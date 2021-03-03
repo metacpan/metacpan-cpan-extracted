@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::Serializer;
-$Search::Elasticsearch::Role::Serializer::VERSION = '7.711';
+$Search::Elasticsearch::Role::Serializer::VERSION = '7.711001';
 use Moo::Role;
 
 requires qw(encode decode encode_pretty encode_bulk mime_type);
@@ -37,7 +37,7 @@ Search::Elasticsearch::Role::Serializer - An interface for Serializer modules
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

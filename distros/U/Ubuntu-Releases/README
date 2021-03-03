@@ -2,7 +2,7 @@ NAME
     Ubuntu::Releases - List Ubuntu releases
 
 VERSION
-    This document describes version 20210115.0 of Ubuntu::Releases (from
+    This document describes version 20210115.1 of Ubuntu::Releases (from
     Perl distribution Ubuntu-Releases), released on 2021-01-15.
 
 SYNOPSIS
@@ -13,8 +13,9 @@ SYNOPSIS
 DESCRIPTION
     This module contains list of Ubuntu releases. Data source is currently
     at: <https://github.com/sharyanto/gudangdata-distrowatch>
-    (table/redhat_release) which in turn is retrieved from
-    <http://distrowatch.com>.
+    (table/ubuntu_release) which in turn is retrieved from
+    <http://distrowatch.com>. Additional data source:
+    <https://github.com/sharyanto/gudangdata> (table/ubuntu_release_animal).
 
 FUNCTIONS
   list_ubuntu_releases

@@ -69,7 +69,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "7.711",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/elastic/elasticsearch-perl/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Search::Elasticsearch",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/elastic/elasticsearch-perl.git",
+         "web" : "https://github.com/elastic/elasticsearch-perl"
+      }
+   },
+   "version" : "7.711001",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Apache-2.0"

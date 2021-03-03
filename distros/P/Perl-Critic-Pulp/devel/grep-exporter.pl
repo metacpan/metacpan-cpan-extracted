@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2012 Kevin Ryde
+# Copyright 2009, 2010, 2012, 2020 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 #

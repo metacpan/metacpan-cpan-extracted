@@ -5,6 +5,7 @@ use Moose;
 use namespace::autoclean;
 use Kavorka '-all';
 use Data::Printer alias => 'pdump';
+use CLI::Driver::Deprecated;
 
 use Getopt::Long 'GetOptionsFromArray';
 Getopt::Long::Configure('no_ignore_case');
@@ -17,42 +18,42 @@ with 'CLI::Driver::CommonRole';
 ###############################
 
 has class => (
-	is  => 'rw',
-	isa => 'Str',
+    is  => 'rw',
+    isa => 'Str',
 );
 
 has cli_arg => (
-	is  => 'rw',
-	isa => 'Str'
+    is  => 'rw',
+    isa => 'Str'
 );
 
 has method_arg => (
-	is  => 'rw',
-	isa => 'Str|Undef'
+    is  => 'rw',
+    isa => 'Str|Undef'
 );
 
 has required => (
-	is  => 'rw',
-	isa => 'Bool'
+    is  => 'rw',
+    isa => 'Bool'
 );
 
 has hard => (
-	is  => 'rw',
-	isa => 'Bool',
+    is  => 'rw',
+    isa => 'Bool',
 );
 
 has flag => (
-	is  => 'rw',
-	isa => 'Bool',
+    is  => 'rw',
+    isa => 'Bool',
 );
 
 has is_array => (
-	is  => 'rw',
-	isa => 'Bool',
+    is  => 'rw',
+    isa => 'Bool',
 );
 
 has value => (
-    is => 'rw',
+    is  => 'rw',
     isa => 'Any',
 );
 
@@ -62,116 +63,133 @@ has 'use_argv_map' => ( is => 'rw', isa => 'Bool' );
 
 method get_signature {
 
-	my %sig;
+    my %sig;
 
-	my $val = $self->_get_val;
-	$self->value($val);
-	if ( defined $val ) {
-		$sig{ $self->method_arg } = $val;
-	}
+    my $val = $self->_get_val;
+    $self->value($val);
+    if ( defined $val ) {
+        $sig{ $self->method_arg } = $val;
+    }
 
-	return %sig;
+    return %sig;
 }
 
 method is_required {
 
-	if ( $self->required ) {
-		return 1;
-	}
+    if ( $self->required ) {
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
 method is_flag {
 
-	if ( $self->flag ) {
-		return 1;
-	}
+    if ( $self->flag ) {
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
 method is_optional {
 
-	if ( !$self->required ) {
-		return 1;
-	}
+    if ( !$self->required ) {
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
 method is_hard {
 
-	if ( $self->hard ) {
-		return 1;
-	}
+    if ( $self->hard ) {
+        return 1;
+    }
 
-	return 0;
+    return 0;
 }
 
 method is_soft {
 
-	if ( !$self->hard ) {
-		return 1;
-	}
+    if ( !$self->hard ) {
+        return 1;
+    }
 
-	return 0;
+    return 0;
+}
+
+method get_usage (Str $dash_opt) {
+
+    if ($self->is_flag) {
+        return sprintf '--%s', $dash_opt;    
+    }
+    
+    my @out;
+    push @out, sprintf '-%s',  $dash_opt;
+    push @out, sprintf '<%s>', $self->method_arg;
+    push @out, '(soft)'  if $self->is_soft;
+    push @out, '(multi)' if $self->is_array;
+
+    return join( ' ', @out );
 }
 
 method _get_val {
 
-	my $arg = $self->cli_arg;
-	my $val;
+    my $arg = $self->cli_arg;
+    my $val;
 
-	if ( $self->is_flag ) {
+    if ( $self->is_flag ) {
 
-		# - just a cli switch
-		# - never required from cmdline
+        # - just a cli switch
+        # - never required from cmdline
 
-		if ( $self->use_argv_map ) {
-			 $val = $ARGV{$self->method_arg};
-			 delete $ARGV{$self->method_arg};
-			 return $val;
-		}
-		else {
-			my $success = GetOptionsFromArray( \@ARGV, "$arg" => \$val, );
-			if ($success) {
-				return $val ? 1 : 0;
-			}
-		}
+        if ( $self->use_argv_map ) {
+            $val = $ARGV{ $self->method_arg };
+            delete $ARGV{ $self->method_arg };
+            return $val;
+        }
+        else {
+            my $success = GetOptionsFromArray( \@ARGV, "$arg" => \$val, );
+            if ($success) {
+                return $val ? 1 : 0;
+            }
+        }
 
-		confess "something went sideways?";
-	}
-	else {
+        confess "something went sideways?";
+    }
+    else {
 
-		if ( $self->use_argv_map ) {
-			if ( $ARGV{$self->method_arg} ) {
-				$val = $ARGV{$self->method_arg};
-				delete $ARGV{$self->method_arg};
-				return $val;
-			}
-		}
-		else {
-			# get "-arg <val>" from cmdline if exists
-			my $arg_type = "s";
-			$arg_type.= '@' if $self->is_array;
+        if ( $self->use_argv_map ) {
+            if ( $ARGV{ $self->method_arg } ) {
+                $val = $ARGV{ $self->method_arg };
+                delete $ARGV{ $self->method_arg };
+                return $val;
+            }
+        }
+        else {
+            # get "-arg <val>" from cmdline if exists
+            my $arg_type = "s";
+            $arg_type .= '@' if $self->is_array;
 
-			my $success =
-			  GetOptionsFromArray( \@ARGV, "$arg=$arg_type" => \$val, );
+            my $success =
+              GetOptionsFromArray( \@ARGV, "$arg=$arg_type" => \$val, );
             if ($success) {
                 return $val;
             }
 
-			confess "something went sideways?" if !$success;
-		}
+            confess "something went sideways?" if !$success;
+        }
 
-		# we didn't find it in @ARGV
-		if ( $self->required ) {
-			confess "failed to get arg from argv: $arg";
-		}
-	}
+        # we didn't find it in @ARGV
+        if ( $self->is_hard && $self->required ) {
+            confess "failed to get arg from argv: $arg";
+        }
+    }
 
-	return;
+    return;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;

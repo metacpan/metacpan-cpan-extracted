@@ -35,21 +35,22 @@ Iterator::Merger - an iterator to efficiently merge sorted iterators
 
 =head1 DESCRIPTION
 
-C<Iterator::Merger> generates the fastest possible pure Perl iterator to merge sorted iterators.
-Source iterators can be code references or filhandlers, and must produce a sorted output.
+C<Iterator::Merger> generates the fastest possible iterator to merge sorted iterators (merge sort).
+Source iterators can be code references or filehandlers, and must produce a sorted output.
 The generated iterator is always a code reference.
 
-See the Implementation section for more details.
+See the IMPLEMENTATION section for more details.
 
 =over 4
 
 =item imerge ITERATORS
 
 ITERATORS is a list of either CODE or GLOB references that must generate an ascending sorted output.
-This function returns a CODE reference that generate the sort-merged output of all ITERATORS.
+This function returns a CODE reference that generates the sort-merged output of all ITERATORS.
 Sorting is done using the cmp comparison operator.
 
 CODE iterators are evaluated in scalar context until undef is returned.
+
 GLOB iterators are evaluated in scalar context, relying on the $/ separator, until EOF.
 
 =item imerge_num ITERATORS
@@ -68,23 +69,25 @@ Functions can be imported explicitely
 
     use Iterator::Merger qw(imerge imerge_num imerge_raw);
 
+=back
+
 =head1 IMPLEMENTATION
 
 =over 4
 
-C<imerge> and C<imerge_num> are very fast as the comparison code is generated
-on the fly, but the price to pay is that any first call with a given number of
-iterators will take some time and memory to generate and evaluate the code.
-Subsequent calls with the same number of source iterators will reuse the same
-code.
+C<imerge> and C<imerge_num> are very fast as the PErl comparison code is
+generated on the fly, but the price to pay is that any first call with a
+given number of iterators will take some time and memory to generate and
+evaluate the code. Subsequent calls with the same number of source iterators
+will reuse the same code.
 
 The cost of this overhead has to be evaluated in comparison to the number of
 sorted elements to merge.
 
-The size of the generated code double for each additionnal source iterator, up
+The size of the generated code doubles for each additionnal source iterator, up
 to a limit.
 
-For example the comparison code for 9 iterators represent about 15KiB of
+For example the comparison code for 9 iterators represents about 15KiB of
 minified Perl code.
 
 When the number of source iterators exceeds 9, C<imerge> and C<imerge_num>

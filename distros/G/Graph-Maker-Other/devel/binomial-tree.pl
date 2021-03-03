@@ -43,7 +43,7 @@ use Smart::Comments;
   # n=6 https://hog.grinvin.org/ViewGraphInfo.action?id=496    E graph
   # n=7 https://hog.grinvin.org/ViewGraphInfo.action?id=714   (Graphedron)
   # n=8 https://hog.grinvin.org/ViewGraphInfo.action?id=700
-  # n=9 not
+  # n=9 https://hog.grinvin.org/ViewGraphInfo.action?id=34546
   # n=10 not
   # n=11 not
   # n=12 not
@@ -57,8 +57,10 @@ use Smart::Comments;
 
   my @graphs;
   foreach my $N (
-                 9 .. 16,
-                 64, 128,
+                 # 9 .. 12,
+                 13 .. 15,
+                 # 9 .. 16,
+                 # 64, 128,
                 ) {
     my $graph = Graph::Maker->new('binomial_tree',
                                   N => $N,
@@ -67,9 +69,10 @@ use Smart::Comments;
                                  );
     print $graph->get_graph_attribute ('name'),"\n";
     push @graphs, $graph;
+
   }
   MyGraphs::hog_searches_html(@graphs);
-  MyGraphs::hog_upload_html($graphs[0]);
+  MyGraphs::hog_upload_html($graphs[2]);
   exit 0;
 }
 {

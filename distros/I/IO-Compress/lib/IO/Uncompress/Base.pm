@@ -9,7 +9,7 @@ our (@ISA, $VERSION, @EXPORT_OK, %EXPORT_TAGS);
 @ISA    = qw(IO::File Exporter);
 
 
-$VERSION = '2.101';
+$VERSION = '2.102';
 
 use constant G_EOF => 0 ;
 use constant G_ERR => -1 ;

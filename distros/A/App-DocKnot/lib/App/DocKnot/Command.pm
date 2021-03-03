@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Command 4.00;
+package App::DocKnot::Command 4.01;
 
 use 5.024;
 use autodie;
@@ -20,6 +20,7 @@ use App::DocKnot::Dist;
 use App::DocKnot::Generate;
 use App::DocKnot::Update;
 use Getopt::Long;
+use Pod::Usage qw(pod2usage);
 
 # Defines the subcommands, their options, and the module and method that
 # implements them.  The keys are the names of the commands.  Each value is a
@@ -56,11 +57,10 @@ use Getopt::Long;
 #     are not set, an error will be thrown.
 our %COMMANDS = (
     dist => {
-        method   => 'make_distribution',
-        module   => 'App::DocKnot::Dist',
-        options  => ['distdir|d=s', 'metadata|m=s'],
-        maximum  => 0,
-        required => ['distdir'],
+        method  => 'make_distribution',
+        module  => 'App::DocKnot::Dist',
+        options => ['distdir|d=s', 'metadata|m=s', 'pgp-key|p=s'],
+        maximum => 0,
     },
     generate => {
         method  => 'generate_output',
@@ -229,7 +229,8 @@ sub run {
 __END__
 
 =for stopwords
-Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense
+Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense Kwalify
+IO-Compress-Lzma
 
 =head1 NAME
 
@@ -242,9 +243,11 @@ App::DocKnot::Command - Run DocKnot commands
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, JSON,
-Perl6::Slurp, and Template (part of Template Toolkit), all of which are
-available from CPAN.
+Perl 5.24 or later and the modules File::BaseDir, File::ShareDir,
+IO::Compress::Xz (part of IO-Compress-Lzma), IO::Uncompress::Gunzip (part of
+IO-Compress), IPC::Run, IPC::System::Simple, JSON::MaybeXS, Kwalify,
+List::SomeUtils, Perl6::Slurp, Template (part of Template Toolkit), and
+YAML::XS, all of which are available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -283,7 +286,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2018-2020 Russ Allbery <rra@cpan.org>
+Copyright 2018-2021 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -305,10 +308,10 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<App::DocKnot::Generate>, L<docknot(1)>
+L<docknot(1)>
 
 This module is part of the App-DocKnot distribution.  The current version of
-App::DocKnot is available from CPAN, or directly from its web site at
+DocKnot is available from CPAN, or directly from its web site at
 L<https://www.eyrie.org/~eagle/software/docknot/>.
 
 =cut

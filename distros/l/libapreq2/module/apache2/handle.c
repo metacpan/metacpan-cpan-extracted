@@ -15,8 +15,6 @@
 **  limitations under the License.
 */
 
-#include "assert.h"
-
 #include "httpd.h"
 #include "http_config.h"
 #include "http_log.h"

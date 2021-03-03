@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Serializer::JSON::PP;
-$Search::Elasticsearch::Serializer::JSON::PP::VERSION = '7.711';
+$Search::Elasticsearch::Serializer::JSON::PP::VERSION = '7.711001';
 use Moo;
 use JSON::PP;
 
@@ -40,7 +40,7 @@ Search::Elasticsearch::Serializer::JSON::PP - A JSON Serializer using JSON::PP
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

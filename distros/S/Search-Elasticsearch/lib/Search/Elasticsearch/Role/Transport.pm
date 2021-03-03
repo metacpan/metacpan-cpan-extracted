@@ -3,7 +3,7 @@
 # See the LICENSE file in the project root for more information
 
 package Search::Elasticsearch::Role::Transport;
-$Search::Elasticsearch::Role::Transport::VERSION = '7.711';
+$Search::Elasticsearch::Role::Transport::VERSION = '7.711001';
 use Moo::Role;
 
 requires qw(perform_request);
@@ -76,7 +76,7 @@ Search::Elasticsearch::Role::Transport - Transport role providing interface betw
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 AUTHOR
 

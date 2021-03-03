@@ -1,5 +1,13 @@
 Revision history for PICA::Data
 
+1.16 2021-03-02T16:19:47Z
+    - Move clean_pica to PICA::Schema and add add option ignore_subfields
+    - Extend method/function field_identifier to occurrence ranges
+
+1.15 2021-03-01T10:56:48Z
+    - Add clean_pica to check PICA data structure (#82)
+    - Rename PICA::Schema::Error to PICA::Error
+
 1.14 2020-07-28T08:42:47Z
     - picadata: allow to repeat --path
     - picadata: don't emit records by default

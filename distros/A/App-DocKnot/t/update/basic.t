@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot::Update module API.
 #
-# Copyright 2020 Russ Allbery <rra@cpan.org>
+# Copyright 2020-2021 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -18,6 +18,10 @@ use Perl6::Slurp qw(slurp);
 use Test::RRA qw(is_file_contents);
 
 use Test::More;
+
+# Isolate from the environment.
+local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
+local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
 
 # Load the module.
 BEGIN { use_ok('App::DocKnot::Update') }

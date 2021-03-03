@@ -5,7 +5,7 @@ use warnings;
 
 use Digest::SHA qw(sha256_hex);
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 RT->AddStyleSheets("resetpassword.css");
 
@@ -54,6 +54,35 @@ sub CreateTokenAndResetPassword {
 
     return ($status, $msg);
 }
+
+
+# Add to RT::User for possible addition to core RT in the future.
+
+package RT::User;
+
+# Set the password for this user back to no value. This is useful for
+# features like ResetPassword that might use the existence of a password
+# to determine if a user should be allowed to reset. Also possibly useful
+# for clearing old passwords after switching to different authentication
+# for RT.
+
+sub UnsetPassword {
+    my $self     = shift;
+
+    unless ( $self->CurrentUserCanModify('Password') ) {
+        return ( 0, $self->loc('Password: Permission Denied') );
+    }
+
+    my ( $val, $msg ) = $self->_Set(Field => 'Password', Value => '');
+    if ($val) {
+        return ( 1, $self->loc("Password unset") );
+    }
+    else {
+        return ( $val, $msg );
+    }
+}
+
+package RT::Extension::ResetPassword;
 
 =head1 NAME
 
@@ -172,6 +201,15 @@ on the company network can access the UI and create new user records.
 Setting this config option to true will allow existing users who do
 not have a password value to send themselves a reset password email
 and set a password.
+
+Setting this to false (0) requires a user to already have a password
+to use the reset feature. This is useful for managing access and
+not automatically allowing new accounts to get a password.
+
+This extension adds a "Password Status" at the bottom of the Access control
+section on the user admin page which shows whether the user currently
+has a password set. The "Delete password" option allows you to clear
+passwords if a user should no longer have access.
 
 =item C<$CreateNewUserAsPrivileged>
 

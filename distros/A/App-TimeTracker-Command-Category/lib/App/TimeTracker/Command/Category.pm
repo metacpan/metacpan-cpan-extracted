@@ -1,11 +1,11 @@
 package App::TimeTracker::Command::Category;
+
+# ABSTRACT: use categories when tracking time with App::TimeTracker
+our $VERSION = '1.003'; # VERSION
+
 use strict;
 use warnings;
 use 5.010;
-
-# ABSTRACT: use categories when tracking time with App::TimeTracker
-
-our $VERSION = "1.002";
 
 use Moose::Util::TypeConstraints;
 use Moose::Role;
@@ -35,9 +35,12 @@ after '_load_attribs_continue' => \&munge_start_attribs;
 before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
     my $self = shift;
 
-    if ( $self->category ) {
-        $self->add_tag( $self->category );
+    return unless my $category = $self->category;
+
+    if (my $prefix = $self->config->{category}{prefix}) {
+        $category = $prefix.$category;
     }
+    $self->add_tag( $category );
 };
 
 sub cmd_statistic {
@@ -52,6 +55,7 @@ sub cmd_statistic {
         }
     );
     my $cats = $self->config->{category}{categories};
+    my $prefix = $self->config->{category}{prefix} || '';
 
     my $total = 0;
     my %stats;
@@ -64,7 +68,7 @@ sub cmd_statistic {
 
         my $got_cat = 0;
         foreach my $cat (@$cats) {
-            if ( $tags{$cat} ) {
+            if ( $tags{$prefix.$cat} || $tags{$cat} ) {
                 $stats{$cat}{abs} += $time;
                 $got_cat = 1;
                 last;
@@ -107,7 +111,7 @@ App::TimeTracker::Command::Category - use categories when tracking time with App
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 DESCRIPTION
 
@@ -131,6 +135,11 @@ Set to a true value if 'category' should be a required command line option
 =head3 categories
 
 A list (ARRAYREF) of category names.
+
+=head3 prefix
+
+If set, add this prefix to the category when storing it as tag. Useful
+to discern regular tags from category pseudo tags.
 
 =head1 NEW COMMANDS
 
@@ -162,11 +171,11 @@ Make sure that 'feature' is a valid category and store it as a tag.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Thomas Klausner.
+This software is copyright (c) 2016 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

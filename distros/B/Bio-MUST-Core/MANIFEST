@@ -38,6 +38,7 @@ bin/tree2list.pl
 bin/tree2tpl.pl
 instant/inst-abbr-ids.pl
 instant/inst-qual-filter.pl
+instant/inst-split-seqs.pl
 instant/inst-tax-filter.pl
 lib/Bio/MUST/Core.pm
 lib/Bio/MUST/Core/Ali.pm

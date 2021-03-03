@@ -11,6 +11,7 @@
     "obsolete-override-for-7": "identifiers/@value/@identifierTypeId=\"cf0a2485-22e9-5be4-ac5c-fe393fb964e4\""
   },
   "marcHoldings": {
+    "restrictToItem": 1,
     "field": "952",
     "indicators": [" ", " "],
     "holdingsElements": {

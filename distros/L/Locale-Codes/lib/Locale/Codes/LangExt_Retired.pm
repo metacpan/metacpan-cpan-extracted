@@ -3,7 +3,7 @@ Locale::Codes::LangExt_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Mon Nov 30 11:55:23 EST 2020
+#    Generated on: Mon Mar  1 14:13:58 EST 2021
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.66';
+$VERSION='3.67';
 
 $Locale::Codes::Retired{'langext'}{'alpha'}{'code'} = {
    q(bbz) => q(Babalia Creole Arabic),

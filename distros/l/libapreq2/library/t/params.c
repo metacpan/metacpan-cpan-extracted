@@ -29,7 +29,7 @@ static apr_table_t *args;
 static apr_pool_t *p;
 
 
-static void request_make(dAT)
+static void request_make(dAT, void *ctx)
 {
     apr_status_t s;
     args = apr_table_make(p, APREQ_DEFAULT_NELTS);
@@ -40,7 +40,7 @@ static void request_make(dAT)
 }
 
 
-static void request_args_get(dAT)
+static void request_args_get(dAT, void *ctx)
 {
     const char *val;
     const apreq_param_t *param;
@@ -59,7 +59,7 @@ static void request_args_get(dAT)
     AT_str_eq(apr_table_get(args,"novalue2"),"");
 }
 
-static void params_as(dAT)
+static void params_as(dAT, void *ctx)
 {
     const char *val;
     apr_array_header_t *arr;
@@ -71,7 +71,7 @@ static void params_as(dAT)
     AT_str_eq(val, "");
 }
 
-static void string_decoding_in_place(dAT)
+static void string_decoding_in_place(dAT, void *ctx)
 {
     char *s1 = apr_palloc(p,4096);
     char *s2 = apr_palloc(p,4096);
@@ -97,7 +97,7 @@ static void string_decoding_in_place(dAT)
     AT_str_eq(s3,"dandy >dons");
 }
 
-static void header_attributes(dAT)
+static void header_attributes(dAT, void *ctx)
 {
     const char *hdr = "text/plain; boundary=\"-foo-\", charset=ISO-8859-1";
     const char *val;
@@ -136,7 +136,7 @@ static void header_attributes(dAT)
 }
 
 
-static void make_param(dAT)
+static void make_param(dAT, void *ctx)
 {
     apreq_param_t *param, *decode;
     apr_status_t s;
@@ -162,7 +162,7 @@ static void make_param(dAT)
     AT_str_eq(decode->v.data, val);
 }
 
-static void quote_strings(dAT)
+static void quote_strings(dAT, void *ctx)
 {
     apr_size_t exp_len, res_len, res_quote_len;
     char *res = apr_palloc(p,24);
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 
     apreq_initialize(p);
 
-    AT = at_create(p, 0, at_report_stdout_make(p));
+    AT = at_create(0, at_report_stdout_make());
     AT_trace_on();
     for (i = 0; i < sizeof(test_list) / sizeof(at_test_t);  ++i)
         plan += test_list[i].plan;

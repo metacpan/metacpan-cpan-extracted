@@ -2,7 +2,8 @@ package Bio::MUST::Core::Seq;
 # ABSTRACT: Nucleotide or protein sequence
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Seq::VERSION = '0.210380';
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
+$Bio::MUST::Core::Seq::VERSION = '0.210610';
 use Moose;
 use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -84,9 +85,9 @@ sub is_subseq_of {
     my $self = shift;
     my $seq2 = shift;                       # can be a mere string
 
-    $self = $self->raw_seq;
+    $self = $self->raw_str;
     $seq2 = $seq2->isa('Bio::MUST::Core::Seq')
-        ? $seq2->raw_seq : _strip_gaps($seq2);
+        ? $seq2->raw_str : _strip_gaps($seq2);
     return 1 if $seq2 =~ m/$self/xmsi;      # case-insensitive comparison
     return 0;                               # only here because expensive!
 }
@@ -96,9 +97,9 @@ sub is_superseq_of {
     my $self = shift;
     my $seq2 = shift;                       # can be a mere string
 
-    $self = $self->raw_seq;
+    $self = $self->raw_str;
     $seq2 = $seq2->isa('Bio::MUST::Core::Seq')
-        ? $seq2->raw_seq : _strip_gaps($seq2);
+        ? $seq2->raw_str : _strip_gaps($seq2);
     return 1 if $self =~ m/$seq2/xmsi;      # case-insensitive comparison
     return 0;                               # only here because expensive!
 }
@@ -112,15 +113,20 @@ sub first_site {
 }
 
 
-sub uc_seq {
+sub uc {                            ## no critic (ProhibitBuiltinHomonyms)
     my $self = shift;
 
     $self->_set_seq( uc $self->seq );
     return $self;
 }
 
+sub uc_seq {                                ## no critic (RequireArgUnpacking)
+    carp '[BMC] Warning: Method uc_seq is deprecated; use uc instead!';
+    return shift->uc(@_);
+}
 
-sub recode_seq {
+
+sub recode {
     my $self     = shift;
     my $base_for = shift;
 
@@ -138,13 +144,18 @@ sub recode_seq {
     return $self;
 }
 
+sub recode_seq {                            ## no critic (RequireArgUnpacking)
+    carp '[BMC] Warning: Method recode_seq is deprecated; use recode instead!';
+    return shift->recode(@_);
+}
+
 # gap cleaning methods
 
 
 sub degap {
     my $self = shift;
 
-    $self->_set_seq($self->raw_seq);
+    $self->_set_seq($self->raw_str);
     return $self;
 }
 
@@ -256,7 +267,7 @@ sub is_gap {
 
 # global methods
 
-around qw(reverse_complemented_seq codons) => sub {
+around qw(purity reverse_complemented_seq codons) => sub {
     my $method = shift;
     my $self   = shift;
 
@@ -268,6 +279,27 @@ around qw(reverse_complemented_seq codons) => sub {
 
     return $self->$method(@_);
 };
+
+
+sub nomiss_seq_len {
+    my $self = shift;
+
+    my $regex = $self->is_protein ? $PROTMISS : $DNAMISS;
+    (my $raw_str = $self->raw_str) =~ s/$regex//xmsg;
+    # TODO: decide how to handle ambiguous nucleotides
+
+    return length $raw_str;
+}
+
+
+sub purity {
+    my $self = shift;
+
+    (my $pure_seq = $self->seq) =~ s/$NONPUREDNA//xmsg;
+    my $purity = 1.0 * length($pure_seq) / $self->seq_len;
+
+    return $purity;
+}
 
 
 sub reverse_complemented_seq {
@@ -298,6 +330,34 @@ sub spliced_seq {
 }
 
 
+sub raw_str {
+    my $self = shift;
+    return _strip_gaps($self->seq);
+}
+
+sub raw_seq {                               ## no critic (RequireArgUnpacking)
+    carp '[BMC] Warning: Method raw_seq is deprecated; use raw_str instead!';
+    return shift->raw_str(@_);
+}
+
+
+sub wrapped_str {
+    my $self  = shift;
+    my $chunk = shift // 60;
+
+    my $nowrap = $chunk < 0 ? 1 : 0;
+    my $width = $self->seq_len;
+    $chunk = $width      if $nowrap;
+
+    my $str;
+    for (my $site = 0; $site < $width; $site += $chunk) {
+        $str .= $self->edit_seq($site, $chunk) . "\n";
+    }
+
+    return $str;
+}
+
+
 sub codons {
     my $self  = shift;
     my $frame = shift // 1;             # defaults to frame +1
@@ -315,24 +375,6 @@ sub codons {
     }
 
     return \@codons;
-}
-
-
-sub raw_seq {
-    my $self = shift;
-    return _strip_gaps($self->seq);
-}
-
-
-
-sub nomiss_seq_len {
-    my $self = shift;
-
-    my $regex = $self->is_protein ? $PROTMISS : $DNAMISS;
-    (my $raw_seq = $self->raw_seq) =~ s/$regex//xmsg;
-    # TODO: decide how to handle ambiguous nucleotides
-
-    return length $raw_seq;
 }
 
 
@@ -358,7 +400,7 @@ Bio::MUST::Core::Seq - Nucleotide or protein sequence
 
 =head1 VERSION
 
-version 0.210380
+version 0.210610
 
 =head1 SYNOPSIS
 
@@ -368,9 +410,23 @@ version 0.210380
 
     # TODO
 
-=head1 METHODS
+=head1 CONSTRUCTORS
 
 =head2 clone
+
+=head2 reverse_complemented_seq
+
+=head2 spliced_seq
+
+=head1 ACCESSORS
+
+=head2 all_states
+
+=head2 state_at
+
+=head2 delete_site
+
+=head1 PROPERTIES
 
 =head2 is_protein
 
@@ -384,9 +440,19 @@ version 0.210380
 
 =head2 first_site
 
+=head2 is_missing
+
+=head2 is_gap
+
+=head2 nomiss_seq_len
+
+=head2 purity
+
+=head1 MUTATORS
+
 =head2 uc
 
-=head2 recode_seq
+=head2 recode
 
 =head2 degap
 
@@ -400,25 +466,13 @@ version 0.210380
 
 =head2 clear_new_tag
 
-=head2 all_states
+=head1 MISC METHODS
 
-=head2 state_at
+=head2 raw_str
 
-=head2 delete_site
-
-=head2 is_missing
-
-=head2 is_gap
-
-=head2 reverse_complemented_seq
-
-=head2 spliced_seq
+=head2 wrapped_str
 
 =head2 codons
-
-=head2 raw_seq
-
-=head2 nomiss_seq_len
 
 =head1 AUTHOR
 
@@ -426,7 +480,7 @@ Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Catherine COLSON Arnaud DI FRANCO
+=for stopwords Catherine COLSON Arnaud DI FRANCO Valerian LUPO
 
 =over 4
 
@@ -437,6 +491,10 @@ Catherine COLSON <ccolson@doct.uliege.be>
 =item *
 
 Arnaud DI FRANCO <arnaud.difranco@gmail.com>
+
+=item *
+
+Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 =back
 

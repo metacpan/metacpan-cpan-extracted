@@ -7,7 +7,7 @@ use Mojo::Promise;
 use Exporter 'import';
 our @EXPORT_OK = qw/ unique_id observable_to_promise /;
 
-our $VERSION = "v0.0.21";
+our $VERSION = "v0.0.22";
 
 my $cursor = 1;
 sub unique_id () {

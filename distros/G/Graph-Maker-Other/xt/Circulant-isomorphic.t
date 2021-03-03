@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2018, 2019 Kevin Ryde
+# Copyright 2018, 2019, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -303,9 +303,9 @@ sub make_Mobius_ladder {
       my $list = $+{'list'};
       $shown{"N=$N $list"} = $+{'id'};
     }
-    ok ($count, 30, 'HOG ID number lines');
+    ok ($count, 34, 'HOG ID number lines');
   }
-  ok (scalar(keys %shown), 30);
+  ok (scalar(keys %shown), 34);
   ### %shown
 
   #     1           2,3 but not all of
@@ -321,7 +321,9 @@ sub make_Mobius_ladder {
   my %seen;
 
   # FIXME: Many N=12 not yet shown in the POD ...
-  foreach my $N (3 .. 11, 13 .. 19) {
+  foreach my $N (3 .. 10
+                 # 11, 13 .. 19
+                ) {
     my $half = int($N/2);
     my @possible_offsets = (1 .. $half);
     my $it = Algorithm::ChooseSubsets->new(\@possible_offsets);

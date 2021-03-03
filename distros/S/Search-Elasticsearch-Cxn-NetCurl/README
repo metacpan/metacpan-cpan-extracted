@@ -3,7 +3,7 @@ NAME
     libcurl via Net::Curl
 
 VERSION
-    version 7.711
+    version 7.711001
 
 DESCRIPTION
     Provides an HTTP Cxn class based on Net::Curl. The "NetCurl" Cxn class

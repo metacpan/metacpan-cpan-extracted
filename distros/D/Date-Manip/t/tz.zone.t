@@ -83,6 +83,7 @@ BST =>
    Europe/Gibraltar
    America/La_Paz
    Europe/Dublin
+   Atlantic/Bermuda
 
 +01:00:00 BST =>
    Europe/London

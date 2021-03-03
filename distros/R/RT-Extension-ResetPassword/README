@@ -99,6 +99,15 @@ CONFIGURATION
         not have a password value to send themselves a reset password email
         and set a password.
 
+        Setting this to false (0) requires a user to already have a password
+        to use the reset feature. This is useful for managing access and not
+        automatically allowing new accounts to get a password.
+
+        This extension adds a "Password Status" at the bottom of the Access
+        control section on the user admin page which shows whether the user
+        currently has a password set. The "Delete password" option allows
+        you to clear passwords if a user should no longer have access.
+
     $CreateNewUserAsPrivileged
         Set this config value to true if users creating a new account should
         default to privileged users.

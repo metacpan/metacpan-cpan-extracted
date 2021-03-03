@@ -1,4 +1,4 @@
-# Copyright (c) 1999-2020 Sullivan Beck. All rights reserved.
+# Copyright (c) 1999-2021 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -234,16 +234,19 @@ The following words may be used:
 Next occurrence:
 
    prossimo
+   prossima
 
 
 Previous occurrence:
 
-   ultimo
+   scorso
+   scorsa
 
 
 Last occurrence:
 
    ultimo
+   ultima
 
 
 =item B<Delta words for going forward/backward in time>
@@ -290,225 +293,333 @@ The following words may be used to specify a business delta:
 Numbers may be spelled out in a variety of ways.  The following sets correspond
 to the numbers from 1 to 53:
 
-   1mo
+   1o
+   1a
    uno
+   una
    primo
+   prima
 
-   2do
+   2o
+   2a
    due
    secondo
+   seconda
 
-   3zo
+   3o
+   3a
    tre
    terzo
+   terza
 
-   4to
+   4o
+   4a
    quattro
    quarto
+   quarta
 
-   5to
+   5o
+   5a
    cinque
    quinto
+   quinta
 
-   6to
+   6o
+   6a
    sei
    sesto
+   sesta
 
-   7mo
+   7o
+   7a
    sette
    settimo
+   settima
 
-   8vo
+   8o
+   8a
    otto
    ottavo
+   ottava
 
-   9no
+   9o
+   9a
    nove
    nono
+   nona
 
-   10mo
+   10o
+   10a
    dieci
    decimo
+   decima
 
 
-   11mo
+   11o
+   11a
    undici
    undicesimo
+   undicesima
 
-   12mo
+   12o
+   12a
    dodici
    dodicesimo
+   dodicesima
 
-   13mo
+   13o
+   13a
    tredici
    tredicesimo
+   tredicesima
 
-   14mo
+   14o
+   14a
    quattordici
    quattordicesimo
+   quattordicesima
 
-   15mo
+   15o
+   15a
    quindici
    quindicesimo
+   quindicesima
 
-   16mo
+   16o
+   16a
    sedici
    sedicesimo
+   sedicesima
 
-   17mo
+   17o
+   17a
    diciassette
    diciassettesimo
+   diciassettesima
 
-   18mo
+   18o
+   18a
    diciotto
    diciottesimo
+   diciottesima
 
-   19mo
+   19o
+   19a
    diciannove
    diciannovesimo
+   diciannovesima
 
-   20mo
+   20o
+   20a
    venti
    ventesimo
+   ventesima
 
 
-   21mo
+   21o
+   21a
    ventuno
    ventunesimo
+   ventunesima
 
-   22mo
+   22o
+   22a
    ventidue
    ventiduesimo
+   ventiduesima
 
-   23mo
+   23o
+   23a
+   ventitré
    ventitre
    ventitreesimo
+   ventitreesima
 
-   24mo
+   24o
+   24a
    ventiquattro
    ventiquattresimo
+   ventiquattresima
 
-   25mo
+   25o
+   25a
    venticinque
    venticinquesimo
+   venticinquesima
 
-   26mo
+   26o
+   26a
    ventisei
    ventiseiesimo
+   ventiseiesima
 
-   27mo
+   27o
+   27a
    ventisette
    ventisettesimo
+   ventisettesima
 
-   28mo
+   28o
+   28a
    ventotto
    ventottesimo
+   ventottesima
 
-   29mo
+   29o
+   29a
    ventinove
    ventinovesimo
+   ventinovesima
 
-   3mo
+   30o
+   30a
    trenta
-   trentesima
    trentesimo
+   trentesima
 
 
-   31mo
+   31o
+   31a
    trentuno
    trentunesimo
+   trentunesima
 
-   32mo
+   32o
+   32a
    trentadue
-   trentiduesima
+   trentaduesimo
+   trentaduesima
 
-   33mo
+   33o
+   33a
    trentatré
    trentatre
-   trentitreesime
+   trentatreesimo
+   trentatreesima
 
-   34mo
+   34o
+   34a
    trentaquattro
    trentiquattresimo
+   trentaquattresima
 
-   35mo
+   35o
+   35a
    trentacinque
-   trenticinquesima
+   trentacinquesimo
+   trentacinquesima
 
-   36mo
+   36o
+   36a
    trentasei
-   trentiseisima
+   trentaseiesimo
+   trentaseiesima
 
-   37mo
+   37o
+   37a
    trentasette
-   trentisettesima
+   trentasettesimo
+   trentasettesima
 
-   38mo
+   38o
+   38a
    trentotto
-   trentiottesime
+   trentottesimo
+   trentottesima
 
-   39mo
+   39o
+   39a
    trentanove
-   trentinovesime
+   trentanovesimo
+   trentanovesima
 
-   40mo
+   40o
+   40a
    quaranta
    quarantesimo
+   quarantesima
 
 
-   41mo
+   41o
+   41a
    quarantuno
    quarantunesimo
+   quarantunesima
 
-   42mo
+   42o
+   42a
    quarantadue
-   quarantiduesime
+   quarantaduesimo
+   quarantaduesima
 
-   43mo
-   quaranta
-   quarantitreesima
+   43o
+   43a
+   quarantatré
+   quarantatre
+   quarantatreesimo
+   quarantatreesima
 
-   44mo
+   44o
+   44a
    quarantaquattro
-   quarantiquattresime
+   quarantaquattresimo
+   quarantaquattresima
 
-   45mo
+   45o
+   45a
    quarantacinque
-   quaranticinquesima
+   quarantacinquesimo
+   quarantacinquesima
 
-   46mo
+   46o
+   46a
    quarantasei
-   quarantiseisime
+   quarantaseiesimo
+   quarantaseiesima
 
-   47mo
+   47o
+   47a
    quarantasette
-   quarantisettesimo
+   quarantasettesimo
+   quarantasettesima
 
-   48mo
+   48o
+   48a
    quarantotto
-   quarantiottesima
+   quarantottesimo
+   quarantottesima
 
-   49mo
+   49o
+   49a
    quarantanove
-   quarantinovesime
+   quarantanovesimo
+   quarantanovesima
 
-   50mo
+   50o
+   50a
    cinquanta
    cinquantesimo
+   cinquantesima
 
 
-   51mo
+   51o
+   51a
    cinquantuno
    cinquantunesimo
+   cinquantunesima
 
-   52mo
+   52o
+   52a
    cinquantadue
-   cinquantiduesime
+   cinquantaduesimo
+   cinquantaduesima
 
-   53mo
+   53o
+   53a
    cinquantatré
    cinquantatre
-   cinquantitreesimo
+   cinquantatreesimo
+   cinquantatreesima
 
 
 =item B<Ignored words>
@@ -537,6 +648,7 @@ The following words may be used:
 
    della
    del
+   di
 
 
 Another word is use to specify that something is on a certain date.  In
@@ -563,7 +675,9 @@ day fields).
 The following words may be used:
 
    domani               +0:0:0:1:0:0:0
+   dopodomani           +0:0:0:2:0:0:0
    ieri                 -0:0:0:1:0:0:0
+   l'altroieri          -0:0:0:2:0:0:0
    oggi                 0:0:0:0:0:0:0
 
 

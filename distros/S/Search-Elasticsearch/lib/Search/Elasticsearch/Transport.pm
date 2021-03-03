@@ -3,7 +3,7 @@
 # See the LICENSE file in the project root for more information
 
 package Search::Elasticsearch::Transport;
-$Search::Elasticsearch::Transport::VERSION = '7.711';
+$Search::Elasticsearch::Transport::VERSION = '7.711001';
 use Moo;
 
 use URI();
@@ -76,7 +76,7 @@ Search::Elasticsearch::Transport - Provides interface between the client class a
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,5 @@
+1.010 - 2021/02/26
+- change bugtracker in Makefile.PL to github
 1.009 - 2019/04/22
 - fixed bug where DNS error was reported when DNS was processed before the end
   of mail

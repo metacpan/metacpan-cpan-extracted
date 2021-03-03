@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Cxn::LWP;
-$Search::Elasticsearch::Cxn::LWP::VERSION = '7.711';
+$Search::Elasticsearch::Cxn::LWP::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Role::Cxn', 'Search::Elasticsearch::Role::Is_Sync';
 
@@ -112,7 +112,7 @@ Search::Elasticsearch::Cxn::LWP - A Cxn implementation which uses LWP
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

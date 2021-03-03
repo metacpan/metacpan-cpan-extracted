@@ -346,6 +346,15 @@ t/59-jit.d/nojit.plan.text
 t/59-jit.d/nojit.plan.xml
 t/59-jit.d/nojit.plan.yaml
 t/59-jit.t
+t/60-backward-scans.d/json.ios.plan
+t/60-backward-scans.d/json.is.plan
+t/60-backward-scans.d/text.ios.plan
+t/60-backward-scans.d/text.is.plan
+t/60-backward-scans.d/xml.ios.plan
+t/60-backward-scans.d/xml.is.plan
+t/60-backward-scans.d/yaml.ios.plan
+t/60-backward-scans.d/yaml.is.plan
+t/60-backward-scans.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

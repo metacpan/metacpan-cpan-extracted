@@ -23,6 +23,7 @@ WriteMakefile(
     PREREQ_PM => {
         'JSON'           => '0',
         'Time::Piece'    => '0',
+        'Term::ReadKey'  => '0',
         'LWP::UserAgent' => '6.04',
         'version'        => '0.77'
     },

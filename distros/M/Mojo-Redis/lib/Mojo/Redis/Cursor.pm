@@ -32,29 +32,25 @@ sub all {
   }
 
   # Non-blocking
-  my $then;
-  $then = sub {
+  $self->_next_p($conn)->then(sub {
     push @res, @{$_[0]};
     return $self->$cb('', $self->{process}->($self, \@res)) if $self->{finished};
-    return $self->_next_p($conn)->then($then);
-  };
+    return $self->_next_p($conn)->then(__SUB__);
+  })->catch(sub { $self->$cb($_[0], []) });
 
-  $self->_next_p($conn)->then($then)->catch(sub { $self->$cb($_[0], []) });
   return $self;
 }
 
 sub all_p {
   my $self = shift->again;        # Reset cursor
   my $conn = $self->connection;
-  my ($then, @res);
+  my @res;
 
-  $then = sub {
+  return $self->_next_p($conn)->then(sub {
     push @res, @{$_[0]};
     return $self->{process}->($self, \@res) if $self->{finished};
-    return $self->_next_p($conn)->then($then);
-  };
-
-  return $self->_next_p($conn)->then($then);
+    return $self->_next_p($conn)->then(__SUB__);
+  });
 }
 
 sub next {

@@ -1,11 +1,11 @@
 package App::TimeTracker::Command::Billing;
+
+# ABSTRACT: Add a billing point as a tag to tasks
+our $VERSION = '1.001'; # VERSION
+
 use strict;
 use warnings;
 use 5.010;
-
-# ABSTRACT: Add a billing point as a tag to tasks
-
-our $VERSION = "1.000";
 
 use Moose::Role;
 use DateTime;
@@ -39,7 +39,12 @@ after '_load_attribs_continue' => \&munge_billing_start_attribs;
 before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
     my $self = shift;
 
-    $self->add_tag( $self->billing ) if $self->billing;
+    return unless my $billing = $self->billing;
+
+    if (my $prefix = $self->config->{billing}{prefix}) {
+        $billing = $prefix.$billing;
+    }
+    $self->add_tag( $billing );
 };
 
 no Moose::Role;
@@ -57,7 +62,7 @@ App::TimeTracker::Command::Billing - Add a billing point as a tag to tasks
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 DESCRIPTION
 
@@ -76,6 +81,10 @@ add a hash named C<billing>, containing the following keys:
 =head3 required
 
 Set to a true value if 'billing' should be a required command line option
+
+=head3 prefix
+
+If set, add this prefix to the billing point when storing it as tag. Useful to discern regular tags from billing point pseudo tags.
 
 =head3 default
 
@@ -124,11 +133,11 @@ helpful for mapping tasks to maintainance contracts.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Thomas Klausner.
+This software is copyright (c) 2011 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

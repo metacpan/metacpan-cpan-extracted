@@ -17,7 +17,7 @@
 
 package Search::Elasticsearch::Client::7_0;
 
-our $VERSION='7.711';
+our $VERSION='7.711001';
 use Search::Elasticsearch 7.00 ();
 
 1;
@@ -32,7 +32,7 @@ Search::Elasticsearch::Client::7_0 - Thin client with full support for Elasticse
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

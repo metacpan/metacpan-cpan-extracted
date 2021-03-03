@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::euvolg00;
-# Copyright (c) 2008-2020 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Nov 30 13:52:24 EST 2020
-#    Data version: tzdata2020d
-#    Code version: tzcode2020d
+#    Generated on: Mon Mar  1 14:17:24 EST 2021
+#    Data version: tzdata2021a
+#    Code version: tzcode2021a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.83';
+$VERSION='6.85';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -329,8 +329,14 @@ END { undef $VERSION; }
    2018 =>
      [
         [ [2018,10,27,23,0,0],[2018,10,28,3,0,0],'+04:00:00',[4,0,0],
-          '+04',0,[9999,12,31,0,0,0],[9999,12,31,4,0,0],
-          '2018102723:00:00','2018102803:00:00','9999123100:00:00','9999123104:00:00' ],
+          '+04',0,[2020,12,26,21,59,59],[2020,12,27,1,59,59],
+          '2018102723:00:00','2018102803:00:00','2020122621:59:59','2020122701:59:59' ],
+     ],
+   2020 =>
+     [
+        [ [2020,12,26,22,0,0],[2020,12,27,1,0,0],'+03:00:00',[3,0,0],
+          '+03',0,[9999,12,31,0,0,0],[9999,12,31,3,0,0],
+          '2020122622:00:00','2020122701:00:00','9999123100:00:00','9999123103:00:00' ],
      ],
 );
 

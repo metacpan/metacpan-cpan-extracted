@@ -76,6 +76,7 @@ devel/grep-printf.pl
 devel/grep-qrm.pl
 devel/grep-qw-comment.pl
 devel/grep-qw.pl
+devel/grep-regexp-common-no-defaults.pl
 devel/grep-rootdir.pl
 devel/grep-shebang-perl.pl
 devel/grep-shebang-pm.pl

@@ -1,0 +1,12 @@
+This directory contains examples for Test::Prereq::Meta. Specifically:
+
+README
+    This file
+
+test-prereq-meta
+    Tests a distribution against its prerequisites. It is command-line
+    driven, and can be run from anywhere provided you tell it where the
+    files are. If run from a distributon directory it needs no input.
+    The heavy lifting is done by the all_prereq_ok() method.
+
+You may also want to look at (or copy) t/prereq.t.

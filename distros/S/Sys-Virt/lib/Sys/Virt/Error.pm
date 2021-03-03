@@ -872,6 +872,10 @@ No domain hostname found
 
 The checkpoint is inconsistent
 
+=item Sys::Virt::Error::ERR_MULTIPLE_DOMAINS
+
+More than one matching domain found
+
 =back
 
 =head1 AUTHORS

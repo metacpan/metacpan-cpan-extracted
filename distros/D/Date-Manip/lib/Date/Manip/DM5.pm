@@ -1,5 +1,5 @@
 package Date::Manip::DM5;
-# Copyright (c) 1995-2020 Sullivan Beck.  All rights reserved.
+# Copyright (c) 1995-2021 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -220,7 +220,7 @@ use IO::File;
 our($Abbrevs);
 use Date::Manip::DM5abbrevs;
 
-$VERSION='6.83';
+$VERSION='6.85';
 our $DM5_VERSION = '5.66';
 
 ########################################################################

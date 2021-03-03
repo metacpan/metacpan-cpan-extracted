@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Path-Tiny-Archive-Zip",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Path::Tiny::Archive::Zip",
   "PREREQ_PM" => {
     "Archive::Zip" => 0,
+    "Exporter" => 0,
     "Path::Tiny" => 0,
+    "constant" => 0,
+    "namespace::clean" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -29,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,12 +41,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Archive::Zip" => 0,
+  "Exporter" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Path::Tiny" => 0,
   "Test::More" => 0,
   "blib" => "1.01",
+  "constant" => 0,
+  "namespace::clean" => 0,
   "strict" => 0,
   "warnings" => 0
 );

@@ -19,6 +19,11 @@ if ! grep -q $VERSION lib/Wireguard/WGmeta/Wrapper/Show.pm; then
     exit
 fi
 
+if ! grep -q $VERSION lib/Wireguard/WGmeta.pm; then
+    echo "ERROR: Version in Show.pm is not updated"
+    exit
+fi
+
 make CHANGES
 make dist
 cd .debian

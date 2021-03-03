@@ -3,16 +3,17 @@ package Validate::Simple;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.4.0';
 
 use Carp;
 
-use Scalar::Util qw/looks_like_number/;
+use Scalar::Util qw/blessed looks_like_number/;
 use Data::Types qw/:all/;
 
 use Data::Dumper;
 
-my $VALUES_OF_ENUM = '__ VALUES __ OF __ ENUM __';
+my $VALUES_OF_ENUM  = '__ VALUES __ OF __ ENUM __';
+my $VALIDATE_OBJECT = '__ VALIDATE __ OBJECT __';
 
 # Constructor
 #
@@ -25,14 +26,14 @@ sub new {
 
     my $self = bless {
         specs      => $specs,
-        all_errors => $all_errors,
+        all_errors => !!$all_errors,
         required   => 0,
         _errors    => [],
     }, $class;
 
     if ( defined( $specs ) && keys( %$specs ) ) {
         $self->validate_specs( $specs, \$self->{required} )
-            || croak "Specs is not valid: " . join( '; ', $self->errors() ); ;
+            || croak "Specs is not valid: " . join( ";\n", $self->errors() );
     }
 
     return $self;
@@ -89,6 +90,7 @@ my @all_types = qw/
                       hash
                       enum
                       code
+                      spec
                   /;
 
 my @number_types = qw/
@@ -112,6 +114,8 @@ my @list_types = qw/
                    /;
 
 my @enum_types = ( 'enum' );
+
+my @spec_types = ( 'spec' );
 
 # Common for all
 my %any = (
@@ -189,20 +193,43 @@ my %enum = (
     },
 );
 
+# Common for spec
+my %spec = (
+    of => {
+        type     => 'hash',
+        of       => {
+            type => 'any',
+        },
+        required => 1,
+        empty    => 0,
+    },
+    $VALIDATE_OBJECT => {
+        type     => 'any',
+        callback => sub {
+            # Must be an object that implements method 'validate'
+            return blessed( $_[0] ) && $_[0]->isa(__PACKAGE__);
+        },
+    },
+);
+
 # Specification of specification format
 my %specs_of_specs = (
-    any        => { specs => { %any } },
+    ( map { $_ => { specs => { %any } } } qw/any code/ ),
     ( map { $_ => { specs => { %any, %number } } } @number_types ),
     ( map { $_ => { specs => { %any, %string } } } @string_types ),
     ( map { $_ => { specs => { %any, %list   } } } @list_types ),
     ( map { $_ => { specs => { %any, %enum   } } } @enum_types ),
+    ( map { $_ => { specs => { %any, %spec   } } } @spec_types ),
 );
 
 for my $key ( keys %specs_of_specs ) {
     $specs_of_specs{ $key }{specs}{type} = {
-        type     => 'enum',
-        values   => [ $key ],
-        required => 1,
+        type            => 'enum',
+        # Here we need both 'values' and "$VALUES_OF_ENUM"
+        # to pass 'validate_specs'
+        values          => [ $key ],
+        $VALUES_OF_ENUM => { $key => undef },
+        required        => 1,
     };
     my $required = 0;
     for my $k ( keys %{ $specs_of_specs{ $key }{specs} } ) {
@@ -233,6 +260,8 @@ sub validate {
     # Clear list of errors
     $self->delete_errors();
 
+    $all_errors //= $self->{all_errors};
+    $all_errors = !!$all_errors;
     my $req = 0;
     # If $specs is not passed, use the one created in constructor,
     # and skip specs validation
@@ -246,7 +275,7 @@ sub validate {
         $req = $self->{required};
     }
     # Otherwise, validate specs first
-    elsif ( !$self->validate_specs( $specs, \$req ) ) {
+    elsif ( !$self->validate_specs( $specs, \$req, '', $all_errors ) ) {
         croak 'Specs is not valid: ' . join( '; ', $self->errors() );
     }
 
@@ -257,7 +286,6 @@ sub validate {
         return;
     }
 
-    $all_errors //= $self->{all_errors};
     # Check parameters
     my $ret = $self->_validate( $params, $specs, \$req, $all_errors );
 
@@ -271,10 +299,12 @@ sub validate {
 # them against rules, which are stored in %specs_of_specs
 #
 sub validate_specs {
-    my ( $self, $specs, $req, $path_to_var ) = @_;
+    my ( $self, $specs, $req, $path_to_var, $all_errors ) = @_;
 
     # This variable contains path to the variable name
     $path_to_var //= '';
+    $all_errors //= $self->{all_errors};
+    $all_errors = !!$all_errors;
 
     unless ( $self->hash( $specs ) ) {
         $self->_error( "Specs MUST be a hashref" );
@@ -307,6 +337,7 @@ sub validate_specs {
             return;
         }
 
+
         # Validate spec
         my $spec_of_spec = $specs_of_specs{ $type }{specs};
         if ( !$self->_validate( $spec, $spec_of_spec, \$specs_of_specs{ $type }{required} ) ) {
@@ -314,9 +345,33 @@ sub validate_specs {
             return;
         }
 
-        # Check spec of 'of'
-        my $r = 0;
-        if ( exists( $spec->{of} ) && !$self->validate_specs( { of => $spec->{of} }, \$r, $p2v ) ) {
+        # Transform enum values into a hash
+        if ( $type eq 'enum' ) {
+            $spec->{ $VALUES_OF_ENUM }{$_} = undef
+                for @{ $spec->{values} };
+        }
+
+        # Subspec
+        if ( $type eq 'spec' ) {
+            my $create_error;
+            my $vs = eval {
+                blessed( $self )->new( $spec->{of}, $all_errors );
+            } or do {
+                $create_error = $@ || 'Zombie error';
+            };
+            if ( $create_error ) {
+                $self->_error( $create_error );
+                return;
+            }
+            my @errors = $vs->delete_errors();
+            if ( @errors ) {
+                $self->_error( "Subspec '$p2v' is invalid: $_" )
+                    for @errors;
+                return;
+            }
+            $spec->{ $VALIDATE_OBJECT } = $vs;
+        }
+        elsif ( exists( $spec->{of} ) && !$self->validate_specs( { of => $spec->{of} }, \( my $r = 0), $p2v, $all_errors ) ) {
             $self->_error( "Bad 'of' spec for variable $p2v" );
             return;
         }
@@ -337,7 +392,10 @@ sub _validate {
     my $req = $$required;
     for my $name ( keys %$params ) {
         if ( !exists $specs->{ $name } ) {
-            $self->_error( "Unknown param '$name'" );
+            $self->_error( "Unknown param '$name':\n"
+                           . Dumper($params) . "\n"
+                           . Dumper($specs)
+                       );
             if ( $all_errors ) {
                 next;
             }
@@ -398,27 +456,32 @@ sub validate_value {
     my @other = ();
     # Enum
     if ( $type eq 'enum' ) {
-        # Create a hash
-        if ( !exists $spec->{ $VALUES_OF_ENUM } ) {
-            $spec->{ $VALUES_OF_ENUM }{$_} = undef
-                for @{ $spec->{values} };
-        }
         push @other, $spec->{ $VALUES_OF_ENUM };
+    }
+
+    # Spec
+    if ( $type eq 'spec' ) {
+        push @other, $spec->{ $VALIDATE_OBJECT };
     }
 
     # Check type
     unless ( $specs_of_specs{ $type }{validate}->( $value, @other ) ) {
-        my $expl = $type eq 'enum'
-            ? ( ": " . Dumper( $spec->{values} ) )
-            : '';
-        $self->_error( "$name: " . ( $value // '[undef]') . " is not of type '$type'$expl" );
+        if ( $type eq 'spec' ) {
+            $self->_error( $name . ( /^\// ? '' : ': ' ) . $_ )
+                for $other[0]->errors();
+        } else {
+            my $expl = $type eq 'enum'
+                ? ( ": " . Dumper( $spec->{values} ) )
+                : '';
+            $self->_error( "$name: >> " . ( $value // '[undef]') . " << is not of type '$type'$expl" );
+        }
         return;
     }
 
     # Check greater than
     if ( exists $spec->{gt} ) {
         if ( $spec->{gt} >= $value ) {
-            $self->_error( "$name: " . ( $value // '[undef]') . " > $spec->{gt} return false" );
+            $self->_error( "$name: " . ( $value // '[undef]') . " > $spec->{gt} returns false" );
             return;
         }
     }
@@ -472,7 +535,8 @@ sub validate_value {
     }
 
     # Check of
-    if ( exists $spec->{of} ) {
+    $all_errors = !!$all_errors;
+    if ( exists $spec->{of} && $type ne 'spec' ) {
         my ( @keys, @values );
         if ( $type eq 'array' ) {
             @values = @$value;
@@ -577,6 +641,10 @@ sub code {
     return ref( $_[1] ) eq 'CODE';
 }
 
+sub spec {
+    return $_[2]->validate( $_[1] );
+}
+
 1;
 
 
@@ -625,7 +693,7 @@ Validate::Simple - (Relatively) Simple way to validate input parameters
             of   => {
                 type =>'enum',
                 values => [ qw/hiking travelling surfing laziness/ ],
-            }
+            },
         },
         score => {
             type => 'hash',
@@ -645,9 +713,38 @@ Validate::Simple - (Relatively) Simple way to validate input parameters
                     callback => sub {
                         @{ $_[0] } < 12;
                     },
-                }
+                },
             },
-        }
+        },
+        address => {
+            type => 'spec',
+            of   => {
+                country => {
+                    type   => 'enum',
+                    values => [ qw/ af ax al ... zw / ],
+                },
+                zip_code => {
+                    type => 'string',
+                },
+                street => {
+                    type => 'string',
+                },
+                number => {
+                    type => 'spec',
+                    of   => {
+                        house_nr => {
+                           type => 'positive_int',
+                        },
+                        house_ext => {
+                           type => 'string',
+                        },
+                        apt => {
+                            type => 'positive_int',
+                        },
+                    },
+                },
+            },
+        },
     };
 
     my $vs1 = Validate::Simple->new( $specs );
@@ -975,6 +1072,69 @@ provided in the C<values> key, which is B<required> for enums:
 The value is a coderef. L<Validate::Simple> only checks the type, it
 B<does not> run the code and B<does not> check its result.
 
+=head3 spec
+
+The value is another structure, of hashref with predefined keys and
+values of different types. The type C<spec> requires the key C<of>,
+which, in turn, expects another valid specification. Obviously, a
+specification may contain as many nested specifications as necessary.
+
+    my $resume_spec = {
+        name => {
+            type => 'string'
+        },
+        objective => {
+            type => 'string'
+        },
+        experience => {
+            type => 'array',
+            of   => {
+                type => 'spec',
+                of   => {
+                    company => {
+                        type => 'string',
+                    },
+                    position => {
+                        type => 'string',
+                    },
+                    description => {
+                        type => 'string',
+                    },
+                    start => {
+                        type => 'spec',
+                        of   => {
+                            year => {
+                                type => 'integer',
+                                gt   => 1960,
+                                le   => 1900 + (localtime)[5],
+                            },
+                            month => {
+                                type => 'positive_int',
+                                lt   => 12,
+                            },
+                        },
+                        required => 1,
+                    },
+                    end => {
+                        type => 'spec',
+                        of   => {
+                            year => {
+                                type => 'integer',
+                                gt   => 1960,
+                                le   => 1900 + (localtime)[5],
+                            },
+                            month => {
+                                type => 'positive_int',
+                                lt   => 12,
+                            },
+                        },
+                        required => 0,
+                    },
+                },
+            },
+        },
+    };
+
 =head1 METHODS
 
 =head2 new( \%spec[, $all_errors] )
@@ -984,20 +1144,23 @@ pass it, because in this case it checks specs syntax only once, not on
 each call of C<validate> method.
 
 By default the module stops validation after finding the first invalid
-value. If the second parameter C<$all_errors> is passed, the module will
-keep checking parameters and will report all found issues.
+value. If the second parameter C<$all_errors> is true, the call of the
+C<validate> method will keep checking all C<\%params> and will stack all
+found errors. The list of errors is returned by the C<errors> method.
 
-=head2 validate( \%params, \%specs[, $all_errors] )
+=head2 validate( \%params, [\%specs[, $all_errors]] )
 
 Does validation of the C<\%params> against C<\%specs>. If C<\%specs> is
 not provided, it performs validation against the spec, given in the
-C<new> method.
+C<new> method. Returns 1 if C<\%params> are valid, C<undef> otherwise.
 
-The parameter C<$all_errors> works the same way as in the C<new()> method.
+The parameter C<$all_errors> works the same way as in the C<new()>
+method.
 
 =head2 errors
 
-Returns the list of validation errors.
+Returns the list of validation errors. The list is being emptied before
+each call of the C<validate> method.
 
 =head1 BUGS
 

@@ -8,9 +8,14 @@ use warnings;
 use Carp;
 use Test::More 0.88;
 
-use Exporter qw{ import };
+use Exporter;
+our @ISA = qw{ Exporter };
 
-our $VERSION = '0.012';
+no if "$]" >= 5.020, feature => qw{ signatures };
+
+use constant CAN_USE_UNICODE	=> "$]" >= 5.008004;
+
+our $VERSION = '0.013';
 
 our @EXPORT =		## no critic (ProhibitAutomaticExportation)
 qw{
@@ -19,8 +24,12 @@ qw{
     pb_name
     pb_opt
     pb_putter
+    set_test_output_encoding
     test_vs_pbpaste
+    CAN_USE_UNICODE
 };
+
+use constant REF_ARRAY	=> ref [];
 
 sub check_testable (;$) {	## no critic (ProhibitSubroutinePrototypes)
     my ( $prog ) = @_;
@@ -102,12 +111,51 @@ sub pb_putter ($) {	## no critic (ProhibitSubroutinePrototypes, RequireArgUnpack
     }
 }
 
+sub set_test_output_encoding (;$) {	## no critic (ProhibitSubroutinePrototypes)
+    my ( $encoding ) = @_;
+    CAN_USE_UNICODE
+	or return;
+    defined $encoding
+	or $encoding = 'UTF-8';
+    my $builder = Test::More->builder();
+    foreach ( qw{ output failure_output todo_output } ) {
+	_my_binmode( $builder->$_(), ":encoding($encoding)" )
+	    or confess "Failed to set Test::More $_ encoding to $encoding: $!";
+    }
+    return;
+}
+
+# I hate this, but Perl 5.6.2 does not have the two-argument binmode.
+if ( CAN_USE_UNICODE ) {
+    eval 'sub _my_binmode { binmode $_[0], $_[1] }';
+} else {
+    eval 'sub _my_binmode { 1 }';
+}
+
 sub test_vs_pbpaste ($$$) {	## no critic (ProhibitSubroutinePrototypes, RequireArgUnpacking)
     my ( $pbopt, $expect, $name ) = @_;
     my @cmd = qw{ pbpaste };
+    if ( defined $pbopt ) {
+	if ( REF_ARRAY eq ref $pbopt ) {
+	    push @cmd, @{ $pbopt };
+	} else {
+	    push @cmd, split qr< \s+ >smx, $pbopt;
+	}
+    }
     defined $pbopt
 	and push @cmd, $pbopt;
-    my $got = `@cmd`;
+    open my $fh, '-|', @cmd
+	or croak "Failed to open pipe from @cmd: $!";
+    # FIXME do I need to be more canny about this?
+    if ( CAN_USE_UNICODE ) {
+	_my_binmode( $fh, ':encoding(utf-8)' )
+	    or croak "Failed to set pipe from @cmd to utf-8: $!";
+    }
+    my $got = do {
+	local $/ = undef;
+	<$fh>;
+    };
+    close $fh;
     chomp $got;
     chomp $expect;
     @_ = ( $got, $expect, $name );

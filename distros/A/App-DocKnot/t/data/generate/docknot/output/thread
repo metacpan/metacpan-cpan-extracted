@@ -102,7 +102,8 @@ The following additional Perl modules are required to use it:
 
 \bullet(packed)[File::BaseDir]
 \bullet(packed)[File::ShareDir]
-\bullet(packed)[IO::Compress::Xz (part of IO-Compress-LZMA)]
+\bullet(packed)[IO::Compress::Xz (part of IO-Compress-Lzma)]
+\bullet(packed)[IO::Uncompress::Gunzip (part of IO-Compress)]
 \bullet(packed)[IPC::Run]
 \bullet(packed)[IPC::System::Simple]
 \bullet(packed)[JSON::MaybeXS]
@@ -179,7 +180,7 @@ license:
 
 \block[
 
-    Copyright 2013-2020
+    Copyright 2013-2021
         Russ Allbery <rra@cpan.org>
 
     Permission is hereby granted, free of charge, to any person obtaining

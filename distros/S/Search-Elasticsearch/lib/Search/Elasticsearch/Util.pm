@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Util;
-$Search::Elasticsearch::Util::VERSION = '7.711';
+$Search::Elasticsearch::Util::VERSION = '7.711001';
 use Moo;
 use Search::Elasticsearch::Error();
 use Scalar::Util qw(blessed);
@@ -136,7 +136,7 @@ Search::Elasticsearch::Util - A utility class for internal use by Search::Elasti
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 AUTHOR
 

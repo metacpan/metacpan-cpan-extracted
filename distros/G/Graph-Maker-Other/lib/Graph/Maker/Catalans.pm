@@ -1,4 +1,4 @@
-# Copyright 2018, 2019, 2020 Kevin Ryde
+# Copyright 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -25,7 +25,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -181,10 +181,8 @@ sub _vertex_name_type_run1s {
 #                   childless is where d[i]!=0, for step up to higher sibling.
 #
 # Other vertex name forms in Knuth:
-# z1,z2,...,zn positions 1 to 2n of the 0s.
-# run0s[i]    = z[i+1] - z[i] - 1
-# cf run0s[i] = Ldepths[i] + 1 - Ldepths[i+1]
-# so z[i] = 2*i - Ldepths[i]
+# z1,z2,...,zn positions 0 to 2n-1 of the 1s.
+# run1s[i] = z[i+1] - z[i] - 1
 #
 sub _vertex_name_type_run0s {
   my ($aref) = @_;
@@ -894,7 +892,7 @@ __END__
 
 #------------------------------------------------------------------------------
 
-=for stopwords Ryde Catalan Catalans coderef undirected OEIS vpar Dov Tamari Pallo associahedron parens parenthesizations postorder Ldepths Lweights Lweight Rweights Rweight pre unclosed recursing lex lexicographically subtree Bracketings Nieuw Archief voor Wiskunde eg rebalancing substring Unranking Baronaigien Ruskey zig zag Triangulations Acta Cybernetica subgraph subgraphs predecessorless successorless Kreweras Sur d'Un substrings ie preorder Sapounakis Tasoulas Tsikouras Dyck Bernardi Bonichon recurse parenthesized aa aaaa Csar Sengupta Suksompong rightarm poset bracketings Bonnin Motzkin Chapoton dexter les Decomposable decomposable decomposables num Makinen
+=for stopwords Ryde Catalan Catalans coderef undirected OEIS vpar Dov Tamari Pallo associahedron parens parenthesizations postorder Ldepths Lweights Lweight Rweights Rweight pre unclosed recursing lex lexicographically subtree Bracketings Nieuw Archief voor Wiskunde eg rebalancing substring Unranking Baronaigien Ruskey zig zag Triangulations Acta Cybernetica subgraph subgraphs predecessorless successorless Kreweras Sur d'Un substrings ie preorder Sapounakis Tasoulas Tsikouras Dyck Bernardi Bonichon recurse parenthesized aa aaaa Csar Sengupta Suksompong rightarm poset bracketings Bonnin Motzkin Chapoton dexter les Decomposable decomposable decomposables num Makinen combinatorial Geyer Rik Warut Subposet Ldepth
 
 =head1 NAME
 
@@ -910,7 +908,7 @@ Graph::Maker::Catalans - create Tamari lattice and other Catalan object graphs
 =head1 DESCRIPTION
 
 C<Graph::Maker::Catalans> creates C<Graph.pm> graphs where each vertex
-represents a "Catalan object", meaning any one of
+represents a "Catalan object", any one of
 
     * balanced binary string (Dyck word) of length 2N
     * binary tree of N internal vertices
@@ -945,7 +943,7 @@ many 0s where the 1s and 0s nest like open and close parens.
      /\/  \  /\       mountain range, 1 up, 0 down
     /      \/  \
     110110001100      balanced binary
-    (()(()))(())        parens
+    (()(()))(())      parens
 
 The heights in the mountain range are like nesting levels of the parens.
 Balanced binary corresponds to a binary tree coded recursively, starting at
@@ -983,17 +981,17 @@ vertex.  The example above is
 
     0,1,1,2,0,1         Ldepths
 
-In terms of balanced binary, Ldepths is at each 1-bit how many unclosed 1s
-precede there (excess of 1s over 0s).  This is since each 1 is a vertex and
-the next edge is a left descent, and each 0 goes back up that left (and
+Ldepths in terms of balanced binary is at each 1-bit count how many unclosed
+1s precede there (excess of 1s over 0s).  This is since each 1 is a vertex
+and the next edge is a left descent, and each 0 goes back up that left (and
 takes a right descent).
 
     1 101 1 0001 100    balanced binary
     0,1,1,2,   0,1      Ldepths
 
-Ordered forests are one-to-one with binary trees by the "natural
-correspondence".  (See for example Knuth volume 1 section 2.3.2 for pictures
-and description.)  Ldepths is vertex depth in the ordered forest.
+Ordered forests are in one-to-one correspondence with binary trees by the
+"natural correspondence".  (See for example Knuth volume 1 section 2.3.2 for
+pictures and description.)  Ldepths is vertex depth in the ordered forest.
 
     binary left child  = ordered first child     \    natural
     binary right child = ordered next sibling    / correspondence
@@ -1009,7 +1007,7 @@ and description.)  Ldepths is vertex depth in the ordered forest.
     binary tree         ordered forest
 
 Option C<vertex_name_type =E<gt> 'Ldepths_inorder'> is the same Ldepths but
-vertices taken in-order.  In terms of balanced binary, this is at each 0 how
+vertices taken in-order.  In terms of balanced binary, at each 0 count how
 many unclosed 0s are after it.  Or equivalently, how many unclosed 1s
 precede and the 0 itself included as a closing.
 
@@ -1041,15 +1039,15 @@ binary tree traversed post-order.
 
 =pod
 
-The above has only one pre-order and one post-order.  The omitted pre R,B
-and post L,B do not uniquely identify their tree object, ie. multiple trees
-have the same resulting vector.
+The above have only one pre-order and one post-order.  The omitted
+combinations are pre R,B and post L,B.  They do not uniquely identify their
+tree object, ie. multiple trees have the same resulting vector.
 
 =head3 Runs
 
 Option C<vertex_name_type =E<gt> 'run1s'> is run lengths of 1s.  At each 0
 of balanced binary, count how many 1s immediately precede it (possibly
-none).  For example,
+zero).  For example,
 
     110 1110 0 0 10 0      balanced
       2,   3,0,0, 1,0      run1s
@@ -1059,8 +1057,9 @@ They note C<run1s> is a "dominating sequence" in the sense sum(terms 1..k)
 E<gt>= k (first term k=1).  sum - k is C<Ldepths_inorder>.
 
 In terms of binary tree, each 0 is an external vertex and the number of 1s
-preceding is the number of left edges above it.  A right-child external has
-no left edges above (being second 0 of an "00" pair).
+preceding is the number of left edges above it.  So C<run1s> is the length
+of the left-edges chain immediately above above each external (and omitting
+the right-most external which is always right so always 0).
 
 Option C<vertex_name_type =E<gt> 'run0s'> is run lengths of 0s.  At each 1
 of balanced binary, count how many 0s immediately follow it (possibly none).
@@ -1068,7 +1067,7 @@ of balanced binary, count how many 0s immediately follow it (possibly none).
     1 10 1 1 1000 10 0      balanced
     0,1, 0,0,3,   2         run0s
 
-C<run0s> is C<Ldepths> differences.  Each 1 is binary tree vertex in
+C<run0s> gives C<Ldepths> differences.  Each 1 is a binary tree vertex in
 preorder.  If no 0s then the next vertex is below so depth +1, whereas each
 0 is empty positions so next vertex higher.
 
@@ -1086,8 +1085,8 @@ preorder.  If no 0s then the next vertex is below so depth +1, whereas each
 
 =head3 Vpar
 
-Option C<vertex_name_type =E<gt> 'vpar'> gives vertex parent array of the
-ordered forest in pre-order.  Vertices are numbered 1 to N and each vpar
+Option C<vertex_name_type =E<gt> 'vpar'> gives the vertex parent array of
+the ordered forest in pre-order.  Vertices are numbered 1 to N and each vpar
 entry is the parent vertex number, or 0 if no parent (a root).  The first
 vertex is the first root, so vpar always starts with 0.
 
@@ -1098,9 +1097,9 @@ vertex is the first root, so vpar always starts with 0.
        4
 
 Comparing forests lexicographically by C<vpar> is the same as comparing
-lexicographically by C<Ldepths>.  So if one of the edge relations is a lex
-increase of C<Ldepths> then it is also a lex increase of C<vpar> (though the
-values in the arrays are not the same in general).
+lexicographically by C<Ldepths>.  So if an edge relation is a lex increase
+of C<Ldepths> then it is also a lex increase of C<vpar> (though the values
+in the arrays are not the same in general).
 
 Option C<vertex_name_type =E<gt> 'vpar_postorder'> is vertex parent array
 with forest vertices labelled in post-order.  The last vertex is the last
@@ -1115,7 +1114,7 @@ root, so C<vpar_postorder> always ends with 0.
 =head3 Weights
 
 Option C<vertex_name_type =E<gt> 'Lweights'> gives a list of subtree sizes.
-This is the of binary tree weights vector considered by Pallo ("Enumerating"
+This is the binary tree weights vector considered by Pallo ("Enumerating"
 below).
 
 Each binary tree external vertex (left to right) is right-most of a sub-tree
@@ -1124,7 +1123,7 @@ until reaching a vertex (internal or external) which is a left child.  The
 weight is the number of externals at and below there.  An external which is
 already a left child is weight 1 (itself only).  The first external is
 always a left child so Lweights start with 1.  The last external is omitted
-(it would always be N+1).
+(it would be N+1 always).
 
               1
           /       \              Lweights
@@ -1155,10 +1154,10 @@ Option C<comma =E<gt> "string"> is the separator between quantities in the
 vertex names.  The default is empty "" for balanced binary or "," comma for
 the others.
 
-Terms are single digits for weights and vpar N E<lt> 10 and depths N E<lt>=
-10.  Omitting the comma by C<comma =E<gt> ""> is then unambiguous and might
-be preferred for compact viewing.  N=10 ambiguity would be at Catalan(10) =
-16796 many vertices which is big but possible.
+Terms are single digits for weights or vpar of N E<lt> 10, and depths of N
+E<lt>= 10.  Omitting the comma by C<comma =E<gt> ''> is then unambiguous and
+might be preferred for compact viewing.  Ambiguity at N=10 would be
+Catalan(10) = 16796 vertices which is big but possible.
 
 =cut
 
@@ -1202,11 +1201,12 @@ operators in an expression parse tree.)
       ^^^^^             ^^^^^              (possibly empty)
 
 A right edge x-y can rotate to left, or a left edge can come from a right
-rotate, hence the graph is regular of degree N-1.
+rotate, so each tree edge gives a graph edge and the graph is regular of
+degree N-1.
 
     num edges = (N-1)/2*Catalan(N) or 0 if N=0
               = binomial(2N-1, N-2)
-              = 0,0,1,5,21,84, ... (A002054)
+              = 0,0,1,5,21,84, ...   (A002054)
     degree N-1 regular (in-degree + out-degree)
 
 =cut
@@ -1234,13 +1234,13 @@ Moving the 1 has the effect of shifting the 1A0 part up and right,
      101100111000          101110011000
        ****1                 1****
 
-Each 01 rotates as in the "from" above, so number of successors is number of
-01 pairs.  Each 11 as in the "to" above can come from a rotate, so number of
-predecessors is number of 11 pairs.
+Each 01 can rotate per the "from" form above, so number of successors is
+number of 01 pairs.  Each 11 in the "to" form above can come from a rotate,
+so number of predecessors is number of 11 pairs.
 
 In terms of ordered forest, rotation is a vertex move down to deeper level.
-A vertex y with preceding sibling x has that x drop down to become child
-of y.  y's other children B and further siblings C remain.
+A vertex y with preceding sibling x has that x and its subtree drop down to
+become the first child of y.  y's other children B remain.
 
           x ... y ... further-C                   y ... further-C
           |     |                 (leftwards)     | \
@@ -1250,9 +1250,9 @@ of y.  y's other children B and further siblings C remain.
 
 In terms of C<Lweights>, Pallo shows a rotate is one entry increasing by its
 smallest possible amount, which is adding the size of its immediately
-preceding sibling (which drops to become first child).  This is y gaining
-subtree size x under it.  The post-order sequence is unchanged.  Pallo
-reaches the same result as Tamari that this operation forms a lattice.
+preceding sibling (drops to become first child).  This is y gaining subtree
+size x under it.  The post-order vertex sequence is unchanged.  Pallo
+reaches the same as Tamari that this operation forms a lattice.
 
 =over
 
@@ -1264,8 +1264,18 @@ Journal, volume 29, number 2, 1986, pages 171-175.
 Taking C<Lweights> as coordinates allows the graph to be drawn as an N-1
 dimensional rectangular figure.  The first Lweights entry is always 1 so can
 be ignored as a coordinate.  Each edge is then forward along one axis.  For
-N=4 in 3 dimensions the effect is good, but more, in 2D projection at least,
-tends to become too busy to see much.  Geyer draws some in this style.
+N=4 in 3 dimensions the effect is good.  Geyer draws N=4 and N=5 in this
+style.  N=5 or more, in 2D projection at least, tends to become too busy to
+see much.
+
+=cut
+
+# Winfried Geyer, "On Tamari Lattices", Discrete Mathematics, volume 133,
+# 1994, pages 99-122.
+# 82586438.pdf
+# 
+
+=pod
 
 The undirected graph has a Hamiltonian path per Joan Lucas (simplified by
 Lucas, van Baronaigien, and Ruskey).  And it has a Hamiltonian cycle per Wu
@@ -1654,7 +1664,7 @@ degree regular the way rotate is.
 
 =head2 Split
 
-Option C<rel_type =E<gt> 'split'> is graph edge where split of a set of
+Option C<rel_type =E<gt> 'split'> is a graph edge where split of a set of
 siblings.  This is the X<Kreweras lattice>Kreweras lattice,
 
 =over
@@ -1671,12 +1681,12 @@ Mathematics, volume 1, number 4, 1972, pages 333-350.
           ---> 110100 ---/
 
 Kreweras considers the lattice in terms of non-crossing partitions of the
-integers 1..N, ie. those integers put into one or more sets.  Non-crossing
-means if sets have overlapping min to max ranges then one must be entirely
-within a gap between elements of the other, the way children fall between
-siblings in a pre-order labelled forest.  Non-crossing partitions are
-precisely the sets of siblings in ordered forests (with roots reckoned
-siblings of each other).
+integers 1..N.  A partition is integers 1..N put into one or more sets.
+Non-crossing means if sets have overlapping min to max ranges then one must
+be entirely within a gap between elements of the other, the way children
+fall between two siblings in a pre-order labelled forest.  Non-crossing
+partitions are precisely the sets of siblings in ordered forests (with roots
+reckoned siblings of each other).
 
 Graph edges are where one set in a partition splits into two sets to reach
 another partition.  The set getting the first element remains.  The other
@@ -1693,9 +1703,9 @@ out by dropping to deeper in the forest.
     [1,8] [2,3,5,6]                    by dropping 3,5 down
     [4,7] [8] [9]                      [2,6] [3,5]
 
-The graph start vertex is ordered forest all singletons which is 1 set of
-siblings.  A split gives 2 sets, and further split 3 sets, and so on until N
-sets which is every vertex alone in its siblings set (path-N down).
+The graph start vertex is the ordered forest all singletons which is 1 set
+of siblings.  A split gives 2 sets, and further split 3 sets, and so on
+until N sets which is every vertex alone in its siblings set (path-N down).
 
 In balanced binary, split is a block of 1s moving to before one or more
 preceding balanced substrings.
@@ -1827,7 +1837,7 @@ determined before any increasing takes place.
 For a directed graph, edges are in the direction of the rules above.  This
 is the default C<rel_direction =E<gt> 'up'>.  Direction "down" is the
 opposite, the same as C<$graph-E<gt>transpose>.  Direction "both" is edges
-both ways.  An undirected graph is just one edge between vertices in all
+both ways.  An undirected graph has just one edge between vertices in all
 cases.
 
 For balanced binary, the various rules are a lexicographic (and numeric)
@@ -1856,10 +1866,10 @@ a lex increase of that preorder.
 
 =head2 Lattice Refinement
 
-As variously noted above, C<split>, C<rotate>, and C<flip>, all form
-lattices (partial ordered set algebras).  They are successive refinements,
-meaning two elements comparable in one remain comparable in the next, and
-some new comparability added.
+As noted above, C<split>, C<rotate>, and C<flip>, all form lattices (partial
+ordered set algebras).  They are successive refinements, meaning two
+elements comparable in one remain comparable in the next, and some new
+comparability added.
 
     split --> rotate --> flip      lattice refinement
 
@@ -1978,17 +1988,18 @@ If the graph is directed (the default) then edges are only in the
 =head1 FORMULAS
 
 The current implementation uses arrays of balanced binary 0,1 internally,
-being the default preorder C<balanced>.  The arrays are generated
-iteratively in the same way as L<Math::NumSeq::BalancedBinary> (see docs
-there for notes).  Some recursion or even some Gray code stepping is
-possible (and which would be fine since no particular order is needed), but
-the iteration is simple enough.
+which is the default preorder C<balanced>.  These arrays are generated by
+iterating in the same way as L<Math::NumSeq::BalancedBinary> (see docs there
+for notes).  Generating by some recursion or even some Gray code stepping is
+possible (generating in any order is fine for the purposes here), but the
+iteration is simple enough.
 
-A relation type examines and manipulates an array to construct destinations.
-Conversions are made from the arrays to the chosen C<vertex_name_type>.
-These are one-pass over an array, possibly with a stack remembering pending
-output or depth.  For postorder output in some cases it's helpful to go from
-end to start (of what is otherwise preorder).
+A relation type examines and manipulates a balanced binary array to
+construct destinations.  Conversions are made from the arrays to the chosen
+C<vertex_name_type>.  These conversions are one-pass over an array, possibly
+with a stack remembering pending output or depth.  For conversions to
+postorder, in some cases it's helpful to go from end to start (of what is
+otherwise preorder).
 
 =head1 HOUSE OF GRAPHS
 
@@ -2136,11 +2147,11 @@ L<Math::NumSeq::Catalan>
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2018, 2019, 2020 Kevin Ryde
+Copyright 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

@@ -4,7 +4,7 @@ package Log::Any::Adapter::Coderef;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -91,6 +91,10 @@ foreach my $method ( Log::Any::Adapter::Util::logging_methods() ) {
         while(my @caller = caller($depth)) {
             my %frame;
             @frame{qw(package file line method)} = @caller;
+            # Don't repeat the package name - it's _usually_ going to be the same as
+            # $frame{package}, and the cases where it isn't aren't too important for us
+            # right now.
+            $frame{method} =~ s{^.*::}{};
             push @stack, \%frame;
         } continue {
             ++$depth;

@@ -1,6 +1,35 @@
 /** @page apreq_changes CHANGES
 //! brief List of major changes.
 
+@section v2_15 Changes with libapreq2-2.15 (released November 12, 2020)
+
+- SECURITY: CVE-2019-12412 (cve.mitre.org)
+  C API [Max Kellermann]
+  Fix a NULL pointer dereference when parsing malformed
+  multipart data in apreq_parse_multipart().
+
+- C API [Yann Ylavic]
+  In apreq_brigade_concat(), fix memory handling and create
+  the FILE bucket correctly.
+
+- Build [Petr Pisar]
+  Fix "make release" on Unix.
+
+@section v2_14 Changes with libapreq2-2.14 (not released)
+
+- Build [stevehay]
+  Fix httpd-2.4.x build for Win32.
+
+- Build [Richard M Kandarian]
+  Fix debug build for Win32.
+
+- C API [joes]
+  Fix mod_apreq2's config merging.
+
+- Perl glue
+  Updated license info in META.yml
+  Updated documentation for Apache2::Cookie
+
 @section v2_13 Changes with libapreq2-2.13 (released December 3, 2010)
 
 - HTTP Only Cookie [Robert Stone & Adam Prime]

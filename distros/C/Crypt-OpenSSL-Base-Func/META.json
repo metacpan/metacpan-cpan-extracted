@@ -1,10 +1,10 @@
 {
-   "abstract" : "Base functions, using the OpenSSL libraries",
+   "abstract" : "Crypt Base Functions, using the OpenSSL libraries",
    "author" : [
       "Lanlan Pan <abbypan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,7 +15,8 @@
    "name" : "Crypt-OpenSSL-Base-Func",
    "no_index" : {
       "directory" : [
-         "t"
+         "t",
+         "inc"
       ]
    },
    "prereqs" : {
@@ -27,12 +28,12 @@
       },
       "configure" : {
          "requires" : {
+            "Crypt::OpenSSL::Guess" : "0.11",
             "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
-         "recommends" : {
-         },
+         "recommends" : {},
          "requires" : {
             "Test::More" : "0",
             "perl" : "5.006"
@@ -52,6 +53,6 @@
          "url" : "http://github.com/abbypan/Crypt-OpenSSL-Base-Func"
       }
    },
-   "version" : "0.31",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

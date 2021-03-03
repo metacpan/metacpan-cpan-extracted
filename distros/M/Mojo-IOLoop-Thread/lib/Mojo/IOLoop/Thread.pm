@@ -1,69 +1,89 @@
 package Mojo::IOLoop::Thread;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 use threads;
 use Thread::Queue;
 
 use Scalar::Util qw(weaken);
 use Mojo::IOLoop;
+use Mojo::JSON;
+use Mojo::Promise;
 use Mojo::Util qw(monkey_patch);
+use YAML::Any qw(Dump);
+
 BEGIN {
     ## no critic ( PrivateSubs )
     monkey_patch 'Mojo::IOLoop', subprocess => sub {
-        my $thr = Mojo::IOLoop::Thread->new;
-        weaken $thr->ioloop(Mojo::IOLoop::_instance(shift))->{ioloop};
-        return $thr->run(@_);
+        my $self = shift;
+        my $instance = ref($self) ? $self : $self->singleton;
+        my $mit = Mojo::IOLoop::Thread->new(ioloop => $instance);
+        return @_ ? $mit->run(@_) : $mit;
     }
 }
 
-use Storable;
+has deserialize => sub { \&Mojo::JSON::decode_json };
+has ioloop      => sub { Mojo::IOLoop->singleton }, weak => 1;
+has serialize   => sub { \&Mojo::JSON::encode_json };
 
-has deserialize => sub { \&Storable::thaw };
-has ioloop      => sub { Mojo::IOLoop->singleton };
-has serialize   => sub { \&Storable::freeze };
+sub exit_code { shift->{exit_code} }
 
 sub pid  { threads->tid() || shift->{pid}  };
 
 sub run {
   my ($self, @args) = @_;
-  $self->ioloop->next_tick(sub { $self->_start(@args) });
+  my $iol = $self->ioloop;
+  $self->ioloop->next_tick(sub { $self->_start(@args) if ref($args[0]) eq 'CODE'});
   return $self;
+}
+
+sub run_p {
+  my ($self, $child) = @_;
+
+  my $p      = Mojo::Promise->new;
+  my $parent = sub {
+    my($self, $err) = (shift, shift);
+    $err ? $p->reject($err) : $p->resolve(@_);
+  };
+  $self->ioloop->next_tick(sub { $self->_start($child, $parent) });
+
+  return $p;
 }
 
 sub _start {
   my ($self, $child, $parent) = @_;
 
   $self->{queue} = Thread::Queue->new();
-  my($thr) = threads->create(
+  my $thr = threads->create(
     {'exit' => 'thread_only'},
     sub {
       my($q) = @_;
-      $self->ioloop->reset;
-      my $results = eval { [$self->$child] } || [];
-      return $@, $results;
+      $self->ioloop->reset({freeze => 1});
+      my $results = eval { [$self->$child] } // [];
+      $self->emit('cleanup');
+      return $self->serialize->([$@, @$results]);
     },
   );
   $self->{pid} = $thr->tid();
   $self->emit('spawn');
 
-  my $rid = $self->ioloop->recurring(0.05 => sub {
+  $self->{check} = sub {
     while ( my $args = $self->{queue}->dequeue_nb() ) {
       $self->emit(progress => @$args);
     }
-    $self->emit('joinable') if $thr->is_joinable();
-    threads->yield();
-  });
+    if ($thr->is_joinable()) {
+      my $results = eval { $self->deserialize->($thr->join()) } // [];
+      my $err = shift(@$results) // $@;
+      $self->{exit_code} = $err ? 1 : 0;
+      $self->$parent($err, @$results);
+    } else {
+      $self->ioloop->timer(0.05 => $self->{check});
+      threads->yield();
+    }
+  };
 
-  $self->on('joinable' => sub {
-    $self->ioloop->remove($rid);
-    while ( my $args = $self->{queue}->dequeue_nb() ) {
-      $self->emit(progress => @$args);
-    }
-    my($err, $results) = $thr->join();
-    $self->$parent($err, @$results);
-  });
+  $self->ioloop->timer(0.05 => $self->{check});
 
   return $self;
 }
@@ -129,7 +149,14 @@ It is a dropin replacement, takes the same parameters and works
 analoguous by just using threads instead of forked processes.
 
 L<Mojo::IOLoop::Thread> replaces L<Mojo::IOLoop/subprocess> with a threaded
-version on module load. Please make sure that you load L<Mojo::IOLoop> first.
+version on module load.
+
+=head1 BUGS and LIMITATIONS
+
+C<exit_code> will not work like L<Mojo::IOLoop::Subprocess/exit_code> because threads
+are not able to pass the exit code back when they are joined by the main thread.
+Additionally the exit code will be set when the subprocess is run with C<run_p>
+(see L<Mojo::IOLoop::Subprocess/run_p>)
 
 =head1 AUTHOR
 
@@ -141,7 +168,7 @@ L<https://github.com/tomk3003/mojo-ioloop-thread>
 
 =head1 COPYRIGHT
 
-Copyright 2017-18 Thomas Kratz.
+Copyright 2017-21 Thomas Kratz.
 
 =head1 LICENSE
 

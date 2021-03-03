@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::afjuba00;
-# Copyright (c) 2008-2020 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Nov 30 13:52:16 EST 2020
-#    Data version: tzdata2020d
-#    Code version: tzcode2020d
+#    Generated on: Mon Mar  1 14:17:28 EST 2021
+#    Data version: tzdata2021a
+#    Code version: tzcode2021a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.83';
+$VERSION='6.85';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -188,8 +188,14 @@ END { undef $VERSION; }
    2000 =>
      [
         [ [2000,1,15,10,0,0],[2000,1,15,13,0,0],'+03:00:00',[3,0,0],
-          'EAT',0,[9999,12,31,0,0,0],[9999,12,31,3,0,0],
-          '2000011510:00:00','2000011513:00:00','9999123100:00:00','9999123103:00:00' ],
+          'EAT',0,[2021,1,31,20,59,59],[2021,1,31,23,59,59],
+          '2000011510:00:00','2000011513:00:00','2021013120:59:59','2021013123:59:59' ],
+     ],
+   2021 =>
+     [
+        [ [2021,1,31,21,0,0],[2021,1,31,23,0,0],'+02:00:00',[2,0,0],
+          'CAT',0,[9999,12,31,0,0,0],[9999,12,31,2,0,0],
+          '2021013121:00:00','2021013123:00:00','9999123100:00:00','9999123102:00:00' ],
      ],
 );
 

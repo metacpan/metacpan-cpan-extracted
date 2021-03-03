@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Update 4.00;
+package App::DocKnot::Update 4.01;
 
 use 5.024;
 use autodie;
@@ -356,7 +356,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2020 Russ Allbery <rra@cpan.org>
+Copyright 2013-2021 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -378,10 +378,10 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<docknot(1)>
+L<docknot(1)>, L<App::DocKnot::Config>
 
 This module is part of the App-DocKnot distribution.  The current version of
-App::DocKnot is available from CPAN, or directly from its web site at
+DocKnot is available from CPAN, or directly from its web site at
 L<https://www.eyrie.org/~eagle/software/docknot/>.
 
 =cut

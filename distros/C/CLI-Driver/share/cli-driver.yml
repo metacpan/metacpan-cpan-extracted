@@ -2,32 +2,6 @@
 
 ---
 
-############################################################################
-# TEMPLATE
-############################################################################
-
-# my-action-name:
-#  is_deprecated: false
-#  class:
-#    name: "My::Class::Name"
-#    attr:
-#      required:
-#        a: attr_name
-#        b: attr_name
-#      optional:
-#        c: attr_name
-#      flags:
-#        dry-run: dry_run_flag_method
-#  method:
-#    name: my_method_name
-#    args:
-#      required:
-#        d: arg_name
-#      optional:                   
-#        e: arg_name
-#      flags:
-#        verbose: verbose_method
-
 sort-driver-file:
   class:
     name: "CLI::Driver::Exec"

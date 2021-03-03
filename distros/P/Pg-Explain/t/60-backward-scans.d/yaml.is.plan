@@ -1,0 +1,30 @@
+- Plan: 
+    Node Type: "Limit"
+    Parallel Aware: false
+    Startup Cost: 0.27
+    Total Cost: 0.48
+    Plan Rows: 1
+    Plan Width: 265
+    Actual Startup Time: 0.011
+    Actual Total Time: 0.011
+    Actual Rows: 1
+    Actual Loops: 1
+    Plans: 
+      - Node Type: "Index Scan"
+        Parent Relationship: "Outer"
+        Parallel Aware: false
+        Scan Direction: "Backward"
+        Index Name: "pg_class_relname_nsp_index"
+        Relation Name: "pg_class"
+        Alias: "pg_class"
+        Startup Cost: 0.27
+        Total Cost: 81.94
+        Plan Rows: 395
+        Plan Width: 265
+        Actual Startup Time: 0.010
+        Actual Total Time: 0.010
+        Actual Rows: 1
+        Actual Loops: 1
+  Planning Time: 0.524
+  Triggers: 
+  Execution Time: 0.098

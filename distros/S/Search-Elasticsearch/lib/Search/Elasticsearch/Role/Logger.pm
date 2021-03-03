@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::Logger;
-$Search::Elasticsearch::Role::Logger::VERSION = '7.711';
+$Search::Elasticsearch::Role::Logger::VERSION = '7.711001';
 use Moo::Role;
 
 use URI();
@@ -171,7 +171,7 @@ Search::Elasticsearch::Role::Logger - Provides common functionality to Logger im
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

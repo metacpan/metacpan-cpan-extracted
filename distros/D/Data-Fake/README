@@ -2,7 +2,7 @@ NAME
     Data::Fake - Declaratively generate fake structured data for testing
 
 VERSION
-    version 0.005
+    version 0.006
 
 SYNOPSIS
         use Data::Fake qw/Core Names Text Dates/;

@@ -1,18 +1,29 @@
+[![Kwalitee](https://cpants.cpanauthors.org/dist/Class-Simple-Cached.png)](http://cpants.cpanauthors.org/dist/Class-Simple-Cached)
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Cache+messages+to+an+object+#perl&url=https://github.com/nigelhorne/class-simple-cached&via=nigelhorne)
+
 # NAME
 
 Class::Simple::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
-A sub-class of [Class::Simple](https://metacpan.org/pod/Class::Simple) which caches calls to read
+A sub-class of [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple) which caches calls to read
 the status of an object that are otherwise expensive.
 
 It is up to the caller to maintain the cache if the object comes out of sync with the cache,
 for example by changing its state.
+
+You can use this class to create a caching layer to an object of any class
+that works on objects with a get/set model such as:
+
+    use Class::Simple;
+    my $obj = Class::Simple->new();
+    $obj->val($newval);
+    $oldval = $obj->val();
 
 # SUBROUTINES/METHODS
 
@@ -21,12 +32,13 @@ for example by changing its state.
 Creates a Class::Simple::Cached object.
 
 It takes one mandatory parameter: cache,
-which is an object which understands get() and set() calls,
-such as an [CHI](https://metacpan.org/pod/CHI) object.
+which is either an object which understands clear(), get() and set() calls,
+such as an [CHI](https://metacpan.org/pod/CHI) object;
+or is a reference to a hash where the return values are to be stored.
 
 It takes one optional argument: object,
 which is an object which is taken to be the object to be cached.
-If not given, an object of the class [Class::Simple](https://metacpan.org/pod/Class::Simple) is instantiated
+If not given, an object of the class [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple) is instantiated
 and that is used.
 
 # AUTHOR
@@ -37,20 +49,15 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 Doesn't work with [Memoize](https://metacpan.org/pod/Memoize).
 
-Please report any bugs or feature requests to `bug-class-simple-cached at rt.cpan.org`,
-or through the web interface at
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Class-Simple-Cached](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Class-Simple-Cached).
+Only works on messages that take no arguments.
+
+Please report any bugs or feature requests to [https://github.com/nigelhorne/Class-Simple-Readonly/issues](https://github.com/nigelhorne/Class-Simple-Readonly/issues).
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-params() returns a ref which means that calling routines can change the hash
-for other routines.
-Take a local copy before making amendments to the table if you don't want unexpected
-things to happen.
-
 # SEE ALSO
 
-[Class::Simple](https://metacpan.org/pod/Class::Simple), [CHI](https://metacpan.org/pod/CHI)
+[Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple), [CHI](https://metacpan.org/pod/CHI)
 
 # SUPPORT
 
@@ -60,22 +67,34 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-- RT: CPAN's request tracker
+- MetaCPAN
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Cached](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Cached)
+    [https://metacpan.org/release/Class-Simple-Cached](https://metacpan.org/release/Class-Simple-Cached)
+
+- Source Repository
+
+    [https://github.com/nigelhorne/Class-Simple-Readonly-Cached](https://github.com/nigelhorne/Class-Simple-Readonly-Cached)
+
+- CPANTS
+
+    [http://cpants.cpanauthors.org/dist/Class-Simple-Cached](http://cpants.cpanauthors.org/dist/Class-Simple-Cached)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=Class-Simple-Cached](http://matrix.cpantesters.org/?dist=Class-Simple-Cached)
 
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/Class-Simple-Cached](http://cpanratings.perl.org/d/Class-Simple-Cached)
 
-- Search CPAN
+- CPAN Testers Dependencies
 
-    [http://search.cpan.org/dist/Class-Simple-Cached/](http://search.cpan.org/dist/Class-Simple-Cached/)
+    [http://deps.cpantesters.org/?module=Class::Simple::Cached](http://deps.cpantesters.org/?module=Class::Simple::Cached)
 
-# LICENSE AND COPYRIGHT
+# LICENCE AND COPYRIGHT
 
 Author Nigel Horne: `njh@bandsman.co.uk`
-Copyright (C) 2019, Nigel Horne
+Copyright (C) 2019-2021, Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -32,6 +32,70 @@ $|=1;
 use Smart::Comments;
 
 
+
+{
+  # linear path length 0 to S^N-1
+  # FIXME: this not quite right
+
+  # spindles=3:  
+  # spindles=4:  
+  # spindles=5:  
+  # spindles=6:  
+
+  foreach my $spindles (3 .. 6) {
+    print "S=$spindles\n";
+    foreach my $balls (1 .. 7) {
+      my $graph = Graph::Maker->new('tower_of_london',
+                                     balls => $balls,
+                                    spindles => $spindles,
+                                     adjacency => 'linear',
+                                     undirected => 1);
+      my $from = 0;
+      my $to = $spindles**$balls-1;
+      $graph->has_vertex($from) or die "no from $from";
+      $graph->has_vertex($to) or die "no to $to";
+      my @path = $graph->SP_Dijkstra($from,$to);
+      my $length = scalar(@path) - 1;
+      # my $length = $graph->path_length($from, $to) || 0;
+      # my $length = Graph_path_length_by_breath_first($graph, $from, $to);
+      print "$length\n";
+    }
+  }
+  exit 0;
+
+  sub Graph_path_length_by_breath_first {
+    my ($graph, $from, $to) = @_;
+    my $verbose = 0;
+    my %seen = ($from => undef);
+    my @vertices = ($from);
+    my $count = 0;
+    while (@vertices) {
+      my @new_vertices;
+      $count++;
+      if ($verbose) {
+        print "  $count  ",scalar(@vertices),"   ";
+        foreach my $i (0 .. min(5, $#vertices)) {
+          print cnv($vertices[$i],10,4),",";
+        }
+        print "\n";
+      }
+
+      foreach my $v (@vertices) {
+        foreach my $n ($graph->neighbours($v)) {
+          next if exists $seen{$n};
+          if ($n eq $to) {
+            if ($verbose) { print "  $v to $n = $to\n"; }
+            return $count;
+          }
+          $seen{$n} = undef;
+          push @new_vertices, $n;
+        }
+      }
+      @vertices = @new_vertices;
+    }
+  }
+
+}
 {
   # Tower of London diameter etc
   # vertices
@@ -135,31 +199,6 @@ use Smart::Comments;
   exit 0;
 }
 
-
-{
-  # linear path length 0 to S^N-1
-
-  # spindles=3:   2  8 26 80 242 728 2186 6560       = 3^n - 1 
-  # spindles=4:   3 10 19 34  57  88  123 176          A160002
-  # spindles=5:   4 12 22 34  52  70   96
-  # spindles=6:   5 14 25 38  53  72
-
-  foreach my $spindles (6, 3 .. 6) {
-    print "S=$spindles\n";
-    foreach my $balls (1 .. 7) {
-      my $linear = Graph::Maker->new('tower_of_london',
-                                     balls => $balls, spindles => $spindles,
-                                     adjacency => 'linear',
-                                     undirected => 1);
-      my $from = 0;
-      my $to = $spindles**$balls-1;
-      # my $length = $linear->path_length($from, $to);
-      my $length = Graph_path_length_by_breath_first($linear, $from, $to);
-      print "$length\n";
-    }
-  }
-  exit 0;
-}
 
 {
   # tikz print

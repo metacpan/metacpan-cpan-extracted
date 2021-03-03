@@ -1,16 +1,15 @@
-.TH "include/apreq_cookie.h" 3 "25 Nov 2010" "Version 2.13" "libapreq2" \" -*- nroff -*-
+.TH "include/apreq_cookie.h" 3 "Thu Nov 5 2020" "Version 2.15" "libapreq2" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-include/apreq_cookie.h \- Cookies and Jars.
-.PP
-\fBapreq_cookie.h\fP describes a common server-side API for request (incoming) and response (outgoing) cookies. It aims towards compliance with the standard cookie specifications listed below. 
+include/apreq_cookie.h \- Cookies and Jars\&.  
+
 .SH SYNOPSIS
 .br
 .PP
-\fC#include 'apreq.h'\fP
+\fC#include 'apreq\&.h'\fP
 .br
-\fC#include 'apr_time.h'\fP
+\fC#include 'apr_time\&.h'\fP
 .br
 
 .SS "Data Structures"
@@ -19,14 +18,22 @@ include/apreq_cookie.h \- Cookies and Jars.
 .ti -1c
 .RI "struct \fBapreq_cookie_t\fP"
 .br
-.RI "\fICookie type, supporting both Netscape and RFC cookie specifications. \fP"
+.RI "Cookie type, supporting both Netscape and RFC cookie specifications\&. "
 .in -1c
-.SS "Defines"
+.SS "Macros"
 
 .in +1c
 .ti -1c
 .RI "#define \fBAPREQ_COOKIE_MAX_LENGTH\fP   4096"
 .br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef struct \fBapreq_cookie_t\fP \fBapreq_cookie_t\fP"
+.br
+.RI "Cookie type, supporting both Netscape and RFC cookie specifications\&. "
 .in -1c
 .SS "Functions"
 
@@ -68,16 +75,16 @@ include/apreq_cookie.h \- Cookies and Jars.
 .RI "static APR_INLINE void \fBapreq_cookie_tainted_off\fP (\fBapreq_cookie_t\fP *c)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP \fBapreq_parse_cookie_header\fP (\fBapr_pool_t\fP *pool, \fBapr_table_t\fP *jar, const char *header)"
+.RI "apr_status_t \fBapreq_parse_cookie_header\fP (apr_pool_t *pool, apr_table_t *jar, const char *header)"
 .br
 .ti -1c
-.RI "\fBapreq_cookie_t\fP * \fBapreq_cookie_make\fP (\fBapr_pool_t\fP *pool, const char *name, const \fBapr_size_t\fP nlen, const char *value, const \fBapr_size_t\fP vlen)"
+.RI "\fBapreq_cookie_t\fP * \fBapreq_cookie_make\fP (apr_pool_t *pool, const char *name, const apr_size_t nlen, const char *value, const apr_size_t vlen)"
 .br
 .ti -1c
-.RI "char * \fBapreq_cookie_as_string\fP (const \fBapreq_cookie_t\fP *c, \fBapr_pool_t\fP *p)"
+.RI "char * \fBapreq_cookie_as_string\fP (const \fBapreq_cookie_t\fP *c, apr_pool_t *p)"
 .br
 .ti -1c
-.RI "int \fBapreq_cookie_serialize\fP (const \fBapreq_cookie_t\fP *c, char *buf, \fBapr_size_t\fP len)"
+.RI "int \fBapreq_cookie_serialize\fP (const \fBapreq_cookie_t\fP *c, char *buf, apr_size_t len)"
 .br
 .ti -1c
 .RI "void \fBapreq_cookie_expires\fP (\fBapreq_cookie_t\fP *c, const char *time_str)"
@@ -85,11 +92,11 @@ include/apreq_cookie.h \- Cookies and Jars.
 .in -1c
 .SH "Detailed Description"
 .PP 
-Cookies and Jars.
-.PP
-\fBapreq_cookie.h\fP describes a common server-side API for request (incoming) and response (outgoing) cookies. It aims towards compliance with the standard cookie specifications listed below. 
+Cookies and Jars\&. 
 
-\fBSee also:\fP
+\fBapreq_cookie\&.h\fP describes a common server-side API for request (incoming) and response (outgoing) cookies\&. It aims towards compliance with the standard cookie specifications listed below\&.
+.PP
+\fBSee also\fP
 .RS 4
 http://wp.netscape.com/newsref/std/cookie_spec.html 
 .PP
@@ -101,149 +108,140 @@ http://www.ietf.org/rfc/rfc2965.txt
 .RE
 .PP
 
-.SH "Define Documentation"
+.SH "Macro Definition Documentation"
 .PP 
 .SS "#define APREQ_COOKIE_MAX_LENGTH   4096"
+This macro is deprecated\&.
 .PP
-This macro is deprecated.
-.PP
-Maximum length of a single Set-Cookie(2) header. 
+Maximum length of a single Set-Cookie(2) header\&. 
 .SH "Function Documentation"
 .PP 
-.SS "char* apreq_cookie_as_string (const \fBapreq_cookie_t\fP * c, \fBapr_pool_t\fP * p)"
+.SS "char* apreq_cookie_as_string (const \fBapreq_cookie_t\fP * c, apr_pool_t * p)"
+Returns a string that represents the cookie as it would appear in a valid 'Set-Cookie*' header\&.
 .PP
-Returns a string that represents the cookie as it would appear in a valid 'Set-Cookie*' header.
-.PP
-\fBParameters:\fP
+\fBParameters\fP
 .RS 4
-\fIc\fP cookie. 
+\fIc\fP cookie\&. 
 .br
-\fIp\fP pool which allocates the returned string.
+\fIp\fP pool which allocates the returned string\&.
 .RE
 .PP
-\fBReturns:\fP
+\fBReturns\fP
 .RS 4
-header string. 
+header string\&. 
 .RE
 .PP
 
 .SS "void apreq_cookie_expires (\fBapreq_cookie_t\fP * c, const char * time_str)"
+Set the Cookie's expiration date\&.
 .PP
-Set the Cookie's expiration date.
-.PP
-\fBParameters:\fP
+\fBParameters\fP
 .RS 4
-\fIc\fP The cookie. 
+\fIc\fP The cookie\&. 
 .br
-\fItime_str\fP If NULL, the Cookie's expiration date is unset, making it a session cookie. This means no 'expires' or 'max-age' attribute will appear in the cookie's serialized form. If time_str is not NULL, the expiration date will be reset to the offset (from now) represented by time_str. The time_str should be in a format that \fBapreq_atoi64t()\fP can understand, namely /[+-]?\\d+\\s*[YMDhms]/.
+\fItime_str\fP If NULL, the Cookie's expiration date is unset, making it a session cookie\&. This means no 'expires' or 'max-age' attribute will appear in the cookie's serialized form\&. If time_str is not NULL, the expiration date will be reset to the offset (from now) represented by time_str\&. The time_str should be in a format that \fBapreq_atoi64t()\fP can understand, namely /[+-]?\\d+\\s*[YMDhms]/\&.
 .RE
 .PP
-\fBRemarks:\fP
+\fBRemarks\fP
 .RS 4
-Now time_str may also be a fixed date; see \fBapr_date_parse_rfc()\fP for admissible formats. 
+Now time_str may also be a fixed date; see apr_date_parse_rfc() for admissible formats\&. 
 .RE
 .PP
 
 .SS "static APR_INLINE void apreq_cookie_httponly_off (\fBapreq_cookie_t\fP * c)\fC [static]\fP"
-.PP
-Turns off the cookie's HttpOnly flag. 
+Turns off the cookie's HttpOnly flag\&. 
 .SS "static APR_INLINE void apreq_cookie_httponly_on (\fBapreq_cookie_t\fP * c)\fC [static]\fP"
-.PP
-Sets the cookie's HttpOnly flag, meaning it is not accessible through client-side script in supported browsers. 
+Sets the cookie's HttpOnly flag, meaning it is not accessible through client-side script in supported browsers\&. 
 .SS "static APR_INLINE unsigned apreq_cookie_is_httponly (const \fBapreq_cookie_t\fP * c)\fC [static]\fP"
+
 .PP
-\fBReturns:\fP
+\fBReturns\fP
 .RS 4
-1 if the HttpOnly flag is set, 0 otherwise. 
+1 if the HttpOnly flag is set, 0 otherwise\&. 
 .RE
 .PP
 
 .SS "static APR_INLINE unsigned apreq_cookie_is_secure (const \fBapreq_cookie_t\fP * c)\fC [static]\fP"
+
 .PP
-\fBReturns:\fP
+\fBReturns\fP
 .RS 4
-1 if the secure flag is set, 0 otherwise. 
+1 if the secure flag is set, 0 otherwise\&. 
 .RE
 .PP
 
 .SS "static APR_INLINE unsigned apreq_cookie_is_tainted (const \fBapreq_cookie_t\fP * c)\fC [static]\fP"
+
 .PP
-\fBReturns:\fP
+\fBReturns\fP
 .RS 4
-1 if the taint flag is set, 0 otherwise. 
+1 if the taint flag is set, 0 otherwise\&. 
 .RE
 .PP
 
-.SS "\fBapreq_cookie_t\fP* apreq_cookie_make (\fBapr_pool_t\fP * pool, const char * name, const \fBapr_size_t\fP nlen, const char * value, const \fBapr_size_t\fP vlen)"
+.SS "\fBapreq_cookie_t\fP* apreq_cookie_make (apr_pool_t * pool, const char * name, const apr_size_t nlen, const char * value, const apr_size_t vlen)"
+Returns a new cookie, made from the argument list\&.
 .PP
-Returns a new cookie, made from the argument list.
-.PP
-\fBParameters:\fP
+\fBParameters\fP
 .RS 4
-\fIpool\fP Pool which allocates the cookie. 
+\fIpool\fP Pool which allocates the cookie\&. 
 .br
-\fIname\fP The cookie's name. 
+\fIname\fP The cookie's name\&. 
 .br
-\fInlen\fP Length of name. 
+\fInlen\fP Length of name\&. 
 .br
-\fIvalue\fP The cookie's value. 
+\fIvalue\fP The cookie's value\&. 
 .br
-\fIvlen\fP Length of value.
+\fIvlen\fP Length of value\&.
 .RE
 .PP
-\fBReturns:\fP
+\fBReturns\fP
 .RS 4
 the new cookie 
 .RE
 .PP
 
 .SS "static APR_INLINE void apreq_cookie_secure_off (\fBapreq_cookie_t\fP * c)\fC [static]\fP"
-.PP
-Turns off the cookie's secure flag. 
+Turns off the cookie's secure flag\&. 
 .SS "static APR_INLINE void apreq_cookie_secure_on (\fBapreq_cookie_t\fP * c)\fC [static]\fP"
+Sets the cookie's secure flag, meaning it only comes back over an SSL-encrypted connction\&. 
+.SS "int apreq_cookie_serialize (const \fBapreq_cookie_t\fP * c, char * buf, apr_size_t len)"
+Same functionality as apreq_cookie_as_string\&. Stores the string representation in buf, using up to len bytes in buf as storage\&. The return value has the same semantics as that of apr_snprintf, including the special behavior for a 'len = 0' argument\&.
 .PP
-Sets the cookie's secure flag, meaning it only comes back over an SSL-encrypted connction. 
-.SS "int apreq_cookie_serialize (const \fBapreq_cookie_t\fP * c, char * buf, \fBapr_size_t\fP len)"
-.PP
-Same functionality as apreq_cookie_as_string. Stores the string representation in buf, using up to len bytes in buf as storage. The return value has the same semantics as that of apr_snprintf, including the special behavior for a 'len = 0' argument.
-.PP
-\fBParameters:\fP
+\fBParameters\fP
 .RS 4
-\fIc\fP cookie. 
+\fIc\fP cookie\&. 
 .br
-\fIbuf\fP storage location for the result. 
+\fIbuf\fP storage location for the result\&. 
 .br
-\fIlen\fP size of buf's storage area.
+\fIlen\fP size of buf's storage area\&.
 .RE
 .PP
-\fBReturns:\fP
+\fBReturns\fP
 .RS 4
-size of resulting header string. 
+size of resulting header string\&. 
 .RE
 .PP
 
 .SS "static APR_INLINE void apreq_cookie_tainted_off (\fBapreq_cookie_t\fP * c)\fC [static]\fP"
-.PP
-Turns off the cookie's tainted flag. 
+Turns off the cookie's tainted flag\&. 
 .SS "static APR_INLINE void apreq_cookie_tainted_on (\fBapreq_cookie_t\fP * c)\fC [static]\fP"
-.PP
-Sets the cookie's tainted flag. 
+Sets the cookie's tainted flag\&. 
 .SS "static APR_INLINE unsigned apreq_cookie_version (const \fBapreq_cookie_t\fP * c)\fC [static]\fP"
+
 .PP
-\fBReturns:\fP
+\fBReturns\fP
 .RS 4
-1 if this is an RFC cookie, 0 if its a Netscape cookie. 
+1 if this is an RFC cookie, 0 if its a Netscape cookie\&. 
 .RE
 .PP
 
 .SS "static APR_INLINE void apreq_cookie_version_set (\fBapreq_cookie_t\fP * c, unsigned v)\fC [static]\fP"
+Sets the cookie's protocol version\&. 
+.SS "apr_status_t apreq_parse_cookie_header (apr_pool_t * pool, apr_table_t * jar, const char * header)"
+Parse a cookie header and store the cookies in an apr_table_t\&.
 .PP
-Sets the cookie's protocol version. 
-.SS "\fBapr_status_t\fP apreq_parse_cookie_header (\fBapr_pool_t\fP * pool, \fBapr_table_t\fP * jar, const char * header)"
-.PP
-Parse a cookie header and store the cookies in an apr_table_t.
-.PP
-\fBParameters:\fP
+\fBParameters\fP
 .RS 4
 \fIpool\fP pool which allocates the cookies 
 .br
@@ -252,25 +250,24 @@ Parse a cookie header and store the cookies in an apr_table_t.
 \fIheader\fP the header value
 .RE
 .PP
-\fBReturns:\fP
+\fBReturns\fP
 .RS 4
-APR_SUCCESS. 
+APR_SUCCESS\&. 
 .PP
-\fBAPREQ_ERROR_BADSEQ\fP if an unparseable character sequence appears. 
+\fBAPREQ_ERROR_BADSEQ\fP if an unparseable character sequence appears\&. 
 .PP
-\fBAPREQ_ERROR_MISMATCH\fP if an rfc-cookie attribute appears in a netscape cookie header. 
+\fBAPREQ_ERROR_MISMATCH\fP if an rfc-cookie attribute appears in a netscape cookie header\&. 
 .PP
-APR_ENOTIMPL if an unrecognized rfc-cookie attribute appears. 
+::APR_ENOTIMPL if an unrecognized rfc-cookie attribute appears\&. 
 .PP
-\fBAPREQ_ERROR_NOTOKEN\fP if a required token was not present. 
+\fBAPREQ_ERROR_NOTOKEN\fP if a required token was not present\&. 
 .PP
-\fBAPREQ_ERROR_BADCHAR\fP if an unexpected token was present. 
+\fBAPREQ_ERROR_BADCHAR\fP if an unexpected token was present\&. 
 .RE
 .PP
 
 .SS "static APR_INLINE \fBapreq_cookie_t\fP* apreq_value_to_cookie (const char * val)\fC [static]\fP"
-.PP
-Upgrades a jar's table values to \fBapreq_cookie_t\fP structs. 
+Upgrades a jar's table values to \fBapreq_cookie_t\fP structs\&. 
 .SH "Author"
 .PP 
-Generated automatically by Doxygen for libapreq2 from the source code.
+Generated automatically by Doxygen for libapreq2 from the source code\&.

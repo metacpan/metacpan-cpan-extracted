@@ -16,12 +16,36 @@ SYNOPSIS
           ...
        }
 
+
+    Also available as a keyword spelled defer
+
+       use Syntax::Keyword::Defer;
+    
+       {
+          my $dbh = DBI->connect( ... ) or die "Cannot connect";
+          defer { $dbh->disconnect; }
+    
+          my $sth = $dbh->prepare( ... ) or die "Cannot prepare";
+          defer { $sth->finish; }
+    
+          ...
+       }
+
 DESCRIPTION
 
     This module provides a syntax plugin that implements a phaser block
     that executes its block when the containing scope has finished. The
     syntax of the FINALLY block looks similar to other phasers in perl
     (such as BEGIN), but the semantics of its execution are different.
+
+    The defer alias is identical in syntax and semantics, just spelled
+    differently. It is provided as an alternative experiment, in order to
+    look identical to similar features provided by other languages (Swift,
+    Zig, Jai, Nim and Odin all provide this). Note that while Go also
+    provides a defer keyword, the semantics here are not the same. Go's
+    version defers until the end of the entire function, rather than the
+    closest enclosing scope as is common to most other languages, and this
+    module.
 
     The operation can be considered a little similar to an END block, but
     with the following key differences:
@@ -113,6 +137,23 @@ KEYWORDS
        $ perl example.pl
        Failed to increment count at examples.pl line 6.
 
+    Because a FINALLY block is a true block (e.g. in the same way something
+    like an if () {...} block is), rather than an anonymous sub, it does
+    not appear to caller() or other stack-inspection tricks. This is useful
+    for calling croak(), for example.
+
+       sub g
+       {
+          my $count = 0;
+          FINALLY { $count or croak "Expected some items"; }
+    
+          $count++ for @_;
+       }
+
+    Here, croak() will correctly report the caller of the g() function,
+    rather than appearing to be called from an __ANON__ sub invoked at the
+    end of the function itself.
+
 TODO
 
     This module contains a unit test file copied and edited from my core
@@ -123,8 +164,29 @@ TODO
       * Try to fix the double-exception test failure on Perl versions
       before v5.20. (Test currently skipped on those versions)
 
-      * Complain on attempts to return, goto, or next/last/redo out of a
-      FINALLY block.
+      * Permit the use of goto or next/last/redo within FINALLY blocks,
+      provided it does not jump to a target outside.
+
+      E.g. the following ought to be permitted, but currently is not:
+
+         FINALLY {
+            foreach my $item (@items) {
+               $item > 5 or next;
+               ...
+            }
+         }
+
+      * Try to detect and forbid nonlocal flow control (goto,
+      next/last/redo) from leaving the FINALLY block.
+
+      E.g. currently the following will crash the interpreter:
+
+         sub func { last ITEM }
+      
+         ITEM: foreach(1..10) {
+            say;
+            defer { func() }
+         }
 
 AUTHOR
 

@@ -1,0 +1,85 @@
+{
+   "abstract" : "syntactic sugar for DBIx::Class in Dancer2, optionally with DBIx::Class::Schema::ResultSetNames",
+   "author" : [
+      "D Ruth Holloway <ruth@hiruthie.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-DBIx-Class",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Code::TidyAll" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::C3::Componentised" : "0",
+            "Dancer2::Plugin" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Dancer2" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "JSON::MaybeXS" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::DBIx::Class" : {
+         "file" : "lib/Dancer2/Plugin/DBIx/Class.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class/-/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class.git",
+         "web" : "https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class"
+      }
+   },
+   "version" : "1.01",
+   "x_contributors" : [
+      "D Ruth Holloway <ruthh@clearbuilt.com>"
+   ],
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

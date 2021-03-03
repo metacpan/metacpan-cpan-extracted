@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::CxnPool::Static;
-$Search::Elasticsearch::Role::CxnPool::Static::VERSION = '7.711';
+$Search::Elasticsearch::Role::CxnPool::Static::VERSION = '7.711001';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::CxnPool';
 requires 'next_cxn';
@@ -56,7 +56,7 @@ Search::Elasticsearch::Role::CxnPool::Static - A CxnPool role for connecting to 
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 METHODS
 

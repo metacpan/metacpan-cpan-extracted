@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use File::Which;
 use Test::More tests => 2;
 use File::Temp qw{ tempdir };
 

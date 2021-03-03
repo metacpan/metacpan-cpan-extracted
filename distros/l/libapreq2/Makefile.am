@@ -144,7 +144,7 @@ perl_install:
 	cd glue/perl; $(MAKE) install
 
 perl_test:
-	cd glue/perl; $(MAKE) test
+	cd glue/perl; ../../libtool --mode=execute -dlopen ../../library/libapreq2.la $(MAKE) test
 
 perl_glue:
 	cd glue/perl; @PERL@ ../../build/xsbuilder.pl run

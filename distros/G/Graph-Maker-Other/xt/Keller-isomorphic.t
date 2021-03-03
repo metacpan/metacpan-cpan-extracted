@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2019 Kevin Ryde
+# Copyright 2017, 2019, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -78,7 +78,7 @@ plan tests => 4;
   my $compared = 0;
   my $others = 0;
   foreach my $subgraph (0 .. 1) {
-    foreach my $N (0 .. 5) {
+    foreach my $N (($subgraph ? 2 : 1) .. 5) {
       my $graph = Graph::Maker->new('Keller', undirected => 1,
                                     N => $N,
                                     subgraph => $subgraph);

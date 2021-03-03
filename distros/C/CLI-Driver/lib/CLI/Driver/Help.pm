@@ -45,21 +45,38 @@ method parse (HashRef|Undef :$href!) {
     return 1;        # success
 }
 
-method get_help( $arg ) {
+method has_help (Str $arg) {
 
     if( exists $self->args->{$arg} ){
+        return 1;
+    }
+    
+    return 0;
+}
+
+method get_usage (Str $arg) {
+
+    return $self->get_help($arg);
+}
+
+method get_help (Str $arg) {
+
+    if ($self->has_help($arg)) {
         return $self->args->{$arg};   
     }
 
     return "";
 }
 
-method has_examples(){
+method has_examples {
+    
     if( @{$self->examples} ){
         return 1;
     }
     
     return 0;   
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;

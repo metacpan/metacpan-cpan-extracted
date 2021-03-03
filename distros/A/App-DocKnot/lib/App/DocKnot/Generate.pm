@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Generate 4.00;
+package App::DocKnot::Generate 4.01;
 
 use 5.024;
 use autodie;
@@ -540,7 +540,7 @@ __END__
 
 =for stopwords
 Allbery DocKnot MERCHANTABILITY NONINFRINGEMENT XDG sublicense JSON CPAN
-ARGS
+ARGS Kwalify
 
 =head1 NAME
 
@@ -549,7 +549,8 @@ App::DocKnot::Generate - Generate documentation from package metadata
 =head1 SYNOPSIS
 
     use App::DocKnot::Generate;
-    my $docknot = App::DocKnot::Generate->new({ metadata => 'docs/metadata' });
+    my $docknot
+      = App::DocKnot::Generate->new({ metadata => 'docs/docknot.yaml' });
     my $readme = $docknot->generate('readme');
     my $index = $docknot->generate('thread');
     $docknot->generate_output('readme');
@@ -557,9 +558,9 @@ App::DocKnot::Generate - Generate documentation from package metadata
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, JSON,
-Perl6::Slurp, and Template (part of Template Toolkit), all of which are
-available from CPAN.
+Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, Kwalify,
+Template (part of Template Toolkit), and YAML::XS, all of which are available
+from CPAN.
 
 =head1 DESCRIPTION
 
@@ -609,7 +610,7 @@ following keys:
 =item metadata
 
 The path to the directory containing metadata for a package.  Default:
-F<docs/metadata> relative to the current directory.
+F<docs/docknot.yaml> relative to the current directory.
 
 =item width
 
@@ -658,7 +659,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2020 Russ Allbery <rra@cpan.org>
+Copyright 2013-2021 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -680,10 +681,10 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<docknot(1)>
+L<docknot(1)>, L<App::DocKnot::Config>
 
 This module is part of the App-DocKnot distribution.  The current version of
-App::DocKnot is available from CPAN, or directly from its web site at
+DocKnot is available from CPAN, or directly from its web site at
 L<https://www.eyrie.org/~eagle/software/docknot/>.
 
 =cut

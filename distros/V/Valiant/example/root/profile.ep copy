@@ -1,0 +1,145 @@
+% layout 'layout.ep';
+% content title => 'Profile';
+% content css => begin
+  <style></style>
+% end
+
+%= form_for $model, style=>'width:27em; margin:auto', begin
+  <fieldset>
+    <legend><%= $model->model_name->human %></legend>
+    <div class='form-group'>
+      %= model_errors class=>'alert alert-danger', style=>'margin: 16px 0 0 0', role=>'alert';
+    </div>
+    <div class='form-group'>
+      %= input 'first_name', class=>'form-control', label=>1;
+    </div>
+    <div class='form-group'>
+      %= input 'last_name', class=>'form-control', label=>1;
+    </div>
+    <div class='form-group'>
+      %= input 'username', class=>'form-control', label=>1;
+    </div>
+
+    <div class='form-group'>
+      %= model_errors_for 'profile', max_errors=>1, class=>'alert alert-danger', role=>'alert';
+      <fieldset class="border p-2">
+        <legend  class="w-auto"><%= $model->human_attribute_name('profile') %></legend>
+        %= fields_for_related 'profile', begin
+        <div class='form-group'>
+          %= input 'address', class=>'form-control', label=>1;
+        </div>
+        <div class='form-group'>
+          %= input 'city', class=>'form-control', label=>1;
+        </div>
+
+        <div class='form-row'>
+          <div class='col form-group'>
+            %= select_from_related 'state', options_label_field=>'name', class=>'form-control', label=>1;
+          </div>
+          <div class='col form-group'>
+            %= input 'zip', class=>'form-control', label=>1;
+          </div>
+        </div>
+
+        <div class='form-row'>
+          <div class='col form-group'>
+            <%= input 'phone_number', 
+                class => 'form-control',
+                label => 1,
+                type => 'tel',
+                placeholder => '123-456-7890',
+                pattern => "[0-9]{3}-[0-9]{3}-[0-9]{4}" %>
+          </div>
+          <div class='col form-group'>
+            <%= input 'birthday', 
+                class => 'form-control',
+                 label => 1 %>
+          </div>
+        </div>
+        % end
+      </fieldset>
+    </div>
+
+    <div class='form-group'>
+      %= model_errors_for 'roles', max_errors=>1, class=>'alert alert-danger', role=>'alert';
+      <fieldset class="border p-2">
+        <legend  class="w-auto"><%= $model->human_attribute_name('roles')  %></legend>
+          <div class="form-check">
+            <input checked="1" name="person.person_roles.0.pks" type="checkbox" class="form-check-input" value="1" id="a0">
+            <label for="a0">administrator</label>
+            <input name="person.person_roles.0.pks.person_id" type="hidden"  value="1">
+            <input name="person.person_roles.0.pks.role_id" type="hidden" cvalue="1">
+          </div>
+          <div class="form-check">
+            <input checked="1" name="person.person_roles.1.pks" type="checkbox" class="form-check-input" value="1" id="a1">
+            <label for="a1">user</label>
+            <input name="person.person_roles.1.pks.person_id" type="hidden"  value="1">
+            <input name="person.person_roles.1.pks.role_id" type="hidden" cvalue="1">
+          </div>
+      </fieldset>
+    </div>
+    
+
+    <div class='form-group'>
+      %= model_errors_for 'person_roles', max_errors=>1, class=>'alert alert-danger', role=>'alert';
+      <fieldset class="border p-2">
+        <legend  class="w-auto"><%= $model->human_attribute_name('person_roles')  %></legend>
+        %= checkbox_from_related 'person_roles', 'role', label => 1, checkbox_attrs => +{class=>'form-check-input'}, begin
+        <div class="form-check">
+          % my ($checkbox, $label) = @_;
+          %= $checkbox;
+          %= $label;
+        </div>
+        % end
+      </fieldset>
+    </div>
+
+
+    <div class='form-group'>
+      %= model_errors_for 'credit_cards', max_errors=>1, class=>'alert alert-danger', role=>'alert';
+      <fieldset class="border p-2">
+        <legend  class="w-auto"><%= $model->human_attribute_name('credit_cards') %></legend>
+        %= fields_for_related 'credit_cards', begin
+        <div class='form-row' id="<%= current_namespace_id %>">
+          <div class='col form-group'>
+            %= input 'card_number', class=>'form-control', label=>1;
+          </div>
+          <div class='col form-group col-4'>
+            %= date_input 'expiration', class=>'form-control', datetime_strftime=>'%Y-%m-%d', label=>1;
+          </div>
+          <div class='col form-group col-1 align-self-center m-0'>
+            <button type="button" 
+              class="close" 
+              aria-label="Close"
+              onclick="return deleteRelatedFields(document.getElementById('<%= current_namespace_id %>'))">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+        % end
+      </fieldset>
+      <button class='btn btn-lg btn-success btn-block' 
+          onclick="return addRelatedFields('<%= namespace_id_for("credit_cards", "template") %>')">
+        Add Credit Card
+      </button>
+    </div>
+    %= submit 'update', class=>'btn btn-lg btn-primary btn-block', value=>'Save Changes';
+  </fieldset>
+% end
+
+<script type='application/javascript'>
+  function addRelatedFields(sourceId) {
+    var html = document.getElementById(sourceId).innerHTML.replace(/{{epoch}}/g, Date.now());
+    document.getElementById(sourceId).insertAdjacentHTML('afterend', html);
+    return false;
+  }
+  function deleteRelatedFields(target) {
+    var destroy;
+    if(destroy = document.getElementById( target.id + '__destroy')) {
+      destroy.value = 1;
+    }
+    target.remove();
+    return false;
+  }
+</script>
+

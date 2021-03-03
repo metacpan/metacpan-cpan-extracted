@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 
-use File::Which;
 use Test::More tests => 6;
 use File::Temp qw{ tempdir };
 BEGIN { use_ok('Monitoring::Generator::TestConfig') };

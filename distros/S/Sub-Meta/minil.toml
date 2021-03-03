@@ -1,5 +1,5 @@
 name = "Sub-Meta"
-badges = ["travis", "coveralls", "metacpan"]
+badges = ["github-actions/test", "coveralls", "metacpan"]
 authority="cpan:KFLY"
 
 module_maker="ModuleBuildTiny"

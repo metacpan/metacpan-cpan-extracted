@@ -1,3 +1,9 @@
+0.27 2021-03-03T21:40:54+01:00
+ - Add PCIMPRICH CPAN account.
+ - Fix bugtracker.
+ - Fix use lib '.' in Makefile.PL.
+ - Update copyright years.
+
 0.26 2020-03-10T12:52:38+01:00
  - Add SARFY CPAN account.
 

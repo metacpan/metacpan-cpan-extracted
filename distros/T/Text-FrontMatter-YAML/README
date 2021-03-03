@@ -7,9 +7,10 @@ such as are found on GitHub (and used in Jekyll, and various other
 programs). It's a way of associating metadata with a file by marking off
 the metadata into a YAML section at the top of the file.
 
-The YAML front matter can be retrieved as a hash or as a string, and the
-file data below can be retrieved as a string, or via a filehandle.
-Access is read-only.
+You can create an object from a string containing a full document (say,
+the contents of a file), or from a hashref (to turn into the YAML front
+matter) and a string (for the rest of the file data). The object can't be
+altered once it's created.
 
 
 SYNOPSIS
@@ -78,7 +79,7 @@ subject line of the e-mail. Thanks!
 
 LICENSE AND COPYRIGHT
 
-Copyright 2013-2019 Aaron Hall.
+Copyright 2013-2021 Aaron Hall.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5.10.1.

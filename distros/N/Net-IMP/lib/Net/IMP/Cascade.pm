@@ -192,7 +192,7 @@ sub new_analyzer {
 	    my $str = ! defined( $buf->{data} ) ? '<undef>' : do {
 		local $_ = $buf->{data};
 		$_ = substr($_,0,27).'...' if length($_)>30;
-		s{([\\\n\r\t[^:print:]])}{ sprintf("\\%03o",ord($1)) }esg;
+		s{([\\\n\r\t[:^print:]])}{ sprintf("\\%03o",ord($1)) }esg;
 		$_
 	    };
 	    push @out, sprintf("#%02d %d..%d%s%s%s %s %s [%d,%d] '%s'",

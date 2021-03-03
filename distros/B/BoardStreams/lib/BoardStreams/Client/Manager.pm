@@ -12,7 +12,7 @@ use Data::Dump 'dump';
 use List::Util 'min';
 use Carp 'croak';
 
-our $VERSION = "v0.0.21";
+our $VERSION = "v0.0.22";
 
 has 'url';
 has 'connection_status_o';
@@ -59,42 +59,59 @@ sub new ($class, $url) {
 
     # set & keep updated $self->{ws}
     $self->{ws} = undef;
-    $self->{wses}->subscribe(sub ($x) {
-        $self->{ws} = $x;
 
-        my sub pass_along ($data) {
-            my $channel_name = $data->{channel};
-            my $channel_uuid = $data->{channelUUID};
-            if (my $channels_set = $self->{channels}{$channel_name}) {
-                foreach my $channel (values %$channels_set) {
-                    next unless !$channel_uuid or $channel->{uuid} eq $channel_uuid;
-                    $channel->{messages_o}->next($data);
+    my %ongoing_messages;
+    my $msgs_from_ws_o = $self->{wses}->pipe(
+        op_switch_map(sub ($x) {
+            $self->{ws} = $x;
+            undef %ongoing_messages;
+            return rx_EMPTY if ! $x;
+            return rx_from_event($self->{ws}, 'binary');
+        }),
+        op_switch_map(sub ($bytes) {
+            $bytes =~ s/^\:([^:]+)\: //s;
+            if (defined(my $bytes_prefix = $1)) {
+                my ($identifier, $i) = $bytes_prefix =~ /^(.*)\s(\S+)\z/;
+                if ($i eq '0') {
+                    $ongoing_messages{$identifier} = $bytes;
+                } elsif ($i =~ /^\d+\z/) {
+                    $ongoing_messages{$identifier} .= $bytes;
+                } elsif ($i eq 'end') {
+                    $ongoing_messages{$identifier} .= $bytes;
+                    my $data = decode_json(delete $ongoing_messages{$identifier});
+                    return rx_of($data);
                 }
+                return rx_EMPTY;
+            }
+            my $data = decode_json($bytes);
+            return rx_of($data);
+        }),
+    );
+
+    $msgs_from_ws_o->pipe(
+        op_filter(sub ($data, @) { exists $data->{channel} }),
+    )->subscribe(sub ($data) {
+        my $channel_name = $data->{channel};
+        my $channel_uuid = $data->{channelUUID};
+        if (my $channels_set = $self->{channels}{$channel_name}) {
+            foreach my $channel (values %$channels_set) {
+                next unless !$channel_uuid or $channel->{uuid} eq $channel_uuid;
+                $channel->{messages_o}->next($data);
             }
         }
-
-        my %ongoing_messages;
-        if ($self->{ws}) {
-            $self->{ws}->on(binary => sub ($, $bytes) {
-                $bytes =~ s/^\:([^:]+)\: //s;
-                if (defined(my $bytes_prefix = $1)) {
-                    my ($identifier, $i) = $bytes_prefix =~ /^(.*)\s(\S+)\z/;
-                    if ($i eq '0') {
-                        $ongoing_messages{$identifier} = $bytes;
-                    } elsif ($i =~ /^\d+\z/) {
-                        $ongoing_messages{$identifier} .= $bytes;
-                    } elsif ($i eq 'end') {
-                        $ongoing_messages{$identifier} .= $bytes;
-                        my $data = decode_json(delete $ongoing_messages{$identifier});
-                        pass_along $data;
-                    }
-                } else {
-                    my $data = decode_json $bytes;
-                    pass_along $data;
-                }
-            });
-        }
     });
+
+    $msgs_from_ws_o->pipe(
+        op_filter(sub ($data, @) { ($data->{type} // '') eq 'configuration' }),
+        op_switch_map(sub ($config) {
+            my $ping_interval = $config->{pingInterval};
+            return rx_timer(rand($ping_interval), $ping_interval)->pipe(
+                op_take_until(
+                    $self->{wses}->pipe( op_filter(sub ($ws, @) { ! $ws }) )
+                ),
+            );
+        }),
+    )->subscribe(sub { $self->send({type => 'ping'}) });
 
     $self->{channels} = {};
 

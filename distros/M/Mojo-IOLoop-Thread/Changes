@@ -1,6 +1,14 @@
 Revision history for Perl extension Mojo-IOLoop-Thread
 
-0.09 2018-11-28T10:02:21Z
+0.10 2021-03-03T10:26:17Z
+    - synch with Mojolicious 8.43
+
+0.09 2018-11-28T10:00:47Z
+
+    - prevent blocking the loop
+
+    - fixed bug when progress queue was not empty
+      after client thread end
 
 0.09 2018-11-28T10:00:47Z
 

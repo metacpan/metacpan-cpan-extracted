@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: inst-qual-filter.pl
 # ABSTRACT: Discard low-quality nt seqs in FASTA files (optimized)
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 use Modern::Perl '2011';
 use autodie;
@@ -20,23 +21,15 @@ my $purity_filter = sub {
     my $seq = shift;
 
     # compute purity
-    # TODO: refactor in module
-    (my $pure_seq = $seq->seq) =~ s/$NONPUREDNA//xmsg;
-    my $purity = 1.0 * length($pure_seq) / $seq->seq_len;
+    my $purity = $seq->purity;
     if ($purity < $ARGV_min_purity) {
         push @bad_seqs, $seq;
         return;
     }
 
-    # store allowed seqs (optonally unwrapped)
-    # TODO: refactor in module
-    my $width = $seq->seq_len;
-    my $chunk = $ARGV_nowrap ? $width : 60;     # optionally disable wrap
-
+    # store allowed seqs
     my $str = '>' . $seq->full_id . "\n";
-    for (my $site = 0; $site < $width; $site += $chunk) {
-        $str .= $seq->edit_seq($site, $chunk) . "\n";
-    }
+    $str .= $seq->wrapped_str;
 
     return $str;
 };
@@ -106,10 +99,6 @@ ambiguous, missing and gap-like character states) are considered as non-pure.
 =for Euclid:
     n.type:    number
     n.default: 1
-
-=item --[no]wrap
-
-[Don't] wrap sequences [default: yes].
 
 =item --version
 

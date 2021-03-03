@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::6_0::Direct::XPack::Graph;
-$Search::Elasticsearch::Client::6_0::Direct::XPack::Graph::VERSION = '7.711';
+$Search::Elasticsearch::Client::6_0::Direct::XPack::Graph::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Client::6_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -40,7 +40,7 @@ Search::Elasticsearch::Client::6_0::Direct::XPack::Graph - Plugin providing Grap
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

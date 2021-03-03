@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2018, 2019 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,6 +23,7 @@ use 5.004;
 use FindBin;
 use File::Spec;
 use File::Slurp;
+use List::Util 'min','max';
 use Test;
 # before warnings checking since Graph.pm 0.96 is not safe to non-numeric
 # version number from Storable.pm
@@ -45,7 +46,7 @@ use MyGraphs;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 2420;
+plan tests => 44774;
 
 my $seq = Math::NumSeq::BalancedBinary->new;
 
@@ -71,13 +72,205 @@ ok (scalar(@vertex_name_types), 13);
 
 
 #------------------------------------------------------------------------------
-# Knuth fasc4a section 7.2.1.6 exercise 30(d), result of lakser on
+# Tamari Lattice subtree sizes
+
+# Return a list of N flags for the "footprint",
+# being 1 when childful, 0 when childless, for each vertex.
+# Childful is when subtree size > 1.
+#
+sub Lweights_to_footprint {
+  my ($Lweights) = @_;
+  return map{$_>1?1:0} @$Lweights;
+}
+ok (join('', Lweights_to_footprint([1,2])), '01');
+ok (join('', Lweights_to_footprint([1,1])), '00');
+
+# $x and $y are arrayrefs of the same length.
+# Return a new arrayref which is their element-wise minimum.
+sub min_of_vectors {
+  my ($x,$y) = @_;
+  my @ret;
+  foreach my $i (0 .. $#$x) {
+    $ret[$i] = min($x->[$i],$y->[$i]);
+  }
+  return \@ret;
+}
+
+{
+  foreach my $N (0 .. 6) {
+    my $graph = Graph::Maker->new('Catalans', N => $N,
+                                  vertex_name_type => 'Lweights');
+    # require MyGraphs; MyGraphs::Graph_view($graph);
+
+    my @prefix;
+    foreach my $v ($graph->vertices) {
+      my @Lweights = split /,/,$v;
+      my $aref = \@prefix;
+      foreach my $w (@Lweights) {
+        if (! defined $aref->[$w]) {
+          $aref->[$w] = [];
+        }
+        $aref = $aref->[$w];
+      }
+    }
+
+    my %vertex_cover_advance_i;
+    my %vertex_cover_reduce_i;
+    foreach my $from ($graph->vertices) {
+      my @from_Lweights = split /,/,$from;
+      foreach my $to ($graph->successors($from)) {
+        my @to_Lweights = split /,/,$to;
+        foreach my $i (0 .. $#from_Lweights) {
+          $to_Lweights[$i] >= $from_Lweights[$i] or die;
+          if ($to_Lweights[$i] > $from_Lweights[$i]) {
+            if (defined $vertex_cover_advance_i{$from}->[$i]) {
+              die "oops, duplicate advance $i";
+            }
+            $vertex_cover_advance_i{$from}->[$i] = $to;
+            $vertex_cover_reduce_i{$to}->[$i] = $from;
+          }
+        }
+      }
+    }
+
+    # $x and $y are arrayrefs of Lweights.
+    # Return a new arrayref of Lweights which is their max.
+    # This is element-wise max but advanced as necessary when the size
+    # cannot be attained with the preceding max terms.
+    my $max_of_vectors = sub {
+      my ($x,$y) = @_;
+      my @ret;
+      my $aref = \@prefix;
+      foreach my $i (0 .. $#$x) {
+        my $m = max($x->[$i],$y->[$i]);
+        while (! defined $aref->[$m]) {
+          $m++;
+          if ($m > $#$aref) { die "oops"; }
+        }
+        $ret[$i] = $m;
+        $aref = $aref->[$m];
+      }
+      return \@ret;
+    };
+
+    my $lowest = MyGraphs::Graph_lattice_lowest($graph);
+    my $highest = MyGraphs::Graph_lattice_highest($graph);
+    my $href = MyGraphs::Graph_lattice_minmax_hash($graph);
+    MyGraphs::Graph_lattice_minmax_validate($graph,$href);
+
+    foreach my $u ($graph->vertices) {
+      my @u_Lweights = split /,/,$u;
+      my @u_footprint = Lweights_to_footprint(\@u_Lweights);
+      # shift @u_footprint;  # f[1]..f[n-1] for compare
+      my $u_footprint = join('',@u_footprint);
+
+      foreach my $v ($graph->vertices) {
+        my @v_Lweights = split /,/,$v;
+        my @v_footprint = Lweights_to_footprint(\@v_Lweights);
+        # shift @v_footprint;  # f[1]..f[n-1] for compare
+        my $v_footprint = join('', @v_footprint);
+
+        my $min_by_vectors = min_of_vectors(\@u_Lweights,\@v_Lweights);
+        my $max_by_vectors = $max_of_vectors->(\@u_Lweights,\@v_Lweights);
+        my $min_by_vectors_str = join(',',@$min_by_vectors);
+        my $max_by_vectors_str = join(',',@$max_by_vectors);
+        my $got_min = $href->{'min'}->{$u}->{$v};
+        my $got_max = $href->{'max'}->{$u}->{$v};
+        ### $got_min
+        ### $min_by_vectors
+        ok ($min_by_vectors_str, $got_min,
+            'Tamari min of Lweights');
+        ok ($max_by_vectors_str, $got_max,
+            "Tamari max of Lweights $u and $v");
+
+        if ($u_footprint eq $v_footprint) {
+          # when u and v have the same footprint, their min and max are also
+          # the same footprint
+          my @min_footprint = Lweights_to_footprint($min_by_vectors);
+          my @max_footprint = Lweights_to_footprint($max_by_vectors);
+          ok (join('',@min_footprint),
+              $u_footprint,
+              'Tamari min of Lweights, same footprint');
+          ok (join('',@max_footprint),
+              $u_footprint,
+              'Tamari max of Lweights, same footprint');
+
+          {
+            # Within footprint, can decrease the first unequal position.
+            # But later decreases might have to wait until equality in the
+            # earlier ones or else a decrease goes too far.
+            #
+            # eg. 1,1,3,4 to 1,1,2,3 reduce 3 to 1,1,3,1 change footprint
+            #     1,1,3,1,5 to 1,1,2,1,4 reduce 4 to 1,1,3,1,2
+            #                                      too far --^
+            my $seen_unequal = 0;
+            foreach my $i (0 .. $#u_Lweights) {
+              if ($u_Lweights[$i] > $v_Lweights[$i]) {
+                my $to = $vertex_cover_reduce_i{$u}->[$i];
+                my @to_Lweights = split /,/, $to;
+                my @to_footprint = Lweights_to_footprint(\@to_Lweights);
+                my $to_footprint = join('', @to_footprint);
+                if ($to_footprint eq $u_footprint) {
+                  if (! $seen_unequal) {
+                    ok (defined $to, 1,
+                        "$u to $v reduce $i first unequal position");
+                    ok ($href->{'min'}->{$to}->{$v},
+                        $got_min,
+                        "$u to $v reduce $i to $to same min");
+                  }
+                }
+              }
+              if ($u_Lweights[$i] != $v_Lweights[$i]) {
+                $seen_unequal = 1;
+              }
+            }
+          }
+          {
+            # Within footprint, the first (biggest) unequal position can
+            # advance.  $got_max is the bigger of u or v there.
+            #
+            # Think other positions can advance, but sometimes not by the
+            # full amount until equality of the preceding so they are the
+            # first unequal.
+            #
+            # eg.  1,1,2,1,4 to 1,1,3,1,2 advance 2
+            #          ^            ^
+            # cannot advance 2 (to 3) until 4 increases   1,1,3,1,5
+            #
+            my $seen_unequal = 0;
+            foreach my $i (reverse 0 .. $#u_Lweights) {
+              if ($u_Lweights[$i] < $v_Lweights[$i]) {
+                my $to = $vertex_cover_advance_i{$u}->[$i];
+                if (! $seen_unequal) {
+                  ok (defined $to, 1,
+                      "$u to $v advance $i last unequal position");
+                }
+                if (defined $to) {
+                  ok ($href->{'max'}->{$to}->{$v},
+                      $got_max,
+                      "$u to $v advance $i same max");
+                }
+              }
+              if ($u_Lweights[$i] != $v_Lweights[$i]) {
+                $seen_unequal = 1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+#------------------------------------------------------------------------------
+# Knuth fasc4a section 7.2.1.6 exercise 30(d), result of Lakser on
 # complementary pairs in the Tamari lattice.
 
 # $vpar is an arrayref of vertex parents, for vertices numbered 1..N (but
 # entries in the array 0..N-1).
 # Return a list of N flags for the "footprint",
-# being each vertex 1 when childful, 0 when childless.
+# being 1 when childful, 0 when childless, for each vertex.
 # Childless is simply that vertex number not appearing in $vpar.
 #
 sub vpar_to_footprint {

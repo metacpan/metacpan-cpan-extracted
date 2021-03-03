@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-Ubuntu-Releases"
       }
    },
-   "version" : "20210115.0",
+   "version" : "20210115.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

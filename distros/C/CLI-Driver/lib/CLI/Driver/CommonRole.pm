@@ -3,7 +3,7 @@ package CLI::Driver::CommonRole;
 use Modern::Perl;
 use Moose::Role;
 use namespace::autoclean;
-use Kavorka '-all';
+use Kavorka 'method';
 use Data::Printer alias => 'pdump';
 use Devel::Confess;
 use Capture::Tiny 'capture';
@@ -57,6 +57,17 @@ method localdatetime ($time = time) {
 	);
 
 	return $str;
+}
+
+method str_to_bool (Str|Undef $str) {
+
+    if (defined $str) {
+        if ($str =~ /^true$/i or $str =~ /^yes$/i or $str eq '1') {
+            return 1;
+        }    
+    }    
+    
+    return 0;
 }
 
 method system (Str  :$cmd,

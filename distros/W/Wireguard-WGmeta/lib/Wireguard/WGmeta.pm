@@ -26,7 +26,11 @@ C<wgXX.conf> file (Metadata is prefixed with C<#+>):
 
 =head1 AUTHORS
 
+Since there is a lot of spam flooding my mailbox, I had to put spam filtering in place. If you want to make sure
+that your email gets delivered into my mailbox, include C<#im_not_a_bot#> in the B<subject!>
+
 S<Tobias Bossert E<lt>tobib at cpan.orgE<gt>>
+
 
 =head1 THANKS TO
 
@@ -61,5 +65,7 @@ SOFTWARE.
 use strict;
 use warnings FATAL => 'all';
 package Wireguard::WGmeta;
+
+our $VERSION = "0.2.1"; # Do not change manually
 
 1;

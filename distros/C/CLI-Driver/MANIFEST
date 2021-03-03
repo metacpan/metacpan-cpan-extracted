@@ -1,6 +1,5 @@
+.includepath
 .project
-bin/cli-driver-example.pl
-bin/cli-driver-sharedir-example.pl
 bin/clidriver.pl
 build.sh
 Changes
@@ -11,6 +10,7 @@ lib/CLI/Driver/Action.pm
 lib/CLI/Driver/ArgParserRole.pm
 lib/CLI/Driver/Class.pm
 lib/CLI/Driver/CommonRole.pm
+lib/CLI/Driver/Deprecated.pm
 lib/CLI/Driver/Exec.pm
 lib/CLI/Driver/Help.pm
 lib/CLI/Driver/Method.pm
@@ -18,9 +18,10 @@ lib/CLI/Driver/Option.pm
 Makefile.PL
 MANIFEST			This list of files
 README
-share/cli-driver-example.yml
-share/cli-driver-v2-example.yml
 share/cli-driver.yml
+share/templates/app-sharedir.pl
+share/templates/app.pl
+share/templates/cli-driver.yml
 t/00-load.t
 t/01-test1.t
 t/02-test2.t
@@ -38,6 +39,8 @@ t/12-test12.t
 t/13-test13.t
 t/14-test14.t
 t/15-test15.t
+t/16-test16.t
+t/bin/testing.pl
 t/etc/cli-driver.yml
 t/lib/CLI/Driver/Test.pm
 t/lib/CLI/Driver/Test2.pm

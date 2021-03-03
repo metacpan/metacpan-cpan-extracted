@@ -1,5 +1,5 @@
 package App::UpdateCPANfile;
-use 5.008001;
+use 5.010001;
 use strict;
 use warnings;
 use Module::CPANfile;
@@ -8,8 +8,9 @@ use App::UpdateCPANfile::CPANfileSnapshotParser;
 use App::UpdateCPANfile::PackageDetails;
 use App::UpdateCPANfile::Change;
 use Module::CoreList;
+use List::Util qw(shuffle);
 
-our $VERSION = "1.0.0";
+our $VERSION = "1.1.0";
 
 sub new {
     my ($class, $path, $snapshot_path, $options) = @_;
@@ -159,6 +160,10 @@ sub _apply_filter {
     }
     if (my $ignore_filter = $self->options->{'ignore-filter'}) {
         $changeset = [ grep { $_->package_name !~ $ignore_filter } @$changeset ];
+    }
+
+    if ($self->options->{shuffle}) {
+        $changeset = [ shuffle(@$changeset) ];
     }
 
     if (my $limit = $self->options->{limit}) {

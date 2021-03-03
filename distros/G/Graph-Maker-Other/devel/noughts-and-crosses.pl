@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2018 Kevin Ryde
+# Copyright 2017, 2018, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -28,9 +28,65 @@ use MyGraphs;
 $|=1;
 
 # uncomment this to run the ### lines
-# use Smart::Comments;
+use Smart::Comments;
 
 
+
+{
+  require Graph;
+  my $graph = Graph->new (undirected => 1,
+                          edges => [[1000,1002],
+                                    [1000,1020],
+                                    [1000,1200],
+                                    [1002,1120],
+                                    [1002,1210],
+                                    [1020,1120],
+                                    [1020,1201],
+                                    [1200,1201],
+                                    [1200,1210]]);
+  print "$graph\n";
+  MyGraphs::Graph_view($graph);
+  my @centres = $graph->centre_vertices;
+  ### @centres
+  exit 0;
+}
+{
+  require Graph;
+  my $graph = Graph->new (undirected => 1, edges => [[1,2]]);
+  $graph->delete_edge(1,2);
+  $graph->delete_vertex(2);
+  print "$graph\n";
+
+  MyGraphs::Graph_view($graph);
+  print $graph->centre_vertices;
+  exit 0;
+}
+
+{
+  # 2x2 1-player up to rotation, broken wheel plus 1 vertex
+  #
+  my $graph = Graph::Maker->new('noughts_and_crosses',
+                                N => 2,
+                                players => 2,
+                                rotate => 1,
+                                undirected => 1);
+  my $num_vertices = $graph->vertices;
+  my $num_edges    = $graph->edges;
+  print "  vertices $num_vertices edges $num_edges\n";
+  # $graph->delete_vertex('0000');
+
+  MyGraphs::Graph_view($graph);
+
+  my @centres = $graph->centre_vertices;
+  ### @centres
+  # exit;
+  #   ok (scalar(@centres), 1);
+  #   ok ($centres[0], '1000');
+  #
+  #   my @ones = grep {count_filled($_)==1} $graph->vertices;
+  #   ok (join(',',sort @centres), join(',',sort @ones));
+  exit 0;
+}
 
 {
   # HOG
@@ -188,8 +244,8 @@ $|=1;
 {
   # N^2 players
   #
-  # not in OEIS: ???    vertices
-  # not in OEIS: 1,64,986409    edges
+  # ???    vertices
+  # not in OEIS: 1,64,986409  \\ edges
   # first player N^2 choices
   # second player N^2-1 choices for each of them
   # count(n) = my(total=0,width=1); for(i=0,n^2, total += width; width*=(n^2-i)); total;
@@ -198,7 +254,7 @@ $|=1;
   # 
   #
   # up to rotate and reflect
-  # not in OEIS: 1,7,77950    edges
+  # not in OEIS: 1,7,77950   \\ edges
   # vertices 2,10,123310 = A085698
 
   foreach my $N (0..3) {
@@ -372,7 +428,7 @@ $|=1;
   print "up to symmetry $count_unsymmetric\n";
   print "vertices ",scalar($graph->vertices),"\n";
   print "edges ",scalar($graph->edges),"\n";
-  Graph_view($graph);
+  MyGraphs::Graph_view($graph);
 
   print "6-piece non-winning states\n";
   foreach my $v (sort $graph->vertices) {

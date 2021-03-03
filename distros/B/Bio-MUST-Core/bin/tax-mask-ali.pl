@@ -54,7 +54,7 @@ tax-mask-ali.pl - Mask ALI files based on taxonomic filters
 
 =head1 VERSION
 
-version 0.210380
+version 0.210610
 
 =head1 USAGE
 

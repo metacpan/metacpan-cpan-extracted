@@ -38,7 +38,7 @@ my @files = (
     'lib/Search/Elasticsearch/Client/7_0/Direct/Rollup.pm',
     'lib/Search/Elasticsearch/Client/7_0/Direct/SQL.pm',
     'lib/Search/Elasticsearch/Client/7_0/Direct/SSL.pm',
-    'lib/Search/Elasticsearch/Client/7_0/Direct/SearchableSnapshots copy.pm',
+    'lib/Search/Elasticsearch/Client/7_0/Direct/SearchableSnapshots.pm',
     'lib/Search/Elasticsearch/Client/7_0/Direct/Security.pm',
     'lib/Search/Elasticsearch/Client/7_0/Direct/Slm.pm',
     'lib/Search/Elasticsearch/Client/7_0/Direct/Snapshot.pm',

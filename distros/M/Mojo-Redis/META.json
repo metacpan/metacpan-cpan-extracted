@@ -30,8 +30,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.80",
-            "Protocol::Redis::Faster" : "0.002"
+            "Mojolicious" : "8.50",
+            "Protocol::Redis::Faster" : "0.002",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -52,7 +53,7 @@
          "web" : "https://github.com/jhthorsen/mojo-redis"
       }
    },
-   "version" : "3.25",
+   "version" : "3.26",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
       "Dan Book <grinnz@grinnz.com>"

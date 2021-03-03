@@ -1,3 +1,5 @@
+0.604 2021/02/26
+- change bugtracker in Makefile.PL to github
 0.603 2014/09/07
 - mark Net::FTP 2.79 as a valid base too, based on patch from
   kimmo[AT]suominen[DOT]com, https://github.com/noxxi/p5-net-inet6glue/pull/3

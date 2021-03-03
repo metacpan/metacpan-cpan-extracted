@@ -15,14 +15,14 @@ format: v1
 
 name: DocKnot
 maintainer: Russ Allbery <rra@cpan.org>
-version: '4.00'
+version: '4.01'
 synopsis: Package documentation generator
 
 license:
   name: Expat
 copyrights:
   - holder: Russ Allbery <rra@cpan.org>
-    years: 2013-2020
+    years: 2013-2021
 
 build:
   type: Module::Build
@@ -114,7 +114,8 @@ requirements: |
 
   * File::BaseDir
   * File::ShareDir
-  * IO::Compress::Xz (part of IO-Compress-LZMA)
+  * IO::Compress::Xz (part of IO-Compress-Lzma)
+  * IO::Uncompress::Gunzip (part of IO-Compress)
   * IPC::Run
   * IPC::System::Simple
   * JSON::MaybeXS

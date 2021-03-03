@@ -13,7 +13,7 @@ WriteMakefile(
 	    license => 'http://dev.perl.org/licenses/',
 	    homepage  => 'https://github.com/noxxi/p5-net-imp',
 	    repository => 'https://github.com/noxxi/p5-net-imp',
-	    bugtracker  => 'https://rt.cpan.org/Dist/Display.html?Queue=Net-IMP',
+	    repository => 'https://github.com/noxxi/p5-net-imp/issues',
 	},
    },
 );

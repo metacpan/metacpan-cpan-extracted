@@ -171,7 +171,7 @@ APR_DECLARE_OPTIONAL_FN(APREQ_DECLARE(apreq_handle_t *),
  * using this apache2 module
  * @see APREQ_MODULE
  */
-#define APREQ_APACHE2_MMN 20090110
+#define APREQ_APACHE2_MMN 20101207
 
 /** @} */
 

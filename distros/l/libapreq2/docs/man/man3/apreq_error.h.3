@@ -1,164 +1,141 @@
-.TH "include/apreq_error.h" 3 "25 Nov 2010" "Version 2.13" "libapreq2" \" -*- nroff -*-
+.TH "include/apreq_error.h" 3 "Thu Nov 5 2020" "Version 2.15" "libapreq2" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-include/apreq_error.h \- Error status codes.
-.PP
-Define the APREQ_ error codes. 
+include/apreq_error.h \- Error status codes\&.  
+
 .SH SYNOPSIS
 .br
 .PP
-\fC#include 'apr_errno.h'\fP
+\fC#include 'apr_errno\&.h'\fP
 .br
-\fC#include 'apreq.h'\fP
+\fC#include 'apreq\&.h'\fP
 .br
 
-.SS "Defines"
+.SS "Macros"
 
 .in +1c
 .ti -1c
-.RI "#define \fBAPR_EBADARG\fP   APR_BADARG"
+.RI "#define \fBAPR_EBADARG\fP   APR_BADARG   /* XXX: don't use APR_BADARG */"
 .br
 .ti -1c
 .RI "#define \fBAPREQ_ERROR_GENERAL\fP   APR_OS_START_USERERR"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_TAINTED\fP   (APREQ_ERROR_GENERAL + 1)"
+.RI "#define \fBAPREQ_ERROR_TAINTED\fP   (\fBAPREQ_ERROR_GENERAL\fP + 1)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_INTERRUPT\fP   (APREQ_ERROR_GENERAL + 2)"
+.RI "#define \fBAPREQ_ERROR_INTERRUPT\fP   (\fBAPREQ_ERROR_GENERAL\fP + 2)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_BADDATA\fP   (APREQ_ERROR_GENERAL  + 10)"
+.RI "#define \fBAPREQ_ERROR_BADDATA\fP   (\fBAPREQ_ERROR_GENERAL\fP  + 10)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_BADCHAR\fP   (APREQ_ERROR_BADDATA  +  1)"
+.RI "#define \fBAPREQ_ERROR_BADCHAR\fP   (\fBAPREQ_ERROR_BADDATA\fP  +  1)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_BADSEQ\fP   (APREQ_ERROR_BADDATA  +  2)"
+.RI "#define \fBAPREQ_ERROR_BADSEQ\fP   (\fBAPREQ_ERROR_BADDATA\fP  +  2)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_BADATTR\fP   (APREQ_ERROR_BADDATA  +  3)"
+.RI "#define \fBAPREQ_ERROR_BADATTR\fP   (\fBAPREQ_ERROR_BADDATA\fP  +  3)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_BADHEADER\fP   (APREQ_ERROR_BADDATA  +  4)"
+.RI "#define \fBAPREQ_ERROR_BADHEADER\fP   (\fBAPREQ_ERROR_BADDATA\fP  +  4)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_BADUTF8\fP   (APREQ_ERROR_BADDATA  +  5)"
+.RI "#define \fBAPREQ_ERROR_BADUTF8\fP   (\fBAPREQ_ERROR_BADDATA\fP  +  5)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_NODATA\fP   (APREQ_ERROR_GENERAL  + 20)"
+.RI "#define \fBAPREQ_ERROR_NODATA\fP   (\fBAPREQ_ERROR_GENERAL\fP  + 20)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_NOTOKEN\fP   (APREQ_ERROR_NODATA   +  1)"
+.RI "#define \fBAPREQ_ERROR_NOTOKEN\fP   (\fBAPREQ_ERROR_NODATA\fP   +  1)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_NOATTR\fP   (APREQ_ERROR_NODATA   +  2)"
+.RI "#define \fBAPREQ_ERROR_NOATTR\fP   (\fBAPREQ_ERROR_NODATA\fP   +  2)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_NOHEADER\fP   (APREQ_ERROR_NODATA   +  3)"
+.RI "#define \fBAPREQ_ERROR_NOHEADER\fP   (\fBAPREQ_ERROR_NODATA\fP   +  3)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_NOPARSER\fP   (APREQ_ERROR_NODATA   +  4)"
+.RI "#define \fBAPREQ_ERROR_NOPARSER\fP   (\fBAPREQ_ERROR_NODATA\fP   +  4)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_MISMATCH\fP   (APREQ_ERROR_GENERAL  + 30)"
+.RI "#define \fBAPREQ_ERROR_MISMATCH\fP   (\fBAPREQ_ERROR_GENERAL\fP  + 30)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_OVERLIMIT\fP   (APREQ_ERROR_MISMATCH +  1)"
+.RI "#define \fBAPREQ_ERROR_OVERLIMIT\fP   (\fBAPREQ_ERROR_MISMATCH\fP +  1)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_UNDERLIMIT\fP   (APREQ_ERROR_MISMATCH +  2)"
+.RI "#define \fBAPREQ_ERROR_UNDERLIMIT\fP   (\fBAPREQ_ERROR_MISMATCH\fP +  2)"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_ERROR_NOTEMPTY\fP   (APREQ_ERROR_MISMATCH +  3)"
+.RI "#define \fBAPREQ_ERROR_NOTEMPTY\fP   (\fBAPREQ_ERROR_MISMATCH\fP +  3)"
 .br
 .in -1c
 .SS "Functions"
 
 .in +1c
 .ti -1c
-.RI "char * \fBapreq_strerror\fP (\fBapr_status_t\fP s, char *buf, \fBapr_size_t\fP bufsize)"
+.RI "char * \fBapreq_strerror\fP (apr_status_t s, char *buf, apr_size_t bufsize)"
 .br
 .in -1c
 .SH "Detailed Description"
 .PP 
-Error status codes.
-.PP
-Define the APREQ_ error codes. 
+Error status codes\&. 
 
-
-.SH "Define Documentation"
+Define the APREQ_ error codes\&. 
+.SH "Macro Definition Documentation"
 .PP 
-.SS "#define APR_EBADARG   APR_BADARG"
-.PP
+.SS "#define APR_EBADARG   APR_BADARG   /* XXX: don't use APR_BADARG */"
 Bad Arguments return value 
 .PP
-\fBSee also:\fP
+\fBSee also\fP
 .RS 4
 APR_BADARG 
 .RE
 .PP
 
-.SS "#define APREQ_ERROR_BADATTR   (APREQ_ERROR_BADDATA  +  3)"
-.PP
-Invalid attribute. 
-.SS "#define APREQ_ERROR_BADCHAR   (APREQ_ERROR_BADDATA  +  1)"
-.PP
-Invalid character. 
-.SS "#define APREQ_ERROR_BADDATA   (APREQ_ERROR_GENERAL  + 10)"
-.PP
-Invalid input data. 
-.SS "#define APREQ_ERROR_BADHEADER   (APREQ_ERROR_BADDATA  +  4)"
-.PP
-Invalid header. 
-.SS "#define APREQ_ERROR_BADSEQ   (APREQ_ERROR_BADDATA  +  2)"
-.PP
-Invalid byte sequence. 
-.SS "#define APREQ_ERROR_BADUTF8   (APREQ_ERROR_BADDATA  +  5)"
-.PP
-Invalid utf8 encoding. 
+.SS "#define APREQ_ERROR_BADATTR   (\fBAPREQ_ERROR_BADDATA\fP  +  3)"
+Invalid attribute\&. 
+.SS "#define APREQ_ERROR_BADCHAR   (\fBAPREQ_ERROR_BADDATA\fP  +  1)"
+Invalid character\&. 
+.SS "#define APREQ_ERROR_BADDATA   (\fBAPREQ_ERROR_GENERAL\fP  + 10)"
+Invalid input data\&. 
+.SS "#define APREQ_ERROR_BADHEADER   (\fBAPREQ_ERROR_BADDATA\fP  +  4)"
+Invalid header\&. 
+.SS "#define APREQ_ERROR_BADSEQ   (\fBAPREQ_ERROR_BADDATA\fP  +  2)"
+Invalid byte sequence\&. 
+.SS "#define APREQ_ERROR_BADUTF8   (\fBAPREQ_ERROR_BADDATA\fP  +  5)"
+Invalid utf8 encoding\&. 
 .SS "#define APREQ_ERROR_GENERAL   APR_OS_START_USERERR"
-.PP
-Internal apreq error. 
-.SS "#define APREQ_ERROR_INTERRUPT   (APREQ_ERROR_GENERAL + 2)"
-.PP
-Parsing interrupted. 
-.SS "#define APREQ_ERROR_MISMATCH   (APREQ_ERROR_GENERAL  + 30)"
-.PP
-Conflicting information. 
-.SS "#define APREQ_ERROR_NOATTR   (APREQ_ERROR_NODATA   +  2)"
-.PP
-Missing attribute. 
-.SS "#define APREQ_ERROR_NODATA   (APREQ_ERROR_GENERAL  + 20)"
-.PP
-Missing input data. 
-.SS "#define APREQ_ERROR_NOHEADER   (APREQ_ERROR_NODATA   +  3)"
-.PP
-Missing header. 
-.SS "#define APREQ_ERROR_NOPARSER   (APREQ_ERROR_NODATA   +  4)"
-.PP
-Missing parser. 
-.SS "#define APREQ_ERROR_NOTEMPTY   (APREQ_ERROR_MISMATCH +  3)"
-.PP
-Setting already configured. 
-.SS "#define APREQ_ERROR_NOTOKEN   (APREQ_ERROR_NODATA   +  1)"
-.PP
-Missing required token. 
-.SS "#define APREQ_ERROR_OVERLIMIT   (APREQ_ERROR_MISMATCH +  1)"
-.PP
-Exceeds configured maximum limit. 
-.SS "#define APREQ_ERROR_TAINTED   (APREQ_ERROR_GENERAL + 1)"
-.PP
-Attempted to perform unsafe action with tainted data. 
-.SS "#define APREQ_ERROR_UNDERLIMIT   (APREQ_ERROR_MISMATCH +  2)"
-.PP
-Below configured minimum limit. 
+Internal apreq error\&. 
+.SS "#define APREQ_ERROR_INTERRUPT   (\fBAPREQ_ERROR_GENERAL\fP + 2)"
+Parsing interrupted\&. 
+.SS "#define APREQ_ERROR_MISMATCH   (\fBAPREQ_ERROR_GENERAL\fP  + 30)"
+Conflicting information\&. 
+.SS "#define APREQ_ERROR_NOATTR   (\fBAPREQ_ERROR_NODATA\fP   +  2)"
+Missing attribute\&. 
+.SS "#define APREQ_ERROR_NODATA   (\fBAPREQ_ERROR_GENERAL\fP  + 20)"
+Missing input data\&. 
+.SS "#define APREQ_ERROR_NOHEADER   (\fBAPREQ_ERROR_NODATA\fP   +  3)"
+Missing header\&. 
+.SS "#define APREQ_ERROR_NOPARSER   (\fBAPREQ_ERROR_NODATA\fP   +  4)"
+Missing parser\&. 
+.SS "#define APREQ_ERROR_NOTEMPTY   (\fBAPREQ_ERROR_MISMATCH\fP +  3)"
+Setting already configured\&. 
+.SS "#define APREQ_ERROR_NOTOKEN   (\fBAPREQ_ERROR_NODATA\fP   +  1)"
+Missing required token\&. 
+.SS "#define APREQ_ERROR_OVERLIMIT   (\fBAPREQ_ERROR_MISMATCH\fP +  1)"
+Exceeds configured maximum limit\&. 
+.SS "#define APREQ_ERROR_TAINTED   (\fBAPREQ_ERROR_GENERAL\fP + 1)"
+Attempted to perform unsafe action with tainted data\&. 
+.SS "#define APREQ_ERROR_UNDERLIMIT   (\fBAPREQ_ERROR_MISMATCH\fP +  2)"
+Below configured minimum limit\&. 
 .SH "Function Documentation"
 .PP 
-.SS "char* apreq_strerror (\fBapr_status_t\fP s, char * buf, \fBapr_size_t\fP bufsize)"
-.PP
-apreq's wrapper around \fBapr_strerror()\fP; recognizes APREQ_ERROR_* status codes. 
+.SS "char* apreq_strerror (apr_status_t s, char * buf, apr_size_t bufsize)"
+apreq's wrapper around apr_strerror(); recognizes APREQ_ERROR_* status codes\&. 
 .SH "Author"
 .PP 
-Generated automatically by Doxygen for libapreq2 from the source code.
+Generated automatically by Doxygen for libapreq2 from the source code\&.

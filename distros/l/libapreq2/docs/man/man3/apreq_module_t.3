@@ -1,15 +1,14 @@
-.TH "apreq_module_t" 3 "25 Nov 2010" "Version 2.13" "libapreq2" \" -*- nroff -*-
+.TH "apreq_module_t" 3 "Thu Nov 5 2020" "Version 2.15" "libapreq2" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-apreq_module_t \- Vtable describing the necessary module functions.  
+apreq_module_t \- Vtable describing the necessary module functions\&.  
 
-.PP
 .SH SYNOPSIS
 .br
 .PP
-\fC#include <apreq_module.h>\fP
 .PP
+\fC#include <apreq_module\&.h>\fP
 .SS "Data Fields"
 
 .in +1c
@@ -17,16 +16,16 @@ apreq_module_t \- Vtable describing the necessary module functions.
 .RI "const char * \fBname\fP"
 .br
 .ti -1c
-.RI "\fBapr_uint32_t\fP \fBmagic_number\fP"
+.RI "apr_uint32_t \fBmagic_number\fP"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBjar\fP )(\fBapreq_handle_t\fP *, const \fBapr_table_t\fP **)"
+.RI "apr_status_t(* \fBjar\fP )(\fBapreq_handle_t\fP *, const apr_table_t **)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBargs\fP )(\fBapreq_handle_t\fP *, const \fBapr_table_t\fP **)"
+.RI "apr_status_t(* \fBargs\fP )(\fBapreq_handle_t\fP *, const apr_table_t **)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBbody\fP )(\fBapreq_handle_t\fP *, const \fBapr_table_t\fP **)"
+.RI "apr_status_t(* \fBbody\fP )(\fBapreq_handle_t\fP *, const apr_table_t **)"
 .br
 .ti -1c
 .RI "\fBapreq_cookie_t\fP *(* \fBjar_get\fP )(\fBapreq_handle_t\fP *, const char *)"
@@ -38,90 +37,73 @@ apreq_module_t \- Vtable describing the necessary module functions.
 .RI "\fBapreq_param_t\fP *(* \fBbody_get\fP )(\fBapreq_handle_t\fP *, const char *)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBparser_get\fP )(\fBapreq_handle_t\fP *, const \fBapreq_parser_t\fP **)"
+.RI "apr_status_t(* \fBparser_get\fP )(\fBapreq_handle_t\fP *, const \fBapreq_parser_t\fP **)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBparser_set\fP )(\fBapreq_handle_t\fP *, \fBapreq_parser_t\fP *)"
+.RI "apr_status_t(* \fBparser_set\fP )(\fBapreq_handle_t\fP *, \fBapreq_parser_t\fP *)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBhook_add\fP )(\fBapreq_handle_t\fP *, \fBapreq_hook_t\fP *)"
+.RI "apr_status_t(* \fBhook_add\fP )(\fBapreq_handle_t\fP *, \fBapreq_hook_t\fP *)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBbrigade_limit_get\fP )(\fBapreq_handle_t\fP *, \fBapr_size_t\fP *)"
+.RI "apr_status_t(* \fBbrigade_limit_get\fP )(\fBapreq_handle_t\fP *, apr_size_t *)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBbrigade_limit_set\fP )(\fBapreq_handle_t\fP *, \fBapr_size_t\fP)"
+.RI "apr_status_t(* \fBbrigade_limit_set\fP )(\fBapreq_handle_t\fP *, apr_size_t)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBread_limit_get\fP )(\fBapreq_handle_t\fP *, \fBapr_uint64_t\fP *)"
+.RI "apr_status_t(* \fBread_limit_get\fP )(\fBapreq_handle_t\fP *, apr_uint64_t *)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBread_limit_set\fP )(\fBapreq_handle_t\fP *, \fBapr_uint64_t\fP)"
+.RI "apr_status_t(* \fBread_limit_set\fP )(\fBapreq_handle_t\fP *, apr_uint64_t)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBtemp_dir_get\fP )(\fBapreq_handle_t\fP *, const char **)"
+.RI "apr_status_t(* \fBtemp_dir_get\fP )(\fBapreq_handle_t\fP *, const char **)"
 .br
 .ti -1c
-.RI "\fBapr_status_t\fP(* \fBtemp_dir_set\fP )(\fBapreq_handle_t\fP *, const char *)"
+.RI "apr_status_t(* \fBtemp_dir_set\fP )(\fBapreq_handle_t\fP *, const char *)"
 .br
 .in -1c
 .SH "Detailed Description"
 .PP 
-Vtable describing the necessary module functions. 
+Vtable describing the necessary module functions\&. 
 .SH "Field Documentation"
 .PP 
-.SS "const char* \fBapreq_module_t::name\fP"
-.PP
-name of this apreq module 
-.SS "\fBapr_uint32_t\fP \fBapreq_module_t::magic_number\fP"
-.PP
-magic number identifying the module and version 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::jar\fP)(\fBapreq_handle_t\fP *, const \fBapr_table_t\fP **)"
-.PP
-get a table with all cookies 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::args\fP)(\fBapreq_handle_t\fP *, const \fBapr_table_t\fP **)"
-.PP
+.SS "apr_status_t(* apreq_module_t::args) (\fBapreq_handle_t\fP *, const apr_table_t **)"
 get a table with all query string parameters 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::body\fP)(\fBapreq_handle_t\fP *, const \fBapr_table_t\fP **)"
-.PP
-get a table with all body parameters 
-.SS "\fBapreq_cookie_t\fP*(* \fBapreq_module_t::jar_get\fP)(\fBapreq_handle_t\fP *, const char *)"
-.PP
-get a cookie by its name 
-.SS "\fBapreq_param_t\fP*(* \fBapreq_module_t::args_get\fP)(\fBapreq_handle_t\fP *, const char *)"
-.PP
+.SS "\fBapreq_param_t\fP*(* apreq_module_t::args_get) (\fBapreq_handle_t\fP *, const char *)"
 get a query string parameter by its name 
-.SS "\fBapreq_param_t\fP*(* \fBapreq_module_t::body_get\fP)(\fBapreq_handle_t\fP *, const char *)"
-.PP
+.SS "apr_status_t(* apreq_module_t::body) (\fBapreq_handle_t\fP *, const apr_table_t **)"
+get a table with all body parameters 
+.SS "\fBapreq_param_t\fP*(* apreq_module_t::body_get) (\fBapreq_handle_t\fP *, const char *)"
 get a body parameter by its name 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::parser_get\fP)(\fBapreq_handle_t\fP *, const \fBapreq_parser_t\fP **)"
-.PP
-gets the parser associated with the request body 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::parser_set\fP)(\fBapreq_handle_t\fP *, \fBapreq_parser_t\fP *)"
-.PP
-manually set a parser for the request body 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::hook_add\fP)(\fBapreq_handle_t\fP *, \fBapreq_hook_t\fP *)"
-.PP
-add a hook function 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::brigade_limit_get\fP)(\fBapreq_handle_t\fP *, \fBapr_size_t\fP *)"
-.PP
+.SS "apr_status_t(* apreq_module_t::brigade_limit_get) (\fBapreq_handle_t\fP *, apr_size_t *)"
 determine the maximum in-memory bytes a brigade may use 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::brigade_limit_set\fP)(\fBapreq_handle_t\fP *, \fBapr_size_t\fP)"
-.PP
+.SS "apr_status_t(* apreq_module_t::brigade_limit_set) (\fBapreq_handle_t\fP *, apr_size_t)"
 set the maximum in-memory bytes a brigade may use 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::read_limit_get\fP)(\fBapreq_handle_t\fP *, \fBapr_uint64_t\fP *)"
-.PP
+.SS "apr_status_t(* apreq_module_t::hook_add) (\fBapreq_handle_t\fP *, \fBapreq_hook_t\fP *)"
+add a hook function 
+.SS "apr_status_t(* apreq_module_t::jar) (\fBapreq_handle_t\fP *, const apr_table_t **)"
+get a table with all cookies 
+.SS "\fBapreq_cookie_t\fP*(* apreq_module_t::jar_get) (\fBapreq_handle_t\fP *, const char *)"
+get a cookie by its name 
+.SS "apr_uint32_t apreq_module_t::magic_number"
+magic number identifying the module and version 
+.SS "const char* apreq_module_t::name"
+name of this apreq module 
+.SS "apr_status_t(* apreq_module_t::parser_get) (\fBapreq_handle_t\fP *, const \fBapreq_parser_t\fP **)"
+gets the parser associated with the request body 
+.SS "apr_status_t(* apreq_module_t::parser_set) (\fBapreq_handle_t\fP *, \fBapreq_parser_t\fP *)"
+manually set a parser for the request body 
+.SS "apr_status_t(* apreq_module_t::read_limit_get) (\fBapreq_handle_t\fP *, apr_uint64_t *)"
 determine the maximum amount of data that will be fed into a parser 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::read_limit_set\fP)(\fBapreq_handle_t\fP *, \fBapr_uint64_t\fP)"
-.PP
+.SS "apr_status_t(* apreq_module_t::read_limit_set) (\fBapreq_handle_t\fP *, apr_uint64_t)"
 set the maximum amount of data that will be fed into a parser 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::temp_dir_get\fP)(\fBapreq_handle_t\fP *, const char **)"
-.PP
+.SS "apr_status_t(* apreq_module_t::temp_dir_get) (\fBapreq_handle_t\fP *, const char **)"
 determine the directory used by the parser for temporary files 
-.SS "\fBapr_status_t\fP(* \fBapreq_module_t::temp_dir_set\fP)(\fBapreq_handle_t\fP *, const char *)"
-.PP
+.SS "apr_status_t(* apreq_module_t::temp_dir_set) (\fBapreq_handle_t\fP *, const char *)"
 set the directory used by the parser for temporary files 
 
 .SH "Author"
 .PP 
-Generated automatically by Doxygen for libapreq2 from the source code.
+Generated automatically by Doxygen for libapreq2 from the source code\&.

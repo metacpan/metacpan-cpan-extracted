@@ -4,9 +4,9 @@ use warnings;
 
 package Geo::LibProj::cs2cs;
 # ABSTRACT: IPC interface to PROJ cs2cs
-$Geo::LibProj::cs2cs::VERSION = '1.01';
+$Geo::LibProj::cs2cs::VERSION = '1.02';
 
-use Carp qw(croak);
+use Carp qw(carp croak);
 use File::Basename qw(basename);
 use File::Spec;
 use Scalar::Util 1.10 qw(looks_like_number);
@@ -55,12 +55,14 @@ sub new {
 	$self->{cmd} = $self->_cmd();
 	$self->{call} = [$self->{cmd}, %$params, $source_crs, '+to', $target_crs, '-'];
 	
+	$self->_ffi_init($source_crs, $target_crs, $params);
+	
 	return $self;
 }
 
 
 sub _special_params {
-	my (undef, $params) = @_;
+	my ($self, $params) = @_;
 	
 	# support -d even for older cs2cs versions
 	if (defined $params->{-d} && defined $params->{-f}) {
@@ -82,6 +84,9 @@ sub _special_params {
 		delete $params->{-W};
 	}
 	
+	$self->{ffi} = $INC{'Geo/LibProj/FFI.pm'}
+	               && ( $params->{XS} || ! defined $params->{XS} );
+	$self->{ffi_warn} = $params->{XS};
 	delete $params->{XS};
 }
 
@@ -102,6 +107,42 @@ sub _cmd {
 	
 	# no luck; let's just hope it'll be on the PATH somewhere
 	return $CMD;
+}
+
+
+sub _ffi_init {
+	my ($self, $source_crs, $target_crs, $params) = @_;
+	
+	carp "Geo::LibProj::FFI is not loaded; falling back to IPC mode" if $self->{ffi_warn} && ! $self->{ffi};
+	return unless $self->{ffi};
+	
+	my @params = grep {
+		$_ eq '-f'
+		? defined $params->{$_} && $params->{$_} ne $FORMAT_OUT
+		: defined $params->{$_}
+	} keys %$params;
+	carp "cs2cs control parameters are unsupported in XS mode; falling back to IPC mode" if $self->{ffi_warn} && @params;
+	return $self->{ffi} = 0 if @params;
+	
+	my $ctx = $self->{ffi_ctx} = Geo::LibProj::FFI::proj_context_create();
+	carp "proj_context_create() failed; falling back to IPC mode" if $self->{ffi_warn} && ! $ctx;
+	return $self->{ffi} = 0 if ! $ctx;
+	
+	Geo::LibProj::FFI::proj_context_use_proj4_init_rules($ctx, 1);
+	
+	my $pj = $self->{ffi_pj} = Geo::LibProj::FFI::proj_create_crs_to_crs(
+			$ctx, $source_crs, $target_crs, undef );
+	carp "proj_create_crs_to_crs() failed; falling back to IPC mode" if $self->{ffi_warn} && ! $pj;
+	return $self->{ffi} = 0 if ! $pj;
+}
+
+
+sub DESTROY {
+	my ($self) = @_;
+	
+	Geo::LibProj::FFI::proj_destroy($self->{ffi_pj}) if $self->{ffi_pj};
+	Geo::LibProj::FFI::proj_context_destroy($self->{ffi_ctx}) if $self->{ffi_ctx};
+	$self->{ffi_pj} = $self->{ffi_ctx} = 0;
 }
 
 
@@ -132,6 +173,8 @@ sub _format {
 
 sub transform {
 	my ($self, @source_points) = @_;
+	
+	return $self->_ffi_transform(@source_points) if $self->{ffi};
 	
 	my @in = ();
 	foreach my $i (0 .. $#source_points) {
@@ -174,8 +217,27 @@ sub transform {
 }
 
 
+sub _ffi_transform {
+	my ($self, @source_points) = @_;
+	
+	my @target_points = map {
+		my $p = Geo::LibProj::FFI::_trans( $self->{ffi_pj}, 1, [$_->[0], $_->[1], $_->[2], 'Inf'] );
+		$p->[3] = $_->[3];
+		delete $p->[3] unless defined $p->[3];
+		$p;
+	} @source_points;
+	
+	return @target_points if wantarray;
+	return $target_points[0] if @target_points < 2;
+	croak "transform() with list argument prohibited in scalar context";
+}
+
+
 sub version {
 	my ($self) = @_;
+	
+	my $ffi = ref $self ? $self->{ffi} : $INC{'Geo/LibProj/FFI.pm'};
+	return Geo::LibProj::FFI::proj_info()->version if $ffi;
 	
 	my $out = '';
 	eval {
@@ -186,6 +248,9 @@ sub version {
 	return $1 if $out =~ m/\b(\d+\.\d+(?:\.\d\w*)?)\b/;
 	return $out;
 }
+
+
+sub xs { shift->{ffi} }
 
 
 1;
@@ -202,11 +267,12 @@ Geo::LibProj::cs2cs - IPC interface to PROJ cs2cs
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 
  use Geo::LibProj::cs2cs;
+ use Geo::LibProj::FFI;  # optional module - see below
  
  $cs2cs = Geo::LibProj::cs2cs->new("EPSG:25833" => "EPSG:4326");
  $point = $cs2cs->transform( [500_000, 6094_800] );  # UTM 33U
@@ -242,9 +308,13 @@ regular expressions.
 
 As a result, this module may be expected to work with many different
 versions of the PROJ library, whereas L<Geo::Proj4> is limited to
-S<version 4> (at time of this writing). However, this module is
-definitely less efficient and possibly also less robust with regards
-to potential changes to the C<cs2cs> input/output format.
+S<version 4> (at time of this writing).
+
+Because the interprocess communication (IPC) with cs2cs(1) has
+significant performance constraints, this module will try to emulate
+the behaviour of cs2cs(1) using L<Geo::LibProj::FFI> if the latter
+module is loaded. This emulation is much faster than IPC, but does
+not support all features of cs2cs(1). See L</"XS MODE"> below.
 
 =head1 METHODS
 
@@ -321,14 +391,23 @@ context to directly obtain a reference to the output point. For lists
 of multiple input points, calling in scalar context is prohibited.
 
 Each call to C<transform()> creates a new C<cs2cs> process and runs
-through the PROJ initialisation. Avoid calling this method in a loop.
-See L</"PERFORMANCE CONSIDERATIONS"> for details.
+through the PROJ initialisation. Avoid calling this method in a loop
+(except in L</"XS MODE">). See L</"PERFORMANCE CONSIDERATIONS"> for
+details.
 
 =head2 version
 
  $version = Geo::LibProj::cs2cs->version;
 
 Attempt to determine the version of PROJ installed on your system.
+
+=head2 xs
+
+ $cs2cs = Geo::LibProj::cs2cs->new(...);
+ $bool = $cs2cs->xs;
+
+Indicates whether a L<Geo::LibProj::cs2cs> instance is using
+L</"XS MODE">.
 
 =head1 CONTROL PARAMETERS
 
@@ -371,14 +450,23 @@ transformation result and are unsupported.
 =head2 XS
 
  Geo::LibProj::cs2cs->new({XS => 0}, ...);
+ Geo::LibProj::cs2cs->new({XS => 1}, ...);
+ Geo::LibProj::cs2cs->new({XS => undef}, ...);  # the default
 
-There is a small chance that future versions of L<Geo::LibProj::cs2cs>
-might automatically switch to an XS implementation if a suitable
-third-party module is installed (such as L<Geo::Proj4>). This might
-improve speed dramatically, but it might also change some of the
-semantics of this module's interface in certain edge cases. If this
-matters to you, you can already now opt out of this behaviour by
-setting the internal parameter C<XS> to a defined non-truthy value.
+By default, this module will in certain cases try to use a foreign
+function interface provided by L<Geo::LibProj::FFI> to emulate
+cs2cs, rather than use L<cs2cs(1)|https://proj.org/apps/cs2cs.html>
+itself. This can give a dramatic performance boost, but does not
+support all features of cs2cs(1). See L</"XS MODE"> for details.
+
+To opt-out of this behaviour and force this module to only use an
+actual cs2cs(1) utility through IPC, the internal parameter C<XS>
+may be set to a defined non-truthy value (C<< XS => 0 >>).
+
+The C<XS> parameter can also be set to a truthy value to indicate
+a preference for the emulation. With C<< XS => 1 >> set, this
+module will emit warnings if it must fall back to IPC due to an
+error in the emulation's initialisation.
 
 =head1 ENVIRONMENT
 
@@ -391,8 +479,6 @@ binary by modifying the value of C<@Geo::LibProj::cs2cs::PATH>. The
 directories listed will be tried in order, and the first match will
 be used. An explicit value of C<undef> in the list will cause the
 environment's C<PATH> to be used at that position in the search.
-Note that these semantics are not yet finalised; they may change in
-future.
 
 =head1 DIAGNOSTICS
 
@@ -402,10 +488,14 @@ the result coordinates. The error string can be controlled
 by the S<C<-e> parameter> as described in the
 L<cs2cs(1)|https://proj.org/apps/cs2cs.html> documentation.
 
+In L</"XS MODE">, C<Inf> is used instead of an error string.
+
 L<Geo::LibProj::cs2cs> dies as soon as any other error condition is
 discovered. Use C<eval>, L<Try::Tiny> or similar to catch this.
 
 =head1 PERFORMANCE CONSIDERATIONS
+
+B<Note:> This section does B<not> apply in L</"XS MODE">.
 
 The C<L<transform()|/"transform">> method has enormous overhead.
 Profiling shows the rate of C<transform()> calls you can expect to
@@ -481,14 +571,69 @@ coordinates as required:
    $record->{coords}->{lat} = $p->[1];
  }
 
+=head1 XS MODE
+
+In order to improve performance, this module is able use a foreign
+function interface provided by L<Geo::LibProj::FFI> to emulate
+cs2cs. This is dramatically faster in most situations, and should
+also be thread-safe.
+
+In this document, the term "XS mode" is used for this emulation
+due to historical reasons. L<perlxs> is not actually used by this
+module at present.
+
+XS mode will be used if, and only if, B<all> of the following
+conditions are met:
+
+=over
+
+=item * L<Geo::LibProj::FFI> is loaded (e. g. with C<use>) before
+the L<Geo::LibProj::cs2cs> instance is created with C<new()>.
+
+=item * The internal L</"XS"> control parameter is either set to
+a truthy value, set to C<undef>, or is missing entirely.
+
+=item * No other control parameters are specified.
+
+=item * Both the source CRS and the target CRS given to the
+C<new()> method can be successfully interpreted by
+L<proj_create()|https://proj.org/development/reference/functions.html#c.proj_create>.
+
+=item * Creating a new PROJ threading context using
+L<proj_context_create()|https://proj.org/development/reference/functions.html#c.proj_context_create>
+succeeds.
+
+=item * Creating a new PROJ transformation object using
+L<proj_create_crs_to_crs()|https://proj.org/development/reference/functions.html#c.proj_create_crs_to_crs>
+succeeds.
+
+=back
+
+For example, the following code should reliably result in the use
+of S<XS mode>:
+
+ use Geo::LibProj::cs2cs 1.02;
+ use Geo::LibProj::FFI;
+ 
+ $cs2cs = Geo::LibProj::cs2cs->new("EPSG:4326" => "EPSG:25833");
+ $point = $cs2cs->transform( [54 + 59/60 + 30.43/3600, -4.2061] );
+ 
+ say $cs2cs->xs ? "FFI/XS mode" : "IPC mode";
+
+Note that XS mode doesn't support the C<cs2cs> DMS string format
+(C<54d59'30.43"N>). You must use numbers, as shown in the example.
+
 =head1 BUGS
 
 To communicate with C<cs2cs>, this software uses L<IPC::Run3>.
-Instead of directly interacting with the C<cs2cs> process, temp
-files are created for every call to C<transform()>. This is probably
-reliable, but slow.
+On most platforms, that module is not L<threads>-safe.
+Instead of directly interacting with the C<cs2cs> process,
+L<IPC::Run3> creates temp files for every call to C<transform()>.
+Except when using threads, this is reliable, but somewhat slow.
 
-The C<-l...> list parameters have not yet been implemented.
+The C<-l...> list parameters have not been implemented.
+
+This module doesn't seem to work on Win32. Try Cygwin.
 
 Please report new issues on GitHub.
 
@@ -496,13 +641,15 @@ Please report new issues on GitHub.
 
 L<Alien::proj>
 
+L<Geo::LibProj::FFI>
+
 =head1 AUTHOR
 
 Arne Johannessen <ajnn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Arne Johannessen.
+This software is Copyright (c) 2020-2021 by Arne Johannessen.
 
 This is free software, licensed under:
 

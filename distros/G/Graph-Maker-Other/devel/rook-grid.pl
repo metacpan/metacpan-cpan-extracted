@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2019 Kevin Ryde
+# Copyright 2017, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -24,11 +24,36 @@ use Graph::Maker::RookGrid;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use MyGraphs;
+$|=1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
 
+{
+  # Wiener index
+  # 0,8,54,192,500,1080,2058,3584,
+  # A085537  4^n - 3^n
+  # A085540
+  #
+  # Wiener index of complement
+  # 0,2,54,168,400,810,1470,
+  # A292058
+  # 2x2 is disconnected, just two path-2 for the absent cross-edges
+
+  foreach my $n (2..2) {
+    my $graph = Graph::Maker->new('rook_grid',
+                                  dims => [$n,$n],
+                                  undirected => 1,
+                                 );
+    $graph = $graph->complement;
+    MyGraphs::Graph_view($graph);
+    my $W = MyGraphs::Graph_Wiener_index($graph);
+    print $W,",";
+  }
+  print "\n";
+  exit 0;
+}
 {
   # HOG
 

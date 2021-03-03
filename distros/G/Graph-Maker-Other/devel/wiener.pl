@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -34,149 +34,6 @@ $|=1;
 # use Smart::Comments;
 
 
-
-{
-  # trees or graphs with mean distance
-  #
-  # -----
-  # trees, mean = 1/2 diameter
-  # vertices 2     5        8 9 10   11
-  # count    0 0 0 1 0  0   1 2  1 0  5 21 19 11 144
-  # n=5 path-5
-  # n=8             https://hog.grinvin.org/ViewGraphInfo.action?id=25162
-  # n=9 middle 1,2  https://hog.grinvin.org/ViewGraphInfo.action?id=25164
-  # n=9 symmetric   https://hog.grinvin.org/ViewGraphInfo.action?id=25166
-  # n=10            https://hog.grinvin.org/ViewGraphInfo.action?id=25168
-  # -----
-  # all graphs, mean = 1/2 diameter
-  # vertices 2     5    9  10y
-  # count    0 0 0 2 0 11 673
-  # n=5 kite         https://hog.grinvin.org/ViewGraphInfo.action?id=782
-  #     path-5 tree
-
-  # --------------------------------------
-  # trees, mean = 2/3 diameter
-  # 3  path
-  # 7  https://hog.grinvin.org/ViewGraphInfo.action?id=452
-  #    bi-star 4,3 (a graphedron extreme, comment posted)
-  # 12 https://hog.grinvin.org/ViewGraphInfo.action?id=27412
-  #    tree mean 2.666 of diam 0.666 W=176 num_pairs=66(12) diameter=4
-  #         *
-  #         |
-  #     *   *   *
-  #     |   |   |
-  # *---*---*---*
-  #     |   |   |
-  #     *   *   *
-  #         |
-  #         *
-  # n=13  4 of 
-  # tree mean 2.666 of diam 0.666 W=208 num_pairs=78 diameter=4
-  # hog not any
-  # -----
-  # all graphs, mean = 2/3 diameter
-  # n=3 path
-  # n=4 square and 3-cycle plus one
-  # n=6  total 12
-  #      one hanging vertex
-  #      hog not
-  #      sans leaf https://hog.grinvin.org/ViewGraphInfo.action?id=450
-  #                = Beineke G3
-  #     cf just the pyramid https://hog.grinvin.org/ViewGraphInfo.action?id=442
-
-  # --------------------------------------
-  # all graphs, mean = 3/4 diameter
-  # n=3  claw
-  # n=5  5-cycle
-  #      3-cycle and 2 hanging
-  # n=6  none
-  # -----
-  # tree, mean = 3/4 diameter
-  # n=3  claw
-  # n=16 https://hog.grinvin.org/ViewGraphInfo.action?id=27414
-  #      bi-star 10,6 (comment posted)
-  #      tree mean 2.25 of diam 0.75 W=270 num_pairs=120 diameter=3
-  #      hog not
-  # n=17 bi-star 11,6
-  #      no others
-  # clusters of stars up to n=25 ...
-
-  # -----
-  # all graphs, mean = 5/6 diameter
-  # n=7  triangle with 4 hanging off one corner
-  #        W=35 num_pairs=21(7) diameter=2
-  # tree, mean = 5/6 diameter
-  # n=6  6-star W=25 num_pairs=15(6) diameter=2
-
-
-  # -----
-  # all graphs, mean = 6/7 diameter
-  # n=8  triangle with 5 hanging off one corner
-  # tree, mean = 6/7 diameter
-  # n=7  7-star W=36 num_pairs=21(7) diameter=2
-
-  my $num = 2;
-  my $den = 3;
-  my $tree = 1;
-  my $terminal = 0;
-
-  require Graph;
-  require MyGraphs;
-  my @values;
-  my @graphs;
-  foreach my $num_vertices (13,
-                            # 2 .. 6,
-                            # 17,
-                           ) {
-    print "n=$num_vertices\n";
-
-    my $iterator_func =  ($tree
-                          ? MyGraphs::make_tree_iterator_edge_aref
-                          (num_vertices => $num_vertices)
-                          :  MyGraphs::make_graph_iterator_edge_aref
-                          (num_vertices => $num_vertices));
-    my $count = 0;
-    while (my $edge_aref = $iterator_func->()) {
-      my $graph = MyGraphs::Graph_from_edge_aref($edge_aref);
-      my $W = ($terminal
-               ? $graph->MyGraphs::Graph_terminal_Wiener_index
-               : $graph->MyGraphs::Graph_Wiener_index);
-      my $diameter = $graph->diameter || 0;
-      my $num_path_vertices = ($terminal
-                               ? $graph->MyGraphs::Graph_leaf_vertices
-                               : $num_vertices);
-      my $num_pairs = $num_path_vertices * ($num_path_vertices-1) / 2;
-      my $divisor = $diameter * $num_pairs;
-      my $mean_dist = ($num_pairs==0 ? -1 : $W / $num_pairs);
-      my $mean_of_diam = ($divisor==0 ? -1 : $W / $divisor);
-      my $equal = ($den*$W == $num*$divisor);  # W/divisor = num/den
-      if ($equal && ($num_vertices <= 7 || @graphs < 6)) {
-        my $cyclic = $graph->is_cyclic ? "cyclic" : "tree";
-        print " $cyclic mean $mean_dist of diam $mean_of_diam W=$W num_pairs=$num_pairs($num_path_vertices) diameter=$diameter\n";
-      } elsif ($num_vertices <= 5) {
-        print "  $mean_of_diam\n";
-      }
-      if ($equal) {
-        $count++;
-        if (@graphs < 3) {
-          my $num_edges = $graph->edges;
-          $graph->set_graph_attribute (name => "$num_vertices vertices $num_edges edges");
-          # $graph->delete_vertices(grep {$graph->vertex_degree($_)==1} $graph->vertices);
-          push @graphs, $graph;
-          MyGraphs::Graph_view($graph,synchronous=>0);
-          # MyGraphs::Graph_print_tikz($graph);
-          # Graph_tree_print($graph);
-        }
-      }
-    }
-    print "  count $count\n";
-    push @values, $count;
-  }
-  require Math::OEIS::Grep;
-  Math::OEIS::Grep->search(array => \@values, verbose=>1);
-  MyGraphs::hog_searches_html(@graphs);
-  exit 0;
-}
 {
   # average_path_length() / diameter of various graph types
   #
@@ -337,7 +194,6 @@ $|=1;
 
     require Graph::Maker::Keller;
     my $graph = Graph::Maker->new('Keller', N => $k);
-    # not in OEIS: 200, 2944
 
     # require Graph::Maker::FibonacciTree;
     # my $graph = Graph::Maker->new('fibonacci_tree',
@@ -355,6 +211,7 @@ $|=1;
                    : $W / $div / $diameter);
     # my $average = ($diameter == 0 ? 'undef'
     #                : $total / $diameter / $vertices**2);
+    if ($k==1) { print $graph->get_graph_attribute ('name'),"\n"; }
     print "$k W=$W diam=$diameter $average\n";
     push @values, $W;
   }
@@ -375,6 +232,149 @@ $|=1;
     return $total;
   }
 }
+{
+  # trees or graphs with mean distance
+  #
+  # -----
+  # trees, mean = 1/2 diameter
+  # vertices 2     5        8 9 10   11
+  # count    0 0 0 1 0  0   1 2  1 0  5 21 19 11 144
+  # n=5 path-5
+  # n=8             https://hog.grinvin.org/ViewGraphInfo.action?id=25162
+  # n=9 middle 1,2  https://hog.grinvin.org/ViewGraphInfo.action?id=25164
+  # n=9 symmetric   https://hog.grinvin.org/ViewGraphInfo.action?id=25166
+  # n=10            https://hog.grinvin.org/ViewGraphInfo.action?id=25168
+  # -----
+  # all graphs, mean = 1/2 diameter
+  # vertices 2     5    9  10y
+  # count    0 0 0 2 0 11 673
+  # n=5 kite         https://hog.grinvin.org/ViewGraphInfo.action?id=782
+  #     path-5 tree
+
+  # --------------------------------------
+  # trees, mean = 2/3 diameter
+  # 3  path
+  # 7  https://hog.grinvin.org/ViewGraphInfo.action?id=452
+  #    bi-star 4,3 (a graphedron extreme, comment posted)
+  # 12 https://hog.grinvin.org/ViewGraphInfo.action?id=27412
+  #    tree mean 2.666 of diam 0.666 W=176 num_pairs=66(12) diameter=4
+  #         *
+  #         |
+  #     *   *   *
+  #     |   |   |
+  # *---*---*---*
+  #     |   |   |
+  #     *   *   *
+  #         |
+  #         *
+  # n=13  4 of 
+  # tree mean 2.666 of diam 0.666 W=208 num_pairs=78 diameter=4
+  # hog not any
+  # -----
+  # all graphs, mean = 2/3 diameter
+  # n=3 path
+  # n=4 square and 3-cycle plus one
+  # n=6  total 12
+  #      one hanging vertex
+  #      hog not
+  #      sans leaf https://hog.grinvin.org/ViewGraphInfo.action?id=450
+  #                = Beineke G3
+  #     cf just the pyramid https://hog.grinvin.org/ViewGraphInfo.action?id=442
+
+  # --------------------------------------
+  # all graphs, mean = 3/4 diameter
+  # n=3  claw
+  # n=5  5-cycle
+  #      3-cycle and 2 hanging
+  # n=6  none
+  # -----
+  # tree, mean = 3/4 diameter
+  # n=3  claw
+  # n=16 https://hog.grinvin.org/ViewGraphInfo.action?id=27414
+  #      bi-star 10,6 (comment posted)
+  #      tree mean 2.25 of diam 0.75 W=270 num_pairs=120 diameter=3
+  #      hog not
+  # n=17 bi-star 11,6
+  #      no others
+  # clusters of stars up to n=25 ...
+
+  # -----
+  # all graphs, mean = 5/6 diameter
+  # n=7  triangle with 4 hanging off one corner
+  #        W=35 num_pairs=21(7) diameter=2
+  # tree, mean = 5/6 diameter
+  # n=6  6-star W=25 num_pairs=15(6) diameter=2
+
+
+  # -----
+  # all graphs, mean = 6/7 diameter
+  # n=8  triangle with 5 hanging off one corner
+  # tree, mean = 6/7 diameter
+  # n=7  7-star W=36 num_pairs=21(7) diameter=2
+
+  my $num = 2;
+  my $den = 3;
+  my $tree = 1;
+  my $terminal = 0;
+
+  require Graph;
+  require MyGraphs;
+  my @values;
+  my @graphs;
+  foreach my $num_vertices (13,
+                            # 2 .. 6,
+                            # 17,
+                           ) {
+    print "n=$num_vertices\n";
+
+    my $iterator_func =  ($tree
+                          ? MyGraphs::make_tree_iterator_edge_aref
+                          (num_vertices => $num_vertices)
+                          :  MyGraphs::make_graph_iterator_edge_aref
+                          (num_vertices => $num_vertices));
+    my $count = 0;
+    while (my $edge_aref = $iterator_func->()) {
+      my $graph = MyGraphs::Graph_from_edge_aref($edge_aref);
+      my $W = ($terminal
+               ? $graph->MyGraphs::Graph_terminal_Wiener_index
+               : $graph->MyGraphs::Graph_Wiener_index);
+      my $diameter = $graph->diameter || 0;
+      my $num_path_vertices = ($terminal
+                               ? $graph->MyGraphs::Graph_leaf_vertices
+                               : $num_vertices);
+      my $num_pairs = $num_path_vertices * ($num_path_vertices-1) / 2;
+      my $divisor = $diameter * $num_pairs;
+      my $mean_dist = ($num_pairs==0 ? -1 : $W / $num_pairs);
+      my $mean_of_diam = ($divisor==0 ? -1 : $W / $divisor);
+      my $equal = ($den*$W == $num*$divisor);  # W/divisor = num/den
+      if ($equal && ($num_vertices <= 7 || @graphs < 6)) {
+        my $cyclic = $graph->is_cyclic ? "cyclic" : "tree";
+        print " $cyclic mean $mean_dist of diam $mean_of_diam W=$W num_pairs=$num_pairs($num_path_vertices) diameter=$diameter\n";
+      } elsif ($num_vertices <= 5) {
+        print "  $mean_of_diam\n";
+      }
+      if ($equal) {
+        $count++;
+        if (@graphs < 3) {
+          my $num_edges = $graph->edges;
+          $graph->set_graph_attribute (name => "$num_vertices vertices $num_edges edges");
+          # $graph->delete_vertices(grep {$graph->vertex_degree($_)==1} $graph->vertices);
+          push @graphs, $graph;
+          MyGraphs::Graph_view($graph,synchronous=>0);
+          # MyGraphs::Graph_print_tikz($graph);
+          # Graph_tree_print($graph);
+        }
+      }
+    }
+    print "  count $count\n";
+    push @values, $count;
+  }
+  require Math::OEIS::Grep;
+  Math::OEIS::Grep->search(array => \@values, verbose=>1);
+  MyGraphs::hog_searches_html(@graphs);
+  exit 0;
+}
+
 
 {
   require Graph;

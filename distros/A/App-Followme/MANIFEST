@@ -17,7 +17,7 @@ lib/App/Followme/FIO.pm
 lib/App/Followme/FileData.pm
 lib/App/Followme/FolderData.pm
 lib/App/Followme/FormatPage.pm
-lib/App/Followme/Guide.pod
+lib/App/Followme/Guide.pm
 lib/App/Followme/Initialize.pm
 lib/App/Followme/JpegData.pm
 lib/App/Followme/MarkdownData.pm
@@ -50,6 +50,7 @@ t/FileData.t
 t/FolderData.t
 t/Followme.t
 t/FormatPage.t
+t/Guide.t
 t/Initialize.t
 t/JpegData.t
 t/MarkdownData.t

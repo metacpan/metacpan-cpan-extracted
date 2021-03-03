@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Leel::AliProcessor;
 # ABSTRACT: Internal class for leel tool
-$Bio::MUST::Apps::Leel::AliProcessor::VERSION = '0.210370';
+$Bio::MUST::Apps::Leel::AliProcessor::VERSION = '0.210570';
 use Moose;
 use namespace::autoclean;
 
@@ -165,7 +165,7 @@ Bio::MUST::Apps::Leel::AliProcessor - Internal class for leel tool
 
 =head1 VERSION
 
-version 0.210370
+version 0.210570
 
 =head1 AUTHOR
 

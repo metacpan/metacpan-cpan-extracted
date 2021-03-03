@@ -1,5 +1,11 @@
 Revision history for Perl extension Monitoring::Generator::TestConfig.
 
+0.54  Fri Feb 26 16:53:51 CET 2021
+	finally remove File::Which requirement
+
+0.52  Fri Feb 26 16:26:58 CET 2021
+	update requirements
+
 0.50  Wed Feb 24 14:04:57 CET 2021
 	change skip_dependencys to skip_dependencies
 	add underline to contact settings

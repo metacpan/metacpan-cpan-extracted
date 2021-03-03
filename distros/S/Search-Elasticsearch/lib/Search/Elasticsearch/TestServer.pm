@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::TestServer;
-$Search::Elasticsearch::TestServer::VERSION = '7.711';
+$Search::Elasticsearch::TestServer::VERSION = '7.711001';
 use Moo;
 use Search::Elasticsearch();
 use POSIX 'setsid';
@@ -211,7 +211,7 @@ Search::Elasticsearch::TestServer - A helper class to launch Elasticsearch nodes
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

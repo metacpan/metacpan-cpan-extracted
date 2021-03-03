@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2014 Kevin Ryde
+# Copyright 2009, 2010, 2014, 2020 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 #
@@ -21,7 +21,6 @@ use 5.010;
 use strict;
 use warnings;
 use Perl6::Slurp;
-use Regexp::Common;
 use Iterator::Simple;
 use Iterator::Simple::Locate;
 

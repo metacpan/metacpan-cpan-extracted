@@ -4,7 +4,7 @@
       "This library is free software; you can redistribute it and/or modify"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -50,9 +50,10 @@
             "IO::String" : "0",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
+            "List::Util" : "0",
             "Module::CPANfile" : "0",
             "Module::CPANfile::Writer" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.010001"
          }
       },
       "test" : {
@@ -72,7 +73,7 @@
    "provides" : {
       "App::UpdateCPANfile" : {
          "file" : "lib/App/UpdateCPANfile.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.0"
       },
       "App::UpdateCPANfile::CPANfileSnapshotParser" : {
          "file" : "lib/App/UpdateCPANfile/CPANfileSnapshotParser.pm"
@@ -95,7 +96,7 @@
          "web" : "https://github.com/hitode909/App-UpdateCPANfile"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.1.0",
    "x_authority" : "cpan:HITODE",
    "x_contributors" : [
       "hitode909 <hitode909@gmail.com>"

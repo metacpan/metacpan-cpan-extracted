@@ -50,13 +50,13 @@ like($string, qr/\[4\]/, 'Current');
 $string = $c->pagination( 4, 15, '/page-{page}?page={page}');
 
 like($string, qr/^<a href="\/page-3\?page=3" rel="prev">\&lt;<\/a>/, 'New template');
-my $url = Mojo::URL->new('http://sojolicio.us:3000/pages');
+my $url = Mojo::URL->new('http://sojolicious.example:3000/pages');
 $url->query({ page => 'offset-{page}'});
 
 $string = $c->pagination( 4, 15, $url);
 
 like($string,
-     qr/^<a href="http:\/\/sojolicio\.us:3000\/pages\?page=offset-3" rel="prev">\&lt;<\/a>/,
+     qr/^<a href="http:\/\/sojolicious\.example:3000\/pages\?page=offset-3" rel="prev">\&lt;<\/a>/,
      'Pagination with Mojo::URL');
 
 $string = $c->pagination( 2, 3 );

@@ -7,6 +7,7 @@ requires 'File::Path', '2.16';
 requires 'Digest::MD5', '2.55';
 requires 'Text::Markdown', '1.000031';
 requires 'Image::Size', '3.300';
+requires 'Pod::Text', '4.14';
 
 recommends 'Net::FTP', '0';
 

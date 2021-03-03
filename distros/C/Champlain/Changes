@@ -1,5 +1,12 @@
 Revision history for Champlain
 
+0.14 Mon Mar 1 11:52:54 PDT 2021
+	Bump version number after failed CPAN upload attempt.
+
+0.13 Tue Jan 26 18:36:15 CET 2021
+	Added project deprecation notice, project is now deprecated.
+
+
 0.12 Sun May  9 17:26:58 CEST 2010
 	API coverage for libchamplain 0.5.1.
 	Includes Memphis support (local rendering).

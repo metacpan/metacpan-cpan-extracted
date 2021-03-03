@@ -50,6 +50,7 @@ subtest 'special params' => sub {
 
 
 subtest 'transform pass-through simulation' => sub {
+	plan skip_all => 'test requires IPC' if $INC{'Geo/LibProj/FFI.pm'};
 	plan tests => 8;
 	@crs = ('+init=epsg:4326' => '+init=epsg:32630');
 	@p = ('5dE', '40dN', '9e+9999', bless {}, 'xxx');

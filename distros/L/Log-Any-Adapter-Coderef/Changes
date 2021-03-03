@@ -1,4 +1,13 @@
 Revision history for Log-Any-Adapter-Coderef
 
+0.002     2021-03-02 02:31:13+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - methods had the package name prepended, since this information is
+    already in the `package` key it's redundant and less helpful for
+    our common scenarios
+
 0.001     2021-02-16 08:50:47+08:00 Asia/Kuala_Lumpur
     Initial release.

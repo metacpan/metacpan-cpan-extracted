@@ -5,7 +5,7 @@ use warnings;
 use Carp;
 use base 'Exporter';
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 use constant DEBUG => 0;
 
@@ -71,7 +71,7 @@ my %Generator_cache;
 		croak "arguments must be CODE references or filehandles" if grep {ref($_) ne 'CODE'} @ites;
 		my $ite = shift(@ites);
 		sub {
-			my $next = &ite;
+			my $next = &$ite;
 			until (defined $next) {
 				$ite = shift(@ites) || return;
 				$next = &$ite;

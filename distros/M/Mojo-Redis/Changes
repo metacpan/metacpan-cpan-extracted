@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojo-Redis
 
+3.26 2021-03-01T09:01:51+0900
+ - Avoid circular reference in redis response parser
+   Contributor: Dan Book
+
 3.25 2020-10-02T10:21:30+0900
  - Fix handling undef() in _process_...() methods #56
  - Fix some leaks in Mojo::Redis::PubSub

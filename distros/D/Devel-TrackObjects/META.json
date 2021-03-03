@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Devel-TrackObjects",
    "no_index" : {
@@ -37,5 +37,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.600"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/noxxi/p5-devel-trackobjects/issues"
+      },
+      "homepage" : "https://github.com/noxxi/p5-devel-trackobjects",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/noxxi/p5-devel-trackobjects"
+      }
+   },
+   "version" : "0.601",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

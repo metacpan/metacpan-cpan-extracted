@@ -9,7 +9,7 @@ use List::AllUtils 'each_array', 'indexes';
 use Storable 'dclone';
 use Carp 'croak';
 
-our $VERSION = "v0.0.21";
+our $VERSION = "v0.0.22";
 
 has bs_prefix => sub { die "bs_prefix is required" };
 has c => sub { die "c is required" };

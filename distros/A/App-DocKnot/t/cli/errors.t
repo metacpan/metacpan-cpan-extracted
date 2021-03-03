@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot command dispatch error handling.
 #
-# Copyright 2018-2020 Russ Allbery <rra@cpan.org>
+# Copyright 2018-2021 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -11,6 +11,10 @@ use autodie;
 use warnings;
 
 use Test::More tests => 11;
+
+# Isolate from the environment.
+local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
+local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
 
 # Load the module.
 BEGIN { use_ok('App::DocKnot::Command') }
@@ -61,4 +65,4 @@ is_error($@, 'generate: metadata path /nonexistent does not exist');
 
 # Check for a missing required argument.
 eval { $docknot->run('dist') };
-is_error($@, 'dist: missing required option --distdir');
+is_error($@, 'dist: distdir path not given');

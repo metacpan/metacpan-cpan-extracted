@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 $VERSION = $VERSION;
 
 use strict;
@@ -20,7 +20,7 @@ use Symbol ();
 
 my %utf8_codepoint = (
 
-    # beautiful concept in young days
+    # beautiful concept in young days, however disabled 5-6 octets for safety
     # https://www.ietf.org/rfc/rfc2279.txt
     'RFC2279' => qr{(?>@{[join('', qw(
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
@@ -101,20 +101,27 @@ my $bare_w = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_';
 # exports %mb
 sub import {
     my $self = shift @_;
-    if (defined($_[0]) and ($_[0] =~ /\A[0123456789]/)) {
+
+    # confirm version
+    if (defined($_[0]) and ($_[0] =~ /\A [0-9] /xms)) {
         if ($_[0] ne $UTF8::R2::VERSION) {
             my($package,$filename,$line) = caller;
-            die "$filename requires UTF8::R2 $_[0], this is version $UTF8::R2::VERSION, stopped at $filename line $line.\n";
+            die "$filename requires @{[__PACKAGE__]} $_[0], however @{[__FILE__]} am only $UTF8::R2::VERSION, stopped at $filename line $line.\n";
         }
         shift @_;
     }
+
     for (@_) {
+
+        # export %mb
         if ($_ eq '%mb') {
             no strict qw(refs);
             # tie my %mb, __PACKAGE__; # makes: Parentheses missing around "my" list
             tie my %mb, 'UTF8::R2';
             *{caller().'::mb'} = \%mb;
         }
+
+        # set script encoding
         elsif (defined $utf8_codepoint{$_}) {
             $x = $utf8_codepoint{$_};
         }
@@ -127,7 +134,7 @@ sub confess {
     my $i = 0;
     my @confess = ();
     while (my($package,$filename,$line,$subroutine) = caller($i)) {
-        push @confess, "[$i] $filename($line) $package::$subroutine\n";
+        push @confess, "[$i] $filename($line) $package"."::$subroutine\n";
         $i++;
     }
     print STDERR CORE::reverse @confess;
@@ -159,7 +166,7 @@ sub UTF8::R2::chr {
 # (truncated to an integer) are used.
 
     my @octet = ();
-    do {
+    CORE::do {
         unshift @octet, ($_ % 0x100);
         $_ = int($_ / 0x100);
     } while ($_ > 0);
@@ -170,20 +177,20 @@ sub UTF8::R2::chr {
 # getc() for UTF-8 codepoint string
 sub UTF8::R2::getc (;*) {
     my $fh = @_ ? Symbol::qualify_to_ref($_[0],caller()) : \*STDIN;
-    my @octet = CORE::getc($fh);
-    if ($octet[0] =~ /\A[\xC2-\xDF]\z/) {
-        push @octet, CORE::getc($fh);
+    my $getc = CORE::getc $fh;
+    if ($getc =~ /\A [\xC2-\xDF] \z/xms) {
+        $getc .= CORE::getc $fh;
     }
-    elsif ($octet[0] =~ /\A[\xE0-\xEF]\z/) {
-        push @octet, CORE::getc($fh);
-        push @octet, CORE::getc($fh);
+    elsif ($getc =~ /\A [\xE0-\xEF] \z/xms) {
+        $getc .= CORE::getc $fh;
+        $getc .= CORE::getc $fh;
     }
-    elsif ($octet[0] =~ /\A[\xF0-\xF4]\z/) {
-        push @octet, CORE::getc($fh);
-        push @octet, CORE::getc($fh);
-        push @octet, CORE::getc($fh);
+    elsif ($getc =~ /\A [\xF0-\xF4] \z/xms) {
+        $getc .= CORE::getc $fh;
+        $getc .= CORE::getc $fh;
+        $getc .= CORE::getc $fh;
     }
-    return join '', @octet;
+    return $getc;
 }
 
 #---------------------------------------------------------------------
@@ -624,8 +631,8 @@ sub UTF8::R2::split {
 
 #---------------------------------------------------------------------
 # substr() for UTF-8 codepoint string
-eval sprintf <<'END', ($] >= 5.014) ? ':lvalue' : '';
-#                    vv----------------*******
+CORE::eval sprintf <<'END', ($] >= 5.014) ? ':lvalue' : '';
+#                    vv----------------------*******
 sub UTF8::R2::substr %s {
     my @x = $_[0] =~ /\G$x/g;
 
@@ -930,7 +937,7 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
     $result = UTF8::R2::lcfirst($_)
     $result = UTF8::R2::length($_)
     $result = UTF8::R2::ord($_)
-    $result = UTF8::R2::qr(qr/$utf8regex/imsxogc)
+    $result = UTF8::R2::qr(qr/$utf8regex/imsxo) # no /gc
     @result = UTF8::R2::reverse(@_)
     $result = UTF8::R2::reverse(@_)
     $result = UTF8::R2::reverse()
@@ -946,7 +953,7 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
     $result = $_ =~ m<\G$mb{qr/$utf8regex/imsxo}>gc
     $result = $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
-=head1 OCTET-semantics Functions vs. Codepoint-semantics Subroutines
+=head1 Octet-Semantics Functions vs. Codepoint-Semantics Subroutines
 
 This software adds the ability to handle UTF-8 code points to bare Perl; it does
 not provide the ability to handle characters and graphene with UTF-8.
@@ -995,7 +1002,7 @@ name.
                           $mb{qr/ \V /}                              since perl 5.010
                           $mb{qr/ \R /}                              since perl 5.010
                           $mb{qr/ \N /}                              since perl 5.012
-                          (max \x{UTF8hex} is \x{7FFFFFFF})
+                          (max \x{UTF8hex} is \x{7FFFFFFF}, so cannot 4 octet codepoints, pardon me please!)
   ------------------------------------------------------------------------------------------------------------------------------------------
   ?? or m??                 (nothing)
   ------------------------------------------------------------------------------------------------------------------------------------------
@@ -1190,10 +1197,11 @@ INABA Hitoshi E<lt>ina@cpan.orgE<gt>
 
 This project was originated by INABA Hitoshi.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENSE and COPYRIGHT
 
 This software is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+modify it under the same terms as Perl itself. See the LICENSE
+file for details.
 
 This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

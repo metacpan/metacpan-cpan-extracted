@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.210380';
+$Bio::MUST::Core::SeqId::VERSION = '0.210610';
 use Moose;
 use namespace::autoclean;
 
@@ -204,8 +204,8 @@ const my @GENERA  => qw(
     A-2
     acetamiprid-degrading
     Activation-tagging
-    Adeno-associated
     Adeno-Associated
+    Adeno-associated
     Aids-associated
     alk-system
     Altai-like
@@ -725,8 +725,8 @@ const my @GENERA  => qw(
     Non-geniculate
     Non-human
     non-mammal
-    non-primate
     Non-primate
+    non-primate
     Norovirus/GII.4/1993-6/UK
     Norovirus/Hu/GII.2/V1/09/18-Jan-2009/Slovenia
     Norovirus/Hu/GII.4/1732/07/07-Jun-2007/Slovenia
@@ -6542,6 +6542,19 @@ sub nexus_id {
 	return qq{'$full_id'};                          # ... and requote
 }
 
+
+sub abbr_with_regex {
+    my $self   = shift;
+    my $prefix = shift // q{};
+    my $regex  = shift // $DEF_ID;
+
+    my @ids = $self->full_id =~ $regex;       # capture original id(s)
+    s{$NOID_CHARS}{_}xmsg for @ids;           # substitute forbidden chars
+    my $abbr_id = join q{}, $prefix, @ids;
+
+    return $abbr_id;
+}
+
 # from Bio::Phylo::PhyloRole
 
 # =item get_nexus_name()
@@ -6682,7 +6695,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.210380
+version 0.210610
 
 =head1 SYNOPSIS
 
@@ -6711,6 +6724,8 @@ version 0.210380
 =head2 foreign_id
 
 =head2 nexus_id
+
+=head2 abbr_with_regex
 
 =head2 new_with
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2018, 2019 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -39,7 +39,10 @@ use File::Spec;
 use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
 
-plan tests => 110;
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
+plan tests => 151;
 
 
 #------------------------------------------------------------------------------
@@ -94,19 +97,33 @@ foreach my $N (0 .. 32) {
     $content =~ /=head1 HOUSE OF GRAPHS.*?=head1/s or die;
     $content = $&;
     my $count = 0;
-    while ($content =~ /^ +(?<id>\d+) +N=(?<N>\d+)( +\(order=(?<order>\d+)\))?/mg) {
+    while ($content =~ /^ +(?<ids>(\d+, )*\d+) +N=(?<Nlo>\d+)( to N=(?<Nhi>[0-9]+))?( +\(order=(?<order>\d+)\))?/mg) {
       $count++;
-      my $id    = $+{'id'};
-      my $N     = $+{'N'};
+      my $ids = $+{'ids'};
+      my $Nlo = $+{'Nlo'};
+      my $Nhi = $+{'Nhi'} // $Nlo;
       my $order = $+{'order'};
-      $shown{"N=$N"} = $+{'id'};
+      ### $ids
+      ### $Nlo
+      ### $Nhi
+      my @ids = split /, /, $ids;
       if (defined $order) {
-        $shown{"order=$order"} = $+{'id'};
+        ok (scalar(@ids), 1, 'one id only for order=X');
+        $shown{"order=$order"} = $ids[0];
       }
+      for (my $N = $Nlo; $N <= $Nhi; $N++) {
+        @ids or die;
+        my $id = shift @ids;
+        my $key = "N=$N";
+        ok (! exists $shown{$key}, 1);
+        $shown{"N=$N"} = $id;
+      }
+      ok (scalar(@ids), 0,
+          "oops, number of ids doesn't match N range");
     }
-    ok ($count, 12, 'HOG ID number lines');
+    ok ($count, 14, 'HOG ID number lines');
   }
-  ok (scalar(keys %shown), 20);
+  ok (scalar(keys %shown), 27);
   ### %shown
 
   my $extras = 0;

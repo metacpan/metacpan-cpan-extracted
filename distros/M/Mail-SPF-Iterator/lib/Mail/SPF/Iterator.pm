@@ -120,6 +120,30 @@ C<< ( RESULT, COMMENT, HASH, EXPLAIN ) >>. RESULT is the result, e.g. "Fail",
 information about problem, mechanism for the Received-SPF header.
 EXPLAIN will be set to the explain string if RESULT is Fail.
 
+The following fields are in HASH
+
+=over 8
+
+=item client-ip
+
+The clients IP address
+
+=item helo
+
+The helo string from the client
+
+=item identity
+
+How the identity of the sender was given, i.e. either C<mailfrom> or
+C<helo>.
+
+=item envelope-from
+
+The sender, either based on the mail from in the SMTP dialog (with
+C<identity> being C<mailfrom>) or the HELO/EHLO.
+
+=back
+
 If no final result was achieved yet it will either return
 C<< (undef,@QUERIES) >> with a list of new queries to continue, C<< ('') >>
 in case the ANSWER produced an error but got ignored, because there are
@@ -212,7 +236,7 @@ use warnings;
 
 package Mail::SPF::Iterator;
 
-our $VERSION = '1.119';
+our $VERSION = '1.120';
 
 use fields (
     # values given in or derived from params to new()

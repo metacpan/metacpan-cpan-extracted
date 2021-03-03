@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Transport::Async;
-$Search::Elasticsearch::Transport::Async::VERSION = '7.711';
+$Search::Elasticsearch::Transport::Async::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Role::Is_Async',
     'Search::Elasticsearch::Role::Transport';
@@ -103,7 +103,7 @@ Search::Elasticsearch::Transport::Async - Provides async interface between the c
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

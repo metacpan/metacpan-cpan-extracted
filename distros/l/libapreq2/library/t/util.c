@@ -21,7 +21,7 @@
 #include "at.h"
 
 
-static void test_atoi64f(dAT)
+static void test_atoi64f(dAT, void *ctx)
 {
     AT_int_eq(apreq_atoi64f("0"), 0);
     AT_int_eq(apreq_atoi64f("-1"), -1);
@@ -36,7 +36,7 @@ static void test_atoi64f(dAT)
           "hex test");
 }
 
-static void test_atoi64t(dAT)
+static void test_atoi64t(dAT, void *ctx)
 {
     AT_int_eq(apreq_atoi64t("0"), 0);
     AT_int_eq(apreq_atoi64t("-1"), -1);
@@ -50,7 +50,7 @@ static void test_atoi64t(dAT)
 
 }
 
-static void test_index(dAT)
+static void test_index(dAT, void *ctx)
 {
     const char haystack[] = "Four score and seven years ago";
     apr_size_t hlen = sizeof haystack - 1;
@@ -71,7 +71,7 @@ static void test_index(dAT)
 #define A_GRAVE  0xE5
 #define KATAKANA_A 0xFF71
 
-static void test_decode(dAT)
+static void test_decode(dAT, void *ctx)
 {
     apr_size_t elen;
     char src1[] = "%C3%80%E3%82%a2"; /* A_GRAVE KATAKANA_A as utf8 */
@@ -87,7 +87,7 @@ static void test_decode(dAT)
     AT_int_eq(expect[4], 0xA2);
 }
 
-static void test_charset_divine(dAT)
+static void test_charset_divine(dAT, void *ctx)
 {
     apr_size_t elen;
     char src1[] = "%C3%80%E3%82%a2"; /* A_GRAVE KATAKANA_A as utf8 */
@@ -112,7 +112,7 @@ static void test_charset_divine(dAT)
 }
 
 
-static void test_decodev(dAT)
+static void test_decodev(dAT, void *ctx)
 {
     char src1[] = "%2540%2";
     char src2[] = "0%u0";
@@ -144,12 +144,12 @@ static void test_decodev(dAT)
 }
 
 
-static void test_encode(dAT)
+static void test_encode(dAT, void *ctx)
 {
 
 }
 
-static void test_cp1252_to_utf8(dAT)
+static void test_cp1252_to_utf8(dAT, void *ctx)
 {
     char src1[] = "%C3%80%E3%82%a2"; /* A_GRAVE KATAKANA_A as utf8 */
     char src2[5];
@@ -186,7 +186,7 @@ static void test_cp1252_to_utf8(dAT)
 
 }
 
-static void test_quote(dAT)
+static void test_quote(dAT, void *ctx)
 {
     size_t len;
     char dst[64];
@@ -208,7 +208,7 @@ static void test_quote(dAT)
     AT_str_eq(dst, "\"foo\\0bar\"");
 }
 
-static void test_quote_once(dAT)
+static void test_quote_once(dAT, void *ctx)
 {
     size_t len;
     char dst[64];
@@ -252,23 +252,23 @@ static void test_quote_once(dAT)
     AT_str_eq(dst, "\"\\\"foo\\\"bar\\\"\"");
 }
 
-static void test_join(dAT)
+static void test_join(dAT, void *ctx)
 {
 
 }
 
-static void test_brigade_fwrite(dAT)
+static void test_brigade_fwrite(dAT, void *ctx)
 {
 
 }
 
-static void test_file_mktemp(dAT)
+static void test_file_mktemp(dAT, void *ctx)
 {
 
 
 }
 
-static void test_header_attribute(dAT)
+static void test_header_attribute(dAT, void *ctx)
 {
     const char hdr[] = "filename=\"filename=foo\" filename=\"quux.txt\"";
     const char *val;
@@ -286,14 +286,14 @@ static void test_header_attribute(dAT)
 
 }
 
-static void test_brigade_concat(dAT)
+static void test_brigade_concat(dAT, void *ctx)
 {
 
 }
 
 
 
-#define dT(func, plan) #func, func, plan
+#define dT(func, plan) #func, func, plan, NULL
 
 
 int main(int argc, char *argv[])
@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
 
     apr_pool_create(&p, NULL);
 
-    AT = at_create(p, 0, at_report_stdout_make(p));
+    AT = at_create(0, at_report_stdout_make());
 
     for (i = 0; i < sizeof(test_list) / sizeof(at_test_t);  ++i)
         plan += test_list[i].plan;

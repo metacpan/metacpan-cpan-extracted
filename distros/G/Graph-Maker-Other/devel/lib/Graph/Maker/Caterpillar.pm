@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -27,7 +27,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 
@@ -57,7 +57,7 @@ sub init {
   }
 
   my $graph = _make_graph(\%params);
-  $graph->set_graph_attribute (name => "Catterpillar ".join(',',@N_list));
+  $graph->set_graph_attribute (name => "Caterpillar ".join(',',@N_list));
 
   my $directed = $graph->is_directed;
   $graph->add_path(1 .. scalar(@N_list));
@@ -156,11 +156,11 @@ L<Graph::Maker::Star>
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -111,10 +111,10 @@ plan tests => 3;
       }
     }
   };
-  foreach my $N (0 .. 64) {
+  foreach my $N (1 .. 64) {
     $try->(N => $N);
   }
-  foreach my $height (0 .. 20) {
+  foreach my $height (1 .. 20) {
     $try->(height => $height);
   }
   ok ($extras, 0);

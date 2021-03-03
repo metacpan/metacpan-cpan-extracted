@@ -24,7 +24,7 @@ use warnings;
 use IO::Socket::INET;
 use Time::HiRes qw(time);
 
-our $VERSION = "1.0.1";   # MineStat version
+our $VERSION = "1.0.2";   # MineStat version
 our $NUM_FIELDS = 6;      # number of values expected from server
 our $DEFAULT_TIMEOUT = 5; # TCP connection timeout
 
@@ -116,7 +116,6 @@ To install this module:
     make
     make install
             
-
 =head1 FUNCTIONS
 
 =head2 init
@@ -131,18 +130,31 @@ The default TCP timeout value is 5 seconds.
 
 =head1 SUPPORT
 
+=over 4
+
 =item Source code: L<https://github.com/FragLand/minestat>
 
 =item Bug reports and feature requests: L<https://github.com/FragLand/minestat/issues>
 
+=back
+
 =head1 DEPENDENCIES
 
-=item L<IO::Socket::INET> 
+=over 4
+
+=item L<IO::Socket::INET>
+
 =item L<Time::HiRes>
+
+=back
 
 =head1 AUTHOR
 
+=over 4
+
 =item B<Lloyd Dilley> C<E<lt>ldilley@cpan.orgE<gt>>
+
+=back
 
 =head1 LICENSE
 

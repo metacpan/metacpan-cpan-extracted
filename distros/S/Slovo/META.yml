@@ -24,7 +24,7 @@ requires:
   EV: '4.33'
   Minion::Backend::SQLite: v5.0.3
   Mojo::SQLite: '3.004'
-  Mojolicious: '8.65'
+  Mojolicious: '9.02'
   Mojolicious::Plugin::Authentication: '1.32'
   Mojolicious::Plugin::OpenAPI: '3.40'
   Mojolicious::Plugin::PODViewer: '0.006'
@@ -37,5 +37,5 @@ resources:
   homepage: https://github.com/kberov/Slovo
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/kberov/Slovo.git
-version: v2021.02.01
+version: v2021.02.20
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

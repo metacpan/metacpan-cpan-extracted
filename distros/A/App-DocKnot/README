@@ -1,8 +1,8 @@
-                               DocKnot 4.00
+                               DocKnot 4.01
                     (Package documentation generator)
                 Maintained by Russ Allbery <rra@cpan.org>
 
-  Copyright 2013-2020 Russ Allbery <rra@cpan.org>.  This software is
+  Copyright 2013-2021 Russ Allbery <rra@cpan.org>.  This software is
   distributed under a BSD-style license.  Please see the section LICENSE
   below for more information.
 
@@ -59,7 +59,8 @@ REQUIREMENTS
 
   * File::BaseDir
   * File::ShareDir
-  * IO::Compress::Xz (part of IO-Compress-LZMA)
+  * IO::Compress::Xz (part of IO-Compress-Lzma)
+  * IO::Uncompress::Gunzip (part of IO-Compress)
   * IPC::Run
   * IPC::System::Simple
   * JSON::MaybeXS
@@ -156,7 +157,7 @@ LICENSE
   The DocKnot package as a whole is covered by the following copyright
   statement and license:
 
-    Copyright 2013-2020 Russ Allbery <rra@cpan.org>
+    Copyright 2013-2021 Russ Allbery <rra@cpan.org>
 
     Permission is hereby granted, free of charge, to any person obtaining
     a copy of this software and associated documentation files (the

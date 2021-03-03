@@ -1,4 +1,4 @@
-# Copyright 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 
@@ -62,7 +62,7 @@ Graph::Maker->add_factory_type('crown' => __PACKAGE__);
 
 __END__
 
-=for stopwords Ryde
+=for stopwords Ryde Nx circulant undirected OEIS
 
 =head1 NAME
 
@@ -88,7 +88,7 @@ For N>=2, the crown is is the graph complement of the rook graph Nx2
 (L<Graph::Maker::RookGrid>).  That graph is a complete set of edges within
 the two N columns, and edges across horizontally.  The crown graph is the
 opposite (nothing within the columns, everything except horizontal
-between)..
+between).
 
 Crown N=4 is the cube graph (L<Graph::Maker::Hypercube> 3).  Crown N=5 is
 circulant N=10 offsets 1,3 (L<Graph::Maker::Circulant>).
@@ -153,11 +153,11 @@ L<Graph::Maker::CompleteBipartite>
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

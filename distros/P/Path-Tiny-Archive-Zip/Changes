@@ -1,5 +1,9 @@
 Revision history for Path-Tiny-Archive-Zip
 
+0.003    2021-02-28
+
+    - Added compression level for zip() method.
+
 0.002    2021-02-18
 
     - Improved documentation.

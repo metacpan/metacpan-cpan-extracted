@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  2.102 28 February 2021
+
+      * Add IO_COMPRESS_SKIP_STDIN_TESTS to skip tests on Windows
+        https://github.com/pmqs/IO-Compress/issues/29
+        b0b511ec6a7dcfa4e372a8b8131767fcb39369b1
+
   2.101 20 February 2021
 
       * fix version numbers in meta files

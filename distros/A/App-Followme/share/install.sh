@@ -11,7 +11,6 @@ cp ../lib/App/Followme.pm $PERL_ENV/App
 chmod -w  $PERL_ENV/App/Followme.pm
 
 mkdir -p $PERL_ENV/App/Followme
-cp  ../lib/App/Followme/*.pod $PERL_ENV/App/Followme
 cp  ../lib/App/Followme/*.pm $PERL_ENV/App/Followme
 chmod -w  $PERL_ENV/App/Followme/*.pm
 

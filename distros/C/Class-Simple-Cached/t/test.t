@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 10;
+use Test::Most tests => 14;
 use Test::NoWarnings;
 use CHI;
 
@@ -25,9 +25,34 @@ TEST: {
 	ok($rc[0] eq 'plugh');
 	ok($rc[1] eq 'xyzzy');
 
+	@rc = $l->foo();
+	ok(!defined($rc[0]));
+
 	ok($cache->get('fred') eq 'wilma');
 
-	# foreach my $key($cache->get_keys()) {
-		# diag($key);
-	# }
+	if($ENV{'TEST_VERBOSE'}) {
+		foreach my $key($cache->get_keys()) {
+			diag($key);
+		}
+	}
+
+	$l = new_ok('Class::Simple::Cached' => [ cache => $cache, object => new_ok('foo') ]);
+	@rc = $l->foo('bar', 'baz');
+	ok(scalar(@rc) == 0);
 }
+
+package foo;
+
+sub new {
+	my $proto = shift;
+	my $class = ref($proto) || $proto;
+
+	return {}, $class;
+}
+
+sub foo {
+	return;
+}
+
+1;
+

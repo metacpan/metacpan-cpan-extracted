@@ -10,7 +10,11 @@ use lib qw{ inc };
 
 use My::Module::Test;
 
+set_test_output_encoding;
+
 use constant REGEXP_REF	=> ref qr{};
+
+no if "$]" >= 5.020, feature => qw{ signatures };
 
 sub test_paste (@);	## no critic (ProhibitSubroutinePrototypes)
 
@@ -52,6 +56,17 @@ foreach my $args (
     flavorize( $getter, $pb->get( 'default_flavor' ) );
     test_paste scalar $getsub->(), $data,
 	"Retrieve $flavor data from $where with $getter.";
+
+    CAN_USE_UNICODE
+	or next;
+
+    # NON-ASCII BELOW HERE
+
+    $pb->clear();
+    $data = chr 0x3a3;	# GREEK CAPITAL LETTER SIGMA
+    $pb->copy ($data);
+    test_paste scalar $pb->paste(), $data,
+	"Retrieve $flavor GREEK CAPITAL LETTER SIGMA from $where with copy.";
 }
 
 done_testing;

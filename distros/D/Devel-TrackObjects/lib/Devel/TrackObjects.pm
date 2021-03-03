@@ -4,7 +4,7 @@ use warnings;
 use Scalar::Util 'weaken';
 use overload;
 
-our $VERSION = '0.600';
+our $VERSION = '0.601';
 
 my @weak_objects; # List of weak objects incl file + line
 my @conditions;   # which objects to track, set by import
@@ -19,61 +19,82 @@ my $with_sizediff; # track changes in size
 my $no_end;       # no show tracked at END
 
 
+my $outfunc = sub {
+    my ($prefix,$out) = @_;
+    if (ref($out)) {
+	# details - can be multiple lines
+	if (@$out) {
+	    print STDERR "LEAK$prefix " .
+		($with_tstamp ? localtime().' ' :'' ) . " >> \n",
+		@$out,
+		" --\n";
+	} else {
+	    print STDERR "LEAK$prefix " .
+		($with_tstamp ? localtime().' ' :'' ) . " >> empty --\n";
+	}
+    } else {
+	# no details - single line
+	$out ||= 'empty ';
+	print STDERR "LEAK$prefix >> $out--\n";
+    }
+};
+
+
 ############################################################################
 # redefined CORE::GLOBAL::bless if restrictions are given
 # which classes should get tracked
 ############################################################################
 sub import {
-	shift;
-	my @opt;
-	while (@_) {
-		local $_ = shift;
-		if ( ! ref && m{^-(\w+)$} ) {
-			push @opt,$1;
-		} elsif ( $_ eq 'track_object' ) {
-			# export function
-			my ($pkg) = caller();
-			no strict 'refs';
-			*{"${pkg}::track_object"} = \&track_object;
-		} elsif ( ! ref && m{^/} ) {
-			# assume uncompiled regex
-			my $rx = eval "qr$_";
-			die $@ if $@;
-			push @conditions,$rx;
-		} else {
-			push @conditions,$_
-		}
+    shift;
+    while (@_) {
+	local $_ = shift;
+	if ( ! ref && m{^-(\w+)$} ) {
+	    if ($1 eq 'debug') {
+		$debug = 1;
+	    } elsif ($1 eq 'verbose') {
+		$verbose = 1;
+	    } elsif ($1 eq 'timestamp') {
+		$with_tstamp = 1;
+	    } elsif ($1 eq 'noend') {
+		$no_end = 1;
+	    } elsif ($1 eq 'size') {
+		# need Devel::Size;
+		$with_size = eval { require Devel::Size }
+		    or die "need Devel::Size installed for '-size' option"
+	    } elsif ($1 eq 'sizediff') {
+		$with_sizediff = 1;
+		unshift @_, 'size'  if ! $with_size;
+	    } elsif ($1 eq 'out') {
+		$outfunc = shift @_;
+		ref($outfunc) eq 'CODE'
+		    or die "outfunc needs to be function reference";
+	    } else {
+		die "unknown option $_";
+	    }
+	} elsif ( $_ eq 'track_object' ) {
+	    # export function
+	    my ($pkg) = caller();
+	    no strict 'refs';
+	    *{"${pkg}::track_object"} = \&track_object;
+	} elsif ( ! ref && m{^/} ) {
+	    # assume uncompiled regex
+	    my $rx = eval "qr$_";
+	    die $@ if $@;
+	    push @conditions,$rx;
+	} else {
+	    push @conditions,$_
 	}
-	for(@opt) {
-		if ( $_ eq 'debug' ) {
-			$debug = 1;
-		} elsif ( $_ eq 'verbose' ) {
-			$verbose = 1;
-		} elsif ( $_ eq 'timestamp' ) {
-			$with_tstamp = 1;
-		} elsif ( $_ eq 'noend' ) {
-			$no_end = 1;
-		} elsif ( $_ eq 'size' ) {
-			# need Devel::Size;
-			$with_size = eval { require Devel::Size }
-				or die "need Devel::Size installed for '-size' option"
-		} elsif ( $_ eq 'sizediff' ) {
-			$with_sizediff = 1;
-			push @opt,'size' if ! $with_size;
-		} else {
-			die "unknown option $_";
-		}
-	}
-	_redefine_bless() if @conditions;
+    }
+    _redefine_bless() if @conditions;
 }
 
 ############################################################################
 # show everything tracked at the end
 ############################################################################
 sub END {
-	$no_end && return;
-	__PACKAGE__->show_tracked() if $is_redefined;
-	1;
+    $no_end && return;
+    __PACKAGE__->show_tracked() if $is_redefined;
+    1;
 }
 
 
@@ -81,9 +102,9 @@ sub END {
 # depending on $verbose show detailed or compact version
 ############################################################################
 sub show_tracked {
-	return $verbose
-		? show_tracked_detailed(@_)
-		: show_tracked_compact(@_);
+    return $verbose
+	? show_tracked_detailed(@_)
+	: show_tracked_compact(@_);
 }
 
 ############################################################################
@@ -91,130 +112,123 @@ sub show_tracked {
 # \@weak_objects, else print myself to STDERR
 ############################################################################
 sub show_tracked_detailed {
-	shift;
-	my $prefix = shift || '';
-	_remove_destroyed();
-	if ( defined wantarray ) {
-		return \@weak_objects;
-	} else {
-		if ( @weak_objects ) {
-			my (%s,%l);
-			print STDERR "LEAK$prefix "
-				. ($with_tstamp ? localtime().' ' :'' ) . " >> \n";
-			for my $o ( sort { 
-				overload::StrVal($a->[0]) cmp overload::StrVal($b->[0]) 
-				} @weak_objects ) {
-				my $line = '-- ';
-				if ( $with_size ) {
-					my $size = Devel::Size::size($o->[0]);
-					my $total_size = Devel::Size::total_size($o->[0]);
-					if ( $with_sizediff ) {
-						$line .= sprintf("size=%d/%+d/%+d ",$size,
-							$size-($o->[6]||0),$size-($o->[4]||0));
-						$line .= sprintf("%d/%+d/%+d ", $total_size,
-							$total_size-($o->[7]||0),$total_size-($o->[5]||0));
-						$o->[4] = $size if ! defined $o->[4];
-						$o->[5] = $total_size if ! defined $o->[5];
-						$o->[6] = $size;
-						$o->[7] = $total_size;
-					} else {
-						$line .= "size=$size total=$total_size ";
-					}
-				}
-				$line .= sprintf "%s | %s:%s%s\n", 
-					overload::StrVal($o->[0]),$o->[1],$o->[2],
-					defined($o->[3]) ? " $o->[3]":'';
-				print STDERR $line;
-			}
-			print STDERR "LEAK$prefix --\n";
+    shift;
+    my $prefix = shift || '';
+    _remove_destroyed();
+    return \@weak_objects if defined wantarray;
+
+    my @out;
+    if ( @weak_objects ) {
+	my (%s,%l);
+	for my $o ( sort {
+	    overload::StrVal($a->[0]) cmp overload::StrVal($b->[0])
+	    } @weak_objects ) {
+	    my $line = '-- ';
+	    if ( $with_size ) {
+		my $size = Devel::Size::size($o->[0]);
+		my $total_size = Devel::Size::total_size($o->[0]);
+		if ( $with_sizediff ) {
+		    $line .= sprintf("size=%d/%+d/%+d ",$size,
+			$size-($o->[6]||0),$size-($o->[4]||0));
+		    $line .= sprintf("%d/%+d/%+d ", $total_size,
+			$total_size-($o->[7]||0),$total_size-($o->[5]||0));
+		    $o->[4] = $size if ! defined $o->[4];
+		    $o->[5] = $total_size if ! defined $o->[5];
+		    $o->[6] = $size;
+		    $o->[7] = $total_size;
 		} else {
-			print STDERR "LEAK$prefix "
-				. ($with_tstamp ? localtime().' ' :'' ) . " >> empty --\n";
+		    $line .= "size=$size total=$total_size ";
 		}
+	    }
+	    $line .= sprintf "%s | %s:%s%s\n",
+		overload::StrVal($o->[0]),$o->[1],$o->[2],
+		defined($o->[3]) ? " $o->[3]":'';
+	    push @out, $line;
 	}
+    }
+    return $outfunc->($prefix,\@out);
 }
 
 ############################################################################
 # show tracked objects in compact form, e.g. only counter for each class
 ############################################################################
 sub show_tracked_compact {
-	shift;
-	my $prefix = shift || '';
-	_remove_destroyed();
-	my %count4class;
-	foreach my $o (@weak_objects) {
-		( $count4class{ ref($o->[0]) } ||= 0 )++;
-	}
-	if ( defined wantarray ) {
-		return %count4class ? \%count4class : undef
-	}
+    shift;
+    my $prefix = shift || '';
+    _remove_destroyed();
+    my %count4class;
+    foreach my $o (@weak_objects) {
+	( $count4class{ ref($o->[0]) } ||= 0 )++;
+    }
+    if ( defined wantarray ) {
+	return %count4class ? \%count4class : undef
+    }
 
-	my $msg = "LEAK$prefix >> ";
-	if ( %count4class ) {
-		foreach ( sort keys %count4class ) {
-			$msg .= $_.'='.$count4class{$_}.' ';
-		}
-	} else {
-		$msg .= "empty "
+    my $msg;
+    if ( %count4class ) {
+	foreach ( sort keys %count4class ) {
+	    $msg .= $_.'='.$count4class{$_}.' ';
 	}
-	$msg .= "--\n";
-	print STDERR $msg;
+    }
+    return $outfunc->($prefix,$msg);
 }
 
 ############################################################################
 # bless object and track it, if it matches @condition
 ############################################################################
 sub _bless_and_track($;$) {
-	my ($pkg,$filename,$line) = caller();
-	my $class = $_[1] || $pkg;
+    my ($pkg,$filename,$line) = caller();
+    my $class = $_[1] || $pkg;
 
-	if (ref($_[0])) {
-	    # unregister
-	    @weak_objects = grep { $_->[0] && $_->[0] != $_[0] } @weak_objects;
+    if (ref($_[0])) {
+	# unregister
+	@weak_objects = grep { $_->[0] && $_->[0] != $_[0] } @weak_objects;
+    }
+    my $object = $old_bless
+	? $old_bless->( $_[0],$class)
+	: CORE::bless( $_[0],$class );
+
+    my $track = 0;
+    if ( @conditions ) {
+	foreach my $c ( @conditions ) {
+	    if ( ! ref($c) ) {
+		$track = 1,last if $c eq $pkg or $c eq $class;
+	    } elsif ( UNIVERSAL::isa($c,'Regexp' )) {
+		$track = 1,last if $pkg =~m{$c} or $class =~m{$c};
+	    } elsif ( UNIVERSAL::isa($c,'CODE' )) {
+		$track = 1,last if $c->($pkg) or $c->($class);
+	    }
 	}
-	my $object = $old_bless ? $old_bless->( $_[0],$class) : CORE::bless( $_[0],$class );
+    } else {
+	$track = 1;
+    }
+    _register( $object,$filename,$line ) if $track;
 
-	my $track = 0;
-	if ( @conditions ) {
-		foreach my $c ( @conditions ) {
-			if ( ! ref($c) ) {
-				$track = 1,last if $c eq $pkg or $c eq $class;
-			} elsif ( UNIVERSAL::isa($c,'Regexp' )) {
-				$track = 1,last if $pkg =~m{$c} or $class =~m{$c};
-			} elsif ( UNIVERSAL::isa($c,'CODE' )) {
-				$track = 1,last if $c->($pkg) or $c->($class);
-			}
-		}
-	} else {
-		$track = 1;
-	}
-	_register( $object,$filename,$line ) if $track;
-
-	return $object;
+    return $object;
 }
 
 ############################################################################
 sub track_object {
-	my ($object,$info) = @_;
-	my (undef,$filename,$line) = caller();
-	_register( $object,$filename,$line,$info );
+    my ($object,$info) = @_;
+    my (undef,$filename,$line) = caller();
+    _register( $object,$filename,$line,$info );
 }
 
 ############################################################################
 # redefine bless unless it's already redefined
 ############################################################################
 sub _redefine_bless {
-	return if $is_redefined;
+    return if $is_redefined;
 
-	# take redefined variant if exists
-	$old_bless = \&CORE::CLOBAL::bless;
-	eval { $old_bless->( {}, __PACKAGE__ ) };
-	$old_bless = undef if $@;
+    # take redefined variant if exists
+    $old_bless = \&CORE::CLOBAL::bless;
+    eval { $old_bless->( {}, __PACKAGE__ ) };
+    $old_bless = undef if $@;
 
-	# redefine 'bless'
-	no warnings 'once';
-	*CORE::GLOBAL::bless = \&_bless_and_track;
-	$is_redefined = 1;
+    # redefine 'bless'
+    no warnings 'once';
+    *CORE::GLOBAL::bless = \&_bless_and_track;
+    $is_redefined = 1;
 }
 
 
@@ -222,27 +236,27 @@ sub _redefine_bless {
 # register object, called from _bless_and_track
 ############################################################################
 sub _register {
-	my ($ref,$fname,$line,$info) = @_;
-	warn "TrackObjects: register ".overload::StrVal($ref).
-		" $fname:$line ".(defined($info) ? $info:'' )."\n" 
-		if $debug;
-	#0: referenz
-	#1: file name
-	#2: line in file
-	#3: info message
-	#4: initial size
-	#5: initial total_size
-	#6: last size
-	#7: last total_size
-	push @weak_objects, [ $ref,$fname,$line,$info ];
-	weaken( $weak_objects[-1][0] );
+    my ($ref,$fname,$line,$info) = @_;
+    warn "TrackObjects: register ".overload::StrVal($ref).
+	" $fname:$line ".(defined($info) ? $info:'' )."\n"
+	if $debug;
+    #0: referenz
+    #1: file name
+    #2: line in file
+    #3: info message
+    #4: initial size
+    #5: initial total_size
+    #6: last size
+    #7: last total_size
+    push @weak_objects, [ $ref,$fname,$line,$info ];
+    weaken( $weak_objects[-1][0] );
 }
 
 ############################################################################
 # eliminate destroyed objects, eg where the weak ref is undef
 ############################################################################
 sub _remove_destroyed {
-	@weak_objects = grep { defined( $_->[0] ) } @weak_objects;
+    @weak_objects = grep { defined( $_->[0] ) } @weak_objects;
 }
 
 
@@ -340,6 +354,13 @@ Includes size and difference in size to last output and first output.
 =item -noend
 
 Don't show remaining tracked objects at B<END>.
+
+=item -out \&func
+
+Use given function (code reference) for output instead of printing to STDERR.
+This function is called as C<$func->($prefix,$line)> for simple output and
+C<$func->($prefix,\@lines)> for detailled output. It is expected to add time
+stamps when needed, i.e. option C<-timestamp> is ignored.
 
 =item -debug
 

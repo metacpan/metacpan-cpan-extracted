@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -24,7 +24,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -61,7 +61,8 @@ sub init {
   my @name;
   my ($n_lo, $n_hi);
   if (defined (my $level = delete($params{'level'}))) {
-    ($n_lo, $n_hi) = $path->level_to_n_range($level);
+    ($n_lo, $n_hi) = $path->level_to_n_range($level)
+      or croak "No level_to_n_range for ", ref $path;
     @name = ("level=$level");
     push @name, "N=$n_lo to $n_hi";
   }

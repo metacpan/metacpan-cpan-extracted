@@ -16,11 +16,14 @@ lib/Wireguard/WGmeta/Cli/Human.pm
 lib/Wireguard/WGmeta/Cli/Router.pm
 lib/Wireguard/WGmeta/Cli/TerminalHelpers.pm
 lib/Wireguard/WGmeta/Index.pod
+lib/Wireguard/WGmeta/Parser/Config.pm
+lib/Wireguard/WGmeta/Parser/Show.pm
 lib/Wireguard/WGmeta/Utils.pm
 lib/Wireguard/WGmeta/Validator.pm
 lib/Wireguard/WGmeta/ValidAttributes.pm
 lib/Wireguard/WGmeta/Wrapper/Bridge.pm
 lib/Wireguard/WGmeta/Wrapper/Config.pm
+lib/Wireguard/WGmeta/Wrapper/ConfigT.pm
 lib/Wireguard/WGmeta/Wrapper/Show.pm
 LICENSE
 Makefile.PL
@@ -28,6 +31,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/cli_test.t
+t/concurrency_test.t
 t/Data/wg0.conf
 t/Data/wg1.conf
 t/Data/wg2.conf

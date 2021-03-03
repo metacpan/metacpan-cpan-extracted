@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Error;
-$Search::Elasticsearch::Error::VERSION = '7.711';
+$Search::Elasticsearch::Error::VERSION = '7.711001';
 our $DEBUG = 0;
 
 @Search::Elasticsearch::Error::Internal::ISA     = __PACKAGE__;
@@ -196,7 +196,7 @@ Search::Elasticsearch::Error - Errors thrown by Search::Elasticsearch
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

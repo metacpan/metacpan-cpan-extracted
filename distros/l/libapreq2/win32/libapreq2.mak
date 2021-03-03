@@ -85,7 +85,7 @@ BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\libapreq2.bsc" 
 LINK32=link.exe
 MANIFEST=$(OUTDIR)\libapreq2.dll.manifest
-LINK32_FLAGS="$(APR_LIB)" "$(APU_LIB)" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /machine:I386 /out:"$(OUTDIR)\libapreq2.dll" /implib:"$(OUTDIR)\libapreq2.lib"
+LINK32_FLAGS="$(APR_LIB)" "$(APU_LIB)" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /out:"$(OUTDIR)\libapreq2.dll" /implib:"$(OUTDIR)\libapreq2.lib"
 
 "$(OUTDIR)\libapreq2.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -103,12 +103,12 @@ ALL : "$(OUTDIR)\libapreq2.dll"
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "APREQ_DECLARE_EXPORT" /I"$(APACHE)\include" /I"$(APREQ_HOME)\include" /YX /FD /GZ  /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
 RSC=rc.exe
-RSC_PROJ=/l 0x409 /i "$(APACHE)\include" /d "_DEBUG /i "$(APREQ_HOME)\include"
+RSC_PROJ=/l 0x409 /i "$(APACHE)\include" /d "_DEBUG" /i "$(APREQ_HOME)\include"
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\libapreq2.bsc" 
 LINK32=link.exe
 MANIFEST=$(OUTDIR)\libapreq2.dll.manifest
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\libapreq2.pdb" /debug /machine:I386 /out:"$(OUTDIR)\libapreq2.dll" /implib:"$(OUTDIR)\libapreq2.lib" /pdbtype:sept 
+LINK32_FLAGS="$(APR_LIB)" "$(APU_LIB)" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\libapreq2.pdb" /debug /out:"$(OUTDIR)\libapreq2.dll" /implib:"$(OUTDIR)\libapreq2.lib" /pdbtype:sept 
 
 "$(OUTDIR)\libapreq2.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<

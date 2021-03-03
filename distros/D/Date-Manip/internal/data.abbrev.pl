@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2008-2020 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@
    'ACST'        => 'Australia/Adelaide',
    'ADDT'        => 'America/Goose_Bay',
    'ADT'         => 'America/Halifax',
-   'AEDT'        => [ 'Australia/Melbourne' => 'Australia/Currie' ],
+   'AEDT'        => [ 'Australia/Melbourne' => 'Australia/Hobart' ],
    'AEST'        => [ 'Australia/Melbourne' => 'Australia/Brisbane' ],
    'AHDT'        => 'America/Anchorage',
    'AHST'        => 'America/Anchorage',

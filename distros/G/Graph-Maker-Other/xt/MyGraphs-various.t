@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -172,7 +172,7 @@ plan tests => 102;
   foreach my $n (1 .. 10) {
     my $graph = Graph::Maker->new('linear', N => $n, undirected => 1);
     if ($n) { $graph->add_vertex(1); }  # bug in Graph::Maker on N=0
-    my $by_prods = Graph_tree_minimal_domsets_count($graph);
+    my $by_prods = MyGraphs::Graph_tree_minimal_domsets_count($graph);
     my $by_pred = MyGraphs::Graph_minimal_domsets_count_by_pred($graph);
     ok ($by_prods, $by_pred, "path $n minimal_domsets_count");
   }

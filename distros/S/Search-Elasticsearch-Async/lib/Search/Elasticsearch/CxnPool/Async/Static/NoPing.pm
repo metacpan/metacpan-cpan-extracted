@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::CxnPool::Async::Static::NoPing;
-$Search::Elasticsearch::CxnPool::Async::Static::NoPing::VERSION = '7.711';
+$Search::Elasticsearch::CxnPool::Async::Static::NoPing::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Role::CxnPool::Static::NoPing',
     'Search::Elasticsearch::Role::Is_Async';
@@ -59,7 +59,7 @@ Search::Elasticsearch::CxnPool::Async::Static::NoPing - An async CxnPool for con
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

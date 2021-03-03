@@ -115,8 +115,9 @@ _create_context()
         RETVAL
 
 int
-_ub_ctx_set_option( dns_unbound_ub_ctx *ctx, const char* opt, const char* val)
+_ub_ctx_set_option( dns_unbound_ub_ctx *ctx, const char* opt, SV* val_sv)
     CODE:
+        char *val = SvPVbyte_nolen(val_sv);
         RETVAL = ub_ctx_set_option(ctx, opt, val);
     OUTPUT:
         RETVAL
@@ -127,8 +128,9 @@ _ub_ctx_debuglevel( dns_unbound_ub_ctx *ctx, int d )
         ub_ctx_debuglevel(ctx, d);
 
 void
-_ub_ctx_debugout( dns_unbound_ub_ctx *ctx, int fd, const char *mode )
+_ub_ctx_debugout( dns_unbound_ub_ctx *ctx, int fd, SV *mode_sv )
     CODE:
+        char *mode = SvPVbyte_nolen(mode_sv);
         FILE *fstream;
 
         // Since libunbound does equality checks against stderr,
@@ -171,11 +173,13 @@ _get_fd_mode_for_fdopen(int fd)
 
 
 SV*
-_ub_ctx_get_option( dns_unbound_ub_ctx *ctx, const char* opt)
+_ub_ctx_get_option( dns_unbound_ub_ctx *ctx, SV* opt)
     CODE:
         char *str;
 
-        int fate = ub_ctx_get_option(ctx, opt, &str);
+        char *opt_str = SvPVbyte_nolen(opt);
+
+        int fate = ub_ctx_get_option(ctx, opt_str, &str);
 
         if (fate) {
 
@@ -194,17 +198,19 @@ _ub_ctx_get_option( dns_unbound_ub_ctx *ctx, const char* opt)
         RETVAL
 
 int
-_ub_ctx_add_ta( dns_unbound_ub_ctx *ctx, char *ta )
+_ub_ctx_add_ta( dns_unbound_ub_ctx *ctx, SV *ta )
     CODE:
-        RETVAL = ub_ctx_add_ta( ctx, ta );
+        char *ta_str = SvPVbyte_nolen(ta);
+        RETVAL = ub_ctx_add_ta( ctx, ta_str );
     OUTPUT:
         RETVAL
 
 #if HAS_UB_CTX_ADD_TA_AUTR
 int
-_ub_ctx_add_ta_autr( dns_unbound_ub_ctx *ctx, char *fname )
+_ub_ctx_add_ta_autr( dns_unbound_ub_ctx *ctx, SV *fname )
     CODE:
-        RETVAL = ub_ctx_add_ta_autr( ctx, fname );
+        char *fname_str = SvPVbyte_nolen(fname);
+        RETVAL = ub_ctx_add_ta_autr( ctx, fname_str );
     OUTPUT:
         RETVAL
 
@@ -213,7 +219,7 @@ _ub_ctx_add_ta_autr( dns_unbound_ub_ctx *ctx, char *fname )
 int
 _ub_ctx_resolvconf( dns_unbound_ub_ctx *ctx, SV *fname_sv )
     CODE:
-        char *fname = SvOK(fname_sv) ? SvPV_nolen(fname_sv) : NULL;
+        char *fname = SvOK(fname_sv) ? SvPVbyte_nolen(fname_sv) : NULL;
 
         RETVAL = ub_ctx_resolvconf( ctx, fname );
     OUTPUT:
@@ -222,23 +228,25 @@ _ub_ctx_resolvconf( dns_unbound_ub_ctx *ctx, SV *fname_sv )
 int
 _ub_ctx_hosts( dns_unbound_ub_ctx *ctx, SV *fname_sv )
     CODE:
-        char *fname = SvOK(fname_sv) ? SvPV_nolen(fname_sv) : NULL;
+        char *fname = SvOK(fname_sv) ? SvPVbyte_nolen(fname_sv) : NULL;
 
         RETVAL = ub_ctx_hosts( ctx, fname );
     OUTPUT:
         RETVAL
 
 int
-_ub_ctx_add_ta_file( dns_unbound_ub_ctx *ctx, char *fname )
+_ub_ctx_add_ta_file( dns_unbound_ub_ctx *ctx, SV *fname )
     CODE:
-        RETVAL = ub_ctx_add_ta_file( ctx, fname );
+        char *fname_str = SvPVbyte_nolen(fname);
+        RETVAL = ub_ctx_add_ta_file( ctx, fname_str );
     OUTPUT:
         RETVAL
 
 int
-_ub_ctx_trustedkeys( dns_unbound_ub_ctx *ctx, char *fname )
+_ub_ctx_trustedkeys( dns_unbound_ub_ctx *ctx, SV *fname )
     CODE:
-        RETVAL = ub_ctx_trustedkeys( ctx, fname );
+        char *fname_str = SvPVbyte_nolen(fname);
+        RETVAL = ub_ctx_trustedkeys( ctx, fname_str );
     OUTPUT:
         RETVAL
 
@@ -295,8 +303,10 @@ _ub_fd( dns_unbound_ub_ctx *ctx )
         RETVAL
 
 SV*
-_resolve_async( dns_unbound_ub_ctx *ctx, const char *name, int type, int class, SV *result )
+_resolve_async( dns_unbound_ub_ctx *ctx, SV *name_sv, int type, int class, SV *result )
     CODE:
+        char *name = SvPVbyte_nolen(name_sv);
+
         int async_id = 0;
 
         // A few different approaches were tried here, including passing
@@ -327,7 +337,7 @@ _resolve( dns_unbound_ub_ctx *ctx, SV *name, int type, int class = 1 )
         struct ub_result* result;
         int retval;
 
-        retval = ub_resolve(ctx, SvPV_nolen(name), type, class, &result);
+        retval = ub_resolve(ctx, SvPVbyte_nolen(name), type, class, &result);
 
         if (retval != 0) {
             RETVAL = newSViv(retval);

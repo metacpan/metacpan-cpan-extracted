@@ -192,19 +192,17 @@ sub _finally {
   my ($self, $handled, $finally) = @_;
 
   my $new = $self->clone;
-  $self->{handled} = 1 if $handled;
-  push @{$self->{resolve}}, sub { _finally_cb($new, $finally, 'resolve', @_) };
-  push @{$self->{reject}},  sub { _finally_cb($new, $finally, 'reject',  @_) };
+  my $cb  = sub {
+    my @results = @_;
+    $new->resolve($finally->())->then(sub {@results});
+  };
 
-  $self->_defer if $self->{results};
+  my $before = $self->{handled};
+  $self->catch($cb);
+  my $next = $self->then($cb);
+  delete $self->{handled} if !$before && !$handled;
 
-  return $new;
-}
-
-sub _finally_cb {
-  my ($new, $finally, $method, @results) = @_;
-  return $new->reject($@) unless eval { $finally->(); 1 };
-  return $new->$method(@results);
+  return $next;
 }
 
 sub _settle {

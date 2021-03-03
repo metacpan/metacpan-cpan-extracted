@@ -1,0 +1,359 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/dateseq/id/dateseq_id
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-13'; # DATE
+our $DIST = 'App-dateseq-id'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/dateseq/id/dateseq_id",
+    program_name => "dateseq-id",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Like dateseq, with builtin support for Indonesian holidays
+# PODNAME: dateseq-id
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dateseq-id - Like dateseq, with builtin support for Indonesian holidays
+
+=head1 VERSION
+
+This document describes version 0.002 of dateseq-id (from Perl distribution App-dateseq-id), released on 2021-01-13.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % dateseq-id [--business] [--business6] [--exclude-dow-json=s]
+     [--exclude-dow=s+] [--exclude-joint-leave] [--exclude-month-json=s]
+     [--exclude-month=s+] [-f=s] [--format-class-attrs-json=s]
+     [--format-class-attrs=s] [--format-class=s] [--format=name]
+     [--header=s] [--holiday] [--include-dow-json=s] [--include-dow=s+]
+     [--include-joint-leave] [--include-month-json=s] [--include-month=s+]
+     [-j] [--json] [--limit-monthly=s] [--limit-yearly=s] [--limit=s]
+     [-n=s] [--(no)naked-res] [--no-business] [--no-business6]
+     [--no-holiday] [--nobusiness] [--nobusiness6] [--noholiday]
+     [--page-result[=program]] [-r] [--reverse] [--strftime=s]
+     [--view-result[=program]] [from] [to] [increment]
+
+Examples:
+
+List Indonesian holidays between 2020-01-01 to 2021-12-31:
+
+ % dateseq-id 2020-01-01 2021-12-13 --holiday
+
+List the last non-holiday business day of each month in 2021:
+
+ % dateseq-id 2021-12-31 2021-01-01 -r --noholiday -j --business --limit-monthly 1
+
+=head1 DESCRIPTION
+
+This utility is a wrapper for L<dateseq>, with builtin support for
+Indonesian holidays (data from L<Calendar::Indonesia::Holiday>). It offers
+additional --holiday (and --noholiday, as well as -j) options to let you filter
+dates based on whether they are Indonesian holidays.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--from>=I<s>
+
+Starting date.
+
+=item B<--header>=I<s>
+
+Add a header row.
+
+=item B<--increment>=I<s>, B<-i>
+
+=item B<--limit-monthly>=I<s>
+
+Only output at most this number of dates for each month.
+
+=item B<--limit-yearly>=I<s>
+
+Only output at most this number of dates for each year.
+
+=item B<--limit>=I<s>, B<-n>
+
+Only generate a certain amount of numbers.
+
+=item B<--reverse>, B<-r>
+
+Decrement instead of increment.
+
+=item B<--to>=I<s>
+
+End date, if not specified will generate an infinite* stream of dates.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--business>
+
+Only list business days (Mon-Fri), or non-business days.
+
+=item B<--business6>
+
+Only list business days (Mon-Sat), or non-business days.
+
+=item B<--exclude-dow-json>=I<s>
+
+Do not show dates with these day-of-weeks (JSON-encoded).
+
+See C<--exclude-dow>.
+
+=item B<--exclude-dow>=I<s@>
+
+Do not show dates with these day-of-weeks.
+
+Can be specified multiple times.
+
+=item B<--exclude-month-json>=I<s>
+
+Do not show dates with these month numbers (JSON-encoded).
+
+See C<--exclude-month>.
+
+=item B<--exclude-month>=I<s@>
+
+Do not show dates with these month numbers.
+
+Can be specified multiple times.
+
+=item B<--holiday>
+
+Only list holidays (or non-holidays).
+
+=item B<--include-dow-json>=I<s>
+
+Only show dates with these day-of-weeks (JSON-encoded).
+
+See C<--include-dow>.
+
+=item B<--include-dow>=I<s@>
+
+Only show dates with these day-of-weeks.
+
+Can be specified multiple times.
+
+=item B<--include-joint-leave>, B<-j>
+
+Whether to assume joint leave days as holidays.
+
+=item B<--include-month-json>=I<s>
+
+Only show dates with these month numbers (JSON-encoded).
+
+See C<--include-month>.
+
+=item B<--include-month>=I<s@>
+
+Only show dates with these month numbers.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Formatting options
+
+=over
+
+=item B<--format-class-attrs-json>=I<s>
+
+Arguments to pass to constructor of DateTime::Format::* class (JSON-encoded).
+
+See C<--format-class-attrs>.
+
+=item B<--format-class-attrs>=I<s>
+
+Arguments to pass to constructor of DateTime::Format::* class.
+
+=item B<--format-class>=I<s>
+
+Use a DateTime::Format::* class for formatting.
+
+By default, <pm:DateTime::Format::Strptime> is used with pattern set from the
+<strftime> option.
+
+
+=item B<--strftime>=I<s>, B<-f>
+
+strftime() format for each date.
+
+Default is `%Y-%m-%d`, unless when hour/minute/second is specified, then it is
+`%Y-%m-%dT%H:%M:%S`.
+
+`dateseq` actually uses <pm:DateTimeX::strftimeq>, so you can embed Perl code
+for flexibility. For example:
+
+    % dateseq 2019-11-19 2019-11-25 -f '%Y-%m-%d%( $_->day_of_week == 7 ? "su" : "" )q'
+
+will print something like:
+
+    2019-11-19
+    2019-11-20
+    2019-11-21
+    2019-11-22
+    2019-11-23
+    2019-11-24su
+    2019-11-25
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C dateseq-id dateseq-id
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete dateseq-id 'p/*/`dateseq-id`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-dateseq-id>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-dateseq-id>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-dateseq-id/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<dateseq>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,14 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 30;
+plan tests => 150;
 
 require Graph::Maker::Keller;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 15;
+  my $want_version = 18;
   ok ($Graph::Maker::Keller::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Keller->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Keller->VERSION($want_version); 1 }, 1,
@@ -92,10 +92,47 @@ foreach my $undirected (0, 1) {
   # N=3, undirected
   my $graph = Graph::Maker->new('Keller', N=>3,
                                 undirected => $undirected);
-  my $num_vertices = $graph->vertices;
-  ok ($num_vertices, 64);
+  my @vertices = $graph->vertices;
+  ok (scalar(@vertices), 64);
   my $num_edges = $graph->edges;
   ok ($num_edges, 1088 * ($undirected ? 1 : 2));
+
+  foreach my $rep (1 .. 20) {
+    my ($u,$v) = aref_two_random_elems(\@vertices);
+    ok ($u ne $v, 1);
+    my ($num_diffs, $have_2mod4) = diff_digits($u,$v);
+    my $got_distance = $graph->path_length($u,$v);
+    my $want_distance = ($num_diffs == 0 ? 0
+                : $num_diffs >= 2 && $have_2mod4 ? 1
+                : 2);
+    ok ($got_distance, $want_distance, "u=$u v=$v");
+
+    my $got_notadjacent = $got_distance >= 2 ? 1 : 0;
+    my $want_notadjacent
+      = ! $have_2mod4 || ($have_2mod4 && $num_diffs == 1) ? 1 : 0;
+    ok ($got_notadjacent, $want_notadjacent, "u=$u v=$v");
+  }
+}
+sub diff_digits {
+  my ($u, $v) = @_;
+  my $num_diffs = 0;
+  my $have_2mod4 = 0;
+  while ($u || $v) {
+    if (($u & 3) != ($v & 3)) { $num_diffs++; }
+    if ((($u - $v) & 3) == 2) { $have_2mod4 = 1; }
+    $u >>= 2;
+    $v >>= 2;
+  }
+  return ($num_diffs, $have_2mod4);
+}
+sub aref_two_random_elems {
+  my ($aref) = @_;
+  my $len = scalar(@$aref);
+  $len >= 2 or die "aref_two_random_elems() is for aref >=2 elems";
+  my $a = int(rand($len));
+  my $b = int(rand($len-1));
+  if ($b >= $a) { $b++; }
+  return $aref->[$a], $aref->[$b];
 }
 
 #------------------------------------------------------------------------------

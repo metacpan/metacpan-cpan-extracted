@@ -104,6 +104,7 @@ _server
 _userpass
 adam
 brainbuz
+brian
 capoeirab
 carnil
 data
@@ -113,6 +114,7 @@ ether
 etype
 evalue
 file
+foy
 ftp
 gerard
 gisle
@@ -138,6 +140,7 @@ miyagawa
 mms
 news
 nntp
+nntps
 oid
 olaf
 piotr

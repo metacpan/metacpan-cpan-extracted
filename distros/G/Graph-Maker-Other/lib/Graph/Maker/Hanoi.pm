@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -35,22 +35,18 @@ sub _default_graph_maker {
   Graph->new(@_);
 }
 
-sub _vertex_names_digits {
+sub _vertex_names_func_digits {
   my ($digits, $spindles) = @_;
-  return join('',@$digits);
+  return join('', reverse @$digits);
 }
-sub _vertex_names_integer {
+sub _vertex_names_func_integer {
   my ($digits, $spindles) = @_;
-  my $pow = 1;
   my $ret = 0;
-  foreach my $i (reverse 0 .. $#$digits) {
-    $ret += $digits->[$i] * $pow;
-    $pow *= $spindles;
+  foreach my $digit (reverse @$digits) {  # digits high to low
+    $ret = $ret*$spindles + $digit;
   }
   return $ret;
 }
-my %vertex_names = (integer => \&_vertex_names_integer,
-                    digits  => \&_vertex_names_digits);
 
 sub init {
   my ($self, %params) = @_;
@@ -61,11 +57,10 @@ sub init {
 
   # this not documented yet ...
   my $vertex_names = delete($params{'vertex_names'}) || 'integer';
-  my $vertex_name_func = $vertex_names{$vertex_names}
+  my $vertex_name_func = $self->can("_vertex_names_func_$vertex_names")
     || croak "Unrecognised vertex_names: ",$vertex_names;
 
   my $graph = $graph_maker->(%params);
-
   {
     my $name = "Hanoi $discs";
     if ($spindles != 3) {
@@ -85,23 +80,21 @@ sub init {
   } else {
     croak "Unrecognised adjacency: ",$adjacency;
   }
-  my $directed = $graph->is_directed;
-  ### $directed
   ### $offset_limit
 
+  # $t[$d] is the spindle number (0 .. $spindles-1) which holds disc $d.
+  # $d = 0 is the smallest disc.
   my @t = (0) x $discs;
-  $graph->add_vertex($vertex_name_func->(\@t, $spindles)); # in case discs=0
+
   my $add_edge = ($graph->is_directed ? 'add_cycle' : 'add_edge');
 
  T: for (;;) {
     my $v = $vertex_name_func->(\@t, $spindles);
-
-    my $seen_count = 0;
+    $graph->add_vertex($v);
     my @seen;
-    foreach my $pos (reverse 0 .. $#t) {
-      my $from_digit = $t[$pos];
-      next if $seen[$from_digit];
-      $seen[$from_digit] = 1;
+    foreach my $d (0 .. $#t) {  # disc number $d, smallest to biggest
+      my $from_digit = $t[$d];
+      next if $seen[$from_digit]++;
       next if $from_digit && $adjacency eq 'star';
 
       foreach my $offset (1 .. $offset_limit) {
@@ -114,10 +107,10 @@ sub init {
         next if $seen[$to_digit];  # smaller disc on other spindle
 
         my @t2 = @t;
-        $t2[$pos] = $to_digit;
+        $t2[$d] = $to_digit;
         my $v2 = $vertex_name_func->(\@t2, $spindles);
         $graph->$add_edge($v, $v2);
-        ### edge: "pos=$pos @t to @t2"
+        ### edge: "pos=$d @t to @t2"
       }
     }
 
@@ -129,112 +122,9 @@ sub init {
     last; # no more @t configurations
   }
   return $graph;
-
-
-
-
-
-  # # smallest disc $t2[-1] moves to either other spindle
-  # foreach (1, 2) {
-  #   $t2[-1]++;
-  #   $t2[-1] %= 3;
-  #   if ($directed || $t2[-1] > $t[-1]) {
-  #     my $v2 = $vertex_name_func->(\@t2, $spindles);
-  #     ### smallest disc: "$v to $v2"
-  #     $graph->add_edge($v, $v2);
-  #   }
-  # }
-  #
-  # # on the spindles without the smallest disc, can move the smaller of
-  # # their two top discs
-  # for (my $pos = $#t-1; $pos >= 0; $pos--) {
-  #   if ($t[$pos] != $t[-1]) {
-  #     @t2 = @t;
-  #     $t2[$pos]++;
-  #     $t2[$pos] %= 3;
-  #     if ($t2[$pos] == $t[-1]) {
-  #       $t2[$pos]++;
-  #       $t2[$pos] %= 3;
-  #     }
-  #     if ($directed || $t2[$pos] > $t[$pos]) {
-  #       my $v2 = $vertex_name_func->(\@t2, $spindles);
-  #       ### second disc: "$v to $v2"
-  #       $graph->add_edge($v, $v2);
-  #     }
-  #     last;
-  #   }
-  # }
-  #
-
-  # # done in integers
-  # if (0) {
-  #   my $v_max = 3**$discs - 1;
-  #   my $vpad_max = 3**($discs-1) - 1;
-  #   ### $discs
-  #   ### $v_max
-  #   ### $vpad_max
-  # 
-  #   foreach my $v (0 .. $v_max) {
-  #     my $low = $v % 3;
-  #     ### $v
-  # 
-  #     foreach my $inc (1, 2) {
-  #       ### $low
-  #       ### $inc
-  #       my $other = ($low + $inc) % 3;
-  #       {
-  #         my $v2 = $v - $low + $other;
-  #         if ($directed || $v2 > $v) {
-  #           ### smallest disc: "$v to $v2"
-  #           $graph->add_edge($v, $v2);
-  #         }
-  #       }
-  # 
-  #       ### $low
-  #       ### $other
-  #       my $pad = ($low - $inc) % 3;
-  #       my $mod = 3;
-  #       my $rem = $low;
-  #       foreach (1 .. $discs) {
-  #         $mod *= 3;
-  #         $rem = 3*$rem + $low;
-  #         my $got = $v % $mod;
-  #         ### $mod
-  #         ### $rem
-  #         ### $got
-  #         if ($got != $rem) {
-  #           my $v2 = $v - $got + ((2*$got - $rem) % $mod);
-  #           if ($directed || $v2 > $v) {
-  #             ### second smallest: "$v to $v2"
-  #             $graph->add_edge($v, $v2);
-  #           }
-  #           last;
-  #         }
-  #       }
-  # 
-  #       # my $pad = ($low - $inc) % 3;
-  #       # ### $other
-  #       # ### $pad
-  #       #
-  #       # my $vpad = $v;
-  #       # for (;;) {
-  #       #   ### at: "vpad=$vpad  v2=$v2"
-  #       #   last if $vpad >= $vpad_max || $v2 >= $vpad_max;
-  #       #   $vpad = 3*$vpad + $pad;
-  #       #   $v2   = 3*$v2 + $pad;
-  #       #   if ($directed || $v2 > $vpad) {
-  #       #     ### second smallest: "$vpad to $v2"
-  #       #   }
-  #       #     $graph->add_edge($vpad, $v2);
-  #       # }
-  #     }
-  #   }
-  # }
-  # 
-  # return $graph;
 }
 
-  Graph::Maker->add_factory_type('hanoi' => __PACKAGE__);
+Graph::Maker->add_factory_type('hanoi' => __PACKAGE__);
 1;
 
 __END__
@@ -274,32 +164,34 @@ Sierpinski triangle and the odd numbers in Pascal's triangle.
                                    / \     / \     / \     / \
                                  13--14--11---9--18--19--25--26
 
-The Hanoi puzzle has N discs and 3 spindles.  The discs on a spindle are in
-size order, smallest at the top.  Each graph vertex is a configuration of
-discs on spindles.  Each edge is a legal move from one configuration to
-another.
+The Hanoi puzzle has N discs and 3 spindles.  The discs on a spindle are
+stacked in size order, smallest at the top.  A legal move takes the top disc
+from one spindle and puts it on another, but a a bigger disc may not go on
+top of a smaller disc.
+
+Each graph vertex is a configuration of discs on spindles.  Each graph edge
+is a legal move from one configuration to another.
 
 There are either two or three legal moves.  The smallest disc can always
-move to either of the other two spindles, and if those two other spindles
-are not empty then the smaller disc of them can move to the other.
+move to either of the other two spindles.  Unless those spindles are both
+empty, the smaller of the top discs can move to the other.
 
 Vertex names are integers 0 to 3^N-1.  Each ternary digit is a disc and its
 value 0,1,2 is which spindle holds that disc.  The least significant digit
-is the smallest disc.  The legal moves are then to change the least
-significant digit to either of its two other values.  Or skip the low run of
-the least significant digit and at the first different digit (if there is
-one) change it to the third value (not itself and not the least
-significant).
+is the smallest disc.  The edges are then to change the least significant
+digit to either of its two other values.  Or skip the low run of the least
+significant digit and at the first non-L digit (if there is one) change it
+to the third value (not itself and not the least significant).
 
     ........ L  -> L+1,L+2 mod 3
     ...M L L L  -> M+1 or M+2 mod 3, whichever is not L
 
 The case of no digit M different from L is 00..00, 11..11 and 22..22 which
-are all discs on a single spindle.  For C<discs=E<gt>3> above these are
-vertices 0, 13 and 26.  These are degree 2 and other vertices are degree 3.
-The puzzle is to traverse from one such all-discs corner to another.
-There's many ways to do that but the shortest is 2^N-1 moves along the side
-shown.
+are all discs on a single spindle.  In C<discs=E<gt>3> drawn above, these
+are vertices 0, 13 and 26.  They are degree 2 and other vertices are
+degree 3.  The puzzle is to traverse from one degree=2 all-discs corner to
+another.  There's many ways to do that but the shortest is 2^N-1 moves along
+the side.
 
 =for GP-Test  9+3+1 == 13
 
@@ -308,15 +200,15 @@ shown.
 The Hanoi graph is Hamiltonian (has a cycle visiting every vertex exactly
 once) by traversing each third in the style of the Sierpinski arrowhead
 (eg. L<Math::PlanePath::SierpinskiArrowheadCentres>).  In C<discs=E<gt>3>
-above the Hamiltonian cycle is an arrowhead traversal 4 to 8, then likewise
-17 to 9, and 18 to 22.
+drawn above, the Hamiltonian cycle is an arrowhead traversal 4 to 8, then
+likewise 17 to 9, and 18 to 22.
 
 =head2 Spindles
 
 Option C<spindles =E<gt> S> specifies how many spindles are used for the
-puzzle.  The default is 3 as described above.  For S spindles and N discs
-the vertices are numbered 0 to S^N-1 inclusive and each digit in base S is
-which spindle holds the disc.  An edge is a change of digit at a position p
+puzzle.  The default is 3 described above.  For S spindles and N discs, the
+vertices are numbered 0 to S^N-1 inclusive and each digit in base S is which
+spindle holds the disc.  An edge is a change of digit at a position p
 provided that neither old nor new digit appears in any of the positions
 below p (as that would mean a smaller disc on the source or destination
 spindle).
@@ -329,9 +221,9 @@ around on some configuration of the bigger discs.  Connections between those
 subgraphs are moves of the bigger discs, where permitted.
 
 The puzzle is again to move all discs from one spindle to another.  Spindles
-E<gt>= 4 can be done in fewer moves than spindles=3 by taking advantage of
-the extra place(s), but the problem of a shortest path is more difficult.
-In spindles=3 the biggest disc can only move by putting all smaller discs on
+E<gt>= 4 can be done in fewer moves than spindles=3 by using the extra
+spindles(s), but the problem of a shortest path is more difficult.  In
+spindles=3, the biggest disc can only move by putting all smaller discs on
 the other spindle, but for E<gt>=4 there are many ways to distribute the
 smaller discs on the other spindles.
 
@@ -358,12 +250,13 @@ triangular pyramid numbers 1,4,10,20,etc.
 
 Option C<adjacency =E<gt> "cyclic"> treats the spindles as a cycle where
 discs can only move forward or backward to adjacent spindles in the cycle.
-In the vertex digit representation the cycle is around digits 0 to S-1, so
-digit changes are +/-1 mod S.
+In the vertex digit representation, the cycle is digits 0 to S-1, so a move
+(when permitted) is a digit changes are +/-1 with wrap-around mod S, and so
+an edge subset of a cyclic grid graph of S dimensions and width N discs.
 
 For spindlesE<lt>=3, cyclic is the same as adjacency "any".  For
 spindlesE<gt>=4, some moves between spindles are disallowed when cyclic, so
-is an edge subset of adjacency "any".
+an edge subset of adjacency "any".
 
 (This option is for cyclic with moves in either direction.  Another
 possibility is cyclic with moves only in one direction around the cycle, as
@@ -383,15 +276,16 @@ L<http://www.cs.wm.edu/~pkstoc/boca.ps>
 
 =back
 
-In the vertex digit representation, the row is digits 0 to S-1, so digit
-changes +/-1 with no wraparound.
+In the vertex digit representation, the row is digits 0 to S-1, so a move
+(when permitted) is a digit change +/-1 with no wrap-around, and so an edge
+subset of a grid graph of S dimensions and width N discs.
 
 The puzzle is to move all discs from the first spindle to the last, which
 means a path from vertex 0 to S^N-1.
 
 For spindlesE<lt>=2, linear is the same as "any".  For spindlesE<gt>=3 some
 moves between spindles are disallowed when linear, so an edge subset of
-cyclic, which in turn an edge subset of any.
+cyclic, which in turn is an edge subset of any.
 
             edges
     ---------------------
@@ -453,36 +347,63 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item discs=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21136>
-
-=item discs=2, linear, L<https://hog.grinvin.org/ViewGraphInfo.action?id=414> (path-9)
-
-=item discs=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=22740>
-
-=item discs=2, spindles=4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=22742>
-
-=item discs=2, spindles=4, cyclic, L<https://hog.grinvin.org/ViewGraphInfo.action?id=25141>
-
-=item discs=2, spindles=4, linear, L<https://hog.grinvin.org/ViewGraphInfo.action?id=25143>
-
-=item discs=2, spindles=4, star, L<https://hog.grinvin.org/ViewGraphInfo.action?id=21152>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=21136> (etc)
 
 =back
+
+    spindles=3 (default)
+      discs=0             1310  (singleton)
+      discs=1             1374  (triangle)
+      discs=1, linear    32234  (path-3)
+
+      discs=2            21136
+      discs=2, linear      414  (path-9)
+
+      discs=3            22740
+      discs=4            35479
+      discs=5            35481
+
+      (For 3 spindles, cyclic=any and star=linear.)
+
+    spindles=4
+      discs=0             1310  (singleton)
+      discs=1               74  (complete-4)
+      discs=1, linear      594  (path-4)
+
+      discs=2            22742
+      discs=2, cyclic    25141
+      discs=2, linear    25143
+      discs=2, star      21152
+
+    spindles=5
+      discs=0             1310  (singleton)
+      discs=1              462  (complete-5)
+      discs=1, linear      286  (path-5)
+
+      discs=2            44075
+      discs=2, linear    44071
+
+    spindles=6
+      discs=0             1310  (singleton)
+      discs=1              232  (complete-6)
+      discs=1, linear      568  (path-6)
+      discs=2, linear    44073
 
 =head1 SEE ALSO
 
 L<Graph::Maker>,
+L<Graph::Maker::HanoiExchange>,
 L<Graph::Maker::Complete>,
 L<Graph::Maker::Cycle>,
 L<Graph::Maker::Linear>
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

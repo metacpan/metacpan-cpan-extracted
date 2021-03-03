@@ -50,19 +50,22 @@ sub ACTION_install {
 
   # if no default set and this plugin has a score, or if this plugin
   # score higher than the existing default, then set default
-  if ($mp3 and (not exists $config->{default}{mp3}
-     or $mp3 >= $config->{default}{mp3}{score})) {
-    $config->{default}{mp3} = { name => $pkg, score => $mp3 };
-    warn "AudioFile::Info - Default mp3 handler is now $pkg\n";
-  }
-
-  if ($ogg and (not exists $config->{default}{ogg}
-     or $ogg >= $config->{default}{ogg}{score})) {
-    $config->{default}{ogg} = { name => $pkg, score => $ogg };
-    warn "AudioFile::Info - Default ogg handler is now $pkg\n";
-  }
+  set_default_handler($config, 'mp3', $mp3, $pkg);
+  set_default_handler($config, 'ogg', $ogg, $pkg);
 
   DumpFile($path, $config);
+}
+
+sub set_default_handler {
+  my ($config, $type, $val, $pkg) = @_;
+
+  if ($val and (not exists $config->{default}{$type}
+    or $val >= $config->{default}{$type}{score})) {
+    $config->{default}{$type} = { name => $pkg, score => $val };
+    warn "AudioFile::Info - Default $type handler is now $pkg\n";
+  }
+
+  return;
 }
 
 1;
@@ -83,6 +86,11 @@ See L<AudioFile::Info> for more details.
 =head2 ACTION_install
 
 Overrides the ACTION_install method from Module::Build.
+
+=head2 set_default_handler
+
+If this new module is a better default handler for a particular
+type of audio file, then make it the default.
 
 =head1 AUTHOR
 

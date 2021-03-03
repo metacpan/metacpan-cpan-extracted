@@ -50,6 +50,7 @@ subtest 'transform usage' => sub {
 
 my $old_cmd = $Geo::LibProj::cs2cs::CMD;
 subtest 'child failure' => sub {
+	plan skip_all => 'test requires IPC' if $INC{'Geo/LibProj/FFI.pm'};
 	plan tests => 8;
 	
 	$Geo::LibProj::cs2cs::CMD = 'false';

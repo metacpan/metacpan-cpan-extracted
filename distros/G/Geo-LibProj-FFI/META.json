@@ -1,0 +1,129 @@
+{
+   "abstract" : "Foreign function interface to PROJ coordinate transformation software",
+   "author" : [
+      "Arne Johannessen <ajnn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Geo-LibProj-FFI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::proj" : "0",
+            "Exporter::Easy" : "0",
+            "FFI::C" : "0",
+            "FFI::Platypus" : "1.00",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Geo::LibProj::FFI" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_COORD::Record" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_COORD::Union" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_ENU" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_GEOD" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_INFO" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_LP" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_LPZ" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_LPZT" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_OPK" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_UV" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_UVW" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_UVWT" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_XY" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_XYZ" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      },
+      "Geo::LibProj::FFI::PJ_XYZT" : {
+         "file" : "lib/Geo/LibProj/FFI.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/johannessen/proj-perl-ffi/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/johannessen/proj-perl-ffi.git",
+         "web" : "https://github.com/johannessen/proj-perl-ffi"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.30.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

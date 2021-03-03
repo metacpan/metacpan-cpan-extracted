@@ -1,4 +1,4 @@
-# Copyright 2019, 2020 Kevin Ryde
+# Copyright 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -54,7 +54,7 @@ sub init {
   my $upto = 1;
   my $add = sub {
     my ($p, $dx,$dy) = @_;
-    # ### _xy_relative: "$old $new"
+     ### add: "parent $p at ".$graph->get_vertex_attribute($p,'x').' '.$graph->get_vertex_attribute($p,'y')." dxdy $dx $dy"
     my $v = $upto++;
     my $x = 0;
     my $y = 0;
@@ -65,8 +65,8 @@ sub init {
         $y = $graph->get_vertex_attribute($p,'y') + $dy;
       }
     }
-    $graph->set_vertex_attribute($v, x => $x + $dx);
-    $graph->set_vertex_attribute($v, y => $y + $dy);
+    $graph->set_vertex_attribute($v, x => $x);
+    $graph->set_vertex_attribute($v, y => $y);
     return $v;
   };
 
@@ -131,9 +131,8 @@ sub init {
       # star  figure 5(a) T6,1  star-6
       #       other N=0 to 5 also star
       if ($N >= 2) {
-        my $a = 6.283185 / ($N-1);
         foreach my $i (0 .. $N-2) {
-          $add->($m, cos($i*$a), sin($i*$a));
+          $add->($m, _rat_to_xy($i, $N-1));
         }
       }
 
@@ -269,12 +268,33 @@ sub init {
   return $graph;
 }
 
+# $num/$den is a rational fraction of a 360 degree circle.
+# Return a pair $x,$y of coordinates for the point at that angle and unit
+# distance.
+# $den==2 or 4 are forced to exact values where floating point would
+# otherwise round-off 90 degrees or 180 degrees in radians to something not
+# quite exact.
+# $num==0 which is $a==0 comes out exact from sin() and cos() already.
+#
+sub _rat_to_xy {
+  my ($num,$den) = @_;
+  ### _rat_to_xy(): "$num $den"
+  if (4*$num == $den) { return (0,1); } # 90 degrees
+  if (4*$num == 2*$den) { return (-1,0); } # 180 degrees
+  if (4*$num == 3*$den) { return (0,-1); } # 270 degrees
+  my $a = 6.283185 * $num / $den;
+  my $x = cos($a);
+  my $y = sin($a);
+  if (3*$num == $den || 3*$num == 2*$den) { $x = -.5; } # 120,240 degrees
+  return ($x,$y);
+}
+
 Graph::Maker->add_factory_type('most_maximum_matchings_tree' => __PACKAGE__);
 1;
 
 __END__
 
-=for stopwords Heuberger Wagner Ryde
+=for stopwords Heuberger Wagner Ryde matchings undirected
 
 =head1 NAME
 
@@ -300,7 +320,7 @@ November 2011, pages 2512-2542.
 L<http://arxiv.org/abs/1011.6554>
 
 L<http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3226351/>
-(full text html)
+(full text HTML)
 
 =back
 
@@ -310,12 +330,11 @@ edges with no end vertices in common.  In a given tree, there is a maximum
 size matching (the match number).  Various different matchings may be this
 maximum size.
 
-Heuberger and Wagner consider the greatest number of maximum matchings for a
-tree of N vertices and show for N != 6,34 there is a unique tree with the
-greatest number of maximum matchings.  And for N=6,34 two trees of the same
-greatest number.
+Heuberger and Wagner consider the number of maximum matchings a tree of N
+vertices might have and show for N != 6,34 there is a unique tree with the
+most maximum matchings, and for N=6,34 two trees of equal most.
 
-The trees are various special cases for small N, and then general forms
+The trees have various special cases for small N, and then general forms
 according to N mod 7.  Vertices are presently numbered 1 to N, but don't
 rely on that, nor on exactly which is attached to which.
 
@@ -328,7 +347,7 @@ L<Graph::Maker::Star>.  The second tree of 6 vertices is a special N=6.5.
       / \      5 maximum                |    5 maximum
      5   4     matchings                *    matchings
 
-For 34 vertices, the second tree is a special N=34.5.
+For 34 vertices, the general case tree is
 
                          *   *
                           \ /
@@ -354,6 +373,9 @@ For 34 vertices, the second tree is a special N=34.5.
 
 =pod
 
+And the second tree is a special N=34.5,
+
+
           *   *          *   *
            \ /            \ /            N => 34.5
             B              B
@@ -376,8 +398,9 @@ For 34 vertices, the second tree is a special N=34.5.
 
 Heuberger and Wagner take vertices in two types.  Type B are matched in
 every maximum matching, and type A are not.  Their final most maximum
-matchings trees have A and B alternating.  All leaves and even distance from
-a leaf are type A, and all odd distance from a leaf are type B.
+matchings trees have A and B alternating.  All leaf vertices and vertices an
+even distance from a leaf are type A, and all odd distance from a leaf are
+type B.
 
 The match number is the number of B vertices.  This is since when making the
 match number, a vertex with a leaf neighbour must be matched (or it and one
@@ -388,8 +411,8 @@ rest.
 =head2 Coordinates
 
 There's a secret undocumented coordinates option which sets vertex
-attributes for locations in a layout similar to what Heuberger and Wagner
-present.  This is a good way to see the pattern, but don't rely on this yet
+attributes for locations in the style of Heuberger and Wagner's example
+picture.  This is a good way to see the pattern, but don't rely on this yet
 as it might change or be removed.
 
 =head1 FUNCTIONS
@@ -423,32 +446,32 @@ L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310> (etc)
 
 =back
 
-    1310    N=1     singleton
-    19655   N=2     path-2
-    32234   N=3     path-3
-    500     N=4     claw, star-4
-    544     N=5     star-5
-    598     N=6     star-6
-    288     N=6.5   other equal most N=6
-    498     N=7     complete binary tree
-    31053   N=8
-    672     N=9
-    25168   N=10    (mean distance = 1/2 diameter)
-    34225   N=11
-    34227   N=12
-    34229   N=13
-    34231   N=14
-    34233   N=15
-    31068   N=34
-    31070   N=34.5
-    31057   N=181   example in Heuberger and Wagner's paper
+    1310     N=1     singleton
+    19655    N=2     path-2
+    32234    N=3     path-3
+    500      N=4     claw, star-4
+    544      N=5     star-5
+    598      N=6     star-6
+    288      N=6.5   other equal most N=6
+    498      N=7     complete binary tree
+    31053    N=8
+    672      N=9
+    25168    N=10    (mean distance = 1/2 diameter)
+    34225, 34227, 34229, 34231, 34233    N=11 to N=15
+    34235, 34237, 34239, 34241, 34243    N=16 to N=20
+    34245, 34247, 34249, 34251, 34253    N=21 to N=25
+    34255, 34257, 34259, 34261, 34263    N=26 to N=30
+    34265, 34267, 34269                  N=31 to N=33
+    31068    N=34
+    31070    N=34.5
+    31057    N=181   example in Heuberger and Wagner's paper
 
 =head1 SEE ALSO
 
 L<Graph::Maker>
 
 My C<vpar> includes an F<examples/most-maximum-matchings.gp> program making
-these trees in Pari/GP, with a recurrence for their number of maximum
+these trees in Pari/GP, and recurrences for their number of maximum
 matchings.
 
 =over
@@ -457,13 +480,22 @@ L<http://user42.tuxfamily.org/pari-vpar/index.html>
 
 =back
 
+Heuberger and Wagner's Sage code includes general case tree creation, and
+counting of the maximum matchings.
+
+=over
+
+L<https://www.math.tugraz.at/~cheub/publications/max-card-matching/>
+
+=back
+
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2019, 2020 Kevin Ryde
+Copyright 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

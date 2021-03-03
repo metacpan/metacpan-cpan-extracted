@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Tree::VERSION = '0.210380';
+$Bio::MUST::Core::Tree::VERSION = '0.210610';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -386,7 +386,7 @@ sub store_itol_datasets {
         } @descendants[ @descendants > 1 ? (0,-1) : (0) ];
         # Note: should always > 1 but one never knows...
 
-        say {$label_out} join q{,}, $id, $label if $collapse;
+        say {$label_out} join q{,}, $id, $label if $label;
         say {$colps_out}            $id         if $collapse;
 
         next NODE if $color eq $BLACK;
@@ -557,7 +557,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.210380
+version 0.210610
 
 =head1 SYNOPSIS
 

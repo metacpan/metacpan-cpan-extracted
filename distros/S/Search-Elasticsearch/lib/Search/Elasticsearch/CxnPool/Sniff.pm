@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::CxnPool::Sniff;
-$Search::Elasticsearch::CxnPool::Sniff::VERSION = '7.711';
+$Search::Elasticsearch::CxnPool::Sniff::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Role::CxnPool::Sniff',
     'Search::Elasticsearch::Role::Is_Sync';
@@ -98,7 +98,7 @@ Search::Elasticsearch::CxnPool::Sniff - A CxnPool for connecting to a local clus
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

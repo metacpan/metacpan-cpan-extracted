@@ -2,7 +2,7 @@
 #
 # Build script for the docknot application.
 #
-# Copyright 2013, 2016, 2018-2020 Russ Allbery <rra@cpan.org>
+# Copyright 2013, 2016, 2018-2021 Russ Allbery <rra@cpan.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -61,18 +61,20 @@ my $build = Module::Build->new(
     # Other package relationships.
     configure_requires => { 'Module::Build' => 0.4004 },
     requires           => {
-        'File::BaseDir'       => 0,
-        'File::ShareDir'      => 0,
-        'IO::Compress::Xz'    => 0,
-        'IPC::Run'            => 0,
-        'IPC::System::Simple' => 0,
-        'JSON::MaybeXS'       => 0,
-        'Kwalify'             => 0,
-        'List::SomeUtils'     => 0,
-        'Perl6::Slurp'        => 0,
-        'Template'            => 0,
-        'YAML::XS'            => '0.81',
-        perl                  => '5.024',
+        'File::BaseDir'          => 0,
+        'File::ShareDir'         => 0,
+        'IO::Uncompress::Gunzip' => 0,
+        'IO::Compress::Xz'       => 0,
+        'IPC::Run'               => 0,
+        'IPC::System::Simple'    => 0,
+        'JSON::MaybeXS'          => 0,
+        'Kwalify'                => 0,
+        'List::SomeUtils'        => 0,
+        'Perl6::Slurp'           => 0,
+        'Pod::Usage'             => 0,
+        'Template'               => 0,
+        'YAML::XS'               => '0.81',
+        perl                     => '5.024',
     },
     test_requires => {
         'Capture::Tiny'         => 0,

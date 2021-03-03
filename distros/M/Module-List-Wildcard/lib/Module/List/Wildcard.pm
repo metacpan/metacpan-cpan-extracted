@@ -1,7 +1,7 @@
 package Module::List::Wildcard;
 
-our $DATE = '2020-12-22'; # DATE
-our $VERSION = '0.004008'; # VERSION
+our $DATE = '2021-01-16'; # DATE
+our $VERSION = '0.004009'; # VERSION
 
 #IFUNBUILT
 # # use strict 'subs', 'vars';
@@ -212,7 +212,7 @@ Module::List::Wildcard - A fork of Module::List that groks wildcard
 
 =head1 VERSION
 
-This document describes version 0.004008 of Module::List::Wildcard (from Perl distribution Module-List-Wildcard), released on 2020-12-22.
+This document describes version 0.004009 of Module::List::Wildcard (from Perl distribution Module-List-Wildcard), released on 2021-01-16.
 
 =head1 SYNOPSIS
 
@@ -321,10 +321,10 @@ L<Module::List>
 
 L<Module::List::Tiny>
 
-L<Module::List::More>, from which Module::List::Wildcard is forked from.
-Module::List::More contains more features, including wildcard support, but
-currently I'm maintainng both. Eventually this duplication might be resolved in
-the future.
+L<Module::List::More>, from which Module::List::Wildcard is actually forked
+from. Module::List::More contains more features, including wildcard support. I'm
+currently maintainng both modules. Eventually this duplication might be resolved
+in the future.
 
 =head1 AUTHOR
 
@@ -332,7 +332,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

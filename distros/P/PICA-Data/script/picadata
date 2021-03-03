@@ -28,8 +28,15 @@ GetOptions(
     "n|number:i" => \$number,
     'color|C'    => \(my $color),
     'mono|M'     => \(my $nocolor),
-    'help|?'     => \(my $help)
+    'help|h|?'   => \(my $help),
+    'version|V'  => \(my $version)
 ) or pod2usage(2);
+
+if ($version) {
+    say $PICA::Data::VERSION;
+    exit
+}
+
 pod2usage(-verbose => 99, -sections => "SYNOPSIS|OPTIONS|DESCRIPTION")
     if $help
     or (!@ARGV and -t);
@@ -38,13 +45,18 @@ my %types = (
     bin    => 'Binary',
     dat    => 'Binary',
     binary => 'Binary',
+    extpp  => 'Binary',
+    ext    => 'Binary',
     plain  => 'Plain',
     pp     => 'Plain',
     plus   => 'Plus',
+    norm   => 'Plus',
+    normpp => 'Plus',
     xml    => 'XML',
     ppxml  => 'PPXML',
     json   => 'JSON',
     ndjson => 'JSON',
+    fields => 'Fields',
 );
 
 my $input = '-';
@@ -93,11 +105,14 @@ $color
     ? {tag => 'blue', occurrence => 'blue', code => 'red', value => 'green'}
     : undef;
 binmode *STDOUT, ':encoding(UTF-8)';
-$writer = "PICA::Writer::${types{$to}}"->new(color => $color) if $to;
+if ($to) {
+    $writer = "PICA::Writer::${types{$to}}";
+    $writer = $writer->new(color => $color, schema => $schema);
+}
 
 my %schema_options = (ignore_unknown => !$report_unknown);
-my $stats          = {records => 0, holdings => 0, items => 0, fields => 0};
-my $invalid        = 0;
+my $stats = {records => 0, holdings => 0, items => 0, fields => 0};
+my $invalid = 0;
 
 while (my $record = $parser->next) {
     if ($sfpath) {
@@ -107,7 +122,7 @@ while (my $record = $parser->next) {
     $record = $record->fields(@pathes) if @pathes;
 
     $writer->write($record) if $writer;
-    if ($schema) {
+    if ($schema && $to ne 'fields') {
         my @errors = $schema->check($record, %schema_options);
         if (@errors) {
             for (@errors) {
@@ -163,6 +178,9 @@ Parse, validate and/or serialize PICA+ data from the command line, e.g.:
   picadata -p 003@ pica.xml -t       # extract field 003@
   picadata pica.xml -s schema.json   # validate against Avram schema
 
+  # document fields used in a record
+  picadata -t fields pica.xml -s <(curl -s https://format.k10plus.de/avram.pl?profile=k10plus)
+
 =head1 OPTIONS
 
 =head2 --from, -f
@@ -173,7 +191,8 @@ L<http://format.gbv.de/pica>
 
 =head2 --to, -t
 
-PICA serialization type to enable writing parsed PICA data.
+PICA serialization type to enable writing parsed PICA data. Use C<fields> to
+list all fields in the data (with optional schema information).
 
 =head2 --count, -c
 
@@ -208,6 +227,10 @@ Colorize output. Only supported for PICA plain and PICA plus format.
 =head2 --mono, -M
 
 Monochrome (don't colorize output).
+
+=head2 --version, -V
+
+Print version number and exit.
 
 =head1 SEE ALSO
 

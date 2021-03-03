@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2019 Kevin Ryde
+# Copyright 2019, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -26,7 +26,7 @@ use Test;
 use lib 't','xt';
 use MyOEIS;
 use MyTestHelpers;
-MyTestHelpers::nowarnings();
+BEGIN { MyTestHelpers::nowarnings() }
 
 use File::Spec;
 use lib File::Spec->catdir('devel','lib');

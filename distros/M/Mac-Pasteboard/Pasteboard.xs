@@ -196,3 +196,10 @@ defaultFlavor ();
 	RETVAL = DEFAULT_FLAVOR;
     OUTPUT:
 	RETVAL
+
+long
+defaultEncode ()
+    CODE:
+	RETVAL = DEFAULT_ENCODE;
+    OUTPUT:
+	RETVAL

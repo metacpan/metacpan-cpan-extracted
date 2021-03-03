@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-$VERSION = "0.32";
+$VERSION = "0.34";
 
 my $lorem_singleton;
 
@@ -143,7 +143,7 @@ Thanks to the guys who pushed me off the cliff called comfort and into the scary
 
 =head1 AUTHOR
 
-Adeola Awoyemi (adeola@fotango.com)
+Adeola Awoyemi (adeola@cpan.org)
 
 =head1 SEE ALSO
 
@@ -151,7 +151,7 @@ Adeola Awoyemi (adeola@fotango.com)
 
 =head1 COPYRIGHT
 
-Copyright 2003 Fotango Ltd. All rights reserved. L<http://opensource.fotango.com/>
+Copyright (c) 2003 by Adeola Awoyemi. 
 This software is released under the same license as Perl itself.
 
 =cut

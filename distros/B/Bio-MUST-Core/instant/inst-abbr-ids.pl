@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: inst-abbr-ids.pl
 # ABSTRACT: Abbreviate seq ids in FASTA files (optimized)
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 use Modern::Perl '2011';
 use autodie;
@@ -16,6 +17,7 @@ use Bio::MUST::Core::Utils qw(secure_outfile);
 use aliased 'Bio::MUST::Core::Ali';
 use aliased 'Bio::MUST::Core::IdMapper';
 
+# TODO add optional %seen hash, either global or filewise and either .1, .2 etc or .2, .3 etc
 # TODO: make things more souple
 # perl -nle 'if ( ($prot,$gca) = m/^>(\S+).*:(GC[AF]_[^:]+)/ ) { print q{>} . $gca . q{|} . $prot } else { print }' hexa-900-p-a_prot_cplt.fa > hexa-900-p-a_prot_cplt_abbr2.fa
 
@@ -57,22 +59,13 @@ my $abbrid_filter = sub {
     my $long_id = $seq->full_id;
     push @long_ids, $long_id;
 
-    # abbreviate seq_id (using code from Roles::Listable::regex_mapper)
-    # TODO: refactor in module
-    my @ids = $long_id =~ $regex;               # capture original id(s)
-    s{$NOID_CHARS}{_}xmsg for @ids;             # substitute forbidden chars
-    my $abbr_id = join q{}, $prefix, @ids;
+    # abbreviate seq_id
+    my $abbr_id = $seq->seq_id->abbr_with_regex($prefix, $regex);
     push @abbr_ids, $abbr_id;
 
-    # store allowed seqs (optonally unwrapped)
-    # TODO: refactor in module
-    my $width = $seq->seq_len;
-    my $chunk = $ARGV_nowrap ? $width : 60;     # optionally disable wrap
-
+    # store allowed seqs
     my $str = '>' . $abbr_id . "\n";            # use abbreviated seq_id
-    for (my $site = 0; $site < $width; $site += $chunk) {
-        $str .= $seq->edit_seq($site, $chunk) . "\n";
-    }
+    $str .= $seq->wrapped_str;
 
     return $str;
 };
@@ -180,10 +173,6 @@ String to use as the seq id prefix (e.g., NCBI taxon id, 4-letter code)
 =item --store-id-mapper
 
 Store the IDM file corresponding to each output file [default: no].
-
-=item --[no]wrap
-
-[Don't] wrap sequences [default: yes].
 
 =item --version
 

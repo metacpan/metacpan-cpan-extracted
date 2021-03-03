@@ -1,12 +1,12 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '1.14';
+our $VERSION = '1.16';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
     pica_match pica_values pica_value pica_fields pica_holdings pica_items
-    pica_guess);
+    pica_guess clean_pica);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 our $ILN_PATH = PICA::Path->new('101@a');
@@ -167,12 +167,17 @@ use PICA::Writer::Plain;
 use PICA::Writer::Binary;
 use PICA::Writer::PPXML;
 use PICA::Writer::JSON;
+use PICA::Writer::Fields;
 
 sub pica_parser {
     _pica_module('PICA::Parser', @_);
 }
 
 sub pica_writer {
+    if (lc $_[0] eq 'generic') {
+        shift;
+        return PICA::Writer::Generic->new(@_);
+    }
     _pica_module('PICA::Writer', @_);
 }
 
@@ -344,8 +349,8 @@ PICA::Data - PICA record processing
 
 =head1 DESCRIPTION
 
-PICA::Data provides methods, classes, functions, and L<picadata|a command line
-application> to process L<PICA+ records|http://format.gbv.de/pica> in Perl.
+PICA::Data provides methods, classes, functions, and L<a command line
+application|picadata> to process L<PICA+ records|http://format.gbv.de/pica>.
 
 PICA+ is the internal data format of the Local Library System (LBS) and the
 Central Library System (CBS) of OCLC, formerly PICA. Similar library formats
@@ -458,6 +463,10 @@ L<PICA::Writer::XML> for type C<xml> or C<picaxml> (PICA-XML)
 
 L<PICA::Writer::PPXML> for type C<ppxml> (PicaPlus-XML)
 
+=item
+
+L<PICA::Writer::Fields> for type C<fields> (summary of used fields and subfields)
+
 =back
 
 =head2 pica_path( $path )
@@ -488,7 +497,8 @@ expression. The following are virtually equivalent:
 
 =head2 pica_fields( $record, $path[, $path...] )
 
-Returns a PICA record (or empty array reference) limited to fields specified inione ore more PICA path expression. The following are virtually equivalent:
+Returns a PICA record (or empty array reference) limited to fields specified in
+one ore more PICA path expression. The following are virtually equivalent:
 
     pica_fields($record, $path);
     $path->record_fields($record);
@@ -542,7 +552,7 @@ where the C<_id> of each record contains the EPN (subfield C<203@/**0>).
 
 =head2 write( [ $type [, @options] ] | $writer )
 
-Write PICA record with given L<PICA::Writer::Base|PICA::Writer::> or
+Write PICA record with given L<PICA::Writer::...|PICA::Writer::Base> or
 L<PICA::Writer::Plain> by default. This method is a shortcut for blessed
 record objects:
 

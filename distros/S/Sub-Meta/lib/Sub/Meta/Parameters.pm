@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Carp ();
 use Scalar::Util ();
@@ -17,27 +17,33 @@ use overload
 
 sub _croak { require Carp; Carp::croak(@_) }
 
+sub param_class { 'Sub::Meta::Param' }
+
 sub new {
     my $class = shift;
     my %args = @_ == 1 ? %{$_[0]} : @_;
 
     _croak 'parameters reqruires args' unless exists $args{args};
 
-    $args{nshift} = 0 unless exists $args{nshift};
-    $args{slurpy} = 0 unless exists $args{slurpy};
-    $args{args}   = $class->_normalize_args($args{args});
-
     my $self = bless \%args => $class;
-    $self->_assert_nshift;
+    $self->set_args($args{args});
+    $self->set_nshift(exists $args{nshift} ? $args{nshift} : 0);
+    $self->set_slurpy($args{slurpy}) if exists $args{slurpy};
     return $self;
 }
 
 sub nshift()   { $_[0]{nshift} }
-sub slurpy()   { !!$_[0]{slurpy} }
+sub slurpy()   { $_[0]{slurpy} ? $_[0]{slurpy} : !!0 }
 sub args()     { $_[0]{args} }
 
 sub set_nshift($) { $_[0]{nshift} = $_[1]; $_[0]->_assert_nshift; $_[0] }
-sub set_slurpy() { $_[0]{slurpy} = !!(defined $_[1] ? $_[1] : 1); $_[0] }
+sub set_slurpy {
+    my ($self, $v) = @_;
+    $self->{slurpy} = Scalar::Util::blessed($v) && $v->isa('Sub::Meta::Param')
+                    ? $v
+                    : $self->param_class->new($v);
+    return $self;
+}
 
 sub set_args {
     my $self = shift;
@@ -47,8 +53,34 @@ sub set_args {
 
 sub _normalize_args {
     my $self = shift;
-    my @args = @_ == 1 && ref $_[0] && (ref $_[0] eq 'ARRAY') ? @{$_[0]} : @_;
-    [ map { Scalar::Util::blessed($_) ? $_ : Sub::Meta::Param->new($_) } @args ]
+    _croak 'args must be a reference' unless @_ == 1 && ref $_[0];
+
+    my @args;
+    if (ref $_[0] eq 'ARRAY') {
+        @args = @{$_[0]};
+    }
+    elsif (ref $_[0] eq 'HASH') {
+        for my $name (sort { $a cmp $b } keys %{$_[0]}) {
+            my $v = $_[0]->{$name};
+            my $f = ref $v && ref $v eq 'HASH';
+            push @args => {
+                name  => $name,
+                named => 1,
+                ($f ? %$v : (type => $v) ),
+            }
+        }
+    }
+    else {
+        @args = ($_[0]);
+    }
+
+    return [
+        map {
+            Scalar::Util::blessed($_) && $_->isa('Sub::Meta::Param')
+            ? $_
+            : $self->param_class->new($_)
+        } @args
+    ]
 }
 
 sub _assert_nshift {
@@ -118,22 +150,28 @@ sub args_max() {
 
 sub is_same_interface {
     my ($self, $other) = @_;
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
-    return unless $self->slurpy eq $other->slurpy;
+    if ($self->slurpy) {
+        return if !($self->slurpy->is_same_interface($other->slurpy))
+    }
+    else {
+        return if $other->slurpy;
+    }
 
-    return unless @{$self->args} == @{$other->args};
+    return if @{$self->args} != @{$other->args};
     for (my $i = 0; $i < @{$self->args}; $i++) {
-        return unless $self->args->[$i]->is_same_interface($other->args->[$i]);
+        return if !($self->args->[$i]->is_same_interface($other->args->[$i]));
     }
 
     if (defined $self->nshift) {
-        return unless $self->nshift == $other->nshift;
+        return if $self->nshift != $other->nshift;
     }
     else {
         return if defined $other->nshift;
     }
 
-    return 1;
+    return !!1;
 }
 
 1;
@@ -205,10 +243,26 @@ Constructor of C<Sub::Meta::Parameters>.
 
 Subroutine arguments arrayref.
 
-=head2 set_args(LIST), set_args(ArrayRef)
+=head2 set_args(ArrayRef), set_args(HashRef), set_args(Ref)
 
 Setter for subroutine arguments.
-An element can be an argument of C<Sub::Meta::Param> or any object which has C<positional>,C<named>,C<required> and C<optional> methods.
+An element can be an argument of C<Sub::Meta::Param>.
+
+    use Types::Standard -types;
+
+    my $p = Sub::Meta::Parameters->new(args => []);
+    $p->set_args([Int,Int]);
+    $p->set_args([{ type => Int, name => 'num' }]);
+
+    # named case:
+    $p->set_args({ a => Str, b => Str });
+    $p->set_args({
+        a => { isa => Str, default => 123 },
+        b => { isa => Str, optional => 1 }
+    });
+
+    # single ref:
+    $p->set_args(Str); # => $p->set_args([Str])
 
 =head2 nshift
 
@@ -221,11 +275,14 @@ For example, it is assumed that 1 is specified in the case of methods, and 0 is 
 
 =head2 slurpy
 
-A boolean whether get all rest arguments.
+Subroutine all rest arguments.
 
-=head2 set_slurpy($bool)
+=head2 set_slurpy($param_args)
 
-Setter for slurpy.
+Setter for slurpy:
+
+    my $p = Sub::Meta::Parameters->new(args => [{ isa => 'Int', name => '$a'}]);
+    $p->set_slurpy({ name => '@numbers', isa => 'Int' }); # => (Int $a, Int @numbers)
 
 =head2 positional
 
@@ -281,6 +338,11 @@ This is computed as follows:
 
 A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
 Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
+
+=head2 param_class
+
+Returns class name of param. default: Sub::Meta::Param
+Please override for customization.
 
 =head1 SEE ALSO
 

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Data::Dumper;
 
 my @tests = (
     [
@@ -183,6 +184,7 @@ my @tests = (
     ],
 );
 
+# Tests for enum
 my @enum_tests = (
     [ -1,     [1..5],                 0 ],
     [ 100,    [95..105],              1 ],
@@ -198,6 +200,10 @@ for my $et ( @enum_tests ) {
 
 push @tests, [ enum => \@enum_tests ];
 
+# Tests for spec
+my @spec_tests = ();
+
+
 my $test_count = 0;
 for my $f ( @tests ) {
     for my $c ( @{ $f->[1] } ) {
@@ -209,24 +215,50 @@ plan tests =>
     1              # Use Data::Types
     + 1            # Use the class
     + 1            # Create an object
-    + $test_count; # Tests
+    + $test_count  # Tests all, but spec
+    + $test_count  # Test spec
+    ;
 
 use_ok('Data::Types');
 use_ok('Validate::Simple');
 my $validate = new_ok( 'Validate::Simple' );
+
 
 for my $test ( @tests ) {
     my ( $meth, @cases ) = ( $test->[0], @{ $test->[1] } );
     for my $c ( @cases ) {
         my $expected_true = pop @$c;
         my $printable = join(',', map {
-            defined( $_ ) ? $_ : "[undef]";
+            defined( $_ )
+                ? (
+                    ref( $_ )
+                    ? Dumper( $_ )
+                    : $_ )
+                : "[undef]";
         } @$c );
+        my $validate_spec = Validate::Simple->new(
+            {
+                var => {
+                    type => $meth,
+                    # Arrays and hashes require "of"
+                    ( $meth =~ /^(array|hash)$/
+                      ? ( of => { type => 'any' }, empty => 1 )
+                      : () ),
+                    # Enums require "values"
+                    ( $meth eq 'enum'
+                      ? ( values => [ keys %{ $c->[1] } ] )
+                      : () ),
+                }
+            }
+        );
+        my $message = "'$meth' with <$printable> returns";
         if ( $expected_true ) {
-            ok( $validate->$meth( @$c ), "'$meth' with <$printable> returns true" );
+            ok( $validate->$meth( @$c ), "$message true" );
+            ok( $validate->spec( { var => $c->[0] }, $validate_spec ), "Subspec: $message true" );
         }
         else {
-            ok( !$validate->$meth( @$c ), "'$meth' with <$printable> returns false" );
+            ok( !$validate->$meth( @$c ), "$message false" );
+            ok( !$validate->spec( $c, $validate_spec ), "Subspec: $message false" );
         }
     }
 }

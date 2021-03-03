@@ -4,6 +4,7 @@ use warnings;
 package App::HTTP_Proxy_IMP::IMP::FakeResponse;
 use base 'Net::IMP::HTTP::Request';
 use fields qw(root file response);
+no warnings 'experimental'; # smartmatch
 
 use Net::IMP;
 use Net::IMP::Debug;

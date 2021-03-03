@@ -2,7 +2,7 @@
 #
 # Basic tests for App::DocKnot::Dist.
 #
-# Copyright 2019-2020 Russ Allbery <rra@cpan.org>
+# Copyright 2019-2021 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -24,9 +24,14 @@ use IPC::System::Simple qw(capturex systemx);
 
 use Test::More;
 
+# Isolate from the environment.
+local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
+local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
+
 # Find the full path to the test data.
 my $cwd      = getcwd() or die "$0: cannot get working directory: $!\n";
-my $dataroot = File::Spec->catfile($cwd, 't', 'data', 'dist');
+my $dataroot = File::Spec->catfile($cwd, 't', 'data', 'dist', 'package');
+my $gpg_path = File::Spec->catfile($cwd, 't', 'data', 'dist', 'fake-gpg');
 
 # Set up a temporary directory.
 my $dir       = File::Temp->newdir();
@@ -60,7 +65,7 @@ if ($@ || !$result) {
     chdir($cwd);
     plan skip_all => 'git and tar not available';
 } else {
-    plan tests => 13;
+    plan tests => 20;
 }
 
 # Load the module.  Change back to the starting directory for this so that
@@ -85,7 +90,20 @@ capture_stdout {
 ok(-e File::Spec->catfile($distdir,  'Empty-1.00.tar.gz'), 'dist exists');
 ok(-e File::Spec->catfile($distdir,  'Empty-1.00.tar.xz'), 'xz dist exists');
 ok(!-e File::Spec->catfile($distdir, 'Empty-1.00.tar'),    'tarball missing');
+ok(!-e File::Spec->catfile($distdir, 'Empty-1.00.tar.gz.asc'), 'no signature');
+ok(!-e File::Spec->catfile($distdir, 'Empty-1.00.tar.xz.asc'), 'no signature');
 is($@, q{}, 'no errors');
+
+# Switch to using a configuration file and enable signing.
+unlink(File::Spec->catfile($distdir, 'Empty-1.00.tar.gz'));
+unlink(File::Spec->catfile($distdir, 'Empty-1.00.tar.xz'));
+mkdir(File::Spec->catfile($dir, 'docknot'));
+open($fh, '>', File::Spec->catfile($dir, 'docknot', 'config.yaml'));
+print {$fh} "distdir: $distdir\npgp_key: some-pgp-key\n"
+  or die "cannot write to config.yaml: $!\n";
+close($fh);
+local $ENV{XDG_CONFIG_HOME} = $dir;
+$dist = App::DocKnot::Dist->new({ gpg => $gpg_path, perl => $^X });
 
 # If we add an ignored file to the source tree, this should not trigger any
 # errors.
@@ -96,6 +114,15 @@ capture_stdout {
     eval { $dist->make_distribution() };
 };
 is($@, q{}, 'no errors with ignored file');
+
+# And now there should be signatures.
+ok(-e File::Spec->catfile($distdir, 'Empty-1.00.tar.gz'), 'dist exists');
+ok(-e File::Spec->catfile($distdir, 'Empty-1.00.tar.xz'), 'xz dist exists');
+ok(-e File::Spec->catfile($distdir, 'Empty-1.00.tar.gz.asc'), 'gz signature');
+ok(-e File::Spec->catfile($distdir, 'Empty-1.00.tar.xz.asc'), 'xz signature');
+open($fh, '<', File::Spec->catfile($distdir, 'Empty-1.00.tar.gz.asc'));
+is("some signature\n", <$fh>, 'fake-gpg was run');
+close($fh);
 
 # If we add a new file to the source tree and run make_distribution() again,
 # it should fail, and the output should contain an error message about an

@@ -1,5 +1,11 @@
 Revision history for this software.
 
+0.23  2021-02-27 00:00:00
+  - fix parse_expr_balanced()
+  - fix cluck()
+  - removed package name from some variables
+  - created by INABA Hitoshi
+
 0.22  2021-02-21 00:00:00
   - supports version strings
   - removed package name from some variables

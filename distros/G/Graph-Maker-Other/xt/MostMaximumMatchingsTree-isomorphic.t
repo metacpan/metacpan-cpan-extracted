@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2019, 2020 Kevin Ryde
+# Copyright 2017, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -40,7 +40,7 @@ use MyGraphs;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 825;
+plan tests => 881;
 
 require Graph::Maker::MostMaximumMatchingsTree;
 
@@ -95,34 +95,44 @@ require Graph::Maker::MostMaximumMatchingsTree;
     $content =~ /=head1 HOUSE OF GRAPHS.*?=head1/s or die;
     $content = $&;
     my $count = 0;
-    while ($content =~ /^ +(?<id>\d+) +N=(?<N>[0-9.]+)/mg) {
+    while ($content =~ /^ +(?<ids>(\d+, )*\d+) +N=(?<Nlo>[0-9.]+)( to N=(?<Nhi>[0-9]+))?/mg) {
       $count++;
-      my $id = $+{'id'};
-      my $N  = $+{'N'};
-      $shown{"N=$N"} = $+{'id'};
+      my $ids = $+{'ids'};
+      my $Nlo = $+{'Nlo'};
+      my $Nhi = $+{'Nhi'} // $Nlo;
+      my @ids = split /, /, $ids;
+      ### match: "$ids  $Nlo $Nhi"
+      for (my $N = $Nlo; $N <= $Nhi; $N++) {
+        @ids or die;
+        my $id = shift @ids;
+        my $key = "N=$N";
+        ok (! exists $shown{$key}, 1);
+        $shown{"N=$N"} = $id;
+      }
+      ok (scalar(@ids), 0);
     }
     ok ($count, 19, 'HOG ID number of lines');
   }
-  ok (scalar(keys %shown), 19);
+  ok (scalar(keys %shown), 34 + 2 + 1);
   ### %shown
 
   my $extras = 0;
   my $compared = 0;
-  my $others = 0;
+  my @notseen;
   my %seen;
-  foreach my $N (0 .. 30) {
+  foreach my $N (1 .. 40, 34.5) {
     my $graph = Graph::Maker->new('most_maximum_matchings_tree',
                                   undirected => 1,
                                   N => $N);
     my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
     $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
-    next if $seen{$g6_str}++;
+    # next if $seen{$g6_str}++;
     my $key = "N=$N";
     if (my $id = $shown{$key}) {
       MyGraphs::hog_compare($id, $g6_str);
       $compared++;
     } else {
-      $others++;
+      push @notseen, $key;
       if (MyGraphs::hog_grep($g6_str)) {
         my $name = $graph->get_graph_attribute('name');
         MyTestHelpers::diag ("HOG $key not shown in POD");
@@ -134,7 +144,8 @@ require Graph::Maker::MostMaximumMatchingsTree;
     }
   }
   ok ($extras, 0);
-  MyTestHelpers::diag ("POD HOG $compared compares, $others others");
+  MyTestHelpers::diag ("POD HOG $compared compares, notseen: ",
+                       join(' ',@notseen));
 }
 
 #------------------------------------------------------------------------------

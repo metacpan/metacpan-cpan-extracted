@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -35,7 +35,16 @@ use File::Spec;
 use lib File::Spec->catdir('devel','lib');
 use MyGraphs;
 
-plan tests => 11;
+my $test_count = (tests => 11)[1];
+plan tests => $test_count;
+
+if (Graph->VERSION eq '0.9716' || Graph->VERSION eq '0.9717') {
+  MyTestHelpers::diag ('skip due to believe badness in delete_vertex() of Graph.pm version ',Graph->VERSION);
+  foreach (1 .. $test_count) {
+    skip ('due to no Math::BigRat', 1, 1);
+  }
+  exit 0;
+}
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

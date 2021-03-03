@@ -28,6 +28,10 @@ plan skip_all => "Could not find dist.ini for Task-CPANAuthors-Regional"
 
 plan tests => 1;
 
+my $ignore_dist = qr/
+^(?: Acme-CPANAuthors-NameGen
+)$/x;
+
 # handle the CPAN::Common::Index::Mirror cache
 my $cache_dir = File::Spec->catdir( File::Spec->tmpdir, "cpan-$<" );
 make_path $cache_dir unless -e $cache_dir;
@@ -41,6 +45,7 @@ diag "Reading packages from $cache";
 
 my %seen;
 my @latest = sort grep !$seen{$_}++,
+    grep !/$ignore_dist/,
     map { $_->{uri} =~ m{cpan:///distfile/.*/(.*)-[^-]*$} }
     $index->search_packages( { package => qr{^Acme::CPANAuthors::} } );
 
@@ -55,7 +60,7 @@ diag "Reading regional modules from $regional_ini";
 push @current, grep /^Acme::CPANAuthors::/,
     keys %{ Config::INI::Reader->read_file($regional_ini)->{Prereqs} };
 
-@current = sort map { s/::/-/g; $_ } @current;
+@current = grep !/$ignore_dist/, sort map { s/::/-/g; $_ } @current;
 
 # compare both lists
 my $ok = is_deeply( \@current, \@latest, "The list matches CPAN" );

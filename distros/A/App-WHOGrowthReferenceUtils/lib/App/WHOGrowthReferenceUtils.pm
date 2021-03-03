@@ -1,7 +1,9 @@
 package App::WHOGrowthReferenceUtils;
 
-our $DATE = '2021-01-03'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-11'; # DATE
+our $DIST = 'App-WHOGrowthReferenceUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Utilities related to WHO growth reference
@@ -18,7 +20,7 @@ App::WHOGrowthReferenceUtils - Utilities related to WHO growth reference
 
 =head1 VERSION
 
-This document describes version 0.002 of App::WHOGrowthReferenceUtils (from Perl distribution App-WHOGrowthReferenceUtils), released on 2020-01-03.
+This document describes version 0.003 of App::WHOGrowthReferenceUtils (from Perl distribution App-WHOGrowthReferenceUtils), released on 2021-01-11.
 
 =head1 DESCRIPTION
 
@@ -40,7 +42,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-WHOGrowthReferen
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-WHOGrowthReferenceUtils/issues>
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-WHOGrowthReferenceUtils>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -49,6 +51,9 @@ feature.
 =head1 SEE ALSO
 
 L<WHO::GrowthReference::Table>
+
+These distributions also have some CLIs: L<WHO::GrowthReference::GenTable>,
+L<WHO::GrowthReference::GenChart>.
 
 =head1 AUTHOR
 

@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 # Perl-Critic-Pulp is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -23,7 +23,7 @@ use base 'Perl::Critic::Policy';
 use Perl::Critic::Utils;
 use Perl::Critic::Pulp;
 
-our $VERSION = 97;
+our $VERSION = 99;
 
 use constant supported_parameters => ();
 use constant default_severity     => $Perl::Critic::Utils::SEVERITY_MEDIUM;
@@ -51,15 +51,16 @@ Perl::Critic::Policy::ValuesAndExpressions::ProhibitFiletest_f - don't use the -
 This policy is part of the L<C<Perl::Critic::Pulp>|Perl::Critic::Pulp>
 add-on.  It asks you not to use the C<-f> file test because doing so is
 usually wrong or unnecessarily restrictive.  On that basis this policy is
-under the "bugs" theme, see L<Perl::Critic/POLICY THEMES>.
+under the "bugs" theme and medium severity, see L<Perl::Critic/POLICY
+THEMES>.
 
 =over 4
 
 =item C<-f> is not the opposite of C<-d>
 
 If you're traversing a tree and want to distinguish files from directories
-to descend into then C<-d> should be used so device files or named pipes can
-be processed.
+to descend into, then C<-d> should be used so device files or named pipes
+can be processed.
 
     if (-f $filename) {      # bad
       process ($filename);
@@ -139,9 +140,9 @@ language.
 =head2 Disabling
 
 Most uses of C<-f> tend to shell script style code written in Perl.  In the
-shell it's usually not possible to do better than such tests (though C<-d>
-or C<-e> are still generally better than C<-f>), but in Perl it is possible
-to do better.
+shell, it's usually not possible to do better than such tests (though C<-d>
+or C<-e> are still generally better than C<-f>), but Perl can do the right
+thing.
 
 A blanket prohibition like this policy is harsh, but is meant as a building
 block or at least to make you think carefully whether C<-f> is really right.
@@ -165,7 +166,7 @@ http://user42.tuxfamily.org/perl-critic-pulp/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 Perl-Critic-Pulp is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

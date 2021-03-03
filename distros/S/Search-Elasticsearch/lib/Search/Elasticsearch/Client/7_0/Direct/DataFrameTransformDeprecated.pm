@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Direct::DataFrameTransformDeprecated;
-$Search::Elasticsearch::Client::7_0::Direct::DataFrameTransformDeprecated::VERSION = '7.711';
+$Search::Elasticsearch::Client::7_0::Direct::DataFrameTransformDeprecated::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -36,7 +36,7 @@ Search::Elasticsearch::Client::7_0::Direct::DataFrameTransformDeprecated - Data 
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head2 DESCRIPTION
 

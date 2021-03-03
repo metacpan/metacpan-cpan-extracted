@@ -1,4 +1,4 @@
-# Copyright 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -365,11 +365,11 @@ L<Math::PlanePath::AlternatePaper>
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

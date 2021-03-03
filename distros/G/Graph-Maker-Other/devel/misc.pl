@@ -32,6 +32,17 @@ $|=1;
 use Smart::Comments;
 
 
+{
+  # Mobius Ladder Spanning Trees
+
+  # read("../../geom/geom.gp")
+  # sqrt3 = geom_sqrt_as_quad(3)
+  # sqrt3^2 == 3
+  # t(n) = n/2 * ( (2+sqrt3)^n + (2-sqrt3)^n + 2);
+  # vector(15,n, t(n))
+  # A020871
+  exit 0;
+}
 
 {
   # Free Trees Corresponding to Hypertrees
@@ -152,86 +163,7 @@ use Smart::Comments;
   MyGraphs::Graph_view($graph);
   exit 0;
 }
-{
-  # Cubefree Substring Relations
 
-  # 11,19,31,49,77,117
-  # v = apply(n->2*n+1,[11,19,31,49,77,117])
-  # vector(#v-1,i,v[i+1]-v[i]) \\ A028445 cubefrees
-
-  my $max_len = 8;
-  my $delta1 = 1;
-  my $prefix = 1;
-
-  my @cubefrees = ('');
-  {
-    my @pending = ('');
-    foreach my $len (1 .. $max_len) {
-      my @new_pending;
-      foreach my $str (@pending) {
-        foreach my $ext ('0','1') {
-          my $new_str = $str.$ext;
-          if (is_cubefree($new_str)) {
-            push @new_pending, $new_str;
-          }
-        }
-      }
-      @pending = @new_pending;
-      push @cubefrees, @pending;
-    }
-  }
-  my $num_vertices = scalar(@cubefrees);
-  print "num_vertices = $num_vertices\n";
-
-  require Graph;
-  my $graph = Graph->new (undirected => 1);
-  $graph->set_graph_attribute
-    (name => "Cubefree Substring Relations, Max Length $max_len");
-  $graph->set_graph_attribute (root => "!");
-  foreach my $from_i (0 .. $#cubefrees) {
-    my $from_str = $cubefrees[$from_i];
-    foreach my $to_i (0 .. $from_i-1) {
-      my $to_str = $cubefrees[$to_i];
-      if ($delta1) {
-        next unless length($from_str) - length($to_str) == 1;
-      }
-      my $pos = index($from_str,$to_str);
-      if ($prefix) {
-        next unless $pos==0;
-      }
-      if ($pos >= 0) {
-        my $from_str = (length($from_str) ? $from_str : '!');
-        my $to_str = (length($to_str) ? $to_str : '!');
-        $graph->add_edge($from_str, $to_str);
-      }
-    }
-  }
-
-  MyGraphs::Graph_view($graph);
-  print "tree\n";
-  MyGraphs::Graph_tree_print($graph, cmp => \&MyGraphs::cmp_alphabetic);
-  # Graph_print_tikz($graph);
-  # MyGraphs::hog_searches_html($graph);
-  exit 0;
-
-  sub find_cube {
-    my ($str) = @_;
-    foreach my $c (1 .. int(length($str)/3)) {
-      my $re = '('.('.' x $c).')\\1\\1';
-      ### $re
-      if ($str =~ $re) {
-        ### $str
-        ### cube: $1
-        return $1;
-      }
-    }
-    return undef;
-  }
-  sub is_cubefree {
-    my ($str) = @_;
-    return ! defined find_cube($str);
-  }
-}
 {
   # isomorphic halves connected at different
   # https://hog.grinvin.org/ViewGraphInfo.action?id=33776
@@ -3607,20 +3539,6 @@ use Smart::Comments;
   $graph->add_path ('L','T','R');
   # MyGraphs::Graph_view($graph);
   MyGraphs::hog_searches_html($graph);
-  exit 0;
-}
-
-{
-  require Graph::Maker::BalancedTree;
-  my $num_children = 2;
-  foreach my $h (0 .. 10) {
-    my $graph = Graph::Maker->new('balanced_tree',
-                                  fan_out => $num_children, height => $h,
-                                  undirected => 1,
-                                 );
-    my $domnum = MyGraphs::Graph_tree_domnum($graph);
-    print "h=$h  domnum $domnum\n";
-  }
   exit 0;
 }
 

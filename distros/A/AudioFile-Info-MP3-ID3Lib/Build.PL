@@ -16,6 +16,7 @@ my $b = AudioFile::Info::Build->new(
     },
     build_requires => {
         YAML            => 0,
+	Test::Exception => 0,
     },
     build_recommends => {
         Module::Build   => 0

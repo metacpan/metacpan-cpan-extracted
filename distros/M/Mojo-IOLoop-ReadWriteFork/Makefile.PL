@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'IO::Pty' => '1.10',
+  'IO::Pty' => '1.16',
   'Mojolicious' => '8.00'
 }
 ,

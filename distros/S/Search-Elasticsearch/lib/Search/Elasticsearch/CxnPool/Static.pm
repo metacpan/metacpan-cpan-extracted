@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::CxnPool::Static;
-$Search::Elasticsearch::CxnPool::Static::VERSION = '7.711';
+$Search::Elasticsearch::CxnPool::Static::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Role::CxnPool::Static',
     'Search::Elasticsearch::Role::Is_Sync';
@@ -67,7 +67,7 @@ Search::Elasticsearch::CxnPool::Static - A CxnPool for connecting to a remote cl
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

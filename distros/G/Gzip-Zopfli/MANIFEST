@@ -1,0 +1,19 @@
+Changes
+examples/synopsis.pl
+gzip-zopfli-perl.c
+lib/Gzip/Zopfli.pm
+lib/Gzip/Zopfli.pod
+make-c-file.pl
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+t/gzip-zopfli.t
+t/GZT.pm
+t/warnings.t
+typemap
+zopfli-one.c
+Zopfli.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

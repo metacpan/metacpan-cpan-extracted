@@ -26,7 +26,7 @@ system "perl -i -ple '$substitution' @pod";
 #  our $VERSION = "[^"]+"
 my @pm;
 find(sub { push @pm, $File::Find::name if /\.pm$/ },
-     qw(glue/perl/lib/Apache2));
+     qw(glue/perl/lib));
 
 my $pattern = '(?<=our \$VERSION = ")([^"]+)(?=")';
 system "perl -i -ple 's/$pattern/$version/' @pm";
@@ -42,6 +42,12 @@ system "perl -i -ple 's/$pattern1/$version/ or s/$pattern2/$version/' configure.
 #
 # win32/Configure.pl
 # my $VERSION = '[^']+'
-my $pattern3 = qr/my \$VERSION = "2.08"/;
+my $pattern3 = qr/my \$VERSION = "2.15"/;
 my $replace = "my \\\$VERSION = \"$version\"";
 system "perl -i -ple 's/$pattern3/$replace/' win32/Configure.pl";
+
+# RELEASE/WEBSITE/this script
+system "perl -i -ple 's/2.15/$version/' build/RELEASE";
+system "perl -i -ple 's/2.15/$version/' build/WEBSITE";
+system "perl -i -ple 's/2.15/$version/' build/update_version.pl";
+

@@ -1,0 +1,11 @@
+Revision history for Web::Solid::Auth
+
+0.3  2021-02-28 08:36:51 CET
+  - Updating documentation and code comments
+  - Adding support for inspecting access_token and id_token
+  
+0.2  2021-02-26 19:47:05 CET
+  - Ading an example web (Plack) application
+
+0.1  2021-02-26 16:14:42 CET
+  - Initial version

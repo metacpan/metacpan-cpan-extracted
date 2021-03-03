@@ -3,7 +3,7 @@ package Ubuntu::Releases;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-15'; # DATE
 our $DIST = 'Ubuntu-Releases'; # DIST
-our $VERSION = '20210115.0'; # VERSION
+our $VERSION = '20210115.1'; # VERSION
 
 use 5.010001;
 use strict;
@@ -669,7 +669,7 @@ Ubuntu::Releases - List Ubuntu releases
 
 =head1 VERSION
 
-This document describes version 20210115.0 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2021-01-15.
+This document describes version 20210115.1 of Ubuntu::Releases (from Perl distribution Ubuntu-Releases), released on 2021-01-15.
 
 =head1 SYNOPSIS
 
@@ -679,10 +679,11 @@ This document describes version 20210115.0 of Ubuntu::Releases (from Perl distri
 
 =head1 DESCRIPTION
 
-This module contains list of Ubuntu releases. Data source is
-currently at: L<https://github.com/sharyanto/gudangdata-distrowatch>
-(table/redhat_release) which in turn is retrieved from
-L<http://distrowatch.com>.
+This module contains list of Ubuntu releases. Data source is currently at:
+L<https://github.com/sharyanto/gudangdata-distrowatch> (table/ubuntu_release)
+which in turn is retrieved from L<http://distrowatch.com>. Additional data
+source: L<https://github.com/sharyanto/gudangdata>
+(table/ubuntu_release_animal).
 
 =head1 FUNCTIONS
 

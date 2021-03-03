@@ -1,3 +1,4 @@
+use lib '.';
 use strict;
 use warnings;
 
@@ -16,14 +17,13 @@ perl_version 5.0100;
 readme_from 'Czech.pm';
 recursive_author_tests('xt');
 requires 'Acme::CPANAuthors' => 0;
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Acme-CPANAuthors-Czech';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Acme-CPANAuthors-Czech/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Acme-CPANAuthors-Czech';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Acme-CPANAuthors-Czech';
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::More' => 0;
 tests_recursive;
-version '0.26';
+version '0.27';
 
 # Run.
 WriteAll();

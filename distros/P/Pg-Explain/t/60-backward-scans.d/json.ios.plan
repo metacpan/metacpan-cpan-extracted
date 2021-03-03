@@ -1,0 +1,40 @@
+[
+  {
+    "Plan": {
+      "Node Type": "Limit",
+      "Parallel Aware": false,
+      "Startup Cost": 0.27,
+      "Total Cost": 0.35,
+      "Plan Rows": 1,
+      "Plan Width": 64,
+      "Actual Startup Time": 0.019,
+      "Actual Total Time": 0.019,
+      "Actual Rows": 1,
+      "Actual Loops": 1,
+      "Plans": [
+        {
+          "Node Type": "Index Only Scan",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Scan Direction": "Backward",
+          "Index Name": "pg_class_relname_nsp_index",
+          "Relation Name": "pg_class",
+          "Alias": "pg_class",
+          "Startup Cost": 0.27,
+          "Total Cost": 30.20,
+          "Plan Rows": 395,
+          "Plan Width": 64,
+          "Actual Startup Time": 0.018,
+          "Actual Total Time": 0.018,
+          "Actual Rows": 1,
+          "Actual Loops": 1,
+          "Heap Fetches": 1
+        }
+      ]
+    },
+    "Planning Time": 0.359,
+    "Triggers": [
+    ],
+    "Execution Time": 0.054
+  }
+]

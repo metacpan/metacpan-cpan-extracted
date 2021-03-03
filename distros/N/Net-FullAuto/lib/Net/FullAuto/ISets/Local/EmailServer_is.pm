@@ -201,9 +201,9 @@ my $configure_emailserver=sub {
          ' unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel'.
          ' ncurses-devel xmlto autoconf libmcrypt libmcrypt-devel'.
          ' libcurl libcurl-devel libicu libicu-devel re2c'.
-         ' libpng-devel.x86_64 freetype-devel.x86_64 cmake'.
+         ' libpng-devel.x86_64 freetype-devel.x86_64 expat-devel'.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all'.
-         ' lzip libffi-devel libc-client-devel texinfo',
+         ' lzip libffi-devel libc-client-devel texinfo cmake',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y update','__display__');
@@ -396,7 +396,6 @@ if ($do==1) {
       Net::FullAuto::FA_Core::handle_error($error) if $error;
       my $cidr=$hash->{SecurityGroups}->[0]->{IpPermissions}
               ->[0]->{IpRanges}->[0]->{CidrIp};
-              ->[0]->{IpRanges}->[0]->{CidrIp};
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
          'tcp --port 22 --cidr '.$cidr." 2>&1";
@@ -451,6 +450,19 @@ if ($do==1) {
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 11332 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 11333 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+
 
    } else {
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -476,6 +488,12 @@ if ($do==1) {
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'firewall-cmd --zone=public --permanent --add-port=443/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=11332/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=11333/tcp',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'firewall-cmd --reload',
@@ -600,6 +618,8 @@ if ($do==1) {
       'make install','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v libxml-2.0.pc /usr/lib64/pkgconfig','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ldconfig -v','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget --random-wait --progress=dot '.
@@ -616,6 +636,8 @@ if ($do==1) {
       'make install','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v sqlite3.pc /usr/lib64/pkgconfig','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ldconfig -v','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget --random-wait --progress=dot '.
@@ -1860,6 +1882,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v libzip.pc /usr/lib64/pkgconfig',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ldconfig -v','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone https://github.com/jedisct1/libsodium',
@@ -1877,6 +1901,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v libsodium.pc /usr/lib64/pkgconfig',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ldconfig -v','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone https://github.com/php/php-src.git',
@@ -2720,16 +2746,17 @@ END
        "sed -i \"s*.bindir.*/usr/local/bin*\" ".
        "/etc/systemd/system/dovecot.service");
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'mkdir -vp /var/run/dovecot','__display__');
+       'mkdir -vp /usr/local/var/run/dovecot','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       "sed -i \"s*.rundir.*/var/run/dovecot*\" ".
+       "sed -i \"s*.rundir.*/usr/local/var/run/dovecot*\" ".
        "/etc/systemd/system/dovecot.service");
    ($stdout,$stderr)=$handle->cmd($sudo.
        'systemctl daemon-reload');
-   #($stdout,$stderr)=$handle->cmd($sudo.
-   #    'systemctl restart dovecot');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       '/usr/local/bin/dovecot');
+       'systemctl restart dovecot');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       '/usr/local/sbin/dovecot service status',
+       '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_roundcube=<<'END';
 
@@ -2803,7 +2830,136 @@ END
       "cp -Rv $gtarfile/* /var/www/html/roundcube",
       '__display__');
 
+   ##     ## ##    ## ########   #######  ##     ## ##    ## ########
+   ##     ## ###   ## ##     ## ##     ## ##     ## ###   ## ##     ##
+   ##     ## ####  ## ##     ## ##     ## ##     ## ####  ## ##     ##
+   ##     ## ## ## ## ########  ##     ## ##     ## ## ## ## ##     ##
+   ##     ## ##  #### ##     ## ##     ## ##     ## ##  #### ##     ##
+   ##     ## ##   ### ##     ## ##     ## ##     ## ##   ### ##     ##
+    #######  ##    ## ########   #######   #######  ##    ## ########
+
+   my $install_redis=<<'END';
+
+
+          o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
+          8 8b   8 8        8     .P 8 8     8     8 8b   8 8    8
+          8 8`b  8 `Yooo.   8    .P  8 8     8     8 8`b  8 8
+          8 8 `b 8     `8   8   oPooo8 8     8     8 8 `b 8 8   oo
+          8 8  `b8      8   8  .P    8 8     8     8 8  `b8 8    8
+          8 8   `8 `YooP'   8 .P     8 8oooo 8oooo 8 8   `8 `YooP8
+          ........................................................
+          ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+                                       ###    ###
+                   ######    ####      ###          ####
+                   ####### ###  ##  ######    ###  ### ##
+                   ###  ## ### ### #######    ###   ###
+                   ###     ###     ##  ###    ###    ###
+                   ###     ####### #######    ###  ## ###
+                   ###       ####   ######   ####   ####
+
+
+          (redis is **NOT** a sponsor of the FullAuto© Project.)
+
+
+END
    ($stdout,$stderr)=$handle->cwd('/opt/source');
+   print $install_redis;
+   sleep 5;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone --recursive https://github.com/redis/redis.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('redis');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git tag --list');
+   $stdout=~s/^.*[^v](\d+\.\d+\.\d+)\s.*$/$1/s;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "git checkout $stdout");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "git status",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "make BUILD_TLS=yes",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "make install",'__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   my $install_unbound=<<'END';
+
+
+          o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
+          8 8b   8 8        8     .P 8 8     8     8 8b   8 8    8
+          8 8`b  8 `Yooo.   8    .P  8 8     8     8 8`b  8 8
+          8 8 `b 8     `8   8   oPooo8 8     8     8 8 `b 8 8   oo
+          8 8  `b8      8   8  .P    8 8     8     8 8  `b8 8    8
+          8 8   `8 `YooP'   8 .P     8 8oooo 8oooo 8 8   `8 `YooP8
+          ........................................................
+          ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+     ##     ## ##    ## ########   #######  ##     ## ##    ## ########
+     ##     ## ###   ## ##     ## ##     ## ##     ## ###   ## ##     ##
+     ##     ## ####  ## ##     ## ##     ## ##     ## ####  ## ##     ##
+     ##     ## ## ## ## ########  ##     ## ##     ## ## ## ## ##     ##
+     ##     ## ##  #### ##     ## ##     ## ##     ## ##  #### ##     ##
+     ##     ## ##   ### ##     ## ##     ## ##     ## ##   ### ##     ##
+      #######  ##    ## ########   #######   #######  ##    ## ########
+
+
+          (unbound is **NOT** a sponsor of the FullAuto© Project.)
+
+
+END
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   print $install_unbound;
+   sleep 5;
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://nlnetlabs.nl/projects/unbound/about/');
+   $stdout=~s/^.*most-recent-version.*?href=["]([^"]+)["].*$/$1/s;
+   my $utarfile=$stdout;
+   $utarfile=~s/^.*\/(.*)$/$1/;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot '.
+      "https://nlnetlabs.nl/$stdout",
+      '__display__');
+   $utarfile=~s/^.*\/(.*)$/$1/;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar xvf $utarfile",'__display__');
+   $utarfile=~s/\.tar\.gz$//;
+   ($stdout,$stderr)=$handle->cwd($utarfile);
+   ($stdout,$stderr)=$handle->cmd($sudo.'pwd','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -v unbound.build','__display__');
+   ($stdout,$stderr)=$handle->cwd('unbound.build');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '../configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','3600','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v ./contrib/unbound.service /etc/systemd/system',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i \'1,/NotifyAccess=/!d\' '.
+      '/etc/systemd/system/unbound.service');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl daemon-reload');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'groupadd -g 5001 unbound');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'useradd -u 5001 -r -g unbound -s /usr/bin/nologin -d '.
+      '/home/unbound -m unbound');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i \'s/^nameserver.*/nameserver 127.0.0.1/\' '.
+      '/etc/resolv.conf');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl enable unbound');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service unbound restart');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service unbound status -l','__display__');
+
    my $install_rspamd=<<'END';
 
 
@@ -2937,11 +3093,46 @@ END
       'cmake .. -DENABLE_HYPERSCAN=ON -DENABLE_LUAJIT=ON '.
       '-DCMAKE_BUILD_TYPE=RelWithDebuginfo '.
       '-DCMAKE_CXX_COMPILER=/usr/local/bin/g++ '.
-      '-DCMAKE_C_COMPILER=/usr/local/bin/gcc','__display__');
+      '-DCMAKE_C_COMPILER=/usr/local/bin/gcc '.
+      '-DCMAKE_INSTALL_RPATH=/usr/local/lib64',
+      '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ldconfig -v','__display__');
+   $ad='bind_socket = "127.0.0.1:11333";';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'/mime/a$ad\' /usr/local/etc/rspamd/worker-normal.inc");
+   $ad='bind_socket = "127.0.0.1:11332";';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'/milter/i$ad\' /usr/local/etc/rspamd/worker-proxy.inc");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i \'s/hosts = "localhost"/self_scan = yes/\' '.
+      '/usr/local/etc/rspamd/worker-proxy.inc');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "rspamadm pw --encrypt -p $service_and_cert_password");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i \'s/q1/$stdout/\' ".
+      '/usr/local/etc/rspamd/worker-controller.inc');
+   $ad='servers = "127.0.0.1";%NL%backend = "redis";';
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" > ".
+      "~/classifier-bayes.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
+       "~/classifier-bayes.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -fv ~/classifier-bayes.conf /usr/local/etc/rspamd',
+      '__display__');
+   $ad='use = ["x-spamd-bar", "x-spam-level", "authentication-results"];';
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" > ".
+      "~/milter_headers.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -fv ~/milter_headers.conf /usr/local/etc/rspamd',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl restart rspamd');
 
 #cleanup;
 

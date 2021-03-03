@@ -1,5 +1,9 @@
 Revision history for Catmandu-BibTeX
 
+0.20  2021-03-02 10:19:26 CET
+  - update tests to work with latest BibTeX::Parser (page range divider is now
+    long dash)
+
 0.19  2021-01-25 13:14:08 CET
   - fix version for LaTeX::ToUnicode
 

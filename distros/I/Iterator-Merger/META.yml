@@ -23,4 +23,4 @@ requires:
   Array::Heap: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.61
+version: 0.62

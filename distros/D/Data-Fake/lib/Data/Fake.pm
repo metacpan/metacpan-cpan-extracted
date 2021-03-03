@@ -5,7 +5,7 @@ use warnings;
 package Data::Fake;
 # ABSTRACT: Declaratively generate fake structured data for testing
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Import::Into 1.002005;
 
@@ -34,7 +34,7 @@ Data::Fake - Declaratively generate fake structured data for testing
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,9 @@
+2021-03-02  Dave Cross <dave@perlhacks.com>
+
+  * Die if no MP3 file is passed to the constructor (thanks MANWAR)
+
+  * Bundle a better version of Build.pm
+
 2020-12-06  Dave Cross <dave@perlhacks.com>
 
   * Add YAML to "configure_requires"

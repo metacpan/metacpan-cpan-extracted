@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Direct::ML;
-$Search::Elasticsearch::Client::7_0::Direct::ML::VERSION = '7.711';
+$Search::Elasticsearch::Client::7_0::Direct::ML::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -36,7 +36,7 @@ Search::Elasticsearch::Client::7_0::Direct::ML - Plugin providing ML API for Sea
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

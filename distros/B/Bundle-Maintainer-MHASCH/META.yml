@@ -3,13 +3,14 @@ abstract: 'CPAN Modules maintained by Martin Becker (MHASCH).'
 author:
   - 'Martin Becker <mhasch at cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '6.56'
-  Test::More: '0.75'
-configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
-license: perl
+  Test::More: '0.82'
+configure_requires:
+  ExtUtils::MakeMaker: '7.06'
+  File::Spec: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,7 +19,15 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Bundle::Maintainer::MHASCH:
+    file: lib/Bundle/Maintainer/MHASCH.pm
+    version: '0.005'
 requires:
   perl: '5.006'
-version: '0.003'
+resources:
+  bugtracker: https://github.com/mhasch/perl-Bundle-Maintainer-MHASCH/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/mhasch/perl-Bundle-Maintainer-MHASCH.git
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -11,8 +11,10 @@ use File::Spec::Functions qw(splitdir catfile);
 use App::Followme;
 use App::Followme::Initialize qw(initialize);
 
-my ($init, $help);
-GetOptions('init|i' => \$init, 'help|h' => \$help);
+my ($init, $help, $guide);
+GetOptions('init|i' => \$init, 
+           'help|h' => \$help,
+           'guide|g' =>\$guide);
 
 my $filename = shift @ARGV;
 my $config = configuration_file();
@@ -21,6 +23,10 @@ my $directory = set_directory($filename);
 
 if ($help) {
     show_help();
+
+} elsif ($guide) {
+    my $page = App::Followme::Guide->new()->print();
+    print $page;
 
 } elsif ($init) {
     initialize($directory);
@@ -96,6 +102,7 @@ all directories below it are checked.
 Options:
 
 -h --help    print this help
+-g --guide   print the guide, a fuller explanation of the task
 -i --init    copy default templates and configurations to directory
 
 EOQ

@@ -18,6 +18,7 @@ MANIFEST.SKIP
 README
 README.md
 share/licenses.yaml
+share/schema/config.yaml
 share/schema/docknot.yaml
 share/schema/licenses.yaml
 share/templates/readme-md.tmpl
@@ -26,12 +27,13 @@ share/templates/thread.tmpl
 t/cli/errors.t
 t/cli/generate.t
 t/config/basic.t
-t/data/dist/Build.PL
-t/data/dist/docs/docknot.yaml
-t/data/dist/lib/Empty.pm
-t/data/dist/MANIFEST
-t/data/dist/MANIFEST.SKIP
-t/data/dist/t/api/empty.t.in
+t/data/dist/fake-gpg
+t/data/dist/package/Build.PL
+t/data/dist/package/docs/docknot.yaml
+t/data/dist/package/lib/Empty.pm
+t/data/dist/package/MANIFEST
+t/data/dist/package/MANIFEST.SKIP
+t/data/dist/package/t/api/empty.t.in
 t/data/generate/ansicolor/docknot.yaml
 t/data/generate/ansicolor/output/readme
 t/data/generate/ansicolor/output/readme-md

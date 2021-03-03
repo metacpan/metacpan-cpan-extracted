@@ -13,6 +13,7 @@ README.md
 t/00-basic.t
 t/app.t
 t/bash.t
+t/before-fork.t
 t/callback.t
 t/close-filehandles.t
 t/close.t

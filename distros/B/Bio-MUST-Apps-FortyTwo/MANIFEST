@@ -8,7 +8,7 @@ META.yml
 Makefile.PL
 README
 bin/compress-db.pl
-bin/debrief-taxR-42.pl
+bin/debrief-42.pl
 bin/forty-two.pl
 bin/leel.pl
 bin/yaml-generator-42.pl

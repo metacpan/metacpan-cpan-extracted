@@ -1,0 +1,79 @@
+{
+   "abstract" : "Test distribution prerequisites against meta data.",
+   "author" : [
+      "Thomas R. Wyant, III F<wyant at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Prereq-Meta",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "Carp" : "0",
+            "Exporter" : "0",
+            "ExtUtils::Manifest" : "0",
+            "File::Find" : "0",
+            "File::Glob" : "0",
+            "File::Spec" : "0",
+            "Module::CoreList" : "0",
+            "Module::Extract::Use" : "1.045",
+            "Module::Metadata" : "0",
+            "Scalar::Util" : "0",
+            "constant" : "0",
+            "perl" : "5.01",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Prereq::Meta" : {
+         "file" : "lib/Test/Prereq/Meta.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://github.com/trwyant/perl-Test-Prereq-Meta/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Test-Prereq-Meta.git",
+         "web" : "https://github.com/trwyant/perl-Test-Prereq-Meta"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

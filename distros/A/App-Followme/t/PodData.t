@@ -80,9 +80,7 @@ do {
 
     my $index_file = $obj->dir_to_filename($obj->{base_directory});
     my $files = $obj->build('all_files', $index_file);
-
-    my $file_list = join(',', @$files);
-    ok(index($file_list, '.pod') > 0, "Build file list"); # test 7
+    ok(@$files > 25, "Build file list"); # test 7
 
     my @files = sort(@$files);
     my $file = shift(@files);
@@ -96,11 +94,14 @@ do {
     my $summary = $obj->build('$summary', $file);
     ok(index($$summary, "base class") > 0, "Get summary"); # test 10
 
-    my @pod_files = grep(/\.pod$/, @files);
-    foreach my $pod_file (@pod_files) {
-        my $body = $obj->build('body', $pod_file);
-        my @urls = $$body =~ /href="([^"]*)"/g;
-        like($urls[0], qr(^[\/a-z]+\.html$), "Test url conversion"); # test 11
-        ok(@urls > 10, "Test finding all urls"); # test 12
+    foreach my $file (@$files) {
+        my @dirs = splitdir($file);
+        my $basename = pop(@dirs);
+        if ($basename eq 'Guide.pm') {
+            my $body = $obj->build('body', $file);
+            my @urls = $$body =~ /href="([^"]*)"/g;
+            like($urls[0], qr(^[\/a-z]+\.html$), "Test url conversion"); # test 11
+            ok(@urls > 10, "Test finding all urls"); # test 12
+        }
     }
 };

@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::API;
-$Search::Elasticsearch::Role::API::VERSION = '7.711';
+$Search::Elasticsearch::Role::API::VERSION = '7.711001';
 use Moo::Role;
 requires 'api_version';
 requires 'api';
@@ -123,7 +123,7 @@ Search::Elasticsearch::Role::API - Provides common functionality for API impleme
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 AUTHOR
 

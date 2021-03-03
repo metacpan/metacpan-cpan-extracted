@@ -33,7 +33,7 @@ annex-to-annex-reinject - use 'git annex reinject' to redo annex-to-annex
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ Sean Whitton <spwhitton@spwhitton.name>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2020 by Sean Whitton <spwhitton@spwhitton.name>.
+This software is Copyright (c) 2019-2021 by Sean Whitton <spwhitton@spwhitton.name>.
 
 This is free software, licensed under:
 

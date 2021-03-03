@@ -4,10 +4,12 @@ use 5.010001;
 use strict;
 use warnings;
 
+use Data::Dmp;
 use Data::Sah::Resolve qw(resolve_schema);
 use Test::Exception;
 use Test::More 0.98;
 use Test::Needs;
+use Test::Deep;
 
 subtest "unknown" => sub {
     test_resolve(
@@ -56,29 +58,29 @@ subtest "Data::Sah" => sub {
 
     test_resolve(
         schema => "posint",
-        result => ["int", [{summary=>"Positive integer (1, 2, ...)", min=>1}]],
+        result => ["int", [superhashof({summary=>"Positive integer (1, 2, ...)", min=>1})]],
     );
     test_resolve(
         schema => ["posint", min=>10],
-        result => ["int", [{summary=>"Positive integer (1, 2, ...)", min=>1}, {min=>10}]],
+        result => ["int", [superhashof({summary=>"Positive integer (1, 2, ...)", min=>1}), {min=>10}]],
     );
     test_resolve(
         schema => ["posint", "merge.delete.min"=>undef],
-        result => ["int", [{summary=>"Positive integer (1, 2, ...)"}]],
+        result => ["int", [superhashof({summary=>"Positive integer (1, 2, ...)"})]],
     );
 
     test_resolve(
         schema => ["poseven"],
-        result => ["int", [{summary=>"Positive integer (1, 2, ...)", min=>1}, {summary=>"Positive even number", div_by=>2}]],
+        result => ["int", [superhashof({summary=>"Positive integer (1, 2, ...)", min=>1}), superhashof({summary=>"Positive even number", div_by=>2})]],
     );
     test_resolve(
         schema => ["poseven", min=>10, div_by=>3],
-        result => ["int", [{summary=>"Positive integer (1, 2, ...)", min=>1}, {summary=>"Positive even number", div_by=>2}, {min=>10, div_by=>3}]],
+        result => ["int", [superhashof({summary=>"Positive integer (1, 2, ...)", min=>1}), superhashof({summary=>"Positive even number", div_by=>2}), superhashof({min=>10, div_by=>3})]],
     );
     test_resolve(
         name   => "2 merges",
         schema => ["example::has_merge", {"merge.normal.div_by"=>3}],
-        result => ["int", [{summary=>"Even integer", div_by=>3}]],
+        result => ["int", [superhashof({summary=>"Even integer", div_by=>3})]],
     );
 };
 
@@ -90,7 +92,7 @@ done_testing;
 sub test_resolve {
     my %args = @_;
 
-    subtest $args{name} => sub {
+    subtest(($args{name} // dmp($args{schema})), sub {
         my $res;
         if ($args{dies}) {
             dies_ok { resolve_schema($args{schema}) } "resolve dies"
@@ -100,8 +102,8 @@ sub test_resolve {
                 or return;
         }
         if ($args{result}) {
-            is_deeply($res, $args{result}, "result")
+            cmp_deeply($res, $args{result}, "result")
                 or diag explain $res;
         }
-    };
+    });
 }

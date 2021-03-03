@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::FortyTwo;
 # ABSTRACT: Main class for forty-two tool
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Apps::FortyTwo::VERSION = '0.210370';
+$Bio::MUST::Apps::FortyTwo::VERSION = '0.210570';
 use Moose;
 use namespace::autoclean;
 
@@ -38,7 +38,7 @@ Bio::MUST::Apps::FortyTwo - Main class for forty-two tool
 
 =head1 VERSION
 
-version 0.210370
+version 0.210570
 
 =head1 DESCRIPTION
 

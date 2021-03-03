@@ -1,5 +1,8 @@
 Revision history for Perl extension JavaScript::Minifier.
 
+1.16 2021-03-03
+    - Fixed parsing of regexp containing unescaped slash (by faf, #12)
+
 1.15 2021-02-02
     - Fixed parsing errors with regexp return (by faf, #11)
 

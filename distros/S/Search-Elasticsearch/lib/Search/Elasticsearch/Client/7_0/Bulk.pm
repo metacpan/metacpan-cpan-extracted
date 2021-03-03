@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Bulk;
-$Search::Elasticsearch::Client::7_0::Bulk::VERSION = '7.711';
+$Search::Elasticsearch::Client::7_0::Bulk::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::Bulk',
     'Search::Elasticsearch::Role::Is_Sync';
@@ -94,7 +94,7 @@ Search::Elasticsearch::Client::7_0::Bulk - A helper module for the Bulk API
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

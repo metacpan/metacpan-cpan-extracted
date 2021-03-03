@@ -1,5 +1,5 @@
 package Task::CPANAuthors;
-$Task::CPANAuthors::VERSION = '1.005';
+$Task::CPANAuthors::VERSION = '1.006';
 use strict;
 use warnings;
 
@@ -36,8 +36,6 @@ L<Acme::CPANAuthors::Acme::CPANAuthors::Authors> - We are CPAN authors who have 
 L<Acme::CPANAuthors::AnyEvent> - We are CPAN Authors of AnyEvent!
 
 L<Acme::CPANAuthors::BackPAN::OneHundred> - The CPAN Authors who have 100+ distributions on BackPAN
-
-L<Acme::CPANAuthors::Booking> - Booking.com CPAN authors
 
 L<Acme::CPANAuthors::CPAN::MostScripts> - Authors with the most scripts on CPAN
 
@@ -85,7 +83,7 @@ L<Task::CPANAuthors::STRO> is not related to L<Acme::CPANAuthors>.
 
 =head1 COPYRIGHT
 
-Copyright 2014 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2014-2021 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 

@@ -152,11 +152,6 @@ sub copy_file {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -256,11 +251,6 @@ sub copy_folder {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -333,11 +323,6 @@ sub create_folder {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -486,11 +471,6 @@ sub delete_chart_category {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -661,11 +641,6 @@ sub delete_chart_data_point {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -818,11 +793,6 @@ sub delete_chart_series {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -910,11 +880,6 @@ sub delete_file {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -998,11 +963,6 @@ sub delete_folder {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1115,11 +1075,6 @@ sub delete_notes_slide {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1272,11 +1227,6 @@ sub delete_notes_slide_paragraph {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1422,11 +1372,6 @@ sub delete_notes_slide_paragraphs {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1597,11 +1542,6 @@ sub delete_notes_slide_portion {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1765,11 +1705,6 @@ sub delete_notes_slide_portions {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -1904,11 +1839,6 @@ sub delete_notes_slide_shape {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2036,11 +1966,6 @@ sub delete_notes_slide_shapes {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2193,11 +2118,6 @@ sub delete_paragraph {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2343,11 +2263,6 @@ sub delete_paragraphs {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2518,11 +2433,6 @@ sub delete_portion {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2686,11 +2596,6 @@ sub delete_portions {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2818,11 +2723,6 @@ sub delete_section {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -2943,11 +2843,6 @@ sub delete_sections {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3064,11 +2959,6 @@ sub delete_slide_animation {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3203,11 +3093,6 @@ sub delete_slide_animation_effect {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3342,11 +3227,6 @@ sub delete_slide_animation_interactive_sequence {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3499,11 +3379,6 @@ sub delete_slide_animation_interactive_sequence_effect {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3620,11 +3495,6 @@ sub delete_slide_animation_interactive_sequences {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3741,11 +3611,6 @@ sub delete_slide_animation_main_sequence {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -3862,11 +3727,6 @@ sub delete_slide_by_index {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4001,11 +3861,6 @@ sub delete_slide_shape {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4133,11 +3988,6 @@ sub delete_slide_shapes {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4290,11 +4140,6 @@ sub delete_slide_subshape {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4440,11 +4285,6 @@ sub delete_slide_subshapes {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4554,11 +4394,6 @@ sub delete_slides_clean_slides_list {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4657,11 +4492,6 @@ sub delete_slides_document_properties {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4778,11 +4608,6 @@ sub delete_slides_document_property {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -4899,11 +4724,6 @@ sub delete_slides_slide_background {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5074,11 +4894,6 @@ sub delete_subshape_paragraph {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5242,11 +5057,6 @@ sub delete_subshape_paragraphs {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5435,11 +5245,6 @@ sub delete_subshape_portion {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5621,11 +5426,6 @@ sub delete_subshape_portions {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5713,11 +5513,6 @@ sub download_file {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5776,11 +5571,6 @@ sub get_disc_usage {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5857,11 +5647,6 @@ sub get_file_versions {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -5938,11 +5723,6 @@ sub get_files_list {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6059,11 +5839,6 @@ sub get_layout_slide {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6162,11 +5937,6 @@ sub get_layout_slides_list {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6283,11 +6053,6 @@ sub get_master_slide {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6386,11 +6151,6 @@ sub get_master_slides_list {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6507,11 +6267,6 @@ sub get_notes_slide {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6628,11 +6383,6 @@ sub get_notes_slide_exists {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6749,11 +6499,6 @@ sub get_notes_slide_header_footer {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -6888,11 +6633,6 @@ sub get_notes_slide_shape {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7045,11 +6785,6 @@ sub get_notes_slide_shape_paragraph {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7184,11 +6919,6 @@ sub get_notes_slide_shape_paragraphs {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7359,11 +7089,6 @@ sub get_notes_slide_shape_portion {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7516,11 +7241,6 @@ sub get_notes_slide_shape_portions {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7637,11 +7357,6 @@ sub get_notes_slide_shapes {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7809,11 +7524,6 @@ sub get_notes_slide_with_format {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -7984,11 +7694,6 @@ sub get_paragraph_portion {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8141,11 +7846,6 @@ sub get_paragraph_portions {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8244,11 +7944,6 @@ sub get_sections {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8376,11 +8071,6 @@ sub get_slide_animation {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8497,11 +8187,6 @@ sub get_slide_header_footer {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8636,11 +8321,6 @@ sub get_slide_shape {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8793,11 +8473,6 @@ sub get_slide_shape_paragraph {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -8932,11 +8607,6 @@ sub get_slide_shape_paragraphs {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9053,11 +8723,6 @@ sub get_slide_shapes {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9210,11 +8875,6 @@ sub get_slide_subshape {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9385,11 +9045,6 @@ sub get_slide_subshape_paragraph {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9542,11 +9197,6 @@ sub get_slide_subshape_paragraphs {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9681,11 +9331,6 @@ sub get_slide_subshapes {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9733,11 +9378,6 @@ sub get_slides_api_info {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9836,11 +9476,6 @@ sub get_slides_document {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -9939,11 +9574,6 @@ sub get_slides_document_properties {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10060,11 +9690,6 @@ sub get_slides_document_property {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10181,11 +9806,6 @@ sub get_slides_image_with_default_format {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10320,11 +9940,6 @@ sub get_slides_image_with_format {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10423,11 +10038,6 @@ sub get_slides_images {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10562,11 +10172,6 @@ sub get_slides_placeholder {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10683,11 +10288,6 @@ sub get_slides_placeholders {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10797,11 +10397,6 @@ sub get_slides_presentation_text_items {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -10900,11 +10495,6 @@ sub get_slides_protection_properties {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11021,11 +10611,6 @@ sub get_slides_slide {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11142,11 +10727,6 @@ sub get_slides_slide_background {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11263,11 +10843,6 @@ sub get_slides_slide_comments {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11384,11 +10959,6 @@ sub get_slides_slide_images {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11487,11 +11057,6 @@ sub get_slides_slide_properties {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11619,11 +11184,6 @@ sub get_slides_slide_text_items {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11722,11 +11282,6 @@ sub get_slides_slides_list {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11843,11 +11398,6 @@ sub get_slides_theme {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -11964,11 +11514,6 @@ sub get_slides_theme_color_scheme {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12085,11 +11630,6 @@ sub get_slides_theme_font_scheme {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12206,11 +11746,6 @@ sub get_slides_theme_format_scheme {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12309,11 +11844,6 @@ sub get_slides_view_properties {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12502,11 +12032,6 @@ sub get_subshape_paragraph_portion {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12677,11 +12202,6 @@ sub get_subshape_paragraph_portions {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12796,11 +12316,6 @@ sub move_file {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12900,11 +12415,6 @@ sub move_folder {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -12988,11 +12498,6 @@ sub object_exists {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -13148,15 +12653,10 @@ sub post_add_new_paragraph {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -13332,15 +12832,10 @@ sub post_add_new_portion {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -13486,15 +12981,10 @@ sub post_add_new_shape {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -13658,15 +13148,10 @@ sub post_add_new_subshape {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -13842,15 +13327,10 @@ sub post_add_new_subshape_paragraph {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -14044,15 +13524,10 @@ sub post_add_new_subshape_portion {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -14181,15 +13656,10 @@ sub post_add_notes_slide {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -14336,15 +13806,10 @@ sub post_chart_category {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'category'}) {
         $_body_data = $args{'category'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -14509,15 +13974,10 @@ sub post_chart_data_point {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'data_point'}) {
         $_body_data = $args{'data_point'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -14664,15 +14124,10 @@ sub post_chart_series {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'series'}) {
         $_body_data = $args{'series'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -14827,11 +14282,6 @@ sub post_copy_layout_slide_from_source_presentation {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -14995,11 +14445,6 @@ sub post_copy_master_slide_from_source_presentation {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -15071,7 +14516,7 @@ sub post_get_notes_slide {
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream', 'multipart/form-data');
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
 
     # header params
     if ( exists $args{'password'}) {
@@ -15086,15 +14531,10 @@ sub post_get_notes_slide {
     }
 
     my $_body_data;
-    # body params
-    if ( exists $args{'document'}) {
-        $_body_data = $args{'document'};
-    }
-
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
     }
 
     # make the API Call
@@ -15168,7 +14608,7 @@ sub post_get_notes_slide_exists {
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream');
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # header params
     if ( exists $args{'password'}) {
@@ -15183,15 +14623,10 @@ sub post_get_notes_slide_exists {
     }
 
     my $_body_data;
-    # body params
-    if ( exists $args{'document'}) {
-        $_body_data = $args{'document'};
-    }
-
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
     }
 
     # make the API Call
@@ -15294,7 +14729,7 @@ sub post_get_notes_slide_with_format {
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream', 'multipart/form-data');
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
 
     # query params
     if (exists $args{'width'} && defined $args{'width'}) {
@@ -15331,15 +14766,10 @@ sub post_get_notes_slide_with_format {
     }
 
     my $_body_data;
-    # body params
-    if ( exists $args{'document'}) {
-        $_body_data = $args{'document'};
-    }
-
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
     }
 
     # make the API Call
@@ -15497,15 +14927,10 @@ sub post_notes_slide_add_new_paragraph {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -15681,15 +15106,10 @@ sub post_notes_slide_add_new_portion {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -15840,15 +15260,10 @@ sub post_notes_slide_add_new_shape {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -16052,15 +15467,10 @@ sub post_notes_slide_shape_save_as {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -16171,15 +15581,10 @@ sub post_presentation_merge {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'request'}) {
         $_body_data = $args{'request'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -16312,11 +15717,6 @@ sub post_section {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -16449,11 +15849,6 @@ sub post_section_move {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -16655,15 +16050,10 @@ sub post_shape_save_as {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -16792,15 +16182,10 @@ sub post_slide_animation_effect {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'effect'}) {
         $_body_data = $args{'effect'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -16929,15 +16314,10 @@ sub post_slide_animation_interactive_sequence {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'sequence'}) {
         $_body_data = $args{'sequence'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -17084,15 +16464,10 @@ sub post_slide_animation_interactive_sequence_effect {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'effect'}) {
         $_body_data = $args{'effect'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -17267,15 +16642,10 @@ sub post_slide_save_as {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -17398,11 +16768,6 @@ sub post_slides_add {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -17480,7 +16845,7 @@ sub post_slides_convert {
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream', 'multipart/form-data');
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
 
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
@@ -17500,15 +16865,10 @@ sub post_slides_convert {
     }
 
     my $_body_data;
-    # body params
-    if ( exists $args{'document'}) {
-        $_body_data = $args{'document'};
-    }
-
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
     }
 
     # make the API Call
@@ -17669,11 +17029,6 @@ sub post_slides_copy {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -17758,7 +17113,7 @@ sub post_slides_document {
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream', 'multipart/form-data');
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
 
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
@@ -17788,15 +17143,10 @@ sub post_slides_document {
     }
 
     my $_body_data;
-    # body params
-    if ( exists $args{'data'}) {
-        $_body_data = $args{'data'};
-    }
-
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
+    # form params
+    if ( exists $args{'data'} ) {
+        $_body_data = $args{'data'};
     }
 
     # make the API Call
@@ -17902,15 +17252,10 @@ sub post_slides_document_from_html {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'html'}) {
         $_body_data = $args{'html'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -17991,7 +17336,7 @@ sub post_slides_document_from_pdf {
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream');
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
@@ -18016,15 +17361,10 @@ sub post_slides_document_from_pdf {
     }
 
     my $_body_data;
-    # body params
-    if ( exists $args{'pdf'}) {
-        $_body_data = $args{'pdf'};
-    }
-
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
+    # form params
+    if ( exists $args{'pdf'} ) {
+        $_body_data = $args{'pdf'};
     }
 
     # make the API Call
@@ -18158,11 +17498,6 @@ sub post_slides_document_from_source {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -18315,15 +17650,10 @@ sub post_slides_document_from_template {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'data'}) {
         $_body_data = $args{'data'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -18343,12 +17673,18 @@ sub post_slides_document_from_template {
 # Performs slides pipeline.
 # 
 # @param Pipeline $pipeline A Pipeline object. (required)
+# @param ARRAY[string] $files Files to upload with the pipeline (optional)
 {
     my $params = {
     'pipeline' => {
         data_type => 'Pipeline',
         description => 'A Pipeline object.',
         required => '1',
+    },
+    'files' => {
+        data_type => 'ARRAY[string]',
+        description => 'Files to upload with the pipeline',
+        required => '0',
     },
     };
     __PACKAGE__->method_documentation->{ 'post_slides_pipeline' } = { 
@@ -18383,15 +17719,14 @@ sub post_slides_pipeline {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
 
     my $_body_data;
+    my $files;
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
     # body params
     if ( exists $args{'pipeline'}) {
         $_body_data = $args{'pipeline'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -18535,11 +17870,6 @@ sub post_slides_presentation_replace_text {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -18672,11 +18002,6 @@ sub post_slides_reorder {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -18797,11 +18122,6 @@ sub post_slides_reorder_many {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -18934,15 +18254,10 @@ sub post_slides_save_as {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -19053,15 +18368,10 @@ sub post_slides_set_document_properties {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'properties'}) {
         $_body_data = $args{'properties'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -19223,11 +18533,6 @@ sub post_slides_slide_replace_text {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -19408,15 +18713,10 @@ sub post_slides_split {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -19638,15 +18938,10 @@ sub post_subshape_save_as {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -19811,15 +19106,10 @@ sub put_chart_category {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'category'}) {
         $_body_data = $args{'category'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -20002,15 +19292,10 @@ sub put_chart_data_point {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'data_point'}) {
         $_body_data = $args{'data_point'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -20175,15 +19460,10 @@ sub put_chart_series {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'series'}) {
         $_body_data = $args{'series'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -20312,15 +19592,10 @@ sub put_layout_slide {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'slide_dto'}) {
         $_body_data = $args{'slide_dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -20449,15 +19724,10 @@ sub put_notes_slide_header_footer {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -20677,15 +19947,10 @@ sub put_notes_slide_shape_save_as {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -20792,15 +20057,10 @@ sub put_presentation_merge {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'request'}) {
         $_body_data = $args{'request'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -20935,11 +20195,6 @@ sub put_section {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -21048,15 +20303,10 @@ sub put_sections {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'sections'}) {
         $_body_data = $args{'sections'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -21239,15 +20489,10 @@ sub put_set_paragraph_portion_properties {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -21412,15 +20657,10 @@ sub put_set_paragraph_properties {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -21621,15 +20861,10 @@ sub put_set_subshape_paragraph_portion_properties {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -21812,15 +21047,10 @@ sub put_set_subshape_paragraph_properties {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -22040,15 +21270,10 @@ sub put_shape_save_as {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -22173,15 +21398,10 @@ sub put_slide_animation {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'animation'}) {
         $_body_data = $args{'animation'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -22328,15 +21548,10 @@ sub put_slide_animation_effect {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'effect'}) {
         $_body_data = $args{'effect'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -22501,15 +21716,10 @@ sub put_slide_animation_interactive_sequence_effect {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'effect'}) {
         $_body_data = $args{'effect'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -22638,15 +21848,10 @@ sub put_slide_header_footer {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -22837,15 +22042,10 @@ sub put_slide_save_as {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -22988,15 +22188,10 @@ sub put_slide_shape_info {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -23161,15 +22356,10 @@ sub put_slide_subshape_info {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -23260,7 +22450,7 @@ sub put_slides_convert {
     if ($_header_accept) {
         $header_params->{'Accept'} = $_header_accept;
     }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream', 'multipart/form-data');
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
 
     # query params
     if (exists $args{'out_path'} && defined $args{'out_path'}) {
@@ -23285,15 +22475,10 @@ sub put_slides_convert {
     }
 
     my $_body_data;
-    # body params
-    if ( exists $args{'document'}) {
-        $_body_data = $args{'document'};
-    }
-
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
     }
 
     # make the API Call
@@ -23395,15 +22580,10 @@ sub put_slides_document_from_html {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'html'}) {
         $_body_data = $args{'html'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -23514,15 +22694,10 @@ sub put_slides_header_footer {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -23633,15 +22808,10 @@ sub put_slides_protection_properties {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -23792,15 +22962,10 @@ sub put_slides_save_as {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -23925,15 +23090,10 @@ sub put_slides_set_document_property {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'property'}) {
         $_body_data = $args{'property'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -24062,15 +23222,10 @@ sub put_slides_slide {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'slide_dto'}) {
         $_body_data = $args{'slide_dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -24199,15 +23354,10 @@ sub put_slides_slide_background {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'background'}) {
         $_body_data = $args{'background'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -24342,11 +23492,6 @@ sub put_slides_slide_background_color {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -24455,15 +23600,10 @@ sub put_slides_slide_properties {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -24608,11 +23748,6 @@ sub put_slides_slide_size {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -24721,15 +23856,10 @@ sub put_slides_view_properties {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -24967,15 +24097,10 @@ sub put_subshape_save_as {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'options'}) {
         $_body_data = $args{'options'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -25100,15 +24225,10 @@ sub put_update_notes_slide {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -25255,15 +24375,10 @@ sub put_update_notes_slide_shape {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -25428,15 +24543,10 @@ sub put_update_notes_slide_shape_paragraph {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -25619,15 +24729,10 @@ sub put_update_notes_slide_shape_portion {
     }
 
     my $_body_data;
+    my $files;
     # body params
     if ( exists $args{'dto'}) {
         $_body_data = $args{'dto'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call
@@ -25695,11 +24800,6 @@ sub storage_exists {
 
     my $_body_data;
     my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
-    }
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
@@ -25786,15 +24886,10 @@ sub upload_file {
     }
 
     my $_body_data;
+    my $files;
     # form params
     if ( exists $args{'file'} ) {
         $_body_data = $args{'file'};
-    }
-
-    my $files;
-    # files
-    if ( exists $args{'files'}) {
-        $files = $args{'files'};
     }
 
     # make the API Call

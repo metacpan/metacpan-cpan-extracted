@@ -21,7 +21,7 @@ sub ESC {
   $_;
 }
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 our @SAFE_SIG = grep {
   not /^(
@@ -97,6 +97,15 @@ sub _start {
     warn "Invalid conduit ($args->{conduit})\n" if DEBUG;
     return $self->emit(error => "Invalid conduit ($args->{conduit})");
   }
+
+  $self->emit(
+    before_fork => {
+      stdin_read   => $stdin_read,
+      stdin_write  => $stdin_write,
+      stdout_read  => $stdout_read,
+      stdout_write => $stdout_write,
+    }
+  );
 
   $pid = fork;
 
@@ -291,7 +300,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 =head1 VERSION
 
-0.38
+0.39
 
 =head1 SYNOPSIS
 
@@ -334,6 +343,22 @@ enable the L</read> event to see the difference between STDERR and STDOUT are
 more than welcome.
 
 =head1 EVENTS
+
+=head2 before_fork
+
+  $self->on(before_fork => sub { my ($self, $pipes) = @_; });
+
+Emitted right before the child process is forked. Example C<$pipes>
+
+  $pipes = {
+    # for both conduit "pipe" and "pty"
+    stdin_write => $pipe_fh_1_or_pty_object,
+    stdout_read => $pipe_fh_2_or_pty_object,
+
+    # only for conduit "pipe"
+    stdin_read => $pipe_fh_3,
+    stdout_write => $pipe_fh_4,
+  }
 
 =head2 close
 

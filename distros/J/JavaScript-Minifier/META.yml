@@ -21,7 +21,7 @@ name: JavaScript-Minifier
 provides:
   JavaScript::Minifier:
     file: lib/JavaScript/Minifier.pm
-    version: '1.15'
+    version: '1.16'
 requires:
   Exporter: '0'
   perl: '5.006'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/zoffixznet/javascript-minifier/issues
   homepage: http://metacpan.org/release/JavaScript-Minifier
   repository: git://github.com/zoffixznet/javascript-minifier.git
-version: '1.15'
+version: '1.16'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -290,7 +290,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           repo_root: .
       name: '@Author::ZOFFIX/Git::NextVersion'
       version: '2.047'
@@ -331,7 +331,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           repo_root: .
       name: '@Author::ZOFFIX/Git::Check'
       version: '2.047'
@@ -349,7 +349,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -362,11 +362,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.15
+          tag: v1.16
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -380,7 +380,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.29.2
+          git_version: 1.7.10.4
           repo_root: .
       name: '@Author::ZOFFIX/Git::Push'
       version: '2.047'

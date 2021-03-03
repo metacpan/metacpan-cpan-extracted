@@ -63,8 +63,8 @@ PICA::Data - PICA record processing
 
 # DESCRIPTION
 
-PICA::Data provides methods, classes, functions, and [picadata](https://metacpan.org/pod/a&#x20;command&#x20;line
-application) to process [PICA+ records](http://format.gbv.de/pica) in Perl.
+PICA::Data provides methods, classes, functions, and [a command line
+application](https://metacpan.org/pod/picadata) to process [PICA+ records](http://format.gbv.de/pica).
 
 PICA+ is the internal data format of the Local Library System (LBS) and the
 Central Library System (CBS) of OCLC, formerly PICA. Similar library formats
@@ -133,6 +133,7 @@ Create a PICA writer object (see [PICA::Writer::Base](https://metacpan.org/pod/P
 - [PICA::Writer::JSON](https://metacpan.org/pod/PICA::Writer::JSON) for type `json` (PICA JSON)
 - [PICA::Writer::XML](https://metacpan.org/pod/PICA::Writer::XML) for type `xml` or `picaxml` (PICA-XML)
 - [PICA::Writer::PPXML](https://metacpan.org/pod/PICA::Writer::PPXML) for type `ppxml` (PicaPlus-XML)
+- [PICA::Writer::Fields](https://metacpan.org/pod/PICA::Writer::Fields) for type `fields` (summary of used fields and subfields)
 
 ## pica\_path( $path )
 
@@ -162,7 +163,8 @@ expression. The following are virtually equivalent:
 
 ## pica\_fields( $record, $path\[, $path...\] )
 
-Returns a PICA record (or empty array reference) limited to fields specified inione ore more PICA path expression. The following are virtually equivalent:
+Returns a PICA record (or empty array reference) limited to fields specified in
+one ore more PICA path expression. The following are virtually equivalent:
 
     pica_fields($record, $path);
     $path->record_fields($record);
@@ -216,7 +218,7 @@ where the `_id` of each record contains the EPN (subfield `203@/**0`).
 
 ## write( \[ $type \[, @options\] \] | $writer )
 
-Write PICA record with given [PICA::Writer::Base](https://metacpan.org/pod/PICA::Writer::) or
+Write PICA record with given [PICA::Writer::...](https://metacpan.org/pod/PICA::Writer::Base) or
 [PICA::Writer::Plain](https://metacpan.org/pod/PICA::Writer::Plain) by default. This method is a shortcut for blessed
 record objects:
 

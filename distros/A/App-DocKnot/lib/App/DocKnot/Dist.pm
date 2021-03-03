@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Dist 4.00;
+package App::DocKnot::Dist 4.01;
 
 use 5.024;
 use autodie;
@@ -233,6 +233,24 @@ sub _replace_perl_path {
     return [@command];
 }
 
+# Given a directory and a prefix for tarballs in that directory, sign the
+# tarballs in that directory.
+#
+# $path   - The directory path
+# $prefix - The tarball file prefix
+#
+# Throws: Text exception on failure to sign the file
+sub _sign_tarballs {
+    my ($self, $path, $prefix) = @_;
+    my @files = $self->_find_matching_tarballs($path, $prefix);
+    for my $file (@files) {
+        my $tarball_path = File::Spec->catdir($path, $file);
+        systemx($self->{gpg}, '--detach-sign', '--armor', '-u',
+            $self->{pgp_key}, $tarball_path);
+    }
+    return;
+}
+
 ##############################################################################
 # Public interface
 ##############################################################################
@@ -256,10 +274,14 @@ sub new {
     if ($args_ref->{metadata}) {
         $config_args{metadata} = $args_ref->{metadata};
     }
-    my $config = App::DocKnot::Config->new(\%config_args);
+    my $config_reader = App::DocKnot::Config->new(\%config_args);
 
-    # Ensure we were given a valid distdir argument.
-    my $distdir = $args_ref->{distdir};
+    # Load the global configuration.
+    my $global_config_ref = $config_reader->global_config();
+
+    # Ensure we were given a valid distdir argument if it was not set in the
+    # global configuration.
+    my $distdir = $args_ref->{distdir} // $global_config_ref->{distdir};
     if (!defined($distdir)) {
         croak('distdir path not given');
     } elsif (!-d $distdir) {
@@ -268,9 +290,11 @@ sub new {
 
     # Create and return the object.
     my $self = {
-        config  => $config->config(),
+        config  => $config_reader->config(),
         distdir => $distdir,
+        gpg     => $args_ref->{gpg} // 'gpg',
         perl    => $args_ref->{perl},
+        pgp_key => $args_ref->{pgp_key} // $global_config_ref->{pgp_key},
     };
     bless($self, $class);
     return $self;
@@ -398,6 +422,12 @@ sub make_distribution {
         my $files = ($count == 1) ? '1 file' : "$count files";
         die "$files missing from distribution\n";
     }
+
+    # Sign the tarballs if configured to do so.
+    if (defined($self->{pgp_key})) {
+        $self->_sign_tarballs($self->{distdir}, $prefix);
+    }
+
     return;
 }
 
@@ -410,7 +440,7 @@ __END__
 
 =for stopwords
 Allbery DocKnot MERCHANTABILITY NONINFRINGEMENT sublicense JSON CPAN ARGS
-distdir Automake xz
+distdir Automake xz gpg Kwalify IO-Compress-Lzma
 
 =head1 NAME
 
@@ -424,9 +454,17 @@ App::DocKnot::Dist - Prepare a distribution tarball
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, IPC::Run,
-IPC::System::Simple, JSON, and Perl6::Slurp, all of which are available from
-CPAN.
+Git, Perl 5.24 or later, and the modules File::BaseDir, File::ShareDir,
+IO::Compress::Xz (part of IO-Compress-Lzma), IO::Uncompress::Gunzip (part of
+IO-Compress), IPC::Run, IPC::System::Simple, Kwalify, List::SomeUtils, and
+YAML::XS, all of which are available from CPAN.
+
+The tools to build whatever type of software distribution is being prepared
+are also required, since the distribution is built and tested as part of
+preparing the tarball.
+
+To sign distribution tarballs, the GnuPG command-line program B<gpg> is
+required.  (Any version, either GnuPG v1 or GnuPG v2, should work.)
 
 =head1 DESCRIPTION
 
@@ -456,18 +494,33 @@ following keys:
 
 The path to the directory into which to put the distribution tarball.  This
 should point to a trusted directory, not one where an attacker could have
-written files (see make_distribution() below).  Required.
+written files (see make_distribution() below).  Required if not set in the
+global configuration file.
+
+=item gpg
+
+The path to the B<gpg> binary, used to sign generated tarballs if C<pgp_key>
+is present in the global configuration or provided as a constructor argument.
+Default: The binary named C<gpg> on the user's PATH.
 
 =item metadata
 
 The path to the directory containing metadata for a package.  Default:
-F<docs/metadata> relative to the current directory.
+F<docs/docknot.yaml> relative to the current directory.
 
 =item perl
 
 The path to the Perl executable to use for build steps that require it.  Used
 primarily in the test suite.  Default: The binary named C<perl> on the user's
 PATH.
+
+=item pgp_key
+
+Sign generated tarballs with the provided PGP key.  The key can be named in
+any way that the B<-u> option of GnuPG understands.  This can also be set in
+the global configuration file.  There is no default; if this option is not
+set, either as a constructor parameter or in the global configuration file,
+the generated tarballs will not be signed.
 
 =back
 
@@ -515,6 +568,11 @@ After the distribution is created, check_dist() will be run on it.  If any
 files are missing from the distribution, they will be reported to standard
 output and then an exception will be thrown.
 
+If the C<pgp_key> constructor parameter or global configuration option is set,
+the generated tarballs will then be signed with that key, using B<gpg>.  The
+generated signature will be armored and stored in a file named by appending
+C<.asc> to the name of the tarball.
+
 =back
 
 =head1 AUTHOR
@@ -523,7 +581,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019-2020 Russ Allbery <rra@cpan.org>
+Copyright 2019-2021 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -545,10 +603,10 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<docknot(1)>
+L<docknot(1)>, L<App::DocKnot::Config>
 
 This module is part of the App-DocKnot distribution.  The current version of
-App::DocKnot is available from CPAN, or directly from its web site at
+DocKnot is available from CPAN, or directly from its web site at
 L<https://www.eyrie.org/~eagle/software/docknot/>.
 
 =cut

@@ -14,10 +14,14 @@ use Test2::V0;
 
 use Sub::Meta::Returns;
 
+my $obj = bless {} => 'Some';
+
 my @TEST = (
     # scalar
     { scalar => 'Str', list => undef, void => undef } => {
     NG => [
+    undef, 'invalid other',
+    $obj, 'invalid obj',
     { scalar => 'Int', list => undef, void => undef }, 'invalid scalar',
     { scalar => 'Str', list => 'Str', void => undef }, 'invalid list',
     { scalar => 'Str', list => undef, void => 'Str' }, 'invalid void',
@@ -82,7 +86,8 @@ while (my ($args, $cases) = splice @TEST, 0, 2) {
 
         subtest 'NG cases' => sub {
             while (my ($other_args, $test_message) = splice @{$cases->{NG}}, 0, 2) {
-                my $other = Sub::Meta::Returns->new($other_args);
+                my $is_hash = ref $other_args && ref $other_args eq 'HASH';
+                my $other = $is_hash ? Sub::Meta::Returns->new($other_args) : $other_args;
                 ok !$meta->is_same_interface($other), $test_message;
             }
         };

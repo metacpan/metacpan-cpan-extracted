@@ -3,7 +3,7 @@ use 5.026000;
 use strict;
 use warnings;
 
-our $VERSION = "0.0.24";
+our $VERSION = "0.0.25";
 
 # the context of Lambda Function
 our $context;
@@ -34,6 +34,12 @@ our $LAYERS = {
             runtime_version => 3,
             paws_arn        => "arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-32-paws:3",
             paws_version    => 3,
+        },
+        'ap-northeast-3' => {
+            runtime_arn     => "arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-32-runtime:1",
+            runtime_version => 1,
+            paws_arn        => "arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-32-paws:1",
+            paws_version    => 1,
         },
         'ap-south-1' => {
             runtime_arn     => "arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-32-runtime:3",
@@ -151,6 +157,12 @@ our $LAYERS = {
             paws_arn        => "arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-30-paws:7",
             paws_version    => 7,
         },
+        'ap-northeast-3' => {
+            runtime_arn     => "arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-30-runtime:1",
+            runtime_version => 1,
+            paws_arn        => "arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-30-paws:1",
+            paws_version    => 1,
+        },
         'ap-south-1' => {
             runtime_arn     => "arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-30-runtime:10",
             runtime_version => 10,
@@ -267,6 +279,12 @@ our $LAYERS = {
             paws_arn        => "arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-28-paws:6",
             paws_version    => 6,
         },
+        'ap-northeast-3' => {
+            runtime_arn     => "arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-28-runtime:1",
+            runtime_version => 1,
+            paws_arn        => "arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-28-paws:1",
+            paws_version    => 1,
+        },
         'ap-south-1' => {
             runtime_arn     => "arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-28-runtime:16",
             runtime_version => 16,
@@ -382,6 +400,12 @@ our $LAYERS = {
             runtime_version => 17,
             paws_arn        => "arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-26-paws:7",
             paws_version    => 7,
+        },
+        'ap-northeast-3' => {
+            runtime_arn     => "arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-26-runtime:1",
+            runtime_version => 1,
+            paws_arn        => "arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-26-paws:1",
+            paws_version    => 1,
         },
         'ap-south-1' => {
             runtime_arn     => "arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-26-runtime:17",
@@ -501,6 +525,12 @@ our $LAYERS_AL2 = {
             runtime_version => 3,
             paws_arn        => "arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-32-paws-al2:3",
             paws_version    => 3,
+        },
+        'ap-northeast-3' => {
+            runtime_arn     => "arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-32-runtime-al2:1",
+            runtime_version => 1,
+            paws_arn        => "arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-32-paws-al2:1",
+            paws_version    => 1,
         },
         'ap-south-1' => {
             runtime_arn     => "arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-32-runtime-al2:3",
@@ -737,6 +767,8 @@ The list of all available layer ARN is here:
 
 =item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-32-runtime-al2:3>
 
+=item C<arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-32-runtime-al2:1>
+
 =item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-32-runtime-al2:3>
 
 =item C<arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-32-runtime-al2:3>
@@ -808,14 +840,14 @@ C<https://shogo82148-lambda-perl-runtime-$REGION.s3.amazonaws.com/perl-$VERSION-
 =head2 Use Prebuilt Docker Images
 
 Prebuilt Docker Images based on L<https://gallery.ecr.aws/lambda/provided> are available.
-You can pull from L<https://gallery.ecr.aws/w2s0h5h2/p5-aws-lambda> or L<https://hub.docker.com/r/shogo82148/p5-aws-lambda>,
+You can pull from L<https://gallery.ecr.aws/shogo82148/p5-aws-lambda> or L<https://hub.docker.com/r/shogo82148/p5-aws-lambda>,
 build your custom images and deploy them to AWS Lambda.
 
 Here is an example of Dockerfile.
 
     FROM shogo82148/p5-aws-lambda:base-5.32.al2
     # or if you want to use ECR Public.
-    # FROM public.ecr.aws/w2s0h5h2/p5-aws-lambda:base-5.32.al2
+    # FROM public.ecr.aws/shogo82148/p5-aws-lambda:base-5.32.al2
     COPY handler.pl /var/task/
     CMD [ "handler.handle" ]
 
@@ -850,7 +882,7 @@ Finally, create new function using awscli.
 =head2 Run in Local using Docker
 
 Prebuilt Docker Images based on L<https://hub.docker.com/r/lambci/lambda/> are available.
-You can pull from L<https://gallery.ecr.aws/w2s0h5h2/p5-aws-lambda> or L<https://hub.docker.com/r/shogo82148/p5-aws-lambda>,
+You can pull from L<https://gallery.ecr.aws/shogo82148/p5-aws-lambda> or L<https://hub.docker.com/r/shogo82148/p5-aws-lambda>,
 and build zip archives to deploy.
 
     # Install the dependency.
@@ -929,6 +961,8 @@ The list of all available layer ARN is here:
 
 =item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-32-paws-al2:3>
 
+=item C<arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-32-paws-al2:1>
+
 =item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-32-paws-al2:3>
 
 =item C<arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-32-paws-al2:3>
@@ -969,17 +1003,17 @@ C<https://shogo82148-lambda-perl-runtime-$REGION.s3.amazonaws.com/perl-$VERSION-
 
 =head2 Use Prebuilt Docker Images for Paws
 
-use the C<base-$VERSION-paws.al2> tag on L<https://gallery.ecr.aws/w2s0h5h2/p5-aws-lambda> or L<https://hub.docker.com/r/shogo82148/p5-aws-lambda>.
+use the C<base-$VERSION-paws.al2> tag on L<https://gallery.ecr.aws/shogo82148/p5-aws-lambda> or L<https://hub.docker.com/r/shogo82148/p5-aws-lambda>.
 
     FROM shogo82148/p5-aws-lambda:base-5.32-paws.al2
     # or if you want to use ECR Public.
-    # FROM public.ecr.aws/w2s0h5h2/p5-aws-lambda:base-5.32-paws.al2
+    # FROM public.ecr.aws/shogo82148/p5-aws-lambda:base-5.32-paws.al2
     COPY handler.pl /var/task/
     CMD [ "handler.handle" ]
 
 =head2 Run in Local using Docker for Paws
 
-use the C<build-$VERSION-paws.al2> and C<$VERSION-paws.al2> tag on L<https://gallery.ecr.aws/w2s0h5h2/p5-aws-lambda> or L<https://hub.docker.com/r/shogo82148/p5-aws-lambda>.
+use the C<build-$VERSION-paws.al2> and C<$VERSION-paws.al2> tag on L<https://gallery.ecr.aws/shogo82148/p5-aws-lambda> or L<https://hub.docker.com/r/shogo82148/p5-aws-lambda>.
 
     # Install the dependency.
     docker run --rm -v $(PWD):/var/task shogo82148/p5-aws-lambda:build-5.32-paws.al2 \
@@ -1023,6 +1057,8 @@ The list of all available layer ARN is here:
 =item C<arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-32-runtime:3>
 
 =item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-32-runtime:3>
+
+=item C<arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-32-runtime:1>
 
 =item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-32-runtime:3>
 
@@ -1068,6 +1104,8 @@ The list of all available layer ARN is here:
 
 =item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-30-runtime:10>
 
+=item C<arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-30-runtime:1>
+
 =item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-30-runtime:10>
 
 =item C<arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-30-runtime:10>
@@ -1112,6 +1150,8 @@ The list of all available layer ARN is here:
 
 =item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-28-runtime:16>
 
+=item C<arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-28-runtime:1>
+
 =item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-28-runtime:16>
 
 =item C<arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-28-runtime:16>
@@ -1155,6 +1195,8 @@ The list of all available layer ARN is here:
 =item C<arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-26-runtime:17>
 
 =item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-26-runtime:17>
+
+=item C<arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-26-runtime:1>
 
 =item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-26-runtime:17>
 
@@ -1206,6 +1248,8 @@ And Paws layers:
 
 =item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-32-paws:3>
 
+=item C<arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-32-paws:1>
+
 =item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-32-paws:3>
 
 =item C<arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-32-paws:3>
@@ -1249,6 +1293,8 @@ And Paws layers:
 =item C<arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-30-paws:7>
 
 =item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-30-paws:7>
+
+=item C<arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-30-paws:1>
 
 =item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-30-paws:7>
 
@@ -1294,6 +1340,8 @@ And Paws layers:
 
 =item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-28-paws:6>
 
+=item C<arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-28-paws:1>
+
 =item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-28-paws:6>
 
 =item C<arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-28-paws:6>
@@ -1337,6 +1385,8 @@ And Paws layers:
 =item C<arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-26-paws:7>
 
 =item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-26-paws:7>
+
+=item C<arn:aws:lambda:ap-northeast-3:445285296882:layer:perl-5-26-paws:1>
 
 =item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-26-paws:7>
 

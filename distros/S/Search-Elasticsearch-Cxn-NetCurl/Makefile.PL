@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "7.711",
+  "VERSION" => "7.711001",
   "test" => {
     "TESTS" => "t/*.t t/10_Basic/*.t t/20_Serializer/*.t t/30_Logger/*.t t/40_Transport/*.t t/50_Cxn_Pool/*.t t/60_Cxn/*.t t/95_TestServer/*.t t/Client_6_0/*.t t/Client_7_0/*.t"
   }

@@ -47,7 +47,7 @@ tab2mapper.pl - Build an id mapper from a tabular file giving annotation strings
 
 =head1 VERSION
 
-version 0.210380
+version 0.210610
 
 =head1 USAGE
 

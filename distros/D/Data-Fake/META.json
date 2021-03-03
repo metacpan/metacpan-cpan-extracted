@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -85,31 +85,31 @@
    "provides" : {
       "Data::Fake" : {
          "file" : "lib/Data/Fake.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Data::Fake::Company" : {
          "file" : "lib/Data/Fake/Company.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Data::Fake::Core" : {
          "file" : "lib/Data/Fake/Core.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Data::Fake::Dates" : {
          "file" : "lib/Data/Fake/Dates.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Data::Fake::Internet" : {
          "file" : "lib/Data/Fake/Internet.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Data::Fake::Names" : {
          "file" : "lib/Data/Fake/Names.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Data::Fake::Text" : {
          "file" : "lib/Data/Fake/Text.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -124,7 +124,7 @@
          "web" : "https://github.com/dagolden/Data-Fake"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Chlo\u00e9 Kekoa <50083900+chloekek@users.noreply.github.com>",
@@ -133,7 +133,7 @@
       "Stuart Skelton <stuarts@broadbean.com>"
    ],
    "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
    "x_spdx_expression" : "Apache-2.0"
 }
 

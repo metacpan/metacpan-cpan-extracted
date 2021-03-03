@@ -11,7 +11,7 @@ WriteMakefile(
             license     => 'http://dev.perl.org/licenses/',
             repository  => 'https://github.com/noxxi/p5-app-http_proxy_imp',
             homepage  => 'https://github.com/noxxi/p5-app-http_proxy_imp',
-            bugtracker  => 'https://rt.cpan.org/Dist/Display.html?Queue=App-HTTP_Proxy_IMP',
+            bugtracker  => 'https://github.com/noxxi/p5-app-http_proxy_imp/issues',
         },
     },
     VERSION_FROM => 'lib/App/HTTP_Proxy_IMP.pm',

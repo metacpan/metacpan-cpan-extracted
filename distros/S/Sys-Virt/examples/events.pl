@@ -13,19 +13,21 @@ my $quit = 0;
 my $c = Sys::Virt->new(uri => $uri, readonly => 1);
 
 sub lifecycle_event {
+    my $conn = shift;
     my $dom = shift;
     my $event = shift;
     my $detail = shift;
 
-    print "$dom $event $detail\n";
+    printf "%s %s %d %d\n", $conn->get_uri, $dom->get_name, $event, $detail;
 }
 
 sub agent_lifecycle_event {
+    my $conn = shift;
     my $dom = shift;
     my $state = shift;
     my $reason = shift;
 
-    print "Agent $dom state=$state reason=$reason\n";
+    printf "Agent %s %s state=%d reason=%d\n", $conn->get_uri, $dom->get_name, $state, $reason;
 }
 
 $c->domain_event_register_any(undef,

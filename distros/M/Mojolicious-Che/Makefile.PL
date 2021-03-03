@@ -18,8 +18,8 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Mojolicious'              => '7.57',
-        'Mojo::Log::Che' => '0.01',
+        'Mojolicious'  => 9.02,
+        'Mojo::Log::Che' => 0.01,
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

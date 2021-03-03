@@ -37,7 +37,7 @@ use 5.8.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.83";
+our $VERSION = "0.84";
 sub  Version { $VERSION }
 
 use Carp;
@@ -64,6 +64,10 @@ my @parsers = (
     [ xlsx => "Spreadsheet::XLSX",			"0.13"		],
 #   [ prl  => "Spreadsheet::Perl",			""		],
     [ sc   => "Spreadsheet::Read",			"0.01"		],
+
+    [ zzz1 => "Z10::Just::For::Testing",		"1.23"		],
+    [ zzz2 => "Z20::Just::For::Testing",		""		],
+    [ zzz3 => "Z30::Just::For::Testing",		"1.00"		],
 
     # Helper modules
     [ ios  => "IO::Scalar",				""		],
@@ -107,8 +111,11 @@ delete $can{supports};
 for (@parsers) {
     my ($flag, $mod, $vsn) = @$_;
     $can{$flag} and next;
-    eval "require $mod; \$vsn and ${mod}->VERSION (\$vsn); \$can{\$flag} = '$mod'" or
-	$_->[0] = "! Cannot use $mod version $vsn: $@";
+    eval "require $mod; \$vsn and ${mod}->VERSION (\$vsn); \$can{\$flag} = '$mod'" and next;
+    $_->[0] = "! Cannot use $mod version $vsn: $@";
+    $can{$flag} = $@ =~ m/need to install|can(?:not|'t) locate/i
+	? 0	# Not found
+	: "";	# Too old
     }
 $can{sc} = __PACKAGE__;	# SquirrelCalc is built-in
 
@@ -446,6 +453,10 @@ sub ReadData {
 	   if (ref $_[0] eq "HASH")  { %opt = %{shift @_} }
 	elsif (@_ % 2 == 0)          { %opt = @_          }
 	}
+
+    # Aliasses
+    exists $opt{transpose} && !exists $opt{pivot} and $opt{pivot} = delete $opt{transpose};
+    exists $opt{trim}      && !exists $opt{strip} and $opt{strip} = delete $opt{trim};
 
     exists $opt{rc}	or $opt{rc}	= $def_opts{rc};
     exists $opt{cells}	or $opt{cells}	= $def_opts{cells};
@@ -1460,6 +1471,20 @@ sub merged_from {
 
 1;
 
+BEGIN {
+    $INC{"Z10/Just/For/Testing.pm"}   = $0;
+    $INC{"Z20/Just/For/Testing.pm"}   = $0;
+    $Z10::Just::For::Testing::VERSION = "1.00";
+    $Z20::Just::For::Testing::VERSION = undef;
+    }
+
+package Z10::Just::For::Testing;
+
+1;
+
+package Z20::Just::For::Testing;
+
+1;
 __END__
 =head1 DESCRIPTION
 
@@ -1664,6 +1689,8 @@ per sheet that have no data, where no data means only undefined or empty
 cells (after optional stripping). If a sheet has no data at all, the sheet
 will be skipped entirely when this attribute is true.
 
+=item trim
+
 =item strip
 
 If set, L<C<ReadData>|/ReadData> will remove trailing- and/or
@@ -1676,6 +1703,11 @@ leading-whitespace from every field.
     2      n/a     strip
     3     strip    strip
 
+C<trim> and C<strip> are aliases. If passed both, C<trim> is ignored
+because of backward compatibility.
+
+=item transpose
+
 =item pivot
 
 Swap all rows and columns.
@@ -1686,13 +1718,16 @@ When a sheet contains data like
   A2      C2  D2
   A3  B3  C3  D3  E3
 
-using C<pivot> will return the sheet data as
+using C<transpose> or C<pivot> will return the sheet data as
 
   A1  A2  A3
   B1      B3
   C1  C2  C3
       D2  D3
   E1      E3
+
+C<transpose> and C<pivot> are aliases. If passed both, C<transpose> is
+ignored because of backward compatibility.
 
 =item sep
 
@@ -2553,7 +2588,7 @@ instead.
 
 =item Spreadsheet::ParseODS
 
-L<Spreadsheet::ParseODS|https://metacpan.org/release/Spreadsheet-ParseODS> is a
+L<Spreadsheet::ParseODS|https://metacpan.org/pod/Spreadsheet::ParseODS> is a
 parser for OpenOffice/LibreOffice (.sxc and .ods) spreadsheet files. It is the
 successor of  L<Spreadsheet::ReadSXC|https://metacpan.org/release/Spreadsheet-ReadSXC>.
 
@@ -2600,7 +2635,7 @@ H.Merijn Brand <perl5@tux.freedom.nl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2020 H.Merijn Brand
+Copyright (C) 2005-2021 H.Merijn Brand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

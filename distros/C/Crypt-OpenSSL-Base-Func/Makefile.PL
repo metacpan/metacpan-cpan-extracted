@@ -13,8 +13,8 @@ WriteMakefile(
     'NAME'             => 'Crypt::OpenSSL::Base::Func',
     AUTHOR             => 'Lanlan Pan <abbypan@gmail.com>',
     'VERSION_FROM'     => 'Func.pm',                              # finds $VERSION
+    'ABSTRACT'    => 'Crypt Base Functions, using the OpenSSL libraries',
     'DISTNAME'         => 'Crypt-OpenSSL-Base-Func',
-    'ABSTRACT'    => 'Base Functions, using the OpenSSL libraries',
     'MIN_PERL_VERSION' => 5.006,
     'PL_FILES'         => {},
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),

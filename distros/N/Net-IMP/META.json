@@ -4,13 +4,13 @@
       "Steffen Ullrich <sullr@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-IMP",
    "no_index" : {
@@ -36,16 +36,14 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://rt.cpan.org/Dist/Display.html?Queue=Net-IMP"
-      },
       "homepage" : "https://github.com/noxxi/p5-net-imp",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/noxxi/p5-net-imp"
+         "url" : "https://github.com/noxxi/p5-net-imp/issues"
       }
    },
-   "version" : "0.634"
+   "version" : "0.635",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

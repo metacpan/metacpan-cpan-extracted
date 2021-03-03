@@ -1,4 +1,4 @@
-# Copyright 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -114,7 +114,7 @@ Graph::Maker->add_factory_type('rook_grid' => __PACKAGE__);
 
 __END__
 
-=for stopwords Ryde OEIS undirected xN hypercubes tesseract
+=for stopwords Ryde OEIS undirected 1xN hypercubes tesseract
 
 =head1 NAME
 
@@ -226,12 +226,16 @@ L<http://oeis.org/A088699> (etc)
 
 =back
 
+    A085537    NxN Wiener index
     A088699    NxN number of independent sets
     A287274    NxM number of dominating sets
     A287065    NxN number of dominating sets
     A290632    NxM number of minimal dominating sets
     A289196    NxN number of connected dominating sets
     A286189    NxN number of connected induced subgraphs
+
+    graph complement
+      A292058    NxN Wiener index
 
 =head1 SEE ALSO
 
@@ -242,11 +246,11 @@ L<Graph::Maker::Hypercube>
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

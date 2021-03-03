@@ -26,6 +26,8 @@ use Wireguard::WGmeta::Cli::Commands::Add;
 use base 'Exporter';
 our @EXPORT = qw(route_command);
 
+our $VERSION = "0.2.1";
+
 =head2 route_command($ref_list_input_args)
 
 Routes the cmd (first argument of C<@ARGV>) to their implementation. The case of the commands to not matter.

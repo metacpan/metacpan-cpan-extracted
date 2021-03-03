@@ -140,11 +140,6 @@ WARN
     close $fh;
 }
 
-if ($path eq 'perl_prereqs') {
-    print perl_prereqs();
-    exit;
-}
-
 if (@ARGV == 0) {
 
     if ($opts{version}) {      # generate META.yml file content
@@ -152,7 +147,7 @@ if (@ARGV == 0) {
 --- #YAML:1.0
 name: libapreq2
 version: $opts{version}
-license: open_source
+license: Apache_2_0
 installdirs: site
 distribution_type: module
 dynamic_config: 1
@@ -183,7 +178,7 @@ no_index:
 generated_by: $0
 EOT
         my %runtime_prereqs =  (
-                               mod_perl2 => $perl_glue{mod_perl},
+                               mod_perl2 => $perl_glue{mod_perl2},
                                     perl => $perl_glue{perl},
                                );
         print_prereqs "requires:", \%runtime_prereqs;
@@ -204,6 +199,9 @@ EOT
     }
 
     exit 0;
+} elsif ($path eq 'perl_prereqs') {
+    print perl_prereqs();
+    exit;
 }
 
 

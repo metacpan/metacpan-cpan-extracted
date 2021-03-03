@@ -1,4 +1,4 @@
-# Copyright 2014, 2015, 2016, 2017, 2019 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 #
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
@@ -118,6 +118,11 @@ sub points_xyscale {
   return [ map {[ $_->[0]*$xfactor, $_->[1]*$yfactor ]} @$points ];
 }
 
+sub points_transpose {
+  my ($points) = @_;
+  return [ map {[reverse @$_]} @$points ];
+}
+
 sub xy_rotate_plus90 {
   my ($x,$y, $reps) = @_;
   if (! defined $reps) { $reps = 1; }
@@ -173,14 +178,18 @@ sub gpc_is_empty {
 #
 sub bbox_xyxy {
   my ($planar) = @_;
-  my $points = $planar->points;
-  my @x = map {$_->[0]} @$points;
-  my @y = map {$_->[0]} @$points;
-  return (min(@x),min(@y), max(@x),max(@y));
+  return points_bbox_xyxy($planar->points);
 }
 
 
 #------------------------------------------------------------------------------
+
+sub points_bbox_xyxy {
+  my ($points) = @_;
+  my @x = map {$_->[0]} @$points;
+  my @y = map {$_->[1]} @$points;
+  return (min(@x),min(@y), max(@x),max(@y));
+}
 
 sub points_to_area {
   my ($points) = @_;

@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Graph::Maker;
 use Carp 'croak';
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -416,6 +416,8 @@ L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310> (etc)
     496       N=6,            E graph
     714       N=7
     700       N=8 (order=3)
+    34546, 34548, 34550, 34552    N=9 to N=12
+    34554, 34556, 34558           N=13 to N=15
     28507     N=16 (order=4)
     21088     N=32 (order=5)
     33543     N=64 (order=6)
@@ -463,11 +465,11 @@ L<Graph::Maker::BinaryBeanstalk>
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

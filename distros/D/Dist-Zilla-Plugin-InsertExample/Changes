@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-InsertExample
 
+0.10      2021-02-28 06:36:57 -0700
+  - Fix bug where utf8 scripts would not be inserted with
+    strange diagnostic (gh#5)
+
 0.09      2017-08-02 14:31:35 -0400
   - Add indent option
 

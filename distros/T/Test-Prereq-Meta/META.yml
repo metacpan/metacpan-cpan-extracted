@@ -1,0 +1,48 @@
+---
+abstract: 'Test distribution prerequisites against meta data.'
+author:
+  - 'Thomas R. Wyant, III F<wyant at cpan dot org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  lib: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Prereq-Meta
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Test::Prereq::Meta:
+    file: lib/Test/Prereq/Meta.pm
+    version: '0.001'
+requires:
+  CPAN::Meta: '0'
+  Carp: '0'
+  Exporter: '0'
+  ExtUtils::Manifest: '0'
+  File::Find: '0'
+  File::Glob: '0'
+  File::Spec: '0'
+  Module::CoreList: '0'
+  Module::Extract::Use: '1.045'
+  Module::Metadata: '0'
+  Scalar::Util: '0'
+  constant: '0'
+  perl: '5.01'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/trwyant/perl-Test-Prereq-Meta/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Test-Prereq-Meta.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

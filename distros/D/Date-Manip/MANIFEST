@@ -544,6 +544,7 @@ lib/Date/Manip/Offset/off441.pm
 lib/Date/Manip/Offset/off442.pm
 lib/Date/Manip/Offset/off443.pm
 lib/Date/Manip/Offset/off444.pm
+lib/Date/Manip/Offset/off445.pm
 lib/Date/Manip/Problems.pod
 lib/Date/Manip/Recur.pm
 lib/Date/Manip/Recur.pod
@@ -799,7 +800,6 @@ lib/Date/Manip/TZ/atstan00.pm
 lib/Date/Manip/TZ/auadel00.pm
 lib/Date/Manip/TZ/aubris00.pm
 lib/Date/Manip/TZ/aubrok00.pm
-lib/Date/Manip/TZ/aucurr00.pm
 lib/Date/Manip/TZ/audarw00.pm
 lib/Date/Manip/TZ/aueucl00.pm
 lib/Date/Manip/TZ/auhoba00.pm

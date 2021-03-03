@@ -1,0 +1,54 @@
+{
+   "abstract" : "Fragmentary distro for Test-Prereq-Meta testing",
+   "author" : [
+      "Thomas R. Wyant, III F<wyant at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231, with edits",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "accept",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+	    "strict" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "accept" : {
+         "file" : "lib/accept.pm",
+         "version" : "0.000_001"
+      }
+   },
+   "release_status" : "testing",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://github.com/trwyant/perl-Test-Prereq-Meta/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Test-Prereq-Meta.git",
+         "web" : "https://github.com/trwyant/perl-Test-Prereq-Meta"
+      }
+   },
+   "version" : "0.000_001",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

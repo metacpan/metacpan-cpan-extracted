@@ -10,8 +10,11 @@ use Mojolicious::Lite;
 $ENV{MOJO_MODE} = 'test';
 my %local_tstamps;
 
+my $last_epoch;
+
 plugin Cron => (
   '*/10 15 * * *' => sub {
+    $last_epoch = shift;
     $local_tstamps{fmt_time(localtime)}++;
     Mojo::IOLoop->stop;
   }
@@ -38,6 +41,9 @@ is \%local_tstamps,
   "$lday 15:50" => 1,
   },         # no more because hour is always 15 local
   'exact tstamps';
+
+# check that new $epock parameter is available on callback
+ok defined $last_epoch && $last_epoch =~ /^\d{10}$/, "got epoch on callback";
 done_testing;
 
 sub fmt_time {

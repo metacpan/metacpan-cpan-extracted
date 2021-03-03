@@ -1,0 +1,10 @@
+
+sub _maps {
+    state $finder = Module::Pluggable::Object->new(
+	require	=> 1,
+	inner	=> 0,
+	search_path	=> [ __PACKAGE__ . '::Map' ],
+    );
+    return $finder->plugins();
+}
+

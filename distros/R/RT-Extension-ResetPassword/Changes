@@ -1,5 +1,9 @@
 Revision history for Perl module RT::Extension::ResetPassword
 
+1.10 2021-03-02
+ - Provide a way to delete a user's password
+ - Display password status on the user admin page
+
 1.09 2021-02-22
  - Provide a config option($ResetPasswordFromAddress) to set email From address
 

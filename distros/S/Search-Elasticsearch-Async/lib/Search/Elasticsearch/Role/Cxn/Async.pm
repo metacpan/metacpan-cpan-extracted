@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::Cxn::Async;
-$Search::Elasticsearch::Role::Cxn::Async::VERSION = '7.711';
+$Search::Elasticsearch::Role::Cxn::Async::VERSION = '7.711001';
 use Moo::Role;
 
 use Search::Elasticsearch::Util qw(new_error);
@@ -82,7 +82,7 @@ Search::Elasticsearch::Role::Cxn::Async - Provides common functionality to async
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

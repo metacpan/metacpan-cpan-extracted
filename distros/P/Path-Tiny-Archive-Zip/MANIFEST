@@ -9,7 +9,8 @@ README.md
 cpanfile
 lib/Path/Tiny/Archive/Zip.pm
 t/00-compile.t
-t/01-base.t
+t/01-basic.t
+t/02-compression.t
 t/author-critic.t
 t/author-pod-spell.t
 t/release-cpan-changes.t

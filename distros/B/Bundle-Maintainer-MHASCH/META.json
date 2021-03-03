@@ -3,10 +3,10 @@
    "author" : [
       "Martin Becker <mhasch at cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,22 +22,46 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.56",
-            "Test::More" : "0.75"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.06",
+            "File::Spec" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "perl" : "5.006"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.82"
+         }
+      }
+   },
+   "provides" : {
+      "Bundle::Maintainer::MHASCH" : {
+         "file" : "lib/Bundle/Maintainer/MHASCH.pm",
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
-   "version" : "0.003",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mhasch/perl-Bundle-Maintainer-MHASCH/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mhasch/perl-Bundle-Maintainer-MHASCH.git",
+         "web" : "https://github.com/mhasch/perl-Bundle-Maintainer-MHASCH"
+      }
+   },
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

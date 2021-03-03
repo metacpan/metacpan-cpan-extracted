@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Role::Bulk;
-$Search::Elasticsearch::Client::7_0::Role::Bulk::VERSION = '7.711';
+$Search::Elasticsearch::Client::7_0::Role::Bulk::VERSION = '7.711001';
 use Moo::Role;
 requires 'add_action', 'flush';
 
@@ -291,7 +291,7 @@ Search::Elasticsearch::Client::7_0::Role::Bulk - Provides common functionality t
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 AUTHOR
 

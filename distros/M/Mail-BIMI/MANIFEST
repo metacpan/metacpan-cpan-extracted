@@ -15,6 +15,7 @@ lib/Mail/BIMI/App/Command/checkdomain.pm
 lib/Mail/BIMI/App/Command/checkrecord.pm
 lib/Mail/BIMI/App/Command/checksvg.pm
 lib/Mail/BIMI/App/Command/checkvmc.pm
+lib/Mail/BIMI/App/Command/svgfromvmc.pm
 lib/Mail/BIMI/Base.pm
 lib/Mail/BIMI/CacheBackend/FastMmap.pm
 lib/Mail/BIMI/CacheBackend/File.pm

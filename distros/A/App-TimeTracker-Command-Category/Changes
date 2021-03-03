@@ -1,5 +1,10 @@
 Revision history for App-TimeTracker-Category
 
+1.003     2021-03-02 15:40:11+01:00
+    - add "prefix" to category via config
+    - switch to Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.002   2016-06-05T21:47:37+0200
     - do not set category if we dont have one (Thomas Klausner)
     - fix attrib munging for some startish commands (Thomas Klausner)

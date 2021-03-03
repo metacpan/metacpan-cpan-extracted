@@ -44,8 +44,7 @@
             "Moose" : "0",
             "Sort::Naturally" : "0",
             "Time::localtime" : "0",
-            "YAML" : "0",
-            "YAML::Tiny" : "1.73",
+            "YAML::Syck" : "1.31",
             "namespace::autoclean" : "0",
             "perl" : "5.006"
          }
@@ -60,9 +59,9 @@
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/gravattj/CLI-Driver-perl.git",
-         "web" : "https://github.com/gravattj/CLI-Driver-perl/Task-DWIM"
+         "web" : "https://github.com/gravattj/CLI-Driver-perl"
       }
    },
-   "version" : 0.69,
+   "version" : 0.77,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

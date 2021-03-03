@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2018, 2019 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -122,15 +122,20 @@ plan tests => 9;
       my $K  = $+{'K'};
       $shown{"N=$N,K=$K"} = $+{'id'};
     }
-    ok ($count, 13, 'HOG ID number of lines');
+    ok ($count, 21, 'HOG ID number of lines');
   }
-  ok (scalar(keys %shown), 13);
+  ok (scalar(keys %shown), 21);
   ### %shown
 
+  # K=1 circular ladder not very relevant, limit those to N<=10
+  # ENHANCE-ME: A few more at bigger N.
+  #
   my $extras = 0;
   my %seen;
-  foreach my $N (3 .. 25) {
-    foreach my $K (1 .. $N-1) {
+  foreach my $N (3 .. 15) {
+    my $min_K = ($N<=10 ? 1 : 2);
+    my $max_K = ($N+1)>>1;
+    foreach my $K ($min_K .. $max_K) {
       my $graph = Graph::Maker->new('Petersen', undirected => 1,
                                     N => $N, K => $K);
       my $g6_str = MyGraphs::Graph_to_graph6_str($graph);

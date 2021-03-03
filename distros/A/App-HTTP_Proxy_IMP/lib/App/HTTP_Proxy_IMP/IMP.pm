@@ -10,6 +10,7 @@ use Net::IMP::HTTP;
 use Scalar::Util 'weaken';
 use Hash::Util 'lock_ref_keys';
 use Compress::Raw::Zlib;
+no warnings 'experimental'; # smartmatch
 use Carp;
 
 my %METHODS_RFC2616 = map { ($_,1) } qw( GET HEAD POST PUT DELETE OPTIONS CONNECT TRACE );

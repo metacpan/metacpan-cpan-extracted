@@ -4,13 +4,13 @@
       "Steffen Ullrich <sullr@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-HTTP_Proxy_IMP",
    "no_index" : {
@@ -43,7 +43,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Dist/Display.html?Queue=App-HTTP_Proxy_IMP"
+         "web" : "https://github.com/noxxi/p5-app-http_proxy_imp/issues"
       },
       "homepage" : "https://github.com/noxxi/p5-app-http_proxy_imp",
       "license" : [
@@ -53,5 +53,6 @@
          "url" : "https://github.com/noxxi/p5-app-http_proxy_imp"
       }
    },
-   "version" : "0.957"
+   "version" : "0.958",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

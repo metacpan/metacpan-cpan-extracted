@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::6_0::Async::Scroll;
-$Search::Elasticsearch::Client::6_0::Async::Scroll::VERSION = '7.711';
+$Search::Elasticsearch::Client::6_0::Async::Scroll::VERSION = '7.711001';
 use Moo;
 use Search::Elasticsearch::Util qw(parse_params throw);
 use Search::Elasticsearch::Async::Util qw(thenable);
@@ -240,7 +240,7 @@ Search::Elasticsearch::Client::6_0::Async::Scroll - A helper module for scrolled
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

@@ -9,7 +9,7 @@
 use Test::More;
 use Test::File::Contents;
 
-my $not = 17;
+my $not = 19;
 
 SKIP: {
     eval( 'use CSS::Packer' );
@@ -26,6 +26,8 @@ SKIP: {
     minTest( 's6', { compress => 'minify' } );
     minTest( 's7', { compress => 'minify', no_compress_comment => 1 } );
     minTest( 's8', { compress => 'minify' } );
+    minTest( 's9', { compress => 'minify' } );
+    minTest( 's10', { compress => 'minify' } );
 
     my $packer = CSS::Packer->init();
 
@@ -81,6 +83,8 @@ sub minTest {
     my $packer = CSS::Packer->init();
 
     $packer->minify( \$css, $opts );
+
+	$css .= "\n" if $css !~ /\n$/;
 
     print GOTFILE $css;
     close(INFILE);

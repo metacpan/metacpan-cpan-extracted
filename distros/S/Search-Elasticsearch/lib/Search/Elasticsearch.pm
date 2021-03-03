@@ -22,7 +22,7 @@ use Moo 2.001000 ();
 use Search::Elasticsearch::Util qw(parse_params load_plugin);
 use namespace::clean;
 
-our $VERSION = '7.711';
+our $VERSION = '7.711001';
 
 my %Default_Plugins = (
     client      => [ 'Search::Elasticsearch::Client',       '7_0::Direct' ],
@@ -79,7 +79,7 @@ Search::Elasticsearch - The official client for Elasticsearch
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

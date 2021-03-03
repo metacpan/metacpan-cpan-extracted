@@ -1,5 +1,10 @@
 Revision history for Text-FrontMatter-YAML
 
+0.10	2021-03-01
+  - Properly check for existence of the input arguments (rather than
+    a boolean test of the value)
+  - Squelch more warnings on empty input (which is valid)
+
 0.09	2019-06-17
   - Bump copyright date, call it 0.09. If this works it'll become 1.0.
 

@@ -1,0 +1,51 @@
+---
+abstract: 'declare interface package'
+author:
+  - 'kfly8 <kfly8@cpan.org>'
+build_requires:
+  Module::Build::Tiny: '0.035'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Boundary
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Boundary:
+    file: lib/Boundary.pm
+    version: '0.01'
+  Boundary::Impl:
+    file: lib/Boundary/Impl.pm
+  Boundary::Types:
+    file: lib/Boundary/Types.pm
+requires:
+  B::Hooks::EndOfScope: '0.12'
+  Carp: '0'
+  Class::Load: '0'
+  Type::Tiny: '1.000000'
+  namespace::allclean: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/kfly8/p5-Boundary/issues
+  homepage: https://github.com/kfly8/p5-Boundary
+  repository: git://github.com/kfly8/p5-Boundary.git
+version: '0.01'
+x_authority: cpan:KFLY
+x_contributors:
+  - 'kfly8 <kfly@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -28,12 +28,12 @@ if($can_test) {
 		}
 	}
 
-	if(not $ENV{AUTHOR_TESTING}) {
-		plan(skip_all => 'Author tests not required for installation');
-	} else {
+	if($ENV{AUTHOR_TESTING}) {
 		new_ok('Class::Simple::Cached' =>
 			[ cache => CHI->new(driver => 'RawMemory', global => 1) ]
 		);
 		plan tests => 2;
+	} else {
+		plan(skip_all => 'Author tests not required for installation');
 	}
 }

@@ -1,3 +1,6 @@
+0.2.24  2021-02-28
+    - More verbosity about priorities in choosing files to delete: added user's priority and backup version score.
+    - Fix: first deleting heviest files of one priority.
 0.2.23  2021-02-13
     - Version bump
 0.2.22  2021-02-13

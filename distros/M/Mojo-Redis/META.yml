@@ -18,13 +18,14 @@ no_index:
     - t
     - inc
 requires:
-  Mojolicious: '7.80'
+  Mojolicious: '8.50'
   Protocol::Redis::Faster: '0.002'
+  perl: '5.016'
 resources:
   bugtracker: https://github.com/jhthorsen/mojo-redis/issues
   homepage: https://github.com/jhthorsen/mojo-redis
   repository: https://github.com/jhthorsen/mojo-redis.git
-version: '3.25'
+version: '3.26'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
   - 'Dan Book <grinnz@grinnz.com>'

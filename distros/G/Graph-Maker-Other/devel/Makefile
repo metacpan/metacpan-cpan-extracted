@@ -1,4 +1,4 @@
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2021 Kevin Ryde
 
 # This file is part of Graph-Maker-Other.
 #
@@ -24,5 +24,5 @@ pictures.pdf: pictures.tex
 
 clean:
 	rm -f pictures.aux pictures.fls pictures.log pictures.out
-	rm -f pictures.dvi pictures.pdf
-	rm -f *.fdb_latexmk _whizzy*
+	rm -f pictures.dvi pictures.pdf *.fdb_latexmk
+	rm -rf _whizzy*

@@ -1,9 +1,9 @@
 package Text::Table::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-20'; # DATE
+our $DATE = '2021-03-03'; # DATE
 our $DIST = 'Text-Table-Any'; # DIST
-our $VERSION = '0.101'; # VERSION
+our $VERSION = '0.102'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -53,7 +53,7 @@ sub table {
     my %params = @_;
 
     my $rows          = $params{rows} or die "Must provide rows!";
-    my $backend       = $params{backend} || 'Text::Table::Tiny';
+    my $backend       = $params{backend} || 'Text::Table::Sprintf';
     my $header_row    = $params{header_row} // 1;
     my $separate_rows = $params{separate_rows} // 0;
 
@@ -262,7 +262,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.101 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-02-20.
+This document describes version 0.102 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2021-03-03.
 
 =head1 SYNOPSIS
 
@@ -277,14 +277,14 @@ This document describes version 0.101 of Text::Table::Any (from Perl distributio
      ['carol', 'brig gen', '8745'],
  ];
  print Text::Table::Any::table(rows => $rows, header_row => 1,
-                               backend => 'Text::Table::Tiny');
+                               backend => 'Text::Table::More');
 
 =head1 DESCRIPTION
 
 This module provides a single function, C<table>, which formats a
 two-dimensional array of data as text table, using one of several available
-backends. The interface is modelled after L<Text::Table::Tiny> (0.03);
-Text::Table::Tiny also happens to be the default backend.
+backends. The interface is modelled after L<Text::Table::Tiny> (0.03).
+L<Text::Table::Sprintf> is the default backend.
 
 The example shown in the SYNOPSIS generates the following table:
 
@@ -386,7 +386,7 @@ Known arguments:
 Required. Takes an array reference which should contain one or more rows of
 data, where each row is an array reference.
 
-=item * backend (str, default C<Text::Table::Tiny>)
+=item * backend (str, default C<Text::Table::Sprintf>)
 
 Optional. Pick a backend module. Supported backends:
 

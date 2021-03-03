@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Serializer::JSON;
-$Search::Elasticsearch::Serializer::JSON::VERSION = '7.711';
+$Search::Elasticsearch::Serializer::JSON::VERSION = '7.711001';
 use Moo;
 use JSON::MaybeXS 1.002002 ();
 
@@ -41,7 +41,7 @@ Search::Elasticsearch::Serializer::JSON - The default JSON Serializer, using JSO
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

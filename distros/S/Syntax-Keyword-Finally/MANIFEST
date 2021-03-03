@@ -4,6 +4,7 @@ hax/cx_pushblock.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
 hax/wrap_keyword_plugin.c.inc
+lib/Syntax/Keyword/Defer.pm
 lib/Syntax/Keyword/Finally.pm
 lib/Syntax/Keyword/Finally.xs
 LICENSE
@@ -13,4 +14,8 @@ META.yml
 README
 t/00use.t
 t/01finally.t
+t/02die.t
+t/10defer.t
+t/80defer+feature-try.t
+t/80defer+SKT.t
 t/99pod.t

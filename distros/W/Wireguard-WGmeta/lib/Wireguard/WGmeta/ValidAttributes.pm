@@ -4,24 +4,89 @@ WGmeta::ValidAttributes - Supported attribute configurations
 
 =head1 DESCRIPTION
 
-In this module all supported attribute names are defined. Currently this only affects
-L<Wireguard::WGmeta::Wrapper::Config/set($interface, $identifier, $attribute, $value [, $allow_non_meta, $forward_function])>
+In this module all supported attributes are configured (and as well their possible validation function). Attributes configured
+here affect how the parser stores them and which attributes are supported by the
+L<Wireguard::WGmeta::Wrapper::Config/set($interface, $identifier, $attribute, $value [, $allow_non_meta, $forward_function])>.
 
 =head1 SYNOPSIS
 
 Add your own attributes to L</WG_META_ADDITIONAL>
-
-=head1 ATTRIBUTE SETS
 
 =cut
 
 package Wireguard::WGmeta::ValidAttributes;
 use strict;
 use warnings FATAL => 'all';
+use experimental 'signatures';
 
 use Wireguard::WGmeta::Validator;
 
-# Attribute configurations (do not change, add your own under WG_META_ADDITIONAL)
+=head1 ATTRIBUTE TYPES
+
+=cut
+
+=head3 ATTR_TYPE_IS_WG_META
+
+(Default) - wg-meta attributes
+
+=cut
+use constant ATTR_TYPE_IS_WG_META => 10;
+=head3 ATTR_TYPE_IS_WG_META_CUSTOM
+
+Your custom wg-meta attributes
+
+=cut
+use constant ATTR_TYPE_IS_WG_META_CUSTOM => 11;
+=head3 ATTR_TYPE_IS_WG_QUICK
+
+wg-quick attribute
+
+=cut
+use constant ATTR_TYPE_IS_WG_QUICK => 12;
+=head3 ATTR_TYPE_IS_WG_ORIG_INTERFACE
+
+Original Wireguard attribute, valid for C<[Interface]> sections.
+
+=cut
+use constant ATTR_TYPE_IS_WG_ORIG_INTERFACE => 13;
+=head3 ATTR_TYPE_IS_WG_ORIG_PEER
+
+Original Wireguard attribute, valid for C<[Peer]> sections.
+
+=cut
+use constant ATTR_TYPE_IS_WG_ORIG_PEER => 14;
+=head3 ATTR_TYPE_IS_UNKNOWN
+
+Any unknown attribute types
+
+=cut
+use constant ATTR_TYPE_IS_UNKNOWN => 15;
+
+use constant TRUE => 1;
+use constant FALSE => 0;
+
+use base 'Exporter';
+our @EXPORT = qw(
+    ATTR_TYPE_IS_WG_META
+    ATTR_TYPE_IS_WG_META_CUSTOM
+    ATTR_TYPE_IS_WG_QUICK
+    ATTR_TYPE_IS_WG_ORIG_INTERFACE
+    ATTR_TYPE_IS_WG_ORIG_PEER
+    ATTR_TYPE_IS_UNKNOWN
+    get_attr_config
+    decide_attr_type
+);
+
+=head1 ATTRIBUTE SETS
+
+General remark: If you want to add your own attributes add them to L</WG_META_ADDITIONAL> - all other config sets
+should only be modified on (possible) future changes in attribute configurations in Wireguard or wg-quick!
+
+=head3 WG_META_DEFAULT
+
+wg-meta default attributes. Do not make changes here, they are expected to be present!
+
+=cut
 use constant WG_META_DEFAULT => {
     'name'        => {
         'in_config_name' => 'Name',
@@ -38,10 +103,14 @@ use constant WG_META_DEFAULT => {
     'disabled'    => {
         'in_config_name' => 'Disabled',
         'validator'      => \&accept_any
+    },
+    'fqdn'    => {
+        'in_config_name' => 'FQDN',
+        'validator'      => \&accept_any
     }
 };
 
-=head2 WG_META_ADDITIONAL
+=head3 WG_META_ADDITIONAL
 
 Define your custom attributes here in the following format (the wg meta prefix can be omitted here):
 
@@ -59,7 +128,11 @@ Validator functions can be defined in L<Wireguard::WGmeta::Validator>
 =cut
 use constant WG_META_ADDITIONAL => {};
 
-# wg-quick attributes
+=head3 WG_QUICK
+
+wg-quick attribute set
+
+=cut
 use constant WG_QUICK => {
     'address'     => {
         'in_config_name' => 'Address',
@@ -99,7 +172,11 @@ use constant WG_QUICK => {
     }
 };
 
-# attribute names which are valid for the [Interface] sections
+=head3 WG_ORIG_INTERFACE
+
+Attributes valid for Wireguard I<[Interface>] sections
+
+=cut
 use constant WG_ORIG_INTERFACE => {
     'listen-port' => {
         'in_config_name' => 'ListenPort',
@@ -115,7 +192,11 @@ use constant WG_ORIG_INTERFACE => {
     }
 };
 
-# attribute name which are valid for the [Peer] sections
+=head3 WG_ORIG_PEER
+
+Attributes valid for Wireguard I<[Peer>] sections
+
+=cut
 use constant WG_ORIG_PEER => {
     'public-key'           => {
         'in_config_name' => 'PublicKey',
@@ -138,5 +219,127 @@ use constant WG_ORIG_PEER => {
         'validator'      => \&accept_any
     },
 };
+
+# internal method to create mappings
+sub _create_inverse_mapping() {
+    my $inv_map = {};
+    map {$inv_map->{$_} = ATTR_TYPE_IS_WG_ORIG_PEER;} (keys %{+WG_ORIG_PEER});
+    map {$inv_map->{$_} = ATTR_TYPE_IS_WG_ORIG_INTERFACE;} (keys %{+WG_ORIG_INTERFACE});
+    map {$inv_map->{$_} = ATTR_TYPE_IS_WG_META;} (keys %{+WG_META_DEFAULT});
+    map {$inv_map->{$_} = ATTR_TYPE_IS_WG_META_CUSTOM;} (keys %{+WG_META_ADDITIONAL});
+    map {$inv_map->{$_} = ATTR_TYPE_IS_WG_QUICK;} (keys %{+WG_QUICK});
+    return $inv_map;
+}
+sub _create_inconfig_name_mapping() {
+    my $names2key = {};
+    map {$names2key->{WG_ORIG_PEER->{$_}{in_config_name}} = $_;} (keys %{+WG_ORIG_PEER});
+    map {$names2key->{WG_ORIG_INTERFACE->{$_}{in_config_name}} = $_;} (keys %{+WG_ORIG_INTERFACE});
+    map {$names2key->{WG_META_DEFAULT->{$_}{in_config_name}} = $_;} (keys %{+WG_META_DEFAULT});
+    map {$names2key->{WG_META_ADDITIONAL->{$_}{in_config_name}} = $_;} (keys %{+WG_META_ADDITIONAL});
+    map {$names2key->{WG_QUICK->{$_}{in_config_name}} = $_;} (keys %{+WG_QUICK});
+    return $names2key;
+}
+
+=head3 INVERSE_ATTR_TYPE_MAPPING
+
+[Generated] Static mapping from I<attr_key>attr_key to I<attr_type>.
+
+=cut
+use constant INVERSE_ATTR_TYPE_MAPPING => _create_inverse_mapping;
+
+=head3 NAME_2_KEYS_MAPPING
+
+[Generated] Static mapping from I<in_config_name> to I<attr_key>.
+
+=cut
+use constant NAME_2_KEYS_MAPPING => _create_inconfig_name_mapping;
+
+=head1 METHODS
+
+=head2 get_attr_config($attr_type)
+
+Returns an attribute config set from L</ATTRIBUTE SETS> given a valid attr type.
+Ideally obtained through L</decide_attr_type($attr_name [, $allow_unknown = FALSE])>.
+
+B<Parameters>
+
+=over 1
+
+=item
+
+C<$attr_type> A valid attribute type.
+
+=back
+
+B<Raises>
+
+Exception is type is invalid (not known).
+
+B<Returns>
+
+If the type is valid, the corresponding attribute config map.
+
+=cut
+sub get_attr_config($attr_type) {
+    for ($attr_type) {
+        $_ == ATTR_TYPE_IS_WG_ORIG_PEER && do {
+            return WG_ORIG_PEER;
+        };
+        $_ == ATTR_TYPE_IS_WG_ORIG_INTERFACE && do {
+            return WG_ORIG_INTERFACE;
+        };
+        $_ == ATTR_TYPE_IS_WG_META && do {
+            return WG_META_DEFAULT;
+        };
+        $_ == ATTR_TYPE_IS_WG_META_CUSTOM && do {
+            return WG_META_ADDITIONAL;
+        };
+        $_ == ATTR_TYPE_IS_WG_QUICK && do {
+            return WG_QUICK;
+        };
+    }
+    die "Invalid attribute type `$attr_type`";
+}
+
+=head2 decide_attr_type($attr_name [, $allow_unknown = FALSE])
+
+Returns the attribute type given an I<attr_key>.
+
+B<Parameters>
+
+=over 1
+
+=item
+
+C<$attr_name> An attribute key as defined in one L</ATTRIBUTE SETS>.
+
+=item
+
+C<[$allow_unknown = FALSE]> If set to true, unknown attributes result in the type L<>.
+
+=back
+
+B<Raises>
+
+An Exception, if the attribute is unknown (and C<$allow_unknown = FALSE>).
+
+B<Returns>
+
+An attribute type from L</ATTRIBUTE TYPES>
+
+=cut
+sub decide_attr_type($attr_name, $allow_unknown = FALSE) {
+    if (exists INVERSE_ATTR_TYPE_MAPPING->{$attr_name}) {
+        return INVERSE_ATTR_TYPE_MAPPING->{$attr_name};
+    }
+    else {
+        if ($allow_unknown == TRUE) {
+            return ATTR_TYPE_IS_UNKNOWN;
+        }
+        else {
+            die "Attribute `$attr_name` is not known";
+        }
+    }
+}
 
 1;

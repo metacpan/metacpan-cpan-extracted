@@ -37,7 +37,7 @@
             "EV" : "4.33",
             "Minion::Backend::SQLite" : "v5.0.3",
             "Mojo::SQLite" : "3.004",
-            "Mojolicious" : "8.65",
+            "Mojolicious" : "9.02",
             "Mojolicious::Plugin::Authentication" : "1.32",
             "Mojolicious::Plugin::OpenAPI" : "3.40",
             "Mojolicious::Plugin::PODViewer" : "0.006",
@@ -66,6 +66,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2021.02.01",
+   "version" : "v2021.02.20",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

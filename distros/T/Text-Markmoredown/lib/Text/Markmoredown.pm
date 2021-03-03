@@ -30,7 +30,7 @@ use base        'Exporter';
 use HTML::Entities qw(encode_entities);
 use Text::ASCIIMathML;
 
-our $VERSION   = '0.000035'; # 0.0.35
+our $VERSION   = '0.000036'; # 0.0.36
 $VERSION = eval $VERSION;
 our @EXPORT_OK = qw(markmod);
 
@@ -457,6 +457,8 @@ sub _RunBlockGamut {
 
     # Do headers first, as these populate cross-refs
     $text = $self->_DoHeaders($text);
+
+    $text = $self->_DoCodeFences($text);
 
     $text = $self->_DoMathBlocks($text);
 
@@ -1490,6 +1492,7 @@ sub _EncodeCode {
     s! \- !$g_escape_table{'-'}!ogx;
     s! _  !$g_escape_table{'_'}!ogx;
     s! ~  !$g_escape_table{'~'}!ogx;
+#    s! \^ !$g_escape_table{'^'}!ogx;
     s! {  !$g_escape_table{'{'}!ogx;
     s! }  !$g_escape_table{'}'}!ogx;
     s! \[ !$g_escape_table{'['}!ogx;
@@ -1808,35 +1811,35 @@ sub _DoMathSpans {
 
 	my ($self, $text) = @_;
 
-	$text =~ s{
-			(?<![\\\$])		# Character before opening $ can't be a backslash or $
-			(\$)		# $1 = Opening
-            (?![\$\s])
-			(.+?)		# $2 = The code block
-			(?:\[(.+)\])?	# $3 = optional label
-            (?<=\S)
-			(\1)
-		}{
- 			my $m = "$2";
-			my $label = "";
-			my @attr = (xmlns=>"http://www.w3.org/1998/Math/MathML");
-
-			if (defined $3) {
-				$label = Header2Label($3);
-				my $header = _RunSpanGamut($3);
-
-				$self->{_crossrefs}{$label} = "#$label";
-				$self->{_titles}{$label} = $header;
-			}
- 			$m =~ s/^[ \t]*//g; # leading whitespace
- 			$m =~ s/[ \t]*$//g; # trailing whitespace
-			push(@attr,(id=>"$label")) if ($label ne "");
-			push(@attr,(display=>"inline"));
-
-			my $mathParser = new Text::ASCIIMathML();
-			$m = $mathParser->TextToMathML($m,\@attr);
-			"$m";
-		}egsx;
+#	$text =~ s{
+#			(?<![\\\$])		# Character before opening $ can't be a backslash or $
+#			(\$)		# $1 = Opening
+#            (?![\$\s])
+#			(.+?)		# $2 = The code block
+#			(?:\[(.+)\])?	# $3 = optional label
+#            (?<=\S)
+#			(\1)
+#		}{
+# 			my $m = "$2";
+#			my $label = "";
+#			my @attr = (xmlns=>"http://www.w3.org/1998/Math/MathML");
+#
+#			if (defined $3) {
+#				$label = Header2Label($3);
+#				my $header = _RunSpanGamut($3);
+#
+#				$self->{_crossrefs}{$label} = "#$label";
+#				$self->{_titles}{$label} = $header;
+#			}
+# 			$m =~ s/^[ \t]*//g; # leading whitespace
+# 			$m =~ s/[ \t]*$//g; # trailing whitespace
+#			push(@attr,(id=>"$label")) if ($label ne "");
+#			push(@attr,(display=>"inline"));
+#
+#			my $mathParser = new Text::ASCIIMathML();
+#			$m = $mathParser->TextToMathML($m,\@attr);
+#			"$m";
+#		}egsx;
 
         $text =~ s{
 			(?<!\\)		# Character before opening << can't be a backslash
@@ -2464,6 +2467,7 @@ sub _EncodeBackslashEscapes {
     s! \\\*  !$g_escape_table{'*'}!ogx;
     s! \\_   !$g_escape_table{'_'}!ogx;
     s! \\\~  !$g_escape_table{'~'}!ogx;
+    s! \\\^  !$g_escape_table{'^'}!ogx;
     s! \\\{  !$g_escape_table{'{'}!ogx;
     s! \\\}  !$g_escape_table{'}'}!ogx;
     s! \\\[  !$g_escape_table{'['}!ogx;

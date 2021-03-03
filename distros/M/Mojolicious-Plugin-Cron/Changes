@@ -1,70 +1,133 @@
+0.033 2021-02-25T20:50:55Z
+
+    - fix windows workflow (github)
+    - fix examples link in pod
+
+0.032 2021-02-25T20:25:14Z
+
+    - expose epoch scheduled time as callback first parameter
+
 0.031 2020-07-21T20:36:18Z
+
     - fix github action badges
 
 0.030 2020-07-21T19:37:43Z
+
     - Use github actions instead of travis/appveyor
     - Fix documentation issue (#10) (thanks themage)
 
 0.029 2020-01-02T19:09:18Z
+
     - Fixed minor typo in the pod (manwar)
 
 0.028 2019-12-30T19:33:00Z
+
     - Several doc issues (haukex)
 
 0.027 2018-12-11T21:03:59Z
 
     - Fixed typo in SYNOPSIS (smonff)
+
 0.026 2018-06-25T14:28:24Z
+
     - Fixes problems on unpriviledges installs after sudo installs
+
 0.025 2018-06-06T13:10:09Z
-	- Fixed minor typo in the pod (manwar)
+
+	  - Fixed minor typo in the pod (manwar)
+
 0.024 2018-06-06T00:31:19Z
+
     - rm accidentally added file
     - typos at pod
     - update pod
+
 0.023 2018-05-29T00:17:22Z
+
     - using Mojo::Reactor::Poll in tests
+
 0.022 2018-05-28T19:15:55Z
+
     - new locking scheme, one file per cron line
+
 0.021 2018-05-28T04:08:37Z
+
     - assure tmp dir is empty in tests
+
 0.020 2018-05-28T03:58:18Z
+
     - fix temporary directories
+
 0.019 2018-05-28T03:30:22Z
-	- cpan release
+
+	  - cpan release
+
 0.018 2018-05-28T03:29:22Z
+
     - use temporary directory for tests
+
 0.017 2018-05-27T23:12:25Z
+
     - minimal version on cpanfile requirements
+
 0.016 2018-05-27T17:09:48Z
+
     - adds simple example
+
 0.015 2018-05-27T16:55:07Z
+
     - waits for ioloop to start with ->next_tick
     - added pod info for extended syntax
+
 0.014 2018-05-27T02:50:53Z
-	- Fix typo
+
+	  - Fix typo
+
 0.013 2018-05-27T02:41:51Z
+
     - First cpan release
+
 0.011 2018-05-27T01:56:13Z
+
     - travis: perl versions 5.22+
+
 0.010 2018-05-27T00:26:41Z
-	- Added badges for travis & appveyor
+
+	  - Added badges for travis & appveyor
+
 0.009 2018-05-27T00:19:45Z
+
     - Added Test2::V0 dependency
+
 0.008 2018-05-27T00:11:00Z
+
     - Fix .travis & .appveyor files location (move to repo root)
+
 0.007 2018-05-27T00:03:21Z
+
     - Adds travis & appveyor tests
+
 0.006 2018-05-26T23:16:48Z
+
     - Pod corrections
+
 0.005 2018-05-26T23:13:14Z
-	- Prevents tmp directory deletion
+
+	  - Prevents tmp directory deletion
+
 0.004 2018-05-17T01:31:23Z
+
     - Get rid of AUTOLOAD cron
     - New synopsis
+
 0.003 2018-05-10T14:50:55Z
+
     - Separate cron temp directories by mojo mode
+
 0.002 2018-05-10T02:41:49Z
+
     - First tests passing
+
 0.001 2018-05-10T00:32:30Z
+
     - Initial commit

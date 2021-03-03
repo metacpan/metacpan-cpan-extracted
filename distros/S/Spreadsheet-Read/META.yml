@@ -39,7 +39,7 @@ optional_features:
 provides: 
   Spreadsheet::Read: 
     file: Read.pm
-    version: '0.83'
+    version: '0.84'
 recommends: 
   Data::Peek: '0.50'
   File::Temp: '0.2311'
@@ -61,4 +61,4 @@ resources:
   bugtracker: https://github.com/Tux/Spreadsheet-Read/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Spreadsheet-Read
-version: '0.83'
+version: '0.84'

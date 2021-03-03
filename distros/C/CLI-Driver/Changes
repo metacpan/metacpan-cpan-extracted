@@ -1,5 +1,26 @@
 Revision history for CLI-Driver
 
+0.77 - removed setting "$YAML::Syck::ImplicitTyping = 1" due to parsing 
+       errors under certain conditions
+
+0.76 - minor change to usage output
+
+0.75 - fixed minor bug in lib/CLI/Driver.pm
+
+0.74 - Switched to YAML::Syck for speed.
+
+0.73 - Improved documentation.
+
+0.72 - incorporated functionality from the example scripts into CLI::Driver.pm
+     - added "__PACKAGE__->meta->make_immutable" where appropriate
+
+0.71 - implemented new 'deprecated' method
+     - deprecated 'is_deprecated' method
+     - rearranged share/ and bin/
+     - misc usage improvements
+
+0.70 - Fix _get_val to not through error for missing required soft args
+
 0.69 - added link to source code on github (thanks to Gabor Szabo)
 
 0.68 - removed circular dependency on Util::Medley

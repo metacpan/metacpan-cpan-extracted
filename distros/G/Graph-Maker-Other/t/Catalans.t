@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2018, 2019 Kevin Ryde
+# Copyright 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,7 +29,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 39825;
+plan tests => 40027;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -39,7 +39,7 @@ require Graph::Maker::Catalans;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 15;
+  my $want_version = 18;
   ok ($Graph::Maker::Catalans::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Catalans->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Catalans->VERSION($want_version); 1 }, 1,
@@ -70,7 +70,8 @@ sub num_intervals {
   my ($graph) = @_;
   my $ret = 0;
   foreach my $v ($graph->vertices) {
-    $ret += 1 + $graph->all_successors($v);
+    my @all_successors = $graph->all_successors($v);
+    $ret += 1 + scalar(@all_successors);
   }
   return $ret;
 }
@@ -105,6 +106,9 @@ ok (binomial(-1,-1), 0);
 
 # Return a list of arrayrefs which are all balanced binary arrays of length
 # 2*$n, so all in graph N = $n.
+#     [1,0,1,0],
+#     [1,1,0,0],
+#     ...
 sub balanced_list {
   my ($n) = @_;
   my @ret;
@@ -382,7 +386,7 @@ sub binary_tree_sizes {
 
 
 #------------------------------------------------------------------------------
-# Canopy
+# Canopy = Footprint
 
 sub binary_tree_to_canopy {
   my ($binary_tree) = @_;
@@ -417,6 +421,241 @@ sub binary_tree_to_canopy {
   }
 }
 
+
+#------------------------------------------------------------------------------
+{
+  # Knuth 7.2.1.6 Table 1
+  #               a1..        d1..    z1..    p1..    c1..
+  my @table1 = (['()()()()', '1111', '1357', '1234', '0000'],
+                ['()()(())', '1102', '1356', '1243', '0001'],
+                ['()(())()', '1021', '1347', '1324', '0010'],
+                ['()(()())', '1012', '1346', '1342', '0011'],
+                ['()((()))', '1003', '1345', '1432', '0012'],
+                ['(())()()', '0211', '1257', '2134', '0100'],
+                ['(())(())', '0202', '1256', '2143', '0101'],
+                ['(()())()', '0121', '1247', '2314', '0110'],
+                ['(()()())', '0112', '1246', '2341', '0111'],
+                ['(()(()))', '0103', '1245', '2431', '0112'],
+                ['((()))()', '0031', '1237', '3214', '0120'],
+                ['((())())', '0022', '1236', '3241', '0121'],
+                ['((()()))', '0013', '1235', '3421', '0122'],
+                ['(((())))', '0004', '1234', '4321', '0123']);
+
+  foreach my $elem (@table1) {
+    my ($a,$d,$z,$p,$c) = @$elem;
+    my $aref = parens_to_balanced_aref($a);
+    ok (is_balanced($aref), 1);
+    my $balanced_str = join('',@$aref);
+    {
+      # d = run lengths of 0s
+      my @run0s = Graph::Maker::Catalans::_vertex_name_type_run0s($aref);
+      ok (join('',@run0s), $d,
+          "$balanced_str run0s c = $c");
+    }
+    {
+      # z = positions 1 to 2n of the 1s
+      ### $aref
+      my @got_z = map {$aref->[$_]==1 ? ($_+1) : ()} 0 .. $#$aref;
+      ok (join('',@got_z), $z,
+          "$balanced_str positions 0s z = $z");
+    }
+    {
+      # p = permutation i'th 1 matchest j'th 0
+      # which is the perm from preorder forest -> postorder forest
+      my @ones;
+      my $o = 1;
+      my $z = 1;
+      my @perm = ('');
+      foreach my $b (@$aref) {
+        if ($b) {
+          push @ones, $o++;
+        } else {
+          $perm[$z++] = pop @ones;
+        }
+      }
+      ok (join('',@perm), $p,
+          "$balanced_str perm p = $p");
+    }
+    {
+      # c = forest depths
+      my @depths = Graph::Maker::Catalans::_vertex_name_type_Ldepths($aref);
+      ok (join('',@depths), $c,
+          "$balanced_str depths c = $d");
+    }
+    ok (join('',@$aref), $balanced_str, "unchanged");
+  }
+}
+sub parens_to_balanced_aref {
+  my ($str) = @_;
+  $str =~ tr/()/10/;
+  return [split //, $str];
+}
+
+{
+  # Knuth 7.2.1.6 Table 2
+  #               l1..   r1..     forest     e1..   s1..     colex
+  my @table2 = (['2340','0000',   "0123",   '1110','3210',  "0000"],
+                ['0340','2000',   "0012",   '0110','0210',  "0100"],
+                ['2040','0300',   "0112",   '2010','3010',  "0010"],
+                ['2040','3000',   "0101",   '1010','1010',  "0110"],
+                ['0040','2300',   "0001",   '0010','0010',  "0120"],
+                ['2300','0040',   "0122",   '1200','3200',  "0001"],
+                ['0300','2040',   "0011",   '0200','0200',  "0101"],
+                ['2300','0400',   "0121",   '2100','3100',  "0011"],
+                ['2300','4000',   "0120",   '1100','2100',  "0111"],
+                ['0300','2400',   "0010",   '0100','0100',  "0121"],
+                ['2000','0340',   "0111",   '3000','3000',  "0012"],
+                ['2000','4300',   "0110",   '2000','2000',  "0112"],
+                ['2000','3040',   "0100",   '1000','1000',  "0122"],
+                ['0000','2340',   "0000",   '0000','0000',  "0123"]);
+
+  my %seen;
+  foreach my $elem (@table2) {
+    my ($l,$r, $forest_depths, $e,$s, $colex_depths) = @$elem;
+    my $aref = depths_str_to_balanced_aref($forest_depths);
+    ok ($seen{$forest_depths}++, 0, 'no duplicates');
+    ### $aref
+
+    my $binary_tree = balanced_to_binary_tree($aref);
+    my @binary_tree_preorder = binary_tree_preorder_list($binary_tree);
+    foreach my $i (0 .. $#binary_tree_preorder) {
+      $binary_tree_preorder[$i]->{'label'} = $i+1;
+    }
+    binary_tree_sizes($binary_tree);
+
+    {
+      # l = left child vertex number
+      my @got_l = map { my $left = $_->{'left'};
+                        (defined $left ? $left->{'label'} : 0)
+                      } @binary_tree_preorder;
+      ok (join('', @got_l), $l,
+          "forest=$forest_depths lefts l = $l");
+    }
+    {
+      # r = right child vertex number
+      my @got_r = map { my $right = $_->{'right'};
+                        (defined $right ? $right->{'label'} : 0)
+                      } @binary_tree_preorder;
+      ok (join('', @got_r), $r,
+          "forest=$forest_depths rights r = $r");
+    }
+    {
+      # c = preorder num children of vertex
+      ;
+    }
+    {
+      # s = binary tree preorder, size of left subtree
+      my @got_s = map { defined $_->{'left'} ? $_->{'left'}->{'size'} : 0
+                      } @binary_tree_preorder;
+      ok (join('', @got_s), $s,
+          "forest=$forest_depths sizes s = $s");
+
+
+      # my @Lweights = reverse Graph::Maker::Catalans::_vertex_name_type_Lweights($aref);
+      # ok (join('', map {$_-1} @Lweights), $s,
+      #     "forest=$forest_depths Lweight s = $s");
+    }
+  }
+}
+
+{
+  # Knuth 7.2.1.6 Table 3
+  #               l1..    r1..   k1..      forest     q1..   u1..  
+  my @table3 = (['10000','2340','0123',    "0000",   '1234','0000'], 
+                ['10003','2400','0122',    "0001",   '1243','1000'], 
+                ['10002','4300','0121',    "0011",   '1423','2000'], 
+                ['40001','2300','0120',    "0111",   '4123','3000'],
+                ['40021','3000','0110',    "0112",   '4132','3100'],
+                ['10023','4000','0111',    "0012",   '1432','2100'], 
+                ['10020','3040','0113',    "0010",   '1324','0100'], 
+                ['30010','2040','0103',    "0110",   '3124','0200'], 
+                ['40013','2000','0100',    "0122",   '4312','3200'], 
+                ['40123','0000','0000',    "0123",   '4321','3210'], 
+                ['30120','0040','0003',    "0120",   '3214','0210'], 
+                ['20100','0340','0023',    "0100",   '2134','0010'], 
+                ['20103','0400','0022',    "0101",   '2143','1010'], 
+                ['40102','0300','0020',    "0121",   '4213','3010']);
+  
+  my %seen;
+  foreach my $elem (@table3) {
+    my ($l,$r,$k, $forest_depths, $q,$u) = @$elem;
+    my $aref = depths_str_to_balanced_aref($forest_depths);
+    ok ($seen{$forest_depths}++, 0,
+        "table3 forest_depths no duplicates $forest_depths");
+    ### $aref
+
+    my $binary_tree = balanced_to_binary_tree($aref);
+    my @binary_tree_inorder = binary_tree_inorder_list($binary_tree);
+    foreach my $i (0 .. $#binary_tree_inorder) {
+      $binary_tree_inorder[$i]->{'label'} = $i+1;
+    }
+    binary_tree_sizes($binary_tree);
+
+    {
+      # l = left child vertex number
+      my @got_l = ($binary_tree->{'label'},
+                   map { my $left = $_->{'left'};
+                        (defined $left ? $left->{'label'} : 0)
+                      } @binary_tree_inorder);
+      ok (join('', @got_l), $l,
+          "table3 forest=$forest_depths lefts l = $l");
+    }
+    {
+      # r = right child vertex number
+      my @got_r = map { my $right = $_->{'right'};
+                        (defined $right ? $right->{'label'} : 0)
+                      } @binary_tree_inorder;
+      ok (join('', @got_r), $r,
+          "table3 forest=$forest_depths rights r = $r");
+    }
+    {
+      # u = permutation binary tree in-order to preorder
+      my @binary_tree_preorder = binary_tree_preorder_list($binary_tree);
+      my @perm = map {$_->{'label'}} @binary_tree_preorder;
+      ok (join('',@perm), $q,
+          "table3 forest=$forest_depths perm q = $q");
+    }
+    {
+      # u = size of left subtree, reverse in-order
+      my @got_s = map { defined $_->{'left'} ? $_->{'left'}->{'size'} : 0
+                      } reverse @binary_tree_inorder;
+      ok (join('', @got_s), $u,
+          "forest=$forest_depths sizes s = $u");
+    }
+  }
+}
+
+sub depths_str_to_balanced_aref {
+  my ($str) = @_;
+  my $prev = -1;
+  my @depths = split //, $str.'0';
+  my @array;
+  foreach my $i (1 .. $#depths) {
+    push @array, 1, (0) x ($depths[$i-1] + 1 - $depths[$i]);
+  }
+  return \@array;
+}
+
+sub binary_tree_preorder_list {
+  my ($binary_tree) = @_;
+  if (defined $binary_tree) {
+    return ($binary_tree,
+            binary_tree_preorder_list($binary_tree->{'left'}),
+            binary_tree_preorder_list($binary_tree->{'right'}));
+  } else {
+    return ();
+  }
+}
+sub binary_tree_inorder_list {
+  my ($binary_tree) = @_;
+  if (defined $binary_tree) {
+    return (binary_tree_inorder_list($binary_tree->{'left'}),
+            $binary_tree,
+            binary_tree_inorder_list($binary_tree->{'right'}));
+  } else {
+    return ();
+  }
+}
 
 #------------------------------------------------------------------------------
 # _balanced_end()
@@ -1679,7 +1918,10 @@ sub rotate_rightarm_num_edges {
                                   undirected => 1,
                                   countedged => 1);
     ok (scalar($graph->vertices), $Catalan_number[$N]);
-    ok (!!$graph->is_cyclic,  $N>=4);
+
+    # FIXME: Graph.pm 0.9716 seems to have some dodginess in is_cyclic,
+    # provoking warning messages (but getting the right answer).
+    # ok (!!$graph->is_cyclic,  $N>=4);
   }
 }
 

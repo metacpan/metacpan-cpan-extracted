@@ -6,6 +6,7 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+README
 cpanfile
 dist.ini
 lib/URI.pm
@@ -46,6 +47,7 @@ lib/URI/mailto.pm
 lib/URI/mms.pm
 lib/URI/news.pm
 lib/URI/nntp.pm
+lib/URI/nntps.pm
 lib/URI/pop.pm
 lib/URI/rlogin.pm
 lib/URI/rsync.pm

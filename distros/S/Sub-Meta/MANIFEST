@@ -12,11 +12,17 @@ minil.toml
 t/00_compile.t
 t/01_meta.t
 t/01_meta/is_same_interface.t
+t/01_meta/new.t
 t/02_parameters.t
 t/02_parameters/is_same_interface.t
 t/03_param.t
 t/03_param/is_same_interface.t
 t/04_returns.t
 t/04_returns/is_same_interface.t
+t/05_mymeta.t
+t/lib/MySubMeta.pm
+t/lib/MySubMeta/Param.pm
+t/lib/MySubMeta/Parameters.pm
+t/lib/MySubMeta/Returns.pm
 META.yml
 MANIFEST

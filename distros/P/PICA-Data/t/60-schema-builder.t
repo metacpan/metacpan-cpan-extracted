@@ -19,7 +19,7 @@ is_deeply $builder->schema->{fields}, $fields;
 $builder->add(
     [
         ['003@', undef, '0', 111, 0, 222],    # repeat existing subfield
-        ['144Z', '01', 'x', 333],    # introduce new field, omit occurrence
+        ['144Z', '', 'x', 333],               # introduce new field
     ]
 );
 

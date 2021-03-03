@@ -3,7 +3,9 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
+
+use Scalar::Util ();
 
 use overload
     fallback => 1,
@@ -32,6 +34,7 @@ sub set_coerce($) { $_[0]{coerce} = defined $_[1] ? $_[1] : 1; $_[0] }
 
 sub is_same_interface {
     my ($self, $other) = @_;
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Returns');
 
     if (defined $self->scalar) {
         return if !_eq($self->scalar, $other->scalar);
@@ -54,7 +57,7 @@ sub is_same_interface {
         return if defined $other->void;
     }
 
-    return 1;
+    return !!1;
 }
 
 sub _eq {

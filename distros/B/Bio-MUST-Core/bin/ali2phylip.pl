@@ -142,7 +142,7 @@ ali2phylip.pl - Convert (and filter) ALI files to PHYLIP files for tree building
 
 =head1 VERSION
 
-version 0.210380
+version 0.210610
 
 =head1 USAGE
 

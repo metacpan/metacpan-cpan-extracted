@@ -1,0 +1,182 @@
+=head1 NAME
+
+Devel::Util - a collection of general-utility development subroutines
+
+=head1 SYNOPSIS
+
+    use Devel::Util qw(dt tz oiaw printr forked);
+
+=head1 DESCRIPTION
+
+C<Devel::Util> contains a collection of subroutines to be used during the development phase, and also possibly in production.
+
+By default C<Devel::Util> does not export any subroutines.
+
+=cut
+
+=head2 dt
+
+=over 2
+
+=item dt BLOCK [NAME]
+
+=item do_time BLOCK [NAME]
+
+=back
+
+    dt {
+        my $i = 10_000_000;
+        rand while $i--;
+    } '10 million rands';
+
+Executes BLOCK and print a timing message to STDERR when done, similar to the Linux C<time> commands,
+reporting I<real>, I<user> and I<sys> times taken by the execution of block up to the millisecond.
+
+The NAME argument is optional and inteneded to help identify the timed block in the printed message.
+If none is provided the filename and line of the C<dt> command is used.
+
+Similarly to C<do>, C<dt> returns the value of the last command of the block, evaluated with the same context as the C<dt> command itself.
+
+C<dt> does not print any timing message if C<$Devel::Util::QUIET> is true.
+
+I<Setting C<$Devel::Util::QUIET> to true prevents C<dt> from printing any timing message.>
+
+=head2 tz
+
+=over 2
+
+=item tz BLOCK TZ
+
+=item timezone BLOCK TZ
+
+=back
+
+    tz {
+        printf "Current time is %s\n", scalar localtime
+    } 'Pacific/Honolulu';
+
+Executes BLOCK, locally setting the TZ environement variable and calling L<POSIX>::C<tzset>
+
+Similarly to C<do>, C<tz> returns the value of the last command of the block, evaluated with the same context as the C<tz> command itself.
+
+=head2 oiaw
+
+=over 2
+
+=item oiaw BLOCK TIME
+
+=item once_in_a_while BLOCK TIME
+
+=back
+
+    my $i = 0;
+    my $t = time;
+    while (time-$t < 3) {
+        ++$i;
+        oiaw {
+            print STDERR "\rprogress: $i"
+        } 0.5;
+    }
+
+Execute BLOCK only when at least TIME seconds have passed since the last call to that same block.
+
+TIME can be fractional.
+
+C<oiaw> can also return a code reference to be used afterward:
+
+    my $i = 0;
+    my $t = time;
+    my $progress = oiaw { print STDERR "\rprogress: $i" } 0.5;
+    while (time-$t < 3) {
+        ++$i;
+        $progress->();
+    }
+
+This second form is faster as the closure is only created once, and also makes it easier to silence by setting the code reference to an empty sub.
+
+=head2 printr
+
+=over 2
+
+=item printr STR
+
+=item printr FORMAT, LIST
+
+=item print_refresh STR
+
+=item print_refresh FORMAT, LIST
+
+=back
+
+    printr 'this';
+    sleep 1;
+    printr 'is';
+    sleep 1;
+    printr 'simple';
+
+C<printr> prints STR to STDERR, replacing anything formerly printr-ed on the same line.
+
+It uses I<\b> characters to delete previous messages in a controlled way, playing nice with I<\n>, shorter strings, or strings with a common prefix.
+
+If more than one argument is used, C<printr> formats its output similarly to what C<printf> does:
+
+    printr '1+1=%d', 1+1;
+
+    # same as:
+    printr sprintf('1+1=%d', 1+1);
+
+It makes sure everything that is common is not deleted, and that everything that is longer than the new message.
+
+Of course any interlaced direct call to C<print STDERR> will prevent C<printr> to work properly on a given line.
+
+I<Setting C<$Devel::Util::QUIET> to true makes C<printr> no-op.>
+
+=head2 forked
+
+    if (forked) {
+        warn 'We are in a forked process'
+    } else {
+        warn 'We are in the main process'
+    }
+
+Returns true if current PID is different than when the module was loaded.
+
+=head2 $Devel::Util::QUIET
+
+If set to true, C<dt> and C<printr> do not print anything.
+
+C<oiaw> is not affected as it can be used to do other things than printing progress.
+
+This variable has also no effect on C<tz> and C<forked>.
+
+=head1 EXPORTS
+
+Nothing by default.
+Functions can be imported explicitly, by their short or long aliases
+
+    # short
+    use Devel::Util qw(dt tz oiaw printr forked);
+
+    # long
+    use Devel::Util qw(do_time timezone once_in_a_while print_refresh forked);
+
+    # everything
+    use Devel::Util qw(:all);
+
+=head1 SEE ALSO
+
+L<Scalar::Util>, L<List::Util>
+
+=head1 AUTHOR
+
+Thomas Drugeon, E<lt>tdrugeon@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010-2021 by Thomas Drugeon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

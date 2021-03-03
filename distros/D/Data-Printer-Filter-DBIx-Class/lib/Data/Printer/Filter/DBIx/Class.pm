@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Data::Printer::Filter::DBIx::Class;
-$Data::Printer::Filter::DBIx::Class::VERSION = '0.000004';
+$Data::Printer::Filter::DBIx::Class::VERSION = '0.000005';
 use Data::Printer::Filter;
 use Scalar::Util qw(blessed);
 use Term::ANSIColor;
@@ -79,11 +79,11 @@ sub _add_prefix {
 
 =head1 NAME
 
-Data::Printer::Filter::DBIx::Class - Apply special Data::Printer filters to DBIx::Class objects
+Data::Printer::Filter::DBIx::Class - (DEPRECATED) Apply special Data::Printer filters to DBIx::Class objects
 
 =head1 VERSION
 
-version 0.000004
+version 0.000005
 
 =head1 SYNOPSIS
 
@@ -110,6 +110,11 @@ can change this behaviour via C<$ENV{DDP_DBIC_ROW_LIMIT}>.
     # Return every row from every ResultSet
     $ENV{DDP_DBIC_ROW_LIMIT} = 0;
 
+=head1 DEPRECATED
+
+This module breaks with the 1.x release of L<Data::Printer>, but that's ok. Use
+L<Data::Printer::Filter::DB> instead.
+
 =head1 AUTHOR
 
 Olaf Alders <olaf@wundercounter.com>
@@ -126,5 +131,5 @@ This is free software, licensed under:
 
 __END__
 
-# ABSTRACT: Apply special Data::Printer filters to DBIx::Class objects
+# ABSTRACT: (DEPRECATED) Apply special Data::Printer filters to DBIx::Class objects
 

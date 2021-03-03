@@ -1,9 +1,9 @@
 NAME
-    Data::Printer::Filter::DBIx::Class - Apply special Data::Printer filters
-    to DBIx::Class objects
+    Data::Printer::Filter::DBIx::Class - (DEPRECATED) Apply special
+    Data::Printer filters to DBIx::Class objects
 
 VERSION
-    version 0.000004
+    version 0.000005
 
 SYNOPSIS
     In your program:
@@ -28,6 +28,10 @@ DESCRIPTION
 
         # Return every row from every ResultSet
         $ENV{DDP_DBIC_ROW_LIMIT} = 0;
+
+DEPRECATED
+    This module breaks with the 1.x release of Data::Printer, but that's ok.
+    Use Data::Printer::Filter::DB instead.
 
 AUTHOR
     Olaf Alders <olaf@wundercounter.com>

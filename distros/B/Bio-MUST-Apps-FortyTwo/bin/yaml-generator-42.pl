@@ -899,7 +899,7 @@ yaml-generator-42.pl - Interactive or batch generator for 42 YAML config files
 
 =head1 VERSION
 
-version 0.210370
+version 0.210570
 
 =head1 USAGE
 

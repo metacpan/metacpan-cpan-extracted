@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2008-2020 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -264,7 +264,7 @@ foreach my $hpuxz (keys %hpux_zones) {
 
    # Open to discussion
 
-   'AEST-10AEDT'   => [ 'Australia/Melbourne' => 'Australia/Currie' ],
+   'AEST-10AEDT'   => [ 'Australia/Melbourne' => 'Australia/Hobart' ],
    'AHST10AHDT'    => 'America/Anchorage',
    'AKST9AKDT'     => 'America/Anchorage',
    'AST10APT'      => 'America/Anchorage',
@@ -279,7 +279,8 @@ foreach my $hpuxz (keys %hpux_zones) {
    'CET-1WEST'     => 'Europe/Luxembourg',
    'CST-8CDT'      => 'Asia/Shanghai',
    'CST5CDT'       => 'America/Havana',
-   'CST6CPT'       => 'America/Chicago',
+   'CST6CPT'       => 'America/Belize',
+   'CST6CWT'       => 'America/Belize',
    'EET-2EEST'     => 'EET',
    'EST5EPT'       => [ 'America/New_York' => 'America/Detroit' ],
    'GMT0BST'       => 'Europe/London',

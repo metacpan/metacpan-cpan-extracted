@@ -7,7 +7,10 @@ subtest 'exception' => sub {
     like dies { Sub::Meta::Parameters->new() },
         qr/parameters reqruires args/, 'requires args';
 
-    like dies { Sub::Meta::Parameters->new(args => p(type => 'Foo', named => 1, optional => 1), nshift => 1) },
+    like dies { Sub::Meta::Parameters->new(args => 'Str') },
+        qr/args must be a reference/, 'args is not reference';
+
+    like dies { Sub::Meta::Parameters->new(args => [p(type => 'Foo', named => 1, optional => 1)], nshift => 1) },
         qr/required positional parameters need more than nshift/, 'nshift';
 };
 
@@ -60,9 +63,9 @@ my @TEST = (
         args_min                 => 1,
         args_max                 => 1,
     ],
-    { args => [p(type => 'Foo')], nshift => 1, slurpy => 1 } => [
+    { args => [p(type => 'Foo')], nshift => 1, slurpy => 'Str' } => [
         nshift                   => 1,
-        slurpy                   => !!1,
+        slurpy                   => p(type => 'Str'),
         args                     => [p(type => 'Foo')],
         _all_positional_required => [p(type => 'Foo')],
         positional               => [],
@@ -124,9 +127,9 @@ my @TEST = (
         args_min                 => 0,
         args_max                 => 0 + 'Inf',
     ],
-    { args => [p(type => 'Foo', named => 1, optional => 1)], slurpy => 1 } => [
+    { args => [p(type => 'Foo', named => 1, optional => 1)], slurpy => 'Str' } => [
         nshift                   => 0,
-        slurpy                   => !!1,
+        slurpy                   => p(type => 'Str'),
         args                     => [p(type => 'Foo', named => 1, optional => 1)],
         _all_positional_required => [],
         positional               => [],
@@ -230,6 +233,7 @@ while (my ($parameters, $expect) = splice @TEST, 0, 2) {
 }
 
 subtest 'setter' => sub {
+    my $some = bless {}, 'Some';
     my $parameters = Sub::Meta::Parameters->new(args => [p()]);
 
     is $parameters->nshift, 0, 'nshift';
@@ -237,21 +241,43 @@ subtest 'setter' => sub {
     is $parameters->nshift, 1, 'nshift';
 
     ok !$parameters->slurpy, 'slurpy';
-    is $parameters->set_slurpy, $parameters, 'set_slurpy';
-    ok $parameters->slurpy, 'slurpy';
-    is $parameters->set_slurpy(0), $parameters, 'set_slurpy';
-    ok !$parameters->slurpy, 'slurpy';
+    is $parameters->set_slurpy('Str'), $parameters, 'set_slurpy';
+    is $parameters->slurpy, p(type => 'Str'), 'slurpy';
+    is $parameters->set_slurpy(p(type => 'Int')), $parameters, 'set_slurpy';
+    is $parameters->slurpy, p(type => 'Int'), 'slurpy';
+    is $parameters->set_slurpy($some), $parameters, 'set_slurpy';
+    is $parameters->slurpy, p(type => $some), 'slurpy';
 
     is $parameters->args, [p()], 'args';
     is $parameters->set_args([p(type => 'Foo')]), $parameters, 'set_args';
     is $parameters->args, [p(type => 'Foo')], 'args';
+    is $parameters->set_args(p(type => 'Foo')), $parameters, 'set_args';
+    is $parameters->args, [p(type => 'Foo')], 'args';
 };
 
 subtest '_normalize_args' => sub {
-    my $blessed_args = [bless {}, 'Some'];
-    is(Sub::Meta::Parameters->_normalize_args($blessed_args), $blessed_args, 'blessed_args');
+    my $some = bless {}, 'Some';
+
+    is(Sub::Meta::Parameters->_normalize_args([$some]), [p($some)], 'blessed arg list');
     is(Sub::Meta::Parameters->_normalize_args(['Foo', 'Bar']), [p('Foo'), p('Bar')], 'arrayref');
-    is(Sub::Meta::Parameters->_normalize_args('Foo', 'Bar'), [p('Foo'), p('Bar')], 'array');
+
+    is(Sub::Meta::Parameters->_normalize_args($some), [p($some)], 'single arg');
+
+    like dies { Sub::Meta::Parameters->_normalize_args('Foo', 'Bar') },
+        qr/args must be a reference/, 'cannot use array';
+
+    is(Sub::Meta::Parameters->_normalize_args(
+        { a => 'Foo', b => 'Bar'}),
+        [p(type => 'Foo', name => 'a', named => 1), p(type => 'Bar', name => 'b', named => 1)], 'hashref');
+
+    is(Sub::Meta::Parameters->_normalize_args(
+        { a => { isa => 'Foo' }, b => { isa => 'Bar' } }),
+        [p(type => 'Foo', name => 'a', named => 1), p(type => 'Bar', name => 'b', named => 1)], 'hashref');
+
+    my $foo = sub { 'Foo' };
+    is(Sub::Meta::Parameters->_normalize_args(
+        { a => $foo }),
+        [p(type => $foo, name => 'a', named => 1)], 'hashref');
 };
 
 subtest 'invocant' => sub {

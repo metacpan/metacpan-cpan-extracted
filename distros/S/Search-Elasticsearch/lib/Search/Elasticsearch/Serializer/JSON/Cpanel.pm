@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Serializer::JSON::Cpanel;
-$Search::Elasticsearch::Serializer::JSON::Cpanel::VERSION = '7.711';
+$Search::Elasticsearch::Serializer::JSON::Cpanel::VERSION = '7.711001';
 use Cpanel::JSON::XS;
 use Moo;
 
@@ -37,7 +37,7 @@ Search::Elasticsearch::Serializer::JSON::Cpanel - A JSON Serializer using Cpanel
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

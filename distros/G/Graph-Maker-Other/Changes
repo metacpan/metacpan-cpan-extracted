@@ -1,4 +1,4 @@
-Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is part of Graph-Maker-Other.
 
@@ -15,6 +15,16 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Graph-Maker-Other.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 18, March 2021
+    - Makefile.PL TEST_REQUIRES Graph.pm 0.97, since think 0.96 not
+      enough for some things exercised
+
+Version 17, February 2021
+    - Catalan.t and NoughtsAndCrosses.t workarounds for Graph 0.9716 trouble
+
+Version 16, February 2021
+    - new HanoiExchange
 
 Version 15, January 2020
     - BinaryBeanstalk, BinomialTree, FibonacciTree, direction_type

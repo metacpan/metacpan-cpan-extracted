@@ -2,8 +2,8 @@ NAME
     Text::Table::Any - Generate text table using one of several backends
 
 VERSION
-    This document describes version 0.101 of Text::Table::Any (from Perl
-    distribution Text-Table-Any), released on 2021-02-20.
+    This document describes version 0.102 of Text::Table::Any (from Perl
+    distribution Text-Table-Any), released on 2021-03-03.
 
 SYNOPSIS
      use Text::Table::Any;
@@ -17,13 +17,13 @@ SYNOPSIS
          ['carol', 'brig gen', '8745'],
      ];
      print Text::Table::Any::table(rows => $rows, header_row => 1,
-                                   backend => 'Text::Table::Tiny');
+                                   backend => 'Text::Table::More');
 
 DESCRIPTION
     This module provides a single function, "table", which formats a
     two-dimensional array of data as text table, using one of several
     available backends. The interface is modelled after Text::Table::Tiny
-    (0.03); Text::Table::Tiny also happens to be the default backend.
+    (0.03). Text::Table::Sprintf is the default backend.
 
     The example shown in the SYNOPSIS generates the following table:
 
@@ -119,7 +119,7 @@ FUNCTIONS
         Required. Takes an array reference which should contain one or more
         rows of data, where each row is an array reference.
 
-    *   backend (str, default "Text::Table::Tiny")
+    *   backend (str, default "Text::Table::Sprintf")
 
         Optional. Pick a backend module. Supported backends:
 

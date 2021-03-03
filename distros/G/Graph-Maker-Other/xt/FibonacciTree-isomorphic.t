@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2019 Kevin Ryde
+# Copyright 2019, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -93,7 +93,7 @@ plan tests => 3;
 
   my $extras = 0;
   my %seen;
-  foreach my $height (0 .. 6) {
+  foreach my $height (1 .. 6) {
     foreach my $series_reduced (0,1) {
       foreach my $leaf_reduced (0,1) {
         my $graph = Graph::Maker->new('fibonacci_tree', height => $height,

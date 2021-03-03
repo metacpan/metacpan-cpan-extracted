@@ -1,0 +1,90 @@
+{
+   "abstract" : "declare interface package",
+   "author" : [
+      "kfly8 <kfly8@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.11",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Boundary",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0.12",
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Type::Tiny" : "1.000000",
+            "namespace::allclean" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Boundary" : {
+         "file" : "lib/Boundary.pm",
+         "version" : "0.01"
+      },
+      "Boundary::Impl" : {
+         "file" : "lib/Boundary/Impl.pm"
+      },
+      "Boundary::Types" : {
+         "file" : "lib/Boundary/Types.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/p5-Boundary/issues"
+      },
+      "homepage" : "https://github.com/kfly8/p5-Boundary",
+      "repository" : {
+         "url" : "git://github.com/kfly8/p5-Boundary.git",
+         "web" : "https://github.com/kfly8/p5-Boundary"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KFLY",
+   "x_contributors" : [
+      "kfly8 <kfly@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

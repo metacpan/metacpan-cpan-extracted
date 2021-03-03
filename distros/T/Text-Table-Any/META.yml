@@ -32,8 +32,8 @@ recommends:
   Text::Table::More: '0'
   Text::Table::Org: '0'
   Text::Table::Paragraph: '0'
-  Text::Table::Sprintf: '0'
   Text::Table::TSV: '0'
+  Text::Table::Tiny: '0'
   Text::Table::TinyBorderStyle: '0'
   Text::Table::TinyColor: '0'
   Text::Table::TinyColorWide: '0'
@@ -42,7 +42,7 @@ recommends:
   Text::TabularDisplay: '0'
   Text::UnicodeBox::Table: '0'
 requires:
-  Text::Table::Tiny: '0'
+  Text::Table::Sprintf: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Text-Table-Any/issues
   homepage: https://metacpan.org/release/Text-Table-Any
   repository: git://github.com/perlancar/perl-Text-Table-Any.git
-version: '0.101'
+version: '0.102'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -62,7 +62,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InsertCodeOutput
       name: InsertCodeOutput
-      version: '0.042'
+      version: '0.043'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'

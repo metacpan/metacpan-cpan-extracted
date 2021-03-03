@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2018, 2019 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,7 +29,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 76;
+plan tests => 78;
 
 require Graph::Maker::NoughtsAndCrosses;
 
@@ -40,7 +40,7 @@ sub num_children {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 15;
+  my $want_version = 18;
   ok ($Graph::Maker::NoughtsAndCrosses::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::NoughtsAndCrosses->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::NoughtsAndCrosses->VERSION($want_version); 1 }, 1,
@@ -133,11 +133,21 @@ foreach my $multiedged (0, 1) {
                                 rotate => 1,
                                 undirected => 1);
   ok (scalar($graph->vertices), 8);
-  ok (scalar($graph->edges), 10);
+  my @edges = $graph->edges;
+  ok (scalar(@edges), 10);
+  ok (! $graph->is_directed, 1);
 
+  # Workaround here for Graph.pm 0.9716 dodginess in delete_vertex().  Want
+  #     $graph->delete_vertex($root);
+  # but in this version it left some kind of dangling half edge (and not
+  # quite right even when delete the edge before delete the vertex).
+  #
   my $root = '0000';
-  ok (!! $graph->has_vertex($root), 1);
-  $graph->delete_vertex('0000');
+  @edges = grep {$_->[0] ne $root && $_->[1] ne $root} @edges;
+  $graph = Graph->new (undirected => 1, edges => \@edges);
+  ok (scalar($graph->vertices), 7);
+  ok (scalar($graph->edges), 9);
+
 
   my @centres = $graph->centre_vertices;
   ok (scalar(@centres), 1);

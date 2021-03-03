@@ -27,7 +27,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Ubuntu-Releases/issues
   homepage: https://metacpan.org/release/Ubuntu-Releases
   repository: git://github.com/perlancar/perl-Ubuntu-Releases.git
-version: '20210115.0'
+version: '20210115.1'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

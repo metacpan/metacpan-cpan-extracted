@@ -1,5 +1,10 @@
 Revision history for App::TimeTracker::Command::Billing
 
+1.001     2021-03-02 15:26:34+01:00
+    - add "prefix" to billing points via config
+    - switch to Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.000   
     - initial commit & first version
 

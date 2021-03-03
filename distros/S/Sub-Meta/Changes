@@ -1,5 +1,15 @@
 Revision history for Perl extension Sub-Meta
 
+0.05 2021-03-03T14:59:40Z
+    [IMPROVEMENTS]
+    - use github actions #7
+    - customize sub meta class #12
+
+    [INCOMPATIBLE CHANGES]
+    - Improved Sub::Meta#new, S:M:Parameters#new, S:M:Param#new #8, #13
+    - Improved is_same_interface can take undef or obj #10
+    - Improved slurpy take Sub::Meta::Param #11
+
 0.04 2019-07-08T15:13:22Z
     - add `is_same_interface` method #4
     - allow `required`, `positional` args #5

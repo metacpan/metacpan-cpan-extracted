@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Bio-MUST-Apps-FortyTwo",
   "EXE_FILES" => [
     "bin/compress-db.pl",
-    "bin/debrief-taxR-42.pl",
+    "bin/debrief-42.pl",
     "bin/forty-two.pl",
     "bin/leel.pl",
     "bin/yaml-generator-42.pl"
@@ -75,7 +75,7 @@ my %WriteMakefileArgs = (
     "Test::Files" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "0.210370",
+  "VERSION" => "0.210570",
   "test" => {
     "TESTS" => "t/*.t"
   }

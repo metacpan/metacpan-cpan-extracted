@@ -6,7 +6,7 @@ use strict;
 use Carp;
 use Regexp::RegGrp;
 
-our $VERSION            = '2.07';
+our $VERSION            = '2.08';
 
 our @COMPRESS           = ( 'minify', 'pretty' );
 our $DEFAULT_COMPRESS   = 'pretty';
@@ -142,7 +142,7 @@ sub init {
         {
             regexp      => qr~([\w-]+)\(\s*([\w-]+)\s*\)~,
             replacement => sub {
-                return $_[0]->{submatches}->[0] . '(' . $_[0]->{submatches}->[0] . ')';
+                return $_[0]->{submatches}->[0] . '(' . $_[0]->{submatches}->[1] . ')';
             }
         },
         {
@@ -393,7 +393,7 @@ CSS::Packer - Another CSS minifier
 
 =head1 VERSION
 
-Version 2.07
+Version 2.08
 
 =head1 DESCRIPTION
 

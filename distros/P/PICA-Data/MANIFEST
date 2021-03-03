@@ -8,6 +8,7 @@ README.md
 cpanfile
 dist.ini
 lib/PICA/Data.pm
+lib/PICA/Error.pm
 lib/PICA/Parser/Base.pm
 lib/PICA/Parser/Binary.pm
 lib/PICA/Parser/JSON.pm
@@ -18,9 +19,9 @@ lib/PICA/Parser/XML.pm
 lib/PICA/Path.pm
 lib/PICA/Schema.pm
 lib/PICA/Schema/Builder.pm
-lib/PICA/Schema/Error.pm
 lib/PICA/Writer/Base.pm
 lib/PICA/Writer/Binary.pm
+lib/PICA/Writer/Fields.pm
 lib/PICA/Writer/Generic.pm
 lib/PICA/Writer/JSON.pm
 lib/PICA/Writer/PPXML.pm
@@ -31,6 +32,7 @@ minil.toml
 script/picadata
 t/00-load.t
 t/10-data.t
+t/12-clean.t
 t/15-path.t
 t/16-match.t
 t/20-parser.t

@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot::Config module API.
 #
-# Copyright 2019-2020 Russ Allbery <rra@cpan.org>
+# Copyright 2019-2021 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -15,6 +15,10 @@ use File::Spec;
 use YAML::XS ();
 
 use Test::More tests => 5;
+
+# Isolate from the environment.
+local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
+local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
 
 # Load the modules.
 BEGIN { use_ok('App::DocKnot::Config') }

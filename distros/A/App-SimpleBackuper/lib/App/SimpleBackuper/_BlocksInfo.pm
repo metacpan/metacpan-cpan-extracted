@@ -34,6 +34,8 @@ sub _BlocksInfo($$;$$$$) {
 			$block_info->{ $version->{block_id} } ||= [0, 0, []];
 			if($block_info->{ $version->{block_id} }->[0] < $backup_id_score * $prio) {
 				$block_info->{ $version->{block_id} }->[0] = $backup_id_score * $prio;
+				$block_info->{ $version->{block_id} }->[3] = $backup_id_score;
+				$block_info->{ $version->{block_id} }->[4] = $prio;
 			}
 			foreach my $part (@{ $version->{parts} }) {
 				$block_info->{ $version->{block_id} }->[1] += $part->{size};

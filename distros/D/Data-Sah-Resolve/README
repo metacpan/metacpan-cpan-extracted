@@ -1,25 +1,28 @@
-SYNOPSIS
+NAME
+    Data::Sah::Resolve - Resolve Sah schema
 
+VERSION
+    This document describes version 0.008 of Data::Sah::Resolve (from Perl
+    distribution Data-Sah-Resolve), released on 2021-02-27.
+
+SYNOPSIS
      use Data::Sah::Resolve qw(resolve_schema);
-    
+
      my $sch = resolve_schema("int");
      # => ["int", []]
-    
+
      my $sch = resolve_schema("posint*");
      # => ["int", [{min=>1}, {req=>1}]
-    
+
      my $sch = resolve_schema([posint => div_by => 3]);
      # => ["int", {min=>1}, {div_by=>3}]
-    
+
      my $sch = resolve_schema(["posint", "merge.delete.min"=>undef, div_by => 3]);
      # => ["int", {div_by=>3}]
 
 DESCRIPTION
-
 FUNCTIONS
-
- resolve_schema([ \%opts, ] $sch) => sch
-
+  resolve_schema([ \%opts, ] $sch) => sch
     Sah schemas can be defined in terms of other schemas. The resolving
     process follows the base schema recursively until it finds a builtin
     type as the base.
@@ -27,56 +30,77 @@ FUNCTIONS
     This routine performs the following steps:
 
     1. Normalize the schema
-
-      Unless schema_is_normalized option is true, in which case schema is
-      assumed to be normalized already.
+        Unless "schema_is_normalized" option is true, in which case schema
+        is assumed to be normalized already.
 
     2. Check if the schema's type is a builtin type
-
-      Currently this is done by checking if the module of the name
-      Data::Sah::Type::<type> is loadable. If it is a builtin type then we
-      are done.
+        Currently this is done by checking if the module of the name
+        "Data::Sah::Type::<type>" is loadable. If it is a builtin type then
+        we are done.
 
     3. Check if the schema's type is the name of another schema
-
-      This is done by checking if Sah::Schema::<name> module exists and is
-      loadable. If this is the case then we retrieve the base schema from
-      the $schema variable in the Sah::Schema::<name> package and repeat
-      the process while accumulating and/or merging the clause sets.
+        This is done by checking if "Sah::Schema::<name>" module exists and
+        is loadable. If this is the case then we retrieve the base schema
+        from the $schema variable in the "Sah::Schema::<name>" package and
+        repeat the process while accumulating and/or merging the clause
+        sets.
 
     4. If schema's type is neither, we die.
 
-    Returns [base_type, clause_sets]. If return_intermediates option is
+    Returns "[base_type, clause_sets]". If "return_intermediates" option is
     true, then the third elements will be the list of intermediate schema
     names.
 
-    Example 1: int.
+    Example 1: "int".
 
-    First we normalize to ["int",{},{}]. The type is int and it is a
+    First we normalize to "["int",{},{}]". The type is "int" and it is a
     builtin type (Data::Sah::Type::int exists) so the final result is
-    ["int", []].
+    "["int", []]".
 
-    Example 2: posint*.
+    Example 2: "posint*".
 
-    First we normalize to ["posint",{req=>1},{}]. The type is posint and it
-    is the name of another schema (Sah::Schema::posint). We retrieve the
-    schema which is ["int", {summary=>"Positive integer (1,2,3,...)",
-    min=>1}, {}]. We now try to resolve int and find that it's a builtin
-    type. So the final result is: ["int", [ {req=>1}, {summary=>"Positive
-    integer (1,2,3,...)", min=>1} ]].
+    First we normalize to "["posint",{req=>1},{}]". The type is "posint" and
+    it is the name of another schema (Sah::Schema::posint). We retrieve the
+    schema which is "["int", {summary=>"Positive integer (1,2,3,...)",
+    min=>1}, {}]". We now try to resolve "int" and find that it's a builtin
+    type. So the final result is: "["int", [ {req=>1}, {summary=>"Positive
+    integer (1,2,3,...)", min=>1} ]]".
 
     Known options:
 
-      * schema_is_normalized => bool (default: 0)
+    *   schema_is_normalized => bool (default: 0)
 
-      When set to true, function will skip normalizing schema and assume
-      input schema is normalized.
+        When set to true, function will skip normalizing schema and assume
+        input schema is normalized.
 
-      * merge_clause_sets => bool (default: 1)
+    *   merge_clause_sets => bool (default: 1)
 
-      * return_intermediates => bool
+    *   return_intermediates => bool
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-Resolve>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-Resolve>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Resolve>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Sah, Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

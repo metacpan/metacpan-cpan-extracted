@@ -1,0 +1,23 @@
+.github/workflows/linux.yml
+.github/workflows/macos.yml
+.github/workflows/windows.yml
+.gitignore
+.travis.yml
+Binmode.xs
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/Sys/Binmode.pm
+ppport.h
+"t/assets/do-\303\251.pl"
+"t/assets/require-\303\251.pl"
+t/do_require.t
+t/exec_and_system.t
+t/filesys.t
+t/net.t
+t/net_setsockopt.t
+t/unimport.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

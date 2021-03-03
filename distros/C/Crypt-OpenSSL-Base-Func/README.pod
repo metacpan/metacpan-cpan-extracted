@@ -8,7 +8,24 @@ Crypt::OpenSSL::Base::Func - Base Functions, using the OpenSSL libraries
 
 =head1 SYNOPSIS
 
-    use Crypt::OpenSSL::Base::Func qw/aes_cmac/;
+    use Crypt::OpenSSL::Base::Func qw/aes_cmac ecdh PKCS12_key_gen PKCS5_PBKDF2_HMAC/;
+
+
+=head1 DESCRIPTION
+
+Crypt::OpenSSL::Base::Func - Base Functions, using the OpenSSL libraries
+
+=head1 Methods
+
+=head2 ecdh
+    
+    z = ecdh(local_priv_pem_file, peer_pub_pem_file)
+
+=head2 aes_cmac
+
+RFC4493: aes_cmac
+
+    mac_hexstr = aes_cmac(key_hexstr, plaintext_hexstr, cipher_name)
 
     my $key = '2b7e151628aed2a6abf7158809cf4f3c';
 
@@ -17,22 +34,34 @@ Crypt::OpenSSL::Base::Func - Base Functions, using the OpenSSL libraries
     print $mac_1, "\n";
     #07:0A:16:B4:6B:4D:41:44:F7:9B:DD:9D:D0:4A:28:7C
 
+    #$ echo -n '6bc1bee22e409f96e93d7e117393172a' | xxd -r -p | openssl dgst -mac cmac -macopt cipher:aes-128-cbc -macopt hexkey:2b7e151628aed2a6abf7158809cf4f3c 
+    #(stdin)= 070a16b46b4d4144f79bdd9dd04a287c
+
     my $msg_2 = '6bc1bee22e409f96e93d7e117393172aae2d8a571e03ac9c9eb76fac45af8e5130c81c46a35ce411';
     my $mac_2 = aes_cmac($key, $msg_2, 'aes-128-cbc');
     print $mac_2, "\n";
     #DF:A6:67:47:DE:9A:E6:30:30:CA:32:61:14:97:C8:27
 
-=head1 DESCRIPTION
+=head2 PKCS12_key_gen
 
-Use OpenSSL libraries, for the function defined in:
+RFC7292 : PKCS12_key_gen
 
-RFC4493 : aes_cmac
+see also openssl/crypto/pkcs12/p12_key.c
 
-=head1 Methods
+    PKCS12_key_gen(password, salt_hexstr, id, iteration, outlen, digest_name)
 
-=head2 aes_cmac
+    my $macdata_key = PKCS12_key_gen('123456', 'e241f01650dbeae4', 3, 2048, 32, 'sha256');
+    print $macdata_key, "\n";
+    #72:12:59:F1:4A:AD:70:B5:88:39:F7:15:66:B4:33:DA:1B:8A:D0:8F:65:0F:4D:02:FA:AA:0B:9B:09:5B:B5:1D
 
-    mac_hexstr = aes_cmac(key_hexstr, plaintext_hexstr, cipher_name)
+=head2 PKCS5_PBKDF2_HMAC
 
-see also openssl/crypto/cmac/cmac.c
+RFC2898 : PBKDF2
 
+see also openssl/crypto/evp/p5_crpt2.c 
+
+    PKCS5_PBKDF2_HMAC(password, salt_hexstr, iteration, digest_name, outlen)
+
+    my $pbkdf2_key = PKCS5_PBKDF2_HMAC('123456', 'b698314b0d68bcbd', 2048, 'sha256', 32);
+    print $pbkdf2_key, "\n";
+    #F6:8B:53:86:DE:3A:8D:63:35:84:69:50:54:4D:29:A5:5A:D3:32:8D:EA:17:68:53:04:D7:82:28:48:AE:C5:34

@@ -11,7 +11,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot 4.00;
+package App::DocKnot 4.01;
 
 use 5.024;
 use autodie;
@@ -20,8 +20,6 @@ use warnings;
 use File::BaseDir qw(config_files);
 use File::ShareDir qw(module_file);
 use File::Spec;
-use JSON::MaybeXS qw(JSON);
-use Perl6::Slurp;
 
 ##############################################################################
 # Helper methods
@@ -34,6 +32,9 @@ use Perl6::Slurp;
 #
 # We therefore try File::BaseDir first (which handles the XDG paths) and fall
 # back on using File::ShareDir to locate the data.
+#
+# This function must be in the App::DocKnot module so that File::ShareDir
+# works properly and searches the correct module path.
 #
 # @path - The relative path of the file as a list of components
 #
@@ -52,22 +53,6 @@ sub appdata_path {
     return $path;
 }
 
-# Helper routine that locates an application data file, interprets it as JSON,
-# and returns the resulting decoded contents.  This uses the relaxed parsing
-# mode, so comments and commas after data elements are supported.
-#
-# @path - The path of the file to load, as a list of components
-#
-# Returns: Anonymous hash or array resulting from decoding the JSON object
-#  Throws: slurp or JSON exception on failure to load or decode the object
-sub load_appdata_json {
-    my ($self, @path) = @_;
-    my $path = $self->appdata_path(@path);
-    my $json = JSON->new;
-    $json->relaxed;
-    return $json->decode(scalar(slurp($path)));
-}
-
 ##############################################################################
 # Module return value and documentation
 ##############################################################################
@@ -76,7 +61,7 @@ sub load_appdata_json {
 __END__
 
 =for stopwords
-Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense JSON
+Allbery DocKnot docknot MERCHANTABILITY NONINFRINGEMENT sublicense
 submodules
 
 =head1 NAME
@@ -85,9 +70,8 @@ App::DocKnot - Documentation and software release management
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, JSON,
-Perl6::Slurp, and Template (part of Template Toolkit), all of which are
-available from CPAN.
+Perl 5.24 or later and the modules File::BaseDir and File::ShareDir, both of
+which are available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -109,17 +93,8 @@ one or more path components.
 
 These data files are installed with App::DocKnot, but each file can be
 overridden by the user via files in F<$HOME/.config/docknot> or
-F</etc/xdg/docknot> (or whatever $XDG_CONFIG_DIRS is set to).  Raises a text
-exception if the desired file could not be located.
-
-=item load_appdata_json(PATH[, ...])
-
-Locate an application data file using the same algorithm as appdata_path(),
-interpret it as JSON, and returns the resulting decoded contents.  This uses
-the relaxed JSON parsing mode, so comments and commas after data elements are
-supported.  The path is specified as one or more path components.
-
-Raises a slurp or JSON exception on failure to load or decode the data file.
+F</etc/xdg/docknot> (or whatever $XDG_CONFIG_HOME and $XDG_CONFIG_DIRS are set
+to).  Raises a text exception if the desired file could not be located.
 
 =back
 
@@ -129,7 +104,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2013-2020 Russ Allbery <rra@cpan.org>
+Copyright 2013-2021 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -154,7 +129,7 @@ SOFTWARE.
 L<docknot(1)>
 
 This module is part of the App-DocKnot distribution.  The current version of
-App::DocKnot is available from CPAN, or directly from its web site at
+DocKnot is available from CPAN, or directly from its web site at
 L<https://www.eyrie.org/~eagle/software/docknot/>.
 
 =cut

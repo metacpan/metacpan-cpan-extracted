@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 #
@@ -21,17 +21,20 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 299;
+use Test::More tests => 315;
 
 use lib 't';
 use MyTestHelpers;
 #BEGIN { MyTestHelpers::nowarnings() }
 
+# uncomment this to run the ### lines
+# use Smart::Comments;
+
 require Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash;
 
 
 #-----------------------------------------------------------------------------
-my $want_version = 97;
+my $want_version = 99;
 is ($Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash::VERSION, $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash->VERSION, $want_version, 'VERSION class method');
 {
@@ -141,13 +144,32 @@ diag "PPI version ",PPI->VERSION;
   ok (! eval { $policy->VERSION($check_version); 1 },
       "VERSION object check $check_version");
 
+  my $try_list = sub {
+    foreach my $elem (@_) {
+      my ($want_count, $str) = @$elem;
+
+      foreach my $str ($str, $str . ';') {
+        my @violations = $critic->critique (\$str);
+
+        # foreach my $violation (@violations) {
+        #   diag $violation->description;
+        # }
+
+        my $got_count = scalar @violations;
+        require Data::Dumper;
+        my $testname = 'default: '
+          . Data::Dumper->new([$str],['str'])->Useqq(1)->Dump;
+        is ($got_count, $want_count, $testname);
+      }
+    }
+  };
 
   #---------------------
   # default
 
-  foreach my $data
+  $try_list->
     (## no critic (RequireInterpolationOfMetachars)
-     
+
      # with non-ASCII chars
      [ 0, '  "$x  \200\0 $y"  ' ],
      [ 1, '  "$x  \200\0 $y \z"  ' ],  # bad \z
@@ -324,17 +346,6 @@ HERE
      [ 0, 'use 5.006;  "\\777"       ' ],
 
      #----------------
-     # \N 
-
-     [ 1, '  "\\N{COLON}"  ' ],
-     [ 0, 'use charnames;          "\\N{COLON}"  ' ],
-     [ 0, 'use charnames q{:full}; "\\N{COLON}"  ' ],
-     [ 1, '{ use charnames; }  "\\N{COLON}"  ' ],  # not in lexical scope
-     [ 0, 'use 5.016;  "\\N{COLON}"  ' ],  # autoloaded charnames in 5.16
-     [ 0, '"\\N{COLON}"; use 5.016' ],     # version can appear anywhere
-
-
-     #----------------
      # runs of backslashes
 
      [ 0, q{  "\\\\s"  } ],
@@ -344,30 +355,49 @@ HERE
      [ 0, q{  "\\\\\\\\\\\\s"  } ],
      [ 1, q{  "\\\\\\\\\\\\\\s"  } ],
 
-    ) {
-    my ($want_count, $str) = @$data;
+    );
 
-    foreach my $str ($str, $str . ';') {
-      my @violations = $critic->critique (\$str);
+  #-----------------------
+  # charnames option
 
-      # foreach my $violation (@violations) {
-      #   diag $violation->description;
-      # }
+  $try_list->
+    (## no critic (RequireInterpolationOfMetachars)
+     [ 1, '  "\\N{COLON}"  ' ],            # without charnames, bad
+     [ 1, '  "\\NCOLON"  ' ],
+     [ 1, '  "\\N"  ' ],
+     [ 0, 'use charnames;          "\\N{COLON}"  ' ],
+     [ 0, 'use charnames q{:full}; "\\N{COLON}"  ' ],
+     [ 1, '{ use charnames; }  "\\N{COLON}"  ' ],  # not in lexical scope
+     [ 0, 'use 5.016;  "\\N{COLON}"  ' ],  # autoloaded charnames in 5.16
+     [ 0, '"\\N{COLON}"; use 5.016' ],     # version can appear anywhere
+     # FIXME: is it good to allow the version statement anywhere?
+    );
 
-      my $got_count = scalar @violations;
-      require Data::Dumper;
-      my $testname = 'default: '
-        . Data::Dumper->new([$str],['str'])->Useqq(1)->Dump;
-      is ($got_count, $want_count, $testname);
-    }
-  }
+  $policy->{_charnames} = 'allow';
+
+  $try_list->
+    (## no critic (RequireInterpolationOfMetachars)
+     [ 0, '               "\\N{COLON}" ' ],
+     [ 0, 'use charnames; "\\N{COLON}" ' ],
+     [ 0, 'use 5.016;     "\\N{COLON}" ' ],
+    );
+
+  $policy->{_charnames} = 'disallow';
+
+  $try_list->
+    (## no critic (RequireInterpolationOfMetachars)
+     [ 1, '               "\\N{COLON}" ' ],
+     [ 1, 'use charnames; "\\N{COLON}" ' ],
+     [ 1, 'use 5.016;     "\\N{COLON}" ' ],
+    );
+
 
   #-------------------
   # double=quotemeta
 
   $policy->{_double} = 'quotemeta';
 
-  foreach my $data
+  $try_list->
     (# no critic (RequireInterpolationOfMetachars)
 
      # non-ascii allowed under default 'quotemeta'
@@ -382,26 +412,7 @@ HERE
      #            : '') ],                 # not 5.8, dummy passing
 
 
-    ) {
-    my ($want_count, $str) = @$data;
-
-    foreach my $str ($str, $str . ';') {
-      # my $printable = Perl::Critic::Policy::ValuesAndExpressions::ProhibitUnknownBackslash::_printable($str);
-      # ### str printable: $printable
-
-      my @violations = $critic->critique (\$str);
-
-      # foreach my $violation (@violations) {
-      #   diag $violation->description;
-      # }
-
-      my $got_count = scalar @violations;
-      require Data::Dumper;
-      my $testname = 'quotemeta: '
-        . Data::Dumper->new([$str],['str'])->Useqq(1)->Dump;
-      is ($got_count, $want_count, $testname);
-    }
-  }
+    );
 
   #-----------------------
   # single=all
@@ -409,7 +420,7 @@ HERE
   # FIXME: what's the progammatic way to set parameters?
   $policy->{_single} = 'all';
 
-  foreach my $data
+  $try_list->
     (## no critic (RequireInterpolationOfMetachars)
      [ 0, 'q{}' ],
      [ 0, 'q{\\\\}' ],
@@ -450,23 +461,7 @@ HERE
      # two violations, not a control-\
      [ 2, "  '\\c\\z '  " ],
 
-    ) {
-    my ($want_count, $str) = @$data;
-
-    foreach my $str ($str, $str . ';') {
-      my @violations = $critic->critique (\$str);
-
-      # foreach my $violation (@violations) {
-      #   diag $violation->description;
-      # }
-
-      my $got_count = scalar @violations;
-      require Data::Dumper;
-      my $testname = 'single: '
-        . Data::Dumper->new([$str],['str'])->Useqq(1)->Dump;
-      is ($got_count, $want_count, $testname);
-    }
-  }
+    );
 }
 
 

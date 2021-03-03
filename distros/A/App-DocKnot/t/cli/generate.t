@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot command dispatch for generate.
 #
-# Copyright 2018-2020 Russ Allbery <rra@cpan.org>
+# Copyright 2018-2021 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -19,6 +19,10 @@ use Perl6::Slurp;
 use Test::RRA qw(is_file_contents);
 
 use Test::More tests => 7;
+
+# Isolate from the environment.
+local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
+local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
 
 # Load the module.
 BEGIN { use_ok('App::DocKnot::Command') }

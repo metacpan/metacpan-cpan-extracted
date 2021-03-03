@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/kfly8/p5-Sub-Meta.svg?branch=master)](https://travis-ci.org/kfly8/p5-Sub-Meta) [![Coverage Status](https://img.shields.io/coveralls/kfly8/p5-Sub-Meta/master.svg?style=flat)](https://coveralls.io/r/kfly8/p5-Sub-Meta?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/Sub-Meta.svg)](https://metacpan.org/release/Sub-Meta)
+[![Actions Status](https://github.com/kfly8/p5-Sub-Meta/workflows/test/badge.svg)](https://github.com/kfly8/p5-Sub-Meta/actions) [![Coverage Status](https://img.shields.io/coveralls/kfly8/p5-Sub-Meta/master.svg?style=flat)](https://coveralls.io/r/kfly8/p5-Sub-Meta?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/Sub-Meta.svg)](https://metacpan.org/release/Sub-Meta)
 # NAME
 
 Sub::Meta - handle subroutine meta information
@@ -36,14 +36,18 @@ $meta->prototype; # $@
 Sub::Util::prototype($meta->sub); # $@
 ```
 
-And you can hold meta information of parameter type and return type. See also [Sub::Meta::Parameters](https://metacpan.org/pod/Sub::Meta::Parameters) and [Sub::Meta::Returns](https://metacpan.org/pod/Sub::Meta::Returns).
+And you can hold meta information of parameter type and return type. See also [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters) and [Sub::Meta::Returns](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AReturns).
 
 ```perl
-$meta->set_parameters( Sub::Meta::Parameters->new(args => [ { type => 'Str' }]) );
+$meta->set_parameters(args => ['Str']));
 $meta->parameters->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
 
-$meta->set_returns( Sub::Meta::Returns->new('Str') );
+$meta->set_args(['Str']);
+$meta->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
+
+$meta->set_returns('Str');
 $meta->returns->scalar; # 'Str'
+$meta->returns->list;   # 'Str'
 ```
 
 And you can compare meta informations:
@@ -65,14 +69,60 @@ $meta eq $other; # 1
 Constructor of `Sub::Meta`.
 
 ```perl
+use Sub::Meta;
+use Types::Standard -types;
+
+# sub Greeting::hello(Str) -> Str
 Sub::Meta->new(
     fullname    => 'Greeting::hello',
     is_constant => 0,
     prototype   => '$',
     attribute   => ['method'],
     is_method   => 1,
-    parameters  => Sub::Meta::Parameters->new(args => [{ type => 'Str' }]),
-    returns     => Sub::Meta::Returns->new('Str'),
+    parameters  => { args => [{ type => Str }]},
+    returns     => Str,
+);
+```
+
+Others are as follows:
+
+```perl
+# sub add(Int, Int) -> Int
+Sub::Meta->new(
+    subname => 'add',
+    args    => [Int, Int],
+    returns => Int,
+);
+
+# method hello(Str) -> Str 
+Sub::Meta->new(
+    subname   => 'hello',
+    args      => [{ message => Str }],
+    is_method => 1,
+    returns   => Str,
+);
+
+# sub twice(@numbers) -> ArrayRef[Int]
+Sub::Meta->new(
+    subname   => 'twice',
+    args      => [],
+    slurpy    => { name => '@numbers' },
+    returns   => ArrayRef[Int],
+);
+
+# Named parameters:
+# sub foo(Str :a) -> Str
+Sub::Meta->new(
+    subname   => 'foo',
+    args      => { a => Str },
+    returns   => Str,
+);
+
+# is equivalent to
+Sub::Meta->new(
+    subname   => 'foo',
+    args      => [{ name => 'a', isa => Str, named => 1 }],
+    returns   => Str,
 );
 ```
 
@@ -192,29 +242,55 @@ Setter for `is_method`.
 
 ## parameters
 
-Parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub::Meta::Parameters).
+Parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters).
 
 ## set\_parameters($parameters)
 
-Sets the parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub::Meta::Parameters) or any object which has `positional`,`named`,`required` and `optional` methods.
+Sets the parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters).
 
 ```perl
 my $meta = Sub::Meta->new;
-$meta->set_parameters({ type => 'Type'});
-$meta->parameters; # => Sub::Meta::Parameters->new({type => 'Type'});
+$meta->set_parameters(args => ['Str']);
+$meta->parameters; # => Sub::Meta::Parameters->new(args => ['Str']);
 
 # or
-$meta->set_parameters(Sub::Meta::Parameters->new(type => 'Foo'));
-$meta->set_parameters(MyParamters->new)
+$meta->set_parameters(Sub::Meta::Parameters->new(args => ['Str']));
+
+# alias
+$meta->set_args(['Str']);
 ```
+
+## args
+
+The alias of `parameters.args`.
+
+## set\_args($args)
+
+The alias of `parameters.set_args`.
+
+## nshift
+
+The alias of `parameters.nshift`.
+
+## set\_nshift($nshift)
+
+The alias of `parameters.set_nshift`.
+
+## slurpy
+
+The alias of `parameters.slurpy`.
+
+## set\_slurpy($slurpy)
+
+The alias of `parameters.set_slurpy`.
 
 ## returns
 
-Returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub::Meta::Returns).
+Returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AReturns).
 
 ## set\_returns($returns)
 
-Sets the returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub::Meta::Returns) or any object.
+Sets the returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AReturns) or any object.
 
 ```perl
 my $meta = Sub::Meta->new;
@@ -230,6 +306,16 @@ $meta->set_returns(MyReturns->new)
 
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether `subname`, `parameters` and `returns` are equal.
+
+## parameters\_class
+
+Returns class name of parameters. default: Sub::Meta::Parameters
+Please override for customization.
+
+## returns\_class
+
+Returns class name of returns. default: Sub::Meta::Returns
+Please override for customization.
 
 # NOTE
 
@@ -251,7 +337,7 @@ If that fails, or if the environment variable `PERL_SUB_META_PP` is defined to a
 
 # SEE ALSO
 
-[Sub::Identify](https://metacpan.org/pod/Sub::Identify), [Sub::Util](https://metacpan.org/pod/Sub::Util), [Sub::Info](https://metacpan.org/pod/Sub::Info), [Function::Paramters::Info](https://metacpan.org/pod/Function::Paramters::Info), [Function::Return::Info](https://metacpan.org/pod/Function::Return::Info)
+[Sub::Identify](https://metacpan.org/pod/Sub%3A%3AIdentify), [Sub::Util](https://metacpan.org/pod/Sub%3A%3AUtil), [Sub::Info](https://metacpan.org/pod/Sub%3A%3AInfo), [Function::Paramters::Info](https://metacpan.org/pod/Function%3A%3AParamters%3A%3AInfo), [Function::Return::Info](https://metacpan.org/pod/Function%3A%3AReturn%3A%3AInfo)
 
 # LICENSE
 

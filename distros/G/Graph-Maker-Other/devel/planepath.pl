@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -56,7 +56,7 @@ $|=1;
     #   $graph = Graph::Maker->new('r5twindragon', level=>$k, arms=>1,
     #                              undirected=>1);
     # }
-    if (1) {
+    if (0) {
       # Dragon
       #   k=3  https://hog.grinvin.org/ViewGraphInfo.action?id=414 path-9
       #   k=4  https://hog.grinvin.org/ViewGraphInfo.action?id=33739
@@ -94,7 +94,7 @@ $|=1;
       $graph = Graph::Maker->new('twindragon', level=>$k,
                                  undirected=>1);
     }
-    if (0) {
+    if (1) {
       # R5DragonCurve
       #   k=1 https://hog.grinvin.org/ViewGraphInfo.action?id=25149 5 segs path
       #   k=2 https://hog.grinvin.org/ViewGraphInfo.action?id=25149
@@ -135,12 +135,16 @@ $|=1;
       #   k=6 https://hog.grinvin.org/ViewGraphInfo.action?id=33789
       #   k=7 https://hog.grinvin.org/ViewGraphInfo.action?id=33791
       #   k=8 https://hog.grinvin.org/ViewGraphInfo.action?id=33793
+      #
+      # Math::PlanePath::HilbertSides
+      #   k=1 https://hog.grinvin.org/ViewGraphInfo.action?id=286   path-5
+      #   k=2 https://hog.grinvin.org/ViewGraphInfo.action?id=33785 like CCurve
 
       require Graph::Maker::PlanePath;
       $graph = Graph::Maker->new('planepath',
                                  undirected=>1,
                                  level=>$k,
-                                 planepath=>'CCurve');
+                                 planepath=>'HilbertSides');
       $graph->set_graph_attribute('vertex_name_type_xy',1);
       if($k==400) {
         MyGraphs::Graph_view($graph);

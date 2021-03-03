@@ -7,7 +7,7 @@ use Net::DNS;
 use Scalar::Util 'dualvar';
 use Exporter;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 # TODO
 # provide some way to get reports (rua)
@@ -32,8 +32,8 @@ use constant {
 
 our @EXPORT_OK = qw($DEBUG);
 our @EXPORT = qw(
-    DMARC_PASS DMARC_FAIL 
-    DMARC_INVALID_FROM DMARC_PERMERROR DMARC_TEMPERROR DMARC_NONE 
+    DMARC_PASS DMARC_FAIL
+    DMARC_INVALID_FROM DMARC_PERMERROR DMARC_TEMPERROR DMARC_NONE
 );
 
 *debug = \&Mail::SPF::Iterator::DEBUG;
@@ -41,18 +41,18 @@ sub import {
     goto &Exporter::import if @_ == 1; # implicit :DEFAULT
     my $i = 1;
     while ( $i<@_ ) {
-        if ( $_[$i] eq 'DebugFunc' || $_[$i] eq 'Debug' ) {
-            Mail::SPF::Iterator->import(splice( @_,$i,2 ));
-            next;
-        }
-        ++$i;
+	if ( $_[$i] eq 'DebugFunc' || $_[$i] eq 'Debug' ) {
+	    Mail::SPF::Iterator->import(splice( @_,$i,2 ));
+	    next;
+	}
+	++$i;
     }
     goto &Exporter::import if @_ >1; # not implicit :DEFAULT
 }
 
 
 # defined at the end, based on the public suffix module we have installed
-sub organizational_domain($);
+sub organizational_domain;
 
 sub new {
     my ($class,%args) = @_;
@@ -60,23 +60,23 @@ sub new {
     # If no SPF information -> try to extract from Received-SPF header in mail
 
     my $self = bless {
-	result => undef,       # cached final result
+	result => undef,   # cached final result
 
-	domain  => undef,      # \@domains extracted from mail header
-	record => undef,       # DMARC record for domain
-	_hdrbuf => '',         # temporary buf to collect header
-	_from => undef,        # list of sender domains during collection in header
+	domain  => undef,  # \@domains extracted from mail header
+	record => undef,   # DMARC record for domain
+	_hdrbuf => '',     # temporary buf to collect header
+	_from => undef,    # list of sender domains during collection in header
 	_dmarc_domain => undef, # list of domains to check for DMARC record
 
-	dkim => undef,         # internal DKIM object
-	dkim_sub => undef,     # external function which computes dkim_result
+	dkim => undef,     # internal DKIM object
+	dkim_sub => undef, # external function which computes dkim_result
 	dkim_result  => undef, # result from DKIM
 
-	spf => undef,          # SPF object
-	spf_result  => undef,  # result from SPF
+	spf => undef,      # SPF object
+	spf_result  => undef, # result from SPF
 
-	dnscache => undef,     # external DNS cache
-	_dnsq => {},           # local mapping to DNS packet for open queries
+	dnscache => undef, # external DNS cache
+	_dnsq => {},       # local mapping to DNS packet for open queries
 	authentication_results => [],
     },$class;
 
@@ -229,12 +229,12 @@ sub next {
 	my $from = $sr->[2]{'envelope-from'} || $sr->[2]{helo} || last;
 	$from =~s{.*\@}{};
 	$from =~s{>.*}{};
-	if ( $rec->{aspf} eq 's' 
+	if ( $rec->{aspf} eq 's'
 	    ? lc($from) ne $rec->{domain}
 	    : $from !~m{^([\w\-\.]+\.)?\Q$rec->{domain}\E}i) {
 	    # Identifier alignment failed
 	    $DEBUG && debug("SPF identifier alignment failed");
-	    $spf_result = [ DMARC_FAIL, 
+	    $spf_result = [ DMARC_FAIL,
 		'envelope-from does not match From header' ];
 	    delete $self->{spf};
 	    $self->{spf_result} = [];
@@ -249,7 +249,7 @@ sub next {
 	    goto return_result;
 	}
 
-	$spf_result = 
+	$spf_result =
 	    $sr->[0] eq SPF_Fail      ? [ DMARC_FAIL, $sr->[3] // 'SPF Fail' ] :
 	    $sr->[0] eq SPF_SoftFail  ? [ DMARC_FAIL, $sr->[3] // 'SPF SoftFail' ] :
 	    $sr->[0] eq SPF_PermError ? [ DMARC_PERMERROR, $sr->[3] // 'SPF PermError' ] :
@@ -276,18 +276,17 @@ sub next {
 	    }
 	}
 	if ($self->{dkim_sub} and
-	    !$best || $best->[0] != DMARC_PASS and
-	    ! $self->{dkim_result}[0] || grep { !$_->status } @{$self->{dkim_result}[0]}) {
+	    !$best || $best->[0] != DMARC_PASS and (
+		! $self->{dkim_result}[0] ||
+		grep { !$_->status } @{$self->{dkim_result}[0]})
+	    ) {
 	    $DEBUG && debug("wating with final result for DKIM to complete");
 	    return (undef);
 	}
-	warn Dumper([$self->{dkim_sub},$self->{dkim_result}[0]]); use Data::Dumper;
-	$self->{result} = $best || 
+	$self->{result} = $best ||
 	    [ DMARC_FAIL, "neither DKIM nor SPF information" ];
 	goto return_result;
     }
-
-
 
     compute_todos:
 
@@ -351,7 +350,7 @@ sub next {
 	    # no more todos - remove SPF object and keep result
 	    $DEBUG && debug("SPF is final - $sr->[0]");
 	    push @{$self->{authentication_results}}, "spf=$sr->[0] " .
-		($sr->[2] && $sr->[2]{problem} && " ($sr->[2]{problem})" || "") .
+		($sr->[2] && $sr->[2]{problem} && " ($sr->[2]{problem})" || "").
 		" smtp.mailfrom=$self->{spf}{sender}";
 	    delete $self->{spf};
 	    goto recalc;
@@ -380,7 +379,7 @@ sub next {
 	my ($q) = $pkt->question;
 	$qid2cb->{ join(':', $q->qtype, $q->qname, $pkt->header->id) }
 	    = [ $sub, @arg ];
-	if ($self->{dnscache} and 
+	if ($self->{dnscache} and
 	    my $cached = $self->{dnscache}{ $q->qtype.':'.$q->qname }) {
 	    # we have a cache hit - adapt header id
 	    $DEBUG && debug("answer %s:%s from dns cache",
@@ -405,7 +404,6 @@ sub next {
 	}
     }
     return (undef,@todo);
-
 
     # We have a final result
     # ---------------------------------------------------------------------
@@ -434,7 +432,6 @@ sub authentication_results {
 	@{$self->{authentication_results}};
 }
 
-
 # returns DMARC record
 sub record { return shift->{record} }
 
@@ -444,7 +441,6 @@ sub domain {
     return $self->{domain} && $self->{domain}[0];
 }
 
-
 *parse_taglist = \&Mail::DKIM::Iterator::parse_taglist;
 sub _got_dmarc_record {
     my ($self,$pkt,$error,$dom) = @_;
@@ -452,7 +448,7 @@ sub _got_dmarc_record {
 
     # Answer received, if we need to ask again we will set it again
     # to the new value.
-    delete $self->{_dmarc_domain}; 
+    delete $self->{_dmarc_domain};
 
     # extract any usable DMARC records...
     my @record;
@@ -476,8 +472,8 @@ sub _got_dmarc_record {
     if ($record[0]{pct}<100 && rand(100)<$record[0]{pct}) {
 	$DEBUG && debug("skipping policy validation because of pct=%d",
 	    $record[0]{pct});
-	$self->{result} = [ 
-	    DMARC_NONE, 
+	$self->{result} = [
+	    DMARC_NONE,
 	    'skipped policy validation due to pct<100'
 	];
 	return;
@@ -488,7 +484,7 @@ sub _got_dmarc_record {
 	$record[0]{sp} = undef;
     }
 
-    $DEBUG && debug("use DMARC record ".join(" ", 
+    $DEBUG && debug("use DMARC record ".join(" ",
 	map { "$_=$record[0]{$_}" } sort keys %{$record[0]}));
 
     # only consider DKIM signatures which match From
@@ -509,10 +505,11 @@ sub _got_dmarc_record {
 	    @{ $self->{dkim_result}[0] };
     }
 
-    # if we have spf_result built from Received-SPF header filter 
-    # for identifier alignment
+    # If we have spf_result built from Received-SPF header filter then
+    # spf_result[0] contains all the Received-SPF headers found and we need
+    # to extract the one which is usable for identifier alignment.
     if ($self->{spf_result} && ref($self->{spf_result}[0]) eq 'ARRAY') {
-	$domrx = 
+	$domrx =
 	    $record[0]{aspf} eq $record[0]{adkim} ? $domrx :
 	    $record[0]{aspf} eq 'r' ? qr{(^|\.)\Q$self->{domain}[-1]\E\z} :
 	    qr{^\Q$self->{domain}[0]\E\z};
@@ -532,7 +529,8 @@ sub _got_dmarc_record {
 		@aligned = @a;
 		last;
 	    }
-	    $DEBUG && debug("multiple aligned Received-SPF found, pick $aligned[0][0]");
+	    $DEBUG && debug(
+		"multiple aligned Received-SPF found, pick $aligned[0][0]");
 	} elsif (@aligned) {
 	    $DEBUG && debug("found aligned Received-SPF with $aligned[0][0] ");
 	} else {
@@ -549,7 +547,7 @@ sub _got_dmarc_record {
     error:
     # retry with next domain if possible
     $DEBUG && debug("error for DMARC query %s: %s - %s",
-	$dom->[0],$error || 'no DMARC records', 
+	$dom->[0],$error || 'no DMARC records',
 	(@$dom>1 ? "retry with @{$dom}[1..$#$dom]":"no retries"));
 
     shift @$dom;
@@ -561,7 +559,7 @@ sub _got_dmarc_record {
 	# XXX This is not fully correct - some errors might be permanent
 	# (NXDOMAIN) while others might be temporary only. For now we assume
 	# that any given error is temporary only.
-	$DEBUG && debug("finally no DMARC record: %s", 
+	$DEBUG && debug("finally no DMARC record: %s",
 	    $error || 'no DMARC records');
 	$self->{result} = $error
 	    ? [ DMARC_TEMPERROR, $error ]
@@ -634,7 +632,6 @@ sub _feed_spf {
     }
 }
 
-
 # Extract information from header. We need:
 # - domain of From header
 # - information from Received-SPF header if no SPF object
@@ -647,7 +644,7 @@ sub _inspect_header {
     goto analyze if $data eq '';
 
     # Extract full headers from mail, i.e. make sure that no more parts of the
-    # header line could follow (incl. line folding). 
+    # header line could follow (incl. line folding).
     # Look out for end of header too.
     $self->{_hdrbuf} .= $data;
     while ( $self->{_hdrbuf} =~m{\G
@@ -667,7 +664,7 @@ sub _inspect_header {
 	}
     }
     # remove what we extracted from the header
-    substr($self->{_hdrbuf},0,pos($self->{_hdrbuf}),'') 
+    substr($self->{_hdrbuf},0,pos($self->{_hdrbuf}),'')
 	if @hdr && defined $self->{_hdrbuf};
 
     # Look for useful stuff in @hdr
@@ -675,7 +672,7 @@ sub _inspect_header {
     # Because we never know what the MUA does we accept it for the From
     # header, but not for the Received-SPF header.
     for(@hdr) {
-	($self->{spf} || $self->{spf_result}) 
+	($self->{spf} || $self->{spf_result})
 	    ? s{^(From)\s*:\s*}{}i
 	    : s{^(?:(From)\s*|Received-SPF):\s*}{}i
 	    or next;
@@ -706,7 +703,7 @@ sub _inspect_header {
 	    return;
 	} elsif (@$from!=1) {
 	    $DEBUG && debug("DMARC multiple domains in From");
-	    $self->{result} = [ DMARC_PERMERROR, 
+	    $self->{result} = [ DMARC_PERMERROR,
 		'multiple sender domains in From' ];
 	    return;
 	}
@@ -850,9 +847,9 @@ sub _inspect_header {
 
 __END__
 
-=head1 NAME Mail::DMARC::Iterator
+=head1 NAME
 
-Iterativ DMARC validation for mails.
+Mail::DMARC::Iterator - Iterativ DMARC validation for mails.
 
 =head1 SYNOPSIS
 
@@ -891,7 +888,7 @@ Iterativ DMARC validation for mails.
 		($result,@todo) = $dmarc->next('');
 	    }
 	} else {
-	    # Net::DNS Packet needed for lookups of 
+	    # Net::DNS Packet needed for lookups of
 	    # SPF, DMARC and DKIM records
 	    my $answer = $resolver->send($todo);
 	    ($result,@todo) = $dmarc->next(
@@ -902,7 +899,7 @@ Iterativ DMARC validation for mails.
     }
 
     print STDERR "%s from-domain=%s; reason=%s\n",
-	$result || 'no-result', 
+	$result || 'no-result',
 	$dmarc->domain || 'unknown-domain',
 	$todo[0] || 'unknown-reason';
 
@@ -913,13 +910,13 @@ This module can be used to validate mails against DMARC policies like specified
 in RFC 7208.
 The main difference to L<Mail::DMARC> is that it does no blocking operations.
 Instead it implements a state machine where user input is fed into and
-instructions what the machine wants is returned. 
+instructions what the machine wants is returned.
 The state machine only wants the data from the mail and the result of specific
 DNS lookups. With each new data fed into the machine it will provide new
 information what it needs next, until it finally has enough input and returns
 the final result.
 Because of this design the DMARC policy validation can be easily integrated into
-event-driven programs or coupled with a specific DNS resolver. 
+event-driven programs or coupled with a specific DNS resolver.
 
 L<Mail::DMARC::Iterator> uses the similarly designed modules
 L<Mail::DKIM::Iterator> and L<Mail::SPF::Iterator> to provide the necessary
@@ -988,7 +985,7 @@ Returns the domain of the From record if already known.
 
 Returns the DMARC policy record as hash, if already known.
 
-=item $self->next( [ mailtext | dnspkt | [ dnspkt,error] ]* ) 
+=item $self->next( [ mailtext | dnspkt | [ dnspkt,error] ]* )
   -> (undef,@todo) | ($result,$reason,$action)
 
 This is the central method to compute the result.
@@ -1063,8 +1060,7 @@ Steffen Ullrich <sullr[at]cpan[dot]org>
 
 =head1 COPYRIGHT
 
-Steffen Ullrich, 2015..2018
+Steffen Ullrich, 2015..2019
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

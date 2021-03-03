@@ -1,5 +1,10 @@
 Revision history for perl module Sys::Virt
 
+7.1.0 2021-03-01
+
+ - Add VIR_ERR_MULTIPLE_DOMAINS constant
+ - Add virDomainGetMessages API and associated constants
+
 7.0.0 2021-01-15
 
  - Add VIR_DOMAIN_GUEST_INFO_DISKS constant

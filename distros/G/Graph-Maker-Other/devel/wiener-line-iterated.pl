@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,78 @@ use Graph;
 use FindBin;
 use lib "$FindBin::Bin/../devel/lib";
 use MyGraphs;
+$|=1;
 
+{
+  # trees G which have iterated line graph Wiener index W(L^2(G)) = W(G)
+  # A051175 number of such trees
+  #                            9 10 11
+  #    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 7, 8, 22, 25, 66, 73, 204, 231,
+  # num(9,10,11) = 1 each
+
+  foreach my $n (8 .. 13) {
+    my $iterator_func = MyGraphs::make_tree_iterator_edge_aref
+      (num_vertices_min => $n,
+       num_vertices_max => $n);
+    my $count = 0;
+    while (my $edge_aref = $iterator_func->()) {
+      my $graph = MyGraphs::Graph_from_edge_aref($edge_aref);
+      my $W = MyGraphs::Graph_Wiener_index($graph);
+      my $graph_L = MyGraphs::Graph_line_graph($graph);
+      # $graph_L = MyGraphs::Graph_line_graph($graph_L);  # to try L^3
+      my $graph_L2 = MyGraphs::Graph_line_graph($graph_L);
+      my $WL2 = MyGraphs::Graph_Wiener_index($graph_L2);
+      if ($W == $WL2) {
+        $count++;
+      }
+    }
+    print "n=$n  $count\n";
+  }
+  exit 0;
+}
+{
+  # trees G which have iterated line graph Wiener index W(L^2(G)) = W(G)
+  # A051175 number of such trees
+  #                            9 10 11
+  #    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 7, 8, 22, 25, 66, 73, 204, 231,
+  # num(9,10,11) = 1 each
+  #
+  # n=9  https://hog.grinvin.org/ViewGraphInfo.action?id=25131
+  # n=10 https://hog.grinvin.org/ViewGraphInfo.action?id=25133
+  # n=11 https://hog.grinvin.org/ViewGraphInfo.action?id=25135
+
+  # Dobrynin, Entringer, Gutman "Wiener Index of Trees: Theory and
+  # Applications" Acta Applicandae Mathematicae, May 2001, 66, 3, survey
+  # of
+  # Dobrynin "Distance of Iterated Line Graphs", Graph Theory Notes of New
+  # York, volume 37, 1999, page 8-9.
+
+  my $iterator_func = MyGraphs::make_tree_iterator_edge_aref
+    (num_vertices_min => 2,
+     num_vertices_max => 11);
+  my @graphs;
+  while (my $edge_aref = $iterator_func->()) {
+    my $graph = MyGraphs::Graph_from_edge_aref($edge_aref);
+    my $W = MyGraphs::Graph_Wiener_index($graph);
+    my $graph_L = MyGraphs::Graph_line_graph($graph);
+    # $graph_L = MyGraphs::Graph_line_graph($graph_L);  # try L^3
+    my $graph_L2 = MyGraphs::Graph_line_graph($graph_L);
+    my $WL2 = MyGraphs::Graph_Wiener_index($graph_L2);
+    if ($W == $WL2) {
+      my $num_vertices = $graph->vertices;
+      print "[$num_vertices] $graph\n";
+      $graph->set_graph_attribute (name => "W(G)=W(L^2(G)) $num_vertices vertices");
+      $graph_L->set_graph_attribute (name => "line graph");
+      $graph_L2->set_graph_attribute (name => "line graph * 2");
+      # Graph_view($graph);
+      push @graphs, $graph;
+      push @graphs, $graph_L;
+      push @graphs, $graph_L2;
+    }
+  }
+  hog_searches_html(@graphs);
+  exit 0;
+}
 {
   # Wiener of line graph
   # Buckley: tree  W(L(G)) = W(G) - binomial(num vertices, 2)
@@ -83,47 +154,7 @@ use MyGraphs;
   exit 0;
 }
 
-{
-  # trees G which have iterated line graph Wiener index W(L^2(G)) = W(G)
-  # A051175 number of such trees
-  # num(9,10,11) = 1 each
-  #
-  # n=9  https://hog.grinvin.org/ViewGraphInfo.action?id=25131
-  # n=10 https://hog.grinvin.org/ViewGraphInfo.action?id=25133
-  # n=11 https://hog.grinvin.org/ViewGraphInfo.action?id=25135
 
-  # Dobrynin, Entringer, Gutman "Wiener Index of Trees: Theory and
-  # Applications" Acta Applicandae Mathematicae, May 2001, 66, 3, survey
-  # of
-  # Dobrynin "Distance of Iterated Line Graphs", Graph Theory Notes of New
-  # York, volume 37, 1999, page 8-9.
-
-  my $iterator_func = make_tree_iterator_edge_aref
-    (num_vertices_min => 2,
-     num_vertices_max => 11);
-  my @array;
- TREE: while (my $edge_aref = $iterator_func->()) {
-    my $graph = Graph_from_edge_aref($edge_aref);
-    my $W = Graph_Wiener_index($graph);
-    my $graph_L = Graph_line_graph($graph);
-    # $graph_L = Graph_line_graph($graph_L);  # try L^3
-    my $graph_L2 = Graph_line_graph($graph_L);
-    my $WL2 = Graph_Wiener_index($graph_L2);
-    if ($W == $WL2) {
-      my $num_vertices = $graph->vertices;
-      print "[$num_vertices] $graph\n";
-      $graph->set_graph_attribute (name => "W(G)=W(L^2(G)) $num_vertices vertices");
-      $graph_L->set_graph_attribute (name => "line graph");
-      $graph_L2->set_graph_attribute (name => "line graph * 2");
-      # Graph_view($graph);
-      push @array, $graph;
-      push @array, $graph_L;
-      push @array, $graph_L2;
-    }
-  }
-  hog_searches_html(@array);
-  exit 0;
-}
 
 {
   # Knor, Macaj, Potocnik, Skrekovski  W(L^3(G)) = W(G)

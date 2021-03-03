@@ -1,15 +1,14 @@
-.TH "apreq_value_t" 3 "25 Nov 2010" "Version 2.13" "libapreq2" \" -*- nroff -*-
+.TH "apreq_value_t" 3 "Thu Nov 5 2020" "Version 2.15" "libapreq2" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
 apreq_value_t \- libapreq's pre-extensible string type  
 
-.PP
 .SH SYNOPSIS
 .br
 .PP
-\fC#include <apreq.h>\fP
 .PP
+\fC#include <apreq\&.h>\fP
 .SS "Data Fields"
 
 .in +1c
@@ -17,10 +16,10 @@ apreq_value_t \- libapreq's pre-extensible string type
 .RI "char * \fBname\fP"
 .br
 .ti -1c
-.RI "\fBapr_size_t\fP \fBnlen\fP"
+.RI "apr_size_t \fBnlen\fP"
 .br
 .ti -1c
-.RI "\fBapr_size_t\fP \fBdlen\fP"
+.RI "apr_size_t \fBdlen\fP"
 .br
 .ti -1c
 .RI "char \fBdata\fP [1]"
@@ -30,41 +29,38 @@ apreq_value_t \- libapreq's pre-extensible string type
 .PP 
 libapreq's pre-extensible string type 
 .PP
-\fBExamples: \fP
+\fBExamples\fP
 .in +1c
-.PP
-\fB/home/issac/asf/svn/v2_13/include/apreq.h\fP.
+\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
 .SH "Field Documentation"
 .PP 
-.SS "char* \fBapreq_value_t::name\fP"
+.SS "char apreq_value_t::data[1]"
+value data 
+.br
+ 
 .PP
-value name 
-.PP
-\fBExamples: \fP
+\fBExamples\fP
 .in +1c
-\fB/home/issac/asf/svn/v2_13/include/apreq.h\fP.
-.SS "\fBapr_size_t\fP \fBapreq_value_t::nlen\fP"
-.PP
-length of name 
-.PP
-\fBExamples: \fP
-.in +1c
-\fB/home/issac/asf/svn/v2_13/include/apreq.h\fP.
-.SS "\fBapr_size_t\fP \fBapreq_value_t::dlen\fP"
-.PP
+\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+.SS "apr_size_t apreq_value_t::dlen"
 length of data 
 .PP
-\fBExamples: \fP
+\fBExamples\fP
 .in +1c
-\fB/home/issac/asf/svn/v2_13/include/apreq.h\fP.
-.SS "char \fBapreq_value_t::data\fP[1]"
+\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+.SS "char* apreq_value_t::name"
+value name 
 .PP
-value data 
-.PP
-\fBExamples: \fP
+\fBExamples\fP
 .in +1c
-\fB/home/issac/asf/svn/v2_13/include/apreq.h\fP.
+\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+.SS "apr_size_t apreq_value_t::nlen"
+length of name 
+.PP
+\fBExamples\fP
+.in +1c
+\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
 
 .SH "Author"
 .PP 
-Generated automatically by Doxygen for libapreq2 from the source code.
+Generated automatically by Doxygen for libapreq2 from the source code\&.

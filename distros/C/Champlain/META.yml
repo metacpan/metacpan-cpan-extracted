@@ -1,15 +1,24 @@
---- #YAML:1.0
-name:                Champlain
-version:             0.12
-abstract:            Map rendering canvas
-license:             perl, lgpl
-author:              
-    - Emmanuel Rodriguez <potyl@cpan.org>
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    Clutter:                       1.000
-    Memphis:                       0.01
+---
+abstract: 'Map rendering canvas'
+author:
+  - 'Emmanuel Rodriguez <potyl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Champlain
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: '0.14'
+x_deprecated: 1
+x_repository: https://gitlab.gnome.org/GNOME/perl-champlain/-/tree/master
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

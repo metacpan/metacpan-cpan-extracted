@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021 Kevin Ryde
 
 # Perl-Critic-Pulp is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -30,7 +30,7 @@ use Perl::Critic::Pulp;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 97;
+our $VERSION = 99;
 
 use constant supported_parameters =>
   ({ name           => 'single',
@@ -47,6 +47,11 @@ use constant supported_parameters =>
      description    => 'Checking of interpolated here-documents.',
      behavior       => 'string',
      default_string => 'all',
+   },
+   { name           => 'charnames',
+     description    => 'Checking of character names \\N{}.',
+     behavior       => 'string',
+     default_string => 'version',
    });
 use constant default_severity => $Perl::Critic::Utils::SEVERITY_MEDIUM;
 use constant default_themes   => qw(pulp cosmetic);
@@ -124,6 +129,7 @@ my %explain = ('%' => '  (hashes are not interpolated)',
               );
 
 my $v5016 = version->new('5.016');
+my $v5006 = version->new('5.006');
 
 sub violates {
   my ($self, $elem, $document) = @_;
@@ -174,7 +180,7 @@ sub violates {
     # Consider known if no "use 5.x" at all, or if present and 5.6 up,
     # so only under explicit "use 5.005" or lower are they not allowed.
     my $perlver = $document->highest_explicit_perl_version;
-    if (! defined $perlver || $perlver >= 5.006) {
+    if (! defined $perlver || $perlver >= $v5006) {
       $known .= '4567';
     }
   }
@@ -186,7 +192,7 @@ sub violates {
   ### $known
   ### perlver: $document->highest_explicit_perl_version
 
-  my $have_charnames;
+  my $have_use_charnames;
   my $interpolate_var_end = -1;
   my $interpolate_var_colon;
   my @violations;
@@ -226,11 +232,22 @@ sub violates {
 
     if (! $single) {
       if ($c eq 'N') {
-        if (! defined $have_charnames) {
-          $have_charnames = _charnames_in_scope($elem);
-        }
-        if ($have_charnames || $have_perl_516) {
-          next;  # ok if "use charnames" or perl 5.16 up (which autoloads that)
+        if ($self->{_charnames} eq 'disallow') {
+          push @violations,
+            $self->violation ('charnames \\N disallowed by config',
+                              '', $elem);
+          next;
+
+        } elsif ($self->{_charnames} eq 'allow') {
+          next;  # ok, allow by config
+
+        } else { # $self->{_charnames} eq 'version'
+          if (! defined $have_use_charnames) {
+            $have_use_charnames = _have_use_charnames_in_scope($elem);
+          }
+          if ($have_use_charnames || $have_perl_516) {
+            next;  # ok if "use charnames" or perl 5.16 up (which autoloads that)
+          }
         }
 
       } elsif ($c eq 'c') {
@@ -388,7 +405,7 @@ sub _printable {
 }
 
 # return true if $elem has a 'use charnames' in its lexical scope
-sub _charnames_in_scope {
+sub _have_use_charnames_in_scope {
   my ($elem) = @_;
   for (;;) {
     $elem = $elem->sprevious_sibling || $elem->parent
@@ -513,7 +530,7 @@ considering interpolations).  Thus,
 =head2 Ending Interpolation
 
 A backslashed colon, bracket, brace or dash is allowed after an interpolated
-variable or element to stop interpolation at that point.
+variable or element, since this stops interpolation at that point.
 
     print "$foo\::bar";    # ok, $foo
     print "@foo\::";       # ok, @foo
@@ -534,9 +551,10 @@ backslashing the second too as C<"\:\:"> is quite common and is allowed.
 
     print "$#foo\:\:bar";  # ok
 
-Only a C<-E<gt>[]> or C<-E<gt>{}> needs a C<\-> to stop interpolation.
-Other cases such as an apparent method call or arrowed coderef call don't
-interpolate and the backslash is treated as unknown since unnecessary.
+Only an array or hash C<-E<gt>[]> or C<-E<gt>{}> need C<\-> to stop
+interpolation.  Other cases such as an apparent method call or arrowed
+coderef call don't interpolate and the backslash is treated as unknown since
+unnecessary.
 
     print "$coderef\->(123)";        # bad, unnecessary
     print "Usage: $class\->foo()";   # bad, unnecessary
@@ -555,9 +573,9 @@ L<perlop/Gory details of parsing quoted constructs>.
 
 =head2 Octal Wide Chars
 
-Octal escapes above C<\400> to C<\777> for wide chars 256 to 511 are new in
-Perl 5.6.  They're considered unknown in 5.005 and earlier (where they end
-up chopped to 8-bits 0 to 255).  Currently if there's no C<use> etc Perl
+Octal escapes C<\400> to C<\777> for wide chars 256 to 511 are new in Perl
+5.6.  They're considered unknown in 5.005 and earlier (where they end up
+chopped to 8-bits 0 to 255).  Currently if there's no C<use> etc Perl
 version then it's presumed a high octal is intentional and is allowed.
 
     print "\400";    # ok
@@ -571,30 +589,38 @@ version then it's presumed a high octal is intentional and is allowed.
 
 =head2 Named Chars
 
-Named chars C<\N{SOME THING}> are added by L<charnames>, new in Perl 5.6,
-and it is autoloaded in Perl 5.16 up when used.  C<\N> is treated as known
-if C<use 5.016> or higher,
+Named chars C<\N{SOME THING}> are added by L<charnames>, new in Perl 5.6.
+In Perl 5.16 up, that module is automatically loaded when C<\N> is used.
+C<\N> is considered known when C<use 5.016> or higher,
 
     use 5.016;
     print "\N{EQUALS SIGN}";   # ok with 5.16 automatic charnames
 
-Or if C<use charnames> in the lexical scope,
+or if C<use charnames> is in the lexical scope,
 
-    {
-      use charnames ':full';
+    { use charnames ':full';
       print "\N{APOSTROPHE}";  # ok
     }
     print "\N{COLON}";         # bad, no charnames in lexical scope
 
-In Perl 5.6 through 5.14 a C<\N> without C<charnames> is a compile error so
-would normally be seen immediately anyway.  There's no check of the
+In Perl 5.6 through 5.14, a C<\N> without C<charnames> is a compile error so
+would be seen in those versions immediately anyway.  There's no check of the
 character name appearing in the C<\N>.  C<charnames> gives an error for
 unknown names.
 
+The C<charnames> option (L</CONFIGURATION> below) can be allow to always
+allow named characters.  This can be used for instance if you always have
+Perl 5.16 up but without declaring that in a C<use> statement.
+
+The C<charnames> option can be disallow to always disallow named characters.
+This is a blanket prohibition rather than an UnknownBackslash as such, but
+matches the allow option.  Disallowing can be matter of personal preference
+or perhaps aim to save a little memory or startup time.
+
 =head2 Other Notes
 
-In the violation messages a non-ascii or non-graphical escaped char is shown
-as hex like C<\{0x263A}>, to ensure the message is printable and
+In the violation messages, a non-ascii or non-graphical escaped char is
+shown as hex like C<\{0x263A}>, to ensure the message is printable and
 unambiguous.
 
 Interpolated C<$foo> or C<@{expr}> variables and expressions are parsed like
@@ -660,8 +686,17 @@ only as an option.
 
 For reference, single-quote here-documents C<E<lt>E<lt>'HERE'> don't have
 any backslash escapes and so are not considered by this policy.  C<qx{}>
-command backticks are double-quote but as C<qx''> is single-quote.  They are
+command backticks are double-quote but C<qx''> is single-quote.  They are
 treated per the corresponding C<single> or C<double> option.
+
+=item C<charnames> (string, default "version")
+
+Whether to treat named characters C<\N{}> in double-quote strings as known
+or unknown,
+
+    version    known if use charnames or use 5.016
+    allow      always allow
+    disallow   always disallow
 
 =back
 
@@ -687,7 +722,7 @@ http://user42.tuxfamily.org/perl-critic-pulp/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021 Kevin Ryde
 
 Perl-Critic-Pulp is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

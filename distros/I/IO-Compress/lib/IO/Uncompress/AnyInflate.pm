@@ -21,7 +21,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $AnyInflateError);
 
-$VERSION = '2.101';
+$VERSION = '2.102';
 $AnyInflateError = '';
 
 @ISA = qw(IO::Uncompress::Base Exporter);

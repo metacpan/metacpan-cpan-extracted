@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Carp ();
 use Scalar::Util ();
@@ -24,6 +24,9 @@ use overload
     eq => \&is_same_interface
     ;
 
+sub parameters_class { 'Sub::Meta::Parameters' }
+sub returns_class    { 'Sub::Meta::Returns' }
+
 sub _croak { require Carp; Carp::croak(@_) }
 
 sub new {
@@ -36,8 +39,22 @@ sub new {
     $self->set_stashname(delete $args{stashname}) if exists $args{stashname};
     $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
 
-    $self->set_parameters($args{parameters}) if exists $args{parameters};
-    $self->set_returns($args{returns})       if exists $args{returns};
+    if (exists $args{parameters}) {
+        $self->set_parameters($args{parameters})
+    }
+    elsif(exists $args{args}) {
+        $self->set_parameters(
+            args => delete $args{args},
+            ( exists $args{slurpy} ? (slurpy => delete $args{slurpy}) : () ),
+
+            ( exists $args{nshift}    ? (nshift => delete $args{nshift}) :
+              exists $args{is_method} ? (nshift => $args{is_method} ? 1 : 0) : () ),
+        );
+    }
+
+    if (exists $args{returns}) {
+        $self->set_returns($args{returns})
+    }
 
     return $self;
 }
@@ -56,9 +73,12 @@ sub line()        { $_[0]{line}        ||= $_[0]->_build_line }
 sub is_constant() { $_[0]{is_constant} ||= $_[0]->_build_is_constant }
 sub prototype()   { $_[0]{prototype}   ||= $_[0]->_build_prototype }
 sub attribute()   { $_[0]{attribute}   ||= $_[0]->_build_attribute }
-sub is_method()   { $_[0]{is_method} }
+sub is_method()   { !!$_[0]{is_method} }
 sub parameters()  { $_[0]{parameters} }
 sub returns()     { $_[0]{returns} }
+sub args()        { $_[0]->parameters->args }
+sub slurpy()      { $_[0]->parameters->slurpy }
+sub nshift()      { $_[0]->parameters->nshift }
 
 sub set_sub($)    {
     $_[0]{sub} = $_[1];
@@ -87,15 +107,58 @@ sub set_prototype($)   { $_[0]{prototype}   = $_[1]; $_[0] }
 sub set_attribute($)   { $_[0]{attribute}   = $_[1]; $_[0] }
 sub set_is_method($)   { $_[0]{is_method}   = $_[1]; $_[0] }
 
-sub set_parameters($) {
+sub set_parameters {
     my $self = shift;
-    $self->{parameters} = Scalar::Util::blessed($_[0]) ? $_[0] : Sub::Meta::Parameters->new(@_);
+    my $v = $_[0];
+    if (Scalar::Util::blessed($v)) {
+        if ($v->isa('Sub::Meta::Parameters')) {
+            $self->{parameters} = $v
+        }
+        else {
+            _croak('object must be Sub::Meta::Parameters');
+        }
+    }
+    else {
+        $self->{parameters} = $self->parameters_class->new(@_);
+    }
     return $self
 }
 
-sub set_returns($) {
+sub set_args {
     my $self = shift;
-    $self->{returns} =  Scalar::Util::blessed($_[0]) ? $_[0] : Sub::Meta::Returns->new(@_);
+    if ($self->parameters) {
+        $self->parameters->set_args(@_);
+    }
+    else {
+        $self->set_parameters($self->parameters_class->new(args => @_));
+    }
+    return $self;
+}
+
+sub set_slurpy {
+    my $self = shift;
+    $self->parameters->set_slurpy(@_);
+    return $self;
+}
+
+sub set_nshift {
+    my $self = shift;
+    if ($self->is_method && $_[0] == 0) {
+        _croak 'nshift of method cannot be zero';
+    }
+    $self->parameters->set_nshift(@_);
+    return $self;
+}
+
+sub set_returns {
+    my $self = shift;
+    my $v = $_[0];
+    if (Scalar::Util::blessed($v) && $v->isa('Sub::Meta::Returns')) {
+        $self->{returns} = $v
+    }
+    else {
+        $self->{returns} = $self->returns_class->new(@_);
+    }
     return $self
 }
 
@@ -135,31 +198,30 @@ sub apply_attribute(@) {
 
 sub is_same_interface {
     my ($self, $other) = @_;
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
     if ($self->subname) {
-        return unless $self->subname eq $other->subname;
+        return if $self->subname ne $other->subname;
     }
     else {
         return if $other->subname;
     }
 
     if ($self->parameters) {
-        return unless $other->parameters;
-        return unless $self->parameters->is_same_interface($other->parameters);
+        return if !($self->parameters->is_same_interface($other->parameters));
     }
     else {
         return if $other->parameters;
     }
 
     if ($self->returns) {
-        return unless $other->returns;
-        return unless $self->returns->is_same_interface($other->returns);
+        return if !($self->returns->is_same_interface($other->returns));
     }
     else {
         return if $other->returns;
     }
 
-    return 1;
+    return !!1;
 }
 
 1;
@@ -204,11 +266,15 @@ Sub::Meta - handle subroutine meta information
 
 And you can hold meta information of parameter type and return type. See also L<Sub::Meta::Parameters> and L<Sub::Meta::Returns>.
 
-    $meta->set_parameters( Sub::Meta::Parameters->new(args => [ { type => 'Str' }]) );
+    $meta->set_parameters(args => ['Str']));
     $meta->parameters->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
+    
+    $meta->set_args(['Str']);
+    $meta->args; # [ Sub::Meta::Param->new({ type => 'Str' }) ]
 
-    $meta->set_returns( Sub::Meta::Returns->new('Str') );
+    $meta->set_returns('Str');
     $meta->returns->scalar; # 'Str'
+    $meta->returns->list;   # 'Str'
 
 And you can compare meta informations:
 
@@ -226,14 +292,58 @@ C<Sub::Meta> provides methods to handle subroutine meta information. In addition
 
 Constructor of C<Sub::Meta>.
 
+    use Sub::Meta;
+    use Types::Standard -types;
+
+    # sub Greeting::hello(Str) -> Str
     Sub::Meta->new(
         fullname    => 'Greeting::hello',
         is_constant => 0,
         prototype   => '$',
         attribute   => ['method'],
         is_method   => 1,
-        parameters  => Sub::Meta::Parameters->new(args => [{ type => 'Str' }]),
-        returns     => Sub::Meta::Returns->new('Str'),
+        parameters  => { args => [{ type => Str }]},
+        returns     => Str,
+    );
+
+Others are as follows:
+
+    # sub add(Int, Int) -> Int
+    Sub::Meta->new(
+        subname => 'add',
+        args    => [Int, Int],
+        returns => Int,
+    );
+
+    # method hello(Str) -> Str 
+    Sub::Meta->new(
+        subname   => 'hello',
+        args      => [{ message => Str }],
+        is_method => 1,
+        returns   => Str,
+    );
+
+    # sub twice(@numbers) -> ArrayRef[Int]
+    Sub::Meta->new(
+        subname   => 'twice',
+        args      => [],
+        slurpy    => { name => '@numbers' },
+        returns   => ArrayRef[Int],
+    );
+
+    # Named parameters:
+    # sub foo(Str :a) -> Str
+    Sub::Meta->new(
+        subname   => 'foo',
+        args      => { a => Str },
+        returns   => Str,
+    );
+
+    # is equivalent to
+    Sub::Meta->new(
+        subname   => 'foo',
+        args      => [{ name => 'a', isa => Str, named => 1 }],
+        returns   => Str,
     );
 
 =head2 sub
@@ -352,15 +462,41 @@ Parameters object of L<Sub::Meta::Parameters>.
 
 =head2 set_parameters($parameters)
 
-Sets the parameters object of L<Sub::Meta::Parameters> or any object which has C<positional>,C<named>,C<required> and C<optional> methods.
+Sets the parameters object of L<Sub::Meta::Parameters>.
 
     my $meta = Sub::Meta->new;
-    $meta->set_parameters({ type => 'Type'});
-    $meta->parameters; # => Sub::Meta::Parameters->new({type => 'Type'});
+    $meta->set_parameters(args => ['Str']);
+    $meta->parameters; # => Sub::Meta::Parameters->new(args => ['Str']);
 
     # or
-    $meta->set_parameters(Sub::Meta::Parameters->new(type => 'Foo'));
-    $meta->set_parameters(MyParamters->new)
+    $meta->set_parameters(Sub::Meta::Parameters->new(args => ['Str']));
+
+    # alias
+    $meta->set_args(['Str']);
+
+=head2 args
+
+The alias of C<parameters.args>.
+
+=head2 set_args($args)
+
+The alias of C<parameters.set_args>.
+
+=head2 nshift
+
+The alias of C<parameters.nshift>.
+
+=head2 set_nshift($nshift)
+
+The alias of C<parameters.set_nshift>.
+
+=head2 slurpy
+
+The alias of C<parameters.slurpy>.
+
+=head2 set_slurpy($slurpy)
+
+The alias of C<parameters.set_slurpy>.
 
 =head2 returns
 
@@ -382,6 +518,16 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
 
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether C<subname>, C<parameters> and C<returns> are equal.
+
+=head2 parameters_class
+
+Returns class name of parameters. default: Sub::Meta::Parameters
+Please override for customization.
+
+=head2 returns_class
+
+Returns class name of returns. default: Sub::Meta::Returns
+Please override for customization.
 
 =head1 NOTE
 

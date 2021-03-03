@@ -22,10 +22,11 @@ no_index:
 requires:
   JSON: '0'
   LWP::UserAgent: '6.04'
+  Term::ReadKey: '0'
   Time::Piece: '0'
   perl: '5.008'
   version: '0.77'
 resources:
   repository: git://github.com/giterlizzi/perl-Net-SecurityCenter
-version: '0.300'
+version: '0.310'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

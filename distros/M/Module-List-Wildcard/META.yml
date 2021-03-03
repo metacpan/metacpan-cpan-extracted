@@ -26,7 +26,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Module-List-Wildcard/issues
   homepage: https://metacpan.org/release/Module-List-Wildcard
   repository: git://github.com/perlancar/perl-Module-List-Wildcard.git
-version: '0.004008'
+version: '0.004009'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

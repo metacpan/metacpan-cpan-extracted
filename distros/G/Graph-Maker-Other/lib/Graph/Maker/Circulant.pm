@@ -1,4 +1,4 @@
-# Copyright 2018, 2019, 2020 Kevin Ryde
+# Copyright 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Graph::Maker;
 use List::Util 'min';
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 
@@ -157,6 +157,7 @@ L<https://hog.grinvin.org/ViewGraphInfo.action?id=226>  etc
     160     N=8 1,2
     570     N=8 1,3
     176     N=8 1,2,3      sixteen cell
+    36263   N=8 1,2,4
     33454   N=8 1,3,4
     180     N=8 1,2,3,4
     640     N=8 1,4        Mobius ladder 4 rungs
@@ -169,9 +170,12 @@ L<https://hog.grinvin.org/ViewGraphInfo.action?id=226>  etc
 
     21063   N=10 1,2
     32519   N=10 1,3
+    36276   N=10 1,5       Mobius ladder 5 rungs
     138     N=10 2,4       two complete-5
+    36274   N=10 2,5
     21117   N=10 1,2,4     cross-linked complete-5s
     148     N=10 1,2,3,4
+    152     N=10 1,2,3,4,5
     20611   N=10 1,2,5
     252     N=10 1,3,5
     142     N=10 1,2,3,5
@@ -245,11 +249,11 @@ L<Graph::Maker::RookGrid>
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2018, 2019, 2020 Kevin Ryde
+Copyright 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

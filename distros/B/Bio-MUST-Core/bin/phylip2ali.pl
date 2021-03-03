@@ -40,7 +40,7 @@ phylip2ali.pl - Convert PHYLIP files to ALI files
 
 =head1 VERSION
 
-version 0.210380
+version 0.210610
 
 =head1 USAGE
 

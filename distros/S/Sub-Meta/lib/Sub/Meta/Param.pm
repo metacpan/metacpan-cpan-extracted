@@ -3,11 +3,12 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
+
+use Scalar::Util ();
 
 use overload
     fallback => 1,
-    '""'     => sub { $_[0]->name || '' },
     eq       =>  \&is_same_interface,
 ;
 
@@ -21,10 +22,11 @@ sub new {
 
     $args{optional} = !delete $args{required} if exists $args{required};
     $args{named}    = !delete $args{positional} if exists $args{positional};
+    $args{type}     = delete $args{isa} if exists $args{isa};
 
     %args = (%DEFAULT, %args);
 
-    bless \%args => $class;
+    return bless \%args => $class;
 }
 
 sub name()       { $_[0]{name} }
@@ -45,27 +47,35 @@ sub set_required($;)   { $_[0]{optional} =  !(defined $_[1] ? $_[1] : 1); $_[0] 
 sub set_named($;)      { $_[0]{named}    = !!(defined $_[1] ? $_[1] : 1); $_[0] }
 sub set_positional($;) { $_[0]{named}    =  !(defined $_[1] ? $_[1] : 1); $_[0] }
 
+# alias
+sub isa_() :method; # NOT isa
+*isa_ = \&type;
+
+sub set_isa($);
+*set_isa = \&set_type;
+
 sub is_same_interface {
     my ($self, $other) = @_;
+    return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Param');
 
     if (defined $self->name) {
-        return unless $self->name eq $other->name;
+        return if $self->name ne $other->name;
     }
     else {
         return if defined $other->name;
     }
 
     if (defined $self->type) {
-        return unless $self->type eq $other->type;
+        return if $self->type ne $other->type;
     }
     else {
         return if defined $other->type;
     }
 
-    return unless $self->optional eq $other->optional;
-    return unless $self->named eq $other->named;
+    return if $self->optional ne $other->optional;
+    return if $self->named ne $other->named;
 
-    return 1;
+    return !!1;
 }
 
 1;
@@ -128,6 +138,14 @@ Any type constraints, e.g. C<Str>.
 =head2 set_type($type)
 
 Setter for C<type>.
+
+=head2 isa_
+
+The alias of C<type>
+
+=head2 set_isa($type)
+
+The alias of C<set_type>
 
 =head2 default
 

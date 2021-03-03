@@ -1,3 +1,15 @@
+0.210610  2021-03-02 23:22:29+01:00 Europe/Brussels
+    - Additions
+      - binaries: new script inst-split-seqs.pl
+      - Seq: added methods purity and wrapped_str
+      - SeqId: added method abbr_with_regex
+    - Changes
+      - binaries: refactored 'inst' executables (still no default install)
+      - Ali: cascaded additions and changes in Seq methods
+      - IdMapper: refactored regex_mapper to use abbr_with_regex
+      - Seq: changed some method names for API consistency (raw_seq, recode_seq, uc_seq)
+      - Tree: iTOL output now labels all internal nodes (instead of only collapsed nodes)
+      
 0.210380  2021-02-07 12:29:46+01:00 Europe/Brussels
     - Additions
       - binaries: new script tax-mask-ali.pl

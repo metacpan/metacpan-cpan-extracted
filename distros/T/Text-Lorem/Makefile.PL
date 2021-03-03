@@ -26,5 +26,5 @@ WriteMakefile(
         },
     },
     LICENSE => 'perl_5',
-    AUTHOR => 'Adeola Awoyemi <adeola@fotango.com>',
+    AUTHOR => 'Adeola Awoyemi <adeola@cpan.org>',
 );

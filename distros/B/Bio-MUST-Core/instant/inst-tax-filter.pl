@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: inst-tax-filter.pl
 # ABSTRACT: Apply a taxonomic filter to a (UniProt) FASTA database (optimized)
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 use Modern::Perl '2011';
 use autodie;
@@ -49,15 +50,9 @@ my $tax_filter = sub {
     # skip unallowed seqs
     return unless $filter->is_allowed($seq_id);
 
-    # store allowed seqs (optonally unwrapped)
-    # TODO: refactor in module
-    my $width = $seq->seq_len;
-    my $chunk = $ARGV_nowrap ? $width : 60;     # optionally disable wrap
-
-    my $str = '>' . $seq->full_id . "\n";       # use original seq_id
-    for (my $site = 0; $site < $width; $site += $chunk) {
-        $str .= $seq->edit_seq($site, $chunk) . "\n";
-    }
+    # store allowed seqs
+    my $str = '>' . $seq->full_id . "\n";	# use original seq_id
+    $str .= $seq->wrapped_str;
 
     return $str;
 };
@@ -134,10 +129,6 @@ following predefined regexes are available (assuming a leading '>'):
 
 =for Euclid:
     str.type: string
-
-=item --[no]wrap
-
-[Don't] wrap sequences [default: yes].
 
 =item --version
 

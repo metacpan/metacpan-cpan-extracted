@@ -1,0 +1,35 @@
+==================================================
+Changes from 2020-02-29 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.01 at 2021-02-28 00:57:15 +0000
+-----------------------------------------
+
+  Change: b84de345cc42888442fe0f33684b38cff9c76260
+  Author: D Ruth Holloway <ruthh@clearbuilt.com>
+  Date : 2021-02-27 17:57:06 +0000
+
+    Minor doc updates 
+
+  Change: 754bf339c9516de57917804d606c63fd7d694bc9
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-02-26 19:46:48 +0000
+
+    V 1.0 release prep 
+
+  Change: a5201f358ea9424411f8b0e196db7eec6d46c011
+  Author: D Ruth Holloway <ruthh@clearbuilt.com>
+  Date : 2021-01-18 19:18:14 +0000
+
+    Tidy up, write tests 
+
+  Change: 26a4cec2632aa86a5cb731100612721b48f4dcd6
+  Author: D Ruth Holloway <ruthh@clearbuilt.com>
+  Date : 2021-01-17 19:02:24 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

@@ -4,7 +4,7 @@
       "Mackerel Developers <mackerel-developers@hatena.ne.jp>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.4",
+   "generated_by" : "Minilla/v3.1.7",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -58,7 +58,7 @@
    "provides" : {
       "Mackerel::ReleaseUtils" : {
          "file" : "lib/Mackerel/ReleaseUtils.pm",
-         "version" : "v0.2.4"
+         "version" : "v0.2.5"
       },
       "Mackerel::ReleaseUtils::Log" : {
          "file" : "lib/Mackerel/ReleaseUtils/Log.pm"
@@ -75,16 +75,17 @@
          "web" : "https://github.com/mackerelio/Mackerel-ReleaseUtils"
       }
    },
-   "version" : "v0.2.4",
-   "x_authority" : "cpan:SONGMU",
+   "version" : "v0.2.5",
+   "x_authority" : "cpan:ASTJ",
    "x_contributors" : [
       "Asato Wakisaka <asato.wakisaka@gmail.com>",
+      "Masayuki Matsuki <y.songmu@gmail.com>",
       "Shoichi Kaji <skaji@cpan.org>",
-      "Songmu <y.songmu@gmail.com>",
       "astj <astj@users.noreply.github.com>",
       "itchyny <itchyny@hatena.ne.jp>",
-      "shibayu36 <shibayu36@gmail.com>"
+      "shibayu36 <shibayu36@gmail.com>",
+      "yseto <yseto@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 0
 }

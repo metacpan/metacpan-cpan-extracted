@@ -1,5 +1,5 @@
 This archive contains the distribution Mojolicious-Plugin-Minion-Starter,
-version 0.003:
+version 0.005:
 
   start/stop minion workers with the Mojolicious server
 

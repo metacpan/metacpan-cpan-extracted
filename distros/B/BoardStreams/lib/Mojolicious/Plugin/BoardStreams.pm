@@ -25,7 +25,7 @@ use Encode 'encode_utf8';
 
 use experimental 'postderef';
 
-our $VERSION = "v0.0.21";
+our $VERSION = "v0.0.22";
 
 use constant {
     DEFAULT_CLEANUP_INTERVAL          => 5,

@@ -7,38 +7,37 @@ Mojolicious::Plugin::Minion::Starter - start/stop minion workers with the Mojoli
 
 =head2 SYNOPSIS
 
-use Mojolicious::Lite -signatures;
+    use Mojolicious::Lite -signatures;
 
-plugin Minion => { SQLite => 'sqlite:queue.db' };
-plugin 'Minion::Starter' => { debug => 1, spawn => 2 };
+    plugin Minion => { SQLite => 'sqlite:queue.db' };
+    plugin 'Minion::Starter' => { debug => 1, spawn => 2 };
 
-app->minion->add_task(sleep => sub {
-    		  sleep 1;
-    	      });
+    app->minion->add_task(sleep => sub {
+                      sleep 1;
+                  });
 
-get '/' => sub {
-    my $c = shift;
-    $c->render('text' => 'ok');
-};
+    get '/' => sub {
+        my $c = shift;
+        $c->render('text' => 'ok');
+    };
 
-get '/enqueue' => sub {
-    my $c = shift;
+    get '/enqueue' => sub {
+        my $c = shift;
 
-    my $j = $c->minion->enqueue('sleep');
+        my $j = $c->minion->enqueue('sleep');
 
-    $c->render('json' => { job => $j });
+        $c->render('json' => { job => $j });
 
-};
+    };
 
-get '/state/:id' => sub {
-    my $c = shift;
-    my $job = $c->minion->job($c->stash('id'));
+    get '/state/:id' => sub {
+        my $c = shift;
+        my $job = $c->minion->job($c->stash('id'));
 
-    $c->render('json' => { job => $c->stash('id'), info => $job->info });
-};
+        $c->render('json' => { job => $c->stash('id'), info => $job->info });
+    };
 
-app->start;
-
+    app->start;
 
 =head2 DESCRIPTION
 

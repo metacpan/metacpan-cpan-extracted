@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2008-2020 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -39,7 +39,7 @@ $def_off{0} = {
                '+00:06:04' => 'Europe/Andorra',
                '+00:09:21' => 'Europe/Paris',
                '+00:12:12' => 'Africa/Algiers',
-               '+00:13:36' => 'Africa/Lagos',
+               '+00:13:35' => 'Africa/Lagos',
                '+00:17:30' => 'Europe/Brussels',
                '+00:19:32' => 'Europe/Amsterdam',
                '+00:20:00' => 'Europe/Amsterdam',
@@ -47,6 +47,7 @@ $def_off{0} = {
                '+00:26:56' => 'Africa/Sao_Tome',
                '+00:29:32' => 'Europe/Monaco',
                '+00:29:46' => 'Europe/Zurich',
+               '+00:30:00' => 'Africa/Accra',
                '+00:34:08' => 'Europe/Zurich',
                '+00:40:44' => 'Africa/Tunis',
                '+00:43:00' => 'Europe/Oslo',
@@ -212,7 +213,6 @@ $def_off{0} = {
                '+09:30:00' => 'Australia/Adelaide',
                '+09:30:48' => 'Asia/Sakhalin',
                '+09:32:54' => 'Asia/Ust-Nera',
-               '+09:35:28' => 'Australia/Currie',
                '+09:39:00' => 'Pacific/Guam',
                '+09:39:52' => 'Australia/Melbourne',
                '+09:48:32' => [ 'Pacific/Port_Moresby' => 'Pacific/Bougainville' ],
@@ -470,6 +470,7 @@ $def_off{0} = {
 $def_off{1} = {
                '+00:00:00' => 'Atlantic/Azores',
                '+00:20:00' => 'Africa/Accra',
+               '+00:30:00' => 'Africa/Accra',
                '+00:34:39' => 'Europe/Dublin',
                '+01:00:00' => 'WET',
                '+01:19:32' => 'Europe/Amsterdam',
@@ -494,7 +495,7 @@ $def_off{1} = {
                '+09:45:00' => 'Australia/Eucla',
                '+10:00:00' => 'Asia/Chita',
                '+10:30:00' => 'Australia/Adelaide',
-               '+11:00:00' => [ 'Australia/Melbourne' => 'Australia/Currie' ],
+               '+11:00:00' => [ 'Australia/Melbourne' => 'Australia/Hobart' ],
                '+11:30:00' => 'Australia/Lord_Howe',
                '+12:00:00' => 'Pacific/Norfolk',
                '+12:30:00' => 'Pacific/Norfolk',
@@ -507,6 +508,7 @@ $def_off{1} = {
                '-02:30:00' => 'America/St_Johns',
                '-02:30:52' => 'America/St_Johns',
                '-03:00:00' => 'America/Halifax',
+               '-03:19:18' => 'Atlantic/Bermuda',
                '-03:32:36' => 'America/La_Paz',
                '-04:00:00' => 'America/New_York',
                '-04:30:00' => 'America/Santo_Domingo',

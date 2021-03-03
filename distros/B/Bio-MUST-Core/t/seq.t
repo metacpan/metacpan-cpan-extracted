@@ -153,7 +153,7 @@ for my $exp_row (@valid_seqs) {
     my $got_row = [
         $seq->seq_id->full_id,
         $seq->seq,                  # can be different from constructor
-        $seq->raw_seq,              # ... due to coercion
+        $seq->raw_str,              # ... due to coercion
         $seq->seq,                  # to check non-destructive gap stripping
         $seq->nomiss_seq_len,
         $seq->is_protein,

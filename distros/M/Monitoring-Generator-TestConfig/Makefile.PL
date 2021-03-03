@@ -12,7 +12,19 @@ resources(
     'repository', => 'https://github.com/sni/Monitoring-Generator-TestConfig',
 );
 
+requires 'Getopt::Long';
+requires 'Pod::Usage';
+requires 'Sys::Hostname';
+requires 'Getopt::Long';
+requires 'Time::HiRes';
+requires 'Carp';
+requires 'POSIX';
+requires 'Data::Dumper';
+requires 'IPC::Cmd';
+
 test_requires 'Test::More'    => 0.87;
+test_requires 'File::Temp';
+test_requires 'File::Basename';
 
 install_script 'bin/create_monitoring_test_config.pl';
 

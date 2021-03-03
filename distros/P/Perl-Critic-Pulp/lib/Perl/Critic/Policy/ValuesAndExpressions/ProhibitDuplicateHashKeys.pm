@@ -1,4 +1,4 @@
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 
@@ -32,7 +32,7 @@ use Perl::Critic::Pulp::Utils 'elem_is_comma_operator';
 #use Smart::Comments;
 
 
-our $VERSION = 97;
+our $VERSION = 99;
 
 use constant supported_parameters => ();
 use constant default_severity => $Perl::Critic::Utils::SEVERITY_MEDIUM;
@@ -284,8 +284,8 @@ what was meant.  On that basis this policy is under the "bugs" theme and
 medium severity (see L<Perl::Critic/POLICY THEMES>).
 
 Perl is happy to run code like the above.  The value of the last "red" is
-stored.  Doing this at runtime is good since you can give defaults which
-further values from a caller or similar can replace.  For example,
+stored.  As runtime behaviour, this is good since you can give defaults
+which further values from a caller or similar can replace.  For example,
 
     sub new {
       my $class = shift;
@@ -351,7 +351,7 @@ http://user42.tuxfamily.org/perl-critic-pulp/index.html
 
 =head1 COPYRIGHT
 
-Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020, 2021 Kevin Ryde
 
 Perl-Critic-Pulp is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

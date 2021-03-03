@@ -6,19 +6,29 @@ use strict;
 use warnings;
 
 use Carp;
-use Encode ();
+use Exporter;
+
+our @ISA = qw{ Exporter };
+
+use constant CAN_USE_UNICODE	=> "$]" >= 5.008004;
+
+BEGIN {
+    # Not
+    # use if CAN_USE_UNICODE, 'Encode'
+    # because that does an import.
+    CAN_USE_UNICODE
+	and require Encode;
+}
 
 BEGIN {
     $ENV{DEVELOPER_DEBUG} and Carp->import ('verbose');
 }
 
-use Exporter qw{ import };
-
 use constant CODE_REF	=> ref sub {};
 
 {
     my @const = qw{
-        defaultFlavor
+        defaultFlavor defaultEncode
 	kPasteboardClipboard kPasteboardFind kPasteboardUniqueName
 	badPasteboardSyncErr badPasteboardIndexErr badPasteboardItemErr
 	    badPasteboardFlavorErr duplicatePasteboardFlavorErr
@@ -51,7 +61,7 @@ use constant CODE_REF	=> ref sub {};
     our @EXPORT = @funcs;	## no critic (ProhibitAutomaticExportation)
 }
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 our $XS_VERSION = $VERSION;
 our $ALPHA_VERSION = $VERSION;
 $VERSION =~ s/_//g;
@@ -62,17 +72,6 @@ XSLoader::load( 'Mac::Pasteboard', $XS_VERSION);
 # This global and its associated environment variable are UNDOCUMENTED
 # and subject to change or retraction without notice.
 our $USE_PBCOPY = $ENV{MAC_PASTEBOARD_USE_PBCOPY};
-unless ( defined $USE_PBCOPY ) {
-    local $@ = undef;
-    eval {	## no critic (RequireCheckingReturnValueOfEval)
-	require POSIX;
-	my ( $sysname, undef, $release ) = POSIX::uname();
-	$release =~ s/ [.] .* //smx;
-	# macOS 10.15 Catalina
-	$USE_PBCOPY = $sysname =~ m/ \A Darwin \z /smxi && $release >= 19;
-	1;
-    };
-}
 
 BEGIN {
     eval {
@@ -122,20 +121,21 @@ my %static = (
 );
 
 sub new {
-    my ($class, $name) = @_;
-    ref $class and $class = ref $class;
+    my ( $class, @arg ) = @_;
+    my $name = @arg % 2 ? shift @arg : kPasteboardClipboard();
     defined $name or $name = kPasteboardClipboard();
     $ENV{DEVELOPER_DEBUG}
 	and warn __PACKAGE__, "->new() creating $name";
     my $self = bless {
 	default_flavor	=> defaultFlavor(),
-	encode		=> 0,
+	encode		=> defaultEncode(),
 	fatal		=> 1,
 	id		=> undef,
 	missing_ok	=> 0,
 	name		=> $name,
 	requested_name	=> $name,
-    }, $class;
+    }, ref $class || $class;
+    @arg and $self->set( @arg );
     my ($status, $pbref, $created_name) = xs_pbl_create ($self->{name});
     __PACKAGE__->_check ($status) and return;
     $created_name and $self->{name} = $created_name;
@@ -183,6 +183,22 @@ sub copy {
 		$flags,
 	    )
 	);
+    }
+}
+
+{
+    my %encoding = (
+	'public.utf8-plain-text'	=> 'UTF-8',
+	'public.utf16-plain-text'	=> 'UTF-16LE',
+	'public.utf16-external-plain-text'	=> 'UTF-16',
+    );
+
+    sub flavor_encoding {
+	my ( $self, $flavor ) = @_;
+	defined $flavor
+	    and $flavor ne ''
+	    or $flavor = $self->get( 'default_flavor' );
+	return $encoding{$flavor};
     }
 }
 
@@ -404,26 +420,17 @@ sub synch {
     }
 }
 
-{
-    my %encoding = (
-	'public.utf8-plain-text'	=> 'UTF-8',
-	'public.utf16-plain-text'	=> 'UTF-16LE',
-	'public.utf16-external-plain-text'	=> 'UTF-16',
-    );
-
-    sub _xlate {
-	my ( $self, $function, $data, $flavor ) = @_;
-	$self->get( 'encode' )
-	    or return $data;
-	defined $flavor
-	    and $flavor ne ''
-	    or $flavor = $self->get( 'default_flavor' );
-	defined $encoding{$flavor}
-	    or return $data;
-	my $code = Encode->can( $function )
-	    or confess "Programming error - Encode can not $function()";
-	return $code->( $encoding{$flavor}, $data );
-    }
+sub _xlate {
+    my ( $self, $function, $data, $flavor ) = @_;
+    CAN_USE_UNICODE
+	or return $data;
+    $self->get( 'encode' )
+	or return $data;
+    defined( my $encoding = $self->flavor_encoding( $flavor ) )
+	or return $data;
+    my $code = Encode->can( $function )
+	or confess "Programming error - Encode can not $function()";
+    return $code->( $encoding, $data );
 }
 
 {
@@ -506,20 +513,6 @@ or equivalently, using the object-oriented interface,
 
 =head1 CAVEATS
 
-macOS (as they spell it now) 10.15 Catalina appears to have broken this
-module. The problem appears to be in placing text on the pasteboard.
-As a stopgap until I can sort this out properly, the C<copy()> method
-spawns L<pbcopy (1)> if run under Darwin 19 or higher. If L<pbcopy (1)>
-is spawned, the flavor functionality is unavailable.
-
-This module is only useful if the script calling it has access to the
-desktop. Otherwise attempts to instantiate a Mac::Pasteboard object will
-fail, with Mac::Pasteboard->get ('status') returning
-coreFoundationUnknownErr (-4960). This may happen when running over an
-ssh connection, and probably from a cron job as well, depending on your
-version of Mac OS X. This restriction appears to apply not only to the
-system clipboard but to privately-created pasteboards.
-
 Beginning with Mac OS 10.6 Snow Leopard, pasteboards could contain
 multiple items. Until I upgrade, this package can only access the first
 item. If your interest is in writing a droplet (that is, an application
@@ -542,6 +535,10 @@ Mac OS. It also does not cover C<com.apple.traditional-mac-plain-text>
 because the encoding of this appears to change, and I have been unable
 to find documentation (or to figure out on my own) which encoding to
 expect.  B<Caveat user>.
+
+Any functionality that involves any character set other than the
+system's native character set is disabled on versions of Perl before
+5.8.4.
 
 =head1 DESCRIPTION
 
@@ -630,6 +627,13 @@ from
 
  Mac::Pasteboard->get ('status');
 
+Starting with version C<0.012_01> you can pass desired attributes as
+arguments -- the same name/value pairs that get passed to C<set()>.
+These come after the pasteboard name if any, but there is no need to
+specify an explicit C<undef> if you want to default the name but specify
+attributes; C<new()> will figure it out based on whether the number of
+arguments is odd or even.
+
 =head2 $status = $pb->clear ()
 
 This method clears the pasteboard. You must clear the pasteboard before
@@ -656,6 +660,18 @@ If the L<id|/id (integer)> attribute is undef, the data are placed in
 the item whose id is 1. Otherwise, the data are placed in the item with
 the given id.  It is an error to attempt to place a given flavor in a
 given item more than once.
+
+=head2 $encoding = $pb->flavor_encoding( $flavor );
+
+This method returns the Unicode encoding of the given flavor, or the
+default flavor if no flavor is given. If the encoding is unknown, it
+returns C<undef>.
+
+You can actually call this as a static method, but if you do so you
+B<must> provide a defined and non-empty value for C<$flavor>.
+
+In fact, this is driven by a table of flavors for which the flavors are
+known. This table is given under L<encode|/encode (boolean)>, below.
 
 =head2 @names = $pb->flavor_flag_names ($flags)
 
@@ -911,6 +927,8 @@ is undocumented (ASCII? MacRoman? MacSomething depending on locale?).
 When it has wide characters to handle it seems to get upgraded to
 UTF-16LE, but how to tell when this is done is also undocumented.
 
+The default value of this attribute is L<defaultEncode|/defaultEncode>.
+
 =head2 default_flavor (string)
 
 This attribute stores the name of the default flavor to use if a flavor
@@ -1142,10 +1160,19 @@ This synchronization flag indicates that the pasteboard has been
 modified since the last time this program accessed it, and the local
 copy of the pasteboard has been synchronized.
 
+=head2 Other Exports
+
+=head3 defaultEncode
+
+This constant specifies the default value of the C<encode> attribute.
+This is true under macOS 10.15 Catalina and later, and false under
+earlier versions.
+
 =head1 BUGS
 
-Please report bugs either through
-L<https://github.com/trwyant/perl-Mac-Pasteboard/issues/> or by mail to
+Please report bugs through
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Mac-Pasteboard>,
+L<https://github.com/trwyant/perl-Mac-Pasteboard/issues/>, or by mail to
 the author.
 
 =head1 SEE ALSO

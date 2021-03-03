@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Role::API;
-$Search::Elasticsearch::Client::7_0::Role::API::VERSION = '7.711';
+$Search::Elasticsearch::Client::7_0::Role::API::VERSION = '7.711001';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::API';
 
@@ -6318,7 +6318,7 @@ Search::Elasticsearch::Client::7_0::Role::API - This class contains the spec for
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,14 @@
 Revision history for Perl bundle Bundle::Maintainer::MHASCH
 
+0.005   Sat, 27 Feb 2021 11:34:42 +0100
+        - made module loading tests non-fatal
+
+0.004   Sat, 27 Feb 2021 07:58:40 +0100
+        - added t/01_modules.t
+        - switched to artistic license
+        - added github repo
+        - moved issue tracking to github
+
 0.003   Fri, 27 Dec 2019 00:39:02 +0100
         - added Math::Polynomial::Cyclotomic
 

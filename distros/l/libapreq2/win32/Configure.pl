@@ -10,7 +10,7 @@ use ExtUtils::MakeMaker;
 use File::Basename;
 use File::Path;
 my ($apache, $apxs, $debug, $help, $no_perl, $perl, $with_perl);
-my $VERSION = "2.09";
+my $VERSION = "2.15";
 my $result = GetOptions( 'with-apache2=s' => \$apache,
 			 'with-apache2-apxs=s' => \$apxs,
 			 'debug' => \$debug,
@@ -41,12 +41,12 @@ my $prog = apache_prog_name($apache);
 my @httpd_ver = httpd_version($prog);
 my $devnull = devnull();
 my %map = (
-    apr => $httpd_ver[1] == 2 ? 'libapr-1.lib' : 'libapr.lib',
-    apu => $httpd_ver[1] == 2 ? 'libaprutil-1.lib' : 'libaprutil.lib'
+    apr => $httpd_ver[1] >= 2 ? 'libapr-1.lib' : 'libapr.lib',
+    apu => $httpd_ver[1] >= 2 ? 'libaprutil-1.lib' : 'libaprutil.lib'
 );
 
 foreach my $what (qw(apr apu)) {
-    my $ap = ($httpd_ver[1] == 2) ?
+    my $ap = ($httpd_ver[1] >= 2) ?
         "$what-1-config.bat" : "$what-config.bat";
     my $cfg = catfile $apache, 'bin', $ap;
     my $lib;

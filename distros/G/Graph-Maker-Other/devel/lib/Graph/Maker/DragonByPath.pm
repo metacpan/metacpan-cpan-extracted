@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -24,7 +24,7 @@ use Graph::Maker;
 use Math::PlanePath::DragonCurve 117; # v.117 for level_to_n_range()
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 sub _default_graph_maker {

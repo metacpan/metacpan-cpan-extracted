@@ -3,7 +3,7 @@
 # See the LICENSE file in the project root for more information
 
 package Search::Elasticsearch::Client::7_0::Direct;
-$Search::Elasticsearch::Client::7_0::Direct::VERSION = '7.711';
+$Search::Elasticsearch::Client::7_0::Direct::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -127,7 +127,7 @@ Search::Elasticsearch::Client::7_0::Direct - Thin client with full support for E
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use warnings;
 package Data::Fake::Internet;
 # ABSTRACT: Fake Internet-related data generators
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Exporter 5.57 qw/import/;
 
@@ -152,7 +152,7 @@ Data::Fake::Internet - Fake Internet-related data generators
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

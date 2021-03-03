@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Cxn::Mojo;
-$Search::Elasticsearch::Cxn::Mojo::VERSION = '7.711';
+$Search::Elasticsearch::Cxn::Mojo::VERSION = '7.711001';
 use Mojo::UserAgent();
 use Promises qw(deferred);
 use Try::Tiny;
@@ -123,7 +123,7 @@ Search::Elasticsearch::Cxn::Mojo - An async Cxn implementation which uses Mojo::
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

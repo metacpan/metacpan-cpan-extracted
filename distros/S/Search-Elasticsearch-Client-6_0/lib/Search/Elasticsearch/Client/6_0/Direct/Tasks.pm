@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::6_0::Direct::Tasks;
-$Search::Elasticsearch::Client::6_0::Direct::Tasks::VERSION = '7.711';
+$Search::Elasticsearch::Client::6_0::Direct::Tasks::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Client::6_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -34,7 +34,7 @@ Search::Elasticsearch::Client::6_0::Direct::Tasks - A client for accessing the T
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

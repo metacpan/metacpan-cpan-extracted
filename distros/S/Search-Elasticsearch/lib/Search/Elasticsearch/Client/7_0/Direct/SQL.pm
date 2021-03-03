@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Direct::SQL;
-$Search::Elasticsearch::Client::7_0::Direct::SQL::VERSION = '7.711';
+$Search::Elasticsearch::Client::7_0::Direct::SQL::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -36,7 +36,7 @@ Search::Elasticsearch::Client::7_0::Direct::SQL - Plugin providing SQL for Searc
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 SYNOPSIS
 

@@ -18,22 +18,42 @@ pbtool - Manipulate Mac OS X pasteboards/clipboards.
 
 I<Pbtool> takes the following options:
 
-B<-binary>
+=head2 --binary
 
 This option specifies that no end-of-line translation is done on output.
 Despite its name, it should be fine for text. To turn this off, specify
 -nobinary.
 
-The default is -binary.
+The default is C<--no-binary> under Catalina (macOS 10.15) and above,
+and C<--binary> otherwise.
 
-B<-echo>
+=head2 --default-flavor
+
+ --default-flavor public.utf16-external-plain-text
+
+This option specifies the default flavor of text if no flavor is
+specified in the command.
+
+The default is
+
+ --default-flavor public.utf8-plain-text
+
+under Catalina (macOS 10.15) and above, and
+
+ --default-flavor com.apple.traditional-mac-plain-text
+
+otherwise.
+
+=head2 --echo
 
 This option specifies that input is echoed to standard error. To turn
-this off, specify -noecho.
+this off, specify C<--noecho>.
 
-The default is -noecho.
+The default is C<--noecho>.
 
-B<-id=n>
+=head2 --id
+
+ --id 42
 
 This option specifies the pasteboard item ID to be used for I<copy> and
 I<paste>, as an unsigned integer. To specify no item id (which in fact
@@ -79,6 +99,13 @@ file, which is opened for appending if the token begins with '>>', or
 for output if it begins with '>'. The token is removed from the list of
 tokens passed to the command.
 
+Beginning in version C<0.012_01> you can specify a pbtool command on the
+command line that runs the script, like this:
+
+ $ pbtool copy_file some_text.txt
+
+This will execute the specified pbtool command, and then exit.
+
 The actual commands are:
 
 =cut
@@ -89,6 +116,7 @@ use warnings;
 use Getopt::Long;
 use IO::File;
 use Mac::Pasteboard qw{:const};
+use Pod::Usage;
 use Text::ParseWords;
 
 BEGIN {
@@ -97,14 +125,15 @@ BEGIN {
     die "Neither YAML nor Data::Dumper available.\n";
 }
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 our $ALPHA_VERSION = $VERSION;
 $VERSION =~ s/_//g;
 
 my %opt = (
-    binary => 1,
-    echo => 0,
-    id => undef,
+    binary		=> defaultEncode ? 0 : 1,
+    default_flavor	=> defaultFlavor,
+    echo		=> 0,
+    id			=> undef,
 );
 
 # We hold on to this filehandle for the duration.
@@ -112,10 +141,16 @@ open (my $binout, '>&', \*STDOUT)	## no critic (RequireBriefOpen)
     or die "Failed to duplicate STDOUT: $!\n";
 binmode ($binout)
     or die "Failed to put \$binout into binmode: $!\n";
+binmode STDOUT, ":encoding(UTF-8)"
+    or die "Failed to put STDOUT to encoding UTF-8: $!\n";
 
 my $optexitval = 1;
 
-_options (@ARGV);
+@ARGV = _options( @ARGV );	## no critic (RequireLocalizedPunctuationVars)
+if ( @ARGV ) {
+    _do_command( @ARGV );
+    exit;
+}
 
 $optexitval = 'NOEXIT';
 
@@ -158,12 +193,7 @@ while (defined ($_ = _readline ())) {
     $_ or next;
     substr ($_, 0, 1) eq '#' and next;
     eval {
-	my ($cmd, @args) = _parse_tokens (quotewords ('\s+', 0, $_));
-	$cmd !~ m/ \A _ /smx
-	    and my $code = __PACKAGE__->can( $cmd )
-	    or die "No such command as '$cmd'.\n";
-	$code->(@args);
-	1;
+	_do_command( _parse_tokens( quotewords( '\s+', 0, $_) ) )
     } or warn $@;
 }
 -t and print "\n";
@@ -205,6 +235,39 @@ sub copy {
     return;
 }
 
+=head2 copy_file file_name [flavor [flags]]
+
+This command copies the contents of the given file to the current
+pasteboard as the given flavor and the given flavor flags. The flavor
+flags default to 0, and the flavor to C<defaultFlavor>. If there is no
+current pasteboard the system clipboard becomes the current pasteboard,
+but you get an error anyway because you do not own it at this point, not
+having cleared it.
+
+The file's encoding is assumed to be that implied by the flavor, if any.
+
+If the I<id> setting is set to a number, your data is copied to the item
+with that ID. If it is set to undef, it is copied to item id 1.
+
+=cut
+
+sub copy_file {
+    my ( $fn, $flavor, $flags ) = @_;
+    $pb or create ();
+    my $encoding = $pb->flavor_encoding( $flavor );
+    local $/ = undef;
+    open my $fh, '<', $fn
+	or die "Unable to open $fn: $!\n";
+    if ( defined $encoding ) {
+	binmode $fh, ":encoding($encoding)"
+	    or die "Failed to set $fn encoding to $encoding: $!\n";
+    }
+    my $data = <$fh>;
+    close $fh;
+    $pb->copy( $data, $flavor, $flags );
+    return;
+}
+
 =head2 create [name]
 
 The named pasteboard is created if necessary, and becomes the current
@@ -215,10 +278,14 @@ pasteboard. If no name is specified, you get the system clipboard, named
 
 {
     my %cache;
-    sub create {
+    sub create {	## no critic (RequireArgUnpacking)
 	my $name = defined $_[0] ? $_[0] : kPasteboardClipboard;
-	$pb = $cache{$name} ||= Mac::Pasteboard->new (
-	    $name, id => $opt{id});
+	$pb = $cache{$name} ||= Mac::Pasteboard->new( $name );
+	$pb->set(
+	    encode		=> ! $opt{binary},
+	    default_flavor	=> $opt{default_flavor},
+	    id		=> $opt{id},
+	);
 	return;
     }
 }
@@ -341,7 +408,7 @@ This command displays the documentation for pbtool.
 =cut
 
 sub help {
-    _usage (2);
+    pod2usage( { -verbose => 2, -exitval => 'NOEXIT' } );
     return;
 }
 
@@ -375,16 +442,21 @@ still in effect):
 {
     my ($boolean, %fmtr);
     BEGIN {
-	$boolean = sub {$opt{$_[0]} ? $_[0] : 'no' . $_[0]};
+	$boolean = sub {$opt{$_[0]} ? $_[0] : 'no-' . $_[0]};
 	%fmtr = (
 	    binary => $boolean,
+	    default_flavor	=> sub { "default-flavor=$_[1]" },
 	    echo => $boolean,
 	    id => sub {defined $_[1] ? "$_[0]=$_[1]" : 'no' . $_[0]},
 	);
     }
     sub opt {
-	@_ and _options (@_);
-	print join (' ', 'opt', map {'-' . $fmtr{$_}->($_, $opt{$_})}
+	my @arg = @_;
+	if ( @arg ) {
+	    @arg = _options( @arg );
+	    @arg and warn "Non-option input ignored: @arg\n";
+	}
+	print join (' ', 'opt', map {'--' . $fmtr{$_}->($_, $opt{$_})}
 	    sort keys %fmtr), "\n";
 	return;
     }
@@ -487,6 +559,29 @@ sub pbpaste {
     return;
 }
 
+=head2 set
+
+This is just an alias for L<opt|/opt>.
+
+=cut
+
+BEGIN {
+    no warnings qw{ once };
+    *set = \&opt;	# sub set{}
+}
+
+=head2 show
+
+This is a variant on L<opt|/opt> that ignores its arguments, so all that
+happens is that the current values of the options are displayed.
+
+=cut
+
+sub show {
+    @_ = ();
+    goto &opt;
+}
+
 =head2 status [value]
 
 This command displays the current status setting of the current
@@ -541,6 +636,19 @@ sub unique {
 #
 #	Utility subroutines
 #
+
+#	_do_command( $cmd, @args )
+#
+#	Execute the given pbtool command
+sub _do_command {
+    my ( $cmd, @args ) = @_;
+    $cmd !~ m/ \A _ /smx
+	and my $code = __PACKAGE__->can( $cmd )
+	or die "No such command as '$cmd'.\n";
+    $code->(@args);
+    return 1;
+}
+
 #	_expand_flavors( $pb, @flavors );
 #
 #	This subroutine takes as its arguments a pasteboard object and
@@ -556,6 +664,18 @@ sub _expand_flavors {
 	$flav->{tags} = $flavor_tags{$flav->{flavor}} ||=
 	    $pb->flavor_tags( $flav->{flavor} );
 	$flav->{flags} = sprintf '0x%x', $flav->{flags};
+	$flav->{encoding} = Mac::Pasteboard->flavor_encoding(
+	    $flav->{flavor} );
+	if ( defined $flav->{data} ) {
+	    local $_ = undef;
+	    {
+		use bytes;
+		$_ = unpack 'H*', $flav->{data};
+	    }
+	    s/ ( .. ) /$1 /smxg;
+	    s/ \s+ \z //smx;
+	    $flav->{data_hex} = $_;
+	}
     }
     return;
 }
@@ -577,6 +697,8 @@ sub _parse_tokens {
     }
     my @rslt;
     foreach (@tokens) {
+	defined $_
+	    or next;
 	if (m/^<<(.*)/) {
 	    my $eod = $1;
 	    my $token = '';
@@ -621,55 +743,17 @@ eod
 
 sub _options {
     local @ARGV = @_;
-    GetOptions (\%opt, qw{binary! echo! id=i}, noid => sub {$opt{id} = undef})
-	or die _usage (1);
-    $pb and $pb->set (id => $opt{id});
-    @ARGV and create (shift @ARGV);
+    GetOptions( \%opt,
+	qw{ binary! default_flavor|default-flavor=s echo! id=i },
+	noid => sub { $opt{id} = undef },
+	help => sub { pod2usage( { -verbose => 2 } ) },
+    ) or pod2usage( { -verbose => 0 } );
+    $pb and $pb->set(
+	encode		=> ! $opt{binary},
+	default_flavor	=> $opt{default_flavor},
+	id		=> $opt{id},
+    );
     return @ARGV;
-}
-
-#	_usage ($verbosity, $exitval)
-#
-#	This subroutine displays the usage text to the desired
-#	verbosity. If Pod::Usage can be loaded, that module is used.
-#	Otherwise a verbosity < 2 gets you a short help message, and
-#	verbosity >= 2 gets you a message recommending the installation
-#	of Pod::Help.
-
-BEGIN {
-    if (eval {require Pod::Usage; 1}) {
-	*_usage = sub {
-	    my ($verbosity, $exitval) = @_;
-	    defined $exitval
-		or $exitval = $verbosity > 1 ? 'NOEXIT' : $optexitval;
-	    Pod::Usage::pod2usage (
-		-verbose => $verbosity,
-		-exitval => $exitval,
-	    );
-	};
-    } else {
-	*_usage = sub {
-	    my ($verbosity, $exitval) = @_;
-	    defined $exitval
-		or $exitval = $verbosity > 1 ? 'NOEXIT' : $optexitval;
-	    die $verbosity > 1 ? <<eod : <<eod;
-Please install Pod::Usage to get help.
-eod
-
-pbtool - Manipulate Mac OS X pasteboards.
-
-usage: pbtool [options] [pasteboard_name]
-
-where the options are:
-  -binary
-    for binary output (-nobinary reverses this);
-  -echo
-    to have commands echoed to standard error (-noecho reverses this);
-  -id=n
-    to set the desired pasteboard ID (-noid sets it to undef).
-eod
-	};
-    }
 }
 
 =head1 BUGS

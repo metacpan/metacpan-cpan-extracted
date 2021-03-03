@@ -261,5 +261,12 @@ test15:
       optional:
         long-arg: longarg
 
-
-
+test16:
+  deprecated:
+    status: true
+    replaced-by: foobar
+  class:
+    name: CLI::Driver::Test
+  method:
+    name: test16_method
+  

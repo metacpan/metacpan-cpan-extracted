@@ -1,6 +1,6 @@
 package Mail::BIMI::Role::CacheBackend;
 # ABSTRACT: Cache handling backend
-our $VERSION = '3.20210225'; # VERSION
+our $VERSION = '3.20210301'; # VERSION
 use 5.20.0;
 use Moose::Role;
 use Mail::BIMI::Prelude;
@@ -37,7 +37,7 @@ Mail::BIMI::Role::CacheBackend - Cache handling backend
 
 =head1 VERSION
 
-version 3.20210225
+version 3.20210301
 
 =head1 DESCRIPTION
 

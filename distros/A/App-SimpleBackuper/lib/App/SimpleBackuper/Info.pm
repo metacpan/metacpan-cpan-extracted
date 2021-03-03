@@ -53,8 +53,8 @@ sub Info {
 		$newest_backup = $newest_backup->{name};
 		push @subfiles, {
 			name			=> ($file->{name} eq '' ? '/' : $file->{name}),
-			oldest_backup	=> $oldest_backup,
-			newest_backup	=> $newest_backup,
+			oldest_backup	=> $oldest_backup // '-',
+			newest_backup	=> $newest_backup // '-',
 		};
 	}
 	

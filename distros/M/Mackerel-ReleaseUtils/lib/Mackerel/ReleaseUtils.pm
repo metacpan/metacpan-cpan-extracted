@@ -15,7 +15,7 @@ use Path::Tiny qw/path/;
 use POSIX qw(setlocale LC_TIME);
 use Scope::Guard qw/guard/;
 use Time::Piece qw/localtime/;
-use version; our $VERSION = version->declare("v0.2.4");
+use version; our $VERSION = version->declare("v0.2.5");
 
 use parent 'Exporter';
 
@@ -72,8 +72,13 @@ sub is_valid_version {
 
 sub decide_next_version {
     my $current_version = shift;
+    my $opt_next_version = shift;
     my $next_version = suggest_next_version($current_version);
-    $next_version = prompt("input next version:", $next_version);
+    if ($opt_next_version) {
+        $next_version = $opt_next_version;
+    } else {
+        $next_version = prompt("input next version:", $next_version);
+    }
 
     if (!is_valid_version($next_version)) {
         die qq{"$next_version" is invalid version string\n};
@@ -197,7 +202,7 @@ sub update_makefile {
 }
 
 sub create_release_pull_request {
-    my ($package_name, $code) = @_;
+    my ($package_name, $code, $opt_next_version) = @_;
     if (DEBUG) {
         $Mackerel::ReleaseUtils::Log::LogLevel = Mackerel::ReleaseUtils::Log::LOG_DEBUG;
     }
@@ -222,7 +227,7 @@ sub create_release_pull_request {
 
     my $current_version = last_release;
     infof "current version: %s\n", $current_version;
-    my $next_version = decide_next_version($current_version);
+    my $next_version = decide_next_version($current_version, $opt_next_version);
 
     $branch_name = "bump-version-$next_version";
     infof "checkout new releasing branch [$branch_name]\n";

@@ -1,0 +1,192 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Gzip::Zopfli - Zopfli deflate/gzip compression library
+
+=head1 SYNOPSIS
+
+    
+    use Gzip::Zopfli 'ZopfliCompress';
+    my $in = 'something' x 1000;
+    my $out = ZopfliCompress ($in);
+    print length ($out), ' ', length ($in), "\n";
+    
+
+
+produces output
+
+    62 9000
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Gzip-Zopfli-0.01/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.01 of Gzip-Zopfli
+corresponding to L<git commit ce701626022c4d9693449a17320e490adb09ffdb|https://github.com/benkasminbullock/gzip-zopfli/commit/ce701626022c4d9693449a17320e490adb09ffdb> released on Mon Mar 1 10:35:58 2021 +0900.
+
+This distribution also contains the source code of the Zopfli library
+version 1.0.3. See L</COPYRIGHT & LICENCE> for the
+conditions under which this source code may be used (Apache Licence,
+copyright by Google Inc.)
+
+=head1 DESCRIPTION
+
+This module offers access to the Zopfli compression library from
+Perl. Please note that the Zopfli does not offer decompression.
+
+=head1 FUNCTIONS
+
+=head2 zopfli_compress
+
+    my $out = zopfli_compress ($in, %options);
+
+Compress C<$in> into C<$out>. The possible options are as follows:
+
+=over
+
+=item blocksplitting
+
+    my $out = zopfli_compress ($in, blocksplitting => 0);
+
+Boolean. Apply blocksplitting or not? Default value is true.
+
+=item blocksplittingmax
+
+    my $out = zopfli_compress ($in, blocksplittingmax => 0);
+
+Maximum number of blocks to split into. Default is 15. Set to 0 for
+unlimited.
+
+=item numiterations
+
+    my $out = zopfli_compress ($in, numiterations => 1);
+
+Number of iterations. Default value is 15.
+
+=item type
+
+    my $out = zopfli_compress ($in, type => 'zlib');
+
+Type of compression. Either C<gzip> (the default), C<zlib>, or C<deflate>.
+
+=back
+
+=head2 zopfli_compress_file
+
+    my $out = zopfli_compress_file (in => "file");
+
+Compress from one file to another file:
+
+    zopfli_compress_file (in => $file, out => "$file.gz");
+
+Compress from data to a file:
+
+    zopfli_compress_file (from => $data, out => 'compressed-file.gz');
+
+It also accepts all the same options as L</zopfli_compress>.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<File::Slurper>
+
+File::Slurper is used by L</zopfli_compress_file> to read and write
+the files.
+
+=back
+
+=head1 SEE ALSO
+
+=head2 About Zopfli
+
+See L<https://github.com/google/zopfli>
+
+=head2 CPAN
+
+=over
+
+=item Other implementations of Zopfli
+
+=over
+
+=item L<Compress::Zopfli>
+
+=back
+
+=item Other gzip/deflate/zlib compression libraries
+
+=over
+
+=item L<Compress::Raw::Zlib>
+
+Interface to the Zlib compression library.
+
+=item L<Gzip::Libdeflate>
+
+Gzip compression and decompression with the new libdeflate library.
+
+=item L<Gzip::Faster>
+
+Alternative interface to zlib.
+
+=back
+
+=item Other
+
+=over
+
+=item Comparison of gzip compressions
+
+L<https://github.com/benkasminbullock/gzip-compare>
+
+=back
+
+=back
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+
+
+The underlying Zopfli library is included in this distribution. Zopfli
+is copyright and licensed as follows:
+
+Copyright 2011 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Author: lode.vandevenne@gmail.com (Lode Vandevenne)
+
+Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
+

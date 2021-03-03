@@ -29,7 +29,7 @@ WriteMakefile(
 	resources => {
 	    license     => 'http://dev.perl.org/licenses/',
 	    homepage    => 'https://github.com/noxxi/p5-net-inet6glue',
-	    bugtracker  => 'https://rt.cpan.org/Dist/Display.html?Queue=Net-INET6Glue',
+	    bugtracker  => 'https://github.com/noxxi/p5-net-inet6glue/issues',
 	    repository  => 'https://github.com/noxxi/p5-net-inet6glue',
 	},
     },

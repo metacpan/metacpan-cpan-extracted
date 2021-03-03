@@ -57,7 +57,7 @@
    "provides" : {
       "Mojolicious::Plugin::Cron" : {
          "file" : "lib/Mojolicious/Plugin/Cron.pm",
-         "version" : "0.031"
+         "version" : "0.033"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/dmanto/Mojolicious-Plugin-Cron"
       }
    },
-   "version" : "0.031",
+   "version" : "0.033",
    "x_contributors" : [
       "Daniel Mantovani <daniel@MBP-daniel.local>",
       "Daniel Mantovani <daniel@gmail.com>",

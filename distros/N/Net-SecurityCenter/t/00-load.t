@@ -13,6 +13,7 @@ require_ok('Net::SecurityCenter::API::Analysis');
 require_ok('Net::SecurityCenter::API::Credential');
 require_ok('Net::SecurityCenter::API::Feed');
 require_ok('Net::SecurityCenter::API::File');
+require_ok('Net::SecurityCenter::API::Notification');
 require_ok('Net::SecurityCenter::API::Plugin');
 require_ok('Net::SecurityCenter::API::PluginFamily');
 require_ok('Net::SecurityCenter::API::Report');
@@ -22,8 +23,14 @@ require_ok('Net::SecurityCenter::API::ScanResult');
 require_ok('Net::SecurityCenter::API::Scanner');
 require_ok('Net::SecurityCenter::API::Status');
 require_ok('Net::SecurityCenter::API::System');
+require_ok('Net::SecurityCenter::API::Ticket');
 require_ok('Net::SecurityCenter::API::User');
 require_ok('Net::SecurityCenter::API::Zone');
+
+require_ok('App::TenableSC');
+require_ok('App::TenableSC::API');
+require_ok('App::TenableSC::Logger');
+require_ok('App::TenableSC::Utils');
 
 done_testing();
 

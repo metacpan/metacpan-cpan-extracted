@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::Serializer::JSON;
-$Search::Elasticsearch::Role::Serializer::JSON::VERSION = '7.711';
+$Search::Elasticsearch::Role::Serializer::JSON::VERSION = '7.711001';
 use Moo::Role;
 requires 'JSON';
 
@@ -120,7 +120,7 @@ Search::Elasticsearch::Role::Serializer::JSON - A Serializer role for JSON modul
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

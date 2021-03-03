@@ -9,7 +9,7 @@ use IO::Compress::Zip::Constants ;
 
 our ($VERSION);
 
-$VERSION = '2.101';
+$VERSION = '2.102';
 
 use Compress::Raw::Zlib  2.101 ();
 

@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::pafiji00;
-# Copyright (c) 2008-2020 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2021 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Nov 30 13:52:19 EST 2020
-#    Data version: tzdata2020d
-#    Code version: tzcode2020d
+#    Generated on: Mon Mar  1 14:17:26 EST 2021
+#    Data version: tzdata2021a
+#    Code version: tzcode2021a
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.83';
+$VERSION='6.85';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -796,6 +796,15 @@ END { undef $VERSION; }
         [ [2090,11,11,14,0,0],[2090,11,12,3,0,0],'+13:00:00',[13,0,0],
           '+13',1,[2091,1,13,13,59,59],[2091,1,14,2,59,59],
           '2090111114:00:00','2090111203:00:00','2091011313:59:59','2091011402:59:59' ],
+     ],
+   2091 =>
+     [
+        [ [2091,1,13,14,0,0],[2091,1,14,2,0,0],'+12:00:00',[12,0,0],
+          '+12',0,[2091,11,10,13,59,59],[2091,11,11,1,59,59],
+          '2091011314:00:00','2091011402:00:00','2091111013:59:59','2091111101:59:59' ],
+        [ [2091,11,10,14,0,0],[2091,11,11,3,0,0],'+13:00:00',[13,0,0],
+          '+13',1,[2092,1,12,13,59,59],[2092,1,13,2,59,59],
+          '2091111014:00:00','2091111103:00:00','2092011213:59:59','2092011302:59:59' ],
      ],
 );
 

@@ -8,6 +8,7 @@ WriteMakefile
   'PREREQ_PM' => {
                    'AudioFile::Info' => 0,
                    'MP3::ID3Lib' => 0,
+                   'Test::Exception' => 0,
                    'YAML' => 0
                  },
   'INSTALLDIRS' => 'site',

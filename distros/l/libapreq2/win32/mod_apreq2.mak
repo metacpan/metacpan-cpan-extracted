@@ -78,7 +78,7 @@ BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\mod_apreq2.bsc" 
 LINK32=link.exe
 MANIFEST=$(OUTDIR)\mod_apreq2.so.manifest
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /machine:I386 /out:"$(OUTDIR)\mod_apreq2.so" /implib:"$(OUTDIR)\mod_apreq2.lib" 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /out:"$(OUTDIR)\mod_apreq2.so" /implib:"$(OUTDIR)\mod_apreq2.lib" 
 "$(OUTDIR)\mod_apreq2.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
@@ -92,13 +92,13 @@ ALL : "$(OUTDIR)\mod_apreq2.dll"
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "MOD_APREQ_EXPORTS" /I"$(APACHE)\include" /I"$(APREQ_HOME)\include" /I"$(MODDIR)" /YX /FD /GZ  /c 
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "APREQ_DECLARE_EXPORT" /I"$(APACHE)\include" /I"$(APREQ_HOME)\include" /I"$(MODDIR)" /YX /FD /GZ  /c 
 MTL_PROJ=/nologo /D "_DEBUG" /mktyplib203 /win32 
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\mod_apreq2.bsc" 
 LINK32=link.exe
 MANIFEST=$(OUTDIR)\mod_apreq2.so.manifest
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\mod_apreq2.pdb" /debug /machine:I386 /out:"$(OUTDIR)\mod_apreq2.so" /implib:"$(OUTDIR)\mod_apreq2.lib" /pdbtype:sept 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:yes /pdb:"$(OUTDIR)\mod_apreq2.pdb" /debug /out:"$(OUTDIR)\mod_apreq2.so" /implib:"$(OUTDIR)\mod_apreq2.lib" /pdbtype:sept 
 "$(OUTDIR)\mod_apreq2.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)

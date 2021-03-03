@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.210380';
+$Bio::MUST::Core::Ali::VERSION = '0.210610';
 use Moose;
 use namespace::autoclean;
 
@@ -189,7 +189,7 @@ sub perc_miss {
 sub uc_seqs {
     my $self = shift;
 
-    $_->uc_seq for $self->all_seqs;
+    $_->uc for $self->all_seqs;
     return $self;
 }
 
@@ -197,7 +197,7 @@ sub uc_seqs {
 sub recode_seqs {                           ## no critic (RequireArgUnpacking)
     my $self = shift;
 
-    $_->recode_seq(@_) for $self->all_seqs;
+    $_->recode(@_) for $self->all_seqs;
     return $self;
 }
 
@@ -381,7 +381,7 @@ sub map_coords {
 
 
 sub height {
-    return shift->count_seqs
+    return shift->count_seqs;
 }
 
 # I/O METHODS
@@ -490,11 +490,9 @@ sub store_fasta {
         my $width = $seq->seq_len;
         $chunk = $width     if $nowrap;             # optionally disable wrap
 
-        for (my $site = 0; $site < $width; $site += $chunk) {
-            my $str = $seq->edit_seq($site, $chunk);
-            $str =~ s{$GAP}{-}xmsg if $is_aligned;  # restore '-' when aligned
-            say {$out} $str;
-        }
+        my $str = $seq->wrapped_str($chunk);
+        $str =~ s{$GAP}{-}xmsg if $is_aligned;      # restore '-' when aligned
+        print {$out} $str;
     }
 
     return;
@@ -747,7 +745,7 @@ sub load_stockholm {
 
 sub instant_store {
     my $class   = shift;
-	my $outfile = shift;
+    my $outfile = shift;
     my $args    = shift // {};          # HashRef (should not be empty...)
 
     my $infile  = $args->{infile};
@@ -826,7 +824,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.210380
+version 0.210610
 
 =head1 SYNOPSIS
 

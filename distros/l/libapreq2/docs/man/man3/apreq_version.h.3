@@ -1,19 +1,18 @@
-.TH "include/apreq_version.h" 3 "25 Nov 2010" "Version 2.13" "libapreq2" \" -*- nroff -*-
+.TH "include/apreq_version.h" 3 "Thu Nov 5 2020" "Version 2.15" "libapreq2" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-include/apreq_version.h \- Versioning API for libapreq
-.PP
-There are several different mechanisms for accessing the version. There is a string form, and a set of numbers; in addition, there are constants which can be compiled into your application, and you can query the library being used for its actual version. 
+include/apreq_version.h \- Versioning API for libapreq\&.  
+
 .SH SYNOPSIS
 .br
 .PP
-\fC#include 'apr_version.h'\fP
+\fC#include 'apr_version\&.h'\fP
 .br
-\fC#include 'apreq.h'\fP
+\fC#include 'apreq\&.h'\fP
 .br
 
-.SS "Defines"
+.SS "Macros"
 
 .in +1c
 .ti -1c
@@ -23,7 +22,7 @@ There are several different mechanisms for accessing the version. There is a str
 .RI "#define \fBAPREQ_MINOR_VERSION\fP   8"
 .br
 .ti -1c
-.RI "#define \fBAPREQ_PATCH_VERSION\fP   0"
+.RI "#define \fBAPREQ_PATCH_VERSION\fP   1"
 .br
 .ti -1c
 .RI "#define \fBAPREQ_VERSION_STRING\fP"
@@ -36,7 +35,7 @@ There are several different mechanisms for accessing the version. There is a str
 
 .in +1c
 .ti -1c
-.RI "void \fBapreq_version\fP (\fBapr_version_t\fP *pvsn)"
+.RI "void \fBapreq_version\fP (apr_version_t *pvsn)"
 .br
 .ti -1c
 .RI "const char * \fBapreq_version_string\fP (void)"
@@ -44,55 +43,53 @@ There are several different mechanisms for accessing the version. There is a str
 .in -1c
 .SH "Detailed Description"
 .PP 
-Versioning API for libapreq
-.PP
-There are several different mechanisms for accessing the version. There is a string form, and a set of numbers; in addition, there are constants which can be compiled into your application, and you can query the library being used for its actual version. 
+Versioning API for libapreq\&. 
 
-Note that it is possible for an application to detect that it has been compiled against a different version of libapreq by use of the compile-time constants and the use of the run-time query function.
+There are several different mechanisms for accessing the version\&. There is a string form, and a set of numbers; in addition, there are constants which can be compiled into your application, and you can query the library being used for its actual version\&.
 .PP
-libapreq version numbering follows the guidelines specified in:
+Note that it is possible for an application to detect that it has been compiled against a different version of libapreq by use of the compile-time constants and the use of the run-time query function\&.
 .PP
-http://apr.apache.org/versioning.html 
-.SH "Define Documentation"
+libapreq version numbering follows the guidelines specified in: 
+.PP
+.nf
+http://apr.apache.org/versioning.html
+
+.fi
+.PP
+ 
+.SH "Macro Definition Documentation"
 .PP 
 .SS "#define APREQ_IS_DEV_STRING   ''"
-.PP
 Internal: string form of the 'is dev' flag 
 .SS "#define APREQ_MAJOR_VERSION   2"
-.PP
-major version Major API changes that could cause compatibility problems for older programs such as structure size changes. No binary compatibility is possible across a change in the major version. 
+major version Major API changes that could cause compatibility problems for older programs such as structure size changes\&. No binary compatibility is possible across a change in the major version\&. 
 .SS "#define APREQ_MINOR_VERSION   8"
-.PP
-Minor API changes that do not cause binary compatibility problems. Should be reset to 0 when upgrading APREQ_MAJOR_VERSION 
-.SS "#define APREQ_PATCH_VERSION   0"
-.PP
+Minor API changes that do not cause binary compatibility problems\&. Should be reset to 0 when upgrading APREQ_MAJOR_VERSION 
+.SS "#define APREQ_PATCH_VERSION   1"
 patch level 
 .SS "#define APREQ_VERSION_STRING"
-.PP
 \fBValue:\fP
 .PP
 .nf
-APR_STRINGIFY(APREQ_MAJOR_VERSION) '.' \
-     APR_STRINGIFY(APREQ_MINOR_VERSION) '.' \
+     APR_STRINGIFY(APREQ_MAJOR_VERSION) "\&." \
+     APR_STRINGIFY(APREQ_MINOR_VERSION) "\&." \
      APR_STRINGIFY(APREQ_PATCH_VERSION) \
      APREQ_IS_DEV_STRING
 .fi
-This symbol is defined for internal, 'development' copies of libapreq. This symbol will be #undef'd for releases. The formatted string of libapreq's version 
+This symbol is defined for internal, 'development' copies of libapreq\&. This symbol will be #undef'd for releases\&. The formatted string of libapreq's version 
 .SH "Function Documentation"
 .PP 
-.SS "void apreq_version (\fBapr_version_t\fP * pvsn)"
+.SS "void apreq_version (apr_version_t * pvsn)"
+Return libapreq's version information information in a numeric form\&.
 .PP
-Return libapreq's version information information in a numeric form.
-.PP
-\fBParameters:\fP
+\fBParameters\fP
 .RS 4
-\fIpvsn\fP Pointer to a version structure for returning the version information. 
+\fIpvsn\fP Pointer to a version structure for returning the version information\&. 
 .RE
 .PP
 
 .SS "const char* apreq_version_string (void)"
-.PP
-Return libapreq's version information as a string. 
+Return libapreq's version information as a string\&. 
 .SH "Author"
 .PP 
-Generated automatically by Doxygen for libapreq2 from the source code.
+Generated automatically by Doxygen for libapreq2 from the source code\&.

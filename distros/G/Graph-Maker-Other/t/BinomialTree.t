@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,14 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 757;
+plan tests => 944;
 
 require Graph::Maker::BinomialTree;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 15;
+  my $want_version = 18;
   ok ($Graph::Maker::BinomialTree::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::BinomialTree->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::BinomialTree->VERSION($want_version); 1 }, 1,
@@ -45,6 +45,75 @@ require Graph::Maker::BinomialTree;
   ok (! eval { Graph::Maker::BinomialTree->VERSION($check_version); 1 }, 1,
       "VERSION class check $check_version");
 }
+
+#------------------------------------------------------------------------------
+# various ways to distinguish the root
+
+foreach my $N (9 .. 12) {
+  my $graph = Graph::Maker->new('binomial_tree',
+                                N => $N,
+                                undirected => 1);
+  foreach my $v ($graph->vertices) {
+    my $degree = $graph->degree($v);
+    ok ($degree==4, $v==0,
+        "N=$N root v=0 is the only degree 4");
+  }
+}
+foreach my $N (13 .. 15) {
+  my $graph = Graph::Maker->new('binomial_tree',
+                                N => $N,
+                                undirected => 1);
+  my @centres = $graph->centre_vertices;
+  ok (scalar(@centres), 1, "N=$N unicentral");
+  ok ($centres[0], 0,
+      "N=$N unicentral root");
+}
+
+# {
+#   # Graph 0.9704 centre_vertices() is none for singleton, not good
+#   my $graph = Graph->new (undirected => 1);
+#   $graph->add_vertex('x');
+#   ok (scalar($graph->centre_vertices), 1);
+#   my @centres = $graph->centre_vertices;
+#   ok (scalar(@centres), 1);
+#   ok ($centres[0], 'x');
+# }
+
+sub is_pow2 {
+  my ($n) = @_;
+  return ($n & ($n-1)) == 0;
+}
+ok (  is_pow2(1), 1);
+ok (  is_pow2(2), 1);
+ok (! is_pow2(3), 1);
+ok (  is_pow2(4), 1);
+ok (! is_pow2(5), 1);
+ok (! is_pow2(7), 1);
+ok (  is_pow2(8), 1);
+
+sub second_highest_bit {
+  my ($n) = @_;
+  while ($n >=4) { $n>>=1; }
+  return $n & 1;
+}
+ok (second_highest_bit(2), 0);
+ok (second_highest_bit(3), 1);
+ok (second_highest_bit(4), 0);
+ok (second_highest_bit(5), 0);
+ok (second_highest_bit(6), 1);
+ok (second_highest_bit(7), 1);
+
+foreach my $N (2 .. 64) {
+  my $graph = Graph::Maker->new('binomial_tree',
+                                N => $N,
+                                undirected => 1);
+  my @centres = sort {$a <=> $b} $graph->centre_vertices;
+  ok (scalar(@centres), 
+      second_highest_bit($N)==0 ? 2 : 1,
+      "N=$N num centres");
+  ok ($centres[0], 0, "N=$N centre root");
+}
+
 
 #------------------------------------------------------------------------------
 # diameter 0 for order=0, otherwise 2*order-1 for order>=1

@@ -28,7 +28,7 @@ no_index:
 provides:
   Log::Any::Adapter::Coderef:
     file: lib/Log/Any/Adapter/Coderef.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Log::Any: '1.050'
   Sys::Hostname: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Log-Any-Adapter-Coderef/issues
   homepage: https://github.com/team-at-cpan/Log-Any-Adapter-Coderef
   repository: https://github.com/team-at-cpan/Log-Any-Adapter-Coderef.git
-version: '0.001'
+version: '0.002'
 x_authority: cpan:TEAM
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

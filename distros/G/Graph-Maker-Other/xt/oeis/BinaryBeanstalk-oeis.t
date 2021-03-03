@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016, 2017, 2018, 2020 Kevin Ryde
+# Copyright 2016, 2017, 2018, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -20,13 +20,12 @@
 
 use 5.004;
 use strict;
-use Memoize;
 use Test;
 plan tests => 51;
 
 use lib 't','xt';
 use MyTestHelpers;
-MyTestHelpers::nowarnings();
+BEGIN { MyTestHelpers::nowarnings() }
 use MyOEIS;
 
 require Graph::Maker::BinaryBeanstalk;

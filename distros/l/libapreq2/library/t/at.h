@@ -21,24 +21,24 @@
 #ifndef AT_H
 #define AT_H
 
-#include "apr.h"
-#include "apr_file_io.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <setjmp.h>
-#include "apr_strings.h"
+#include <stdio.h>
+#include <string.h>
 
 typedef struct at_t at_t;
 typedef struct at_report_t at_report_t;
 
-typedef apr_status_t (*at_report_function_t)(at_report_t *r, const char *msg);
-typedef void(*at_test_function_t)(at_t *t);
+typedef int (*at_report_function_t)(at_report_t *r, const char *msg);
+typedef void(*at_test_function_t)(at_t *t, void *ctx);
 typedef struct at_test_t at_test_t;
 
 struct at_test_t {
     const char          *name;
     at_test_function_t   func;
     int                  plan;
+    void                *ctx;
     const char          *fatals;
     const char          *skips;
     const char          *todos;
@@ -47,6 +47,11 @@ struct at_test_t {
 struct at_report_t {
     at_report_function_t func;
 };
+
+/* Private, portable snprintf implementation. 
+ */
+int at_snprintf(char *buf, int size, const char *format, ...);
+int at_vsnprintf(char *buf, int size, const char *format, va_list args); 
 
 /* We only need one at_t struct per test suite, so lets call it *AT.
  * The mnemonic we follow is that (for lowercase foo) "AT_foo(bar)"
@@ -68,14 +73,22 @@ struct at_t {
     const int           *todo;    /* list of expected failures */
     at_report_t         *report  ;/* handles the results of each check */
     unsigned char        flags;   /* verbosity: concise, trace, debug, etc. */
-    apr_pool_t          *pool;    /* creator pool with end-of-test cleanup */
     jmp_buf             *abort;   /* where fatals go to die */
 };
 
 
+#if defined(WIN32)
+#define AT_INLINE __inline
+#elif !defined(__GNUC__) || __GNUC__ < 2 || \
+    (__GNUC__ == 2 && __GNUC_MINOR__ < 7) ||\
+    defined(NEXT) || defined(NETWARE)
+#define AT_INLINE
+#else
+#define AT_INLINE __inline__
+#endif
 
-static APR_INLINE
-apr_status_t at_report(at_t *t, const char *msg) {
+static AT_INLINE
+int at_report(at_t *t, const char *msg) {
     at_report_t *r = t->report;
     return r->func(r, msg);
 }
@@ -85,17 +98,20 @@ apr_status_t at_report(at_t *t, const char *msg) {
 void at_ok(at_t *t, int is_ok, const char *label, const char *file, int line);
 #define AT_ok(is_ok, label) at_ok(AT, is_ok, label, __FILE__, __LINE__)
 
-at_t *at_create(apr_pool_t *pool, unsigned char flags, at_report_t *report);
-apr_status_t at_begin(at_t *t, int total);
+at_t *at_create(unsigned char flags, at_report_t *report);
+int at_begin(at_t *t, int total);
 #define AT_begin(total) at_begin(AT, total)
 
-apr_status_t at_run(at_t *AT, const at_test_t *test);
+int at_run(at_t *AT, const at_test_t *test);
 #define AT_run(test) at_run(AT, test)
 
 void at_end(at_t *t);
 #define AT_end() at_end(AT)
 
 
+#define AT_FLAG_TODO(f)       ((f) & 8)
+#define AT_FLAG_TODO_ON(f)    ((f) |= 8)
+#define AT_FLAG_TODO_OFF(f)   ((f) &= ~8)
 #define AT_FLAG_DEBUG(f)       ((f) & 4)
 #define AT_FLAG_DEBUG_ON(f)    ((f) |= 4)
 #define AT_FLAG_DEBUG_OFF(f)   ((f) &= ~4)
@@ -106,6 +122,8 @@ void at_end(at_t *t);
 #define AT_FLAG_CONCISE_ON(f)  ((f) |= 1)
 #define AT_FLAG_CONCISE_OFF(f) ((f) &= ~1)
 
+#define AT_todo_on()       AT_FLAG_TODO_ON(AT->flags)
+#define AT_todo_off()      AT_FLAG_TODO_OFF(AT->flags)
 #define AT_debug_on()      AT_FLAG_DEBUG_ON(AT->flags)
 #define AT_debug_off()     AT_FLAG_DEBUG_OFF(AT->flags)
 #define AT_trace_on()      AT_FLAG_TRACE_ON(AT->flags)
@@ -118,9 +136,9 @@ void at_end(at_t *t);
 /* Additional reporting utils.
    These emit TAP comments, and are not "checks". */
 
-apr_status_t at_comment(at_t *t, const char *fmt, va_list vp);
+int at_comment(at_t *t, const char *fmt, va_list vp);
 
-static APR_INLINE
+static AT_INLINE
 void at_debug(at_t *t, const char *fmt, ...) {
     va_list vp;
     va_start(vp, fmt);
@@ -129,7 +147,7 @@ void at_debug(at_t *t, const char *fmt, ...) {
     va_end(vp);
 }
 
-static APR_INLINE
+static AT_INLINE
 void at_trace(at_t *t, const char *fmt, ...) {
     va_list vp;
     va_start(vp, fmt);
@@ -141,7 +159,7 @@ void at_trace(at_t *t, const char *fmt, ...) {
 
 /* These are "checks". */
 
-static APR_INLINE
+static AT_INLINE
 void at_check(at_t *t, int is_ok, const char *label, const char *file,
            int line, const char *fmt, ...)
 {
@@ -154,11 +172,25 @@ void at_check(at_t *t, int is_ok, const char *label, const char *file,
 
         if (fmt != NULL) {
             char *f;
-            apr_snprintf(format, sizeof format, " format: %s", fmt);
+            at_snprintf(format, sizeof format, " format: %s", fmt);
             at_trace(t, "%s", format);
             memcpy(format, "   left:", 8);
             f = format + strlen(format);
-            apr_snprintf(f, sizeof format - strlen(format), "\n  right: %s", fmt);
+            at_snprintf(f, sizeof format - strlen(format), "\n  right: %s", fmt);
+            at_comment(t, format, vp);
+        }
+    }
+    else if (AT_FLAG_DEBUG(t->flags) && !is_ok) {
+        char format[32] = "testing: %s (%s:%d)";
+        at_debug(t, format, label, file, line);
+
+        if (fmt != NULL) {
+            char *f;
+            at_snprintf(format, sizeof format, " format: %s", fmt);
+            at_debug(t, "%s", format);
+            memcpy(format, "   left:", 8);
+            f = format + strlen(format);
+            at_snprintf(f, sizeof format - strlen(format), "\n  right: %s", fmt);
             at_comment(t, format, vp);
         }
     }
@@ -173,8 +205,8 @@ void at_check(at_t *t, int is_ok, const char *label, const char *file,
     char fmt[] =  ", as %u-byte struct pointers";                       \
     char buf[256] = #a " != " #b;                                       \
     const unsigned blen = sizeof(#a " != " #b);                         \
-    apr_snprintf(buf + blen - 1, 256 - blen, fmt, sz);                  \
-    apr_snprintf(fmt, sizeof(fmt), "%%.%us", sz);                       \
+    at_snprintf(buf + blen - 1, 256 - blen, fmt, sz);                   \
+    at_snprintf(fmt, sizeof(fmt), "%%.%us", sz);                        \
     at_check(AT, memcmp(left, right, sz), buf, __FILE__, __LINE__,      \
            fmt, left, right);                                           \
 } while (0)                                                             \
@@ -185,8 +217,8 @@ void at_check(at_t *t, int is_ok, const char *label, const char *file,
     char fmt[] =  ", as %u-byte struct pointers";                       \
     char buf[256] = #a " == " #b;                                       \
     const unsigned blen = sizeof(#a " == " #b);                         \
-    apr_snprintf(buf + blen - 1, 256 - blen , fmt, sz);                 \
-    apr_snprintf(fmt, sizeof(fmt), "%%.%us", sz);                       \
+    at_snprintf(buf + blen - 1, 256 - blen , fmt, sz);                  \
+    at_snprintf(fmt, sizeof(fmt), "%%.%us", sz);                        \
     at_check(AT, !memcmp(left, right, sz), buf, __FILE__, __LINE__,     \
            fmt, left, right);                                           \
 } while (0)
@@ -209,13 +241,13 @@ void at_check(at_t *t, int is_ok, const char *label, const char *file,
 #define AT_ptr_eq(a, b) do {                                    \
     const void *left = a, *right = b;                           \
     at_check(AT, left == right, #a " == " #b ", as pointers",   \
-            __FILE__, __LINE__, "%pp", left, right);            \
+            __FILE__, __LINE__, "%p", left, right);             \
 } while (0)
 
 #define AT_ptr_ne(a, b) do {                                    \
     const void *left = a, *right = b;                           \
     at_check(AT, left != right, #a " != " #b ", as pointers",   \
-            __FILE__, __LINE__, "%pp", left, right);            \
+            __FILE__, __LINE__, "%p", left, right);             \
 } while (0)
 
 
@@ -245,13 +277,13 @@ void at_check(at_t *t, int is_ok, const char *label, const char *file,
                                   __FILE__, __LINE__, fmt, a, b)
 
 
-static APR_INLINE
+static AT_INLINE
 void at_skip(at_t *t, int n, const char *reason, const char *file, int line) {
     char buf[256];
     while (n-- > 0) {
         ++t->current;
-        apr_snprintf(buf, 256, "ok %d - %s (%d) #skipped: %s (%s:%d)",
-                     t->current + t->prior, t->name, t->current, reason, file, line);
+        at_snprintf(buf, 256, "ok %d - %s (%d) #skipped: %s (%s:%d)",
+                    t->current + t->prior, t->name, t->current, reason, file, line);
         at_report(t, buf);
     }
 }
@@ -261,17 +293,18 @@ void at_skip(at_t *t, int n, const char *reason, const char *file, int line) {
 
 /* Report utilities. */
 
-at_report_t *at_report_file_make(apr_pool_t *p, apr_file_t *f);
-APR_INLINE
-static at_report_t *at_report_stdout_make(apr_pool_t *p)
+at_report_t *at_report_file_make(FILE *f);
+AT_INLINE
+static at_report_t *at_report_stdout_make(void)
 {
-    apr_file_t *out;
-    apr_file_open_stdout(&out, p);
-    return at_report_file_make(p, out);
+    return at_report_file_make(stdout);
 }
+void at_report_file_cleanup(at_report_t *r);
+#define at_report_stdout_cleanup(r) at_report_file_cleanup(r)
 
-void at_report_local(at_t *AT, apr_pool_t *p, const char *file, int line);
-#define AT_localize(p) at_report_local(AT, p, __FILE__, __LINE__)
-
+void at_report_local(at_t *AT, const char *file, int line);
+#define AT_localize() at_report_local(AT, __FILE__, __LINE__)
+void at_report_delocalize(at_t *AT);
+#define AT_delocalize() at_report_delocalize(AT)
 
 #endif /* AT_H */

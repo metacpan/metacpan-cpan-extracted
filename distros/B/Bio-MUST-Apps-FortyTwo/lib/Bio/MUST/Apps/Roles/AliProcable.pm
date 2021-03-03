@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Roles::AliProcable;
 # ABSTRACT: Attributes and methods common to AliProcessor objects
-$Bio::MUST::Apps::Roles::AliProcable::VERSION = '0.210370';
+$Bio::MUST::Apps::Roles::AliProcable::VERSION = '0.210570';
 use Moose::Role;
 
 use autodie;
@@ -48,7 +48,7 @@ Bio::MUST::Apps::Roles::AliProcable - Attributes and methods common to AliProces
 
 =head1 VERSION
 
-version 0.210370
+version 0.210570
 
 =head1 SYNOPSIS
 

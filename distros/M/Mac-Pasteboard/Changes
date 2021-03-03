@@ -1,3 +1,30 @@
+0.013		2021-03-02	T. R. Wyant
+    Add rt.cpan.org back to bug reporting methods.
+
+    Correct handling of non-ASCII characters.  At least, I sincerely
+    hope so. Thanks to Ray Takamoto for bringing this to my attention.
+    User-visible changes (aside from the obvious) include:
+
+    * The default data flavor is now public.utf8-plain-text under macOS
+      10.15 Catalina and higher.
+
+    * By default, the encoding attribute is true under macOS 10.15 Catalina
+      and higher.
+
+    * You can now pass desired attribute values to new(), instead of
+      instantiating a default object and calling set().
+
+    * Method flavor_encoding() reports what Unicode encoding is used for a
+      given pasteboard data flavor -- or the default flavor if no argument
+      is specified.
+
+    * The stopgap mods for macOS 10.15 Catalina, introduced in version
+      0.010_01, are now disabled by default, since investigating this
+      problem showed (I think!) what was actually going on.
+
+    * Made sure it would actually work under Perl 5.6.2. The encoding
+      functionality, though, does not work prior to Perl 5.8.4.
+
 0.012		2021-01-13	T. R. Wyant
     Use GitHub as bug tracker. R.I.P. rt.cpan.org.
 
@@ -15,18 +42,6 @@
     The above makes no sense to me, but I band-aided it by having copy()
     spawn pbcopy if POSIX::uname indicates that we are running under Darwin
     19 or higher.
-
-0.010_01	2019-10-13	T. R. Wyant
-    Stopgap modifications for macOS 10.15 Catalina.
-
-    The underlying problem appears to be that copy() does not put stuff on
-    the public pasteboards. It puts it somewhere, though, becase paste() can
-    find it, even if run in a separate process. But paste() also finds stuff
-    put on the pasteboard by pbcopy (1).
-    
-    The above makes no sense to me, but I band-aided it by having copy()
-    spawn pbcopy (1) if POSIX::uname indicates that we are running under
-    Darwin 19 or higher.
 
 0.010		2019-08-07	T. R. Wyant
     Tweak t/pasteboard.t do() file names.  This test does things like

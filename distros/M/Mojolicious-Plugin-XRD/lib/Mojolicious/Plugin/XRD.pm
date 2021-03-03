@@ -2,11 +2,11 @@ package Mojolicious::Plugin::XRD;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/quote deprecated/;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 # Todo: Support
 #  $self->reply->xrd( $xrd => {
-#    resource => 'acct:akron@sojolicio.us',
+#    resource => 'acct:akron@sojolicious.example',
 #    expires  => (30 * 24 * 60 * 60),
 #    cache    => ...,
 #    chi      => ...
@@ -299,7 +299,7 @@ Mojolicious::Plugin::XRD - XRD Document Handling with Mojolicious
 
   # In controller
   my $xrd = $c->new_xrd;
-  $xrd->subject('acct:akron@sojolicio.us');
+  $xrd->subject('acct:akron@sojolicious.example');
   $xrd->link(profile => '/me.html');
 
   # Render as XRD or JRD, depending on request
@@ -309,7 +309,7 @@ Mojolicious::Plugin::XRD - XRD Document Handling with Mojolicious
   # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
   # <XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0"
   #      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  #   <Subject>acct:akron@sojolicio.us</Subject>
+  #   <Subject>acct:akron@sojolicious.example</Subject>
   #   <Link href="/me.html"
   #         rel="profile" />
   # </XRD>
@@ -317,7 +317,7 @@ Mojolicious::Plugin::XRD - XRD Document Handling with Mojolicious
   # or:
   # Content-Type: application/jrd+json
   # {
-  #   "subject":"acct:akron@sojolicio.us",
+  #   "subject":"acct:akron@sojolicious.example",
   #   "links":[{"rel":"profile","href":"\/me.html"}]
   # }
 
@@ -409,7 +409,7 @@ B<This method is experimental and may change wihout warnings.>
 
   # In Controllers
   $self->reply->xrd( $xrd );
-  $self->reply->xrd( undef, 'acct:acron@sojolicio.us' );
+  $self->reply->xrd( undef, 'acct:acron@sojolicious.example' );
 
 The helper C<reply-E<gt>xrd> renders an XRD object either
 in C<xml> or in C<json> notation, depending on the request.

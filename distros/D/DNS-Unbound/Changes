@@ -1,5 +1,9 @@
 Revision history for Perl module DNS::Unbound
 
+0.22 Thu, 25 Feb 2021
+- BUG FIX: Use byte representation to send strings to C. This fixes
+  encoding problems with non-ASCII strings.
+
 0.21 Sat, 9 Jan 2021
 - Fix author test resolvconf.t after default port changed from 53 to 5353
   in Net::DNS::Nameserver version 1.28.

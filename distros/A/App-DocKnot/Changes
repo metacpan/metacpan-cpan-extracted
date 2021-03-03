@@ -1,5 +1,32 @@
                        User-Visible DocKnot Changes
 
+DocKnot 4.01 (unreleased)
+
+    DocKnot now supports a global configuration file.  The default
+    location is $HOME/.config/docknot/config.yaml, but it honors the XDG
+    environment variables.  Currently, this configuration file can be used
+    to set the distribution directory and signing PGP key for docknot
+    dist.
+
+    docknot dist can now optionally sign distribution tarballs with GnuPG
+    after they have been generated.  To request signing, use the --pgp-key
+    command-line option or set pgp_key in the new global configuration
+    file.
+
+    The -d option to docknot dist is now optional if distdir is set in
+    DocKnot's global configuration file.
+
+    Remove the load_appdata_json helper function from App::DocKnot.  This
+    is no longer used now that all DocKnot data is in YAML.
+
+    Properly import Pod::Usage so that docknot --help works.
+
+    Correct the REQUIREMENTS sections of the module documentation to
+    reflect new dependencies and the removal of a JSON dependency from
+    most of DocKnot.
+
+    Fix left-over documentation references to the old metatada path.
+
 DocKnot 4.00 (2020-12-25)
 
     Change the metadata format to a single YAML file, with a slightly

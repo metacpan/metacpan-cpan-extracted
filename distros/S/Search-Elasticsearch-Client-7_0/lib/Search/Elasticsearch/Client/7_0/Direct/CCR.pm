@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::Direct::CCR;
-$Search::Elasticsearch::Client::7_0::Direct::CCR::VERSION = '7.711';
+$Search::Elasticsearch::Client::7_0::Direct::CCR::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -36,7 +36,7 @@ Search::Elasticsearch::Client::7_0::Direct::CCR - Plugin providing cross-cluster
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head2 DESCRIPTION
 

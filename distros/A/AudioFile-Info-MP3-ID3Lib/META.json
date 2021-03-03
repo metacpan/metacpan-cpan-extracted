@@ -16,6 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Test::Exception" : "0",
             "YAML" : "0"
          }
       },
@@ -39,7 +40,7 @@
       },
       "AudioFile::Info::MP3::ID3Lib" : {
          "file" : "lib/AudioFile/Info/MP3/ID3Lib.pm",
-         "version" : "v1.8.0"
+         "version" : "v1.8.1"
       }
    },
    "release_status" : "stable",
@@ -56,6 +57,6 @@
          "web" : "https://github.com/davorg/audiofile-info-mp3-id3lib"
       }
    },
-   "version" : "v1.8.0",
+   "version" : "v1.8.1",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

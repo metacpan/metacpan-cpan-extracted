@@ -56,24 +56,21 @@ FortyTwo::Manual - User Guide for Forty-Two
 
 =head1 VERSION
 
-version 0.210370
+version 0.210570
 
 =encoding UTF-8
-
-=for todo TODO: devise a way to get correct internal links in .md doc
 
 =head1 Background
 
 =head2 Aim and features
 
-The aim of C<42> is to add (and optionally align) sequences to a preexisting
-multiple sequence alignment (MSA) while controlling for orthology relationships
-and potentially contaminating sequences.
-
-Sequences to add are either nucleotide transcripts resulting from transcriptome
-assembly or already translated protein sequences. In theory, one can also use
-genomic nucleotide sequences (because C<42> can splice introns), but this
-possibility has not been extensively tested so far.
+C<42> is a phylogenomic tool designed to add (and optionally align) sequences to
+a preexisting multiple sequence alignment (MSA) while controlling for orthology
+relationships and potentially contaminating sequences. Sequences to add are
+either nucleotide transcripts resulting from transcriptome assembly or already
+translated protein sequences. In theory, one can also use genomic nucleotide
+sequences (because C<42> can splice introns), but this possibility has not been
+extensively tested so far.
 
 =for todo TODO: amend these paragraphs after publication...
 
@@ -101,16 +98,10 @@ set of complete proteomes that do not include the expected taxon (= TOL check
 decoy). While the power of the first mechanism is dependent on the taxonomic
 breadth of each MSA, the second approach is more widely applicable.
 
-C<42> is exclusively setup through a structured text file (e.g., C<YAML>
-format). Archiving of this file allows a user to document all the configuration
-details for a given run.
-
-=for todo TODO: Example of a complete YAML config file
-
-C<42>'s verbosity is configured directly on the command line. C<42> can be very
-introspective if asked to be so. At the highest verbosity level, the numerous
-C<BLAST> reports are not deleted after the run and are thus available for manual
-inspection (e.g., for debugging purposes).
+As species-rich ribosomal protein MSAs are available for both prokaryotic and
+eukaryotic genomes, C<42> can also be used to probe the contamination level of
+any genome or transcriptome of interest using the first approach. A special mode
+is provided for this application, termed the C<metagenomic> mode.
 
 =head2 Design principles
 
@@ -118,18 +109,28 @@ In a single run, C<42> can process an arbitrary large number of MSAs (C<FASTA>
 files specified using shell jokers on the command line). Moreover, one can
 search for orthologous sequences in as many organisms as wanted.
 
-The configuration (C<config>) file has two main parts: one with the options that
-apply globally to the run and one that lists the organisms (C<orgs>) to search
-and their specific options, including the path (C<bank_dir>) to the
-corresponding sequence databases (C<banks> in C<42>'s parlance). The C<config>
-file includes a mechanism of default values (C<defaults>) that apply to all
-organisms except when otherwise specified in individual C<org> subsections
-(e.g., C<code>).
+C<42> is exclusively setup through a structured text file (e.g., C<YAML>
+format). Archiving of this file allows a user to document all the configuration
+details for a given run. This C<config> file has two main parts: one with the
+options that apply globally to the run and one that lists the organisms
+(C<orgs>) to search and their specific options, including the path (C<bank_dir>)
+to the corresponding sequence databases (C<banks> in C<42>'s parlance). The
+C<config> file further includes a mechanism of default values (C<defaults>) that
+apply to all organisms except when otherwise specified in individual C<org>
+subsections (e.g., C<code>).
 
 When C<42> enriches a MSA, it processes each organism in turn following the
 order of C<org> subsections in the C<config> file. Several I<out-of-order>
 optimisations ensure that similar computations (e.g., C<BLAST> searches) are not
-repeated uselessly.
+repeated uselessly. Parallelization is possible either by running multiple
+instances of C<42> on a grid computer, each working on a different set of MSAs
+processed serially, or by enabling an internal batch queue allowing the
+processing of several MSAs at once by each instance of C<42>.
+
+C<42>'s verbosity is configured directly on the command line. C<42> can be very
+introspective if asked to be so. At the highest verbosity level, the numerous
+C<BLAST> reports are not deleted after the run and are thus available for manual
+inspection (e.g., for debugging purposes).
 
 =head1 Functional overview
 
@@ -245,7 +246,7 @@ those that recovered the best hits in the complete proteomes of the C<ref_orgs>.
 The only thing that matters is that I<the loop is closed>. The set of homologues
 for which this condition holds then become the B<orthologues>. If the parameter
 C<ref_brh> of the C<config> file is set to C<off>, all homologues are
-automatically considered as orthologues (but see L<PARA files|"Optimized
+automatically considered as orthologues (but see L<"PARA files"|"Optimized
 enrichment of multigenic families"> just below).
 
 =head3 Optimized enrichment of multigenic families
@@ -337,7 +338,9 @@ orthologue is simply added to the MSA. Otherwise, it is tagged as a contaminant
 (C<c#>). When an orthologue is tagged as a contaminant, the binomial of the
 organism at the origin of the taxonomic affiliation (or a higher-ranking taxon
 in case of LCA inference) is further appended to its identifier (i.e.,
-C<...Genus_species>).
+C<...Genus_species>). This mechanism can also be used to estimate the level of
+contamination of any genome or transcriptome (see the L<"Metagenomic
+mode"|"Estimation of the contamination level in metagenomic mode"> below).
 
 Taxonomic filters are optional and require a local copy of the I<NCBI Taxonomy>
 database (C<tax_dir> parameter in the C<config> file). It can be installed using
@@ -355,13 +358,13 @@ uncontaminated orthologue because of this possibility, C<42> skips all decoy
 hits that satisfy the taxonomic filter specified for the organism being added.
 
 Let us take an example. Imagine that our MSAs only contain sequences from
-Hymenopterans (e.g., wasps and ants). If we enable decoy TOL proteomes when
+hymenopterans (e.g., wasps and ants). If we enable decoy TOL proteomes when
 adding some bees, contaminated orthologues corresponding to say, parasitic mites
 such as I<Varroa destructor>, will be correctly rejected because they match some
-tick protein included in Ixodes decoy proteome. However, genuine bee sequences
-would also be wrongly rejected because they match with the Apis decoy proteome.
-To avoid this, we will use a taxonomic filter to skip Hymenoptera (or even
-Hexapoda) hits in decoy proteomes.
+tick protein included in I<Ixodes> decoy proteome. However, genuine bee
+sequences would also be wrongly rejected because they match with the I<Apis>
+decoy proteome. To avoid this, we will use a taxonomic filter to skip
+Hymenoptera (or even Hexapoda) hits in decoy proteomes.
 
 As one can see, both avenues rely on taxonomic filters. Choosing the right level
 of taxonomic filtration is no easy task and often requires a bit of testing. In
@@ -465,6 +468,9 @@ of commands that should work on C<Ubuntu> 20.04.
 Obviously, this requires admin rights on your system:
 
     $ sudo su
+    $ apt install zlib1g-dev                    # maybe unnecessary
+    $ apt install libssl-dev                    # maybe unnecessary
+    $ apt install libmodule-build-tiny-perl     # maybe unnecessary
     $ apt install ncbi-blast+
     $ apt install cpanminus
     $ cpanm Bio::FastParsers
@@ -809,6 +815,49 @@ no speed gain in specifying more threads than MSAs to process.
 
 Unfortunately, the current parallel implementation scheme leads to completely
 scrambled log files. There is thus no point to ask for a high verbosity level.
+
+=head3 Estimation of the contamination level in metagenomic mode
+
+C<42> can be used as a stand-alone contamination detection tool to spot foreign
+sequences and estimate the contamination level in transcriptomic or genomic data
+as well as the taxonomic sources of contamination. To this end, it comes with
+two sets of ribosomal protein MSAs: one set of 78 eukaryotic MSAs, manually
+curated and continuously enriched with new species in H. Philippe's lab, and one
+set of 90 prokaryotic MSAs, fetched from I<RiboDB>. Both sets are available at
+L<https://bitbucket.org/phylogeno/42-ribo-msas/>.
+
+For each transcriptome/genome, C<42> recovers the ribosomal protein orthologs
+and then labels each one by computing the last common ancestor (LCA) of their
+closest relatives (best BLAST hits) in the corresponding MSA (excluding
+self-matches). The algorithm relies on the C<megan-like> mode described in
+L<"Contamination detection and handling">. In this regard, since ribosomal
+proteins are highly conserved, we suggest a more stringent parameterization of
+the C<megan-like> algorithm, so as to avoid false positives during LCA
+computation, with a C<--tax_score_mul> of C<0.99> instead of C<0.95> and a
+C<--tax_min_ident> of C<50> instead of C<0>.
+
+The follow up consists in running C<debrief-42.pl>, which parses the taxonomic
+reports produced by C<42> in order to compare the taxonomic label (LCA) of each
+ortholog computed by C<42> with the source organism lineage (according to I<NCBI
+Taxonomy>) and classifies the sequences as contaminants if they differ at a
+predefined taxonomic rank, based on a first user-defined list of taxa
+(C<--seq_labeling>). After each ortholog has been classified, an estimated
+contamination percentage is computed.
+
+Additionally, contaminations are further classified to determine the main
+sources of contaminants, based on a second user-defined list of taxa
+(C<--contam_labeling>), which allows the user to fine control the output report.
+In this regard, we distinguish two types of sequences, B<classified
+contaminations> and B<unclassified contaminations>. The latter are those that
+bear an uninformative taxonomic label, i.e., too broad to point to a specific
+lineage with accuracy (e.g., C<Sar>). Finally, the sequences that can only be
+affiliated at the highest taxonomic levels, such as C<cellular organisms>,
+C<Eukaryota>, C<Bacteria> or C<Archaea>, are classified as B<unknown sequences>.
+
+A typical command for running the metagenomic debriefer is shown below:
+
+    $ debrief-42.pl --indir=./MSAs/ --in=-42 --taxdir=taxdump/ \
+        --seq_labeling=seq-labels.idl --contam_labeling=contam-labels.idl
 
 =head1 AUTHOR
 

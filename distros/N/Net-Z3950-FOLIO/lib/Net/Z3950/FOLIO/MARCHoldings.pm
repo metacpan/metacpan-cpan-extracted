@@ -7,7 +7,7 @@ use Net::Z3950::FOLIO::HoldingsRecords qw(makeHoldingsRecords);
 
 
 sub insertMARCHoldings {
-    my($ihi, $marc, $cfg) = @_;
+    my($ihi, $marc, $cfg, $barcode) = @_;
     my $marcCfg = $cfg->{marcHoldings} || {};
     my $holdingsObjects = makeHoldingsRecords($ihi->{holdingsRecords2}, $marc);
 
@@ -21,7 +21,9 @@ sub insertMARCHoldings {
 	for (my $j = 0; $j < @$itemObjects; $j++) {
 	    my $itemMap = _listOfPairs2map($itemObjects->[$j]);
 	    # use Data::Dumper; warn Dumper($itemMap);
-	    $marcField = _addSubfields($marcField, $marcCfg, $marcCfg->{itemElements}, $itemMap);
+	    if (!$marcCfg->{restrictToItem} || !$barcode || $itemMap->{itemId} eq $barcode) {
+		$marcField = _addSubfields($marcField, $marcCfg, $marcCfg->{itemElements}, $itemMap);
+	    }
 	}
 
 	$marc->append_fields($marcField) if $marcField;

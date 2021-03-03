@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::Debrief42::TaxReport::NewSeq;
 # ABSTRACT: Internal class for tabular tax-report parser
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Apps::Debrief42::TaxReport::NewSeq::VERSION = '0.210370';
+$Bio::MUST::Apps::Debrief42::TaxReport::NewSeq::VERSION = '0.210570';
 use Moose;
 use namespace::autoclean;
 
@@ -58,7 +58,7 @@ Bio::MUST::Apps::Debrief42::TaxReport::NewSeq - Internal class for tabular tax-r
 
 =head1 VERSION
 
-version 0.210370
+version 0.210570
 
 =head1 SYNOPSIS
 

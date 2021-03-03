@@ -3,7 +3,7 @@
 # See the LICENSE file in the project root for more information
 
 package Search::Elasticsearch::Role::Client::Direct;
-$Search::Elasticsearch::Role::Client::Direct::VERSION = '7.711';
+$Search::Elasticsearch::Role::Client::Direct::VERSION = '7.711001';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::Client';
 use Search::Elasticsearch::Util qw(load_plugin is_compat throw);
@@ -179,7 +179,7 @@ Search::Elasticsearch::Role::Client::Direct - Request parsing for Direct clients
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

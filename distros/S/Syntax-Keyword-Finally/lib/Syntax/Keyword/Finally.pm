@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Finally 0.02;
+package Syntax::Keyword::Finally 0.03;
 
 use v5.14;
 use warnings;
@@ -31,12 +31,36 @@ C<Syntax::Keyword::Finally> - add C<FINALLY> phaser block syntax to perl
       ...
    }
 
+Z<>
+
+Also available as a keyword spelled C<defer>
+
+   use Syntax::Keyword::Defer;
+
+   {
+      my $dbh = DBI->connect( ... ) or die "Cannot connect";
+      defer { $dbh->disconnect; }
+
+      my $sth = $dbh->prepare( ... ) or die "Cannot prepare";
+      defer { $sth->finish; }
+
+      ...
+   }
+
 =head1 DESCRIPTION
 
 This module provides a syntax plugin that implements a phaser block that
 executes its block when the containing scope has finished. The syntax of the
 C<FINALLY> block looks similar to other phasers in perl (such as C<BEGIN>),
 but the semantics of its execution are different.
+
+The C<defer> alias is identical in syntax and semantics, just spelled
+differently. It is provided as an alternative experiment, in order to look
+identical to similar features provided by other languages (Swift, Zig, Jai,
+Nim and Odin all provide this). Note that while Go also provides a C<defer>
+keyword, the semantics here are not the same. Go's version defers until the
+end of the entire function, rather than the closest enclosing scope as is
+common to most other languages, and this module.
 
 The operation can be considered a little similar to an C<END> block, but with
 the following key differences:
@@ -140,6 +164,23 @@ Z<>
    $ perl example.pl
    Failed to increment count at examples.pl line 6.
 
+Because a C<FINALLY> block is a true block (e.g. in the same way something
+like an C<if () {...}> block is), rather than an anonymous sub, it does not
+appear to C<caller()> or other stack-inspection tricks. This is useful for
+calling C<croak()>, for example.
+
+   sub g
+   {
+      my $count = 0;
+      FINALLY { $count or croak "Expected some items"; }
+
+      $count++ for @_;
+   }
+
+Here, C<croak()> will correctly report the caller of the C<g()> function,
+rather than appearing to be called from an C<__ANON__> sub invoked at the end
+of the function itself.
+
 =cut
 
 sub import
@@ -159,6 +200,7 @@ sub import_into
 
    my %syms = map { $_ => 1 } @syms;
    $^H{"Syntax::Keyword::Finally/finally"}++ if delete $syms{finally};
+   $^H{"Syntax::Keyword::Finally/defer"}++   if delete $syms{defer};
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
@@ -178,8 +220,31 @@ Try to fix the double-exception test failure on Perl versions before v5.20.
 
 =item *
 
-Complain on attempts to C<return>, C<goto>, or C<next/last/redo> out of a
-C<FINALLY> block.
+Permit the use of C<goto> or C<next/last/redo> within C<FINALLY> blocks,
+provided it does not jump to a target outside.
+
+E.g. the following ought to be permitted, but currently is not:
+
+   FINALLY {
+      foreach my $item (@items) {
+         $item > 5 or next;
+         ...
+      }
+   }
+
+=item *
+
+Try to detect and forbid nonlocal flow control (C<goto>, C<next/last/redo>)
+from leaving the C<FINALLY> block.
+
+E.g. currently the following will crash the interpreter:
+
+   sub func { last ITEM }
+
+   ITEM: foreach(1..10) {
+      say;
+      defer { func() }
+   }
 
 =back
 

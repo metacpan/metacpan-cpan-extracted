@@ -1,3 +1,10 @@
+0.003   2021-01-11  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention WHO::GrowthReference::Gen{Table,Chart}.
+
+
 0.002   2021-01-03  Released-By: PERLANCAR
 
         - [build] Rebuild to update prereqs to Sah coerce rule modules.

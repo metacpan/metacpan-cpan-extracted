@@ -1,4 +1,4 @@
-[![Release](https://img.shields.io/github/release/giterlizzi/perl-Net-SecurityCenter.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter/releases) [![Build Status](https://travis-ci.org/giterlizzi/perl-Net-SecurityCenter.svg)](https://travis-ci.org/giterlizzi/perl-Net-SecurityCenter) [![License](https://img.shields.io/github/license/giterlizzi/perl-Net-SecurityCenter.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter) [![Starts](https://img.shields.io/github/stars/giterlizzi/perl-Net-SecurityCenter.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter) [![Forks](https://img.shields.io/github/forks/giterlizzi/perl-Net-SecurityCenter.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter) [![Issues](https://img.shields.io/github/issues/giterlizzi/perl-Net-SecurityCenter.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter/issues) [![Coverage Status](https://coveralls.io/repos/github/giterlizzi/perl-Net-SecurityCenter/badge.svg)](https://coveralls.io/github/giterlizzi/perl-Net-SecurityCenter)
+[![Release](https://img.shields.io/github/release/giterlizzi/perl-Net-SecurityCenter.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter/releases) [![Actions Status](https://github.com/giterlizzi/perl-Net-SecurityCenter/workflows/linux/badge.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter/actions) [![Actions Status](https://github.com/giterlizzi/perl-Net-SecurityCenter/workflows/macos/badge.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter/actions) [![License](https://img.shields.io/github/license/giterlizzi/perl-Net-SecurityCenter.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter) [![Starts](https://img.shields.io/github/stars/giterlizzi/perl-Net-SecurityCenter.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter) [![Forks](https://img.shields.io/github/forks/giterlizzi/perl-Net-SecurityCenter.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter) [![Issues](https://img.shields.io/github/issues/giterlizzi/perl-Net-SecurityCenter.svg)](https://github.com/giterlizzi/perl-Net-SecurityCenter/issues) [![Coverage Status](https://coveralls.io/repos/github/giterlizzi/perl-Net-SecurityCenter/badge.svg)](https://coveralls.io/github/giterlizzi/perl-Net-SecurityCenter)
 
 # Net::SecurityCenter - Perl interface to Tenable.sc (SecurityCenter) REST API
 
@@ -28,14 +28,28 @@ $sc->logout();
 
 ## Install
 
-To install `Net::SecurityCenter` distribution, run the following commands:
+Using Makefile.PL:
+
+To install `Net::SecurityCenter` distribution, run the following commands.
 
     perl Makefile.PL
     make
     make test
     make install
 
+Using App::cpanminus:
+
+    cpanm Net::SecurityCenter
+
+
+## Documentation
+
+ - `perldoc Net::SecurityCenter`
+ - https://metacpan.org/release/Net-SecurityCenter
+ - https://giterlizzi.github.io/perl-Net-SecurityCenter
+
+
 ## Copyright
 
- - Copyright 2018-2020 © Giuseppe Di Terlizzi
+ - Copyright 2018-2021 © Giuseppe Di Terlizzi
  - Nessus®, Tenable.sc® and SecurityCenter® is a Registered Trademark of Tenable®, Inc.

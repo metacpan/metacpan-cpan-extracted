@@ -17,10 +17,21 @@ BEGIN {
 }
 
 
-use Test::More 0.96 tests => 6 + 1;
+use Test::More 0.96 tests => 7 + 1;
 use Test::Exception;
 use Test::Warnings;
 
+
+# Some environs may lack the a "system list" of EPSG codes, e. g.:
+# http://www.cpantesters.org/cpan/report/6f6ba6f8-94dc-11ea-bdec-09261f24ea8f
+# It's not a PROJ 4.x issue, see:
+# http://www.cpantesters.org/cpan/report/6b7006d8-94d8-11ea-9d35-29711f24ea8f
+# The integration test needs to either detect and skip those cases entirely, or avoid EPSG codes entirely.
+# For a discussion, see:
+# https://proj.org/usage/transformation.html#proj-4-x-5-x-paradigm
+my $epsg4326 = '+proj=longlat +datum=WGS84 +no_defs';
+my $epsg3395 = '+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs';
+my $epsg25833 = '+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs';
 
 my ($c, $p, @p);
 my (@crs, @pts);
@@ -45,7 +56,7 @@ subtest 'version' => sub {
 
 subtest 'transform synopsis' => sub {
 	plan tests => 7;
-	@crs = ('+init=epsg:25833' => '+init=epsg:4326');
+	@crs = ($epsg25833 => $epsg4326);
 	
 	lives_ok { $c = 0; $c = Geo::LibProj::cs2cs->new(@crs); } 'new cs2cs fwd';
 	lives_ok { $p = 0; $p = $c->transform( [500_000, 6094_791] ); } 'transform 1 lives';
@@ -60,8 +71,9 @@ subtest 'transform synopsis' => sub {
 
 
 subtest 'transform dms' => sub {
+	plan skip_all => 'test requires IPC' if $INC{'Geo/LibProj/FFI.pm'};
 	plan tests => 12;
-	@crs = ('+init=epsg:4326' => '+init=epsg:25833');
+	@crs = ($epsg4326 => $epsg25833);
 	
 	lives_ok { $c = 0; $c = Geo::LibProj::cs2cs->new(@crs, {-f=>'%.0f',-r=>''}); } 'new cs2cs in';
 	lives_ok { $p = 0; $p = $c->transform( [q(54d59'30"N), q(15d4'28"E)] ); } 'in lives';
@@ -84,7 +96,7 @@ subtest 'transform dms' => sub {
 
 subtest 'transform error' => sub {
 	plan tests => 2;
-	@crs = ('+init=epsg:4326' => '+init=epsg:32630');
+	@crs = ($epsg4326 => $epsg25833);
 	
 	lives_ok { $p = 0; $p = $c->transform( ['Inf', '-Inf'] ); } 'inf transform lives';
 	lives_and { is_deeply [$p->[0], $p->[1]], ['*', '*'] } 'inf transform result';
@@ -92,6 +104,7 @@ subtest 'transform error' => sub {
 
 
 subtest 'child failure stderr' => sub {
+	plan skip_all => 'test requires IPC' if $INC{'Geo/LibProj/FFI.pm'};
 	plan tests => 3;
 	lives_ok { $c = {}; $c = Geo::LibProj::cs2cs->new(undef, undef); } 'new cs2cs';
 	$c->{call} = [ $c->{call}->[0], '-l-' ];
@@ -110,12 +123,25 @@ subtest 'problematic floats' => sub {
 		[ 5.634748, -3.666786 ],  # 0x1.689fb61p+2, -0x1.d5593e6p+1
 		[ 5.634740, -3.666780 ],  # 0x1.689f948p+2, -0x1.d5590c1p+1
 	);
-	lives_ok { $c = 0; $c = Geo::LibProj::cs2cs->new('+init=epsg:4326' => '+init=epsg:3395', {-r=>'', -f=>'%.9g'}); } 'new cs2cs';
+	lives_ok { $c = 0; $c = Geo::LibProj::cs2cs->new($epsg4326 => $epsg3395, {-r=>'', -f=>'%.9g'}); } 'new cs2cs';
 	lives_ok { @p = 0; @p = $c->transform(@pts); } 'transform lives';
 	is_deeply \@p, [
 		[-408184.750, 624078.416, 0],
 		[-408184.082, 624077.527, 0],
 	], 'result valid' or diag 'possible cause: $FORMAT_IN="%a"';
+};
+
+
+subtest 'ffi' => sub {
+	my $ffi = eval "require Geo::LibProj::FFI; 1";
+	plan skip_all => 'test requires FFI' unless $ffi && $INC{'Geo/LibProj/FFI.pm'};
+	plan tests => 5;
+	@crs = ($epsg4326 => $epsg25833);
+	lives_ok { $c = 0; $c = Geo::LibProj::cs2cs->new(@crs) } 'new cs2cs';
+	lives_and { ok $c->xs } 'xs mode';
+	lives_ok { $p = 0; $p = $c->transform( [12, 79] ) } 'transform lives';
+	like $p->[0], qr/^43612.\./, 'easting';
+	like $p->[1], qr/^877161.\./, 'northing';
 };
 
 

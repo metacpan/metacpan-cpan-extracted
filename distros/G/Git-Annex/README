@@ -8,7 +8,7 @@ Git::Annex -- class representing a git-annex repository
 
 annex-to-annex -- use hardlinks to migrate files between git annex repos
 
-annex-review-unused -- interactively process `git annex unused` output
+git-annex-reviewunused -- interactively process `git annex unused` output
 
 INSTALLATION
 
@@ -28,7 +28,7 @@ After installing, you can find documentation for this module and its
 scripts with the perldoc & man commands.
 
     % perldoc Git::Annex
-    % man annex-review-unused
+    % man git-annex-reviewunused
 
 You can also look for information at:
 

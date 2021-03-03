@@ -15,7 +15,7 @@ package App::annex_to_annex_reinject;
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-$App::annex_to_annex_reinject::VERSION = '0.006';
+$App::annex_to_annex_reinject::VERSION = '0.007';
 use 5.028;
 use strict;
 use warnings;
@@ -145,7 +145,7 @@ App::annex_to_annex_reinject - annex-to-annex-reinject
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 FUNCTIONS
 
@@ -164,7 +164,7 @@ Sean Whitton <spwhitton@spwhitton.name>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2020 by Sean Whitton <spwhitton@spwhitton.name>.
+This software is Copyright (c) 2019-2021 by Sean Whitton <spwhitton@spwhitton.name>.
 
 This is free software, licensed under:
 

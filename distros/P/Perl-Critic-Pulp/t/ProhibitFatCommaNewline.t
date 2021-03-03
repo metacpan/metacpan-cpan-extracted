@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2017, 2019, 2021 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 #
@@ -27,7 +27,7 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
 #-----------------------------------------------------------------------------
-my $want_version = 97;
+my $want_version = 99;
 is ($Perl::Critic::Policy::CodeLayout::ProhibitFatCommaNewline::VERSION,
     $want_version, 'VERSION variable');
 is (Perl::Critic::Policy::CodeLayout::ProhibitFatCommaNewline->VERSION,

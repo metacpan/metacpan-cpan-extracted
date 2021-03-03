@@ -12,6 +12,7 @@ t/13-nodata.t
 t/14-emptydata.t
 t/15-emptyboth.t
 t/16-init-from-utf8-string.t
+t/17-zilch.t
 t/20-basic-init-from-sections.t
 t/21-empty-null-yaml.t
 t/22-empty-null-data.t

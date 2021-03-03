@@ -51,7 +51,11 @@ sc-api - Tenable.sc (SecurityCenter) API command line interface
 
         --access_key        Access Key
         --secrey_key        Secret Key
-        
+
+        --ssl_cert_file     Certificate file
+        --ssl_cert_key      Certificate private key
+        --ssl_password      Private key password (optional)
+
         --config [FILE]     Configuration file
 
         --format [TYPE]     Output format (default: json)
@@ -149,6 +153,10 @@ See L<Net::SecurityCenter::API::Scanner> class.
 
 See L<Net::SecurityCenter::API::System> class.
 
+=head2 ticket
+
+See L<Net::SecurityCenter::API::Ticket> class.
+
 =head2 user
 
 See L<Net::SecurityCenter::API::User> class.
@@ -177,13 +185,23 @@ Sample configuration file with API Authentication:
     secret_key = <SECRET KEY>
     access_key = <ACCESS KEY>
 
+Sample configuration file with SSL Mutual-Auth:
+
+    [SecurityCenter]
+    hostname      = tenable-sc.example.org:443
+    username      = secman
+    password      = mypass
+    ssl_cert_file = /path/my-cert.crt
+    ssl_key_file  = /path/my-private.key
+    ssl_password  = <SECRET>
+
 =head1 AUTHOR
 
 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2018-2020 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+Copyright © 2018-2021 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

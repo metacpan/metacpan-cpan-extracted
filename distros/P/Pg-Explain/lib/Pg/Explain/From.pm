@@ -26,11 +26,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =cut
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 =head1 SYNOPSIS
 
@@ -114,6 +114,9 @@ sub make_node_from {
         $use_type = 'HashAggregate'  if $strategy eq 'Hashed';
         $use_type = 'GroupAggregate' if $strategy eq 'Sorted';
         $use_type = 'MixedAggregate' if $strategy eq 'Mixed';
+    }
+    if ( ( $struct->{ 'Scan Direction' } || '' ) eq 'Backward' ) {
+        $use_type .= ' Backward';
     }
 
     my $new_node = Pg::Explain::Node->new(

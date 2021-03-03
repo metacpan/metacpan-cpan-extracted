@@ -1,3 +1,9 @@
+0.102   2021-03-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Change default backend from Text::Table::Tiny to
+	  Text::Table::Sprintf.
+
+
 0.101   2021-02-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add options: separate_rows.

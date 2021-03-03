@@ -1,5 +1,9 @@
 Revision history for Git::Annex
 
+0.007     2021-02-28 13:20:42-07:00 America/Phoenix
+    - Rename annex-review-unused to git-annex-reviewunused now that git-annex
+      supports third party subcommands.
+
 0.006     2020-03-23 17:02:28-07:00 America/Phoenix
     - annex-review-unused: Check whether unused files still exist earlier.
       Avoids misleading output when --just-print is supplied.

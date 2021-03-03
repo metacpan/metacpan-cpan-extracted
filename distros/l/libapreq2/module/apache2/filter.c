@@ -15,8 +15,6 @@
 **  limitations under the License.
 */
 
-#include "assert.h"
-
 #include "httpd.h"
 #include "http_config.h"
 #include "http_log.h"
@@ -37,8 +35,8 @@ static void *apreq_create_dir_config(apr_pool_t *p, char *d)
     /* d == OR_ALL */
     struct dir_config *dc = apr_palloc(p, sizeof *dc);
     dc->temp_dir      = NULL;
-    dc->read_limit    = APREQ_DEFAULT_READ_LIMIT;
-    dc->brigade_limit = APREQ_DEFAULT_BRIGADE_LIMIT;
+    dc->read_limit    = -1;
+    dc->brigade_limit = -1;
     return dc;
 }
 
@@ -52,7 +50,7 @@ static void *apreq_merge_dir_config(apr_pool_t *p, void *a_, void *b_)
     c->brigade_limit = (b->brigade_limit == (apr_size_t)-1) /* overrides ok */
                       ? a->brigade_limit : b->brigade_limit;
 
-    c->read_limit    = (b->read_limit < a->read_limit)  /* why min? */
+    c->read_limit    = (b->read_limit < a->read_limit)  /* yes, min */
                       ? b->read_limit : a->read_limit;
 
     return c;
@@ -532,10 +530,11 @@ void apreq_filter_make_context(ap_filter_t *f)
         ctx->brigade_limit = APREQ_DEFAULT_BRIGADE_LIMIT;
     } else {
         ctx->temp_dir      = d->temp_dir;
-        ctx->read_limit    = d->read_limit;
-        ctx->brigade_limit = d->brigade_limit;
+        ctx->read_limit    = (d->read_limit == (apr_uint64_t)-1)
+            ? APREQ_DEFAULT_READ_LIMIT : d->read_limit;
+        ctx->brigade_limit = (d->brigade_limit == (apr_size_t)-1)
+            ? APREQ_DEFAULT_BRIGADE_LIMIT : d->brigade_limit;
     }
 
     f->ctx = ctx;
 }
-

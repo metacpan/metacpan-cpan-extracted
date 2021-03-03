@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::7_0::TestServer;
-$Search::Elasticsearch::Client::7_0::TestServer::VERSION = '7.711';
+$Search::Elasticsearch::Client::7_0::TestServer::VERSION = '7.711001';
 use strict;
 use warnings;
 
@@ -58,7 +58,7 @@ Search::Elasticsearch::Client::7_0::TestServer - Client-specific backend for Sea
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 AUTHOR
 

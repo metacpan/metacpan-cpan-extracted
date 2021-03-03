@@ -7,9 +7,9 @@ use Moose;
 use namespace::autoclean;
 use Method::Signatures;
 use Data::Printer alias => 'pdump';
-use YAML ();
 use Carp;
 use Sort::Naturally;
+use YAML::Syck;
 
 ##############################################################################
 # PUBLIC ATTRIBUTES
@@ -26,15 +26,16 @@ use Sort::Naturally;
 method sortDriverFile (Str  :$driverFile!,
                        Bool :$writeStdout) {
 
-    $YAML::Preserve  = 1;
-	$YAML::UseHeader = 0;
+    $YAML::Syck::ImplicitTyping = 1;
+    $YAML::Syck::Headless = 1;
+    $YAML::Syck::SortKeys = 1;
 
-	my $yaml = YAML::LoadFile($driverFile);
+	my $yaml = YAML::Syck::LoadFile($driverFile);
     my @keys = keys %$yaml;
      
     my @sorted = ('---');
 	foreach my $key ( nsort( keys %$yaml ) ) {
-		push @sorted, YAML::Dump( { $key => $yaml->{$key} } );
+		push @sorted, YAML::Syck::Dump( { $key => $yaml->{$key} } );
 	}
 
     my $sorted = join "\n", @sorted;
@@ -53,5 +54,7 @@ method sortDriverFile (Str  :$driverFile!,
 ##############################################################################
 # PRIVATE METHODS
 ##############################################################################
+
+__PACKAGE__->meta->make_immutable;
 
 1;

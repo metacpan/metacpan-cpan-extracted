@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Roles::RunProcable;
 # ABSTRACT: Attributes and methods common to RunProcessor objects
-$Bio::MUST::Apps::Roles::RunProcable::VERSION = '0.210370';
+$Bio::MUST::Apps::Roles::RunProcable::VERSION = '0.210570';
 use Moose::Role;
 
 use autodie;
@@ -108,7 +108,7 @@ Bio::MUST::Apps::Roles::RunProcable - Attributes and methods common to RunProces
 
 =head1 VERSION
 
-version 0.210370
+version 0.210570
 
 =head1 SYNOPSIS
 

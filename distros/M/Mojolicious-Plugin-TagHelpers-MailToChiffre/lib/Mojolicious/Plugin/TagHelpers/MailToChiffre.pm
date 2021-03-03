@@ -4,7 +4,7 @@ use Mojo::ByteStream 'b';
 use Mojo::Collection 'c';
 use Mojo::URL;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 # Cache for generated CSS and JavaScript
 has [qw/js css pattern_rotate/];
@@ -38,6 +38,8 @@ sub register {
     $pattern_rotate = $plugin_param->{pattern_rotate};
   };
   $plugin->pattern_rotate($pattern_rotate);
+
+  $plugin->{no_inline} = $plugin_param->{no_inline} // undef;
 
   # Add pseudo condition for manipulating the stash for the fallback
   my $routes = $app->routes;
@@ -177,14 +179,34 @@ sub register {
       # Return path
       $url->query({sid => $account, %param});
 
+      # Create anchor link
+      my $str = qq!<a rel="nofollow" !;
+
+      # No fallback is established
       if ($no_fallback) {
-        $url = qq!javascript:$method_name(false,'$url')!;
+
+        # Do not establish a URL at all
+        if ($plugin->{no_inline}) {
+          $str .= qq!href="#" data-href="$url" !;
+        }
+
+        # Use javascript fallback
+        else {
+          $str .= qq!href="javascript:$method_name(false,'$url')" !;
+        };
+      }
+
+      else {
+        $str .= qq!href="$url" !;
       };
 
-      # Create anchor link
-      my $str = qq!<a href="$url" rel="nofollow" onclick="!;
-      $str .= 'return true;' if $no_fallback;
-      $str .= 'return ' . $method_name . '(this,false)';
+      if ($plugin->{no_inline}) {
+        $str .= 'class="' . $method_name;
+      } else {
+        $str .= 'onclick="';
+        $str .= 'return true;' if $no_fallback;
+        $str .= 'return ' . $method_name . '(this,false)';
+      };
 
       # Obfuscate display string using css
       unless ($text) {
@@ -195,7 +217,10 @@ sub register {
           c(@post)->join->xml_escape;
       }
       else {
-        $str .= ';' . int(rand(50)) . '">' . $text->();
+        unless ($plugin->{no_inline}) {
+          $str .= ';' . int(rand(50));
+        };
+        $str .= '">' . $text->();
       };
 
       $str .= '</a>';
@@ -208,7 +233,12 @@ sub register {
   $app->helper(
     mail_to_chiffre_css => sub {
       return $plugin->css if $plugin->css;
-      my $css = qq!a[onclick\$='return $method_name(this,false)']!;
+      my $css;
+      if ($plugin->{no_inline}) {
+        $css = qq!a.$method_name!;
+      } else {
+        $css = qq!a[onclick\$='return $method_name(this,false)']!;
+      };
       $css = $css . '{direction:rtl;unicode-bidi:bidi-override;text-align:left}'.
         $css . '>span:nth-child(1n+2){display:none}' .
        $css . '>span:nth-child(1):after{content:\'@\'}';
@@ -286,6 +316,23 @@ sub register {
   location.href='ma'+$v{url}+'to:?'+$v{param_array}.join('&');
   return false
 }!;
+      # csp compliant variant
+      if ($plugin->{no_inline}) {
+        $js .= qq!
+;document.addEventListener("DOMContentLoaded",
+  function(){
+    document.querySelectorAll(".${method_name}").forEach(
+      i=>i.addEventListener(
+        "click",function(e){
+          e.preventDefault();
+          ${method_name}(false,this.href=='#'?this.getAttribute('data-href'):this.href)
+        }
+      )
+    )
+  }
+)!;
+      };
+
       $js =~ s/\s*\n\s*//g;
       $plugin->js(b($js));
       return $plugin->js;
@@ -525,9 +572,9 @@ Mojolicious::Plugin::TagHelpers::MailToChiffre - Obfuscate Email Addresses in Te
   @@ index.html.ep
   % layout 'default', title => 'Welcome';
   <p>
-    Mail me at <%= mail_to_chiffre 'akron@sojolicio.us', subject => 'Hi!' %>
+    Mail me at <%= mail_to_chiffre 'akron@sojolicious.example', subject => 'Hi!' %>
     or
-    <%= mail_to_chiffre 'test@sojolicio.us', begin %>Write me<% end %>
+    <%= mail_to_chiffre 'test@sojolicious.example', begin %>Write me<% end %>
   </p>
 
 
@@ -600,7 +647,8 @@ otherwise it defaults to a random string.
 
 In case you want to make the email address visual,
 it is obfuscated using CSS with
-L<reversed directionality|http://techblog.tilllate.com/2008/07/20/ten-methods-to-obfuscate-e-mail-addresses-compared/> and non-displayed span segments.
+L<reversed directionality|http://techblog.tilllate.com/2008/07/20/ten-methods-to-obfuscate-e-mail-addresses-compared/>
+and non-displayed span segments.
 
 Although the left string tries to not leave too many hints of its email address nature,
 this obfuscation is obviously easier to deobfuscate than the javascript obfuscation,
@@ -632,6 +680,9 @@ your email addresses. It defaults to a random string.
 The C<pattern_rotate> numeral value will rotate the characters of the obfuscated
 email address and is stored directly in the javascript.
 It default to C<2>.
+The C<no_inline> removes the C<onclick> parameter from the L</mail_to_chiffre>
+link and establishes an eventhandler on all L</mail_to_chiffre> links on a single page.
+This is required to make the helper compliant to C<Content Security Policy>.
 
 All parameters can be set either on registration or
 as part of the configuration file with the key C<TagHelpers-MailToChiffre>.
@@ -642,9 +693,9 @@ as part of the configuration file with the key C<TagHelpers-MailToChiffre>.
 =head2 mail_to_chiffre
 
   # In Templates
-  <%= mail_to_chiffre 'akron@sojolicio.us', subject => 'Hello!' %>
-  <%= mail_to_chiffre 'akron@sojolicio.us', cc => 'metoo@sojolicio.us' %>
-  %= mail_to_chiffre 'akron@sojolicio.us' => begin
+  <%= mail_to_chiffre 'akron@sojolicious.example', subject => 'Hello!' %>
+  <%= mail_to_chiffre 'akron@sojolicious.example', cc => 'metoo@sojolicious.example' %>
+  %= mail_to_chiffre 'akron@sojolicious.example' => begin
     <img src="mailme.gif" />
   % end
 

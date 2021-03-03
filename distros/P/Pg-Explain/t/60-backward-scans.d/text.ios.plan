@@ -1,0 +1,5 @@
+Limit  (cost=0.27..0.35 rows=1 width=64) (actual time=0.020..0.021 rows=1 loops=1)
+  ->  Index Only Scan Backward using pg_class_relname_nsp_index on pg_class  (cost=0.27..30.20 rows=395 width=64) (actual time=0.019..0.019 rows=1 loops=1)
+        Heap Fetches: 1
+Planning Time: 0.357 ms
+Execution Time: 0.058 ms

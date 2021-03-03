@@ -50,6 +50,15 @@ subtest 'fake_paragraphs' => sub {
     }
 };
 
+subtest 'scalar context' => sub {
+    my @words = fake_words(2)->();
+    is(scalar(@words), 1, "words");
+    my @sentences = fake_sentences(2)->();
+    is(scalar(@sentences), 1, "sentences");
+    my @paragraphs = fake_paragraphs(2)->();
+    is(scalar(@paragraphs), 1, "paragraphs");
+};
+
 done_testing;
 #
 # This file is part of Data-Fake

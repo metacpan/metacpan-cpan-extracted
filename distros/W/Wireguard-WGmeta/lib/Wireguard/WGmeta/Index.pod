@@ -24,12 +24,11 @@ A fancy C<show> output which combines the meta-data, running-config and static-c
 
 =item *
 
-Modular structure: The whole parser is independent of the CLI module - and can be used as a standalone library.
+Modular structure: Both parsers/writers are independent - and therefore can be used as a standalone library.
 
 =item *
 
-The config parser/writer and as well as the C<wg show dump> parser are independent too.
-For more info, please refer to L<Wireguard::WGmeta::Wrapper::Config> and L<Wireguard::WGmeta::Wrapper::Show>
+Built-in concurrent access support!
 
 =item *
 
@@ -77,15 +76,31 @@ B<WG_NO_COLOR>: If defined, the show command does not prettify the output with c
 
 =item *
 
+L<Wireguard::WGmeta::Parser::Config> - Wireguard configuration parser (bi-directional)
+
+=item *
+
+L<Wireguard::WGmeta::Parser::Show> - C<wg show dump> parser.
+
+=item *
+
+L<Wireguard::WGmeta::Wrapper::Config> - Wrapper class for reading/writing and modifying wireguard configurations and as well handle metadata.
+
+=item *
+
+L<Wireguard::WGmeta::Wrapper::ConfigT> - Specialized wrapper class supporting concurrent access.
+
+=item *
+
+L<Wireguard::WGmeta::Wrapper::Show> - Wrapper class around C<wg show dump> output.
+
+=item *
+
 L<Wireguard::WGmeta::Cli::Router> - Entry point for the CLI
 
 =item *
 
-L<Wireguard::WGmeta::Wrapper::Config> - Class for reading/writing and modifying wireguard configurations and as well handle metadata.
-
-=item *
-
-L<Wireguard::WGmeta::Wrapper::Show> - Class for parsing the output of C<wg show dump>
+L<Wireguard::WGmeta::ValidAttributes> - Configurations for all supported attributes.
 
 =back
 
@@ -93,7 +108,14 @@ L<Wireguard::WGmeta::Wrapper::Show> - Class for parsing the output of C<wg show 
 
 =head1 AUTHORS
 
-S<Tobias Bossert E<lt>tobib at cpan.orgE<gt>>
+Since there is a lot of spam flooding my mailbox, I had to put spam filtering in place. If you want to make sure
+that your email gets delivered into my mailbox, include C<#im_not_a_bot#> in the B<subject!>
+
+S<Tobias Bossert E<lt>tobib at cpan dot orgE<gt>>
+
+=head1 THANKS TO
+
+L<OETIKER+PARTNER AG|https://www.oetiker.ch/> for sponsoring this project.
 
 =head1 COPYRIGHT AND LICENSE
 

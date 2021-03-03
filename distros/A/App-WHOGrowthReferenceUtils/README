@@ -2,9 +2,9 @@ NAME
     App::WHOGrowthReferenceUtils - Utilities related to WHO growth reference
 
 VERSION
-    This document describes version 0.002 of App::WHOGrowthReferenceUtils
+    This document describes version 0.003 of App::WHOGrowthReferenceUtils
     (from Perl distribution App-WHOGrowthReferenceUtils), released on
-    2020-01-03.
+    2021-01-11.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -21,13 +21,17 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-App-WHOGrowthReferenceUtils/issues>
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-WHOGrowthReferenc
+    eUtils>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     WHO::GrowthReference::Table
+
+    These distributions also have some CLIs: WHO::GrowthReference::GenTable,
+    WHO::GrowthReference::GenChart.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

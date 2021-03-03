@@ -64,9 +64,9 @@ plan tests => 47;
       my $order = $+{'order'};
       $shown{"order=$order"} = $+{'id'};
     }
-    ok ($count, 3, 'HOG ID number lines');
+    ok ($count, 8, 'HOG ID number lines');
   }
-  ok (scalar(keys %shown), 3);
+  ok (scalar(keys %shown), 8);
   ### %shown
 
   my $extras = 0;

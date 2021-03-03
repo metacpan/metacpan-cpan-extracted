@@ -16,8 +16,9 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'Mojolicious' => '7.80',
-  'Protocol::Redis::Faster' => '0.002'
+  'Mojolicious' => '8.50',
+  'Protocol::Redis::Faster' => '0.002',
+  'perl' => '5.016'
 }
 ,
   META_MERGE     => {

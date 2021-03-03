@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::CxnPool::Static::NoPing;
-$Search::Elasticsearch::Role::CxnPool::Static::NoPing::VERSION = '7.711';
+$Search::Elasticsearch::Role::CxnPool::Static::NoPing::VERSION = '7.711001';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::CxnPool';
 
@@ -96,7 +96,7 @@ Search::Elasticsearch::Role::CxnPool::Static::NoPing - A CxnPool for connecting 
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 AUTHOR
 

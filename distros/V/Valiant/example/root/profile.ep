@@ -1,0 +1,73 @@
+% layout 'layout.ep';
+% content title => 'Profile';
+% content css => begin
+  <style></style>
+% end
+
+%= form_for $model, style=>'width:27em; margin:auto', begin
+  <fieldset>
+    <legend><%= $model->model_name->human %></legend>
+    <div class='form-group'>
+      %= model_errors class=>'alert alert-danger', style=>'margin: 16px 0 0 0', role=>'alert';
+    </div>
+    <div class='form-group'>
+      %= input 'first_name', class=>'form-control', label=>1;
+    </div>
+    <div class='form-group'>
+      %= input 'last_name', class=>'form-control', label=>1;
+    </div>
+    <div class='form-group'>
+      %= input 'username', class=>'form-control', label=>1;
+    </div>
+
+    <div class='form-group'>
+      %= model_errors_for 'profile', max_errors=>1, class=>'alert alert-danger', role=>'alert';
+      <fieldset class="border p-2">
+        <legend  class="w-auto"><%= $model->human_attribute_name('profile') %></legend>
+        %= fields_for_related 'profile', begin
+        <div class='form-group'>
+          %= input 'address', class=>'form-control', label=>1;
+        </div>
+        <div class='form-group'>
+          %= input 'city', class=>'form-control', label=>1;
+        </div>
+
+        <div class='form-row'>
+          <div class='col form-group'>
+            %= select_from_related 'state', options_label_field=>'name', include_blank=>1, class=>'form-control', label=>1;
+          </div>
+          <div class='col form-group'>
+            %= input 'zip', class=>'form-control', label=>1;
+          </div>
+        </div>
+
+        <div class='form-row'>
+          <div class='col form-group'>
+            <%= input 'phone_number', 
+                class => 'form-control',
+                label => 1 %>
+          </div>
+          <div class='col form-group'>
+            <%= input 'birthday', 
+                class => 'form-control',
+                 label => 1 %>
+          </div>
+        </div>
+        % end
+      </fieldset>
+      % if ($model->profile && !$model->profile->is_marked_for_deletion && $model->profile->in_storage) {
+        <button class='btn btn-lg btn-success btn-block' value='1' name='<%= namespace_name_for("profile","_destroy") %>' >
+          Remove <%= $model->profile->human_attribute_name('profile') %>
+        </button>
+      % } elsif($model->profile && $model->profile->is_marked_for_deletion && $model->profile->in_storage) {
+        <button class='btn btn-lg btn-success btn-block' value='1' name='<%= namespace_name_for("profile","_restore") %>' >
+          Restore <%= $model->profile->human_attribute_name('profile') %>
+        </button>
+      % }
+    </div>
+    %= submit 'update', class=>'btn btn-lg btn-primary btn-block', value=>'Save Changes';
+  </fieldset>
+% end
+
+
+

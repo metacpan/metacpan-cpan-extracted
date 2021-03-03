@@ -1,21 +1,21 @@
-.TH "apreq_param_t" 3 "25 Nov 2010" "Version 2.13" "libapreq2" \" -*- nroff -*-
+.TH "apreq_param_t" 3 "Thu Nov 5 2020" "Version 2.15" "libapreq2" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-apreq_param_t \- 
+apreq_param_t
 .SH SYNOPSIS
 .br
 .PP
-\fC#include <apreq_param.h>\fP
 .PP
+\fC#include <apreq_param\&.h>\fP
 .SS "Data Fields"
 
 .in +1c
 .ti -1c
-.RI "\fBapr_table_t\fP * \fBinfo\fP"
+.RI "apr_table_t * \fBinfo\fP"
 .br
 .ti -1c
-.RI "\fBapr_bucket_brigade\fP * \fBupload\fP"
+.RI "apr_bucket_brigade * \fBupload\fP"
 .br
 .ti -1c
 .RI "unsigned \fBflags\fP"
@@ -29,19 +29,15 @@ apreq_param_t \-
 Common data structure for params and file uploads 
 .SH "Field Documentation"
 .PP 
-.SS "\fBapr_table_t\fP* \fBapreq_param_t::info\fP"
-.PP
-header table associated with the param 
-.SS "\fBapr_bucket_brigade\fP* \fBapreq_param_t::upload\fP"
-.PP
-brigade used to spool upload files 
-.SS "unsigned \fBapreq_param_t::flags\fP"
-.PP
+.SS "unsigned apreq_param_t::flags"
 charsets, taint marks, app-specific bits 
-.SS "const \fBapreq_value_t\fP \fBapreq_param_t::v\fP"
-.PP
+.SS "apr_table_t* apreq_param_t::info"
+header table associated with the param 
+.SS "apr_bucket_brigade* apreq_param_t::upload"
+brigade used to spool upload files 
+.SS "const \fBapreq_value_t\fP apreq_param_t::v"
 underlying name/value info 
 
 .SH "Author"
 .PP 
-Generated automatically by Doxygen for libapreq2 from the source code.
+Generated automatically by Doxygen for libapreq2 from the source code\&.

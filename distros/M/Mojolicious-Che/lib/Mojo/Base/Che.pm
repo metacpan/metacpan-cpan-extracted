@@ -1,23 +1,24 @@
 package Mojo::Base::Che;
-# ABSTRACT: some patch for Mojo::Base(current 8.02)
+# ABSTRACT: some patch for Mojo::Base(current 8.23)
 
 use Mojo::Base -strict;
-use mro;# weak
+#~ use mro;# weak
 
-# copy-paste sub Mojo::Base::attr + patch 1 line
+# copy-paste sub Mojo::Base::attr + patch 1 line #~
 sub Mojo::Base::attr {
   my ($self, $attrs, $value, %kv) = @_;
   return unless (my $class = ref $self || $self) && $attrs;
-
+ 
   Carp::croak 'Default has to be a code reference or constant value'
     if ref $value && ref $value ne 'CODE';
-
+  Carp::croak 'Unsupported attribute option' if grep { $_ ne 'weak' } keys %kv;
+ 
   # Weaken
   if ($kv{weak}) {
     state %weak_names;
     unless ($weak_names{$class}) {
       my $names = $weak_names{$class} = [];
-      my $sub = sub {
+      my $sub   = sub {
         my $self = shift->next::method(@_);
         ref $self->{$_} and Scalar::Util::weaken $self->{$_} for @$names;
         return $self;
@@ -27,16 +28,16 @@ sub Mojo::Base::attr {
       unshift @{"${class}::ISA"}, $base;
     }
     push @{$weak_names{$class}}, ref $attrs eq 'ARRAY' ? @$attrs : $attrs;
-}
-
+  }
+ 
   for my $attr (@{ref $attrs eq 'ARRAY' ? $attrs : [$attrs]}) {
-    # patch
     #~ Carp::croak qq{Attribute "$attr" invalid} unless $attr =~ /^[a-zA-Z_]\w*$/;
-
+ 
     # Very performance-sensitive code with lots of micro-optimizations
+    my $sub;
     if ($kv{weak}) {
       if (ref $value) {
-        my $sub = sub {
+        $sub = sub {
           return exists $_[0]{$attr}
             ? $_[0]{$attr}
             : (
@@ -47,44 +48,37 @@ sub Mojo::Base::attr {
           ref($_[0]{$attr} = $_[1]) and Scalar::Util::weaken($_[0]{$attr});
           $_[0];
         };
-        Mojo::Util::monkey_patch($class, $attr, $sub);
       }
       else {
-        my $sub = sub {
+        $sub = sub {
           return $_[0]{$attr} if @_ == 1;
           ref($_[0]{$attr} = $_[1]) and Scalar::Util::weaken($_[0]{$attr});
           $_[0];
         };
-        Mojo::Util::monkey_patch($class, $attr, $sub);
       }
+    }
+    elsif (ref $value) {
+      $sub = sub {
+        return
+          exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
+          if @_ == 1;
+        $_[0]{$attr} = $_[1];
+        $_[0];
+      };
+    }
+    elsif (defined $value) {
+      $sub = sub {
+        return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
+          if @_ == 1;
+        $_[0]{$attr} = $_[1];
+        $_[0];
+      };
     }
     else {
-      if (ref $value) {
-        my $sub = sub {
-          return
-            exists $_[0]{$attr}
-            ? $_[0]{$attr}
-            : ($_[0]{$attr} = $value->($_[0]))
-            if @_ == 1;
-          $_[0]{$attr} = $_[1];
-          $_[0];
-        };
-        Mojo::Util::monkey_patch($class, $attr, $sub);
-      }
-      elsif (defined $value) {
-        my $sub = sub {
-          return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
-            if @_ == 1;
-          $_[0]{$attr} = $_[1];
-          $_[0];
-        };
-        Mojo::Util::monkey_patch($class, $attr, $sub);
-      }
-      else {
-        Mojo::Util::monkey_patch($class, $attr,
-          sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] });
-      }
+      $sub
+        = sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] };
     }
+    Mojo::Util::monkey_patch($class, $attr, $sub);
   }
 }
 

@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ no_index:
 provides:
   App::UpdateCPANfile:
     file: lib/App/UpdateCPANfile.pm
-    version: v1.0.0
+    version: v1.1.0
   App::UpdateCPANfile::CPANfileSnapshotParser:
     file: lib/App/UpdateCPANfile/CPANfileSnapshotParser.pm
   App::UpdateCPANfile::Change:
@@ -50,14 +50,15 @@ requires:
   IO::String: '0'
   JSON: '0'
   LWP::UserAgent: '0'
+  List::Util: '0'
   Module::CPANfile: '0'
   Module::CPANfile::Writer: '0'
-  perl: '5.008001'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/hitode909/App-UpdateCPANfile/issues
   homepage: https://github.com/hitode909/App-UpdateCPANfile
   repository: git://github.com/hitode909/App-UpdateCPANfile.git
-version: 1.0.0
+version: 1.1.0
 x_authority: cpan:HITODE
 x_contributors:
   - 'hitode909 <hitode909@gmail.com>'

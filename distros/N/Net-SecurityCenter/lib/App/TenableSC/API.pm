@@ -10,6 +10,8 @@ use parent 'App::TenableSC';
 
 use App::TenableSC::Utils qw(:all);
 
+our $VERSION = '0.310';
+
 @App::TenableSC::command_options = (
     'output|format|f=s',
 
@@ -86,24 +88,24 @@ sub startup {
             }
 
             print JSON->new->pretty(1)->convert_blessed(1)->encode($results);
-            exit 0;
+            exit;
 
         }
 
         if ( $self->options->{'format'} eq 'dumper' ) {
             print dumper($results);
-            exit 0;
+            exit;
         }
 
         if ( $self->options->{'format'} eq 'yaml' ) {
 
             if ( eval { require YAML::XS } ) {
                 print YAML::XS::Dump($results);
-                exit 0;
+                exit;
             }
             if ( eval { require YAML } ) {
                 print YAML::Dump($results);
-                exit 0;
+                exit;
             }
 
             print "ERROR: YAML or YAML::XS module are missing\n";
@@ -123,17 +125,25 @@ sub startup {
             }
 
             foreach my $row ( @{$results} ) {
+
                 if ( !@fields ) {
                     @fields = sort keys %{$row};
                 }
-                my @row;
+
+                my @row = ();
 
                 foreach (@fields) {
 
                     if ( ref $row->{$_} eq 'HASH' ) {
                         push @row, encode_json( $row->{$_} );
                     } else {
-                        push @row, $row->{$_};
+                        my $value = $row->{$_};
+
+                        if ( $self->options->{'format'} ne 'table' ) {
+                            $value = sprintf '"%s"', $value if ( $value =~ /\n/ || $value =~ /\,/ );
+                            $value =~ s/\n/\r\n/g;
+                        }
+                        push @row, $value;
                     }
 
                 }
@@ -153,14 +163,14 @@ sub startup {
 
             }
 
-            exit 0;
+            exit;
 
         }
 
     }
 
     print "$results\n";
-    exit 0;
+    exit;
 
 }
 
@@ -198,8 +208,8 @@ sub table {
 
     } else {
 
-        for my $i ( 0 .. @{ $rows->[0] } ) {
-            $widths->[$i] = 1;
+        for my $i ( 0 .. @{ $rows->[0] } - 1 ) {
+            $widths->[$i] = 0;
         }
 
         $header_separator = undef;
@@ -217,7 +227,7 @@ sub table {
         my $header_row   = sprintf( $format, @{$headers} );
         my $header_width = length($header_row);
 
-         $table .= $header_row;
+        $table .= $header_row;
 
         if ($header_separator) {
             $table .= sprintf( "%s\n", $header_separator x $header_width );
@@ -226,13 +236,7 @@ sub table {
     }
 
     for my $row ( @{$rows} ) {
-
-        if ( $output_format eq 'table' ) {
-            $table .= sprintf( $format, map { $_ || '' } @{$row} );
-        } else {
-            $table .= sprintf( $format, map { trim($_) } @{$row} );
-        }
-
+        $table .= sprintf( $format, map { $_ || '' } @{$row} );
     }
 
     return $table;
@@ -300,7 +304,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

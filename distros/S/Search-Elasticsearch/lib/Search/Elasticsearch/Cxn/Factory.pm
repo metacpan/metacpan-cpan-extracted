@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Cxn::Factory;
-$Search::Elasticsearch::Cxn::Factory::VERSION = '7.711';
+$Search::Elasticsearch::Cxn::Factory::VERSION = '7.711001';
 use Moo;
 use Search::Elasticsearch::Util qw(parse_params load_plugin);
 use namespace::clean;
@@ -64,7 +64,7 @@ Search::Elasticsearch::Cxn::Factory - Used by CxnPools to create new Cxn instanc
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

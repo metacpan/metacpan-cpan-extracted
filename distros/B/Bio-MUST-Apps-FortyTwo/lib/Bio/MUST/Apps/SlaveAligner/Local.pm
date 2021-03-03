@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::SlaveAligner::Local;
 # ABSTRACT: Internal class for slave-aligner
-$Bio::MUST::Apps::SlaveAligner::Local::VERSION = '0.210370';
+$Bio::MUST::Apps::SlaveAligner::Local::VERSION = '0.210570';
 use Moose;
 use namespace::autoclean;
 
@@ -174,7 +174,7 @@ Bio::MUST::Apps::SlaveAligner::Local - Internal class for slave-aligner
 
 =head1 VERSION
 
-version 0.210370
+version 0.210570
 
 =head1 AUTHOR
 

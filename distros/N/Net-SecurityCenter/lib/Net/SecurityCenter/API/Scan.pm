@@ -4,13 +4,11 @@ use warnings;
 use strict;
 
 use Carp;
-use English qw( -no_match_vars );
-
 use parent 'Net::SecurityCenter::Base';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.300';
+our $VERSION = '0.310';
 
 my $common_template = {
 
@@ -234,9 +232,13 @@ sub list {
     my $raw    = delete( $params->{'raw'} );
     my $scans  = $self->client->get( '/scan', $params );
 
-    return        if ( !$scans );
-    return $scans if ($raw);
-    return sc_merge($scans);
+    return if ( !$scans );
+
+    if ($raw) {
+        return wantarray ? @{$scans} : $scans;
+    }
+
+    return wantarray ? @{ sc_merge($scans) } : sc_merge($scans);
 }
 
 #-------------------------------------------------------------------------------
@@ -470,7 +472,7 @@ using Nessus Scanner without create a scan.
 
 B<NOTE>: This method is an alias for C<$sc-E<gt>add ( schedule =E<gt> 'now', ... )>.
 
-See C<$sc-E<gt>add_scan> paragraph for information about the allowed C<params>.
+See C<$sc-E<gt>add> paragraph for information about the allowed C<params>.
 
 =head2 delete
 
@@ -514,7 +516,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

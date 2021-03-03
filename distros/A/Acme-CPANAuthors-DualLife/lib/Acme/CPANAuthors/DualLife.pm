@@ -1,5 +1,5 @@
 package Acme::CPANAuthors::DualLife;
-$Acme::CPANAuthors::DualLife::VERSION = '0.48';
+$Acme::CPANAuthors::DualLife::VERSION = '0.50';
 #ABSTRACT: We are CPAN Authors of Dual Life core modules
 
 use strict;
@@ -8,9 +8,10 @@ use warnings;
 use Acme::CPANAuthors::Register (
   AMBS => q[Alberto Manuel Brandao Simoes],
   ANDK => q[Andreas J. Koenig],
-  ATOOMIC => q[Nicolas R.],
+  ATOOMIC => q[icolas .],
   AUDREYT => q[Audrey Tang],
   BINGOS => q[Chris Williams],
+  CAPOEIRAB => q[Chase Whitener],
   CHORNY => q[Alexandr Ciornii],
   CORION => q[Max Maischein],
   DAGOLDEN => q[David Golden],
@@ -23,7 +24,6 @@ use Acme::CPANAuthors::Register (
   EXODIST => q[Chad Granum],
   FERREIRA => q[Adriano Ferreira],
   FLORA => q[Florian Ragwitz],
-  GAAS => q[Gisle Aas],
   HAARG => q[Graham Knop],
   HMBRAND => q[H.Merijn Brand],
   ISHIGAKI => q[Kenichi Ishigaki],
@@ -31,7 +31,6 @@ use Acme::CPANAuthors::Register (
   JDHEDDEN => q[Jerry D. Hedden],
   JESSE => q[Jesse Vincent],
   JKEENAN => q[James E Keenan],
-  JPEACOCK => q[John Peacock],
   JSTOWE => q[Jonathan Stowe],
   JV => q[Johan Vromans],
   KANE => q[Jos Boumans],
@@ -85,7 +84,7 @@ Acme::CPANAuthors::DualLife - We are CPAN Authors of Dual Life core modules
 
 =head1 VERSION
 
-version 0.48
+version 0.50
 
 =head1 SYNOPSIS
 
@@ -110,9 +109,10 @@ It is currently statically generated information, I hope to make it dynamic in t
 
   AMBS => q[Alberto Manuel Brandao Simoes],
   ANDK => q[Andreas J. Koenig],
-  ATOOMIC => q[Nicolas R.],
+  ATOOMIC => q[icolas .],
   AUDREYT => q[Audrey Tang],
   BINGOS => q[Chris Williams],
+  CAPOEIRAB => q[Chase Whitener],
   CHORNY => q[Alexandr Ciornii],
   CORION => q[Max Maischein],
   DAGOLDEN => q[David Golden],
@@ -125,7 +125,6 @@ It is currently statically generated information, I hope to make it dynamic in t
   EXODIST => q[Chad Granum],
   FERREIRA => q[Adriano Ferreira],
   FLORA => q[Florian Ragwitz],
-  GAAS => q[Gisle Aas],
   HAARG => q[Graham Knop],
   HMBRAND => q[H.Merijn Brand],
   ISHIGAKI => q[Kenichi Ishigaki],
@@ -133,7 +132,6 @@ It is currently statically generated information, I hope to make it dynamic in t
   JDHEDDEN => q[Jerry D. Hedden],
   JESSE => q[Jesse Vincent],
   JKEENAN => q[James E Keenan],
-  JPEACOCK => q[John Peacock],
   JSTOWE => q[Jonathan Stowe],
   JV => q[Johan Vromans],
   KANE => q[Jos Boumans],
@@ -184,7 +182,7 @@ Chris Williams
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Chris Williams.
+This software is copyright (c) 2021 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

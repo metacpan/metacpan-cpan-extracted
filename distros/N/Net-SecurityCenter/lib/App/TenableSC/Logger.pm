@@ -5,7 +5,7 @@ use warnings;
 
 use Time::Piece;
 
-our $VERSION = '0.300';
+our $VERSION = '0.310';
 
 #-------------------------------------------------------------------------------
 # CONSTRUCTOR
@@ -29,27 +29,10 @@ sub log {
 
 #-------------------------------------------------------------------------------
 
-sub info {
-    return shift->log( 'INFO', shift );
-}
-
-#-------------------------------------------------------------------------------
-
-sub debug {
-    return shift->log( 'DEBUG', shift );
-}
-
-#-------------------------------------------------------------------------------
-
-sub warning {
-    return shift->log( 'WARNING', shift );
-}
-
-#-------------------------------------------------------------------------------
-
-sub error {
-    return shift->log( 'ERROR', shift );
-}
+sub info    { shift->log( 'INFO',    shift ) }
+sub debug   { shift->log( 'DEBUG',   shift ) }
+sub warning { shift->log( 'WARNING', shift ) }
+sub error   { shift->log( 'ERROR',   shift ) }
 
 #-------------------------------------------------------------------------------
 
@@ -84,7 +67,23 @@ For more information about the Tenable.sc (SecurityCenter) REST API follow the o
 L<https://docs.tenable.com/sccv/api/index.html>
 
 
+=head1 CONSTRUCTOR
+
+=head2 App::TenableSC::Logger->new
+
+Create a new instance of L<App::TenableSC::Logger>.
+
+
 =head1 METHODS
+
+=head2 $logger->error|warning|debug|info ( $message )
+
+Write message in STDERR.
+
+
+=head1 SEE ALSO
+
+L<Log::Log4perl>, L<Log::Any>, L<Mojo::Log>
 
 
 =head1 SUPPORT
@@ -116,7 +115,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

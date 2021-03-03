@@ -3,25 +3,26 @@ abstract: 'RPC Interface for External IMP Plugins'
 author:
   - 'Steffen Ullrich <sullr@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-IMP-Remote
 no_index:
   directory:
     - t
     - inc
 requires:
-  Net::IMP: 0.618
+  Net::IMP: '0.618'
 resources:
-  bugtracker: https://rt.cpan.org/Dist/Display.html?Queue=Net-IMP-Remote
+  bugtracker: https://github.com/noxxi/p5-net-imp-remote/issues
   homepage: https://github.com/noxxi/p5-net-imp-remote
   license: http://dev.perl.org/licenses/
   repository: https://github.com/noxxi/p5-net-imp-remote
-version: 0.009
+version: '0.010'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

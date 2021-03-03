@@ -1,6 +1,6 @@
 name = "Mackerel-ReleaseUtils"
 # badges = ["travis"]
-authority="cpan:SONGMU"
+authority="cpan:ASTJ"
 
 module_maker="ModuleBuildTiny"
 requires_external_bin=['git', 'hub', 'ghch', 'gobump']

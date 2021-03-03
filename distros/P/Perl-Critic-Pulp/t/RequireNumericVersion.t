@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2021 Kevin Ryde
 
 # This file is part of Perl-Critic-Pulp.
 #
@@ -30,7 +30,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 require Perl::Critic::Policy::ValuesAndExpressions::RequireNumericVersion;
 
 #-----------------------------------------------------------------------------
-my $want_version = 97;
+my $want_version = 99;
 is ($Perl::Critic::Policy::ValuesAndExpressions::RequireNumericVersion::VERSION,
     $want_version,
     'VERSION variable');

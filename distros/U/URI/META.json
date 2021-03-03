@@ -30,7 +30,7 @@
       },
       "develop" : {
          "recommends" : {
-            "Business::ISBN" : "0",
+            "Business::ISBN" : "3.005",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007",
             "Storable" : "0"
          },
@@ -89,175 +89,179 @@
    "provides" : {
       "URI" : {
          "file" : "lib/URI.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::Escape" : {
          "file" : "lib/URI/Escape.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::Heuristic" : {
          "file" : "lib/URI/Heuristic.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::IRI" : {
          "file" : "lib/URI/IRI.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::QueryParam" : {
          "file" : "lib/URI/QueryParam.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::Split" : {
          "file" : "lib/URI/Split.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::URL" : {
          "file" : "lib/URI/URL.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::WithBase" : {
          "file" : "lib/URI/WithBase.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::data" : {
          "file" : "lib/URI/data.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::file" : {
          "file" : "lib/URI/file.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::file::Base" : {
          "file" : "lib/URI/file/Base.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::file::FAT" : {
          "file" : "lib/URI/file/FAT.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::file::Mac" : {
          "file" : "lib/URI/file/Mac.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::file::OS2" : {
          "file" : "lib/URI/file/OS2.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::file::QNX" : {
          "file" : "lib/URI/file/QNX.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::file::Unix" : {
          "file" : "lib/URI/file/Unix.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::file::Win32" : {
          "file" : "lib/URI/file/Win32.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::ftp" : {
          "file" : "lib/URI/ftp.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::gopher" : {
          "file" : "lib/URI/gopher.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::http" : {
          "file" : "lib/URI/http.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::https" : {
          "file" : "lib/URI/https.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::ldap" : {
          "file" : "lib/URI/ldap.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::ldapi" : {
          "file" : "lib/URI/ldapi.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::ldaps" : {
          "file" : "lib/URI/ldaps.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::mailto" : {
          "file" : "lib/URI/mailto.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::mms" : {
          "file" : "lib/URI/mms.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::news" : {
          "file" : "lib/URI/news.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::nntp" : {
          "file" : "lib/URI/nntp.pm",
-         "version" : "5.07"
+         "version" : "5.09"
+      },
+      "URI::nntps" : {
+         "file" : "lib/URI/nntps.pm",
+         "version" : "5.09"
       },
       "URI::pop" : {
          "file" : "lib/URI/pop.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::rlogin" : {
          "file" : "lib/URI/rlogin.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::rsync" : {
          "file" : "lib/URI/rsync.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::rtsp" : {
          "file" : "lib/URI/rtsp.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::rtspu" : {
          "file" : "lib/URI/rtspu.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::sftp" : {
          "file" : "lib/URI/sftp.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::sip" : {
          "file" : "lib/URI/sip.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::sips" : {
          "file" : "lib/URI/sips.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::snews" : {
          "file" : "lib/URI/snews.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::ssh" : {
          "file" : "lib/URI/ssh.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::telnet" : {
          "file" : "lib/URI/telnet.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::tn3270" : {
          "file" : "lib/URI/tn3270.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::urn" : {
          "file" : "lib/URI/urn.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::urn::isbn" : {
          "file" : "lib/URI/urn/isbn.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       },
       "URI::urn::oid" : {
          "file" : "lib/URI/urn/oid.pm",
-         "version" : "5.07"
+         "version" : "5.09"
       }
    },
    "release_status" : "stable",
@@ -274,7 +278,7 @@
       "x_IRC" : "irc://irc.perl.org/#lwp",
       "x_MailingList" : "mailto:libwww@perl.org"
    },
-   "version" : "5.07",
+   "version" : "5.09",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -336,7 +340,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -367,7 +371,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.30.0",
+                  "git_version" : "2.28.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "commits",
@@ -406,6 +410,11 @@
             "class" : "Dist::Zilla::Plugin::Prereqs::FromCPANfile",
             "name" : "Prereqs::FromCPANfile",
             "version" : "0.08"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "Readme",
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -559,7 +568,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },
@@ -570,7 +579,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },
@@ -581,7 +590,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },
@@ -638,7 +647,7 @@
             "class" : "Dist::Zilla::Plugin::VersionFromMainModule",
             "config" : {
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000037",
+                  "Module::Metadata" : "1.000036",
                   "version" : "0.006"
                }
             },
@@ -681,7 +690,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -698,12 +707,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v5.07",
+                  "tag" : "v5.09",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -753,7 +762,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -773,7 +782,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.30.0",
+                  "git_version" : "2.28.0",
                   "repo_root" : "."
                }
             },
@@ -863,6 +872,7 @@
       "Adam Herzog <adam@adamherzog.com>",
       "Alex Kapranoff <kapranoff@gmail.com>",
       "Brendan Byrd <Perl@ResonatorSoft.org>",
+      "brian d foy <brian.d.foy@gmail.com>",
       "David Schmidt <davewood@gmx.at>",
       "Dorian Taylor <dorian.taylor.lists@gmail.com>",
       "gerard <gerard@tty.nl>",

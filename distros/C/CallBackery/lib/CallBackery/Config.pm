@@ -300,9 +300,9 @@ Load translations from po files
 
 sub getTranslations {
     my $self = shift;
-    my $cfg = shift;
+    my $cfg = shift || {};
     my %lx;
-    my $path = $self->app->home->rel_file("share");
+    my $path = $cfg->{path} // $self->app->home->rel_file("share");
     my $po = new Locale::PO();
     for my $file (glob(File::Spec->catdir($path, '*.po'))) {
         my ($volume, $localePath, $localeName) = File::Spec->splitpath($file);

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2019 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,13 +22,57 @@ use FindBin;
 use File::Spec;
 use Graph;
 use Math::Trig 'pi';
+use Graph::Maker::Hypercube;
 
 use lib File::Spec->catdir($FindBin::Bin, File::Spec->updir, 'devel', 'lib');
 use MyGraphs;
 
 # uncomment this to run the ### lines
-# use Smart::Comments;
+use Smart::Comments;
 
+{
+  # Hypercube plus complete graph clique for each N-1 dimension face
+  # N=3 cube   https://hog.grinvin.org/ViewGraphInfo.action?id=176
+  #
+  # 2^(N-1) cross edges not present
+
+  my @graphs;
+  foreach my $N (3..5) {
+    my $graph = Graph::Maker->new('hypercube', N => $N, undirected=>1);
+    my @vertices = $graph->vertices;
+    # print "vertices ", join(' ',@vertices),"\n";
+    foreach my $pos (0 .. $N-1) {
+      my $mask = 1<<$pos;
+      foreach my $want (0,$mask) {
+        my @face = grep {(($_-1) & $mask) == $want} @vertices;
+        @face == 1<<($N-1) or die;
+        # print "face ", join(' ',@face),"\n";
+        add_clique($graph,@face);
+      }
+    }
+    my @edges = $graph->edges;
+    my $num_edges = scalar(@edges);
+    $graph = $graph->complement;
+    print "vertices ", join(' ',@vertices),"\n";
+    print "edges ", join(' ',map {join(',',@$_)} @edges),"\n";
+    print "N=$N  $num_edges edges\n";
+    push @graphs, $graph;
+  }
+  MyGraphs::hog_searches_html(@graphs);
+  # MyGraphs::hog_upload_html($graphs[1]);
+  # MyGraphs::Graph_view($graphs[-1]);
+  exit 0;
+
+  sub add_clique {
+    my ($graph, @vertices) = @_;
+    foreach my $from_i (0 .. $#vertices) {
+      foreach my $to_i (($graph->is_undirected ? $from_i+1 : 0) .. $#vertices) {
+        next if $from_i == $to_i;
+        $graph->add_edge ($vertices[$from_i], $vertices[$to_i]);
+      }
+    }
+  }
+}
 {
   # Hypercube
   # N=3 cube      https://hog.grinvin.org/ViewGraphInfo.action?id=1022
@@ -39,16 +83,16 @@ use MyGraphs;
   # N=7
   require Graph::Maker::Hypercube;
   my @graphs;
-  for (my $k = 6; @graphs < 2; $k++) {
-    my $graph = Graph::Maker->new('hypercube', N => $k, undirected=>1);
+  for (my $N = 6; @graphs < 2; $N++) {
+    my $graph = Graph::Maker->new('hypercube', N => $N, undirected=>1);
 
-    my $a = pi/2/($k-1);
+    my $a = pi/2/($N-1);
     ### $a
-    my @basis = map { [sin($_*$a), cos($_*$a)] } 0 .. $k-1;
+    my @basis = map { [sin($_*$a), cos($_*$a)] } 0 .. $N-1;
     foreach my $n ($graph->vertices) {
       my $x = 0;
       my $y = 0;
-      foreach my $i (0 .. $k-1) {
+      foreach my $i (0 .. $N-1) {
         if (($n-1) & (1<<$i)) {
           ### add: "n=$n i=$i $basis[$i]->[0] $basis[$i]->[1]"
           $x += $basis[$i]->[0];

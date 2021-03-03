@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Graph::Maker;
 use List::Util 'min';
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -92,7 +92,7 @@ Graph::Maker::Petersen - create Petersen and generalized Petersen graphs
 C<Graph::Maker::Petersen> creates a C<Graph.pm> graph of the Petersen
 graph,
 
-                       ___1___ 
+                       ___1___
                   ____/   |   \____
                  /        |        \
                 2__       6       __5           N => 5
@@ -159,17 +159,28 @@ L<https://hog.grinvin.org/ViewGraphInfo.action?id=746> (etc)
 
     746     N=3, K=1    circular ladder 3 rungs
     1022    N=4, K=1    cube
-    588     N=4, K=2    
+    588     N=4, K=2
+    36274   N=5, K=1    circular ladder 5 rungs
     660     N=5, K=2    Petersen
     32798   N=6, K=1    cross-connected 6-cycles
-    28482   N=7, K=2    
+    34383   N=6, K=2
+    36287   N=7, K=1    circular ladder 7 rungs
+    28482   N=7, K=2
+    36292   N=8, K=1    circular ladder 8 rungs
     1229    N=8, K=3    Mobius Kantor
-    6700    N=9, K=3    
+    36298   N=9, K=1    circular ladder 9 rungs
+    6700    N=9, K=3
+    36310   N=10, K=1   circular ladder 10 rungs
     1043    N=10, K=2   Dodecahedral
     1036    N=10, K=3   Desargues
-    24052   N=11, K=2   
-    27325   N=12, K=2   
+
+    24052   N=11, K=2
+    27325   N=12, K=2
     1234    N=12, K=5   Nauru
+    36346   N=13, K=5
+    36361   N=15, K=4
+
+    (And a few more at bigger N.)
 
 =head1 OEIS
 
@@ -196,11 +207,11 @@ L<Graph::Maker::Hypercube>
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

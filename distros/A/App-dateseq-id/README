@@ -1,0 +1,159 @@
+NAME
+    App::dateseq::id - Like dateseq, with builtin support for Indonesian
+    holidays
+
+VERSION
+    This document describes version 0.002 of App::dateseq::id (from Perl
+    distribution App-dateseq-id), released on 2021-01-13.
+
+FUNCTIONS
+  dateseq_id
+    Usage:
+
+     dateseq_id(%args) -> [status, msg, payload, meta]
+
+    Like dateseq, with builtin support for Indonesian holidays.
+
+    This utility is a wrapper for dateseq, with builtin support for
+    Indonesian holidays (data from Calendar::Indonesia::Holiday). It offers
+    additional --holiday (and --noholiday, as well as -j) options to let you
+    filter dates based on whether they are Indonesian holidays.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   business => *bool*
+
+        Only list business days (Mon-Fri), or non-business days.
+
+    *   business6 => *bool*
+
+        Only list business days (Mon-Sat), or non-business days.
+
+    *   exclude_dow => *date::dow_nums*
+
+        Do not show dates with these day-of-weeks.
+
+    *   exclude_month => *date::month_nums*
+
+        Do not show dates with these month numbers.
+
+    *   format_class => *perl::modname*
+
+        Use a DateTime::Format::* class for formatting.
+
+        By default, DateTime::Format::Strptime is used with pattern set from
+        the <strftime> option.
+
+    *   format_class_attrs => *hash*
+
+        Arguments to pass to constructor of DateTime::Format::* class.
+
+    *   from => *date*
+
+        Starting date.
+
+    *   header => *str*
+
+        Add a header row.
+
+    *   holiday => *bool*
+
+        Only list holidays (or non-holidays).
+
+    *   include_dow => *date::dow_nums*
+
+        Only show dates with these day-of-weeks.
+
+    *   include_joint_leave => *bool*
+
+        Whether to assume joint leave days as holidays.
+
+    *   include_month => *date::month_nums*
+
+        Only show dates with these month numbers.
+
+    *   increment => *duration*
+
+    *   limit => *posint*
+
+        Only generate a certain amount of numbers.
+
+    *   limit_monthly => *posint*
+
+        Only output at most this number of dates for each month.
+
+    *   limit_yearly => *posint*
+
+        Only output at most this number of dates for each year.
+
+    *   reverse => *true*
+
+        Decrement instead of increment.
+
+    *   strftime => *str*
+
+        strftime() format for each date.
+
+        Default is "%Y-%m-%d", unless when hour/minute/second is specified,
+        then it is "%Y-%m-%dT%H:%M:%S".
+
+        "dateseq" actually uses DateTimeX::strftimeq, so you can embed Perl
+        code for flexibility. For example:
+
+         % dateseq 2019-11-19 2019-11-25 -f '%Y-%m-%d%( $_->day_of_week == 7 ? "su" : "" )q'
+
+        will print something like:
+
+         2019-11-19
+         2019-11-20
+         2019-11-21
+         2019-11-22
+         2019-11-23
+         2019-11-24su
+         2019-11-25
+
+    *   to => *date*
+
+        End date, if not specified will generate an infinite* stream of
+        dates.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-dateseq-id>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-dateseq-id>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-App-dateseq-id/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::dateseq
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

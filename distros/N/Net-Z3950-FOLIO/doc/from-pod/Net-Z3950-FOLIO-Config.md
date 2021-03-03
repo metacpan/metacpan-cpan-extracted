@@ -29,6 +29,7 @@ Net::Z3950::FOLIO::Config - configuration file for the FOLIO Z39.50 gateway
       "graphqlQuery": "instances.graphql-query",
       "chunkSize": 5
       "marcHoldings": {
+        "restrictToItem": 0,
         "field": "952",
         "indicators": [" ", " "],
         "holdingsElements": {
@@ -191,15 +192,23 @@ more records than are actually wanted.
 ## `marcHoldings`
 
 An optional object specifying how holdings and item-level data should
-be mapped into MARC fields. It contains four elements:
+be mapped into MARC fields. It contains up to five elements:
 
-- `field`
+- `restrictToItem`
+
+    If specified and set to 1, then the item-level holding information
+    included in MARC records is restricted to that which pertains to the
+    barcode mentioned in the search that yielded the record, if any. If
+    zero (the default), then information on all holdings and items is
+    included.
+
+- `field` (mandatory)
 
     A string specifying which MARC field should be used for holdings
     information. When a record contains multiple holdings, a separate
     instance of this MARC field is created for each holding.
 
-- `indicators`
+- `indicators` (mandatory)
 
     An array containing two strings, each of them specifying one of the
     two indicators to be used in the MARC field that contains

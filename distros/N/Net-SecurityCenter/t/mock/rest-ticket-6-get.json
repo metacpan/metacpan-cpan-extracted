@@ -1,0 +1,51 @@
+{
+    "type" : "regular",
+    "response" : {
+        "id" : "6",
+        "name" : "TestTicket",
+        "description" : "",
+        "classification" : "Information",
+        "status" : "assigned",
+        "notes" : "",
+        "assignedTime" : "1423501383",
+        "resolvedTime" : "-1",
+        "closedTime" : "-1",
+        "createdTime" : "1423501383",
+        "modifiedTime" : "1423501383",
+        "canUse" : "true",
+        "canManage" : "true",
+        "canRespond" : "true",
+        "creator" : {
+            "id" : "1",
+            "username" : "head",
+            "firstname" : "hi",
+            "lastname" : "User"
+        },
+        "owner" : {
+            "id" : "1",
+            "username" : "head",
+            "firstname" : "hi",
+            "lastname" : "User"
+        },
+        "assignee" : {
+            "id" : "1",
+            "username" : "head",
+            "firstname" : "hi",
+            "lastname" : "User"
+        },
+        "ownerGroup" : {
+            "id" : "0",
+            "name" : "Full Access",
+            "description" : "Full Access group"
+        },
+        "assigneeGroup" : {
+            "id" : "0",
+            "name" : "Full Access",
+            "description" : "Full Access group"
+        }
+    },
+    "error_code" : 0,
+    "error_msg" : "",
+    "warnings" : {},
+    "timestamp" : 1423501383
+}

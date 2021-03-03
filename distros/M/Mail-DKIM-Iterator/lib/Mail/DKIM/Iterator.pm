@@ -1,7 +1,7 @@
 package Mail::DKIM::Iterator;
 use v5.10.0;
 
-our $VERSION = '1.009';
+our $VERSION = '1.010';
 
 use strict;
 use warnings;

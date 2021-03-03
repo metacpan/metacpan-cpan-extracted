@@ -1,3 +1,19 @@
+0.008   2021-02-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump prereq version Text::CSV -> 1.91 (csv() function) (thanks
+	  SREZIC) [GH#1].
+
+
+0.007   2021-01-16  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Use zscore tables as well as percentile tables to produce
+	  zscore results, we cannot convert from percentile to zscore using
+	  Statistics::Standard_Normal other than for the height-age data,
+	  because the other data do not follow a normal distribution.
+
+        - [incompatible changes] Rename some result keys.
+
+
 0.006   2021-01-10  Released-By: PERLANCAR; Urgency: low
 
 	- No data changes.

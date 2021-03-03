@@ -5,6 +5,7 @@ use Sub::Meta::Param;
 subtest 'single arg' => sub {
     my $param = Sub::Meta::Param->new('Type');
     is $param->type, 'Type', 'type';
+    is $param->isa_, 'Type', 'isa';
     is $param->name, undef, 'name';
     is $param->default, undef, 'default';
     is $param->coerce, undef, 'coerce';
@@ -31,8 +32,13 @@ subtest 'setter' => sub {
 
     is $param->set_name('$foo'), $param, 'set_name';
     is $param->name, '$foo', 'name';
+
     is $param->set_type('Type'), $param, 'set_type';
     is $param->type, 'Type', 'type';
+    is $param->set_isa('Type2'), $param, 'set_isa';
+    is $param->isa_, 'Type2', 'type2';
+    is $param->type, 'Type2', 'type2';
+
     is $param->set_default('Default'), $param, 'set_default';
     is $param->default, 'Default', 'default';
     is $param->set_coerce('Coerce'), $param, 'set_coerce';
@@ -61,10 +67,7 @@ subtest 'setter' => sub {
 
 subtest 'overload' => sub {
     my $param = Sub::Meta::Param->new({ name => '$foo' });
-    is "$param", '$foo', 'overload string';
-
-    my $empty = Sub::Meta::Param->new({ });
-    is "$empty", '', 'overload no string';
+    ok $param eq $param;
 };
 
 subtest 'new' => sub {

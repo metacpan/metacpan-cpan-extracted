@@ -8,7 +8,7 @@ configure_requires:
   Devel::CheckBin: '0'
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.7, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Mackerel::ReleaseUtils:
     file: lib/Mackerel/ReleaseUtils.pm
-    version: v0.2.4
+    version: v0.2.5
   Mackerel::ReleaseUtils::Log:
     file: lib/Mackerel/ReleaseUtils/Log.pm
 requires:
@@ -39,14 +39,15 @@ resources:
   bugtracker: https://github.com/mackerelio/Mackerel-ReleaseUtils/issues
   homepage: https://github.com/mackerelio/Mackerel-ReleaseUtils
   repository: git://github.com/mackerelio/Mackerel-ReleaseUtils.git
-version: v0.2.4
-x_authority: cpan:SONGMU
+version: v0.2.5
+x_authority: cpan:ASTJ
 x_contributors:
   - 'Asato Wakisaka <asato.wakisaka@gmail.com>'
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
-  - 'Songmu <y.songmu@gmail.com>'
   - 'astj <astj@users.noreply.github.com>'
   - 'itchyny <itchyny@hatena.ne.jp>'
   - 'shibayu36 <shibayu36@gmail.com>'
+  - 'yseto <yseto@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

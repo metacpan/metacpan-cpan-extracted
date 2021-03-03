@@ -113,7 +113,7 @@ static char mix_data[] =
 #define MR_ENCTYPE "multipart/related"
 #define XML_ENCTYPE "application/xml"
 
-static void locate_default_parsers(dAT)
+static void locate_default_parsers(dAT, void *ctx)
 {
 
 #ifdef __ELF__
@@ -137,7 +137,7 @@ static void locate_default_parsers(dAT)
 
 }
 
-static void parse_urlencoded(dAT)
+static void parse_urlencoded(dAT, void *ctx)
 {
     apr_status_t rv;
     apr_bucket_alloc_t *ba;
@@ -173,7 +173,7 @@ static void parse_urlencoded(dAT)
 
 }
 
-static void parse_multipart(dAT)
+static void parse_multipart(dAT, void *ctx)
 {
     apr_size_t i, j;
     apr_bucket_alloc_t *ba;
@@ -189,7 +189,7 @@ static void parse_multipart(dAT)
          * when this many (~1M) tests are involved.
          */
 
-        AT_localize(p);
+        AT_localize();
 
         for (i = 0; i <= strlen(form_data); ++i) {
             const char *val;
@@ -261,11 +261,12 @@ static void parse_multipart(dAT)
 #ifdef APR_POOL_DEBUG
         apr_bucket_alloc_destroy(ba);
 #endif
+        AT_delocalize();
         apr_pool_clear(p);
     }
 }
 
-static void parse_disable_uploads(dAT)
+static void parse_disable_uploads(dAT, void *ctx)
 {
     const char *val;
     apr_table_t *t, *body;
@@ -308,7 +309,7 @@ static void parse_disable_uploads(dAT)
 }
 
 
-static void parse_generic(dAT)
+static void parse_generic(dAT, void *ctx)
 {
     char *val;
     apr_size_t vlen;
@@ -340,7 +341,7 @@ static void parse_generic(dAT)
     AT_mem_eq(val, xml_data, vlen);
 }
 
-static void hook_discard(dAT)
+static void hook_discard(dAT, void *ctx)
 {
     apr_status_t rv;
     apreq_param_t *dummy;
@@ -372,7 +373,7 @@ static void hook_discard(dAT)
 }
 
 
-static void parse_related(dAT)
+static void parse_related(dAT, void *ctx)
 {
     char ct[] = "multipart/related; boundary=f93dcbA3; "
         "type=application/xml; start=\"<980119.X53GGT@example.com>\"";
@@ -450,7 +451,7 @@ typedef struct {
 } array_elt;
 
 
-static void parse_mixed(dAT)
+static void parse_mixed(dAT, void *ctx)
 {
     const char *val;
     char *val2;
@@ -536,7 +537,7 @@ int main(int argc, char *argv[])
     apreq_initialize(p);
 
 
-    AT = at_create(test_pool, 0, at_report_stdout_make(test_pool));
+    AT = at_create(0, at_report_stdout_make());
 
     for (i = 0; i < sizeof(test_list) / sizeof(at_test_t);  ++i)
         plan += test_list[i].plan;

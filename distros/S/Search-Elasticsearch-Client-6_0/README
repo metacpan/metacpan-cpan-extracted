@@ -3,7 +3,7 @@ NAME
     Elasticsearch 6.x APIs
 
 VERSION
-    version 7.711
+    version 7.711001
 
 DESCRIPTION
     The Search::Elasticsearch::Client::6_0 package provides a client

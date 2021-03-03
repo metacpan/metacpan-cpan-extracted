@@ -14,7 +14,7 @@ use App::TenableSC::Logger;
 
 use Net::SecurityCenter;
 
-our $VERSION = '0.300';
+our $VERSION = '0.310';
 
 my @global_options = (
     'help|h',
@@ -26,6 +26,10 @@ my @global_options = (
 
     'username=s',
     'password=s',
+
+    'ssl_cert_file=s',
+    'ssl_key_file=s',
+    'ssl_password=s',
 
     'access_key=s',
     'secret_key=s',
@@ -43,15 +47,16 @@ sub run {
 
     my ( $class, %args ) = @_;
 
-    my $options = {};
-    my $config  = {};
-    my $logger  = App::TenableSC::Logger->new;
+    my $options       = {};
+    my $config        = {};
+    my $logger        = App::TenableSC::Logger->new;
+    my @config_params = qw(hostname username password access_key secret_key
+        verbose scheme timeout ssl_cert_file ssl_key_file ssl_password);
 
     GetOptions( $options, ( @global_options, @command_options ) ) or pod2usage( -verbose => 0 );
 
     pod2usage(1) if ( $options->{'help'} );
-
-    cli_version if ( $options->{'version'} );
+    cli_version  if ( $options->{'version'} );
 
     if ( $options->{'config'} ) {
 
@@ -59,9 +64,9 @@ sub run {
 
         if ( $config && defined( $config->{'SecurityCenter'} ) ) {
 
-            foreach (qw/hostname username password access_key secret_key verbose scheme timeout/) {
-                if ( defined( $config->{'SecurityCenter'}->{$_} ) ) {
-                    $options->{$_} = $config->{'SecurityCenter'}->{$_};
+            foreach my $param (@config_params) {
+                if ( defined( $config->{'SecurityCenter'}->{$param} ) ) {
+                    $options->{$param} = $config->{'SecurityCenter'}->{$param};
                 }
             }
 
@@ -122,10 +127,28 @@ sub connect {
     $sc_options->{'logger'} = $self->logger              if ( $self->options->{'verbose'} );
     $sc_options->{'scheme'} = $self->options->{'scheme'} if ( $self->options->{'scheme'} );
 
+    # Set SSL options for IO::Socket::SSL
+    if ( defined $self->options->{'ssl_cert_file'} ) {
+
+        $sc_options->{'ssl_options'}->{'SSL_cert_file'} = $self->options->{'ssl_cert_file'};
+
+        if ( defined $self->options->{'ssl_key_file'} ) {
+            $sc_options->{'ssl_options'}->{'SSL_key_file'} = $self->options->{'ssl_key_file'};
+        }
+
+        if ( defined $self->options->{'ssl_password'} ) {
+            $sc_options->{'ssl_options'}->{'SSL_passwd_cb'} = sub {
+                $self->options->{'ssl_password'};
+            }
+        }
+
+    }
+
     my $sc = Net::SecurityCenter->new( $self->options->{'hostname'}, $sc_options );
 
     my %auth = ();
 
+    # Username and password authentication
     if ( $self->options->{'username'} && $self->options->{'password'} ) {
         %auth = (
             username => $self->options->{'username'},
@@ -133,6 +156,7 @@ sub connect {
         );
     }
 
+    # API Key authentication
     if ( $self->options->{'secret_key'} && $self->options->{'access_key'} ) {
         %auth = (
             secret_key => $self->options->{'secret_key'},
@@ -172,7 +196,7 @@ App::TenableSC - Base class for Tenable.sc (SecurityCenter) applications
 =head1 DESCRIPTION
 
 This module provides Perl scripts easy way to write Tenable.sc (SecurityCenter)
-application usinc L<Net::SecurityCenter>.
+application using L<Net::SecurityCenter>.
 
 
 =head1 METHODS
@@ -283,7 +307,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

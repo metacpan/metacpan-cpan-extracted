@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::CxnPool;
-$Search::Elasticsearch::Role::CxnPool::VERSION = '7.711';
+$Search::Elasticsearch::Role::CxnPool::VERSION = '7.711001';
 use Moo::Role;
 use Search::Elasticsearch::Util qw(parse_params);
 use List::Util qw(shuffle);
@@ -151,7 +151,7 @@ Search::Elasticsearch::Role::CxnPool - Provides common functionality to the CxnP
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

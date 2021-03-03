@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.22';
+$VERSION = '0.23';
 $VERSION = $VERSION;
 
 # internal use
@@ -218,7 +218,7 @@ sub cluck {
     my $i = 0;
     my @cluck = ();
     while (my($package,$filename,$line,$subroutine) = caller($i)) {
-        push @cluck, "[$i] $filename($line) $package::$subroutine\n";
+        push @cluck, "[$i] $filename($line) $package"."::$subroutine\n";
         $i++;
     }
     print STDERR CORE::reverse @cluck;
@@ -2981,6 +2981,7 @@ sub parse_expr_balanced {
         # close bracket
         elsif (/\G (\Q$close_bracket\E) /xmsgc) {
             $parsed .= $1;
+            $parsed .= parse_ambiguous_char();
             if (--$nest_bracket <= 0) {
                 last;
             }

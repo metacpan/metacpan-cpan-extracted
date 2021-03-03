@@ -13,11 +13,11 @@ Class::Simple::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -27,6 +27,14 @@ the status of an object that are otherwise expensive.
 It is up to the caller to maintain the cache if the object comes out of sync with the cache,
 for example by changing its state.
 
+You can use this class to create a caching layer to an object of any class
+that works on objects with a get/set model such as:
+
+    use Class::Simple;
+    my $obj = Class::Simple->new();
+    $obj->val($newval);
+    $oldval = $obj->val();
+
 =head1 SUBROUTINES/METHODS
 
 =head2 new
@@ -34,8 +42,9 @@ for example by changing its state.
 Creates a Class::Simple::Cached object.
 
 It takes one mandatory parameter: cache,
-which is an object which understands get() and set() calls,
-such as an L<CHI> object.
+which is either an object which understands clear(), get() and set() calls,
+such as an L<CHI> object;
+or is a reference to a hash where the return values are to be stored.
 
 It takes one optional argument: object,
 which is an object which is taken to be the object to be cached.
@@ -48,7 +57,11 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	return unless(defined($class));
+	# Use Class::Simple::Cached->new(), not Class::Simple::Cached::new()
+	if(!defined($class)) {
+		carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		return;
+	}
 
 	my %args;
 	if(ref($_[0]) eq 'HASH') {
@@ -64,10 +77,11 @@ sub new {
 		$args{'object'} = Class::Simple->new(%args);
 	}
 
-	if($args{'cache'}) {
+	if($args{'cache'} && ref($args{'cache'})) {
 		return bless \%args, $class;
 	}
 	Carp::carp('Usage: ', __PACKAGE__, '->new(cache => $cache [, object => $object ], %args)');
+	return;	# undef
 }
 
 sub _caller_class
@@ -89,6 +103,12 @@ sub AUTOLOAD {
 	my $cache = $self->{'cache'};
 
 	if($param eq 'DESTROY') {
+		if(ref($cache) eq 'HASH') {
+			while(my($key, $value) = each %{$cache}) {
+				delete $cache->{$key};
+			}
+			return;
+		}
 		if(defined($^V) && ($^V ge 'v5.14.0')) {
 			return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
 		}
@@ -107,11 +127,21 @@ sub AUTOLOAD {
 
 	if(scalar(@_) == 0) {
 		# Retrieving a value
-		if(my $rc = $cache->get($param)) {
+		my $rc;
+		if(ref($cache) eq 'HASH') {
+			$rc = $cache->{$param};
+		} else {
+			$rc = $cache->get($param);
+		}
+		if($rc) {
+			die $param if($rc eq 'never');
 			if(ref($rc) eq 'ARRAY') {
+				my @foo = @{$rc};
+				die $param if($foo[0] eq __PACKAGE__ . '>UNDEF<');
+				die $param if($foo[0] eq 'never');
 				return @{$rc};
 			}
-			if($rc eq __PACKAGE__ . ">UNDEF<") {
+			if($rc eq __PACKAGE__ . '>UNDEF<') {
 				return;
 			}
 			return $rc;
@@ -121,15 +151,24 @@ sub AUTOLOAD {
 			if(scalar(@rc) == 0) {
 				return;
 			}
-			$cache->set($param, \@rc, 'never');
+			if(ref($cache) eq 'HASH') {
+				$cache->{$param} = \@rc;
+			} else {
+				$cache->set($param, \@rc, 'never');
+			}
 			return @rc;
 		}
-		my $rc = $object->$func();
-		if(!defined($rc)) {
-			$cache->set($param, __PACKAGE__ . ">UNDEF<", 'never');
-			return;
+		if(defined(my $rc = $object->$func())) {
+			if(ref($cache) eq 'HASH') {
+				return $cache->{$param} = $rc;
+			}
+			return $cache->set($param, $rc, 'never');
 		}
-		return $cache->set($param, $rc, 'never');
+		if(ref($cache) eq 'HASH') {
+			return $cache->{$param} = __PACKAGE__ . '>UNDEF<';
+		}
+		$cache->set($param, __PACKAGE__ . '>UNDEF<', 'never');
+		return;
 	}
 
 	# $param = "SUPER::$param";
@@ -137,11 +176,24 @@ sub AUTOLOAD {
 	if($_[1]) {
 		# Storing an array
 		# We store a ref to the array, and dereference on retrieval
-		my $val = $object->$func(\@_);
-		$cache->set($param, $val, 'never');
-		return @{$val};
+		if(defined(my $val = $object->$func(\@_))) {
+			if(ref($cache) eq 'HASH') {
+				$cache->{$param} = $val;
+			} else {
+				$cache->set($param, $val, 'never');
+			}
+			return @{$val};
+		}
+		if(ref($cache) eq 'HASH') {
+			return $cache->{$param} = __PACKAGE__ . '>UNDEF<';
+		}
+		$cache->set($param, __PACKAGE__ . '>UNDEF<', 'never');
+		return;
 	}
 	# Storing a scalar
+	if(ref($cache) eq 'HASH') {
+		return $cache->{$param} = $object->$func($_[0]);
+	}
 	return $cache->set($param, $object->$func($_[0]), 'never');
 }
 
@@ -153,16 +205,11 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 Doesn't work with L<Memoize>.
 
-Please report any bugs or feature requests to C<bug-class-simple-cached at rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Class-Simple-Cached>.
+Only works on messages that take no arguments.
+
+Please report any bugs or feature requests to L<https://github.com/nigelhorne/Class-Simple-Readonly/issues>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-params() returns a ref which means that calling routines can change the hash
-for other routines.
-Take a local copy before making amendments to the table if you don't want unexpected
-things to happen.
 
 =head1 SEE ALSO
 
@@ -178,24 +225,36 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker
+=item * MetaCPAN
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Cached>
+L<https://metacpan.org/release/Class-Simple-Cached>
+
+=item * Source Repository
+
+L<https://github.com/nigelhorne/Class-Simple-Readonly-Cached>
+
+=item * CPANTS
+
+L<http://cpants.cpanauthors.org/dist/Class-Simple-Cached>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=Class-Simple-Cached>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Class-Simple-Cached>
 
-=item * Search CPAN
+=item * CPAN Testers Dependencies
 
-L<http://search.cpan.org/dist/Class-Simple-Cached/>
+L<http://deps.cpantesters.org/?module=Class::Simple::Cached>
 
 =back
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENCE AND COPYRIGHT
 
 Author Nigel Horne: C<njh@bandsman.co.uk>
-Copyright (C) 2019, Nigel Horne
+Copyright (C) 2019-2021, Nigel Horne
 
 Usage is subject to licence terms.
 The licence terms of this software are as follows:

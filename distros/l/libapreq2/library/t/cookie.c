@@ -69,7 +69,7 @@ static const char cgcookies4[] = "SID=66XUEH8AAAIAAFmLLRkAAAAV|2a48c4ae2e"
 static apr_table_t *jar, *jar2, *jar3, *jar4, *jar5, *jar6, *jar7;
 static apr_pool_t *p;
 
-static void jar_make(dAT)
+static void jar_make(dAT, void *ctx)
 {
     jar = apr_table_make(p, APREQ_DEFAULT_NELTS);
     AT_not_null(jar);
@@ -94,7 +94,7 @@ static void jar_make(dAT)
     AT_int_eq(apreq_parse_cookie_header(p, jar7, cgcookies4), APR_SUCCESS);
 }
 
-static void jar_get_rfc(dAT)
+static void jar_get_rfc(dAT, void *ctx)
 {
     const char *val;
     AT_not_null(val = apr_table_get(jar2, "first"));
@@ -105,7 +105,7 @@ static void jar_get_rfc(dAT)
     AT_str_eq(val, "cie");
 }
 
-static void jar_get_ns(dAT)
+static void jar_get_ns(dAT, void *ctx)
 {
 
     AT_str_eq(apr_table_get(jar, "a"), "1");
@@ -126,7 +126,7 @@ static void jar_get_ns(dAT)
 }
 
 
-static void netscape_cookie(dAT)
+static void netscape_cookie(dAT, void *ctx)
 {
     char expires[APR_RFC822_DATE_LEN];
     char *val;
@@ -160,7 +160,7 @@ static void netscape_cookie(dAT)
 }
 
 
-static void rfc_cookie(dAT)
+static void rfc_cookie(dAT, void *ctx)
 {
     apreq_cookie_t *c = apreq_cookie_make(p,"rfc",3,"out",3);
     const char *expected;
@@ -210,7 +210,7 @@ static void rfc_cookie(dAT)
 }
 
 
-#define dT(func, plan) #func, func, plan
+#define dT(func, plan) #func, func, plan, NULL
 
 
 int main(int argc, char *argv[])
@@ -230,8 +230,8 @@ int main(int argc, char *argv[])
 
     apr_pool_create(&p, NULL);
 
-    AT = at_create(p, 0, at_report_stdout_make(p));
-
+    AT = at_create(0, at_report_stdout_make());
+    AT_trace_on();
     for (i = 0; i < sizeof(test_list) / sizeof(at_test_t);  ++i)
         plan += test_list[i].plan;
 

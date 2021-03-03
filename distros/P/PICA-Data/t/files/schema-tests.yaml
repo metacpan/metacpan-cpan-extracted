@@ -45,6 +45,10 @@ schemas:
               2-3:
                 codes:
                   zz: {}
+  level2:
+    fields:
+      200A:
+        repeatable: 0
 
 # sample records to reference in tests
 records:
@@ -60,9 +64,12 @@ records:
   099X-wrong: "099X $xyaa"
   occurrences: "028C/01 $dEmma$aGoldman\n222X/123 $x23"
   occurrences-missing: "028C $dEmma$aGoldman"
+  level2ok: "200A/001 $x1\n200A/002 $x2"
+  level2notok: "200A/001 $x1\n200A/001 $x2"
 
 # actual tests with schema, record, options, and expected errors
 tests:
+
 
 - check: valid record
   schema: 021A
@@ -224,5 +231,19 @@ tests:
         message: invalid value at position 2-3 of subfield 099X$x
 
 # TODO:
-# - check fields in level 1 and level 2 (uniqueness per local copy!)
+# - check fields in level 1 (uniqueness/required per local copy)
+# - check fields in level 2 (required per local copy)
+# - check x-fields
 
+- check: level2 field repeated
+  schema: level2
+  record: level2notok
+  errors:
+  - message: field 200A/001 is not repeatable
+    tag: 200A
+    occurrence: '001'
+    repeated: 1
+
+- check: level2 field repeated but different occurrence
+  schema: level2
+  record: level2ok

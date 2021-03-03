@@ -3,7 +3,7 @@ NAME
     support for Elasticsearch 7.x APIs
 
 VERSION
-    version 7.711
+    version 7.711001
 
 DESCRIPTION
     The Search::Elasticsearch::Client::7_0::Async package provides a client

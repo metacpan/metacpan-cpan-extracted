@@ -27,7 +27,7 @@ WriteMakefile(
     },
     CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => '7.44' },
     BUILD_REQUIRES     => { 'Test::More' => '1.3' },
-    PREREQ_PM          => { 'Moose' => '2.2', 'XML::Simple' => '2.25' },
+    PREREQ_PM          => { 'Moose' => '2', 'XML::Simple' => '2.25' },
     test  => { TESTS => 't/*.t t/*/*.t' },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'xDT-Parser-*' },

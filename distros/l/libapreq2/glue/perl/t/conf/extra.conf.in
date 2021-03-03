@@ -1,14 +1,16 @@
 <IfModule mod_env.c>
-    PassEnv PERL5LIB
+    PassEnv PERL5LIB LD_LIBRARY_PATH
 </IfModule>
 
 <IfModule mod_alias.c>
     ScriptAlias /cgi-bin/ "@ServerRoot@/cgi-bin/"
 </IfModule>
 
+<IfDefine !APACHE2_4>
 <IfModule !mpm_winnt.c>
    LockFile @ServerRoot@/logs/accept.lock
 </IfModule>
+</IfDefine>
 
 <Directory "@ServerRoot@/cgi-bin">
    AllowOverride None

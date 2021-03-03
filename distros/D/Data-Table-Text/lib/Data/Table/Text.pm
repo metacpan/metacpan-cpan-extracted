@@ -17,7 +17,7 @@
 # updateDocumentation - detect parameter type mismatch between prototype and specified parameter
 package Data::Table::Text;
 use v5.26;
-our $VERSION = 20201221;                                                        # Version
+our $VERSION = 20210226;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -2641,7 +2641,7 @@ Title for the table
 END
      head      => <<'END',
 Header text which will preceed the formatted table.
-DDDDDDD will be replaced with the current date and time.
+DDDD will be replaced with the current date and time.
 NNNN will be replaced with the number of rows in the table.
 TTTT will be replaced with the title from the title keyword
 END
@@ -2750,7 +2750,7 @@ sub formatTable($;$%)                                                           
   my $date = dateTimeStamp;
   my $N    = keyCount(1, $data);
   my $H    = ($head//'') =~ s(DDDD) ($date)gr =~ s(NNNN) ($N)gr;
-     $H    =~ s(TTTT_) ($title)gs         if $Title;
+     $H    =~ s(TTTT) ($title)gs          if $Title;
   push @report, $Title                    if $Title;
   push @report, $H                        if $head;
   push @report, qq(This file: $file)      if $file;
@@ -3756,6 +3756,18 @@ sub chooseStringAtRandom(@)                                                     
   $strings[$r]
  }
 
+sub randomizeArray(@)                                                           # Randomize an array
+ {my (@a) = @_;                                                                 # Array to randomize
+  for my $i(keys @a)
+   {my $r = int(rand() * ($i+1));                                                 # Uniform randomization
+    my $s = $a[$i];
+    my $t = $a[$r];
+            $a[$i] = $t;
+            $a[$r] = $s;
+   }
+  @a
+ }
+
 #D1 Arrays of Arrays                                                            # Operations on arrays of arrays
 
 sub lengthOfLongestSubArray($)                                                  # Given an array of arrays find the length of the longest sub array.
@@ -4594,6 +4606,27 @@ sub awsR53a($$$%)                                                               
     {"Action": "UPSERT",
     "ResourceRecordSet":
        {"Name": "$server", "Type": "A", "TTL": 300,
+        "ResourceRecords": [{"Value": "$ip"}]
+       }
+    }
+  ]
+}
+END
+  my $p = awsProfile(%options);                                                 # Profile
+  my $s = xxx qq(aws route53 change-resource-record-sets --hosted-zone-id )     # Execute command
+             .qq($zone --change-batch file://$t $p),
+              qr(ChangeInfo);
+  unlink $t;
+  $s
+ }
+
+sub awsR53aaaa($$$%)                                                            # Create/Update a B<AAAA> L<DNS> record for the specified server.
+ {my ($zone, $server, $ip, %options) = @_;                                      # Zone id from R53, fully qualified domain name, ip6 address, AWS CLI global options
+  my $t = writeTempFile(<<END);                                                 # Create description of update as JSON
+{ "Changes": [
+    {"Action": "UPSERT",
+    "ResourceRecordSet":
+       {"Name": "$server", "Type": "AAAA", "TTL": 300,
         "ResourceRecords": [{"Value": "$ip"}]
        }
     }
@@ -6127,26 +6160,40 @@ END
 
 sub wellKnownUrls                                                               #P Short names for some well known urls
  {genHash(q(Short_Names_For_Well_Known_Urls),                                   #  Short names for some well known urls
-    alde            => [q(Aldebaran),                                           "https://en.wikipedia.org/wiki/Aldebaran"                                                                                         ], #
+    ab              => [q(Android Build),                                       "https://metacpan.org/pod/Android::Build"                                                                                         ], #
     alva            => [q(Rio Alva),                                            "https://duckduckgo.com/?t=canonical&q=rio+alva&iax=images&ia=images"                                                             ], #
     ami             => [q(Amazon Machine Image),                                "https://en.wikipedia.org/wiki/Amazon_Machine_Image"                                                                              ], #
     apache          => [q(Apache Web Server),                                   "https://en.wikipedia.org/wiki/Apache_HTTP_Server"                                                                                ], #
-    appaapps        => [q(AppaApps),                                            "http://www.appaaps.com"                                                                                                          ], #
+    aas             => [q(Amazon App Store),                                    "https://www.amazon.com/s?k=appaapps"                                                                                             ], #
+    appaapps        => [q(www.appaapps.com),                                    "http://www.appaaps.com"                                                                                                          ], #
+    aramco          => [q(Saudi Aramco),                                        "https://en.wikipedia.org/wiki/Saudi_Aramco"                                                                                      ], #
     arena           => [q(arena),                                               "https://en.wikipedia.org/wiki/Region-based_memory_management"                                                                    ], #
     ascii           => [q(Ascii),                                               "https://en.wikipedia.org/wiki/ASCII"                                                                                             ], #
     awsami          => [q(Amazon Web Services - Amazon Machine Image),          "https://en.wikipedia.org/wiki/Amazon_Machine_Image"                                                                              ], #
     awscli          => [q(Amazon Web Services Command Line Interface),          "https://aws.amazon.com/cli/"                                                                                                     ], #
+    awsforecast     => [q(Amazon Web Services Forecast),                        "https://eu-west-1.console.aws.amazon.com/forecast"                                                                               ], #
     aws             => [q(Amazon Web Services),                                 "http://aws.amazon.com"                                                                                                           ], #
+    avx             => [q(Advanced Vector Extensions),                          "https://en.wikipedia.org/wiki/AVX-512"                                                                                           ], #
+    avx512          => [q(Advanced Vector Extensions),                          "https://en.wikipedia.org/wiki/AVX-512"                                                                                           ], #
+    bash            => [q(Bash),                                                "https://en.wikipedia.org/wiki/Bash_(Unix_shell)"                                                                                 ], #
+    ban             => [q(Briana Ashley Nevarez),                               "https://www.linkedin.com/in/briana-nevarez-b66b621b0/"                                                                           ], #
+    binarysearch    => [q(Binary Search),                                       "https://metacpan.org/release/Binary-Heap-Search"                                                                                 ], #
+    bitterend       => [q(Bitter End),                                          "https://en.wikipedia.org/wiki/Knot#Bitter_end"                                                                                   ], #
     blob            => [q(blob),                                                "https://en.wikipedia.org/wiki/Binary_large_object"                                                                               ], #
     boson           => [q(Boson),                                               "https://en.wikipedia.org/wiki/Boson"                                                                                             ], #
     browser         => [q(web browser),                                         "https://en.wikipedia.org/wiki/Web_browser"                                                                                       ], #
+    code            => [q(programming code),                                    "https://en.wikipedia.org/wiki/Computer_program"                                                                                  ], #
     certbot         => [q(Certbot),                                             "https://certbot.eff.org/lets-encrypt/ubuntufocal-apache"                                                                         ], #
     cgi             => [q(Common Gateway Interface),                            "https://en.wikipedia.org/wiki/Common_Gateway_Interface"                                                                          ], #
     chmod           => [q(chmod),                                               "https://linux.die.net/man/1/chmod"                                                                                               ], #
     chown           => [q(chown),                                               "https://linux.die.net/man/1/chown"                                                                                               ], #
     cicero          => [q("The sinews of war are an infinite supply of money"), "https://en.wikipedia.org/wiki/Cicero#Legacy"                                                                                     ], #
-    codementor      => [q(Codementor),                                          "https://www.codementor.io"                                                                                                       ], #
+    cicd            => [q(CI/CD),                                               "https://en.wikipedia.org/wiki/Continuous_integration"                                                                            ], #
+    cl              => [q(command line),                                        "https://en.wikipedia.org/wiki/Command-line_interface"                                                                            ], #
+    cm              => [q(Codementor),                                          'https://www.codementor.io/@philiprbrenan'                                                                                        ], #
+    codementor      => [q(Codementor),                                          'https://www.codementor.io/@philiprbrenan'                                                                                        ], #
     commandline     => [q(command line),                                        "https://en.wikipedia.org/wiki/Command-line_interface"                                                                            ], #
+    comment         => [q(comment),                                             "https://en.wikipedia.org/wiki/Comment_(computer_programming)"                                                                    ], #
     computer        => [q(computer),                                            "https://en.wikipedia.org/wiki/Computer"                                                                                          ], #
     concept         => [q(concept),                                             "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/concept.html#concept"], #
     confess         => [q(confess),                                             "http://perldoc.perl.org/Carp.html#SYNOPSIS/"                                                                                     ], #
@@ -6159,38 +6206,49 @@ sub wellKnownUrls                                                               
     csv             => [q(csv),                                                 "https://en.wikipedia.org/wiki/Comma-separated_values"                                                                            ], #
     curl            => [q(curl),                                                "https://linux.die.net/man/1/curl"                                                                                                ], #
     dataStructure   => [q(data structure),                                      "https://en.wikipedia.org/wiki/Data_structure"                                                                                    ], #
+    db2             => [q(DB2),                                                 "https://en.wikipedia.org/wiki/IBM_Db2_Family"                                                                                    ], #
+    dbi             => [q(DBI),                                                 "https://dbi.perl.org/"                                                                                                           ], #
     dependencies    => [q(dependencies),                                        "https://en.wikipedia.org/wiki/Coupling_(computer_programming)"                                                                   ], #
     dexl            => [q(Data::Edit::Xml::Lint),                               "https://metacpan.org/release/Data-Edit-Xml-Lint"                                                                                 ], #
     dex             => [q(Data::Edit::Xml),                                     "https://metacpan.org/pod/Data::Edit::Xml"                                                                                        ], #
     dexr            => [q(Data::Edit::Xml::Reuse),                              "https://metacpan.org/release/Data-Edit-Xml-Reuse"                                                                                ], #
     dexx            => [q(Data::Edit::Xml::Xref),                               "https://metacpan.org/release/Data-Edit-Xml-Xref"                                                                                 ], #
+    dhahran         => [q(Dhahran),                                             "https://en.wikipedia.org/wiki/Dhahran"                                                                                           ], #
     dfa             => [q(DFA),                                                 "https://metacpan.org/pod/Data::DFA"                                                                                              ], #
     die             => [q(die),                                                 "http://perldoc.perl.org/functions/die.html"                                                                                      ], #
-    diospiros       => [q(dispiros),                                            "https://en.wikipedia.org/wiki/Persimmon"                                                                                         ], #
+    diff            => [q(diff),                                                "https://en.wikipedia.org/wiki/Diff"                                                                                              ], #
+    diospiros       => [q(diospiros),                                           "https://en.wikipedia.org/wiki/Persimmon"                                                                                         ], #
     ditaot          => [q(DITA Open ToolKit),                                   "http://www.dita-ot.org/download"                                                                                                 ], #
     dita            => [q(Dita),                                                "http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html"                            ], #
     dns             => [q(Domain Name System),                                  "https://en.wikipedia.org/wiki/Domain_Name_System"                                                                                ], #
     docbook         => [q(DocBook),                                             "https://tdg.docbook.org/tdg/5.1/"                                                                                                ], #
     documentation   => [q(documentation),                                       "https://en.wikipedia.org/wiki/Software_documentation"                                                                            ], #
     domain          => [q(domain name),                                         "https://en.wikipedia.org/wiki/Domain_name"                                                                                       ], #
+    dom             => [q(Document Object Model),                               "https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model"                                                          ], #
     dtd             => [q(DTD),                                                 "https://en.wikipedia.org/wiki/Document_type_definition"                                                                          ], #
     dtt             => [q(Data::Table::Text),                                   "https://metacpan.org/pod/Data::Table::Text"                                                                                      ], #
+    dttg            => [q(Data::Table::Text),                                   "https://github.com/philiprbrenan/DataTableText"                                                                                  ], #
     ec2Console      => [q(EC2 Console),                                         "https://us-east-1.console.aws.amazon.com/ec2/"                                                                                   ], #
     ec2             => [q(EC2),                                                 "https://aws.amazon.com/ec2/"                                                                                                     ], #
     eff             => [q(The Electronic Frontier Foundation),                  "https://en.wikipedia.org/wiki/Electronic_Frontier_Foundation"                                                                    ], #
+    english         => [q(English),                                             "https://en.wikipedia.org/wiki/English_language"                                                                                  ], #
     eval            => [q(eval),                                                "http://perldoc.perl.org/functions/eval.html"                                                                                     ], #
     extensions      => [q(file name extensions),                                "https://en.wikipedia.org/wiki/List_of_filename_extensions"                                                                       ], #
     fail            => [q(fail),                                                "https://1lib.eu/book/2468851/544b50"                                                                                             ], #
     file            => [q(file),                                                "https://en.wikipedia.org/wiki/Computer_file"                                                                                     ], #
     find            => [q(find),                                                "https://en.wikipedia.org/wiki/Find_(Unix)"                                                                                       ], #
+    foehn           => [q(Foehn),                                               "https://en.wikipedia.org/wiki/Foehn_wind"                                                                                        ], #
     folder          => [q(folder),                                              "https://en.wikipedia.org/wiki/File_folder"                                                                                       ], #
     fork            => [q(fork),                                                "https://en.wikipedia.org/wiki/Fork_(system_call)"                                                                                ], #
     gbstandard      => [q(GB Standard),                                         "http://metacpan.org/pod/Dita::GB::Standard"                                                                                      ], #
+    gdpr            => [q(European Directive on Data Protection),               "https://gdpr.eu"                                                                                                                 ], #
     geany           => [q(Geany),                                               "https://www.geany.org"                                                                                                           ], #
     ghc             => [q(Github Automation),                                   "https://metacpan.org/release/GitHub-Crud"                                                                                        ], #
+    gigabit         => [q(gigabit),                                             "https://en.wikipedia.org/wiki/Gigabit_Ethernet"                                                                                  ], #
     gitHubAction    => [q(GitHub Action),                                       "https://docs.github.com/en/free-pro-team\@latest/actions/quickstart"                                                             ], #
     gitHubCrud      => [q(GitHub::Crud),                                        "https://metacpan.org/pod/GitHub::Crud"                                                                                           ], #
-    gitHub          => [q(GitHub),                                              "https://github.com"                                                                                                              ], #
+    gitHub          => [q(GitHub),                                              "https://github.com/philiprbrenan"                                                                                                ], #
+    gitHubDP        => [q(GitHub Developer Program),                            "https://github.com/philiprbrenan"                                                                                                ], #
     gmt             => [q(Greenwich Mean Time),                                 "https://en.wikipedia.org/wiki/Greenwich_Mean_Time"                                                                               ], #
     gnufdl          => [q(GNU Free Documentation License),                      "https://en.wikipedia.org/wiki/Wikipedia:Text_of_the_GNU_Free_Documentation_License"                                              ], #
     grep            => [q(grep),                                                "https://en.wikipedia.org/wiki/Grep"                                                                                              ], #
@@ -6198,45 +6256,71 @@ sub wellKnownUrls                                                               
     gui             => [q(graphical user interface),                            "https://en.wikipedia.org/wiki/Graphical_user_interface"                                                                          ], #
     gunzip          => [q(gunzip),                                              "https://en.wikipedia.org/wiki/Gunzip"                                                                                            ], #
     gzip            => [q(gzip),                                                "https://en.wikipedia.org/wiki/Gzip"                                                                                              ], #
+    hacker          => [q(hacker),                                              "https://1lib.eu/book/643342/813ee7"                                                                                              ], #
+    heapsLaw        => [q(Heap's Law),                                          "https://en.wikipedia.org/wiki/Heaps%27_law"                                                                                      ], #
     help            => [q(help),                                                "https://en.wikipedia.org/wiki/Online_help"                                                                                       ], #
     hexadecimal     => [q(hexadecimal),                                         "https://en.wikipedia.org/wiki/Hexadecimal"                                                                                       ], #
+    hpe             => [q(Hewlett Packard Enterprise),                          "https://www.hpe.com/us/en/home.html"                                                                                             ], #
     html            => [q(HTML),                                                "https://en.wikipedia.org/wiki/HTML"                                                                                              ], #
+    http            => [q(HTTP),                                                "https://en.wikipedia.org/wiki/HTTP"                                                                                              ], #
+    https           => [q(HTTPS),                                               "https://en.wikipedia.org/wiki/HTTPS"                                                                                             ], #
     htmltable       => [q(html table),                                          "https://www.w3.org/TR/html52/tabular-data.html#the-table-element"                                                                ], #
     hxnormalize     => [q(hxnormalize),                                         "https://www.w3.org/Tools/HTML-XML-utils/man1/hxnormalize.html"                                                                   ], #
+    ibm             => [q(IBM),                                                 "https://en.wikipedia.org/wiki/IBM"                                                                                               ], #
     iconv           => [q(iconv),                                               "https://linux.die.net/man/1/iconv"                                                                                               ], #
     ide             => [q(Integrated Development Environment),                  "https://en.wikipedia.org/wiki/Integrated_development_environment"                                                                ], #
     ietf            => [q(Internet Engineering Task Force),                     "https://en.wikipedia.org/wiki/Internet_Engineering_Task_Force"                                                                   ], #
     imagemagick     => [q(Imagemagick),                                         "https://www.imagemagick.org/script/index.php"                                                                                    ], #
     install         => [q(install),                                             "https://en.wikipedia.org/wiki/Installation_(computer_programs)"                                                                  ], #
+    intelsde        => [q(Intel Software Development Emulator),                 "https://software.intel.com/content/www/us/en/develop/articles/intel-software-development-emulator.html"                          ], #
+    internet        => [q(Internet),                                            "https://en.wikipedia.org/wiki/Internet"                                                                                          ], #
+    ip6             => [q(IPv6 address),                                        "https://en.wikipedia.org/wiki/IPv6"                                                                                              ], #
     ip              => [q(IP address),                                          "https://en.wikipedia.org/wiki/IP_address"                                                                                        ], #
+    ipaddress       => [q(IP address),                                          "https://en.wikipedia.org/wiki/IP_address"                                                                                        ], #
+    jet             => [q(Joint European Torus),                                "https://en.wikipedia.org/wiki/Joint_European_Torus"                                                                              ], #
+    jetni           => [q(Physics design calculations for the JET neutral injectors),"https://www.sciencedirect.com/science/article/pii/B978008025697950052X"                                                     ], #
     javascript      => [q(JavaScript),                                          "https://en.wikipedia.org/wiki/JavaScript"                                                                                        ], #
     json            => [q(Json),                                                "https://en.wikipedia.org/wiki/JSON"                                                                                              ], #
+    keyboard        => [q(keyboard),                                            "https://en.wikipedia.org/wiki/Computer_keyboard"                                                                                 ], #
+    killarney       => [q(Killarney),                                           "https://en.wikipedia.org/wiki/Killarney"                                                                                         ], #
+    kubuntu         => [q(Kubuntu),                                             "https://kubuntu.org/"                                                                                                            ], #
     laser           => [q(laser),                                               "https://en.wikipedia.org/wiki/Laser"                                                                                             ], #
     learningCurve   => [q(learning curve),                                      "https://en.wikipedia.org/wiki/Learning_curve"                                                                                    ], #
+    libpq           => [q(libpq),                                               "https://www.postgresql.org/docs/13/libpq.html"                                                                                   ], #
     lint            => [q(lint),                                                "http://xmlsoft.org/xmllint.html"                                                                                                 ], #
     linux           => [q(Linux),                                               "https://en.wikipedia.org/wiki/Linux"                                                                                             ], #
     liseMeitner     => [q(Lise Meitner),                                        "https://en.wikipedia.org/wiki/Lise_Meitner"                                                                                      ], #
     list            => [q(list),                                                "https://en.wikipedia.org/wiki/Linked_list"                                                                                       ], #
     log             => [q(log),                                                 "https://en.wikipedia.org/wiki/Log_file"                                                                                          ], #
+    lunchclub       => [q(LunchClub),                                           "https://lunchclub.com/?invite_code=philipb4"                                                                                     ], #
     lvaluemethod    => [q(lvalue method),                                       "http://perldoc.perl.org/perlsub.html#Lvalue-subroutines"                                                                         ], #
+    maze            => [q(Maze),                                                "https://github.com/philiprbrenan/maze"                                                                                           ], #
     md5             => [q(MD5 sum),                                             "https://en.wikipedia.org/wiki/MD5"                                                                                               ], #
     md              => [q(Mark Down),                                           "https://en.wikipedia.org/wiki/Markdown"                                                                                          ], #
-    me              => [q(Middle East),                                         "https://en.wikipedia.org/wiki/Middle_East"                                                                                       ], #
+    mideast         => [q(Middle East),                                         "https://en.wikipedia.org/wiki/Middle_East"                                                                                       ], #
+    meme            => [q(Meme),                                                "https://en.wikipedia.org/wiki/Meme"                                                                                              ], #
     mentor          => [q(mentor),                                              "https://en.wikipedia.org/wiki/Mentorship"                                                                                        ], #
     metadata        => [q(metadata),                                            "https://en.wikipedia.org/wiki/Metadata"                                                                                          ], #
     minimalism      => [q(minimalism),                                          "https://en.wikipedia.org/wiki/Minimalism_(computing)"                                                                            ], #
     mod_shib        => [q(mod_shib),                                            "https://wiki.shibboleth.net/confluence/display/SP3/Apache"                                                                       ], #
     module          => [q(module),                                              "https://en.wikipedia.org/wiki/Modular_programming"                                                                               ], #
     mopc            => [q(mop-c),                                               "https://metacpan.org/pod/Preprocess::Ops"                                                                                        ], #
+    murphyslaw      => [q(Murphy's Law),                                        "https://en.wikipedia.org/wiki/Murphy%27s_law"                                                                                    ], #
     mysqlMan        => [q(MySql manual),                                        "https://dev.mysql.com/doc/refman/8.0/en/"                                                                                        ], #
     mysql           => [q(MySql),                                               "https://en.wikipedia.org/wiki/MySQL"                                                                                             ], #
+    nasm            => [q(nasm),                                                "https://github.com/netwide-assembler/nasm"                                                                                       ], #
     nfa             => [q(NFA),                                                 "https://metacpan.org/pod/Data::NFA"                                                                                              ], #
+    ni              => [q(Neutral Beam Injection),                              "https://en.wikipedia.org/wiki/Neutral-beam_injection"                                                                            ], #
+    nodejs          => [q(NodeJs),                                              "https://en.wikipedia.org/wiki/NodeJs"                                                                                            ], #
     oauth           => [q(Oauth),                                               "https://en.wikipedia.org/wiki/OAuth"                                                                                             ], #
+    openoffice      => [q(Apache Open Office),                                  "https://www.openoffice.org/download/index.html"                                                                                  ], #
+    openssl         => [q(Open SSL),                                            "https://www.openssl.org/"                                                                                                        ], #
     othermeta       => [q(othermeta),                                           "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlto.html#cmlto__othermeta"    ], #
-    our             => [q(our),                                                 "https://perldoc.perl.org/functions/our.html"                                                                                     ], #
+#   our             => [q(our),                                                 "https://perldoc.perl.org/functions/our.html"                                                                                     ], #
     oxygenformat    => [q(Oxygen Format),                                       "https://www.oxygenxml.com/doc/versions/20.1/ug-author/topics/linked-output-messages-of-external-engine.html"                     ], #
     oxygenworkshop  => [q(Oxygen Workshop),                                     "http://github.com/philiprbrenan/oxygenWorkShop"                                                                                  ], #
     pairprogram     => [q(pair program),                                        "https://en.wikipedia.org/wiki/Pair_programming"                                                                                  ], #
+    pairprograming  => [q(pair programing),                                     "https://en.wikipedia.org/wiki/Pair_programming"                                                                                  ], #
     parkinson       => [q(Parkinson's law: work expands to fill the time available), "https://en.wikipedia.org/wiki/Parkinson%27s_law"                                                                            ], #
     parse           => [q(parse),                                               "https://en.wikipedia.org/wiki/Parsing"                                                                                           ], #
     pcdInstall      => [q(PCD installation),                                    "https://github.com/philiprbrenan/philiprbrenan.github.io/blob/master/pcd_installation.md"                                        ], #
@@ -6246,54 +6330,74 @@ sub wellKnownUrls                                                               
     people          => [q(people),                                              "https://en.wikipedia.org/wiki/Person"                                                                                            ], #
     perlal          => [q(Perl Artistic Licence),                               "https://dev.perl.org/licenses/artistic.html"                                                                                     ], #
     perl            => [q(Perl),                                                "http://www.perl.org/"                                                                                                            ], #
+    pg              => [q(Postgres database),                                   "https://www.postgresql.org/"                                                                                                     ], #
+    pi              => [q(𝝿),                                                   "https://en.wikipedia.org/wiki/Pi"                                                                                                ], #
     philCpan        => [q(CPAN),                                                "https://metacpan.org/author/PRBRENAN"                                                                                            ], #
+    photoApp        => [q(AppaApps Photo App),                                  "https://github.com/philiprbrenan/AppaAppsGitHubPhotoApp"                                                                         ], #
     php             => [q(PHP),                                                 "https://en.wikipedia.org/wiki/PHP"                                                                                               ], #
     pl              => [q(programming language),                                "https://en.wikipedia.org/wiki/Programming_language"                                                                              ], #
+    pli             => [q(Programming Language One),                            "https://en.wikipedia.org/wiki/PL/I"                                                                                              ], #
     pod             => [q(POD),                                                 "https://perldoc.perl.org/perlpod.html"                                                                                           ], #
     poppler         => [q(Poppler),                                             "https://poppler.freedesktop.org/"                                                                                                ], #
+    postgres        => [q(Postgres),                                            "https://github.com/philiprbrenan/postgres"                                                                                       ], #
     prb             => [q(prb),                                                 "http://philiprbrenan.appaapps.com/"                                                                                              ], #
     preprocessor    => [q(preprocessor),                                        "https://en.wikipedia.org/wiki/Preprocessor"                                                                                      ], #
     process         => [q(process),                                             "https://en.wikipedia.org/wiki/Process_management_(computing)"                                                                    ], #
-    procfs          => [q(Process File System),                                "https://en.wikipedia.org/wiki/Procfs"                                                                                            ], #
+    procfs          => [q(Process File System),                                 "https://en.wikipedia.org/wiki/Procfs"                                                                                            ], #
+    program         => [q(program),                                             "https://en.wikipedia.org/wiki/Computer_program"                                                                                  ], #
+    python          => [q(Python),                                              "https://www.python.org/"                                                                                                         ], #
     rackspace       => [q(Rackspace),                                           "https://www.rackspace.com/"                                                                                                      ], #
     recursively     => [q(recursively),                                         "https://en.wikipedia.org/wiki/Recursion"                                                                                         ], #
     recursive       => [q(recursive),                                           "https://en.wikipedia.org/wiki/Recursion"                                                                                         ], #
     relocatable     => [q(relocatable),                                         "https://en.wikipedia.org/wiki/Relocation_%28computing%29"                                                                        ], #
+    r               => [q(the R programming language),                          "https://en.wikipedia.org/wiki/R_(programming_language)"                                                                          ], #
+    riyadh          => [q(Riyadh),                                              "https://en.wikipedia.org/wiki/Riyadh"                                                                                            ], #
+    rfp             => [q(Request For Proposal),                                "https://en.wikipedia.org/wiki/Request_for_proposal"                                                                              ], #
     r53             => [q(Route 53),                                            "https://console.aws.amazon.com/route53"                                                                                          ], #
     rsa             => [q(RSA),                                                 "https://en.wikipedia.org/wiki/RSA_(cryptosystem)"                                                                                ], #
     rsync           => [q(rsync),                                               "https://linux.die.net/man/1/rsync"                                                                                               ], #
     s3Console       => [q(S3 Console),                                          "https://s3.console.aws.amazon.com/s3/home"                                                                                       ], #
     s3              => [q(S3),                                                  "https://aws.amazon.com/s3/"                                                                                                      ], #
+    s390            => [q(IBM System 390),                                      "https://en.wikipedia.org/wiki/IBM_System/390"                                                                                    ], #
     saml            => [q(Security Assertion Markup Language),                  "https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language"                                                                ], #
     samltest        => [q(SAML test),                                           "https://samltest.id/"                                                                                                            ], #
     samltools       => [q(SAML tools),                                          "https://www.samltool.com/sp_metadata.php"                                                                                        ], #
+    sas             => [q(SAS Institute),                                       "https://en.wikipedia.org/wiki/SAS_Institute"                                                                                     ], #
     securityGroup   => [q(security group),                                      "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/working-with-security-groups.html"                                           ], #
     selfaware       => [q(self aware),                                          "https://en.wikipedia.org/wiki/Self-awareness"                                                                                    ], #
     sevenZ          => [q(7z),                                                  "https://en.wikipedia.org/wiki/7z"                                                                                                ], #
     sha             => [q(SHA),                                                 "https://en.wikipedia.org/wiki/SHA-1"                                                                                             ], #
     shell           => [q(shell),                                               "https://en.wikipedia.org/wiki/Shell_(computing)"                                                                                 ], #
     shib            => [q(Shibboleth),                                          "https://www.shibboleth.net/"                                                                                                     ], #
+    simd            => [q(SIMD),                                                "https://www.officedaytime.com/simd512e/"                                                                                         ], #
     smartmatch      => [q(smartmatch),                                          "https://perldoc.perl.org/perlop.html#Smartmatch-Operator"                                                                        ], #
     snake_case      => [q(snake_case),                                          "https://en.wikipedia.org/wiki/Snake_case"                                                                                        ], #
     camelCase       => [q(camelCase),                                           "https://en.wikipedia.org/wiki/Camel_case"                                                                                        ], #
     sow             => [q(Shibboleth on Windows),                               "http://philiprbrenan.appaapps.com/ShibbolethOnWindows"                                                                           ], #
     spot            => [q(spot),                                                "https://aws.amazon.com/ec2/spot/"                                                                                                ], #
-    sql             => [q(Structure Query Language),                            "https://en.wikipedia.org/wiki/SQL"                                                                                               ], #
+    spreedsheet     => [q(Spreadsheet),                                         "https://en.wikipedia.org/wiki/Spreadsheet"                                                                                       ], #
+    sql             => [q(Structured Query Language),                           "https://en.wikipedia.org/wiki/SQL"                                                                                               ], #
+    squareroot      => [q(Square Root),                                         "https://en.wikipedia.org/wiki/Square_root"                                                                                               ], #
     ssh             => [q(Secure Shell),                                        "https://www.ssh.com/ssh"                                                                                                         ], #
     ssxr            => [q(Self Xref),                                           "https://philiprbrenan.github.io/selfServiceXref.pdf"                                                                             ], #
     step            => [q(step),                                                "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlts.html#cmlts__step"         ], #
     steps           => [q(steps),                                               "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlts.html#cmlts__steps"        ], #
+    stopwords       => [q(stopwords),                                           "https://metacpan.org/pod/Storable"                                                                                               ], #
     storable        => [q(Storable),                                            "https://metacpan.org/pod/Storable"                                                                                               ], #
     sub             => [q(sub),                                                 "https://perldoc.perl.org/perlsub.html"                                                                                           ], #
     substeps        => [q(substeps),                                            "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/contentmodels/cmlts.html#cmlts__substeps"     ], #
     sws             => [q(Sir Walter Scott),                                    "https://en.wikipedia.org/wiki/Walter_Scott"                                                                                      ], #
+    ta              => [q(Transamerica),                                        "https://en.wikipedia.org/wiki/Transamerica_Corporation"                                                                          ], #
     table           => [q(table of information),                                "https://en.wikipedia.org/wiki/Table_(information)"                                                                               ], #
     tab             => [q(tab),                                                 "https://en.wikipedia.org/wiki/Tab_key"                                                                                           ], #
     taocp           => [q(The Art of Computer Programming),                     "https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming"                                                                   ], #
     task            => [q(task),                                                "http://docs.oasis-open.org/dita/dita/v1.3/errata02/os/complete/part3-all-inclusive/langRef/technicalContent/task.html#task"      ], #
     test            => [q(test),                                                "https://en.wikipedia.org/wiki/Software_testing"                                                                                  ], #
+    textmatch       => [q(text matching),                                       "https://metacpan.org/pod/Text::Match"                                                                                            ], #
     tree            => [q(tree),                                                "https://en.wikipedia.org/wiki/Tree_(data_structure)"                                                                             ], #
     tls             => [q(TLS),                                                 "https://en.wikipedia.org/wiki/Transport_Layer_Security"                                                                          ], #
+    thp             => [q(Theoretical Computational Physics),                   "https://en.wikipedia.org/wiki/Theoretical_physics"                                                                               ], #
+    ucla            => [q(University of California at Los Angeles),             "https://en.wikipedia.org/wiki/University_of_California,_Los_Angeles"                                                             ], #
     ubuntu          => [q(Ubuntu),                                              "https://ubuntu.com/download/desktop"                                                                                             ], #
     udel            => [q(University of Delaware),                              "https://www.udel.edu/"                                                                                                           ], #
     undef           => [q(undef),                                               "https://perldoc.perl.org/functions/undef.html"                                                                                   ], #
@@ -6303,19 +6407,25 @@ sub wellKnownUrls                                                               
     url             => [q(url),                                                 "https://en.wikipedia.org/wiki/URL"                                                                                               ], #
     user            => [q(user),                                                "https://en.wikipedia.org/wiki/User_(computing)"                                                                                  ], #
     utf8            => [q(utf8),                                                "https://en.wikipedia.org/wiki/UTF-8"                                                                                             ], #
-    unix            => [q(Unix),                                                "https://en.wikipedia.org/wiki/Unix"                                                                                             ], #
-    unixHaters      => [q(Unix Haters Handbook),                                "https://1lib.eu/book/750790/8f3128"                                                                                             ], #
+    unix            => [q(Unix),                                                "https://en.wikipedia.org/wiki/Unix"                                                                                              ], #
+    unixHaters      => [q(Unix Haters Handbook),                                "https://1lib.eu/book/750790/8f3128"                                                                                              ], #
+    udp             => [q(User Datagram Protocol),                              "https://en.wikipedia.org/wiki/User_Datagram_Protocol"                                                                            ], #
     verify          => [q(verify),                                              "https://en.wikipedia.org/wiki/Software_verification_and_validation"                                                              ], #
-    vetstar         => [q(Vetstar),                                             "https://vetstar.com/"                                                                                                            ], #
+    v2              => [q(Vectors In Two Dimensions),                           "https://pypi.org/project/Vector2/"                                                                                               ], #
+    vhdl            => [q(VHDL),                                                "https://ghdl.readthedocs.io/en/latest/about.html"                                                                                ], #
+    vi              => [q(vi),                                                  "https://www.vim.org/"                                                                                                            ], #
     website         => [q(web site),                                            "https://en.wikipedia.org/wiki/Website"                                                                                           ], #
     whitespace      => [q(white space),                                         "https://en.wikipedia.org/wiki/Whitespace_character"                                                                              ], #
     whp             => [q(Whp),                                                 "https://www.whp.net/en/"                                                                                                         ], #
     widget          => [q(widget),                                              "https://en.wikipedia.org/wiki/Graphical_widget"                                                                                  ], #
     word            => [q(word),                                                "https://en.wikipedia.org/wiki/Doc_(computing)"                                                                                   ], #
+    x64             => [q(x64),                                                 "https://en.wikipedia.org/wiki/X86-64"                                                                                            ], #
     xmllint         => [q(Xml Lint),                                            "http://xmlsoft.org/xmllint.html"                                                                                                 ], #
     xmlparser       => [q(Xml parser),                                          "https://metacpan.org/pod/XML::Parser/"                                                                                           ], #
     xml             => [q(Xml),                                                 "https://en.wikipedia.org/wiki/XML"                                                                                               ], #
     xref            => [q(Xref),                                                "https://metacpan.org/pod/Data::Edit::Xml::Xref"                                                                                  ], #
+    youngtableau    => [q(Young Tableau),                                       "https://en.wikipedia.org/wiki/Young_tableau"                                                                                     ], #
+    youngtableaug   => [q(Young Tableau on GitHub),                             "https://github.com/philiprbrenan/youngTableauSort/"                                                                              ], #
     zerowidthspace  => [q(zero width space),                                    "https://en.wikipedia.org/wiki/Zero-width_space"                                                                                  ], #
     zip             => [q(zip),                                                 "https://linux.die.net/man/1/zip"                                                                                                 ], #
     zoom            => [q(Zoom),                                                "https://zoom.us/"                                                                                                                ], #
@@ -6366,10 +6476,10 @@ sub expandWellKnownWordsAsUrlsInHtmlFormat($)                                   
  {my ($string)  = @_;                                                           # String containing url names to expand
   my $wellKnown = wellKnownUrls;                                                # Well known urls to expand
 
-  for my $w(sort keys %$wellKnown)                                              # Expand well known urls as html a links
+  for my $w(sort keys %$wellKnown)                                              # Expand well known words (lowercased) as html links
    {my ($t, $u) = @{$$wellKnown{$w}};
     $string =~ s(L\[$w\]) (<a href="$u">$t</a>)gis;                             # Explicit link
-    $string =~ s(\s$w\s) ( <a href="$u">$t</a> )gs;                             # Word that matches
+    $string =~ s(\s$w([.,;:'"]*)\s) ( <a href="$u">$t</a>$1 )gs;                # Word that matches
    }
 
   $string =~ s(W\[(\w+)\]) (<code>$1</code>)gs;                                 # W[...] wraps words with definitions we wish to stress
@@ -6770,7 +6880,7 @@ END
       $parmNames //= ''; $parmDescriptions //= '';                              # No parameters
 
       my @parameters = split /,\s*/,                                            # Parameter names
-        $parmNames =~ s/\A\s*\{my\s*\x28//r =~ s/\x29\s*=\s*\@_;//r;            # Names inside parenthesis
+        $parmNames =~ s/\A\s*\{my\s*\x28//r =~ s/\x29\s*=\s*\@_.*//r;           # Names inside parenthesis
 
       my $signatureNames = join ', ', @parameters;                              # Signature using parameter names
          $signatureNames{$name} = $signatureNames;
@@ -7083,7 +7193,7 @@ L<http://www.appaapps.com|http://www.appaapps.com>
 
 `head1 Copyright
 
-Copyright (c) 2016-2019 Philip R Brenan.
+Copyright (c) 2016-2021 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -7478,7 +7588,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  awsIp awsMetaData awsParallelGatherFolder
  awsParallelIpAddresses awsParallelPrimaryInstanceId awsParallelPrimaryIpAddress
  awsParallelProcessFiles awsParallelSecondaryIpAddresses awsParallelSpreadFolder
- awsR53a
+ awsR53a awsR53aaaa
  binModeAllUtf8 boldString boldStringUndo
  call callSubInOverlappedParallel callSubInParallel checkFile checkFilePath
  checkFilePathDir checkFilePathExt checkKeys childPids chooseStringAtRandom
@@ -7546,6 +7656,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  printPerlDataAsXml
  processSizesInParallel
  quoteFile
+ randomizeArray
  readBinaryFile readFile readFileFromRemote readFiles readGZipFile readStdIn readUtf16File
  rectangularArray rectangularArray2
  relFromAbsAgainstAbs reloadHashes removeBOM removeDuplicatePrefixes
@@ -19617,8 +19728,8 @@ my $localTest = ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";   
 
 Test::More->builder->output("/dev/null") if $localTest;                         # Reduce number of confirmation messages during testing
 
-if ($^O =~ m(bsd|linux)i) {plan tests    => 668}                                # Supported systems
-#lsif (onWindows)         {plan tests    => 620}                                # Somewhat supported systems
+if ($^O =~ m(bsd|linux)i) {plan tests    => 669}                                # Supported systems
+#lsif (onWindows)         {plan tests    => 621}                                # Somewhat supported systems
 else
  {plan skip_all =>qq(Not supported on: $^O);
  }
@@ -20174,7 +20285,7 @@ if (1) {                                                                        
 
 if (1) {                                                                        #TsetIntersectionOverUnion
   my $f = setIntersectionOverUnion {a=>1, b=>2, e=>3}, [qw(c d e)], qw(e);
-  ok $f > 0.199999 && $f < 2.00001;
+  ok $f > 0.199999 && $f < 0.200001;
  }
 
 if (1) {                                                                        #TsetPartitionOnIntersectionOverUnion
@@ -21717,23 +21828,23 @@ if (0) {                                                                        
 
 if (1) {                                                                        #TexpandWellKnownUrlsInHtmlFormat #TexpandWellKnownUrlsInDitaFormat #TexpandWellKnownUrlsInPerlFormat #TexpandWellKnownUrlsInHtmlFromPerl #TexpandWellKnownUrlsInPod2Html #TexpandWellKnownWordsAsUrlsInHtmlFormat
   ok expandWellKnownUrlsInDitaFormat(q(L[github])) eq
-    q(<xref scope="external" format="html" href="https://github.com">GitHub</xref>);
+    q(<xref scope="external" format="html" href="https://github.com/philiprbrenan">GitHub</xref>);
 
   ok expandWellKnownUrlsInHtmlFormat(q(L[github])) eq
-    q(<a format="html" href="https://github.com">GitHub</a>);
+    q(<a format="html" href="https://github.com/philiprbrenan">GitHub</a>);
 
   ok expandWellKnownUrlsInPerlFormat(q(L<github>)) eq
-    q(L<GitHub|https://github.com>);
+    q(L<GitHub|https://github.com/philiprbrenan>);
 
   ok expandWellKnownUrlsInPerlFormat(q(github))    eq q(github);
 
   ok expandWellKnownUrlsInHtmlFromPerl(q(L<github>)) eq
-    q(<a format="html" href="https://github.com">GitHub</a>);
+    q(<a format="html" href="https://github.com/philiprbrenan">GitHub</a>);
 
-  is_deeply expandWellKnownWordsAsUrlsInHtmlFormat(q(go to gitHub and press enter.)),
-    q(go to <a href="https://github.com">GitHub</a> and press enter.), 'ex1';
+  is_deeply expandWellKnownWordsAsUrlsInHtmlFormat(q(go to gitHub and press w[enter].)),
+    q(go to <a href="https://github.com/philiprbrenan">GitHub</a> and press enter.), 'ex1';
 
-  ok expandWellKnownUrlsInPod2Html(<<END) eq eval '"aaa\n\n=begin HTML\n\n<aaaa format=\"html\" href=\"https://github.com\">GitHub</aaaa>\n\n=end   HTML\n\n\nbbb\n"';
+  ok expandWellKnownUrlsInPod2Html(<<END) eq eval '"aaa\n\n=begin HTML\n\n<aaaa format=\"html\" href=\"https://github.com/philiprbrenan\">GitHub</aaaa>\n\n=end   HTML\n\n\nbbb\n"';
 aaa L<github> bbb
 END
  }
@@ -22127,6 +22238,7 @@ END
  }
 
 ok q(a) eq chooseStringAtRandom(qw(a a a a));                                   #TchooseStringAtRandom
+is_deeply [randomizeArray(qw(a a a a))], [qw(a a a a)];                           #TrandomizeArray
 
 if (0) {                                                                        #TawsEc2DescribeInstances #TawsEc2DescribeInstancesGetIPAddresses
   my %options = (region => q(us-east-2), profile=>q(fmc));

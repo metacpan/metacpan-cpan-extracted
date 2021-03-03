@@ -12,7 +12,7 @@ use LWP::UserAgent;
 use Net::SecurityCenter::Error;
 use Net::SecurityCenter::Utils qw(trim dumper);
 
-our $VERSION = '0.300';
+our $VERSION = '0.310';
 our $ERROR;
 
 #-------------------------------------------------------------------------------
@@ -31,7 +31,7 @@ sub new {
     my $cookie_jar = HTTP::Cookies->new();
 
     $agent->agent( _agent() );
-    $agent->ssl_opts( verify_hostname => 0 );
+    $agent->ssl_opts( verify_hostname => 0 );    # Disable Host verification
 
     my $timeout  = delete( $options->{'timeout'} );
     my $ssl_opts = delete( $options->{'ssl_options'} ) || {};
@@ -45,7 +45,7 @@ sub new {
     }
 
     if ($ssl_opts) {
-        $agent->ssl_opts($ssl_opts);
+        $agent->ssl_opts( %{$ssl_opts} );
     }
 
     $agent->cookie_jar($cookie_jar);
@@ -469,6 +469,64 @@ for log the REST request and response messages.
 
 =back
 
+=head3 Two-Way SSL/TLS Mutual Authentication
+
+You can use configure SSL client certificate authentication for Tenable.sc user
+account authentication using L<IO::Socket::SSL> C<SSL_*> options in
+B<ssl_options> param.
+
+B<Example 1: User certificate + Private Key>
+
+    my $sc = Net::SecurityCenter::REST( $sc_server, {
+        ssl_options => {
+            SSL_cert_file => '/path/ssl.cer',   # Client Certificate
+            SSL_key_file  => '/path/priv.key',  # Private Key
+        }
+    } );
+
+B<Example 2: User certificate + Private Key + Password>
+
+    my $sc = Net::SecurityCenter::REST( $sc_server, {
+        ssl_options => {
+            SSL_cert_file => '/path/ssl.cer',   # Client Certificate
+            SSL_key_file  => '/path/priv.key',  # Private Key
+            SSL_passwd_cb => sub { 'secret' }   # Key secret
+        }
+    } );
+
+B<Example 3: PKCS#12>
+
+    my $sc = Net::SecurityCenter::REST( $sc_server, {
+        ssl_options => {
+            SSL_cert_file => '/path/ssl.p12',   # PKCS#12 file
+        }
+    } );
+
+From L<IO::Socket::SSL> man:
+
+B<SSL_cert_file> | B<SSL_cert> | B<SSL_key_file> | B<SSL_key>
+
+The certificate can be given as a file with C<SSL_cert_file> or as an internal
+representation of an X509* object (like you get from L<Net::SSLeay> or
+L<IO::Socket::SSL::Utils::PEM_xxx2cert>) with C<SSL_cert>. If given as a file it
+will automatically detect the format. Supported file formats are PEM, DER and
+PKCS#12, where PEM and PKCS#12 can contain the certificate and the chain to use,
+while DER can only contain a single certificate.
+
+For each certificate a key is need, which can either be given as a file with
+C<SSL_key_file> or as an internal representation of an EVP_PKEY* object with
+C<SSL_key> (like you get from L<Net::SSLeay> or L<IO::Socket::SSL::Utils::PEM_xxx2key>).
+If a key was already given within the PKCS#12 file specified by C<SSL_cert_file>
+it will ignore any C<SSL_key> or C<SSL_key_file>. If no C<SSL_key> or
+C<SSL_key_file> was given it will try to use the PEM file given with
+C<SSL_cert_file> again, maybe it contains the key too.
+
+B<SSL_passwd_cb>
+
+If your private key is encrypted, you might not want the default password prompt
+from L<Net::SSLeay>. This option takes a reference to a subroutine that should
+return the password required to decrypt your private key.
+
 
 =head1 METHODS
 
@@ -553,7 +611,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

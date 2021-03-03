@@ -2,7 +2,7 @@
 #
 # Tests for App::DocKnot::Dist command selection to generate a distribution.
 #
-# Copyright 2019-2020 Russ Allbery <rra@cpan.org>
+# Copyright 2019-2021 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -13,6 +13,10 @@ use warnings;
 use File::Spec;
 
 use Test::More tests => 7;
+
+# Isolate from the environment.
+local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
+local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
 
 # Load the module.
 BEGIN { use_ok('App::DocKnot::Dist') }

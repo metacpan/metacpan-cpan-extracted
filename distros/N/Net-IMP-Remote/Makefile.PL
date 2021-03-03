@@ -18,7 +18,7 @@ WriteMakefile(
 	    license => 'http://dev.perl.org/licenses/',
 	    homepage  => 'https://github.com/noxxi/p5-net-imp-remote',
 	    repository => 'https://github.com/noxxi/p5-net-imp-remote',
-	    bugtracker  => 'https://rt.cpan.org/Dist/Display.html?Queue=Net-IMP-Remote',
+	    bugtracker => 'https://github.com/noxxi/p5-net-imp-remote/issues',
 	},
    },
 );

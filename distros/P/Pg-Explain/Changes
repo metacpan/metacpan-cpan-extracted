@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+1.06    2021/03/03
+        - Fixed handling of Backward (Index|Index Only) Scans in non-text plans.
+        Bug reported by Yaroslav Schekin (ysch) on IRC.
+
 1.05    2021/02/18
         - Add parsing of JIT information from plans in all four formats (text, json, yaml, xml)
 

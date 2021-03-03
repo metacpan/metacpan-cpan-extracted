@@ -30,13 +30,12 @@ requires:
   Moose: '0'
   Sort::Naturally: '0'
   Time::localtime: '0'
-  YAML: '0'
-  YAML::Tiny: '1.73'
+  YAML::Syck: '1.31'
   namespace::autoclean: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/gravattj/CLI-Driver-perl/issues
   homepage: https://github.com/gravattj/CLI-Driver-perl
   repository: https://github.com/gravattj/CLI-Driver-perl.git
-version: '0.69'
+version: '0.77'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

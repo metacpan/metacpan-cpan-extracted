@@ -29,6 +29,7 @@ CFStringRef
 com
 const
 coreFoundationUnknownErr
+defaultEncode
 defaultFlavor
 dualvar
 duplicatePasteboardFlavorErr

@@ -53,6 +53,6 @@
          "web" : "https://github.com/Akron/Mojolicious-Plugin-TagHelpers-Pagination"
       }
    },
-   "version" : 0.08,
+   "version" : 0.09,
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

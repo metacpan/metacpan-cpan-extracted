@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2018 Kevin Ryde
+# Copyright 2017, 2018, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -25,11 +25,10 @@ plan tests => 2;
 
 use lib 't','xt';
 use MyTestHelpers;
-MyTestHelpers::nowarnings();
+BEGIN { MyTestHelpers::nowarnings() }
 use MyOEIS;
 
 use Graph::Maker::Petersen;
-
 
 # cf indsets in nautyextra misc.c
 

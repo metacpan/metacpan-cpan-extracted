@@ -1,0 +1,23 @@
+{
+    "type" : "regular",
+    "response" : {
+        "usable" : [
+            {
+                "id" : "1",
+                "name" : "TestTicket",
+                "description" : ""
+            }
+        ],
+        "manageable" : [
+            {
+                "id" : "1",
+                "name" : "TestTicket",
+                "description" : ""
+            }
+        ]
+    },
+    "error_code" : 0,
+    "error_msg" : "",
+    "warnings" : {},
+    "timestamp" : 1423499298
+}

@@ -4,7 +4,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 # VERSION
 
-0.38
+0.39
 
 # SYNOPSIS
 
@@ -47,6 +47,22 @@ enable the ["read"](#read) event to see the difference between STDERR and STDOUT
 more than welcome.
 
 # EVENTS
+
+## before\_fork
+
+    $self->on(before_fork => sub { my ($self, $pipes) = @_; });
+
+Emitted right before the child process is forked. Example `$pipes`
+
+    $pipes = {
+      # for both conduit "pipe" and "pty"
+      stdin_write => $pipe_fh_1_or_pty_object,
+      stdout_read => $pipe_fh_2_or_pty_object,
+
+      # only for conduit "pipe"
+      stdin_read => $pipe_fh_3,
+      stdout_write => $pipe_fh_4,
+    }
 
 ## close
 

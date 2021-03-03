@@ -10,7 +10,8 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
     # Mojolicious::Lite
 
     plugin Cron => ( '*/5 9-16 * * *' => sub {
-        # do someting non-blocking but useful
+        my $target_epoch = shift;
+        # do something non-blocking but useful
     });
 
     # Mojolicious
@@ -65,7 +66,7 @@ is needed so jobs are not executed several times.
 a platform-independent behavior.
 
 Please take a look in the examples section, for a simple Mojo Application that you can
-run on hypnotoad, try hot restarts, adding / removing workers, etc, and
+run on a preforked server, try hot restarts, adding / removing workers, etc, and
 check that scheduled jobs execute without interruptions or duplications.
 
 # EXTENDEND SYNTAX HASH
@@ -107,7 +108,7 @@ Each crontab line consists of a hash with the following keys:
 - code => sub {...}
 
     Mandatory. Is the code that will be executed whenever the crontab rule fires.
-    Note that this code \*MUST\* be non-blocking. For tasks that are naturally
+    Note that this code **MUST** be non-blocking. For tasks that are naturally
     blocking, the recommended solution would be to enqueue tasks in a job 
     queue (like the [Minion](https://metacpan.org/pod/Minion) queue, that will play nicelly with any Mojo project).
 
@@ -122,6 +123,36 @@ Each crontab line consists of a hash with the following keys:
 
 Register plugin in [Mojolicious](https://metacpan.org/pod/Mojolicious) application.
 
+# MULTIHOST LOCKING
+
+The epoch corresponding to the scheduled time (i.e. the perl "time" function
+corresponding to the current task) is available as the first parameter for the
+callback sub. This can be used as a higher level "lock" to limit the amount
+of simultaneous scheduled tasks to just one on a multi-host environment.
+
+(You will need some kind of db service accessible from all hosts).
+
+    # Execute some job every 5 minutes, only on one of the existing hosts
+
+    plugin Cron => ( '*/5 * * * *' => sub {
+        my $target_epoch = shift;
+        my $last_epoch = some_kind_of_atomic_swap_function(
+          key => "some id key for this crontab",
+          value => $target_epoch
+          );
+        if ($target_epoch != $last_epoc) { # Only first host will get here!
+          # do something non-blocking
+        } else {
+          # following hosts will get here. Do not call the task
+        }
+    });
+
+That "atomic\_swap" function **needs to be non-blocking**. As this is unlikely the
+case because it will normally imply a remote call, you can just enqueue a job to a [Minion](https://metacpan.org/pod/Minion) queue
+and then inside the task filter out already executed (by other host) tasks by this lock.
+You can see a working proof of concept [here](https://github.com/dmanto/clustered-cron-example), using
+an [etcd](https://etcd.io) db as a resilient backend to handle the atomic swap functionality.
+
 # WINDOWS INSTALLATION
 
 To install in windows environments, you need to force-install module
@@ -133,11 +164,11 @@ Daniel Mantovani, `dmanto@cpan.org`
 
 # COPYRIGHT AND LICENCE
 
-Copyright 2018, Daniel Mantovani.
+Copyright (C) 2018-2021, Daniel Mantovani.
 
 This library is free software; you may redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
 
 # SEE ALSO
 
-[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious%3A%3AGuides), [Mojolicious::Plugins](https://metacpan.org/pod/Mojolicious%3A%3APlugins), [Algorithm::Cron](https://metacpan.org/pod/Algorithm%3A%3ACron)
+[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious%3A%3AGuides), [Mojolicious::Plugins](https://metacpan.org/pod/Mojolicious%3A%3APlugins), [Algorithm::Cron](https://metacpan.org/pod/Algorithm%3A%3ACron), [Minion](https://metacpan.org/pod/Minion)

@@ -1,5 +1,8 @@
 Revision history for Data-Printer-Filter-DBIx-Class
 
+0.000005  2021-03-02 17:22:58-05:00 America/Toronto
+    - Deprecate this module in favour of the official DB filter.
+
 0.000004  2016-02-05 12:10:57-05:00 America/Toronto
     - Bumps minimum version of Data::Printer to 0.38
 

@@ -8,5 +8,6 @@ t/WebsiteScrapper.t
 lib/Fancazzista/Scrap.pm
 lib/Fancazzista/Scrap/RedditScrapper.pm
 lib/Fancazzista/Scrap/WebsiteScrapper.pm
+lib/Fancazzista/Scrap/DevtoScrapper.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

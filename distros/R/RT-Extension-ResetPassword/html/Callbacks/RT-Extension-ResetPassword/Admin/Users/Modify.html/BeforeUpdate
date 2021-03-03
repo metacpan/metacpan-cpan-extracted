@@ -18,6 +18,20 @@ if ( ( $ARGS{'SendPasswordResetEmail'} || $session{'SendPasswordResetEmail'} ) &
     }
 }
 delete $session{'SendPasswordResetEmail'};
+
+# Handle DeleteUserPassword
+if ( $ARGS{'DeleteUserPassword'} ) {
+    my ($ret, $msg) = $User->UnsetPassword();
+    if ( $ret ) {
+        push @{$Results}, $msg;
+    }
+    else {
+        push @{$Results}, 'Unable to delete password';
+        RT::Logger->error( "$msg" );
+    }
+}
+
+
 </%INIT>
 <%ARGS>
 $Results

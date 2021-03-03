@@ -18,13 +18,13 @@
 #include "apreq_version.h"
 #include "at.h"
 
-static void version_string(dAT)
+static void version_string(dAT, void *ctx)
 {
     const char *vstring = apreq_version_string();
     AT_not_null(vstring);
     AT_str_eq(vstring, APREQ_VERSION_STRING);
 }
-static void version_type(dAT)
+static void version_type(dAT, void *ctx)
 {
     apr_version_t v;
     apreq_version(&v);
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     unsigned i, plan = 0;
     dAT;
     at_test_t test_list [] = {
-        {"version_string", version_string, 2, "1"},
+        {"version_string", version_string, 2, NULL, "1"},
         {"version_type", version_type, 4}
     };
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     apr_pool_create(&p, NULL);
 
-    AT = at_create(p, 0, at_report_stdout_make(p));
+    AT = at_create(0, at_report_stdout_make());
 
     for (i = 0; i < sizeof(test_list) / sizeof(at_test_t);  ++i)
         plan += test_list[i].plan;

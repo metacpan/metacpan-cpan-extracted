@@ -28,9 +28,7 @@ __END__
 
 =head1 NAME
 
-Fancazzista::Scrap - Perl module for scrap reddit post, dev.to post, website content.
-
-It only scrap article/post link and link text.
+Fancazzista::Scrap
 
 =head1 SYNOPSIS
 
@@ -79,13 +77,14 @@ It only scrap article/post link and link text.
 
 =head1 DESCRIPTION
 
-Fancazzista::Scrap allows to scrap website articles or subreddit posts with a config.
+Perl module for scrap reddit post, dev.to post, website content.
+It only scrap article/post link and link text.
 
 =head1 SEE ALSO
 
 =head1 AUTHOR
 
-Antoine MICELI<lt>https://miceli.click<gt>
+Antoine MICELI, https://miceli.click
 
 =head1 COPYRIGHT AND LICENSE
 

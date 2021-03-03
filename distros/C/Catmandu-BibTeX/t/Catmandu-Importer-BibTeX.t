@@ -22,7 +22,7 @@ my $data = [
         type     => 'article',
         author   => ['γλώσσα',],
         journal  => 'Journal of Physical Agents',
-        pages    => '21--32',
+        pages    => '21–32',
         title =>
             'Domestic Applications for social robots - a user study on appearance and function',
         year => '2008',

@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 15;
+$VERSION = 18;
 @ISA = ('Graph::Maker');
 
 
@@ -159,17 +159,26 @@ to 4^N vertices (including self) except no edge to those differing by only
 differences at all for vertex itself), and also no edge to vertices
 differing by 2 mod 4 at a single digit, which is N possible digit positions.
 
-=for GP-Test  vector(6,N,N--; 4^N-3^N-N) == [0, 0, 5, 34, 171, 776]
+=cut
 
-=for GP-Test  vector(6,N,N--; 1/2*4^N*(4^N-3^N-N)) == [0, 0, 40, 1088, 21888, 397312]
+# GP-Test  vector(6,N,N--; 4^N-3^N-N) == [0, 0, 5, 34, 171, 776]
+# GP-Test  vector(6,N,N--; 1/2*4^N*(4^N-3^N-N)) == [0, 0, 40, 1088, 21888, 397312]
+# GP-Test  vector(6,N,N--; 1/2*4^N*(4^N-1) - 1/2*4^N*(4^N-3^N-N)) == [0, 6, 80, 928, 10752, 126464]
 
-=for GP-Test  vector(6,N,N--; 1/2*4^N*(4^N-1) - 1/2*4^N*(4^N-3^N-N)) == [0, 6, 80, 928, 10752, 126464]
+=pod
 
-N=0 and N=1 have no edges since there are only 0 digits and 1 digit
+N=0 and N=1 have no edges since there no digits and a single digit
 respectively, so nothing differs in 2 digit positions.
 
 N=2 (16 vertices and 40 edges) is the Clebsch graph, which is the
 16-cyclotomic graph.
+
+The graph diameter is 2, for NE<gt>=2.  A pair of vertices u,v not connected
+by an edge either don't have a digit differing 2 mod 4, or do but that is
+the sole difference.  For the latter, a common intermediate is formed simply
+by a different digit at one of the other positions.  For the former, take an
+intermediate differing from u by 2 mod 4 at one digit position, and
+differing from v by 2 mod 4 at another digit position.
 
 =head2 Subgraph
 
@@ -252,8 +261,12 @@ L<http://oeis.org/A202604> (etc)
 
 =back
 
+    A284838    num edges
     A202604    clique numbers (size of maximum clique)
-
+    A258935    independence number
+    A292056    Wiener index
+    A301571    num vertices at distance 2 (3^N + N - 1)
+  
 =head1 SEE ALSO
 
 L<Graph::Maker>
@@ -268,18 +281,18 @@ L<http://dimacs.rutgers.edu/Challenges/>
 
 =cut
 
-# in their binary form,
+# in the DIMACS binary form,
 # ftp://dimacs.rutgers.edu/pub/challenge/graph/benchmarks/clique/keller4.clq.b
 
 =pod
 
 =head1 HOME PAGE
 
-L<http://user42.tuxfamily.org/graph-maker/index.html>
+L<http://user42.tuxfamily.org/graph-maker-other/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

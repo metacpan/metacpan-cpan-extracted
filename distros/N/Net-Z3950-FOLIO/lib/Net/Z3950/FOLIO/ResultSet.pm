@@ -7,9 +7,12 @@ sub new {
     my $class = shift();
     my($setname, $cql) = @_;
 
+    my $barcode = _extract_barcode($cql);
+
     return bless {
 	setname => $setname,
 	cql => $cql,
+	barcode => $barcode,
 	total_count => undef,
 	records => [],
 	marcRecords => {},
@@ -23,6 +26,11 @@ sub total_count {
     my $old = $this->{total_count};
     $this->{total_count} = $newVal if defined $newVal;
     return $old;
+}
+
+sub barcode {
+    my $this = shift();
+    return $this->{barcode};
 }
 
 sub insert_records {
@@ -58,6 +66,22 @@ sub marcRecord {
 
     my $mr = $this->{marcRecords};
     return $mr->{$instanceId};
+}
+
+
+# If the $cql query is a search for a barcode, return that barcode;
+# otherwise return undefined. We could do this the sophisticated way,
+# by parsing the CQL and examing every node, but in practice it
+# probably suffices to do a simple string check.
+#
+sub _extract_barcode {
+    my ($cql) = @_;
+
+    if ($cql =~ /^item.barcode[\t ]*=[\t ]*(.*)/) {
+	return $1;
+    }
+
+    return undef;
 }
 
 1;

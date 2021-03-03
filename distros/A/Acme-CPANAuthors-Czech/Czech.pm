@@ -4,7 +4,7 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 # Modules.
 use Acme::CPANAuthors::Register(
@@ -28,6 +28,7 @@ use Acme::CPANAuthors::Register(
 	'MJFO' => 'Michal Jurosz',
 	'PAJAS' => 'Petr Pajas',
 	'PASKY' => 'Petr Baudiš',
+	'PCIMPRICH' => 'Petr Cimprich',
 	'PEK' => 'Petr Kletečka',
 	'POPEL' => 'Martin Popel',
 	'PSME' => 'Petr Šmejkal',
@@ -94,7 +95,7 @@ See documentation for L<Acme::CPANAuthors> for more details.
  print "Count of Czech CPAN authors: $count\n";
 
  # Output:
- # Count of Czech CPAN authors: 39
+ # Count of Czech CPAN authors: 40
 
 =head1 EXAMPLE2
 
@@ -135,25 +136,26 @@ See documentation for L<Acme::CPANAuthors> for more details.
  #     [17] "MJFO",
  #     [18] "PAJAS",
  #     [19] "PASKY",
- #     [20] "PEK",
- #     [21] "POPEL",
- #     [22] "PSME",
- #     [23] "RUR",
- #     [24] "RVASICEK",
- #     [25] "SARFY",
- #     [26] "SEIDLJAN",
- #     [27] "SKIM",
- #     [28] "SMRZ",
- #     [29] "STRAKA",
- #     [30] "TKR",
- #     [31] "TRIPIE",
- #     [32] "TYNOVSKY",
- #     [33] "VARISD",
- #     [34] "VASEKD",
- #     [35] "YENYA",
- #     [36] "ZABA",
- #     [37] "ZEMAN",
- #     [38] "ZOUL"
+ #     [20] "PCIMPRICH",
+ #     [21] "PEK",
+ #     [22] "POPEL",
+ #     [23] "PSME",
+ #     [24] "RUR",
+ #     [25] "RVASICEK",
+ #     [26] "SARFY",
+ #     [27] "SEIDLJAN",
+ #     [28] "SKIM",
+ #     [29] "SMRZ",
+ #     [30] "STRAKA",
+ #     [31] "TKR",
+ #     [32] "TRIPIE",
+ #     [33] "TYNOVSKY",
+ #     [34] "VARISD",
+ #     [35] "VASEKD",
+ #     [36] "YENYA",
+ #     [37] "ZABA",
+ #     [38] "ZEMAN",
+ #     [39] "ZOUL"
  # ]
 
 =head1 DEPENDENCIES
@@ -172,12 +174,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2020 Michal Josef Špaček
+© 2011-2021 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.27
 
 =cut

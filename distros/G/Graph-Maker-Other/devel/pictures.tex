@@ -1,4 +1,4 @@
-% Copyright 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
+% Copyright 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Ryde
 %
 
 %; whizzy section
@@ -92,6 +92,361 @@
 
 
 %------------------------------------------------------------------------------
+\clearpage
+\section{Hanoi Exchange 4}
+
+\begin{tikzpicture}
+    [scale=.7, xscale=.7,
+     my box/.style={draw,minimum size=1.3em,inner sep=.15em,outer sep=.1em},
+    ]
+
+  \node (0)  at (0,0)   [my box] {0};
+  \node (1)  at (-1,-1) [my box] {1};
+  \node (2)  at (1,-1)  [my box] {2};
+  \node (3)  at (-2,-2) [my box] {3};
+  \node (4)  at (-3,-3) [my box] {4};
+  \node (5)  at (-1,-3) [my box] {5};
+  \node (6)  at (2,-2)  [my box] {6};
+  \node (7)  at (1,-3)  [my box] {7};
+  \node (8)  at (3,-3)  [my box] {8};
+  \node (9)  at (-4,-4) [my box] {9};
+  \node (10) at (-5,-5) [my box] {10};
+  \node (11) at (-3,-5) [my box] {11};
+  \node (12) at (-6,-6) [my box] {12};
+  \node (13) at (-7,-7) [my box] {13};
+  \node (14) at (-5,-7) [my box] {14};
+  \node (15) at (-2,-6) [my box] {15};
+  \node (16) at (-3,-7) [my box] {16};
+  \node (17) at (-1,-7) [my box] {17};
+  \node (18) at (4,-4) [my box] {18};
+  \node (19) at (3,-5) [my box] {19};
+  \node (20) at (5,-5) [my box] {20};
+  \node (21) at (2,-6) [my box] {21};
+  \node (22) at (1,-7) [my box] {22};
+  \node (23) at (3,-7) [my box] {23};
+  \node (24) at (6,-6) [my box] {24};
+  \node (25) at (5,-7) [my box] {25};
+  \node (26) at (7,-7) [my box] {26};
+
+  \begin{scope}[shift={(-8,-8)}]
+  \node (27) at (0,0)   [my box] {27};
+  \node (28) at (-1,-1) [my box] {28};
+  \node (29) at (1,-1)  [my box] {29};
+  \node (30) at (-2,-2) [my box] {30};
+  \node (31) at (-3,-3) [my box] {31};
+  \node (32) at (-1,-3) [my box] {32};
+  \node (33) at (2,-2)  [my box] {33};
+  \node (34) at (1,-3)  [my box] {34};
+  \node (35) at (3,-3)  [my box] {35};
+  \node (36) at (-4,-4) [my box] {36};
+  \node (37) at (-5,-5) [my box] {37};
+  \node (38) at (-3,-5) [my box] {38};
+  \node (39) at (-6,-6) [my box] {39};
+  \node (40) at (-7,-7) [my box] {40};
+  \node (41) at (-5,-7) [my box] {41};
+  \node (42) at (-2,-6) [my box] {42};
+  \node (43) at (-3,-7) [my box] {43};
+  \node (44) at (-1,-7) [my box] {44};
+  \node (45) at (4,-4)  [my box] {45};
+  \node (46) at (3,-5)  [my box] {46};
+  \node (47) at (5,-5)  [my box] {47};
+  \node (48) at (2,-6)  [my box] {48};
+  \node (49) at (1,-7)  [my box] {49};
+  \node (50) at (3,-7)  [my box] {50};
+  \node (51) at (6,-6)  [my box] {51};
+  \node (52) at (5,-7)  [my box] {52};
+  \node (53) at (7,-7)  [my box] {53};
+  \end{scope}
+
+  \begin{scope}[shift={(8,-8)}]
+  \node (54) at (0,0)   [my box] {54};
+  \node (55) at (-1,-1) [my box] {55};
+  \node (56) at (1,-1)  [my box] {56};
+  \node (57) at (-2,-2) [my box] {57};
+  \node (58) at (-3,-3) [my box] {58};
+  \node (59) at (-1,-3) [my box] {59};
+  \node (60) at (2,-2)  [my box] {60};
+  \node (61) at (1,-3)  [my box] {61};
+  \node (62) at (3,-3)  [my box] {62};
+  \node (63) at (-4,-4) [my box] {63};
+  \node (64) at (-5,-5) [my box] {64};
+  \node (65) at (-3,-5) [my box] {65};
+  \node (66) at (-6,-6) [my box] {66};
+  \node (67) at (-7,-7) [my box] {67};
+  \node (68) at (-5,-7) [my box] {68};
+  \node (69) at (-2,-6) [my box] {69};
+  \node (70) at (-3,-7) [my box] {70};
+  \node (71) at (-1,-7) [my box] {71};
+  \node (72) at (4,-4)  [my box] {72};
+  \node (73) at (3,-5)  [my box] {73};
+  \node (74) at (5,-5)  [my box] {74};
+  \node (75) at (2,-6)  [my box] {75};
+  \node (76) at (1,-7)  [my box] {76};
+  \node (77) at (3,-7)  [my box] {77};
+  \node (78) at (6,-6)  [my box] {78};
+  \node (79) at (5,-7)  [my box] {79};
+  \node (80) at (7,-7)  [my box] {80};
+  \end{scope}
+
+  \draw [] (51) to (52);
+  \draw [] (38) to (42);
+  \draw [] (0) to (2);
+  \draw [] (51) to (53);
+  \draw [] (28) to (30);
+  \draw [] (1) to (3);
+  \draw [] (42) to (44);
+  \draw [] (30) to (32);
+  \draw [] (18) to (20);
+  \draw [] (59) to (61);
+  \draw [] (6) to (7);
+  \draw [] (24) to (25);
+  \draw [] (76) to (77);
+  \draw [] (15) to (16);
+  \draw [] (5) to (7);
+  \draw [] (12) to (13);
+  \draw [] (73) to (74);
+  \draw [] (19) to (20);
+  \draw [] (77) to (79);
+  \draw [] (72) to (74);
+  \draw [] (64) to (66);
+  \draw [] (66) to (68);
+  \draw [] (19) to (7);
+  \draw [] (67) to (68);
+  \draw [] (79) to (80);
+  \draw [] (6) to (8);
+  \draw [] (36) to (37);
+  \draw [] (39) to (41);
+  \draw [] (41) to (43);
+  \draw [] (12) to (14);
+  \draw [] (75) to (76);
+  \draw [] (34) to (46);
+  \draw [] (13) to (14);
+  \draw [] (4) to (5);
+  \draw [] (32) to (34);
+  \draw [] (9) to (10);
+  \draw [] (35) to (34);
+  \draw [] (69) to (70);
+  \draw [] (70) to (71);
+  \draw [] (10) to (12);
+  \draw [] (38) to (37);
+  \draw [] (78) to (80);
+  \draw [] (69) to (75);
+  \draw [] (31) to (32);
+  \draw [] (39) to (40);
+  \draw [] (2) to (6);
+  \draw [] (29) to (33);
+  \draw [] (42) to (48);
+  \draw [] (1) to (2);
+  \draw [] (9) to (11);
+  \draw [] (35) to (33);
+  \draw [] (46) to (47);
+  \draw [] (61) to (62);
+  \draw [] (68) to (70);
+  \draw [] (52) to (53);
+  \draw [] (22) to (23);
+  \draw [] (54) to (55);
+  \draw [] (60) to (61);
+  \draw [] (14) to (16);
+  \draw [] (56) to (60);
+  \draw [] (32) to (38);
+  \draw [] (58) to (59);
+  \draw [] (55) to (56);
+  \draw [] (73) to (75);
+  \draw [] (38) to (36);
+  \draw [] (15) to (11);
+  \draw [] (58) to (57);
+  \draw [] (59) to (65);
+  \draw [] (27) to (29);
+  \draw [] (17) to (35);
+  \draw [] (66) to (67);
+  \draw [] (3) to (4);
+  \draw [] (74) to (78);
+  \draw [] (27) to (28);
+  \draw [] (15) to (17);
+  \draw [] (78) to (79);
+  \draw [] (7) to (8);
+  \draw [] (45) to (47);
+  \draw [] (45) to (63);
+  \draw [] (25) to (26);
+  \draw [] (3) to (5);
+  \draw [] (43) to (44);
+  \draw [] (69) to (71);
+  \draw [] (30) to (31);
+  \draw [] (33) to (34);
+  \draw [] (16) to (17);
+  \draw [] (19) to (21);
+  \draw [] (23) to (25);
+  \draw [] (22) to (58);
+  \draw [] (63) to (65);
+  \draw [] (19) to (18);
+  \draw [] (55) to (57);
+  \draw [] (37) to (39);
+  \draw [] (24) to (26);
+  \draw [] (54) to (56);
+  \draw [] (75) to (77);
+  \draw [] (21) to (23);
+  \draw [] (0) to (1);
+  \draw [] (15) to (21);
+  \draw [] (63) to (64);
+  \draw [] (48) to (50);
+  \draw [] (20) to (24);
+  \draw [] (40) to (41);
+  \draw [] (57) to (59);
+  \draw [] (50) to (52);
+  \draw [] (28) to (29);
+  \draw [] (65) to (69);
+  \draw [] (21) to (22);
+  \draw [] (48) to (49);
+  \draw [] (46) to (45);
+  \draw [] (42) to (43);
+  \draw [] (5) to (11);
+  \draw [] (49) to (50);
+  \draw [] (47) to (51);
+  \draw [] (65) to (64);
+  \draw [] (10) to (11);
+  \draw [] (61) to (73);
+  \draw [] (73) to (72);
+  \draw [] (46) to (48);
+  \draw [] (60) to (62);
+
+\end{tikzpicture}
+
+
+%------------------------------------------------------------------------------
+\clearpage
+\section{Whythoff Game 3,2}
+
+\url{http://hdl.handle.net/2268/100440}
+
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.7,
+     my box/.style={draw,minimum size=1.3em,inner sep=.15em,outer sep=.1em},
+    ]
+  \node (3-2) at ( 0,    2   ) [my box] {3,2};
+  \node (3-1) at ( 1,    1.72) [my box] {3,1};
+  \node (3-0) at ( 1.75,  .9 ) [my box] {3,0};
+  \node (2-0) at ( 1.75, 0   ) [my box] {2,0};
+  \node (2-2) at (-1,    1.72) [my box] {2,2};
+  \node (2-1) at (-1.75,  .9 ) [my box] {2,1};
+  \node (1-1) at (-1.75, 0   ) [my box] {1,1};
+  \node (1-0) at (0,     0   ) [my box] {1,0};
+  \node (0-0) at (0,     -.9 ) [my box] {0,0};
+
+  % \node (3-2) at (90:2) [my box] {3,2};
+  % \node (3-1) at (90-30:2) [my box] {3,1};
+  % \node (3-0) at (90-30-40:2) [my box] {3,0};
+  % \node (2-0) at (90-30-40-30:2) [my box] {2,0};
+  % \node (2-2) at (90+30:2) [my box] {2,2};
+  % \node (2-1) at (90+30+40:2) [my box] {2,1};
+  % \node (1-1) at (90+30+40+30:2) [my box] {1,1};
+  % \node (1-0) at (-90:.4) [my box] {1,0};
+  % \node (0-0) at (-90:1.5) [my box] {0,0};
+
+  % \node (3-2) at (0,3) [my box] {3,2};
+  % \node (3-1) at (1,3) [my box] {3,1};
+  % \node (3-0) at (2,2.5) [my box] {3,0};
+  % \node (2-1) at (-1,1) [my box] {2,1};
+  % \node (2-2) at (-1,2.5) [my box] {2,2};
+  % \node (0-0) at (1,-.5) [my box] {0,0};
+  % \node (2-0) at (3,1.5) [my box] {2,0};
+  % \node (1-0) at (3,.5) [my box] {1,0};
+  % \node (1-1) at (0,0) [my box] {1,1};
+
+  \draw [->] (2-0) to (0-0);
+  \draw [->] (3-2) to (3-1);
+  \draw [->] (1-1) to (1-0);
+  \draw [->] (3-1) to (3-0);
+  \draw [->] (3-2) to (1-0);
+  \draw [->] (3-1) to (1-0);
+  \draw [->] (3-1) to (2-0);
+  \draw [->] (2-2) to (0-0);
+  \draw [->] (3-0) to (2-0);
+  \draw [->] (2-1) to (1-1);
+  \draw [->] (3-2) to (2-2);
+  \draw [->] (2-2) to (2-1);
+  \draw [->] (3-0) to (0-0);
+  \draw [->] (2-2) to (2-0);
+  \draw [->] (3-2) to (2-1);
+  \draw [->] (3-2) to (2-0);
+  \draw [->] (2-2) to (1-1);
+  \draw [->] (3-2) to (3-0);
+  \draw [->] (1-0) to (0-0);
+  \draw [->] (2-0) to (1-0);
+  \draw [->] (3-1) to (1-1);
+  \draw [->] (3-0) to (1-0);
+  \draw [->] (1-1) to (0-0);
+  \draw [->] (2-1) to (1-0);
+  \draw [->] (2-1) to (2-0);
+  \draw [->] (3-1) to (2-1);
+
+\end{tikzpicture}
+\end{center}
+
+\needspace{15\baselineskip}
+
+Rigo's drawing:
+\begin{center}
+\begin{tikzpicture}
+    [scale=1.7,
+     my box/.style={draw,minimum size=1.3em,inner sep=.15em,outer sep=.1em},
+    ]
+  \node (3-2) at ( 0, 2) [my box] {3,2};
+
+  \node (3-0) at (-2, 1) [my box] {3,0};
+  \node (2-0) at (-1, 1) [my box] {2,0};
+  \node (2-2) at ( 0, 1) [my box] {2,2};
+  \node (2-1) at ( 1, 1) [my box] {2,1};
+  \node (3-1) at ( 2, 1) [my box] {3,1};
+
+  \node (0-0) at (-1.3, 0) [my box] {0,0};
+  \node (1-0) at (0,    0) [my box] {1,0};
+  \node (1-1) at (1.3,  0) [my box] {1,1};
+
+  \draw [->] (2-0) to (0-0);
+  \draw [->] (3-2) to (3-1);
+  \draw [->] (1-1) to (1-0);
+  \draw [->,bend left=25] (3-2) to (1-0);
+  \draw [->] (3-1) to (1-0);
+  \draw [->,bend right=25] (3-1) to (2-0);
+  \draw [->,bend right=80] (3-1) .. controls +(120:2) and +(60:2) .. (3-0)
+    coordinate[pos=.5,name=top];
+  \draw [->] (2-2) to (0-0);
+  \draw [->] (3-0) to (2-0);
+  \draw [->] (2-1) to (1-1);
+  \draw [->] (3-2) to (2-2);
+  \draw [->] (2-2) to (2-1);
+  \draw [->] (3-0) to (0-0);
+  \draw [->] (2-2) to (2-0);
+  \draw [->] (3-2) to (2-1);
+  \draw [->] (3-2) to (2-0);
+  \draw [->] (2-2) to (1-1);
+  \draw [->] (3-2) to (3-0);
+  \draw [->] (2-0) to (1-0);
+  \draw [->] (3-1) to (1-1);
+  \draw [->] (3-0) to (1-0);
+  \draw [->] (2-1) to (1-0);
+  \draw [->,bend left=30] (2-1) to (2-0);
+  \draw [->] (3-1) to (2-1);
+
+  \draw [->] (1-0) to (0-0);
+  \draw [->,bend left=20] (1-1) to (0-0);
+
+  % Hack for bounding box of Bezier curve to not include its control points.
+  % \node at (top) {X};
+  \coordinate (top-left) at (current bounding box.north west |- top);
+  \coordinate (bottom-right) at (current bounding box.south east);
+  \pgfresetboundingbox
+  \useasboundingbox (top-left) rectangle (bottom-right);
+
+\end{tikzpicture}
+\end{center}
+
+
+
+
+%------------------------------------------------------------------------------
+\clearpage
 \section{9,3 Symmetric}
 
 9,3 symmetric.  9 points, 3 ``lines''.
@@ -101,7 +456,7 @@ Each line 3 points, each point 3 lines.
 \subsection{Tri-Hex}
 \begin{center}
 \begin{tikzpicture}
-    [scale=1.7,
+    [scale=1.5,
      my box/.style={draw,minimum size=1.3em,inner sep=.15em,outer sep=.1em},
     ]
 
@@ -139,11 +494,14 @@ Each line 3 points, each point 3 lines.
 \end{tikzpicture}
 \end{center}
 
+\needspace{10\baselineskip}
 \subsection{Pappus}
 
 Geometric lines: \url{https://hog.grinvin.org/ViewGraphInfo.action?id=33731}
 
+\noindent
 Lines as cliques: \url{https://hog.grinvin.org/ViewGraphInfo.action?id=370}
+
 \begin{center}
 \begin{tikzpicture}
     [scale=1.7,
@@ -182,6 +540,7 @@ Lines as cliques: \url{https://hog.grinvin.org/ViewGraphInfo.action?id=370}
 \end{tikzpicture}
 \end{center}
 
+\needspace{10\baselineskip}
 \subsection{Other}
 \begin{center}
 \begin{tikzpicture}
@@ -221,9 +580,7 @@ Lines as cliques: \url{https://hog.grinvin.org/ViewGraphInfo.action?id=370}
 \end{tikzpicture}
 \end{center}
 
-
-\pagebreak 
-
+\needspace{10\baselineskip}
 Circulant N=9 1,2
 \begin{center}
 \begin{tikzpicture}
@@ -302,6 +659,7 @@ Circulant N=9 1,2
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Tamari Lattice Intervals Lattice N=3}
 
 \begin{center}
@@ -597,10 +955,12 @@ Circulant N=9 1,2
 
 
 %------------------------------------------------------------------------------
-\section{Binary Tree Dexter}
+\clearpage
+\section{Binary Trees}
 
-\subsection{N=4}
-\url{https://hog.grinvin.org/ViewGraphInfo.action?id=33621}
+\subsection{Binary Tree Dexter}
+
+N=4 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=33621}
 
 Each graph vertex is a balanced binary string (Dyck word) of N pairs.
 There are Catalan(4)=14 such.  Each graph edge is the "dexter"
@@ -666,11 +1026,9 @@ September 2018.
 \end{center}
 
 %------------------------------------------------------------------------------
-\section{Binary Tree Rotate A-Empty}
+\subsection{Binary Tree Rotate A-Empty}
 
-\subsection{N=4}
-
-\url{https://hog.grinvin.org/ViewGraphInfo.action?id=33607}
+N=4 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=33607}
 
 Each vertex represents a binary tree of N=4 vertices (there are
 Catalan(4)=14 such).  Each edge is by a ``rotate'' where the first
@@ -730,10 +1088,9 @@ Trees'', Pattern Recognition Letters, volume 13, 1992, pages 411-415.
 
 
 %------------------------------------------------------------------------------
-\section{Balanced Binary Filling}
+\subsection{Balanced Binary Filling}
 
-\subsection{N=4}
-\url{https://hog.grinvin.org/ViewGraphInfo.action?id=33595}
+N=4 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=33595}
 
 Each graph vertex is a balanced binary string (Dyck word) of N=4 pairs
 (there are Catalan(4)=14 such).  Each edge is the "filling" defined by
@@ -790,6 +1147,7 @@ article 06.2.5.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Excess Configurations}
 
 \subsection{N=3}
@@ -956,6 +1314,7 @@ of the Giant Component'', Random Structures and Algorithms, volume 4,
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Bulgarian Solitaire}
 
 \subsection{N=7}
@@ -963,7 +1322,7 @@ of the Giant Component'', Random Structures and Algorithms, volume 4,
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=2,yscale=.8,
+    [scale=2,yscale=.7,
      my box/.style={draw,minimum size=1.3em,inner sep=.15em,outer sep=.1em},
     ]
 
@@ -1006,6 +1365,7 @@ of the Giant Component'', Random Structures and Algorithms, volume 4,
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Tamari Lattice, Binary Tree Rotation Graph}
 
 % GP-DEFINE  Cat(n) = binomial(n<<1,n) / (n+1);
@@ -1061,7 +1421,7 @@ regular (21 edges, OEIS A002054).
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=1,
+    [scale=.6,
      my box/.style={fill,circle,inner sep=.15em,outer sep=.15em,node contents=},
     ]
 
@@ -1358,11 +1718,13 @@ fashion (by intervals \dots).
 \end{tikzpicture}
 \end{center}
 
+\needspace{20\baselineskip}
 \subsection{N=5}
 
 N=5
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=33549}
 
+\noindent
 N=6
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=33551}
 
@@ -1521,6 +1883,7 @@ cf Geyer (above) again, figure 10(b).
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Kreweras Lattice N=4}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=33557}
@@ -1606,6 +1969,7 @@ N=6
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Dudeney Towns Hamiltonian}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=32239}
@@ -1721,6 +2085,7 @@ Hamiltonian cycle.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Dudeney 248 Cyclists}
 
 Cyclists starting at ``star'' ending at E, Hamiltonian path (visit
@@ -1788,6 +2153,7 @@ magazine, April 1985.  And that article reprinted in Martin Gardner,
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Pi Graph Digits}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=32206}
@@ -1883,6 +2249,7 @@ Donald Knuth, MSRI lecture "The Birth of the Giant Component", 1 Oct 2004.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Unlabelled Vpar Differences}
 
 %---------------------
@@ -2307,6 +2674,7 @@ differ from each other in just that last entry.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Vpar Differences}
 
 \subsection{N=3 Trees}
@@ -2561,6 +2929,7 @@ time.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Ordered Forests Depths Vector Differences N=4}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=32179}
@@ -2969,6 +3338,7 @@ N=5
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Complement of Smallest Asymmetric Tree}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=31120}
@@ -3065,6 +3435,7 @@ pages 215-227.  Graph X14 in their numbering.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Erdos and Renyi Asymmetric Del or Add}
 
 Erd\H{o}s and R\'enyi, ``Asymmetric Graphs'', Acta Mathematica
@@ -3367,6 +3738,7 @@ an automorphism swapping two pairs.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Nine Vertices, Asymmetric, Made Symmetric by Delete Edge}
 
 \subsection{Degrees le 5}
@@ -3881,7 +4253,7 @@ Nine Second
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=2,
+    [scale=1.7,
      my box/.style={draw,circle,minimum size=1.3em,inner sep=.1em,outer sep=.3em},
     ]
 
@@ -3920,6 +4292,7 @@ Nine Second
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Automorphisms C3, N=9}
 
 \begin{center}
@@ -4131,6 +4504,7 @@ Nine Second
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Automorphisms C3, N=10}
 
 %----------------
@@ -4328,6 +4702,7 @@ the middle fixed vertex.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{N=6 Asymmetrics}
 
 \begin{center}
@@ -4390,6 +4765,7 @@ the middle fixed vertex.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{N=20 Five Domnum Different}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=31101}
@@ -4403,12 +4779,14 @@ perfect domination number = 8, \newline
 semi-total domination number = 9, \newline
 total domination number = 10.
 
-Its n=20 vertices is the fewest where such a 5-different tree occurs, and it is the only such n=20.  The quantities are consecutive 6,7,8,9,10.  The independence number = 11 is different and consecutive too.
-
+Its n=20 vertices is the fewest where such a 5-different tree occurs,
+and it is the only such n=20.  The quantities are consecutive
+6,7,8,9,10.  The independence number = 11 is different and consecutive
+too.
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=1.3,
+    [scale=1.2,
      my box/.style={draw,circle,minimum size=1.3em,inner sep=.1em,outer sep=.3em},
     ]
 
@@ -4459,7 +4837,7 @@ Its n=20 vertices is the fewest where such a 5-different tree occurs, and it is 
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=1.3,
+    [scale=1.2,
      my box/.style={draw,circle,minimum size=1.3em,inner sep=.1em,outer sep=.3em},
     ]
 
@@ -4509,6 +4887,7 @@ Its n=20 vertices is the fewest where such a 5-different tree occurs, and it is 
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{N=20 Seven Domnum Etc Different}
 
 Different domnum, indomnum, perfect domnum, semitotdomnum, totdomnum,
@@ -4573,11 +4952,12 @@ Diameter 10 Min
 \end{tikzpicture}
 \end{center}
 
+\needspace{8\baselineskip}
 Diameter 15 Max
 \begin{center}
 \begin{tikzpicture}
-    [scale=.8,yscale=1.5,
-     my box/.style={draw,circle,minimum size=1.3em,inner sep=.1em,outer sep=.3em},
+    [scale=.75,yscale=1.5,
+     my box/.style={draw,circle,minimum size=1.3em,inner sep=.1em,outer sep=.1em},
     ]
 
   \node (00) at (0,0) [my box] {00};
@@ -4633,6 +5013,7 @@ Diameter 15 Max
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Regular Cospectral}
 
 First
@@ -4725,7 +5106,6 @@ First
 \end{center}
 
 Second
-
 \begin{center}
 \begin{tikzpicture}
     [scale=2,
@@ -4774,7 +5154,6 @@ Second
 
 
 Third
-
 \begin{center}
 \begin{tikzpicture}
     [scale=2,
@@ -4817,7 +5196,6 @@ Third
 \end{center}
 
 Fourth
-
 \begin{center}
 \begin{tikzpicture}
     [scale=2,
@@ -4863,6 +5241,7 @@ Fourth
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{n=32 Tree Most Minimal Dominating Sets}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=30700}
@@ -5143,6 +5522,7 @@ subdivided and then connected by an edge from middle vertex of the
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{N=34 Cross-Connected Halves, Most Minimal Dominating Sets}
 
 \subsection{Two Subdivided Bi-Star 4,5 Connected at 4-Star Middles}
@@ -5166,7 +5546,7 @@ middle of the 5-stars.
 \begin{center}
 \begin{tikzpicture}
     [scale=.8,
-     my box/.style={draw,circle,minimum size=1.2em,inner sep=.1em,outer sep=.3em},
+     my box/.style={draw,circle,minimum size=1.2em,inner sep=.1em,outer sep=.1em},
      font=\scriptsize,
     ]
   \newcommand\MyRight{5}
@@ -5360,6 +5740,7 @@ the middle of the 4-stars.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Graphs Most Minimal Dominating Sets}
 
 \subsection{N=6}
@@ -5369,7 +5750,7 @@ Octahedral.
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=226}
 \begin{center}
 \begin{tikzpicture}
-    [scale=2,
+    [scale=1.5,
      my box/.style={draw,circle,minimum size=1.2em,inner sep=.1em,outer sep=.1em},
      font=\normalsize,
     ]
@@ -5399,7 +5780,7 @@ Octahedral.
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=2,
+    [scale=1.5,
      my box/.style={draw,circle,minimum size=1.2em,inner sep=.1em,outer sep=.1em},
      font=\normalsize,
     ]
@@ -6565,6 +6946,7 @@ cross-connections.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Asymmetric Subtree Relations}
 
 Ilhee Kim, Ringi Kim, Paul Seymour, ``The Minimal Automorphism-Free
@@ -6722,6 +7104,7 @@ vertex.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Seven Segment LED Subsets, 7 without left, 9 with bottom}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=30627}
@@ -6756,7 +7139,7 @@ paperback.
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=1.5,yscale=.8,
+    [scale=1.3,yscale=.8,
      my box/.style={draw,circle,minimum size=1.2em,inner sep=.1em,outer sep=.3em},
     ]
 
@@ -6791,7 +7174,7 @@ paperback.
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=1.5,
+    [scale=1.1,
      my box/.style={draw,circle,minimum size=1.2em,inner sep=.1em,outer sep=.3em},
     ]
 
@@ -6824,7 +7207,7 @@ paperback.
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=2,
+    [scale=1.2,
      my box/.style={draw,circle,minimum size=1.2em,inner sep=.2em,outer sep=.3em},
      font=\normalsize,
     ]
@@ -6854,11 +7237,9 @@ paperback.
   \draw [->] (9) to (4);
 
 \end{tikzpicture}
-\end{center}
-
-\begin{center}
+\hspace{2em}
 \begin{tikzpicture}
-    [scale=2,
+    [scale=1.2,
      my box/.style={draw,circle,minimum size=1.2em,inner sep=.1em,outer sep=.3em},
     ]
 
@@ -6893,6 +7274,7 @@ paperback.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Ramsey 3,4}
 
 \subsection{One}
@@ -7113,7 +7495,8 @@ equivalently steps 3,4.
 \smallskip
 
 cf
-\url{http://independencenumber.wordpress.com/2012/10/12/solutions-and-problems/}
+{\scriptsize
+\url{http://independencenumber.wordpress.com/2012/10/12/solutions-and-problems/}}
 
 \begin{center}
 \begin{tikzpicture}
@@ -7240,7 +7623,7 @@ cf
 H
 \begin{center}
 \begin{tikzpicture}
-    [scale=3,
+    [scale=2,
      my box/.style={draw,circle,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
     ]
 
@@ -7352,6 +7735,7 @@ Three
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Mobius Ladder 8 with 2 Non-Consecutive Rungs Deleted}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=30360}
@@ -7367,7 +7751,7 @@ number 4.
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=3,
+    [scale=2,
      my box/.style={draw,circle,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
     ]
 
@@ -7396,7 +7780,7 @@ number 4.
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=3,rotate=90,
+    [scale=2,rotate=90,
      my box/.style={draw,circle,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
     ]
 
@@ -7425,6 +7809,7 @@ number 4.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Circulant 17 steps 1,2,4,8}
 
 \begin{center}
@@ -7620,6 +8005,7 @@ number 4.
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Rook Grid 4,4}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=30317}
@@ -7715,6 +8101,7 @@ cf \url{http://www.win.tue.nl/~aeb/drg/graphs/Shrikhande.html}
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Regular But Median Size Less than N}
 
 polyhedral of vertices
@@ -7724,8 +8111,8 @@ n =     1  2  3  4  5  6   7    8     9
 n=8 regular 1 but median size 4 is not all vertices
 \begin{center}
 \begin{tikzpicture}
-    [scale=2,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+    [scale=1.5,
+     my box/.style={draw,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (0) at (1.5, .4) [my box] {0};
@@ -7755,8 +8142,8 @@ n=8 regular 1 but median size 4 is not all vertices
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=2,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+    [scale=1.5,
+     my box/.style={draw,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (0) at (0,0) [my box] {0};
@@ -7786,8 +8173,8 @@ n=8 regular 1 but median size 4 is not all vertices
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=2,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+    [scale=1.5,
+     my box/.style={draw,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (0) at (0/8*360:1) [my box] {0};
@@ -7817,8 +8204,8 @@ n=8 regular 1 but median size 4 is not all vertices
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=2,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+    [scale=1.5,
+     my box/.style={draw,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (0) at (6/8*360:1) [my box] {0};
@@ -7852,7 +8239,7 @@ n=8 regular 1 but median size 4 is not all vertices
 \begin{center}
 \begin{tikzpicture}
     [scale=1,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     my box/.style={draw,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (0) at (0,-2) [my box] {0};
@@ -7887,7 +8274,7 @@ n=9 not regular but median size = 9
 \begin{center}
 \begin{tikzpicture}
     [scale=1.2,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     my box/.style={draw,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (0) at (2.8, 1.9) [my box] {0};
@@ -7921,6 +8308,7 @@ n=9 not regular but median size = 9
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{n=8 Pseudosimilar which are Line Graph}
 
 \subsection{Smallest Pseudosimilar}
@@ -8210,6 +8598,7 @@ root graph of the line graph
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Pseudosimilar n=8 Subgraph Relations}
 
 \begin{center}
@@ -8437,12 +8826,13 @@ root graph of the line graph
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Crown 4}
 
 \begin{center}
 \begin{tikzpicture}
     [scale=1.2,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     my box/.style={draw,minimum size=1.5em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (1) at (0,0) [my box] {1};
@@ -8474,6 +8864,7 @@ root graph of the line graph
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Most Minimum Dominating Sets}
 
 Some same as most minimal domsets.  (RECHECK)
@@ -8484,8 +8875,8 @@ n=5
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=1.2,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+    [scale=1,
+     my box/.style={draw,minimum size=1.2em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (0) at (0,0) [my box] {0};
@@ -8516,7 +8907,7 @@ complete-5 less 3 non-touching edges
 \begin{center}
 \begin{tikzpicture}
     [scale=1,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     my box/.style={draw,minimum size=1.2em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (0) at (3,2) [my box] {0};
@@ -8551,7 +8942,7 @@ n=7 domnum 3 in 22 ways
 \begin{center}
 \begin{tikzpicture}
     [scale=1,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     my box/.style={draw,minimum size=1.2em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (0) at (5,-1) [my box] {0};
@@ -8577,6 +8968,7 @@ n=7 domnum 3 in 22 ways
 \end{center}
 
 %----------------------
+\needspace{10\baselineskip}
 
 n=8 domnum 3 in 36 ways
 
@@ -8584,8 +8976,8 @@ n=8 domnum 3 in 36 ways
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=1.3,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.2em},
+    [scale=1,
+     my box/.style={draw,minimum size=1.2em,inner sep=.1em,outer sep=.2em},
     ]
 
   \node (0) at (0,-2.5) [my box] {0};
@@ -8617,11 +9009,11 @@ n=8 domnum 3 in 36 ways
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=1.3,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.2em},
+    [scale=1,
+     my box/.style={draw,minimum size=1.2em,inner sep=.1em,outer sep=.2em},
     ]
 
-  \node (0) at (-3,0) [my box] {0};
+  \node (0) at (-3.2, 0) [my box] {0};
   \node (1) at (-4,2) [my box] {1};
   \node (2) at (0,2) [my box] {2};
   \node (3) at (-.5, 0) [my box] {3};
@@ -8650,6 +9042,7 @@ n=8 domnum 3 in 36 ways
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{6 Vertices Mean Distance 2/3 of Diameter}
 
 12 total
@@ -8658,7 +9051,7 @@ with one hanging
 \begin{center}
 \begin{tikzpicture}
     [scale=1.2,
-     my box/.style={draw,minimum size=2em,inner sep=.1em,outer sep=.3em},
+     my box/.style={draw,minimum size=1.2em,inner sep=.1em,outer sep=.3em},
     ]
 
   \node (2) at (3,0) [my box] {2};
@@ -8686,7 +9079,10 @@ with one hanging
 
 
 %------------------------------------------------------------------------------
-\section{Noughts and Crosses 2x2, 1 Player}
+\clearpage
+\section{Noughts and Crosses}
+
+\subsection{Noughts and Crosses 2x2, 1 Player}
 
 Tesseract induced subgraph.
 
@@ -8930,7 +9326,7 @@ Tesseract induced subgraph.
 \end{center}
 
 %------------------------------------------------------------------------------
-\section{Noughts and Crosses 2x2}
+\subsection{Noughts and Crosses 2x2}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=27017}
 
@@ -9127,7 +9523,7 @@ Tesseract induced subgraph.
 
 
 %------------------------------------------------------------------------------
-\section{Noughts and Crosses 2x2 up to Rotation}
+\subsection{Noughts and Crosses 2x2 up to Rotation}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=27020}
 
@@ -9200,7 +9596,7 @@ Tesseract induced subgraph.
 
 
 %------------------------------------------------------------------------------
-\section{Noughts and Crosses 2x2, 1 Player, up to Reflection}
+\subsection{Noughts and Crosses 2x2, 1 Player, up to Reflection}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=856}
 
@@ -9232,7 +9628,7 @@ Tesseract induced subgraph.
 \end{center}
 
 %------------------------------------------------------------------------------
-\section{Noughts and Crosses 2x2, 3 Players, up to Rotation}
+\subsection{Noughts and Crosses 2x2, 3 Players, up to Rotation}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=27025}
 
@@ -9367,6 +9763,7 @@ Tesseract induced subgraph.
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Subgraph Non-Relations Among 4-Vertex Graphs}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=26965}
@@ -9404,6 +9801,7 @@ Tesseract induced subgraph.
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Subgraph Relations Among 4-Vertex Graphs, 1-Edge Delta}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=26963}
@@ -9479,6 +9877,7 @@ Tesseract induced subgraph.
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Subgraph Relations Among 4-Vertex Connected Graphs}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=748}
@@ -9594,6 +9993,7 @@ Tesseract induced subgraph.
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Transpositions 4-Star = Claw}
 
 \begin{center}
@@ -9677,6 +10077,7 @@ Tesseract induced subgraph.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Transpositions 4-Cycle}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=1292}
@@ -9774,6 +10175,7 @@ Tesseract induced subgraph.
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Transpositions 4-Row}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=1391}
@@ -9934,10 +10336,12 @@ Tesseract induced subgraph.
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Petersen Triangle Replaced}
 
 Vertex transitive non-Hamiltonian.
 
+\noindent
 \url{http://mathworld.wolfram.com/NonhamiltonianVertex-TransitiveGraph.html}
 
 \begin{center}
@@ -10031,6 +10435,7 @@ Vertex transitive non-Hamiltonian.
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Petersen Line Graph}
 
 Petersen 3-regular so line graph $3+3-2=4$ regular
@@ -10204,6 +10609,7 @@ Petersen 3-regular so line graph $3+3-2=4$ regular
 \end{center}
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Beineke All as Subgraphs, 12 Edges}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=748}
@@ -10355,6 +10761,7 @@ Emphasizing their construction, clique decompositions, and regularity
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Beineke Subgraph Relations}
 
 \begin{center}
@@ -10439,13 +10846,16 @@ Emphasizing their construction, clique decompositions, and regularity
 
 
 %------------------------------------------------------------------------------
-\section{Hanoi 2 Discs, 4 Spindles, Star}
+\clearpage
+\section{Hanoi}
+
+\subsection{Hanoi 2 Discs, 4 Spindles, Star}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=21152}
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=1.25,
+    [scale=1,
      my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
      font=\scriptsize,
     ]
@@ -10521,8 +10931,9 @@ Puzzle'', Congressus Numerantium, volume 102, 1994, pages 3-12,
 \url{http://www.cs.wm.edu/~pkstoc/boca.ps}
 
 
-%------------------------------------------------------------------------------
-\section{Hanoi Graph 2 Discs, 4 Spindles, Linear}
+%-----------------------------------
+\needspace{20\baselineskip}
+\subsection{Hanoi Graph 2 Discs, 4 Spindles, Linear}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=25143}
 
@@ -10533,7 +10944,7 @@ Puzzle'', Congressus Numerantium, volume 102, 1994, pages 3-12,
 
 \begin{center}
 \begin{tikzpicture}
-  [scale=1.5,
+  [scale=1.2,
    my box/.style={circle,draw,inner sep=.15em,outer sep=.3em,minimum size=1.6em},
   ]
 
@@ -10598,14 +11009,15 @@ Stockmeyer gives a straightforward recursive solution for the general case n dis
 ``The Four-in-a-Row Puzzle''
 
 
-%------------------------------------------------------------------------------
-\section{Hanoi Graph 2 Discs, 4 Spindles, Cyclic}
+%-----------------------------------
+\needspace{20\baselineskip}
+\subsection{Hanoi Graph 2 Discs, 4 Spindles, Cyclic}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=25141}
 
 \begin{center}
 \begin{tikzpicture}
-    [scale=2,
+    [scale=1.25,
      my box/.style={circle,draw,inner sep=.15em,outer sep=.3em},
      font=\scriptsize,
     ]
@@ -10669,8 +11081,9 @@ each of those vertices is the small disc going successively around the
 big disc moves (where permitted).
 
 
-%------------------------------------------------------------------------------
-\section{Hanoi 2 Discs 4 Spindles}
+%--------------------------------
+\needspace{20\baselineskip}
+\subsection{Hanoi 2 Discs 4 Spindles}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=22742}
 
@@ -10769,6 +11182,7 @@ DOI 10.2478/s11533-013-0227-7
 
 
 %------------------------------------------------------------------------------
+\clearpage
 \section{Johnson 5,2}
 
 \url{https://hog.grinvin.org/ViewGraphInfo.action?id=21154}

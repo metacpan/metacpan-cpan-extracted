@@ -2,7 +2,7 @@
 #
 # Tests for license metadata.
 #
-# Copyright 2017-2018, 2020 Russ Allbery <rra@cpan.org>
+# Copyright 2017-2018, 2020-2021 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -14,6 +14,10 @@ use File::ShareDir qw(module_file);
 use Kwalify qw(validate);
 use Test::More tests => 2;
 use YAML::XS ();
+
+# Isolate from the environment.
+local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
+local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
 
 # Load the module.
 BEGIN { use_ok('App::DocKnot') }

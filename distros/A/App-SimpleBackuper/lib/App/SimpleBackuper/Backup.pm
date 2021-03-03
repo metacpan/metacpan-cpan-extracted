@@ -58,7 +58,7 @@ sub _get_block_to_delete {
 	if(ref($state->{blocks2delete_prio2size2chunks}->[0]) eq 'HASH') {
 		$state->{blocks2delete_prio2size2chunks}->[0] = [
 			map {$state->{blocks2delete_prio2size2chunks}->[0]->{ $_ }}
-			sort {$a <=> $b}
+			sort {$b <=> $a}
 			keys %{ $state->{blocks2delete_prio2size2chunks}->[0] }
 		];
 	}
@@ -69,7 +69,7 @@ sub _get_block_to_delete {
 	shift @$prio_basket if ! @$size_basket;
 	shift @{ $state->{blocks2delete_prio2size2chunks} } if ! @$prio_basket;
 	
-	return $block_id, @{ $state->{blocks_info}->{ $block_id }->[2] };
+	return $block_id;
 }
 
 sub Backup {
@@ -608,7 +608,13 @@ sub _file_proc {
 		and $file->{versions}->[-1]->{size}	== $version{size}
 		and $file->{versions}->[-1]->{mode}	== $version{mode}
 		and $file->{versions}->[-1]->{mtime}== $version{mtime}
-		and ( defined $file->{versions}->[-1]->{symlink_to} == defined $version{symlink_to} or ( defined $version{symlink_to} and $file->{versions}->[-1]->{symlink_to} eq $version{symlink_to} ) )
+		and (
+			defined $file->{versions}->[-1]->{symlink_to} == defined $version{symlink_to}
+			and (
+				! defined $version{symlink_to}
+				or $file->{versions}->[-1]->{symlink_to} eq $version{symlink_to}
+			)
+		)
 		and join(' ', map { $_->{hash} } @{ $file->{versions}->[-1]->{parts} }) eq join(' ', map { $_->{hash} } @{ $version{parts} })
 	) {
 		$file->{versions}->[-1]->{backup_id_max} = $state->{last_backup_id};
@@ -660,7 +666,7 @@ sub _free_up_space {
 		next if ! $block;
 		next if $block->{last_backup_id} == $state->{last_backup_id};
 		
-		$deleted += App::SimpleBackuper::_BlockDelete($options, $state, $block, \@files);
+		$deleted += App::SimpleBackuper::_BlockDelete($options, $state, $block, $state->{blocks_info}->{ $block_id }->[2]);
 		last if $deleted;
 	}
 	

@@ -1,0 +1,47 @@
+Geo::LibProj::FFI
+
+This module is a foreign function interface to the PROJ
+<https://proj.org/> coordinate transformation library. Please see the
+PROJ library's C function reference
+<https://proj.org/development/reference/functions.html> for further
+documentation. You should be able to use those C functions as if they
+were Perl.
+
+This module is very incomplete. Version 0.01 does only little more than
+what is necessary to support Geo::LibProj::cs2cs.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+API LICENSE
+
+The API this module gives access to is the "proj.h" API, which is
+available under the terms of the Expat MIT license.
+
+ Copyright (c) 2016, 2017, Thomas Knudsen / SDFE
+ Copyright (c) 2018, Even Rouault
+
+The API designers didn't write this Perl module, and the module author
+didn't design the API.
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021 by Arne Johannessen.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

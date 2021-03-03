@@ -12,7 +12,7 @@ use Digest::MD5 qw(md5_hex);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.98";
+our $VERSION = "1.99";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

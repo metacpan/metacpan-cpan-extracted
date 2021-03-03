@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2018, 2019 Kevin Ryde
+# Copyright 2018, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -31,6 +31,63 @@ $|=1;
 use Smart::Comments;
 
 
+{
+  # footprint intervals which cover steps
+  my $N = 2;
+  my $graph = Graph::Maker->new('Catalans', N => $N,
+                                rel_type => 'dexter',
+                                # countedged => 1,
+                               );
+  print "$graph\n";
+  ### edges: $graph->edges
+  MyGraphs::Graph_view($graph);
+  print num_intervals($graph)," vs ",dexter_num_intervals($N),"\n";
+  print Graph->VERSION,"\n";
+  exit 0;
+
+  sub num_intervals {
+    my ($graph) = @_;
+    my $ret = 0;
+    foreach my $v ($graph->vertices) {
+      my @all_successors = $graph->all_successors($v);
+      my @successors = $graph->successors($v);
+      my @neighbours = $graph->neighbours;
+      ### $v
+      ### @successors
+      ### @all_successors
+      ### @neighbours
+      ### out_degree: $graph->out_degree($v)
+      $ret += 1 + scalar(@all_successors);
+    }
+    return $ret;
+  }
+  sub dexter_num_intervals {
+    my ($n) = @_;
+    return $n==0 ? 1 :  3 * 2**($n-1) * binomial(2*$n,$n) / ($n+1) / ($n+2);
+  }
+  sub binomial {
+    my ($n,$k) = @_;
+    if ($n < 0 || $k < 0) { return 0; }
+    my $ret = 1;
+    foreach my $i (1 .. $k) {
+      $ret *= $n-$k+$i;
+      ### assert: $ret % $i == 0
+      $ret /= $i;
+    }
+    return $ret;
+  }
+}
+{
+  # footprint intervals which cover steps
+  my $N = 4;
+  my $base = Graph::Maker->new
+    ('Catalans',
+     N          => $N,
+     undirected => 0,
+     vertex_name_type => 'Lweights');
+
+  exit 0;
+}
 {
   # intervals lattice
   # rotate intervals lattice num cover edges

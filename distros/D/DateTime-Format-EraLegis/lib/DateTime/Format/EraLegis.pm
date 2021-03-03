@@ -1,34 +1,37 @@
 package DateTime::Format::EraLegis;
-$DateTime::Format::EraLegis::VERSION = '0.011';
+$DateTime::Format::EraLegis::VERSION = '0.012';
 # ABSTRACT: DateTime formatter for Era Legis (http://oto-usa.org/calendar.html)
 
-use 5.010;
-use Any::Moose;
-use Method::Signatures;
+use 5.014;
+use Function::Parameters qw(fun method);
+use Moo;
+use strictures 2;
+use namespace::clean;
 use Astro::Sunrise qw(sunrise);
 
 has 'ephem' => (
     is => 'ro',
-    isa => 'DateTime::Format::EraLegis::Ephem',
-    lazy_build => 1,
+#    isa => 'DateTime::Format::EraLegis::Ephem',
+    lazy => 1,
+    builder => 1,
     );
 
 has 'style' => (
     is => 'ro',
-    isa => 'DateTime::Format::EraLegis::Style',
-    lazy_build => 1,
+#    isa => 'DateTime::Format::EraLegis::Style',
+    lazy => 1,
+    builder => 1,
     );
 
-method _build_ephem {
+method _build_ephem() {
     return DateTime::Format::EraLegis::Ephem::DBI->new;
 }
 
-method _build_style {
+method _build_style() {
     return DateTime::Format::EraLegis::Style->new;
 }
 
-
-method format_datetime(DateTime $dt, Str :$format = 'plain', :$geo = undef) {
+method format_datetime($dt, :$format = 'plain', :$geo = undef) {
     $dt = $dt->clone;
 
     ### Day of week should match existing time zone
@@ -80,52 +83,50 @@ method format_datetime(DateTime $dt, Str :$format = 'plain', :$geo = undef) {
     return ($format eq 'raw') ? \%tdate : $tdate{plain};
 }
 
-
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
-
 ######################################################
 package DateTime::Format::EraLegis::Ephem;
-$DateTime::Format::EraLegis::Ephem::VERSION = '0.011';
-use Any::Moose qw(Role);
+use Moo::Role;
+use strictures 2;
 
 requires 'lookup';
 
-no Any::Moose;
-
 ######################################################
 package DateTime::Format::EraLegis::Ephem::DBI;
-$DateTime::Format::EraLegis::Ephem::DBI::VERSION = '0.011';
+$DateTime::Format::EraLegis::Ephem::DBI::VERSION = '0.012';
 use 5.010;
-use Any::Moose;
+use Function::Parameters qw(fun method);
+use Moo;
+use strictures 2;
+use namespace::clean;
 use Carp;
 use DBI;
-use Method::Signatures;
 
 with 'DateTime::Format::EraLegis::Ephem';
 
 has 'ephem_db' => (
     is => 'ro',
-    isa => 'Str',
-    lazy_build => 1,
+#    isa => 'Str',
+    builder => 1,
+    lazy => 1,
     );
 
 has 'dbh' => (
     is => 'ro',
-    isa => 'DBI::db',
-    lazy_build => 1,
+#    isa => 'DBI::db',
+    builder => 1,
+    lazy => 1,
     );
 
-method _build_ephem_db {
+method _build_ephem_db() {
     return $ENV{ERALEGIS_EPHEMDB}
         // croak 'No ephemeris database defined';
 }
 
-method _build_dbh {
+method _build_dbh() {
     return DBI->connect( 'dbi:SQLite:dbname='.$self->ephem_db );
 }
 
-method lookup(Str $body, DateTime $dt) {
+method lookup($body, $dt) {
     my $time = $dt->ymd . ' ' . $dt->hms;
     croak 'Date is before era legis' if $time lt '1904-03-20';
     my $rows = $self->dbh->selectcol_arrayref(
@@ -138,69 +139,72 @@ method lookup(Str $body, DateTime $dt) {
     return $rows->[0];
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
-
 ######################################################
 
 package DateTime::Format::EraLegis::Style;
-$DateTime::Format::EraLegis::Style::VERSION = '0.011';
+
 use 5.010;
-use Any::Moose;
+use Function::Parameters qw(fun method);
+use Moo;
+use strictures 2;
+use namespace::clean;
 use utf8;
 use Roman::Unicode qw(to_roman);
-use Method::Signatures;
 
 has 'lang' => (
     is => 'ro',
-    isa => 'Str',
+#    isa => 'Str',
     default => 'latin',
     required => 1,
     );
 
 has 'dow' => (
     is => 'ro',
-    isa => 'ArrayRef',
-    lazy_build => 1,
+#    isa => 'ArrayRef',
+    builder => 1,
+    lazy => 1,
     );
 
 has 'signs' => (
     is => 'ro',
-    isa => 'ArrayRef',
-    lazy_build => 1,
+#    isa => 'ArrayRef',
+    builder => 1,
+    lazy => 1,
     );
 
 has 'years' => (
     is => 'ro',
-    isa => 'ArrayRef',
-    lazy_build => 1,
+#    isa => 'ArrayRef',
+    builder => 1,
+    lazy => 1,
     );
 
 has 'show_terse' => (
     is => 'ro',
-    isa => 'Bool',
+#    isa => 'Bool',
     default => 0,
     );
 
 has [ qw( show_deg show_dow show_year roman_year ) ] => (
     is => 'ro',
-    isa => 'Bool',
+#    isa => 'Bool',
     default => 1,
     );
 
 has 'template' => (
     is => 'ro',
-    isa => 'Str',
-    lazy_build => 1,
+#    isa => 'Str',
+    builder => 1,
+    lazy => 1,
     );
 
 has 'vs15' => (
     is => 'ro',
-    isa => 'Bool',
+#    isa => 'Bool',
     default => 1,
     );
 
-method _build_dow {
+method _build_dow() {
     return
         ($self->lang eq 'symbol')
         ? [qw( ☉ ☽ ♂ ☿ ♃ ♀ ♄ ☉ )]
@@ -209,7 +213,7 @@ method _build_dow {
         : [qw(Solis Lunae Martis Mercurii Iovis Veneris Saturni Solis)];
 }
 
-method _build_signs {
+method _build_signs() {
     return [qw( ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ )]
         if $self->lang eq 'symbol';
 
@@ -225,14 +229,14 @@ method _build_signs {
     return [qw(Ariete Tauro Geminis Cancro Leone Virginie Libra Scorpio Sagittario Capricorno Aquario Pisci)];
 }
 
-method _build_years {
+method _build_years() {
     return
         ($self->roman_year)
         ? [ 0, map { to_roman($_) } 1..21 ]
         : [ 0..21 ];
 }
 
-method _build_template {
+method _build_template() {
     my $template = '';
     my $vs = $self->vs15 ? '︎' : '';
     if ($self->show_deg) {
@@ -263,7 +267,7 @@ method _build_template {
     return $template;
 }
 
-method express( HashRef $tdate ) {
+method express( $tdate ) {
     my $datestr = $self->template;
 
     my $vs = $self->lang eq 'symbol' && $self->vs15 ? '︎' : '';
@@ -279,8 +283,6 @@ method express( HashRef $tdate ) {
     return $datestr;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;
 
 __END__

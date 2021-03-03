@@ -27,5 +27,5 @@ resources:
   X_web: https://github.com/FragLand/minestat
   bugtracker: https://github.com/FragLand/minestat/issues
   repository: https://github.com/FragLand/minestat.git
-version: v1.0.1
+version: v1.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

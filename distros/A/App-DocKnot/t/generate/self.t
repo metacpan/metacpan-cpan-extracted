@@ -2,7 +2,7 @@
 #
 # Test generated files against the files included in the package.
 #
-# Copyright 2016, 2018-2019 Russ Allbery <rra@cpan.org>
+# Copyright 2016, 2018-2019, 2021 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -16,6 +16,10 @@ use File::Spec;
 use Test::RRA qw(is_file_contents);
 
 use Test::More tests => 5;
+
+# Isolate from the environment.
+local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
+local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
 
 # Load the module.
 BEGIN { use_ok('App::DocKnot::Generate') }

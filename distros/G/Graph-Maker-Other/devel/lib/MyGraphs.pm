@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018, 2019, 2020 Kevin Hyde
+# Copyright 2015, 2016, 2017, 2018, 2019, 2020, 2021 Kevin Hyde
 #
 # This file is shared by a couple of distributions.
 #
@@ -107,6 +107,7 @@ use vars '@EXPORT_OK';
               'postscript_view_file',
 
               'Graph_to_GraphViz2',
+              'Graph_set_xy_points','Graph_vertex_xy',
 
               'Graph_subtree_depth',
               'Graph_subtree_children',
@@ -311,7 +312,9 @@ sub Graph_view {
   ### Graph_view(): %options
 
   my @vertices = $graph->vertices;
-  my $is_xy = ($graph->get_graph_attribute('vertex_name_type_xy')
+  my $is_xy = ($options{'is_xy'}
+               || $graph->get_graph_attribute('vertex_name_type_xy')
+               || $graph->get_graph_attribute('vertex_name_type_xy_triangular')
                || $graph->get_graph_attribute('xy')
                || (@vertices
                    && defined $graph->get_vertex_attribute($vertices[0],'xy'))
@@ -642,14 +645,24 @@ sub Graph_tree_print {
 # use Smart::Comments;
 sub Graph_tree_layout {
   my ($graph, %options) = @_;
+  ### Graph_tree_layout ...
   my $v = $options{'v'} // Graph_tree_root($graph);
   my $x = $options{'x'} || 0;
   my $y = $options{'y'} || 0;
+  my $order = $options{'order'} || '';
+  my $align = $options{'align'} || '';
   my $filled = $options{'filled'} // [];
 
   my @children = Graph_vertex_children($graph,$v);
   my @heights = map {Graph_tree_height($graph,$_)} @children;
-  my @order = sort {$heights[$b] <=> $heights[$a]} 0 .. $#children;
+  my @order;
+  if ($order eq 'name') {
+    @order = sort {$graph->get_vertex_attribute($children[$a],'name')
+                     cmp $graph->get_vertex_attribute($children[$b],'name')}
+      0 .. $#children;
+  } else {
+    @order = sort {$heights[$b] <=> $heights[$a]} 0 .. $#children;
+  }
 
   my $h = (@children ? $heights[$order[0]]+1 : 0);
   ### $h
@@ -670,7 +683,9 @@ sub Graph_tree_layout {
   foreach my $i (@order) {
     Graph_tree_layout($graph, v=>$children[$i],
                       x=>$x+1, y=>$y++,
-                      filled=>$filled);
+                      filled => $filled,
+                      order => $order,
+                      align => $align);
   }
 }
 # no Smart::Comments;
@@ -1151,23 +1166,17 @@ HERE
         $graph = Graph_from_graph6_str($graph);
       }
     }
-    my $graph6_filename = File::Spec->catfile($dir, "$i.g6");
     my $png_fh          = File::Temp->new;
     my $png_filename    = $png_fh->filename;
-    ### $graph6_filename
 
+    my $graph6_str;
     if ($graph->isa('Graph::Easy')) {
       require Graph::Easy::As_graph6;
-      require File::Slurp;
-      File::Slurp::write_file($graph6_filename,$graph->as_graph6);
+      $graph6_str = $graph->as_graph6;
     } else {
-      require Graph::Writer::Graph6;
-      my $writer = Graph::Writer::Graph6->new;
-      $writer->write_graph($graph, $graph6_filename);
+      $graph6_str = Graph_to_graph6_str($graph);
     }
-    my $graph6_size = (-s $graph6_filename) - 1;
-    require File::Slurp;
-    my $graph6_str = File::Slurp::read_file($graph6_filename);
+    my $graph6_size = length $graph6_str;
 
     my $num_vertices = $graph->vertices;
     my $num_edges    = $graph->edges;
@@ -1226,7 +1235,6 @@ HERE
     print $h <<"HERE";
 <hr width="100%">
 <p>
-  <a href="file://$graph6_filename">$graph6_filename</a>
   $graph6_size bytes,
   $num_vertices vertices,
   $num_edges edges
@@ -1237,15 +1245,13 @@ HERE
       print $h "empty\n";
     }
     print $h <<"HERE";
-  <FORM name="DoSearchGraphFromFile" id="DoSearchGraphFromFile"
-        action="$hog_url/DoSearchGraphFromFile.action"
-        enctype="multipart/form-data" method="post">
-    <INPUT name="graphFormatName" type="hidden" value="Graph6">
-    <INPUT name="upload" id="DoSearchGraphFromFile_upload"
-           type="file"
-           value="$graph6_filename">
-    <INPUT id="DoSearchGraphFromFile_0" type="submit" value="Search graph">
-  </FORM>
+<FORM name="DoSearchGraphFromGraph6String"
+      action="$hog_url/DoSearchGraphFromGraph6String.action"
+      method="post">
+  <INPUT type="text" name="graph6String" value="$graph6_str"/>
+  <INPUT type="submit"
+         value="Search"/>
+</FORM>
 HERE
 
     if ($num_vertices <= 60) {
@@ -1256,7 +1262,7 @@ HERE
               my $type = $graph->get_graph_attribute('vertex_name_type');
               defined $type && $type =~ /^xy/ }
             || do {
-              my ($v) = $graph->vertices;
+              my ($v) = sort $graph->vertices;
               defined $v && defined($graph->get_vertex_attribute($v,'x')) });
       if ($is_xy || 1) {
         ### write with graphviz2 neato ...
@@ -1323,7 +1329,7 @@ HERE
   close $h or die;
 
   print scalar(@graphs)," graphs\n";
-  print "mozilla file://$html_filename >/dev/null 2>&1 &\n";
+  print "iceweasel file://$html_filename >/dev/null 2>&1 &\n";
 }
 
 # blank out all labels of a Graph::Easy
@@ -1397,9 +1403,13 @@ sub hog_upload_html {
   print "graph $name\n";
   print "$num_vertices vertices, $num_edges edges\n";
 
+  my $yscale = $options{'yscale'} || 1;
+  if ($graph->get_graph_attribute('is_xy_triangular')) {
+    $yscale *= sqrt(3);
+  }
   my @points = map { my ($x,$y) = MyGraphs::Graph_vertex_xy($graph,$_)
                        or croak("no X,Y coordinates for vertex ",$_);
-                     [$x,$y]
+                     [$x,$yscale*$y]
                    } @vertices;
   ### @points
 
@@ -1501,7 +1511,9 @@ sub hog_upload_html {
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <body>
-Upload $name
+<h2>Upload</h2>
+<p>
+$name
 <br>
 $num_vertices vertices, $num_edges edges, size $upsize bytes
 <br>
@@ -1514,12 +1526,13 @@ $num_vertices vertices, $num_edges edges, size $upsize bytes
 </form>
 <p>
 <img width=400 height=400 src="$png_uri">
+</p>
 </body>
 </html>
 HERE
   close $h or die;
 
-  print "mozilla file://$html_filename >/dev/null 2>&1 &\n";
+  print "iceweasel file://$html_filename >/dev/null 2>&1 &\n";
 }
 
 # Return true of all arguments are different, as compared by "eq".
@@ -1550,7 +1563,7 @@ sub graph6_view {
   Graph_view($graph);
 }
 sub graph6_str_to_canonical {
-  my ($g6_str) = @_;
+  my ($g6_str, %options) = @_;
   ### graph6_str_to_canonical(): $g6_str
 
   # num_vertices == 0 is already canonical and nauty-labelg doesn't like to
@@ -1565,13 +1578,15 @@ sub graph6_str_to_canonical {
   my $canonical;
   my $err;
   require IPC::Run;
-  if (! IPC::Run::run(['nauty-labelg',
-                       '-g',  # graph6 output
-                       # '-i2',
-                      ],
-                      '<',\$g6_str,
-                      '>',\$canonical,
-                      '2>',\$err)) {
+  if (! IPC::Run::run
+      (['nauty-labelg',
+        (($options{'format'}||'') eq 'sparse6' ? '-s'
+         : '-g'),  # graph6 output
+         # '-i2',
+        ],
+        '<',\$g6_str,
+        '>',\$canonical,
+        '2>',\$err)) {
     die "nauty-labelg error: ",$canonical,$err;
   }
   return $canonical;
@@ -1816,20 +1831,25 @@ sub Graph_triangle_is_even {
 #
 # Triangles are found one way only, so if a,b,c then no calls also for
 # permutations like b,a,c.  It's unspecified exactly which vertices are the
-# $a,$b,$c in the callback (though the current code has then in ascending
+# $a,$b,$c in the callback (though the current code has them in ascending
 # alphabetical order).
 #
 sub Graph_triangle_search {
   my ($graph, $callback) = @_;
   foreach my $a ($graph->vertices) {
     my @a_neighbours = sort $graph->neighbours($a);
+    ### $a
+    ### @a_neighbours
 
-    foreach my $bi (0 .. $#a_neighbours-2) {
+    foreach my $bi (0 .. $#a_neighbours-1) {
       my $b = $a_neighbours[$bi];
       next if $b lt $a;
+      ### $b
 
-      foreach my $ci ($bi+1 .. $#a_neighbours-1) {
+      foreach my $ci ($bi+1 .. $#a_neighbours) {
         my $c = $a_neighbours[$ci];
+        ### $b
+        ### $c
         if ($graph->has_edge($b,$c)) {
           if (my $stop = $callback->($a,$b,$c)) {
             return $stop;
@@ -2537,12 +2557,16 @@ sub Graph_to_GraphViz2 {
   require GraphViz2;
   $options{'vertex_name_type'}
     //= $graph->get_graph_attribute('vertex_name_type') // '';
-  my $is_xy = ($options{'vertex_name_type'} =~ /^xy/
-               || $graph->get_graph_attribute('vertex_name_type_xy'));
+  my $is_xy = ($options{'is_xy'}
+               || $options{'vertex_name_type'} =~ /^xy/
+               || $graph->get_graph_attribute('vertex_name_type_xy')
+               || $graph->get_graph_attribute('vertex_name_type_xy_triangular'));
   my $is_xy_triangular
-    = ($options{'vertex_name_type'} =~ /^xy-triangular/
+    = ($graph->get_graph_attribute('is_xy_triangular')
+       || $options{'vertex_name_type'} =~ /^xy-triangular/
        || $graph->get_graph_attribute('vertex_name_type_xy_triangular'));
   ### $is_xy
+  ### $is_xy_triangular
 
   my $name = $graph->get_graph_attribute('name');
   my $flow = ($options{'flow'} // $graph->get_graph_attribute('flow') // 'down');
@@ -2564,21 +2588,19 @@ sub Graph_to_GraphViz2 {
 
   foreach my $v ($graph->vertices) {
     my @attrs;
-
-    if (defined (my $xy = $graph->get_vertex_attribute($v,'xy'))) {
-      push @attrs, pin=>1, pos=>$xy;
-    } elsif ($is_xy) {
-      my ($x,$y) = split /,/, $v;
+    if (my ($x,$y) = Graph_vertex_xy($graph,$v)) {
       if ($is_xy_triangular) {
-        $x *= 1/2;
-        $y = sprintf '%.5f', $y*sqrt(3)/2;
+        $y = sprintf '%.5f', $y*sqrt(3);
+      }
+      if (defined $options{'scale'}) {
+        $x *= $options{'scale'};
+        $y *= $options{'scale'};
       }
       push @attrs, pin=>1, pos=>"$x,$y";
       ### @attrs
-    } elsif (defined(my $x = $graph->get_vertex_attribute($v,'x'))
-             && defined(my $y = $graph->get_vertex_attribute($v,'y'))) {
-      ### pin at: "$x,$y"
-      push @attrs, pin=>1, pos=>"$x,$y";
+    }
+    if (defined(my $name = $graph->get_vertex_attribute($v,'name'))) {
+      push @attrs, label => $name;
     }
     $graphviz2->add_node(name => $v,
                          margin => '0.03,0.02',  # cf default 0.11,0.055
@@ -2600,7 +2622,7 @@ sub Graph_vertex_xy {
   }
   if ($graph->get_graph_attribute('vertex_name_type_xy_triangular')) {
     my ($x,$y) = split /,/, $v;
-    return ($x*.5, $y*(sqrt(3)/2));
+    return ($x, $y*sqrt(3));
   }
   if ($graph->get_graph_attribute('vertex_name_type_xy')) {
     return split /,/, $v;
@@ -2992,6 +3014,8 @@ sub Graph_rename_vertex {
   }
 
   $graph->add_vertex($new_name);
+  $graph->set_vertex_attributes($new_name,
+                                $graph->get_vertex_attributes($old_name));
   foreach my $edge ($graph->edges_at($old_name)) {
     my ($from,$to) = @$edge;
     if ($from eq $old_name) { $from = $new_name; }
@@ -3484,6 +3508,65 @@ sub Graph_indnum_and_count {
 
 
 #------------------------------------------------------------------------------
+# Domination Number
+
+# Cockayne, Goodman, Hedetniemi, "A Linear Algorithm for the Domination
+# Number of a Tree", Information Processing Letters, volume 4, number 2,
+# November 1975, pages 41-44.
+
+# $graph is a Graph.pm undirected tree or forest.
+# Return its domination number.
+#
+sub Graph_tree_domnum {
+  my ($graph) = @_;
+  ### Graph_tree_domnum: "num_vertices ".scalar($graph->vertices)
+  $graph->expect_acyclic;
+
+  $graph = $graph->copy;
+  my $domnum = 0;
+  my %mtype = map {$_=>'bound'} $graph->vertices;
+ OUTER: while ($graph->vertices) {
+    foreach my $v ($graph->vertices) {
+      my $degree = $graph->vertex_degree($v);
+      next unless $degree <= 1;
+      ### consider: $v
+      ### $degree
+
+      my ($u) = $graph->neighbours($v);
+      if ($mtype{$v} eq 'free') {
+        ### free, delete ...
+
+      } elsif ($mtype{$v} eq 'bound') {
+        ### bound ...
+        if (defined $u) {
+          ### set neighbour $u required ...
+          $mtype{$u} = 'required';
+        } else {
+          ### no neighbour, domnum++ ...
+          $domnum++;
+        }
+
+      } elsif ($mtype{$v} eq 'required') {
+        ### required, domnum++ ...
+        $domnum++;
+        if (defined $u && $mtype{$u} eq 'bound') {
+          ### set neighbour $u free ...
+          $mtype{$u} = 'free';
+        }
+      } else {
+        die;
+      }
+      delete $mtype{$v};
+      $graph->delete_vertex($v);
+      next OUTER;
+    }
+    die "oops, not a tree";
+  }
+  return $domnum;
+}
+
+
+#------------------------------------------------------------------------------
 # Dominating Sets Count
 
 # with(n)   = prod(child any)     # sets including parent
@@ -3720,7 +3803,7 @@ sub tree_minimal_domsets_count_data_product_into {
 #
 sub Graph_is_domset {
   my ($graph, $aref) = @_;
-  my %vertices = map {$_=>1} $graph->vertices;
+  my %vertices; @vertices{$graph->vertices} = ();
   delete @vertices{@$aref,
                      map {$graph->neighbours($_)} @$aref};
   return keys(%vertices) == 0;
@@ -3765,17 +3848,41 @@ sub Graph_is_minimal_domset {
 #
 sub Graph_minimal_domsets_count_by_pred {
   my ($graph) = @_;
+  return Graph_sets_count_by_pred($graph, \&Graph_is_minimal_domset);
+}
+sub Graph_sets_count_by_pred {
+  my ($graph, $func) = @_;
   require Algorithm::ChooseSubsets;
   my $count = 0;
   my @vertices = sort $graph->vertices;
   my $it = Algorithm::ChooseSubsets->new(\@vertices);
   while (my $aref = $it->next) {
-    if (Graph_is_minimal_domset($graph,$aref)) {
+    if ($func->($graph,$aref)) {
       $count++;
     }
   }
   return $count;
 }
+sub Graph_sets_minimum_and_count_by_pred {
+  my ($graph, $func) = @_;
+  require Algorithm::ChooseSubsets;
+  my @count;
+  my $minsize = $graph->vertices;
+  my @vertices = sort $graph->vertices;
+  my $it = Algorithm::ChooseSubsets->new(\@vertices);
+  while (my $aref = $it->next) {
+    my $size = @$aref;
+    next if $size > $minsize;
+    if ($func->($graph,$aref)) {
+      $count[$size]++;
+      $minsize = min($minsize,$size);
+    }
+  }
+  return ($minsize, $count[$minsize]);
+}
+
+#------------------------------------------------------------------------------
+# Total Dominating Sets
 
 # $graph is a Graph.pm.
 # $aref is an arrayref of vertex names.
@@ -3786,68 +3893,9 @@ sub Graph_minimal_domsets_count_by_pred {
 #
 sub Graph_is_total_domset {
   my ($graph, $aref) = @_;
-  my %vertices = map {$_=>1} $graph->vertices;
+  my %vertices; @vertices{$graph->vertices} = ();
   delete @vertices{map {$graph->neighbours($_)} @$aref};
   return keys(%vertices) == 0;
-}
-
-
-#------------------------------------------------------------------------------
-# Domination Number
-
-# Cockayne, Goodman, Hedetniemi, "A Linear Algorithm for the Domination
-# Number of a Tree", Information Processing Letters, volume 4, number 2,
-# November 1975, pages 41-44.
-
-# $graph is a Graph.pm undirected tree or forest.
-# Return its domination number.
-#
-sub Graph_tree_domnum {
-  my ($graph) = @_;
-  ### Graph_tree_domnum: "num_vertices ".scalar($graph->vertices)
-  $graph->expect_acyclic;
-
-  $graph = $graph->copy;
-  my $domnum = 0;
-  my %mtype = map {$_=>'bound'} $graph->vertices;
- OUTER: while ($graph->vertices) {
-    foreach my $v ($graph->vertices) {
-      my $degree = $graph->vertex_degree($v);
-      next unless $degree <= 1;
-      ### consider: $v
-      ### $degree
-
-      my ($u) = $graph->neighbours($v);
-      if ($mtype{$v} eq 'free') {
-        ### free, delete ...
-
-      } elsif ($mtype{$v} eq 'bound') {
-        ### bound ...
-        if (defined $u) {
-          ### set neighbour $u required ...
-          $mtype{$u} = 'required';
-        } else {
-          ### no neighbour, domnum++ ...
-          $domnum++;
-        }
-
-      } elsif ($mtype{$v} eq 'required') {
-        ### required, domnum++ ...
-        $domnum++;
-        if (defined $u && $mtype{$u} eq 'bound') {
-          ### set neighbour $u free ...
-          $mtype{$u} = 'free';
-        }
-      } else {
-        die;
-      }
-      delete $mtype{$v};
-      $graph->delete_vertex($v);
-      next OUTER;
-    }
-    die "oops, not a tree";
-  }
-  return $domnum;
 }
 
 
@@ -4368,7 +4416,8 @@ sub Graph_num_intervals {
   my ($graph) = @_;
   my $ret = 0;
   foreach my $v ($graph->vertices) {
-    $ret += 1 + $graph->all_successors($v);
+    my @all_successors = $graph->all_successors($v);
+    $ret += 1 + scalar(@all_successors);
   }
   return $ret;
 }

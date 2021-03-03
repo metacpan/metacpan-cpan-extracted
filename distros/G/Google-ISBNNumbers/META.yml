@@ -1,0 +1,46 @@
+---
+abstract: 'Retrieve book info by ISBN number'
+author:
+  - 'Eric Chernoff <eric@weaverstreet.net<gt>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Google-ISBNNumbers
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Google::ISBNNumbers:
+    file: lib/Google/ISBNNumbers.pm
+    version: '1.00'
+requires:
+  Cpanel::JSON::XS: '4.08'
+  HTTP::Tiny: '0.076'
+  IO::Socket::SSL: '1.56'
+  Net::SSLeay: '1.49'
+  perl: '5.022001'
+resources:
+  bugtracker: https://github.com/ericschernoff/Google-ISBNNumbers/issues
+  homepage: https://github.com/ericschernoff/Google-ISBNNumbers
+  repository: git://github.com/ericschernoff/Google-ISBNNumbers.git
+version: '1.00'
+x_authority: cpan:ECHERNOF
+x_contributors:
+  - 'Eric Chernoff <eric@pepper.weaverstreet.net>'
+  - 'Eric Chernoff <ericschernoff@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

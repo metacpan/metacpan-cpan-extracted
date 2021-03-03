@@ -7,12 +7,18 @@ that should be provided before the module is installed.
 
 ## INSTALLATION
 
-To install this module, run the following commands:
+Using Makefile.PL:
+
+To install this module, run the following commands.
 
     perl Makefile.PL
     make
     make test
     make install
+
+Using App::cpanminus:
+
+    cpanm Net::SecurityCenter
 
 ## SUPPORT AND DOCUMENTATION
 
@@ -20,12 +26,16 @@ After installing, you can find documentation for this module with the
 perldoc command.
 
     perldoc Net::SecurityCenter
+    perldoc Net::SecurityCenter::Base
+    perldoc Net::SecurityCenter::Error
     perldoc Net::SecurityCenter::REST
-    perldoc Net::SecurityCenter::API
+    perldoc Net::SecurityCenter::Utils
+
     perldoc Net::SecurityCenter::API::Analysis
     perldoc Net::SecurityCenter::API::Credential
     perldoc Net::SecurityCenter::API::Feed
     perldoc Net::SecurityCenter::API::File
+    perldoc Net::SecurityCenter::API::Notification
     perldoc Net::SecurityCenter::API::Plugin
     perldoc Net::SecurityCenter::API::PluginFamily
     perldoc Net::SecurityCenter::API::Policy
@@ -35,19 +45,26 @@ perldoc command.
     perldoc Net::SecurityCenter::API::ScanResult
     perldoc Net::SecurityCenter::API::Scanner
     perldoc Net::SecurityCenter::API::System
+    perldoc Net::SecurityCenter::API::Ticket
     perldoc Net::SecurityCenter::API::User
     perldoc Net::SecurityCenter::API::Zone
-    perldoc Net::SecurityCenter::Utils
+
+    perldoc App::TenableSC
+    perldoc App::TenableSC::Logger
+    perldoc App::TenableSC::Utils
+
+    perldoc App::TenableSC::API
+
 
 You can also look for information at:
 
   * GitHub issues (report bugs here) https://github.com/giterlizzi/perl-Net-SecurityCenter/issues
-  * SlackMan documentation https://github.com/giterlizzi/perl-Net-SecurityCenter/wiki
+  * Documentation https://giterlizzi.github.io/perl-Net-SecurityCenter
 
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2018-2020 Giuseppe Di Terlizzi
+Copyright (C) 2018-2021 Giuseppe Di Terlizzi
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

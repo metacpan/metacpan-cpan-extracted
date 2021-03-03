@@ -106,19 +106,19 @@ my $chiffre_as_expected = sub {
   $t->success( ok(1, $desc . ' (' . $norm . ')') );
 };
 
-$t->$chiffre_as_expected('akron@sojolicio.us', 'Chiffre 1');
+$t->$chiffre_as_expected('akron@sojolicious.example', 'Chiffre 1');
 
-$t->$chiffre_as_expected('äkrön@sojolicio.us', 'Chiffre 2');
-$t->$chiffre_as_expected('akron@sojolicio.us', subject => 'Hi!', 'Chiffre 3');
-$t->$chiffre_as_expected('akron@sojolicio.us', to => 'ä@test.com', 'Chiffre 4');
-$t->$chiffre_as_expected('akron@sojolicio.us', cc => 'ä@test.com', 'Chiffre 5');
-$t->$chiffre_as_expected('akron@sojolicio.us', bcc => 'ä@test.com', 'Chiffre 6');
-$t->$chiffre_as_expected('akron@sojolicio.us', subject => 'Hi!', to => 'ä@test.com', 'Chiffre 7');
+$t->$chiffre_as_expected('äkrön@sojolicious.example', 'Chiffre 2');
+$t->$chiffre_as_expected('akron@sojolicious.example', subject => 'Hi!', 'Chiffre 3');
+$t->$chiffre_as_expected('akron@sojolicious.example', to => 'ä@test.com', 'Chiffre 4');
+$t->$chiffre_as_expected('akron@sojolicious.example', cc => 'ä@test.com', 'Chiffre 5');
+$t->$chiffre_as_expected('akron@sojolicious.example', bcc => 'ä@test.com', 'Chiffre 6');
+$t->$chiffre_as_expected('akron@sojolicious.example', subject => 'Hi!', to => 'ä@test.com', 'Chiffre 7');
 
 
-$t->$chiffre_as_expected('akron@sojolicio.us', subject => 'Hi!', to => 'ä@test.com', bcc => ['hihi@test.com','ü@wow.com'], 'Chiffre 8');
+$t->$chiffre_as_expected('akron@sojolicious.example', subject => 'Hi!', to => 'ä@test.com', bcc => ['hihi@test.com','ü@wow.com'], 'Chiffre 8');
 
-$t->$chiffre_as_expected('akron@sojolicio.us', subject => 'Hi!', cb => sub { 'test' }, 'Chiffre 9');
+$t->$chiffre_as_expected('akron@sojolicious.example', subject => 'Hi!', cb => sub { 'test' }, 'Chiffre 9');
 
 # New start
 $app = Mojolicious->new;
@@ -147,20 +147,58 @@ $app->routes->get('/' . $path)->mail_to_chiffre(
   }
 );
 
-$t->$chiffre_as_expected('akron@sojolicio.us', 'Chiffre 2.1');
-$t->$chiffre_as_expected('akron@sojolicio.us', subject => 'Hi!', to => 'ä@test.com', bcc => ['hihi@test.com','ü@wow.com'], 'Chiffre 2.2');
-$t->$chiffre_as_expected('akron@sojolicio.us', subject => 'Hi!', cb => sub { 'test' }, 'Chiffre 2.3');
+$t->$chiffre_as_expected('akron@sojolicious.example', 'Chiffre 2.1');
+$t->$chiffre_as_expected('akron@sojolicious.example', subject => 'Hi!', to => 'ä@test.com', bcc => ['hihi@test.com','ü@wow.com'], 'Chiffre 2.2');
+$t->$chiffre_as_expected('akron@sojolicious.example', subject => 'Hi!', cb => sub { 'test' }, 'Chiffre 2.3');
 
 is($app->mail_to_chiffre('', subject => 'Hi!')->to_string, '', 'Return nothing');
-my $failed_cc = $app->mail_to_chiffre('akron@sojolicio.us', subject => 'Hi!', cc => '')->to_string;
+my $failed_cc = $app->mail_to_chiffre('akron@sojolicious.example', subject => 'Hi!', cc => '')->to_string;
 unlike($failed_cc, qr/[\?&]cc=/,    'No cc 1');
 like($failed_cc, qr/[\?&]subject=/, 'No cc 2');
 like($failed_cc, qr/norka/,     'No cc 3');
 
-$failed_cc = $app->mail_to_chiffre('akron@sojolicio.us', subject => 'Hi!', cc => [])->to_string;
+$failed_cc = $app->mail_to_chiffre('akron@sojolicious.example', subject => 'Hi!', cc => [])->to_string;
 unlike($failed_cc, qr/[\?&]cc=/,    'No cc 4');
 like($failed_cc, qr/[\?&]subject=/, 'No cc 5');
 like($failed_cc, qr/norka/,     'No cc 6');
+
+
+# New start
+$app = Mojolicious->new;
+$t = Test::Mojo->new;
+$t->app($app);
+
+$method_name = 'cspCompliant';
+
+$app->plugin('TagHelpers::MailToChiffre' => {
+  pattern_rotate => 9,
+  method_name => $method_name,
+  no_inline => 1
+});
+
+$css = $app->mail_to_chiffre_css;
+ok($css !~ m/^a\[onclick\$='return $method_name\(this,false\)'/, 'css is as expected');
+ok($css =~ m/^a\.$method_name/, 'css is as expected');
+
+$js = $app->mail_to_chiffre_js;
+like($js, qr/^function $method_name\(/, 'js is as expected');
+like($js, qr/\(3,2\)/, 'pattern shift is as expected');
+like($js, qr/DOMContentLoaded/, 'Load on event');
+like($js, qr!this\.href=='#'\?this\.getAttribute\('data-href'\):this\.href!);
+
+my $tag = $app->mail_to_chiffre('me@sojolicious.example');
+like($tag, qr!data-href!);
+like($tag, qr!href="#"!);
+like($tag, qr!class="$method_name"!);
+unlike($tag, qr!onclick|javascript!);
+
+$tag = $app->mail_to_chiffre('me@sojolicious.example' => sub { return 'okay' });
+like($tag, qr!data-href!);
+like($tag, qr!href="#"!);
+like($tag, qr!class="$method_name"!);
+unlike($tag, qr!onclick|javascript!);
+
+
 
 done_testing;
 

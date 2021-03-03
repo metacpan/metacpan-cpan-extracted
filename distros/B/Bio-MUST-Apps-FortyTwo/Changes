@@ -1,3 +1,9 @@
+0.210570  2021-02-27 00:21:16+01:00 Europe/Brussels
+    - Additions
+      - 42: Documented metagenomic run_mode in the Manual
+    - Changes
+      - 42: Tweaked column heads of debrief-42.pl (and renamed script)
+      
 0.210370  2021-02-06 14:45:33+01:00 Europe/Brussels
     - Additions
       - 42/1331: New command-line option --outdir to control output location

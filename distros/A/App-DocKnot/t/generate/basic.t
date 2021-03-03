@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot::Generate module API.
 #
-# Copyright 2013, 2016-2020 Russ Allbery <rra@cpan.org>
+# Copyright 2013, 2016-2021 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -17,6 +17,10 @@ use File::Spec;
 use Test::RRA qw(is_file_contents);
 
 use Test::More;
+
+# Isolate from the environment.
+local $ENV{XDG_CONFIG_HOME} = '/nonexistent';
+local $ENV{XDG_CONFIG_DIRS} = '/nonexistent';
 
 # Load the module.
 BEGIN { use_ok('App::DocKnot::Generate') }

@@ -1,0 +1,7 @@
+name = "namespace-allclean"
+badges = ['github-actions/test', 'coveralls', 'metacpan']
+authority="cpan:KFLY"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+markdown_maker = "Pod::Markdown::Github"

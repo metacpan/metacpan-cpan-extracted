@@ -88,6 +88,11 @@ method test15_method (Num :$longarg = 1) {
     return $longarg;
 }
 
+
+method test16_method {
+    return 'success';
+}
+
 #############################
 ###### PRIVATE METHODS ######
 #############################

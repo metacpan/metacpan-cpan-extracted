@@ -1,14 +1,21 @@
 Revision history for Net::SecurityCenter
 
+0.310 2021-03-01
+    - Added "Net::SecurityCenter::API::Ticket" class
+    - Fixed "ssl_opts" param in "Net::SecurityCenter::REST"
+    - Added array return context in "Net::SecurityCenter::API::Scan->list"
+    - sc-api: Added Two-Way SSL/TLS Mutual Authentication
+    - sc-api: Improved CSV output (thanks to SFUX)
+
 0.300 2020-10-30
     - Added support for API Authentication (added in Tenable.sc 5.13)
     - Added "Net::SecurityCenter::API::Notification" class
     - Added "App:TenableSC" class for CLI applications
     - Improved "sc-api" table output
-    - Added supporto for API Authentication in "sc-api"
+    - Added support for API Authentication in "sc-api"
     - Improved error handling
     - Improved documentations
-    - Improved Perl "magic" features (wantarray)
+    - Improved Perl magic features (wantarray)
     - Code beautifications
 
 0.206 2020-07-22
@@ -68,7 +75,7 @@ Revision history for Net::SecurityCenter
       - Zone
     - Improved documentation
     - Improved test suite
-    - Added support for Log::Log4perl and Log::Any logging modules
+    - Added support for "Log::Log4perl", "Log::Any" and "Mojo::Log" logging modules
  
 0.100 2018-12-28
     - initial release

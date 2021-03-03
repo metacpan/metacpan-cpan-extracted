@@ -1,5 +1,5 @@
 This archive contains the distribution Mojo-Response-JSON-Path,
-version 0.003:
+version 0.004:
 
   use JSON::Path for searching JSON responses
 

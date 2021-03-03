@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Client::6_0::Role::Scroll;
-$Search::Elasticsearch::Client::6_0::Role::Scroll::VERSION = '7.711';
+$Search::Elasticsearch::Client::6_0::Role::Scroll::VERSION = '7.711001';
 use Moo::Role;
 requires 'finish';
 use Search::Elasticsearch::Util qw(parse_params throw);
@@ -80,7 +80,7 @@ Search::Elasticsearch::Client::6_0::Role::Scroll - Provides common functionality
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@
 # See the LICENSE file in the project root for more information
 
 package Search::Elasticsearch::Client::7_0::Direct::Ingest;
-$Search::Elasticsearch::Client::7_0::Direct::Ingest::VERSION = '7.711';
+$Search::Elasticsearch::Client::7_0::Direct::Ingest::VERSION = '7.711001';
 use Moo;
 with 'Search::Elasticsearch::Client::7_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -21,7 +21,7 @@ Search::Elasticsearch::Client::7_0::Direct::Ingest - A client for accessing the 
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

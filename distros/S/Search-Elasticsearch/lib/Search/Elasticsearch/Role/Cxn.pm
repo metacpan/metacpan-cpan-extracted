@@ -16,7 +16,7 @@
 # under the License.
 
 package Search::Elasticsearch::Role::Cxn;
-$Search::Elasticsearch::Role::Cxn::VERSION = '7.711';
+$Search::Elasticsearch::Role::Cxn::VERSION = '7.711001';
 use Moo::Role;
 use Search::Elasticsearch::Util qw(parse_params throw to_list);
 use List::Util qw(min);
@@ -446,7 +446,7 @@ Search::Elasticsearch::Role::Cxn - Provides common functionality to HTTP Cxn imp
 
 =head1 VERSION
 
-version 7.711
+version 7.711001
 
 =head1 DESCRIPTION
 

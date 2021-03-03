@@ -1,10 +1,11 @@
 package Reddit::Client;
 
-our $VERSION = '1.3864'; 
+our $VERSION = '1.3865'; 
 # Needs doc:
 # report, modmail_mute, modmail_action, Modm...->archive, sticky_post
 
-
+# 1.3865 fixed bug that was showing up for testers but not for me for some reason
+# it was using shift ambiguously before a ternary operator. return shift ? true : false
 # 1.3863 fixed bug in get_subreddit_info that prevented some pages from working
 
 # 1.386 2/19/21
@@ -2185,7 +2186,7 @@ sub fullname {
 	return $id;
 }
 sub bool {
-	return shift ? "true" : "false";
+	return $_[0] ? "true" : "false";
 }
 sub ispost { 
 	my $name = shift;

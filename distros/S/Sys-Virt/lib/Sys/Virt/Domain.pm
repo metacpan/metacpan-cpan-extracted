@@ -2277,6 +2277,23 @@ the existing keys. It is not an error if the keys do not exist.
 
 =back
 
+=item my @msgs = $dom->get_messages($flags=0)
+
+Retrieve a list of messages associated with the domain. The
+optional C<$flags> parameter can accept zero or more of
+
+=over 4
+
+=item Sys::Virt::Domain::MESSAGE_DEPRECATION
+
+Warnings about use of deprecated features
+
+=item Sys::Virt::Domain::MESSAGE_TAINTING
+
+Warnings about actions that have tainting the domain
+
+=back
+
 =back
 
 =head1 CONSTANTS

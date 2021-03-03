@@ -3,7 +3,7 @@ package JavaScript::Minifier;
 use strict;
 use warnings;
 
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -142,8 +142,14 @@ sub putLiteral {
       action1($s);
       action1($s);
     }
+    if ($s->{regexp_flag} && $s->{a} eq '[') { # note character class inside regexp, in character class inside regexp there could be unescaped delimiter
+        $s->{charclass_flag} = 1;
+    }
+    elsif ($s->{regexp_flag} && $s->{a} eq ']') {
+        $s->{charclass_flag} = 0;
+    }
     action1($s);
-  } until ($s->{last} eq $delimiter || !defined($s->{a}));
+  } until ($s->{last} eq $delimiter && !($s->{regexp_flag} && $s->{charclass_flag}) || !defined($s->{a}));
   if ($s->{last} ne $delimiter) { # ran off end of file before printing the closing delimiter
     die 'unterminated ' . ($delimiter eq '\'' ? 'single quoted string' : $delimiter eq '"' ? 'double quoted string' : 'regular expression') . ' literal, stopped';
   }
@@ -228,6 +234,8 @@ sub minify {
   $s->{b} = _get($s);
   $s->{c} = _get($s);
   $s->{d} = _get($s);
+  $s->{regexp_flag} = 0;
+  $s->{charclass_flag} = 0;
   $s->{return_flag} = 0;
   $s->{return_string} = '';
   $s->{last} = undef; # assign for safety
@@ -312,6 +320,7 @@ sub minify {
         onWhitespaceConditionalComment($s) ? action1($s) : preserveEndspace($s);
       }
       else { # regexp literal
+        $s->{regexp_flag} = 1;
         putLiteral($s);
         collapseWhitespace($s);
         # don't want closing delimiter to become a slash-slash comment with following conditional comment
@@ -319,6 +328,7 @@ sub minify {
       }
     }
     elsif ($s->{a} eq '\'' || $s->{a} eq '"' ) { # string literal
+      $s->{regexp_flag} = 0;
       putLiteral($s);
       preserveEndspace($s);
     }

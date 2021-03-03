@@ -521,6 +521,7 @@ It will propagate all spooled results and new results given to this method.
 
 =back
 
+=back
 
 =head1 AUTHOR
 

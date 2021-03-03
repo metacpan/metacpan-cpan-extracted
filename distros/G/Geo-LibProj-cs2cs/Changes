@@ -1,5 +1,9 @@
 Revision history for Geo::LibProj::cs2cs
 
+1.02  2021-03-03
+
+ - Add support for PROJ's C API through Geo::LibProj::FFI
+
 1.01  2020-05-13
 
  - Fix broken tests

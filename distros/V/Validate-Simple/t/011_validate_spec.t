@@ -11,6 +11,11 @@ my @tests = (
             [ [ { var=> { type => 'any' } } ], 0, 0 ],
             [ { var => [ type => 'any' ] },    0, 0 ],
             [ { var => 'any' },                0, 0 ],
+        ],
+    },
+    {
+        name => 'Valid specs',
+        specs => [
             [ { var => { type => 'any' } },    1, 0 ],
             [ { var => { required => 1 } },    1, 1 ],
             [
@@ -29,6 +34,23 @@ my @tests = (
                 },
                 1, 2
             ],
+            [
+                {
+                    var => {
+                        type => 'number',
+                    },
+                    foo => {
+                        type => 'spec',
+                        of => {
+                            bar => {
+                                type => 'string',
+                                required => 1,
+                            },
+                        },
+                    },
+                },
+                1, 0
+            ],
         ],
     },
     {
@@ -42,6 +64,23 @@ my @tests = (
                     var => {
                         type => 'hash',
                         of => 'string',
+                    },
+                },
+                0, 0
+            ],
+            [
+                {
+                    var => {
+                        type => 'number',
+                    },
+                    foo => {
+                        type => 'spec',
+                        of => {
+                            bar => {
+                                type => 'typo',
+                                required => 1,
+                            },
+                        },
                     },
                 },
                 0, 0

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017, 2019, 2020 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019, 2020, 2021 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -33,6 +33,8 @@ $|=1;
 use Smart::Comments;
 
 
+#------------------------------------------------------------------------------
+
 {
   # HOG
   # 
@@ -40,7 +42,8 @@ use Smart::Comments;
   foreach my $N (
                  # 6.5, 34.5, 0 .. 40
                  # 34,34.5,
-                 11 .. 15,
+                 # 26 .. 35,
+                 35 .. 40
                 ) {
     my $graph = Graph::Maker->new('most_maximum_matchings_tree',
                                   N => $N,
@@ -49,9 +52,26 @@ use Smart::Comments;
     push @graphs, $graph;
   }
   MyGraphs::hog_searches_html(@graphs);
-  MyGraphs::hog_upload_html($graphs[4]);
+  # MyGraphs::hog_upload_html($graphs[7]);
   exit 0;
 }
+
+{
+  foreach my $N (2 .. 6) {
+    print "n=$N\n";
+    my $graph = Graph::Maker->new('most_maximum_matchings_tree', N => $N,
+                                  coordinate_type => 'HW',
+                                  undirected => 1);
+    foreach my $v (sort $graph->vertices) {
+      my $x = $graph->get_vertex_attribute($v,'x');
+      my $y = $graph->get_vertex_attribute($v,'y');
+      print "  v=$v  $x  $y\n";
+    }
+  }
+  exit 0;
+}
+
+
 
 
 my @want_vpars

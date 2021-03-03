@@ -23,7 +23,7 @@ WriteMakefile(
             license     => 'http://dev.perl.org/licenses/',
             repository  => 'https://github.com/noxxi/p5-mail-dmarc-iterator',
             homepage  => 'https://github.com/noxxi/p5-mail-dmarc-iterator',
-            bugtracker  => 'https://rt.cpan.org/Dist/Display.html?Queue=Mail-DMARC-Iterator',
+            bugtracker  => 'https://github.com/noxxi/p5-mail-dmarc-iterator/issues',
         },
     },
     PREREQ_PM => {

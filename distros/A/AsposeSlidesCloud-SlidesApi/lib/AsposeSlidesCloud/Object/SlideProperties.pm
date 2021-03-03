@@ -189,7 +189,7 @@ __PACKAGE__->method_documentation({
     'orientation' => {
     	datatype => 'string',
     	base_name => 'Orientation',
-    	description => 'Last used view mode.',
+    	description => 'Slide orientation.',
     	format => '',
     	read_only => '',
     		},

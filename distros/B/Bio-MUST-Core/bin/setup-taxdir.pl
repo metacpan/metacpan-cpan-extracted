@@ -31,7 +31,7 @@ setup-taxdir.pl - Setup a local mirror of the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.210380
+version 0.210610
 
 =head1 USAGE
 

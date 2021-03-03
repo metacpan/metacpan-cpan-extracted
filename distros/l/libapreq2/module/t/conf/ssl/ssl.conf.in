@@ -25,7 +25,7 @@
         CustomLog logs/ssl_request_log ssl
     </IfModule>
 
-    SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL
+    SSLCipherSuite ALL
 
     <IfDefine TEST_SSL_PASSPHRASE_EXEC>
         SSLPassPhraseDialog  exec:@ServerRoot@/conf/ssl/httpd-passphrase.pl

@@ -51,6 +51,6 @@
          "url" : "https://github.com/FragLand/minestat.git"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

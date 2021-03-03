@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "v0.0.21";
+our $VERSION = "v0.0.22";
 
 
 
@@ -31,13 +31,13 @@ For now, the documentation can be found at: L<https://boardstreams.dev>.
 =head1 ASSOCIATION WITH JAVASCRIPT LIBRARIES
 
 This module release should be used in conjunction with npm package C<boardstreams> version
-L<0.0.11|https://www.npmjs.com/package/boardstreams/v/0.0.11>.
+L<0.0.12|https://www.npmjs.com/package/boardstreams/v/0.0.12>.
 
-    $ npm install boardstreams@0.0.11 --save
+    $ npm install boardstreams@0.0.12 --save
 
 Or:
 
-    <script src="https://unpkg.com/boardstreams@0.0.11"></script>
+    <script src="https://unpkg.com/boardstreams@0.0.12"></script>
 
 =head1 NOTIFICATIONS FOR NEW RELEASES
 

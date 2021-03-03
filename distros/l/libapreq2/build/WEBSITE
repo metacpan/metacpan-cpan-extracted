@@ -54,25 +54,16 @@ UPDATING THE WEBSITE:
     $ cd httpd/site/trunk
     $ emacs xdocs/apreq/*
     $ ant
-    $ svn commit -m "..." xdocs/apreq/ docs/apreq/
-
-    [do this before you make your RELEASE annoucement and deal with any issues first]
 
   6) copy docs/html/* to http/site/trunk/xdocs/apreq/docs/libapreq2
+  
+     [XXX: tags files / man pages ????]
 
-     tags files / man pages ????
+  7) commit the changes as follows:
+    
+    $ svn commit -m "released libapreq2-2.15" xdocs/apreq/ docs/apreq/
 
-  7) Login (via ssh) to people.apache.org and do
-
-    MAKE SURE your umask is 2
-    $ umask
-    22
-    $ umask 2
-    $ umask
-    2
-
-    $ cd /www/httpd.apache.org
-    $ svn update index.html apreq/
+    [do this before you make your RELEASE annoucement and deal with any issues first]
 
     Wait for ajax to sync every 1-2 hours or so....
 

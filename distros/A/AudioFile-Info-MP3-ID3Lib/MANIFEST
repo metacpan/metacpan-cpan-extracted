@@ -9,6 +9,7 @@ t/1_read.t
 t/2_write.t
 t/3_pod.t
 t/4_pod_coverage.t
+t/errs.t
 t/test.mp3
 Makefile.PL
 META.json

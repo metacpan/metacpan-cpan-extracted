@@ -1,0 +1,30 @@
+NAME
+
+    Acme::MetaSyntactic::legotheincredibles - LEGO The Incredibles theme
+
+VERSION
+
+    version 0.02
+
+DESCRIPTION
+
+    Characters from the LEGO The Incredibles game as gleaned from the
+    http://lego.wikia.com/wiki/LEGO_The_Incredibles.
+
+    Jack-Jack!
+
+SEE ALSO
+
+    Acme::MetaSyntactic, Acme::MetaSyntactic::List.
+
+AUTHOR
+
+    Chris Williams
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2021 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

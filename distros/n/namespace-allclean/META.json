@@ -1,0 +1,81 @@
+{
+   "abstract" : "Avoid imports all subroutines into your namespace",
+   "author" : [
+      "kfly8 <kfly8@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.11",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "namespace-allclean",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0.12",
+            "namespace::clean" : "0.20",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "namespace::allclean" : {
+         "file" : "lib/namespace/allclean.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/p5-namespace-allclean/issues"
+      },
+      "homepage" : "https://github.com/kfly8/p5-namespace-allclean",
+      "repository" : {
+         "url" : "git://github.com/kfly8/p5-namespace-allclean.git",
+         "web" : "https://github.com/kfly8/p5-namespace-allclean"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KFLY",
+   "x_contributors" : [
+      "kfly8 <kfly@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

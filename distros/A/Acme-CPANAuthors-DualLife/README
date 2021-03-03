@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.48
+    version 0.50
 
 SYNOPSIS
 
@@ -32,9 +32,10 @@ CONTAINED AUTHORS
 
       AMBS => q[Alberto Manuel Brandao Simoes],
       ANDK => q[Andreas J. Koenig],
-      ATOOMIC => q[Nicolas R.],
+      ATOOMIC => q[icolas .],
       AUDREYT => q[Audrey Tang],
       BINGOS => q[Chris Williams],
+      CAPOEIRAB => q[Chase Whitener],
       CHORNY => q[Alexandr Ciornii],
       CORION => q[Max Maischein],
       DAGOLDEN => q[David Golden],
@@ -47,7 +48,6 @@ CONTAINED AUTHORS
       EXODIST => q[Chad Granum],
       FERREIRA => q[Adriano Ferreira],
       FLORA => q[Florian Ragwitz],
-      GAAS => q[Gisle Aas],
       HAARG => q[Graham Knop],
       HMBRAND => q[H.Merijn Brand],
       ISHIGAKI => q[Kenichi Ishigaki],
@@ -55,7 +55,6 @@ CONTAINED AUTHORS
       JDHEDDEN => q[Jerry D. Hedden],
       JESSE => q[Jesse Vincent],
       JKEENAN => q[James E Keenan],
-      JPEACOCK => q[John Peacock],
       JSTOWE => q[Jonathan Stowe],
       JV => q[Johan Vromans],
       KANE => q[Jos Boumans],
@@ -106,7 +105,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2020 by Chris Williams.
+    This software is copyright (c) 2021 by Chris Williams.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

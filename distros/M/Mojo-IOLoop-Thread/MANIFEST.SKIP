@@ -1,0 +1,13 @@
+^\.(?!perltidyrc)
+^\.perlcriticrc
+.*\.bak$
+\.tar\.gz$
+^Makefile$
+^MYMETA\.
+^blib
+^pm_to_blib
+^README.md
+^travis.yml
+^appveyor.yml
+^\.gitignore
+^_Deparsed_XSubs.pm

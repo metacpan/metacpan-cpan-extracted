@@ -1,0 +1,77 @@
+==================================================
+Changes from 2020-02-29 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.02 at 2021-02-28 01:24:20 +0000
+-----------------------------------------
+
+  Change: b14bbc2b96a0842ab7dcad839597500f93bd7219
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-02-27 18:23:15 +0000
+
+    Minor doc fixes 
+
+  Change: eaae8fee698ed9924a3d51696cc25e5053cf6146
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-02-27 17:14:00 +0000
+
+    Minor doc change, per mst's request. 
+
+  Change: d1b0373f58ea5e898b0641118daef37d3147cd5a
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-02-26 18:45:44 +0000
+
+    V 1.0 release prep 
+
+  Change: a76ed1f3574b58b42ea699808d36e19aae5fba96
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-18 19:18:46 +0000
+
+    Fix POD 
+
+  Change: 86ff34833f9838775018354314905f81e6a03885
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-03 11:25:01 +0000
+
+    Update dist.ini and .gitignore 
+
+  Change: c27591cead39215c2c0182320debb6c5e2f939cd
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-03 08:49:02 +0000
+
+    Add auto cpanfile, update dist.ini 
+
+  Change: d740efc2b819540bcb854e8b67f340aa6e819f4f
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-03 08:49:02 +0000
+
+    Allow tests to pass if they don't have SQLite installed. 
+
+  Change: f71628a8e6ba4951ec80c645ff5492108ffa2b4d
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-03 08:49:02 +0000
+
+    Update tests to use Try::Tiny 
+
+  Change: b0d45f7894af65e6b4ec9abd18535846e4ee393d
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-03 08:49:01 +0000
+
+    More docs, and a few corrections 
+
+  Change: 2410371d54fb16856d382ae1f98c32a45bc5e9fd
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-03 08:49:01 +0000
+
+    Updated tests 
+
+  Change: c1a5dc8080b9067086cfa5fbcbf1aee76fdd2534
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-03 08:49:01 +0000
+
+    Initial version 
+
+================
+End of releases.
+================

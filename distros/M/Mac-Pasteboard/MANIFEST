@@ -1,12 +1,10 @@
 Build.PL
 Changes
-Makefile.PL
-MBCopy.PL
 constant-c.inc
 constant-h.inc
 constant-xs.inc
-eg/README
 eg/droplet
+eg/README
 eg/save_image
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
@@ -16,8 +14,12 @@ lib/Mac/Pasteboard.pm
 lib/Mac/Pasteboard/Droplet.pod
 LICENSES/Artistic
 LICENSES/Copying
+Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+MBCopy.PL
+META.json
+META.yml
 Pasteboard.xs
 pbl.c
 pbl.h
@@ -31,8 +33,6 @@ t/misc.tx
 t/paste.tx
 t/pasteboard.t
 t/synch.tx
-META.json
-META.yml
 xt/author/changes.t
 xt/author/critic.t
 xt/author/executable.t
@@ -43,3 +43,4 @@ xt/author/perlcriticrc
 xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_spelling.t
+xt/author/prereq.t

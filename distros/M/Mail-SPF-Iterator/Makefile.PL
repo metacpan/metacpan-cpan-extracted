@@ -10,7 +10,10 @@ WriteMakefile(
     },
     META_MERGE => {
 	resources => {
+            license     => 'http://dev.perl.org/licenses/',
 	    repository => 'https://github.com/noxxi/p5-mail-spf-iterator',
+            homepage  => 'https://github.com/noxxi/p5-mail-spf-iterator',
+            bugtracker  => 'https://github.com/noxxi/p5-mail-spf-iterator/issues',
 	},
     },
 );

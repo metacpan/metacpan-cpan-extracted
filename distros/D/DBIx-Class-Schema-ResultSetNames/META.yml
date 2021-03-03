@@ -1,0 +1,37 @@
+---
+abstract: 'Create resultset accessors from table names'
+author:
+  - 'D Ruth Holloway <ruth@hiruthie.me>'
+build_requires:
+  DBD::SQLite: '0'
+  DBIx::Class::Core: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Try::Tiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Schema-ResultSetNames
+provides:
+  DBIx::Class::Schema::ResultSetNames:
+    file: lib/DBIx/Class/Schema/ResultSetNames.pm
+    version: '1.02'
+requires:
+  DBIx::Class::Schema: '0'
+  Lingua::EN::Inflect::Phrase: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://gitlab.com/GeekRuthie/DBIx-Class-Schema-ResultSetNames/-/issues
+  repository: https://gitlab.com/GeekRuthie/DBIx-Class-Schema-ResultSetNames.git
+version: '1.02'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

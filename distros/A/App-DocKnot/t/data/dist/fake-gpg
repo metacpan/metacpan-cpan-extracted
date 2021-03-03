@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# Fake gpg program for testing dist signing.
+
+echo '#' "$@"
+if [ "$1" != '--detach-sign' ]; then exit 1; fi
+if [ "$2" != '--armor'       ]; then exit 1; fi
+if [ "$3" != '-u'            ]; then exit 1; fi
+if [ "$4" != 'some-pgp-key'  ]; then exit 1; fi
+echo 'some signature' >"$5".asc
+exit 0

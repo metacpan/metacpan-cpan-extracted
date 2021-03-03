@@ -1,0 +1,192 @@
+#!/usr/bin/env perl
+
+use 5.010;
+
+use strict;
+use warnings;
+
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+use Test::More 0.88;
+use Test::Prereq::Meta;
+
+our $VERSION = '0.001';
+
+my %opt = (
+    ignore_url	=> [],
+);
+my $dump;
+
+GetOptions( \%opt,
+    qw{
+	accept=s@
+	cd|C=s
+	file_prereq_ok|file-prereq-ok!
+	meta_file|meta-file=s@
+	name=s
+	perl_version|perl-version=s
+	prune=s@
+	unused!
+	uses=s@
+	verbose!
+    },
+    help	=> sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+$opt{unused} //= $opt{uses};
+
+if ( defined $opt{cd} ) {
+    chdir $opt{cd}
+	or die "Unable to cd to $opt{cd}: $!\n";
+}
+
+my $tpm = Test::Prereq::Meta->new(
+    accept		=> $opt{accept},
+    meta_file		=> $opt{meta_file},
+    name		=> $opt{name},
+    perl_version	=> $opt{perl_version},
+    prune		=> $opt{prune},
+    uses		=> $opt{uses},
+    verbose		=> $opt{verbose},
+);
+
+if ( $opt{file_prereq_ok} ) {
+    $tpm->file_prereq_ok( $_ ) for @ARGV;
+} else {
+    $tpm->all_prereq_ok( @ARGV );
+}
+
+$opt{unused}
+    and $tpm->all_prereqs_used();
+
+done_testing();
+
+__END__
+
+=head1 TITLE
+
+test-prereq-meta - Test whether all required modules are listed in the distribution's prerequisites
+
+=head1 SYNOPSIS
+
+ test-prereq-meta
+ test-prereq-meta fubar.pm
+ test-prereq-meta Foo/bar
+ test-prereq-meta -help
+ test-prereq-meta -version
+
+=head1 OPTIONS
+
+=head2 --accept
+
+ --accept Some::Module
+
+This option causes the given module to be accepted even though it is not
+among the prerequisites of the distribution. It can be specified more
+than once.
+
+=head2 --cd
+
+ --cd ../Fubar
+
+Run the tests against files from the specified directory.
+
+By default they are run against files from the current directory.
+
+=head2 --C
+
+This is a synonym for C<--cd>, provided for compatibility with Git.
+
+=head2 --file-prereq-ok
+
+If this Boolean option is asserted, the argument list is interpreted as
+the names of files to be analyzed by
+L<file_prereq_ok()|Test::Prereq::Meta/file_prereq_ok>.
+
+The default is C<--no-file-prereq-ok>.
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 --meta-file
+
+ --meta-file MYMETA.yml
+
+This option specifies the name of the file containing the distribution's
+meta data. It can be specified more than once, in which case the first
+file that is readable is used.
+
+If unspecified, L<Test::Prereq::Meta|Test::Prereq::Meta>'s default is
+used.
+
+=head2 --name
+
+ --name '%m in %f'
+
+This option specifies the name of the generated tests.
+
+If unspecified, L<Test::Prereq::Meta|Test::Prereq::Meta>'s default is
+used.
+
+=head2 --perl-version
+
+This option specifies the version of Perl whose core modules are
+exempted from being included in the prerequisites.
+
+If unspecified, L<Test::Prereq::Meta|Test::Prereq::Meta>'s default is
+used.
+
+=head2 --unused
+
+If this Boolean option is asserted, the C<all_prereqs_used()> method
+will be called after all specified modules have been tested.
+
+The default is C<--unused> if the L<--uses|/--uses> option is specified
+at least once; otherwise it is C<--no-unused>.
+
+=head2 --uses
+
+ --uses Some::Module
+
+This option causes the given module to be considered as used, even if no
+use of it is detected. It can be specified more than once.
+
+=head2 --verbose
+
+This Boolean option causes diagnostics to be emitted for redundant
+L<--accept|/--accept> and (if L<--unused|/--unused> is asserted)
+L<--uses|/--uses> modules.
+
+The default is C<--no-verbose>.
+
+=head2 --version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script tests a Perl distribution (or selected files in that
+distribution) to ensure that all modules required are named as
+requirements in the meta data for the distribution.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2021 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

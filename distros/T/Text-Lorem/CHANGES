@@ -9,3 +9,9 @@
 0.32 2021-02-19
   + Update methods to return list or scalar context
   + Add tests for context, singleton, and new
+0.33 2021-02-23
+  + Update author contact details and copyright
+  + Added Github workflow to make sure tests are passing
+0.34 2021-02-25
+  + Remove .github dir from MANIFEST
+  + Update author in Makefile.PL

@@ -9,7 +9,7 @@ use Time::Piece;
 use Data::Dumper ();
 use Exporter qw(import);
 
-our $VERSION = '0.300';
+our $VERSION = '0.310';
 
 our @EXPORT_OK = qw(
     sc_check_params
@@ -541,7 +541,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2021 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -276,6 +276,15 @@ sub _test {
         }
     );
 
+    subtest(
+        'Ticket API' => sub {
+
+            ok( $sc->ticket->list,           'Get list of Tickets' );
+            ok( $sc->ticket->get( id => 6 ), 'Get Ticket detail' );
+
+        }
+    );
+
     ok( $sc->logout, 'Logout from SecurityCenter' );
 
     done_testing();

@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Listable;
 # ABSTRACT: Listable Moose role for objects with implied id lists
-$Bio::MUST::Core::Roles::Listable::VERSION = '0.210380';
+$Bio::MUST::Core::Roles::Listable::VERSION = '0.210610';
 use Moose::Role;
 
 use autodie;
@@ -119,25 +119,13 @@ sub len_mapper {
 }
 
 
-sub regex_mapper {
+sub regex_mapper {                          ## no critic (RequireArgUnpacking)
     my $self   = shift;
-    my $prefix = shift // q{};
-    my $regex  = shift // $DEF_ID;
+    # my $prefix = shift // q{};    # note the currying below
+    # my $regex  = shift // $DEF_ID;
 
-    my @long_ids = map { $_->full_id } $self->all_seq_ids;
-
-    # extract unique id component and substitute forbidden chars
-    # Note: this implementation was definitely too smart...
-    # my @abbr_ids = map { $prefix . $_                 }
-    #                map { $_ =~ s{$NOID_CHARS}{_}g; $_ }
-    #                map { $_ =~ $regex; $1             } @long_ids;
-
-    my @abbr_ids;
-    for my $long_id (@long_ids) {
-        my @ids = $long_id =~ $regex;           # capture original id(s)
-        s{$NOID_CHARS}{_}xmsg for @ids;         # substitute forbidden chars
-        push @abbr_ids, join q{}, $prefix, @ids;
-    }
+    my @long_ids = map { $_->full_id             } $self->all_seq_ids;
+    my @abbr_ids = map { $_->abbr_with_regex(@_) } $self->all_seq_ids;
 
     return Bio::MUST::Core::IdMapper->new(
         long_ids => \@long_ids,
@@ -241,7 +229,7 @@ Bio::MUST::Core::Roles::Listable - Listable Moose role for objects with implied 
 
 =head1 VERSION
 
-version 0.210380
+version 0.210610
 
 =head1 SYNOPSIS
 
