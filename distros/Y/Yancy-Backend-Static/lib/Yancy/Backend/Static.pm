@@ -1,5 +1,5 @@
 package Yancy::Backend::Static;
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 # ABSTRACT: Build a Yancy site from static Markdown files
 
 #pod =head1 SYNOPSIS
@@ -9,11 +9,11 @@ our $VERSION = '0.013';
 #pod         backend => 'static:.',
 #pod         read_schema => 1,
 #pod     };
-#pod     get '/*path', {
+#pod     get '/*slug', {
 #pod         controller => 'yancy',
 #pod         action => 'get',
 #pod         schema => 'pages',
-#pod         path => 'index', # Default to index page
+#pod         slug => 'index', # Default to index page
 #pod         template => 'default', # default.html.ep below
 #pod     };
 #pod     app->start;
@@ -57,13 +57,13 @@ our $VERSION = '0.013';
 #pod         backend => 'static:.',
 #pod         read_schema => 1,
 #pod     };
-#pod     get '/*path', {
+#pod     get '/*slug', {
 #pod         controller => 'yancy',
 #pod         action => 'get',
 #pod         schema => 'pages',
 #pod         template => 'default',
 #pod         layout => 'default',
-#pod         path => 'index',
+#pod         slug => 'index',
 #pod     };
 #pod     app->start;
 #pod     __DATA__
@@ -98,7 +98,7 @@ our $VERSION = '0.013';
 #pod =for html <img style="max-width: 100%" src="https://raw.githubusercontent.com/preaction/Yancy-Backend-Static/master/eg/public/editor-1.png">
 #pod
 #pod You should first create an C<index> page by clicking the "Add Item"
-#pod button to create a new page and giving the page a C<path> of C<index>.
+#pod button to create a new page and giving the page a C<slug> of C<index>.
 #pod
 #pod =for html <img style="max-width: 100%" src="https://raw.githubusercontent.com/preaction/Yancy-Backend-Static/master/eg/public/editor-2.png">
 #pod
@@ -205,9 +205,9 @@ sub new {
 sub create {
     my ( $self, $schema, $params ) = @_;
 
-    my $path = $self->path->child( $self->_id_to_path( $params->{path} ) );
+    my $path = $self->path->child( $self->_id_to_path( $params->{slug} ) );
     $self->_write_file( $path, $params );
-    return $params->{path};
+    return $params->{slug};
 }
 
 sub get {
@@ -233,7 +233,7 @@ sub get {
         warn sprintf 'Could not load file %s: %s', $path, $@;
         return undef;
     }
-    $item->{path} = $self->_path_to_id( $path->to_rel( $self->path ) );
+    $item->{slug} = $self->_path_to_id( $path->to_rel( $self->path ) );
     $self->_normalize_item( $schema, $item );
     return $item;
 }
@@ -263,14 +263,14 @@ sub list {
             warn sprintf 'Could not load file %s: %s', $path, $@;
             next;
         }
-        $item->{path} = $self->_path_to_id( $path->to_rel( $self->path ) );
+        $item->{slug} = $self->_path_to_id( $path->to_rel( $self->path ) );
         $self->_normalize_item( $schema, $item );
         next unless match( $params, $item );
         push @items, $item;
         $total++;
     }
 
-    $opt->{order_by} //= 'path';
+    $opt->{order_by} //= 'slug';
     my $ordered_items = order_by( $opt->{order_by}, \@items );
 
     my $start = $opt->{offset} // 0;
@@ -295,8 +295,8 @@ sub set {
         %$params,
     );
 
-    if ( $params->{path} ) {
-      my $new_path = $self->path->child( $self->_id_to_path( $params->{path} ) );
+    if ( $params->{slug} ) {
+      my $new_path = $self->path->child( $self->_id_to_path( $params->{slug} ) );
       if ( -f $path and $new_path ne $path ) {
          $path->remove;
       }
@@ -316,12 +316,12 @@ sub read_schema {
     my %page_schema = (
         type => 'object',
         title => 'Pages',
-        required => [qw( path markdown )],
-        'x-id-field' => 'path',
-        'x-view-item-url' => '/{path}',
-        'x-list-columns' => [ 'title', 'path' ],
+        required => [qw( slug markdown )],
+        'x-id-field' => 'slug',
+        'x-view-item-url' => '/{slug}',
+        'x-list-columns' => [ 'title', 'slug' ],
         properties => {
-            path => {
+            slug => {
                 type => 'string',
                 'x-order' => 2,
             },
@@ -468,7 +468,7 @@ sub _deparse_content {
         my $v = $item->{ $_ };
           JSON::PP::is_bool($v) ? $v ? 'true' : 'false' : $v
         }}
-        grep { !/^(?:markdown|html|path)$/ }
+        grep { !/^(?:markdown|html|slug)$/ }
         keys %$item;
     return ( %data ? YAML::Dump( \%data ) . "---\n" : "") . ( $item->{markdown} // "" );
 }
@@ -485,7 +485,7 @@ Yancy::Backend::Static - Build a Yancy site from static Markdown files
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -494,11 +494,11 @@ version 0.013
         backend => 'static:.',
         read_schema => 1,
     };
-    get '/*path', {
+    get '/*slug', {
         controller => 'yancy',
         action => 'get',
         schema => 'pages',
-        path => 'index', # Default to index page
+        slug => 'index', # Default to index page
         template => 'default', # default.html.ep below
     };
     app->start;
@@ -542,13 +542,13 @@ create a file called C<myapp.pl> with the following contents:
         backend => 'static:.',
         read_schema => 1,
     };
-    get '/*path', {
+    get '/*slug', {
         controller => 'yancy',
         action => 'get',
         schema => 'pages',
         template => 'default',
         layout => 'default',
-        path => 'index',
+        slug => 'index',
     };
     app->start;
     __DATA__
@@ -583,7 +583,7 @@ L<Yancy> editor.
 =for html <img style="max-width: 100%" src="https://raw.githubusercontent.com/preaction/Yancy-Backend-Static/master/eg/public/editor-1.png">
 
 You should first create an C<index> page by clicking the "Add Item"
-button to create a new page and giving the page a C<path> of C<index>.
+button to create a new page and giving the page a C<slug> of C<index>.
 
 =for html <img style="max-width: 100%" src="https://raw.githubusercontent.com/preaction/Yancy-Backend-Static/master/eg/public/editor-2.png">
 

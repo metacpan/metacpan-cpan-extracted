@@ -3,6 +3,8 @@ use 5.010;
 use strict;
 use warnings;
 
+use parent 'RxPerl::Base';
+
 use RxPerl ':all';
 
 use Mojo::IOLoop;
@@ -12,7 +14,9 @@ use Exporter 'import';
 our @EXPORT_OK = @RxPerl::EXPORT_OK;
 our %EXPORT_TAGS = %RxPerl::EXPORT_TAGS;
 
-our $VERSION = "v6.0.1";
+our $VERSION = "v6.6.0";
+
+our $promise_class = 'Mojo::Promise';
 
 foreach my $func_name (@EXPORT_OK) {
     set_subname __PACKAGE__."::$func_name", \&{$func_name};
@@ -53,8 +57,6 @@ sub _cancel_interval {
 
     Mojo::IOLoop->remove($id);
 }
-
-1;
 
 
 
@@ -98,6 +100,10 @@ or app that uses Mojo::IOLoop.
 
 The documentation at L<RxPerl> applies to this module too.
 
+=head1 NOTIFICATIONS FOR NEW RELEASES
+
+You can start receiving emails for new releases of this, or other, modules, over at L<https://perlmodules.net>.
+
 =head1 LICENSE
 
 Copyright (C) Karelcom OÜ.
@@ -107,6 +113,6 @@ it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-KARJALA E<lt>karjala@cpan.orgE<gt>
+Alexander Karelas E<lt>karjala@cpan.orgE<gt>
 
 =cut

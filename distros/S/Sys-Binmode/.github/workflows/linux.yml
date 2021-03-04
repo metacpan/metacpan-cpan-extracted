@@ -33,7 +33,7 @@ jobs:
           - '5.20'
           - '5.18'
           - '5.16'
-#          - '5.14'
+          - '5.14'
 #          - '5.12'
 #          - '5.10'
 #          - '5.8'
@@ -51,5 +51,16 @@ jobs:
         run: perl Makefile.PL
       - name: make
         run: make
-      - name: Run Tests
-        run: make test
+      - name: Run Tests (no coverage)
+        if: matrix.perl-version != '5.32'
+        run: prove -wlvmb t
+      - name: Install Linux::Seccomp
+        if: matrix.perl-version == '5.32'
+        run: cpanm --notest Linux::Seccomp
+      - name: Run tests (with coverage)
+        if: matrix.perl-version == '5.32'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cpanm --notest Devel::Cover::Report::Coveralls
+          `perl -MConfig -E'print $Config::Config{"sitebin"}'`/cover -test -report Coveralls

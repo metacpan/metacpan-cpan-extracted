@@ -2,6 +2,15 @@
 ##
 ## Change log for perl distribution DTA::CAB
 
+v1.115 Thu, 04 Mar 2021 14:06:40 +0100 moocow
+	* Morph::Helsinki::DE updated tag-extraction heuristics (use original FST label conventions <+NN>, <+V> etc.)
+	* added Morph::SMOR (just an alias for Morph::Helsinki::DE), Morph::TAGH (just an alias for Morph)
+
+v1.114 Mon, 01 Mar 2021 15:45:44 +0100 moocow
+	* added DTA::CAB::Chain::DE_free
+	  - for use with (modified) Helsinki hfst-german FST from https://sourceforge.net/projects/hfst/files/resources/morphological-transducers
+	* refactored DTA::CAB::Morph::Helsinki -> DTA::CAB::Morph::Helsinki::EN + DTA::CAB::Morph::Helsinki::DE
+
 v1.113 Thu, 16 Jul 2020 15:42:53 +0200 moocow
 	* added first-stab at DTA::CAB::Format:CONLLU conforming to https://universaldependencies.org/format.html
 	  - optional special handling for some 'MISC' fields, including "json=JSON" for embedded TJ-format

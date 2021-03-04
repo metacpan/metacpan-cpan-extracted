@@ -41,6 +41,8 @@ utf8::upgrade($addr);
 {
     use Sys::Binmode;
 
+    # NB: This hangs on Cygwin, assumedly because it’s using an IP socket
+    # under the hood rather than a real local socket.
     ok(
         connect($c, $addr),
         'connect with upgraded string',

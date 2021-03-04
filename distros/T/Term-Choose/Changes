@@ -1,6 +1,13 @@
 Revision history for Term::Choose
 
 
+1.720   2021-03-04
+    - Filter choices.
+    - Bugfix in list_idx2rc.
+    - Win32: fixed mouse mode.
+    - Code refactoring.
+    - Update documentation.
+
 1.713   2021-01-01
     - Add bugracker info to the Makefile.PL.
     - Update year copyright.

@@ -35,14 +35,11 @@ has 'message' => (
 
   sub _build_message { "Error" }
 
- 
 use overload(
   q{""}    => 'as_string',
   bool     => sub () { 1 },
   fallback => 1,
 );
- 
- 
   
 sub BUILD { shift->trace }
  

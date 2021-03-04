@@ -1,3 +1,6 @@
+v1.0.3  2021-03-04
+    - Updated the public suffix list to the current version
+
 v1.0.2    2020-12-10
     - Updated the public suffix list to the current version
     - Document a commonly used alternative CPAN module

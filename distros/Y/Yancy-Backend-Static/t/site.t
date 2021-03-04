@@ -25,7 +25,7 @@ $t->app->plugin( Yancy => {
 $t->app->routes->get( '/not-a-draft' )->to(
     'yancy#get',
     schema => 'pages',
-    path => 'not-a-draft',
+    slug => 'not-a-draft',
     template => 'is-draft',
     layout => 'default',
 );
@@ -35,10 +35,10 @@ $t->get_ok( '/not-a-draft.html' )
     ->content_type_like( qr{^text/html} )
     ->content_like( qr{Not a draft} );
 
-$t->app->routes->get( '/*path' )->to(
+$t->app->routes->get( '/*slug' )->to(
     'yancy#get',
     schema => 'pages',
-    path => 'index',
+    slug => 'index',
     template => 'page',
     layout => 'default',
 );
@@ -87,7 +87,7 @@ $t->get_ok( '/style.css', 'static file not handled' )
 
 my @items = $t->app->yancy->list( 'pages' );
 is_deeply
-    [ sort map { $_->{path} } @items ],
+    [ sort map { $_->{slug} } @items ],
     [
         'about/index', 'empty', 'index', 'not-a-draft'
     ],

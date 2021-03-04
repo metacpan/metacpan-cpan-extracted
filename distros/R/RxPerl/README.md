@@ -298,8 +298,8 @@ Pipeable operators (also referred to as "operators") are passed as arguments to 
 observables. Their function is to take an observable, transform it somehow, then (similar to piped shell commands) pass
 the result of the transformation to the next pipeable operator in the pipe, or return it to the user.
 
-The following list is the currently implemented operators, with links to relevant rxjs documentation (which should apply to RxPerl
-too).
+The following list is the currently implemented operators, with links to relevant rxjs documentation (which should
+apply to RxPerl too).
 
 - op\_audit\_time
 
@@ -697,6 +697,35 @@ too).
             op_with_latest_from(rx_interval(0.7)),
         )->subscribe($observer);
 
+## PROMISE FUNCTIONS
+
+These functions return a promise, and require the exitence of a user-selectable promise library.
+They are borrowed from rxjs 7, and remain EXPERIMENTAL until rxjs 7 is finalized.
+
+- first\_value\_from
+
+    Accepts an observable and returns a promise that resolves with the observable's first emitted value
+    as soon as it gets emitted. If no value is emitted before the observable's completion, the promise
+    is rejected.
+
+        use RxPerl::IOAsync ':all';
+        RxPerl::IOAsync->set_promise_class('Promise::ES6'); # not required for RxPerl::Mojo
+
+        my $o = ...; # an observable
+        first_value_from($o)->then( ... );
+
+- last\_value\_from
+
+    Accepts an observable and returns a promise that resolves with the observable's last emitted value
+    as soon as the observable completes. If no value is emitted before the observable's completion, the
+    promise is rejected.
+
+        use RxPerl::IOAsync ':all';
+        RxPerl::IOAsync->set_promise_class('Promise::ES6'); # not required for RxPerl::Mojo
+
+        my $o = ...; # an observable
+        last_value_from($o)->then( ... );
+
 # OBSERVABLE METHODS
 
 - subscribe
@@ -794,7 +823,7 @@ ReactiveX to cater for web developers already familiar with rxjs.
 
 - [Ryu](https://metacpan.org/pod/Ryu)
 
-# NOTIFICATIONS FOR NEW VERSIONS
+# NOTIFICATIONS FOR NEW RELEASES
 
 You can start receiving emails for new releases of this module, at [https://perlmodules.net](https://perlmodules.net).
 
@@ -807,4 +836,4 @@ it under the same terms as Perl itself.
 
 # AUTHOR
 
-KARJALA <karjala@cpan.org>
+Alexander Karelas <karjala@cpan.org>

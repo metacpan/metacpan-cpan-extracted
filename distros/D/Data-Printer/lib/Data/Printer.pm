@@ -5,7 +5,7 @@ use Data::Printer::Object;
 use Data::Printer::Common;
 use Data::Printer::Config;
 
-our $VERSION = '1.000003';
+our $VERSION = '1.000004';
 $VERSION = eval $VERSION;
 
 my $rc_arguments;
@@ -1033,8 +1033,9 @@ Sébastien Feugère (smonff), Sergey Aleynikov (randir), Slaven Rezić,
 Stanislaw Pusep (syp), Stephen Thirlwall (sdt), sugyan, Tai Paul,
 Tatsuhiko Miyagawa (miyagawa), Thomas Sibley (tsibley),
 Tim Heaney (oylenshpeegul), Toby Inkster (tobyink), Torsten Raudssus (Getty),
-Tokuhiro Matsuno (tokuhirom), trapd00r, Tsai Chung-Kuan, vividsnow,
-Wesley Dal`Col (blabos), y, Yanick Champoux (yanick).
+Tokuhiro Matsuno (tokuhirom), trapd00r, Tsai Chung-Kuan,
+Veesh Goldman (rabbiveesh), vividsnow, Wesley Dal`Col (blabos), y,
+Yanick Champoux (yanick).
 
 If I missed your name, please drop me a line!
 

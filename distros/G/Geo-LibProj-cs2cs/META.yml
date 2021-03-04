@@ -20,7 +20,7 @@ no_index: {}
 provides:
   Geo::LibProj::cs2cs:
     file: lib/Geo/LibProj/cs2cs.pm
-    version: '1.02'
+    version: '1.03'
 recommends:
   Alien::proj: '1.06'
   Geo::LibProj::FFI: '0'
@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/johannessen/cs2cs-perl/issues
   repository: https://github.com/johannessen/cs2cs-perl.git
-version: '1.02'
+version: '1.03'
 x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

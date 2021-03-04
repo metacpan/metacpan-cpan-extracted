@@ -7,6 +7,7 @@ use Test::More;
 use Test::FailWarnings;
 
 use File::Temp;
+use Errno;
 
 my $dir = File::Temp::tempdir( CLEANUP => 1 );
 
@@ -35,6 +36,25 @@ utf8::encode($e_dblenc);
     my $got = do { local $/; <$rfh> };
 
     is($got, $e_down, 'upgraded sent to exec as expected');
+}
+
+# Here to bump up coverage:
+{
+    my $dir = File::Temp::tempdir( CLEANUP => 1 );
+
+    open my $wfh, '>', "$dir/$e_dblenc";
+
+    use Sys::Binmode;
+
+    # We want this exec to fail, so ignore Perl’s warning about it:
+    no warnings 'exec';
+
+    if ( exec { "$dir/$e_up" } "$dir/$e_up" ) {
+        fail 'exec should fail here!';
+    }
+    else {
+        is( 0 + $!, Errno::ENOENT, 'exec looks for the right file' );
+    }
 }
 
 die 'downgraded??' if !utf8::is_utf8($e_up);

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014;
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -14,14 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Yancy-Backend-Static",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Yancy::Backend::Static",
   "PREREQ_PM" => {
     "I18N::Langinfo" => 0,
     "JSON::PP" => 0,
     "Text::Markdown" => 0,
     "YAML" => 0,
-    "Yancy" => "1.057"
+    "Yancy" => "1.069"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Mojo" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +49,7 @@ my %FallbackPrereqs = (
   "Test::More" => "1.001005",
   "Text::Markdown" => 0,
   "YAML" => 0,
-  "Yancy" => "1.057"
+  "Yancy" => "1.069"
 );
 
 

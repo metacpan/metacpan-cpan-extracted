@@ -203,7 +203,8 @@ my $configure_emailserver=sub {
          ' libcurl libcurl-devel libicu libicu-devel re2c'.
          ' libpng-devel.x86_64 freetype-devel.x86_64 expat-devel'.
          ' oniguruma oniguruma-devel tcl tcl-devel git-all'.
-         ' lzip libffi-devel libc-client-devel texinfo cmake',
+         ' lzip libffi-devel libc-client-devel texinfo cmake'.
+         ' systemd-devel',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y update','__display__');
@@ -452,6 +453,12 @@ if ($do==1) {
          && $error!~/already exists/;
       $c='aws ec2 authorize-security-group-ingress '.
          '--group-name EmailServerSecurityGroup --protocol '.
+         'tcp --port 6379 --cidr '.$cidr." 2>&1";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      Net::FullAuto::FA_Core::handle_error($error) if $error
+         && $error!~/already exists/;
+      $c='aws ec2 authorize-security-group-ingress '.
+         '--group-name EmailServerSecurityGroup --protocol '.
          'tcp --port 11332 --cidr '.$cidr." 2>&1";
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
@@ -488,6 +495,9 @@ if ($do==1) {
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'firewall-cmd --zone=public --permanent --add-port=443/tcp',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'firewall-cmd --zone=public --permanent --add-port=6379/tcp',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'firewall-cmd --zone=public --permanent --add-port=11332/tcp',
@@ -1161,6 +1171,8 @@ END
          "$nginx_path/nginx/nginx.conf");
       ($stdout,$stderr)=$handle->cmd($sudo.'service nginx start',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'service nginx status -l',
+         '__display__');
       ($stdout,$stderr)=$handle->cwd("$nginx_path/nginx");
       test_for_amazon_ec2();
       if ($main::amazon) {
@@ -1306,6 +1318,8 @@ if ($do==1) {
 }
       ($stdout,$stderr)=$handle->cmd($sudo."service nginx restart",
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo."service nginx status -l",
+         '__display__');
    }
 }
 
@@ -1368,7 +1382,7 @@ END
          'mysql --version','__display__');
       $mysql_version=~s/^mysql\s+Ver\s+(.*?)\s+Distrib.*$/$1/;
       ($mysql_status,$stderr)=$handle->cmd($sudo.
-         'service mysql status','__display__');
+         'service mysql status -l','__display__');
    }
    if ($mysql_version<15.1 || $mysql_status!~/SUCCESS/) {
       # https://docs.couchbase.com/server/6.0/install/thp-disable.html
@@ -1434,6 +1448,8 @@ END
             '__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             'service disable-thp start','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'service disable-thp status -l','__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             'sudo chkconfig disable-thp on','__display__');
       }
@@ -1614,6 +1630,8 @@ END
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service mysql start','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service mysql status -l','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'chmod 711 /var/lib/mysql/mysql','__display__');
       print "MYSQL START STDOUT=$stdout and STDERR=$stderr<==\n";sleep 5;
@@ -2064,6 +2082,8 @@ END
          'chkconfig --levels 235 php-fpm on');
       ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm start',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm status -l',
+         '__display__');
       $prompt=$handle->prompt();
       ($stdout,$stderr)=$handle->cwd('/opt/source');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2097,6 +2117,8 @@ END
          'bash -c "echo extension=mailparse.so > '.
          '/usr/local/php'.$vn.'/etc/conf.d/mailparse.ini"');
       ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm start',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm status -l',
          '__display__');
    } elsif (-e '/opt/cpanel/ea-php70') {
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -2340,13 +2362,11 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'groupadd -g 4099 dovecot');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 4099 -r -g dovecot -s /usr/bin/nologin -d '.
-      '/home/dovecot -m dovecot');
+      'useradd -u 4099 -r -g dovecot -s /usr/bin/nologin dovecot');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'groupadd -g 5000 vmail');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 5000 -r -g vmail -s /usr/bin/nologin -d '.
-      '/home/vmail -m vmail');
+      'useradd -u 5000 -r -g vmail -s /usr/bin/nologin vmail');
    #($stdout,$stderr)=$handle->cmd($sudo.
    #   'openssl req -new -outform PEM -out /etc/postfix/smtpd.cert '.
    #   '-newkey rsa:2048 -nodes -keyout /etc/postfix/smtpd.key '.
@@ -2583,12 +2603,7 @@ END
       "sudo mkdir -vp /var/mail/vhosts/$domain_url",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'groupadd -g 5000 vmail','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -g vmail -u 5000 vmail -d /var/mail/',
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'chown -R vmail:vmail /var/mail/','__display__');
+      'chown -Rv vmail:vmail /var/mail/','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v conf.d/10-auth.conf /usr/local/etc/dovecot/conf.d",
       '__display__');
@@ -2755,7 +2770,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
        'systemctl restart dovecot');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       '/usr/local/sbin/dovecot service status',
+       '/usr/local/sbin/dovecot service status -l',
        '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_roundcube=<<'END';
@@ -2830,14 +2845,6 @@ END
       "cp -Rv $gtarfile/* /var/www/html/roundcube",
       '__display__');
 
-   ##     ## ##    ## ########   #######  ##     ## ##    ## ########
-   ##     ## ###   ## ##     ## ##     ## ##     ## ###   ## ##     ##
-   ##     ## ####  ## ##     ## ##     ## ##     ## ####  ## ##     ##
-   ##     ## ## ## ## ########  ##     ## ##     ## ## ## ## ##     ##
-   ##     ## ##  #### ##     ## ##     ## ##     ## ##  #### ##     ##
-   ##     ## ##   ### ##     ## ##     ## ##     ## ##   ### ##     ##
-    #######  ##    ## ########   #######   #######  ##    ## ########
-
    my $install_redis=<<'END';
 
 
@@ -2851,13 +2858,13 @@ END
           ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-                                       ###    ###
-                   ######    ####      ###          ####
-                   ####### ###  ##  ######    ###  ### ##
-                   ###  ## ### ### #######    ###   ###
-                   ###     ###     ##  ###    ###    ###
-                   ###     ####### #######    ###  ## ###
-                   ###       ####   ######   ####   ####
+                                        ###  ###
+                    ######    ####      ###       ####
+                    ####### ###  ##  ######  ### ### ##
+                    ###  ## ### ### #######  ###  ###
+                    ###     ###     ##  ###  ###   ###
+                    ###     ####### #######  ### ## ###
+                    ###       ####   ###### ####  ####
 
 
           (redis is **NOT** a sponsor of the FullAuto© Project.)
@@ -2879,9 +2886,132 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "git status",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "make BUILD_TLS=yes",'__display__');
+      "make BUILD_TLS=yes USE_SYSTEMD=yes",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "make install",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i '/information/avm.overcommit_memory = 1' /etc/sysctl.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sysctl vm.overcommit_memory=1');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "sed -i '/overcommit/anet.core.somaxconn=65535' /etc/sysctl.conf");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sysctl net.core.somaxconn=65535');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'groupadd -g 5001 redis');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'useradd -u 5001 -r -g redis -s /usr/bin/nologin '.
+      'redis');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /usr/local/var/lib/redis','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v redis:redis /usr/local/var/lib/redis','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /usr/local/var/log/redis','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v redis:redis /usr/local/var/log/redis','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /usr/local/var/run/redis','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v redis:redis /usr/local/var/run/redis','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /usr/local/etc/redis','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v redis:redis /usr/local/etc/redis','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v redis.conf /usr/local/etc/redis','__display__');
+   #
+   # echo-ing/streaming files over ssh can be tricky. Use echo -e
+   #          and replace these characters with thier HEX
+   #          equivalents (use an external editor for quick
+   #          search and replace - and paste back results.
+   #          use copy/paste or cat file and copy/paste results.):
+   #
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
+   #          "  -   \\x22     \  -  \\x5C
+   #          $  -   \\x24     %  -  \\x25
+   #
+   # https://www.lisenet.com/2014/ - bash approach to conversion
+
+   my $redis_service=<<'END';
+# example systemd service unit file for redis-server
+#
+# In order to use this as a template for providing a redis service in your
+# environment, _at the very least_ make sure to adapt the redis configuration
+# file you intend to use as needed (make sure to set \\x22supervised systemd\\x22), and
+# to set sane TimeoutStartSec and TimeoutStopSec property values in the unit's
+# \\x22[Service]\\x22 section to fit your needs.
+#
+# Some properties, such as User= and Group=, are highly desirable for virtually
+# all deployments of redis, but cannot be provided in a manner that fits all
+# expectable environments. Some of these properties have been commented out in
+# this example service unit file, but you are highly encouraged to set them to
+# fit your needs.
+#
+# Please refer to systemd.unit(5), systemd.service(5), and systemd.exec(5) for
+# more information.
+
+[Unit]
+Description=Redis data structure server
+Wants=network-online.target
+After=network-online.target
+Documentation=http://redis.io/documentation, man:redis-server(1)
+
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/redis-server /usr/local/etc/redis/redis.conf --supervised systemd --daemonize no
+ExecStop=/bin/kill -s TERM \\x24MAINPID
+PIDFile=/usr/local/var/run/redis/redis.pid
+Restart=always
+User=redis
+Group=redis
+RuntimeDirectory=redis
+RuntimeDirectoryMode=2755
+TimeoutStopSec=90
+TimeoutStartSec=90
+UMask=0077
+PrivateTmp=yes
+NoNewPrivileges=yes
+LimitNOFILE=65535
+PrivateDevices=yes
+ProtectHome=yes
+ReadOnlyDirectories=/
+WorkingDirectory=/usr/local/var/lib/redis
+ReadWriteDirectories=-/usr/local/var/lib/redis
+ReadWriteDirectories=-/usr/local/var/log/redis
+ReadWriteDirectories=-/usr/local/var/run/redis
+
+NoNewPrivileges=true
+CapabilityBoundingSet=CAP_SETGID CAP_SETUID CAP_SYS_RESOURCE
+
+#MemoryDenyWriteExecute=true
+#ProtectKernelModules=true
+#ProtectKernelTunables=true
+#ProtectControlGroups=true
+#RestrictRealtime=true
+#RestrictNamespaces=true
+
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+ProtectSystem=true
+ReadWriteDirectories=-/usr/local/etc/redis
+
+[Install]
+WantedBy=multi-user.target
+Alias=redis.service
+END
+   ($stdout,$stderr)=$handle->cmd("echo -e \"$redis_service\" > ".
+      "~/redis.service");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv -fv ~/redis.service /etc/systemd/system',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl daemon-reload');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service redis start','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service redis status -l','__display__');
+
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_unbound=<<'END';
 
@@ -2934,9 +3064,9 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       '../configure','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'make','__display__');
+      'make','3600','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','3600','__display__');
+      'make install','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v ./contrib/unbound.service /etc/systemd/system',
       '__display__');
@@ -2946,10 +3076,10 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl daemon-reload');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'groupadd -g 5001 unbound');
+      'groupadd -g 5002 unbound');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'useradd -u 5001 -r -g unbound -s /usr/bin/nologin -d '.
-      '/home/unbound -m unbound');
+      'useradd -u 5002 -r -g unbound -s /usr/bin/nologin '.
+      'unbound');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i \'s/^nameserver.*/nameserver 127.0.0.1/\' '.
       '/etc/resolv.conf');
@@ -3101,6 +3231,8 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i \'/include/a\/usr\/local\/lib64\' /etc/ld.so.conf');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'ldconfig -v','__display__');
    $ad='bind_socket = "127.0.0.1:11333";';
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -3132,7 +3264,31 @@ END
       'mv -fv ~/milter_headers.conf /usr/local/etc/rspamd',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'systemctl restart rspamd');
+      'cp -v ../rspamd.service /etc/systemd/system','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i \'s#/usr/bin#/usr/local/bin#\' '.
+      '/etc/systemd/system/rspamd.service');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i \'s#/etc#/usr/local/etc#\' '.
+      '/etc/systemd/system/rspamd.service');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'groupadd -g 5003 _rspamd');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'useradd -u 5003 -r -g _rspamd -s /usr/bin/nologin _rspamd');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /var/log/rspamd','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v _rspamd:_rspamd /var/log/rspamd','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /var/lib/rspamd','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v _rspamd:_rspamd /var/lib/rspamd','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'systemctl enable rspamd');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service rspamd restart');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'service rspamd status -l','__display__');
 
 #cleanup;
 

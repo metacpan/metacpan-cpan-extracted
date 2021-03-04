@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.713';
+our $VERSION = '1.720';
 
 use Exporter qw( import );
 
@@ -69,7 +69,7 @@ sub print_columns {
 
 
 sub cut_to_printwidth {
-    my ( $str, $avail_w, $return_rest ) = @_;
+    my ( $str, $avail_w, $return_rest ) = @_;   # return_remainder
     my $count = 0;
     my $total = 0;
     for my $i ( 0 .. ( length( $str ) - 1 ) ) {

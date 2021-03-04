@@ -5,8 +5,10 @@ META.json
 README.md
 cpanfile
 lib/RxPerl.pm
+lib/RxPerl/Base.pm
 lib/RxPerl/BehaviorSubject.pm
 lib/RxPerl/ConnectableObservable.pm
+lib/RxPerl/Functions.pm
 lib/RxPerl/Observable.pm
 lib/RxPerl/Operators/Creation.pm
 lib/RxPerl/Operators/Pipeable.pm
@@ -19,6 +21,7 @@ lib/RxPerl/Test.pm
 lib/RxPerl/Utils.pm
 minil.toml
 t/marble.t
+t/promises.t
 t/simple.t
 t/subject_order.t
 META.yml

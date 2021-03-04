@@ -2,8 +2,8 @@ requires "I18N::Langinfo" => "0";
 requires "JSON::PP" => "0";
 requires "Text::Markdown" => "0";
 requires "YAML" => "0";
-requires "Yancy" => "1.057";
-requires "perl" => "5.014";
+requires "Yancy" => "1.069";
+requires "perl" => "5.016";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";

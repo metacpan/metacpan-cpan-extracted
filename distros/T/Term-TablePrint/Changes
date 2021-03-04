@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.130   2021-03-04
+        - Option to filter table rows.
+
 0.124   2021-01-01
         - Add bugracker info to the Makefile.PL.
         - Update year copyright.

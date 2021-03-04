@@ -1,6 +1,6 @@
 package Valiant;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 $VERSION = eval $VERSION;
 
 1;
@@ -801,8 +801,9 @@ we will attempt to resolve it to a translated string (see L<Valiant::I18N>).
 =head2 strict
 
 When true instead of adding a message to the errors list, will throw exception with the
-error instead.  If the true value is the name of a class that provides a C<throw>
-message, will use that instead.
+error instead.  If the true value is a string (basically anything other than a 1) we use the
+string given as the message.  If the true value is the name of a class that provides a C<throw>
+message, will use that instead.  Lastly if the value is a coderef we call that.
 
 =head2 on
 

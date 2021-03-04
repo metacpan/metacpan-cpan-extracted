@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.713';
+our $VERSION = '1.720';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -64,6 +64,7 @@ sub _defaults {
         color               => 0,
         #default            => undef,
         empty               => '<empty>',
+        f3                  => 1,
         #footer             => undef,
         hide_cursor         => 1,
         include_highlighted => 0,
@@ -102,6 +103,7 @@ sub _valid_options {
         page                => '[ 0 1 ]',
         alignment           => '[ 0 1 2 ]',
         color               => '[ 0 1 2 ]',
+        f3                  => '[ 0 1 2 ]',
         include_highlighted => '[ 0 1 2 ]',
         layout              => '[ 0 1 2 3 ]',
         keep                => '[ 1-9 ][ 0-9 ]*',
@@ -186,11 +188,11 @@ sub __init_term {
 
 
 sub __reset_term {
-    my ( $self, $from_choose ) = @_;
+    my ( $self, $clear_choose ) = @_;
     if ( defined $self->{plugin} ) {
-        $self->{plugin}->__reset_mode();
+        $self->{plugin}->__reset_mode( { mouse => $self->{mouse}, hide_cursor => $self->{hide_cursor} } );
     }
-    if ( $from_choose ) {
+    if ( $clear_choose ) {
         my $up = $self->{i_row} + $self->{count_prompt_lines};
         print up( $up ) if $up;
         print "\r" . clear_to_end_of_screen();
@@ -277,7 +279,7 @@ sub __choose {
     };
     $self->__init_term();
     ( $self->{term_width}, $self->{term_height} ) = get_term_size();
-    $self->__write_first_screen();
+    $self->__wr_first_screen();
     my $fast_page = 10;
     if ( $self->{pp_count} > 10_000 ) {
         $fast_page = 20;
@@ -305,7 +307,7 @@ sub __choose {
             my $up = $self->{i_row} + $self->{count_prompt_lines};
             print up( $up ) if $up;
             print "\r" . clear_to_end_of_screen();
-            $self->__write_first_screen();
+            $self->__wr_first_screen();
             next GET_KEY;
         }
         next GET_KEY if $key == NEXT_get_key;
@@ -327,7 +329,7 @@ sub __choose {
         if ( $saved_pos && $key != VK_PAGE_UP && $key != CONTROL_B && $key != VK_PAGE_DOWN && $key != CONTROL_F ) {
             $saved_pos = undef;
         }
-        # $self->{rc2idx} holds the new list (AoA) formatted in "__list_idx_to_rowcol" appropriate to the chosen layout.
+        # $self->{rc2idx} holds the new list (AoA) formatted in "__list_idx2rc" appropriate to the chosen layout.
         # $self->{rc2idx} does not hold the values directly but the respective list indexes from the original list.
         # If the original list would be ( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ) and the new formatted list should be
         #     a d g
@@ -556,6 +558,10 @@ sub __choose {
             exit 1;
         }
         elsif ( $key == LINE_FEED || $key == CARRIAGE_RETURN ) { # ENTER key
+            if ( $self->{search} ) {
+                $self->__search_end();
+                next GET_KEY;
+            }
             my $index = $self->{index} || $self->{ll};
             if ( ! defined $self->{wantarray} ) {
                 $self->__reset_term( 1 );
@@ -609,6 +615,9 @@ sub __choose {
                     $self->__wr_cell( $self->{pos}[ROW], $self->{pos}[COL] );
                 }
             }
+            else {
+                $self->__beep();
+            }
         }
         elsif ( $key == CONTROL_SPACE ) {
             if ( $self->{wantarray} ) {
@@ -629,11 +638,22 @@ sub __choose {
                 $self->__beep();
             }
         }
+        elsif ( $key == VK_F3 && $self->{f3} ) {
+            if ( $self->{ll} ) {
+                $self->__reset_term( 0 );
+                return -13;
+            }
+            if ( $self->{search} ) {
+                $self->__search_end();
+            }
+            $self->__search_begin();
+        }
         else {
             $self->__beep();
         }
     }
 }
+
 
 sub __beep {
     my ( $self, $beep ) = @_;
@@ -722,35 +742,11 @@ sub __set_default_cell {
 }
 
 
-sub __write_first_screen {
+sub __wr_first_screen {
     my ( $self ) = @_;
-    ( $self->{avail_width}, $self->{avail_height} ) = ( $self->{term_width}, $self->{term_height} );
-    if ( $self->{col_width} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
-        $self->{avail_width} += WIDTH_CURSOR;
-        # + WIDTH_CURSOR: use also the last terminal column if there is only one print-column;
-        #                 with only one print-column the output doesn't get messed up if an item
-        #                 reaches the right edge of the terminal on a non-MSWin32-OS
-    }
-    #if ( $self->{ll} && $self->{ll} > $self->{avail_width} ) {
-    #    return -2;
-    #}
-    if ( $self->{max_width} && $self->{avail_width} > $self->{max_width} ) {
-        $self->{avail_width} = $self->{max_width};
-    }
-    if ( $self->{avail_width} < 1 ) {
-        $self->{avail_width} = 1;
-    }
-    $self->__prepare_promptline();
-    $self->{pp_row} = $self->{page} || $self->{footer} ? 1 : 0;
-    $self->{avail_height} -= $self->{count_prompt_lines} + $self->{pp_row};
-    if ( $self->{avail_height} < $self->{keep} ) {
-        $self->{avail_height} = $self->{term_height} >= $self->{keep} ? $self->{keep} : $self->{term_height};
-    }
-    if ( $self->{max_height} && $self->{max_height} < $self->{avail_height} ) {
-        $self->{avail_height} = $self->{max_height};
-    }
+    $self->__avail_screen_size();
     $self->__current_layout();
-    $self->__list_idx_to_rowcol();
+    $self->__list_idx2rc();
     if ( $self->{page} ) {
         $self->__prepare_page_number();
     }
@@ -951,6 +947,36 @@ sub __goto {
 }
 
 
+sub __avail_screen_size {
+    my ( $self ) = @_;
+    ( $self->{avail_width}, $self->{avail_height} ) = ( $self->{term_width}, $self->{term_height} );
+    if ( $self->{col_width} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+        $self->{avail_width} += WIDTH_CURSOR;
+        # + WIDTH_CURSOR: use also the last terminal column if there is only one print-column;
+        #                 with only one print-column the output doesn't get messed up if an item
+        #                 reaches the right edge of the terminal on a non-MSWin32-OS
+    }
+    #if ( $self->{ll} && $self->{ll} > $self->{avail_width} ) {
+    #    return -2;
+    #}
+    if ( $self->{max_width} && $self->{avail_width} > $self->{max_width} ) {
+        $self->{avail_width} = $self->{max_width};
+    }
+    if ( $self->{avail_width} < 1 ) {
+        $self->{avail_width} = 1;
+    }
+    $self->__prepare_promptline();
+    $self->{pp_row} = $self->{page} || $self->{footer} ? 1 : 0;
+    $self->{avail_height} -= $self->{count_prompt_lines} + $self->{pp_row};
+    if ( $self->{avail_height} < $self->{keep} ) {
+        $self->{avail_height} = $self->{term_height} >= $self->{keep} ? $self->{keep} : $self->{term_height};
+    }
+    if ( $self->{max_height} && $self->{max_height} < $self->{avail_height} ) {
+        $self->{avail_height} = $self->{max_height};
+    }
+}
+
+
 sub __current_layout {
     my ( $self ) = @_;
     my $all_in_first_row;
@@ -980,10 +1006,11 @@ sub __current_layout {
 }
 
 
-sub __list_idx_to_rowcol {
+sub __list_idx2rc {
     my ( $self ) = @_;
     my $layout = $self->{current_layout};
     $self->{rc2idx} = [];
+    $self->{rest} = 0;
     if ( $layout == -1 ) {
         $self->{rc2idx}[0] = [ 0 .. $#{$self->{list}} ];
     }
@@ -1172,6 +1199,105 @@ sub __mouse_info_to_key {
 }
 
 
+sub __user_input {
+    my ( $self, $prompt ) = @_;
+    $self->{plugin}->__reset_mode( { mouse => $self->{mouse}, hide_cursor => $self->{hide_cursor} } );
+    my $string;
+    if ( ! eval {
+        require Term::Form;
+        Term::Form->VERSION(0.530);
+        my $term = Term::Form->new();
+        $string = $term->readline( $prompt, { hide_cursor => 2, clear_screen => 2, color => $self->{color} } );
+        1 }
+    ) {
+        print "\r", clear_to_end_of_line();
+        print show_cursor() if ! $self->{hide_cursor};
+        print $prompt;
+        $string = <STDIN>;
+        print hide_cursor() if ! $self->{hide_cursor};
+        chomp $string;
+    }
+    $self->__init_term();
+    return $string;
+}
+
+
+sub __search_begin {
+    my ( $self ) = @_;
+    $self->{search} = 1;
+    $self->{map_search_list_index} = [];
+    my $search_str = $self->__user_input( '> search-pattern: ' );
+    if ( ! length $search_str ) {
+        $self->__search_end();
+        return;
+    }
+    if ( $self->{f3} == 1 ) {
+        $search_str = '(?i)' . $search_str;
+    }
+    $self->{backup_list} = [ @{$self->{list}} ];
+    my $filtered_list = [];
+    for my $i ( 0 .. $#{$self->{list}} ) {
+        if ( $self->{list}[$i] =~ /$search_str/ ) {
+            push @{$self->{map_search_list_index}}, $i;
+            push @$filtered_list, $self->{list}[$i];
+        }
+    }
+    if ( ! @$filtered_list ) {
+        $filtered_list = [ 'No matches found.' ];
+        $self->{map_search_list_index} = [ 0 ];
+    }
+    $self->{mark} = $self->__marked_rc2idx();
+    $self->{list} = $filtered_list;
+    $self->{backup_length} = [ @{$self->{length}} ];
+    $self->{backup_col_width} = $self->{col_width};
+    $self->__length_list_elements();
+    $self->{default} = 0;
+    for my $opt ( qw(meta_items no_spacebar mark) ) {
+        if ( defined $self->{$opt} ) {
+            $self->{'backup_' . $opt} = [ @{$self->{$opt}} ];
+            my $tmp = [];
+            for my $orig_idx ( @{$self->{$opt}} ) {
+                for my $i ( 0 .. $#{$self->{map_search_list_index}} ) {
+                    if ( $self->{map_search_list_index}[$i] == $orig_idx ) {
+                        push @$tmp, $i;
+                    }
+                }
+            }
+            $self->{$opt} = $tmp;
+        }
+    }
+    my $up = $self->{i_row} + $self->{count_prompt_lines} + 1; # + 1 => readline
+    print up( $up ) if $up;
+    $self->__wr_first_screen();
+}
+
+
+sub __search_end {
+    my ( $self ) = @_;
+    if ( defined $self->{map_search_list_index} && @{$self->{map_search_list_index}} ) {
+        $self->{default} = $self->{map_search_list_index}[$self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]]];
+        $self->{mark} = $self->__marked_rc2idx();
+        my $tmp_mark = [];
+        for my $i ( @{$self->{mark}} ) {
+            push @$tmp_mark, $self->{map_search_list_index}[$i];
+        }
+        my %seen;
+        $self->{mark} = [ grep !$seen{$_}++, @$tmp_mark, defined $self->{backup_mark} ? @{$self->{backup_mark}} : () ];
+    }
+    delete $self->{map_search_list_index};
+    delete $self->{backup_mark};
+    for my $key ( qw(list length col_width meta_items no_spacebar) ) {
+        my $key_backup = 'backup_' . $key;
+        $self->{$key} = $self->{$key_backup} if defined $self->{$key_backup};
+        delete $self->{$key_backup};
+    }
+    $self->{search} = 0;
+    my $up = $self->{i_row} + $self->{count_prompt_lines};
+    print up( $up ) if $up;
+    print "\r" . clear_to_end_of_screen();
+    $self->__wr_first_screen();
+}
+
 
 1;
 
@@ -1188,7 +1314,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.713
+Version 1.720
 
 =cut
 
@@ -1328,6 +1454,11 @@ C<choose> returns C<undef> or an empty list in list context if the C<q> key (or 
 
 If the I<mouse> mode is enabled, an item can be chosen with the left mouse key, in list context the right mouse key can
 be used instead the C<SpaceBar> key.
+
+Pressing the C<F3> allows one to enter a regular expression so that only the items that match the regular expression
+are displayed. When going back to the unfiltered menu (C<Enter>) the item highlighted in the filtered menu keeps the
+highlighting. Also (in I<list context>) marked items retain there markings. The Perl function C<readline> is used to
+read the regular expression if L<Term::Form> is not available. See option I<f3>.
 
 =head2 Keys to move around
 
@@ -1473,6 +1604,18 @@ Sets the string displayed on the screen instead an empty string.
 Add a string in the bottom line.
 
 (default: undefined)
+
+=head3 f3
+
+This option is experimental.
+
+Set the behavior of the C<F3> key.
+
+0 - off
+
+1 - case-insensitive search (default)
+
+2 - case-sensitive search
 
 =head3 hide_cursor
 

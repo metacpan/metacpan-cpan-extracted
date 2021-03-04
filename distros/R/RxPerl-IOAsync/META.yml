@@ -26,17 +26,17 @@ no_index:
 provides:
   RxPerl::IOAsync:
     file: lib/RxPerl/IOAsync.pm
-    version: v6.0.1
+    version: v6.6.0
 requires:
   IO::Async: '0'
-  RxPerl: v6.0.0
+  RxPerl: v6.6.1
   Sub::Util: '1.41'
   perl: '5.010'
 resources:
   bugtracker: https://gitlab.com/karjala/rxperl-ioasync-for-perl/issues
   homepage: https://gitlab.com/karjala/rxperl-ioasync-for-perl
   repository: git://gitlab.com/karjala/rxperl-ioasync-for-perl.git
-version: v6.0.1
+version: v6.6.0
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

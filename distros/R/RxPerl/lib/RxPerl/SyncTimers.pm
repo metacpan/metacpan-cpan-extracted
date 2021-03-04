@@ -3,6 +3,8 @@ package RxPerl::SyncTimers;
 use strict;
 use warnings;
 
+use parent 'RxPerl::Base';
+
 use RxPerl ':all';
 
 use Sub::Util 'set_subname';
@@ -15,6 +17,7 @@ foreach my $func_name (@EXPORT_OK) {
     set_subname __PACKAGE__."::$func_name", \&{$func_name};
 }
 
+our $promise_class;
 our $DEBUG = 0;
 
 my $_id_cursor = 0;

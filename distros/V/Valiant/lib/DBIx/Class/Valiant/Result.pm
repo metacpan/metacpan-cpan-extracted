@@ -19,7 +19,8 @@ use DBIx::Class::Candy::Exports;
 export_methods ['filters', 'validates', 'filters_with', 'validates_with', 'accept_nested_for'];
 
 __PACKAGE__->mk_classdata( _m2m_metadata => {} );
- 
+__PACKAGE__->mk_classdata( auto_validation => 1 );
+
 sub many_to_many {
   my $class = shift;
   my ($meth_name, $link, $far_side) = @_;
@@ -88,9 +89,9 @@ sub insert {
   $args{context} = \@context;
 
   debug 2, "About to run validations for @{[$self]}";
-  $self->validate(%args);
+  $self->validate(%args) if $self->auto_validation;
 
-  if($self->invalid) {
+  if($self->errors->size) {
     debug 2, "Skipping insert for @{[$self]} because its invalid";
     return $self;
   }
@@ -148,9 +149,9 @@ sub update {
   }
 
   debug 2, "About to run validations for @{[$self]}";
-  $self->validate(%validate_args);
+  $self->validate(%validate_args) if $self->auto_validation;
 
-  return $self if $self->invalid;
+  return $self if $self->errors->size;
   foreach my $related(keys %nested) {
     if(my $cb = $nested{$related}->{reject_if}) {
       next if $cb->($self, $related{$related});

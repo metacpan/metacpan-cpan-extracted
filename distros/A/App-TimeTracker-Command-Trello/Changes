@@ -1,5 +1,11 @@
 Revision history for App::TimeTracker::Command::Trello
 
+1.008     2021-03-03 22:41:04+01:00
+    - ignore some list names in listname_as_tag
+    - add prefix config option for pseudo tag
+    - switch to Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.007   2020-09-29T15:14:59
     - new format for branch name: idShort_name
     - keep spaces in name

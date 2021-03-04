@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl-IOAsync
 
+v6.6.0 2021-03-04T13:31:17Z
+
+    - allow RxPerl's first_value_from, last_value_from
+
 v6.0.1 2021-01-30T05:04:01Z
 
     - updated version of RxPerl dependency

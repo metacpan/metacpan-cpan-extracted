@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "IO::Async" : "0",
-            "RxPerl" : "v6.0.0",
+            "RxPerl" : "v6.6.1",
             "Sub::Util" : "1.41",
             "perl" : "5.010"
          }
@@ -57,7 +57,7 @@
    "provides" : {
       "RxPerl::IOAsync" : {
          "file" : "lib/RxPerl/IOAsync.pm",
-         "version" : "v6.0.1"
+         "version" : "v6.6.0"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://gitlab.com/karjala/rxperl-ioasync-for-perl"
       }
    },
-   "version" : "v6.0.1",
+   "version" : "v6.6.0",
    "x_authority" : "cpan:KARJALA",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1

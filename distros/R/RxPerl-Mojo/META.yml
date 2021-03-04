@@ -1,13 +1,13 @@
 ---
 abstract: 'Mojo::IOLoop adapter for RxPerl'
 author:
-  - 'KARJALA <karjala@cpan.org>'
+  - 'Alexander Karelas <karjala@cpan.org>'
 build_requires:
   Test2::V0: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,17 +26,17 @@ no_index:
 provides:
   RxPerl::Mojo:
     file: lib/RxPerl/Mojo.pm
-    version: v6.0.1
+    version: v6.6.0
 requires:
   Mojo::IOLoop: '0'
-  RxPerl: v6.0.0
+  RxPerl: v6.6.1
   Sub::Util: '1.41'
   perl: '5.010'
 resources:
   bugtracker: https://gitlab.com/karjala/rxperl-mojo-for-perl/issues
   homepage: https://gitlab.com/karjala/rxperl-mojo-for-perl
   repository: git://gitlab.com/karjala/rxperl-mojo-for-perl.git
-version: v6.0.1
+version: v6.6.0
 x_authority: cpan:KARJALA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

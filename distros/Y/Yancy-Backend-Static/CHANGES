@@ -1,5 +1,19 @@
 Changelog for Yancy-Backend-Static
 
+0.014     2021-03-04 09:38:26-06:00 America/Chicago
+
+    [BREAKING]
+
+    - The `path` field is now called `slug`. You must change your route
+      placeholders.
+
+    [Fixed]
+
+    - Fixed compatibility with Mojolicious 9. Mojolicious 9 makes
+      reserved stash values like `path` illegal to put as route
+      placeholder names.
+
+
 0.013     2020-08-04 21:07:41-05:00 America/Chicago
 
     [Fixed]

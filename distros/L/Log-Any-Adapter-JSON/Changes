@@ -1,0 +1,33 @@
+Changes file for Log::Any::Adapter::JSON
+
+1.07      2021-03-04 06:31:39-05:00 America/New_York
+
+  - Skip pipe test on MSWin32
+
+1.06      2021-03-03 20:31:39-05:00 America/New_York
+
+  - Update doc
+
+1.05      2021-03-03 20:27:31-05:00 America/New_York
+
+  - Update doc
+
+1.04      2021-03-03 20:17:22-05:00 America/New_York
+
+  - Update README
+
+1.03      2021-03-03 20:15:46-05:00 America/New_York
+
+  - Documentation updates
+
+1.02      2021-03-03 19:29:29-05:00 America/New_York
+
+  - Fix typo in prereqs
+
+1.01      2021-03-03 19:23:57-05:00 America/New_York
+
+  - Add support for Log::Any's context hash
+
+1.00      2021-03-03 18:38:00-05:00 America/New_York
+
+  - First version, released on an unsuspecting world

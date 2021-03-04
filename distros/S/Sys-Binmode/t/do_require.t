@@ -6,25 +6,32 @@ use warnings;
 use Test::More;
 use Test::FailWarnings;
 
-use FindBin;
-push @INC, "$FindBin::Bin/assets";
+use File::Temp;
 
-plan skip_all => 'Can’t find the assets.' if !(-e "$FindBin::Bin/assets/do-é.pl");
+my $e_down = "é";
 
-my $e_up = "é";
+my $dir = File::Temp::tempdir();
+
+do { open my $w, '>', "$dir/do-$e_down.pl" };
+do { open my $w, '>', "$dir/require-$e_down.pl"; print {$w} 1 };
+
+my $e_up = $e_down;
 utf8::upgrade($e_up);
 
 do {
     use Sys::Binmode;
 
-    eval { do "do-$e_up.pl" };
+    eval { do "$dir/do-$e_up.pl" };
     is( $@, q<>, 'do with upgraded string' );
 };
+
+# Just in case …
+utf8::upgrade($e_up);
 
 do {
     use Sys::Binmode;
 
-    eval { require "require-$e_up.pl" };
+    eval { require "$dir/require-$e_up.pl" };
     is( $@, q<>, 'require with upgraded string' );
 };
 

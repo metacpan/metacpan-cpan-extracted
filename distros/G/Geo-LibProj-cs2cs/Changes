@@ -1,5 +1,12 @@
 Revision history for Geo::LibProj::cs2cs
 
+1.03  2021-03-04
+
+ - Fix a bug that prevented certain older PROJ versions from
+   parsing legacy proj-strings with multiple parameters
+ - Add Alien::Proj4 to the PATH if Alien::proj is unavailable
+ - Skip some tests on Win32 that weren't designed for it
+
 1.02  2021-03-03
 
  - Add support for PROJ's C API through Geo::LibProj::FFI

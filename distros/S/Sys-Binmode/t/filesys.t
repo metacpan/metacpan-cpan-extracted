@@ -29,7 +29,7 @@ do {
     ok( fileno($rfh), 'open() with upgraded string' );
 };
 
-if ($^O =~ m<linux|darwin|bsd>i) {
+if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
     use Sys::Binmode;
 
     ok( (-e _get_path_up()), '-e with upgraded string' );
@@ -91,14 +91,19 @@ if ($^O =~ m<linux|darwin|bsd>i) {
         'link with upgraded string',
     );
 
-    ok( (lstat _get_path_up())[0], 'lstat with upgraded string' );
+    ok( (lstat _get_path_up())[2], 'lstat with upgraded string' );
 
-    mkdir( _get_path_up() . '-dir' ),
+    mkdir( _get_path_up() . '-dir' );
 
     ok(
         (-e "$dir/$e_down-dir"),
         'mkdir with upgraded string',
     );
+
+    # In case mkdir created the wrong-named directory, we delete
+    # whatever it created and create the path we want to exist:
+    rmdir( _get_path_up() . '-dir' ) or warn "rmdir: $!";
+    mkdir "$dir/$e_down-dir";
 
     ok(
         opendir( my $dh, _get_path_up() . '-dir' ),
@@ -118,7 +123,7 @@ if ($^O =~ m<linux|darwin|bsd>i) {
         'rmdir with upgraded string',
     );
 
-    ok( (stat _get_path_up())[0], 'stat with upgraded string' );
+    ok( (stat _get_path_up())[2], 'stat with upgraded string' );
 
     symlink 'haha', _get_path_up() . '-symlink';
     is(

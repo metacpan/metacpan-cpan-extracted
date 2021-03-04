@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.529';
+our $VERSION = '0.530';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -58,11 +58,11 @@ sub _valid_options {
     my ( $caller ) = @_;
     if ( $caller eq 'new' ) {
         return {
-            clear_screen     => '[ 0 1 ]',
+            clear_screen     => '[ 0 1 2 ]',
             codepage_mapping => '[ 0 1 ]',
             show_context     => '[ 0 1 ]',
             auto_up          => '[ 0 1 2 ]',
-            color            => '[ 0 1 2 ]',
+            color            => '[ 0 1 2 ]',     # hide_cursor == 2 # documentation
             hide_cursor      => '[ 0 1 2 ]',
             no_echo          => '[ 0 1 2 ]',
             read_only        => 'Array_Int',
@@ -76,7 +76,7 @@ sub _valid_options {
     }
     if ( $caller eq 'readline' ) {
         return {
-            clear_screen     => '[ 0 1 ]',
+            clear_screen     => '[ 0 1 2 ]',
             codepage_mapping => '[ 0 1 ]',
             show_context     => '[ 0 1 ]',
             color            => '[ 0 1 2 ]',
@@ -88,7 +88,7 @@ sub _valid_options {
     }
     if ( $caller eq 'fill_form' ) {
         return {
-            clear_screen     => '[ 0 1 ]',
+            clear_screen     => '[ 0 1 2 ]',
             codepage_mapping => '[ 0 1 ]',
             auto_up          => '[ 0 1 2 ]',
             color            => '[ 0 1 2 ]',
@@ -133,16 +133,21 @@ sub __init_term {
 sub __reset_term {
     my ( $self, $up ) = @_;
     if ( defined $self->{plugin} ) {
-        $self->{plugin}->__reset_mode();
+        $self->{plugin}->__reset_mode( { hide_cursor => 0 } );
     }
     if ( $up ) {
         print up( $up );
     }
-    print "\r" . clear_to_end_of_screen();
+    if ( $self->{clear_screen} == 2 ) {
+        print "\r" . clear_to_end_of_line();
+    }
+    else {
+        print "\r" . clear_to_end_of_screen();
+    }
     if ( $self->{hide_cursor} == 1 ) {
         print show_cursor();
     }
-    elsif ( $self->{hide_cursor} == 2 ) { # documentation
+    elsif ( $self->{hide_cursor} == 2 ) {
         print hide_cursor();
     }
     if ( exists $self->{backup_instance_defaults} ) {
@@ -203,7 +208,10 @@ sub __calculate_threshold {
 
 sub __before_readline {
     my ( $self, $m ) = @_;
-    my @info = line_fold( $self->{info}, $self->{i}{term_w}, { color => $self->{color}, join => 0 } );
+    my @pre_text_array;
+    if ( length $self->{info} ) {
+        @pre_text_array = line_fold( $self->{info}, $self->{i}{term_w}, { color => $self->{color}, join => 0 } );
+    }
     if ( $self->{show_context} ) {
         my @before_lines;
         if ( $m->{diff} ) {
@@ -242,16 +250,18 @@ sub __before_readline {
                 $self->{i}{keys}[0] = '';
             }
         }
-        $self->{i}{pre_text} = join "\n", @info, @before_lines;
+        push @pre_text_array, @before_lines;
     }
     else {
         $self->{i}{keys}[0] = $self->__get_prompt();
-        $self->{i}{pre_text} = join "\n", @info;
     }
-    $self->{i}{pre_text_row_count} = $self->{i}{pre_text} =~ tr/\n//;
-    if ( length $self->{i}{pre_text} ) {
-        ++$self->{i}{pre_text_row_count};
+    if ( $self->{clear_screen} == 2 ) {
+        $self->{i}{pre_text} = join "\n", map { "\r" . clear_to_end_of_line() . $_ } @pre_text_array;
     }
+    else {
+        $self->{i}{pre_text} = join "\n", @pre_text_array;
+    }
+    $self->{i}{pre_text_row_count} = scalar @pre_text_array;
 }
 
 sub __get_prompt {
@@ -269,17 +279,17 @@ sub __get_prompt {
 sub __after_readline {
     my ( $self, $m ) = @_;
     my $count_chars_after = @{$m->{str}} - ( @{$m->{p_str}} + $m->{diff} );
-    if (  ! $self->{show_context} || ! $count_chars_after ) {
+    if ( ! $self->{show_context} || ! $count_chars_after ) {
         $self->{i}{post_text} = '';
         $self->{i}{post_text_row_count} = 0;
         return;
     }
-    my @after_lines;
+    my @post_text_array;
     my $line = '';
     my $line_w = 0;
     for my $i ( ( @{$m->{str}} - $count_chars_after ) .. $#{$m->{str}} ) {
         if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
-            push @after_lines, $line;
+            push @post_text_array, $line;
             $line = $m->{str}[$i][0];
             $line_w = $m->{str}[$i][1];
             next;
@@ -288,13 +298,15 @@ sub __after_readline {
         $line_w = $line_w + $m->{str}[$i][1];
     }
     if ( $line_w ) {
-        push @after_lines, $line;
+        push @post_text_array, $line;
     }
-    $self->{i}{post_text} = join "\n", @after_lines;
-    if ( length $self->{i}{post_text} ) {
-        $self->{i}{post_text_row_count} = $self->{i}{post_text} =~ tr/\n//;
-        ++$self->{i}{post_text_row_count};
+    if ( $self->{clear_screen} == 2 ) { # never
+        $self->{i}{post_text} = join "\n", map { "\r" . clear_to_end_of_line() . $_ } @post_text_array;
     }
+    else {
+        $self->{i}{post_text} = join "\n", @post_text_array;
+    }
+    $self->{i}{post_text_row_count} = scalar @post_text_array;
 }
 
 
@@ -366,6 +378,9 @@ sub readline {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
     }
+    if ( $self->{clear_screen} == 2 && $self->{show_context} ) {
+        $self->{clear_screen} = 0;
+    }
     if ( $^O eq "MSWin32" ) {
         print $self->{codepage_mapping} ? "\e(K" : "\e(U";
     }
@@ -380,7 +395,7 @@ sub readline {
     my $m = $self->__init_readline( $term_w, $prompt );
     my $big_step = 10;
     my $up_before = 0;
-    if ( $self->{clear_screen} ) {
+    if ( $self->{clear_screen} == 1 ) {
         print clear_screen();
     }
 
@@ -397,7 +412,9 @@ sub readline {
         if ( $up_before ) {
             print up( $up_before );
         }
-        print "\r" . clear_to_end_of_screen();
+        if ( $self->{clear_screen} < 2 ) {
+            print "\r" . clear_to_end_of_screen();
+        }
         $self->__before_readline( $m );
         $up_before = $self->{i}{pre_text_row_count};
         if ( $self->{hide_cursor} ) {
@@ -930,7 +947,7 @@ sub __write_first_screen {
     }
     $self->{i}{seps} = [];
     $self->{i}{keys} = [];
-    if ( $self->{clear_screen} ) {
+    if ( $self->{clear_screen} == 1 ) {
         print clear_screen();
     }
     else {
@@ -990,6 +1007,9 @@ sub fill_form {
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
+    }
+    if ( $self->{clear_screen} == 2 ) {
+        $self->{clear_screen} = 0;
     }
     if ( $^O eq "MSWin32" ) {
         print $self->{codepage_mapping} ? "\e(K" : "\e(U";
@@ -1258,7 +1278,7 @@ sub fill_form {
             if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
                 print up( $up );
                 print "\r" . clear_to_end_of_screen();
-                $self->__write_first_screen( $list, $back_row, $auto_up );                                                  # cursor on {back}
+                $self->__write_first_screen( $list, $back_row, $auto_up );                                          # cursor on {back}
                 $m = $self->__string_and_pos( $list );
             }
             elsif ( $self->{i}{curr_row} == $#$list ) {                                                             # if ENTER && {last row}: jumps to the {first data row/2}
@@ -1281,7 +1301,7 @@ sub fill_form {
                     print down( 1 );
                 }
                 else {
-                    print up( $up );                                                                                 # or else to the next page
+                    print up( $up );                                                                                # or else to the next page
                     $self->__print_next_page( $list );
                 }
             }
@@ -1345,7 +1365,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.529
+Version 0.530
 
 =cut
 
@@ -1446,9 +1466,12 @@ clear_screen
 
 If enabled, the screen is cleared before the output.
 
-0 - off
+0 - clears from the current position to the end of screen
 
-1 - on
+1 - clears the entire screen
+
+2 - if I<show_context> is disabled, clears only the current (readline) row. If I<show_context> is enabled behaves like
+I<clear_screen> where set to 0.
 
 default: C<0>
 

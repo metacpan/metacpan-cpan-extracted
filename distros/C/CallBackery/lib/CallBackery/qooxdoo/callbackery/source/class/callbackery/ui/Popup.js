@@ -36,7 +36,6 @@ qx.Class.define("callbackery.ui.Popup", {
         if (cfg.set){
             this.set(cfg.set);
         }
-        var parentFormData = getParentFormData();
         this.add(this._createContent(cfg,getParentFormData));
     },
     members: {

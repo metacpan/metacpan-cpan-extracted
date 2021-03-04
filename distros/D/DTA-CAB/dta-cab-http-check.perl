@@ -20,7 +20,7 @@ use strict;
 ## Version
 our $VERSION = 0.05;
 our $SVNID   = q(
-  $HeadURL: svn+ssh://odo.dwds.de/home/svn/dev/DTA-CAB/trunk/dta-cab-http-check.perl $
+  $HeadURL: svn+ssh://svn.dwds.de/home/svn/dev/DTA-CAB/trunk/dta-cab-http-check.perl $
   $Id: dta-cab-http-check.perl 31044 2019-11-25 13:51:49Z moocow $
 );
 

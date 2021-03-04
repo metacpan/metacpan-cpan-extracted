@@ -28,6 +28,27 @@ sub new {
 }
 
 ##==============================================================================
+## Package: Analyzer::Morph::Extra::GeoLexHessen
+##==============================================================================
+package DTA::CAB::Analyzer::Morph::Extra::GeoLexHessen;
+our @ISA = qw(DTA::CAB::Analyzer::Morph::Extra::OrtLexHessen);
+use strict;
+
+## $obj = CLASS_OR_OBJ->new(%args)
+##  + object structure: see DTA::CAB::Analyzer::Dict::BDB
+sub new {
+  my $that = shift;
+  my $aut = $that->SUPER::new(
+			      ##-- analysis selection
+			      checkLabel => 'mextra.GeoLexHessen', ##-- key to check for re-analysis
+			      ##-- user args
+			      @_
+			     );
+  return $aut;
+}
+
+
+##==============================================================================
 ## Analysis Formatting
 ##==============================================================================
 

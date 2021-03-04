@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.713';
+our $VERSION = '1.720';
 
 use Term::Choose::Constants qw( :linux :keys TERM_READKEY );
 use Term::Choose::Screen    qw( hide_cursor show_cursor normal );
@@ -35,49 +35,78 @@ sub __get_key_OS {
     return if ! defined $c1;
     if ( $c1 eq "\e" ) {
         my $c2 = _getc_wrapper( 0.10 );
-        if    ( ! defined $c2 ) { return KEY_ESC; } # unused
-        elsif ( $c2 eq 'A' ) { return VK_UP; }     #vt 52
-        elsif ( $c2 eq 'B' ) { return VK_DOWN; }
-        elsif ( $c2 eq 'C' ) { return VK_RIGHT; }
-        elsif ( $c2 eq 'D' ) { return VK_LEFT; }
-        elsif ( $c2 eq 'H' ) { return VK_HOME; }
+        if    ( ! defined $c2 ) { return KEY_ESC; } # unused        #\e
+        elsif ( $c2 eq 'A' ) { return VK_UP; }      # vt 52         #\eA
+        elsif ( $c2 eq 'B' ) { return VK_DOWN; }                    #\eB
+        elsif ( $c2 eq 'C' ) { return VK_RIGHT; }                   #\eC
+        elsif ( $c2 eq 'D' ) { return VK_LEFT; }                    #\eD
+        elsif ( $c2 eq 'F' ) { return VK_END; }                     #\eF
+        elsif ( $c2 eq 'H' ) { return VK_HOME; }                    #\eH
+        elsif ( $c2 eq 'P' ) { return VK_F1; }                      #\eP
+        elsif ( $c2 eq 'Q' ) { return VK_F2; }                      #\eQ
+        elsif ( $c2 eq 'R' ) { return VK_F3; }                      #\eR
+        elsif ( $c2 eq 'S' ) { return VK_F4; }                      #\eS
         elsif ( $c2 eq 'O' ) {
             my $c3 = _getc_wrapper( 0 );
-            if    ( $c3 eq 'A' ) { return VK_UP; }
-            elsif ( $c3 eq 'B' ) { return VK_DOWN; }
-            elsif ( $c3 eq 'C' ) { return VK_RIGHT; }
-            elsif ( $c3 eq 'D' ) { return VK_LEFT; }
-            elsif ( $c3 eq 'F' ) { return VK_END; }
-            elsif ( $c3 eq 'H' ) { return VK_HOME; }
-            elsif ( $c3 eq 'Z' ) { return KEY_BTAB; }
+            if    ( $c3 eq 'A' ) { return VK_UP; }                  #\eOA
+            elsif ( $c3 eq 'B' ) { return VK_DOWN; }                #\eOB
+            elsif ( $c3 eq 'C' ) { return VK_RIGHT; }               #\eOC
+            elsif ( $c3 eq 'D' ) { return VK_LEFT; }                #\eOD
+            elsif ( $c3 eq 'F' ) { return VK_END; }                 #\eOF
+            elsif ( $c3 eq 'H' ) { return VK_HOME; }                #\eOH
+            elsif ( $c3 eq 'P' ) { return VK_F1; }                  #\eOP
+            elsif ( $c3 eq 'Q' ) { return VK_F2; }                  #\eOQ
+            elsif ( $c3 eq 'R' ) { return VK_F3; }                  #\eOR
+            elsif ( $c3 eq 'S' ) { return VK_F4; }                  #\eOS
+            elsif ( $c3 eq 'Z' ) { return KEY_BTAB; }               #\eOZ
             else {
                 return NEXT_get_key;
             }
         }
         elsif ( $c2 eq '[' ) {
             my $c3 = _getc_wrapper( 0 );
-            if    ( $c3 eq 'A' ) { return VK_UP; }
-            elsif ( $c3 eq 'B' ) { return VK_DOWN; }
-            elsif ( $c3 eq 'C' ) { return VK_RIGHT; }
-            elsif ( $c3 eq 'D' ) { return VK_LEFT; }
-            elsif ( $c3 eq 'F' ) { return VK_END; }
-            elsif ( $c3 eq 'H' ) { return VK_HOME; }
-            elsif ( $c3 eq 'Z' ) { return KEY_BTAB; }
-            elsif ( $c3 =~ m/^[0-9]$/ ) {
+            if    ( $c3 eq 'A' ) { return VK_UP; }                  #\e[A
+            elsif ( $c3 eq 'B' ) { return VK_DOWN; }                #\e[B
+            elsif ( $c3 eq 'C' ) { return VK_RIGHT; }               #\e[C
+            elsif ( $c3 eq 'D' ) { return VK_LEFT; }                #\e[D
+            elsif ( $c3 eq 'F' ) { return VK_END; }                 #\e[F
+            elsif ( $c3 eq 'H' ) { return VK_HOME; }                #\e[H
+            elsif ( $c3 eq 'Z' ) { return KEY_BTAB; }               #\e[Z
+            elsif ( $c3 eq '1' ) {
                 my $c4 = _getc_wrapper( 0 );
-                if ( $c4 eq '~' ) {
-                    # 1 = VK_HOME
-                    if    ( $c3 eq '2' ) { return VK_INSERT; }
-                    elsif ( $c3 eq '3' ) { return VK_DELETE; }
-                    # 4 = VK_END
-                    elsif ( $c3 eq '5' ) { return VK_PAGE_UP; }
-                    elsif ( $c3 eq '6' ) { return VK_PAGE_DOWN; }
+                if    ( $c4 eq 'F' ) { return VK_END; }             #\e[1F
+                elsif ( $c4 eq 'H' ) { return VK_HOME; }            #\e[1H
+                elsif ( $c4  =~ m/^[1234]$/ ) {
+                    my $c5 = _getc_wrapper( 0 );
+                    if ( $c5 eq '~' ) {
+                        if    ( $c4 eq '1' ) { return VK_F1; }      #\e[11~
+                        elsif ( $c4 eq '2' ) { return VK_F2; }      #\e[12~
+                        elsif ( $c4 eq '3' ) { return VK_F3; }      #\e[13~
+                        elsif ( $c4 eq '4' ) { return VK_F4; }      #\e[14~
+                        else {
+                            return NEXT_get_key;
+                        }
+                    }
                     else {
                         return NEXT_get_key;
                     }
                 }
+                elsif ( $c4 eq '~' ) { return VK_HOME; }            #\e[1~
                 else {
                     return NEXT_get_key;
+                }
+            }
+            elsif ( $c3 =~ m/^[23456]$/ ) {
+                my $c4 = _getc_wrapper( 0 );
+                if ( $c4 eq '~' ) {
+                    if    ( $c3 eq '2' ) { return VK_INSERT; }      #\e[2~
+                    elsif ( $c3 eq '3' ) { return VK_DELETE; }      #\e[3~
+                    elsif ( $c3 eq '4' ) { return VK_END; }         #\e[4~
+                    elsif ( $c3 eq '5' ) { return VK_PAGE_UP; }     #\e[5~
+                    elsif ( $c3 eq '6' ) { return VK_PAGE_DOWN; }   #\e[6~
+                    else {
+                        return NEXT_get_key;
+                    }
                 }
             }
             # http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
@@ -151,9 +180,7 @@ sub __mouse_event_to_button {
 
 sub __set_mode {
     my ( $self, $config ) = @_;
-    $self->{mouse}       = $config->{mouse};        # so options passed with $config are
-    $self->{hide_cursor} = $config->{hide_cursor};  # also available in __reset_mode
-    if ( $self->{hide_cursor} ) {
+    if ( $config->{hide_cursor} ) {
         print hide_cursor();
     }
     my $mode_stty;
@@ -177,24 +204,24 @@ sub __set_mode {
         chomp $Stty;
         system( "stty -echo $mode_stty" ) == 0 or die $?;
     }
-    if ( $self->{mouse} ) {
+    if ( $config->{mouse} ) {
         my $return = binmode STDIN, ':raw';
         if ( $return ) {
             print SET_ANY_EVENT_MOUSE_1003;
             print SET_SGR_EXT_MODE_MOUSE_1006;
         }
         else {
-            $self->{mouse} = 0;
+            $config->{mouse} = 0;
             warn "binmode STDIN, :raw: $!\nmouse-mode disabled\n";
         }
     }
-    return $self->{mouse};
+    return $config->{mouse};
 };
 
 
 sub __reset_mode {
-    my ( $self ) = @_;
-    if ( $self->{mouse} ) {
+    my ( $self, $config ) = @_;
+    if ( $config->{mouse} ) {
         binmode STDIN, ':encoding(UTF-8)' or warn "binmode STDIN, :encoding(UTF-8): $!\n";
         print UNSET_SGR_EXT_MODE_MOUSE_1006;
         print UNSET_ANY_EVENT_MOUSE_1003;
@@ -211,7 +238,7 @@ sub __reset_mode {
             system( "stty sane" ) == 0 or die $?;
         }
     }
-    if ( $self->{hide_cursor} ) {
+    if ( $config->{hide_cursor} ) {
         print show_cursor();
     }
 }

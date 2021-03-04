@@ -1,10 +1,10 @@
 {
    "abstract" : "an implementation of Reactive Extensions / rxjs for Perl",
    "author" : [
-      "KARJALA <karjala@cpan.org>"
+      "Alexander Karelas <karjala@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -49,6 +49,7 @@
       },
       "test" : {
          "requires" : {
+            "Promise::ES6" : "0",
             "Test2::V0" : "0"
          }
       }
@@ -56,19 +57,26 @@
    "provides" : {
       "RxPerl" : {
          "file" : "lib/RxPerl.pm",
-         "version" : "v6.5.0"
+         "version" : "v6.6.1"
+      },
+      "RxPerl::Base" : {
+         "file" : "lib/RxPerl/Base.pm"
       },
       "RxPerl::BehaviorSubject" : {
          "file" : "lib/RxPerl/BehaviorSubject.pm",
-         "version" : "v6.5.0"
+         "version" : "v6.6.1"
       },
       "RxPerl::ConnectableObservable" : {
          "file" : "lib/RxPerl/ConnectableObservable.pm",
-         "version" : "v6.5.0"
+         "version" : "v6.6.1"
+      },
+      "RxPerl::Functions" : {
+         "file" : "lib/RxPerl/Functions.pm",
+         "version" : "v6.6.1"
       },
       "RxPerl::Observable" : {
          "file" : "lib/RxPerl/Observable.pm",
-         "version" : "v6.5.0"
+         "version" : "v6.6.1"
       },
       "RxPerl::Operators::Creation" : {
          "file" : "lib/RxPerl/Operators/Creation.pm"
@@ -78,18 +86,18 @@
       },
       "RxPerl::ReplaySubject" : {
          "file" : "lib/RxPerl/ReplaySubject.pm",
-         "version" : "v6.5.0"
+         "version" : "v6.6.1"
       },
       "RxPerl::Subject" : {
          "file" : "lib/RxPerl/Subject.pm",
-         "version" : "v6.5.0"
+         "version" : "v6.6.1"
       },
       "RxPerl::Subscriber" : {
          "file" : "lib/RxPerl/Subscriber.pm"
       },
       "RxPerl::Subscription" : {
          "file" : "lib/RxPerl/Subscription.pm",
-         "version" : "v6.5.0"
+         "version" : "v6.6.1"
       },
       "RxPerl::SyncTimers" : {
          "file" : "lib/RxPerl/SyncTimers.pm"
@@ -99,7 +107,7 @@
       },
       "RxPerl::Utils" : {
          "file" : "lib/RxPerl/Utils.pm",
-         "version" : "v6.5.0"
+         "version" : "v6.6.1"
       }
    },
    "release_status" : "stable",
@@ -113,7 +121,7 @@
          "web" : "https://gitlab.com/karjala/rxperl"
       }
    },
-   "version" : "v6.5.0",
+   "version" : "v6.6.1",
    "x_authority" : "cpan:KARJALA",
    "x_contributors" : [
       "Alexander Karelas <alex.karelas@gmail.com>",

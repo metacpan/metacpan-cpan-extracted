@@ -1,12 +1,13 @@
 package App::TimeTracker::Command::Trello;
+
+# ABSTRACT: App::TimeTracker Trello plugin
+our $VERSION = '1.008'; # VERSION
+
 use strict;
 use warnings;
 use 5.010;
 
-# ABSTRACT: App::TimeTracker Trello plugin
 use App::TimeTracker::Utils qw(error_message warning_message);
-
-our $VERSION = "1.007";
 
 use Moose::Role;
 use WWW::Trello::Lite;
@@ -93,7 +94,8 @@ before [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
     my $self = shift;
     return unless $self->has_trello;
 
-    my $cardname = 'trello:' . $self->trello;
+    my $cardname = $self->_prefix.$self->trello;
+
     $self->insert_tag($cardname);
 
     my $name;
@@ -157,10 +159,12 @@ after [ 'cmd_start', 'cmd_continue', 'cmd_append' ] => sub {
 after 'cmd_stop' => sub {
     my $self = shift;
 
+    return unless $self->config->{trello}{update_time_worked} || ( $self->can('move_to') && $self->move_to);
+
     my $task = $self->_previous_task;
     return unless $task;
 
-    my $oldid = $task->trello_card_id;
+    my $oldid = $task->trello_card_id($self->_prefix);
     return unless $oldid;
 
     my $task_rounded_minutes = $task->rounded_minutes;
@@ -425,13 +429,21 @@ sub _tag_listname {
     return unless $list_id;
     my $rv = $self->_do_trello( 'get', 'lists/' . $list_id . '/name' );
     my $name = $rv->{_value};
-    $self->insert_tag($name) if $name;
+    if ($name && $name !~ /^(todo|doing|done|review)$/i) {
+        $self->insert_tag($name);
+    }
+}
+
+sub _prefix {
+    my $self = shift;
+    return $self->config->{trello}{prefix} || 'trello:';
 }
 
 sub App::TimeTracker::Data::Task::trello_card_id {
-    my $self = shift;
+    my ($self, $prefix) = @_;
+
     foreach my $tag ( @{ $self->tags } ) {
-        next unless $tag =~ /^trello:(\w+)/;
+        next unless $tag =~ /^$prefix(.*)$/;
         return $1;
     }
 }
@@ -452,7 +464,7 @@ App::TimeTracker::Command::Trello - App::TimeTracker Trello plugin
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 DESCRIPTION
 
@@ -508,6 +520,13 @@ Your trello C<member_id>.
 Needed for adding you to a Card's list of members. Currently a bit
 hard to get from trello, so use C<tracker setup_trello>.
 
+=head3 prefix
+
+Default: C<trello:>
+
+Add this prefix to the card name when storing it as tag. Useful to
+discern regular tags from card name pseudo tags.
+
 =head3 update_time_worked
 
 If set to true, updates the time worked on this task on the Trello Card.
@@ -524,7 +543,7 @@ Context: stopish commands
 =head3 listname_as_tag
 
 If set to true, will fetch the name of the list the current card
-belongs to and store the name as an additional tag.
+belongs to and store the name as an additional tag, unless the list name matches C</^(todo|doing|done|review)$/i>
 
 Context: startish commands
 
@@ -599,11 +618,11 @@ If --move_to is specified and a matching list is found in C<list_map> in config,
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Thomas Klausner.
+This software is copyright (c) 2016 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

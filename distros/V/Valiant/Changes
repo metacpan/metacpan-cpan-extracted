@@ -1,5 +1,11 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001003  2021 March 04
+          - Allow one to disable auto validation on DBIC classes.  This allows
+          you to insert or update rows that are invalid.
+          - Added some test cases for strict mode validations and allowed one a
+          bit more control over strict mode messaging.
+
 0.001002  2021 February 25
           - quick followup that just fixes POD issues
 

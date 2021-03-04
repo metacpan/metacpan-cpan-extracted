@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.068';
+our $VERSION = '1.069';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -604,7 +604,6 @@ use Mojo::JSON qw( true false decode_json );
 use Mojo::File qw( path );
 use Mojo::Loader qw( load_class );
 use Yancy::Util qw( load_backend curry copy_inline_refs derp is_type json_validator );
-use JSON::Validator::OpenAPI::Mojolicious;
 use Storable qw( dclone );
 use Scalar::Util qw( blessed );
 
@@ -921,6 +920,7 @@ sub _helper_validate {
         $schema = $args[0];
     }
 
+    my @errors;
     my %check_item = %$input_item;
     for my $prop_name ( keys %{ $schema->{properties} } ) {
         my $prop = $schema->{properties}{ $prop_name };
@@ -958,9 +958,18 @@ sub _helper_validate {
             # the item
             %check_item = ( %check_item, $prop_name => '<PASSWORD>' );
         }
+
+        # XXX: JSON::Validator 4 moved support for readOnly/writeOnly to
+        # the OpenAPI schema classes, but we use JSON Schema internally,
+        # so we need to make support ourselves for now...
+        if ( $prop->{readOnly} && exists $check_item{ $prop_name } ) {
+            push @errors, JSON::Validator::Error->new(
+                "/$prop_name", "Read-only.",
+            );
+        }
     }
 
-    my @errors = $v->validate_input( \%check_item, @args );
+    push @errors, $v->validate( \%check_item, @args );
     return @errors;
 }
 
@@ -1057,7 +1066,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.068
+version 1.069
 
 =head1 SYNOPSIS
 

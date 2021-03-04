@@ -15,7 +15,8 @@ DTA::CAB::WebServiceHowto - User documentation for DTA::CAB web-service
 =head1 DESCRIPTION
 
 This document describes the use of the L<DTA::CAB|http://odo.dwds.de/~jurish/software/dta-cab/> web-service accessible
-at L<http://www.deutschestextarchiv.de/cab/>.
+at L<http://www.deutschestextarchiv.de/public/cab/> and its aliases
+L<http://www.deutschestextarchiv.de/demo/cab/> and L<http://www.deutschestextarchiv.de/cab/>.
 The CAB web-service provides
 error-tolerant linguistic analysis for historical German text,
 including normalization of historical orthographic variants
@@ -545,7 +546,7 @@ L<1800-1900|http://www.deutschestextarchiv.de/cab/?a=default1.1800-1900&q=avf%20
 =head3 Format Conversion
 
 The CAB server can be used to convert between various
-supported L<IE<sol>O Formats|/I-O Formats>.  In this mode,
+supported L<IE<sol>O Formats|/IE<sol>O Formats>.  In this mode,
 no analysis is performed on the input data
 (with the exception of tokenization for raw untokenized input),
 but the input document is parsed and re-formatted according to
@@ -817,7 +818,7 @@ Frequency of the surface type in the DTA corpus, if available.
 
 Boolean integer indicating whether or not at least one L</morph>
 analysis was present for the current token.
-Unlike the L<morph|/morph1> attribute, the C<hasmorph> attribute
+Unlike the L<morph|/morph> attribute, the C<hasmorph> attribute
 is B<not> suppressed in the output from the publicly accessible
 web-service.
 
@@ -956,7 +957,7 @@ section of the graphical interface.
 
 CAB supports various text-based formats for human consumption and/or further processing.
 While typically not as flexible or efficient as the "pure" data-oriented formats
-described L<below|/Data-oriented formats>, CAB's native text-based formats offer
+described L<below|/Data-oriented Formats>, CAB's native text-based formats offer
 a reasonable compromise between human- and machine-readability.
 All text-based CAB formats expect and return data encoded in L<UTF-8|https://en.wikipedia.org/wiki/UTF-8>,
 B<without> a L<Byte-order mark|https://en.wikipedia.org/wiki/Byte_order_mark>.
@@ -1122,8 +1123,6 @@ followed by a JSON object representing the internal token structure.
 
 Useful for further script-based processing.
 
-=back
-
 =cut
 
 ##========================================================================
@@ -1141,6 +1140,8 @@ of expanded types separated by TABs, newlines, and/or carriage returns.
 
 Primarily useful for online L</Term Expansion> in conjunction with
 L</Analysis Chains> such as C<expand>, C<expand.eqlemma>, C<expand.eqpho>, or C<expand.eqrw>.
+
+=back
 
 =cut
 
@@ -1452,7 +1453,7 @@ or L<LibreOffice|https://ask.libreoffice.org/en/question/2641/convert-to-command
 The CAB web-service is a request-oriented service:
 it accepts a user request as a set of I<parameter>=I<value> pairs
 and returns the analyzed data as a L<DTA::CAB::Document|DTA::CAB::Document> object
-encoded according to the L<output format|/I-O Formats> specified by the C<ofmt> parameter.
+encoded according to the L<output format|/IE<sol>O Formats> specified by the C<ofmt> parameter.
 Parameters are passed to the DiaCollo web-service
 L<RESTfully|https://en.wikipedia.org/wiki/Representational_state_transfer>
 via the L<URL query string|http://en.wikipedia.org/wiki/Query_string>
@@ -1484,9 +1485,9 @@ To analyze a L<TEI-like|/TEI> XML file F<FILE.tei.xml> using L<curl|http://curl.
 and save the analysis results to a "spliced" TEI file F<FILE.teiws.xml>,
 the following command-line ought to suffice:
 
- curl -X POST -sSF "qd=@FILE.tei.xml" -o "FILE.teiws.xml" "http://www.deutschestextarchiv.de/cab/query?fmt=tei"
+ curl -X POST -sSLF "qd=@FILE.tei.xml" -o "FILE.teiws.xml" "http://www.deutschestextarchiv.de/public/cab/query?fmt=tei"
 
-Alternative L<IO formats|/I-O Formats> and L<request parameters|DTA::CAB::HttpProtocol/query-Requests>
+Alternative L<IO formats|/IE<sol>O Formats> and L<request parameters|DTA::CAB::HttpProtocol/query-Requests>
 can be accommodated by inserting them into the L<URL query string|http://en.wikipedia.org/wiki/Query_string>
 passed to L<C<curl>|http://curl.haxx.se/docs/manpage.html>.
 You can also make use of the
@@ -1494,7 +1495,7 @@ inline POSTDATA mechanism (a.k.a. "xpost") described in L<the DTA::CAB::HttpProt
 in order to save yourself and the CAB server the effort of encoding/decoding the document data.
 In this case, you need to specify an appropriate "C<Content-Type>" header, e.g:
 
- curl -X POST -sSH "Content-Type: text/tei+xml; charset=utf8" --data-binary "@FILE.tei.xml" -o "FILE.teiws.xml" "http://www.deutschestextarchiv.de/cab/query?fmt=tei"
+ curl -X POST -sSLH "Content-Type: text/tei+xml; charset=utf8" --data-binary "@FILE.tei.xml" -o "FILE.teiws.xml" "http://www.deutschestextarchiv.de/public/cab/query?fmt=tei"
 
 You might be interested in the L<cab-curl-post.sh|http://./cab-curl-post.sh> and/or L<cab-curl-xpost.sh|http://./cab-curl-xpost.sh>
 wrapper scripts, which encapsulate some of the common curl command-line options.
@@ -1504,7 +1505,7 @@ The preceding 2 example C<curl> calls should be equivalent to:
  bash cab-curl-xpost.sh "?fmt=tei" "FILE.xml" -o "FILE.teiws.xml"
 
 Note that when accessing the CAB web-service API directly via HTTP in this fashion,
-auto-detection of L<input file format|/I-O Formats> is not supported,
+auto-detection of L<input file format|/IE<sol>O Formats> is not supported,
 so you must specify at least the L<"fmt"|DTA::CAB::HttpProtocol/fmt-fmt1> parameter
 in the URL query string if your files are not in the global default format
 (usually L<TT|/TT>).

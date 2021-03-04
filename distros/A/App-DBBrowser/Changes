@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.260    2021-03-04
+        - New option to filter table rows.
+
 2.258    2021-02-20
         - Signal name: fixed spelling.
 

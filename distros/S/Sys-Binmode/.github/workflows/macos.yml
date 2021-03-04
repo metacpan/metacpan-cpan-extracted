@@ -32,9 +32,5 @@ jobs:
         run: perl Makefile.PL
       - name: make
         run: make
-      - name: Run tests (with coverage)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          curl -L https://cpanmin.us | perl - --notest Devel::Cover::Report::Coveralls
-          `perl -MConfig -E'print $Config::Config{"sitebin"}'`/cover -test -report Coveralls
+      - name: Run tests
+        run: make test

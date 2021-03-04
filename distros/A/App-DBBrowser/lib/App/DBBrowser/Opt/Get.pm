@@ -78,6 +78,7 @@ sub defaults {
             hide_cursor       => 0, # not an option, always 0
             color             => 0,
             decimal_separator => '.',
+            f3                => 1,
             grid              => 1,
             keep_header       => 1,
             min_col_width     => 30,

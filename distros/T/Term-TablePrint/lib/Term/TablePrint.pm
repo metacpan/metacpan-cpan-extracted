@@ -4,12 +4,12 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.124';
+our $VERSION = '0.130';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
 use Carp         qw( croak );
-use List::Util   qw( sum );
+use List::Util   qw( sum none );
 use Scalar::Util qw( looks_like_number );
 
 use Term::Choose                  qw( choose );
@@ -60,6 +60,7 @@ sub _valid_options {
         squash_spaces     => '[ 0 1 ]',
         color             => '[ 0 1 2 ]',
         grid              => '[ 0 1 2 ]',
+        f3                => '[ 0 1 2 ]',
         table_expand      => '[ 0 1 2 ]',
         mouse             => '[ 0 1 2 3 4 ]',
         binary_string     => 'Str',
@@ -80,6 +81,7 @@ sub _defaults {
         codepage_mapping  => 0,
         color             => 0,
         decimal_separator => '.',
+        f3                => 1,
         grid              => 1,
         hide_cursor       => 1,
         keep_header       => 1,
@@ -127,9 +129,9 @@ sub print_table {
         return $ob->print_table( @_ );
     }
     my $self = shift;
-    my ( $table_ref, $opt ) = @_;
+    my ( $orig_table, $opt ) = @_;
     croak "print_table: called with " . @_ . " arguments - 1 or 2 arguments expected." if @_ < 1 || @_ > 2;
-    croak "print_table: requires an ARRAY reference as its first argument."            if ref $table_ref  ne 'ARRAY';
+    croak "print_table: requires an ARRAY reference as its first argument."            if ref $orig_table  ne 'ARRAY';
     if ( defined $opt ) {
         croak "print_table: the (optional) second argument is not a HASH reference."   if ref $opt ne 'HASH';
         validate_options( _valid_options(), $opt );
@@ -150,7 +152,7 @@ sub print_table {
     if ( $self->{hide_cursor} ) {
         print hide_cursor();
     }
-    if ( ! @$table_ref ) {
+    if ( ! @$orig_table ) {
         choose(
             [ 'Close with ENTER' ],
             { prompt => "'print_table': empty table without header row!", hide_cursor => 0 }
@@ -164,7 +166,7 @@ sub print_table {
     if ( $self->{decimal_separator} ne '.' ) {
         $self->{thsd_sep} = '_';
     }
-    my $table_rows = @$table_ref - 1;
+    my $table_rows = @$orig_table - 1;
     if ( $self->{max_rows} && $table_rows >= $self->{max_rows} ) {
         $self->{info_row} = sprintf( 'Reached the row LIMIT %s', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
         # App::DBBrowser: $table_rows already cut to $self->{max_rows} so total rows are not known at this point.
@@ -172,48 +174,73 @@ sub print_table {
         if ( $table_rows > $self->{max_rows} ) {
             $self->{info_row} .= sprintf( '  (total %s)', insert_sep( $table_rows, $self->{thsd_sep} ) );
         }
-        $self->{row_idxs} = [ 0 .. $self->{max_rows} ]; # -1 for index and +1 for header row
     }
-    else {
-        $self->{row_idxs} = [ 0 .. $#$table_ref ];
-    }
+    my $chosen_cols;
     if ( $self->{choose_columns}  ) {
-        $self->{chosen_cols} = $self->__choose_columns( $table_ref->[0] );
-        if ( ! defined $self->{chosen_cols} ) {
+        $chosen_cols = $self->__choose_columns( $orig_table->[0] );
+        if ( ! defined $chosen_cols ) {
             $self->__reset();
             return;
         }
-        if ( ! @{$self->{chosen_cols}} ) {
-            $self->{chosen_cols} = [ 0 .. $#{$table_ref->[0]} ];
+        if ( ! @{$chosen_cols} ) {
+            $chosen_cols = [ 0 .. $#{$orig_table->[0]} ];
         }
     }
     else {
-        $self->{chosen_cols} = [ 0 .. $#{$table_ref->[0]} ];
+        $chosen_cols = [ 0 .. $#{$orig_table->[0]} ];
     }
-    $self->{orig_table} = $table_ref;
-    $self->{progress} = Term::TablePrint::ProgressBar->new( {
-        row_count => scalar @{$self->{row_idxs}},
-        col_count => scalar @{$self->{chosen_cols}},
-        threshold => $self->{progress_bar},
-    } );
-    $self->__recursive_code();
+    $self->{filter} = undef;
+    while ( 1 ) {
+        my $next = $self->__write_table( $orig_table, $chosen_cols );
+        if ( $next ) {
+            next;
+        }
+        last;
+    }
     $self->__reset();
     return;
 }
 
 
-sub __recursive_code {
+sub __read_pattern {
     my ( $self ) = @_;
-    $self->{table_copy} = [];
-    $self->__copy_table();
-    $self->__calc_col_width();
+    if ( ! $self->{f3} ) {
+        return;
+    }
+    require Term::Form;
+    Term::Form->VERSION(0.530);
+    my $term = Term::Form->new();
+    my $string = $term->readline(
+        '> search-pattern: ',
+        { hide_cursor => 2, clear_screen => 2, color => $self->{color} }
+    );
+    if ( $self->{f3} == 1 && length $string ) {
+        return '(?i)' . $string;
+    }
+    return $string;
+}
+
+
+sub __write_table {
+    my ( $self, $orig_table, $chosen_cols ) = @_;
+    my $progress = Term::TablePrint::ProgressBar->new( {
+        row_count => ( $self->{max_rows} > @$orig_table ? scalar @$orig_table : $self->{max_rows} ),
+        col_count => scalar @{$chosen_cols},
+        threshold => $self->{progress_bar},
+    } );
+    my $table_copy = $self->__copy_table( $progress, $orig_table, $chosen_cols );
+    if ( length $self->{filter} ) {
+        $progress->{row_count} = scalar @$table_copy;
+        return 2 if ! @$table_copy;
+    }
+    $self->__calc_col_width( $progress, $table_copy );
     my $extra_w = $^O eq 'MSWin32' || $^O eq 'cygwin' ? 0 : WIDTH_CURSOR;
     my $term_w = get_term_width() + $extra_w;
-    my $w_cols = $self->__calc_avail_col_width( $term_w );
+    my $w_cols = $self->__calc_avail_col_width( $table_copy, $term_w );
     if ( ! defined $w_cols ) {
         return;
     }
-    my $list = $self->__cols_to_string( $w_cols ); # $self->{table_copy} is now $list
+    my $list = $self->__cols_to_string( $progress, $orig_table, $table_copy, $w_cols ); # $self->{table_copy} is now $list
     my $table_w = sum( @$w_cols, $self->{tab_w} * $#{$w_cols} );
     my @header;
     #$self->{info} = 'INFO'; # info info_tabs prompt_tabs
@@ -255,12 +282,12 @@ sub __recursive_code {
     my $old_row = 0;
     my $auto_jumped_to_first_row = 2;
     my $row_is_expanded = 0;
+    my $return;
 
     while ( 1 ) {
         if ( $term_w != get_term_width() + $extra_w ) {
             $term_w = get_term_width() + $extra_w;
-            $self->__recursive_code();
-            return;
+            return 1;
         }
         if ( $self->{keep_header} && ! @$list ) {
             push @$list, ''; # so that going back requires always the same amount of keystrokes
@@ -270,30 +297,39 @@ sub __recursive_code {
             $list,
             { prompt => $prompt, index => 1, default => $old_row, ll => $table_w, layout => 3,
               clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer => $self->{table_name},
-              color => $self->{color}, codepage_mapping => $self->{codepage_mapping} }
+              color => $self->{color}, codepage_mapping => $self->{codepage_mapping}, f3 => $self->{f3} }
         );
+
+        if ( length $self->{filter} ) {
+            $return = 2;
+            $self->{filter} = undef;
+        }
         if ( ! defined $row ) {
-            return;
+            return $return;
         }
         elsif ( $row < 0 ) { # -1 -2
-            next;
+            if ( $row == -13 ) {
+                $self->{filter} = $self->__read_pattern();
+                return 2
+            }
+            return 1;
         }
         if ( ! $self->{table_expand} ) {
-            return if $row == 0;
+            return $return if $row == 0;
             next;
         }
         else {
             if ( $old_row == $row ) {
                 if ( $row == 0 ) {
                     if ( ! $self->{keep_header} ) {
-                        return;
+                        return $return;
                     }
                     elsif ( $self->{table_expand} == 1 ) {
-                        return if $row_is_expanded;
-                        return if $auto_jumped_to_first_row == 1;
+                        return $return if $row_is_expanded;
+                        return $return if $auto_jumped_to_first_row == 1;
                     }
                     elsif ( $self->{table_expand} == 2 ) {
-                        return if $row_is_expanded;
+                        return $return if $row_is_expanded;
                     }
                     $auto_jumped_to_first_row = 0;
                 }
@@ -342,7 +378,17 @@ sub __recursive_code {
                     }
                 }
             }
-            $self->__print_single_row( $row, $self->{longest_col_name} + 1 );
+            my $orig_row;
+            if ( defined $return && $return == 2 ) {
+                $orig_row = $self->{map_indexes}[$row];
+                if ( ! defined $orig_row ) {
+                    return $return;
+                }
+            }
+            else {
+                $orig_row = $row;
+            }
+            $self->__print_single_row( $orig_table, $orig_row, $chosen_cols );
         }
         delete $ENV{TC_RESET_AUTO_UP};
     }
@@ -350,11 +396,21 @@ sub __recursive_code {
 
 
 sub __copy_table {
-    my ( $self ) = @_;
-    my $count = $self->{progress}->set_progress_bar();            #
-    for my $row ( @{$self->{orig_table}}[@{$self->{row_idxs}}] ) {
-        my $tmp = [];
-        for ( @{$row}[@{$self->{chosen_cols}}] ) {
+    my ( $self, $progress, $orig_table, $chosen_cols ) = @_;
+    my $table_copy = [];
+    $self->{map_indexes} = []; #
+    my $count = $progress->set_progress_bar();            #
+    my $row_id = -1;
+    ROW: for my $row ( @$orig_table ) {
+        ++$row_id;
+        if ( length $self->{filter} ) {
+            if ( none { defined $_ && $_ =~ $self->{filter} } @{$row}[@{$chosen_cols}] ) {
+                next ROW if $row_id != 0;
+            }
+            push @{$self->{map_indexes}}, $row_id;
+        }
+        my $tmp_row = [];
+        COL: for ( @{$row}[@$chosen_cols] ) {
             my $str = $_; # this is where the copying happens
             $str = $self->{undef}            if ! defined $str;
             $str = _handle_reference( $str ) if ref $str;
@@ -373,34 +429,38 @@ sub __copy_table {
             $str =~ s/\t/ /g;
             $str =~ s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
             $str =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
-            push @$tmp, $str;
+            push @$tmp_row, $str;
         }
-        push @{$self->{table_copy}}, $tmp;
-        if ( $self->{progress}{type} ) {                          #
-            if ( $count >= $self->{progress}{next_update} ) {     #
-                $self->{progress}->update_progress_bar( $count ); #
-            }                                                     #
-            ++$count;                                             #
-        }                                                         #
+        push @$table_copy, $tmp_row;
+        if ( @$table_copy == $self->{max_rows} ) {
+            last;
+        }
+        if ( $progress->{type} ) {                        #
+            if ( $count >= $progress->{next_update} ) {   #
+                $progress->update_progress_bar( $count ); #
+            }                                             #
+            ++$count;                                     #
+        }                                                 #
     }
-    if ( $self->{progress}{type} ) {                              #
-        $self->{progress}->last_update_progress_bar( $count );    #
-    }                                                             #
+    if ( $progress->{type} ) {                            #
+        $progress->last_update_progress_bar( $count );    #
+    }                                                     #
+    return $table_copy
 }
 
 
 sub __calc_col_width {
-    my ( $self ) = @_;
-    my $count = $self->{progress}->set_progress_bar();            #
+    my ( $self, $progress, $table_copy ) = @_;
+    my $count = $progress->set_progress_bar();            #
     $self->{longest_col_name} = 0;
-    $self->{w_cols}  = [ ( 1 ) x @{$self->{table_copy}[0]} ];
-    $self->{w_int}   = [ ( 0 ) x @{$self->{table_copy}[0]} ];
-    $self->{w_fract} = [ ( 0 ) x @{$self->{table_copy}[0]} ];
+    $self->{w_cols}  = [ ( 1 ) x @{$table_copy->[0]} ];
+    $self->{w_int}   = [ ( 0 ) x @{$table_copy->[0]} ];
+    $self->{w_fract} = [ ( 0 ) x @{$table_copy->[0]} ];
     my $ds = quotemeta( $self->{decimal_separator} );
     my $normal_row = 0;
-    my @col_idx = ( 0 .. $#{$self->{table_copy}[0]} );
+    my @col_idx = ( 0 .. $#{$table_copy->[0]} );
 
-    for my $row ( @{$self->{table_copy}}[@{$self->{row_idxs}}] ) {
+    for my $row ( @$table_copy ) {
         for my $i ( @col_idx ) {
             if ( $normal_row ) {
                 my $width;
@@ -434,21 +494,21 @@ sub __calc_col_width {
                 }
             }
         }
-        if ( $self->{progress}{type} ) {                          #
-            if ( $count >= $self->{progress}{next_update} ) {     #
-                $self->{progress}->update_progress_bar( $count ); #
-            }                                                     #
-            ++$count;                                             #
-        }                                                         #
+        if ( $progress->{type} ) {                        #
+            if ( $count >= $progress->{next_update} ) {   #
+                $progress->update_progress_bar( $count ); #
+            }                                             #
+            ++$count;                                     #
+        }                                                 #
     }
-    if ( $self->{progress}{type} ) {                              #
-        $self->{progress}->last_update_progress_bar( $count );    #
-    }                                                             #
+    if ( $progress->{type} ) {                            #
+        $progress->last_update_progress_bar( $count );    #
+    }                                                     #
 }
 
 
 sub __calc_avail_col_width {
-    my ( $self, $term_w ) = @_;
+    my ( $self, $table_copy, $term_w ) = @_;
     my $w_head = [ @{$self->{w_head}} ];
     my $w_cols = [ @{$self->{w_cols}} ];
     my $avail_w = $term_w - $self->{tab_w} * $#$w_cols;
@@ -472,7 +532,7 @@ sub __calc_avail_col_width {
     elsif ( $sum > $avail_w ) {
         my $min_width = $self->{min_col_width} || 1;
         if ( @$w_head > $avail_w ) {
-            $self->__print_term_not_wide_enough_message();
+            $self->__print_term_not_wide_enough_message( $table_copy );
             return;
         }
         my @w_cols_tmp = @$w_cols;
@@ -520,8 +580,8 @@ sub __calc_avail_col_width {
 
 
 sub __cols_to_string {
-    my ( $self, $w_cols ) = @_;
-    my $count = $self->{progress}->set_progress_bar();            #
+    my ( $self, $progress, $orig_table, $table_copy, $w_cols ) = @_;
+    my $count = $progress->set_progress_bar();            #
     my $tab;
     if ( $self->{grid} ) {
         $tab = ( ' ' x int( $self->{tab_w} / 2 ) ) . '|' . ( ' ' x int( $self->{tab_w} / 2 ) );
@@ -536,13 +596,13 @@ sub __cols_to_string {
         }
     }
     my $ds = quotemeta( $self->{decimal_separator} );
-    for my $row ( @{$self->{row_idxs}} ) {
+    for my $row ( 0 .. $#$table_copy ) {
         my $str = '';
         for my $col ( 0 .. $#$w_cols ) {
-            if ( ! length $self->{table_copy}[$row][$col] ) {
+            if ( ! length $table_copy->[$row][$col] ) {
                 $str = $str . ' ' x $w_cols->[$col];
             }
-            elsif ( $self->{table_copy}[$row][$col] =~ /^([-+]?[0-9]*)($ds[0-9]+)?\z/ ) {
+            elsif ( $table_copy->[$row][$col] =~ /^([-+]?[0-9]*)($ds[0-9]+)?\z/ ) {
                 my $all = '';
                 if ( $self->{w_fract}[$col] ) {
                     if ( defined $2 ) {
@@ -573,28 +633,34 @@ sub __cols_to_string {
                 }
             }
             else {
-                $str = $str . unicode_sprintf( $self->{table_copy}[$row][$col], $w_cols->[$col] ); # ###
+                $str = $str . unicode_sprintf( $table_copy->[$row][$col], $w_cols->[$col] );
             }
-            if ( $self->{color} && defined $self->{orig_table}[$row][$col] ) {
-                my @color = $self->{orig_table}[$row][$col] =~ /(\e\[[\d;]*m)/g;
-                $str =~ s/\x{feff}/shift @color/ge;
-                $str = $str . $color[-1] if @color;
+            if ( $self->{color} ) {
+                my $r = $row;
+                if ( length $self->{filter} ) {
+                    $r = $self->{map_indexes}[$row];
+                }
+                if ( defined $orig_table->[$r][$col] ) {
+                    my @color = $orig_table->[$r][$col] =~ /(\e\[[\d;]*m)/g;
+                    $str =~ s/\x{feff}/shift @color/ge;
+                    $str = $str . $color[-1] if @color;
+                }
             }
             $str = $str . $tab if $col != $#$w_cols;
         }
         #$str = $str . RESET if $self->{color};
-        $self->{table_copy}[$row] = $str;   # overwrite table_copy to save memory
-        if ( $self->{progress}{type} ) {                          #
-            if ( $count >= $self->{progress}{next_update} ) {     #
-                $self->{progress}->update_progress_bar( $count ); #
-            }                                                     #
-            ++$count;                                             #
-        }                                                         #
+        $table_copy->[$row] = $str;   # overwrite table_copy to save memory
+        if ( $progress->{type} ) {                        #
+            if ( $count >= $progress->{next_update} ) {   #
+                $progress->update_progress_bar( $count ); #
+            }                                             #
+            ++$count;                                     #
+        }                                                 #
     }
-    if ( $self->{progress}{type} ) {                              #
-        $self->{progress}->last_update_progress_bar( $count );    #
-    }                                                             #
-    return $self->{table_copy};
+    if ( $progress->{type} ) {                            #
+        $progress->last_update_progress_bar( $count );    #
+    }                                                     #
+    return $table_copy;
 }
 
 
@@ -609,14 +675,14 @@ sub __choose_columns {
     my @cols = map { defined $_ ? $_ : '<UNDEF>' } @$avail_cols;
 
     while ( 1 ) {
-        my @chosen_cols = @$col_idxs ?  @cols[@$col_idxs] : '*';
+        my @chosen_cols = @$col_idxs ?  @cols[@$col_idxs] : '*'; # ###
         my $prompt = $init_prompt . join( ', ', @chosen_cols );
         my $choices = [ @pre, @cols ];
         my @idx = choose(
             $choices,
             { prompt => $prompt, lf => [ 0, $s_tab ], clear_screen => 1, undef => '<<',
               meta_items => [ 0 .. $#pre ], index => 1, mouse => $self->{mouse}, include_highlighted => 2,
-              hide_cursor => 0, codepage_mapping => $self->{codepage_mapping} }
+              hide_cursor => 0, codepage_mapping => $self->{codepage_mapping}, f3 => $self->{f3} }
         );
         if ( ! @idx || $idx[0] == 0 ) {
             if ( @$col_idxs ) {
@@ -635,16 +701,19 @@ sub __choose_columns {
 }
 
 sub __print_single_row {
-    my ( $self, $row, $len_key ) = @_;
-    my $orig_tbl = $self->{orig_table};
+    my ( $self, $orig_table, $row, $chosen_cols ) = @_;
+    my $orig_tbl = $orig_table;
     my $term_w = get_term_width();
-    $len_key = int( $term_w / 100 * 33 ) if $len_key > int( $term_w / 100 * 33 );
+    my $len_key = $self->{longest_col_name} + 1;
+    if ( $len_key > int( $term_w / 100 * 33 ) ) {
+        $len_key = int( $term_w / 100 * 33 );
+    }
     my $separator = ' : ';
     my $len_sep = length( $separator );
     my $col_max = $term_w - ( $len_key + $len_sep + 1 );
     my $row_data = [ ' Close with ENTER' ];
 
-    for my $col ( @{$self->{chosen_cols}} ) {
+    for my $col ( @$chosen_cols ) {
         push @$row_data, ' ';
         my $key = $orig_tbl->[0][$col];
         if ( ! defined $key ) {
@@ -676,7 +745,7 @@ sub __print_single_row {
     }
     choose(
         $row_data,
-        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
+        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, f3 => $self->{f3} }
     );
 }
 
@@ -701,7 +770,7 @@ sub _handle_reference {
 }
 
 sub __print_term_not_wide_enough_message {
-    my ( $self ) = @_;
+    my ( $self, $table_copy ) = @_;
     my $prompt_1 = 'To many columns - terminal window is not wide enough.';
     choose(
         [ 'Press ENTER to show the column names.' ],
@@ -709,8 +778,8 @@ sub __print_term_not_wide_enough_message {
     );
     my $prompt_2 = 'Column names (close with ENTER).';
     choose(
-        $self->{table_copy}[0],
-        { prompt => $prompt_2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
+        $table_copy->[0],
+        { prompt => $prompt_2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, f3 => $self->{f3} }
     );
 }
 
@@ -741,7 +810,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.124
+Version 0.130
 
 =cut
 
@@ -775,7 +844,7 @@ cursor reaches the topmost line, the previous page is shown automatically if it 
 
 If the terminal is too narrow to print the table, the columns are adjusted to the available width automatically.
 
-If the option table_expand is enabled and a row is selected with Return, each column of that row is output in its own
+If the option table_expand is enabled and a row is selected with C<Return>, each column of that row is output in its own
 line preceded by the column name. This might be useful if the columns were cut due to the too low terminal width.
 
 The following modifications are made (at a copy of the original data) to the table elements before the output.
@@ -880,6 +949,9 @@ If the size of the window is changed, the screen is rewritten as soon as the use
 If the option I<choose_columns> is enabled, the C<SpaceBar> key (or the right mouse key) can be used to select columns -
 see option L</choose_columns>.
 
+The C<F3> key opens a prompt. A regular expression is expected as input. This enables one to only display rows where at
+least one column matches the entered pattern. See option I<f3>.
+
 =head2 OPTIONS
 
 Defaults may change in a future release.
@@ -939,6 +1011,20 @@ Setting I<color> to C<1> enables the support for color and text formatting escap
 selected element. If set to C<2>, also for the current selected element the color support is enabled (inverted colors).
 
 Default: 0
+
+=head3 f3
+
+This option is experimental.
+
+Set the behavior of the C<F3> key.
+
+0 - off
+
+1 - case-insensitive search
+
+2 - case-sensitive search
+
+Default: 1
 
 =head3 grid
 

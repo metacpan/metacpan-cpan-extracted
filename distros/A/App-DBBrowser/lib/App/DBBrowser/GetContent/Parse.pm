@@ -46,9 +46,9 @@ sub __parse_with_Text_CSV {
     say $waiting . "\r";
     seek $fh, 0, 0;
     my $rows_of_cols = [];
-    require Text::CSV;
     require String::Unescape;
     my $options = { map { $_ => String::Unescape::unescape( $sf->{o}{csv}{$_} ) } keys %{$sf->{o}{csv}} };
+    require Text::CSV;
     my $csv = Text::CSV->new( $options ) or die Text::CSV->error_diag();
     $csv->callbacks( error => sub {
         my ( $code, $str, $pos, $rec, $fld ) = @_;

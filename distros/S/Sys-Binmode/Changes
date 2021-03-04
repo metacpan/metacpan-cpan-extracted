@@ -1,4 +1,14 @@
 Revision history for Perl module Sys::Binmode
 
+0.02 Wed, 3 March 2021
+- FIX: do/require now work on Windows.
+- Perl 5.14 is now supported.
+- Improve documentation, esp. re utf8.pm.
+- Fix filesystem tests on nonzero-numbered devices.
+- Avoid re-wrapping the already-wrapped code in later threads.
+- Remove static assets from do & require tests.
+- (internal) Deduplicate %^H key
+- (internal) Tweak saving of op handlers.
+
 0.01 Tue, 2 March 2021
 - original version

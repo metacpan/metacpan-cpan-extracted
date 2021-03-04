@@ -110,6 +110,7 @@ sub get_content {
                     elsif ( $sf->{i}{gc}{source_type} eq 'file' ) {
                         $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
                         $open_mode = '<:encoding(' . $sf->{o}{insert}{file_encoding} . ')';
+                        #
                     }
                     $sql->{insert_into_args} = [];
                     if ( $parse_mode_idx < 3 && -T $file_fs ) {

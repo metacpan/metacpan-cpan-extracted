@@ -4,7 +4,7 @@ use warnings;
 
 package Geo::LibProj::cs2cs;
 # ABSTRACT: IPC interface to PROJ cs2cs
-$Geo::LibProj::cs2cs::VERSION = '1.02';
+$Geo::LibProj::cs2cs::VERSION = '1.03';
 
 use Carp qw(carp croak);
 use File::Basename qw(basename);
@@ -16,11 +16,13 @@ use IPC::Run3 qw(run3);
 
 our $CMD = 'cs2cs';
 our @PATH = ();
-eval {
-	require # optional module; try to hide from static analysers
-		Alien::proj;
-	unshift @PATH, File::Spec->catdir(Alien::proj->dist_dir, 'bin');
-};
+BEGIN {
+	# optional modules
+	eval "require Alien::proj" or eval "require Alien::Proj4";
+}
+eval { unshift @PATH, File::Spec->catdir(Alien::proj->dist_dir, 'bin') };
+eval { push @PATH, undef, File::Spec->catdir(Alien::Proj4->dist_dir, 'bin') };
+
 
 # default stringification formats for cs2cs stdin and stdout
 our $FORMAT_IN  = '%.15g';
@@ -52,8 +54,10 @@ sub new {
 	for my $key (keys %$params) {
 		delete $params->{$key} unless defined $params->{$key};
 	}
+	my @source_crs = split m/ /, $source_crs // 'undef';
+	my @target_crs = split m/ /, $target_crs // 'undef';
 	$self->{cmd} = $self->_cmd();
-	$self->{call} = [$self->{cmd}, %$params, $source_crs, '+to', $target_crs, '-'];
+	$self->{call} = [$self->{cmd}, %$params, @source_crs, '+to', @target_crs, '-'];
 	
 	$self->_ffi_init($source_crs, $target_crs, $params);
 	
@@ -267,7 +271,7 @@ Geo::LibProj::cs2cs - IPC interface to PROJ cs2cs
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -596,7 +600,7 @@ a truthy value, set to C<undef>, or is missing entirely.
 =item * No other control parameters are specified.
 
 =item * Both the source CRS and the target CRS given to the
-C<new()> method can be successfully interpreted by
+C<new()> method can be successfully interpreted as CRS by
 L<proj_create()|https://proj.org/development/reference/functions.html#c.proj_create>.
 
 =item * Creating a new PROJ threading context using

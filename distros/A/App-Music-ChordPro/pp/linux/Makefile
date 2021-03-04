@@ -26,15 +26,15 @@ clean ::
 
 PERLLIB := /usr/lib64
 PERLINC := ${PERLLIB}/perl5/CORE
-PERLSO  := perl530.so
+PERLSO  := $(shell perl -wle 'printf("perl%d%06d.so\n",$$1,$$2) if $$] =~ /^(\d+)\.(\d\d\d\d\d\d)/')
 
 .PHONY :: ppl
-ppl :: clean chordpro wxchordpro unpack copy_coredll loaders
+ppl :: clean wxchordpro unpack copy_coredll loaders
 
 .PHONY :: unpack
 unpack :
 	perl ../pp2ppl.pl --dest=${DEST} wxchordpro --quiet
-	perl ../pp2ppl.pl --dest=${DEST} chordpro   --quiet
+	cp -p "${ROOT}/script/chordpro.pl" "${DEST}/script/chordpro.pl" 
 	cp -p "${ROOT}/lib/App/Music/ChordPro/Config.pm" "${DEST}/lib/App/Music/ChordPro/Config.pm" 
 	cp "${DEST}/res/icons/chordpro.ico" ${DEST}
 	mv "${DEST}/res" "${DEST}/lib/App/Music/ChordPro/"
@@ -50,12 +50,12 @@ unpack :
 
 copy_coredll :
 	cp -pL ${PERLLIB}/libperl.so ${DEST}/${PERLSO}
-	patchelf --set-soname perl530.so ${DEST}/${PERLSO}
+	patchelf --set-soname ${PERLSO} ${DEST}/${PERLSO}
 	cp -pL ${PERLLIB}/libpthread.so.0 ${DEST}/
 
 PREFIX := '"script/"'
 CCOPTS := $(shell perl -MExtUtils::Embed -e ccopts) -DSCRIPTPREFIX=${PREFIX}
-LDOPTS := -Wl,--rpath='$${ORIGIN}' ${PERLSO} -lpthread
+LDOPTS := -Wl,--rpath='$${ORIGIN}' ${DEST}/${PERLSO} -lpthread
 
 .PHONY :: loaders
 loaders : "${DEST}/wxchordpro" "${DEST}/chordpro"
@@ -73,6 +73,15 @@ _loaders : "${DEST}/chordpro"
 
 clean ::
 	rm -fr build
+
+# Build AppImage.
+APPIMAGETOOL := appimagetool
+
+appimage : ppl
+	cp AppRun ${DEST}
+	cd ${DEST}; ln lib/App/Music/ChordPro/res/linux/chordpro.desktop .
+	cd ${DEST}; ln lib/App/Music/ChordPro/res/icons/chordpro.png .
+	${APPIMAGETOOL} -n ${DEST} ChordPro.AppImage
 
 # Truly dynamic version of loader. Rename to {wx}chordpro if you dare.
 

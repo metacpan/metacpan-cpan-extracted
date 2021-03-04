@@ -30,7 +30,5 @@ jobs:
         run: perl Makefile.PL
       - name: make
         run: make
-      - name: run one
-        run: prove -wlvmb t/exec_and_system.t
       - name: Run Tests
-        run: make test
+        run: prove -wlvmb t

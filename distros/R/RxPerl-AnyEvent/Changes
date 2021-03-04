@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl-AnyEvent
 
+v6.6.0 2021-03-03T22:08:48Z
+
+    - allow RxPerl's first_value_from, last_value_from
+
 v6.0.1 2021-01-30T05:02:17Z
 
     - updated version of RxPerl dependency

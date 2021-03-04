@@ -30,6 +30,9 @@ sub new {
 			      ##-- verbosity
 			      check_symbols => 0,
 
+			      ##-- Helsinki variant (e.g. 'de', 'en', ...)
+			      helsinkiLang => '',
+
 			      ##-- user args
 			      @_
 			     );
@@ -57,6 +60,12 @@ sub analyzeTypes {
 	$tag   = $1;
 	$lemma = substr($hi, 0, length($hi)-length($tag));
 	$tag   = join('.', ($tag =~ /\[\+?([^\<\>\[\]\/\\]+)\\?\]/g));
+      }
+      elsif ($hi =~ /(\[\+[^<>\[\]\/\\]+\](?:\[[^\]]*\]|\\.)*)$/) {
+	##-- de_free: "Haus[<NN>]Mann[<NN>]Kost[+NN][<Fem>][<Akk>][<Sg>]", "laufen[+V][<3>][<Sg>][<Pres>][<Ind>]"
+	$tag = $1;
+	$lemma = substr($hi, 0, length($hi)-length($tag));
+	$tag   = join('.', ($tag =~ /\[\+?<?([^<>\[\]\/\\]+)\\?>?\]/g));
       }
       elsif ($hi =~ /((?:\\?\[\<?[^\<\>\[\]\/\\]+\>?\\?\]))$/) {
 	$tag   = $1;
@@ -88,7 +97,7 @@ __END__
 
 =head1 NAME
 
-DTA::CAB::Analyzer::Morph - morphological analysis via Gfsm automata
+DTA::CAB::Analyzer::Morph::Helsinki - morphological analysis via Gfsm automata, for use with Helsinki-style transducers
 
 =cut
 
@@ -111,8 +120,8 @@ DTA::CAB::Analyzer::Morph - morphological analysis via Gfsm automata
 
 =head1 DESCRIPTION
 
-DTA::CAB::Analyzer::Morph
-a simplified wrapper for
+DTA::CAB::Analyzer::Morph::Helsinki
+is a simplified wrapper for
 L<DTA::CAB::Analyzer::Automaton::Gfsm|DTA::CAB::Analyzer::Automaton::Gfsm>
 which sets the following default options:
 
@@ -122,6 +131,12 @@ which sets the following default options:
  tolower => 1,            ##-- bash input to lower-case
 
 It also adds TAGH-style tag-extraction post-processing in its analyzeTypes() method.
+
+Morphological transducers are available in HFST format for various languages
+from L<https://sourceforge.net/projects/hfst/files/resources/morphological-transducers/>.
+In order to be used with this package, the HFST transducers must be converted to Gfsm
+format, and may require additional transducer-specific adjustments (e.g. alphabet conventions
+for tag-extraction heuristics).
 
 =cut
 
@@ -140,7 +155,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2019 by Bryan Jurish
+Copyright (C) 2016-2021 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.1 or,

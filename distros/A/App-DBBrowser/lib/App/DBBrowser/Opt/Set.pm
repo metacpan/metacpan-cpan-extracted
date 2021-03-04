@@ -69,6 +69,7 @@ sub _options {
             { name => '_keep_header',  text => "- Keep header",       section => 'table' },
             { name => '_table_expand', text => "- Expand table",      section => 'table' },
             { name => '_info_expand',  text => "- Expand info-table", section => 'G'     },
+            { name => '_f3',           text => "- F3 filter",         section => 'table' },
             { name => '_mouse',        text => "- Mouse mode",        section => 'table' },
         ],
         group_enable => [
@@ -495,6 +496,13 @@ sub set_options {
                 $prompt .= "\n\n" . 'Choose: ';
                 my $sub_menu = [
                     [ 'info_expand', "- Expand info-table rows",   [ $no, $yes . ' - fast back', $yes ] ],
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq '_f3' ) {
+                my $prompt = 'Choose: ';
+                my $sub_menu = [
+                    [ 'f3', "- Row filter", [ 'disabled', 'case insensitive', 'case sensitive' ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

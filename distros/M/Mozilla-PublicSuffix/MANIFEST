@@ -5,7 +5,6 @@ LICENSE
 MANIFEST
 META.yml
 README
-TODO
 effective_tld_names.dat
 lib/Mozilla/PublicSuffix.pm
 t/00-compile.t

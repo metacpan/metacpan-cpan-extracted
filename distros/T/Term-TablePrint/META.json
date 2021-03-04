@@ -37,8 +37,9 @@
             "Exporter" : "0",
             "List::Util" : "1.33",
             "Scalar::Util" : "0",
-            "Term::Choose" : "1.712",
+            "Term::Choose" : "1.720",
             "Term::Choose::Util" : "0.121",
+            "Term::Form" : "0.530",
             "constant" : "0",
             "perl" : "5.008003",
             "strict" : "0",
@@ -57,6 +58,6 @@
          "web" : "https://github.com/kuerbis/Term-TablePrint"
       }
    },
-   "version" : "0.124",
+   "version" : "0.130",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

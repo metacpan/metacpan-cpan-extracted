@@ -1,5 +1,13 @@
 Revision history for Perl extension RxPerl
 
+v6.6.1 2021-03-03T21:32:07Z
+
+    - FIXED: allow perl v5.10 to run RxPerl again
+
+v6.6.0 2021-03-03T21:21:37Z
+
+    - added first_value_from, last_values_from exportable functions
+
 v6.5.0 2021-01-27T08:53:33Z
 
     - added op_skip_until

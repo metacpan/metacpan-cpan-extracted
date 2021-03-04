@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.258';
+our $VERSION = '2.260';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -53,7 +53,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.258
+Version 2.260
 
 =head1 SYNOPSIS
 
@@ -162,6 +162,9 @@ Vertical spaces (C<\v>) are squashed to two spaces
 Control characters, code points of the surrogate ranges and non-characters are removed.
 
 See also the option group L</Output>.
+
+The C<F3> key opens a prompt. A regular expression is expected as input. This enables one to only display rows where at
+least one column matches the entered pattern. See option L<F3 filter>.
 
 =head1 MENUS
 
@@ -700,6 +703,20 @@ do not expand the first row if the cursor auto-jumped to the first row.
 
 =back
 
+=head3 F3 filter
+
+Set the behavior of the C<F3> key.
+
+=over
+
+=item C<disabled>
+
+=item C<case-insensitive search>
+
+=item C<case-sensitive search>
+
+=back
+
 =head3 Mouse mode
 
 Set the I<Mouse mode> (see L<Term::Choose/mouse>).
@@ -981,7 +998,7 @@ are then used as default values when the user is asked for the data types.
 Sets C<LIMIT> automatically to I<Max Rows>. This can be overwritten by setting a SQL C<LIMIT> statement manually.
 Fetched table rows are kept in memory.
 
-To disable the automatic limit set I<Auto Limit> to C<0>.
+To disable the automatic limit set I<Max Rows> to C<0>.
 
 =head2 Output
 

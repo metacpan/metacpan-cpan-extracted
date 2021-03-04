@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.068';
+our $VERSION = '1.069';
 # ABSTRACT: The Best Web Framework Deserves the Best CMS
 
 # "Mr. Fry: Son, your name is Yancy, just like me and my grandfather and
@@ -313,21 +313,19 @@ has home => sub {
 
 sub startup {
     my ( $app ) = @_;
+    unshift @{$app->plugins->namespaces}, 'Yancy::Plugin';
+
     $app->plugin( Config => { default => { } } );
     $app->plugin( 'Yancy', $app->config );
 
-    unshift @{$app->plugins->namespaces}, 'Yancy::Plugin';
-    for my $plugin ( @{ $app->config->{plugins} } ) {
-        $app->plugin( @$plugin );
-    }
-
-    $app->routes->get('/*path', { path => 'index' } )
+    $app->routes->get('/*fallback', { fallback => 'index' } )
     ->to( cb => sub {
         my ( $c ) = @_;
-        my $path = $c->stash( 'path' );
+        my $path = $c->stash( 'fallback' );
         return if $c->render_maybe( $path );
         $path =~ s{(^|/)[^/]+$}{${1}index};
-        return $c->render( $path );
+        return if $c->render_maybe( $path );
+        return $c->reply->not_found;
     } );
     # Add default not_found renderer
     push @{$app->renderer->classes}, 'Yancy';
@@ -343,7 +341,7 @@ Yancy - The Best Web Framework Deserves the Best CMS
 
 =head1 VERSION
 
-version 1.068
+version 1.069
 
 =head1 SYNOPSIS
 

@@ -808,6 +808,24 @@ ok $state->id;
   is $role->label, 'test';
 }
 
+# auto_validation test
+
+{
+  # Basic create test.
+  ok my $person = Schema
+    ->resultset('Test')
+    ->create({
+      name => 'a',
+    }), 'created fixture';
+
+  ok $person->in_storage, 'record was  saved';
+  ok $person->invalid, 'attempted record invalid';
+  is_deeply +{ $person->errors->to_hash }, +{
+    name => [
+      "is too short (minimum is 2 characters)",
+    ],
+  };
+}
 
 done_testing;
 

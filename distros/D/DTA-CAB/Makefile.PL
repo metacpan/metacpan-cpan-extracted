@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 ##----------------------------------------------------------------------
 ## Constants
-my $VERSION = '1.113';
+my $VERSION = '1.115';
 
 ##----------------------------------------------------------------------
 ## Hacks
@@ -208,7 +208,8 @@ sub MY::manifypods {
 
 INST_CSS ?= ../../$(CSS)
 #POD2HTMLFLAGS ?= --css="$(INST_CSS)" --backlink="(Back to top)" --podroot=blib --podpath=script --header
-POD2HTMLFLAGS ?= --css="$(INST_CSS)" --backlink --podroot=blib --podpath=lib:script --noheader
+#POD2HTMLFLAGS ?= --css="$(INST_CSS)" --backlink --podroot=blib --podpath=lib:script --noheader
+POD2HTMLFLAGS ?= --css="$(INST_CSS)" --backlink --podroot=./blib --podpath=./lib:./script --noheader
 POD2HTML ?= pod2html $(POD2HTMLFLAGS)
 
 INST_HTMLDIR ?= blib/html

@@ -153,6 +153,7 @@ t/lib/Example/Schema/Result/PersonRole.pm
 t/lib/Example/Schema/Result/Profile.pm
 t/lib/Example/Schema/Result/Role.pm
 t/lib/Example/Schema/Result/State.pm
+t/lib/Example/Schema/Result/Test.pm
 t/lib/Example/Schema/ResultSet.pm
 t/lib/Example/Schema/ResultSet/PersonRole.pm
 t/lib/Person.pm
@@ -183,6 +184,7 @@ t/lib/locale/en.pl
 t/opts.t
 t/proxy.t
 t/skip.t
+t/strict.t
 t/translation.t
 t/validates.t
 t/validator.t

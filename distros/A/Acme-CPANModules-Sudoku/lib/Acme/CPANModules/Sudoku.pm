@@ -1,9 +1,9 @@
 package Acme::CPANModules::Sudoku;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-13'; # DATE
+our $DATE = '2021-01-16'; # DATE
 our $DIST = 'Acme-CPANModules-Sudoku'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use Acme::CPANModulesUtil::Misc;
@@ -17,20 +17,22 @@ in the room.
 **Playing**
 
 There are certainly more modules on CPAN for solving Sudoku puzzles compared to
-for playing. And between the two available modules, I find that there's no good
-playable Sudoku game on CPAN. You'd be better off opening your browser and visit
-<https://websudoku.com> or <https://sudoku.com>. Sad but true. Not the case for
-all games though. I did enjoy *Games::FrozenBubble* and still play *Games::2048*
-from time to time.
+for playing. And between the two available modules for playing, I find that
+there's currently no good playable Sudoku game on CPAN. Sad but true. You'd be
+better off opening your browser and visiting <https://websudoku.com> or
+<https://sudoku.com>, or installing *ksudoku* or *gnome-sudoku* if you're using
+KDE/GNOME.
 
-These modules are for playing Sudoku:
+(CPAN does still contain some playable games though. I did enjoy
+*Games::FrozenBubble* and still play *Games::2048* from time to time.)
+
+These modules are available for playing Sudoku:
 
 <pm:Games::Sudoku::CLI>. Since it's CLI (prompt-based) instead of TUI, it's not
 really convenient to play unless you're a CLI freak.
 
-<pm:Games::Sudoku::Component::TkPlayer>. It's GUI and barely playable, but
-clunky and not pretty. There's no visual indicator for separating the larger 3x3
-boxes.
+<pm:Games::Sudoku::Component::TkPlayer>. It's GUI, but clunky and not pretty.
+There's no visual indicator for separating the larger 3x3 boxes.
 
 
 **Generating**
@@ -86,7 +88,7 @@ Acme::CPANModules::Sudoku - Sudoku-related modules on CPAN
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANModules::Sudoku (from Perl distribution Acme-CPANModules-Sudoku), released on 2021-01-13.
+This document describes version 0.005 of Acme::CPANModules::Sudoku (from Perl distribution Acme-CPANModules-Sudoku), released on 2021-01-16.
 
 =head1 DESCRIPTION
 
@@ -97,20 +99,22 @@ in the room.
 B<Playing>
 
 There are certainly more modules on CPAN for solving Sudoku puzzles compared to
-for playing. And between the two available modules, I find that there's no good
-playable Sudoku game on CPAN. You'd be better off opening your browser and visit
-L<https://websudoku.com> or L<https://sudoku.com>. Sad but true. Not the case for
-all games though. I did enjoy I<Games::FrozenBubble> and still play I<Games::2048>
-from time to time.
+for playing. And between the two available modules for playing, I find that
+there's currently no good playable Sudoku game on CPAN. Sad but true. You'd be
+better off opening your browser and visiting L<https://websudoku.com> or
+L<https://sudoku.com>, or installing I<ksudoku> or I<gnome-sudoku> if you're using
+KDE/GNOME.
 
-These modules are for playing Sudoku:
+(CPAN does still contain some playable games though. I did enjoy
+I<Games::FrozenBubble> and still play I<Games::2048> from time to time.)
+
+These modules are available for playing Sudoku:
 
 L<Games::Sudoku::CLI>. Since it's CLI (prompt-based) instead of TUI, it's not
 really convenient to play unless you're a CLI freak.
 
-L<Games::Sudoku::Component::TkPlayer>. It's GUI and barely playable, but
-clunky and not pretty. There's no visual indicator for separating the larger 3x3
-boxes.
+L<Games::Sudoku::Component::TkPlayer>. It's GUI, but clunky and not pretty.
+There's no visual indicator for separating the larger 3x3 boxes.
 
 B<Generating>
 

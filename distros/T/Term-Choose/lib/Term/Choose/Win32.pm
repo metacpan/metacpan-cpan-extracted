@@ -4,13 +4,14 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.713';
+our $VERSION = '1.720';
 
 
 use Encode qw( decode );
 
 use Encode::Locale qw();
-use Win32::Console qw( STD_INPUT_HANDLE ENABLE_MOUSE_INPUT ENABLE_PROCESSED_INPUT STD_OUTPUT_HANDLE
+use Win32::Console qw( STD_INPUT_HANDLE ENABLE_PROCESSED_INPUT ENABLE_LINE_INPUT ENABLE_ECHO_INPUT ENABLE_MOUSE_INPUT
+                       STD_OUTPUT_HANDLE
                        RIGHT_ALT_PRESSED LEFT_ALT_PRESSED RIGHT_CTRL_PRESSED LEFT_CTRL_PRESSED SHIFT_PRESSED
                        FOREGROUND_INTENSITY BACKGROUND_INTENSITY );
 
@@ -63,6 +64,10 @@ sub __get_key_OS {
             elsif ( $v_key_code == VK_CODE_DOWN )      { return VK_DOWN }
             elsif ( $v_key_code == VK_CODE_INSERT )    { return VK_INSERT }
             elsif ( $v_key_code == VK_CODE_DELETE )    { return VK_DELETE }
+            elsif ( $v_key_code == VK_CODE_F1 )        { return VK_F1 }
+            elsif ( $v_key_code == VK_CODE_F2 )        { return VK_F2 }
+            elsif ( $v_key_code == VK_CODE_F3 )        { return VK_F3 }
+            elsif ( $v_key_code == VK_CODE_F4 )        { return VK_F4 }
             else                                       { return NEXT_get_key }
         }
     }
@@ -99,16 +104,18 @@ sub __get_key_OS {
 
 sub __set_mode {
     my ( $self, $config ) = @_;
-    $self->{hide_cursor} = $config->{hide_cursor};
     $self->{input} = Win32::Console->new( STD_INPUT_HANDLE );
     $self->{old_in_mode} = $self->{input}->Mode();
     if ( $config->{mouse} ) {
-        $self->{input}->Mode( !ENABLE_PROCESSED_INPUT|ENABLE_MOUSE_INPUT );
+        # To make the mouse mode work, QUICK_EDIT_MODE has to be disabled.
+        # https://docs.microsoft.com/en-us/windows/console/setconsolemode:
+        # To disable this mode (QUICK_EDIT_MODE), use ENABLE_EXTENDED_FLAGS (0x0080) without this flag (QUICK_EDIT_MODE).
+        $self->{input}->Mode( !ENABLE_PROCESSED_INPUT|ENABLE_MOUSE_INPUT|0x0080 );
     }
     else {
         $self->{input}->Mode( !ENABLE_PROCESSED_INPUT );
     }
-    if ( $self->{hide_cursor} ) {
+    if ( $config->{hide_cursor} ) {
         print hide_cursor();
     }
     return $config->{mouse};
@@ -116,16 +123,26 @@ sub __set_mode {
 
 
 sub __reset_mode {
-    my ( $self ) = @_;
+    my ( $self, $config ) = @_;
+    my $fallback_resetmode = ENABLE_PROCESSED_INPUT|ENABLE_LINE_INPUT|ENABLE_ECHO_INPUT;
     if ( defined $self->{input} ) {
         if ( defined $self->{old_in_mode} ) {
             $self->{input}->Mode( $self->{old_in_mode} );
+            # old_in_mode == 503 == 0x0001|0x0002|0x0004|0x0010|0x0020|0x0040|0x0080|0x0100
             delete $self->{old_in_mode};
+        }
+        else {
+            $self->{input}->Mode( $fallback_resetmode );
         }
         $self->{input}->Flush;
     }
+    else {
+        my $input = Win32::Console->new( STD_INPUT_HANDLE );
+        $input->Mode( $fallback_resetmode );
+        $input->Flush;
+    }
     print normal();
-    if ( delete $self->{hide_cursor} ) {
+    if ( $config->{hide_cursor} ) {
         print show_cursor();
     }
 }
@@ -146,6 +163,16 @@ sub __get_cursor_row {
 
 
 
+# ENABLE_PROCESSED_INPUT        = 0x0001    win32::Console
+# ENABLE_LINE_INPUT             = 0x0002    Win32::Console
+# ENABLE_ECHO_INPUT             = 0x0004    Win32::Console
+# ENABLE_WINDOW_INPUT           = 0x0008    Win32::Console
+# ENABLE_MOUSE_INPUT            = 0x0010    Win32::Console
+# ENABLE_INSERT_MODE            = 0x0020
+# ENABLE_QUICK_EDIT_MODE        = 0x0040
+# ENABLE_EXTENDED_FLAGS         = 0x0080
+# ENABLE_AUTO_POSITION          = 0x0100    ?
+# ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200
 
 
 

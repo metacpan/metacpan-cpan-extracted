@@ -23,7 +23,7 @@ my $be = Yancy::Backend::Static->new(
 );
 
 my %index_page = (
-    path => 'index',
+    slug => 'index',
     title => 'Index',
     is_draft => JSON::PP::false,
     markdown => qq{# Index\n\nThis is my index page\n},
@@ -46,14 +46,14 @@ is_deeply $item,
 $item = $be->get( pages => 'NOT_FOUND' );
 is $item, undef, 'get() NOT_FOUND returns undef';
 
-$id = $be->create( pages => {path => 'empty'} );
+$id = $be->create( pages => {slug => 'empty'} );
 is $id, 'empty', 'id is returned';
 ok -z $temp->child( "$id.markdown" ), 'created empty page exists with zero size';
 $be->delete( pages => $id );
 ok ! -e $temp->child( "$id.markdown" ), 'empty page gets deleted';
 
 my %about_page = (
-    path => 'about',
+    slug => 'about',
     title => 'About',
     markdown => qq{# About\n\nThis is my about page\n},
 );
@@ -85,8 +85,8 @@ is_deeply $result->{items},
     ],
     'list() reports correct items';
 
-$result = $be->list( pages => { path => 'index' } );
-is $result->{total}, 1, 'list() reports one page matching path "index"';
+$result = $be->list( pages => { slug => 'index' } );
+is $result->{total}, 1, 'list() reports one page matching slug "index"';
 is_deeply $result->{items},
     [
         {
@@ -94,10 +94,10 @@ is_deeply $result->{items},
             html => qq{<h1>Index</h1>\n\n<p>This is my index page</p>\n},
         }
     ],
-    'list() reports correct items matching path "index"';
+    'list() reports correct items matching slug "index"';
 
-$result = $be->list( pages => { path => { -like => 'in%' } } );
-is $result->{total}, 1, 'list() reports one page matching path "in%"';
+$result = $be->list( pages => { slug => { -like => 'in%' } } );
+is $result->{total}, 1, 'list() reports one page matching slug "in%"';
 is_deeply $result->{items},
     [
         {
@@ -105,9 +105,9 @@ is_deeply $result->{items},
             html => qq{<h1>Index</h1>\n\n<p>This is my index page</p>\n},
         }
     ],
-    'list() reports correct items matching path "index"';
+    'list() reports correct items matching slug "index"';
 
-$result = $be->list( 'pages', {}, { order_by => { -desc => 'path' } } );
+$result = $be->list( 'pages', {}, { order_by => { -desc => 'slug' } } );
 is $result->{total}, 2, 'list() reports two pages total';
 is_deeply $result->{items},
     [
@@ -122,7 +122,7 @@ is_deeply $result->{items},
     ],
     'list() reports correct items in correct order';
 
-$result = $be->list( 'pages', {}, { order_by => { -desc => 'path' }, limit => 1 } );
+$result = $be->list( 'pages', {}, { order_by => { -desc => 'slug' }, limit => 1 } );
 is $result->{total}, 2, 'list() with limit still reports two pages total';
 is_deeply $result->{items},
     [
@@ -133,7 +133,7 @@ is_deeply $result->{items},
     ],
     'list() returns only 1 item, because of limit';
 
-$result = $be->list( 'pages', {}, { order_by => { -desc => 'path' }, offset => 1, limit => 1 } );
+$result = $be->list( 'pages', {}, { order_by => { -desc => 'slug' }, offset => 1, limit => 1 } );
 is $result->{total}, 2, 'list() with limit+offset still reports two pages total';
 is_deeply $result->{items},
     [
@@ -144,7 +144,7 @@ is_deeply $result->{items},
     ],
     'list() returns only 1 item, the 2nd item, because of limit+offset';
 
-$result = $be->list( 'pages', {}, { order_by => { -desc => 'path' }, offset => 1, limit => 50 } );
+$result = $be->list( 'pages', {}, { order_by => { -desc => 'slug' }, offset => 1, limit => 50 } );
 is $result->{total}, 2, 'list() with limit+offset beyond the end still reports two pages total';
 is_deeply $result->{items},
     [
@@ -167,7 +167,7 @@ is_deeply $item,
     'set item is correct';
 
 my %contact_page = (
-    path => 'contact',
+    slug => 'contact',
     title => 'Contact',
     markdown => qq{# Contact Me\n},
 );
@@ -182,14 +182,14 @@ is_deeply $item,
     },
     'set item is correct';
 
-$success = $be->set( pages => 'contact', { path => 'contact-different-path' } );
-ok $success, 'partial set changing a path was successful';
-$item = $be->get( pages => 'contact-different-path' );
+$success = $be->set( pages => 'contact', { slug => 'contact-different-slug' } );
+ok $success, 'partial set changing a slug was successful';
+$item = $be->get( pages => 'contact-different-slug' );
 is_deeply $item,
     {
         %contact_page,
         html => qq{<h1>Contact Me</h1>\n},
-        path => 'contact-different-path',
+        slug => 'contact-different-slug',
     },
     'set item is correct';
 ok !-f $temp->child( "contact.markdown" ), 'file is deleted';
@@ -237,7 +237,7 @@ subtest 'encoding' => sub {
 
     my %decoded_page = (
         title => 'Test ' . $id_decoded,
-        path => $id_decoded,
+        slug => $id_decoded,
         markdown => $content_decoded,
     );
 
