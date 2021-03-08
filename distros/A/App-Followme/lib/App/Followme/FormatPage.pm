@@ -11,7 +11,7 @@ use Digest::MD5 qw(md5_hex);
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "1.99";
+our $VERSION = "2.00";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

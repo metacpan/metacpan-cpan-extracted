@@ -20,7 +20,7 @@ my ($a, $b, $c, $d, $v, $union, $struct);
 
 # proj_coord
 
-($a, $b, $c, $d) = (12.3, -34.5, 56.7, -78.9);
+($a, $b, $c, $d) = (12.5, -34.5, 67.5, -89.5);
 lives_and { ok $union = proj_coord($a, $b, $c, $d) } 'coord';
 
 

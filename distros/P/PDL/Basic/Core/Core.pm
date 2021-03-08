@@ -8,7 +8,7 @@ use PDL::Exporter;
 require PDL; # for $VERSION
 use DynaLoader;
 our @ISA    = qw( PDL::Exporter DynaLoader );
-our $VERSION = '2.026';
+our $VERSION = '2.028';
 bootstrap PDL::Core $VERSION;
 use PDL::Types ':All';
 use Config;
@@ -2746,7 +2746,7 @@ sub PDL::convert {
 
 =for ref
 
-byte|short|ushort|long|indx|longlong|float|double (shorthands to convert datatypes)
+byte|short|ushort|long|indx|longlong|float|double|cfloat|cdouble (shorthands to convert datatypes)
 
 =for usage
 
@@ -3057,6 +3057,8 @@ sub PDL::set{    # Sets a particular single value
 =for ref
 
 Returns a single value inside a piddle as perl scalar.
+If the piddle is a native complex value (cdouble, cfloat), it will
+be stringified.
 
 =for usage
 

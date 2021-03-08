@@ -69,7 +69,7 @@ subtest "component (AttrbGrp) with group(NoInstrAttrib)" => sub {
             2 => 'ZERO_COUPON',
         });
     my $f_2 = Protocol::FIX::Field->new(872, 'InstrAttribValue', 'STRING');
-    my $g = Protocol::FIX::Group->new(
+    my $g   = Protocol::FIX::Group->new(
         $f_0,
         [
             $f_1 => 0,
@@ -101,7 +101,7 @@ subtest "component (InstrumentExtension) with complex subcomponent (AttrbGrp)" =
             2 => 'ZERO_COUPON',
         });
     my $f_2 = Protocol::FIX::Field->new(872, 'InstrAttribValue', 'STRING');
-    my $g = Protocol::FIX::Group->new(
+    my $g   = Protocol::FIX::Group->new(
         $f_0,
         [
             $f_1 => 0,
@@ -117,7 +117,7 @@ subtest "component (InstrumentExtension) with complex subcomponent (AttrbGrp)" =
             1 => 'BOOKENTRY',
             2 => 'BEARER',
         });
-    my $of_2 = Protocol::FIX::Field->new(869, 'PctAtRisk', 'PERCENTAGE');
+    my $of_2    = Protocol::FIX::Field->new(869, 'PctAtRisk', 'PERCENTAGE');
     my $c_outer = Protocol::FIX::Component->new(
         'InstrumentExtension',
         [

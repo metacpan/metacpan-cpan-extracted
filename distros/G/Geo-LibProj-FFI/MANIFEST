@@ -7,7 +7,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
-examples/pj_obs_api_mini_demo.pl
+eg/pj_obs_api_mini_demo.pl
 lib/Geo/LibProj/FFI.pm
 t/constants.t
 t/context.t

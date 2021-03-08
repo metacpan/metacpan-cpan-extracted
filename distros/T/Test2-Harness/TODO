@@ -1,20 +1,135 @@
- * Have runner spawn the test
- * Have main process monitor for jobs to start/end
+Test/Run start an [Interface]
+ - Listens for events and renders/logs them
+ - Listens for keystrokes and responds
+ - Curses interface maybe?
 
-  * New job:
-   * spawn processor with pipe (collect and audit, one process)
-   * Update running status display
+Test/Start start a [Runner]
+ - Starts Stages (if any)
+ - Directs stages to spawn tests, or spawn tests directly if no stages
+ - Brings stages back up to speed if they respawn without having done some expected work
+ - Re-spawns stages when necessary
+ - Exits when work is done
 
-  * Job End:
-   * Update running status display (but note that it is processing still if processor is not done)
+[Stage]s
+ - Get to a ready state, report ready to the runner
+ - Report to the runner when they respawn
+ - Run tests
 
-The main process will read all the ongoing pipes and render the output, it will also launch processors as needed.
+[Auditor]
+ - Parent to tests
+ - Exec'd after child is spawned
 
-Do we want an option to produce job-logs with -k instead of using pipes?
+[Test]
+ - Duh
 
 
-if (defined &Fcntl::F_SETPIPE_SZ) {
-    # Set pipe buffer to 5mb
-    my $size = fcntl($out_wh, Fcntl::F_SETPIPE_SZ, (5 * 1024 * 1014));
-}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Runner should be a poll loop, spawning tests or directing stages to spawn tests
+
+
+______________________
+
+Only use COMPRESS if there is a dip between the workers and the main process.. which seems unlikely
+
+PURGE post-exit timeout. Not needed, event-timeout is good enough
+
+
+Test(stdout, stderr) -> Overlord(-> muxer -> auditor ->) -> Logger(-> logfile/namedpipe)
+
+Main((<- logfile/namedpipe)(-> Renderers))
+
+===========================
+
+ - Run      - Keep as-is
+
+ - Runner   - Keep current name
+            - Runner spawns an auditor, which spawns the test
+            - Runner cannot spawn a new job until the auditor is done
+            - Runner no longer handles timeouts or killing all child processes, auditors handle it
+
+ - Stream   - Fix show_buffered to be false outside of the master process.
+            - Clean up
+            - If an FD is specified send it to the FD
+            - Otherwise print it ~pretty~ in STDOUT
+            - Maybe fix real problem in Test2::API/HUB/Subtest/IPC that sends buffered events to the local formatter.
+
+ - Events   - Can be just json that gets decoded when/if needed
+            - json is preserved to be passed along
+            - dirty() method to clear the json?
+            - readonly, ->dirty() makes a deep copy that is not read-only?
+            - see yy.pl
+
+ - Auditor  - Process that wraps a test and produces single-job results (collector+auditor by current names)
+            - Collect events for 1 job
+            - Audit events
+            - Kills itself and test if runner goes away
+            - Removes job dir after done (unless -k)
+            - Use SIGCHLD to make sure exit is written ASAP
+            - 4 parts:
+                - Collector   (jobdir)
+                - Muxer       (Re-orders and/or combines events)
+                - TimeTracker (TimeTracker, extend to include post-exit audit-time)
+                - Watcher     (Test State)
+            - Writes output
+                - See (job log below)
+
+ - Overlord - Should be the module for test/run (has no current name!)
+            - Should do the combining of results from multiple jobs
+            - Reads main process/runner output (all events from this are eminent)
+            - Produces aggregate info
+            - Sends events to log, renderer, plugin, etc
+            - Renderers have an event_types
+            - Only decode the set(s) needed for the renderer
+            - Delete job-files when done (except -k) but first ask each renderer if a replay is needed (qvf)
+            - Logger can write events as-is without decoding them :-)
+
+
+- Add custom color support
+
+
+
+- Double check bail-out behavior, some "cruft" was removed from stream
+- Change reload to send a "RELOAD" event to the queue instead of using sighup
+- Bail-out should bail just the current run, not kill the runner
+
+========================================
+
+job log: .ljsonl
+\d\nJSON\n...0\nnull\n
+
+========================================
+
+Event stream: .jsonl
+
+========================================
+
+Default Renderer
+ - Add display of done but still processing
+    - [P] Pass
+    - [F] Fail
+    - [A] Auditing
+    - [R] Running
+    - [T] To do or retry
+ 050 500 025 155 433    (rgbXXX)
+[P:0|F:0|A:0|R:0|T:100]
+
+
+
+\x10\x0C\0\x10

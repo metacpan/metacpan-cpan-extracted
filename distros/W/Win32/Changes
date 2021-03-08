@@ -1,5 +1,14 @@
 Revision history for the Perl extension Win32.
 
+0.56    [2021-03-07]
+        - added t/Privileges.t to MANIFEST
+
+0.55    [2021-03-07]
+        - added Win32::IsSymlinkCreationAllowed(), Win32::IsDeveloperModeEnabled(),
+          and Win32::GetProcessPrivileges() by Tomasz Konojacki <me@xenu.pl> [PR/27]
+        - removed old code for versions before Windows 2000
+          by Tomasz Konojacki <me@xenu.pl> [PR/26]
+
 0.54    [2020-03-27]
         - Skip tests that rely upon short names if these are unavailable
           and additional docs about short filenames. Richard Leach [PR/23]

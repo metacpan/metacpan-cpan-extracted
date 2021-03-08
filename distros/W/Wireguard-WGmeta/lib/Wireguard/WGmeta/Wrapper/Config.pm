@@ -49,7 +49,7 @@ use Wireguard::WGmeta::Parser::Config;
 use Wireguard::WGmeta::ValidAttributes;
 use Wireguard::WGmeta::Utils;
 
-our $VERSION = "0.2.1"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.2.2"; # do not change manually, this variable is updated when calling make
 
 use constant FALSE => 0;
 use constant TRUE => 1;
@@ -963,7 +963,8 @@ None, or undef if C<$new == True> and the interface in fact not a wg config.
 sub reload_from_disk($self, $interface, $new = FALSE) {
     my $config_path;
     if ($new == FALSE) {
-        if ($self->is_valid_interface($interface)) {
+        # do not use is_valid_interface() here otherwise there is a risk of infinite recursion (in a concurrent environment)
+        if (exists $self->{parsed_config}{$interface}) {
             $config_path = $self->{wireguard_home} . $interface . '.conf';
             my $contents = read_file($self->{parsed_config}{$interface}{config_path});
             $self->{parsed_config}{$interface} = parse_wg_config($contents, $interface, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, FALSE);

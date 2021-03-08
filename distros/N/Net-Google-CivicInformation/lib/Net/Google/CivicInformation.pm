@@ -1,13 +1,16 @@
 package Net::Google::CivicInformation;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use strict;
 use warnings;
 use v5.10;
 
 use Carp 'croak';
+use Function::Parameters;
 use HTTP::Tiny;
+use Log::Any ();
+
 use Types::Common::String 'NonEmptyStr';
 use Moo;
 use namespace::clean;
@@ -38,6 +41,15 @@ has _client => (
     },
 );
 
+has log => (
+    is      => 'lazy',
+    builder => sub { Log::Any->get_logger() },
+);
+
+method BUILD (@) {
+    $self->log->trace('Building instance of ' . __PACKAGE__);
+}
+
 1; # return true
 
 __END__
@@ -46,7 +58,7 @@ __END__
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =encoding utf8
 

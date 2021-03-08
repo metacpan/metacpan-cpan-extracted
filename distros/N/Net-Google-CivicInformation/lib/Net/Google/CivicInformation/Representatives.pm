@@ -1,6 +1,6 @@
 package Net::Google::CivicInformation::Representatives;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use strict;
 use warnings;
@@ -23,7 +23,14 @@ sub _build__api_url {
 }
 
 ##
+method BUILD (@) {
+    $self->log->trace('Building instance of ' . __PACKAGE__);
+}
+
+##
 method representatives_for_address (NonEmptyStr $address) {
+    $self->log->debugf('representatives_for_address called with: "%s"', $address);
+
     my $uri = URI->new( $self->_api_url );
     $uri->query_form(
         address => $address,
@@ -37,8 +44,12 @@ method representatives_for_address (NonEmptyStr $address) {
         if ( ! $call->{success} ) {
             my $resp = decode_json( $call->{content} );
             $response = $resp;
+
+            $self->log->error('Error response from Google API', $resp);
         }
         else {
+            $self->log->debug('Success response from Google API');
+
             my $data = decode_json( $call->{content} );
 
             my @result;
@@ -66,6 +77,8 @@ method representatives_for_address (NonEmptyStr $address) {
         }
     }
     catch {
+        $self->log->errorf("Fatal error trying to call Google API: $_");
+
         $response = {
             error => {
                 message => 'Caught fatal error trying to call Google API',
@@ -84,7 +97,7 @@ __END__
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =encoding utf8
 
@@ -131,7 +144,7 @@ On error, the response will contain a key C<error> containing a hashref like:
     }
   }
 
-On success, the response will contain an key C<officials> containing an arrayref of
+On success, the response will contain a key C<officials> containing an arrayref of
 hashrefs, ordered by descending seniority (head of state down). Each hashref
 represents a single official: there may be more than one record at the same "rank."
 The hashref will contain the following keys:

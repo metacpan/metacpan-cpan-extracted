@@ -41,6 +41,7 @@ EOPM
 
 pp_addhdr('
 #include <math.h>
+#include <complex.h>
 
 /* MOD requires hackage to map properly into the positive-definite numbers. */
 /* Note that this code causes some warning messages in the compile, because */
@@ -79,7 +80,6 @@ sub biop {
     my ($name,$op,$swap,$doc,%extra) = @_;
     my $optxt = protect_chars ref $op eq 'ARRAY' ? $op->[1] : $op;
     $op = $op->[0] if ref $op eq 'ARRAY';
-
     if ($swap) {
 	$extra{HdrCode} = << 'EOH';
   pdl *tmp;
@@ -100,8 +100,9 @@ EOH
 	#      See also `ufunc()`.
 	delete $extra{Exception};
     }
-    if( exists $extra{Comparison} && $PDL::Config{WITH_BADVAL} ) {
+    if (exists $extra{Comparison} && $PDL::Config{WITH_BADVAL}) {
 	# *append* to header
+	# I am not sure if this should be changed to complex double?
 	$extra{HdrCode} .= <<'EOH';
            {
              double bad_a, bad_b;
@@ -115,6 +116,7 @@ EOH
     }
 
     pp_def($name,
+	   PMCode => $pmcode,
 	   Pars => 'a(); b(); [o]c();',
 	   OtherPars => 'int swap',
 	   HandleBad => 1,
@@ -165,6 +167,9 @@ sub bifunc {
     my $isop=0; if ($funcov =~ s/^op//) { $isop = 1; }
     my $funcovp = protect_chars $funcov;
     $func = $func->[0] if ref $func eq 'ARRAY';
+    my $got_complex = PDL::Core::Dev::got_complex_version($func, 2);
+    $extra{GenericTypes} = [ grep !$is_complex{$_}, @{$extra{GenericTypes}} ]
+	if !$got_complex and $extra{GenericTypes};
     if ($swap) {
 	$extra{HdrCode} .= << 'EOH';
   pdl *tmp;
@@ -184,22 +189,21 @@ EOH
 #a little dance to avoid the MOD macro warnings for byte & ushort datatypes
     my $codestr;
     my $badcodestr;
+    my $complex_bit = << "ENDCODE";
+  types(C) %{ \$c() = c${func}(\$a(),\$b()); %}
+  types(G) %{ \$c() = c${func}f(\$a(),\$b()); %}
+ENDCODE
     if ($extra{unsigned}){
     $codestr = << "ENDCODE";
-  types(BU) %{
-  \$c() = BU_$func(\$a(),\$b());
-  %}
-  types(SLNFD) %{
-  \$c() = $func(\$a(),\$b());
-  %}
-  types(Q) %{
-  \$c() = Q_$func(\$a(),\$b());
-  %}
+  types(BU) %{ \$c() = BU_$func(\$a(),\$b()); %}
+  types(SLNFD) %{ \$c() = $func(\$a(),\$b()); %}
+  types(Q) %{ \$c() = Q_$func(\$a(),\$b()); %}
 ENDCODE
 } else {
-   $codestr = "\$c() = $func(\$a(),\$b());";
+   $codestr = "types(BUSLNQFD) %{ \$c() = $func(\$a(),\$b()); %}";
    }
  delete $extra{unsigned}; #remove the key so it doesn't get added in pp_def.
+    $codestr .= $complex_bit if $got_complex;
 
  $badcodestr = 'if ( $ISBAD(a()) || $ISBAD(b()) )
 	       $SETBAD(c());
@@ -250,6 +254,9 @@ sub ufunc {
     my $funcov = ref $func eq 'ARRAY' ? $func->[1] : $func;
     my $funcovp = protect_chars $funcov;
     $func = $func->[0] if ref $func eq 'ARRAY';
+    my $got_complex = PDL::Core::Dev::got_complex_version($func, 1);
+    $extra{GenericTypes} = [ grep !$is_complex{$_}, @{$extra{GenericTypes}} ]
+	if !$got_complex and $extra{GenericTypes};
 
     # handle exceptions
     my $badcode = '$ISBAD(a())';
@@ -260,6 +267,14 @@ sub ufunc {
 	#      See also `biop()`.
 	delete $extra{Exception};
     }
+    my $complex_bit = <<EOF;
+	types(G) %{ \$b() = c${func}f(\$a()); %}
+	types(C) %{ \$b() = c$func(\$a()); %}
+EOF
+    my $codestr = <<EOF;
+	types(BUSLNQFD) %{ \$b() = $func(\$a()); %}
+EOF
+    $codestr .= $complex_bit if $got_complex;
 
     # do not have to worry about propagation of the badflag when
     # inplace since only input piddle is a, hence its badflag
@@ -271,11 +286,13 @@ sub ufunc {
 	   NoBadifNaN => 1,
 	   Inplace => 1,
 	   Code => pp_line_numbers(__LINE__,
-	   "\$b() = $func(\$a());"),
+	       $codestr
+	   ),
 	   BadCode =>
-	   pp_line_numbers(__LINE__, 'if ( ' . $badcode . ' )
-	      $SETBAD(b());
-	   else' . "\n  \$b() = $func(\$a());\n"),
+		    pp_line_numbers(__LINE__, 'if ( ' . $badcode . ' )
+		    $SETBAD(b());
+		    else {' . "\n" . $codestr . "}\n"
+		    ),
 	   %extra,
 	   Doc => << "EOD");
 =for ref
@@ -328,10 +345,13 @@ biop('divide','/',1,'divide two piddles', Exception => '$b() == 0' );
 
 ## comparison ops
 # need swapping
-biop('gt','>',1,'the binary E<gt> (greater than) operation', Comparison => 1 );
-biop('lt','<',1,'the binary E<lt> (less than) operation', Comparison => 1 );
-biop('le','<=',1,'the binary E<lt>= (less equal) operation', Comparison => 1 );
-biop('ge','>=',1,'the binary E<gt>= (greater equal) operation', Comparison => 1 );
+my $R = [B,U,S,L,N,Q,F,D]; # real types here
+my $C = [C,G];
+# not defined for complex numbers
+biop('gt','>',1,'the binary E<gt> (greater than) operation', Comparison => 1, GenericTypes=>$R );
+biop('lt','<',1,'the binary E<lt> (less than) operation', Comparison => 1,GenericTypes=>$R );
+biop('le','<=',1,'the binary E<lt>= (less equal) operation', Comparison => 1,GenericTypes=>$R );
+biop('ge','>=',1,'the binary E<gt>= (greater equal) operation', Comparison => 1,GenericTypes=>$R );
 # no swap required but set anyway fixing sf bug #391
 biop('eq','==',1,'binary I<equal to> operation (C<==>)', Comparison => 1 );
 biop('ne','!=',1,'binary I<not equal to> operation (C<!=>)', Comparison => 1 );
@@ -352,20 +372,18 @@ biop('xor','^',1,'binary I<exclusive or> of two piddles',GenericTypes => $T,
 ufunc('bitnot','~','unary bit negation',GenericTypes => $T);
 
 # some standard binary functions
-bifunc('power',['pow','op**'],1,'raise piddle C<$a> to the power C<$b>',GenericTypes => [D]);
-bifunc('atan2','atan2',1,'elementwise C<atan2> of two piddles',GenericTypes => [D]);
-bifunc('modulo',['MOD','op%'],1,'elementwise C<modulo> operation',unsigned=>1);
-bifunc('spaceship',['SPACE','op<=>'],1,'elementwise "<=>" operation');
+bifunc('power',['pow','op**'],1,'raise piddle C<$a> to the power C<$b>',GenericTypes => [C,G,D]);
+bifunc('atan2','atan2',1,'elementwise C<atan2> of two piddles',GenericTypes => [D,F]);
+bifunc('modulo',['MOD','op%'],1,'elementwise C<modulo> operation',unsigned=>1,GenericTypes=>$R);
+bifunc('spaceship',['SPACE','op<=>'],1,'elementwise "<=>" operation', ,GenericTypes=>$R);
 
 # some standard unary functions
-ufunc('sqrt','sqrt','elementwise square root', Exception => '$a() < 0' );
-ufunc('abs',['ABS','abs'],'elementwise absolute value',GenericTypes => [D,F,S,L]);
+ufunc('sqrt','sqrt','elementwise square root',); # Exception => '$a() < 0' ,GenericTypes=>$R );
 ufunc('sin','sin','the sin function');
 ufunc('cos','cos','the cos function');
-ufunc('not','!','the elementwise I<not> operation');
-ufunc('exp','exp','the exponential function',GenericTypes => [D]);
-ufunc('log','log','the natural logarithm',GenericTypes => [D],
-      Exception => '$a() <= 0' );
+ufunc('not','!','the elementwise I<not> operation',GenericTypes=>$R );
+ufunc('exp','exp','the exponential function',GenericTypes => [D,C]);
+ufunc('log','log','the natural logarithm',GenericTypes => [F,D,G,C], Exception => '$a() <= 0' );
 
 pp_export_nothing();
 
@@ -429,6 +447,55 @@ This is unnecessary if $pdl->badflag is known to be 1 before the slice is perfor
 See http://pdl.perl.org/PDLdocs/BadValues.html#dataflow_of_the_badflag for details.'
 ); # pp_def assgn
 
+# special functions for complex data types that somehow don't work well with
+# the ufunc/bifunc logic
+sub cfunc {
+    my ($name,$func,$doc, %extra) = @_;
+    my $badcode = '$ISBAD(a())';
+    my $codestr = "\$b() = \$TCG(${func},${func}f)(\$a());";
+    pp_def($name,
+	   GenericTypes=>$C,
+	   Pars => 'a(); [o]b()',
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   Inplace => 1,
+	   Code => pp_line_numbers(__LINE__,
+	       $codestr
+	   ),
+	   BadCode =>
+		    pp_line_numbers(__LINE__, 'if ( ' . $badcode . ' )
+		    $SETBAD(b());
+		    else {' . "\n" . $codestr . "}\n"
+		    ),
+	   %extra,
+	   Doc => $doc);
+}
+
+cfunc('carg', 'carg', 'Returns the polar angle of a complex number.');
+cfunc('conj', 'conj', 'complex conjugate.');
+cfunc('creal', 'creal', 'Returns the real part of a complex number.');
+cfunc('cimag', 'cimag', 'Returns the imaginary part of a complex number.');
+cfunc('_cabs', 'cabs', 'Returns the absolute (length) of a complex number.',
+    PMFunc=>'',
+);
+
+pp_def(
+	'ci',
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	 GenericTypes=>$C,
+	Pars=>'cdouble [o]b();',
+	Code=>'$b()=0+1I;',
+	Doc=> <<'EOF',
+Returns the complex number 0 + 1i.
+
+B<WARNING> because this is not defined as a constant (with empty
+prototype), you must use it either as C<10*ci> or C<ci()*10>. If you
+use it as C<ci*10> this will actually try to use 10 as a glob and pass
+that to C<ci>, which will not do what you want.
+EOF
+); # pp_def ci
+
 pp_def('ipow',
    Doc => qq{
 =for ref
@@ -478,8 +545,35 @@ Algorithm from L<Wikipedia|http://en.wikipedia.org/wiki/Exponentiation_by_squari
    })
 );
 
+pp_def ( '_rabs',
+	GenericTypes=>[qw(B U S L N Q F D)],
+	Pars=>'a(); [o]b()',
+	HandleBad => 1,
+	NoBadifNaN => 1,
+	    Inplace => 1,
+	BadCode => '
+	       if ( $ISBAD(a()) )
+	           $SETBAD(b());
+	       else
+		$b()=ABS ($a()) ; ',
+	Code=>'$b()=ABS ($a()) ; ',
+	Doc=>'Returns the absolute value of a number. ' ,
+	PMFunc=>'',
+);
 
-#pp_export_nothing();
+pp_addpm(<<'EOPM');
+
+sub PDL::abs {
+	my $x=shift;
+	my $ret;
+	if ($x->type eq 'cdouble' or $x->type eq 'cfloat') {
+		$ret=PDL::_cabs($x);
+	} else {
+		$ret=PDL::_rabs($x);
+	}
+	$ret;
+}
+
+EOPM
 
 pp_done();
-

@@ -15,9 +15,9 @@ use Exporter 'import';
 our @EXPORT_OK = @RxPerl::EXPORT_OK;
 our %EXPORT_TAGS = %RxPerl::EXPORT_TAGS;
 
-our $VERSION = "v6.6.0";
+our $VERSION = "v6.7.0";
 
-our $promise_class;
+our $promise_class = 'Future';
 
 foreach my $func_name (@EXPORT_OK) {
     set_subname __PACKAGE__."::$func_name", \&{$func_name};

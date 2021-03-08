@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2019 -- leonerd@leonerd.org.uk
 
 package Device::AVR::Info::Module;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp;
 
@@ -23,15 +23,15 @@ C<Device::AVR::Info::Module> - represent a single kind of peripheral module type
 
 Instances in this class are returned from L<Device::AVR::Info>:
 
- use Device::AVR::Info;
+   use Device::AVR::Info;
 
- my $avr = Device::AVR::Info->new_from_file( "devices/ATtiny84.xml" );
+   my $avr = Device::AVR::Info->new_from_file( "devices/ATtiny84.xml" );
 
- my $fuses = $avr->peripheral( 'FUSE' );
- my $module = $fuses->module;
+   my $fuses = $avr->peripheral( 'FUSE' );
+   my $module = $fuses->module;
 
- printf "The FUSE module has %d registers\n",
-    scalar $module->registers( 'FUSE' );
+   printf "The FUSE module has %d registers\n",
+      scalar $module->registers( 'FUSE' );
 
 =cut
 
@@ -49,7 +49,9 @@ sub _new
 
 =cut
 
-=head2 $name = $module->name
+=head2 name
+
+   $name = $module->name
 
 Returns the name of the module
 
@@ -57,26 +59,28 @@ Returns the name of the module
 
 sub name { shift->{_module}{name} }
 
-=head2 @registers = $module->registers( $groupname )
+=head2 registers
+
+   @registers = $module->registers( $groupname )
 
 Returns a list of register instances, representing the registers in the named
 group.
 
 Each is a structure of the following fields.
 
- $register->name
- $register->offset
- $register->size
- $register->initval
- $register->caption
- $register->mask
- @fields = $register->bitfields
+   $register->name
+   $register->offset
+   $register->size
+   $register->initval
+   $register->caption
+   $register->mask
+   @fields = $register->bitfields
 
 The C<bitfields> field returns a list of structures of the following fields:
 
- $field->name
- $field->caption
- $field->mask
+   $field->name
+   $field->caption
+   $field->mask
 
 =cut
 

@@ -5,7 +5,7 @@ use base qw(PDF::API2::Content PDF::API2::Resource::XObject::Form);
 use strict;
 use warnings;
 
-our $VERSION = '2.038'; # VERSION
+our $VERSION = '2.039'; # VERSION
 
 use PDF::API2::Basic::PDF::Dict;
 use PDF::API2::Basic::PDF::Utils;
@@ -21,7 +21,7 @@ sub new {
     $self->{' charspace'} = 0;
     $self->{' hscale'} = 100;
     $self->{' wordspace'} = 0;
-    $self->{' lead'} = 0;
+    $self->{' leading'} = 0;
     $self->{' rise'} = 0;
     $self->{' render'} = 0;
     $self->{' matrix'} = [1, 0, 0, 1, 0, 0];

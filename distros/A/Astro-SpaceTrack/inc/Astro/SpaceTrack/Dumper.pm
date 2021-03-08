@@ -19,7 +19,7 @@ eval {
     1;
 } or croak 'Can not load Mock::LWP::UserAgent. Code must be run from the base directory of the Astro-SpaceTrack distribution';
 
-our $VERSION = '0.143';
+our $VERSION = '0.144';
 
 {
     my $json;
@@ -241,7 +241,9 @@ L<Astro::SpaceTrack|Astro::SpaceTrack>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack>,
+L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues/>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

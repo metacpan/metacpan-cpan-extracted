@@ -24,7 +24,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojo-ioloop-readwritefork/issues
   homepage: https://github.com/jhthorsen/mojo-ioloop-readwritefork
   repository: https://github.com/jhthorsen/mojo-ioloop-readwritefork.git
-version: '0.39'
+version: '0.40'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

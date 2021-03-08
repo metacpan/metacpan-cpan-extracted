@@ -1,9 +1,9 @@
 package HTTP::Headers::Patch::DontUseStorable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-03'; # DATE
+our $DATE = '2021-03-08'; # DATE
 our $DIST = 'HTTP-Headers-Patch-DontUseStorable'; # DIST
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.061'; # VERSION
 
 use 5.010001;
 use strict;
@@ -27,7 +27,7 @@ sub patch_data {
         patches => [
             {
                 action => 'replace',
-                mod_version => qr/^6\.[01].+/,
+                mod_version => qr/^6\.[012].+/,
                 sub_name => 'clone',
                 code => \&_clone,
             },
@@ -50,7 +50,7 @@ HTTP::Headers::Patch::DontUseStorable - (DEPRECATED) Do not use Storable
 
 =head1 VERSION
 
-This document describes version 0.060 of HTTP::Headers::Patch::DontUseStorable (from Perl distribution HTTP-Headers-Patch-DontUseStorable), released on 2020-02-03.
+This document describes version 0.061 of HTTP::Headers::Patch::DontUseStorable (from Perl distribution HTTP-Headers-Patch-DontUseStorable), released on 2021-03-08.
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2017, 2015, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2017, 2015, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

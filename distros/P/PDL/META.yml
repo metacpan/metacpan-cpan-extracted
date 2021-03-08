@@ -13,6 +13,7 @@ build_requires:
 configure_requires:
   Carp: '1.2'
   Devel::CheckLib: '1.01'
+  ExtUtils::Depends: '0.402'
   ExtUtils::MakeMaker: '6.56'
   ExtUtils::ParseXS: '3.01'
   File::Path: '0'
@@ -63,5 +64,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdl/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl.git
-version: '2.026'
+version: '2.028'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

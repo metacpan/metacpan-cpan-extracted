@@ -22,7 +22,7 @@ Any functions and/or objects implemented will be described in comments, not in P
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019,2020 Peter C. Jones
+Copyright (C) 2019,2020,2021 Peter C. Jones
 
 =head1 LICENSE
 
@@ -117,23 +117,23 @@ sub SendMessage_getRawString {
     carp sprintf "\n\nSendMessage_getRawString(hwnd(0x%08x),%s,%s,{%s})\n", $self->hwnd, $msgid, $wparam, join(',', %$args) if $DEBUG_RAW;
 
     $trim = 'retval' if $wlength and !defined $trim;
-    $trim = '<undef>' unless defined $trim;
+    #$trim = '<undef>' unless defined $trim;
 
     my $wrv = $wlength ? 0 : $wparam;
 
     carp sprintf "\tid=%s trim=%s wrv=%s wlength=%s BEFORE LENGTH\n", map {$_ // '<undef>'} $msgid, $trim, $wrv, $wlength if $DEBUG_RAW;
     carp sprintf "\tdebug retval=%s\n", $self->SendMessage( $msgid, $wrv, 0)//'<undef>' if $DEBUG_RAW;
     my $length =
+                    !defined($trim)         ? $MAX_PATH :                                 # no length limit, so use MAX_PATH
                     $trim eq 'wparam'       ? $wparam :                                   # wparam => characters in string
                     $trim eq 'retval+1'     ? 1+$self->SendMessage( $msgid, $wrv, 0) :    # SendMessage result => characters, need to add char for \0
                     $trim eq 'retval'       ? $self->SendMessage( $msgid, $wrv, 0) :      # SendMessage result => characters
-                    !defined($trim)         ? $MAX_PATH :                                 # no length limit, so use MAX_PATH
                     1*$trim eq $trim        ? 0+$trim :                                   # numeric
-                    die "unknown trim '$trim'";
+                    die sprintf "unknown trim '%s'", $trim//'<undef>';
     carp sprintf "\tid=%s trim=%s wrv=%s wlength=%s length=%s\n", map {$_ // '<undef>'} $msgid, $trim, $wrv, $wlength, $length if $DEBUG_RAW;
 
     # specifically for retval-based, just return empty string and dont bother with second SendMessage if the first SendMessage said length would be 0 bytes.
-    if($trim eq 'retval' and 0==$length) { return ""; }
+    if($trim//'<undef>' eq 'retval' and 0==$length) { return ""; }
 
     # otherwise, assume the user lied to us, and grab one character
     $length = 1 unless $length>0; # make sure it's always at least one character

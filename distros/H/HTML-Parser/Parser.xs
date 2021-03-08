@@ -424,18 +424,19 @@ parse(self, chunk)
 
 void
 eof(self)
-	SV* self;
+    SV* self;
     PREINIT:
-	PSTATE* p_state = get_pstate_hv(aTHX_ self);
+    PSTATE* p_state = get_pstate_hv(aTHX_ self);
     PPCODE:
         if (p_state->parsing)
             p_state->eof = 1;
         else {
-	    p_state->parsing = 1;
-	    parse(aTHX_ p_state, 0, self); /* flush */
-	    p_state->parsing = 0;
-	}
-	PUSHs(self);
+            p_state->parsing = 1;
+            parse(aTHX_ p_state, 0, self); /* flush */
+            SPAGAIN;
+            p_state->parsing = 0;
+        }
+        PUSHs(self);
 
 SV*
 strict_comment(pstate,...)

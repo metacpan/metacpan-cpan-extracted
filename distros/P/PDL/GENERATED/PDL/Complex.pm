@@ -315,10 +315,6 @@ sub real($) {
 
 convert real to complex, assuming an imaginary part of zero
 
-=for bad
-
-r2C does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -352,10 +348,6 @@ BEGIN {*r2C = \&PDL::Complex::r2C;
 
 convert imaginary to complex, assuming a real part of zero
 
-=for bad
-
-i2C does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -381,10 +373,6 @@ BEGIN {*i2C = \&PDL::Complex::i2C;
 
 convert complex numbers in rectangular form to polar (mod,arg) form. Works inplace
 
-=for bad
-
-Cr2p does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -410,10 +398,6 @@ BEGIN {*Cr2p = \&PDL::Complex::Cr2p;
 
 convert complex numbers in polar (mod,arg) form to rectangular form. Works inplace
 
-=for bad
-
-Cp2r does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -451,10 +435,6 @@ BEGIN {*Csub = \&PDL::Complex::Csub;
 
 complex multiplication
 
-=for bad
-
-Cmul does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -480,10 +460,6 @@ BEGIN {*Cmul = \&PDL::Complex::Cmul;
 
 Project via product to N-1 dimension
 
-=for bad
-
-Cprodover does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -509,10 +485,6 @@ BEGIN {*Cprodover = \&PDL::Complex::Cprodover;
 
 mixed complex/real multiplication
 
-=for bad
-
-Cscale does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -538,10 +510,6 @@ BEGIN {*Cscale = \&PDL::Complex::Cscale;
 
 complex division
 
-=for bad
-
-Cdiv does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -569,10 +537,6 @@ Complex comparison operator (spaceship).
 
 Ccmp orders by real first, then by imaginary. Hm, but it is mathematical nonsense! Complex numbers cannot be ordered.
 
-=for bad
-
-Ccmp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -598,10 +562,6 @@ BEGIN {*Ccmp = \&PDL::Complex::Ccmp;
 
 complex conjugation. Works inplace
 
-=for bad
-
-Cconj does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -627,10 +587,6 @@ BEGIN {*Cconj = \&PDL::Complex::Cconj;
 
 complex C<abs()> (also known as I<modulus>)
 
-=for bad
-
-Cabs does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -661,10 +617,6 @@ BEGIN {*Cabs = \&PDL::Complex::Cabs;
 
 complex squared C<abs()> (also known I<squared modulus>)
 
-=for bad
-
-Cabs2 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -695,10 +647,6 @@ BEGIN {*Cabs2 = \&PDL::Complex::Cabs2;
 
 complex argument function ("angle")
 
-=for bad
-
-Carg does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -729,10 +677,6 @@ BEGIN {*Carg = \&PDL::Complex::Carg;
 
   sin (a) = 1/(2*i) * (exp (a*i) - exp (-a*i)). Works inplace
 
-=for bad
-
-Csin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -758,10 +702,6 @@ BEGIN {*Csin = \&PDL::Complex::Csin;
 
   cos (a) = 1/2 * (exp (a*i) + exp (-a*i)). Works inplace
 
-=for bad
-
-Ccos does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -805,10 +745,6 @@ sub Ctan($) { Csin($_[0]) / Ccos($_[0]) }
 
   exp (a) = exp (real (a)) * (cos (imag (a)) + i * sin (imag (a))). Works inplace
 
-=for bad
-
-Cexp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -834,10 +770,6 @@ BEGIN {*Cexp = \&PDL::Complex::Cexp;
 
   log (a) = log (cabs (a)) + i * carg (a). Works inplace
 
-=for bad
-
-Clog does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -863,10 +795,6 @@ BEGIN {*Clog = \&PDL::Complex::Clog;
 
 complex C<pow()> (C<**>-operator)
 
-=for bad
-
-Cpow does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -892,10 +820,6 @@ BEGIN {*Cpow = \&PDL::Complex::Cpow;
 
 Works inplace
 
-=for bad
-
-Csqrt does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -921,10 +845,6 @@ BEGIN {*Csqrt = \&PDL::Complex::Csqrt;
 
 Works inplace
 
-=for bad
-
-Casin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -950,10 +870,6 @@ BEGIN {*Casin = \&PDL::Complex::Casin;
 
 Works inplace
 
-=for bad
-
-Cacos does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -997,10 +913,6 @@ sub Catan($) {
 
   sinh (a) = (exp (a) - exp (-a)) / 2. Works inplace
 
-=for bad
-
-Csinh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1026,10 +938,6 @@ BEGIN {*Csinh = \&PDL::Complex::Csinh;
 
   cosh (a) = (exp (a) + exp (-a)) / 2. Works inplace
 
-=for bad
-
-Ccosh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1055,10 +963,6 @@ BEGIN {*Ccosh = \&PDL::Complex::Ccosh;
 
 Works inplace
 
-=for bad
-
-Ctanh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1084,10 +988,6 @@ BEGIN {*Ctanh = \&PDL::Complex::Ctanh;
 
 Works inplace
 
-=for bad
-
-Casinh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1113,10 +1013,6 @@ BEGIN {*Casinh = \&PDL::Complex::Casinh;
 
 Works inplace
 
-=for bad
-
-Cacosh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1142,10 +1038,6 @@ BEGIN {*Cacosh = \&PDL::Complex::Cacosh;
 
 Works inplace
 
-=for bad
-
-Catanh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1171,10 +1063,6 @@ BEGIN {*Catanh = \&PDL::Complex::Catanh;
 
 compute the projection of a complex number to the riemann sphere. Works inplace
 
-=for bad
-
-Cproj does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1200,10 +1088,6 @@ BEGIN {*Cproj = \&PDL::Complex::Cproj;
 
 Compute the C<n> roots of C<a>. C<n> must be a positive integer. The result will always be a complex type!
 
-=for bad
-
-Croots does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1252,10 +1136,6 @@ sub im($) { bless $_[0]->slice("(1)"), 'PDL'; }
 
 evaluate the polynomial with (real) coefficients C<coeffs> at the (complex) position(s) C<x>. C<coeffs[0]> is the constant term.
 
-=for bad
-
-rCpolynomial does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

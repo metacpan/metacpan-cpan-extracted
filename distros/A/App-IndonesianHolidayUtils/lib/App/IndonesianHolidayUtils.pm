@@ -3,9 +3,9 @@ package App::IndonesianHolidayUtils;
 use 5.010001;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-13'; # DATE
+our $DATE = '2021-01-17'; # DATE
 our $DIST = 'App-IndonesianHolidayUtils'; # DIST
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.061'; # VERSION
 
 1;
 # ABSTRACT: List Indonesian holidays
@@ -22,7 +22,7 @@ App::IndonesianHolidayUtils - List Indonesian holidays
 
 =head1 VERSION
 
-This document describes version 0.060 of App::IndonesianHolidayUtils (from Perl distribution App-IndonesianHolidayUtils), released on 2021-01-13.
+This document describes version 0.061 of App::IndonesianHolidayUtils (from Perl distribution App-IndonesianHolidayUtils), released on 2021-01-17.
 
 =head1 SYNOPSIS
 
@@ -30,11 +30,11 @@ This distribution contains several CLI's related to Indonesian holidays:
 
 =over
 
-=item * L<is-id-holiday>
+=item * L<is-idn-holiday>
 
-=item * L<list-id-holidays>
+=item * L<list-idn-holidays>
 
-=item * L<list-id-workdays>
+=item * L<list-idn-workdays>
 
 =back
 

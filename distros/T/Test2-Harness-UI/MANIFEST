@@ -13,6 +13,9 @@ dist.ini
 json-view.LICENSE
 json-view.README.md
 lib/App/Yath/Command/ui.pm
+lib/App/Yath/Plugin/YathUIDB.pm
+lib/Test2/Harness/Renderer/UI.pm
+lib/Test2/Harness/Renderer/UIDB.pm
 lib/Test2/Harness/UI.pm
 lib/Test2/Harness/UI/CPANImporter.pm
 lib/Test2/Harness/UI/Config.pm
@@ -29,11 +32,11 @@ lib/Test2/Harness/UI/Controller/Run.pm
 lib/Test2/Harness/UI/Controller/Runs.pm
 lib/Test2/Harness/UI/Controller/Upload.pm
 lib/Test2/Harness/UI/Controller/User.pm
-lib/Test2/Harness/UI/Import.pm
 lib/Test2/Harness/UI/Importer.pm
 lib/Test2/Harness/UI/Queries.pm
 lib/Test2/Harness/UI/Request.pm
 lib/Test2/Harness/UI/Response.pm
+lib/Test2/Harness/UI/RunProcessor.pm
 lib/Test2/Harness/UI/Schema.pm
 lib/Test2/Harness/UI/Schema/MySQL.pm
 lib/Test2/Harness/UI/Schema/MySQL56.pm
@@ -55,6 +58,7 @@ lib/Test2/Harness/UI/Schema/Result/User.pm
 lib/Test2/Harness/UI/Util.pm
 lib/Test2/Harness/UI/Util/Errors.pm
 lib/Test2/Harness/UI/Util/HashBase.pm
+lib/Test2/Harness/UI/Util/ImportModes.pm
 scripts/yath-ui-importer.pl
 share/css/dashboard.css
 share/css/datatables.min.css

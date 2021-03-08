@@ -23,6 +23,7 @@ t/WrapScope/ConfigGenerator/samples/multiple_packages.pm
 t/WrapScope/ConfigGenerator/samples/multiple_packages_block_syntax.pm
 t/WrapScope/ConfigGenerator/samples/no_packages.pm
 t/WrapScope/ConfigGenerator/samples/wrapped.pm
+t/WrapScope/arg_tags.t
 t/WrapScope/caller.t
 t/WrapScope/context.t
 t/WrapScope/errors.t

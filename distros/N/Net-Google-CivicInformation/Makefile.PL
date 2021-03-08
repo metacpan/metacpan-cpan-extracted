@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Function::Parameters" => 0,
     "HTTP::Tiny" => 0,
     "JSON::MaybeXS" => 0,
+    "Log::Any" => "1.708",
     "Moo" => 0,
     "Try::Tiny" => 0,
     "Types::Common::String" => 0,
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "Test::Pod::Coverage" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,7 @@ my %FallbackPrereqs = (
   "Function::Parameters" => 0,
   "HTTP::Tiny" => 0,
   "JSON::MaybeXS" => 0,
+  "Log::Any" => "1.708",
   "Moo" => 0,
   "Test::Most" => 0,
   "Test::Pod::Coverage" => 0,

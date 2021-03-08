@@ -1,5 +1,28 @@
 Revision history for Perl distribution Win32-Mechanize-NotepadPlusPlus
 
+v0.006001 2021-Mar-07
+    - meta fix: turn off the auto-download on smoke tester machines,
+      because it was causing fails
+
+v0.006 2021-Mar-06
+    - add getSettingsOnCloudPath() with test (#54)
+    - add getLineNumberWidthMode(), setLineNumberWidthMode(), and
+      the %LINENUMWIDTH enumeration with test (#54 addendeum)
+    - test suite bug: with v7.9.1 and newer, replaceTargetText() changes
+      the selection/getTargetText() value, so update the readback
+      to be version agnostic (#57)
+    - documentation error: fox %NPPIDM description in Notepad.pm (#53)
+    - meta fix: make test suite pass on cpantesters smoke testers,
+      even if smoke tester machine doesn't have Notepad++, or has
+      an old, incompatible version (#56)
+
+v0.005 2020-Oct-16
+    - replace %ENCODINGKEY with %BUFFERENCODING, because the old hash
+      had wrong values that didn't match getEncoding's return values
+      (#50)
+    - add setEncoding command to call NPPM_SETBUFFERENCODING
+      as the logical pair to getEncoding (#51)
+
 v0.004001 2020-Jun-20
     - fix bug in notepad->prompt(), which only used two of the three
       arguments, in wrong order (#47); test suite verifies default

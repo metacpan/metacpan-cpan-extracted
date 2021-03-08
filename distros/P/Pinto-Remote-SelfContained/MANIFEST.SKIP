@@ -1,0 +1,5 @@
+^\.git
+\.sw.?$
+^\.perl-version$
+^local/
+^cover_db/

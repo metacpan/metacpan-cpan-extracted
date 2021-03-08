@@ -14,3 +14,4 @@ MANIFEST			This list of files
 META.yml
 t/01load.t
 t/roundtrip.t
+t/roundtrip_alt.t

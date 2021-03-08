@@ -14,15 +14,15 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-IndonesianHolidayUtils",
   "EXE_FILES" => [
-    "script/is-id-holiday",
-    "script/list-id-holidays",
-    "script/list-id-workdays"
+    "script/is-idn-holiday",
+    "script/list-idn-holidays",
+    "script/list-idn-workdays"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::IndonesianHolidayUtils",
   "PREREQ_PM" => {
-    "Calendar::Indonesia::Holiday" => "0.331",
+    "Calendar::Indonesia::Holiday" => "0.335",
     "Data::Sah::Coerce::perl::To_date::From_float::epoch" => 0,
     "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
     "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.060",
+  "VERSION" => "0.061",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Calendar::Indonesia::Holiday" => "0.331",
+  "Calendar::Indonesia::Holiday" => "0.335",
   "Data::Sah::Coerce::perl::To_date::From_float::epoch" => 0,
   "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
   "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,

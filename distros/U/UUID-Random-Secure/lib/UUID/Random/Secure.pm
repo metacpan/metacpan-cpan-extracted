@@ -1,9 +1,9 @@
 package UUID::Random::Secure;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-17'; # DATE
+our $DATE = '2021-01-18'; # DATE
 our $DIST = 'UUID-Random-Secure'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ UUID::Random::Secure - Like UUID::Random, but uses Math::Random::Secure for rand
 
 =head1 VERSION
 
-This document describes version 0.001 of UUID::Random::Secure (from Perl distribution UUID-Random-Secure), released on 2021-01-17.
+This document describes version 0.002 of UUID::Random::Secure (from Perl distribution UUID-Random-Secure), released on 2021-01-18.
 
 =head1 SYNOPSIS
 
@@ -46,6 +46,9 @@ Use like you would L<UUID::Random>:
  say UUID::Random::Secure::generate();
 
 =head1 DESCRIPTION
+
+Note that this module currently does not produce RFC 4122-compliant v4 (random)
+UUIDs (no encoding of variant and version information into the UUID).
 
 =head1 FUNCTIONS
 
@@ -72,6 +75,8 @@ feature.
 L<UUID::Random>
 
 L<Math::Random::Secure>
+
+L<Crypt::Misc>
 
 =head1 AUTHOR
 

@@ -1,0 +1,51 @@
+---
+abstract: 'lexer to break text up into user-defined tokens'
+author:
+  - 'Aaron Crane, <arc@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-TokenStream
+provides:
+  Text::TokenStream:
+    file: lib/Text/TokenStream.pm
+    version: '0.03'
+  Text::TokenStream::Lexer:
+    file: lib/Text/TokenStream/Lexer.pm
+    version: '0.03'
+  Text::TokenStream::Role::Stream:
+    file: lib/Text/TokenStream/Role/Stream.pm
+    version: '0.03'
+  Text::TokenStream::Token:
+    file: lib/Text/TokenStream/Token.pm
+    version: '0.03'
+  Text::TokenStream::Types:
+    file: lib/Text/TokenStream/Types.pm
+    version: '0.03'
+requires:
+  Carp: '0'
+  List::Util: '1.29'
+  Moo: '1.006000'
+  Moo::Role: '0'
+  Type::Library: '0'
+  Type::Utils: '0'
+  Types::Common::Numeric: '0'
+  Types::Path::Tiny: '0'
+  Types::Standard: '1.002000'
+  namespace::clean: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/arc/Text-TokenStream/issues
+  repository: git://github.com/arc/Text-TokenStream.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

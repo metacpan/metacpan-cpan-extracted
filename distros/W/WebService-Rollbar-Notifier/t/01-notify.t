@@ -100,7 +100,7 @@ my $VER = $WebService::Rollbar::Notifier::VERSION;
 sub verify_response {
     my ($tx, $description) = @_;
 
-    if (not $tx->success) {
+    if ($tx->error) {
         diag 'Failed to successfully send request. About to fail. Dumping '
             . 'what we received for debugging purposes: '
             . $tx->res->to_string;

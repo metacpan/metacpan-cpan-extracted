@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "DBIx::Class::Core" => 0,
     "DBIx::Class::Schema" => 0,
+    "DBIx::Class::Schema::ResultSetNames" => 0,
     "Dancer2" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "Plack::Test" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "Class::C3::Componentised" => 0,
   "DBIx::Class::Core" => 0,
   "DBIx::Class::Schema" => 0,
+  "DBIx::Class::Schema::ResultSetNames" => 0,
   "Dancer2" => 0,
   "Dancer2::Plugin" => 0,
   "ExtUtils::MakeMaker" => 0,

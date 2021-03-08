@@ -5,7 +5,7 @@ use File::Basename 'dirname';
 use Cwd 'abs_path';
 use Mojolicious::Plugin::MySQLViewerLite::Command;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 has command => sub {
   my $self = shift;
@@ -28,11 +28,20 @@ sub register {
   $self->add_template_path($app->renderer, __PACKAGE__);
   $self->add_static_path($app->static, __PACKAGE__);
   
+  # Mojolicious compatibility
+  my $any_method_name;
+  if ($Mojolicious::VERSION >= '8.67') {
+    $any_method_name = 'any'
+  }
+  else {
+    $any_method_name = 'route'
+  }
+
   # Routes
   my $r = $conf->{route} // $app->routes;
   $self->prefix($prefix);
   {
-    my $r = $r->route("/$prefix")->to(
+    my $r = $r->$any_method_name("/$prefix")->to(
       'mysqlviewerlite#',
       namespace => 'Mojolicious::Plugin::MySQLViewerLite',
       plugin => $self,

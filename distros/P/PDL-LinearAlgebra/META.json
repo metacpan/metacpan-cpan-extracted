@@ -4,7 +4,7 @@
       "Chris Marshall <chm@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "PDL" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -32,8 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "0",
-            "constant" : "1.03"
+            "PDL" : "0"
          }
       }
    },
@@ -49,7 +48,7 @@
          "web" : "https://github.com/PDLPorters/pdl-linearalgebra"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_IRC" : "irc://irc.perl.org/#pdl",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

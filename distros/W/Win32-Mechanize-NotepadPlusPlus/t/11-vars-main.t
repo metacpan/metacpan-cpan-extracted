@@ -4,9 +4,12 @@
 use 5.010;
 use strict;
 use warnings;
-sub nNotepad() { 13 };
+sub nNotepad() { 14 };
 sub nScintilla() { 63 };
 use Test::More tests => nNotepad+nScintilla+2;
+
+use FindBin;
+BEGIN { my $f = $FindBin::Bin . '/nppPath.inc'; require $f if -f $f; }
 
 use Win32::Mechanize::NotepadPlusPlus ':vars';
 
@@ -24,7 +27,8 @@ my %hashes = (
     '%NOTIFICATION' => \%NOTIFICATION,
     '%DOCSTATUS' => \%DOCSTATUS,
     '%NPPIDM' => \%NPPIDM,
-    '%ENCODINGKEY' => \%ENCODINGKEY,
+    '%BUFFERENCODING' => \%BUFFERENCODING,
+    '%LINENUMWIDTH' => \%LINENUMWIDTH,
 
     # editor hashes
     '%SCIMSG' => \%SCIMSG ,

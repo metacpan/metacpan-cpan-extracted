@@ -52,7 +52,7 @@ subtest 'needs_rehash', sub {
 	my $encoded = argon2id_pass('password', 'saltsalt', 2, '64M', 1, 32);
 	ok(!argon2_needs_rehash($encoded, 'argon2id', 2, '64M', 1, 32, 8), 'No rehash with same parameters');
 	ok(argon2_needs_rehash($encoded, 'argon2i', 2, '64M', 1, 32, 8), 'Rehash with different argon2 variant');
-	ok(argon2_needs_rehash($encoded, 'argon2id', 1, '64M', 1, 32, 8), 'Rehash with different time cost');
+	ok(argon2_needs_rehash($encoded, 'argon2id', 3, '64M', 1, 32, 8), 'Rehash with different time cost');
 	ok(argon2_needs_rehash($encoded, 'argon2id', 2, '128M', 1, 32, 8), 'Rehash with different memory cost');
 	ok(argon2_needs_rehash($encoded, 'argon2id', 2, '64M', 2, 32, 8), 'Rehash with different parallelism');
 	ok(argon2_needs_rehash($encoded, 'argon2id', 2, '64M', 1, 16, 8), 'Rehash with different output length');

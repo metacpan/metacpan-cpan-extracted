@@ -18,6 +18,7 @@ my @TEST = (
     undef, 'invalid other',
     $obj, 'invalid obj',
     { subname => 'bar' }, 'invalid subname',
+    { subname => undef }, 'undef subname',
     { subname => 'foo', parameters => $p1 }, 'invalid parameters',
     { subname => 'foo', returns => $r1 }, 'invalid returns',
     ],
@@ -72,6 +73,35 @@ my @TEST = (
     { subname => 'foo', parameters => $p1, returns => $r1, attribute => ['method'] }, 'valid w/ attribute',
     { subname => 'foo', parameters => $p1, returns => $r1, prototype => '$' }, 'valid w/ prototype',
     ]},
+
+    # method
+    { subname => 'foo', is_method => !!1 } => {
+    NG => [
+    { subname => 'foo', is_method => !!0 }, 'invalid method',
+    { subname => 'foo' }, 'invalid method',
+    ],
+    OK => [
+    { subname => 'foo', is_method => !!1 }, 'valid method',
+    ]},
+
+    { subname => 'foo', is_method => !!0, } => {
+    NG => [
+    { subname => 'foo', is_method => !!1 }, 'invalid method',
+    ],
+    OK => [
+    { subname => 'foo', is_method => !!0 }, 'valid method',
+    { subname => 'foo' }, 'valid method',
+    ]},
+
+    { subname => 'foo', is_method => !!1, parameters => $p1 } => {
+    NG => [
+    { subname => 'foo', is_method => !!0, parameters => $p1 }, 'invalid method',
+    { subname => 'foo',                parameters => $p1 }, 'invalid method',
+    { subname => 'foo', is_method => !!1, parameters => $p2 }, 'invalid parameters',
+    ],
+    OK => [
+    { subname => 'foo', is_method => !!1, parameters => $p1 }, 'valid method',
+    ]},
 );
 
 use JSON::PP;
@@ -89,6 +119,8 @@ my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 
 while (my ($args, $cases) = splice @TEST, 0, 2) {
     my $meta = Sub::Meta->new($args);
+    my $inline = $meta->is_same_interface_inlined('$_[0]');
+    my $is_same_interface = eval sprintf('sub { %s }', $inline);
 
     subtest "@{[$json->encode($args)]}" => sub {
 
@@ -97,6 +129,7 @@ while (my ($args, $cases) = splice @TEST, 0, 2) {
                 my $is_hash = ref $other_args && ref $other_args eq 'HASH';
                 my $other = $is_hash ? Sub::Meta->new($other_args) : $other_args;
                 ok !$meta->is_same_interface($other), $test_message;
+                ok !$is_same_interface->($other), "inlined: $test_message";
             }
         };
 
@@ -104,6 +137,7 @@ while (my ($args, $cases) = splice @TEST, 0, 2) {
             while (my ($other_args, $test_message) = splice @{$cases->{OK}}, 0, 2) {
                 my $other = Sub::Meta->new($other_args);
                 ok $meta->is_same_interface($other), $test_message;
+                ok $is_same_interface->($other), "inlined: $test_message";
             }
         };
     };

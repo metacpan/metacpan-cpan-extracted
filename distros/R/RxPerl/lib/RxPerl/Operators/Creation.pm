@@ -214,6 +214,27 @@ sub rx_from {
         return $thing;
     }
 
+    elsif (blessed $thing and $thing->isa('Future')) {
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            $thing->on_done(sub {
+                $subscriber->{next}->(splice @_, 0, 1) if defined $subscriber->{next};
+                $subscriber->{complete}->() if defined $subscriber->{complete};
+            });
+
+            $thing->on_fail(sub {
+                $subscriber->{error}->(splice @_, 0, 1) if defined $subscriber->{error};
+            });
+
+            $thing->on_ready(sub {
+                if ($thing->is_cancelled) {
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                }
+            });
+        });
+    }
+
     elsif (blessed $thing and $thing->can('then')) {
         return rx_observable->new(sub {
             my ($subscriber) = @_;

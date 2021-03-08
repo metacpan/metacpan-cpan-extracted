@@ -1,6 +1,6 @@
 package Log::Any::Adapter::JSON;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use strict;
 use warnings;
@@ -171,7 +171,7 @@ __END__
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =encoding utf8
 

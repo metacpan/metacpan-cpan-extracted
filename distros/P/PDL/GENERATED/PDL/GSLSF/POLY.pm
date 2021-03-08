@@ -64,10 +64,6 @@ changing the directory structure at this time.  These fixes should allow things 
 
 c[0] + c[1] x + c[2] x^2 + ... + c[m-1] x^(m-1)
 
-=for bad
-
-gsl_poly_eval does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

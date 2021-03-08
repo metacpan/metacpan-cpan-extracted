@@ -1,0 +1,12 @@
+Changes
+examples/synopsis.pl
+lib/HTML/Make/Page.pm
+lib/HTML/Make/Page.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/html-make-page.t
+t/options.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

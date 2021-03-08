@@ -11,7 +11,7 @@ use File::Spec::Functions qw(splitdir catfile);
 use App::Followme::FIO;
 use App::Followme::NestedText;
 
-our $VERSION = "1.99";
+our $VERSION = "2.00";
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -405,7 +405,6 @@ run_before:
     <nav class="dropdown-content">
       <a href="essays/index.html">Essays</a>
       <a href="photos/index.html">Photos</a>
-      <a href="help/index.html">Help</a>
     </nav>
 </div>
 </header>
@@ -448,7 +447,6 @@ script.</p>
     <nav class="footer-content">
         <a href="essays/index.html">Essays</a>
         <a href="photos/index.html">Photos</a>
-        <a href="help/index.html">Help</a>
     </nav>
 </footer>
 </body>
@@ -750,41 +748,6 @@ $body
 </article>
 </body>
 </html>
-#>>> copy text _templates/create_help.htm
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<!-- section meta -->
-<base href="$site_url/" />
-<title>$title</title>
-<meta name="date" content="$mdate" />
-<meta name="description" content="$description" />
-<meta name="keywords" content="$keywords" />
-<meta name="author" content="$author" />
-<!-- endsection meta -->
-</head>
-<body>
-<header>
-<h1>Site Title</h1>
-</header>
-<article>
-<section id="primary">
-</section>
-<section id="secondary">
-<!-- section secondary -->
-<!-- for @files -->
-<!-- if $title eq 'App::Followme::Guide' -->
-<h2>$title</h2>
-
-$body
-<!-- endif -->
-<!-- endfor -->
-
-<!-- endsection secondary-->
-</section>
-</article>
-</body>
-</html>
 #>>> copy text _templates/create_index.htm
 <html>
 <head>
@@ -891,24 +854,6 @@ This folder is configured (via followme.cfg) to contain an archive of
 previously written essays. When followme is run, it will create an index 
 for files in the current directory  containing a link to each essay in the 
 archive.
-#>>> copy text help/followme.cfg
-run_before:
-    - App::Followme::ConvertPage
-    - App::Followme::CreateIndex
-package: App::Followme
-ConvertPage::data_pkg: App::Followme::PodData
-ConvertPage::extension: pm
-CreateIndex::data_pkg: App::Followme::WebData
-CreateIndex::extension: html
-CreateIndex::template_file: create_help.htm
-#>>> copy text help/index.md
-----
-title: Help Directory
-description: Help files for followme
-keywords: help
-----
-This folder contains an html version of the main help file for
-followme.
 #>>> copy text photos/followme.cfg
 run_before:
     - App::Followme::CreateGallery

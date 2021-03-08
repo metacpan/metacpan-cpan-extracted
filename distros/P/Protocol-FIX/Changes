@@ -1,3 +1,8 @@
+0.05      2021-03-05 09:11:09+00:00 UTC
+    - Bugfix: Not able to parse repetitive group
+    - Code tidy
+    - Bugfix: Typo fix
+
 0.04      2017-03-30 09:21:52+00:00 UTC
     - Bugfix: specify exact List::Util version
 

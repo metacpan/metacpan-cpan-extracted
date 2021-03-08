@@ -7,7 +7,7 @@ requires "Log::Any::Adapter" => "1.050";
 requires "Path::Tiny" => "0";
 requires "Time::Moment" => "0";
 requires "perl" => "5.010";
-requires "strictures" => "0";
+requires "strictures" => "2.000006";
 
 on 'test' => sub {
   requires "Encode" => "0";

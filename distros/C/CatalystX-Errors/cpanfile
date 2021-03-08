@@ -4,7 +4,7 @@ requires 'HTTP::Headers::ActionPack';
 requires 'Catalyst::Utils';
 requires 'Text::Template';
 requires 'JSON::MaybeXS';
-requires 'Scalar::List::Utils';
+requires 'Scalar::Util';
 
 on test => sub {
   requires 'Test::Most' => '0.34';

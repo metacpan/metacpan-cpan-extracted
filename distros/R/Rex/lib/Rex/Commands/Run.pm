@@ -28,7 +28,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.2'; # VERSION
+our $VERSION = '1.13.3'; # VERSION
 
 #require Exporter;
 require Rex::Exporter;
@@ -384,9 +384,6 @@ To run only a specific command with sudo, use :
  
  say sudo { command => 'id', user => 'different' }; # run a single command with sudo as different user
  
- # running a single command with sudo as different user, and `cd` to another directory too
- say sudo { command => 'id', user => 'different', cwd => '/home/different' };
-
 To run multiple commands with C<sudo>, either use an anonymous code reference directly:
 
  sudo sub {

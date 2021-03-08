@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::XObject::Form::Hybrid';
 use strict;
 use warnings;
 
-our $VERSION = '2.038'; # VERSION
+our $VERSION = '2.039'; # VERSION
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;

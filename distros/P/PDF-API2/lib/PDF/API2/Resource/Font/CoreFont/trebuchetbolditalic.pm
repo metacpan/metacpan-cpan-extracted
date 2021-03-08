@@ -3,7 +3,7 @@ package PDF::API2::Resource::Font::CoreFont::trebuchetbolditalic;
 use strict;
 use warnings;
 
-our $VERSION = '2.038'; # VERSION
+our $VERSION = '2.039'; # VERSION
 
 sub data { return {
     'fontname' => 'TrebuchetMS,BoldItalic',

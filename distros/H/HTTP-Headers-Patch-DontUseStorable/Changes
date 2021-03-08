@@ -1,3 +1,8 @@
+0.061   2021-03-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow HTTP::Headers 6.2x to be patched.
+
+
 0.060   2020-02-03  Released-By: PERLANCAR; Urgency: medium
 
 	- No functional changes.

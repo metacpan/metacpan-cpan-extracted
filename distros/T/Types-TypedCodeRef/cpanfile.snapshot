@@ -402,13 +402,13 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Importer 0.024
       perl 5.008001
-  Sub-Meta-0.04
-    pathname: K/KF/KFLY/Sub-Meta-0.04.tar.gz
+  Sub-Meta-0.05
+    pathname: K/KF/KFLY/Sub-Meta-0.05.tar.gz
     provides:
-      Sub::Meta 0.04
-      Sub::Meta::Param 0.04
-      Sub::Meta::Parameters 0.04
-      Sub::Meta::Returns 0.04
+      Sub::Meta 0.05
+      Sub::Meta::Param 0.05
+      Sub::Meta::Parameters 0.05
+      Sub::Meta::Returns 0.05
     requirements:
       Carp 0
       Module::Build::Tiny 0.035

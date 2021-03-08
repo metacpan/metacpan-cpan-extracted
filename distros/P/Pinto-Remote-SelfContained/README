@@ -1,0 +1,37 @@
+NAME
+
+    Pinto::Remote::SelfContained - interact with a remote Pinto repository
+
+DESCRIPTION
+
+    Pinto::Remote::SelfContained is a partial clone of Pinto::Remote, but
+    without the server parts, and therefore a much smaller dependency
+    graph. Documentation can be found in that module.
+
+    This class exists for situations where your organisation is using
+    Pinto, and doesn't currently have the bandwidth to move away from it to
+    any alternative, but wants something smaller than the whole of Pinto
+    for interacting with the remote repo.
+
+METHODS
+
+ run($action_name => %action_args)
+
+    Loads the Action subclass for the given $action_name and constructs an
+    object using the given $action_args. If the subclass
+    Pinto::Remote::SelfContained::Action::$action_name does not exist, then
+    it falls back to the Pinto::Remote::SelfContained::Action base class.
+
+AUTHOR
+
+    Aaron Crane, <arc@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2020 Aaron Crane.
+
+LICENSE
+
+    This library is free software and may be distributed under the same
+    terms as perl itself. See http://dev.perl.org/licenses/.
+

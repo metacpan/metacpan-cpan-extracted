@@ -80,6 +80,8 @@ EOS
   
   my $create_table = $self->dbi->execute($sql)->value;
   
+  return unless defined $create_table;
+  
   # Format
   $create_table =~ s/\(/(\n  /;
   $create_table =~ s/, /,\n  /g;

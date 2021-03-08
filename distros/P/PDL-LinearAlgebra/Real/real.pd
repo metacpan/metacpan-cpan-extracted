@@ -10,11 +10,6 @@ $VERSION = eval $VERSION;
 
 use PDL::Exporter;
 
-
-#TODO 
-# dot
-
-
 sub generate_code($){
 	if ($config{WITHOUT_THREAD}){
 	return '
@@ -37,9 +32,6 @@ pp_addhdr('
 #include <float.h>
 ');
 }
-
-
-
 
 pp_addhdr('
 #include <math.h>
@@ -95,8 +87,6 @@ use strict;
 
 }
 
-
-
 =encoding Latin-1
 
 =head1 NAME
@@ -125,7 +115,86 @@ These routines accept either float or double piddles.
 
 EOD
 
+pp_def("gtsv",
+	HandleBad => 0,
+	Pars => '[phys]DL(n); [phys]D(n); [phys]DU(n); [io,phys]B(n,nrhs); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+	     types(F) %{
+		extern int sgtsv_(integer *n, integer *nrhs,
+		float *dl, float *d, float *du, float *b,
+                integer *ldb, integer *info);
+             %}
+             types(D) %{
+		extern int dgtsv_(integer *n, integer *nrhs,
+		double *dl, double *d, double *du, double *b,
+                integer *ldb, integer *info);
+             %}
+		$TFD(sgtsv_,dgtsv_)(
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__nrhs_size)},
+		$P(DL),
+		$P(D),
+		$P(DU),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+',
+      Doc => '
 
+=for ref
+
+Solves the equation
+
+	A * X = B
+
+where A is an C<n> by C<n> tridiagonal matrix, by Gaussian elimination with
+partial pivoting, and B is an C<n> by C<nrhs> matrix.
+
+Note that the equation C<A**T*X = B>  may be solved by interchanging the
+order of the arguments DU and DL.
+
+B<NB> This differs from the LINPACK function C<dgtsl> in that C<DL>
+starts from its first element, while the LINPACK equivalent starts from
+its second element.
+
+    Arguments
+    =========
+
+    DL:   On entry, DL must contain the (n-1) sub-diagonal elements of A.
+
+          On exit, DL is overwritten by the (n-2) elements of the
+          second super-diagonal of the upper triangular matrix U from
+          the LU factorization of A, in DL(1), ..., DL(n-2).
+
+    D:    On entry, D must contain the diagonal elements of A.
+
+          On exit, D is overwritten by the n diagonal elements of U.
+
+    DU:   On entry, DU must contain the (n-1) super-diagonal elements of A.
+
+          On exit, DU is overwritten by the (n-1) elements of the
+          first super-diagonal of the U.
+
+    B:    On entry, the n by nrhs matrix of right hand side matrix B.
+          On exit, if info = 0, the n by nrhs solution matrix X.
+
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
+            > 0:  if info = i, U(i,i) is exactly zero, and the solution
+                  has not been computed.  The factorization has not been
+                  completed unless i = n.
+
+=for example
+
+ $dl = random(float, 9);
+ $d = random(float, 10);
+ $du = random(float, 9);
+ $b = random(10,5);
+ gtsv($dl, $d, $du, $b, ($info=null));
+ print "X is:\n$b" unless $info;
+
+');
 
 pp_def("gesvd",
        HandleBad => 0,
@@ -133,13 +202,6 @@ pp_def("gesvd",
 	Pars => '[io,phys]A(m,n); int jobu(); int jobvt(); [o,phys]s(r); [o,phys]U(p,q); [o,phys]VT(s,t); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
              types(F) %{
 
 		extern int sgesvd_(char *jobu, char *jobvt, integer *m, integer *n, float *a,
@@ -763,7 +825,6 @@ pp_def("geev",
 	Pars => '[phys]A(n,n); int jobvl(); int jobvr(); [o,phys]wr(n); [o,phys]wi(n); [o,phys]vl(m,m); [o,phys]vr(p,p); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char jvl = \'N\';
 		char jvr = \'N\';
              types(F) %{
@@ -913,13 +974,6 @@ pp_def("geevx",
 	Pars => '[io,phys]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o,phys]wr(n); [o,phys]wi(n); [o,phys]vl(m,m); [o,phys]vr(p,p); int [o,phys]ilo(); int [o,phys]ihi(); [o,phys]scale(n); [o,phys]abnrm(); [o,phys]rconde(q); [o,phys]rcondv(r); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
 		char jvl = \'N\';
 		char jvr = \'N\';
 		char balanc, sens;
@@ -1198,7 +1252,6 @@ pp_def("ggev",
 	Pars => '[phys]A(n,n); int jobvl();int jobvr();[phys]B(n,n);[o,phys]alphar(n);[o,phys]alphai(n);[o,phys]beta(n);[o,phys]VL(m,m);[o,phys]VR(p,p);int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		integer lwork = -1;
 		char pjobvl = \'N\', pjobvr = \'N\';
 
@@ -1378,7 +1431,6 @@ pp_def("ggevx",
 	Pars => '[io,phys]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(n,n);[o,phys]alphar(n);[o,phys]alphai(n);[o,phys]beta(n);[o,phys]VL(m,m);[o,phys]VR(p,p);int [o,phys]ilo();int [o,phys]ihi();[o,phys]lscale(n);[o,phys]rscale(n);[o,phys]abnrm();[o,phys]bbnrm();[o,phys]rconde(r);[o,phys]rcondv(s);int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		integer lwork = -1, *iwork, *bwork;
 		char pjobvl = \'N\', pjobvr = \'N\';
 		char pbalanc, psens;
@@ -1796,7 +1848,6 @@ pp_def("gees",
 	OtherPars => "SV* select_func" ,
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char jvs = \'N\';
 		char psort = \'N\';
 		integer *bwork;
@@ -2026,7 +2077,6 @@ pp_def("geesx",
 	OtherPars => "SV* select_func" ,
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char jvs = \'N\';
 		char psort = \'N\';
 		integer *bwork;
@@ -2336,7 +2386,6 @@ pp_def("gges",
 	OtherPars => "SV* select_func" ,
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		integer lwork = -1;
 		char pjobvsl = \'N\', pjobvsr = \'N\', psort = \'N\';
 		integer *bwork;
@@ -2628,8 +2677,6 @@ pp_def("ggesx",
 	OtherPars => "SV* select_func" ,
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
 		integer maxwrk, lwork,liwork;
 		integer minwrk = 1;
 		static integer c__0 = 0;
@@ -2963,13 +3010,6 @@ pp_def("syev",
 	Pars => '[io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
 		char jz = \'N\';
 		char puplo = \'U\';
 		integer lwork = -1;
@@ -3077,13 +3117,6 @@ pp_def("syevd",
 	Pars => '[io,phys]A(n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
 		char jz = \'N\';
 		char puplo = \'U\';
 		integer lwork = -1;
@@ -3212,13 +3245,6 @@ pp_def("syevx",
 	Pars => '[phys]A(n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n); [o,phys]z(p,q);int [o,phys]ifail(r); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
 		char jz = \'N\';
 		char puplo = \'U\';
 		char prange = \'A\';
@@ -3433,13 +3459,6 @@ pp_def("syevr",
 	Pars => '[phys]A(n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu();[phys]abstol();int [o,phys]m();[o,phys]w(n); [o,phys]z(p,q);int [o,phys]isuppz(r); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
 		char jz = \'N\';
 		char puplo = \'U\';
 		char prange = \'A\';
@@ -3703,7 +3722,6 @@ pp_def("sygv",
 	Pars => '[io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(n,n);[o,phys]w(n); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char jz = \'N\';
 		char puplo = \'U\';
 		integer lwork = -1;
@@ -3846,7 +3864,6 @@ pp_def("sygvd",
 	Pars => '[io,phys]A(n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(n,n);[o,phys]w(n); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char jz = \'N\';
 		char puplo = \'U\';
 		integer lwork = -1;
@@ -4256,7 +4273,6 @@ pp_def("gesv",
 	Pars => '[io,phys]A(n,n);  [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
              types(F) %{
 		extern int sgesv_(integer *n, integer *nrhs, float *a, integer
 		*lda, integer *ipiv, float *b, integer *ldb, integer *info);
@@ -4331,7 +4347,6 @@ pp_def("gesvx",
 	Pars => '[io,phys]A(n,n); int trans(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); int [io]equed(); [io,phys]r(n); [io,phys]c(n); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m);[o,phys]rpvgrw();int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char ptrans, pfact, pequed;
 		integer *iwork;
 
@@ -4668,13 +4683,6 @@ pp_def("sysv",
 	Pars => '[io,phys]A(n,n);  int uplo(); [io,phys]B(n,m); int [o,phys]ipiv(n); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
 		char puplo = \'U\';
 		integer lwork = -1;
              types(F) %{
@@ -4809,14 +4817,6 @@ pp_def("sysvx",
 	Pars => '[phys]A(n,n); int uplo(); int fact(); [phys]B(n,m); [io,phys]af(n,n); int [io,phys]ipiv(n); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
-
 		char pfact = \'N\';
 		char puplo = \'U\';
 		integer lwork = -1;
@@ -5064,13 +5064,6 @@ pp_def("posv",
 	Pars => '[io,phys]A(n,n);  int uplo(); [io,phys]B(n,m); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
              char puplo = \'U\';
 
              types(F) %{
@@ -5158,13 +5151,6 @@ pp_def("posvx",
 	Pars => '[io,phys]A(n,n); int uplo(); int fact(); [io,phys]B(n,m); [io,phys]af(n,n); int [io]equed(); [io,phys]s(n); [o,phys]X(n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
 		char pfact;
 		char pequed = \'N\';
 		char puplo = \'U\';
@@ -5441,14 +5427,6 @@ pp_def("gels",
 	Pars => '[io,phys]A(m,n); int trans(); [io,phys]B(p,q);int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
-
-
 		char ptrans = \'N\';
 		integer lwork = -1;
 
@@ -5600,12 +5578,6 @@ pp_def("gelsy",
 	Pars => '[io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); int [io,phys]jpvt(n); int [o,phys]rank();int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
 		integer lwork = -1;
 
              types(F) %{
@@ -5755,12 +5727,6 @@ pp_def("gelss",
 	Pars => '[io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
 		integer lwork = -1;
 
              types(F) %{
@@ -5891,12 +5857,6 @@ pp_def("gelsd",
 	Pars => '[io,phys]A(m,n); [io,phys]B(p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
 		integer lwork = -1;
 		integer smlsiz, size_i, nlvl, *iwork;
 		integer minmn = min( $SIZE(m), $SIZE(n) );
@@ -6076,12 +6036,6 @@ pp_def("gglse",
 	Pars => '[phys]A(m,n); [phys]B(p,n);[io,phys]c(m);[phys]d(p);[o,phys]x(n);int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
 		integer lwork = -1;
 
              types(F) %{
@@ -6204,12 +6158,6 @@ pp_def("ggglm",
 	Pars => '[phys]A(n,m); [phys]B(n,p);[phys]d(n);[o,phys]x(m);[o,phys]y(p);int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
-		
-
-
-
 		integer lwork = -1;
 
              types(F) %{
@@ -7242,7 +7190,6 @@ pp_def("getrs",
 	Pars => '[phys]A(n,n); int trans(); [io,phys]B(n,m); int [phys]ipiv(n); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
              char transp = \'N\';
 	     types(F) %{
 		extern int sgetrs_(char *trans, integer *n, integer *nrhs,
@@ -7390,7 +7337,6 @@ pp_def("potrs",
 	Pars => '[phys]A(n,n); int uplo(); [io,phys]B(n,m); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
              char puplo = \'U\';
 	     types(F) %{
 		extern int spotrs_(char *uplo, integer *n, integer *nrhs,
@@ -7555,7 +7501,6 @@ pp_def("latrs",
 	Pars => '[phys]A(n,n); int uplo(); int trans(); int diag(); int normin();[io,phys]x(n); [o,phys]scale();[io,phys]cnorm(n);int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
              char puplo = \'U\';
              char ptrans = \'N\';
              char pdiag = \'N\';
@@ -7924,7 +7869,6 @@ pp_def("pocon",
 	Pars => '[phys]A(n,n); int uplo(); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
              char puplo = \'U\';
 
 	     types(F) %{
@@ -8003,7 +7947,6 @@ pp_def("trcon",
 	Pars => '[phys]A(n,n); int norm();int uplo();int diag(); [o,phys]rcond();int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
              char puplo = \'U\';
              char pdiag = \'N\';
              char pnorm = \'I\';
@@ -9576,7 +9519,6 @@ pp_def("ormrz",
 	Pars => '[phys]A(k,p); int side(); int trans(); [phys]tau(k); [io,phys]C(m,n);int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
 		integer kk =  $SIZE(p) - $SIZE(k);
@@ -9707,7 +9649,6 @@ pp_def("gehrd",
 	Pars => '[io,phys]A(n,n); int [phys]ilo();int [phys]ihi();[o,phys]tau(k); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		integer lwork = -1;
              
 	     types(F) %{
@@ -9836,8 +9777,6 @@ pp_def("orghr",
 	Pars => '[io,phys]A(n,n); int [phys]ilo();int [phys]ihi();[phys]tau(k); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
-
 		integer lwork = -1;
              
 	     types(F) %{
@@ -9934,7 +9873,6 @@ pp_def("hseqr",
 	Pars => '[io,phys]H(n,n); int job();int compz();int [phys]ilo();int [phys]ihi();[o,phys]wr(n); [o,phys]wi(n);[o,phys]Z(m,m); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char pcompz;
 		char pjob = \'E\';
 		integer lwork = -1;
@@ -10098,7 +10036,6 @@ pp_def("trevc",
 	Pars => '[io,phys]T(n,n); int side();int howmny();int [phys]select(q);[io,phys]VL(m,r); [io,phys]VR(p,s);int [o,phys]m(); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char pside,phowmny;
 		integer mm = 0;
 
@@ -10298,7 +10235,6 @@ pp_def("tgevc",
 	Pars => '[io,phys]A(n,n); int side();int howmny();[io,phys]B(n,n);int [phys]select(q);[io,phys]VL(m,r); [io,phys]VR(p,s);int [o,phys]m(); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char pside,phowmny;
 		integer mm = 0;
 
@@ -10480,7 +10416,6 @@ pp_def("gebal",
 	Pars => '[io,phys]A(n,n); int job(); int [o,phys]ilo();int [o,phys]ihi();[o,phys]scale(n); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char pjob;
              
 	     types(F) %{
@@ -10608,7 +10543,6 @@ pp_def("gebak",
 	Pars => '[io,phys]A(n,m); int job(); int side();int [phys]ilo();int [phys]ihi();[phys]scale(n); int [o,phys]info()',
 	GenericTypes => [F,D],
 	Code => generate_code '
-
 		char pjob;
 		char pside =\'L\' ;
              

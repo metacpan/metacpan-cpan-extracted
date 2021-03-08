@@ -1,3 +1,16 @@
+0.144		2021-03-07	T. R. Wyant
+    Add rt.cpan.org back to bug reporting methods. Long live RT!
+
+    Document retirement of NASA Human Space Flight web site, and its
+    effect on this package.
+
+    Any access of iridium_status_mccants is now fatal
+
+    Get prerequisites up to snuff and add xt/author/prereq.t to ensure
+    they stay that way.
+
+    Add Celestrak catalog 'gnss'.
+
 0.143		2021-01-09	T. R. Wyant
     Add Travis CI testing.
 

@@ -12,9 +12,9 @@ my $tests =
 [
     {
         name            => q{digits},
-        test            => q{12345},
-        word            => q{12345},
-        word_digits     => q{12345},
+        test            => 12345,
+        word            => 12345,
+        word_digits     => 12345,
     },
     {
         name            => q{single quote string},

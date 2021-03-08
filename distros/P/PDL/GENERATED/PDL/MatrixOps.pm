@@ -483,10 +483,6 @@ runs across their components.
 
 
 
-=for bad
-
-eigens_sym ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -600,10 +596,6 @@ numbers.  It might be useful to be able to return complex eigenvalues.
 
 
 
-=for bad
-
-eigens ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -722,10 +714,6 @@ orientation of the ellipsoid of transformation:
 
 
 
-=for bad
-
-svd ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1265,10 +1253,6 @@ less opaque interface.
 
 
 
-=for bad
-
-simq ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1297,10 +1281,6 @@ Convert a symmetric square matrix to triangular vector storage.
 
 
 
-=for bad
-
-squaretotri does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

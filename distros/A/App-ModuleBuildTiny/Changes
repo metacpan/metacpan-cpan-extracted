@@ -1,5 +1,9 @@
 Revision history for App-ModuleBuildTiny
 
+0.029
+          - Extract license from metamerge file
+          - Several documentation fixes
+
 0.028
           - Load prereqs.json/yml on meta regeneration
           - Let Module::Metadata do POD decoding

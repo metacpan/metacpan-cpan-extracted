@@ -5,7 +5,7 @@ use Kavorka -all;
 use utf8;
 use Telugu::TGC;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 has 'tgc' => (

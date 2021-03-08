@@ -14,7 +14,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.2'; # VERSION
+our $VERSION = '1.13.3'; # VERSION
 
 use Rex::Logger;
 use Rex::Cloud::Base;
@@ -117,10 +117,10 @@ sub run_instance {
 
   my $xml = $self->_request(
     "RunInstances",
-    ImageId  => $data{"image_id"},
-    MinCount => 1,
-    MaxCount => 1,
-    KeyName  => $data{"key"},
+    ImageId                      => $data{"image_id"},
+    MinCount                     => 1,
+    MaxCount                     => 1,
+    KeyName                      => $data{"key"},
     InstanceType                 => $data{"type"} || "m1.small",
     "Placement.AvailabilityZone" => $data{"zone"} || "",
     %security_group,

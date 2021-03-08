@@ -45,6 +45,7 @@
          "requires" : {
             "DBIx::Class::Core" : "0",
             "DBIx::Class::Schema" : "0",
+            "DBIx::Class::Schema::ResultSetNames" : "0",
             "Dancer2" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
@@ -60,7 +61,7 @@
    "provides" : {
       "Dancer2::Plugin::DBIx::Class" : {
          "file" : "lib/Dancer2/Plugin/DBIx/Class.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -74,7 +75,7 @@
          "web" : "https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_contributors" : [
       "D Ruth Holloway <ruthh@clearbuilt.com>"
    ],

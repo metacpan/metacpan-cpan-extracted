@@ -86,6 +86,7 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
+xt/author/prereq.t
 xt/author/spacetrack_catalogs.t
 xt/author/spacetrack_modeldef_v2.t
 xt/author/spacetrack_rest_range.t

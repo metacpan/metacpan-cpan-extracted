@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Aas
+Alders
 Antonio
 Attr
 Attrseq
@@ -43,17 +44,20 @@ Michael
 Mike
 Nicholas
 Nicolas
+Olaf
 Orton
 Parser
 Perrad
 PullParser
 Radici
+Rinaldo
 Salvatore
 Salzenberg
 Skyttä
 South
 Steinbrunner
 Textification
+Todd
 TokeParser
 Tokenpos
 Unterminated
@@ -82,9 +86,11 @@ mchase
 msouth
 nick
 nicolas
+olaf
 salvatore
 tagname
 textified
+toddr
 undecoded
 ville
 zefram

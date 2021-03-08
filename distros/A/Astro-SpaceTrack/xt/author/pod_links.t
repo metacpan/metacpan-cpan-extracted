@@ -17,6 +17,12 @@ BEGIN {
 }
 
 Test::Pod::LinkCheck::Lite->new(
+    ignore_url		=> [
+	qr< \A https?://spaceflight[.]nasa[.]gov (?: / | \z ) >smx,
+	qw{
+	    https://www.nasa.gov/station
+	},
+    ],
     prohibit_redirect	=> ALLOW_REDIRECT_TO_INDEX,
 )->all_pod_files_ok(
     qw{ blib eg tools },

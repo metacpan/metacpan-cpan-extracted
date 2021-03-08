@@ -13,7 +13,7 @@ sub set_promise_class {
 
     @_ == 2 or croak 'missing $promise_class parameter';
 
-    load $promise_class;
+    load $promise_class if length $promise_class;
     no strict 'refs';
     ${ "${class}::promise_class" } = $promise_class;
 }

@@ -9,9 +9,9 @@ README
 dist.ini
 lib/App/IndonesianHolidayUtils.pm
 lib/Text/ANSITable/StyleSet/Calendar/Indonesia/Holiday/HolidayType.pm
-script/is-id-holiday
-script/list-id-holidays
-script/list-id-workdays
+script/is-idn-holiday
+script/list-idn-holidays
+script/list-idn-workdays
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

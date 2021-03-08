@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
 package Device::AVR::Info;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp;
 
@@ -24,12 +24,12 @@ C<Device::AVR::Info> - load data from F<Atmel> F<AVR Studio> device files
 
 =head1 SYNOPSIS
 
- use Device::AVR::Info;
+   use Device::AVR::Info;
 
- my $avr = Device::AVR::Info->new_from_file( "devices/ATtiny84.xml" );
+   my $avr = Device::AVR::Info->new_from_file( "devices/ATtiny84.xml" );
 
- printf "The signature of %s is %s\n",
-    $avr->name, $avr->signature;
+   printf "The signature of %s is %s\n",
+      $avr->name, $avr->signature;
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,9 @@ F<AVR Studio>, and provides convenient access to the data stored inside them.
 
 =cut
 
-=head2 $avr = Device::AVR::Info->new_from_file( $filename )
+=head2 new_from_file
+
+   $avr = Device::AVR::Info->new_from_file( $filename )
 
 Loads the device information from the given XML file.
 
@@ -81,15 +83,21 @@ sub _module_by_name
 
 =cut
 
-=head2 $name = $avr->name
+=head2 name
+
+   $name = $avr->name
 
 The device name (e.g. "ATtiny84")
 
-=head2 $architecture = $avr->architecture
+=head2 architecture
+
+   $architecture = $avr->architecture
 
 The device architecture (e.g. "AVR8")
 
-=head2 $family = $avr->family
+=head2 family
+
+   $family = $avr->family
 
 The device family (e.g. "tinyAVR")
 
@@ -99,17 +107,21 @@ sub name         { shift->{_device}{name} }
 sub architecture { shift->{_device}{architecture} }
 sub family       { shift->{_device}{family} }
 
-=head2 @ifaces = $avr->interfaces
+=head2 interfaces
 
-=head2 $iface = $avr->interface( $name )
+=head2 interface
+
+   @ifaces = $avr->interfaces
+
+   $iface = $avr->interface( $name )
 
 Returns a list of interface instances, or a single one having the given name,
 representing the programming interfaces supported by the device.
 
 Each is a structure of the following fields.
 
- $iface->name
- $iface->type
+   $iface->name
+   $iface->type
 
 =cut
 
@@ -131,32 +143,37 @@ sub interface
    return;
 }
 
-=head2 @memories = $avr->memories
+=head2 memories
 
-=head2 $memory = $avr->memory( $name )
+=head2 memory
+
+   @memories = $avr->memories
+
+   $memory = $avr->memory( $name )
 
 Returns a list of memory instances, or a single one having the given name,
 representing the available memories on the device.
 
 Each is a structure of the following fields.
 
- $memory->name
- $memory->id
- $memory->endianness
- $memory->start # in bytes
- $memory->size  # in bytes
- @segments = $memory->segments
+   $memory->name
+   $memory->id
+   $memory->endianness
+   $memory->start # in bytes
+   $memory->size  # in bytes
+   @segments = $memory->segments
+   $segment = $memory->segment($name)
 
 The C<segments> field returns a list of structures of the following fields:
 
- $seg->start
- $seg->size
- $seg->name
- $seg->type
- $seg->can_read
- $seg->can_write
- $seg->can_exec
- $seg->pagesize
+   $seg->start
+   $seg->size
+   $seg->name
+   $seg->type
+   $seg->can_read
+   $seg->can_write
+   $seg->can_exec
+   $seg->pagesize
 
 Note that all sizes are given in bytes; for memories of 16-bit word-size,
 divide this by 2 to obtain the size in words.
@@ -174,6 +191,7 @@ divide this by 2 to obtain the size in words.
    sub start      { shift->[3] }
    sub size       { shift->[4] }
    sub segments   { @{ shift->[5] } }
+   sub segment    { $_->name eq $_[1] and return $_ for $_[0]->segments; return }
 }
 
 readonly_struct MemorySegment => [qw( start size name type can_read can_write can_exec pagesize )];
@@ -209,18 +227,22 @@ sub _memory_by_id
    return;
 }
 
-=head2 @ints = $avr->interrupts
+=head2 interrupts
 
-=head2 $int = $avr->interrupt( $name )
+=head2 interrupt
+
+   @ints = $avr->interrupts
+
+   $int = $avr->interrupt( $name )
 
 Returns a list of interrupt instances, or a single one having the given name,
 representing the interrupt sources available on the device.
 
 Each is a structure of the following fields.
 
- $int->name
- $int->index
- $int->caption
+   $int->name
+   $int->index
+   $int->caption
 
 =cut
 
@@ -242,9 +264,13 @@ sub interrupt
    return;
 }
 
-=head2 @periphs = $avr->peripherals
+=head2 peripherals
 
-=head2 $periph = $avr->peripheral( $name )
+=head2 peripheral
+
+   @periphs = $avr->peripherals
+
+   $periph = $avr->peripheral( $name )
 
 Returns a list of peripheral instances, or a single one having the given name,
 representing the peripherals or other miscellaneous information available on
@@ -252,13 +278,13 @@ the device.
 
 Each is a structure of the following fields.
 
- $periph->name
- $periph->module     # instance of Device::AVR::Info::Module
- $periph->regname
- $periph->regspace   # instance of $memory
+   $periph->name
+   $periph->module     # instance of Device::AVR::Info::Module
+   $periph->regname
+   $periph->regspace   # instance of $memory
 
- @registers = $periph->registers
- # instances of $register from Device::AVR::Info::Module
+   @registers = $periph->registers
+   # instances of $register from Device::AVR::Info::Module
 
 =cut
 
@@ -303,15 +329,21 @@ sub peripheral
    return;
 }
 
-=head2 @group_names = $avr->property_groups
+=head2 property_groups
+
+   @group_names = $avr->property_groups
 
 Returns (in no particular order) the names of the defined property groups.
 
-=head2 \%values = $avr->property_group( $group_name )
+=head2 property_group
+
+   \%values = $avr->property_group( $group_name )
 
 Returns a HASH reference of all the properties in the given property group.
 
-=head2 $value = $avr->property( $group_name, $prop_name )
+=head2 property
+
+   $value = $avr->property( $group_name, $prop_name )
 
 Returns a single value of a property in the given property group.
 
@@ -361,7 +393,9 @@ These methods wrap information provided by the basic accessors.
 
 =cut
 
-=head2 $sig = $avr->signature
+=head2 signature
+
+   $sig = $avr->signature
 
 Returns a 6-character hexadecimal string consisting of the three bytes of the
 device signature.

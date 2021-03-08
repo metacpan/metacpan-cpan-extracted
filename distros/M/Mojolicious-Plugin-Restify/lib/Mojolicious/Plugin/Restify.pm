@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Util qw(camelize);
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 sub register {
   my ($self, $app, $conf) = @_;
@@ -93,7 +93,7 @@ sub register {
       # generate "/$path" collection route
       my $controller
         = $options->{controller} ? "$options->{controller}-$path" : $path;
-      my $collection = $r->route("/$options->{route_path}")->to("$controller#");
+      my $collection = $r->any("/$options->{route_path}")->to("$controller#");
 
       # Map HTTP methods to instance methods/mojo actions
       while (my ($http_method, $method) = each %{$options->{collection_method_map}}) {
@@ -123,9 +123,12 @@ sub register {
       local $options->{element_method_map} = $options->{element_method_map}
         // $conf->{element_method_map};
 
+      # 'over' was deprecated in favor of 'requires' in Mojolicious 8.67
+      my $requires_method = $r->can('over') ? 'over' : 'requires';
+
       # generate "/$path/:id" element route with specific placeholder
-      my $element = $r->route("/$options->{placeholder}${path}_id")
-        ->over($options->{over} => "${path}_id")->name($options->{route_name});
+      my $element = $r->any("/$options->{placeholder}${path}_id")
+        ->$requires_method($options->{over} => "${path}_id")->name($options->{route_name});
 
       # Generate remaining CRUD routes for "/$path/:id", optionally creating a
       # resource_lookup method for the resource $element.
@@ -740,6 +743,8 @@ In alphabetical order:
 Castaway
 
 Dragoș-Robert Neagu
+
+Toratora
 
 =back
 

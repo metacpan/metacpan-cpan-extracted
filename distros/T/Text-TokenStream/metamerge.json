@@ -1,0 +1,12 @@
+{
+    "resources": {
+        "repository": {
+            "url": "git://github.com/arc/Text-TokenStream.git",
+            "web": "https://github.com/arc/Text-TokenStream",
+            "type": "git"
+        },
+        "bugtracker": {
+            "web": "https://github.com/arc/Text-TokenStream/issues"
+        }
+    }
+}

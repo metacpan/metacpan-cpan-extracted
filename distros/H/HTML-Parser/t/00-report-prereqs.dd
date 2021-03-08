@@ -40,8 +40,7 @@ do { my $x = {
                                       'URI::URL' => '0',
                                       'XSLoader' => '0',
                                       'perl' => '5.008',
-                                      'strict' => '0',
-                                      'vars' => '0'
+                                      'strict' => '0'
                                     }
                     },
        'test' => {
@@ -59,8 +58,7 @@ do { my $x = {
                                    'Test::More' => '0',
                                    'URI' => '0',
                                    'perl' => '5.008',
-                                   'strict' => '0',
-                                   'vars' => '0'
+                                   'strict' => '0'
                                  }
                  }
      };

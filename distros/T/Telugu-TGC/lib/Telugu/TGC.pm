@@ -5,7 +5,7 @@ use Regexp::Grammars;
 use Kavorka -all;
 use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # V[m] | CH | {CH}C[v][m] | D | F | Hpv | W | Sid | N | Other | NT
 

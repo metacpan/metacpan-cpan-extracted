@@ -12,7 +12,7 @@ use Protocol::FIX::MessageInstance;
 my $proto = Protocol::FIX->new('FIX44');
 
 subtest "simple message instance " => sub {
-    my $m = $proto->message_by_name('Heartbeat');
+    my $m  = $proto->message_by_name('Heartbeat');
     my $ta = Protocol::FIX::TagsAccessor->new([$proto->field_by_name('TestReqID') => 'abc']);
 
     my $mi = Protocol::FIX::MessageInstance->new($m, $ta);

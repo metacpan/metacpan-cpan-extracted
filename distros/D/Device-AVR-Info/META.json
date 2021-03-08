@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -34,11 +34,11 @@
    "provides" : {
       "Device::AVR::Info" : {
          "file" : "lib/Device/AVR/Info.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Device::AVR::Info::Module" : {
          "file" : "lib/Device/AVR/Info/Module.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

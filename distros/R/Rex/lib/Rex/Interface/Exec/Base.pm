@@ -12,7 +12,7 @@ use warnings;
 use Carp;
 use Rex::Helper::Run;
 
-our $VERSION = '1.13.2'; # VERSION
+our $VERSION = '1.13.3'; # VERSION
 
 sub new {
   my $that  = shift;

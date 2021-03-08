@@ -56,7 +56,6 @@ is_deeply scalar Astro::SpaceTrack->attribute_names(), [ qw{
     session_cookie
     space_track_version
     url_iridium_status_kelso
-    url_iridium_status_mccants
     url_iridium_status_sladen
     username
     verbose

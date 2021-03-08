@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.038'; # VERSION
+our $VERSION = '2.039'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -73,9 +73,9 @@ PDF::API2 - Facilitates the creation and modification of PDF files
 
 =item $pdf = PDF::API2->new(%options)
 
-Creates a new PDF object.  If you will be saving it as a file and
-already know the filename, you can give the '-file' option to minimize
-possible memory requirements later on.
+Creates a new PDF object.  If you will be saving it as a file and already know
+the filename, you can give the '-file' option to minimize possible memory
+requirements later on.
 
 B<Example:>
 
@@ -90,6 +90,9 @@ B<Example:>
     $pdf = PDF::API2->new(-file => 'our/new.pdf');
     ...
     $pdf->save();
+
+To turn off automatic compression of PDF contents, include option C<-compress>
+with a false value.  This is generally only useful for debugging.
 
 =cut
 
@@ -109,7 +112,12 @@ sub new {
     weaken $self->{'catalog'};
     $self->{'fonts'} = {};
     $self->{'pagestack'} = [];
-    $self->{'forcecompress'} = 1;
+    if (exists $options{'-compress'}) {
+        $self->{'forcecompress'} = $options{'-compress'} ? 1 : 0;
+    }
+    else {
+        $self->{'forcecompress'} = 1;
+    }
     $self->preferences(%options);
     if ($options{'-file'}) {
         $self->{'pdf'}->create_file($options{'-file'});
@@ -123,7 +131,7 @@ sub new {
     return $self;
 }
 
-=item $pdf = PDF::API2->open($pdf_file)
+=item $pdf = PDF::API2->open($pdf_file, %options)
 
 Opens an existing PDF file.
 
@@ -137,6 +145,9 @@ B<Example:>
     ...
     $pdf->update();
 
+To turn off automatic compression of PDF contents, include option C<-compress>
+with a false value.  This is generally only useful for debugging.
+
 =cut
 
 sub open {
@@ -144,30 +155,48 @@ sub open {
     croak "File '$file' does not exist" unless -f $file;
     croak "File '$file' is not readable" unless -r $file;
 
-    my $content;
-    my $scalar_fh = FileHandle->new();
-    CORE::open($scalar_fh, '+<', \$content) or die "Can't begin scalar IO";
-    binmode $scalar_fh, ':raw';
-
-    my $disk_fh = FileHandle->new();
-    CORE::open($disk_fh, '<', $file) or die "Can't open $file for reading: $!";
-    binmode $disk_fh, ':raw';
-    $disk_fh->seek(0, 0);
-    my $data;
-    while (not $disk_fh->eof()) {
-        $disk_fh->read($data, 512);
-        $scalar_fh->print($data);
+    my $self = {};
+    bless $self, $class;
+    foreach my $parameter (keys %options) {
+        $self->default($parameter, $options{$parameter});
     }
-    $disk_fh->close();
-    $scalar_fh->seek(0, 0);
 
-    my $self = $class->open_scalar($content, %options);
+    my $is_writable = -w $file;
+    $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($file, $is_writable);
+    _open_common($self, %options);
     $self->{'pdf'}->{' fname'} = $file;
+    $self->{'opened_readonly'} = 1 unless $is_writable;
 
     return $self;
 }
 
-=item $pdf = PDF::API2->open_scalar($pdf_string)
+sub _open_common {
+    my ($self, %options) = @_;
+
+    $self->{'pdf'}->{'Root'}->realise();
+    $self->{'pdf'}->{' version'} ||= '1.3';
+
+    $self->{'pages'} = $self->{'pdf'}->{'Root'}->{'Pages'}->realise();
+    weaken $self->{'pages'};
+    my @pages = proc_pages($self->{'pdf'}, $self->{'pages'});
+    $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
+    weaken $self->{'pagestack'}->[$_] for (0 .. scalar @{$self->{'pagestack'}});
+
+    $self->{'catalog'} = $self->{'pdf'}->{'Root'};
+    weaken $self->{'catalog'};
+
+    if (exists $options{'-compress'}) {
+        $self->{'forcecompress'} = $options{'-compress'} ? 1 : 0;
+    }
+    else {
+        $self->{'forcecompress'} = 1;
+    }
+    $self->{'fonts'} = {};
+    $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
+    return $self;
+}
+
+=item $pdf = PDF::API2->open_scalar($pdf_string, %options)
 
 Opens a PDF contained in a string.
 
@@ -181,6 +210,9 @@ B<Example:>
     $pdf = PDF::API2->open_scalar($pdf_string);
     ...
     $pdf->saveas('our/new.pdf');
+
+To turn off automatic compression of PDF contents, include option C<-compress>
+with a false value.  This is generally only useful for debugging.
 
 =cut
 
@@ -201,19 +233,8 @@ sub open_scalar {
     CORE::open($fh, '+<', \$content) or die "Can't begin scalar IO";
 
     $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($fh, 1);
-    $self->{'pdf'}->{'Root'}->realise();
-    $self->{'pages'} = $self->{'pdf'}->{'Root'}->{'Pages'}->realise();
-    weaken $self->{'pages'};
-    $self->{'pdf'}->{' version'} ||= '1.3';
-    my @pages = proc_pages($self->{'pdf'}, $self->{'pages'});
-    $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
-    weaken $self->{'pagestack'}->[$_] for (0 .. scalar @{$self->{'pagestack'}});
-    $self->{'catalog'} = $self->{'pdf'}->{'Root'};
-    weaken $self->{'catalog'};
+    _open_common($self, %options);
     $self->{'opened_scalar'} = 1;
-    $self->{'forcecompress'} = 1;
-    $self->{'fonts'} = {};
-    $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
 
     return $self;
 }
@@ -938,7 +959,8 @@ B<Example:>
 
 sub update {
     my $self = shift();
-    $self->saveas($self->{'pdf'}->{' fname'});
+    croak "File is read-only" if $self->{'opened_readonly'};
+    $self->{'pdf'}->close_file();
     return;
 }
 
@@ -969,7 +991,13 @@ sub saveas {
         $self->{'pdf'}->close_file();
     }
     else {
-        $self->{'pdf'}->out_file($file);
+        unless ($self->{'pdf'}->{' fname'}) {
+            $self->{'pdf'}->out_file($file);
+        }
+        else {
+            $self->{'pdf'}->clone_file($file);
+            $self->{'pdf'}->close_file();
+        }
     }
 
     $self->end();
@@ -1221,7 +1249,7 @@ sub openpage {
             # this will be fixed by the following code or content or filters
 
             ## if we like compress we will do it now to do quicker saves
-            if ($self->{'forcecompress'} > 0) {
+            if ($self->{'forcecompress'}) {
                 # $content->compressFlate();
                 $content->{' stream'} = dofilter($content->{'Filter'}, $content->{' stream'});
                 $content->{' nofilt'} = 1;
@@ -1393,7 +1421,7 @@ sub importPageIntoForm {
             # so we just copy it and add the required "qQ"
             $xo->add('q', $k->{' stream'}, 'Q');
         }
-        $xo->compressFlate() if $self->{'forcecompress'} > 0;
+        $xo->compressFlate() if $self->{'forcecompress'};
     }
 
     return $xo;

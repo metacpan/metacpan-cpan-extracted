@@ -1,0 +1,12 @@
+{
+    "resources": {
+        "repository": {
+            "url": "git://github.com/arc/Pinto-Remote-SelfContained.git",
+            "web": "https://github.com/arc/Pinto-Remote-SelfContained",
+            "type": "git"
+        },
+        "bugtracker": {
+            "web": "https://github.com/arc/Pinto-Remote-SelfContained/issues"
+        }
+    }
+}

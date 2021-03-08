@@ -19,7 +19,7 @@ WriteMakefile(
         'Data::Page'        => '2.02',
         'Validator::Custom' => '1.0201',
         'DBIx::Connector'   => '0.52',
-        'Mojolicious::Plugin::AutoRoute' => '0.12'
+        'Mojolicious::Plugin::AutoRoute' => '0.23'
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Mojolicious-Plugin-DBViewer-*' },

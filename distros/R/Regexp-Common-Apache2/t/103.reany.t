@@ -17,6 +17,7 @@ my $tests =
         regex           => q{/\w+\.\w+\;?/i},
         regflags        => q{i},
         regpattern      => q{\w+\.\w+\;?},
+        regsep          => q{/},
         test            => q{/\w+\.\w+\;?/i},
     },
     {

@@ -12,6 +12,17 @@ use PDL::Types;
 use PDL::Config;
 my $usenan = $PDL::Config{BADVAL_USENAN} || 0;
 
+our $macros = <<'EOF';
+#define PDL_REDODIMS(declini, cast, type, flag, name, pdlname) \
+  declini name ## _datap = (cast(PDL_REPRP_TRANS(pdlname, flag))); \
+  declini name ## _physdatap = (cast(pdlname->data));
+
+#define PDL_REDODIMS_BADVAL(declini, cast, type, flag, name, pdlname) \
+  PDL_REDODIMS(declini, cast, type, flag, name, pdlname) \
+  type name ## _badval = 0; \
+  PDL_Anyval name ## _anyval_badval = PDL->get_pdl_badvalue(pdlname); \
+  ANYVAL_TO_CTYPE(name ## _badval, type, name ## _anyval_badval);
+EOF
 our %Typemap = ();
 use PDL::Types ':All';
 
@@ -275,12 +286,8 @@ sub get_xsnormdimchecks {
 	$str .= "   if($siz == -1 || ($ndims > $no && $siz == 1)) {\n" .
 	        "      $siz = $dim;\n" .
 		"   } else if($ndims > $no && $siz != $dim) {\n" .
-# XXX should these lines simply be removed? If re-inserted, be sure to use PDL_COMMENT
-#		"      if($dim == 1) {\n" .
-#		"         /* Do nothing */ /* XXX Careful, increment? */" .
-#		"      } else {\n" .
 		"      if($dim != 1) {\n" .
-                "         \$CROAK(\"Wrong dims\\n\");\n" .
+                "         \$CROAK(\"Wrong dimensions for parameter '@{[ $this->name ]}'\\n\");\n" .
 		"      }\n   }\n";
 	$no++;
     } 
@@ -445,26 +452,15 @@ sub get_xsdatapdecl {
     my $flag = $this->get_nnflag;
     my $name = $this->{Name};
     $type = $this->ctype($genlooptype) if defined $genlooptype;
-    my $declini = ($asgnonly ? "" : "\t$type *");
+    my $declini = ($asgnonly ? "" : "$type *");
     my $cast = ($type ? "($type *)" : "");
-# ThreadLoop does this for us.
-#	return "$declini ${name}_datap = ($cast((${_})->data)) + (${_})->offs;\n";
-    
-    my $str = PDL::PP::pp_line_numbers(__LINE__, "$declini ${name}_datap = ($cast(PDL_REPRP_TRANS($pdl,$flag)));\n" .
-	"$declini ${name}_physdatap = ($cast($pdl->data));\n");
-
+    my $macro = "PDL_REDODIMS";
     # assuming we always need this 
     # - may not be true - eg if $asgnonly ??
     # - not needed for floating point types when using NaN as bad values
-    if ( $this->{BadFlag} and $type and 
-	 ( $usenan == 0 or $type !~ /^PDL_(Float|Double)$/ ) ) {
-	my $cname = $type; $cname =~ s/^PDL_//;
-	$str .= "\t$type   ${name}_badval = 0;\n";
-	$str .= "\tPDL_Anyval  ${name}_anyval_badval = PDL->get_pdl_badvalue($pdl);\n";
-	$str .= "\tANYVAL_TO_CTYPE(${name}_badval, ${type}, ${name}_anyval_badval);\n";
-    }	
-
-    return "$str\n";
+    $macro = "PDL_REDODIMS_BADVAL" if $this->{BadFlag} and $type and
+	( $usenan == 0 or $type !~ /^PDL_(Float|Double)$/ );
+    PDL::PP::pp_line_numbers(__LINE__, "$macro($declini, $cast, $type, $flag, $name, $pdl)");
 }
 
 1;

@@ -27,9 +27,18 @@ my $tests =
     {
         name            => q{function, arguments},
         test            => q{%{tolower:SomeValue}},
+        var_func        => q{tolower:SomeValue},
         var_func_args   => q{SomeValue},
         var_func_name   => q{tolower},
         variable        => q{%{tolower:SomeValue}},
+    },
+    {
+        name            => q{%{md5:foo}},
+        test            => q{%{md5:foo}},
+        var_func        => q{md5:foo},
+        var_func_args   => q{foo},
+        var_func_name   => q{md5},
+        variable        => q{%{md5:foo}},
     },
 ];
 

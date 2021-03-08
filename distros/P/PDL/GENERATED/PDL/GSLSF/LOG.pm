@@ -61,10 +61,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Provide a logarithm function with GSL semantics.
 
-=for bad
-
-gsl_sf_log does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -90,10 +86,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Complex Logarithm exp(lnr + I theta) = zr + I zi Returns argument in [-pi,pi].
 
-=for bad
-
-gsl_sf_complex_log does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

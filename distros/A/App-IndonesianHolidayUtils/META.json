@@ -29,7 +29,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Calendar::Indonesia::Holiday" : "0.331",
+            "Calendar::Indonesia::Holiday" : "0.335",
             "Data::Sah::Coerce::perl::To_date::From_float::epoch" : "0",
             "Data::Sah::Coerce::perl::To_date::From_obj::datetime" : "0",
             "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" : "0",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-App-IndonesianHolidayUtils"
       }
    },
-   "version" : "0.060",
+   "version" : "0.061",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -78,17 +78,17 @@
       "plugins" : [
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript is-id-holiday",
+            "name" : "GenPericmdScript is-idn-holiday",
             "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript list-id-holidays",
+            "name" : "GenPericmdScript list-idn-holidays",
             "version" : "0.423"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
-            "name" : "GenPericmdScript list-id-workdays",
+            "name" : "GenPericmdScript list-idn-workdays",
             "version" : "0.423"
          },
          {

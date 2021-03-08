@@ -9,3 +9,6 @@ The following logs changes for the CPAN distribution Valiant
 0.001003  2021-01-30
           - Put ::Utils in more polite namespace
           - Include exception classes for the lazy
+
+0.001004  2021-03-06
+          - update dependencies

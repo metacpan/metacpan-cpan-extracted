@@ -8,12 +8,14 @@ use Test::More;
 use Win32;
 use Win32::GuiTest 1.64 qw':FUNC !SendMessage';     # 1.64 required for 64-bit SendMessage
 
-use Win32::Mechanize::NotepadPlusPlus qw/:main :vars/;
-
 use FindBin;
+BEGIN { my $f = $FindBin::Bin . '/nppPath.inc'; require $f if -f $f; }
+
 use lib $FindBin::Bin;
 use myTestHelpers qw/:userSession/;
 use Path::Tiny 0.018 qw/path tempfile/;
+
+use Win32::Mechanize::NotepadPlusPlus qw/:main :vars/;
 
 #   if any unsaved buffers, HALT test and prompt user to save any critical
 #       files, then re-run test suite.
@@ -54,7 +56,7 @@ for my $c (GetChildWindows($hWnd)) {
 PushButton("OK", 0.5);
 
 # extract version and bits from debugInfo
-my ($ver, $bits) = $debugInfo =~ m/^Notepad\+\+ (v[\d\.]+)\s*\((\d+)-bit\)\s*$/m;
+my ($ver, $bits) = $debugInfo =~ m/^Notepad\+\+ (v[\d\.]+)(?:\s*\((\d+)-bit\))?\s*$/m;
 ok $ver, 'DebugInfo:Notepad++ ver';
 ok $bits, 'DebugInfo:Notepad++ bits';
 diag sprintf "\n\nDEBUG INFO: Notepad++ %s %s-bit\n\n\n", $ver//'<undef>', $bits//'<undef>';

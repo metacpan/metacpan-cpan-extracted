@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Jobs;
 use strict;
 use warnings;
 
-our $VERSION = '0.000034';
+our $VERSION = '0.000036';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -37,13 +37,22 @@ sub handle {
         env          => $req->env,
         content_type => 'application/x-jsonl',
 
-        done  => sub { $flush && !@jobs && $run->complete },
+        done => sub {
+            return 0 if @jobs;
+
+            unless ($flush) {
+                $run->discard_changes();
+                return 0;
+            }
+
+            return $run->complete;
+        },
         fetch => sub {
             $flush = 1 if $run->complete;
 
-            my @new = $run->jobs(undef, {offset => $offset, order_by => [{-asc => 'retry'}, {-desc => 'fail'}, {-asc => 'job_ord'}]})->all;
+            my @new = $run->jobs({job_ord => { '>' => $offset }}, {order_by => {-asc => 'job_ord'}})->all;
             if (@new) {
-                $offset += @new;
+                $offset = $new[-1]->job_ord;
                 push @jobs => @new;
             }
 

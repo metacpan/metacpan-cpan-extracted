@@ -1,5 +1,12 @@
 -----------------------------------------------------
 
+0.10  2021-03-08
+  - Version bump.
+
+0.09  2021-03-07
+  - Update to accomodate deprecated functions in Mojolicious 9.*. (Thanks
+    toratora.)
+
 0.08  2017-04-17
   - Fix current_id helper. RE wasn't greedy enough so wouldn't work for paths
     greater than a depth of 2. (Thanks Dragoș.)

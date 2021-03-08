@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = '1.13.2'; # VERSION
+our $VERSION = '1.13.3'; # VERSION
 
 my $report;
 

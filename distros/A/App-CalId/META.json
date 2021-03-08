@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Calendar::Indonesia::Holiday" : "0",
+            "Calendar::Indonesia::Holiday" : "0.331",
             "DateTime" : "0",
             "Getopt::Long" : "2.50",
             "List::Util" : "1.45",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/perlancar/perl-App-CalId"
       }
    },
-   "version" : "0.132",
+   "version" : "0.133",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

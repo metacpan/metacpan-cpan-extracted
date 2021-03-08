@@ -12,9 +12,9 @@ my $tests =
 [
     {
         name            => q{digits},
-        test            => q{12345},
-        word            => q{12345},
-        word_digits     => q{12345},
+        test            => 12345,
+        word            => 12345,
+        word_digits     => 12345,
     },
     {
         name            => q{single quote string},
@@ -73,24 +73,32 @@ my $tests =
         test            => q{("John")},
         word            => q{("John")},
         word_enclosed   => q{"John"},
+        word_parens_close => q{)},
+        word_parens_open => q{(},
     },
     {
         name            => q{parenthesis enclosing single quote},
         test            => q{('John')},
         word            => q{('John')},
         word_enclosed   => q{'John'},
+        word_parens_close => q{)},
+        word_parens_open => q{(},
     },
     {
         name            => q{parenthesis enclosing dotted},
         test            => q{("John"."Peter")},
         word            => q{("John"."Peter")},
-        word_dot_word   => q{("John"."Peter")},
+        word_enclosed   => q{"John"."Peter"},
+        word_parens_close => q{)},
+        word_parens_open => q{(},
     },
     {
         name            => q{parenthesis enclosing variable},
         test            => q{(%{REQUEST_URI})},
         word            => q{(%{REQUEST_URI})},
         word_enclosed   => q{%{REQUEST_URI}},
+        word_parens_close => q{)},
+        word_parens_open => q{(},
     },
 ];
 

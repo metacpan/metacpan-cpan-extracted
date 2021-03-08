@@ -61,10 +61,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Evaluate Gegenbauer polynomials.
 
-=for bad
-
-gsl_sf_gegenpoly_n does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -90,10 +86,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Calculate array of Gegenbauer polynomials from 0 to n-1.
 
-=for bad
-
-gsl_sf_gegenpoly_array does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

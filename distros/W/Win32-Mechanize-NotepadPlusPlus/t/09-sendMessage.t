@@ -9,6 +9,9 @@ use strict;
 use warnings;
 use Test::More;
 
+use FindBin;
+BEGIN { my $f = $FindBin::Bin . '/nppPath.inc'; require $f if -f $f; }
+
 use Win32::Mechanize::NotepadPlusPlus::Notepad ':vars';
 use Win32::Mechanize::NotepadPlusPlus::Editor ':vars';
 BEGIN {
@@ -33,6 +36,10 @@ my $view = $w->SendMessage($NPPMSG{NPPM_GETCURRENTVIEW}, 0, 0);
 like $view, qr/^[01]$/, 'GetCurrentView (should be 0 or 1): '. ($view//'<undef>');
 
 my $ival = $w->SendMessage_get32u($NPPMSG{NPPM_GETCURRENTLANGTYPE}, 0);
+note sprintf "langtype ival = '%s'\n", $ival // '<undef>';
+ok defined $ival, 'SendMessage_get32u: ' . ($ival//'<undef>');
+
+$ival = $w->SendMessage_get32u($NPPMSG{NPPM_GETCURRENTLANGTYPE}, 1); # 2021-Feb-16: add ,1 for condition coverage 
 note sprintf "langtype ival = '%s'\n", $ival // '<undef>';
 ok defined $ival, 'SendMessage_get32u: ' . ($ival//'<undef>');
 

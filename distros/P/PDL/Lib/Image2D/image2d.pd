@@ -137,9 +137,12 @@ my %pnpolyFields = (
 	'pnpolyfill_pp' => {'pars' => '[o,nc] a(m,n); ps(k,l); int col()', 'special' => 'if(c) { $a() = $col(); }'}
 );
 
+my $R = ['B','S','U','L','N','Q','F','D']; # should be using code from Types.pm to set up.
+
 for my $name (sort keys %pnpolyFields) {
 	pp_def($name,
 		HandleBad => 0,
+		GenericTypes=>$R,
 		PMFunc => '',
 		Doc => undef,
 		Pars => $pnpolyFields{$name}->{'pars'},
@@ -195,8 +198,8 @@ pp_addhdr('
 
 for ( PDL::Types::typesrtkeys() ) {
     my $ctype = $PDL::Types::typehash{$_}{ctype};
+    next if $ctype =~ /C/; # filter complex
     my $ppsym = $PDL::Types::typehash{$_}{ppsym};
-
   pp_addhdr << "EOH";
 
 /*
@@ -621,6 +624,7 @@ Note: this routine does the median over all points in a rectangular
 
 EOD
         Pars => 'a(m,n); [o]b(m,n);',
+        GenericTypes=>$R,
 	# funny parameter names to avoid special case in 'init_vars'
         OtherPars => 'int __p_size; int __q_size; int opt;',
         PMCode => '
@@ -939,6 +943,7 @@ EOD
 
        HandleBad => 1,
         Pars => 'a(m,n); [o]val(); int [o]x(); int[o]y();',
+        GenericTypes=>$R,
         Code => '
         double cur; int curind1; int curind2;
         curind1=0;
@@ -1157,6 +1162,7 @@ where the second parameter specifies the connectivity (4 or 8) of the labeling.
 ',
        HandleBad => 0, # a marker
         Pars => 'a(m,n); int+ [o]b(m,n);',
+        GenericTypes=>$R,
         OtherPars => 'int con',
         Code => '
 
@@ -1529,7 +1535,8 @@ EOD
 
 pp_def('bilin2d',
        HandleBad => 0,
-    Pars => 'I(n,m); O(q,p)',
+    Pars => 'Int(n,m); O(q,p)',
+    GenericTypes=>$R,
     Doc=><<'EOD',
 
 =for ref
@@ -1558,10 +1565,10 @@ EOD
 	  if (jj>=($SIZE(m)-1)) jj = $SIZE(m)-2;
 	  ii1 = ii+1;
 	  jj1 = jj+1;
-	  y1 = $I(n=>ii,m=>jj);
-	  y2 = $I(n=>ii1,m=>jj);
-	  y3 = $I(n=>ii1,m=>jj1);
-	  y4 = $I(n=>ii,m=>jj1);
+	  y1 = $Int(n=>ii,m=>jj);
+	  y2 = $Int(n=>ii1,m=>jj);
+	  y3 = $Int(n=>ii1,m=>jj1);
+	  y4 = $Int(n=>ii,m=>jj1);
 	  t = x-ii;
 	  u = y-jj;
 	  $O(q=>i,p=>j) += (1-t)*(1-u)*y1 + t*(1-u)*y2 + t*u*y3 + (1-t)*u*y4;
@@ -1576,7 +1583,8 @@ EOD
 
 pp_def('rescale2d',
        HandleBad => 0,
-    Pars => 'I(m,n); O(p,q)',
+    Pars => 'Int(m,n); O(p,q)',
+    GenericTypes=>$R,
     Doc=><<'EOD',
 
 =for ref
@@ -1616,7 +1624,7 @@ if(ox >= ix && oy >= iy) {
 	for(xx=lx;xx<=cx;xx++)
 	  for(yy=ly;yy<=cy;yy++) {
 /*	    fprintf(stderr,"i: %d, j: %d, xx: %d, yy: %d\n",i,j,xx,yy); */
-	    $O(p=>xx,q=>yy) += $I(m=>i,n=>j);
+	    $O(p=>xx,q=>yy) += $Int(m=>i,n=>j);
 	  }
 	ly = cy + 1;
       }
@@ -1639,7 +1647,7 @@ else if(ox < ix && oy < iy) {
 	for(xx=lx;xx<=cx;xx++)
 	  for(yy=ly;yy<=cy;yy++) {
 /*	    fprintf(stderr,"i: %d, j: %d, xx: %d, yy: %d\n",i,j,xx,yy); */
-	    temp += $I(n=>yy,m=>xx);
+	    temp += $Int(n=>yy,m=>xx);
 	    num++;
 	  }
 	$O(p=>i,q=>j) += temp/num;
@@ -1663,7 +1671,7 @@ else if(ox >= ix && oy < iy) {
 	num = 0;
 	for(yy=ly;yy<=cy;yy++) {
 /*	  fprintf(stderr,"1 i: %d, j: %d, xx: %d, yy: %d\n",i,j,xx,yy); */
-	    temp += $I(n=>yy,m=>i);
+	    temp += $Int(n=>yy,m=>i);
 	  num++;
 	}
 	for(xx=lx;xx<=cx;xx++) {
@@ -1690,7 +1698,7 @@ else if(ox < ix && oy >= iy) {
 	num = 0;
 	for(xx=lx;xx<=cx;xx++) {
 /*	  fprintf(stderr,"1 i: %d, j: %d, xx: %d, yy: %d\n",i,j,xx,yy); */
-	    temp += $I(n=>j,m=>xx);
+	    temp += $Int(n=>j,m=>xx);
 	  num++;
 	}
 	for(yy=ly;yy<=cy;yy++) {

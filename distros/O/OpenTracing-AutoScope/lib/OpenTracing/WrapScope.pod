@@ -43,9 +43,10 @@ which is roughly equivalent to:
 
 =head1 IMPORT ARGUMENTS
 
-import takes subroutine names as arguments, these need to be fully qualified 
-if they are not in the current package. All specified subroutines will have
-spans attached to them. Context and caller frames will be preserved.
+import takes subroutine names (with optional signatures) as arguments,
+these need to be fully qualified if they are not in the current package.
+All specified subroutines will have spans attached to them.
+Context and caller frames will be preserved.
 
 The following tags will be automatically added to each span:
 
@@ -72,6 +73,141 @@ The following tags will be automatically added to each span:
 Additionally, if a wrapped subroutine dies, an additional C<error> tag
 (set to a true value) and C<message> tag, containing (C<$@>) will be
 added to the span.
+
+=head2 Signatures
+
+If a signature is used, tags containing the argument values will be added to the span.
+The syntax is similar to the built-in signatures, although simplified.
+A signature is a parenthesised list of arguments:
+
+  use OpenTracing::WrapScope 'Foo::bar($arg, \%config)'
+
+In this example, calling
+
+  Foo::bar('test', { date => '2020-01-01', limit => 16 })
+
+will produce the following tags:
+
+ arguments.arg = 'test'
+ arguments.config.date = '2020-01-01'
+ arguments.config.limit = 10
+
+The following argument types are supported:
+
+=over 4
+
+=item Scalar
+
+Captures a single argument and assigns it to a tag with the specified name.
+
+  use OpenTracing::WrapScope 'foo($bar)';
+
+  foo('username')
+
+Produces:
+
+  arguments.bar = 'username'
+
+=item undef
+
+Causes an argument to be skipped.
+
+  use OpenTracing::WrapScope 'foo($first, undef, $third)';
+
+  foo(1, 2, 3)
+
+Produces:
+
+  arguments.first = 1
+  arguments.third = 3
+
+=item Array
+
+Captures all remaining arguments and puts them into indexed tags.
+
+  use OpenTracing::WrapScope 'foo(@args)';
+
+  foo('a', 'b', 'c')
+
+Produces:
+
+  arguments.args.0 = 'a'
+  arguments.args.1 = 'b'
+  arguments.args.2 = 'c'
+
+Optionally, slices can be used to limit which elements are to be captured:
+
+  use OpenTracing::WrapScope 'foo(@args[ 0, 2 ])';
+  use OpenTracing::WrapScope 'foo(@args[ 3, 5..8 ])';
+
+B<Note>: Only literal integers and ranges can be used for slicing.
+
+=item ArrayRef
+
+Captures a single array reference argument and puts it into indexed tags.
+
+  use OpenTracing::WrapScope 'foo(\@args)';
+
+  foo([ 'x', 'y', 'z' ])
+
+Produces:
+
+  arguments.args.0 = 'x'
+  arguments.args.1 = 'y'
+  arguments.args.2 = 'z'
+
+It supports slicing in the same way as the regular L<Array>.
+
+  use OpenTracing::WrapScope 'foo(\@args[ 0, 2 ])';
+  use OpenTracing::WrapScope 'foo(\@args[ 3, 5..8 ])';
+
+B<Note>: If at the time of the call, the specified argument is not an array
+reference, it will be silently ignored and no tags will be produced for that
+argument.
+
+=item Hash (or key-value pairs)
+
+Captures all remaining arguments and treats them as a hash.
+
+  use OpenTracing::WrapScope 'foo(%args)';
+
+  foo(x => 1, y => 2, z => 3)
+
+Produces:
+
+  arguments.foo.x = 1
+  arguments.foo.y = 2
+  arguments.foo.y = 3
+
+Optionally, slices can be used to limit which elements are to be captured:
+
+  use OpenTracing::WrapScope 'foo(%args{"x", "y"})';
+
+B<Note>: Only single or double quoted strings can be used for slicing.
+
+=item HashRef
+
+Captures a single hash reference argument and puts it into tags.
+
+  use OpenTracing::WrapScope 'foo(\%args)';
+
+  foo( { x => 1, y => 2, z => 3 } )
+
+Produces:
+
+  arguments.foo.x = 1
+  arguments.foo.y = 2
+  arguments.foo.y = 3
+
+It supports slicing in the same way as the regular L<Hash>.
+
+  use OpenTracing::WrapScope 'foo(\%args{"x", "y"})';
+
+B<Note>: If at the time of the call, the specified argument is not a hash
+reference, it will be silently ignored and no tags will be produced for that
+argument.
+
+=back
 
 =head2 -file
 
@@ -125,8 +261,10 @@ Passing this option will disable that warning.
 
 Replaces the specified subroutine with a span-handling version.
 $sub needs to be a fully qualified subroutine name or an unqualified name
-from the current package. The subroutine needs to be defined or a warning
-will be thrown. This warning can be made fatal with:
+from the current package, it can optionally include a signature (see L<Signatures>).
+
+The subroutine needs to be defined or a warning will be thrown. This warning
+can be made fatal with:
 
   use warnings FATAL => 'OpenTracing::WrapScope';
 
@@ -134,10 +272,17 @@ or disabled with:
 
   no warnings 'OpenTracing::WrapScope';
 
-=head2 wrapped($code_ref)
+=head2 wrapped($code_ref, $signature)
 
 Returns a version of the given code reference with span handling attached.
 Useful for adding spans to anonymous subroutines.
+
+A signature may be optionally included to track the arguments,
+it B<should not> include parentheses:
+
+  my $coderef = OpenTracing::WrapScope::wrapped(sub { ... }, '$arg1, $arg2, @others')
+
+See L<Signatures> for details.
 
 =head2 wrap_from_file($filename)
 

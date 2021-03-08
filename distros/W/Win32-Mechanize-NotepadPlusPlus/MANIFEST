@@ -7,6 +7,8 @@ examples/genRandomText.pl
 examples/npp_selection_filenames_md5.pl
 examples/pasteSpecial.pl
 examples/readme.txt
+examples/rotateViews.pl
+helpbuild/myMakeHelper.pm
 lib/Win32/Mechanize/NotepadPlusPlus.pm
 lib/Win32/Mechanize/NotepadPlusPlus/__hwnd.pm
 lib/Win32/Mechanize/NotepadPlusPlus/Editor.pm
@@ -27,6 +29,7 @@ src/mpod.pl
 src/Notepad_plus_msgs.h
 src/Scintilla.h
 t/00-load.t
+t/000-findNpp.t
 t/01-defaults.t
 t/02-bits.t
 t/09-sendMessage.t
@@ -36,8 +39,11 @@ t/11-vars-notepad.t
 t/20-sessionSaver.t
 t/30-nppViaObject.t
 t/31-nppBeforeObject.t
+t/hwnd.t
 t/myTestHelpers.pm
 t/npp-buffer.t
+t/npp-err-main.t
+t/npp-err-npp.t
 t/npp-files.t
 t/npp-gui.t
 t/npp-menucmd.t
@@ -48,7 +54,9 @@ t/sci-hlprfns.t
 t/sci-manu.t
 t/sci-testcases.t
 t/sci-undo.t
+t/xtra.t
 xt/00-sign.t
+xt/pod-test.t
 xt/sci-autogen.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

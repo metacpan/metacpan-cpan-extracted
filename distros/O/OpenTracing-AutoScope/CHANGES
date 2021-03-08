@@ -1,6 +1,18 @@
 CHANGE LOG
 ==========
 
+2021-03-05 - v0.107.0
+---------------------
+
+### Added
+  - Support for tracing subroutine arguments
+
+### Fixed
+  - WrapScope files can now contain empty lines
+  - AutoScope no longer crashes when a scope was closed before scope end
+
+
+
 2020-10-08 - v0.106.6
 ---------------------
 

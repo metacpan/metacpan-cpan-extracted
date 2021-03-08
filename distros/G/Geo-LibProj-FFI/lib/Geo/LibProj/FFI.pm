@@ -2,12 +2,12 @@ use 5.012;
 use warnings;
 
 # ABSTRACT: Foreign function interface to PROJ coordinate transformation software
-package Geo::LibProj::FFI 0.01;
+package Geo::LibProj::FFI 0.02;
 
 
-use Alien::proj;
+use Alien::proj 1.07;
 use FFI::Platypus 1.00;
-use FFI::C;
+use FFI::C 0.08;
 
 use Exporter::Easy (TAGS => [
 	context => [qw(
@@ -42,8 +42,8 @@ use Exporter::Easy (TAGS => [
 	)],
 	const => [qw(
 		PJ_DEFAULT_CTX
-		PJ_FWD PJ_IDENT PJ_INV
 		PJ_LOG_NONE PJ_LOG_ERROR PJ_LOG_DEBUG PJ_LOG_TRACE PJ_LOG_TELL
+		PJ_FWD PJ_IDENT PJ_INV
 	)],
 	all => [qw(
 		:context
@@ -105,37 +105,37 @@ $ffi->type('opaque' => 'PJ');  # the PJ object herself
 
 # Geodetic, mostly spatiotemporal coordinate types
 {
-	package Geo::LibProj::FFI::PJ_XYZT 0.01;
+	package Geo::LibProj::FFI::PJ_XYZT 0.02;
 	FFI::C->struct('PJ_XYZT' => [ 'x' => 'double', 'y' => 'double', 'z' => 'double', 't' => 'double' ]);
-	package Geo::LibProj::FFI::PJ_UVWT 0.01;
+	package Geo::LibProj::FFI::PJ_UVWT 0.02;
 	FFI::C->struct('PJ_UVWT' => [ u => 'double', v => 'double', w => 'double', t => 'double' ]);
-	package Geo::LibProj::FFI::PJ_LPZT 0.01;
+	package Geo::LibProj::FFI::PJ_LPZT 0.02;
 	FFI::C->struct('PJ_LPZT' => [ lam => 'double', phi => 'double', z => 'double', t => 'double' ]);
-	package Geo::LibProj::FFI::PJ_OPK 0.01;
+	package Geo::LibProj::FFI::PJ_OPK 0.02;
 	FFI::C->struct('PJ_OPK' => [ o => 'double', p => 'double', k => 'double' ]);
 	# Rotations: omega, phi, kappa
-	package Geo::LibProj::FFI::PJ_ENU 0.01;
+	package Geo::LibProj::FFI::PJ_ENU 0.02;
 	FFI::C->struct('PJ_ENU' => [ e => 'double', n => 'double', u => 'double' ]);
 	# East, North, Up
-	package Geo::LibProj::FFI::PJ_GEOD 0.01;
+	package Geo::LibProj::FFI::PJ_GEOD 0.02;
 	FFI::C->struct('PJ_GEOD' => [ 's' => 'double', 'a1' => 'double', 'a2' => 'double' ]);
 	# Geodesic length, fwd azi, rev azi
 }
 
 # Classic proj.4 pair/triplet types - moved into the PJ_ name space
 {
-	package Geo::LibProj::FFI::PJ_UV 0.01;
+	package Geo::LibProj::FFI::PJ_UV 0.02;
 	FFI::C->struct('PJ_UV' => [ u => 'double', v => 'double' ]);
-	package Geo::LibProj::FFI::PJ_XY 0.01;
+	package Geo::LibProj::FFI::PJ_XY 0.02;
 	FFI::C->struct('PJ_XY' => [ 'x' => 'double', 'y' => 'double' ]);
-	package Geo::LibProj::FFI::PJ_LP 0.01;
+	package Geo::LibProj::FFI::PJ_LP 0.02;
 	FFI::C->struct('PJ_LP' => [ lam => 'double', phi => 'double' ]);
 	
-	package Geo::LibProj::FFI::PJ_XYZ 0.01;
+	package Geo::LibProj::FFI::PJ_XYZ 0.02;
 	FFI::C->struct('PJ_XYZ' => [ 'x' => 'double', 'y' => 'double', 'z' => 'double' ]);
-	package Geo::LibProj::FFI::PJ_UVW 0.01;
+	package Geo::LibProj::FFI::PJ_UVW 0.02;
 	FFI::C->struct('PJ_UVW' => [ u => 'double', v => 'double', w => 'double' ]);
-	package Geo::LibProj::FFI::PJ_LPZ 0.01;
+	package Geo::LibProj::FFI::PJ_LPZ 0.02;
 	FFI::C->struct('PJ_LPZ' => [ lam => 'double', phi => 'double', z => 'double' ]);
 }
 
@@ -143,7 +143,7 @@ $ffi->type('opaque' => 'PJ');  # the PJ object herself
 # Data type for generic geodetic 3D data plus epoch information
 # Avoid preprocessor renaming and implicit type-punning: Use a union to make it explicit
 {
-	package Geo::LibProj::FFI::PJ_COORD::Union 0.01;
+	package Geo::LibProj::FFI::PJ_COORD::Union 0.02;
 	FFI::C->union('PJ_COORD_union' => [
 		v    => 'double[4]',  # First and foremost, it really is "just 4 numbers in a vector"
 		xyzt => 'PJ_XYZT',
@@ -173,7 +173,7 @@ $ffi->type('opaque' => 'PJ');  # the PJ object herself
 		Geo::LibProj::FFI::PJ_COORD::Record->new( v => [@{shift->v}] );
 	}
 	
-	package Geo::LibProj::FFI::PJ_COORD::Record 0.01;
+	package Geo::LibProj::FFI::PJ_COORD::Record 0.02;
 	use FFI::Platypus::Record;
 	record_layout_1(qw{ double[4] v });
 	sub as_union {
@@ -184,7 +184,7 @@ $ffi->type('record(Geo::LibProj::FFI::PJ_COORD::Record)' => 'PJ_COORD');
 
 
 {
-	package Geo::LibProj::FFI::PJ_INFO 0.01;
+	package Geo::LibProj::FFI::PJ_INFO 0.02;
 	use FFI::Platypus::Record;
 	record_layout_1(
 		int    => 'major',       # Major release number
@@ -295,7 +295,7 @@ Geo::LibProj::FFI - Foreign function interface to PROJ coordinate transformation
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -317,7 +317,8 @@ version 0.01
  printf "Target: easting %.2f, northing %.2f\n",
      $b->enu->e, $b->enu->n;
 
-See also F<examples/pj_obs_api_mini_demo.pl> in this distribution.
+See also the example script F<eg/pj_obs_api_mini_demo.pl>
+in this distribution.
 
 =head1 DESCRIPTION
 

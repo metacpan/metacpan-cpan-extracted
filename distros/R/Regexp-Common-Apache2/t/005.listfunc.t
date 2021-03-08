@@ -11,23 +11,23 @@ BEGIN
 my $tests = 
 [
     {
+        func_args       => q{"John"},
+        func_name       => q{someFunc},
         listfunc        => q{someFunc("John")},
-        listfunc_args   => q{"John"},
-        listfunc_name   => q{someFunc},
         name            => q{list function},
         test            => q{someFunc("John")},
     },
     {
+        func_args       => q{"John", "Paul", "Peter"},
+        func_name       => q{someFunc},
         listfunc        => q{someFunc( "John", "Paul", "Peter" )},
-        listfunc_args   => q{"John", "Paul", "Peter"},
-        listfunc_name   => q{someFunc},
         name            => q{list function with list of words},
         test            => q{someFunc( "John", "Paul", "Peter" )},
     },
     {
+        func_args       => q{"John", otherListFunc( "Paul" )},
+        func_name       => q{someFunc},
         listfunc        => q{someFunc( "John", otherListFunc( "Paul" ) )},
-        listfunc_args   => q{"John", otherListFunc( "Paul" )},
-        listfunc_name   => q{someFunc},
         name            => q{list function with other list function},
         test            => q{someFunc( "John", otherListFunc( "Paul" ) )},
     },

@@ -1,2 +1,2 @@
 requires 'Test2::Suite';
-requires 'Mojolicious';
+requires 'Mojolicious', '==8.65';

@@ -1,4 +1,4 @@
-# auto-converted from src/Notepad_plus_msgs.h at Sat Apr  4 13:09:33 2020
+# auto-converted from src/Notepad_plus_msgs.h at Thu Dec 31 15:14:01 2020
 package Win32::Mechanize::NotepadPlusPlus::Notepad::Messages;
 
 use warnings;
@@ -19,6 +19,8 @@ our %nppm_dummyhash = (
     'FILE_NAME'                                                  => 3,
     'FULL_CURRENT_PATH'                                          => 1,
     'GETFILENAMEATCURSOR'                                        => 11,
+    'LINENUMWIDTH_CONSTANT'                                      => 1,
+    'LINENUMWIDTH_DYNAMIC'                                       => 0,
     'L_ADA'                                                      => 42,
     'L_ASCII'                                                    => 14,
     'L_ASM'                                                      => 32,
@@ -154,6 +156,7 @@ our %nppm_dummyhash = (
     'NPPM_GETFULLPATHFROMBUFFERID'                               => ((1024 + 1000) + 58),
     'NPPM_GETLANGUAGEDESC'                                       => ((1024 + 1000) + 84),
     'NPPM_GETLANGUAGENAME'                                       => ((1024 + 1000) + 83),
+    'NPPM_GETLINENUMBERWIDTHMODE'                                => ((1024 + 1000) + 100),
     'NPPM_GETMENUHANDLE'                                         => ((1024 + 1000) + 25),
     'NPPM_GETNAMEPART'                                           => ((1024 + 3000) + 4),
     'NPPM_GETNBOPENFILES'                                        => ((1024 + 1000) + 7),
@@ -169,6 +172,7 @@ our %nppm_dummyhash = (
     'NPPM_GETPLUGINSCONFIGDIR'                                   => ((1024 + 1000) + 46),
     'NPPM_GETPOSFROMBUFFERID'                                    => ((1024 + 1000) + 57),
     'NPPM_GETSESSIONFILES'                                       => ((1024 + 1000) + 14),
+    'NPPM_GETSETTINGSONCLOUDPATH'                                => ((1024 + 1000) + 98),
     'NPPM_GETSHORTCUTBYCMDID'                                    => ((1024 + 1000) + 76),
     'NPPM_GETWINDOWSVERSION'                                     => ((1024 + 1000) + 42),
     'NPPM_HIDEMENU'                                              => ((1024 + 1000) + 72),
@@ -200,6 +204,7 @@ our %nppm_dummyhash = (
     'NPPM_SETBUFFERLANGTYPE'                                     => ((1024 + 1000) + 65),
     'NPPM_SETCURRENTLANGTYPE'                                    => ((1024 + 1000) + 6),
     'NPPM_SETEDITORBORDEREDGE'                                   => ((1024 + 1000) + 93),
+    'NPPM_SETLINENUMBERWIDTHMODE'                                => ((1024 + 1000) + 99),
     'NPPM_SETMENUITEMCHECK'                                      => ((1024 + 1000) + 40),
     'NPPM_SETSMOOTHFONT'                                         => ((1024 + 1000) + 92),
     'NPPM_SETSTATUSBAR'                                          => ((1024 + 1000) + 24),

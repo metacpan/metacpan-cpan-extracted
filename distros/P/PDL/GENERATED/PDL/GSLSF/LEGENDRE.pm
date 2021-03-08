@@ -61,10 +61,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 P_l(x)
 
-=for bad
-
-gsl_sf_legendre_Pl does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -90,10 +86,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 P_l(x) from 0 to n-1.
 
-=for bad
-
-gsl_sf_legendre_Pl_array does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -119,10 +111,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Q_l(x)
 
-=for bad
-
-gsl_sf_legendre_Ql does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -148,10 +136,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 P_lm(x)
 
-=for bad
-
-gsl_sf_legendre_Plm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -204,10 +188,6 @@ See L</gsl_sf_legendre_array_index> to get the value of C<l> and C<m> in the ret
 
 
 
-=for bad
-
-gsl_sf_legendre_array processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -238,10 +218,6 @@ Calculate the relation between gsl_sf_legendre_arrays index and l and m values.
 
 Note that this function is called differently than the corresponding GSL function, to make it more useful for PDL: here you just input the maximum l (lmax) that was used in C<gsl_sf_legendre_array> and it calculates all l and m values.
 
-=for bad
-
-gsl_sf_legendre_array_index does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -267,10 +243,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 P_lm(x), normalized properly for use in spherical harmonics
 
-=for bad
-
-gsl_sf_legendre_sphPlm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -296,10 +268,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Irregular Spherical Conical Function P^{1/2}_{-1/2 + I lambda}(x)
 
-=for bad
-
-gsl_sf_conicalP_half does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -325,10 +293,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Regular Spherical Conical Function P^{-1/2}_{-1/2 + I lambda}(x)
 
-=for bad
-
-gsl_sf_conicalP_mhalf does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -354,10 +318,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Conical Function P^{0}_{-1/2 + I lambda}(x)
 
-=for bad
-
-gsl_sf_conicalP_0 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -383,10 +343,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Conical Function P^{1}_{-1/2 + I lambda}(x)
 
-=for bad
-
-gsl_sf_conicalP_1 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -412,10 +368,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Regular Spherical Conical Function P^{-1/2-l}_{-1/2 + I lambda}(x)
 
-=for bad
-
-gsl_sf_conicalP_sph_reg does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -441,10 +393,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Regular Cylindrical Conical Function P^{-m}_{-1/2 + I lambda}(x)
 
-=for bad
-
-gsl_sf_conicalP_cyl_reg_e does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -470,10 +418,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 lth radial eigenfunction of the Laplacian on the 3-dimensional hyperbolic space.
 
-=for bad
-
-gsl_sf_legendre_H3d does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -499,10 +443,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Array of H3d(ell), for l from 0 to n-1.
 
-=for bad
-
-gsl_sf_legendre_H3d_array does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

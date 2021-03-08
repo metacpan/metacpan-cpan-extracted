@@ -19,11 +19,11 @@ Crypt::OpenSSL::Guess - Guess OpenSSL include path
 Crypt::OpenSSL::Guess provides helpers to guess OpenSSL include path on any platforms.
 
 Often MacOS's homebrew OpenSSL cause a problem on installation due to include path is not added.
-Some CPAN module provides to modify include path with configure-args, but [Carton](https://metacpan.org/pod/Carton) or [Module::CPANfile](https://metacpan.org/pod/Module::CPANfile)
+Some CPAN module provides to modify include path with configure-args, but [Carton](https://metacpan.org/pod/Carton) or [Module::CPANfile](https://metacpan.org/pod/Module%3A%3ACPANfile)
 is not supported to pass configure-args to each modules. Crypt::OpenSSL::\* modules should use it on your [Makefile.PL](https://metacpan.org/pod/Makefile.PL).
 
-This module resolves the include path by [Net::SSLeay](https://metacpan.org/pod/Net::SSLeay)'s workaround.
-Original code is taken from `inc/Module/Install/PRIVATE/Net/SSLeay.pm` by [Net::SSLeay](https://metacpan.org/pod/Net::SSLeay).
+This module resolves the include path by [Net::SSLeay](https://metacpan.org/pod/Net%3A%3ASSLeay)'s workaround.
+Original code is taken from `inc/Module/Install/PRIVATE/Net/SSLeay.pm` by [Net::SSLeay](https://metacpan.org/pod/Net%3A%3ASSLeay).
 
 # FUNCTIONS
 
@@ -59,7 +59,7 @@ Original code is taken from `inc/Module/Install/PRIVATE/Net/SSLeay.pm` by [Net::
 
 # SEE ALSO
 
-[Net::SSLeay](https://metacpan.org/pod/Net::SSLeay)
+[Net::SSLeay](https://metacpan.org/pod/Net%3A%3ASSLeay)
 
 # LICENSE
 

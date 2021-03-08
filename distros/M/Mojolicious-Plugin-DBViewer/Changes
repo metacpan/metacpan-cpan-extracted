@@ -1,3 +1,7 @@
+0.30 2021-03-08
+  - Catch up with the latest Mojolicious changes. 
+    Mojolicious 8.67  2020-12-04
+    Deprecated Mojolicious::Routes::Route::route in favor of Mojolicious::Routes::Route::any.
 0.29 2017-03-31
   - Support DBIx::Custom 0.40, Validator::Custom 1.0201
 0.28

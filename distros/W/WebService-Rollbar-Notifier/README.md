@@ -175,8 +175,8 @@ detailed description of supported fields.
 [www.rollbar.com](http://www.rollbar.com) will be
 blocking, otherwise non-blocking, with
 the `callback` subref called after a request completes. The subref
-will receive in its `@_` the [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent) object that
-performed the call and [Mojo::Transaction::HTTP](https://metacpan.org/pod/Mojo::Transaction::HTTP) object with the
+will receive in its `@_` the [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent) object that
+performed the call and [Mojo::Transaction::HTTP](https://metacpan.org/pod/Mojo%3A%3ATransaction%3A%3AHTTP) object with the
 response.
 
 ## `->notify()`
@@ -198,7 +198,7 @@ response.
 Takes two mandatory and one optional arguments. Always returns
 true value if we're making non-blocking calls (see
 `callback` argument to constructor). Otherwise, returns the response
-as [Mojo::Transaction::HTTP](https://metacpan.org/pod/Mojo::Transaction::HTTP) object. The arguments are:
+as [Mojo::Transaction::HTTP](https://metacpan.org/pod/Mojo%3A%3ATransaction%3A%3AHTTP) object. The arguments are:
 
 ### First argument
 
@@ -355,7 +355,7 @@ interpreted as exception message and exception description accordingly.
 ### $frames
 
 **Mandatory**. Contains frames from stacktrace. It can be either
-[Devel::StackTrace](https://metacpan.org/pod/Devel::StackTrace) object (in which case we extract frames from this object) or
+[Devel::StackTrace](https://metacpan.org/pod/Devel%3A%3AStackTrace) object (in which case we extract frames from this object) or
 arrayref with frames in Rollbar format (described in
 [https://rollbar.com/docs/api/items\_post/](https://rollbar.com/docs/api/items_post/))
 

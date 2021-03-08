@@ -5,8 +5,9 @@ NAME
 DESCRIPTION
 
     This module provides a class for interacting with an AVR
-    microcontroller in one of the newer ATmega 0-series, or ATtiny 0-series
-    or 1-series types, which uses the UPDI programming and debug interface.
+    microcontroller over the UPDI programming and debug interface. This is
+    used by chips in the newer ATmega 0-series, or ATtiny 0-series or
+    1-series, or AVR DA or AVR DB families.
 
  Hardware Interface
 
@@ -50,6 +51,7 @@ CONSTRUCTORS
 
          part => "ATtiny814"  | "attiny814"  | "t814"
          part => "ATmega4809" | "atmega4809" | "m4809"
+         part => "AVR64DA48"  | "avr64da48"
 
     baud => INT
 
@@ -177,18 +179,31 @@ METHODS
 
     Requests the chip to enter NVM programming mode.
 
- write_nvm_page
+ read_flash_page
 
-       $updi->write_nvm_page( $addr, $data, $wordsize )->get
+       $data = $updi->read_flash_page( $addr, $len )->get
 
-    Writes a single page into NVM controller in 8- or 16-bit word
-    transfers. $addr is within the data address space. $wordsize must be
-    either 8 or 16.
+    Reads a single flash page and returns the data. $addr is within the
+    flash address space.
 
- erasewrite_nvm_page
+ write_flash_page
 
-    Identical to "write_nvm_page" but issues a combined erase-and-write
-    command. This is the method to use for EEPROM writes.
+       $updi->write_flash_page( $addr, $data )->get
+
+    Writes a single flash page into the NVM controller in 16-bit word
+    transfers. $addr is within the flash address space.
+
+ read_eeprom_page
+
+       $data = $updi->read_eeprom_page( $addr, $len )->get
+
+    Reads a single EEPROM page and returns the data. $addr is within the
+    EEPROM address space.
+
+ write_eeprom_page
+
+    Similar to "write_flash_page" but issues a combined erase-and-write
+    command and $addr is within the EEPROM address space.
 
  write_fuse
 

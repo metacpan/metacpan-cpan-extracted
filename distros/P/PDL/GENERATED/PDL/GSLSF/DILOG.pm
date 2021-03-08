@@ -61,10 +61,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 /* Real part of DiLogarithm(x), for real argument. In Lewins notation, this is Li_2(x). Li_2(x) = - Re[ Integrate[ Log[1-s] / s, {s, 0, x}] ]
 
-=for bad
-
-gsl_sf_dilog does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -90,10 +86,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 DiLogarithm(z), for complex argument z = r Exp[i theta].
 
-=for bad
-
-gsl_sf_complex_dilog does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

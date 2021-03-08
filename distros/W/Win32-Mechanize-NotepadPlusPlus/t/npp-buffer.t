@@ -7,14 +7,17 @@ use strict;
 use warnings;
 use Test::More;
 
-use Win32 ();
-use Win32::Mechanize::NotepadPlusPlus qw/:main :vars/;
 use FindBin;
+BEGIN { my $f = $FindBin::Bin . '/nppPath.inc'; require $f if -f $f; }
+
 use lib $FindBin::Bin;
 use myTestHelpers qw/:all/;
 myTestHelpers::setChildEndDelay(2);
 
 use Path::Tiny 0.018;
+
+use Win32 ();
+use Win32::Mechanize::NotepadPlusPlus qw/:main :vars/;
 
 BEGIN { select STDERR; $|=1; select STDOUT; $|=1; } # make STDOUT and STDERR both autoflush (hopefully then interleave better)
 
@@ -103,6 +106,9 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     # getCurrentView
     $myview = $npp->getCurrentView();
     is $myview, 1, sprintf 'msg{NPPM_GETCURRENTVIEW} ->getCurrentView() = %d (should be in other after clone)', $myview;
+	
+	# 2021-Jan-31 coverage addition: make sure editor() wrapper will return editor2 object
+	is editor(), editor2(), 'coverage: editor() returns editor2() when second view is active';
 
     # close the clone
     $ret = $npp->close() if($ret);
@@ -111,6 +117,9 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     # getCurrentView
     $myview = $npp->getCurrentView();
     is $myview, 0, sprintf 'msg{NPPM_GETCURRENTVIEW} ->getCurrentView() = %d (should be in main after closing clone)', $myview;
+
+	# 2021-Jan-31 coverage addition: make sure editor() wrapper will return editor2 object
+	is editor(), editor1(), 'coverage: editor() returns editor1() when second view is active';
 
     # getCurrentFilename
     my $rfile = $npp->getCurrentFilename();
@@ -192,7 +201,7 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     $rdbk = $npp->getCurrentLang();
     is $rdbk, 5, sprintf 'msg{NPPM_SETCURRENTLANGTYPE} ->setLangType(%d, nobuffer): %d', 5, $rdbk;
 
-    $ret = $npp->setCurrentLang(3, $npp->getCurrentBufferID );
+    $ret = $npp->setLangType(3, $npp->getCurrentBufferID);
     $rdbk = $npp->getCurrentLang();
     is $rdbk, 3, sprintf 'msg{NPPM_SETBUFFERLANGTYPE} ->setLangType(%d, 0x%08x): %d', 3, $npp->getCurrentBufferID, $rdbk;
 
@@ -202,18 +211,55 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
 
 }
 
-# getEncoding
+# getEncoding / setEncoding
 {
-    ok scalar(keys %ENCODINGKEY), sprintf 'Number of encoding keys in %%ENCODINGKEY: %d', scalar keys %ENCODINGKEY;
-    #note sprintf "encoding[%s] = '%s'\n", $_, $ENCODINGKEY{ $_ }//'<undef>' for sort { $a <=> $b } keys %ENCODINGKEY;
+    ok scalar(keys %BUFFERENCODING), sprintf 'Number of encoding keys in %%BUFFERENCODING: %d', scalar keys %BUFFERENCODING;
 
-    my $buff_enc = $npp->getEncoding($opened[0]{bufferID});
-    ok $buff_enc, sprintf 'msg{NPPM_GETBUFFERENCODING} ->getEncoding(0x%08x) = %d', $opened[0]{bufferID}, $buff_enc;
-    ok $ENCODINGKEY{ $buff_enc }, sprintf 'encoding key = "%s"', $ENCODINGKEY{ $buff_enc } // '<undef>';
+    my $buff_enc;
 
+    # issue#51: missing setEncoding()
+    $npp->newFile();
+    my $bufid = $npp->getCurrentBufferID();
+    for my $set_encoding ( 0 .. 7 ) {
+        $npp->setEncoding($bufid, $set_encoding);
+        $buff_enc = $npp->getEncoding($bufid);
+        is $buff_enc, $set_encoding, sprintf 'msg{NPPM_SETENCODING} ->setEncoding(%d)/getEncoding() reads back %d', $set_encoding, $buff_enc;
+    }
+    $npp->setEncoding(0);   # set encoding to 0
     $buff_enc = $npp->getEncoding();
-    ok $buff_enc, sprintf 'msg{NPPM_GETBUFFERENCODING} ->getEncoding() = %d', $buff_enc;
-    ok $ENCODINGKEY{ $buff_enc }, sprintf 'encoding key = "%s"', $ENCODINGKEY{ $buff_enc } // '<undef>';
+    is $buff_enc, 0, sprintf 'msg{NPPM_SETENCODING} ->setEncoding(%d) without bufid, vs %d', 0, $buff_enc;
+
+    # issue#50: compare IDM_FORMAT_* to getEncoding values, and confirm BUFFERENCODING hash
+    my @pairs = (
+        # IDM_FORMAT_...                   expected enc , canonical string
+        ['IDM_FORMAT_ANSI'              => 0            , 'ANSI'        ],  # uni8Bit
+        ['IDM_FORMAT_UTF_8'             => 1            , 'UTF8_BOM'    ],  # uniUTF8
+        ['IDM_FORMAT_UCS_2BE'           => 2            , 'UCS2_BE_BOM' ],  # uni16BE
+        ['IDM_FORMAT_UCS_2LE'           => 3            , 'UCS2_LE_BOM' ],  # uni16LE
+        ['IDM_FORMAT_AS_UTF_8'          => 4            , 'UTF8'        ],  # uniCookie = UTF-8 (no BOM)
+
+        ['IDM_FORMAT_CONV2_ANSI'        => 0            ],  # uni8Bit
+        ['IDM_FORMAT_CONV2_UTF_8'       => 1            ],  # uniUTF8
+        ['IDM_FORMAT_CONV2_UCS_2BE'     => 2            ],  # uni16BE
+        ['IDM_FORMAT_CONV2_UCS_2LE'     => 3            ],  # uni16LE
+        ['IDM_FORMAT_CONV2_AS_UTF_8'    => 4            ],  # uniCookie = UTF-8 (no BOM)
+    );
+    for ( @pairs ) {
+        my ($key, $enc, $str) = @$_;
+        my $idm = $NPPIDM{$key};
+        editor->setSavePoint(); # lie to Notepad++, don't want it complaining of changes while I'm testing encoding commands
+        $npp->menuCommand( $idm );
+        $buff_enc = $npp->getEncoding();
+        is $buff_enc, $enc, sprintf '->menuCommand($NPPIDM{%-40s}) expects ->getEncoding() = %d', $key, $enc;
+        if(defined $str) {
+            is $BUFFERENCODING{$enc}, $str, sprintf '$BUFFERENCODING{%d} vs "%s" (map integer to string)', $enc, $str;
+            is $BUFFERENCODING{$str}, $enc, sprintf '$BUFFERENCODING{%s} vs %d (map string to integer)', $str, $enc;
+        }
+    }
+
+    # cleanup
+    editor->setSavePoint(); # lie to Notepad++, saying that the file doesn't need to be saved before closing
+    $npp->close();
 }
 
 # getFormatType setFormatType

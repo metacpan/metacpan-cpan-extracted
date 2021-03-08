@@ -35,7 +35,7 @@ use Wireguard::WGmeta::Utils;
 use base 'Exporter';
 our @EXPORT = qw(parse_wg_config create_wg_config);
 
-our $VERSION = "0.2.1"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.2.2"; # do not change manually, this variable is updated when calling make
 
 use constant FALSE => 0;
 use constant TRUE => 1;

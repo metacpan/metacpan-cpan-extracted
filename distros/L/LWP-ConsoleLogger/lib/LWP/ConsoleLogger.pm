@@ -4,7 +4,7 @@ use warnings;
 use 5.006;
 
 package LWP::ConsoleLogger;
-our $VERSION = '0.000042';
+our $VERSION = '0.000043';
 use Data::Printer { end_separator => 1, hash_separator => ' => ' };
 use DateTime qw();
 use HTML::Restrict qw();
@@ -539,7 +539,7 @@ sub _draw {
     my $t        = shift;
     my $preamble = shift;
 
-    return if !$t->rows;
+    return                   if !$t->rows;
     $self->_debug($preamble) if $preamble;
     $self->_debug( $t->draw );
 }
@@ -556,7 +556,7 @@ LWP::ConsoleLogger - LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000042
+version 0.000043
 
 =head1 SYNOPSIS
 

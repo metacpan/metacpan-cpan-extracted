@@ -4,7 +4,7 @@
 #
 package PDL::LinearAlgebra::Real;
 
-@EXPORT_OK  = qw( PDL::PP gesvd PDL::PP gesdd PDL::PP ggsvd PDL::PP geev PDL::PP geevx PDL::PP ggev PDL::PP ggevx PDL::PP gees PDL::PP geesx PDL::PP gges PDL::PP ggesx PDL::PP syev PDL::PP syevd PDL::PP syevx PDL::PP syevr PDL::PP sygv PDL::PP sygvd PDL::PP sygvx PDL::PP gesv PDL::PP gesvx PDL::PP sysv PDL::PP sysvx PDL::PP posv PDL::PP posvx PDL::PP gels PDL::PP gelsy PDL::PP gelss PDL::PP gelsd PDL::PP gglse PDL::PP ggglm PDL::PP getrf PDL::PP getf2 PDL::PP sytrf PDL::PP sytf2 PDL::PP potrf PDL::PP potf2 PDL::PP getri PDL::PP sytri PDL::PP potri PDL::PP trtri PDL::PP trti2 PDL::PP getrs PDL::PP sytrs PDL::PP potrs PDL::PP trtrs PDL::PP latrs PDL::PP gecon PDL::PP sycon PDL::PP pocon PDL::PP trcon PDL::PP geqp3 PDL::PP geqrf PDL::PP orgqr PDL::PP ormqr PDL::PP gelqf PDL::PP orglq PDL::PP ormlq PDL::PP geqlf PDL::PP orgql PDL::PP ormql PDL::PP gerqf PDL::PP orgrq PDL::PP ormrq PDL::PP tzrzf PDL::PP ormrz PDL::PP gehrd PDL::PP orghr PDL::PP hseqr PDL::PP trevc PDL::PP tgevc PDL::PP gebal PDL::PP gebak PDL::PP lange PDL::PP lansy PDL::PP lantr PDL::PP gemm PDL::PP mmult PDL::PP crossprod PDL::PP syrk PDL::PP dot PDL::PP axpy PDL::PP nrm2 PDL::PP asum PDL::PP scal PDL::PP rot PDL::PP rotg PDL::PP lasrt PDL::PP lacpy PDL::PP laswp PDL::PP lamch PDL::PP labad PDL::PP tricpy PDL::PP cplx_eigen PDL::PP augment PDL::PP mstack PDL::PP charpol );
+@EXPORT_OK  = qw( PDL::PP gtsv PDL::PP gesvd PDL::PP gesdd PDL::PP ggsvd PDL::PP geev PDL::PP geevx PDL::PP ggev PDL::PP ggevx PDL::PP gees PDL::PP geesx PDL::PP gges PDL::PP ggesx PDL::PP syev PDL::PP syevd PDL::PP syevx PDL::PP syevr PDL::PP sygv PDL::PP sygvd PDL::PP sygvx PDL::PP gesv PDL::PP gesvx PDL::PP sysv PDL::PP sysvx PDL::PP posv PDL::PP posvx PDL::PP gels PDL::PP gelsy PDL::PP gelss PDL::PP gelsd PDL::PP gglse PDL::PP ggglm PDL::PP getrf PDL::PP getf2 PDL::PP sytrf PDL::PP sytf2 PDL::PP potrf PDL::PP potf2 PDL::PP getri PDL::PP sytri PDL::PP potri PDL::PP trtri PDL::PP trti2 PDL::PP getrs PDL::PP sytrs PDL::PP potrs PDL::PP trtrs PDL::PP latrs PDL::PP gecon PDL::PP sycon PDL::PP pocon PDL::PP trcon PDL::PP geqp3 PDL::PP geqrf PDL::PP orgqr PDL::PP ormqr PDL::PP gelqf PDL::PP orglq PDL::PP ormlq PDL::PP geqlf PDL::PP orgql PDL::PP ormql PDL::PP gerqf PDL::PP orgrq PDL::PP ormrq PDL::PP tzrzf PDL::PP ormrz PDL::PP gehrd PDL::PP orghr PDL::PP hseqr PDL::PP trevc PDL::PP tgevc PDL::PP gebal PDL::PP gebak PDL::PP lange PDL::PP lansy PDL::PP lantr PDL::PP gemm PDL::PP mmult PDL::PP crossprod PDL::PP syrk PDL::PP dot PDL::PP axpy PDL::PP nrm2 PDL::PP asum PDL::PP scal PDL::PP rot PDL::PP rotg PDL::PP lasrt PDL::PP lacpy PDL::PP laswp PDL::PP lamch PDL::PP labad PDL::PP tricpy PDL::PP cplx_eigen PDL::PP augment PDL::PP mstack PDL::PP charpol );
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -40,8 +40,6 @@ use strict;
  BEGIN{ $^W = $warningFlag;}
 
 }
-
-
 
 =encoding Latin-1
 
@@ -81,6 +79,87 @@ These routines accept either float or double piddles.
 
 =cut
 
+
+
+
+
+
+=head2 gtsv
+
+=for sig
+
+  Signature: ([phys]DL(n); [phys]D(n); [phys]DU(n); [io,phys]B(n,nrhs); int [o,phys]info())
+
+
+
+=for ref
+
+Solves the equation
+
+	A * X = B
+
+where A is an C<n> by C<n> tridiagonal matrix, by Gaussian elimination with
+partial pivoting, and B is an C<n> by C<nrhs> matrix.
+
+Note that the equation C<A**T*X = B>  may be solved by interchanging the
+order of the arguments DU and DL.
+
+B<NB> This differs from the LINPACK function C<dgtsl> in that C<DL>
+starts from its first element, while the LINPACK equivalent starts from
+its second element.
+
+    Arguments
+    =========
+
+    DL:   On entry, DL must contain the (n-1) sub-diagonal elements of A.
+
+          On exit, DL is overwritten by the (n-2) elements of the
+          second super-diagonal of the upper triangular matrix U from
+          the LU factorization of A, in DL(1), ..., DL(n-2).
+
+    D:    On entry, D must contain the diagonal elements of A.
+
+          On exit, D is overwritten by the n diagonal elements of U.
+
+    DU:   On entry, DU must contain the (n-1) super-diagonal elements of A.
+
+          On exit, DU is overwritten by the (n-1) elements of the
+          first super-diagonal of the U.
+
+    B:    On entry, the n by nrhs matrix of right hand side matrix B.
+          On exit, if info = 0, the n by nrhs solution matrix X.
+
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
+            > 0:  if info = i, U(i,i) is exactly zero, and the solution
+                  has not been computed.  The factorization has not been
+                  completed unless i = n.
+
+=for example
+
+ $dl = random(float, 9);
+ $d = random(float, 10);
+ $du = random(float, 9);
+ $b = random(10,5);
+ gtsv($dl, $d, $du, $b, ($info=null));
+ print "X is:\n$b" unless $info;
+
+
+
+=for bad
+
+gtsv ignores the bad-value flag of the input piddles.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+
+
+=cut
+
+
+
+
+
+
+*gtsv = \&PDL::gtsv;
 
 
 

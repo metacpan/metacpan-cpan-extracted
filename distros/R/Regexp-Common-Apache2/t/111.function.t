@@ -11,10 +11,11 @@ BEGIN
 my $tests = 
 [
     {
+        func_args       => q{"parameter1", "parameter2"},
+        func_name       => q{someFunction},
         function        => q{someFunction("parameter1", "parameter2")},
-        function_args   => q{"parameter1", "parameter2"},
-        function_name   => q{someFunction},
         name            => q{basic function},
+        paren_group     => q{("parameter1", "parameter2")},
         test            => q{someFunction("parameter1", "parameter2")},
     },
 ];

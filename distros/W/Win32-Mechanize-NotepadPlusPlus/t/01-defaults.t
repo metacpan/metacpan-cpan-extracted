@@ -9,6 +9,9 @@ use strict;
 use warnings;
 use Test::More tests => 5;
 
+use FindBin;
+BEGIN { my $f = $FindBin::Bin . '/nppPath.inc'; require $f if -f $f; }
+
 use Win32::Mechanize::NotepadPlusPlus ':main';
 
 my $npp = notepad();

@@ -5,7 +5,7 @@ use warnings;
 
 use Protocol::FIX;
 
-our $VERSION = '0.04';    ## VERSION
+our $VERSION = '0.05';    ## VERSION
 
 =head1 NAME
 
@@ -55,7 +55,7 @@ sub new {
             $prerequisite_composite = $composites->[$idx - 2];
         }
 
-        push @composites, $c, ($required ? 1 : 0);
+        push @composites,           $c, ($required ? 1 : 0);
         push @mandatory_composites, $c->{name} if $required;
         $composite_by_name{$c->{name}} = [$c, $prerequisite_composite];
 

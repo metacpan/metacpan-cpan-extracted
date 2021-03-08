@@ -71,10 +71,6 @@ Incomplete Fermi-Dirac Integrals:
 
 Complete integral F_j(x) for integer j
 
-=for bad
-
-gsl_sf_fermi_dirac_int does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -100,10 +96,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Complete integral F_{-1/2}(x)
 
-=for bad
-
-gsl_sf_fermi_dirac_mhalf does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -129,10 +121,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Complete integral F_{1/2}(x)
 
-=for bad
-
-gsl_sf_fermi_dirac_half does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -158,10 +146,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Complete integral F_{3/2}(x)
 
-=for bad
-
-gsl_sf_fermi_dirac_3half does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -187,10 +171,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Incomplete integral F_0(x,b) = ln(1 + e^(b-x)) - (b-x)
 
-=for bad
-
-gsl_sf_fermi_dirac_inc_0 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

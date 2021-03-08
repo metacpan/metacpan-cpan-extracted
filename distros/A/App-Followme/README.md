@@ -22,26 +22,41 @@ all directories below it are checked.
 
 # CHANGES
 
-This version is a beta release for version two of followme. In the past the code
-constructed a hash and passed it to the template, which used the values in the
-hash to produce the web page. In version two the code passes an object to the
-template, which calls the build method for each variable in the template, passing
-the name of the variable and a filename to retrieve it from as arguments. The
-module then returns the value, which is used to fill in the template. The major
-user visible change is that the template syntax has changed, the new syntax is a
-subset of the previous syntax. Please see [App::Followme::Template](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ATemplate) for a
-description of the template syntax. The second change is that the configuration
-parameters of some of the modules has changed. The new configuration parameters
-are described in each module. The motivation for the change is that placing the
-variable building in a separate class allows more than one type of file to be
-handled by modules placed in the configurarion file. Each class handles a type
-of file and the name of the class which builds the variables is a configuration
-parameter. The third change is that the configuration file format has changed
-to use a subset of yaml. The new configuration file format is decribed below.
+This version is version two of followme. In the past the code constructed a hash 
+and passed it to the template, which used the values in the hash to produce the 
+web page. In version two the code passes an object to the template, which calls 
+the build method for each variable in the template, passing the name of the 
+variable and a filename to retrieve it from as arguments. The module then 
+returns the value, which is used to fill in the template. The major user visible 
+change is that the template syntax has changed, the new syntax is a subset of the 
+previous syntax. Please see [App::Followme::Template](https://metacpan.org/pod/App%3A%3AFollowme%3A%3ATemplate) for a description of the 
+template syntax. 
 
-The beta release will be used to build a website documenting followme and the
-process of building the site will be used to debug any remaining problems.
-When this process is finished, the version will be bumped to 2.00.
+The second change is that the configuration parameters of some of the modules 
+has changed. The new configuration parameters are described in each module. 
+The motivation for the change is that placing the variable building in a separate 
+class allows more than one type of file to be handled by modules placed in the 
+configurarion file. Each class handles a type of file and the name of the class 
+which builds the variables is a configuration parameter. 
+
+The third change is that the configuration file format has changed
+to use a subset of yaml instead of . The new configuration file format is decribed 
+below. The biggest change is to how modules are assigned to run\_before and
+run\_after. Previously this is how the configuration file would look:
+
+    author = Your Name
+    run_before = App::Followme::FormatPage
+    run_before = App::Followme::ConvertPage
+    run_after = App::Followme::CreateSitemap 
+
+This is how the same lines in the configuration file look now:
+
+    author: Your Name
+    run_before:
+        - App::Followme::FormatPage
+        - App::Followme::ConvertPage
+    run_after:
+        - App::Followme::CreateSitemap 
 
 # INSTALLATION
 

@@ -22,7 +22,7 @@ subtest "simple case :: NoRoutingIDs" => sub {
             4 => 'BLOCK_LIST',
         });
     my $f_2 = Protocol::FIX::Field->new(217, 'RoutingID', 'STRING');
-    my $g = Protocol::FIX::Group->new(
+    my $g   = Protocol::FIX::Group->new(
         $f_0,
         [
             $f_1 => 0,

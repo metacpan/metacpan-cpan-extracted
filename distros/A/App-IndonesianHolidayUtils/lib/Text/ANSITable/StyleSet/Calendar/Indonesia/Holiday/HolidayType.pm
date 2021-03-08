@@ -1,9 +1,9 @@
 package Text::ANSITable::StyleSet::Calendar::Indonesia::Holiday::HolidayType;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-13'; # DATE
+our $DATE = '2021-01-17'; # DATE
 our $DIST = 'App-IndonesianHolidayUtils'; # DIST
-our $VERSION = '0.060'; # VERSION
+our $VERSION = '0.061'; # VERSION
 
 use 5.010;
 use Moo;
@@ -68,7 +68,7 @@ Text::ANSITable::StyleSet::Calendar::Indonesia::Holiday::HolidayType - Set foreg
 
 =head1 VERSION
 
-This document describes version 0.060 of Text::ANSITable::StyleSet::Calendar::Indonesia::Holiday::HolidayType (from Perl distribution App-IndonesianHolidayUtils), released on 2021-01-13.
+This document describes version 0.061 of Text::ANSITable::StyleSet::Calendar::Indonesia::Holiday::HolidayType (from Perl distribution App-IndonesianHolidayUtils), released on 2021-01-17.
 
 =for Pod::Coverage ^(summary|apply)$
 

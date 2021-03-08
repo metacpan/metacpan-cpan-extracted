@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '2.038'; # VERSION
+our $VERSION = '2.039'; # VERSION
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);

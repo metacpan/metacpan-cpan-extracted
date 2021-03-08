@@ -7,8 +7,11 @@
 use 5.010;
 use strict;
 use warnings;
-sub nNotepad() { 13 };
+sub nNotepad() { 14 };
 use Test::More tests => nNotepad+2;
+
+use FindBin;
+BEGIN { my $f = $FindBin::Bin . '/nppPath.inc'; require $f if -f $f; }
 
 use Win32::Mechanize::NotepadPlusPlus::Notepad ':vars';
 
@@ -25,7 +28,8 @@ my %hashes = (
     '%NOTIFICATION' => \%NOTIFICATION,
     '%DOCSTATUS' => \%DOCSTATUS,
     '%NPPIDM' => \%NPPIDM,
-    '%ENCODINGKEY' => \%ENCODINGKEY,
+    '%BUFFERENCODING' => \%BUFFERENCODING,
+    '%LINENUMWIDTH' => \%LINENUMWIDTH,
 );
 
 for my $name ( sort keys %hashes ) {

@@ -1,5 +1,12 @@
 Revision history for Perl module Test::File
 
+1.448 2021-03-05T15:01:18Z
+	* Promote to a user release
+
+1.447_01 2021-03-02T16:11:23Z
+	* Try handling all-numeric user and group names (but, also, wtf?)
+	Github #26.
+
 1.447 2021-02-24T21:32:41Z
 	* Trying harder to get the tests to pass on Cygwin
 

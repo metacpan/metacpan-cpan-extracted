@@ -1,5 +1,17 @@
 Revision history for Device-AVR-UPDI
 
+0.07    2021-03-05
+        [CHANGES]
+         * Support the NVM controller in the AVR DA and DB families
+         * Rebuild with latest AVR-Dx ATDF files
+            + Adds support for AVR{32,64,128}DA and AVR{32,64,128}DB series
+              of chips
+         * Added `read-sib` command
+         * Extra debug printing if UPDI_DEBUG is set to 2
+
+        [BUGFIXES]
+         * Support writing the fuse at index 0
+
 0.06    2020-11-25
         [BUGFIXES]
          * Remember to pack t/lib/MockFH.pm into MANIFEST

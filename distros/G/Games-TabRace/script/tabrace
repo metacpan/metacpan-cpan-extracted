@@ -1,0 +1,426 @@
+#!perl
+
+our $DATE = '2021-03-05'; # DATE
+our $VERSION = '0.004'; # VERSION
+
+# FRAGMENT id=shcompgen-hint command=tabrace
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Time::HiRes qw(time);
+
+my %Opts = (
+    'data_file' => "$ENV{HOME}/.tabrace.dat",
+);
+my $State = {
+    state => 'uninit',
+    num_completed_numbers => 0,
+};
+
+my $data_file_read;
+sub read_data_file {
+    return if $data_file_read;
+    require JSON::MaybeXS;
+    open my $fh, "<", $Opts{data_file} or return;
+    local $/;
+    my $content = <$fh>;
+    $State = JSON::MaybeXS::decode_json($content);
+    $data_file_read++;
+}
+
+sub write_data_file {
+    require JSON::MaybeXS;
+    open my $fh, ">", $Opts{data_file}
+        or die "Can't write to data file '$Opts{data_file}': $!\n";
+    print $fh JSON::MaybeXS::encode_json($State);
+}
+
+sub enter_high_scores {
+    # check if the game can be entered in high score list
+    $State->{high_scores} //= [];
+
+    if (@{ $State->{high_scores} } < 5 ||
+            $State->{score} > $State->{high_scores}[-1]{score}) {
+        print "Congratulations, you made the high scores list!\n\n";
+    }
+
+    push @{ $State->{high_scores} }, {
+        user  => $ENV{USER},
+        score => $State->{score},
+        time  => time(),
+    };
+    $State->{high_scores} = [
+        sort { ($b->{score}//0) <=> ($a->{score}//0) }
+            @{ $State->{high_scores} }
+    ];
+    splice @{ $State->{high_scores} }, 5
+        if @{ $State->{high_scores} } > 5;
+}
+
+sub print_high_scores {
+    require Text::Table::Tiny;
+
+    $State->{high_scores} //= [];
+
+    say Text::Table::Tiny::generate_table(
+        header_row => 1,
+        rows => [
+            ['Name', 'Score', 'Time'],
+            map { [$_->{user}, $_->{score}, scalar(localtime $_->{time})] }
+                @{ $State->{high_scores} },
+        ],
+    );
+    print "\n";
+}
+
+sub gen_number {
+    my $num_digits = int(3*rand() + 4);
+    $State->{current_number} =
+        int(10**($num_digits-1) + 9*10**($num_digits-1)*rand());
+    $State->{start_time} = undef;
+    $State->{end_time}   = undef;
+}
+
+if ($ENV{COMP_LINE} || $ENV{COMMAND_LINE}) {
+
+    # inside tab completion
+
+    my $shell;
+    if ($ENV{COMP_SHELL}) {
+        ($shell = $ENV{COMP_SHELL}) =~ s!.+/!!;
+    } elsif ($ENV{COMMAND_LINE}) {
+        $shell = 'tcsh';
+    } else {
+        $shell = 'bash';
+    }
+
+    my ($words, $cword);
+    if ($ENV{COMP_LINE}) {
+        require Complete::Bash;
+        ($words,$cword) = @{ Complete::Bash::parse_cmdline(undef, undef, {truncate_current_word=>1}) };
+        ($words,$cword) = @{ Complete::Bash::join_wordbreak_words($words, $cword) };
+    } elsif ($ENV{COMMAND_LINE}) {
+        require Complete::Tcsh;
+        $shell //= 'tcsh';
+        ($words, $cword) = @{ Complete::Tcsh::parse_cmdline() };
+    }
+
+    shift @$words; $cword--; # strip program name
+    my $word = splice @$words, $cword, 1;
+
+    read_data_file();
+
+    require Complete::Util;
+    my $compres;
+
+    if ($State->{state} eq 'uninit') {
+        $compres = ['0:Please-run-tabrace-first-to-init.', '9:'];
+    } else {
+        $State->{start_time} //= time();
+
+        if ($State->{current_number} eq $word) {
+            # number guessed correctly
+            $compres = [$word];
+            goto FORMAT;
+        }
+
+        if (index($State->{current_number}, $word) != 0) {
+            # wrong typing, reset word
+            $compres = [''];
+            goto FORMAT;
+        }
+
+        $compres = Complete::Util::complete_array_elem(
+            word  => $word,
+            array => [map {
+                "$word$_" .
+                    (index($State->{current_number}, "$word$_") == 0 ?
+                         "x" : "")
+                } 0..9],
+        );
+    }
+
+  FORMAT:
+    if ($shell eq 'bash') {
+        require Complete::Bash;
+        print Complete::Bash::format_completion(
+            $compres, {word=>$words->[$cword]});
+    } elsif ($shell eq 'fish') {
+        require Complete::Fish;
+        print Complete::Bash::format_completion(
+            $compres, {word=>$words->[$cword]});
+    } elsif ($shell eq 'tcsh') {
+        require Complete::Tcsh;
+        print Complete::Tcsh::format_completion($compres);
+    } elsif ($shell eq 'zsh') {
+        require Complete::Zsh;
+        print Complete::Zsh::format_completion($compres);
+    } else {
+        die "Unknown shell '$shell'";
+    }
+
+    write_data_file();
+    exit 0;
+
+} else {
+
+    # outside tab completion
+
+    require Getopt::Long;
+    Getopt::Long::Configure(
+        'no_ignore_case', 'bundling', 'auto_help', 'auto_version');
+    Getopt::Long::GetOptions(
+        "reset-game" => sub {
+            read_data_file();
+            $State->{state} = 'uninit';
+            $State->{num_completed_numbers} = 0;
+            $State->{score} = 0;
+            write_data_file();
+            exit 0;
+        },
+        "reset-high-scores" => sub {
+            read_data_file();
+            $State->{high_scores} = [];
+            write_data_file();
+            exit 0;
+        },
+        "high-scores" => sub {
+            read_data_file();
+            print_high_scores();
+            exit 0;
+        },
+    );
+
+    read_data_file();
+    if ($State->{state} eq 'uninit') {
+        require File::Which;
+        unless (File::Which::which("tabrace")) {
+            print <<'_';
+
+tabrace doesn't seem to be in your PATH. For proper game play, please put
+me in your PATH first.
+_
+            exit 1;
+        }
+        $State->{state} = 'play';
+        gen_number();
+        write_data_file();
+        print <<'_';
+
+Welcome to tabrace, a game played with tab completion. You must first enable tab
+completion for your shell. Here's how to do it in bash:
+
+    % complete -C tabrace tabrace
+
+Or alternatively, install shcompgen from CPAN using 'cpanm -n App::shcompgen'.
+For instructions on how to enable tab completion for other shells, see manpage.
+
+The objective of the game is to type three numbers (each number has between 4
+and 6 digits) as fast as possible, digit by digit. For each number, you type
+"tabrace " then press Tab (Tab) to see digits between 0 to 9. There's an 'x'
+next to the correct digit. Type the correct digit and press Tab (Tab) again to
+see the next digit. After all digits are typed, press Enter to clock in your
+time for the number. Your points will be determined from how fast you typed the
+number. Do the same for the rest of the numbers to get the total score.
+
+I'm ready to play! Are you? Type "tabrace" and press Tab (Tab) to start.
+
+_
+        exit 0;
+    } elsif ($State->{state} eq 'play' && @ARGV) {
+        require Lingua::EN::Numbers::Ordinate;
+
+        $State->{num_completed_numbers}++;
+        $State->{end_time} = time();
+        $State->{start_time} //= $State->{end_time};
+        my $dur = sprintf("%.3f", $State->{end_time}-$State->{start_time});
+        my $nth = ($State->{num_completed_numbers} >= 3 ? "last" :
+                       Lingua::EN::Numbers::Ordinate::ordinate($State->{num_completed_numbers}));
+        if ($ARGV[0] eq $State->{current_number}) {
+            print "You typed the $nth number in $dur sec(s).";
+            my $good_time = 3.5+length($State->{current_number});
+            my $bonus = 0;
+            if ($dur <= $good_time) {
+                $bonus = 50;
+                print " Good job!";
+            } elsif ($dur <= $good_time + 3) {
+                $bonus = 10;
+                print " Not bad, try better next time.";
+            } else {
+                print " Too slow, really try better next time.";
+            }
+            my $point = $bonus +
+                int(100 + 500/($dur+1)*length($State->{current_number})/4);
+            print " You get $point points.\n\n";
+            $State->{score} += $point;
+        } else {
+            print "You typed the $nth number incorrectly, the correct number is $State->{current_number}.\n\n";
+        }
+        if ($State->{num_completed_numbers} >= 3) {
+            $State->{score} //= 0;
+            print "Game over. Your total score for this game: $State->{score}.\n\n";
+            enter_high_scores();
+            print_high_scores();
+            print "To play another game, press 'tabrace <tab>' again.\n";
+            $State->{num_completed_numbers} = 0;
+            $State->{score} = 0;
+            gen_number();
+        } else {
+            print "Ready for the next number? Type 'tabrace <tab>' again.\n";
+            gen_number();
+        }
+        write_data_file();
+    } else {
+        print <<'_';
+
+You are in a game play. Type "tabrace" and press Tab (Tab) to continue playing.
+Or, if you want to reset the game, type "tabrace --reset-game" and press Enter.
+
+_
+        exit 0;
+
+    }
+
+} # outside tab completion
+
+# ABSTRACT: A game played by shell tab completion
+# PODNAME: tabrace
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tabrace - A game played by shell tab completion
+
+=head1 VERSION
+
+This document describes version 0.004 of tabrace (from Perl distribution Games-TabRace), released on 2021-03-05.
+
+=head1 SYNOPSIS
+
+To start playing the game:
+
+ % tabrace <enter>
+
+To type a number (type digit marked by x):
+
+ % tabrace <tab>
+ 0    1    2    3    4x   5    6    7    8    9
+ % tabrace 4<tab>
+ 40    41    42    43    44   45    46    47x    48    49
+ % tabrace 47<tab>
+ 470x    471    472    473    474   475    476    477    478    479
+ % tabrace 470<tab>
+ 4700    4701    4702    4703    4704   4705    4706    4707    4708x    4709
+ % tabrace 4708<tab>
+ % tabrace 4708 _<enter>
+
+=head1 DESCRIPTION
+
+Welcome to tabrace, a game played with tab completion. You must first enable tab
+completion for your shell. Here's how to do it in the various shells:
+
+=over
+
+=item * bash
+
+ % complete -C tabrace tabrace
+
+Or alternatively, install L<shcompgen> from CPAN using C<cpanm -n
+App::shcompgen>.
+
+=item * tcsh
+
+ % complete tabrace 'p/*/`tabrace`/'
+
+Or alternatively, install L<shcompgen> from CPAN using C<cpanm -n
+App::shcompgen>.
+
+=item * zsh
+
+Put a file named C<_tabrace> containing the text below somewhere to your
+C<fpath>:
+
+ #compdef tabrace
+ _tabrace() {
+   si=$IFS
+   compadd -- $(COMP_LINE=$BUFFER COMP_POINT=$CURSOR tabrace)
+   IFS=$si
+ }
+ _tabrace "$@"
+
+Or alternatively, install L<shcompgen> from CPAN using C<cpanm -n
+App::shcompgen>.
+
+=item * fish
+
+ % complete -c tabrace -f -a '(begin; set -lx COMP_SHELL fish; set -lx COMP_LINE (commandline); set -lx COMP_POINT (commandline -C); tabrace; end)'
+
+=back
+
+The objective of the game is to type 3 numbers as fast as possible. For each
+number, you type "tabrace " then press Tab (Tab) to see digits between 0 to 9.
+There's an 'x' next to the correct digit. Type the correct digit and press Tab
+(Tab) again to see the next digit. After all digits are typed, press Enter to
+clock in your time for the number. Your points will be determined from how fast
+you typed the number. Do the same for the rest of the numbers to get the total
+score.
+
+=head1 OPTIONS
+
+=head2 --help
+
+Display help and exit.
+
+=head2 --version
+
+Display version and exit.
+
+=head2 --reset-game
+
+Reset game.
+
+=head2 --reset-high-scores
+
+Reset high scores.
+
+=head2 --high-scores
+
+Show high scores and exit.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Games-TabRace>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Games-TabRace>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Games-TabRace/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

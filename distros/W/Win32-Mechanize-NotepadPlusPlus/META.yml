@@ -6,8 +6,9 @@ build_requires:
   Config: '0'
   Encode: '0'
   ExtUtils::MakeMaker: '0'
-  FindBin: '0'
+  FindBin: '1.49'
   Path::Tiny: '0.058'
+  Test::Exception: '0'
   Test::More: '0.86'
   Win32: '0'
   Win32::API: '0'
@@ -18,6 +19,8 @@ build_requires:
 configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '6.52'
+  FindBin: '1.49'
+  Test::Exception: '0'
   Test::More: '0.86'
   Win32: '0'
   constant: '0'
@@ -40,13 +43,13 @@ no_index:
 provides:
   Win32::Mechanize::NotepadPlusPlus:
     file: lib/Win32/Mechanize/NotepadPlusPlus.pm
-    version: '0.004001'
+    version: '0.006001'
   Win32::Mechanize::NotepadPlusPlus::Editor:
     file: lib/Win32/Mechanize/NotepadPlusPlus/Editor.pm
-    version: '0.004001'
+    version: '0.006001'
   Win32::Mechanize::NotepadPlusPlus::Notepad:
     file: lib/Win32/Mechanize/NotepadPlusPlus/Notepad.pm
-    version: '0.004001'
+    version: '0.006001'
 requires:
   Carp: '0'
   Config: '0'
@@ -66,5 +69,5 @@ requires:
 resources:
   bugtracker: https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus/issues
   repository: https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus.git
-version: '0.004001'
+version: '0.006001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

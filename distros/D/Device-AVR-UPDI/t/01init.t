@@ -42,6 +42,11 @@ my $mockfio = Test::Future::IO->controller;
       ->returns( "\x55\xC3\x08" );
    $mockfio->expect_sleep( 0.1 );
 
+   $mockfio->expect_syswrite_anyfh( "\x55\xE5" );
+   $mockfio->expect_sysread_anyfh( 18 )
+      ->returns( "\x55\xE5" . "tinyAVR\x00P:0D:0\x003" );
+   $mockfio->expect_sleep( 0.1 );
+
    $updi->init_link->get;
 
    $mockfh->check_and_clear( "->init_link" );

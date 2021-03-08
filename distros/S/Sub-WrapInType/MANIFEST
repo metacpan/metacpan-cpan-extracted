@@ -9,5 +9,7 @@ lib/Sub/WrapInType.pm
 minil.toml
 t/00_compile.t
 t/01_wrap_sub.t
+t/02_wrap_method.t
+t/03_new.t
 META.yml
 MANIFEST

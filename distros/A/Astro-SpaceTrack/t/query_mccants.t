@@ -92,22 +92,20 @@ SKIP: {
 		local $TODO = 'Flaky server suooprt';
 
 		ok $st->cache_hit(), 'This time content came from cache';
-		$st->cache_hit()
-		    and diag "Cache hit";
-		$st->cache_hit()
-		    or eval {
+		if ( $st->cache_hit() ) {
+		    diag "Cache hit";
+		} else {
 		    diag <<'EOD';
 The above cache test seems to fail much more often than not, with the
 trace information (available by setting environment variable
 SPACETRACK_TEST_CACHE to 0x22) showing that the If-Modified-After header
 is in fact set but the server returns 200 anyway.
 EOD
-		    require YAML;
-		    diag 'Response pragmata: ', YAML::Dump( [
-			    most_recent_http_response()->header( 'pragma' ) ] );
-		    diag 'Object pragmata: ', YAML::Dump( $obj_pragmata );
+		    diag 'Response pragmata: ', explain [
+			    most_recent_http_response()->header( 'pragma' ) ];
+		    diag 'Object pragmata: ', explain $obj_pragmata;
 		    1;
-		} or diag 'Pragmata not dumped; can not load YAML';
+		}
 	    }
 
 	    is most_recent_http_response()->content(), $want,

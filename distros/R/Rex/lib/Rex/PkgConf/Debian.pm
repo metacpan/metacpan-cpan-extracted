@@ -10,7 +10,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.2'; # VERSION
+our $VERSION = '1.13.3'; # VERSION
 
 use Rex::Helper::Run;
 
@@ -38,9 +38,10 @@ sub get_options {
   my %config;
   for my $line (@lines) {
 
-    # Expecting: * postfix/relayhost: smtp.example.com
+    # Example line:
+    # * keyboard-configuration/optionscode: grp:caps_toggle,grp_led:scroll
     Rex::Logger::debug("Parsing line $line");
-    if ( $line =~ m!^(\*?)\s+(.+):\s*(.*)! ) {
+    if ( $line =~ m!^(\*?)\s+([^:]+):\s*(.*)! ) {
       my ( $already_set, $question, $value ) = ( $1, $2, $3, $4 );
       Rex::Logger::debug(
         "Found configuration question $question with value $value");

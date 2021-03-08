@@ -30,6 +30,7 @@ do { my $x = {
                    'requires' => {
                                    'DBIx::Class::Core' => '0',
                                    'DBIx::Class::Schema' => '0',
+                                   'DBIx::Class::Schema::ResultSetNames' => '0',
                                    'Dancer2' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',

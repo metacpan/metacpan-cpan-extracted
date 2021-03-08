@@ -1,0 +1,11 @@
+Revision history for Text::TokenStream
+
+0.03    2021-03-06
+    - Specify minimum Moo version for `coerce => 1`
+
+0.02    2021-03-06
+    - Specify minimum Types::Standard version for CycleTuple (reported by
+      Slaven Rezić)
+
+0.01    2021-03-05
+    - Initial release

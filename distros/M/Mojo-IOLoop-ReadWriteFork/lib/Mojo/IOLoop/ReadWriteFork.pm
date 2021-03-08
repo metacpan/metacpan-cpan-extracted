@@ -21,7 +21,7 @@ sub ESC {
   $_;
 }
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 our @SAFE_SIG = grep {
   not /^(
@@ -211,8 +211,15 @@ sub _cleanup {
 sub _maybe_terminate {
   my ($self, $pending_event) = @_;
   delete $self->{$pending_event};
-  $self->emit(close => $self->{exit_value}, $self->{signal})->_cleanup
-    unless $self->{wait_eof} or $self->{wait_sigchld};
+  return if $self->{wait_eof} or $self->{wait_sigchld};
+
+  my @errors;
+  for my $cb (@{$self->subscribers('close')}) {
+    push @errors, $@ unless eval { $self->$cb(@$self{qw(exit_value signal)}); 1 };
+  }
+
+  $self->_cleanup;
+  $self->emit(error => $_) for @errors;
 }
 
 sub _read {
@@ -300,7 +307,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 =head1 VERSION
 
-0.39
+0.40
 
 =head1 SYNOPSIS
 

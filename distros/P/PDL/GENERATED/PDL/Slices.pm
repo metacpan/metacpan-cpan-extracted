@@ -119,10 +119,6 @@ Internal vaffine identity function.
 
 
 
-=for bad
-
-s_identity processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -208,9 +204,7 @@ L</indexND>.
 
 
 
-=for bad
 
-index barfs if any of the index values are bad.
 
 =cut
 
@@ -295,9 +289,7 @@ L</indexND>.
 
 
 
-=for bad
 
-index1d propagates BAD index elements to the output variable.
 
 =cut
 
@@ -382,9 +374,7 @@ L</indexND>.
 
 
 
-=for bad
 
-index2d barfs if either of the index values are bad.
 
 =cut
 
@@ -757,10 +747,6 @@ to tease out the algorithm.
 
 
 
-=for bad
-
-rangeb processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -795,10 +781,6 @@ decode to C<$c>.
 
 
 
-=for bad
-
-rld does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -867,10 +849,6 @@ first instance of C<0> in each row of C<$x> should be considered.
 
 
 
-=for bad
-
-rle does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -937,10 +915,6 @@ are exchanged with each other i.e.
 
 
 
-=for bad
-
-xchg does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1103,10 +1077,6 @@ The other dimensions are moved accordingly.
 Negative dimension indices count from the end.
 
 
-=for bad
-
-mv does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1221,10 +1191,6 @@ depending on whether you prefer error-reporting clarity or speed of execution.
 
 
 
-=for bad
-
-oslice does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1304,10 +1270,6 @@ to C<$x-E<gt>at(2,1,2,0,1,2)>.
 NOTE: diagonal doesn't handle threadids correctly. XXX FIX
 
 
-=for bad
-
-diagonalI does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1362,10 +1324,6 @@ negative and will then be counted from the last dim backwards
 in the usual way (-1 = last dim).
 
 
-=for bad
-
-lags does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1404,10 +1362,6 @@ the expression
 is always true (C<m> has to be less than 3).
 
 
-=for bad
-
-splitdim does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1434,10 +1388,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 Shift vector elements along with wrap. Flows data back&forth.
 
 
-=for bad
-
-rotate does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1471,10 +1421,6 @@ Put some dimensions to a threadid.
 
 
 
-=for bad
-
-threadI does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1503,10 +1449,6 @@ A vaffine identity transformation (includes thread_id copying).
 Mainly for internal use.
 
 
-=for bad
-
-identvaff does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1535,10 +1477,6 @@ All threaded dimensions are made real again.
 See [TBD Doc] for details and examples.
 
 
-=for bad
-
-unthread does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1940,10 +1878,6 @@ sub PDL::slice (;@) {
 info not available
 
 
-=for bad
-
-sliceb does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

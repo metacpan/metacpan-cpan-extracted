@@ -106,10 +106,6 @@ sub gsldiff{
 info not available
 
 
-=for bad
-
-diff_central does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -137,10 +133,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 info not available
 
 
-=for bad
-
-diff_backward does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -168,10 +160,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 info not available
 
 
-=for bad
-
-diff_forward does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

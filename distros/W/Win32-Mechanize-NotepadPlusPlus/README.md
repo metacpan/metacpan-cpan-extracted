@@ -105,7 +105,7 @@ or thru the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Win
 
 # COPYRIGHT
 
-Copyright (C) 2019,2020 Peter C. Jones
+Copyright (C) 2019,2020,2021 Peter C. Jones
 
 # LICENSE
 

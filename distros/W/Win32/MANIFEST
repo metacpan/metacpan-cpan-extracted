@@ -19,4 +19,5 @@ t/GetOSVersion.t
 t/GetShortPathName.t
 t/GuidGen.t
 t/Names.t
+t/Privileges.t
 t/Unicode.t

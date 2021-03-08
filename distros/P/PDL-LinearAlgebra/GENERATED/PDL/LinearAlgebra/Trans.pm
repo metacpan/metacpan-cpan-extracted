@@ -66,7 +66,6 @@ PDL routine sec. If you need to call it specify its origin module : PDL::Basic::
 
 
 
-
 =head1 FUNCTIONS
 
 
@@ -93,7 +92,6 @@ combined with scaling-and-squaring and optionaly normalization of the trace.
 The algorithm is described in Roger B. Sidje (rbs.uq.edu.au)
 "EXPOKIT: Software Package for Computing Matrix Exponentials".
 ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
-
 
      A:		On input argument matrix. On output exp(t*A).
      		Use Fortran storage type.
@@ -154,7 +152,6 @@ Complex version of geexp. The value used for trace normalization is not returned
 The algorithm is described in Roger B. Sidje (rbs@maths.uq.edu.au)
 "EXPOKIT: Software Package for Computing Matrix Exponentials".
 ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
-
 
 
 
@@ -226,7 +223,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Apply an arbitrary function to a complex triangular matrix. Uses a recurrence of Parlett.
 If uplo is true, A is lower triangular.
-
 
 
 
@@ -418,7 +414,6 @@ sub PDL::mexp {
 #	else{
 #		$order = 8;
 #	}
-	
 
 	# Trace normalization
 #	$m = $m->copy;
@@ -431,9 +426,6 @@ sub PDL::mexp {
 #	elsif ($trace > 0){
 #		$m->diagonal(0,1) -= $trace;
 #	}
-	
-
-
 
 	# Scale M
 #	$norm = $m->mnorm(0);
@@ -485,14 +477,12 @@ sub PDL::mexp {
 #	$X;
 #}
 
-
 *mexpts = \&PDL::mexpts;
 sub PDL::mexpts {
 	my ($m, $order, $tol) = @_;
 	my @dims = $m->dims;
 	barf("mexp1 requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($em, $trm);
 	$order = 20 unless defined $order;
 	$em = (@dims == 3 ) ? diag(r2C ones($dims[1])) : diag(ones($dims[1]));
@@ -529,7 +519,6 @@ sub PDL::mpow {
 	my @dims = $m->dims;
 	barf("mpow requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my $ret;
 	if (UNIVERSAL::isa($power,'PDL') and $power->dims > 1){
 		my ($e, $v) = $m->meigen(0,1);
@@ -539,7 +528,6 @@ sub PDL::mpow {
 		$ret = $m;
 		my $pow = floor($power);
 		$pow++ if ($power < 0 and $power != $pow);
-                
                 # TODO: what a beautiful thing (is it a game ?)
 		for(my $i = 1; $i < abs($pow); $i++){	$ret x= $m;}
 		$ret = $ret->minv if $power < 0;
@@ -559,7 +547,6 @@ sub PDL::mpow {
 		$ret = $v * $e**$power x $v->minv;
 	}
 	return (@dims ==3) ? $ret : toreal($ret, $tol);
-
 }
 
 =head2 mcos
@@ -585,7 +572,6 @@ sub PDL::mcos {
 	my @dims = $m->dims;
 	barf("mcos requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	return (@dims == 3) ? (mexp(i*$m) + mexp(- i*$m)) / 2 : re(mexp(i*$m))->sever;
 }
 
@@ -612,7 +598,6 @@ sub PDL::macos {
 	my @dims = $m->dims;
 	barf("macos requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($id, $ret);
 	$id = PDL::zeroes $m;
 	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
@@ -643,9 +628,7 @@ sub PDL::msin {
 	my @dims = $m->dims;
 	barf("msin requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	return (@dims == 3) ? (mexp(i*$m) - mexp(- i*$m))/(2*i) : im(mexp(i*$m))->sever;
-
 }
 
 =head2 masin
@@ -671,7 +654,6 @@ sub PDL::masin {
 	my @dims = $m->dims;
 	barf("masin requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($ret, $id);
 	$id = PDL::zeroes $m;
 	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
@@ -702,10 +684,7 @@ sub PDL::mtan {
 	my @dims = $m->dims;
 	barf("mtan requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	return scalar msolvex(mcos($m), msin($m),equilibrate=>1) unless $id;
-
-	
 	if (@dims == 3){
 		$id = PDL::zeroes $m;
 		$id->slice('(0),:,:')->diagonal(0,1) .= 1;
@@ -716,7 +695,6 @@ sub PDL::mtan {
 		$m = mexp(i * $m);
 		return scalar $m->re->msolvex($m->im,equilibrate=>1);
 	}
-
 }
 
 =head2 matan
@@ -742,7 +720,6 @@ sub PDL::matan {
 	my @dims = $m->dims;
 	barf("matan requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($id, $ret);
 	$id = PDL::zeroes($m)->r2C;
 	$id->re->diagonal(0,1) .= 1;
@@ -773,9 +750,7 @@ sub PDL::mcot {
 	my @dims = $m->dims;
 	barf("mcot requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	return scalar msolvex(msin($m),mcos($m),equilibrate=>1) unless $id;
-
 	if (@dims == 3){
 		$id = PDL::zeroes $m;
 		$id->slice('(0),:,:')->diagonal(0,1) .= 1;
@@ -811,7 +786,6 @@ sub PDL::macot {
 	my @dims = $m->dims;
 	barf("macot requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "macot: singular matrix";
@@ -843,7 +817,6 @@ sub PDL::msec {
 	my @dims = $m->dims;
 	barf("msec requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	return (@dims == 3) ? PDL::minv(mexp(i+$m) + mexp(- i*$m)) * 2 : scalar PDL::minv(re(mexp(i*$m)));
 }
 
@@ -870,7 +843,6 @@ sub PDL::masec {
 	my @dims = $m->dims;
 	barf("masec requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "masec: singular matrix";
@@ -902,9 +874,7 @@ sub PDL::mcsc {
 	my @dims = $m->dims;
 	barf("mcsc requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	return (@dims == 3) ? PDL::minv(mexp(i*$m) - mexp(- i*$m)) * 2*i : scalar PDL::minv(im(mexp(i*$m)));
-
 }
 
 =head2 macsc
@@ -930,7 +900,6 @@ sub PDL::macsc {
 	my @dims = $m->dims;
 	barf("macsc requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "macsc: singular matrix";
@@ -990,7 +959,6 @@ sub PDL::macosh {
 	my @dims = $m->dims;
 	barf("macosh requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($id, $ret);
 	$id = PDL::zeroes $m;
 	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
@@ -1056,7 +1024,6 @@ sub PDL::masinh {
 	$ret = msqrt($m x $m + $id);
 	$m = $m->r2C if $ret->getndims > @dims;	
 	mlog(($m + $ret), $tol);
-
 }
 
 =head2 mtanh
@@ -1083,9 +1050,7 @@ sub PDL::mtanh {
 	my @dims = $m->dims;
 	barf("mtanh requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	return scalar msolvex(mcosh($m), msinh($m),equilibrate=>1) unless $id;
-
 	$id = PDL::zeroes $m;
 	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
 	$m = mexp(-2*$m);
@@ -1116,7 +1081,6 @@ sub PDL::matanh {
 	my @dims = $m->dims;
 	barf("matanh requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($id, $ret);
 	$id = PDL::zeroes $m;
 	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
@@ -1147,7 +1111,6 @@ sub PDL::mcoth {
 	my @dims = $m->dims;
 	barf("mcoth requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	
 	scalar msolvex(msinh($m), mcosh($m),equilibrate=>1) unless $id;
 	$id = PDL::zeroes $m;
 	(@dims == 3) ? $id->slice('(0),:,:')->diagonal(0,1) .= 1 : $id->diagonal(0,1) .= 1;
@@ -1179,7 +1142,6 @@ sub PDL::macoth {
 	my @dims = $m->dims;
 	barf("macoth requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "macoth: singular matrix";
@@ -1239,7 +1201,6 @@ sub PDL::masech {
 	my @dims = $m->dims;
 	barf("masech requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "masech: singular matrix";
@@ -1299,7 +1260,6 @@ sub PDL::macsch {
 	my @dims = $m->dims;
 	barf("macsch requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-
 	my ($inv, $info) = $m->minv;
 	if ($info){
 		warn "macsch: singular matrix";
@@ -1343,7 +1303,6 @@ sub PDL::mfun {
 	my @dims = $m->dims;
 	barf("mfun requires a 2-D square matrix")
 		unless( ((@dims == 2) || (@dims == 3)) && $dims[-1] == $dims[-2] );
-	
 	if ($diag){
 		my ($e, $v, $inv, $info);
 		($e, $v) = $m->meigen(0,1);
@@ -1366,12 +1325,10 @@ sub PDL::mfun {
 	else{
 		$m = $m->r2C unless @dims == 3;
 		my ($t, undef, $z, undef, $info) = $m->mschur(1);
-
 		if ($info){
 			warn "mfun: Can't compute Schur form\n";
 			return;		
 		}
-
 		$method = 'PDL::Complex::'.$method unless ref($method);
 		($t, $info) = $t->ctrfun(0,$method);
 		if($info){
@@ -1433,7 +1390,6 @@ it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-
 
 
 

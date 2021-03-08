@@ -1,6 +1,7 @@
 #!/usr/local/bin/perl
 BEGIN
 {
+    use v5.22.1;
     use strict;
     use warnings;
 };
@@ -67,22 +68,45 @@ sub dump_tests
         my $expect = $tests->[$i];
         my $test = $expect->{test};
         my $name = $expect->{name};
+        my $re = {};
+        if( $expect->{skip} )
+        {
+            printf( "Skipping test %d%s\n", $i + 1, ( length( $name ) ? " ($name)" : '' ) );
+            $ok++;
+            $re->{test} = $test;
+            $re->{name} = $name if( length( $name ) );
+            $re->{skip} = 1,
+            push( @$all, $re );
+            next;
+        }
         printf( "Checking test %d%s\n", $i + 1, ( length( $name ) ? " ($name)" : '' ) );
         
         if( $test =~ /^$opts->{re}$/g )
         {
             # print( "Yes, it works\n" );
-            my $re = { %+ };
+            $re = { %+ };
             $re->{test} = $test;
             $re->{name} = $name if( length( $name ) );
-            $ok++;
-            # print( "bold_all => $+{bold_all}\nbold_type => $+{bold_type}\nbold_text => $+{bold_text}\n" );
-            push( @$all, $re );
-            ## print( Data::Dump::dump( $re ), ",\n\n" );
+            if( $expect->{fail} )
+            {
+                print( STDERR "Test ", $i + 1, ( length( $name ) ? " ($name)" : '' ), " was supposed to fail, but it did not\n" );
+            }
+            else
+            {
+                $ok++;
+                push( @$all, $re );
+            }
         }
         else
         {
-            $ok++ if( $expect->{fail} );
+            if( $expect->{fail} )
+            {
+                $ok++;
+                $re->{test} = $test;
+                $re->{name} = $name if( length( $name ) );
+                $re->{fail} = 1,
+                push( @$all, $re );
+            }
             print( "Test ", $i + 1, ( length( $name ) ? " ($name)" : '' ), " failed (", $expect->{fail} ? 'expected' : 'unexpected', "): '$test'\n\n" );
         }
     }
@@ -94,7 +118,14 @@ sub dump_tests
             print( ( ' ' x 4 ), "\{\n" );
             foreach my $k ( sort( keys( %$ref ) ) )
             {
-                printf( "%s%-15s => q{%s},\n", ( ' ' x 8 ), $k, $ref->{ $k } );
+                if( $ref->{ $k } =~ /^\d+$/ )
+                {
+                    printf( "%s%-15s => %d,\n", ( ' ' x 8 ), $k, $ref->{ $k } );
+                }
+                else
+                {
+                    printf( "%s%-15s => q{%s},\n", ( ' ' x 8 ), $k, $ref->{ $k } );
+                }
             }
             print( ( ' ' x 4 ), "\},\n" );
         }

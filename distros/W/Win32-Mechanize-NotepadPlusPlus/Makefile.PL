@@ -76,9 +76,11 @@ use 5.010;
             'warnings' => 0,
             'strict' => 0,
             'Test::More' => 0.86,
+			'Test::Exception' => 0,
             'constant' => 0,
             'Config' => 0,
             'Win32' => 0,
+            'FindBin' => 1.49, # the version released with perl v5.10
         };
     }
     if( $ExtUtils::MakeMaker::VERSION >= '6.64' ) {
@@ -86,6 +88,7 @@ use 5.010;
             'warnings' => 0,
             'strict' => 0,
             'Test::More' => 0.86,
+			'Test::Exception' => 0,
             'constant' => 0,
             'Config' => 0,
             'Path::Tiny' => 0.058,          # 0.018 needed for rootdir and cwd; 0.058 needed for sibling
@@ -93,7 +96,7 @@ use 5.010;
             'Win32::API' => 0,
             'Win32::GuiTest'    => 1.64,    # version needed for 64-bit ::SendMessage retval
             'Encode' => 0,
-            'FindBin' => 0,
+            'FindBin' => 1.49,              # the version released with perl v5.10
         };
     }
     if( $ExtUtils::MakeMaker::VERSION >= '6.18' ) {
@@ -101,11 +104,22 @@ use 5.010;
     }
 }
 
+use FindBin;
+use lib $FindBin::Bin . '/helpbuild';
+use myMakeHelper;
+my %helper = myMakeHelper();
+use Data::Dumper; print Dumper \%helper;
+if(exists $helper{npp_folder} and exists $helper{zip}) {
+    warn "creating include-file for updating PATH=$helper{npp_folder};%PATH%";
+    open my $inc, '>', "${FindBin::Bin}/t/nppPath.inc";
+    print {$inc} "BEGIN { \$ENV{PATH} = '$helper{npp_folder};' . \$ENV{PATH} };\n\n1;\n";
+}
+
 sub MY::postamble {
     my (undef,%h) = @_;
     #require Data::Dumper;
     #print STDERR Data::Dumper->Dump([\%h], [qw(mm_args{postamble})]);
-    return <<'POSTAMBLE';
+    my $POSTAMBLE =<<'POSTAMBLE';
 # TEST_D is used to test for the existence of a directory
 TEST_D = $(ABSPERLRUN) -MExtUtils::Command -e test_d --
 
@@ -123,10 +137,12 @@ distauthtest :: disttest
 
 # addition to realclean: also delete coverage database, if testcover was run
 realclean ::
-	$(NOECHO) ( $(TEST_D) cover_db && $(RM_RF) cover_db ) || $(ECHO) realclean:: skip "rm -rf cover_db"
-	$(NOECHO) ( $(TEST_F) LICENSE.pod && $(RM_RF) LICENSE.pod ) || $(ECHO) realclean:: LICENSE.pod intermediary
-	$(NOECHO) ( $(TEST_F) README.pod && $(RM_RF) README.pod ) || $(ECHO) realclean:: README.pod intermediary
-	$(NOECHO) ( $(TEST_F) MYMETA.json.lock && $(RM_RF) MYMETA.json.lock ) || $(ECHO) realclean:: MYMETA.json.lock temp file
+	$(NOECHO) ( $(TEST_D) cover_db && $(RM_RF) cover_db ) || $(ECHO) realclean:: didn't find cover_db
+	$(NOECHO) ( $(TEST_F) LICENSE.pod && $(RM_RF) LICENSE.pod ) || $(ECHO) realclean:: didn't find LICENSE.pod intermediary
+	$(NOECHO) ( $(TEST_F) README.pod && $(RM_RF) README.pod ) || $(ECHO) realclean:: didn't find README.pod intermediary
+	$(NOECHO) ( $(TEST_F) MYMETA.json.lock && $(RM_RF) MYMETA.json.lock ) || $(ECHO) realclean:: didn't find MYMETA.json.lock temp file
+	$(NOECHO) ( $(TEST_D) %TEMP%\notepad++ && $(RM_RF) %TEMP%\notepad++ ) || $(ECHO) realclean:: didn't find temp\notepad++ to clean
+	$(NOECHO) ( $(TEST_F) t\nppPath.inc && $(RM_RF) t\nppPath.inc ) || $(ECHO) realclean:: didn't find t\nppPath.inc to clean
 
 # veryclean: runs realclean, then deletes .bak, .old, .orig, and similar
 
@@ -184,8 +200,10 @@ src_export ::
 	$(NOECHO) svn export --force https://github.com/notepad-plus-plus/notepad-plus-plus/trunk/PowerEditor/src/menuCmdID.h src/
 	$(NOECHO) svn export --force https://github.com/notepad-plus-plus/notepad-plus-plus/trunk/scintilla/include/Scintilla.h src/
 
-
 POSTAMBLE
+
+    return $POSTAMBLE;
+
 }
 
 if($ENV{W32MNPP_FORCE_WRONG_OS}) {

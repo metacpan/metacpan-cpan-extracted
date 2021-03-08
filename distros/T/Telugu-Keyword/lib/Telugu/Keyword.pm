@@ -1,6 +1,6 @@
 package Telugu::Keyword;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Mouse;
 use utf8;
@@ -152,7 +152,7 @@ This module provides keywords to write perl program in Telugu script
 =head2 కొఱకు
 
    కొఱకు is equivalent to for loop. No need to write my inforont of the loop variable
-   ex:
+   eq:
       కొఱకు $పాస్ (1 .. $ఎన్ని) {
         ... #code here
       }
@@ -167,74 +167,7 @@ This module provides keywords to write perl program in Telugu script
 
    ఐతే is equivalent to if condition
 
-
-=head1 Functions
-
-=head2 సమ
-
-    సమ is equivalent to eq. Used to compare two strings.
-    it takes two parameters and returns a bool.
-
-    ex:
-        ఐతే(సమ("ఇంకెన్నిరోజులు", "ఇంకెన్నిరోజులు")) {
-            print "inside If";
-        }
-
-        is equivalent to
-
-        if( "ఇంకెన్నిరోజులు" eq "ఇంకెన్నిరోజులు" ) {
-            print "inside If";
-        }
-
-=head2 అసమ
-
-    అసమ is equivalent to ne. Used to compare two strings.
-    it takes two parameters and returns a bool.
-
-    ex:
-        ఐతే(అసమ("ఇంకెన్నిరోజులు", "రోజులు")) {
-            print "inside If";
-        }
-
-        is equivalent to
-
-        if( "ఇంకెన్నిరోజులు" ne "రోజులు" ) {
-            print "inside If";
-        }
-
-=head2 రీడ్
-
-    read file to a variable.
-    it takes one parameter, filename.
-
-    ex:
-            నా $పేజి = రీడ్("s1.sb");
-            ముద్రణ $పేజి;
-
-
-=head2 రైట్
-
-    write string to a file.
-    it takes two parameters, filename and string.
-
-    ex:
-            నా $పేజి = రీడ్("s1.sb");
-            రైట్("s2.sb", $పేజి);
-
-=head2 వుండాలి
-
-    Include code written in another file.
-    it takes one parameter, filename.
-
-    ex:
-           వుండాలి("s1.sb");
-
-    is equivalent to
-        require "s1.sb";
-
-    always end Include files with 1; statement.
-
-=head1 shoba
+=head2 shoba
 
     shoba is an executable installed with this module
     write your program in telugu and save it in a file with .sb extension

@@ -17,9 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Geo::LibProj::FFI",
   "PREREQ_PM" => {
-    "Alien::proj" => 0,
+    "Alien::proj" => "1.07",
     "Exporter::Easy" => 0,
-    "FFI::C" => 0,
+    "FFI::C" => "0.08",
     "FFI::Platypus" => "1.00"
   },
   "TEST_REQUIRES" => {
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Warnings" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,9 +35,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Alien::proj" => 0,
+  "Alien::proj" => "1.07",
   "Exporter::Easy" => 0,
-  "FFI::C" => 0,
+  "FFI::C" => "0.08",
   "FFI::Platypus" => "1.00",
   "Test::Exception" => 0,
   "Test::More" => 0,

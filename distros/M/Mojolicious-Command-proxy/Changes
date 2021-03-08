@@ -1,3 +1,6 @@
+0.005 2021-03-08
+- avoid "path" as stash value because now reserved
+
 0.004 2020-09-28
 - fix logic error with query-string and incoming path is empty-string
 

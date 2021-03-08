@@ -1,6 +1,5 @@
 on 'runtime' => sub {
     requires 'strict';
-    requires 'vars';
     requires 'Carp';
     requires 'Exporter';
     requires 'HTML::Tagset';
@@ -17,7 +16,6 @@ on 'configure' => sub {
 
 on 'test' => sub {
     requires 'strict';
-    requires 'vars';
     requires 'Config';
     requires 'FileHandle';
     requires 'File::Spec';

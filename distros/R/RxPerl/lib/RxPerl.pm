@@ -15,7 +15,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.6.1";
+our $VERSION = "v6.7.0";
 
 1;
 __END__
@@ -177,7 +177,8 @@ L<https://rxjs.dev/api/index/function/forkJoin>
 
 L<https://rxjs.dev/api/index/function/from>
 
-Currently, only arrayrefs, promises, observables and strings are allowed as argument to this function.
+Currently, only arrayrefs, promises, Futures, observables and strings are allowed as argument
+to this function.
 
     # 10, 20, 30, complete
     rx_from([10, 20, 30])->subscribe($observer);
@@ -731,8 +732,16 @@ L<https://rxjs.dev/api/operators/withLatestFrom>
 
 =head2 PROMISE FUNCTIONS
 
-These functions return a promise, and require the exitence of a user-selectable promise library.
-They are borrowed from rxjs 7, and remain EXPERIMENTAL until rxjs 7 is finalized.
+These functions return a promise or a future, and require the existence of a user-selectable
+promise library which is automatically loaded in runtime. The functions are borrowed from
+rxjs 7, and remain experimental until rxjs 7 is finalized.
+
+You can optionally set the type of promises returned by these functions with the
+C<< RxPerl::AnyEvent->set_promise_class($promise_class) >> class method, unless you're using
+L<RxPerl::AnyEvent>, in which case it's mandatory.
+
+By default the functions return a L<Mojo::Promise> object (when using with L<RxPerl::Mojo>),
+or a L<Future> object (when using with L<RxPerl::IOAsync>).
 
 =over
 
@@ -742,8 +751,8 @@ Accepts an observable and returns a promise that resolves with the observable's 
 as soon as it gets emitted. If no value is emitted before the observable's completion, the promise
 is rejected.
 
-    use RxPerl::IOAsync ':all';
-    RxPerl::IOAsync->set_promise_class('Promise::ES6'); # not required for RxPerl::Mojo
+    use RxPerl::AnyEvent ':all';
+    RxPerl::AnyEvent->set_promise_class('Promise::ES6');
 
     my $o = ...; # an observable
     first_value_from($o)->then( ... );
@@ -754,8 +763,8 @@ Accepts an observable and returns a promise that resolves with the observable's 
 as soon as the observable completes. If no value is emitted before the observable's completion, the
 promise is rejected.
 
-    use RxPerl::IOAsync ':all';
-    RxPerl::IOAsync->set_promise_class('Promise::ES6'); # not required for RxPerl::Mojo
+    use RxPerl::AnyEvent ':all';
+    RxPerl::AnyEvent->set_promise_class('Promise::ES6');
 
     my $o = ...; # an observable
     last_value_from($o)->then( ... );

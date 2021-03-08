@@ -59,6 +59,6 @@
          "web" : "https://github.com/elcamlost/Test2-MojoX"
       }
    },
-   "version" : 0.05,
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : 0.06,
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

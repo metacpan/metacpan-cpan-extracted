@@ -4,7 +4,7 @@
       "Gisle Aas <gaas@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -65,8 +65,7 @@
             "URI::URL" : "0",
             "XSLoader" : "0",
             "perl" : "5.008",
-            "strict" : "0",
-            "vars" : "0"
+            "strict" : "0"
          }
       },
       "test" : {
@@ -84,55 +83,54 @@
             "Test::More" : "0",
             "URI" : "0",
             "perl" : "5.008",
-            "strict" : "0",
-            "vars" : "0"
+            "strict" : "0"
          }
       }
    },
    "provides" : {
       "HTML::Entities" : {
          "file" : "lib/HTML/Entities.pm",
-         "version" : "3.75"
+         "version" : "3.76"
       },
       "HTML::Filter" : {
          "file" : "lib/HTML/Filter.pm",
-         "version" : "3.75",
+         "version" : "3.76",
          "x_deprecated" : 1
       },
       "HTML::HeadParser" : {
          "file" : "lib/HTML/HeadParser.pm",
-         "version" : "3.75"
+         "version" : "3.76"
       },
       "HTML::LinkExtor" : {
          "file" : "lib/HTML/LinkExtor.pm",
-         "version" : "3.75"
+         "version" : "3.76"
       },
       "HTML::Parser" : {
          "file" : "lib/HTML/Parser.pm",
-         "version" : "3.75"
+         "version" : "3.76"
       },
       "HTML::PullParser" : {
          "file" : "lib/HTML/PullParser.pm",
-         "version" : "3.75"
+         "version" : "3.76"
       },
       "HTML::TokeParser" : {
          "file" : "lib/HTML/TokeParser.pm",
-         "version" : "3.75"
+         "version" : "3.76"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/libwww-perl/html-parser/issues"
+         "web" : "https://github.com/libwww-perl/HTML-Parser/issues"
       },
-      "homepage" : "https://github.com/libwww-perl/html-parser",
+      "homepage" : "https://github.com/libwww-perl/HTML-Parser",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/libwww-perl/html-parser.git",
-         "web" : "https://github.com/libwww-perl/html-parser"
+         "url" : "https://github.com/libwww-perl/HTML-Parser.git",
+         "web" : "https://github.com/libwww-perl/HTML-Parser"
       }
    },
-   "version" : "3.75",
+   "version" : "3.76",
    "x_contributors" : [
       "Antonio Radici <antonio@dyne.org>",
       "Barbie <barbie@missbarbell.co.uk>",
@@ -148,12 +146,14 @@
       "Mike South <msouth@gmail.com>",
       "Nicholas Clark <nick@ccl4.org>",
       "Nicolas R <nicolas@atoomic.org>",
+      "Olaf Alders <olaf@wundersolutions.com>",
       "Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>",
+      "Todd Rinaldo <toddr@cpan.org>",
       "Ville Skytt\u00e4 <ville.skytta@iki.fi>",
       "Yves Orton <demerphq@gmail.com>",
       "Zefram <zefram@fysh.org>"
    ],
-   "x_generated_by_perl" : "v5.26.1",
+   "x_generated_by_perl" : "v5.30.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

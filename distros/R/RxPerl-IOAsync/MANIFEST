@@ -6,5 +6,7 @@ README.md
 cpanfile
 lib/RxPerl/IOAsync.pm
 minil.toml
+t/from_future.t
+t/value_from.t
 META.yml
 MANIFEST

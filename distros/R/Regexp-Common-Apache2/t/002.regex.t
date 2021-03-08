@@ -13,6 +13,7 @@ my $tests =
     {
         regex           => q{/John Doe/},
         regpattern      => q{John Doe},
+        regsep          => q{/},
         test            => q{/John Doe/},
     },
     {

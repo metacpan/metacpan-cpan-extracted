@@ -1,0 +1,42 @@
+{
+   "abstract" : "patchperl plugin for darwin",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-PatchPerl-Plugin-Darwin",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::PatchPerl" : "2.08"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::PatchPerl::Plugin::Darwin" : {
+         "file" : "lib/Devel/PatchPerl/Plugin/Darwin.pm",
+         "version" : "v0.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

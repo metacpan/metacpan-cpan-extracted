@@ -9,6 +9,8 @@ use Test::More;
 use Win32;
 
 use FindBin;
+BEGIN { my $f = $FindBin::Bin . '/nppPath.inc'; require $f if -f $f; }
+
 use lib $FindBin::Bin;
 use myTestHelpers;
 myTestHelpers::setChildEndDelay(6);
@@ -213,5 +215,31 @@ local $TODO = undef;
 #   menuCommand
 #   runMenuCommand
 #   runPluginCommand
+
+# *etLineNumberWidthMode:
+SKIP: {
+TODO: {
+    use version;
+    my $ver = version->parse( notepad->getNppVersion() );
+    note sprintf "get/setLineNumberWidthMode optional test using NPP $ver\n";
+    skip "getLineNumberWidthMode() not implemented in $ver", 2 if $ver < version->parse(v7.9.2);
+    local $TODO = "notepad++.exe v7.9.2 has known implementation bug #9338" if $ver == version->parse(v7.9.2);
+    my $orig = notepad->getLineNumberWidthMode();
+        note sprintf "\torig => \"%s\"", defined $orig ? explain $orig : '<undef>';
+        note sprintf "\tkeys => (%s)", join ',', keys %LINENUMWIDTH;
+    for my $key ( sort keys %LINENUMWIDTH ) {
+        my $set = $LINENUMWIDTH{$key};
+            note sprintf "\tLINENUMWIDTH{%s} => \"%s\"", explain($key//'<undef>'), explain($set//'<undef>');
+        my $ret = notepad->setLineNumberWidthMode($set);
+            note sprintf "\t=> setLineNumberWidthMode(%s) => \"%s\"", explain($key//'<undef>'), explain($ret//'<undef>');
+        my $get = notepad->getLineNumberWidthMode();
+            note sprintf "\t=> getLineNumberWidthMode() => \"%s\"", explain($get//'<undef>');
+        is $get, $set, sprintf "setLineNumberWidthMode($key) reads back \"%d\"", explain($get//'<undef>');
+    }
+
+    # return to original setting
+    notepad->setLineNumberWidthMode($orig);
+}
+}
 
 done_testing;

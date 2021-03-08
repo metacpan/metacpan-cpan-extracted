@@ -1,10 +1,16 @@
 ==================================================
-Changes from 2020-02-29 00:00:00 +0000 to present.
+Changes from 2020-03-06 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 1.01 at 2021-02-28 00:57:15 +0000
+version 1.02 at 2021-03-06 02:48:16 +0000
 -----------------------------------------
+
+  Change: dd079852caa4ef50fe336f16270e00371612c180
+  Author: D Ruth Holloway <ruthh@clearbuilt.com>
+  Date : 2021-03-05 19:47:44 +0000
+
+    Add dependency that was breaking automated tests. 
 
   Change: b84de345cc42888442fe0f33684b38cff9c76260
   Author: D Ruth Holloway <ruthh@clearbuilt.com>

@@ -1,7 +1,7 @@
 requires 'perl', '5.010001';
 requires 'Carp';
 requires 'Scalar::Util';
-requires 'Sub::Meta', '0.04';
+requires 'Sub::Meta', '0.05';
 requires 'Type::Tiny', '1.010004';
 requires 'Sub::WrapInType', '0.03';
 requires 'Moo', '2.004004';

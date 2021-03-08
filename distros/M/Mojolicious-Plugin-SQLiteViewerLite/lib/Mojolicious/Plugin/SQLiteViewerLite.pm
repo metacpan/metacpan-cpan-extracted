@@ -7,7 +7,7 @@ use Validator::Custom;
 use File::Basename 'dirname';
 use Cwd 'abs_path';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 has command => sub {
   my $self = shift;
@@ -28,13 +28,22 @@ sub register {
   # Add template and public path
   $self->add_template_path($app->renderer, __PACKAGE__);
   $self->add_static_path($app->static, __PACKAGE__);
+
+  # Mojolicious compatibility
+  my $any_method_name;
+  if ($Mojolicious::VERSION >= '8.67') {
+    $any_method_name = 'any'
+  }
+  else {
+    $any_method_name = 'route'
+  }
   
   # Routes
   my $r = $conf->{route} // $app->routes;
   my $prefix = $conf->{prefix} // 'sqliteviewerlite';
   $self->prefix($prefix);
   {
-    my $r = $r->route("/$prefix")->to(
+    my $r = $r->$any_method_name("/$prefix")->to(
       'sqliteviewerlite#',
       namespace => 'Mojolicious::Plugin::SQLiteViewerLite',
       plugin => $self,

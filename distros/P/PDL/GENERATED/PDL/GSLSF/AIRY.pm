@@ -61,10 +61,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Airy Function Ai(x).
 
-=for bad
-
-gsl_sf_airy_Ai does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -90,10 +86,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Airy Function Bi(x).
 
-=for bad
-
-gsl_sf_airy_Bi does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -119,10 +111,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Scaled Airy Function Ai(x). Ai(x) for x < 0  and exp(+2/3 x^{3/2}) Ai(x) for  x > 0.
 
-=for bad
-
-gsl_sf_airy_Ai_scaled does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -148,10 +136,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Scaled Airy Function Bi(x). Bi(x) for x < 0  and exp(+2/3 x^{3/2}) Bi(x) for  x > 0.
 
-=for bad
-
-gsl_sf_airy_Bi_scaled does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -177,10 +161,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Derivative Airy Function Ai`(x).
 
-=for bad
-
-gsl_sf_airy_Ai_deriv does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -206,10 +186,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Derivative Airy Function Bi`(x).
 
-=for bad
-
-gsl_sf_airy_Bi_deriv does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -235,10 +211,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Derivative Scaled Airy Function Ai(x). Ai`(x) for x < 0  and exp(+2/3 x^{3/2}) Ai`(x) for  x > 0.
 
-=for bad
-
-gsl_sf_airy_Ai_deriv_scaled does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -264,10 +236,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Derivative Scaled Airy Function Bi(x). Bi`(x) for x < 0  and exp(+2/3 x^{3/2}) Bi`(x) for  x > 0.
 
-=for bad
-
-gsl_sf_airy_Bi_deriv_scaled does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

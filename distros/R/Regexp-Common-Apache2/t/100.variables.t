@@ -14,9 +14,9 @@ use re 'eval';
 #ok( q{%{:10:}} =~ /\%\{\:\d+\:\}/, q{%{:10:}} );
 ok( q{%{:10:}} =~ /\{\:$RE{Apache2}{TrunkDigits}\:\}/, q{%{:10:} using digits} );
 
-ok( q{%{:10:}} =~ /\%\{\:$RE{Apache2}{TrunkWord}\:\}/, q{%{:10:} using word} );
+ok( q{%{:10:}} =~ /^\%\{\:$RE{Apache2}{TrunkWord}\:\}$/, q{%{:10:} using word} );
 
-ok( q{%{:10:}} =~ /$RE{Apache2}{TrunkVariable}/, q{%{:10:} using variable} );
+ok( q{%{:10:}} =~ /^$RE{Apache2}{TrunkVariable}$/, q{%{:10:} using variable} );
 
 my $tests = 
 [
@@ -29,6 +29,7 @@ my $tests =
     {
         name            => q{function, arguments},
         test            => q{%{tolower:SomeValue}},
+        var_func        => q{tolower:SomeValue},
         var_func_args   => q{SomeValue},
         var_func_name   => q{tolower},
         variable        => q{%{tolower:SomeValue}},
@@ -36,7 +37,7 @@ my $tests =
     {
         name            => q{word -> digit},
         test            => q{%{:10:}},
-        var_word        => q{10},
+        var_word        => 10,
         variable        => q{%{:10:}},
     },
     {
@@ -50,18 +51,6 @@ my $tests =
         test            => q{%{:"Hello":}},
         var_word        => q{"Hello"},
         variable        => q{%{:"Hello":}},
-    },
-    {
-        name            => q{dot separated word},
-        test            => q{%{:"my"."word":}},
-        var_word        => q{"my"."word"},
-        variable        => q{%{:"my"."word":}},
-    },
-    {
-        name            => q{dot separated word mixed quotes},
-        test            => q{%{:"my".'word':}},
-        var_word        => q{"my".'word'},
-        variable        => q{%{:"my".'word':}},
     },
     {
         name            => q{substitution within},
@@ -96,14 +85,23 @@ my $tests =
     {
         name            => q{condition within},
         test            => q{%{:1:}},
-        var_cond        => q{1},
+        var_word        => 1,
         variable        => q{%{:1:}},
     },
     {
         name            => q{regular expression back reference},
+        rebackref       => 1,
         test            => q{$1},
         var_backref     => q{$1},
         variable        => q{$1},
+    },
+    {
+        name            => q{%{md5:foo}},
+        test            => q{%{md5:foo}},
+        var_func        => q{md5:foo},
+        var_func_args   => q{foo},
+        var_func_name   => q{md5},
+        variable        => q{%{md5:foo}},
     },
 ];
 

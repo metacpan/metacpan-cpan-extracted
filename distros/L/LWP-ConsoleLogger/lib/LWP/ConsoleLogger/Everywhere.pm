@@ -2,7 +2,7 @@ package LWP::ConsoleLogger::Everywhere;
 use strict;
 use warnings;
 
-our $VERSION = '0.000042';
+our $VERSION = '0.000043';
 
 use Class::Method::Modifiers ();
 use LWP::ConsoleLogger::Easy qw( debug_ua );
@@ -72,7 +72,7 @@ LWP::ConsoleLogger::Everywhere - LWP tracing everywhere
 
 =head1 VERSION
 
-version 0.000042
+version 0.000043
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ version 0.000042
 
     # or all of them at once:
     LWP::ConsoleLogger::Everywhere->set( pretty => 1);
-    
+
     # Redact sensitive data for all user agents
     $ENV{LWPCL_REDACT_HEADERS} = 'Authorization,Foo,Bar';
     $ENV{LWPCL_REDACT_PARAMS} = 'seekrit,password,credit_card';

@@ -3,8 +3,8 @@ NAME
     tax article 21 (PPh pasal 21)
 
 VERSION
-    This document describes version 0.062 of Business::Tax::ID::PPH21 (from
-    Perl distribution Business-Tax-ID-PPH21), released on 2020-03-03.
+    This document describes version 0.063 of Business::Tax::ID::PPH21 (from
+    Perl distribution Business-Tax-ID-PPH21), released on 2021-03-08.
 
 SYNOPSIS
 DESCRIPTION
@@ -43,11 +43,15 @@ FUNCTIONS
 
     *   Someone who doesn't pay PPh 21 op earns at or below PTKP:
 
-         calc_net_income_from_pph21_op(year => 2016, pph21_op => 0, tp_status => "TK/0"); # -> 54000000
+         calc_net_income_from_pph21_op(year => 2016, pph21_op => 0, tp_status => "TK/0"); # -> [200, "OK", 54000000, {}]
 
     *   Example #2:
 
-         calc_net_income_from_pph21_op(year => 2016, pph21_op => 20000000, tp_status => "K/2"); # -> 234166666.666667
+         calc_net_income_from_pph21_op(year => 2016, pph21_op => 20000000, tp_status => "K/2");
+
+        Result:
+
+         [200, "OK", 234166666.666667, {}]
 
     If pph21_op is 0, will return the PTKP amount. Actually one can earn
     between zero and the full PTKP amount to pay zero PPh 21 op.
@@ -95,11 +99,15 @@ FUNCTIONS
 
     *   Someone who earns below PTKP:
 
-         calc_pph21_op(year => 2015, net_income => 30000000, tp_status => "TK/0"); # -> 0
+         calc_pph21_op(year => 2015, net_income => 30000000, tp_status => "TK/0"); # -> [200, "OK", 0, {}]
 
     *   Example #2:
 
-         calc_pph21_op(year => 2015, net_income => 300000000, tp_status => "K/2"); # -> 33750000
+         calc_pph21_op(year => 2015, net_income => 300000000, tp_status => "K/2");
+
+        Result:
+
+         [200, "OK", 33750000, {}]
 
     This function is not exported by default, but exportable.
 
@@ -144,16 +152,21 @@ FUNCTIONS
 
         Result:
 
-         {
-           "K/0"  => 58500000,
-           "K/1"  => 63000000,
-           "K/2"  => 67500000,
-           "K/3"  => 72000000,
-           "TK/0" => 54000000,
-           "TK/1" => 58500000,
-           "TK/2" => 63000000,
-           "TK/3" => 67500000,
-         }
+         [
+           200,
+           "OK",
+           {
+             "K/0"  => 58500000,
+             "K/1"  => 63000000,
+             "K/2"  => 67500000,
+             "K/3"  => 72000000,
+             "TK/0" => 54000000,
+             "TK/1" => 58500000,
+             "TK/2" => 63000000,
+             "TK/3" => 67500000,
+           },
+           {},
+         ]
 
     When calculating individual income tax, the net income is subtracted by
     this amount first. This means that if a person has income below this
@@ -192,10 +205,18 @@ FUNCTIONS
         Result:
 
          [
-           { max => 50000000, rate => 0.05 },
-           { xmin => 50000000, max => 250000000, rate => 0.15 },
-           { xmin => 250000000, max => 500000000, rate => 0.25 },
-           { xmin => 500000000, rate => 0.3 },
+           200,
+           "OK",
+           [
+             { max => 50000000, rate => 0.05 },
+             { xmin => 50000000, max => 250000000, rate => 0.15 },
+             { xmin => 250000000, max => 500000000, rate => 0.25 },
+             { xmin => 500000000, rate => 0.3 },
+           ],
+           {
+             "table.field_formats" => [undef, undef, ["percent", { sprintf => "%3.0f%%" }]],
+             "table.fields"        => ["xmin", "max", "rate"],
+           },
          ]
 
     PPh21 differentiates rates between individuals ("OP", "orang pribadi")
@@ -242,7 +263,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2017, 2015 by
+    This software is copyright (c) 2021, 2020, 2019, 2017, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

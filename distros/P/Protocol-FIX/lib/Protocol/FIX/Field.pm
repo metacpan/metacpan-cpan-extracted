@@ -5,7 +5,7 @@ use warnings;
 
 use Protocol::FIX;
 
-our $VERSION = '0.04';    ## VERSION
+our $VERSION = '0.05';    ## VERSION
 
 =head1 NAME
 
@@ -99,7 +99,7 @@ my $UTCTIMESTAMP_validator = sub {
             && ($5 >= 0)
             && ($5 <= 59)
             && ($6 >= 0)
-            && ($5 <= 60)
+            && ($5 <= 60);
 
     } else {
         return;

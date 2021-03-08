@@ -60,7 +60,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.2'; # VERSION
+our $VERSION = '1.13.3'; # VERSION
 
 BEGIN {
   use Rex::Require;
@@ -205,7 +205,7 @@ sub import {
 
   if ($opt) {
     $dbh = DBI->connect(
-      $opt->{"dsn"}, $opt->{"user"},
+      $opt->{"dsn"},            $opt->{"user"},
       $opt->{"password"} || "", $opt->{"attr"}
     );
     $dbh->{mysql_auto_reconnect} = 1;

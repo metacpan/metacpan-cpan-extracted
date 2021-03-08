@@ -26,7 +26,7 @@ use Wireguard::WGmeta::Cli::Commands::Add;
 use base 'Exporter';
 our @EXPORT = qw(route_command);
 
-our $VERSION = "0.2.1";
+our $VERSION = "0.2.2";
 
 =head2 route_command($ref_list_input_args)
 

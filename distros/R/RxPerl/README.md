@@ -151,7 +151,8 @@ should apply to RxPerl too).
 
     [https://rxjs.dev/api/index/function/from](https://rxjs.dev/api/index/function/from)
 
-    Currently, only arrayrefs, promises, observables and strings are allowed as argument to this function.
+    Currently, only arrayrefs, promises, Futures, observables and strings are allowed as argument
+    to this function.
 
         # 10, 20, 30, complete
         rx_from([10, 20, 30])->subscribe($observer);
@@ -699,8 +700,16 @@ apply to RxPerl too).
 
 ## PROMISE FUNCTIONS
 
-These functions return a promise, and require the exitence of a user-selectable promise library.
-They are borrowed from rxjs 7, and remain EXPERIMENTAL until rxjs 7 is finalized.
+These functions return a promise or a future, and require the existence of a user-selectable
+promise library which is automatically loaded in runtime. The functions are borrowed from
+rxjs 7, and remain experimental until rxjs 7 is finalized.
+
+You can optionally set the type of promises returned by these functions with the
+`RxPerl::AnyEvent->set_promise_class($promise_class)` class method, unless you're using
+[RxPerl::AnyEvent](https://metacpan.org/pod/RxPerl%3A%3AAnyEvent), in which case it's mandatory.
+
+By default the functions return a [Mojo::Promise](https://metacpan.org/pod/Mojo%3A%3APromise) object (when using with [RxPerl::Mojo](https://metacpan.org/pod/RxPerl%3A%3AMojo)),
+or a [Future](https://metacpan.org/pod/Future) object (when using with [RxPerl::IOAsync](https://metacpan.org/pod/RxPerl%3A%3AIOAsync)).
 
 - first\_value\_from
 
@@ -708,8 +717,8 @@ They are borrowed from rxjs 7, and remain EXPERIMENTAL until rxjs 7 is finalized
     as soon as it gets emitted. If no value is emitted before the observable's completion, the promise
     is rejected.
 
-        use RxPerl::IOAsync ':all';
-        RxPerl::IOAsync->set_promise_class('Promise::ES6'); # not required for RxPerl::Mojo
+        use RxPerl::AnyEvent ':all';
+        RxPerl::AnyEvent->set_promise_class('Promise::ES6');
 
         my $o = ...; # an observable
         first_value_from($o)->then( ... );
@@ -720,8 +729,8 @@ They are borrowed from rxjs 7, and remain EXPERIMENTAL until rxjs 7 is finalized
     as soon as the observable completes. If no value is emitted before the observable's completion, the
     promise is rejected.
 
-        use RxPerl::IOAsync ':all';
-        RxPerl::IOAsync->set_promise_class('Promise::ES6'); # not required for RxPerl::Mojo
+        use RxPerl::AnyEvent ':all';
+        RxPerl::AnyEvent->set_promise_class('Promise::ES6');
 
         my $o = ...; # an observable
         last_value_from($o)->then( ... );

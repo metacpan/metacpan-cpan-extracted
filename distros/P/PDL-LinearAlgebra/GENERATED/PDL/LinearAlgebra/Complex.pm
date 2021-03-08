@@ -4,7 +4,7 @@
 #
 package PDL::LinearAlgebra::Complex;
 
-@EXPORT_OK  = qw( PDL::PP cgesvd PDL::PP cgesdd PDL::PP cggsvd PDL::PP cgeev PDL::PP cgeevx PDL::PP cggev PDL::PP cggevx PDL::PP cgees PDL::PP cgeesx PDL::PP cgges PDL::PP cggesx PDL::PP cheev PDL::PP cheevd PDL::PP cheevx PDL::PP cheevr PDL::PP chegv PDL::PP chegvd PDL::PP chegvx PDL::PP cgesv PDL::PP cgesvx PDL::PP csysv PDL::PP csysvx PDL::PP chesv PDL::PP chesvx PDL::PP cposv PDL::PP cposvx PDL::PP cgels PDL::PP cgelsy PDL::PP cgelss PDL::PP cgelsd PDL::PP cgglse PDL::PP cggglm PDL::PP cgetrf PDL::PP cgetf2 PDL::PP csytrf PDL::PP csytf2 PDL::PP cchetrf PDL::PP chetf2 PDL::PP cpotrf PDL::PP cpotf2 PDL::PP cgetri PDL::PP csytri PDL::PP chetri PDL::PP cpotri PDL::PP ctrtri PDL::PP ctrti2 PDL::PP cgetrs PDL::PP csytrs PDL::PP chetrs PDL::PP cpotrs PDL::PP ctrtrs PDL::PP clatrs PDL::PP cgecon PDL::PP csycon PDL::PP checon PDL::PP cpocon PDL::PP ctrcon PDL::PP cgeqp3 PDL::PP cgeqrf PDL::PP cungqr PDL::PP cunmqr PDL::PP cgelqf PDL::PP cunglq PDL::PP cunmlq PDL::PP cgeqlf PDL::PP cungql PDL::PP cunmql PDL::PP cgerqf PDL::PP cungrq PDL::PP cunmrq PDL::PP ctzrzf PDL::PP cunmrz PDL::PP cgehrd PDL::PP cunghr PDL::PP chseqr PDL::PP ctrevc PDL::PP ctgevc PDL::PP cgebal PDL::PP clange PDL::PP clansy PDL::PP clantr PDL::PP cgemm PDL::PP cmmult PDL::PP ccrossprod PDL::PP csyrk PDL::PP cdot PDL::PP cdotc PDL::PP caxpy PDL::PP cnrm2 PDL::PP casum PDL::PP cscal PDL::PP sscal PDL::PP crotg PDL::PP clacpy PDL::PP claswp PDL::PP ctricpy PDL::PP cmstack PDL::PP ccharpol );
+@EXPORT_OK  = qw( PDL::PP cgtsv PDL::PP cgesvd PDL::PP cgesdd PDL::PP cggsvd PDL::PP cgeev PDL::PP cgeevx PDL::PP cggev PDL::PP cggevx PDL::PP cgees PDL::PP cgeesx PDL::PP cgges PDL::PP cggesx PDL::PP cheev PDL::PP cheevd PDL::PP cheevx PDL::PP cheevr PDL::PP chegv PDL::PP chegvd PDL::PP chegvx PDL::PP cgesv PDL::PP cgesvx PDL::PP csysv PDL::PP csysvx PDL::PP chesv PDL::PP chesvx PDL::PP cposv PDL::PP cposvx PDL::PP cgels PDL::PP cgelsy PDL::PP cgelss PDL::PP cgelsd PDL::PP cgglse PDL::PP cggglm PDL::PP cgetrf PDL::PP cgetf2 PDL::PP csytrf PDL::PP csytf2 PDL::PP cchetrf PDL::PP chetf2 PDL::PP cpotrf PDL::PP cpotf2 PDL::PP cgetri PDL::PP csytri PDL::PP chetri PDL::PP cpotri PDL::PP ctrtri PDL::PP ctrti2 PDL::PP cgetrs PDL::PP csytrs PDL::PP chetrs PDL::PP cpotrs PDL::PP ctrtrs PDL::PP clatrs PDL::PP cgecon PDL::PP csycon PDL::PP checon PDL::PP cpocon PDL::PP ctrcon PDL::PP cgeqp3 PDL::PP cgeqrf PDL::PP cungqr PDL::PP cunmqr PDL::PP cgelqf PDL::PP cunglq PDL::PP cunmlq PDL::PP cgeqlf PDL::PP cungql PDL::PP cunmql PDL::PP cgerqf PDL::PP cungrq PDL::PP cunmrq PDL::PP ctzrzf PDL::PP cunmrz PDL::PP cgehrd PDL::PP cunghr PDL::PP chseqr PDL::PP ctrevc PDL::PP ctgevc PDL::PP cgebal PDL::PP clange PDL::PP clansy PDL::PP clantr PDL::PP cgemm PDL::PP cmmult PDL::PP ccrossprod PDL::PP csyrk PDL::PP cdot PDL::PP cdotc PDL::PP caxpy PDL::PP cnrm2 PDL::PP casum PDL::PP cscal PDL::PP sscal PDL::PP crotg PDL::PP clacpy PDL::PP claswp PDL::PP ctricpy PDL::PP cmstack PDL::PP ccharpol );
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -55,8 +55,6 @@ use PDL::LinearAlgebra::Real;
 	BEGIN{ $^W = $warningFlag ; }
 }
 
-
-
 =encoding Latin-1
 
 =head1 NAME
@@ -76,12 +74,10 @@ PDL::LinearAlgebra::Complex - PDL interface to the lapack linear algebra program
  $job = 0;
  cgesdd($a, $job, $info, $s , $u, $v);
 
-
 =head1 DESCRIPTION
 
 This module provides an interface to parts of the lapack library (complex numbers).
 These routines accept either float or double piddles.
-
 
 
 
@@ -95,6 +91,88 @@ These routines accept either float or double piddles.
 
 =cut
 
+
+
+
+
+
+=head2 cgtsv
+
+=for sig
+
+  Signature: ([phys]DL(2,n); [phys]D(2,n); [phys]DU(2,n); [io,phys]B(2,n,nrhs); int [o,phys]info())
+
+
+
+=for ref
+
+Solves the equation
+
+	A * X = B
+
+where A is an C<n> by C<n> tridiagonal matrix, by Gaussian elimination with
+partial pivoting, and B is an C<n> by C<nrhs> matrix.
+
+Note that the equation C<A**T*X = B>  may be solved by interchanging the
+order of the arguments DU and DL.
+
+B<NB> This differs from the LINPACK function C<cgtsl> in that C<DL>
+starts from its first element, while the LINPACK equivalent starts from
+its second element.
+
+    Arguments
+    =========
+
+    DL:   On entry, DL must contain the (n-1) sub-diagonal elements of A.
+
+          On exit, DL is overwritten by the (n-2) elements of the
+          second super-diagonal of the upper triangular matrix U from
+          the LU factorization of A, in DL(1), ..., DL(n-2).
+
+    D:    On entry, D must contain the diagonal elements of A.
+
+          On exit, D is overwritten by the n diagonal elements of U.
+
+    DU:   On entry, DU must contain the (n-1) super-diagonal elements of A.
+
+          On exit, DU is overwritten by the (n-1) elements of the
+          first super-diagonal of the U.
+
+    B:    On entry, the n by nrhs matrix of right hand side matrix B.
+          On exit, if info = 0, the n by nrhs solution matrix X.
+
+    info:   = 0:  successful exit
+            < 0:  if info = -i, the i-th argument had an illegal value
+            > 0:  if info = i, U(i,i) is exactly zero, and the solution
+                  has not been computed.  The factorization has not been
+                  completed unless i = n.
+
+=for example
+
+ use PDL::Complex;
+ $dl = random(float, 9) + random(float, 9) * i;
+ $d = random(float, 10) + random(float, 10) * i;
+ $du = random(float, 9) + random(float, 9) * i;
+ $b = random(10,5) + random(10,5) * i;
+ cgtsv($dl, $d, $du, $b, ($info=null));
+ print "X is:\n$b" unless $info;
+
+
+
+=for bad
+
+cgtsv ignores the bad-value flag of the input piddles.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+
+
+=cut
+
+
+
+
+
+
+*cgtsv = \&PDL::cgtsv;
 
 
 

@@ -1,9 +1,10 @@
 requires 'perl', '5.010';
 
 requires 'Sub::Util', '1.41';
-requires 'RxPerl', 'v6.6.1';
+requires 'RxPerl', 'v6.7.0';
 requires 'IO::Async';
 
 on 'test' => sub {
     requires 'Test2::V0';
+    requires 'Future';
 };

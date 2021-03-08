@@ -110,9 +110,7 @@ will be quicker.
 
 
 
-=for bad
 
-Unlike the FFT routines, conv2d is able to process bad values.
 
 =cut
 
@@ -177,10 +175,7 @@ is rather pointless)
 
 
 
-=for bad
 
-Bad values are ignored in the calculation. If all elements within the
-kernel are bad, the output is set bad.
 
 =cut
 
@@ -247,10 +242,6 @@ Note: this routine does the median over all points in a rectangular
 
 
 
-=for bad
-
-med2df does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -312,10 +303,6 @@ approximately linearly with window size.
 
 
 
-=for bad
-
-box2d does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -353,9 +340,7 @@ copied across.
 
 
 
-=for bad
 
-This routine does not handle bad values - use L</patchbad2d> instead
 
 =cut
 
@@ -392,10 +377,7 @@ is performed (see L</patch2d>).
 
 
 
-=for bad
 
-patchbad2d handles bad values. The output piddle I<may> contain
-bad values, depending on the pattern of bad values in the input piddle.
 
 =cut
 
@@ -424,11 +406,6 @@ Return value/position of maximum value in 2D image
 Contributed by Tim Jeness
 
 
-
-=for bad
-
-Bad values are excluded from the search. If all pixels
-are bad then the output is set bad.
 
 
 
@@ -460,12 +437,6 @@ C<$box> is the full-width of the box, i.e. the window
 is C<+/- $box/2>.
 
 
-
-=for bad
-
-Bad pixels are excluded from the centroid calculation. If all elements are
-bad (or the pixel sum is 0 - but why would you be centroiding
-something with negatives in...) then the output values are set bad.
 
 
 
@@ -555,10 +526,6 @@ where the second parameter specifies the connectivity (4 or 8) of the labeling.
 
 
 
-=for bad
-
-ccNcompt ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -799,10 +766,6 @@ rot2d is faster.
 
 
 
-=for bad
-
-rot2d ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -822,7 +785,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (I(n,m); O(q,p))
+  Signature: (Int(n,m); O(q,p))
 
 
 =for ref
@@ -833,10 +796,6 @@ piddle which is supposed to be larger than the first one.
 
 
 
-=for bad
-
-bilin2d ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -856,7 +815,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (I(m,n); O(p,q))
+  Signature: (Int(m,n); O(p,q))
 
 
 =for ref
@@ -872,10 +831,6 @@ rescale2d.
 
 
 
-=for bad
-
-rescale2d ignores the bad-value flag of the input piddles.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

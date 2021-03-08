@@ -10,7 +10,7 @@ use Win32::Mechanize::NotepadPlusPlus::Editor::Messages;  # exports %SCIMSG, whi
 use utf8;   # there are UTF8 arrows throughout the source code (in POD and strings)
 use Config;
 
-our $VERSION = '0.004001'; # auto-populated from W::M::NPP
+our $VERSION = '0.006001'; # auto-populated from W::M::NPP
 
 our @EXPORT_VARS = (@Win32::Mechanize::NotepadPlusPlus::Editor::Messages::EXPORT);
 our @EXPORT_OK = (@EXPORT_VARS);
@@ -11531,7 +11531,7 @@ sub __auto_generate($) {
 
             return $self->{_hwobj}->SendMessage_sendRawString_getRawString( $SCIMSG{$sci} , $wparam_string, $args );
         };
-    } elsif( $nSciArgs==2 and $info{subRet}//'<undef>' eq 'str' and $info{sciArgs}[1] =~ /^\Qchar *\E/) {
+    } elsif( $info{subRet}//'<undef>' eq 'str' and $nSciArgs==2 and $info{sciArgs}[1] =~ /^\Qchar *\E/) {
         ################################
         # asking for a string: ex ->getText()
         ################################
@@ -11699,8 +11699,12 @@ sub __auto_generate($) {
                     $method, $sci,
                     join("\n\t",
                         map {
+                            # uncoverable branch true       dummy placeholder should never be reached
+                            # uncoverable branch false      dummy placeholder should never be reached
+                            # uncoverable condition left    dummy placeholder should never be reached
+                            # uncoverable condition false   dummy placeholder should never be reached
                             my $t = $info{$_}//'<undef>';   # uncoverable statement dummy placeholder should never be reached; I don't even know how to test
-                            $t =~ s/ *=> */: /;              # uncoverable statement dummy placeholder should never be reached; I don't even know how to test
+                            $t =~ s/ *=> */: /;             # uncoverable statement dummy placeholder should never be reached; I don't even know how to test
                                                             # uncoverable statement dummy placeholder should never be reached; I don't even know how to test
                             sprintf qq|"%s"=>"%s"|,
                                 $_,
@@ -11753,7 +11757,7 @@ or thru the repository's interface at L<https://github.com/pryrt/Win32-Mechanize
 
 =head1 COPYRIGHT
 
-Copyright (C) 2019,2020 Peter C. Jones
+Copyright (C) 2019,2020,2021 Peter C. Jones
 
 =head1 LICENSE
 

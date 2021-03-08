@@ -5,7 +5,7 @@ use utf8;
 use Kavorka -all;
 use FFI::Raw;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $flite = 'libflite.so.1';
 my $kal16 = 'libflite_cmu_us_kal16.so.1';
@@ -37,43 +37,21 @@ TTS::Flite - Perl extension for blah blah blah
 
   use TTS::Flite;
 
-  my $tts = TTS::Flite->new();
+  my $flite = TTS::Flite->new();
 
-  $tts->init();  # call it only once, before calling tts.
-  $tts->tts("Some String");
+  $flite->init();  # call it only once, before calling tts.
+
+  $flite->tts("Some string");
+  $flite->tts("Some other string");
 
 =head1 DESCRIPTION
 
-Stub documentation for TTS-Flite, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+  You need to install flite before using this module. on ubuntu you can do this by `sudo apt install libflite1`
 
-Blah blah blah.
-
-=head2 EXPORT
-
-None by default.
-
-
-
-=head1 SEE ALSO
-
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
-
-=head1 AUTHOR
-
-raj, E<lt>raj@E<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019 by raj
+Copyright (C) 2019 by Rajkumar Reddy
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.1 or,

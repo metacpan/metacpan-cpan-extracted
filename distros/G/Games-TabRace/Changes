@@ -1,6 +1,11 @@
-Revision history for Games-TabRace
+0.004   2021-03-05  Released-By: PERLANCAR; Urgency: medium
 
-0.003   2016-10-26 (PERLANCAR)
+	- Avoid perl undef warnings.
+
+	- Update instruction.
+
+
+0.003   2016-10-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -8,7 +13,7 @@ Revision history for Games-TabRace
 	  various shells.
 
 
-0.002   2016-10-26 (PERLANCAR)
+0.002   2016-10-26  Released-By: PERLANCAR
 
 	- [Bugfix] Fix criteria of displaying 'you entered into the high
 	  scores list'.
@@ -16,6 +21,6 @@ Revision history for Games-TabRace
 	- [doc] Add Description.
 
 
-0.001   2016-10-26 (PERLANCAR)
+0.001   2016-10-26  Released-By: PERLANCAR
 
         - First release.

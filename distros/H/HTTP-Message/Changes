@@ -1,5 +1,9 @@
 Revision history for HTTP-Message
 
+6.29      2021-03-06 04:50:34Z
+    - fix issue with HTTP::Request internal cache for canonical url when using
+      URI::URL (GH#146) (andrew-grechkin)
+
 6.28      2021-02-19 16:22:13Z
     - fix warnings during HTTP::Config->match #62 (GH#152) (Viťas Strádal)
 

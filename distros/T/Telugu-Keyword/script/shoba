@@ -21,46 +21,6 @@ sub readFile {
     }
 }
 
-sub సమ {
-    my ($left, $right) = @_;
-    my $bool = $left eq $right;
-    return $bool;
-}
-
-sub అసమ {
-    my ($left, $right) = @_;
-    my $bool = $left ne $right;
-    return $bool;
-}
-
-sub రీడ్ {
-    my ($filename) = @_;
-    my $contents;
-
-    open(my $fh, '<:encoding(UTF-8)', $filename) or die "cannot open file $filename";
-    {
-        local $/;
-        $contents = <$fh>;
-    }
-    close($fh);
-
-    return $contents;
-}
-
-sub రైట్ {
-    my ($filename, $string) = @_;
-
-    open(my $fh, '>:encoding(UTF-8)', $filename) or die "cannot open file $filename";
-    print $fh $string;
-    close($fh);
-}
-
-sub వుండాలి {
-    my ($name) = @_;
-    require $name;
-}
-
-
 my $filename = $ARGV[0];
 my $filecontents;
 if( defined $filename) {

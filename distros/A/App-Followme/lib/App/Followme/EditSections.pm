@@ -11,7 +11,7 @@ use base qw(App::Followme::Module);
 use File::Spec::Functions qw(catfile);
 use App::Followme::FIO;
 
-our $VERSION = "1.99";
+our $VERSION = "2.00";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

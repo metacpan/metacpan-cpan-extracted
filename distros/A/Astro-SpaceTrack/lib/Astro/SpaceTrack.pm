@@ -51,21 +51,47 @@ You should consult the above link for the full text of the user
 agreement before using this software to retrieve content from the Space
 Track web site.
 
+=head1 FUNCTIONAL NOTICES
+
 =head2 DEPRECATION NOTICE: IRIDIUM STATUS
 
 As of version 0.137, Iridium status format C<'mccants'> is fully
 deprecated, and will result in an exception.
 
-I should have put the
-C<url_iridium_status_mccants> accessor and mutator through a deprecation
-cycle at the same time, but did not. So the first attempt to access or
-change this attribute will result in a warning. At the first release
-after August 1 2020, all accesses or changes will result in a warning,
-and six months after that they will be fatal.
+As of version 0.143, any access of attribute
+C<url_iridium_status_mccants> is fatal.
 
 Of course, since there are no longer any Iridium Classic satellites in
 service, all the Iridium status machinery is a candidate for deprecation
 and removal. Stay tuned.
+
+=head2 RETIREMENT OF NASA HUMAN SPACE FLIGHT WEB SITE
+
+On February 25 2021 NASA shut down their Human Space Flight web site at
+L<https://spaceflight.nasa.gov/>. This means that the
+C<spaceflight()> method is non-functional. As of February
+28 2021 access redirects to
+L<https://www.nasa.gov/feature/spaceflightnasagov-has-been-retired/>.
+This lists a number of replacement resources, including
+L<https://spotthestation.nasa.gov/> and L<https://www.nasa.gov/station>.
+
+Unfortunately, so far I have found no replacement source for ISS TLEs.
+The redirection page notes the availability of state vectors in both
+text and XML, at
+C<https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.txt>
+and
+C<https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml>
+respectively. I may provide download access to these, but it will be a
+while until a state-vector analog to
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> is written, if it ever
+is.
+
+The functional result of this is that the C<spaceflight()> method
+gives a C<403> error as of February 28 2021. If some reasonable
+replacement becomes known to me, I will use it; otherwise this method
+will be removed. My usual removal schedule calls for the method to warn
+on the first use September 2021, warn on every use March 2022, die
+September 2022, and be removed completely March 2023.
 
 =head1 DESCRIPTION
 
@@ -106,7 +132,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.143';
+our $VERSION = '0.144';
 our @EXPORT_OK = qw{
     shell
 
@@ -257,6 +283,7 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	starlink	=> { name => 'Starlink' },
 	oneweb		=> { name => 'OneWeb' },
 	swarm		=> { name => 'Swarm' },
+	gnss		=> { name => 'GNSS navigational satellites' },
     },
     celestrak_supplemental => {
 	gps		=> { name => 'GPS',		rms => 1 },
@@ -274,6 +301,7 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	    name	=> 'Planet TLEs (no, not Mercury etc)',
 	    rms		=> 1,
 	},
+	# Project Kuiper Internet
     },
     iridium_status => {
 	kelso => {name => 'Celestrak (Kelso)'},
@@ -640,8 +668,6 @@ sub new {
 	space_track_version	=> DEFAULT_SPACE_TRACK_VERSION,
 	url_iridium_status_kelso =>
 	    'http://celestrak.com/SpaceTrack/query/iridium.txt',
-	url_iridium_status_mccants =>
-	    'http://www.prismnet.com/~mmccants/tles/iridium.html',
 	url_iridium_status_sladen =>
 	    'http://www.rod.sladen.org.uk/iridium.htm',
 	username => undef,	# Login username.
@@ -783,14 +809,17 @@ This method returns a list of legal attribute names.
 
 sub attribute_names {
     my ( $self ) = @_;
+    my @keys = grep { ! {
+	    url_iridium_status_mccants	=> 1,
+	}->{$_} } sort keys %mutator;
     ref $self
-	or return wantarray ? sort keys %mutator : [sort keys %mutator];
+	or return wantarray ? @keys : \@keys;
     my $space_track_version = $self->getv( 'space_track_version' );
     my @names = grep {
 	$mutator{$_} == \&_mutate_spacetrack_interface ?
 	exists $self->{_space_track_interface}[$space_track_version]{$_}
 	: 1
-    } sort keys %mutator;
+    } @keys;
     return wantarray ? @names : \@names;
 }
 
@@ -3827,6 +3856,11 @@ sub source {
 
 =item $resp = $st->spaceflight ()
 
+B<Notice:> NASA shut down the source of this information on February 25
+2021. See
+L<RETIREMENT OF NASA HUMAN SPACE FLIGHT WEB SITE|/ RETIREMENT OF NASA HUMAN SPACE FLIGHT WEB SITE>
+above for more information, including deprecation plans for this method.
+
 This method downloads current orbital elements from NASA's human
 spaceflight site, L<https://spaceflight.nasa.gov/>. As of July 21 2011
 you only get the International Space Station.
@@ -3943,6 +3977,7 @@ sub spaceflight {
     my $html = '';
     my $now = time ();
     my %tle;
+    $DB::single = 1;	# Debug
     foreach my $url (@list) {
 	my $resp = $self->_get_agent()->get ($url);
 	__tweak_response( $resp );
@@ -4865,7 +4900,7 @@ sub _check_cookie_generic {
 #	    shuttle	=> 3,
 #	},
 	attribute	=> {
-	    url_iridium_status_mccants	=> 2,
+	    url_iridium_status_mccants	=> 3,
 	},
 	iridium_status	=> {
 	    mccants	=> 3,
@@ -6422,16 +6457,7 @@ The default is 'http://celestrak.com/SpaceTrack/query/iridium.txt'
 
 =item url_iridium_status_mccants (text)
 
-This attribute is B<deprecated>, and will warn on every use. On the
-first release after February 15 2021, any access of this attribute will
-be fatal.
-
-This attribute specifies the location of Mike McCants' Iridium status
-page. You should normally not change this, but it is provided so you
-will not be dead in the water if Mr. McCants needs to change his
-ISP or re-arrange his web site.
-
-The default is 'http://www.prismnet.com/~mmccants/tles/iridium.html'.
+This attribute is B<deprecated>, and any access of it will be fatal.
 
 =item url_iridium_status_sladen (text)
 
@@ -6665,8 +6691,9 @@ systems, Perl versions, and Perl module versions. It is rather likely,
 for example, that the module will die horribly if run with an
 insufficiently-up-to-date version of LWP.
 
-Please file bug reports at
-L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues>, or in
+Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack>,
+L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues/>, or in
 electronic mail to the author.
 
 =head1 MODIFICATIONS OF HISTORICAL INTEREST
@@ -6704,8 +6731,6 @@ and the warning becoming fatal six months after that.
 On the other hand, the C<RCSVALUE> and C<RCS_SIZE> data will continue
 to be returned in such ways and places that the Space Track web site
 itself returns them.
-
-
 
 =head1 ACKNOWLEDGMENTS
 

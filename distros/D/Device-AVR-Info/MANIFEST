@@ -1,4 +1,3 @@
-bin/avr-fuses
 Build.PL
 Changes
 examples/load-device

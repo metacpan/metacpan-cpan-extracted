@@ -2,9 +2,9 @@ NAME
     HTTP::Headers::Patch::DontUseStorable - (DEPRECATED) Do not use Storable
 
 VERSION
-    This document describes version 0.060 of
+    This document describes version 0.061 of
     HTTP::Headers::Patch::DontUseStorable (from Perl distribution
-    HTTP-Headers-Patch-DontUseStorable), released on 2020-02-03.
+    HTTP-Headers-Patch-DontUseStorable), released on 2021-03-08.
 
 SYNOPSIS
      use HTTP::Headers::Patch::DontUseStorable;
@@ -55,7 +55,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2017, 2015, 2012 by
+    This software is copyright (c) 2021, 2020, 2017, 2015, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

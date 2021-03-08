@@ -63,6 +63,7 @@ do { my $x = {
                                    'Test::More' => '0.88',
                                    'Time::Local' => '0',
                                    'Try::Tiny' => '0',
+                                   'URI::URL' => '0',
                                    'lib' => '0',
                                    'overload' => '0',
                                    'perl' => '5.008001'

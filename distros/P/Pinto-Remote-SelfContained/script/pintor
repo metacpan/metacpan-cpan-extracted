@@ -1,0 +1,154 @@
+#! perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use Pinto::Remote::SelfContained::App;
+
+our $VERSION = '0.900';
+
+Pinto::Remote::SelfContained::App->new_from_argv(\@ARGV)->run;
+
+__END__
+
+=head1 NAME
+
+pintor - script for interacting with a remote Pinto server
+
+=head1 SYNOPSIS
+
+    pintor help
+    pintor list --root http://example.com --stack dev
+
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item B<pintor add> I<archive>
+
+Add local archives to the repository
+
+=item B<pintor clean>
+
+Remove orphaned distribution archives
+
+=item B<pintor commands>
+
+List the application's commands.
+
+=item B<pintor copy> I<from-stack to-stack>
+
+Create a new stack by copying another
+
+=item B<pintor default> (B<--none> | I<stack>)
+
+Mark the default stack
+
+=item B<pintor delete> I<target>...
+
+Permanently remove an archive
+
+=item B<pintor diff> [I<left>] I<right>
+
+Show difference between two stacks
+
+=item B<pintor help> [I<command>...]
+
+Display a command's help screen
+
+=item B<pintor install> I<target>...
+
+Install stuff from the repository
+
+=item B<pintor kill> I<stack>
+
+Permanently delete a stack
+
+=item B<pintor list> [I<stack>]
+
+Show the packages in a stack
+
+=item B<pintor lock> [I<stack>]
+
+Mark a stack as read-only
+
+=item B<pintor log> [I<stack>]
+
+Show the revision logs of a stack
+
+=item B<pintor look> I<target>...
+
+Unpack and explore distributions with your shell
+
+=item B<pintor new> I<stack>
+
+Create a new empty stack
+
+=item B<pintor nop>
+
+Do nothing
+
+=item B<pintor pin> I<target>...
+
+Force a package to stay in a stack
+
+=item B<pintor props> [I<stack>]
+
+Show or set stack properties
+
+=item B<pintor pull> [I<target>]...
+
+Pull archives from upstream repositories
+
+=item B<pintor register> I<target>...
+
+Put existing packages on a stack
+
+=item B<pintor rename> I<stack to-stack>
+
+Change the name of a stack
+
+=item B<pintor reset> [I<stack>] I<revision>
+
+Reset a stack to a prior revision
+
+=item B<pintor revert> [I<stack>] I<revision>
+
+Revert stack to a prior revision
+
+=item B<pintor roots> [I<stack>]
+
+Show the roots of a stack
+
+=item B<pintor stacks>
+
+Show available stacks
+
+=item B<pintor statistics> [I<stack>]
+
+Report statistics about the repository
+
+=item B<pintor unlock> [I<stack>]
+
+Mark a stack as writable
+
+=item B<pintor unpin> I<target>...
+
+Free packages that have been pinned
+
+=item B<pintor unregister> I<target>...
+
+Remove packages from a stack
+
+=item B<pintor update> I<target>...
+
+Update packages to latest versions
+
+=item B<pintor verify>
+
+Report archives that are missing
+
+=back
+
+=cut

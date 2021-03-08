@@ -29,5 +29,5 @@ resources:
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/elcamlost/Test2-MojoX
-version: 0.05
+version: 0.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

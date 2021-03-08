@@ -2288,7 +2288,7 @@ user = mailuser
 password = $service_and_cert_password
 dbname = mail
 table = users
-select_field = CONCAT(SUBSTRING_INDEX(email,'@',-1),'/',SUBSTRING_INDEX(email,'@',1),'/')
+select_field = CONCAT(SUBSTRING_INDEX(email,'\@',-1),'/',SUBSTRING_INDEX(email,'\@',1),'/')
 where_field = email
 hosts = 127.0.0.1
 END
@@ -2768,9 +2768,9 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
        'systemctl daemon-reload');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       'systemctl restart dovecot');
+       'service dovecot restart');
    ($stdout,$stderr)=$handle->cmd($sudo.
-       '/usr/local/sbin/dovecot service status -l',
+       'service dovecot status -l',
        '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_roundcube=<<'END';
@@ -3008,7 +3008,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl daemon-reload');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'service redis start','__display__');
+      'service redis restart','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'service redis status -l','__display__');
 
@@ -3042,7 +3042,6 @@ END
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    print $install_unbound;
    sleep 5;
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://nlnetlabs.nl/projects/unbound/about/');
    $stdout=~s/^.*most-recent-version.*?href=["]([^"]+)["].*$/$1/s;
@@ -3074,6 +3073,9 @@ END
       'sed -i \'1,/NotifyAccess=/!d\' '.
       '/etc/systemd/system/unbound.service');
    ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i \'s/=+/=/\' '.
+      '/etc/systemd/system/unbound.service');
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl daemon-reload');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'groupadd -g 5002 unbound');
@@ -3081,7 +3083,10 @@ END
       'useradd -u 5002 -r -g unbound -s /usr/bin/nologin '.
       'unbound');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'sed -i \'s/^nameserver.*/nameserver 127.0.0.1/\' '.
+      'sed -i \'s/^nameserver/#nameserver/\' '.
+      '/etc/resolv.conf');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i \'/nameserver/anameserver 127.0.0.1\' '.
       '/etc/resolv.conf');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'systemctl enable unbound');
@@ -3203,7 +3208,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       './configure','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'make','__display__');
+      'make','3600','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
    #($stdout,$stderr)=$handle->cwd('/opt/source');
@@ -3227,11 +3232,11 @@ END
       '-DCMAKE_INSTALL_RPATH=/usr/local/lib64',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'make','__display__');
+      'make','3600','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'sed -i \'/include/a\/usr\/local\/lib64\' /etc/ld.so.conf');
+      'sed -i \'/include/a\/usr/local/lib64\' /etc/ld.so.conf');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'ldconfig -v','__display__');
    $ad='bind_socket = "127.0.0.1:11333";';

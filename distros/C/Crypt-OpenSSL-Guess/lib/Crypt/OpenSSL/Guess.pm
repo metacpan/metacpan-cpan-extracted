@@ -3,10 +3,11 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
-use File::Spec;
 use Config;
+use English qw( $OSNAME -no_match_vars );
+use File::Spec;
 use Symbol qw(gensym);
 
 use Exporter 'import';
@@ -20,8 +21,20 @@ sub openssl_inc_paths {
     return '' unless -x $exec;
 
     my @inc_paths;
-    for ("$prefix/include", "$prefix/inc32", '/usr/kerberos/include') {
-        push @inc_paths, $_ if -f "$_/openssl/ssl.h";
+
+    my @try_includes = (
+        'include' => sub { 1 },
+        'inc32'   => sub { $OSNAME eq 'MSWin32' },
+    );
+
+    while (
+        !@inc_paths
+            && defined( my $dir = shift @try_includes )
+            && defined( my $cond = shift @try_includes )
+    ) {
+        if ( $cond->() && -f "$prefix/$dir/openssl/ssl.h" ) {
+            @inc_paths = "$prefix/$dir";
+        }
     }
 
     return join ' ', map { "-I$_" } @inc_paths;
@@ -45,11 +58,11 @@ sub openssl_lib_paths {
         my @pairs = ();
         # Library names depend on the compiler
         @pairs = (['eay32','ssl32'],['crypto.dll','ssl.dll'],['crypto','ssl']) if $Config{cc} =~ /gcc/;
-        @pairs = (['libeay32','ssleay32'],['libeay32MD','ssleay32MD'],['libeay32MT','ssleay32MT']) if $Config{cc} =~ /cl/;
+        @pairs = (['libeay32','ssleay32'],['libeay32MD','ssleay32MD'],['libeay32MT','ssleay32MT'],['libcrypto','libssl'],['crypto','ssl']) if $Config{cc} =~ /cl/;
         for my $dir (@lib_paths) {
             for my $p (@pairs) {
                 $found = 1 if ($Config{cc} =~ /gcc/ && -f "$dir/lib$p->[0].a" && -f "$dir/lib$p->[1].a");
-                $found = 1 if ($Config{cc} =~ /cl/ && -f "$dir/$p->[0].lib" && -f "$dir/p->[1].lib");
+                $found = 1 if ($Config{cc} =~ /cl/ && -f "$dir/$p->[0].lib" && -f "$dir/$p->[1].lib");
                 if ($found) {
                     @lib_paths = ($dir);
                     last;
@@ -60,6 +73,9 @@ sub openssl_lib_paths {
     elsif ($^O eq 'VMS') {
         if (-r 'sslroot:[000000]openssl.cnf') {      # openssl.org source install
             @lib_paths = ('SSLLIB');
+        }
+        elsif (-r 'ssl1$root:[000000]openssl.cnf') {  # VSI or HPE SSL1 install
+            @lib_paths = ('SYS$SHARE');
         }
         elsif (-r 'ssl$root:[000000]openssl.cnf') {  # HP install
             @lib_paths = ('SYS$SHARE');
@@ -94,6 +110,12 @@ sub find_openssl_prefix {
         return $ENV{OPENSSL_PREFIX};
     }
 
+    # Homebrew (macOS) or LinuxBrew
+    if ($^O ne 'MSWin32' and my $prefix = `brew --prefix openssl 2>@{[File::Spec->devnull]}`) {
+        chomp $prefix;
+        return $prefix;
+    }
+
     my @guesses = (
         '/home/linuxbrew/.linuxbrew/opt/openssl/bin/openssl' => '/home/linuxbrew/.linuxbrew/opt/openssl', # LinuxBrew openssl
         '/usr/local/opt/openssl/bin/openssl' => '/usr/local/opt/openssl', # OSX homebrew openssl
@@ -112,6 +134,7 @@ sub find_openssl_prefix {
         $Config{prefix} . '\bin\openssl.exe'      => $Config{prefix},           # strawberry perl
         $Config{prefix} . '\..\c\bin\openssl.exe' => $Config{prefix} . '\..\c', # strawberry perl
         '/sslexe/openssl.exe'            => '/sslroot',  # VMS, openssl.org
+        '/ssl1$exe/openssl.exe'          => '/ssl1$root',# VMS, VSI or HPE install
         '/ssl$exe/openssl.exe'           => '/ssl$root', # VMS, HP install
     );
 
@@ -159,7 +182,12 @@ sub openssl_version {
         close $pipe;
 
         if ( ($major, $minor, $letter) = $output =~ /^OpenSSL\s+(\d+\.\d+)\.(\d+)([a-z]?)/ ) {
-        } elsif ( ($major, $minor) = $output =~ /^LibreSSL\s+(\d+\.\d+)\.(\d+)/ ) {
+        } elsif ( ($major, $minor) = $output =~ /^LibreSSL\s+(\d+\.\d+)(?:\.(\d+))?/ ) {
+            # LibreSSL 2.0.x releases only identify themselves as "LibreSSL 2.0",
+            # with no patch release number
+            if ( !defined $minor ) {
+                $minor = "x";
+            }
         } else {
             die <<EOM
 *** OpenSSL version test failed

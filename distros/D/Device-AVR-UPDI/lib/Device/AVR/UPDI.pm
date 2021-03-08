@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Device::AVR::UPDI 0.06;
+package Device::AVR::UPDI 0.07;
 
 use v5.20;
 use warnings;
@@ -20,7 +20,7 @@ my $SHAREDIR = module_dir( __PACKAGE__ );
 
 use Struct::Dumb qw( readonly_struct );
 
-use constant DEBUG => $ENV{UPDI_DEBUG};
+use constant DEBUG => $ENV{UPDI_DEBUG} // 0;
 
 readonly_struct PartInfo => [qw(
    name
@@ -67,9 +67,10 @@ C<Device::AVR::UPDI> - interact with an F<AVR> microcontroller over F<UPDI>
 
 =head1 DESCRIPTION
 
-This module provides a class for interacting with an F<AVR> microcontroller in
-one of the newer F<ATmega> 0-series, or F<ATtiny> 0-series or 1-series types,
-which uses the F<UPDI> programming and debug interface.
+This module provides a class for interacting with an F<AVR> microcontroller
+over the F<UPDI> programming and debug interface. This is used by chips in the
+newer F<ATmega> 0-series, or F<ATtiny> 0-series or 1-series, or F<AVR DA> or
+F<AVR DB> families.
 
 =head2 Hardware Interface
 
@@ -119,6 +120,7 @@ Any of the following forms are accepted
 
    part => "ATtiny814"  | "attiny814"  | "t814"
    part => "ATmega4809" | "atmega4809" | "m4809"
+   part => "AVR64DA48"  | "avr64da48"
 
 =item baud => INT
 
@@ -310,6 +312,7 @@ async sub _op_writeread
 
    my $fh = $self->{fh};
 
+   printf STDERR "WR: => %v02X\n", $write if DEBUG > 1;
    await Future::IO->syswrite_exactly( $fh, $write );
 
    my $buf = "";
@@ -326,8 +329,13 @@ async sub _op_writeread
             ->then_fail( "Timed out waiting for $what\n" )
       );
 
+      my $got = substr( $buf,   0, length $write );
+      my $exp = substr( $write, 0, length $write );
+
+      printf STDERR "RD: <= %v02X\n", $buf if DEBUG > 1;
+
       die "Received different bytes while waiting to receive echo of command - is this a UPDI programmer?\n"
-         if substr( $buf, 0, length( $write ) ) ne substr( $write, 0, length $buf );
+         if $got ne $exp;
    }
 
    return substr( $buf, length( $write ) );
@@ -370,10 +378,20 @@ async sub ld
       $self->_op_writeread( SYNC . pack( "C S<", OP_ST|OP_PTRREG|OP_DATA16, $addr ), 1 );
    $ack eq "\x40" or croak "Expected ACK to ST PTR";
 
-   await
-      $self->_op_writeread( SYNC . pack( "C C", OP_REPEAT, $len - 1 ), 0 ) if $len > 1;
-   my $ret = await
-      $self->_op_writeread( SYNC . pack( "C", OP_LD|OP_PTRINC|OP_DATA8 ), $len );
+   my $ret = "";
+
+   while( $len ) {
+      my $chunklen = $len;
+      # REPEAT can only do at most 255 repeats
+      $chunklen = 256 if $chunklen > 256;
+
+      await
+         $self->_op_writeread( SYNC . pack( "C C", OP_REPEAT, $chunklen - 1 ), 0 ) if $chunklen > 1;
+      $ret .= await
+         $self->_op_writeread( SYNC . pack( "C", OP_LD|OP_PTRINC|OP_DATA8 ), $chunklen );
+
+      $len -= $chunklen;
+   }
 
    printf STDERR ">> LD[%04X] -> %v02X\n", $addr, $ret if DEBUG;
    return $ret;
@@ -500,6 +518,10 @@ async sub init_link
    # We have to disable collision detection or else the chip won't respond
    # properly
    await $self->stcs( REG_CTRLB, CTRLB_CCDETDIS );
+
+   # Read the SIB so we can determine what kind of NVM controller is required
+   my $sib = await $self->read_sib;
+   $self->{nvm_version} = $sib->{nvm_version};
 }
 
 =head2 read_updirev
@@ -682,84 +704,90 @@ async sub enable_nvmprog
    die "Timed out waiting for NVMPROG key to be accepted\n" if !$timeout;
 }
 
-use constant {
-   NVMCTRL_CTRLA  => 0,
-      NVMCTRL_CMD_WP   => 1,
-      NVMCTRL_CMD_ER   => 2,
-      NVMCTRL_CMD_ERWP => 3,
-      NVMCTRL_CMD_PBC  => 4,
-      NVMCTRL_CMD_CHER => 5,
-      NVMCTRL_CMD_EEER => 6,
-      NVMCTRL_CMD_WFU  => 7,
-   NVMCTRL_CTRLB  => 1,
-   NVMCTRL_STATUS => 2,
-      NVMCTRL_STATUS_FBUSY => (1<<0),
-   NVMCTRL_DATA   => 6,
-   NVMCTRL_ADDR   => 8,
-};
-
-async sub nvmctrl_command
-{
-   my $self = shift;
-   my ( $cmd ) = @_;
-
-   await $self->sts8( $self->{partinfo}->baseaddr_nvmctrl + NVMCTRL_CTRLA, $cmd );
-}
-
-async sub await_nvm_not_busy
+sub nvmctrl
 {
    my $self = shift;
 
-   my $timeout = 50;
-   while( --$timeout ) {
-      last if not( NVMCTRL_STATUS_FBUSY & await $self->lds8(
-         $self->{partinfo}->baseaddr_nvmctrl + NVMCTRL_STATUS, 1 ) );
+   return $self->{nvmctrl} if defined $self->{nvmctrl};
 
-      await Future::IO->sleep( 0.01 );
-   }
+   defined( my $nvm_version = $self->{nvm_version} ) or
+      croak "Must ->init_link before calling ->nvmctrl";
+
+   # ATtiny and ATmega chips claim "P:0"
+   return $self->{nvmctrl} = Device::AVR::UPDI::_NVMCtrlv0->new( $self )
+      if $nvm_version eq "P:0";
+
+   # AVR Dx chips claim "P:2"
+   return $self->{nvmctrl} = Device::AVR::UPDI::_NVMCtrlv2->new( $self )
+      if $nvm_version eq "P:2";
+
+   croak "Unrecognised NVM version string $nvm_version";
 }
 
-=head2 write_nvm_page
+=head2 read_flash_page
 
-   $updi->write_nvm_page( $addr, $data, $wordsize )->get
+   $data = $updi->read_flash_page( $addr, $len )->get
 
-Writes a single page into NVM controller in 8- or 16-bit word transfers.
-C<$addr> is within the data address space. C<$wordsize> must be either 8 or
-16.
-
-=head2 erasewrite_nvm_page
-
-Identical to L</write_nvm_page> but issues a combined erase-and-write command.
-This is the method to use for EEPROM writes.
+Reads a single flash page and returns the data. C<$addr> is within the flash
+address space.
 
 =cut
 
-async sub write_nvm_page
+async sub read_flash_page
 {
    my $self = shift;
-   my ( $addr, $data, $wordsize, $cmd ) = @_;
+   my ( $addr, $len ) = @_;
 
-   # clear page buffer
-   await $self->nvmctrl_command( NVMCTRL_CMD_PBC );
-   await $self->await_nvm_not_busy;
-
-   if( $wordsize == 8 ) {
-      await $self->st8( $addr, $data );
-   }
-   elsif( $wordsize == 16 ) {
-      await $self->st16( $addr, $data );
-   }
-   else {
-      croak "Invalid word size";
-   }
-
-   await $self->nvmctrl_command( $cmd // NVMCTRL_CMD_WP );
-   await $self->await_nvm_not_busy;
+   return await $self->nvmctrl->read_flash_page( $addr, $len );
 }
 
-sub erasewrite_nvm_page
+=head2 write_flash_page
+
+   $updi->write_flash_page( $addr, $data )->get
+
+Writes a single flash page into the NVM controller in 16-bit word transfers.
+C<$addr> is within the flash address space.
+
+=cut
+
+async sub write_flash_page
 {
-   shift->write_nvm_page(@_[0..2], NVMCTRL_CMD_ERWP);
+   my $self = shift;
+   my ( $addr, $data ) = @_;
+
+   await $self->nvmctrl->write_flash_page( $addr, $data );
+}
+
+=head2 read_eeprom_page
+
+   $data = $updi->read_eeprom_page( $addr, $len )->get
+
+Reads a single EEPROM page and returns the data. C<$addr> is within the EEPROM
+address space.
+
+=cut
+
+async sub read_eeprom_page
+{
+   my $self = shift;
+   my ( $addr, $len ) = @_;
+
+   return await $self->nvmctrl->read_eeprom_page( $addr, $len );
+}
+
+=head2 write_eeprom_page
+
+Similar to L</write_flash_page> but issues a combined erase-and-write
+command and C<$addr> is within the EEPROM address space.
+
+=cut
+
+async sub write_eeprom_page
+{
+   my $self = shift;
+   my ( $addr, $data ) = @_;
+
+   await $self->nvmctrl->write_eeprom_page( $addr, $data );
 }
 
 =head2 write_fuse
@@ -776,19 +804,7 @@ async sub write_fuse
    my $self = shift;
    my ( $idx, $value ) = @_;
 
-   my $addr = $self->{partinfo}->baseaddr_fuse + $idx;
-
-   my $baseaddr_nvmctrl = $self->{partinfo}->baseaddr_nvmctrl;
-
-   # Oddly, this works but an attempt at STS16 does not. Unsure why
-   await $self->sts8 ( $baseaddr_nvmctrl + NVMCTRL_ADDR  , $addr & 0xFF );
-   await $self->sts8 ( $baseaddr_nvmctrl + NVMCTRL_ADDR+1, $addr >> 8 );
-
-   await $self->sts8 ( $baseaddr_nvmctrl + NVMCTRL_DATA, $value );
-
-   await $self->nvmctrl_command( NVMCTRL_CMD_WFU );
-
-   await $self->await_nvm_not_busy;
+   await $self->nvmctrl->write_fuse( $idx, $value );
 }
 
 =head2 read_fuse
@@ -808,6 +824,244 @@ async sub read_fuse
    my $addr = $self->{partinfo}->baseaddr_fuse + $idx;
 
    return await $self->lds8( $addr );
+}
+
+package # hide from indexer
+   Device::AVR::UPDI::_NVMCtrlv0 {
+
+   use Carp;
+
+   use constant {
+      NVMCTRL_CTRLA  => 0,
+         NVMCTRL_CMD_WP   => 1,
+         NVMCTRL_CMD_ER   => 2,
+         NVMCTRL_CMD_ERWP => 3,
+         NVMCTRL_CMD_PBC  => 4,
+         NVMCTRL_CMD_CHER => 5,
+         NVMCTRL_CMD_EEER => 6,
+         NVMCTRL_CMD_WFU  => 7,
+      NVMCTRL_CTRLB  => 1,
+      NVMCTRL_STATUS => 2,
+         NVMCTRL_STATUS_FBUSY => (1<<0),
+      NVMCTRL_DATA   => 6,
+      NVMCTRL_ADDR   => 8,
+   };
+
+   sub new
+   {
+      my $class = shift;
+      my ( $updi ) = @_;
+
+      return bless [ $updi, $updi->{partinfo} ], $class;
+   }
+
+   sub updi
+   {
+      my $self = shift;
+      return $self->[0];
+   }
+
+   sub partinfo
+   {
+      my $self = shift;
+      return $self->[1];
+   }
+
+   async sub nvmctrl_command
+   {
+      my $self = shift;
+      my ( $cmd ) = @_;
+
+      my $updi = $self->updi;
+
+      await $updi->sts8( $self->partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLA, $cmd );
+   }
+
+   async sub await_nvm_not_busy
+   {
+      my $self = shift;
+
+      my $updi = $self->updi;
+
+      my $timeout = 50;
+      while( --$timeout ) {
+         last if not( NVMCTRL_STATUS_FBUSY & await $updi->lds8(
+            $self->partinfo->baseaddr_nvmctrl + NVMCTRL_STATUS, 1 ) );
+
+         await Future::IO->sleep( 0.01 );
+      }
+   }
+
+   async sub read_flash_page
+   {
+      my $self = shift;
+      my ( $addr, $len ) = @_;
+      return await $self->updi->ld( $self->partinfo->baseaddr_flash + $addr, $len );
+   }
+
+   async sub read_eeprom_page
+   {
+      my $self = shift;
+      my ( $addr, $len ) = @_;
+      return await $self->updi->ld( $self->partinfo->baseaddr_eeprom + $addr, $len );
+   }
+
+   async sub _write_page
+   {
+      my $self = shift;
+      my ( $addr, $data, $wordsize, $cmd ) = @_;
+
+      my $updi = $self->updi;
+
+      # clear page buffer
+      await $self->nvmctrl_command( NVMCTRL_CMD_PBC );
+      await $self->await_nvm_not_busy;
+
+      if( $wordsize == 8 ) {
+         await $updi->st8( $addr, $data );
+      }
+      elsif( $wordsize == 16 ) {
+         await $updi->st16( $addr, $data );
+      }
+      else {
+         croak "Invalid word size";
+      }
+
+      await $self->nvmctrl_command( $cmd );
+      await $self->await_nvm_not_busy;
+   }
+
+   async sub write_flash_page
+   {
+      my $self = shift;
+      my ( $addr, $data ) = @_;
+      await $self->_write_page( $self->partinfo->baseaddr_flash + $addr, $data, 16, NVMCTRL_CMD_WP );
+   }
+
+   async sub write_eeprom_page
+   {
+      my $self = shift;
+      my ( $addr, $data ) = @_;
+      await $self->_write_page( $self->partinfo->baseaddr_eeprom + $addr, $data, 8, NVMCTRL_CMD_ERWP );
+   }
+
+   async sub write_fuse
+   {
+      my $self = shift;
+      my ( $idx, $value ) = @_;
+
+      my $updi = $self->updi;
+
+      my $addr = $self->partinfo->baseaddr_fuse + $idx;
+
+      my $baseaddr = $self->partinfo->baseaddr_nvmctrl;
+
+      # Oddly, this works but an attempt at STS16 does not. Unsure why
+      await $updi->sts8 ( $baseaddr + NVMCTRL_ADDR  , $addr & 0xFF );
+      await $updi->sts8 ( $baseaddr + NVMCTRL_ADDR+1, $addr >> 8 );
+
+      await $updi->sts8 ( $baseaddr + NVMCTRL_DATA, $value );
+
+      await $self->nvmctrl_command( NVMCTRL_CMD_WFU );
+
+      await $self->await_nvm_not_busy;
+   }
+}
+
+package # hide from indexer
+   Device::AVR::UPDI::_NVMCtrlv2 {
+
+   use base 'Device::AVR::UPDI::_NVMCtrlv0';
+
+   use Carp;
+
+   use constant {
+      # Command values
+         NVMCTRL_CMD_NOCMD  => 0x00,
+         NVMCTRL_CMD_FLWR   => 0x02,
+         NVMCTRL_CMD_EEERWR => 0x13,
+
+      NVMCTRL_CTRLB => 1,
+
+      NVMCTRL_DATA   => 6,
+      NVMCTRL_ADDR   => 8,
+   };
+
+   async sub _set_flmap
+   {
+      my $self = shift;
+      my ( $bank ) = @_;
+
+      await $self->updi->sts8( $self->partinfo->baseaddr_nvmctrl + NVMCTRL_CTRLB, $bank << 4 );
+   }
+
+   async sub read_flash_page
+   {
+      my $self = shift;
+      my ( $addr, $len ) = @_;
+
+      await $self->_set_flmap( $addr >> 15 );
+      $addr &= 0x7FFF;
+
+      return await $self->updi->ld( $self->partinfo->baseaddr_flash + $addr, $len );
+   }
+
+   async sub _write_page
+   {
+      my $self = shift;
+      my ( $addr, $data, $wordsize, $cmd ) = @_;
+
+      my $updi = $self->updi;
+
+      # set page write mode
+      await $self->nvmctrl_command( $cmd );
+
+      if( $wordsize == 8 ) {
+         await $updi->st8( $addr, $data );
+      }
+      elsif( $wordsize == 16 ) {
+         await $updi->st16( $addr, $data );
+      }
+      else {
+         croak "Invalid word size";
+      }
+
+      await $self->await_nvm_not_busy;
+
+      # clear command
+      await $self->nvmctrl_command( NVMCTRL_CMD_NOCMD );
+      await $self->await_nvm_not_busy;
+   }
+
+   async sub write_flash_page
+   {
+      my $self = shift;
+      my ( $addr, $data ) = @_;
+
+      await $self->_set_flmap( $addr >> 15 );
+      $addr &= 0x7FFF;
+
+      await $self->_write_page( $self->partinfo->baseaddr_flash + $addr, $data, 16, NVMCTRL_CMD_FLWR );
+   }
+
+   async sub write_eeprom_page
+   {
+      my $self = shift;
+      my ( $addr, $data ) = @_;
+
+      await $self->_write_page( $self->partinfo->baseaddr_eeprom + $addr, $data, 8, NVMCTRL_CMD_EEERWR );
+   }
+
+   async sub write_fuse
+   {
+      my $self = shift;
+      my ( $idx, $value ) = @_;
+
+      # Fuses are written by pretending it's EEPROM
+      my $data = pack "C", $value;
+
+      await $self->_write_page( $self->partinfo->baseaddr_fuse + $idx, $data, 8, NVMCTRL_CMD_EEERWR );
+   }
 }
 
 =head1 SEE ALSO
@@ -881,3 +1135,25 @@ ATtiny817|1e9320|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG
 ATtiny824|1e9329|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny826|1e9328|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
 ATtiny827|1e9327|0x1000|0x1280|0x1100|0x8000|64|8192|0x1400|32|128|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,APPEND,BOOTEND
+AVR128DA28|1e970a|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DA32|1e9709|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DA48|1e9708|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DA64|1e9707|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DB28|1e970e|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DB32|1e970d|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DB48|1e970c|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR128DB64|1e970b|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR32DA28|1e9534|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR32DA32|1e9533|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR32DA48|1e9532|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR32DB28|1e9537|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR32DB32|1e9536|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR32DB48|1e9535|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR64DA28|1e9615|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR64DA32|1e9614|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR64DA48|1e9613|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR64DA64|1e9612|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR64DB28|1e9619|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR64DB32|1e9618|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR64DB48|1e9617|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE
+AVR64DB64|1e9616|0x1000|0x1050|0x1100|0x8000|512|32768|0x1400|1|512|WDTCFG,BODCFG,OSCCFG,,,SYSCFG0,SYSCFG1,CODESIZE,BOOTSIZE

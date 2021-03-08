@@ -1,3 +1,9 @@
+0.15 2021-03-08
+  - Catch up with the latest Mojolicious changes. 
+    Mojolicious 8.67  2020-12-04
+    Deprecated Mojolicious::Routes::Route::route in favor of Mojolicious::Routes::Route::any.
+    
+    Mojolicious::AutoRoute itself don't break any backword compatible.
 0.14
   - fix test bag when DBIx::Custom is upgraded to 0.40
 0.13

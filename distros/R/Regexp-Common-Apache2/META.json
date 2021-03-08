@@ -59,6 +59,6 @@
          "web" : "https://git.deguest.jp/jack/Regexp-Common-Apache2"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

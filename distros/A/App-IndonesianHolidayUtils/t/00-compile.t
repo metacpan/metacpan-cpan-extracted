@@ -14,9 +14,9 @@ my @module_files = (
 );
 
 my @scripts = (
-    'script/is-id-holiday',
-    'script/list-id-holidays',
-    'script/list-id-workdays'
+    'script/is-idn-holiday',
+    'script/list-idn-holidays',
+    'script/list-idn-workdays'
 );
 
 # no fake home requested

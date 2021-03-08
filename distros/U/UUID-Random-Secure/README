@@ -3,8 +3,8 @@ NAME
     for random numbers
 
 VERSION
-    This document describes version 0.001 of UUID::Random::Secure (from Perl
-    distribution UUID-Random-Secure), released on 2021-01-17.
+    This document describes version 0.002 of UUID::Random::Secure (from Perl
+    distribution UUID-Random-Secure), released on 2021-01-18.
 
 SYNOPSIS
     Use like you would UUID::Random:
@@ -13,6 +13,10 @@ SYNOPSIS
      say UUID::Random::Secure::generate();
 
 DESCRIPTION
+    Note that this module currently does not produce RFC 4122-compliant v4
+    (random) UUIDs (no encoding of variant and version information into the
+    UUID).
+
 FUNCTIONS
   generate
 HOMEPAGE
@@ -34,6 +38,8 @@ SEE ALSO
     UUID::Random
 
     Math::Random::Secure
+
+    Crypt::Misc
 
 AUTHOR
     perlancar <perlancar@cpan.org>

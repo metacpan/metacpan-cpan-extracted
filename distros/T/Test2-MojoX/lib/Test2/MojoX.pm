@@ -1,7 +1,7 @@
 package Test2::MojoX;
 use Mojo::Base -base;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 ## "Amy: He knows when you are sleeping.
 ##  Professor: He knows when you're on the can.
@@ -1376,6 +1376,14 @@ perl testing tools and for advices on the code.
 
 José Joaquín Atria C<jjatria@cpan.org> for the idea to put L<Test2::Suite>
 and L<Test::Mojo> together.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2019-2021, Ilya Rassadin E<lt>elcamlost@cpan.orgE<gt>.
+
+This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
+2.0.
+
 
 =head1 AUTHORS
 

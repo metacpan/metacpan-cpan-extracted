@@ -1,5 +1,9 @@
 Change history for HTML-Parser
 
+3.76      2021-03-04
+  * Add a fix for a stack confusion error on `eof`. (GH#21) (Matthew Horsfall
+    and Chase Whitener)
+
 3.75      2020-08-30
   * Cleanup the prereqs a bit
   * Mark HTML::Filter as deprecated as the docs point out

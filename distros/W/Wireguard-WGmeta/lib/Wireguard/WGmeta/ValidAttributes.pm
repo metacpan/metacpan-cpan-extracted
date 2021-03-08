@@ -315,7 +315,7 @@ C<$attr_name> An attribute key as defined in one L</ATTRIBUTE SETS>.
 
 =item
 
-C<[$allow_unknown = FALSE]> If set to true, unknown attributes result in the type L<>.
+C<[$allow_unknown = FALSE]> If set to true, unknown attributes result in the type L</ATTR_TYPE_IS_UNKNOWN>.
 
 =back
 

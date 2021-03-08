@@ -9,6 +9,8 @@ use warnings;
 use Test::More;
 
 use FindBin;
+BEGIN { my $f = $FindBin::Bin . '/nppPath.inc'; require $f if -f $f; }
+
 use lib $FindBin::Bin;
 use myTestHelpers qw/:all/;
 

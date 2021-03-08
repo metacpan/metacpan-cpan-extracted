@@ -1,4 +1,4 @@
-# auto-converted from src/Scintilla.h at Sat Apr  4 13:09:33 2020
+# auto-converted from src/Scintilla.h at Thu Dec 31 15:14:01 2020
 package Win32::Mechanize::NotepadPlusPlus::Editor::Messages;
 
 use warnings;
@@ -43,6 +43,7 @@ our %scimsg_dummyhash = (
     'INDIC_DIAGONAL'                                             => 3,
     'INDIC_DOTBOX'                                               => 12,
     'INDIC_DOTS'                                                 => 10,
+    'INDIC_EXPLORERLINK'                                         => 22,
     'INDIC_FULLBOX'                                              => 16,
     'INDIC_GRADIENT'                                             => 20,
     'INDIC_GRADIENTCENTRE'                                       => 21,
@@ -1068,7 +1069,7 @@ our %scimsg_dummyhash = (
     'SC_PRINT_INVERTLIGHT'                                       => 1,
     'SC_PRINT_NORMAL'                                            => 0,
     'SC_PRINT_SCREENCOLOURS'                                     => 5,
-    'SC_SEARCHRESULT_LINEBUFFERMAXLENGTH'                        => 1024,
+    'SC_SEARCHRESULT_LINEBUFFERMAXLENGTH'                        => 2048,
     'SC_SEL_LINES'                                               => 2,
     'SC_SEL_RECTANGLE'                                           => 1,
     'SC_SEL_STREAM'                                              => 0,

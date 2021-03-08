@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '1.000042';
+our $VERSION = '1.000043';
 
 use App::Yath::Options;
 
@@ -178,6 +178,8 @@ sub ipc {
 sub handle_sig {
     my $self = shift;
     my ($sig) = @_;
+
+    eval { $_->signal($sig) } for grep { $_->can('signal') } @{$self->renderers};
 
     print STDERR "\nCaught SIG$sig, forwarding signal to child processes...\n";
     $self->ipc->killall($sig);
@@ -2069,7 +2071,7 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2021 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

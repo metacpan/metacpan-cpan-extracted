@@ -1,5 +1,9 @@
 Revision history for Crypt-Argon2
 
+0.009     2021-03-07 23:01:38+01:00 Europe/Amsterdam
+          - Added argon2d_pass and argon2d_verify
+          - Allow more strictly hashed values in argon2_needs_rehash
+
 0.008     2021-02-19 20:13:53+01:00 Europe/Amsterdam
           - Add a argon2_needs_rehash function
           - Enforce byte semantics for passwords and salts

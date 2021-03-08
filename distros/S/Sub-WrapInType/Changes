@@ -1,5 +1,9 @@
 Revision history for Perl extension Sub-WrapInType
 
+0.05 2021-03-07T20:03:29Z
+    - Support skip_invocant option and add wrap_method function (kfly8++)
+    - Support check option and type checking can be controlled through the PERL_NDEBUG or NDEBUG environment variables.
+
 0.04 2020-12-12T14:15:19Z
     - Fix the version of Type::Tiny
 

@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Telugu::Keyword',
     VERSION_FROM      => 'lib/Telugu/Keyword.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {'Mouse' => '2.5.6', 'Keyword::Declare' => '0.001013'}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {'Mouse' => '0', 'Keyword::Declare' => '0'}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Telugu/Keyword.pm', # retrieve abstract from module
     AUTHOR            => '',
     EXE_FILES         => ['script/shoba'],

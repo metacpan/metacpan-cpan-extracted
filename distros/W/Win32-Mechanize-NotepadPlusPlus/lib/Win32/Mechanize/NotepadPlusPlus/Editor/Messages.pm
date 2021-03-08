@@ -1562,6 +1562,7 @@ Used by L<indicSetStyle|Win32::Mechanize::NotepadPlusPlus::Editor/indicSetStyle>
     INDIC_TEXTFORE          | 17 | Change text foreground.
     INDIC_POINT             | 18 | A triangle below the start of the indicator.
     INDIC_POINTCHARACTER    | 19 | A triangle below the center of the first character.
+    INDIC_EXPLORERLINK      | 22 | Indicator used for hyperlinks [npp7.9]
     ------------------------+----+--------------------------------------
     INDICATOR_CONTAINER     | 8  | Containers use indexes 8-31 [npp7.8]
     INDICATOR_IME           | 32 | IME use indexes 32 - IME_MAX [npp7.8]
@@ -1572,6 +1573,7 @@ Note that the INDICATOR_* values are used as style indexes, not style values.  (
 Documentation also gives older INDIC_ values for those, but claims that the INDICATOR_ name is
 preferred, so that is all that is implemented here.)
 
+[npp#.#] Value added in particular version of Notepad++; not available in earlier versions.
 [npp7.8] Noted values require at least Scintilla v4.2.0, found in Notepad++ v7.8 and newer.
 
 =cut
@@ -1584,6 +1586,7 @@ our %SC_INDICSTYLE = (
     'INDIC_DIAGONAL'                                             => 3,
     'INDIC_DOTBOX'                                               => 12,
     'INDIC_DOTS'                                                 => 10,
+    'INDIC_EXPLORERLINK'                                         => 22, # v7.9.0
     'INDIC_FULLBOX'                                              => 16,
     'INDIC_GRADIENT'                                             => 20,
     'INDIC_GRADIENTCENTRE'                                       => 21,
@@ -2050,7 +2053,7 @@ our %SC_PRINTCOLOURMODE = (
 );
 
 
-#    'SC_SEARCHRESULT_LINEBUFFERMAXLENGTH'                        => 1024, # no longer documented
+#    'SC_SEARCHRESULT_LINEBUFFERMAXLENGTH'                        => 2048, # no longer documented # changed from 1024 in v7.9 to 2048 in v7.9.1
 
 =item %SC_SEL
 

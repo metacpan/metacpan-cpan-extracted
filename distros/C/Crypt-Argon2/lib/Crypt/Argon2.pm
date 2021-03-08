@@ -1,5 +1,5 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.008';
+$Crypt::Argon2::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -29,7 +29,7 @@ sub argon2_needs_rehash {
 	while ($argstring =~ m/(\w)=(\d+)/gc) {
 		$args{$1} = $2;
 	}
-	return 1 if $args{t} != $t_cost or $args{m} != $m_cost or $args{p} != $parallelism;
+	return 1 if $args{t} < $t_cost or $args{m} < $m_cost or $args{p} < $parallelism;
 	return 1 if length decode_base64($salt) != $salt_length or length decode_base64($hash) != $output_length;
 	return 0;
 }
@@ -50,7 +50,7 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -127,13 +127,21 @@ This verifies that the C<$password> matches C<$encoded>. All parameters and the 
 
 This function processes the C<$password> with the given C<$salt> and parameters much like C<argon2i_pass>, but returns the binary tag instead of a formatted string.
 
+=head2 argon2d_pass($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
+
+This function processes the C<$password> with the given C<$salt> and parameters much like argon2id_pass, but uses the argon2d variant instead.
+
+=head2 argon2d_verify($encoded, $password
+
+This verifies that the C<$password> matches C<$encoded>. All parameters and the tag value are extracted from C<$encoded>, so no further arguments are necessary.
+
 =head2 argon2d_raw($password, $salt, $t_cost, $m_factor, $parallelism, $tag_size)
 
 This function processes the C<$password> with the given C<$salt> and parameters much like C<argon2i_pass>, but returns a binary tag for argon2d instead of a formatted string for argon2i.
 
 =head2 argon2_needs_rehash($encoded, $type, $t_cost, $m_cost, $parallelism, $salt_length, $output_length)
 
-This function checks if a password-encoded string needs a rehash. It will return true if the C<$type> (valid values are C<argon2i>, C<argon2id> or C<argon2d>), C<$t_cost>, C<$m_cost>, C<$parallelism>, C<$salt_length> or C<$argon2d> arguments don't match the password-encoded hash
+This function checks if a password-encoded string needs a rehash. It will return true if the C<$type> (valid values are C<argon2i>, C<argon2id> or C<argon2d>) mismatches or any of the C<$t_cost>, C<$m_cost>, C<$parallelism>, C<$salt_length> or C<$output_length> arguments are higher than in the password-encoded hash.
 
 =head1 RECOMMENDED SETTINGS
 

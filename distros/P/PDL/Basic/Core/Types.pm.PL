@@ -59,6 +59,9 @@ my @types = (
 	      usenan => 0,           # do we need NaN handling for this type?
 	      packtype => 'C*',      # the perl pack type
 	      defaultbadval => 'UCHAR_MAX',
+	      real=>1,
+	      integer=>1,
+	      unsigned=>1,
 	     },
 	     {
 	      identifier => 'S',
@@ -68,6 +71,9 @@ my @types = (
 	      usenan => 0,
 	      packtype => 's*',
 	      defaultbadval => 'SHRT_MIN',
+	      real=>1,
+	      integer=>1,
+	      unsigned=>0,
 	     },
 	     {
 	      identifier => 'US',
@@ -78,6 +84,9 @@ my @types = (
 	      usenan => 0,
 	      packtype => 'S*',
 	      defaultbadval => 'USHRT_MAX',
+	      real=>1,
+	      integer=>1,
+	      unsigned=>1,
 	     },
 	     {
 	      identifier => 'L',
@@ -87,6 +96,9 @@ my @types = (
 	      usenan => 0,
 	      packtype => 'l*',
 	      defaultbadval => 'INT_MIN',
+	      real=>1,
+	      integer=>1,
+	      unsigned=>0,
 	     },
 
 #
@@ -103,6 +115,9 @@ my @types = (
         usenan => 0,
         packtype => &packtypeof_PDL_Indx,
         defaultbadval => 'LONG_MIN',
+        real=>1,
+        integer=>1,
+        unsigned=>0,
        },
 #
 #
@@ -123,6 +138,9 @@ my @types = (
 	                             # on the other hand 2^63 should be the
                                      # value of of llong_max which we should be
                                      # able to compute at runtime ?!
+	real=>1,
+	integer=>1,
+	unsigned=>0,
       },
 
 # IMPORTANT:
@@ -138,6 +156,9 @@ my @types = (
 		  usenan => 1,
 		  packtype => 'f*',
 	          defaultbadval => '-FLT_MAX',
+	          real=>1,
+	          integer=>0,
+	          unsigned=>0,
 	      },
 	      {
 		  identifier => 'D',
@@ -147,6 +168,38 @@ my @types = (
 		  usenan => 1,
 		  packtype => 'd*',
 	          defaultbadval => '-DBL_MAX',
+	          real=>1,
+	          integer=>0,
+	          unsigned=>0,
+	      },
+	      {
+		  identifier => 'CF',
+		  onecharident => 'G',   # only needed if different from identifier
+		  pdlctype => 'PDL_CFloat',
+		  realctype => 'complex float',
+		  convertfunc => 'cfloat',
+		  ppforcetype => 'cfloat',
+		  usenan => 0,
+		  packtype => '(ff)*',
+	          defaultbadval => '(complex float)( -FLT_MAX/2)',
+	          real=>0,
+	          integer=>0,
+	          unsigned=>0,
+	      },
+	      {
+		  identifier => 'CD',
+		  onecharident => 'C',   # only needed if different from identifier
+		  pdlctype => 'PDL_CDouble',
+		  realctype => 'complex double',
+		  convertfunc => 'cdouble',
+		  ppforcetype => 'cdouble',
+		  usenan => 0,
+		  packtype => '(dd)*',
+	          defaultbadval => '(complex double)( -DBL_MAX/2)',
+	          #defaultbadval => '-DBL_MAX',
+	          real=>0,
+	          integer=>0,
+	          unsigned=>0,
 	      },
 	      );
 
@@ -677,7 +730,9 @@ sub PDL::Types::types { # return all known types as type objects
 !NO!SUBS!
 
 foreach my $name ( qw( ctype ppsym realctype ppforcetype convertfunc
-		       sym numval usenan ioname defbval) ) {
+		       sym numval usenan ioname defbval
+		       real integer unsigned
+                       ) ) {
   print OUT << "EOS";
 sub $name {
   return \$PDL::Types::typehash{\$_[0]->symbol}->{$name};
@@ -762,6 +817,10 @@ taken from the actual code that defines the C<ushort> type:
 	      ppforcetype => 'ushort',
 	      usenan => 0,
 	      packtype => 'S*',
+	      defaultbadval => 'USHRT_MAX',
+	      real=>1,
+	      integer=>1,
+	      unsigned=>1,
 	     },
 
 Before we start to explain the fields please take this important
@@ -828,6 +887,24 @@ Generally only required for floating point types.
 packtype
 
 I<Required>. The Perl pack type used to pack Perl values into the machine representation for this type. For details see C<perldoc -f pack>.
+
+=item *
+
+integer
+
+I<Required>. Boolean - is this an integer type?
+
+=item *
+
+unsigned
+
+I<Required>. Boolean - is this an unsigned type?
+
+=item *
+
+real
+
+I<Required>. Boolean - is this a real (not complex) type?
 
 =back
 

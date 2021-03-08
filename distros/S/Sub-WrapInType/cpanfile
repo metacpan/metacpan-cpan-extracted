@@ -8,6 +8,6 @@ requires 'Class::InsideOut';
 requires 'namespace::autoclean';
 
 on 'test' => sub {
-  requires 'Test2::Suite';
+  requires 'Test2::Suite', '0.000071';
 };
 

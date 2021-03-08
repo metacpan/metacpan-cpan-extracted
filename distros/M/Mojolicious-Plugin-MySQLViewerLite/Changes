@@ -1,6 +1,10 @@
-0.16 (DEPRECATED)
+0.17 2021-03-08
+  - Catch up with the latest Mojolicious changes. 
+    Mojolicious 8.67  2020-12-04
+    Deprecated Mojolicious::Routes::Route::route in favor of Mojolicious::Routes::Route::any.
+0.16
   - fix test bug
-0.15 (DEPRECATED)
+0.15
   - this module is merged into Mojolicious::Plugin::DBViewer.
   - this module is DEPRECATED and will be removed from CPAN in 2018/4/1.
 0.14

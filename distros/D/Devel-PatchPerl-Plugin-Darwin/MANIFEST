@@ -1,0 +1,6 @@
+Build.PL
+lib/Devel/PatchPerl/Plugin/Darwin.pm
+MANIFEST			This list of files
+t/patch.t
+META.yml
+META.json

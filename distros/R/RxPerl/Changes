@@ -1,5 +1,10 @@
 Revision history for Perl extension RxPerl
 
+v6.7.0 2021-03-08T00:09:20Z
+
+    - support for Futures in first_event_from and last_event_from
+    - support for Futures in rx_from
+
 v6.6.1 2021-03-03T21:32:07Z
 
     - FIXED: allow perl v5.10 to run RxPerl again

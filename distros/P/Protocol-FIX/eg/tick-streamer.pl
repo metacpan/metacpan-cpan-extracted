@@ -1,140 +1,197 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+tick-streamer - Mojolicious-based FIX-server
+
+=head1 SYNOPSIS
+
+perl tick-streamer.pl [options]
+
+ Options
+  -p, --listening_port          Port, on which server will accept incoming connections
+  -s, --symbol_list             Comma-separated symbols list (e.g. EURCAD, EURUSD)
+  -S, --SenderCompID            SenderCompID (e.g. FixServer)
+  -T, --TargetCompID            TargetCompID (e.g. Client1)
+  -U, --Username                Username
+  -P, --Password                Password (hmac sha 256 of username and password)
+  -l, --log                     Log level
+  -h, --help                    Show this message.
+
+=head1 DESCRIPTION
+
+Mojolicious-based FIX-server which streams quotes with randomly generated prices
+
+=cut
+
 use strict;
 use warnings;
-
-# Mojolicious-based FIX-server which streams quotes with randomly generated prices
-
-use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 
 use Mojo::IOLoop::Server;
 use Mojo::IOLoop;
 use Protocol::FIX qw/humanize/;
 use POSIX qw(strftime);
+use Digest::SHA qw(hmac_sha256_hex);
+use Pod::Usage;
+use Getopt::Long qw(GetOptions :config no_auto_abbrev no_ignore_case);
 
+use Log::Any qw($log);
+
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
+require Log::Any::Adapter;
 GetOptions(
-    'p|listening_port=i'      => \my $port,
-    's|symbol_list=s'         => \my $symbol_list,
-    'S|SenderCompID=s'        => \my $sender_comp_id,
-    'T|TargetCompID=s'        => \my $target_comp_id,
-    'L|Login=s'               => \my $login,
-    'P|Password=s'            => \my $password,
-    'h|help'                  => \my $help,
-);
+    'p|listening_port=i' => \my $port,
+    's|symbol_list=s'    => \my $symbol_list,
+    'S|SenderCompID=s'   => \my $sender_comp_id,
+    'T|TargetCompID=s'   => \my $target_comp_id,
+    'U|Username=s'       => \my $username,
+    'P|Password=s'       => \my $password,
+    'l|log=s'            => \my $log_level,
+    'h|help'             => \my $help,
+    )
+    or pod2usage({
+        -verbose  => 99,
+        -sections => "NAME|SYNOPSIS|DESCRIPTION|OPTIONS",
+    });
 
-my $show_help = $help || !$port || !$symbol_list
-    || !$sender_comp_id || !$target_comp_id
-    || !$login || !$password
-    ;
-die <<"EOF" if ($show_help);
-usage: $0 OPTIONS
+Log::Any::Adapter->set(qw(Stdout), log_level => $log_level // 'info');
 
-These options are available:
-  -p, --listening_port          Port, on which $0 will accept incoming connections
-  -s, --symbol_list             Comma-separated symbols list (e.g. EURAUD, EURCAD)
-  -S, --SenderCompID            SenderCompID (e.g. FixServer)
-  -T, --TargetCompID            TargetCompID (e.g. Client1)
-  -L, --Login                   Login
-  -P, --Password                Password
-  -h, --help                    Show this message.
-EOF
+my $show_help =
+       $help
+    || !$port
+    || !$symbol_list
+    || !$sender_comp_id
+    || !$target_comp_id
+    || !$username
+    || !$password;
+
+pod2usage({
+        -verbose  => 99,
+        -sections => "NAME|SYNOPSIS|DESCRIPTION|OPTIONS",
+    }) if $show_help;
+
+Log::Any::Adapter->set(qw(Stdout), log_level => $log_level // 'info');
 
 my @symbols = sort split /,/, $symbol_list;
 my %price_for = map {
-    my $s = $_;
+    my $s     = $_;
     my $price = sprintf('%0.3f', 1000 * rand);
-    print "initial price for $s = $price\n";
+    $log->debugf("initial price for %s = %s", $s, $price);
     $s => $price;
 } @symbols;
 
 my $send_quotes;
 
-
 my $send_message = sub {
     my ($client, $message) = @_;
-    print("=> ", $client->{id}, " : ", ($message =~ s/\x{01}/|/gr), "\n");
+    $log->debugf("=> %s : %s", $client->{id}, ($message =~ s/\x{01}/|/gr));
     $client->{stream}->write($message);
 };
 
-Mojo::IOLoop->recurring(1 => sub {
-    print("refreshing quotes\n");
-    for my $symbol (@symbols) {
-        my $price = $price_for{$symbol};
-        my $delta = $price * 0.0001;
-        $price += (rand() * $delta) - $delta * 0.5;
-        $price = sprintf('%0.3f', $price);
-        print "$symbol => $price\n";
-        $price_for{$symbol} = $price;
-    }
-    $send_quotes->();
-});
-
+Mojo::IOLoop->recurring(
+    1 => sub {
+        $log->debug("refreshing quotes");
+        for my $symbol (@symbols) {
+            my $price = $price_for{$symbol};
+            my $delta = $price * 0.0001;
+            $price += (rand() * $delta) - $delta * 0.5;
+            $price = sprintf('%0.3f', $price);
+            $log->debugf("%s => %s", $symbol, $price);
+            $price_for{$symbol} = $price;
+        }
+        $send_quotes->();
+    });
 
 my %session_for;
 my $fix_protocol = Protocol::FIX->new('FIX44');
 
 $send_quotes = sub {
-    for my $client (grep {$_->{status} eq 'authorized'} values %session_for ) {
+    for my $client (grep { $_->{status} eq 'authorized' } values %session_for) {
         for my $symbol (@symbols) {
-            my $price = $price_for{$symbol};
+            my $price     = $price_for{$symbol};
             my $timestamp = strftime("%Y%m%d-%H:%M:%S.000", gmtime);
-            my $message = $fix_protocol->message_by_name('MarketDataSnapshotFullRefresh')
-                ->serialize([
+            my $message   = $fix_protocol->message_by_name('MarketDataSnapshotFullRefresh')->serialize([
                     SenderCompID => $sender_comp_id,
                     TargetCompID => $target_comp_id,
                     MsgSeqNum    => $client->{msg_seq}++,
                     SendingTime  => $timestamp,
                     Instrument   => [Symbol => $symbol],
-                    MDFullGrp    => [ NoMDEntries => [
-                        [MDEntryType => 'BID',   MDEntryPx => $price],
-                        [MDEntryType => 'OFFER', MDEntryPx => $price],
-                    ]],
+                    MDFullGrp    => [
+                        NoMDEntries => [[
+                                MDEntryType => 'BID',
+                                MDEntryPx   => $price
+                            ],
+                            [
+                                MDEntryType => 'OFFER',
+                                MDEntryPx   => $price
+                            ],
+                        ]
+                    ],
                 ]);
             $send_message->($client, $message);
         }
-        print(scalar(@symbols), " has been sent to ", $client->{id}, "\n");
+        $log->debugf("%s has been sent to %s", scalar(@symbols), $client->{id});
     }
 };
 
 my $on_Logon = sub {
     my ($client, $message) = @_;
     if ($client->{status} eq 'unauthorized') {
-        my $ok = 1;
+        my $ok         = 1;
+        my $error_code = '';
         $ok &&= ($message->value('SenderCompID') eq $target_comp_id) || do {
-            print "SenderCompID mismatch: ", $message->value('SenderCompID'), " vs $target_comp_id", "\n";
+            $error_code = 'SenderCompID_Mismatch';
+            $log->debugf("SenderCompID mismatch: %s vs %s", $message->value('SenderCompID'), $target_comp_id);
             0;
         };
         $ok &&= ($message->value('TargetCompID') eq $sender_comp_id) || do {
-            print "TargetCompID mismatch: ", $message->value('TargetCompID'), " vs $sender_comp_id", "\n";
+            $error_code = 'TargetCompID_Mismatch';
+            $log->debugf("TargetCompID mismatch: %s vs %s", $message->value('TargetCompID'), $sender_comp_id);
             0;
         };
-        $ok &&= ($message->value('Username') eq $login) || do {
-            print "Username mismatch: ", $message->value('Username'), " vs $login", "\n";
+        $ok &&= ($message->value('Username') eq $username) || do {
+            $error_code = 'Credentials_Mismatch';
+            $log->debugf("Username mismatch: %s vs %s", $message->value('Username'), $username);
             0;
         };
-        $ok &&= ($message->value('Password') eq $password) || do {
-            print "Password mismatch: ", $message->value('Password'), " vs $password", "\n";
+        $ok &&= ($message->value('Password') eq hmac_sha256_hex($username, $password)) || do {
+            $error_code = 'Credentials_Mismatch';
+            $log->debugf("Password mismatch: %s vs %s", $message->value('Password'), $password);
             0;
         };
         if ($ok) {
-            print("authorizing ", $client->{id}, "\n");
+            $log->debugf("authorizing %s", $client->{id});
             $client->{status} = 'authorized';
 
             my $timestamp = strftime("%Y%m%d-%H:%M:%S.000", gmtime);
-            my $message = $fix_protocol->message_by_name('Logon')
-                ->serialize([
-                    SenderCompID  => $sender_comp_id,
-                    TargetCompID  => $target_comp_id,
-                    MsgSeqNum     => $client->{msg_seq}++,
-                    SendingTime   => $timestamp,
-                    EncryptMethod => 'NONE',
-                    HeartBtInt    => 60,
-                ]);
+            my $message   = $fix_protocol->message_by_name('Logon')->serialize([
+                SenderCompID  => $sender_comp_id,
+                TargetCompID  => $target_comp_id,
+                MsgSeqNum     => $client->{msg_seq}++,
+                SendingTime   => $timestamp,
+                EncryptMethod => 'NONE',
+                HeartBtInt    => 60,
+            ]);
 
             $send_message->($client, $message);
         } else {
-            print("credentials mismatch ", $client->{id}, "\n");
+            $log->debugf("credentials mismatch %s", $client->{id});
+
+            my $timestamp = strftime("%Y%m%d-%H:%M:%S.000", gmtime);
+            my $message   = $fix_protocol->message_by_name('Logout')->serialize([
+                SenderCompID => $sender_comp_id,
+                TargetCompID => $target_comp_id,
+                SendingTime  => $timestamp,
+                MsgSeqNum    => $client->{msg_seq}++,
+                Text         => "Invalid login. Error: $error_code."
+            ]);
+
+            $send_message->($client, $message);
         }
     } else {
-        print("client is already authorized, protocol error\n");
+        $log->debug("client is already authorized, protocol error");
     }
 };
 
@@ -145,48 +202,56 @@ my %dispatcher = (
 my $on_accept = sub {
     my $client = shift;
     my $stream = $client->{stream};
-    $stream->on(read => sub {
-        my ($stream, $bytes) = @_;
-        $client->{buff} .= $bytes;
-        print("Received ", length($bytes), " bytes from client ", $client->{id}, "\n");
-        print(humanize($bytes),"\n");
+    $stream->on(
+        read => sub {
+            my ($stream, $bytes) = @_;
+            $client->{buff} .= $bytes;
+            $log->debugf("Received %s bytes from client %s", length($bytes), $client->{id});
+            $log->debugf(humanize($bytes), "\n");
 
-        my ($message, $err) = $fix_protocol->parse_message(\$client->{buff});
-        if ($err) {
-            print ("Got protocol error from ", $client->{id}, ":", $err, "\n");
-        }elsif ($message) {
-            my $name = $message->name;
-            print("Message '$name'\n");
-            my $handler = $dispatcher{$name} // die("No handler for message '$name'");
-            $handler->($client, $message);
-        } else {
-            print("Not enough data to parse message\n");
-        }
-    });
-    $stream->on(close => sub {
-        my $stream = shift;
-        print("Stream fro cleint ", $client->{id}, " has been closed", "\n");
-        delete $session_for{$client->{id}};
-    });
-    $stream->on(error => sub {
-        my ($stream, $err) = @_;
-        print("Client ", $client->{id}, " errored with", $err, "\n");
-    });
+            my ($message, $err) = $fix_protocol->parse_message(\$client->{buff});
+            if ($err) {
+                $log->debugf("Got protocol error from %s, error %s", $client->{id}, $err);
+            } elsif ($message) {
+                my $name = $message->name;
+                $log->debugf("Message %s", $name);
+                my $handler = $dispatcher{$name} // die("No handler for message '$name'");
+                $handler->($client, $message);
+            } else {
+                $log->debug("Not enough data to parse message");
+            }
+        });
+    $stream->on(
+        close => sub {
+            my $stream = shift;
+            $log->debugf("Stream for client %s has been closed", $client->{id});
+            delete $session_for{$client->{id}};
+        });
+    $stream->on(
+        error => sub {
+            my ($stream, $err) = @_;
+            $log->debugf("Client %s errored with %s", $client->{id}, $err);
+        });
     $stream->start;
-
 };
 
 my $server = Mojo::IOLoop::Server->new;
-$server->on(accept => sub {
-    my ($server, $handle) = @_;
-    #print ref($handle);
-    my $client_id = $handle->peerhost . ":" . $handle->peerport;
-    print "accepted client: $client_id\n";
-    my $stream = Mojo::IOLoop::Stream->new($handle);
-    my $client = { id => $client_id, stream => $stream, status => 'unauthorized', buff => '', msg_seq => 1, };
-    $session_for{$client_id} = $client;
-    $on_accept->($client);
-});
+$server->on(
+    accept => sub {
+        my ($server, $handle) = @_;
+        my $client_id = $handle->peerhost . ":" . $handle->peerport;
+        $log->debugf("accepted client: %s", $client_id);
+        my $stream = Mojo::IOLoop::Stream->new($handle);
+        my $client = {
+            id      => $client_id,
+            stream  => $stream,
+            status  => 'unauthorized',
+            buff    => '',
+            msg_seq => 1,
+        };
+        $session_for{$client_id} = $client;
+        $on_accept->($client);
+    });
 $server->listen(port => $port);
 
 $server->start;

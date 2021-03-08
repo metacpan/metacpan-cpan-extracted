@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.17, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Crypt::OpenSSL::Guess:
     file: lib/Crypt/OpenSSL/Guess.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   Config: '0'
   Exporter: '5.57'
@@ -37,6 +37,7 @@ resources:
   bugtracker: https://github.com/akiym/Crypt-OpenSSL-Guess/issues
   homepage: https://github.com/akiym/Crypt-OpenSSL-Guess
   repository: git://github.com/akiym/Crypt-OpenSSL-Guess.git
-version: '0.11'
+version: '0.12'
 x_authority: cpan:AKIYM
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

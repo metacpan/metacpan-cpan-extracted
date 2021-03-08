@@ -6,6 +6,8 @@ use Test2::Tools::Tester qw(facets);
 
 use Mojolicious::Lite;
 
+get '/' => sub { shift->reply->not_found };
+
 my $t = Test2::MojoX->new;
 my $assert_facets;
 

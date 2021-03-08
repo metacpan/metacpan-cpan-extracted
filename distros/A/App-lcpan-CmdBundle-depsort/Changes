@@ -1,0 +1,8 @@
+0.002   2021-03-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix regex to recognize version number in tarball name.
+
+
+0.001   2021-03-07  Released-By: PERLANCAR
+
+        - First release.

@@ -46,6 +46,7 @@ my $foo = 'file://' . path('t/test-data/foo.html')->absolute;
 
 foreach my $mech (@user_agents) {
     my $logger = debug_ua($mech);
+    ok( $logger->dump_content, 'defaults to highest log level' );
     is(
         exception {
             $mech->get($foo);
@@ -53,6 +54,18 @@ foreach my $mech (@user_agents) {
         undef,
         'code lives'
     );
+
+    my $silent_logger = debug_ua( $mech, 0 );
+
+    my @dump_attrs = (
+        'content', 'cookies', 'headers', 'params', 'status', 'text',
+        'title',   'uri',
+    );
+
+    for my $suffix (@dump_attrs) {
+        my $attr = 'dump_' . $suffix;
+        ok( !$silent_logger->$attr, 'silent logger does not ' . $attr );
+    }
 }
 
 # Check XML parsing

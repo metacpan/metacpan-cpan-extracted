@@ -121,10 +121,6 @@ C<im> follows I<strictly> the type of C<type>).
 
 
 
-=for bad
-
-pnminraw does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -154,10 +150,6 @@ Read in an ascii pnm file.
 
 
 
-=for bad
-
-pnminascii does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -189,10 +181,6 @@ naturally.
 
 
 
-=for bad
-
-pnmout does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

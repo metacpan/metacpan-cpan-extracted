@@ -101,7 +101,7 @@ use experimental 'signatures';
 use Wireguard::WGmeta::Cli::Router;
 use Wireguard::WGmeta::Cli::TerminalHelpers;
 
-our $VERSION = "0.2.1";
+our $VERSION = "0.2.2";
 
 local $SIG{__WARN__} = sub($message) {
     prettify_message($message, 1);

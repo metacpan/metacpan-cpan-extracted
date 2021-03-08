@@ -1,3 +1,8 @@
+1.000043  2021-03-05 07:47:04-08:00 America/Los_Angeles
+
+    - Minor documentation correction
+    - Add 'signal()' method to Renderer base class
+
 1.000042  2020-11-17 22:44:35-08:00 America/Los_Angeles
 
     - Fix pipe size setting to actually use the value we want

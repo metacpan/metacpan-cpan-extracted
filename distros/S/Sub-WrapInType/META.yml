@@ -3,11 +3,11 @@ abstract: 'Wrap the subroutine to validate the argument type and return type.'
 author:
   - 'mp0liiu <mpoliiu@cpan.org>'
 build_requires:
-  Test2::Suite: '0'
+  Test2::Suite: '0.000071'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.9, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Sub::WrapInType:
     file: lib/Sub/WrapInType.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Carp: '0'
   Class::InsideOut: '0'
@@ -40,8 +40,9 @@ resources:
   bugtracker: https://github.com/ybrliiu/p5-Sub-WrapInType/issues
   homepage: https://github.com/ybrliiu/p5-Sub-WrapInType
   repository: git://github.com/ybrliiu/p5-Sub-WrapInType.git
-version: '0.04'
+version: '0.05'
 x_contributors:
+  - 'kfly8 <kfly@cpan.org>'
   - 'ybrliiu <raian@reeshome.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

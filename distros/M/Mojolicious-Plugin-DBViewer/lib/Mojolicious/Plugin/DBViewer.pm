@@ -7,7 +7,7 @@ use DBIx::Custom;
 use Validator::Custom;
 use Carp 'croak';
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 has 'command';
 has 'prefix';
@@ -77,6 +77,15 @@ sub register {
   $base_path =~ s/\.pm$//;
   push @{$app->static->paths}, "$base_path/public";
   push @{$app->renderer->paths}, "$base_path/templates";
+
+  # Mojolicious compatibility
+  my $any_method_name;
+  if ($Mojolicious::VERSION >= '8.67') {
+    $any_method_name = 'any'
+  }
+  else {
+    $any_method_name = 'route'
+  }
   
   # Routes
   my $r = $conf->{route};
@@ -105,7 +114,7 @@ sub register {
       {path => 'select-statements', title => 'Selects statements'};
     
     # Route Config
-    my $r = $r->route("/$prefix")->to(
+    my $r = $r->$any_method_name("/$prefix")->to(
       'dbviewer#',
       namespace => $namespace,
       plugin => $self,

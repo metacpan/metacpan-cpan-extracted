@@ -127,9 +127,9 @@ do {
     $date = $obj->format_date(1, time());
     ok($date gt '1000000000', 'Format date in sort order'); # test 16
 
-    $obj->{date_format} = 'Day, dd Mon yyyy';
+    $obj->{date_format} = 'dd/mm/yyyy';
     $date = $obj->format_date(0, time());
-    like($date, qr(\w+\.?, \d\d \w+\.? \d\d\d\d$),
+    like($date, qr(^\d\d/\d\d/\d\d\d\d$),
          'Format date with user supplied format'); # test 17
 
     my $size = $obj->format_size(0, 2500);

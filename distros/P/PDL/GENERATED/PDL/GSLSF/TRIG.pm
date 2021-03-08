@@ -61,10 +61,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Sin(x) with GSL semantics.
 
-=for bad
-
-gsl_sf_sin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -90,10 +86,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Cos(x) with GSL semantics.
 
-=for bad
-
-gsl_sf_cos does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -119,10 +111,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Hypot(x,xx) with GSL semantics.
 
-=for bad
-
-gsl_sf_hypot does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -148,10 +136,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Sin(z) for complex z
 
-=for bad
-
-gsl_sf_complex_sin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -177,10 +161,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Cos(z) for complex z
 
-=for bad
-
-gsl_sf_complex_cos does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -206,10 +186,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Log(Sin(z)) for complex z
 
-=for bad
-
-gsl_sf_complex_logsin does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -235,10 +211,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Log(Sinh(x)) with GSL semantics.
 
-=for bad
-
-gsl_sf_lnsinh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -264,10 +236,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Log(Cos(x)) with GSL semantics.
 
-=for bad
-
-gsl_sf_lncosh does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -293,10 +261,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Convert polar to rectlinear coordinates.
 
-=for bad
-
-gsl_sf_polar_to_rect does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -322,10 +286,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Convert rectlinear to polar coordinates. return argument in range [-pi, pi].
 
-=for bad
-
-gsl_sf_rect_to_polar does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -351,10 +311,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Force an angle to lie in the range (-pi,pi].
 
-=for bad
-
-gsl_sf_angle_restrict_symm does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -380,10 +336,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Force an angle to lie in the range [0,2 pi).
 
-=for bad
-
-gsl_sf_angle_restrict_pos does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -409,10 +361,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Sin(x) for quantity with an associated error.
 
-=for bad
-
-gsl_sf_sin_err does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -438,10 +386,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Cos(x) for quantity with an associated error.
 
-=for bad
-
-gsl_sf_cos_err does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

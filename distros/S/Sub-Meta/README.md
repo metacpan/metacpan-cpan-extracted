@@ -126,19 +126,27 @@ Sub::Meta->new(
 );
 ```
 
-## sub
+## ACCESSORS
+
+### sub
 
 A subroutine reference.
 
-## set\_sub
+### set\_sub
 
 Setter for subroutine reference.
 
-## subname
+```perl
+sub hello { ... }
+$meta->set_sub(\&hello);
+$meta->sub # => \&hello
+```
+
+### subname
 
 A subroutine name, e.g. `hello`
 
-## set\_subname($subname)
+### set\_subname($subname)
 
 Setter for subroutine name.
 
@@ -149,7 +157,7 @@ $meta->subname; # world
 Sub::Util::subname($meta->sub); # hello (NOT apply to sub)
 ```
 
-## apply\_subname($subname)
+### apply\_subname($subname)
 
 Sets subroutine name and apply to the subroutine reference.
 
@@ -160,91 +168,91 @@ $meta->subname; # world
 Sub::Util::subname($meta->sub); # world
 ```
 
-## fullname
+### fullname
 
 A subroutine full name, e.g. `main::hello`
 
-## set\_fullname($fullname)
+### set\_fullname($fullname)
 
 Setter for subroutine full name.
 
-## stashname
+### stashname
 
 A subroutine stash name, e.g. `main`
 
-## set\_stashname($stashname)
+### set\_stashname($stashname)
 
 Setter for subroutine stash name.
 
-## subinfo
+### subinfo
 
 A subroutine information, e.g. `['main', 'hello']`
 
-## set\_subinfo(\[$stashname, $subname\])
+### set\_subinfo(\[$stashname, $subname\])
 
 Setter for subroutine information.
 
-## file
+### file
 
 A filename where subroutine is defined, e.g. `path/to/main.pl`.
 
-## set\_file($filepath)
+### set\_file($filepath)
 
 Setter for `file`.
 
-## line
+### line
 
 A line where the definition of subroutine started, e.g. `5`
 
-## set\_line($line)
+### set\_line($line)
 
 Setter for `line`.
 
-## is\_constant
+### is\_constant
 
 A boolean value indicating whether the subroutine is a constant or not.
 
-## set\_is\_constant($bool)
+### set\_is\_constant($bool)
 
 Setter for `is_constant`.
 
-## prototype
+### prototype
 
 A prototype of subroutine reference, e.g. `$@`
 
-## set\_prototype($prototype)
+### set\_prototype($prototype)
 
 Setter for `prototype`.
 
-## apply\_prototype($prototype)
+### apply\_prototype($prototype)
 
 Sets subroutine prototype and apply to the subroutine reference.
 
-## attribute
+### attribute
 
 A attribute of subroutine reference, e.g. `undef`, `['method']`
 
-## set\_attribute($attribute)
+### set\_attribute($attribute)
 
 Setter for `attribute`.
 
-## apply\_attribute(@attribute)
+### apply\_attribute(@attribute)
 
 Sets subroutine attributes and apply to the subroutine reference.
 
-## is\_method
+### is\_method
 
 A boolean value indicating whether the subroutine is a method or not.
 
-## set\_is\_method($bool)
+### set\_is\_method($bool)
 
 Setter for `is_method`.
 
-## parameters
+### parameters
 
 Parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters).
 
-## set\_parameters($parameters)
+### set\_parameters($parameters)
 
 Sets the parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters).
 
@@ -260,35 +268,35 @@ $meta->set_parameters(Sub::Meta::Parameters->new(args => ['Str']));
 $meta->set_args(['Str']);
 ```
 
-## args
+### args
 
 The alias of `parameters.args`.
 
-## set\_args($args)
+### set\_args($args)
 
 The alias of `parameters.set_args`.
 
-## nshift
+### nshift
 
 The alias of `parameters.nshift`.
 
-## set\_nshift($nshift)
+### set\_nshift($nshift)
 
 The alias of `parameters.set_nshift`.
 
-## slurpy
+### slurpy
 
 The alias of `parameters.slurpy`.
 
-## set\_slurpy($slurpy)
+### set\_slurpy($slurpy)
 
 The alias of `parameters.set_slurpy`.
 
-## returns
+### returns
 
 Returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AReturns).
 
-## set\_returns($returns)
+### set\_returns($returns)
 
 Sets the returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AReturns) or any object.
 
@@ -302,17 +310,38 @@ $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
 $meta->set_returns(MyReturns->new)
 ```
 
-## is\_same\_interface($other\_meta)
+## OTHERS
+
+### is\_same\_interface($other\_meta)
 
 A boolean value indicating whether the subroutine's interface is same or not.
-Specifically, check whether `subname`, `parameters` and `returns` are equal.
+Specifically, check whether `subname`, `is_method`, `parameters` and `returns` are equal.
 
-## parameters\_class
+### is\_same\_interface\_inlined($other\_meta\_inlined)
+
+Returns inlined `is_same_interface` string:
+
+```perl
+use Sub::Meta;
+my $meta = Sub::Meta->new(subname => 'hello');
+my $inline = $meta->is_same_interface_inlined('$_[0]');
+# $inline looks like this:
+#    Scalar::Util::blessed($_[0]) && $_[0]->isa('Sub::Meta')
+#    && defined $_[0]->subname && 'hello' eq $_[0]->subname
+#    && !$_[0]->is_method
+#    && !$_[0]->parameters
+#    && !$_[0]->returns
+my $check = eval "sub { $inline }";
+$check->(Sub::Meta->new(subname => 'hello')); # => OK
+$check->(Sub::Meta->new(subname => 'world')); # => NG
+```
+
+### parameters\_class
 
 Returns class name of parameters. default: Sub::Meta::Parameters
 Please override for customization.
 
-## returns\_class
+### returns\_class
 
 Returns class name of returns. default: Sub::Meta::Returns
 Please override for customization.

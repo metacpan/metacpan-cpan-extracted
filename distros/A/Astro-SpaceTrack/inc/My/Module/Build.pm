@@ -22,11 +22,16 @@ sub ACTION_authortest {
     local $ENV{SPACETRACK_OPT} = undef;
 
     local $ENV{SPACETRACK_USER} = $ENV{SPACETRACK_USER};
-    My::Module::Test::spacetrack_user();
 
     my @depends_on = ( qw{ build } );
     -e 'META.json' or push @depends_on, 'distmeta';
     $self->depends_on( @depends_on );
+
+    # NOTE that we must do this AFTER the build step because it loads
+    # Astro::SpaceTrack to access the identity file -- which maybe it
+    # should not. The symptom of failure to load is that we get prompted
+    # for Space Track user name and password.
+    My::Module::Test::spacetrack_user();
 
     $self->test_files( qw{ t xt/author },
 	My::Module::Recommend->make_optional_modules_tests() );
@@ -96,7 +101,9 @@ C<--test_files> argument.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack>,
+L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues/>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

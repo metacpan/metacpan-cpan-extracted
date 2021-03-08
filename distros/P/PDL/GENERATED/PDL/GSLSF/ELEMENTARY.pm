@@ -61,10 +61,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Multiplication.
 
-=for bad
-
-gsl_sf_multiply does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -90,10 +86,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Multiplication with associated errors.
 
-=for bad
-
-gsl_sf_multiply_err does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

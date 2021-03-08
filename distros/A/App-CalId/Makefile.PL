@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CalId",
   "PREREQ_PM" => {
-    "Calendar::Indonesia::Holiday" => 0,
+    "Calendar::Indonesia::Holiday" => "0.331",
     "DateTime" => 0,
     "Getopt::Long" => "2.50",
     "List::Util" => "1.45",
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.132",
+  "VERSION" => "0.133",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Calendar::Indonesia::Holiday" => 0,
+  "Calendar::Indonesia::Holiday" => "0.331",
   "DateTime" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => "2.50",

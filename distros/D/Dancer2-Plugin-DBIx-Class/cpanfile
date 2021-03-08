@@ -10,6 +10,7 @@ requires "perl" => "5.012";
 on 'test' => sub {
   requires "DBIx::Class::Core" => "0";
   requires "DBIx::Class::Schema" => "0";
+  requires "DBIx::Class::Schema::ResultSetNames" => "0";
   requires "Dancer2" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";

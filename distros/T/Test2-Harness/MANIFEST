@@ -100,6 +100,14 @@ lib/Test2/Harness/Util/Queue.pm
 lib/Test2/Harness/Util/Term.pm
 lib/Test2/Harness/Util/UUID.pm
 lib/Test2/Tools/HarnessTester.pm
+old/Auditor.pm
+old/Auditor/TimeTracker.pm
+old/Auditor/Watcher.pm
+old/Collector.pm
+old/Collector/JobDir.pm
+old/Collector/TapParser.pm
+old/auditor.pm
+old/collector.pm
 scripts/yath
 t/0-load_all.t
 t/1-pod_name.t
@@ -299,3 +307,4 @@ t2/vars.t
 test.pl
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
+xxx.jsonl

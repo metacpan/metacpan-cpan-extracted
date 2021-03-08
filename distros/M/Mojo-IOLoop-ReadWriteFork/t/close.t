@@ -16,4 +16,13 @@ Mojo::IOLoop->start;
 
 like $output, qr/line one\nline two\nFORCE\n/, 'close' or diag $output;
 
+my ($got_event, $err, @errors) = (0);
+$fork = Mojo::IOLoop::ReadWriteFork->new;
+$fork->on(error => sub { push @errors, $_[1]; die 'yikes!' });
+$fork->on(close => sub { Carp::confess('infinite loop') if $got_event++ < 3 });
+$fork->run_p(sub { })->catch(sub { $err = shift })->wait;
+is $got_event, 1, 'avoid infinite loop';
+ok !$err,   'promise fullfills, even if close() and error() fail';
+ok @errors, 'error was emitted';
+
 done_testing;

@@ -12,6 +12,8 @@ use Test::More;
 use Win32;
 
 use FindBin;
+BEGIN { my $f = $FindBin::Bin . '/nppPath.inc'; require $f if -f $f; }
+
 use lib $FindBin::Bin;
 use myTestHelpers qw/:userSession dumper/;
 

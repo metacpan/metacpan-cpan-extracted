@@ -1,5 +1,9 @@
 Changes file for Log::Any::Adapter::JSON
 
+1.08      2021-03-04 18:21:40-05:00 America/New_York
+
+  - Update prereqs (strictures is v 2)
+  
 1.07      2021-03-04 06:31:39-05:00 America/New_York
 
   - Skip pipe test on MSWin32

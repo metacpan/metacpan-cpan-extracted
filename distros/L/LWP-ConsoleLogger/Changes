@@ -1,5 +1,8 @@
 Revision history for LWP-ConsoleLogger
 
+0.000043  2021-03-04 19:00:40Z
+    - Ensure that a silent logger is actually silent (GH#21) (Olaf Alders)
+
 0.000042  2019-06-12 15:15:52Z
     -  Don't rely on Mojo to be installed in tests (GH#18) (Olaf Alders)
 

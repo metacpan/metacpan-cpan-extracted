@@ -1,7 +1,9 @@
 package LWP::ConsoleLogger::Easy;
-our $VERSION = '0.000042';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.000043';
 
 use HTTP::Request;
 use HTTP::Response;
@@ -23,7 +25,8 @@ my %VERBOSITY = (
 
 sub debug_ua {
     my $ua    = shift;
-    my $level = shift || 10;
+    my $level = shift;
+    $level //= 10;
 
     my %args = map { $_ => $VERBOSITY{$_} <= $level } keys %VERBOSITY;
     my $console_logger = LWP::ConsoleLogger->new(%args);
@@ -113,7 +116,7 @@ LWP::ConsoleLogger::Easy - Easy LWP tracing and debugging
 
 =head1 VERSION
 
-version 0.000042
+version 0.000043
 
 =head1 SYNOPSIS
 

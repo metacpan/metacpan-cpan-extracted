@@ -22,6 +22,7 @@ WriteMakefile(
     LICENSE        => 'mit',
     PREREQ_PM      => {},
     BUILD_REQUIRES => {},
+    MAKE           => 'gmake',
     EXE_FILES      => [
         "bin/wg-meta"
     ],
@@ -60,6 +61,3 @@ CHANGES: VERSION
 
 EOF
 }
-
-
-

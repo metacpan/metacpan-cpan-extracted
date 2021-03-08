@@ -21,14 +21,14 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => 0,
     "MRO::Compat" => 0,
     "Moose" => 0,
-    "Scalar::List::Utils" => 0,
+    "Scalar::Util" => 0,
     "Text::Template" => 0
   },
   "TEST_REQUIRES" => {
     "Catalyst" => 0,
     "Test::Most" => "0.34"
   },
-  "VERSION" => "0.001003",
+  "VERSION" => "0.001004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +42,7 @@ my %FallbackPrereqs = (
   "JSON::MaybeXS" => 0,
   "MRO::Compat" => 0,
   "Moose" => 0,
-  "Scalar::List::Utils" => 0,
+  "Scalar::Util" => 0,
   "Test::Most" => "0.34",
   "Text::Template" => 0
 );

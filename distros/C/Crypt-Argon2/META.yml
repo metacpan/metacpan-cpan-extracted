@@ -17,7 +17,7 @@ name: Crypt-Argon2
 provides:
   Crypt::Argon2:
     file: lib/Crypt/Argon2.pm
-    version: '0.008'
+    version: '0.009'
 requires:
   Exporter: '5.57'
   MIME::Base64: '0'
@@ -27,7 +27,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-argon2/issues
   repository: git://github.com/Leont/crypt-argon2.git
-version: '0.008'
+version: '0.009'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

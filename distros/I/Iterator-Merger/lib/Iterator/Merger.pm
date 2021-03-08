@@ -5,9 +5,9 @@ use warnings;
 use Carp;
 use base 'Exporter';
 
-our $VERSION = '0.62';
+our $VERSION = '0.64';
 
-use constant DEBUG => 0;
+# use constant DEBUG => 1;
 
 our @EXPORT_OK = qw(
 	imerge
@@ -19,19 +19,19 @@ our %EXPORT_TAGS = (
 	all => \@EXPORT_OK
 );
 
-use constant HAS_ARRAY_HEAP  => eval "use Array::Heap;1";
-
+our $Has_defined_or;
+our $Has_array_heap;
 our $Max_generate;
 
-unless (defined $Max_generate) {
-	$Max_generate = HAS_ARRAY_HEAP ? 9 : 12; # 10 => ~30KiB to eval (doubles each increment)
-}
+$Has_defined_or = eval "undef // 1" unless defined $Has_defined_or;
+BEGIN { $Has_array_heap = eval "require Array::Heap;1" unless defined $Has_array_heap };
+$Max_generate = $Has_array_heap ? 9 : 12 unless defined $Max_generate;
 
 my %Generator_cache;
 
-*imerge_raw = eval q!
-	# try to use the defined-or operator
-	sub {
+*imerge_raw = eval($Has_defined_or ?
+	q!sub {
+		# DEBUG && warn "defined or";
 		my @ites = @_ or return sub {};
 		if (@ites==1) {
 			my $ite = shift;
@@ -53,10 +53,10 @@ my %Generator_cache;
 				}
 			}
 		}
-	}
-! || eval q!
-	# default to use defined() and a temporary variable
-	sub {
+	}!
+	:
+	q!sub {
+		# DEBUG && warn "temp var";
 		my @ites = @_ or return sub {};
 		if (@ites==1) {
 			my $ite = shift;
@@ -78,19 +78,19 @@ my %Generator_cache;
 			}
 			$next
 		}
-	}
-! || die $@;
+	}!
+) || die $@;
 
 sub imerge {
-	_imerge(1, \@_)
+	_imerge(1, 1, \@_)
 }
 
 sub imerge_num {
-	_imerge(0, \@_)
+	_imerge(0, 1, \@_)
 }
 
 sub _imerge {
-	my ($lex, $iterators) = @_;
+	my ($lex, $asc, $iterators) = @_;
 	my $nb = @$iterators;
 	
 	croak "arguments must be CODE references or filehandles" if grep {ref($_) !~ /^CODE$|^GLOB$/} @$iterators;
@@ -105,10 +105,10 @@ sub _imerge {
 		return ref($ite) eq 'GLOB' ? sub {scalar <$ite>} : sub {scalar &$ite};
 	}
 	elsif ($nb <= $Max_generate) {
-		DEBUG && warn "generate";
+		# DEBUG && warn "generate";
 		if ($nb == grep {ref($_) eq 'GLOB'} @$iterators) {
 			# only globs
-			my $code = $Generator_cache{$nb, $lex, 1} ||= _merger_generator($nb, $lex, 1);
+			my $code = $Generator_cache{$nb, $lex, 1} ||= _merger_generator($nb, $lex, $asc, 1);
 			return $code->(@$iterators);
 		} else {
 			for (@$iterators) {
@@ -117,7 +117,7 @@ sub _imerge {
 					$_ = sub {<$fh>}
 				}
 			}
-			my $code = $Generator_cache{$nb, $lex, 0} ||= _merger_generator($nb, $lex, 0);
+			my $code = $Generator_cache{$nb, $lex, 0} ||= _merger_generator($nb, $lex, $asc, 0);
 			return $code->(@$iterators);
 		}
 	}
@@ -129,8 +129,8 @@ sub _imerge {
 				$_ = sub {<$fh>}
 			}
 		}
-		if (HAS_ARRAY_HEAP) {
-			DEBUG && warn "heap";
+		if ($Has_array_heap) {
+			# DEBUG && warn "heap";
 			# general case, use a heap
 			my @heap;
 			# cannot take references to *_heap_lex and *_heap functions,
@@ -165,7 +165,7 @@ sub _imerge {
 			}
 		}
 		else {
-			DEBUG && warn "brutal";
+			# DEBUG && warn "brutal";
 			# no heap available, lets be dirty
 			my @values = map {scalar &$_} @$iterators;
 	#		warn "values: ", join(", ", map {length($_)?1:0} @values), "\n";
@@ -206,13 +206,14 @@ sub _imerge {
 	}
 }
 
+# nb=10 => ~30KiB to eval (doubles each increment)
 sub _merger_generator {
-	my ($nb, $lex, $globs) = @_;
+	my ($nb, $lex, $asc, $globs) = @_;
 	my $str = "no warnings;sub{";
 	$str .= "my(". join(',', map {"\$i$_"} 1..$nb). ")=\@_;";
 	$str .= $globs ? "my\$n$_=<\$i$_>;" : "my\$n$_=&\$i$_;" for 1..$nb;
 	$str .= "my\$r;sub{";
-	my $cmp = $lex ? ' lt' : '<';
+	my $cmp = $lex ? ($asc ? ' lt' : ' gt') : ($asc ? '<' : '>');
 	$str .= _cmp($cmp, $globs, 1..$nb);
 	$str .= ";\$r}}";
 

@@ -61,10 +61,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Evaluate generalized Laguerre polynomials.
 
-=for bad
-
-gsl_sf_laguerre_n does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

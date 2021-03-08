@@ -7,7 +7,7 @@ use File::Path qw(rmtree);
 use File::Spec::Functions qw(catfile catdir rel2abs splitdir);
 
 use Test::Requires 'Text::Markdown';
-use Test::More tests => 18;
+use Test::More tests => 16;
 
 #----------------------------------------------------------------------
 # Load package
@@ -142,22 +142,4 @@ do {
     my $page = fio_read_page($gallery_name);
     my @items = $page =~ m/(<div class="lightbox")/g;
     is(@items, 3, 'Index three photos'); # test 16
-};
-
-#----------------------------------------------------------------------
-# Create help
-
-do {
-    my $help_dir = catfile($test_dir, 'help');
-    chdir($help_dir) or die $!;
-
-    my $followme = App::Followme->new();
-    $followme->run($help_dir);
-
-    my $help_name = catfile($help_dir, 'index.html'); 
-    ok(-e $help_name,  "Help index file created"); # test 17
-
-    my $page = fio_read_page($help_name);
-    my @items = $page =~ m/(<dt>)/g;
-    ok(@items > 25, 'Index help'); # test 18
 };

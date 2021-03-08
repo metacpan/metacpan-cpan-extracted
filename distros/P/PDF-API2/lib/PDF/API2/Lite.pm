@@ -3,7 +3,7 @@ package PDF::API2::Lite;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.038'; # VERSION
+our $VERSION = '2.039'; # VERSION
 
 BEGIN {
 
@@ -559,13 +559,16 @@ sub textfont {
     return($self);
 }
 
-=item $txt->textlead $leading
+=item $txt->textleading $leading
 
 =cut
 
-sub textlead {
+# Deprecated: leading is the correct term for this operator
+sub textlead { return textleading(@_) }
+
+sub textleading {
     my $self=shift @_;
-    $self->{gfx}->lead(@_);
+    $self->{gfx}->leading(@_);
     return($self);
 }
 

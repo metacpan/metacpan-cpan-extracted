@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.05";
+our $VERSION = "0.07";
 
 use Carp ();
 use Scalar::Util ();
@@ -15,7 +15,7 @@ use overload
     eq => \&is_same_interface
     ;
 
-sub _croak { require Carp; Carp::croak(@_) }
+sub _croak { require Carp; goto &Carp::croak }
 
 sub param_class { 'Sub::Meta::Param' }
 
@@ -150,28 +150,43 @@ sub args_max() {
 
 sub is_same_interface {
     my ($self, $other) = @_;
+
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
-    if ($self->slurpy) {
-        return if !($self->slurpy->is_same_interface($other->slurpy))
-    }
-    else {
-        return if $other->slurpy;
-    }
+    return unless $self->slurpy ? $self->slurpy->is_same_interface($other->slurpy)
+                                : !$other->slurpy;
 
-    return if @{$self->args} != @{$other->args};
+    return unless @{$self->args} == @{$other->args};
+
     for (my $i = 0; $i < @{$self->args}; $i++) {
-        return if !($self->args->[$i]->is_same_interface($other->args->[$i]));
+        return unless $self->args->[$i]->is_same_interface($other->args->[$i]);
     }
 
-    if (defined $self->nshift) {
-        return if $self->nshift != $other->nshift;
-    }
-    else {
-        return if defined $other->nshift;
-    }
+    return unless defined $self->nshift ? $self->nshift == $other->nshift
+                                        : !defined $other->nshift;
 
     return !!1;
+}
+
+sub is_same_interface_inlined {
+    my ($self, $v) = @_;
+
+    my @src;
+
+    push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Parameters')", $v, $v);
+
+    push @src => $self->slurpy ? $self->slurpy->is_same_interface_inlined(sprintf('%s->slurpy', $v))
+                               : sprintf('!%s->slurpy', $v);
+
+    push @src => sprintf('%d == @{%s->args}', scalar @{$self->args}, $v);
+
+    for (my $i = 0; $i < @{$self->args}; $i++) {
+        push @src => $self->args->[$i]->is_same_interface_inlined(sprintf('%s->args->[%d]', $v, $i))
+    }
+
+    push @src => defined $self->nshift ? sprintf('%d == %s->nshift', $self->nshift, $v) : sprintf('!defined %s->nshift', $v);
+
+    return join "\n && ", @src;
 }
 
 1;
@@ -239,11 +254,13 @@ Constructor of C<Sub::Meta::Parameters>.
         slurpy => 0,       # optional. whether get all rest arguments
     );
 
-=head2 args
+=head2 ACCESSORS
+
+=head3 args
 
 Subroutine arguments arrayref.
 
-=head2 set_args(ArrayRef), set_args(HashRef), set_args(Ref)
+=head3 set_args(ArrayRef), set_args(HashRef), set_args(Ref)
 
 Setter for subroutine arguments.
 An element can be an argument of C<Sub::Meta::Param>.
@@ -264,59 +281,59 @@ An element can be an argument of C<Sub::Meta::Param>.
     # single ref:
     $p->set_args(Str); # => $p->set_args([Str])
 
-=head2 nshift
+=head3 nshift
 
 Number of shift arguments.
 
-=head2 set_nshift($nshift)
+=head3 set_nshift($nshift)
 
 Setter for nshift.
 For example, it is assumed that 1 is specified in the case of methods, and 0 is specified in the case of normal functions.
 
-=head2 slurpy
+=head3 slurpy
 
 Subroutine all rest arguments.
 
-=head2 set_slurpy($param_args)
+=head3 set_slurpy($param_args)
 
 Setter for slurpy:
 
     my $p = Sub::Meta::Parameters->new(args => [{ isa => 'Int', name => '$a'}]);
     $p->set_slurpy({ name => '@numbers', isa => 'Int' }); # => (Int $a, Int @numbers)
 
-=head2 positional
+=head3 positional
 
 Returns an arrayref of parameter objects for the positional arguments.
 
-=head2 positional_required
+=head3 positional_required
 
 Returns an arrayref of parameter objects for the required positional arguments.
 
-=head2 positional_optional
+=head3 positional_optional
 
 Returns an arrayref of parameter objects for the optional positional arguments.
 
-=head2 named
+=head3 named
 
 Returns an arrayref of parameter objects for the named arguments.
 
-=head2 named_required
+=head3 named_required
 
 Returns an arrayref of parameter objects for the required named arguments.
 
-=head2 named_optional
+=head3 named_optional
 
 Returns an arrayref of parameter objects for the optional named arguments.
 
-=head2 invocant
+=head3 invocant
 
 First element of invocants.
 
-=head2 invocants
+=head3 invocants
 
 Returns an arrayref of parameter objects for the variables into which initial arguments are shifted automatically. This will usually return () for normal functions and ('$self') for methods.
 
-=head2 args_min
+=head3 args_min
 
 Returns the minimum number of required arguments.
 
@@ -326,7 +343,7 @@ This is computed as follows:
   Required named parameters count 2 each (key + value).
   Slurpy parameters don't count either because they accept empty lists.
 
-=head2 args_max
+=head3 args_max
 
 Returns the maximum number of arguments.
 
@@ -334,12 +351,18 @@ This is computed as follows:
   If there are any named or slurpy parameters, the result is Inf.
   Otherwise the result is the number of all invocants and positional parameters.
 
-=head2 is_same_interface($other_meta)
+=head3 is_same_interface($other_meta)
 
 A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
 Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
 
-=head2 param_class
+=head2 OTHERS
+
+=head3 is_same_interface_inlined($other_meta_inlined)
+
+Returns inlined C<is_same_interface> string.
+
+=head3 param_class
 
 Returns class name of param. default: Sub::Meta::Param
 Please override for customization.

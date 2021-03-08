@@ -1,9 +1,9 @@
 package Business::Tax::ID::PPH21;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2021-03-08'; # DATE
 our $DIST = 'Business-Tax-ID-PPH21'; # DIST
-our $VERSION = '0.062'; # VERSION
+our $VERSION = '0.063'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,7 +13,7 @@ use Exporter::Rinci qw(import);
 
 our %SPEC;
 
-my $latest_supported_year = 2019;
+my $latest_supported_year = 2020;
 
 our %arg_tp_status = (
     tp_status => {
@@ -362,7 +362,7 @@ Business::Tax::ID::PPH21 - Routines to help calculate Indonesian income tax arti
 
 =head1 VERSION
 
-This document describes version 0.062 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2020-03-03.
+This document describes version 0.063 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2021-03-08.
 
 =head1 SYNOPSIS
 
@@ -405,11 +405,15 @@ Examples:
 
 =item * Someone who doesn't pay PPh 21 op earns at or below PTKP:
 
- calc_net_income_from_pph21_op(year => 2016, pph21_op => 0, tp_status => "TK/0"); # -> 54000000
+ calc_net_income_from_pph21_op(year => 2016, pph21_op => 0, tp_status => "TK/0"); # -> [200, "OK", 54000000, {}]
 
 =item * Example #2:
 
- calc_net_income_from_pph21_op(year => 2016, pph21_op => 20000000, tp_status => "K/2"); # -> 234166666.666667
+ calc_net_income_from_pph21_op(year => 2016, pph21_op => 20000000, tp_status => "K/2");
+
+Result:
+
+ [200, "OK", 234166666.666667, {}]
 
 =back
 
@@ -469,11 +473,15 @@ Examples:
 
 =item * Someone who earns below PTKP:
 
- calc_pph21_op(year => 2015, net_income => 30000000, tp_status => "TK/0"); # -> 0
+ calc_pph21_op(year => 2015, net_income => 30000000, tp_status => "TK/0"); # -> [200, "OK", 0, {}]
 
 =item * Example #2:
 
- calc_pph21_op(year => 2015, net_income => 300000000, tp_status => "K/2"); # -> 33750000
+ calc_pph21_op(year => 2015, net_income => 300000000, tp_status => "K/2");
+
+Result:
+
+ [200, "OK", 33750000, {}]
 
 =back
 
@@ -530,16 +538,21 @@ Examples:
 
 Result:
 
- {
-   "K/0"  => 58500000,
-   "K/1"  => 63000000,
-   "K/2"  => 67500000,
-   "K/3"  => 72000000,
-   "TK/0" => 54000000,
-   "TK/1" => 58500000,
-   "TK/2" => 63000000,
-   "TK/3" => 67500000,
- }
+ [
+   200,
+   "OK",
+   {
+     "K/0"  => 58500000,
+     "K/1"  => 63000000,
+     "K/2"  => 67500000,
+     "K/3"  => 72000000,
+     "TK/0" => 54000000,
+     "TK/1" => 58500000,
+     "TK/2" => 63000000,
+     "TK/3" => 67500000,
+   },
+   {},
+ ]
 
 =back
 
@@ -590,10 +603,18 @@ Examples:
 Result:
 
  [
-   { max => 50000000, rate => 0.05 },
-   { xmin => 50000000, max => 250000000, rate => 0.15 },
-   { xmin => 250000000, max => 500000000, rate => 0.25 },
-   { xmin => 500000000, rate => 0.3 },
+   200,
+   "OK",
+   [
+     { max => 50000000, rate => 0.05 },
+     { xmin => 50000000, max => 250000000, rate => 0.15 },
+     { xmin => 250000000, max => 500000000, rate => 0.25 },
+     { xmin => 500000000, rate => 0.3 },
+   ],
+   {
+     "table.field_formats" => [undef, undef, ["percent", { sprintf => "%3.0f%%" }]],
+     "table.fields"        => ["xmin", "max", "rate"],
+   },
  ]
 
 =back
@@ -650,7 +671,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

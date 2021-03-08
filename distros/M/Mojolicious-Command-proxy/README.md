@@ -22,7 +22,7 @@ Mojolicious::Command::proxy - Proxy web requests elsewhere
 
 # DESCRIPTION
 
-[Mojolicious::Command::proxy](https://metacpan.org/pod/Mojolicious::Command::proxy) is a command line interface for
+[Mojolicious::Command::proxy](https://metacpan.org/pod/Mojolicious%3A%3ACommand%3A%3Aproxy) is a command line interface for
 making an app that proxies some or all incoming requests elsewhere.
 Having done so, it then passes the rest of its arguments to the app's
 `start` method, as illustrated in the synopsis above.
@@ -56,7 +56,7 @@ Command-line arguments will only be parsed at the start of the
 command-line. This allows you to pass option through to e.g. `daemon`.
 
 As a special case, if the `app` attribute is exactly a
-[Mojo::HelloWorld](https://metacpan.org/pod/Mojo::HelloWorld) app, it will replace its `routes` attribute with an
+[Mojo::HelloWorld](https://metacpan.org/pod/Mojo%3A%3AHelloWorld) app, it will replace its `routes` attribute with an
 empty one first, since the `whatever` route clashes with the proxy route,
 being also a match-everything wildcard route. This makes the `mojo proxy`
 invocation function as expected.
@@ -80,7 +80,7 @@ which _can_ be an empty string (which is treated the same as solitary
 route internally. However, the author can see no good reason to do this
 outside of testing.
 
-It uses ["proxy->start\_p" in Mojolicious::Plugin::DefaultHelpers](https://metacpan.org/pod/Mojolicious::Plugin::DefaultHelpers#proxy-start_p) but
+It uses ["proxy->start\_p" in Mojolicious::Plugin::DefaultHelpers](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ADefaultHelpers#proxy-start_p) but
 adds the full header-proxying behaviour.
 
 # AUTHOR

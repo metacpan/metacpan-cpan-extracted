@@ -17,7 +17,7 @@ use Protocol::FIX::Parser;
 use Exporter qw/import/;
 
 our @EXPORT_OK = qw/humanize/;
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 
 =head1 NAME
 
@@ -129,7 +129,7 @@ sub new {
 Modifies the protocol, by loading XML extension.
 
 The extension might contain additional B<messages> or B<fields>.  The
-extenation XML should conform the format as the protocol definition itself,
+extension XML should conform the format as the protocol definition itself,
 i.e.:
 
     <fix type='FIX' major='4' minor='4' servicepack='0'>
@@ -158,7 +158,7 @@ sub extension {
 
     my ($type, $major, $minor) = @{$definition->{fix}}{qw/-type -major -minor/};
     my $extension_id = join('.', $type, $major, $minor);
-    my $protocol_id = $self->{id};
+    my $protocol_id  = $self->{id};
     die("Extension ID ($extension_id) does not match Protocol ID ($protocol_id)")
         unless $extension_id eq $protocol_id;
 
@@ -251,7 +251,7 @@ sub _get_composites {
     my ($values, $lookup) = @_;
     return () unless $values;
 
-    my $array = ref($values) ne 'ARRAY' ? [$values] : $values;
+    my $array      = ref($values) ne 'ARRAY' ? [$values] : $values;
     my @composites = map {
         my $ref       = $_;
         my $name      = $ref->{-name};
@@ -399,12 +399,12 @@ sub _construct_from_definition {
     my ($type, $major, $minor) = @{$definition->{fix}}{qw/-type -major -minor/};
     my $protocol_id = join('.', $type, $major, $minor);
 
-    my $fields_lookup = $self->_construct_fields($definition);
+    my $fields_lookup     = $self->_construct_fields($definition);
     my $components_lookup = $self->_construct_components($definition, $fields_lookup);
 
     my $header_descr  = $definition->{fix}->{header};
     my $trailer_descr = $definition->{fix}->{trailer};
-    my $header        = $self->_construct_composite('header', $header_descr, $fields_lookup, $components_lookup);
+    my $header        = $self->_construct_composite('header',  $header_descr,  $fields_lookup, $components_lookup);
     my $trailer       = $self->_construct_composite('trailer', $trailer_descr, $fields_lookup, $components_lookup);
 
     my $serialized_begin_string = $fields_lookup->{by_name}->{BeginString}->serialize($protocol_id);

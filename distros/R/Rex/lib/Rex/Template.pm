@@ -100,7 +100,7 @@ use strict;
 use warnings;
 use Symbol;
 
-our $VERSION = '1.13.2'; # VERSION
+our $VERSION = '1.13.3'; # VERSION
 
 use Rex::Config;
 use Rex::Logger;

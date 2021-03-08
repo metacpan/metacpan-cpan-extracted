@@ -1,0 +1,210 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::Make::Page - Automate making HTML <head> and <body>
+
+=head1 SYNOPSIS
+
+    
+    use HTML::Make::Page 'make_page';
+    my ($html, $body) = make_page (title => 'Personal Home Page', lang => 'en');
+    $body->add_text (<<EOF);
+    <img src='under-construction.gif' alt='This site is ALWAYS under construction!!!'>
+    <p>Personal details</p>
+    EOF
+    print $html->text ();
+
+
+produces output
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Personal Home Page</title>
+    </head>
+    <body>
+    <img src='under-construction.gif' alt='This site is ALWAYS under construction!!!'>
+    <p>Personal details</p>
+    </body>
+    </html>
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Page-0.01/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.01 of HTML-Make-Page
+corresponding to L<git commit 3b2c40c43000eb55733c8abf6bc21a2fc6512aef|https://github.com/benkasminbullock/html-make-page/commit/3b2c40c43000eb55733c8abf6bc21a2fc6512aef> released on Mon Mar 8 16:00:38 2021 +0900.
+
+=head1 DESCRIPTION
+
+This module simplifies generating the <head> and <body> elements of an
+HTML page using L<HTML::Make>.
+
+=head2 Restrictions
+
+The output is restricted to the following variants of HTML:
+
+=over
+
+=item HTML 5 only
+
+The output has a doctype of C<< <!DOCTYPE html> >>.
+
+=item Lower-case tags only
+
+No <HTML> etc., the tags generated are lower-case only.
+
+=item UTF-8 encoding only
+
+The output has C<< <meta charset='UTF-8'> >> added automatically.
+
+=item Viewport is added automatically
+
+The viewport meta element, necessary for viewing web pages on mobile
+phones, is automatically added to the output.
+
+=item XHTML tags are not supported
+
+XHTML tags of the form C<< <br/> >> are not necessary in HTML 5 and
+are not supported.
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 make_page
+
+    my ($html, $body) = make_page (title => 'My Cool Page');
+
+The argument to the function is a hash of options of the form
+C<make_page (%options)>. The options are as follows.
+
+=head3 Options
+
+=over
+
+=item css
+
+An array reference giving a list of style sheets to be added using
+<link> in <head>.
+
+
+    my ($h, $b) = make_page (css => ['my.css', 'your.css']);
+
+=item js
+
+An array reference of names of JavaScript files you want to include in
+your header. To add C<async> or C<defer> to the script tag, use a hash
+reference in place of the name of the script with the keys C<src> for
+the file and then any true value for C<async> or C<defer> to add
+those.
+
+
+    my ($h, $b) = make_page (js => ['cat.js', 'dog.js', {src => 'parrot.js', async => 1}]);
+
+=item lang
+
+The language of your page, for example "en" for English. This is added
+to the opening <html> tag.
+
+
+    my ($h, $b) = make_page (lang => "en");
+
+=item link
+
+Link elements. The value must be an array reference containing hash
+references. Each hash reference must contain the compulsory C<rel>
+key, otherwise it is not included in the output. 
+
+If no C<href> is present, a warning is printed. This warning may be
+turned off with L</quiet>.
+
+CSS stylesheets can be added using this, but they can also be added
+more simply using the L</css> option.
+
+
+    my ($h, $b) = make_page (link => [{rel=>"icon", type=>"image/png", href=>"favicon.png"}]);
+
+=item meta
+
+Meta-tag things which you want to add, for example author, description
+or keywords meta-tags. The value must be an array reference containing
+hash references.
+
+Note that the C<viewport> meta tag and the C<charset> meta tag are
+included by default.
+
+
+    my ($h, $b) = make_page (meta => [{name => 'author', content => 'Long John Silver'}]);
+
+=item quiet
+
+Suppress warnings about harmless things like omitted titles and
+unknown options.
+
+
+    my ($h, $b) = make_page (quiet => 1);
+
+=item style
+
+CSS in text format. The starting and closing <style> html tags will be
+added for you.
+
+
+    my $style = <<EOF;
+h1 => {
+   color => 'white';
+   background-color => '#FFF';
+}
+EOF
+    my ($h, $b) = make_page (style => $style);
+
+=item title
+
+The title of your page. A <title> element is "compulsory" in HTML so
+if you omit this a warning is printed. Suppress the warning with
+L</quiet>.
+
+
+    my ($h, $b) = make_page (title => "My Cool Page");
+
+
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item HTML::Make
+
+This module is based on L<HTML::Make>.
+
+=back
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

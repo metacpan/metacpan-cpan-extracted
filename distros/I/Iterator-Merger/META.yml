@@ -1,5 +1,5 @@
 ---
-abstract: 'an iterator to efficiently merge sorted iterators'
+abstract: 'an iterator to efficiently mergesort iterators'
 author:
   - "Thomas Drugeon, <tdrugeon@cpan.org>\r"
 build_requires:
@@ -19,8 +19,8 @@ no_index:
   directory:
     - inc
     - t
-requires:
+recommends:
   Array::Heap: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.62
+version: 0.64

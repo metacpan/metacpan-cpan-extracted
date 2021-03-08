@@ -148,12 +148,14 @@ else {
 
 sub _generic_read
 {
-   my ( $baseaddr, $pagesize, $size ) = @_;
+   my ( $type, $pagesize, $size ) = @_;
+
+   my $readmethod = "read_${type}_page";
 
    my $data = "";
    my $addr = 0;
    while( $addr < $size ) {
-      $data .= $updi->ld( $baseaddr + $addr, $pagesize )->get;
+      $data .= $updi->$readmethod( $addr, $pagesize )->get;
 
       $addr += $pagesize;
       printf STDERR "\rRead %d (%.2f%%)", $addr, 100 * $addr / $size;
@@ -166,9 +168,10 @@ sub _generic_read
 
 sub _generic_write
 {
-   my ( $data, $baseaddr, $pagesize, $size, $wordsize, $is_eeprom ) = @_;
+   my ( $type, $data, $pagesize, $size ) = @_;
 
-   my $method = $is_eeprom ? "erasewrite_nvm_page" : "write_nvm_page";
+   my $writemethod = "write_${type}_page";
+   my $readmethod  = "read_${type}_page";
 
    die "Too much data to write in $size bytes\n"
       if $size < length $data;
@@ -181,7 +184,7 @@ sub _generic_write
    while( $addr < $size ) {
       my $chunk = substr $data, $addr, $pagesize;
 
-      $updi->$method( $baseaddr + $addr, $chunk, $wordsize )->get;
+      $updi->$writemethod( $addr, $chunk )->get;
 
       $addr += length $chunk;
       printf STDERR "\rWritten %d (%.2f%%)", $addr, 100 * $addr / $size;
@@ -193,7 +196,7 @@ sub _generic_write
    while( $addr < $size ) {
       my $chunk = substr $data, $addr, $pagesize;
 
-      my $readback = $updi->ld( $baseaddr + $addr, length $chunk )->get;
+      my $readback = $updi->$readmethod( $addr, length $chunk )->get;
       if( $readback ne $chunk ) {
          printf STDERR "Read: %v02X\n", $readback;
          printf STDERR "Exp : %v02X\n", $chunk;
@@ -229,6 +232,28 @@ sub run_reset
    reset_chip;
 }
 
+=head2 read-sib
+
+Reads the System Information Block
+
+   $ avr-updi read-sib
+
+Note that this command does not need the C<--part> to be specified.
+
+=cut
+
+sub run_read_sib
+{
+   $PART //= "ATtiny814"; # part doesn't matter
+   make_updi;
+
+   my $sib = $updi->read_sib->get;
+
+   foreach my $key ( sort keys %$sib ) {
+      printf "%12s: %s\n", uc $key, $sib->{$key};
+   }
+}
+
 =head2 read-flash
 
 Reads from the flash portion of non-volatile memory ("NVM").
@@ -242,8 +267,8 @@ sub run_read_flash
    make_updi;
    check_signature;
 
-   my $data = _generic_read(
-      $updi->partinfo->baseaddr_flash, $updi->partinfo->pagesize_flash, $updi->partinfo->size_flash );
+   my $data = _generic_read( flash =>
+      $updi->partinfo->pagesize_flash, $updi->partinfo->size_flash );
 
    open_output_file->output( $data );
 }
@@ -266,9 +291,8 @@ sub run_write_flash
 
    my $data = open_input_file->input;
 
-   _generic_write( $data,
-      $updi->partinfo->baseaddr_flash, $updi->partinfo->pagesize_flash, $updi->partinfo->size_flash,
-      16 );
+   _generic_write( flash => $data,
+      $updi->partinfo->pagesize_flash, $updi->partinfo->size_flash );
 }
 
 =head2 read-eeprom
@@ -284,8 +308,8 @@ sub run_read_eeprom
    make_updi;
    check_signature;
 
-   my $data = _generic_read(
-      $updi->partinfo->baseaddr_eeprom, $updi->partinfo->pagesize_eeprom, $updi->partinfo->size_eeprom );
+   my $data = _generic_read( eeprom =>
+      $updi->partinfo->pagesize_eeprom, $updi->partinfo->size_eeprom );
 
    open_output_file->output( $data );
 }
@@ -306,9 +330,8 @@ sub run_write_eeprom
 
    my $data = open_input_file->input;
 
-   _generic_write( $data,
-      $updi->partinfo->baseaddr_eeprom, $updi->partinfo->pagesize_eeprom, $updi->partinfo->size_eeprom,
-      8, "EEPROM" );
+   _generic_write( eeprom => $data,
+      $updi->partinfo->pagesize_eeprom, $updi->partinfo->size_eeprom );
 }
 
 =head2 read-fuses
@@ -397,8 +420,9 @@ sub run_write_fuses
 
       if( $name =~ m/\./ ) {
          my ( $regname, $fusename ) = $name =~ m/^(.*?)\.(.*)$/;
-         my $idx = first { defined $FUSES[$_] and $FUSES[$_] eq $regname } 0 .. $#FUSES or
-            die "Unrecognised fuse register $regname";
+         my $idx = first { defined $FUSES[$_] and $FUSES[$_] eq $regname } 0 .. $#FUSES;
+         defined $idx or die "Unrecognised fuse register $regname";
+
          my $fuse = $fuseinfo->{fusemap}{$fusename} or
             die "Unrecognised fuse $fusename";
          $fuse->{reg} eq $regname or
@@ -421,8 +445,8 @@ sub run_write_fuses
          $values[$idx] |= $value;
       }
       else {
-         my $idx = first { defined $FUSES[$_] and $FUSES[$_] eq $name } 0 .. $#FUSES or
-            die "Unrecognised fuse";
+         my $idx = first { defined $FUSES[$_] and $FUSES[$_] eq $name } 0 .. $#FUSES;
+         defined $idx or die "Unrecognised fuse";
 
          $value = hex $value if $value =~ m/^0x/;
 

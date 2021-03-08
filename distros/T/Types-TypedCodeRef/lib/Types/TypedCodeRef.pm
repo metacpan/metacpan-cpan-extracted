@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Type::Library (
   -base,
@@ -22,30 +22,9 @@ use Types::TypedCodeRef::Factory;
 sub get_sub_meta_from_sub_wrap_in_type {
   my $typed_code_ref = shift;
   if ( Scalar::Util::blessed($typed_code_ref) && $typed_code_ref->isa('Sub::WrapInType') ) {
-    my @parameters = do {
-      if (ref $typed_code_ref->params eq 'ARRAY') {
-        map { Sub::Meta::Param->new($_) } @{ $typed_code_ref->params };
-      }
-      elsif (ref $typed_code_ref->params eq 'HASH') {
-        map {
-          Sub::Meta::Param->new({
-            name  => $_,
-            type  => $typed_code_ref->params->{$_},
-            named => 1,
-          });
-        } sort keys %{ $typed_code_ref->params };
-      }
-      else {
-        Sub::Meta::Param->new($typed_code_ref->params);
-      }
-    };
     return Sub::Meta->new(
-      parameters => Sub::Meta::Parameters->new(args => \@parameters),
-      returns    => Sub::Meta::Returns->new(
-        scalar => $typed_code_ref->returns,
-        list   => $typed_code_ref->returns,
-        void   => $typed_code_ref->returns,
-      ),
+      args    => $typed_code_ref->params,
+      returns => $typed_code_ref->returns,
     );
   }
   return;

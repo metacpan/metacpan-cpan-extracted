@@ -25,18 +25,24 @@
       "build" : {
          "requires" : {
             "File::Temp" : "0",
-            "Test::More" : "0.96"
+            "Test::More" : "0.96",
+            "lib" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Config" : "0",
+            "FileHandle" : "0",
+            "Getopt::Std" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Data::Dumper" : "0",
+            "Config" : "0",
             "Exporter" : "0",
             "Getopt::Long" : "2.39",
             "HTTP::Date" : "0",
@@ -65,14 +71,14 @@
    "provides" : {
       "Astro::SpaceTrack" : {
          "file" : "lib/Astro/SpaceTrack.pm",
-         "version" : "0.143"
+         "version" : "0.144"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-Astro-SpaceTrack/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -83,6 +89,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-SpaceTrack"
       }
    },
-   "version" : "0.143",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.144",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

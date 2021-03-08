@@ -13,7 +13,7 @@ use HTTP::Response;
 use LWP::UserAgent;
 use JSON;
 
-our $VERSION = '0.143';
+our $VERSION = '0.144';
 
 our $CANNED_RESPONSE_DIR = File::Spec->catdir(
     qw{ t data Mock-LWP-UserAgent } );
@@ -241,7 +241,9 @@ This class has no public attributes.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://rt.cpan.org>, or in electronic mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack>,
+L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues/>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

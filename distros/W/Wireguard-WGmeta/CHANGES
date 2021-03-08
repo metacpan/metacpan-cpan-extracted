@@ -1,3 +1,6 @@
+0.2.2 2021-02-28 Tobias Bossert (tobib at cpan.org)
+- fix: Possible infinite recursion in reload_from_disk()
+
 0.2.1 2021-02-28 Tobias Bossert (tobib at cpan.org)
 - fix: Concurrency-test threads detection
 

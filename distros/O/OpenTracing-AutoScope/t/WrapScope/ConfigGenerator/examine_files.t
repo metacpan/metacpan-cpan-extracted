@@ -63,6 +63,24 @@ my @cases = (
         /],
     },
     {
+        name => 'include a sub with signature',
+        args => [
+            files   => [ '*', '*/*' ],
+            ignore  => [ 'Secret/*' ],
+            include => [ 'Secret::Encryption::hash(@args)' ],
+        ],
+        expected => [qw/
+            main::run_foo
+            TopLvl1::top_1_stuff
+            TopLvl1::top_1_something
+            TopLvl1::_top_1_private
+            TopLvl2::top_2_stuff
+            TopLvl2::top_2_something
+            TopLvl2::_top_2_private
+            Secret::Encryption::hash(@args)
+        /],
+    },
+    {
         name     => '.pm only',
         args     => [ files => [ '*.pm', '*/*.pm' ], ],
         expected => [qw/

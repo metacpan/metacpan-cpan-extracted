@@ -62,7 +62,7 @@ subtest "group accessor" => sub {
         map { Protocol::FIX::TagsAccessor->new([$f1 => $_->[0], $f2 => $_->[1],]); } ([qw/my-login my-secret/], [qw/your-login your-secret/]);
     my $group_accessor = Protocol::FIX::TagsAccessor->new([$g => \@tag_accessors]);
 
-    my $c = Protocol::FIX::Component->new('CredentialGroups', [$g => 0]);
+    my $c  = Protocol::FIX::Component->new('CredentialGroups', [$g => 0]);
     my $ta = Protocol::FIX::TagsAccessor->new([$c => $group_accessor]);
 
     is $ta->value('CredentialGroups')->value('NoCredentials')->[0]->value('Username'), 'my-login';

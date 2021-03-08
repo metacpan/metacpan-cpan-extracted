@@ -12,9 +12,6 @@ use Type::Params qw( compile compile_named multisig );
 use Types::Standard -types;
 use Scalar::Util;
 use Sub::Meta;
-use Sub::Meta::Param;
-use Sub::Meta::Parameters;
-use Sub::Meta::Returns;
 use Sub::WrapInType qw( wrap_sub );
 use Carp qw( croak );
 use namespace::autoclean;
@@ -38,33 +35,13 @@ has name => (
   default => 'TypedCodeRef',
 );
 
-has name_generator => (
-  is      => 'ro',
-  isa     => CodeRef,
-  builder => '_build_name_generator',
-);
-
-has constraint_generator => (
-  is      => 'ro',
-  isa     => CodeRef,
-  lazy    => 1,
-  builder => '_build_constraint_generator',
-);
-
 has sub_meta_finders => (
   is       => 'ro',
   isa      => ArrayRef[CodeRef],
   required => 1,
 );
 
-has coercion_generator => (
-  is       => 'ro',
-  isa      => CodeRef,
-  lazy     => 1,
-  builder  => '_build_coercion_generator',
-);
-
-sub _build_name_generator {
+sub name_generator {
   sub {
     my ($type_name, @type_parameters) = @_;
     $type_name . do {
@@ -99,7 +76,7 @@ sub _build_name_generator {
   };
 }
 
-sub _build_constraint_generator {
+sub constraint_generator {
   my $self = shift;
 
   sub {
@@ -123,32 +100,8 @@ sub _build_constraint_generator {
         my ($params, $returns) = $validator->(@_);
 
         Sub::Meta->new(
-          parameters => do {
-            my @meta_params = do {
-              if ( ref $params eq 'ARRAY' ) {
-                map { Sub::Meta::Param->new($_) } @$params;
-              }
-              elsif ( ref $params eq 'HASH' ) {
-                map {
-                  Sub::Meta::Param->new({
-                    name  => $_,
-                    type  => $params->{$_},
-                    named => 1,
-                  });
-                }
-                sort keys %$params;
-              }
-              else {
-                Sub::Meta::Param->new($params);
-              }
-            };
-            Sub::Meta::Parameters->new(args => \@meta_params);
-          },
-          returns => Sub::Meta::Returns->new(
-            scalar => $returns,
-            list   => $returns,
-            void   => $returns,
-          ),
+          args    => $params,
+          returns => $returns,
         );
       }
       else {
@@ -175,17 +128,11 @@ sub find_sub_meta {
 
 sub create_unknown_sub_meta {
   Sub::Meta->new(
-    parameters => Sub::Meta::Parameters->new(
-      args   => [],
-      slurpy => 1,
-    ),
-    returns => Sub::Meta::Returns->new(),
+    slurpy => 1,
   );
 }
 
-sub _build_coercion_generator {
-  my $self = shift;
-
+sub coercion_generator {
   sub {
     my (undef, $type, @type_parameters) = @_;
     

@@ -4,7 +4,7 @@ use Mojo::Util qw(getopt url_escape);
 use Mojo::URL;
 use Mojolicious::Routes;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 has description => 'Proxy web requests elsewhere';
 has usage => sub { shift->extract_usage . "\n" };
@@ -27,10 +27,10 @@ sub run {
 sub proxy {
   my ($self, $app, $from, $to) = @_;
   $from ||= '/';
-  $app->routes->any("$from*path" => { path => "" } => sub {
+  $app->routes->any("$from*proxy_path" => { proxy_path => "" } => sub {
     my ($c) = @_;
     my $req = $c->req;
-    my $path = $c->stash('path');
+    my $path = $c->stash('proxy_path');
     $path = url_escape $path, '^A-Za-z0-9\-._~/'; # route in unescapes, escaping normal stuff except "/" seems reasonable
     my $query = $c->req->url->query->to_string;
     $path = join '?', $path, grep length, $query;

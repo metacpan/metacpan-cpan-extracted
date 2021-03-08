@@ -39,7 +39,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.2'; # VERSION
+our $VERSION = '1.13.3'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -234,9 +234,9 @@ sub cron {
     if ( $c->add( %{$config} ) ) {
       my $rnd_file = $c->write_cron;
       $c->activate_user_cron( $rnd_file, $user );
-      return 1;              # something changed
+      return 1; # something changed
     }
-    return 0;                # nothing changed
+    return 0;   # nothing changed
   }
 
   elsif ( $action eq "delete" ) {

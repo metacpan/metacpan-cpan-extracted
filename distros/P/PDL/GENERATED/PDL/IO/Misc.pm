@@ -75,10 +75,6 @@ use strict;
 
 Swaps pairs of bytes in argument x()
 
-=for bad
-
-bswap2 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -104,10 +100,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Swaps quads of bytes in argument x()
 
-=for bad
-
-bswap4 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -133,10 +125,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Swaps octets of bytes in argument x()
 
-=for bad
-
-bswap8 does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

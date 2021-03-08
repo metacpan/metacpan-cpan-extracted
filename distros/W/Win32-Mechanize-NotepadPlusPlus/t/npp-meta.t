@@ -7,8 +7,11 @@ use strict;
 use warnings;
 use Test::More;
 use Win32;
+use version;
 
 use FindBin;
+BEGIN { my $f = $FindBin::Bin . '/nppPath.inc'; require $f if -f $f; }
+
 use lib $FindBin::Bin;
 use myTestHelpers qw/runCodeAndClickPopup :userSession/;
 
@@ -33,6 +36,7 @@ my $ret;
 $ret = notepad()->getNppVersion;
 like $ret, qr/^v\d+[\.\d]*$/, 'getNppVersion';
     note sprintf "\t=> \"%s\"", defined $ret ? explain $ret : '<undef>';
+my $ver = version->parse($ret); # save for later
 
 $ret = notepad()->getPluginVersion;
 like $ret, qr/v\d+\.[\._\d]+/, 'getPluginVersion';
@@ -100,5 +104,15 @@ ok $ret, 'getNppVar(NPP_DIRECTORY)';
 $ret = notepad()->getNppVar( $INTERNALVAR{NPP_FULL_FILE_PATH} );
 ok $ret, 'getNppVar(NPP_FULL_FILE_PATH)';
     note sprintf "\t=> \"%s\"", defined $ret ? explain $ret : '<undef>';
+
+SKIP: {
+    skip "Not implemented in $ver", 1 if $ver < version->parse(v7.9.2);
+        note sprintf "getSettingsOnCloudPath optional test\n";
+    my $exp_len = notepad()->SendMessage( $NPPMSG{NPPM_GETSETTINGSONCLOUDPATH} , 0 );
+        note sprintf "\t=> \"%s\"", defined $exp_len ? explain $exp_len : '<undef>';
+    my $path = notepad()->getSettingsOnCloudPath();
+        note sprintf "\t=> \"%s\"", defined $path ? explain $path : '<undef>';
+    is $exp_len, length($path), 'getSettingsOnCloudPath matches expected length';
+}
 
 done_testing;

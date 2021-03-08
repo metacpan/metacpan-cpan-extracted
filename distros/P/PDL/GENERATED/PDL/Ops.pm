@@ -4,7 +4,7 @@
 #
 package PDL::Ops;
 
-@EXPORT_OK  = qw(  PDL::PP log10 PDL::PP assgn PDL::PP ipow );
+@EXPORT_OK  = qw(  PDL::PP log10 PDL::PP assgn PDL::PP carg PDL::PP conj PDL::PP creal PDL::PP cimag PDL::PP _cabs PDL::PP ci PDL::PP ipow PDL::PP _rabs );
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -85,10 +85,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-plus processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -128,10 +124,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-mult processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -171,10 +163,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-minus processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -214,10 +202,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-divide processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -257,10 +241,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-gt processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -300,10 +280,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-lt processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -343,10 +319,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-le processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -386,10 +358,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-ge processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -429,10 +397,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-eq processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -472,10 +436,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-ne processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -515,10 +475,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-shiftleft processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -558,10 +514,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-shiftright processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -601,10 +553,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-or2 processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -644,10 +592,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-and2 processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -687,10 +631,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-xor processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -726,10 +666,6 @@ This function is used to overload the unary C<~> operator/function.
 
 
 
-=for bad
-
-bitnot processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -769,10 +705,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-power processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -812,10 +744,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-atan2 processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -855,10 +783,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-modulo processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -898,10 +822,6 @@ This restriction is expected to go away in future releases.
 
 
 
-=for bad
-
-spaceship processes bad values.
-The state of the bad-value flag of the output piddles is unknown.
 
 
 =cut
@@ -937,10 +857,6 @@ This function is used to overload the unary C<sqrt> operator/function.
 
 
 
-=for bad
-
-sqrt processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -951,45 +867,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 *sqrt = \&PDL::sqrt;
-
-
-
-
-
-=head2 abs
-
-=for sig
-
-  Signature: (a(); [o]b())
-
-=for ref
-
-elementwise absolute value
-
-=for example
-
-   $y = abs $x;
-   $x->inplace->abs;  # modify $x inplace
-
-It can be made to work inplace with the C<$x-E<gt>inplace> syntax.
-This function is used to overload the unary C<abs> operator/function.
-
-
-
-=for bad
-
-abs processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
-
-
-=cut
-
-
-
-
-
-
-*abs = \&PDL::abs;
 
 
 
@@ -1015,10 +892,6 @@ This function is used to overload the unary C<sin> operator/function.
 
 
 
-=for bad
-
-sin processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1054,10 +927,6 @@ This function is used to overload the unary C<cos> operator/function.
 
 
 
-=for bad
-
-cos processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1093,10 +962,6 @@ This function is used to overload the unary C<!> operator/function.
 
 
 
-=for bad
-
-not processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1132,10 +997,6 @@ This function is used to overload the unary C<exp> operator/function.
 
 
 
-=for bad
-
-exp processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1171,10 +1032,6 @@ This function is used to overload the unary C<log> operator/function.
 
 
 
-=for bad
-
-log processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1210,10 +1067,6 @@ This function is used to overload the unary C<log10> operator/function.
 
 
 
-=for bad
-
-log10 processes bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1256,19 +1109,7 @@ sub PDL::log10 {
 
 Plain numerical assignment. This is used to implement the ".=" operator
 
-=for bad
 
-If C<a> is a child piddle (e.g., the result of a slice) and bad values are generated in C<b>,
-the bad value flag is set in C<b>, but it is B<NOT> automatically propagated back to the parent of C<a>.
-The following idiom ensures that the badflag is propagated back to the parent of C<a>:
-
- $pdl->slice(":,(1)") .= PDL::Bad_aware_func();
- $pdl->badflag(1);
- $pdl->check_badflag();
-
-This is unnecessary if $pdl->badflag is known to be 1 before the slice is performed.
-
-See http://pdl.perl.org/PDLdocs/BadValues.html#dataflow_of_the_badflag for details.
 
 =cut
 
@@ -1278,6 +1119,159 @@ See http://pdl.perl.org/PDLdocs/BadValues.html#dataflow_of_the_badflag for detai
 
 
 *assgn = \&PDL::assgn;
+
+
+
+
+
+=head2 carg
+
+=for sig
+
+  Signature: (a(); [o]b())
+
+=for ref
+
+Returns the polar angle of a complex number.
+
+
+
+=cut
+
+
+
+
+
+
+*carg = \&PDL::carg;
+
+
+
+
+
+=head2 conj
+
+=for sig
+
+  Signature: (a(); [o]b())
+
+=for ref
+
+complex conjugate.
+
+
+
+=cut
+
+
+
+
+
+
+*conj = \&PDL::conj;
+
+
+
+
+
+=head2 creal
+
+=for sig
+
+  Signature: (a(); [o]b())
+
+=for ref
+
+Returns the real part of a complex number.
+
+
+
+=cut
+
+
+
+
+
+
+*creal = \&PDL::creal;
+
+
+
+
+
+=head2 cimag
+
+=for sig
+
+  Signature: (a(); [o]b())
+
+=for ref
+
+Returns the imaginary part of a complex number.
+
+
+
+=cut
+
+
+
+
+
+
+*cimag = \&PDL::cimag;
+
+
+
+
+
+=head2 _cabs
+
+=for sig
+
+  Signature: (a(); [o]b())
+
+=for ref
+
+Returns the absolute (length) of a complex number.
+
+
+
+=cut
+
+
+
+
+
+
+
+
+
+
+
+=head2 ci
+
+=for sig
+
+  Signature: (cdouble [o]b())
+
+Returns the complex number 0 + 1i.
+
+B<WARNING> because this is not defined as a constant (with empty
+prototype), you must use it either as C<10*ci> or C<ci()*10>. If you
+use it as C<ci*10> this will actually try to use 10 as a glob and pass
+that to C<ci>, which will not do what you want.
+
+
+
+
+=cut
+
+
+
+
+
+
+*ci = \&PDL::ci;
 
 
 
@@ -1309,10 +1303,6 @@ Algorithm from L<Wikipedia|http://en.wikipedia.org/wiki/Exponentiation_by_squari
 
 
 
-=for bad
-
-ipow does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1323,6 +1313,44 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 *ipow = \&PDL::ipow;
+
+
+
+
+
+=head2 _rabs
+
+=for sig
+
+  Signature: (a(); [o]b())
+
+=for ref
+
+Returns the absolute value of a number. 
+
+
+
+=cut
+
+
+
+
+
+
+
+
+
+
+sub PDL::abs {
+	my $x=shift;
+	my $ret;
+	if ($x->type eq 'cdouble' or $x->type eq 'cfloat') {
+		$ret=PDL::_cabs($x);
+	} else {
+		$ret=PDL::_rabs($x);
+	}
+	$ret;
+}
 
 
 

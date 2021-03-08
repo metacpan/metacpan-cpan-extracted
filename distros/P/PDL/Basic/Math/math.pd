@@ -43,11 +43,17 @@ sub doco {
   for (@funcs) { $doco{$_} = $doc }
 }
 
-doco (qw/acos asin atan tan/,
-'The usual trigonometric function.');
+doco (qw/acos asin atan tan/, <<'EOF');
+The usual trigonometric function.
+Note that when input is a perl scalar and the real-value based function
+would return NaN, it now returns a cdouble.
+EOF
 
-doco (qw/cosh sinh tanh acosh asinh atanh/,
-'The standard hyperbolic function.');
+doco (qw/cosh sinh tanh acosh asinh atanh/, <<'EOF');
+The standard hyperbolic function.
+Note that when input is a perl scalar and the real-value based function
+would return NaN, it now returns a cdouble.
+EOF
 
 doco (qw/ceil floor/,
 'Round to integer values in floating-point format.');
@@ -66,7 +72,7 @@ rounding half-integers up or away from zero.
 
 If you are looking to round half-integers up (regardless of sign), try
 C<floor($x+0.5)>.  If you want to round half-integers away from zero,
-try C<< floor(abs($x)+0.5)*($x<=>0) >>./);
+try C<< ceil(abs($x)+0.5)*($x<=>0) >>./);
 
 doco( 'pow',"Synonym for `**'.");
 
@@ -157,7 +163,7 @@ pp_addhdr('
 
 # Standard `-lm'
 my (@ufuncs1) = qw(acos asin atan cosh sinh tan tanh); # F,D only
-my (@ufuncs1g) = qw(ceil floor rint); # Any type
+my (@ufuncs1g) = qw(ceil floor rint); # Any real type
 
 # Note:
 #  ops.pd has a power() function that does the same thing
@@ -172,22 +178,39 @@ my (@besufuncs) = qw(j0 j1 y0 y1); # "
 my (@besbifuncs) = qw(jn yn); # "
 # Need igamma, ibeta, and a fall-back implementation of the above
 
-sub code_ufunc    { return '$b() = ' . $_[0] . '($a());'; }
+sub code_ufunc {
+    my ($name) = @_;
+    my $got_complex = PDL::Core::Dev::got_complex_version($name, 1);
+    my $complex_bit = sprintf(<<'EOF', $name);
+	types(C) %%{ $b() = c%1$s($a()); %%}
+	types(G) %%{ $b() = c%1$sf($a()); %%}
+EOF
+    ($got_complex ? $complex_bit : '') .
+    'types(BSULNQFD) %{ $b() = ' . $name . '($a()); %}'."\n";
+}
 sub badcode_ufunc {
-    my $name = $_[0];
-    return 'if ( $ISBAD(a()) ) { $SETBAD(b()); } else { $b() = ' . $name . '($a()); }';
+    'if ( $ISBAD(a()) ) { $SETBAD(b()); } else {' . "\n" .
+	code_ufunc(@_) .
+    "}\n";
 }
 
 sub code_bifunc {
     my $name = $_[0]; my $x = $_[1] || 'a'; my $y = $_[2] || 'b';
     my $c = $_[3] || 'c';
-    return "\$$c() = $name(\$$x(),\$$y());";
+    my $got_complex = PDL::Core::Dev::got_complex_version($name, 2);
+    my $complex_bit = sprintf(<<'EOF', $name, $x, $y, $c);
+	types(C) %%{ $%4$s() = c%1$s($%2$s(), $%3$s()); %%}
+	types(G) %%{ $%4$s() = c%1$sf($%2$s(), $%3$s()); %%}
+EOF
+    ($got_complex ? $complex_bit : '') .
+    "types(BSULNQFD) %{ \$$c() = $name(\$$x(),\$$y()); %}\n";
 }
 sub badcode_bifunc {
     my $name = $_[0]; my $x = $_[1] || 'a'; my $y = $_[2] || 'b';
     my $c = $_[3] || 'c';
-    return 'if ( $ISBAD('.$x.'()) || $ISBAD('.$y.'()) ) { $SETBAD('.$c.'()); } else { ' .
-	"\$$c() = $name(\$$x(),\$$y()); }";
+    'if ( $ISBAD('.$x.'()) || $ISBAD('.$y.'()) ) { $SETBAD('.$c.'()); } else {' . "\n" .
+	code_bifunc(@_) .
+    "}\n";
 }
 
 sub inplace_doc {
@@ -197,10 +220,11 @@ sub inplace_doc {
 
 my $func;
 foreach $func (@ufuncs1) {
+    my $got_complex = PDL::Core::Dev::got_complex_version($func, 1);
     pp_def($func,
 	   HandleBad => 1,
 	   NoBadifNaN => 1,
-	   GenericTypes => ['F','D'],
+	   GenericTypes => [($got_complex ? ('G','C') : ()), 'F','D'],
 	   Pars => 'a(); [o]b();',
 	   Inplace => 1,
 	   Doc => inplace_doc( $func ),
@@ -208,10 +232,12 @@ foreach $func (@ufuncs1) {
 	   BadCode => badcode_ufunc($func),
 	   );
 }
-
+my $R = ['B','S','U','L','N','Q','F','D']; # should be using code from Types.pm to set up.
+# real types
 foreach $func (@ufuncs1g) {
     pp_def($func,
 	   HandleBad => 1,
+	   GenericTypes=>$R,
 	   NoBadifNaN => 1,
 	   Pars => 'a(); [o]b();',
 	   Inplace => 1,
@@ -222,11 +248,13 @@ foreach $func (@ufuncs1g) {
 }
 
 foreach $func (@bifuncs1) {
+    my $got_complex = PDL::Core::Dev::got_complex_version($func, 2);
     pp_def($func,
 	   HandleBad => 1,
 	   NoBadifNaN => 1,
 	   Pars => 'a(); b(); [o]c();',
 	   Inplace => [ 'a' ],
+	   GenericTypes => [($got_complex ? ('G','C') : ()), @$R],
 	   Doc => inplace_doc( $func ),
 	   Code => code_bifunc($func),
 	   BadCode => badcode_bifunc($func),
@@ -278,6 +306,7 @@ foreach $func (@besbifuncs) {
 if ($^O !~ /win32/i) {
     pp_def("lgamma",
 	   HandleBad => 1,
+	   GenericTypes=>$R,
 	   Pars => 'a(); [o]b(); int[o]s()',
 	   Doc => $doco{"lgamma"},
 	   Code =>
@@ -298,6 +327,7 @@ if ($^O !~ /win32/i) {
 elsif ($Config{cc} =~ /\bgcc/i) {
     pp_def("lgamma",
 	   HandleBad => 1,
+	   GenericTypes=>$R,
 	   Pars => 'a(); [o]b(); int[o]s()',
 	   Doc => $doco{"lgamma"},
 	   Code =>

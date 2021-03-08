@@ -28,7 +28,7 @@ use experimental 'signatures';
 use base 'Exporter';
 our @EXPORT = qw(wg_show_dump_parser);
 
-our $VERSION = "0.2.1"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.2.2"; # do not change manually, this variable is updated when calling make
 
 
 =head3 wg_show_dump_parser($input)

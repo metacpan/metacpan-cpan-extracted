@@ -1,0 +1,86 @@
+{
+   "abstract" : "lexer to break text up into user-defined tokens",
+   "author" : [
+      "Aaron Crane, <arc@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.029",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-TokenStream",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.029"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::Util" : "1.29",
+            "Moo" : "1.006000",
+            "Moo::Role" : "0",
+            "Type::Library" : "0",
+            "Type::Utils" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Path::Tiny" : "0",
+            "Types::Standard" : "1.002000",
+            "namespace::clean" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::TokenStream" : {
+         "file" : "lib/Text/TokenStream.pm",
+         "version" : "0.03"
+      },
+      "Text::TokenStream::Lexer" : {
+         "file" : "lib/Text/TokenStream/Lexer.pm",
+         "version" : "0.03"
+      },
+      "Text::TokenStream::Role::Stream" : {
+         "file" : "lib/Text/TokenStream/Role/Stream.pm",
+         "version" : "0.03"
+      },
+      "Text::TokenStream::Token" : {
+         "file" : "lib/Text/TokenStream/Token.pm",
+         "version" : "0.03"
+      },
+      "Text::TokenStream::Types" : {
+         "file" : "lib/Text/TokenStream/Types.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/arc/Text-TokenStream/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/arc/Text-TokenStream.git",
+         "web" : "https://github.com/arc/Text-TokenStream"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

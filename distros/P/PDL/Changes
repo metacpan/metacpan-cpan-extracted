@@ -1,3 +1,24 @@
+2.028 2021-03-07
+- correct complex-maths functions for their C types
+- fix MOD-problem-dodging logic for native complex
+
+2.027 2021-03-06
+- no changes from 2.026_04
+
+2.026_04 2021-03-02
+- define and use C macros in PP for shorter, more comprehensible XS
+
+2.026_03 2021-02-28
+- got_complex_version change to defeat FreeBSD 10 false positive for complex funcs
+- trig functions like asin($perl_scalar) return NaN for >1 again
+
+2.026_02 2021-02-25
+- implement PDL::Type::real etc
+- native complex numbers need check_lib as FreeBSD <10 has no complex trig
+
+2.026_01 2021-02-19
+- native support for complex numbers - thanks @fantasma13
+
 2.026 2021-02-13
 - fix GSL build errors, improve docs - thanks @d-lamb
 - rfits properly treats BLANK in rice-compressed - thanks @d-lamb

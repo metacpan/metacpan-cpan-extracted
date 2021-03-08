@@ -2,7 +2,7 @@ package Test2::Harness::Renderer;
 use strict;
 use warnings;
 
-our $VERSION = '1.000042';
+our $VERSION = '1.000043';
 
 use Carp qw/croak/;
 
@@ -11,6 +11,8 @@ use Test2::Harness::Util::HashBase qw/-settings -verbose -progress -color/;
 sub render_event { croak "$_[0] forgot to override 'render_event()'" }
 
 sub finish { }
+
+sub signal { }
 
 1;
 
@@ -63,6 +65,12 @@ Called for every event. Return is ignored.
 Called once after testing is done.
 
 C<%ARGS>:
+
+=item $renderer->signal($signal)
+
+Called when the rendering process receives a signal. This is your chance to do
+any cleanup or report the signal. This is not an event, you can ignore it. Do
+not exit or throw any exceptions here please.
 
 =over 4
 

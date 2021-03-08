@@ -3,7 +3,7 @@ package App::CalId;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-13'; # DATE
 our $DIST = 'App-CalId'; # DIST
-our $VERSION = '0.132'; # VERSION
+our $VERSION = '0.133'; # VERSION
 
 use 5.010001;
 use strict;
@@ -255,7 +255,7 @@ App::CalId - Display Indonesian calendar on the command-line
 
 =head1 VERSION
 
-This document describes version 0.132 of App::CalId (from Perl distribution App-CalId), released on 2021-01-13.
+This document describes version 0.133 of App::CalId (from Perl distribution App-CalId), released on 2021-01-13.
 
 =head1 SYNOPSIS
 

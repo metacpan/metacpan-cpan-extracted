@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 use ojo::ServeDir::App;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub import {
     ojo::ServeDir::App->new->start('daemon');
@@ -20,7 +20,7 @@ ojo::ServeDir - Helper module to serve local files
 
 =head1 VERSION
 
-Version 0.1
+Version 0.11
 
 =head1 SYNOPSIS
 

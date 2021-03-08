@@ -61,10 +61,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Riemann Zeta Function zeta(x) = Sum[ k^(-s), {k,1,Infinity} ], s != 1.0
 
-=for bad
-
-gsl_sf_zeta does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -90,10 +86,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Hurwicz Zeta Function zeta(s,q) = Sum[ (k+q)^(-s), {k,0,Infinity} ]
 
-=for bad
-
-gsl_sf_hzeta does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -119,10 +111,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Eta Function eta(s) = (1-2^(1-s)) zeta(s)
 
-=for bad
-
-gsl_sf_eta does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

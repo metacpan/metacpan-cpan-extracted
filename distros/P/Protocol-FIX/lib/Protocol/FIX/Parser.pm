@@ -8,7 +8,7 @@ use Protocol::FIX qw/humanize/;
 use Protocol::FIX::TagsAccessor;
 use Protocol::FIX::MessageInstance;
 
-our $VERSION = '0.04';    ## VERSION
+our $VERSION = '0.05';    ## VERSION
 
 =head1 NAME
 
@@ -62,7 +62,7 @@ sub parse {
 
     # this are fatal messages, i.e. point to developer error, hence we die
     die("buffer is undefined, cannot parse") unless defined $buff_ref;
-    die("buffer is not scalar reference") unless ref($buff_ref) eq 'SCALAR';
+    die("buffer is not scalar reference")    unless ref($buff_ref) eq 'SCALAR';
 
     my $begin_string = $protocol->{begin_string};
     my $buff_length  = length($$buff_ref);
@@ -136,7 +136,7 @@ sub parse {
         }
 
         my $header_body = substr($$buff_ref, 0, $consumed_length + $body_length);
-        my $sum = 0;
+        my $sum         = 0;
         $sum += ord $_ for split //, $header_body;
         $sum %= 256;
 
@@ -219,7 +219,7 @@ sub _construct_tag_accessor_group {
     my ($sub_composite, undef) = @$composite_desc;
 
     my @tag_accessors;
-    for my $idx (1 .. $value) {
+    for (my $idx = 1; $idx <= $value;) {
         my ($ta) = _construct_tag_accessor($protocol, $sub_composite, $tag_pairs, 0);
         return (undef,
                   "Protocol error: cannot construct item #${idx} for "
@@ -229,6 +229,7 @@ sub _construct_tag_accessor_group {
                 . $sub_composite->{name} . "')")
             unless $ta;
         push @tag_accessors, $ta;
+        $idx += $ta->count;
     }
     return ([$sub_composite => \@tag_accessors]);
 }

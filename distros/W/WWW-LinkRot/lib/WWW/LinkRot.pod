@@ -1,0 +1,120 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+WWW::LinkRot - check web page link rot
+
+=head1 SYNOPSIS
+
+    use WWW::LinkRot;
+
+=head1 VERSION
+
+This documents version 0.01 of WWW-LinkRot
+corresponding to L<git commit 669d2c37bcc74b435d2e2d7e6983c48565e65081|https://github.com/benkasminbullock/www-linkrot/commit/669d2c37bcc74b435d2e2d7e6983c48565e65081> released on Mon Mar 8 22:48:31 2021 +0900.
+
+=head1 DESCRIPTION
+
+Scan HTML pages for links, try to access the links, and make a report.
+
+The HTML files need to be in UTF-8 encoding.
+
+=head1 FUNCTIONS
+
+=head2 check_links
+
+    check_links ($links);
+
+Check the links returned by L</get_links> and write to a JSON file specified by the C<out> option.
+
+    check_links ($links, out => "link-statuses.json");
+
+=head2 get_links
+
+    my $links = get_links (\@files);
+
+Given a list of HTML files in C<@files>, extract all the links from
+it. The return value C<$links> contains a hash reference whose keys
+are the links and whose values are array references containing a list
+of all the files of C<@files> which contain the link.
+
+=head2 html_report
+
+    html_report (in => 'link-statuses.json', 
+
+Write an HTML report using the JSON output by L</get_links>.
+
+=head2 replace
+
+    replace (\%links, @files);
+
+Make a regex of links with 30* statuses and new locations, then go
+through @files and replace them with the new locations.
+
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<LWP::UserAgent>
+
+=item L<HTML::Make>
+
+This is used to make the HTML report about the links.
+
+=item L<HTML::Make::Page>
+
+This is used to make the HTML report about the links.
+
+=item L<JSON::Parse>
+
+=item L<JSON::Create>
+
+This is used to make the report file about the links.
+
+=item L<Trav::Dir>
+
+This is used to traverse the directory of HTML files.
+
+=item L<File::Slurper>
+
+This is used for reading and writing files.
+
+=item L<Convert::Moji>
+
+=back
+
+=head1 SEE ALSO
+
+=head2 CPAN
+
+=over
+
+=item L<HTTP::SimpleLinkChecker>
+
+=item L<W3C::LinkChecker>
+
+=back
+
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

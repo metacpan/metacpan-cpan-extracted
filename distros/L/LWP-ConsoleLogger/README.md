@@ -4,16 +4,16 @@ LWP::ConsoleLogger - LWP tracing and debugging
 
 # VERSION
 
-version 0.000042
+version 0.000043
 
 # SYNOPSIS
 
-The simplest way to get started is by adding [LWP::ConsoleLogger::Everywhere](https://metacpan.org/pod/LWP::ConsoleLogger::Everywhere)
+The simplest way to get started is by adding [LWP::ConsoleLogger::Everywhere](https://metacpan.org/pod/LWP%3A%3AConsoleLogger%3A%3AEverywhere)
 to your code and then just watching your output.
 
     use LWP::ConsoleLogger::Everywhere ();
 
-If you need more control, look at [LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP::ConsoleLogger::Easy).
+If you need more control, look at [LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP%3A%3AConsoleLogger%3A%3AEasy).
 
     use LWP::ConsoleLogger::Easy qw( debug_ua );
     use WWW::Mechanize;
@@ -118,11 +118,11 @@ It can be hard (or at least tedious) to debug mechanize scripts.  LWP::Debug is
 deprecated.  It suggests you write your own debugging handlers, set up a proxy
 or install Wireshark.  Those are all workable solutions, but this module exists
 to save you some of that work.  The guts of this module are stolen from
-[Plack::Middleware::DebugLogging](https://metacpan.org/pod/Plack::Middleware::DebugLogging), which in turn stole most of its internals
+[Plack::Middleware::DebugLogging](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3ADebugLogging), which in turn stole most of its internals
 from [Catalyst](https://metacpan.org/pod/Catalyst).  If you're new to LWP::ConsoleLogger, I suggest getting
-started with the [LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP::ConsoleLogger::Easy) wrapper.  This will get you up and
+started with the [LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP%3A%3AConsoleLogger%3A%3AEasy) wrapper.  This will get you up and
 running in minutes.  If you need to tweak the settings that
-[LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP::ConsoleLogger::Easy) chooses for you (or if you just want to be fancy),
+[LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP%3A%3AConsoleLogger%3A%3AEasy) chooses for you (or if you just want to be fancy),
 please read on.
 
 Since this is a debugging library, I've left as much mutable state as possible,
@@ -226,7 +226,7 @@ HTML content to make it easier to detect changes in the body of the page.
     );
 
 Try to make sure that your content mangling doesn't return broken HTML as that
-may not play well with [HTML::Restrict](https://metacpan.org/pod/HTML::Restrict).
+may not play well with [HTML::Restrict](https://metacpan.org/pod/HTML%3A%3ARestrict).
 
 ## request\_callback
 
@@ -239,7 +239,7 @@ Use this handler to set up console logging on your requests.
     );
 
 This is done for you by default if you set up your logging via
-[LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP::ConsoleLogger::Easy).
+[LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP%3A%3AConsoleLogger%3A%3AEasy).
 
 ## response\_callback
 
@@ -252,7 +252,7 @@ Use this handler to set up console logging on your responses.
     );
 
 This is done for you by default if you set up your logging via
-[LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP::ConsoleLogger::Easy).
+[LWP::ConsoleLogger::Easy](https://metacpan.org/pod/LWP%3A%3AConsoleLogger%3A%3AEasy).
 
 ## text\_pre\_filter( sub { ... } )
 
@@ -282,7 +282,7 @@ return the new content type (text/plain) when you exit the sub.  If you do not
 do this, HTML formatting will then be applied to your plain text as is
 explained below.
 
-If this is HTML content, [HTML::Restrict](https://metacpan.org/pod/HTML::Restrict) will be applied after the
+If this is HTML content, [HTML::Restrict](https://metacpan.org/pod/HTML%3A%3ARestrict) will be applied after the
 text\_pre\_filter has been run.  LWP::ConsoleLogger will then strip away some
 whitespace and newlines from processed HTML in its own opinionated way, in
 order to present you with more readable text.

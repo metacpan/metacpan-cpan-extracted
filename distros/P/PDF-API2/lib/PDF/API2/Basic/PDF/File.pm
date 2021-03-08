@@ -1,22 +1,16 @@
-#=======================================================================
+# Code in the PDF::API2::Basic::PDF namespace was originally copied from the
+# Text::PDF distribution.
 #
-#   THIS IS A REUSED PERL MODULE, FOR PROPER LICENCING TERMS SEE BELOW:
+# Copyright Martin Hosken <Martin_Hosken@sil.org>
 #
-#   Copyright Martin Hosken <Martin_Hosken@sil.org>
-#
-#   Modified for PDF::API2 by Alfred Reibenschuh <alfredreibenschuh@gmx.net>
-#
-#   No warranty or expression of effectiveness, least of all regarding
-#   anyone's safety, is implied in this software or documentation.
-#
-#   This specific module is licensed under the Perl Artistic License.
-#
-#=======================================================================
+# Martin Hosken's code may be used under the terms of the MIT license.
+# Subsequent versions of the code have the same license as PDF::API2.
+
 package PDF::API2::Basic::PDF::File;
 
 use strict;
 
-our $VERSION = '2.038'; # VERSION
+our $VERSION = '2.039'; # VERSION
 
 =head1 NAME
 
@@ -229,8 +223,13 @@ sub open {
         $fh = $filename;
     }
     else {
-        die "File '$filename' does not exist !" unless -f $filename;
-        $fh = IO::File->new(($update ? '+' : '') . "<$filename") || return;
+        die "File '$filename' does not exist"  unless -f $filename;
+        die "File '$filename' is not readable" unless -r $filename;
+        if ($update) {
+            die "File '$filename' is not writable" unless -w $filename;
+        }
+        $fh = IO::File->new(($update ? '+' : '') . "<$filename")
+            || die "Error opening '$filename': $!";
         $self->{' INFILE'} = $fh;
         if ($update) {
             $self->{' update'} = 1;
@@ -331,13 +330,6 @@ sub append_file {
 
     my $fh = $self->{' INFILE'};
 
-    # hack to upgrade pdf-version number to support
-    # requested features in higher versions than
-    # the pdf was originally created.
-    my $version = $self->{' version'} || '1.4';
-    $fh->seek(0, 0);
-    $fh->print("%PDF-$version\n");
-
     my $tdict = PDFDict();
     $tdict->{'Prev'} = PDFNum($self->{' loc'});
     $tdict->{'Info'} = $self->{'Info'};
@@ -406,6 +398,39 @@ sub create_file {
 }
 
 
+=head2 $p->clone_file($fname)
+
+Creates a copy of the input file at the specified filename and sets it as the
+output file for future writes.  A file handle may be passed instead of a
+filename.
+
+=cut
+
+sub clone_file {
+    my ($self, $filename) = @_;
+    my $fh;
+
+    $self->{' fname'} = $filename;
+    if (ref $filename) {
+        $fh = $filename;
+    }
+    else {
+        $fh = IO::File->new(">$filename") || die "Unable to open $filename for writing";
+        binmode($fh,':raw');
+    }
+
+    $self->{' OUTFILE'} = $fh;
+
+    my $in = $self->{' INFILE'};
+    $in->seek(0, 0);
+    my $data;
+    while (not $in->eof()) {
+        $in->read($data, 1024 * 1024);
+        $fh->print($data);
+    }
+    return $self;
+}
+
 =head2 $p->close_file
 
 Closes up the open file for output by outputting the trailer etc.
@@ -425,7 +450,7 @@ sub close_file {
     $tdict->{'Size'} = $self->{'Size'} || PDFNum(1);
     $tdict->{'Prev'} = PDFNum($self->{' loc'}) if $self->{' loc'};
     if ($self->{' update'}) {
-        foreach my $key (grep ($_ !~ m/^[\s\-]/, keys %$self)) {
+        foreach my $key (grep { $_ !~ m/^[\s\-]/ } keys %$self) {
             $tdict->{$key} = $self->{$key} unless defined $tdict->{$key};
         }
 
@@ -911,8 +936,8 @@ sub remove_obj {
     delete $self->{' objects'}{$objind->uid()};
     delete $self->{' outlist_cache'}{$objind};
     delete $self->{' printed_cache'}{$objind};
-    @{$self->{' outlist'}} = grep($_ ne $objind, @{$self->{' outlist'}});
-    @{$self->{' printed'}} = grep($_ ne $objind, @{$self->{' printed'}});
+    @{$self->{' outlist'}} = grep { $_ ne $objind } @{$self->{' outlist'}};
+    @{$self->{' printed'}} = grep { $_ ne $objind } @{$self->{' printed'}};
     $self->{' objcache'}{$objind->{' objnum'}, $objind->{' objgen'}} = undef
         if $self->{' objcache'}{$objind->{' objnum'}, $objind->{' objgen'}} eq $objind;
     return $self;
@@ -933,7 +958,7 @@ that it will not cause the data already output to be changed.
 sub ship_out {
     my ($self, @objs) = @_;
 
-    return unless defined $self->{' OUTFILE'};
+    die "No output file specified" unless defined $self->{' OUTFILE'};
     my $fh = $self->{' OUTFILE'};
     seek($fh, 0, 2); # go to the end of the file
 

@@ -2,18 +2,18 @@ NAME
     App::IndonesianHolidayUtils - List Indonesian holidays
 
 VERSION
-    This document describes version 0.060 of App::IndonesianHolidayUtils
+    This document describes version 0.061 of App::IndonesianHolidayUtils
     (from Perl distribution App-IndonesianHolidayUtils), released on
-    2021-01-13.
+    2021-01-17.
 
 SYNOPSIS
     This distribution contains several CLI's related to Indonesian holidays:
 
-    *   is-id-holiday
+    *   is-idn-holiday
 
-    *   list-id-holidays
+    *   list-idn-holidays
 
-    *   list-id-workdays
+    *   list-idn-workdays
 
 HOMEPAGE
     Please visit the project's homepage at

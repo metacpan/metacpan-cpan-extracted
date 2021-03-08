@@ -6,9 +6,9 @@ use Sub::Identify;
 subtest 'non sub' => sub {
     my $meta = Sub::Meta->new;
     is $meta->sub, undef, 'sub';
-    is $meta->subname, '', 'subname';
-    is $meta->fullname, '', 'fullname';
-    is $meta->stashname, '', 'stashname';
+    is $meta->subname, undef, 'subname';
+    is $meta->fullname, undef, 'fullname';
+    is $meta->stashname, undef, 'stashname';
     is $meta->file, '', 'file';
     is $meta->line, undef, 'line';
     is $meta->is_constant, undef, 'is_constant';
@@ -99,6 +99,8 @@ subtest 'has sub' => sub {
         my $meta = Sub::Meta->new(sub => \&hello3);
         is $meta->apply_subname('HELLO'), $meta, 'apply_subname';
         is $meta->subname, 'HELLO', 'subname';
+        is $meta->stashname, 'main', 'stashname';
+        is $meta->fullname, 'main::HELLO', 'fullname';
         is [ Sub::Identify::get_code_info(\&hello3) ], ['main','HELLO'], 'build_subinfo';
 
         is $meta->apply_prototype('$'), $meta, 'apply_prototype';
@@ -126,8 +128,35 @@ subtest 'new' => sub {
     is(Sub::Meta->new({ sub => \&test_new})->sub, \&test_new, 'args hashref');
 
     is(Sub::Meta->new(subname => 'foo')->subname, 'foo', 'subname args');
-    is(Sub::Meta->new(stashname => 'foo')->stashname, 'foo', 'stashname args');
-    is(Sub::Meta->new(fullname => 'foo::bar')->fullname, 'foo::bar', 'fullname args');
+    is(Sub::Meta->new(stashname => 'Bar')->stashname, 'Bar', 'stashname args');
+    is(Sub::Meta->new(fullname => 'Baz::boo')->fullname, 'Baz::boo', 'fullname args');
+};
+
+subtest 'subname/stashname/fullname' => sub {
+    my $meta = Sub::Meta->new;
+    is $meta->subname, undef, 'undef subname';
+    is $meta->stashname, undef, 'undef stashname';
+    is $meta->fullname, undef, 'undef fullname';
+
+    is $meta->set_subname('foo'), $meta;
+    is $meta->subname, 'foo', 'subname';
+    is $meta->stashname, undef, 'undef stashname';
+    is $meta->fullname, '::foo', 'fullname';
+
+    is $meta->set_stashname('Bar'), $meta;
+    is $meta->subname, 'foo', 'subname';
+    is $meta->stashname, 'Bar', 'stashname';
+    is $meta->fullname, 'Bar::foo', 'fullname';
+
+    is $meta->set_subname(undef), $meta;
+    is $meta->subname, undef, 'undef subname';
+    is $meta->stashname, 'Bar', 'stashname';
+    is $meta->fullname, 'Bar::', 'fullname';
+
+    is $meta->set_fullname('Hello::world'), $meta;
+    is $meta->subname, 'world', 'subname';
+    is $meta->stashname, 'Hello', 'stashname';
+    is $meta->fullname, 'Hello::world', 'fullname';
 };
 
 subtest 'constant' => sub {

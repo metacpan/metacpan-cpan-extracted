@@ -8,14 +8,16 @@ $ENV{READWRITEFORK_SSH} ||= Mojo::File->new('.readwritefork_ssh')->slurp;
 chomp $ENV{READWRITEFORK_SSH};
 
 my $columns = int(300 * rand);
-my $fork = Mojo::IOLoop::ReadWriteFork->new;
+my $fork    = Mojo::IOLoop::ReadWriteFork->new;
 my (@pipe_names, @pipe_ref);
-$fork->on(before_fork => sub {
-  my ($fork, $pipes) = @_;
-  @pipe_names = sort keys %$pipes;
-  @pipe_ref = map { ref $pipes->{$_} } sort keys %$pipes;
-  $pipes->{stdout_read}->set_winsize(40, $columns);
-});
+$fork->on(
+  before_fork => sub {
+    my ($fork, $pipes) = @_;
+    @pipe_names = sort keys %$pipes;
+    @pipe_ref   = map { ref $pipes->{$_} } sort keys %$pipes;
+    $pipes->{stdout_read}->set_winsize(40, $columns);
+  }
+);
 
 my $buf = '';
 $fork->on(read => sub { $buf .= pop });

@@ -6208,20 +6208,20 @@ sub get_master_info
    my $addr='';
    if ($^O ne 'cygwin') {
       if ($Local_HostName!~/^localhost\.local/) {
-         $addr=gethostbyname($Local_HostName) ||
-             &handle_error(
-             "Couldn't Resolve Local Hostname $Local_HostName : ");
-         my $gip=sprintf "%vd", $addr;
-# --CONTINUE-- print "WHAT IS GIP=$gip<==\n";
-         $same_host_as_Master{$gip}='-';
-         $Local_IP_Address->{$gip}='-';
-         $Local_FullHostName=gethostbyaddr($addr,AF_INET) ||
-            handle_error(
-            "Couldn't Re-Resolve Local Hostname $Local_HostName : ");
+         my $socket = IO::Socket::INET->new(
+            Proto       => 'udp',
+            PeerAddr    => '198.41.0.4', # a.root-servers.net
+            PeerPort    => '53', # DNS
+         );
+         my $ip=$socket->sockhost ||
+            &handle_error(
+            "Couldn't Resolve Local Hostname $Local_HostName : ");
+         $same_host_as_Master{$ip}='-';
+         $Local_IP_Address->{$ip}='-';
       } else {
-         my $gip='127.0.0.1';
-         $same_host_as_Master{$gip}='-';
-         $Local_IP_Address->{$gip}='-';
+         my $ip='127.0.0.1';
+         $same_host_as_Master{$ip}='-';
+         $Local_IP_Address->{$ip}='-';
          $Local_FullHostName=$Local_HostName;
       }
    } else {
@@ -13994,7 +13994,12 @@ END
    } else {
       $fullhostname=$hostname=$Hosts{"__Master_${$}__"}{'HostName'}||'';
    }
-   my $ip=inet_ntoa((gethostbyname($hostname))[4])||'';
+   my $socket = IO::Socket::INET->new(
+       Proto       => 'udp',
+       PeerAddr    => '198.41.0.4', # a.root-servers.net
+       PeerPort    => '53', # DNS
+   );
+   my $ip=$socket->sockhost||'';
    my $suroot='';
    foreach my $host (keys %same_host_as_Master) {
       next if $host eq "__Master_${$}__";

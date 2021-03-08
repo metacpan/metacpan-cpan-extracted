@@ -63,10 +63,6 @@ of which is 3. This routine does dataflow automatically.
 
 
 
-=for bad
-
-combcoords does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -109,10 +105,6 @@ For definition of the potential, see the actual function.
 
 
 
-=for bad
-
-repulse does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -155,10 +147,6 @@ For definition of the potential, see the actual function.
 
 
 
-=for bad
-
-attract does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -186,10 +174,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 info not available
 
 
-=for bad
-
-vrmlcoordsvert does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

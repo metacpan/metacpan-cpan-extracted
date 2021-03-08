@@ -176,8 +176,6 @@ ok eq_array(\@output, \@expected), 'removed all interfaces [wg0]';
 
 ok((not -e TEST_DIR . 'mini_wg0.conf'), 'interface file removed');
 
-done_testing();
-
 # write back initial configs
 my ($filename_1, $filename_2) = (TEST_DIR . 'mini_wg1.conf', TEST_DIR . 'mini_wg0.conf');
 write_file($filename_1, $initial_wg1);
@@ -198,4 +196,8 @@ sub does_throw($test_name, $fun, @args) {
     } or $ok = 1;
     ok $ok, $test_name;
 }
+
+done_testing();
+
+
 

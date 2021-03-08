@@ -367,10 +367,12 @@ else {
     ok 1, 'skip....no thread support present';
 }
 
-done_testing();
-
 # write back initial configs
 my ($filename_1, $filename_2) = (TEST_DIR . 'mini_wg1.conf', TEST_DIR . 'mini_wg0.conf');
 write_file($filename_1, $initial_wg1);
 write_file($filename_2, $initial_wg0);
+
+done_testing();
+
+
 

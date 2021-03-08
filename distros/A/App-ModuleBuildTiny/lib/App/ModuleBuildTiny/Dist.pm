@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.028';
+our $VERSION = '0.029';
 
 use CPAN::Meta;
 use Carp qw/croak/;
@@ -16,6 +16,8 @@ use File::Spec::Functions qw/catfile catdir rel2abs/;
 use File::Slurper qw/write_text read_binary/;
 use ExtUtils::Manifest qw/manifind maniskip maniread/;
 use Module::Runtime 'require_module';
+use Module::Metadata 1.000037;
+
 use Pod::Escapes qw/e2char/;
 
 use Env qw/@PERL5LIB @PATH/;
@@ -92,7 +94,19 @@ sub distname {
 }
 
 sub detect_license {
-	my ($data, $filename, $authors) = @_;
+	my ($data, $filename, $authors, $mergedata) = @_;
+	if ($mergedata->{license} && @{$mergedata->{license}} == 1) {
+		require Software::LicenseUtils;
+		Software::LicenseUtils->VERSION(0.103014);
+		my $spec_version = $mergedata->{'meta-spec'} && $mergedata->{'meta-spec'}{version} ? $mergedata->{'meta-spec'}{version} : 2;
+		my @guess = Software::LicenseUtils->guess_license_from_meta_key($mergedata->{license}[0], $spec_version);
+		croak "Couldn't parse license from metamerge: @guess" if @guess > 1;
+		if (@guess) {
+			my $class = $guess[0];
+			require_module($class);
+			return $class->new({holder => join(', ', @{$authors})});
+		}
+	}
 	my (@license_sections) = grep { /licen[cs]e|licensing|copyright|legal|authors?\b/i } $data->pod_inside;
 	for my $license_section (@license_sections) {
 		next unless defined ( my $license_pod = $data->pod($license_section) );
@@ -149,10 +163,9 @@ sub new {
 	my $distname = distname($mergedata);
 	my $filename = distfilename($distname);
 
-	require Module::Metadata; Module::Metadata->VERSION('1.000009');
 	my $data = Module::Metadata->new_from_file($filename, collect_pod => 1, decode_pod => 1) or die "Couldn't analyse $filename: $!";
 	my @authors = map { s/E<([^>]+)>/e2char($1)/ge; m/ \A \s* (.+?) \s* \z /x } grep { /\S/ } split /\n/, $data->pod('AUTHOR') // $data->pod('AUTHORS') // '' or warn "Could not parse any authors from `=head1 AUTHOR` in $filename";
-	my $license = detect_license($data, $filename, \@authors);
+	my $license = detect_license($data, $filename, \@authors, $mergedata);
 
 	my $load_meta = !%{ $opts{regenerate} || {} } && uptodate('META.json', 'cpanfile', 'prereqs.json', 'prereqs.yml', $mergefile);
 	my $meta = $load_meta ? CPAN::Meta->load_file('META.json', { lazy_validation => 0 }) : do {

@@ -1,0 +1,105 @@
+use PDL::LiteF;
+#use PDL::Complex;
+use PDL::Config;
+use PDL::Core::Dev;
+
+use Test::More;
+
+sub tapprox {
+        my($x,$y) = @_;
+        my $c = abs($x-$y);
+        my $d = max($c);
+        $d < 0.0001;
+}
+
+$ref = pdl([[-2,1],[-3,1]]);
+$ref2 = squeeze($ref->slice("0,")+ci()*$ref->slice("1,"));
+$x = ci() -pdl (-2, -3);
+
+ok($x->type eq 'cdouble', 'type promotion i - piddle');
+ok(tapprox($x->cimag,$ref->slice("1,:")), 'value from i - piddle');
+
+$x = cdouble (2,3);
+$x-=3*ci();
+ok(type ($x) eq 'cdouble', 'type promption piddle - i');
+$y=cfloat($x);
+ok(type ($y) eq 'cfloat', 'type conversion to cfloat');
+ok(tapprox($x->cimag,$ref->slice("0,1")), 'value from piddle - i');
+
+# dataflow from complex to real
+$ar = $x->creal;
+$ar++;
+ok(tapprox($x->creal, -$ref->slice("0,")->squeeze), 'no complex to real dataflow');
+$x+=ci;
+ok(tapprox($x->cimag, -$ref->slice("1,")*2), 'no dataflow after conversion');
+
+# Check that converting from re/im to mag/ang and
+#  back we get the same thing
+$x = $ref2->copy;
+my $a=abs($x);
+my $p=carg($x);
+
+my $y = $a*cos($p)+ci()*$a*sin($p);
+ok(tapprox($x-$y, 0.), 'check re/im and mag/ang equivalence');
+
+# to test Cabs, Cabs2, Carg (ref PDL)
+# Catan, Csinh, Ccosh, Catanh, Croots
+
+$cabs = sqrt($x->creal**2+$x->cimag**2);
+
+ok(ref abs $x eq 'PDL', 'Cabs type');
+ok(ref carg ($x) eq 'PDL', 'Carg type');
+ok(tapprox($cabs, abs $x), 'Cabs value');
+
+ok(tapprox($x**2, $x * $x), '** op complex')
+  or diag "For ($x), got: ", $x**2, ", expected: ", $x * $x;
+ok(tapprox($x->pow(2), $x * $x), 'complex pow')
+  or diag "Got: ", $x->pow(2), ", expected: ", $x * $x;
+ok(tapprox($x->power(2, 0), $x * $x), 'complex power')
+  or diag "Got: ", $x->power(2, 0), ", expected: ", $x * $x;
+
+# Check cat'ing of PDL::Complex
+$y = $x->creal->copy + 1;
+my $bigArray = $x->cat($y);
+#ok(abs($bigArray->sum() +  8 - 4*ci()) < .0001, 'check cat for PDL::Complex');
+
+my $z = pdl(0) + ci()*pdl(0);
+$z **= 2;
+
+ok(tapprox($z, 0 + 0*ci), 'check that 0 +0i exponentiates correctly'); # Wasn't always so.
+
+my $r = pdl(-10) + ci()*pdl(0);
+$r **= 2;
+
+ok(tapprox($r, 100 + 0*ci),
+  'check that imaginary part is exactly zero') # Wasn't always so
+  or diag "got: ", $r;
+
+my $asin_2 = PDL::asin(2)."";
+like $asin_2, qr/nan/i, 'perl scalar 2 treated as real';
+$asin_2 = PDL::asin(2.0)."";
+like $asin_2, qr/nan/i, 'perl scalar 2.0 treated as real';
+$asin_2 = PDL::asin(byte 2)."";
+like $asin_2, qr/nan/i, 'real byte treated as real';
+$asin_2 = PDL::asin(double 2)."";
+like $asin_2, qr/nan/i, 'real double treated as real';
+$asin_2 = PDL::asin(pdl 2)."";
+like $asin_2, qr/nan/i, 'pdl(2) treated as real';
+if (PDL::Core::Dev::got_complex_version('asin', 1)) {
+  my $c_asin_2 = PDL::asin(cdouble(2))."";
+  unlike $c_asin_2, qr/nan/i, 'asin of complex gives complex result';
+}
+
+TODO: {
+   local $TODO = "Known_problems sf.net bug #1176614" if ($PDL::Config{SKIP_KNOWN_PROBLEMS} or exists $ENV{SKIP_KNOWN_PROBLEMS} );
+
+
+   # Check stringification of complex piddle
+   # This is sf.net bug #1176614
+   my $c =  9.1234 + 4.1234*ci;
+   my $c211 = $c->dummy(2,1);
+   my $c211str = "$c211";
+   ok($c211str=~/(9.123|4.123)/, 'sf.net bug #1176614');
+}
+
+done_testing;

@@ -1,5 +1,8 @@
 Revision history for WebService-Rollbar-Notifier
 
+1.002010 2020-03-07
+    - Debitrot (#13)
+
 1.002009 2017-09-22
     - Allow custom 'title' in messages
 

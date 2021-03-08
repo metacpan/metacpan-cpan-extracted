@@ -61,10 +61,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Legendre form of complete elliptic integrals K(k) = Integral[1/Sqrt[1 - k^2 Sin[t]^2], {t, 0, Pi/2}].
 
-=for bad
-
-gsl_sf_ellint_Kcomp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -90,10 +86,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Legendre form of complete elliptic integrals E(k) = Integral[  Sqrt[1 - k^2 Sin[t]^2], {t, 0, Pi/2}]
 
-=for bad
-
-gsl_sf_ellint_Ecomp does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -119,10 +111,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Legendre form of incomplete elliptic integrals F(phi,k)   = Integral[1/Sqrt[1 - k^2 Sin[t]^2], {t, 0, phi}]
 
-=for bad
-
-gsl_sf_ellint_F does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -148,10 +136,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Legendre form of incomplete elliptic integrals E(phi,k)   = Integral[  Sqrt[1 - k^2 Sin[t]^2], {t, 0, phi}]
 
-=for bad
-
-gsl_sf_ellint_E does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -178,10 +162,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Legendre form of incomplete elliptic integrals P(phi,k,n) = Integral[(1 + n Sin[t]^2)^(-1)/Sqrt[1 - k^2 Sin[t]^2], {t, 0, phi}]
 
-=for bad
-
-gsl_sf_ellint_P does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -208,10 +188,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Legendre form of incomplete elliptic integrals D(phi,k)
 
-=for bad
-
-gsl_sf_ellint_D does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -237,10 +213,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Carlsons symmetric basis of functions RC(x,y)   = 1/2 Integral[(t+x)^(-1/2) (t+y)^(-1)], {t,0,Inf}
 
-=for bad
-
-gsl_sf_ellint_RC does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -266,10 +238,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Carlsons symmetric basis of functions RD(x,y,z) = 3/2 Integral[(t+x)^(-1/2) (t+y)^(-1/2) (t+z)^(-3/2), {t,0,Inf}]
 
-=for bad
-
-gsl_sf_ellint_RD does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -295,10 +263,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Carlsons symmetric basis of functions RF(x,y,z) = 1/2 Integral[(t+x)^(-1/2) (t+y)^(-1/2) (t+z)^(-1/2), {t,0,Inf}]
 
-=for bad
-
-gsl_sf_ellint_RF does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -324,10 +288,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Carlsons symmetric basis of functions RJ(x,y,z,p) = 3/2 Integral[(t+x)^(-1/2) (t+y)^(-1/2) (t+z)^(-1/2) (t+p)^(-1), {t,0,Inf}]
 
-=for bad
-
-gsl_sf_ellint_RJ does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

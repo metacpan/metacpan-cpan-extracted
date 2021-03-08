@@ -107,10 +107,6 @@ sub gslmroot_fsolver{
 info not available
 
 
-=for bad
-
-fsolver_meat does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

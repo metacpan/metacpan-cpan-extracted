@@ -153,6 +153,7 @@ use PDL::Core qw/:Func/;
 use PDL::Basic qw/:Func/;
 use PDL::Types;
 use PDL::ImageND qw/kernctr/; # moved to ImageND since FFTW uses it too
+use PDL::Ops qw/ci cimag creal/;
 
 END {
   # tidying up required after using fftn
@@ -171,7 +172,8 @@ sub todecimal {
 
 =for ref
 
-Complex 1-D FFT of the "real" and "imag" arrays [inplace].
+Complex 1-D FFT of the "real" and "imag" arrays [inplace]. A single
+cfloat/cdouble input piddle can also be used.
 
 =for sig
 
@@ -187,13 +189,19 @@ fft($real,$imag);
 
 sub PDL::fft {
 	# Convert the first argument to decimal and check for trouble.
-	eval {	todecimal($_[0]);	};
+	my $re=$_[0];
+	my $im=$_[1];
+	if ($re->type =~ m/cdouble|cfloat/) {
+		$im=cimag($re);
+		$re=creal($re);
+	}
+	eval {	todecimal($re);	};
 	if ($@) {
 		$@ =~ s/ at .*//s;
 		barf("Error in FFT with first argument: $@");
 	}
 	# Convert the second argument to decimal and check for trouble.
-	eval {	todecimal($_[1]);	};
+	eval {	todecimal($im);	};
 	if ($@) {
 		$@ =~ s/ at .*//s;
 		my $message = "Error in FFT with second argument: $@";
@@ -201,7 +209,12 @@ sub PDL::fft {
 			if ($message =~ /undefined value/);
 		barf($message);
 	}
-	_fft($_[0],$_[1]);
+	_fft($re,$im);
+	if ($_[0]->type =~ m/cdouble|cfloat/) {
+		$_[0]= $re+ci()*$im;
+	} else {
+		$_[0]=$re,$_[1]=$im;
+	}
 }
 
 
@@ -209,7 +222,8 @@ sub PDL::fft {
 
 =for ref
 
-Complex inverse 1-D FFT of the "real" and "imag" arrays [inplace].
+Complex inverse 1-D FFT of the "real" and "imag" arrays [inplace]. A single
+cfloat/cdouble input piddle can also be used.
 
 =for sig
 
@@ -225,13 +239,19 @@ ifft($real,$imag);
 
 sub PDL::ifft {
 	# Convert the first argument to decimal and check for trouble.
-	eval {	todecimal($_[0]);	};
+	my $re=$_[0];
+	my $im=$_[1];
+	if ($re->type =~ m/cdouble|cfloat/) {
+		$im=cimag($re);
+		$re=creal($re);
+	}
+	eval {	todecimal($re);	};
 	if ($@) {
 		$@ =~ s/ at .*//s;
 		barf("Error in FFT with first argument: $@");
 	}
 	# Convert the second argument to decimal and check for trouble.
-	eval {	todecimal($_[1]);	};
+	eval {	todecimal($im);	};
 	if ($@) {
 		$@ =~ s/ at .*//s;
 		my $message = "Error in FFT with second argument: $@";
@@ -239,7 +259,12 @@ sub PDL::ifft {
 			if ($message =~ /undefined value/);
 		barf($message);
 	}
-	_ifft($_[0],$_[1]);
+	_ifft($re,$im);
+	if ($_[0]->type =~ m/cdouble|cfloat/) {
+		$_[0]= $re+ci()*$im;
+	} else {
+		$_[0]=$re,$_[1]=$im;
+	}
 }
 
 =head2 realfft()
@@ -320,6 +345,10 @@ N-dimensional FFT over all pdl dims of input (inplace)
 sub PDL::fftnd {
     barf "Must have real and imaginary parts for fftnd" if $#_ != 1;
     my ($r,$i) = @_;
+    if ($r->type =~m/cdouble|cfloat/ ) {
+	$i=cimag $r;
+	$r=creal $r;
+    }
     my ($n) = $r->getndims;
     barf "Dimensions of real and imag must be the same for fft"
         if ($n != $i->getndims);
@@ -333,7 +362,11 @@ sub PDL::fftnd {
       $r = $r->mv(0,$n);
       $i = $i->mv(0,$n);
     }
-    $_[0] = $r; $_[1] = $i;
+    if ($_[0]->type =~m/cdouble|cfloat/ ) {
+	$_[0]=$r+ci()*$i;
+    } else {
+	$_[0] = $r; $_[1] = $i;
+    }
     undef;
 }
 
@@ -354,6 +387,10 @@ N-dimensional inverse FFT over all pdl dims of input (inplace)
 sub PDL::ifftnd {
     barf "Must have real and imaginary parts for ifftnd" if $#_ != 1;
     my ($r,$i) = @_;
+    if ($r->type =~m/cdouble|cfloat/ ) {
+	$r=creal $r;
+	$i=cimag $r;
+    }
     my ($n) = $r->getndims;
     barf "Dimensions of real and imag must be the same for ifft"
         if ($n != $i->getndims);
@@ -367,7 +404,11 @@ sub PDL::ifftnd {
       $r = $r->mv(0,$n);
       $i = $i->mv(0,$n);
     }
-    $_[0] = $r; $_[1] = $i;
+    if ($_[0]->type =~m/cdouble|cfloat/ ) {
+	$_[0]=$r+ci()*$i;
+    } else {
+	$_[0] = $r; $_[1] = $i;
+    }
     undef;
 }
 
@@ -431,6 +472,10 @@ sub PDL::fftconvolve {
 sub PDL::fftconvolve_inplace {
     barf "Must have image & kernel for fftconvolve" if $#_ != 1;
     my ($hr, $hi) = @_;
+    if ($hr->type =~m/cdouble|cfloat/) {
+	$hi=cimag($hr);
+	$hr=creal($hr);
+    }
     my ($n) = $hr->getndims;
     todecimal($hr);   # Convert to double unless already float or double
     todecimal($hi);   # Convert to double unless already float or double
@@ -456,8 +501,14 @@ sub PDL::fftconvolve_inplace {
     $hr->clump(-1)->set(0,$hr->clump(-1)->at(0)*2);
     $hi->clump(-1)->set(0,0.);
     ifftnd($hr,$hi);
-    $_[0] = $hr; $_[1] = $hi;
-    ($hr,$hi);
+    # convert back to complex if input was complex
+    if ($_[0]->type =~m/cdouble|cfloat/) {
+	$_[0]=$hr+ci()*$hi;
+	return $_[0];
+    } else {
+        $_[0] = $hr; $_[1] = $hi;
+        return ($hr,$hi);
+    }
 }
 
 
@@ -474,10 +525,6 @@ sub PDL::fftconvolve_inplace {
 
 Internal routine doing maths for convolution
 
-=for bad
-
-convmath does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -503,10 +550,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Complex multiplication
 
-=for bad
-
-cmul does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -532,10 +575,6 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 Complex division
 
-=for bad
-
-cdiv does not process bad values.
-It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

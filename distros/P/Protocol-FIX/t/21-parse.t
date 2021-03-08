@@ -310,4 +310,13 @@ subtest "Logon message (from 3rd-party app)" => sub {
     is $err, undef;
 };
 
+subtest "MarketDataRequest with 2 instruments" => sub {
+    my $buff = dehumanize(
+        '8=FIX.4.4 | 9=132 | 35=V | 262=KaOjuV | 265=1 | 34=1 | 49=Client1 | 52=20210304-03:49:19.636 | 263=1 | 56=FixServer | 264=1 | 146=2 | 55=1HZ100V | 55=R_100 | 267=2 | 269=0 | 269=1 | 10=009 | '
+    );
+    my ($mi, $err) = $proto->parse_message(\$buff);
+    ok $mi;
+    is $err, undef;
+};
+
 done_testing;

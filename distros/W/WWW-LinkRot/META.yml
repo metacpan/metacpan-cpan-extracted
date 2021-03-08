@@ -1,0 +1,33 @@
+---
+abstract: 'check web page link rot'
+author:
+  - 'Ben Bullock <bkb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-LinkRot
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Convert::Moji: '0.10'
+  File::Slurper: '0.012'
+  HTML::Make: '0.05'
+  HTML::Make::Page: '0.01'
+  JSON::Create: '0.32'
+  JSON::Parse: '0.61'
+  LWP::UserAgent: '6.53'
+  perl: '5.006001'
+resources:
+  bugtracker: https://github.com/benkasminbullock/www-linkrot/issues
+  repository: git://github.com/benkasminbullock/www-linkrot.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

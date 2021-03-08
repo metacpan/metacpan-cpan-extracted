@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '1.000042';
+our $VERSION = '1.000043';
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase qw/<_command_info_hash/;
@@ -388,7 +388,7 @@ F<http://github.com/Test-More/Test2-Harness/>.
 
 =head1 COPYRIGHT
 
-Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2021 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

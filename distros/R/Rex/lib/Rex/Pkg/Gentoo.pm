@@ -10,7 +10,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.2'; # VERSION
+our $VERSION = '1.13.3'; # VERSION
 
 use Rex::Commands::Run;
 use Rex::Helper::Run;
@@ -212,7 +212,7 @@ sub add_repository {
       }
     }
     else {
-      $op = 'a';   # --add
+      $op = 'a'; # --add
     }
     i_run "layman -$op $name" if defined $op;
   }

@@ -1,4 +1,4 @@
-package Dancer2::Plugin::DBIx::Class 1.01;
+package Dancer2::Plugin::DBIx::Class 1.02;
 use strict;
 use warnings;
 use Dancer2::Plugin;
@@ -111,7 +111,7 @@ Dancer2::Plugin::DBIx::Class - syntactic sugar for DBIx::Class in Dancer2, optio
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 
