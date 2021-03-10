@@ -1,9 +1,9 @@
 package Calendar::Indonesia::Holiday;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-16'; # DATE
+our $DATE = '2021-03-09'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.335'; # VERSION
+our $VERSION = '0.337'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1117,11 +1117,16 @@ my %year_holidays;
     );
 }
 
-# decreed sep 10, 2020
+# decreed sep 10, 2020 (SKB No 642/2020, 4/2020, 4/2020)
 #
 # ref:
 # - https://www.menpan.go.id/site/berita-terkini/libur-nasional-dan-cuti-bersama-tahun-2021-sebanyak-23-hari
 # - https://www.kemenkopmk.go.id/sites/default/files/artikel/2020-09/SKB%20Cuti%20Bersama%20Tahun%202021.pdf
+#
+# revised feb 22, 2021: joint leave days reduced from 7 days to 2 days (SKB No. 281/2021, No. 1/2021, No. 1/2021)
+# ref:
+# - https://www.menpan.go.id/site/berita-terkini/cegah-penularan-covid-19-pemerintah-pangkas-cuti-bersama-2021-jadi-2-hari
+# - https://www.kemenkopmk.go.id/sites/default/files/pengumuman/2021-02/SKB%203%20Menteri%20tentang%20Perubahan%20Libnas%20%26%20Cutber%202021%20.pdf
 
 {
     my $isramiraj2021;
@@ -1146,13 +1151,8 @@ my %year_holidays;
     ];
 
     push @{ $year_holidays{2021} }, (
-        _jointlv     ({_expand_dm("12-03")}, {holiday=>$isramiraj2021}),
         _jointlv     ({_expand_dm("12-05")}, {holiday=>$eidulf2021}),
-        _jointlv     ({_expand_dm("17-05")}, {holiday=>$eidulf2021}),
-        _jointlv     ({_expand_dm("18-05")}, {holiday=>$eidulf2021}),
-        _jointlv     ({_expand_dm("19-05")}, {holiday=>$eidulf2021}),
         _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
-        _jointlv     ({_expand_dm("27-12")}, {holiday=>$christmas}),
     );
 }
 
@@ -1452,7 +1452,7 @@ gen_modified_sub(
 
 $SPEC{list_idn_workdays} = {
     v => 1.1,
-    summary => '',
+    summary => 'List Indonesian workdays (non-holidays) in calendar',
     args => {
         year       => {schema=>'int*'},
         month      => {schema=>['int*', between=>[1, 12]]},
@@ -1602,7 +1602,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.335 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-01-16.
+This document describes version 0.337 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-03-09.
 
 =head1 SYNOPSIS
 
@@ -2302,7 +2302,7 @@ Usage:
 
  list_idn_workdays(%args) -> [status, msg, payload, meta]
 
-.
+List Indonesian workdays (non-holidays) in calendar.
 
 This function is not exported.
 

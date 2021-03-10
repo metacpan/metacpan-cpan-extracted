@@ -6,7 +6,7 @@ use 5.008004;
 use Carp ();
 
 # ABSTRACT: Bundle foreign code with your Perl module
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.38'; # VERSION
 
 
 package FFI::Platypus;
@@ -150,7 +150,7 @@ FFI::Platypus::Bundle - Bundle foreign code with your Perl module
 
 =head1 VERSION
 
-version 1.34
+version 1.38
 
 =head1 SYNOPSIS
 
@@ -199,7 +199,7 @@ C<lib/Foo.pm>:
  
  use strict;
  use warnings;
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  
  {
    my $ffi = FFI::Platypus->new( api => 1 );
@@ -355,7 +355,7 @@ dist is named C<Foo-Bar> but your specific class is named C<Foo::Bar::Baz>, you'
 want something like this:
 
  package Foo::Bar::Baz;
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->bundle('Foo::Bar');
  ...
@@ -541,7 +541,7 @@ C<lib/Init.pm>:
  
  use strict;
  use warnings;
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  
  our $VERSION = '1.00';
  
@@ -579,6 +579,176 @@ If C<ffi_pl_bundle_fini> didn't call back into Perl space like
 this then we don't have to be as careful about deallocating
 things in Perl space.
 
+=head2 Compiler or linker flags example
+
+There are times when you will want to specify your own compiler and
+linker flags for the C code that you are bundling.  The C<TL;DR> is that
+you can put a C<.fbx> file in your C<ffi> directory.  This is a Perl
+script that returns a hash reference that is passed into the
+L<FFI::Build> constructor.  This allows you to set a number of options,
+including compiler and linker flags.  A more detailed example follows:
+
+You may want or need to set compiler and linker flags for your bundled
+C code.  For example, say we have a header file, but instead of
+putting it in the C<ffi> directory we want to put it in a separate
+directory called C<include>.
+
+C<include/answer.h>:
+
+ #ifndef ANSWER_H
+ #define ANSWER_H
+ 
+ int answer(void);
+ 
+ #endif
+
+C<ffi/answer.c>:
+
+ #include <answer.h>
+ 
+ int
+ answer(void)
+ {
+   /* the answer to life the universe and everything */
+   return 42;
+ }
+
+C<lib/Answer.pm>:
+
+ package Answer;
+ 
+ use strict;
+ use warnings;
+ use FFI::Platypus 1.00;
+ use base qw( Exporter );
+ 
+ our @EXPORT = qw( answer );
+ 
+ my $ffi = FFI::Platypus->new( api => 1 );
+ $ffi->bundle;
+ $ffi->attach( answer => [] => 'int' );
+ 
+ 1;
+
+If you try to use this module just as-is you will get an error, about
+not being able to find the header file.  Probably something like this:
+
+ ffi/answer.c:1:10: fatal error: 'answer.h' file not found
+
+So we put a C<answer.fbx> file in the C<ffi> directory.  (In case you
+are wondering FBX stands for "Ffi Build and file eXtensions should
+whenever possible be three characters long").  The name of the file
+can be anything so long as it ends in C<.fbx>, we just choose C<answer>
+here because that is the name of the project.
+
+C<ffi/answer.fbx>:
+
+ our $DIR;
+ 
+ return {
+   cflags => "-I/include",
+   source => "$DIR/*.c",
+ }
+
+The C<$DIR> variable is provided by the builder code.  It is the root
+of the distribution, and is helpful if you need a fully qualified path.
+In this case you could have also used C<ffi/*.c>.
+
+The script returns a hash reference which is passed into the L<FFI::Build>
+constructor, so you can use any of the options supported by that
+class.  Now we should be able to use our bundled module:
+
+ % perl -Ilib -MAnswer=answer -E 'say answer'
+ 42
+
+=head2 Using bundled code with Alien.
+
+A useful technique is to use Platypus with L<Alien> technology.  The
+L<Alien> namespace is reserved for providing external non-Perl dependencies
+for CPAN modules.  The nominal L<Alien> module when installed looks
+for the library locally, and if it can't be found it fetches it from
+the internet, builds it, and installs it in a private directory so that
+it can be used by other CPAN modules.  For L<Aliens> that provide
+shared libraries, and that have simple interfaces that do not require
+additional C code you can easily just pass the shared libraries
+to Platypus directly.  For modules that require some bundled C code
+and an L<Alien> you have to link the L<Alien> library with your bundled
+code.  If the L<Alien> uses the L<Alien::Base> interface then all you have
+to do is give the name of the L<Alien> to L<FFI::Build>.
+
+For example, the C<bzip2> library provides an interface that requires
+the caller to allocate a C C<struct> and then pass it to its various
+functions.  The C<struct> is actually pretty simple and you could use
+L<FFI::C> or L<FFI::Platypus::Record>, but here is an example of how you
+would connect bundled C code with an L<Alien>.
+
+C<ffi/compress.c>:
+
+ #include <bzlib.h>
+ #include <stdlib.h>
+ 
+ int
+ bzip2__new(bz_stream **stream, int blockSize100k, int verbosity, int workFactor )
+ {
+   *stream = malloc(sizeof(bz_stream));
+   (*stream)->bzalloc = NULL;
+   (*stream)->bzfree  = NULL;
+   (*stream)->opaque  = NULL;
+ 
+   return BZ2_bzCompressInit(*stream, blockSize100k, verbosity, workFactor );
+ }
+
+C<lib/Bzip2.pm>:
+
+ package Bzip2;
+ 
+ use strict;
+ use warnings;
+ use FFI::Platypus 1.00;
+ use FFI::Platypus::Memory qw( free );
+ 
+ my $ffi = FFI::Platypus->new( api => 1 );
+ $ffi->bundle;
+ 
+ $ffi->mangler(sub {
+   my $name = shift;
+   $name =~ s/^/bzip2__/ unless $name =~ /^BZ2_/;
+   $name;
+ });
+ 
+ =head2 new
+ 
+  my $bzip2 = Bzip2->new($block_size_100k, $verbosity, $work_flow);
+ 
+ =cut
+ 
+ $ffi->attach( new => ['opaque*', 'int', 'int', 'int'] => 'int' => sub {
+   my $xsub = shift;
+   my $class = shift;
+   my $ptr;
+   my $ret = $xsub->(\$ptr, @_);
+   return bless \$ptr, $class;
+ });
+ 
+ $ffi->attach( [ BZ2_bzCompressEnd => 'DESTROY' ] => ['opaque'] => 'int' => sub {
+   my $xsub = shift;
+   my $self = shift;
+   my $ret = $xsub->($$self);
+   free $$self;
+ });
+ 
+ 1;
+
+The C<.fbx> file that goes with this to make it work with L<Alien::Libbz2>
+is now pretty trivial:
+
+C<ffi/bz2.fbx>:
+
+ {
+   alien => ['Alien::Libbz2'],
+   source => ['ffi/*.c'],
+ };
+
 =head1 AUTHOR
 
 Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
@@ -614,6 +784,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 Meredith (merrilymeredith, MHOWARD)
 
 Diab Jerius (DJERIUS)
+
+Eric Brine (IKEGAMI)
 
 =head1 COPYRIGHT AND LICENSE
 

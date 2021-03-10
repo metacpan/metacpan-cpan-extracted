@@ -10,7 +10,7 @@ our @EXPORT = qw( dlopen dlerror dlsym dlclose );
 push @EXPORT, grep /RTLD_/, keys %FFI::Platypus::DL::;
 
 # ABSTRACT: Slightly non-portable interface to libdl
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.38'; # VERSION
 
 
 1;
@@ -27,11 +27,11 @@ FFI::Platypus::DL - Slightly non-portable interface to libdl
 
 =head1 VERSION
 
-version 1.34
+version 1.38
 
 =head1 SYNOPSIS
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  use FFI::Platypus::DL;
  
  my $handle = dlopen("./libfoo.so", RTLD_PLATYPUS_DEFAULT);
@@ -210,6 +210,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 Meredith (merrilymeredith, MHOWARD)
 
 Diab Jerius (DJERIUS)
+
+Eric Brine (IKEGAMI)
 
 =head1 COPYRIGHT AND LICENSE
 

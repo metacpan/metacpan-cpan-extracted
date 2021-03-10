@@ -61,7 +61,7 @@ sub twilight {
                 $on_event->(@_);
             },
             on_noevent => sub {
-                $on_event->(@_);
+                $on_noevent->(@_);
             },
             %arg,
             get_position => sub { _get_equatorial( $SU, $_[0] ) },
@@ -197,7 +197,7 @@ Astro::Montenbruck::RiseSet - rise, set, transit.
     use Astro::Montenbruck::Ephemeris::Planet qw/:ids/;
     use Astro::Montenbruck::MathUtils qw/frac/;
     use Astro::Montenbruck::RiseSet::Constants qw/:all/;
-    use Astro::Montenbruck::RiseSet' qw/:all/;
+    use Astro::Montenbruck::RiseSet qw/:all/;
 
     # create function for calculating rise/set/transit events for Munich, Germany, on March 23, 1989.
     my $func = rst(
@@ -220,7 +220,7 @@ Astro::Montenbruck::RiseSet - rise, set, transit.
     );
 
     # alternatively, call the function in list context:
-    my %res = $func->($MO); # result structure is described bellow
+    my %res = $func->($MO); # result structure is described below
 
     # calculate civil twilight    
     twilight(
@@ -262,6 +262,9 @@ L<Astro::Montenbruck::RiseSet::Sunset::riseset_func>, which calculates rise and 
 =back
 
 Both of them are described in I<"Astronomy On The Personal Computer"> by O.Montenbruck and T.Phleger.
+However, they are built on different algorithms: B<riseset_func> utilizes quadratic interpolation 
+while B<rst> is iterative. Along with rise and set, B<rst> gives transit times. At the other hand, 
+B<riseset_func> is a base for calculating twilight.
 
 To take into account I<parallax>, I<refraction> and I<apparent radius> of the
 bodies, we use average corrections to geometric altitudes:
@@ -309,6 +312,23 @@ not be required to carry out outdoor activities. Only the brightest celestial
 objects can be observed by the naked eye during this time.
 
 =back
+
+=head1 CAVEATS
+
+Sometimes rise and set happen on different calendar dates. For example, here is the output of C<riseset.pl>
+script:
+
+  $ perl .\script\riseset.pl --date=1989-03-28 --place=48.1 -11.6 --timezone=UTC
+
+  Date      :  1989-03-28 UTC
+  Place     :  48N06, 011E35
+  Time Zone :  UTC
+
+          rise       transit    set     
+  Moon    23:34:17   03:23:59   07:10:54
+
+This directly depends on time zone. Since event time is always given as Julian date,
+it is not hard to determine correct order of events. 
 
 =head1 EXPORT
 

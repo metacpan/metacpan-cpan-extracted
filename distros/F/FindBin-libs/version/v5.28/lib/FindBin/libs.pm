@@ -332,7 +332,17 @@ sub import
     # already been through abs_path, not much more to check here.
 
     my %argz    = &$handle_args;
-    my @libz    = map { m{ (.+) }xs } $find_libs->( \%argz );
+    my @libz    
+    = map
+    {
+        my ( $path ) = m{ (.+) }x; 
+
+        ( $path =~ /\S/ )
+        ? $path
+        : ()
+    }
+    $find_libs->( \%argz )
+    ;
 
     my $caller = caller;
 

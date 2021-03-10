@@ -77,7 +77,7 @@ sub marcRecord {
 sub _extract_barcode {
     my ($cql) = @_;
 
-    if ($cql =~ /^item.barcode[\t ]*=[\t ]*(.*)/) {
+    if ($cql =~ /^item.barcode[\t ]*=+[\t ]*(.*)/) {
 	return $1;
     }
 

@@ -4,7 +4,7 @@
       "John Karr <brainbuz@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -34,8 +34,10 @@
             "Moose" : "0",
             "Moose::Role" : "0",
             "Path::Tiny" : "0.108",
+            "Ref::Util" : "0.202",
             "Sort::Hash" : "0",
             "Storable" : "3.15",
+            "String::TtyLength" : "0.02",
             "Time::Piece" : "0",
             "Try::Tiny" : "0",
             "YAML::XS" : "0",
@@ -44,11 +46,13 @@
             "parent" : "0",
             "perl" : "5.022",
             "strict" : "0",
+            "utf8" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Carp::Always" : "0",
             "Data::Printer" : "0",
             "File::Temp" : "0",
             "Test2::Bundle::More" : "0",
@@ -56,6 +60,9 @@
             "Test2::Tools::Warnings" : "0",
             "Test2::V0" : "0",
             "Test::Exception" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
             "perl" : "5.022"
          }
       }
@@ -72,7 +79,7 @@
          "web" : "https://github.com/brainbuz/Vote-Count"
       }
    },
-   "version" : "1.09",
+   "version" : "1.10",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "GPL-3.0-only"

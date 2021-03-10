@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210204173826;
+our $VERSION = 1.20210309172131;
 
 my $formatters = [
                 {
@@ -91,34 +91,34 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2057", "Damietta",
-"2050", "Mansoura",
-"2047", "Kafr\ El\-Sheikh",
+$areanames{en} = {"2097", "Aswan",
+"2065", "Red\ Sea",
+"2095", "Luxor",
+"2064", "Ismailia",
 "2069", "El\-Tor",
 "2040", "Tanta",
-"2015", "10th\ of\ Ramadan",
-"2062", "Suez",
-"2066", "Port\ Said",
-"203", "Alexandria",
-"2068", "El\-Arish",
-"2095", "Luxor",
-"2046", "Marsa\ Matruh",
-"2064", "Ismailia",
-"2048", "Monufia",
-"2096", "Qena",
-"2082", "Beni\ Suef",
-"2045", "Damanhur",
 "2093", "Sohag",
-"20554", "10th\ of\ Ramadan",
+"2096", "Qena",
+"2066", "Port\ Said",
+"2082", "Beni\ Suef",
+"2068", "El\-Arish",
+"203", "Alexandria",
 "2055", "Zagazig",
-"2065", "Red\ Sea",
+"2057", "Damietta",
+"2046", "Marsa\ Matruh",
+"2048", "Monufia",
+"2050", "Mansoura",
 "2084", "Fayoum",
-"2097", "Aswan",
-"2086", "Minia",
-"2013", "Banha",
+"20554", "10th\ of\ Ramadan",
+"2015", "10th\ of\ Ramadan",
+"2045", "Damanhur",
+"2047", "Kafr\ El\-Sheikh",
+"202", "Cairo\/Giza\/Qalyubia",
 "2088", "Assiout",
-"2092", "Wadi\ El\-Gedid",
-"202", "Cairo\/Giza\/Qalyubia",};
+"2013", "Banha",
+"2086", "Minia",
+"2062", "Suez",
+"2092", "Wadi\ El\-Gedid",};
 
     sub new {
       my $class = shift;

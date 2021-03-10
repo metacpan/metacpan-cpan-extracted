@@ -143,11 +143,8 @@ Version 0.01
 
 =head1 DESCRIPTION
 
-Low level routines for calculating rise and set times of celestial bodies. Unlike
-L<Astro::Montenbruck::RiseSet::RST> module, they are based on algorithms from the
-I<Montenbruck & Phleger> book. They are especially usefull for calculating
-different types of twilight. Meeus's method is unsuitable for calculating
-I<astronomical twilight>.
+Low level routines for calculating rise and set times of celestial bodies. 
+They are especially usefull for calculating different types of twilight. 
 
 =head1 FUNCTIONS
 

@@ -12,7 +12,7 @@ use DateTime::Format::Strptime qw/strptime/;
 use Astro::Montenbruck::MathUtils qw/ddd dms zdms frac/;
 use Astro::Montenbruck::Time qw/jd2unix/;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 our @EXPORT_OK = qw/parse_datetime parse_geocoords dmsz_str dms_or_dec_str
   dmsdelta_str hms_str format_geo @ZODIAC $LOCALE @DEFAULT_PLACE 
@@ -28,7 +28,17 @@ Readonly::Array our @ZODIAC =>
   qw/Aries Taurus Gemini Cancer Leo Virgin Libra Scorpio
   Sagittarius Capricorn Aquarius Pisces/;
 
-our $LOCALE = setlocale(LC_TIME);
+
+our $LOCALE;
+BEGIN {
+    $LOCALE = setlocale(LC_ALL);
+    eval {
+        DateTime->now()->set_locale($LOCALE);
+    };
+    $LOCALE = 'C'
+}
+
+
 our @DEFAULT_PLACE = qw/51N28 000W00/;
 
 sub parse_datetime {
@@ -48,7 +58,7 @@ sub parse_datetime {
     die "Could not parse date & time '$s': $@" unless $dt;
     $dt->set_locale($LOCALE);
     if ($dt->time_zone->name eq 'floating') {
-        eval { $dt->set_time_zone('local') };
+        # eval { $dt->set_time_zone('local') };
         $dt->set_time_zone('UTC') if $@;
     }
     $dt

@@ -3,7 +3,7 @@ package Text::TokenStream::Role::Stream;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use namespace::clean;
 

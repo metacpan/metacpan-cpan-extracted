@@ -1,16 +1,18 @@
 Revision history for Vote::Count
-
+1.10  Mar  11, 2021 Extraction of changes from the stv branch.
+                    fixup to tiebreaker, weighted votes approval matrix topcount,
+                    precedence fallback, Choices method, WithdrawalList, UntieList.
 1.09  Oct  15, 2020 Rounding options to floor. allow alternate threshold in TCA.
-1.08  Sep   8, 2020 Made STAR return similar hash to other methods. 
-                    Fixed Edge Case bug in Condorcet vs IRV. 
+1.08  Sep   8, 2020 Made STAR return similar hash to other methods.
+                    Fixed Edge Case bug in Condorcet vs IRV.
 1.07  Aug   5, 2020 Moved most of Count.pm to Common role and shared with Matrix.
                     Added Method::MinMax.
 1.06  Aug   1, 2020 Fixed some instances of using Active instead of SetActive, broken pod links.
 1.05  July  6, 2020 Added Simple option to CondorcetVsIRV
 1.04  July  6, 2020 Excising ghosts files from dependency tree.
-1.03  July  5, 2020 Attempt to fix failure to install on Strawberry, 
+1.03  July  5, 2020 Attempt to fix failure to install on Strawberry,
                     Move TextTableTiny into Vote::Count namespace.
-1.02  Jul   1, 2020 Documentation Review. Added Methods for NonApproval and 
+1.02  Jul   1, 2020 Documentation Review. Added Methods for NonApproval and
                     support for Borda to value unranked choices at 1.
 1.01  Dec  16, 2019 precedence file tiebreaker for use where rules require random
 1.00  Dec   2, 2019 Stable Release
@@ -22,7 +24,7 @@ Revision history for Vote::Count
 0.10  Sep   4, 2019 Range and STAR support
 0.022 Aug  25, 2019 TieBreaker CondorcetIRV CondorcetVsIRV
 0.021 Aug  13, 2019 Fix bug from Active Attribute being a reference to other copies
-                    ie when set/get. 
+                    ie when set/get.
                     added Grand Junction as a TieBreaker.
 0.020 Aug  10, 2019 Switch IRV to consumable Role.
 0.017 Aug   5, 2019 Add comment support to ReadBallots, add write function.

@@ -201,6 +201,20 @@ is_deeply( \@aggregated, \@expected, 'aggregate, v6 shuffled' );
 ###
 
 @input = qw(
+  1.2.3.4/32
+);
+
+@expected = qw(
+  1.2.3.4/32
+);
+
+@blocks     = map { Net::IPAM::Block->new($_) } @input;
+@aggregated = map { $_->to_string } aggregate(@blocks);
+is_deeply( \@aggregated, \@expected, 'aggregate, v4 overflow check' );
+
+###
+
+@input = qw(
   255.255.255.0-255.255.255.200
   255.255.255.150-255.255.255.255
 );
@@ -209,8 +223,8 @@ is_deeply( \@aggregated, \@expected, 'aggregate, v6 shuffled' );
   255.255.255.0/24
 );
 
-@blocks = map { Net::IPAM::Block->new($_) } @input;
-@aggregated = map { $_->to_string } aggregate( @blocks );
+@blocks     = map { Net::IPAM::Block->new($_) } @input;
+@aggregated = map { $_->to_string } aggregate(@blocks);
 is_deeply( \@aggregated, \@expected, 'aggregate, v4 overflow check' );
 
 ###
@@ -224,8 +238,8 @@ is_deeply( \@aggregated, \@expected, 'aggregate, v4 overflow check' );
   ffff::1-ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
 );
 
-@blocks = map { Net::IPAM::Block->new($_) } @input;
-@aggregated = map { $_->to_string } aggregate( @blocks );
+@blocks     = map { Net::IPAM::Block->new($_) } @input;
+@aggregated = map { $_->to_string } aggregate(@blocks);
 is_deeply( \@aggregated, \@expected, 'aggregate, v6 overflow check' );
 
 ####
@@ -240,8 +254,8 @@ is_deeply( \@aggregated, \@expected, 'aggregate, v6 overflow check' );
   ::/128
 );
 
-@blocks = map { Net::IPAM::Block->new($_) } @input;
-@aggregated = map { $_->to_string } aggregate( @blocks );
+@blocks     = map { Net::IPAM::Block->new($_) } @input;
+@aggregated = map { $_->to_string } aggregate(@blocks);
 is_deeply( \@aggregated, \@expected, 'aggregate, overflow check' );
 
 done_testing();

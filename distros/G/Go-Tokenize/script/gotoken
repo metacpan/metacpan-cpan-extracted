@@ -1,0 +1,21 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use Go::Tokenize 'tokenize';
+use File::Slurper qw!read_text!;
+
+for (@ARGV) {
+    my $text = read_text ($_);
+    my $tokens = tokenize ($text);
+    for my $token (@$tokens) {
+	print "$token->{type} at line $token->{line} from $token->{start} to $token->{end}:\n";
+	print "$token->{contents}\n\n";
+    }
+}
+
+
+# Local variables:
+# mode: perl
+# End:

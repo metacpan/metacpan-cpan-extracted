@@ -11,7 +11,7 @@ use Test2::Harness::Util::UUID qw/gen_uuid/;
 
 use Test2::Harness::Util qw/mod2file/;
 
-our $VERSION = '0.000036';
+our $VERSION = '0.000041';
 
 use parent 'Test2::Harness::Renderer';
 use Test2::Harness::Util::HashBase qw{
@@ -22,6 +22,7 @@ use Test2::Harness::Util::HashBase qw{
     <project
     <user
     <finished
+    +links
 };
 
 sub init {
@@ -42,7 +43,7 @@ sub init {
             my $file = mod2file($cmod);
             require $file;
 
-            $config = $cmod->yath_ui_config(%$db);
+            $config = $cmod->yath_ui_config(%$$db);
         }
         else {
             my $dsn = $db->dsn;
@@ -84,6 +85,20 @@ sub init {
     }
 
     $config->connect // die "Could not connect to the db";
+
+    STDOUT->autoflush(1);
+    print $self->links;
+}
+
+sub links {
+    my $self = shift;
+    return $self->{+LINKS} if defined $self->{+LINKS};
+
+    if (my $url = $self->settings->yathui->url) {
+        $self->{+LINKS} = "\nThis run can be reviewed at: $url/run/" . $self->settings->run->run_id . "\n\n";
+    }
+
+    return $self->{+LINKS} //= "";
 }
 
 sub signal {
@@ -110,9 +125,11 @@ sub render_event {
         my $p = $config->schema->resultset('Project')->find_or_create({name => $self->{+PROJECT}, project_id => gen_uuid()});
         my $u = $config->schema->resultset('User')->find_or_create({username => $self->{+USER}, user_id => gen_uuid(), role => 'user'});
 
+        my $ydb = $self->settings->prefix('yathui-db') or die "No DB settings";
         my $run = $config->schema->resultset('Run')->create({
             run_id     => $run_id,
             mode       => $self->settings->yathui->mode,
+            buffer     => $ydb->buffering,
             status     => 'pending',
             user_id    => $u->user_id,
             project_id => $p->project_id,
@@ -123,6 +140,7 @@ sub render_event {
         my $processor = Test2::Harness::UI::RunProcessor->new(
             config => $config,
             run => $run,
+            interval => $ydb->flush_interval,
         );
 
         $self->{+PROCESSOR} = $processor;
@@ -141,6 +159,8 @@ sub finish {
     $self->{+PROCESSOR}->finish();
 
     $self->{+FINISHED} = 1;
+
+    print $self->links;
 }
 
 sub DESTROY {

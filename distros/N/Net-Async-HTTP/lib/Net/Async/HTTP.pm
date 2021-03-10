@@ -1,16 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2008-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2008-2021 -- leonerd@leonerd.org.uk
 
 package Net::Async::HTTP;
 
 use strict;
 use warnings;
-use 5.010;  # //
+use v5.10;  # //
 use base qw( IO::Async::Notifier );
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 our $DEFAULT_UA = "Perl + " . __PACKAGE__ . "/$VERSION";
 our $DEFAULT_MAXREDIR = 3;
@@ -58,6 +58,8 @@ C<Net::Async::HTTP> - use HTTP with C<IO::Async>
 
 =head1 SYNOPSIS
 
+   use Future::AsyncAwait;
+
    use IO::Async::Loop;
    use Net::Async::HTTP;
    use URI;
@@ -68,9 +70,9 @@ C<Net::Async::HTTP> - use HTTP with C<IO::Async>
 
    $loop->add( $http );
 
-   my ( $response ) = $http->do_request(
+   my $response = await $http->do_request(
       uri => URI->new( "http://www.cpan.org/" ),
-   )->get;
+   );
 
    print "Front page of http://www.cpan.org/ is:\n";
    print $response->as_string;
@@ -406,8 +408,8 @@ sub configure
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 When returning a Future, the following methods all indicate HTTP-level errors
 using the Future failure name of C<http>. If the error relates to a specific
@@ -548,7 +550,9 @@ sub get_connection
    return $f;
 }
 
-=head2 $response = $http->do_request( %args )->get
+=head2 do_request
+
+   $response = await $http->do_request( %args );
 
 Send an HTTP request to a server, returning a L<Future> that will yield the
 response. The request may be represented by an L<HTTP::Request> object, or a
@@ -707,7 +711,9 @@ C<stall_timeout> as the operation name.
 
 =back
 
-=head2 $http->do_request( %args )
+=head2 do_request (void)
+
+   $http->do_request( %args )
 
 When not returning a future, the following extra arguments are used as
 callbacks instead:
@@ -1047,7 +1053,12 @@ sub _make_request_for_uri
    }
 
    $request->protocol( "HTTP/1.1" );
-   $request->header( Host => $uri->host );
+   if( $args{port} != $uri->default_port ) {
+      $request->header( Host => "$args{host}:$args{port}" );
+   }
+   else {
+      $request->header( Host => "$args{host}" );
+   }
 
    my $headers = $args{headers};
    if( $headers and reftype $headers eq "ARRAY" ) {
@@ -1076,16 +1087,21 @@ sub _make_request_for_uri
    return %args;
 }
 
-=head2 $response = $http->GET( $uri, %args )->get
+=head2 GET, HEAD, PUT, ...
 
-=head2 $response = $http->HEAD( $uri, %args )->get
+   $response = await $http->GET( $uri, %args );
 
-=head2 $response = $http->PUT( $uri, $content, %args )->get
+   $response = await $http->HEAD( $uri, %args );
 
-=head2 $response = $http->POST( $uri, $content, %args )->get
+   $response = await $http->PUT( $uri, $content, %args );
 
-Convenient wrappers for performing C<GET>, C<HEAD>, C<PUT> or C<POST> requests
-with a C<URI> object and few if any other arguments, returning a C<Future>.
+   $response = await $http->POST( $uri, $content, %args );
+
+   $response = await $http->PATCH( $uri, $content, %args );
+
+Convenient wrappers for performing C<GET>, C<HEAD>, C<PUT>, C<POST> or
+C<PATCH> requests with a C<URI> object and few if any other arguments,
+returning a C<Future>.
 
 Remember that C<POST> with non-form data (as indicated by a plain scalar
 instead of an C<ARRAY> reference of form data name/value pairs) needs a
@@ -1121,6 +1137,13 @@ sub POST
    return $self->do_request( method => "POST", uri => $uri, content => $content, @args );
 }
 
+sub PATCH
+{
+   my $self = shift;
+   my ( $uri, $content, @args ) = @_;
+   return $self->do_request( method => "PATCH", uri => $uri, content => $content, @args );
+}
+
 =head1 SUBCLASS METHODS
 
 The following methods are intended as points for subclasses to override, to
@@ -1128,7 +1151,9 @@ add extra functionallity.
 
 =cut
 
-=head2 $http->prepare_request( $request )
+=head2 prepare_request
+
+   $http->prepare_request( $request )
 
 Called just before the C<HTTP::Request> object is sent to the server.
 
@@ -1154,7 +1179,9 @@ sub prepare_request
    $self->{cookie_jar}->add_cookie_header( $request ) if $self->{cookie_jar};
 }
 
-=head2 $http->process_response( $response )
+=head2 process_response
+
+   $http->process_response( $response )
 
 Called after a non-redirect C<HTTP::Response> has been received from a server.
 The originating request will be set in the object.
@@ -1242,7 +1269,9 @@ if( eval { require Compress::Bzip2 and $Compress::Bzip2::VERSION >= 2.10 } ) {
 
 Other content encoding types can be registered by calling the following method
 
-=head2 Net::Async::HTTP->register_decoder( $name, $q, $make_decoder )
+=head2 register_decoder
+
+   Net::Async::HTTP->register_decoder( $name, $q, $make_decoder )
 
 Registers an encoding type called C<$name>, at the quality value C<$q>. In
 order to decode this encoding type, C<$make_decoder> will be invoked with no
@@ -1293,6 +1322,7 @@ the end of stream is reached, when it will be invoked with no arguments.
 The C<Future>-returning C<GET> method makes it easy to await multiple URLs at
 once, by using the L<Future::Utils> C<fmap_void> utility 
 
+   use Future::AsyncAwait;
    use Future::Utils qw( fmap_void );
 
    my @URLs = ( ... );
@@ -1315,7 +1345,7 @@ once, by using the L<Future::Utils> C<fmap_void> utility
    } foreach => \@URLs,
      concurrent => 5;
 
-   $loop->await( $future );
+   await $future;
 
 =cut
 

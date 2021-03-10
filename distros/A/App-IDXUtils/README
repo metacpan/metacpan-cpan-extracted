@@ -3,13 +3,15 @@ NAME
     Exchange
 
 VERSION
-    This document describes version 0.004 of App::IDXUtils (from Perl
-    distribution App-IDXUtils), released on 2020-12-27.
+    This document describes version 0.005 of App::IDXUtils (from Perl
+    distribution App-IDXUtils), released on 2021-01-17.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes several utilities related to the Indonesian
     Stock Exchange (IDX):
+
+    *   get-idx-daily-trading-summary
 
     *   list-idx-boards
 
@@ -46,7 +48,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

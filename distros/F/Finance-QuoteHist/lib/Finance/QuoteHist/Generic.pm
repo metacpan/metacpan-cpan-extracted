@@ -672,7 +672,8 @@ sub date_normalize {
     $normal_date = ParseDate($m =~ /^\d+$/ ? "$y/$m/01" : "$m 01 $y");
   }
   else {
-    if ($date =~ /^\d{10}$/) {
+    # allow for negative epochs
+    if ($date =~ /^-?\d+$/) {
       $normal_date = ParseDateString("epoch $date");
     }
     else {

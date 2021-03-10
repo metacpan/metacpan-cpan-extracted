@@ -57,4 +57,15 @@ subtest 'empty type parameters' => sub {
   is $type->get_message(undef), q{Undef did not pass type constraint "TypedCodeRef[]"};
 };
 
+subtest 'method' => sub {
+  my $meta = Sub::Meta->new(
+      args      => Int,
+      returns   => Int,
+      is_method => 1
+  );
+  my $type = TypedCodeRef[$meta];
+  ok !$type->check(wrap_sub Int ,=> Int, sub { $_[0] ** 2 } );
+  ok $type->check(wrap_method Int ,=> Int, sub { $_[0] ** 2 } );
+};
+
 done_testing;

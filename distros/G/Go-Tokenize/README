@@ -1,0 +1,92 @@
+    ____               _____     _              _         
+   / ___| ___    _ _  |_   _|__ | | _____ _ __ (_)_______ 
+  | |  _ / _ \  (_|_)   | |/ _ \| |/ / _ \ '_ \| |_  / _ \
+  | |_| | (_) |  _ _    | | (_) |   <  __/ | | | |/ /  __/
+   \____|\___/  (_|_)   |_|\___/|_|\_\___|_| |_|_/___\___|
+                                                          
+
+
+This is the README for Go::Tokenize version 0.01.
+
+Go::Tokenize is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Go::Tokenize - Tokenize Go
+
+Turn Go code into tokens.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+website:
+
+    * http://metacpan.org/release/Go-Tokenize
+
+(This link goes to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc Go::Tokenize
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.1 or later.
+
+To install the module from CPAN, use
+
+    cpan Go::Tokenize
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Go::Tokenize
+
+To install the module from the source file, Go-Tokenize-0.01.tar.gz, follow
+this sequence of commands:
+
+    tar xfz Go-Tokenize-0.01.tar.gz
+    cd Go-Tokenize-0.01
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/go-tokenize/issues>,
+
+or if you want to alter the source code of Go::Tokenize, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/go-tokenize>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Wed Mar 10 19:11:22 2021.
+
+-----------------------------------------------------------------------------

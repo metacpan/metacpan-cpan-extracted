@@ -1,0 +1,11 @@
+Changes
+lib/Go/Tokenize.pm
+lib/Go/Tokenize.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+script/gotoken
+t/go-tokenize.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

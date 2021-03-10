@@ -12,7 +12,7 @@ use Capture::Tiny qw( capture_merged capture );
 use FFI::Temp;
 
 # ABSTRACT: System detection and probing for FFI extensions.
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.38'; # VERSION
 
 
 sub new
@@ -513,7 +513,7 @@ FFI::Probe - System detection and probing for FFI extensions.
 
 =head1 VERSION
 
-version 1.34
+version 1.38
 
 =head1 SYNOPSIS
 
@@ -679,6 +679,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 Meredith (merrilymeredith, MHOWARD)
 
 Diab Jerius (DJERIUS)
+
+Eric Brine (IKEGAMI)
 
 =head1 COPYRIGHT AND LICENSE
 

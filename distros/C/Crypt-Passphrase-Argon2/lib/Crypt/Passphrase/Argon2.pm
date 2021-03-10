@@ -1,12 +1,12 @@
 package Crypt::Passphrase::Argon2;
-$Crypt::Passphrase::Argon2::VERSION = '0.001';
+$Crypt::Passphrase::Argon2::VERSION = '0.002';
 use strict;
 use warnings;
 
 use parent 'Crypt::Passphrase::Encoder';
 
 use Carp 'croak';
-use Crypt::Argon2;
+use Crypt::Argon2 0.009;
 
 my %encoder_for = (
 	argon2i  => \&Crypt::Argon2::argon2i_pass,
@@ -19,8 +19,8 @@ sub new {
 	my $subtype     =  $args{subtype}     || 'argon2id';
 	croak "Unknown subtype $subtype" unless $encoder_for{ $subtype };
 	return bless {
-		memory_cost      => $args{memory_cost}      || '256M',
-		time_cost      => $args{time_cost}      ||    3,
+		memory_cost => $args{memory_cost} || '256M',
+		time_cost   => $args{time_cost}   ||    3,
 		parallelism => $args{parallelism} ||    1,
 		output_size => $args{output_size} ||   16,
 		salt_size   => $args{salt_size}   ||   16,
@@ -70,7 +70,7 @@ Crypt::Passphrase::Argon2 - An Argon2 encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 METHODS
 
@@ -106,15 +106,15 @@ This choses the argon2 subtype. It defaults to C<argon2id>, and unless you know 
 
 =over 4
 
-=item * 2id
+=item * C<argon2id>
 
-This is the default. It's a hybrid of C<2i> and C<2d> that largely combines the advantages of both.
+This is the default. It's a hybrid of C<argon2i> and C<argon2d> that largely combines the advantages of both.
 
-=item * 2i
+=item * C<argon2i>
 
 This is optimized against timing attacks, but more vulnerable against other cryptographic attacks. It must not be used with a C<time_cost> lower than 3.
 
-=item * 2d
+=item * C<argon2d>
 
 This is optimized for resistance to GPU cracking attacks but not against timing based side-channel attacks.
 

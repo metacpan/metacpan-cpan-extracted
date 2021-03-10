@@ -326,6 +326,9 @@ t/testfiles/verse-3.muse
 t/testfiles/verse-4.exp.html
 t/testfiles/verse-4.exp.ltx
 t/testfiles/verse-4.muse
+t/testfiles/verse-5.exp.html
+t/testfiles/verse-5.exp.ltx
+t/testfiles/verse-5.muse
 t/testfiles/verse.exp.html
 t/testfiles/verse.exp.ltx
 t/testfiles/verse.muse

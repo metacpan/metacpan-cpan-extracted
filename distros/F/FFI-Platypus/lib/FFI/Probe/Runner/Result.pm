@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: The results from a probe run.
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.38'; # VERSION
 
 
 sub new
@@ -42,7 +42,7 @@ FFI::Probe::Runner::Result - The results from a probe run.
 
 =head1 VERSION
 
-version 1.34
+version 1.38
 
 =head1 SYNOPSIS
 
@@ -113,6 +113,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 Meredith (merrilymeredith, MHOWARD)
 
 Diab Jerius (DJERIUS)
+
+Eric Brine (IKEGAMI)
 
 =head1 COPYRIGHT AND LICENSE
 

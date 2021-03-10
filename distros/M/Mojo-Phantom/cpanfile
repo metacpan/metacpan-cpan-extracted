@@ -1,4 +1,5 @@
 requires 'Mojolicious', '7.15'; # Mojo::File
+requires 'Mojo::IOLoop::Delay'; # Removed from Mojolicious at 9.0
 requires 'JavaScript::Value::Escape';
 requires 'Role::Tiny';
 requires 'Test2', '1.302015'; # Test::Builder + Test2 that works together

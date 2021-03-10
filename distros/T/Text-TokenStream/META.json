@@ -50,23 +50,23 @@
    "provides" : {
       "Text::TokenStream" : {
          "file" : "lib/Text/TokenStream.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Text::TokenStream::Lexer" : {
          "file" : "lib/Text/TokenStream/Lexer.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Text::TokenStream::Role::Stream" : {
          "file" : "lib/Text/TokenStream/Role/Stream.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Text::TokenStream::Token" : {
          "file" : "lib/Text/TokenStream/Token.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Text::TokenStream::Types" : {
          "file" : "lib/Text/TokenStream/Types.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -80,7 +80,7 @@
          "web" : "https://github.com/arc/Text-TokenStream"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

@@ -14,7 +14,7 @@ use Math::Trig qw/deg2rad/;
 use Astro::Montenbruck::MathUtils qw/dms ddd frac/;
 use Astro::Montenbruck::Ephemeris::Planet qw/:ids/;
 use Astro::Montenbruck::RiseSet;
-
+use Data::Dumper;
 BEGIN {
     use_ok( 'Astro::Montenbruck::RiseSet::Constants', qw/:events :states :altitudes/ );
     use_ok( 'Astro::Montenbruck::RiseSet::Sunset', qw/riseset_func/ );
@@ -153,14 +153,40 @@ subtest 'Sun & Moon, normal conditions' => sub {
                 sin_h0       => sin( deg2rad($h0{$pla}) ),
                 on_event => sub {
                     my ($evt, $jd) = @_;
-                    my $ut = frac($jd - 0.5) * 24;
-                    my @hm  = @{ $case->{$pla}->{$evt} };
-                    delta_ok( $ut, ddd(@hm), sprintf( '%s %s: %02d:%02d', $pla, $evt, @hm ) );
+                    if ($case->{$pla}->{$evt}) {
+                        my $ut = frac($jd - 0.5) * 24;
+                        my @hm  = @{ $case->{$pla}->{$evt} };
+                        delta_ok( $ut, ddd(@hm), sprintf( '%s %s: %02d:%02d', $pla, $evt, @hm ) );
+                    }
                 },
                 on_noevent => sub { fail("$pla: event expected") }
             );
         }
     }
+    done_testing();
+};
+
+subtest 'Moon rise on 1989-03-28' => sub {
+    riseset_func(
+        date   => [1989, 3, 28],
+        phi    => 48.1,
+        lambda => -11.6
+    )->(
+        get_position => sub { Astro::Montenbruck::RiseSet::_get_equatorial( $MO, $_[0] ) },
+        sin_h0       => sin( deg2rad($H0_MOO) ),
+        on_event => sub {
+            my ($evt, $jd) = @_;
+            my $ut = frac($jd - 0.5) * 24;            
+            if ($evt eq $EVT_RISE) {
+                delta_ok($jd, 2447614.52589818);  
+            }
+            else {
+                delta_ok($jd, 2447613.79840355);
+            }
+            diag "$evt UT: $ut";
+        },
+        on_noevent => sub { fail("Event expected") }
+    );    
     done_testing();
 };
 

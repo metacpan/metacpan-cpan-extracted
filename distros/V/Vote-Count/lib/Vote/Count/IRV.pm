@@ -13,13 +13,13 @@ with 'Vote::Count::TieBreaker';
 
 use Storable 3.15 'dclone';
 
-our $VERSION='1.09';
+our $VERSION='1.10';
 
 =head1 NAME
 
 Vote::Count::IRV
 
-=head1 VERSION 1.09
+=head1 VERSION 1.10
 
 =cut
 
@@ -27,26 +27,25 @@ Vote::Count::IRV
 
 no warnings 'experimental';
 use List::Util qw( min max );
-use Vote::Count::TextTableTiny 'generate_markdown_table';
 #use Data::Dumper;
 
-sub _ResolveTie ( $self, $active, $tiebreaker, @choices ) {
-  return @choices if @choices == 1;
+sub _ResolveTie ( $self, $active, $tiebreaker, @tiedchoices ) {
+  return @tiedchoices if @tiedchoices == 1;
   my %high =
-    map { $_ => 1 } $self->TieBreaker( $tiebreaker, $active, @choices );
+    map { $_ => 1 } $self->TieBreaker( $tiebreaker, $active, @tiedchoices );
   if ( defined $self->{'last_tiebreaker'} ) {
     $self->logt( $self->{'last_tiebreaker'}{'terse'} );
     $self->logv( $self->{'last_tiebreaker'}{'verbose'} );
     $self->{'last_tiebreaker'} = undef;
   }
-  if ( @choices == scalar( keys %high ) ) { return @choices }
+  if ( @tiedchoices == scalar( keys %high ) ) { return @tiedchoices }
   # tiebreaker returns winner, we want losers!
-  # use map to remove winner(s) from @choices.
+  # use map to remove winner(s) from @tiedchoices.
   # warning about sort interpreted as function fixed
   my @low = sort map {
     if   ( $high{$_} ) { }
     else               { $_ }
-  } @choices;
+  } @tiedchoices;
   return @low;
 }
 
@@ -133,7 +132,7 @@ Instant Runoff Voting is also known as Alternative Vote and as the Hare Method.
 
 There is no standard accepted method for IRV tie resolution, Eliminate All is a common one and the default.
 
-Returns a tie when all of the remaining choices are in a tie. 
+Returns a tie when all of the remaining choices are in a tie.
 
 An optional value to RunIRV is to specify tiebreaker, see TieBreaker.
 

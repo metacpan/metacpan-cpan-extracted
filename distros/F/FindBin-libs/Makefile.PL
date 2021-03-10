@@ -139,7 +139,7 @@ WriteMakefile
         NAME            FindBin::libs
         LICENSE         perl
     ),
-    VERSION         => 'v2.20.2',
+    VERSION         => 'v2.21.0',
     AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>',
     PREREQ_PM       =>
     {

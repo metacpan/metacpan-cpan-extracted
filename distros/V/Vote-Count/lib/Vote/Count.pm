@@ -13,18 +13,19 @@ use Data::Dumper;
 use Time::Piece;
 use Path::Tiny;
 use Vote::Count::Matrix;
-use Storable 3.15 'dclone';
+use Vote::Count::ReadBallots qw( read_ballots read_range_ballots);
+# use Storable 3.15 'dclone';
 
 no warnings 'experimental';
 
-our $VERSION='1.09';
+our $VERSION='1.10';
 
 =head1 NAME
 
 Vote::Count
 
 
-=head1 VERSION 1.09
+=head1 VERSION 1.10
 
 =cut
 
@@ -32,18 +33,15 @@ Vote::Count
 
 has 'BallotSet' => ( is => 'ro', isa => 'HashRef', required => 1 );
 
-has TieBreakMethod => (
-  is       => 'rw',
-  isa      => 'Str',
-  required => 0,
-);
-
-# This is only used for the precedence tiebreaker!
-has PrecedenceFile => (
-  is       => 'rw',
-  isa      => 'Str',
-  required => 0,
-);
+sub _load_ballotset ( $self ) {
+  if ( $self->{'BallotSet'}{'read_ballots'} ) {
+    $self->{'BallotSet'}
+      = read_ballots( $self->{'BallotSet'}{'read_ballots'} );
+  } elsif ( $self->{'BallotSet'}{'read_range_ballots'} ) {
+    $self->{'BallotSet'}
+      = read_range_ballots( $self->{'BallotSet'}{'read_range_ballots'} );
+  }
+}
 
 has 'PairMatrix' => (
   is      => 'ro',
@@ -67,6 +65,8 @@ sub _buildmatrix ( $self ) {
 
 sub BUILD {
   my $self = shift;
+  # If files were given to ballotset they need to be loaded
+  $self->_load_ballotset();
   # Verbose Log
   $self->{'LogV'} = localtime->cdate . "\n";
   # Debugging Log
@@ -77,7 +77,7 @@ sub BUILD {
 }
 
 # load the roles providing the underlying ops.
-with 
+with
   'Vote::Count::Common',
   'Vote::Count::Approval',
   'Vote::Count::Borda',
@@ -450,7 +450,7 @@ Get a Matrix Object for the Active Set. Generated and cached on the first reques
 
 =head3 UpdatePairMatrix
 
-Regenerate and cache Matrix with current Active Set. 
+Regenerate and cache Matrix with current Active Set.
 
 
 =head3 VotesCast
@@ -465,7 +465,7 @@ Returns the number of non-exhausted ballots based on the current Active Set.
 
 =head1 Minimum Perl Version
 
-It is the policy of Vote::Count to only develop with recent versions of Perl. Support for older versions will be dropped as they either start failing tests or impair adoption of new features. 
+It is the policy of Vote::Count to only develop with recent versions of Perl. Support for older versions will be dropped as they either start failing tests or impair adoption of new features.
 
 
 =head2 Components

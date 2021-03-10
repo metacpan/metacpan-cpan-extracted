@@ -7,7 +7,7 @@ use PDL;
 
 if ( eval { use Data::Printer {
 		colored => 0,
-		filters => { -external => [ 'PDL' ] }
+		filters => [ 'PDL' ]
 	}; 1 } ) {
   plan tests => 8;
 } else {

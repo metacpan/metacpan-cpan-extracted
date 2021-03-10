@@ -1,0 +1,67 @@
+{
+   "abstract" : "Toolkit for implementing a frontend server/client the Apache Guacamole system",
+   "author" : [
+      "Joel Berger, <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.029",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GuacLite",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.029"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "Mojolicious" : "8.15"
+         }
+      }
+   },
+   "provides" : {
+      "GuacLite" : {
+         "file" : "lib/GuacLite.pm",
+         "version" : "0.02"
+      },
+      "GuacLite::Client::Guacd" : {
+         "file" : "lib/GuacLite/Client/Guacd.pm"
+      },
+      "GuacLite::Client::Web" : {
+         "file" : "lib/GuacLite/Client/Web.pm"
+      },
+      "GuacLite::Client::Web::Command::pack" : {
+         "file" : "lib/GuacLite/Client/Web.pm"
+      },
+      "GuacLite::Plugin::Guacd" : {
+         "file" : "lib/GuacLite/Plugin/Guacd.pm"
+      },
+      "GuacLite::Util" : {
+         "file" : "lib/GuacLite/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/GuacLite/issues"
+      },
+      "repository" : {
+         "url" : "http://github.com/jberger/GuacLite"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_spdx_expression" : "Apache-2.0"
+}

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Astro-Montenbruck",
    "prereqs" : {
@@ -21,7 +21,6 @@
             "Test::CheckManifest" : "0.9",
             "Test::Harness" : "3.38",
             "Test::More" : "1.30",
-            "Test::Number::Delta" : "1.06",
             "Test::Pod::Coverage" : "1.08",
             "Test::Simple" : "1.30"
          }
@@ -38,7 +37,8 @@
             "List::MoreUtils" : "0.43",
             "Memoize" : "1.03",
             "Readonly" : "2.05",
-            "Term::ANSIColor" : "1.00"
+            "Term::ANSIColor" : "1.00",
+            "Test::Number::Delta" : "1.06"
          }
       }
    },
@@ -174,5 +174,5 @@
    },
    "release_status" : "stable",
    "version" : "1.2",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

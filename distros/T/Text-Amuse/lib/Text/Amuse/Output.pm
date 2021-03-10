@@ -1073,6 +1073,10 @@ sub manage_verse {
     else { die "Not reached" }
 
     my (@chunks) = split(/\n/, $el->string);
+
+    # remove useless <br> triggering LaTeX errors
+    s/<br>\s*\z// for @chunks;
+
     my (@out, @stanza);
     foreach my $l (@chunks) {
         if ($l =~ m/\A( *)(.+?)\z/s) {

@@ -13,6 +13,9 @@ sub new {
         url      => 'http://localhost',
         username => 'admin',
         password => 'initial',
+
+        ssl_verify_hostname => 0,
+
         %args,
     );
 

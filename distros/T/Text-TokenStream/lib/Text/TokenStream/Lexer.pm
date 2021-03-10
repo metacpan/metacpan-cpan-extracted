@@ -3,7 +3,7 @@ package Text::TokenStream::Lexer;
 use v5.12;
 use Moo;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Carp qw(confess);
 use List::Util qw(pairmap);

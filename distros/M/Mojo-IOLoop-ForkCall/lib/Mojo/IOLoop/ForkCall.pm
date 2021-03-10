@@ -2,10 +2,11 @@ package Mojo::IOLoop::ForkCall;
 
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 $VERSION = eval $VERSION;
 
 use Mojo::IOLoop;
+use Mojo::IOLoop::Delay;
 use IO::Pipely 'pipely';
 use POSIX ();
 use Scalar::Util ();
@@ -24,7 +25,8 @@ has 'weaken'       => 0;
 
 sub run {
   my ($self, @args) = @_;
-  my $delay = $self->ioloop->delay(sub{ $self->_run(@args) });
+  my $delay = Mojo::IOLoop::Delay->new->ioloop($self->ioloop);
+  $delay->steps(sub{ $self->_run(@args) });
   $delay->catch(sub{ $self->emit( error => pop ) });
   return $self;
 }

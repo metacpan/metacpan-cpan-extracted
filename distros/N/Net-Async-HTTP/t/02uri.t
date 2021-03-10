@@ -389,4 +389,30 @@ do_test_uri( "plain string URI",
    expect_res_code => 200,
 );
 
+do_test_uri( "simple PATCH",
+   method  => "PATCH",
+   uri     => URI->new( "http://host11/resource" ),
+   content => "The content",
+   content_type => "text/plain",
+
+   expect_req_firstline => "PATCH /resource HTTP/1.1",
+   expect_req_headers => {
+      Host => "host11",
+      'Content-Length' => 11,
+      'Content-Type' => "text/plain",
+   },
+   expect_req_content => "The content",
+
+   response => "HTTP/1.1 201 Created$CRLF" . 
+   "Content-Length: 0$CRLF" .
+   "Connection: Keep-Alive$CRLF" .
+   $CRLF,
+
+   expect_res_code    => 201,
+   expect_res_headers => {
+      'Content-Length' => 0,
+      'Connection'     => "Keep-Alive",
+   },
+);
+
 done_testing;

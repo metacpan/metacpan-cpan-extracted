@@ -4,13 +4,13 @@
       "Joel Berger <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojo-IOLoop-ForkCall",
    "prereqs" : {
@@ -22,6 +22,7 @@
       "runtime" : {
          "requires" : {
             "IO::Pipely" : "0",
+            "Mojo::IOLoop::Delay" : "0",
             "Mojolicious" : "5.08",
             "Perl::OSType" : "0"
          }
@@ -30,7 +31,7 @@
    "provides" : {
       "Mojo::IOLoop::ForkCall" : {
          "file" : "lib/Mojo/IOLoop/ForkCall.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "Mojolicious::Plugin::ForkCall" : {
          "file" : "lib/Mojolicious/Plugin/ForkCall.pm"
@@ -48,7 +49,7 @@
          "url" : "https://github.com/jberger/Mojo-IOLoop-ForkCall"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_deprecated" : 1,
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

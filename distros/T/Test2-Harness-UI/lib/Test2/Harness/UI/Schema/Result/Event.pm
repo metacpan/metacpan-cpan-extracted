@@ -3,11 +3,13 @@ use utf8;
 use strict;
 use warnings;
 
+use Test2::Harness::UI::Util::ImportModes();
+
 use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000036';
+our $VERSION = '0.000041';
 
 __PACKAGE__->parent_column('parent_id');
 
@@ -27,6 +29,11 @@ __PACKAGE__->inflate_column(
 
 sub run  { shift->job->run }
 sub user { shift->job->run->user }
+
+sub in_mode {
+    my $self = shift;
+    return Test2::Harness::UI::Util::ImportModes::event_in_mode(event => $self, @_);
+}
 
 sub TO_JSON {
     my $self = shift;

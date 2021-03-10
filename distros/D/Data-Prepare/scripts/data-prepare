@@ -31,7 +31,7 @@ if ($uniq_cols) {
   die "Usage: -u file..." unless @ARGV;
   my (@files, %f2col2count) = @_;
   for my $file (@ARGV) {
-    my $data = csv(in => $file, encoding => "UTF-8");
+    my $data = read_csv($file);
     my $col2count = non_unique_cols($data);
     next if !keys %$col2count;
     $f2col2count{$file} = $col2count;
@@ -47,7 +47,7 @@ if ($analyse) {
   die "Usage: -a file..." unless @ARGV;
   my %f2cs;
   for my $file (@ARGV) {
-    my $data = csv(in => $file, encoding => "UTF-8");
+    my $data = read_csv($file);
     $f2cs{$file} = [ cols_non_empty($data) ];
   }
   print _dump(\%f2cs);
@@ -60,11 +60,19 @@ sub _dump {
   Data::Dumper::Dumper($_[0]);
 }
 
+sub read_csv {
+  my ($file) = @_;
+  open my $fh, "<:encoding(UTF-8)", $file or die "$file: $!";
+  my $char = $fh->getc;
+  $fh->ungetc(ord $char) if ord($char) != 0xFEFF; # Text::CSV fails on BOM
+  csv(in => $fh);
+}
+
 if (grep defined, $slice_num, $slice_key) {
   die "Usage: -s[kn] col[num|key] file..." unless @ARGV;
   require Encode;
   for my $file (@ARGV) {
-    my $data = csv(in => $file, encoding => "UTF-8");
+    my $data = read_csv($file);
     if (!defined $slice_num) {
       $slice_num = key_to_index($data->[0])->{$slice_key};
       die "Unknown column-name '$slice_key' in '$file'" if !defined $slice_num;
@@ -79,11 +87,11 @@ my $process_config = LoadFile($config);
 if ($pk_analyse) {
   die "Usage: -p file..." unless @ARGV;
   my $pk_map = make_pk_map(
-    csv(in => $process_config->{pk_spec}{file}, encoding => "UTF-8"),
+    read_csv($process_config->{pk_spec}{file}),
     @{ $process_config->{pk_spec} }{ qw(primary_key alt_keys) },
   );
   for my $file (@ARGV) {
-    my $data = csv(in => $file, encoding => "UTF-8");
+    my $data = read_csv($file);
     my ($col2code2exact, $no_exact_match) = pk_col_counts($data, $pk_map);
     my $k2i = key_to_index($data->[0]);
     my (%col2code2approx, @no_approx_match);
@@ -105,22 +113,22 @@ if ($pk_analyse) {
 if ($key_analyse) {
   die "Usage: -k file..." unless @ARGV;
   my $pk_map = make_pk_map(
-    csv(in => $process_config->{pk_spec}{file}, encoding => "UTF-8"),
+    read_csv($process_config->{pk_spec}{file}),
     @{ $process_config->{pk_spec} }{ qw(primary_key alt_keys) },
   );
   for my $file (@ARGV) {
-    my $data = csv(in => $file, encoding => "UTF-8");
+    my $data = read_csv($file);
     print "$file: ", _dump([ pk_col_counts($data, $pk_map) ]);
   }
   exit;
 }
 
 my %set_to_process; @set_to_process{
-  (map @{ $_->{files} }, map @{$process_config->{$_}}, qw(merge pk_insert)),
+  (map @{ $_->{files} }, map @{$process_config->{$_} || []}, qw(merge pk_insert)),
   (map keys(%{$process_config->{$_}}), qw(chop_cols chop_lines)),
 } = ();
 
-my %file2data = map +($_ => csv(in => $_, encoding => "UTF-8")), keys %set_to_process;
+my %file2data = map +($_ => read_csv($_)), keys %set_to_process;
 for my $file (sort keys %{ $process_config->{chop_cols} }) {
   my $cols = $process_config->{chop_cols}{$file};
   print "$file: cols (@$cols)\n" if $verbose;
@@ -139,7 +147,7 @@ for my $file (sort keys %{ $process_config->{chop_lines} }) {
   chop_lines($lines, $file2data{$file});
 }
 my $pk_map; $pk_map = make_pk_map(
-  csv(in => $process_config->{pk_spec}{file}, encoding => "UTF-8"),
+  read_csv($process_config->{pk_spec}{file}),
   @{ $process_config->{pk_spec} }{ qw(primary_key alt_keys) },
 ) if $process_config->{pk_insert};
 for my $pk_set (@{ $process_config->{pk_insert} }) {
@@ -151,7 +159,7 @@ for my $pk_set (@{ $process_config->{pk_insert} }) {
 }
 for my $file (sort keys %file2data) {
   print "to $file\n" if $verbose;
-  csv (in => $file2data{$file}, out => $file, encoding => "UTF-8");
+  csv(in => $file2data{$file}, out => $file, encoding => "UTF-8");
 }
 
 =head1 NAME

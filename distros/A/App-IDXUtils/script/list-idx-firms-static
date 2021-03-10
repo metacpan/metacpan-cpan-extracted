@@ -4,19 +4,21 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-27'; # DATE
+our $DATE = '2021-01-17'; # DATE
 our $DIST = 'App-IDXUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Finance/SE/IDX/Static/list_idx_firms",
     program_name => "list-idx-firms-static",
+    log => 1,
     read_config => 0,
     read_env => 0,
 );
@@ -38,15 +40,15 @@ list-idx-firms-static - List firms listed on the IDX
 
 =head1 VERSION
 
-This document describes version 0.004 of list-idx-firms-static (from Perl distribution App-IDXUtils), released on 2020-12-27.
+This document describes version 0.005 of list-idx-firms-static (from Perl distribution App-IDXUtils), released on 2021-01-17.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-idx-firms-static [--board=s] [--format=name] [--json]
-     [--(no)naked-res] [--page-result[=program]] [--sector=s]
-     [--view-result[=program]]
+ % list-idx-firms-static [--board=s] [--debug] [--format=name] [--json]
+     [--log-level=level] [--(no)naked-res] [--page-result[=program]]
+     [--quiet] [--sector=s] [--trace] [--verbose] [--view-result[=program]]
 
 =head1 DESCRIPTION
 
@@ -67,6 +69,32 @@ Filter by value of board.
 =item B<--sector>=I<s>
 
 Filter by value of sector.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -187,7 +215,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

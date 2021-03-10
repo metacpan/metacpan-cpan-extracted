@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 our @EXPORT_OK = qw(
   cols_non_empty
   non_unique_cols
@@ -26,7 +26,7 @@ sub chop_lines {
 sub chop_cols {
   my ($chopcols, $data) = @_;
   for my $c (sort {$b <=> $a} @$chopcols) {
-    splice @$_, $c, 1 for @$data;
+    splice @$_, $c, 1 for grep $#$_ >= $c, @$data;
   }
 }
 

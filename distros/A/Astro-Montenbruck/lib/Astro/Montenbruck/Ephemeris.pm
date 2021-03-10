@@ -214,8 +214,7 @@ See L<Astro::Montenbruck::Ephemeris::Planet::Pluto>.
 =head2 Universal Time vs Ephemeris Time
 
 For better accuracy the time must be given in I<Ephemeris Time (ET)>. To convert
-I<UT> to I<ET>, use C<t2dt> function from L<Astro::Montenbruck::Time> module.
-
+I<UT> to I<ET>, use C<delta_t> function from L<Astro::Montenbruck::Time::DeltaT> module.
 
 =head1 SUBROUTINES
 

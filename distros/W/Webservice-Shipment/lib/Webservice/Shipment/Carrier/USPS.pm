@@ -7,6 +7,7 @@ use constant DEBUG => $ENV{MOJO_SHIPMENT_DEBUG};
 use Mojo::Template;
 use Mojo::URL;
 use Mojo::IOLoop;
+use Mojo::IOLoop::Delay;
 use Time::Piece;
 
 has api_url => sub { Mojo::URL->new('http://production.shippingapis.com/ShippingAPI.dll?API=TrackV2') };
@@ -93,11 +94,11 @@ sub request {
     return _handle_response($tx);
   }
 
-  Mojo::IOLoop->delay(
+  Mojo::IOLoop::Delay->new->steps(
     sub { $self->ua->get($url, shift->begin) },
     sub {
       my ($ua, $tx) = @_;
-      die $tx->error->{message} unless $tx->success;
+      die $tx->error->{message} if $tx->error;
       my $dom = _handle_response($tx);
       $self->$cb(undef, $dom);
     },

@@ -45,6 +45,7 @@ t/WrapScope/samples/wrapscope2.txt
 t/WrapScope/tags.t
 t/WrapScope/warnings.t
 t/lib/Line/Storage.pm
+t/bugs/leftover-match.t
 t/guarded-span.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

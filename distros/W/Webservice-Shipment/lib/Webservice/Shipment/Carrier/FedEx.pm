@@ -5,6 +5,7 @@ use Mojo::Base 'Webservice::Shipment::Carrier';
 use constant DEBUG =>  $ENV{MOJO_SHIPMENT_DEBUG};
 
 use Mojo::IOLoop;
+use Mojo::IOLoop::Delay;
 use Mojo::JSON;
 use Mojo::URL;
 use Time::Piece;
@@ -106,11 +107,11 @@ sub request {
     return _handle_response($tx);
   }
 
-  Mojo::IOLoop->delay(
+  Mojo::IOLoop::Delay->new->steps(
     sub { $self->ua->start($tx, shift->begin) },
     sub {
       my ($ua, $tx) = @_;
-      die $tx->error->{message} unless $tx->success;
+      die $tx->error->{message} if $tx->error;
       my $json = _handle_response($tx);
       $self->$cb(undef, $json);
     },

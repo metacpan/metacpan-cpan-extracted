@@ -298,8 +298,8 @@ Astro::Montenbruck::Lunation - Lunar quarters.
 
 =head1 DESCRIPTION
 
-Searches lunar quarters. Algorythms are based on
-I<"Astronomical Algorythms"> by I<Jean Meeus>, I<Second Edition>, I<Willmann-Bell, Inc., 1998>.
+Searches lunar quarters. Algorithms are based on
+I<"Astronomical Algorithms"> by I<Jean Meeus>, I<Second Edition>, I<Willmann-Bell, Inc., 1998>.
 
 
 =head1 EXPORT

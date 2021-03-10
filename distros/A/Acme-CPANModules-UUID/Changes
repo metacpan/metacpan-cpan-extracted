@@ -1,6 +1,14 @@
+0.005   2021-01-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Forgot to recommend Crypt::Misc (instead of UUID::Random family)
+	  in one instance.
+
+
 0.004   2021-01-18  Released-By: PERLANCAR; Urgency: medium
 
-	- Add participant: Crypt::Misc [GH#1].
+	- Add entry: Crypt::Misc [GH#1].
 
 	- [doc] Add information about variant & version encoding, add
 	  feature v4_rfc4122.
@@ -12,7 +20,7 @@
 
 0.003   2021-01-17  Released-By: PERLANCAR; Urgency: medium
 
-	- Add modules: UUID::Random::Secure, UUID::Random::PERLANCAR.
+	- Add entries: UUID::Random::Secure, UUID::Random::PERLANCAR.
 
 	- [ux] Add 1 more generation to benchmark code so it can return
 	  result when viewed by bencher's --show-items-results option.

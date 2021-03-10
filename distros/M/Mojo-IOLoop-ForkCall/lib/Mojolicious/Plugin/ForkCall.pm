@@ -2,6 +2,7 @@ package Mojolicious::Plugin::ForkCall;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
+use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::ForkCall;
 use Carp;
 our @CARP_NOT = qw/Mojolicious Mojolicious::Controller/;
@@ -19,7 +20,7 @@ sub register {
     my @args = @_;
 
     my $tx = $c->render_later->tx;
-    Mojo::IOLoop->delay(
+    Mojo::IOLoop::Delay->new->steps(
       sub{
         my $end = shift->begin;
         my $once = sub { $end->(@_) if $end; undef $end };

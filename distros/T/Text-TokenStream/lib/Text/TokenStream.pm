@@ -3,7 +3,7 @@ package Text::TokenStream;
 use v5.12;
 use Moo;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use List::Util qw(max);
 use Types::Path::Tiny qw(Path);
@@ -48,18 +48,12 @@ has current_position => (
 
 with qw(Text::TokenStream::Role::Stream);
 
-# Only to be called if the buffer has at least one token
-sub _next {
-    my ($self) = @_;
-    my $tok = shift @{ $self->_pending };
-    $self->_set_current_position( $tok->position + length($tok->text) );
-    return $tok;
-}
-
 sub next {
     my ($self) = @_;
     $self->fill(1) or return undef;
-    return $self->_next;
+    my $tok = shift @{ $self->_pending };
+    $self->_set_current_position( $tok->position + length($tok->text) );
+    return $tok;
 }
 
 sub fill {
@@ -93,7 +87,7 @@ sub skip_optional {
     my ($self, $target) = @_;
     my $tok = $self->peek // return 0;
     return 0 if !$tok->matches($target);
-    $self->_next;
+    $self->next; # ignore return
     return 1;
 }
 
@@ -116,7 +110,7 @@ sub next_of {
         // $self->err(join ' ', "Missing token", grep defined, $where);
     $self->token_err($tok, join ' ', "Unexpected", $tok->type, "token", grep defined, $where)
         if !$tok->matches($target);
-    return $self->_next;
+    return $self->next;
 }
 
 sub _err {

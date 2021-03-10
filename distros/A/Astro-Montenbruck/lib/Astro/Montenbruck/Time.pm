@@ -381,7 +381,7 @@ Given Standard Julian Date, calculate Standard Julian date for midnight of the s
 
 =head2 unix2jd($seconds)
 
-Given Unix time, in seconds, convert it to Standard Julian date.
+Given Unix (POSIX) time, in seconds, convert it to Standard Julian date.
 
 =head2 jd2unix($jd)
 
@@ -409,7 +409,7 @@ Given aI<Standard Julian date>, calculate time in centuries since epoch 2000.0.
 
 =head2 t1900($jd)
 
-Given a I<Standard Julian date>, calculate time in centuries since epoch 2000.0.
+Given a I<Standard Julian date>, calculate time in centuries since epoch 1900.0.
 
 
 =head2 jd2gst($jd)

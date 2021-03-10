@@ -1,13 +1,13 @@
 ---
 abstract: 'Interact with your client side code via PhantomJS'
 author:
-  - 'Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>'
+  - 'Joel Berger, <joel.a.berger@gmail.com>'
 build_requires: {}
 configure_requires:
   IPC::Cmd: '0'
   Module::Build::Tiny: '0'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.022, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,13 +16,14 @@ name: Mojo-Phantom
 provides:
   Mojo::Phantom:
     file: lib/Mojo/Phantom.pm
-    version: '0.11'
+    version: '0.12'
   Mojo::Phantom::Process:
     file: lib/Mojo/Phantom/Process.pm
   Test::Mojo::Role::Phantom:
     file: lib/Test/Mojo/Role/Phantom.pm
 requires:
   JavaScript::Value::Escape: '0'
+  Mojo::IOLoop::Delay: '0'
   Mojolicious: '7.15'
   Role::Tiny: '0'
   Test2: '1.302015'
@@ -33,5 +34,6 @@ resources:
   bugtracker: http://github.com/jberger/Mojo-Phantom/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojo-Phantom
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

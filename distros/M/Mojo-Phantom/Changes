@@ -1,5 +1,8 @@
 Revision history for Perl module Mojo-Phantom
 
+0.12 2021-03-08
+  - Explicitly require Mojo::IOLoop::Delay, which was removed from Mojolicious at 9.0
+
 0.11 2018-02-13
   - Protect against changes to Mojo::IOLoop::Delay->catch
 

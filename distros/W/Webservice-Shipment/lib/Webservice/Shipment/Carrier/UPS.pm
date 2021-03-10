@@ -5,6 +5,7 @@ use Mojo::Base 'Webservice::Shipment::Carrier';
 use Mojo::Template;
 use Mojo::URL;
 use Mojo::IOLoop;
+use Mojo::IOLoop::Delay;
 use Time::Piece;
 use Carp;
 
@@ -117,11 +118,11 @@ sub request {
     return _handle_response($tx);
   }
 
-  Mojo::IOLoop->delay(
+  Mojo::IOLoop::Delay->new->steps(
     sub { $self->ua->post($self->api_url, $xml, shift->begin) },
     sub {
       my ($ua, $tx) = @_;
-      die $tx->error->{message} unless $tx->success;
+      die $tx->error->{message} if $tx->error;
       my $dom = _handle_response($tx);
       $self->$cb(undef, $dom);
     },

@@ -20,7 +20,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.17';
+our $VERSION = '10.18';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -540,7 +540,8 @@ can be processed.
 
   priority => 5
 
-Job priority, defaults to C<0>. Jobs with a higher priority get performed first.
+Job priority, defaults to C<0>. Jobs with a higher priority get performed first. Priorities can be positive or negative,
+but should be in the range between C<100> and C<-100>.
 
 =item queue
 

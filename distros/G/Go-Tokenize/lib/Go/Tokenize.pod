@@ -1,0 +1,106 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Go::Tokenize - Tokenize Go
+
+=head1 SYNOPSIS
+
+    use Go::Tokenize;
+
+=head1 VERSION
+
+This documents version 0.01 of Go-Tokenize
+corresponding to L<git commit 62708e18afa5676b39aff68935df240bd51d02c9|https://github.com/benkasminbullock/go-tokenize/commit/62708e18afa5676b39aff68935df240bd51d02c9> released on Wed Mar 10 19:10:53 2021 +0900.
+
+=head1 DESCRIPTION
+
+Turn Go code into tokens.
+
+=head1 FUNCTIONS
+
+=head2 tokenize
+
+    my $tokens = tokenize ($go);
+
+Given your Go program text in C<$go>, turn it into tokens. The return
+value is an array reference which contains hash references. The hash
+references have the following keys
+
+=over
+
+=item contents
+
+The text content of the token.
+
+=item end
+
+The position of the final character of the token, in characters. See
+L</start> for the numbering. This is the value of L<pos> as the regex
+used for matching matches components.
+
+=item line
+
+The line number of the start position of the token, numbered from 1.
+
+=item start
+
+The position of the beginning character of the token, in
+characters. This is numbered from 0 for the first character of the
+file. If you read the Go file in using C<:encoding(utf8)> and the file
+contains non-ASCII characters, this and L</end> will be different from
+the byte offsets. Also, because this is the position of the character,
+if the token is one character in length, its value will be the same as
+L</end>. In other words the length of the token is (end - start + 1).
+
+=item type
+
+The type of the token. Currently the following are supported:
+
+=over
+
+=item comment
+
+=item keyword
+
+=item operator
+
+=item string
+
+=back
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<C::Tokenize>
+
+This is used because Go comments are identical to C comments.
+
+=item L<Text::LineNumber>
+
+=back
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

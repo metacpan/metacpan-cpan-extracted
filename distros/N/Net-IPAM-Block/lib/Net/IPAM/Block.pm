@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '4.00';
+our $VERSION = '4.11';
 
 use 5.10.0;
 use strict;
@@ -487,7 +487,8 @@ cmp() returns -1, 0, +1:
 =cut
 
 sub cmp {
-  return ( $_[0]->base->cmp( $_[1]->base ) ) || ( $_[1]->last->cmp( $_[0]->last ) );
+  return ( $_[0]->base->cmp( $_[1]->base ) )
+    || ( $_[1]->last->cmp( $_[0]->last ) );
 }
 
 =head2 is_disjunct_with
@@ -656,7 +657,7 @@ sub diff {
   }
 
   # last diff
-  if ( $cursor->cmp( $outer->last ) <= 0 ) {
+  if ( defined $cursor && $cursor->cmp( $outer->last ) <= 0 ) {
     my $base_ip = $cursor;
     my $last_ip = $outer->last;
 
@@ -709,37 +710,44 @@ If CIDRs are required, use the following idiom:
 =cut
 
 sub aggregate {
-  my @result;
+  return @_ if @_ <= 1;
 
   # sort blocks => sieve subsets
-  my @sieved = Net::IPAM::Block::Private::_sieve( sort { $a->cmp($b) } @_ );
+  my @sorted = sort_block(@_);
 
-  my $i = 0;
-  while ( $i < @sieved ) {
-    my $this = $sieved[$i];
-    my $last_changed;
-    my $j;
-    for ( $j = $i + 1 ; $j < @sieved ; $j++ ) {
+  # start with first [0] block as prev, see below
+  my @result = ( shift @sorted );
 
-      # can't agg different IP versions
-      last if $this->version != $sieved[$j]->version;
+  # [1, ..
+  for (@sorted) {
 
-      # if this.last++ >= next.base, add blocks
-      # no overflow in incr possible, next block is still behind this block
-      if ( $this->{last}->incr->cmp( $sieved[$j]->{base} ) >= 0 ) {
-        $this->{last} = $sieved[$j]->{last};
-        $last_changed++;
-        next;
-      }
+    # skip rubbish
+    next unless defined $_;
 
-      last;
+    my $prev = $result[$#result];
+
+    # expand prev
+    if ( $prev->overlaps_with($_) ) {
+      $prev->{last} = $_->{last};
+      $prev->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $prev->{base}, $prev->{last} );
+      next;
     }
-    $i = $j;
 
-    # this.last may have changed, calculate new mask
-    $this->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $this->{base}, $this->{last} ) if $last_changed;
+    # expand prev
+    my $next = $prev->{last}->incr;
+    if ( defined $next && $next->cmp( $_->{base} ) == 0 ) {
+      $prev->{last} = $_->{last};
+      $prev->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $prev->{base}, $prev->{last} );
+      next;
+    }
 
-    push @result, $this;
+    # append block
+    if ( $prev->is_disjunct_with($_) ) {
+      push @result, $_;
+      next;
+    }
+
+    # skip contains and equals
   }
 
   return wantarray ? @result : [@result];

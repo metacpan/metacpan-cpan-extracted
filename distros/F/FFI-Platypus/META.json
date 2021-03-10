@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,11 +30,13 @@
             "ExtUtils::MakeMaker" : "7.12",
             "ExtUtils::ParseXS" : "3.30",
             "IPC::Cmd" : "0",
+            "JSON::PP" : "0",
             "perl" : "5.006"
          }
       },
       "develop" : {
          "requires" : {
+            "Convert::Binary::C" : "0",
             "Devel::Hide" : "0",
             "Devel::PPPort" : "3.28",
             "FindBin" : "0",
@@ -49,6 +51,7 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
+            "Test::Script" : "0",
             "Test::Spelling" : "0",
             "Test::Strict" : "0",
             "YAML" : "0"
@@ -87,7 +90,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.34",
+   "version" : "1.38",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
@@ -104,10 +107,11 @@
       "Mohammad S Anwar (MANWAR)",
       "H\u00e5kon H\u00e6gland (hakonhagland, HAKONH)",
       "Meredith (merrilymeredith, MHOWARD)",
-      "Diab Jerius (DJERIUS)"
+      "Diab Jerius (DJERIUS)",
+      "Eric Brine (IKEGAMI)"
    ],
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.33.6",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

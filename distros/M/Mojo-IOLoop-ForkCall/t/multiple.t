@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use Mojo::IOLoop;
+use Mojo::IOLoop::Delay;
 use Mojo::IOLoop::ForkCall;
  
 use Test::More;
@@ -13,7 +14,7 @@ use Test::More;
 # if this does not happen, it may not fail, so this test passing is not 100% proof,
 # then again, failure should be an indicator of problem.
 
-my $delay = Mojo::IOLoop->delay;
+my $delay = Mojo::IOLoop::Delay->new;
 my @fc;
 for my $id (1..2) {
   my $fc = Mojo::IOLoop::ForkCall->new;

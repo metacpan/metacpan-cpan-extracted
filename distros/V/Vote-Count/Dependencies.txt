@@ -12,8 +12,10 @@ Moose
 Moose::Role
 namespace::autoclean
 Path::Tiny
+Ref::Util
 Sort::Hash
 Storable
+String::TtyLength 0.02
 Test2::Bundle::More
 Test2::Tools::Exception
 Test2::V0

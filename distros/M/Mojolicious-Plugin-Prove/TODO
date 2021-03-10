@@ -5,10 +5,8 @@ TODO
  * Add documentation to all .pm files
  * Enable options for prove (maybe with checkboxes) like ```--timer```
  * Allow ENV variables to run author/release tests
- * Use url_for for all links
  * Improve layout
  * Colorize output
  * Add tests:
    * set HARNESS_TIMER in testsuite
-   * change "prefix"
 

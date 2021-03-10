@@ -1,3 +1,26 @@
+0.000041  2021-03-09 15:40:29-08:00 America/Los_Angeles
+
+    - Fix a couple JS and import bugs
+
+0.000040  2021-03-09 14:44:26-08:00 America/Los_Angeles
+
+    - Insert optimization
+
+0.000039  2021-03-09 13:17:07-08:00 America/Los_Angeles
+
+    - Add control over buffering mode on import
+
+0.000038  2021-03-08 13:21:44-08:00 America/Los_Angeles
+
+    - Fix bug in --yathui-db-config option
+
+0.000037  2021-03-08 07:53:10-08:00 America/Los_Angeles
+
+    - Clean up unnecessary events as soon as a job finishes in live mode
+    - Add --yathui-only-db and yathui-db options
+    - Put quick-db for renderer into the yath workdir
+    - Add url when possible when using UIDB
+
 0.000036  2021-03-05 10:34:32-08:00 America/Los_Angeles
 
     - Fix bug when using non-complete imports

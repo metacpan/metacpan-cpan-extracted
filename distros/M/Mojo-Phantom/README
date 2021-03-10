@@ -46,10 +46,10 @@ DESCRIPTION
 WARNING
 
     The upstream phantom.js has been retired in favor of headless chrome. A
-    Mojo::Chrome (and related Test::Mojo::Role::Chrome) is planned and is
-    already in the works (perhaps it is released already who knows?!).
-    While this module will continue to function, just know that it depends
-    on a project that is defunct.
+    Mojo::Chrome (and related Test::Mojo::Role::Chrome) was planned but has
+    been stalled for lack of certain necessary usage documentation that has
+    not been forthcoming. While this module will continue to function, just
+    know that it depends on a project that is defunct.
 
 ATTRIBUTES
 
@@ -166,7 +166,7 @@ CONTRIBUTORS
 
     Graham Ollis (plicease)
 
-    Sebastian Paaske TÃ¸rholm (Eckankar)
+    Sebastian Paaske Tørholm (Eckankar)
 
 COPYRIGHT AND LICENSE
 

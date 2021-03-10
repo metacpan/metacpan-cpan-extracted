@@ -1,6 +1,14 @@
 CHANGE LOG
 ==========
 
+2021-03-08 - v0.107.1
+---------------------
+
+### Fixed
+  - bug with prototype parsing picking up leftover match variables
+
+
+
 2021-03-05 - v0.107.0
 ---------------------
 

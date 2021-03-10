@@ -163,6 +163,17 @@ B<colorless>: without colors, for terminals that do not support ANSI color codes
 
 =head1 DESCRIPTION
 
-B<phases> Computes lunar phases around a date. Current phase is highlited.
+B<phases> Computes lunar phases around a date. Current phase (from perspective of the query date) 
+is highlited and marked with asterisk.
+
+For instance,
+ 
+  Date          :  2021-02-22
+  
+  First Quarter :  2021-02-19 21:48:11 *
+  Full Moon     :  2021-02-27 11:20:33
+
+means that the query date, Feb 22, belongs to the First Quarter, while the next phase will start on Feb 27. 
+
 
 =cut

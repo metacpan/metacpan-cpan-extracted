@@ -8,18 +8,49 @@ use lib ("$Bin/../lib");
 use POSIX qw/strftime/;
 use Getopt::Long qw/GetOptions/;
 use Pod::Usage qw/pod2usage/;
+
+use DateTime;
+use DateTime::TimeZone;
+
 use Astro::Montenbruck::Ephemeris::Planet qw/:ids @PLANETS/;
 use Astro::Montenbruck::Time qw/jdnow jd2cal cal2jd jd2unix/;
 use Astro::Montenbruck::RiseSet::Constants qw/:events :states/;
 use Astro::Montenbruck::RiseSet qw/rst/;
-use Astro::Montenbruck::Utils::Helpers qw/parse_geocoords format_geo @DEFAULT_PLACE/;
+use Astro::Montenbruck::Utils::Helpers qw/parse_geocoords format_geo current_timezone @DEFAULT_PLACE/;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 binmode(STDOUT, ":encoding(UTF-8)");
+
+
+sub parse_date {
+    my ($date_str, $tz_name) = @_;
+    my ($ye, $mo, $da) = $date_str =~ /(\d+)-(\d+)-(\d+)/;
+    DateTime->new(
+        year      => $ye,
+        month     => $mo,
+        day       => $da,
+        hour      => 12,
+        minute    => 0,
+        second    => 0,
+        time_zone => $tz_name
+    );
+}
+
+sub jd2str  {
+    my $jd = shift;
+    my $tz = shift;
+    my %arg = (format => '%Y-%m-%d', @_);
+
+	DateTime->from_epoch(
+		epoch     => jd2unix($jd), 
+		time_zone => $tz
+	)->strftime($arg{format})	
+};
 
 my $man    = 0;
 my $help   = 0;
 my $start  = strftime('%Y-%m-%d', localtime());
+my $tzone = current_timezone();
 my $days   = 30;
 my @place;
 
@@ -30,12 +61,15 @@ GetOptions(
     'man'        => \$man,
     'start:s'    => \$start,
     'days:i'     => \$days,
+    'timezone:s' => \$tzone,
     'place:s{2}' => \@place,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
 pod2usage(-verbose => 2) if $man;
 
+my $dt = parse_date($start, $tzone);
+my $tz = DateTime::TimeZone->new( name => $tzone );
 @place = @DEFAULT_PLACE unless @place;
 my ($lat, $lon);
 
@@ -46,13 +80,15 @@ if  (grep(/^[\+\-]?(\d+(\.?\d+)?|(\.\d+))$/, @place) == 2) {
     ($lat, $lon) = parse_geocoords(@place);
 }
 say format_geo($lat, $lon);
+say sprintf('Time Zone: %s', $tz->name);
+say '';
 
-my $jd_start = cal2jd($start =~ /(\d+)-(\d+)-(\d+)/);
+my $jd_start = $dt->jd;
 my $jd_end = $jd_start + $days;
 
 for (my $jd = $jd_start; $jd < $jd_end; $jd++) { 
     my @date = jd2cal($jd);
-    say strftime('%Y-%m-%d', localtime(jd2unix($jd)));
+    say jd2str($jd, $tz);
     
     my $rst_func = rst(
         date     => \@date,
@@ -66,7 +102,7 @@ for (my $jd = $jd_start; $jd < $jd_end; $jd++) {
             $pla,
             on_event   => sub {
                 my ($evt, $jd_evt) = @_;
-                $report{$evt} = strftime("%H:%M", localtime(jd2unix($jd_evt)));
+                $report{$evt} = jd2str($jd_evt, $tz, format => '%H:%M')
             },
             on_noevent => sub {
                 my ($evt, $state) = @_;
@@ -117,6 +153,24 @@ Start date, in B<YYYY-DD-MM> format, current date by default.
 
 Number of days to process, B<30> by default
 
+=item B<--timezone>
+
+Time zone name, e.g.: C<EST>, C<UTC>, C<Europe/Berlin> etc. 
+or I<offset from Greenwich> in format B<+HHMM> / B<-HHMM>, like C<+0300>.
+
+    --timezone=CET # Central European Time
+    --timezone=EST # Eastern Standard Time
+    --timezone=UTC # Universal Coordinated Time
+    --timezone=GMT # Greenwich Mean Time, same as the UTC
+    --timezone=+0300 # UTC + 3h (eastward from Greenwich)
+    --timezone="Europe/Moscow"
+
+By default, local timezone by default.
+
+Please, note: Windows platform does not recognize some time zone names, C<MSK> for instance.
+In such cases use I<offset from Greenwich> format, as described above.
+
+
 =item B<--place>
 
 The observer's location. Contains 2 elements, space separated. 
@@ -151,6 +205,8 @@ Negative numbers represent I<South> latitude and I<East> longitudes.
 
 C<--place=55.75 -37.58> for I<Moscow, Russian Federation>.
 C<--place=40.73 73.935> for I<New-York, NY, USA>.
+
+=back
 
 
 =head1 DESCRIPTION

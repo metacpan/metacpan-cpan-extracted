@@ -12,7 +12,16 @@ use Capture::Tiny ();
 use File::Path ();
 
 # ABSTRACT: Build shared libraries for use with FFI
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.38'; # VERSION
+
+# Platypus-Man,
+# Platypus-Man,
+# Friendly Neighborhood Platypus-Man
+# Is He Strong?
+# Listen Bud
+# He's got Proportional Strength of a Platypus
+# Hey Man!
+# There Goes The Platypus-Man
 
 
 sub _native_name
@@ -302,11 +311,11 @@ FFI::Build - Build shared libraries for use with FFI
 
 =head1 VERSION
 
-version 1.34
+version 1.38
 
 =head1 SYNOPSIS
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  use FFI::Build;
  
  my $build = FFI::Build->new(
@@ -546,6 +555,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 Meredith (merrilymeredith, MHOWARD)
 
 Diab Jerius (DJERIUS)
+
+Eric Brine (IKEGAMI)
 
 =head1 COPYRIGHT AND LICENSE
 

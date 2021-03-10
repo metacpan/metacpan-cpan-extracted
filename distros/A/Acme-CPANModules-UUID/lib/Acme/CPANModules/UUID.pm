@@ -3,7 +3,7 @@ package Acme::CPANModules::UUID;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-18'; # DATE
 our $DIST = 'Acme-CPANModules-UUID'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -70,10 +70,9 @@ _
             module => 'UUID::Tiny',
             description => <<'_',
 
-This module should be your go-to choice if you cannot use an XS module.
-
-To create a cryptographically secure random (v4) UUIDs, use
-<pm:UUID::Tiny::Patch::UseMRS>.
+This module should be your go-to choice if you cannot use an XS module. It can
+create v1, v3, v4 UUIDs. However, the random v4 UUIDs are not cryptographically
+secure, if you need that use <pm:Crypt::Misc>.
 
 The benchmark code creates 1000+1 v1 string UUIDs.
 
@@ -213,7 +212,7 @@ Acme::CPANModules::UUID - Modules that can generate immutable universally unique
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANModules::UUID (from Perl distribution Acme-CPANModules-UUID), released on 2021-01-18.
+This document describes version 0.005 of Acme::CPANModules::UUID (from Perl distribution Acme-CPANModules-UUID), released on 2021-01-18.
 
 =head1 SYNOPSIS
 
@@ -264,9 +263,9 @@ L<UUID::Tiny> 1.04
 
 L<UUID::Random> 0.04
 
-L<UUID::Random::PERLANCAR> 0.001
+L<UUID::Random::PERLANCAR> 0.003
 
-L<UUID::Random::Secure> 0.001
+L<UUID::Random::Secure> 0.002
 
 L<Crypt::Misc> 0.069
 
@@ -331,16 +330,16 @@ Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz 
 Benchmark with default options (C<< bencher --cpanmodules-module UUID >>):
 
  #table1#
- +-------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
- | participant             | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
- +-------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
- | UUID::Random::Secure    |        49 |    21     |                 0.00% |              4431.81% | 4.1e-05   |      20 |
- | UUID::Random            |       130 |     7.9   |               158.85% |              1650.72% | 9.4e-06   |      20 |
- | UUID::Tiny              |       140 |     7     |               193.05% |              1446.45% | 6.6e-05   |      20 |
- | Crypt::Misc             |       200 |     7     |               212.38% |              1350.72% |   0.00011 |      20 |
- | UUID::Random::PERLANCAR |      1460 |     0.683 |              2906.64% |                50.73% | 6.4e-07   |      20 |
- | Data::UUID              |      2200 |     0.45  |              4431.81% |                 0.00% | 1.8e-06   |      20 |
- +-------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ +-------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant             | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +-------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | UUID::Random::Secure    |        47 |    21     |                 0.00% |              5169.04% | 3.8e-05 |      20 |
+ | UUID::Random            |       120 |     8.1   |               162.82% |              1904.79% | 1.3e-05 |      20 |
+ | UUID::Tiny              |       150 |     6.5   |               225.62% |              1518.17% |   2e-05 |      20 |
+ | Crypt::Misc             |       300 |     4     |               501.01% |               776.70% | 5.6e-05 |      21 |
+ | UUID::Random::PERLANCAR |      1460 |     0.685 |              3004.16% |                69.74% | 6.4e-07 |      20 |
+ | Data::UUID              |      2500 |     0.4   |              5169.04% |                 0.00% | 1.4e-06 |      20 |
+ +-------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher --cpanmodules-module UUID --module-startup >>):
@@ -349,13 +348,13 @@ Benchmark module startup overhead (C<< bencher --cpanmodules-module UUID --modul
  +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
  | participant             | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
  +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
- | UUID::Random::Secure    |      85   |              79.5 |                 0.00% |              1449.25% |   0.00015 |      20 |
- | UUID::Tiny              |      23   |              17.5 |               274.06% |               314.17% | 8.1e-05   |      21 |
- | Crypt::Misc             |      17   |              11.5 |               386.20% |               218.64% | 7.4e-05   |      20 |
- | Data::UUID              |      14   |               8.5 |               509.26% |               154.28% | 7.6e-05   |      20 |
- | UUID::Random            |       7.6 |               2.1 |              1022.50% |                38.02% | 8.7e-06   |      20 |
- | UUID::Random::PERLANCAR |       7.5 |               2   |              1032.48% |                36.80% | 7.8e-06   |      20 |
- | perl -e1 (baseline)     |       5.5 |               0   |              1449.25% |                 0.00% | 1.2e-05   |      20 |
+ | UUID::Random::Secure    |      93   |              86   |                 0.00% |              1263.99% |   0.00051 |      20 |
+ | UUID::Tiny              |      30   |              23   |               251.48% |               288.07% |   0.00046 |      20 |
+ | Crypt::Misc             |      19   |              12   |               384.34% |               181.62% |   0.00017 |      20 |
+ | Data::UUID              |      15   |               8   |               532.72% |               115.58% | 5.4e-05   |      20 |
+ | UUID::Random            |      10   |               3   |               778.10% |                55.33% |   0.00017 |      20 |
+ | UUID::Random::PERLANCAR |       9.2 |               2.2 |               905.70% |                35.63% | 2.9e-05   |      21 |
+ | perl -e1 (baseline)     |       7   |               0   |              1263.99% |                 0.00% | 7.3e-05   |      20 |
  +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
 
 
@@ -400,10 +399,9 @@ The benchmark code creates 1000+1 v1 string UUIDs.
 
 =item * L<UUID::Tiny>
 
-This module should be your go-to choice if you cannot use an XS module.
-
-To create a cryptographically secure random (v4) UUIDs, use
-L<UUID::Tiny::Patch::UseMRS>.
+This module should be your go-to choice if you cannot use an XS module. It can
+create v1, v3, v4 UUIDs. However, the random v4 UUIDs are not cryptographically
+secure, if you need that use L<Crypt::Misc>.
 
 The benchmark code creates 1000+1 v1 string UUIDs.
 

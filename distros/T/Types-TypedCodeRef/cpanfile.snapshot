@@ -436,10 +436,10 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 0
       Scalar::Util 0
       perl 5.006
-  Sub-WrapInType-0.04
-    pathname: M/MP/MPOLIIU/Sub-WrapInType-0.04.tar.gz
+  Sub-WrapInType-0.05
+    pathname: M/MP/MPOLIIU/Sub-WrapInType-0.05.tar.gz
     provides:
-      Sub::WrapInType 0.04
+      Sub::WrapInType 0.05
     requirements:
       Carp 0
       Class::InsideOut 0

@@ -1,0 +1,9 @@
+#title verse
+#lang fr
+
+<verse>
+D’un trône <br> étayé par ses crimes,<br>
+   Robespierre, enivré de sang,<br>
+Du doigt désigne ses victimes<br>
+   A l’anarchiste rugissant.
+</verse>

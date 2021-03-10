@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/IDXUtils.pm','script/list-idx-boards','script/list-idx-boards-static','script/list-idx-brokers','script/list-idx-brokers-static','script/list-idx-firms','script/list-idx-firms-static','script/list-idx-sectors','script/list-idx-sectors-static'];
+my $filenames = ['lib/App/IDXUtils.pm','script/get-idx-daily-trading-summary','script/list-idx-boards','script/list-idx-boards-static','script/list-idx-brokers','script/list-idx-brokers-static','script/list-idx-firms','script/list-idx-firms-static','script/list-idx-sectors','script/list-idx-sectors-static'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -114,7 +114,7 @@ sub riseset_func {
             # prepare for next interval
             $y_minus = $y_plus;
             $hour += 2;
-        } until ( ( $hour == 25 ) || ( $rise_found && $set_found ) );
+        } until ( ( $hour >= 36 ) || ( $rise_found && $set_found ) );
 
         $arg{on_noevent}->( $above ? $STATE_CIRCUMPOLAR : $STATE_NEVER_RISES )
           unless ( $rise_found || $set_found );
@@ -166,15 +166,11 @@ Version 0.01
 
 =head1 DESCRIPTION
 
-Low level routines for calculating rise and set times of celestial bodies. Unlike
-L<Astro::Montenbruck::RiseSet::RST> module, they are based on algorithms from the
-I<Montenbruck & Phleger> book. They are especially usefull for calculating
-different types of twilight. Meeus's method is unsuitable for calculating
-I<astronomical twilight>.
+Low level routines for calculating rise and set times of celestial bodies. 
 
 =head1 FUNCTIONS
 
-=head2 riseset ( %args )
+=head2 riseset_func ( %args )
 
 time of rise and set events.
 
@@ -207,7 +203,7 @@ The arguments are:
 
 =item * event type, one of C<$EVT_RISE> or C<$EVT_SET>
 
-=item * Univerrsal time of the event
+=item * Universal time of the event
 
 =back
 

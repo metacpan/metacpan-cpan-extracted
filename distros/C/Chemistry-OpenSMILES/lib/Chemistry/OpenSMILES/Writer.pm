@@ -8,7 +8,7 @@ use Chemistry::OpenSMILES::Parser;
 use Graph::Traversal::DFS;
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.4.3'; # VERSION
+our $VERSION = '0.4.4'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );

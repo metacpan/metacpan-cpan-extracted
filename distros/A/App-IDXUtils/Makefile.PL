@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-IDXUtils",
   "EXE_FILES" => [
+    "script/get-idx-daily-trading-summary",
     "script/list-idx-boards",
     "script/list-idx-boards-static",
     "script/list-idx-brokers",
@@ -26,9 +27,17 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "App::IDXUtils",
   "PREREQ_PM" => {
+    "Data::Sah::Coerce::perl::To_date::From_float::epoch" => 0,
+    "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
+    "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
+    "Data::Sah::Coerce::perl::To_date::From_str::iso8601" => 0,
+    "Data::Sah::Compiler::perl::TH::date" => 0,
+    "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
+    "Finance::SE::IDX" => "0.006",
     "Finance::SE::IDX::Any" => 0,
     "Finance::SE::IDX::Static" => "20201222.0.1",
+    "Log::ger" => "0.037",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.827"
   },
@@ -38,7 +47,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,12 +55,20 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Coerce::perl::To_date::From_float::epoch" => 0,
+  "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
+  "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
+  "Data::Sah::Coerce::perl::To_date::From_str::iso8601" => 0,
+  "Data::Sah::Compiler::perl::TH::date" => 0,
+  "Data::Sah::Compiler::perl::TH::int" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,
+  "Finance::SE::IDX" => "0.006",
   "Finance::SE::IDX::Any" => 0,
   "Finance::SE::IDX::Static" => "20201222.0.1",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.037",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.827",
   "Test::More" => 0

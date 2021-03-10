@@ -1,0 +1,16 @@
+version: "3.6"
+services:
+  guacd:
+    image: guacamole/guacd
+    expose:
+      - 4822
+
+  guaclite:
+    build: .
+    links:
+      - guacd
+    environment:
+      GUACLITE_GUACD_HOST: guacd
+    ports:
+      - "3000:3000"
+

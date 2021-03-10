@@ -5,11 +5,11 @@ NAME
 
 VERSION
 
-    version 1.34
+    version 1.38
 
 SYNOPSIS
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
      # for all new code you should use api => 1
      my $ffi = FFI::Platypus->new( api => 1 );
@@ -663,7 +663,7 @@ EXAMPLES
 
  Integer conversions
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
      my $ffi = FFI::Platypus->new( api => 1 );
      $ffi->lib(undef);
@@ -682,7 +682,7 @@ EXAMPLES
  libnotify
 
      use FFI::CheckLib;
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
      # NOTE: I ported this from anoter Perl FFI library and it seems to work most
      # of the time, but also seems to SIGSEGV sometimes.  I saw the same behavior
@@ -739,7 +739,7 @@ EXAMPLES
 
  Allocating and freeing memory
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      use FFI::Platypus::Memory qw( malloc free memcpy );
      
      my $ffi = FFI::Platypus->new( api => 1 );
@@ -828,7 +828,7 @@ EXAMPLES
  libuuid
 
      use FFI::CheckLib;
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      use FFI::Platypus::Memory qw( malloc free );
      
      my $ffi = FFI::Platypus->new( api => 1 );
@@ -839,11 +839,10 @@ EXAMPLES
      $ffi->attach(uuid_generate => ['uuid_t'] => 'void');
      $ffi->attach(uuid_unparse  => ['uuid_t','uuid_string'] => 'void');
      
-     my $uuid = "\0" x 16;  # uuid_t
+     my $uuid = "\0" x $ffi->sizeof('uuid_t');
      uuid_generate($uuid);
      
-     my $string = "\0" x 37; # 36 bytes to store a UUID string
-                             # + NUL termination
+     my $string = "\0" x $ffi->sizeof('uuid_string');
      uuid_unparse($uuid, $string);
      
      print "$string\n";
@@ -859,7 +858,7 @@ EXAMPLES
 
  puts and getpid
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
      my $ffi = FFI::Platypus->new( api => 1 );
      $ffi->lib(undef);
@@ -874,7 +873,7 @@ EXAMPLES
 
  Math library
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      use FFI::CheckLib;
      
      my $ffi = FFI::Platypus->new( api => 1 );
@@ -901,9 +900,9 @@ EXAMPLES
 
  Strings
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
-     my $ffi = FFI::Platypus->new;
+     my $ffi = FFI::Platypus->new( api => 1 );
      $ffi->lib(undef);
      $ffi->attach(puts => ['string'] => 'int');
      $ffi->attach(strlen => ['string'] => 'int');
@@ -922,13 +921,18 @@ EXAMPLES
      
      puts(strerror(2));
 
-    Discussion: Strings are not a native type to libffi but the are handled
-    seamlessly by Platypus.
+    Discussion: ASCII and UTF-8 Strings are not a native type to libffi but
+    the are handled seamlessly by Platypus. If you need to talk to an API
+    that uses so called "wide" strings (APIs which use const wchar_t* or
+    wchar_t*), then you will want to use the wide string type plugin
+    FFI::Platypus::Type::WideString. APIs which use other arbitrary
+    encodings can be accessed by converting your Perl strings manually with
+    the Encode module.
 
  Attach function from pointer
 
      use FFI::TinyCC;
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
      my $ffi = FFI::Platypus->new( api => 1 );
      my $tcc = FFI::TinyCC->new;
@@ -964,7 +968,7 @@ EXAMPLES
      use constant ZMQ_REQ => 3;
      use constant ZMQ_REP => 4;
      use FFI::CheckLib qw( find_lib_or_exit );
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      use FFI::Platypus::Memory qw( malloc );
      use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );
      
@@ -1053,8 +1057,8 @@ EXAMPLES
 
  libarchive
 
-     use FFI::Platypus      ();
-     use FFI::CheckLib      qw( find_lib_or_exit );
+     use FFI::Platypus 1.00;
+     use FFI::CheckLib qw( find_lib_or_exit );
      
      # This example uses FreeBSD's libarchive to list the contents of any
      # archive format that it suppors.  We've also filled out a part of
@@ -1178,7 +1182,7 @@ EXAMPLES
 
  unix open
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
      {
        package FD;
@@ -1227,7 +1231,7 @@ EXAMPLES
 
  bzip2
 
-     use FFI::Platypus 0.20 (); # 0.20 required for using wrappers
+     use FFI::Platypus 1.00;
      use FFI::CheckLib qw( find_lib_or_die );
      use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );
      use FFI::Platypus::Memory qw( malloc free );
@@ -1308,6 +1312,34 @@ EXAMPLES
     return from the wrapper function will be returned back to the original
     caller.
 
+ The Win32 API
+
+     use utf8;
+     use FFI::Platypus 1.00;
+     
+     my $ffi = FFI::Platypus->new(
+       api  => 1,
+       lib  => [undef],
+     );
+     
+     # see FFI::Platypus::Lang::Win32
+     $ffi->lang('Win32');
+     
+     # Send a Unicode string to the Windows API MessageBoxW function.
+     use constant MB_OK                   => 0x00000000;
+     use constant MB_DEFAULT_DESKTOP_ONLY => 0x00020000;
+     $ffi->attach( [MessageBoxW => 'MessageBox'] => [ 'HWND', 'LPCWSTR', 'LPCWSTR', 'UINT'] => 'int' );
+     MessageBox(undef, "I ❤️ Platypus", "Confession", MB_OK|MB_DEFAULT_DESKTOP_ONLY);
+
+    Discussion: The API used by Microsoft Windows present some unique
+    challenges. On 32 bit systems a different ABI is used than what is used
+    by the standard C library. It also provides a rats nest of type
+    aliases. Finally if you want to talk Unicode to any of the Windows API
+    you will need to use UTF-16LE instead of utf-8 which is native to Perl.
+    (The Win32 API refers to these as LPWSTR and LPCWSTR types). As much as
+    possible the Win32 "language" plugin attempts to handle this
+    transparently. For more details see FFI::Platypus::Lang::Win32.
+
  bundle your own code
 
     ffi/foo.c:
@@ -1355,7 +1387,7 @@ EXAMPLES
      
      use strict;
      use warnings;
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
      {
        my $ffi = FFI::Platypus->new( api => 1 );
@@ -1731,6 +1763,16 @@ SEE ALSO
 
       Documentation and tools for using Platypus with the Assembly
 
+    FFI::Platypus::Lang::Win32
+
+      Documentation and tools for using Platypus with the Win32 API.
+
+    Wasm and Wasm::Wasmtime
+
+      Modules for writing WebAssembly bindings in Perl. This allows you to
+      call functions written in any language supported by WebAssembly.
+      These modules are also implemented using Platypus.
+
     Convert::Binary::C
 
       A great interface for decoding C data structures, including structs,
@@ -1830,6 +1872,8 @@ AUTHOR
     Meredith (merrilymeredith, MHOWARD)
 
     Diab Jerius (DJERIUS)
+
+    Eric Brine (IKEGAMI)
 
 COPYRIGHT AND LICENSE
 

@@ -3,7 +3,7 @@ package Text::TokenStream::Types;
 use v5.12;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Type::Utils qw(as class_type coerce declare from role_type where via);
 use Types::Common::Numeric qw(PositiveOrZeroInt);

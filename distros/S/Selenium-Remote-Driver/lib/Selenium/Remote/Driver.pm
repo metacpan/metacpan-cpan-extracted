@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.39';
+$Selenium::Remote::Driver::VERSION = '1.40';
 use strict;
 use warnings;
 
@@ -530,7 +530,7 @@ sub _request_new_session {
       if $FORCE_WD2; #XXX 'secret' feature to help the legacy unit tests to work
 
     #Delete compatibility layer when using drivers directly
-    if ( $self->isa('Selenium::Firefox') || $self->isa('Selenium::Chrome') ) {
+    if ( $self->isa('Selenium::Firefox') || $self->isa('Selenium::Chrome') || $self->isa('Selenium::Edge') ) {
         if (   exists $args->{capabilities}
             && exists $args->{capabilities}->{alwaysMatch} )
         {
@@ -1890,7 +1890,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.39
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -3596,7 +3596,7 @@ See L</find_element>.
 =head2 get_text
 
  Description:
-    Get the text of a particular element. Wrapper around L<find_element()>
+    Get the text of a particular element. Wrapper around L</find_element>
 
  Usage:
     $text = $driver->get_text("//div[\@name='q']");
@@ -3605,7 +3605,7 @@ See L</find_element>.
 
  Description:
     Get the current text for the whole body. If you want the entire raw HTML instead,
-    See L<get_page_source>.
+    See L</get_page_source>.
 
  Usage:
     $body_text = $driver->get_body();
@@ -3674,50 +3674,19 @@ See L</find_element>.
  Usage:
      $driver->delete_local_storage_item('key')
 
-=head1 SEE ALSO
+=head1 AUTHORS
 
-Please see those modules/websites for more information related to this module.
+Current Maintainers:
 
 =over 4
 
 =item *
 
-L<L<https://github.com/SeleniumHQ/selenium> - the main selenium RC project|L<https://github.com/SeleniumHQ/selenium> - the main selenium RC project>
-
-=item *
-
-L<L<https://github.com/SeleniumHQ/selenium/wiki/JsonWireProtocol> - the "legacy" webdriver specification|L<https://github.com/SeleniumHQ/selenium/wiki/JsonWireProtocol> - the "legacy" webdriver specification>
-
-=item *
-
-L<L<https://www.w3.org/TR/webdriver/> - the WC3 WebDriver 3 specification|L<https://www.w3.org/TR/webdriver/> - the WC3 WebDriver 3 specification>
-
-=item *
-
-L<https://github.com/teodesian/Selenium-Remote-Driver/wiki>
-
-=item *
-
-L<Brownie|Brownie>
-
-=item *
-
-L<Wight|Wight>
+George S. Baugh <george@troglodyne.net>
 
 =back
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/teodesian/Selenium-Remote-Driver/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=head1 AUTHORS
-
-Current Maintainers:
+Previous maintainers:
 
 =over 4
 
@@ -3728,12 +3697,6 @@ Daniel Gempesaw <gempesaw@gmail.com>
 =item *
 
 Emmanuel Peroumalnaïk <peroumalnaik.emmanuel@gmail.com>
-
-=back
-
-Previous maintainers:
-
-=over 4
 
 =item *
 
@@ -3960,6 +3923,8 @@ Yves Lavoie <ylavoie@yveslavoie.com>
 Copyright (c) 2010-2011 Aditya Ivaturi, Gordon Child
 
 Copyright (c) 2014-2017 Daniel Gempesaw
+
+Copyright (c) 2018-2021 George S. Baugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

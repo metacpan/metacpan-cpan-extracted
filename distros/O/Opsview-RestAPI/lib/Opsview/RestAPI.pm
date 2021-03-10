@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package Opsview::RestAPI;
-$Opsview::RestAPI::VERSION = '1.210260';
+$Opsview::RestAPI::VERSION = '1.210670';
 # ABSTRACT: Interact with the Opsview Rest API interface
 
 use version;
@@ -495,7 +495,7 @@ Opsview::RestAPI - Interact with the Opsview Rest API interface
 
 =head1 VERSION
 
-version 1.210260
+version 1.210670
 
 =head1 SYNOPSIS
 
@@ -503,7 +503,7 @@ version 1.210260
 
   my $rest=Opsview::RestAPI();
   # equivalent to
-  my $rest=Opsview::RestAPI(
+  my $rest=Opsview::RestAPI->new(
       url => 'http://localhost',
       username => 'admin',
       password => 'initial',

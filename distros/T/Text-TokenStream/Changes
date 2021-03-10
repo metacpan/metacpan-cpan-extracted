@@ -1,5 +1,8 @@
 Revision history for Text::TokenStream
 
+0.04    2021-03-09
+    - Always call `next` method, so it can be overridden
+
 0.03    2021-03-06
     - Specify minimum Moo version for `coerce => 1`
 

@@ -7,7 +7,7 @@ use Carp qw( croak );
 require FFI::Platypus;
 
 # ABSTRACT: Defining types for FFI::Platypus
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.38'; # VERSION
 
 # The TypeParser and Type classes are used internally ONLY and
 # are not to be exposed to the user.  External users should
@@ -58,13 +58,13 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 1.34
+version 1.38
 
 =head1 SYNOPSIS
 
 OO Interface:
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->type('int' => 'my_int');
 
@@ -78,7 +78,7 @@ Types may be "defined" ahead of time, or simply used when defining or
 attaching functions.
 
  # Example of defining types
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->type('int');
  $ffi->type('string');
@@ -134,7 +134,7 @@ second argument to the L<FFI::Platypus#type> method can be used to
 define a type alias that can later be used by function declaration
 and attachment.
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->type('int'    => 'myint');
  $ffi->type('string' => 'mystring');
@@ -258,9 +258,9 @@ takes a character you want to use the perl L<ord|perlfunc#ord> function.
 Here is an example that uses the standard libc C<isalpha>, C<isdigit>
 type functions:
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(undef);
  $ffi->type('int' => 'character');
  
@@ -299,14 +299,14 @@ things like C<wchar_t>, C<off_t>, C<wint_t>. You can use this script to
 list all the integer types that L<FFI::Platypus> knows about, plus how
 they are implemented.
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  
- foreach my $type_name (sort FFI::Platypus->types)
+ foreach my $type_name (sort $ffi->types)
  {
    my $meta = $ffi->type_meta($type_name);
-   next unless $meta->{element_type} eq 'int';
+   next unless defined $meta->{element_type} && $meta->{element_type} eq 'int';
    printf "%20s %s\n", $type_name, $meta->{ffi_type};
  }
 
@@ -628,6 +628,19 @@ and return an opaque pointer to the string using a cast.
  });
  print_message($get_message);
 
+Another type of string that you may run into with some APIs is the
+so called "wide" string.  In your C code if you see C<wchar_t*>
+or C<const wchar_t*> or if in Win32 API code you see C<LPWSTR>
+or C<LPCWSTR>.  Most commonly you will see these types when working
+with the Win32 API, but you may see them in Unix as well.  These
+types are intended for dealing with Unicode, but they do not use
+the same UTF-8 format used by Perl internally, so they need to be
+converted.  You can do this manually by allocating the memory
+and using the L<Encode> module, but the easier way is to use
+either L<FFI::Platypus::Type::WideString> or
+L<FFI::Platypus::Lang::Win32>, which handle the memory allocation
+and conversion for you.
+
 =head2 Pointer / References
 
 In C you can pass a pointer to a variable to a function in order
@@ -656,7 +669,7 @@ code.
  }
  
  # foo.pl
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib('libfoo.so'); # change to reflect the dynamic lib
                          # that contains foo.c
@@ -694,6 +707,7 @@ Here is a brief example:
 
  package My::UnixTime;
  
+ use FFI::Platypus 1.00;
  use FFI::Platypus::Record;
  
  record_layout_1(qw(
@@ -748,7 +762,7 @@ then smushes them back together to get the original C<time_t> (an
 integer).
 
  use Convert::Binary::C;
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  use Data::Dumper qw( Dumper );
  
  my $c = Convert::Binary::C->new;
@@ -828,7 +842,7 @@ Here is a longer practical example, once again using the tm struct:
 
  package My::UnixTime;
  
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  use FFI::TinyCC;
  use FFI::TinyCC::Inline 'tcc_eval';
  
@@ -982,7 +996,7 @@ when it returns to Perl space.  An example of using this is the
 Unix C<pipe> command which returns a list of two file descriptors
 as an array.
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib(undef);
@@ -1025,9 +1039,9 @@ example the C code:
 
 Can be called from Perl like this:
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  
- my $ffi = FFI::Platypus->new( api => 1 )
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib('./var_array.so');
  
  $ffi->attach( sum => [ 'int[]', 'int' ] => 'int' );
@@ -1083,7 +1097,7 @@ and probably never will be.
 
 And the Perl code:
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib('./closure.so');
@@ -1103,7 +1117,7 @@ And the Perl code:
 If you have a pointer to a function in the form of an C<opaque> type,
 you can pass this in place of a closure type:
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lib('./closure.so');
@@ -1186,7 +1200,7 @@ constants in your Perl module, like this:
 
  package Foo;
  
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  use base qw( Exporter );
  
  our @EXPORT_OK = qw( FOO_STATIC FOO_DYNAMIC FOO_OTHER foo get_foo );
@@ -1210,7 +1224,7 @@ function, like this:
 
  package Foo;
  
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  
  our @EXPORT_OK = qw( foo get_foo );
  
@@ -1263,7 +1277,7 @@ interface like this:
 
  package Foo;
  
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  use FFI::Platypus::API qw( arguments_get_string );
  
  my $ffi = FFI::Platypus->new( api => 1 );
@@ -1373,6 +1387,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 Meredith (merrilymeredith, MHOWARD)
 
 Diab Jerius (DJERIUS)
+
+Eric Brine (IKEGAMI)
 
 =head1 COPYRIGHT AND LICENSE
 

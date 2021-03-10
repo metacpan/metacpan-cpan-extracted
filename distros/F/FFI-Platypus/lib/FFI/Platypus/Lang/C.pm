@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Documentation and tools for using Platypus with the C programming language
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.38'; # VERSION
 
 
 sub native_type_map
@@ -28,11 +28,11 @@ FFI::Platypus::Lang::C - Documentation and tools for using Platypus with the C p
 
 =head1 VERSION
 
-version 1.34
+version 1.38
 
 =head1 SYNOPSIS
 
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->lang('C'); # the default
 
@@ -60,6 +60,10 @@ values are libffi native types.
 =item L<FFI::Platypus>
 
 The Core Platypus documentation.
+
+=item L<FFI::Platypus::Lang>
+
+Includes a list of other language plugins for Platypus.
 
 =back
 
@@ -98,6 +102,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 Meredith (merrilymeredith, MHOWARD)
 
 Diab Jerius (DJERIUS)
+
+Eric Brine (IKEGAMI)
 
 =head1 COPYRIGHT AND LICENSE
 

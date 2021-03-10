@@ -1,0 +1,28 @@
+NAME
+
+    Rex::Interface::Shell::Ilo -- Rex module to support iLO
+
+DESCRIPTION
+
+    Rex module to support iLO via the SMASH CLP shell.
+
+LICENSE
+
+    This software is Copyright (c) 2021 by adjust GmbH. This is free
+    software, licensed under: The GNU Lesser General Public License,
+    Version 3, June 2007
+
+SUBROUTINES/METHODS
+
+  new
+
+    Initialize a Rex::Interface::Shell::Ilo object.
+
+  detect
+
+    Detect a Ilo (SMASH CLP) shell
+
+  exec
+
+    Execute a command with the SMASH CLP shell.
+

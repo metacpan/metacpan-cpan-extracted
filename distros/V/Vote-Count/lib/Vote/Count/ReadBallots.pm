@@ -11,17 +11,17 @@ use YAML::XS;
 
 # ABSTRACT: Read Ballots for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='1.09';
+our $VERSION='1.10';
 
 =head1 NAME
 
 Vote::Count::ReadBallots
 
-=head1 VERSION 1.09
+=head1 VERSION 1.10
 
 =head1 SYNOPSIS
 
-  Vote::Count::ReadBallots;
+  use Vote::Count::ReadBallots;
 
   my $data1 = read_ballots('t/data/data1.txt');
 
@@ -36,6 +36,7 @@ All public methods are exported.
     ballots   {
         CHOCOLATE:MINTCHIP:VANILLA {
             count   1,
+            votevalue   1, # needed for STV support
             votes   [
                 [0] "CHOCOLATE",
                 [1] "MINTCHIP",
@@ -139,12 +140,11 @@ sub read_ballots( $filename ) {
     'comment'   => ''
   );
 BALLOTREADLINES:
-  for my $line_raw ( path($filename)->lines ) {
+  for my $line_raw ( path($filename)->lines({chomp => 1}) ) {
     if ( $line_raw =~ m/^\#/ ) {
       $data{'comment'} .= $line_raw;
       next BALLOTREADLINES;
     }
-    chomp $line_raw;
     if ( $line_raw =~ m/^\:CHOICES\:/ ) {
       if ( $data{'choices'} ) {
         croak("File $filename redefines CHOICES \n$line_raw\n");
@@ -175,6 +175,7 @@ BALLOTREADLINES:
       $data{'ballots'}{$line}{'votes'} = \@votes;
     }
   }
+  for my  $K ( keys $data{'ballots'}->%* ) { $data{'ballots'}{$K}{'votevalue'} = 1 }
   return \%data;
 }
 
@@ -186,7 +187,7 @@ sub write_ballots ( $BallotSet, $destination ) {
     my $cnt = $BallotSet->{'ballots'}{$k}{'count'};
     push @data, "$cnt:$k";
   }
-  for (@data) { $_ .= "\n" if $_ !~ /\n$/ }
+  for my $D (@data) { $D .= "\n" if $D !~ /\n$/ }
   path($destination)->spew(@data);
 }
 

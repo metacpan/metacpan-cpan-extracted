@@ -14,7 +14,6 @@ my $builder = Module::Build->new(
         'Test::More'    => '1.30',
         'Test::Simple'  => '1.30',
         'Test::Harness' => '3.38',
-        'Test::Number::Delta' => '1.06',
         'Test::CheckManifest' => '0.9',
         'Test::Pod::Coverage' => '1.08',
         'Pod::Simple::HTMLBatch' => '0',
@@ -27,6 +26,7 @@ my $builder = Module::Build->new(
         'DateTime'        => '1.44',
         'DateTime::Format::Strptime' => '1.76',
         'List::MoreUtils'  => '0.43',
+        'Test::Number::Delta' => '1.06',        
     },
     add_to_cleanup        => [ 'Astro-*' ],
 );

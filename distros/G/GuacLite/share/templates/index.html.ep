@@ -1,0 +1,136 @@
+<!DOCTYPE HTML>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+      http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+  <head>
+    <link rel="stylesheet" type="text/css" href="guacamole.css"/>
+    <title>Guacamole (EXAMPLE)</title>
+  </head>
+
+  <body>
+
+    <!-- Display -->
+    <div id="connect">
+      <p>
+        Connect by url, e.g. vnc://raspberrypi.local:5900?password=mypass, see options <a href="https://guacamole.apache.org/doc/gug/configuring-guacamole.html#connection-configuration">here</a>.
+        Hostname and port may be specified as url or query parameters, if both query parameters win.
+      </p>
+
+      <div>
+        <input id="target">
+        <button id="connect" onclick="connect()">Connect</button>
+      </div>
+    </div>
+    <div id="display"></div>
+
+    <!-- Guacamole JavaScript API -->
+    <script type="text/javascript" src="guaclite.js"></script>
+
+    <!-- Init -->
+    <script type="text/javascript"> /* <![CDATA[ */
+
+      function connect() {
+        Guacamole.initialize();
+
+        // Get display div from document
+        var display = document.getElementById("display");
+
+        var tunnel = new Guacamole.WebSocketTunnel('<%= url_for('tunnel')->to_abs %>');
+        tunnel.onstatechange = function (state) {
+          if (state != Guacamole.Tunnel.State.CLOSED) return;
+          alert('Connection closed');
+        };
+
+        // Instantiate client, using an HTTP tunnel for communications.
+        var guac = new Guacamole.Client(tunnel);
+
+        // Add client to display div
+        const guacDisplay = guac.getDisplay();
+        display.appendChild(guacDisplay.getElement());
+
+        // Error handler
+        guac.onerror = function(error) {
+          console.log(error);
+          alert(error.message);
+        };
+
+        // Inform about required variables as indicated by the server
+        guac.onrequired = function(list) {
+          console.log('Required: ', list);
+
+          // Prompt for each required item
+          list.forEach(name => {
+            const value = prompt(`The value '${name}' is required`);
+            const stream = guac.createArgumentValueStream("text/plain", name);
+            const writer = new Guacamole.StringWriter(stream);
+            writer.sendText(value);
+            writer.sendEnd();
+          });
+        };
+
+        // Connect
+        const pixel_density = window.devicePixelDensity || 1;
+        const client = {
+          audio: Guacamole.AudioPlayer.getSupportedTypes(),
+          video: Guacamole.VideoPlayer.getSupportedTypes(),
+          //TODO port tests from: https://github.com/apache/guacamole-client/blob/d1e928bea79ca81c827e9b6adedabc98eefdf701/guacamole/src/main/webapp/app/client/services/guacImage.js
+          image: ['image/jpeg', 'image/png', 'image/webp'],
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          width: Math.floor(window.innerWidth * pixel_density),
+          height: Math.floor(window.innerHeight * pixel_density),
+          dpi: Math.floor(96 * pixel_density),
+        };
+
+        document.getElementById('connect').hidden = true;
+        guac.connect(encodeURIComponent(JSON.stringify({
+          client,
+          target: document.getElementById('target').value,
+        })));
+
+        // Disconnect on close
+        window.onunload = function() {
+          guac.disconnect();
+        }
+
+        // Mouse
+        var mouse = new Guacamole.Mouse(guac.getDisplay().getElement());
+
+        mouse.onmousedown =
+        mouse.onmouseup   =
+        mouse.onmousemove = function(mouseState) {
+          guac.sendMouseState(mouseState);
+        };
+
+        // Keyboard
+        var keyboard = new Guacamole.Keyboard(document);
+
+        keyboard.onkeydown = function (keysym) {
+          guac.sendKeyEvent(1, keysym);
+        };
+
+        keyboard.onkeyup = function (keysym) {
+          guac.sendKeyEvent(0, keysym);
+        };
+      }
+
+
+    </script>
+
+  </body>
+
+</html>

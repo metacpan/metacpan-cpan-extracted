@@ -1,0 +1,6 @@
+--no-standard-output
+--no-standard-error-output
+--no-blanks-before-comments
+--comma-arrow-breakpoints=3
+--variable-maximum-line-length
+--minimum-space-to-comment=1

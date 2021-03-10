@@ -45,7 +45,7 @@ sub print_data {
                                      : $sch->{data_row_data};
     print $self->decorate (sprintf($fmt, $title), $sch->{data_row_title});
     print $self->decorate(': ', $sch->{data_row_data});
-    $data = " $data" unless $data =~ /^[-+]/;
+    $data = " $data" unless $data =~ /^[-+ ].*/;
     say $self->decorate( $data, $data_color);
 }
 

@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/App/IDXUtils.pm
+script/get-idx-daily-trading-summary
 script/list-idx-boards
 script/list-idx-boards-static
 script/list-idx-brokers

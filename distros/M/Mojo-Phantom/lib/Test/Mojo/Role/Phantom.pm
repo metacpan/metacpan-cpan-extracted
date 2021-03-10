@@ -4,6 +4,7 @@ use Role::Tiny;
 
 use Test::More ();
 
+use Mojo::IOLoop::Delay;
 use Mojo::Phantom;
 
 sub phantom_ok {
@@ -43,7 +44,7 @@ sub phantom_ok {
   my $name = $opts->{name} || 'all phantom tests successful';
   my $block = sub {
     Test::More::plan(tests => $opts->{plan}) if $opts->{plan};
-    Mojo::IOLoop->delay(
+    Mojo::IOLoop::Delay->new->steps(
       sub { $phantom->execute_url($url, $js, shift->begin) },
       sub {
         my ($delay, $err, $status) = @_;

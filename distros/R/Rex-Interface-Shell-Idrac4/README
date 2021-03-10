@@ -1,0 +1,28 @@
+NAME
+
+    Rex::Interface::Shell::Idrac4 -- Rex module to support Idrac4
+
+DESCRIPTION
+
+    Rex module to support Idrac4 shell.
+
+LICENSE
+
+    This software is Copyright (c) 2021 by adjust GmbH. This is free
+    software, licensed under: The GNU Lesser General Public License,
+    Version 3, June 2007
+
+SUBROUTINES/METHODS
+
+  new
+
+    Initialize a Rex::Interface::Shell::Idrac4 object.
+
+  detect
+
+    Detect an Idrac4 shell.
+
+  exec
+
+    Execute a command with the Idrac4 shell.
+

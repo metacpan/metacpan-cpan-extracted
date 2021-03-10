@@ -1,5 +1,9 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## [1.9](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v1.9) (Tue Mar  9 16:51:24 GMT 2021)
+
+* Barcode Search in default connfiguration (use attribute 9998) now uses exact match (`==`) rather than the default string match operator (`=`). Fixes an issue raised in DEVOPS-558.
+
 ## [1.8](https://github.com/folio-org/Net-Z3950-FOLIO/tree/v1.8) (Fri Feb 26 12:12:08 GMT 2021)
 
 * Optionally, restrict item-level MARC holdings info to item mentioned in barcode search. Fixes ZF-32.

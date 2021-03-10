@@ -91,7 +91,7 @@ Astro::Montenbruck::SolEqu - Solstices and Equinoxes.
 The times of he equinoxes and solstices are the instants when the apparent longiude
 of the Sun is a multiple of B<90 degrees>.
 
-Searches solstices and eqinoxes. Algorythms are based on
+Searches solstices and eqinoxes. Algorithms are based on
 I<"Astronomical Formulae for Calculators"> by I<Jean Meeus>, I<Forth Edition>, I<Willmann-Bell, Inc., 1988>.
 
 

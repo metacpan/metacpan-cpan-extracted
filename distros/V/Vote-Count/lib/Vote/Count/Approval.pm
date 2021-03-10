@@ -10,13 +10,13 @@ use Moose::Role;
 no warnings 'experimental';
 use Carp;
 
-our $VERSION='1.09';
+our $VERSION='1.10';
 
 =head1 NAME
 
 Vote::Count::Approval
 
-=head1 VERSION 1.09
+=head1 VERSION 1.10
 
 =cut
 
@@ -39,13 +39,19 @@ Returns a RankCount object for the current Active Set taking an optional argumen
   # to specify a cutoff on Range Ballots
   my $Approval = $Election->Approval( $activeset, $cutoff );
 
-=head1 Method NonApproval  
+For RCV, Approval respects weighting, 'votevalue' is defaulted to 1 by readballots. Integers or Floating point values may be used.
 
-The opposite of Approval. Returns a RankCount object for the current Active Set of the non-exhausted ballots not supporting a choice. It does not have the option to provide an Active Set. Only available for Ranked Ballots. 
+=head3 LastApprovalBallots
+
+Returns a hashref of the unweighted raw count from the last Approval operation.
+
+=head1 Method NonApproval
+
+The opposite of Approval. Returns a RankCount object for the current Active Set of the non-exhausted ballots not supporting a choice. It does not have the option to provide an Active Set. Only available for Ranked Ballots.
 
 =head2 Cut Off (Range Ballots Only)
 
-When counting Approval on Range Ballots it is appropriate to set a threshold below which a choice is not considered to be supported by the voter, but indicated to represent a preference to even lower or unranked choices. 
+When counting Approval on Range Ballots it is appropriate to set a threshold below which a choice is not considered to be supported by the voter, but indicated to represent a preference to even lower or unranked choices.
 
 A good value is half of the maximum possible score, however, the default action must be to treat all choices with a score as approved. With a Range of 0-10 a cutoff of 5 would be recommended, choices scored 4 or lower would not be counted for approval. If cutoff isn't provided it defaults to 0 producing the desired default behaviour.
 
@@ -53,16 +59,25 @@ For Ranked Ballots the cutoff is ignored. If a cutoff is desired for Ranked Ball
 
 =cut
 
-sub _approval_rcv_do ( $active, $ballots ) {
+has 'LastApprovalBallots' => (
+  is => 'rw',
+  isa     => 'HashRef',
+  required => 0,
+);
+
+sub _approval_rcv_do ( $I, $active, $ballots ) {
   my %approval = ( map { $_ => 0 } keys( $active->%* ) );
+  my %lastappcount = ( map { $_ => 0 } keys( $active->%* ) );
   for my $b ( keys %{$ballots} ) {
     my @votes = $ballots->{$b}->{'votes'}->@*;
     for my $v (@votes) {
       if ( defined $approval{$v} ) {
-        $approval{$v} += $ballots->{$b}{'count'};
+        $approval{$v} += $ballots->{$b}{'count'} * $ballots->{$b}{'votevalue'} ;
+        $lastappcount{$v} += $ballots->{$b}{'count'};
       }
     }
   }
+  $I->LastApprovalBallots( \%lastappcount );
   return Vote::Count::RankCount->Rank( \%approval );
 }
 
@@ -86,14 +101,14 @@ sub Approval ( $self, $active = undef, $cutoff = 0 ) {
       $cutoff );
   }
   else {
-    _approval_rcv_do( $active, $BallotSet{'ballots'} );
+    $self->_approval_rcv_do( $active, $BallotSet{'ballots'} );
   }
 }
 
 sub _non_approval_rcv_do ( $I, $ballots ) {
   my $active = $I->Active();
   my %nonapproval = ( map { $_ => 0 } keys( $active->%* ) );
-  my %approval = %{_approval_rcv_do ( $active, $ballots )->RawCount()};
+  my %approval = %{$I->_approval_rcv_do ( $active, $ballots )->RawCount()};
   my $activevotes = $I->VotesActive();
   for my $A ( keys %nonapproval) {
     $nonapproval{ $A } = $activevotes - $approval{ $A };
@@ -101,7 +116,7 @@ sub _non_approval_rcv_do ( $I, $ballots ) {
   return Vote::Count::RankCount->Rank( \%nonapproval );
 }
 
-# For each choice in the active set counts ballots 
+# For each choice in the active set counts ballots
 sub NonApproval ( $I, $cutoff = 0 ) {
   my %BallotSet = $I->BallotSet()->%*;
   my $ballots = $BallotSet{'ballots'};

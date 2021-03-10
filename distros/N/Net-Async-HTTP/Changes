@@ -1,5 +1,14 @@
 Revision history for Net-Async-HTTP
 
+0.48    2021-03-08
+        [CHANGES]
+         * Add PATCH method convenience wrapper
+         * Updates to documentation style
+
+        [BUGFIXES]
+         * Make sure to set port number in Host header if using a non-default
+           port for the URI scheme (RT134411)
+
 0.47    2020-05-13
         [CHANGES]
          * Updated for Metrics::Any 0.05

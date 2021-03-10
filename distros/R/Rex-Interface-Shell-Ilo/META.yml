@@ -1,0 +1,35 @@
+---
+abstract: 'Rex module to support iLO'
+author:
+  - 'Maxine E. Aubrey <max@adjust.com>'
+build_requires:
+  Test2::V0: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Rex-Interface-Shell-Ilo
+provides:
+  Rex::Interface::Shell::Ilo:
+    file: lib/Rex/Interface/Shell/Ilo.pm
+    version: v0.1.0
+requires:
+  Rex::Interface::Shell::Default: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/adjust/Rex-Interface-Shell-Ilo/issues
+  repository: git://github.com/adjust/Rex-Interface-Shell-Ilo.git
+version: v0.1.0
+x_contributors:
+  - 'Ali Polatel <11023+alip@users.noreply.github.com>'
+  - 'Ali Polatel <alip@adjust.com>'
+x_generated_by_perl: v5.30.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: LGPL-3.0

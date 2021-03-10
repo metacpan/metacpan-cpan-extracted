@@ -5,13 +5,36 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.4.3'; # VERSION
+our $VERSION = '0.4.4'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
 our @EXPORT_OK = qw(
+    clean_chiral_centers
     is_aromatic
 );
+
+# Removes chiral setting from tetrahedral chiral centers with less than
+# four distinct neighbours. Returns the affected atoms.
+#
+# CAVEAT: disregards anomers
+# TODO: check other chiral centers
+sub clean_chiral_centers($$)
+{
+    my( $moiety, $color_sub ) = @_;
+
+    my @affected;
+    for my $atom ($moiety->vertices) {
+        next if !$atom->{chirality};
+        next if $moiety->degree($atom) != 4;
+        my %colors = map { ($color_sub->( $_ ) => 1) }
+                         $moiety->neighbours($atom);
+        next if scalar keys %colors == 4;
+        delete $atom->{chirality};
+        push @affected, $atom;
+    }
+    return @affected;
+}
 
 sub is_aromatic($)
 {
@@ -19,48 +42,128 @@ sub is_aromatic($)
     return $atom->{symbol} ne ucfirst $atom->{symbol};
 }
 
-sub _validate($)
+sub _validate($@)
 {
-    my( $moiety ) = @_;
+    my( $moiety, $color_sub ) = @_;
 
     for my $atom (sort { $a->{number} <=> $b->{number} } $moiety->vertices) {
-        # TODO: TH and AL chiral centers also have to be checked
-        if( $atom->{chirality} && $atom->{chirality} =~ /^@@?$/ &&
-            $moiety->degree($atom) < 4 ) {
-            # FIXME: tetrahedral allenes are false-positives
-            warn sprintf 'chiral center %s(%d) has %d bonds while ' .
-                         'at least 4 is required' . "\n",
-                         $atom->{symbol},
-                         $atom->{number},
-                         $moiety->degree($atom);
-        }
-
-        # FIXME: this code yields false-positives, see COD entries
-        # 1100780 and 1547257
-        my %bond_types;
-        for my $neighbour ($moiety->neighbours($atom)) {
-            next if !$moiety->has_edge_attribute( $atom, $neighbour, 'bond' );
-            my  $bond_type = $moiety->get_edge_attribute( $atom, $neighbour, 'bond' );
-            if( $bond_type =~ /^[\\\/]$/ &&
-                $atom->{number} > $neighbour->{number} ) {
-                $bond_type = $bond_type eq '\\' ? '/' : '\\';
-            }
-            $bond_types{$bond_type}++;
-        }
-        foreach ('/', '\\') {
-            if( $bond_types{$_} && $bond_types{$_} > 1 ) {
-                warn sprintf 'atom %s(%d) has %d bonds of type \'%s\', ' .
-                             'cis/trans definitions must not conflict' . "\n",
+        # TODO: AL chiral centers also have to be checked
+        if( $atom->{chirality} && $atom->{chirality} =~ /^@@?$/ ) {
+            if( $moiety->degree($atom) < 4 ) {
+                # FIXME: tetrahedral allenes are false-positives
+                warn sprintf 'chiral center %s(%d) has %d bonds while ' .
+                             'at least 4 is required' . "\n",
                              $atom->{symbol},
                              $atom->{number},
-                             $bond_types{$_},
-                             $_;
+                             $moiety->degree($atom);
+            } elsif( $moiety->degree($atom) == 4 && $color_sub ) {
+                my %colors = map { ($color_sub->( $_ ) => 1) }
+                                 $moiety->neighbours($atom);
+                if( scalar keys %colors != 4 ) {
+                    # FIXME: anomers are false-positives, see COD entry
+                    # 7111036
+                    warn sprintf 'tetrahedral chiral setting for %s(%d) ' .
+                                 'is not needed as not all 4 neighbours ' .
+                                 'are distinct' . "\n",
+                                 $atom->{symbol},
+                                 $atom->{number};
+                }
+            }
+        }
+
+        # Warn about unmarked tetrahedral chiral centers
+        if( !$atom->{chirality} && $moiety->degree($atom) == 4 ) {
+            my $color_sub_local = $color_sub;
+            if( !$color_sub_local ) {
+                $color_sub_local = sub { return $_[0]->{symbol} };
+            }
+            my %colors = map { ($color_sub_local->( $_ ) => 1) }
+                             $moiety->neighbours($atom);
+            if( scalar keys %colors == 4 ) {
+                warn sprintf 'atom %s(%d) has 4 distinct neighbours, ' .
+                             'but does not have a chiral setting' . "\n",
+                             $atom->{symbol},
+                             $atom->{number};
             }
         }
     }
 
-    # TODO: cis/trans bond not next to a double bond
+    # FIXME: establish deterministic order
+    for my $bond ($moiety->edges) {
+        my( $A, $B ) = sort { $a->{number} <=> $b->{number} } @$bond;
+        if( $A eq $B ) {
+            warn sprintf 'atom %s(%d) has bond to itself' . "\n",
+                         $A->{symbol},
+                         $A->{number};
+        }
+
+        if( $moiety->has_edge_attribute( @$bond, 'bond' ) ) {
+            my $bond_type = $moiety->get_edge_attribute( @$bond, 'bond' );
+            if( $bond_type eq '=' ) {
+                # Test cis/trans bonds
+                # FIXME: Not sure how to check which definition belongs to
+                # which of the double bonds. See COD entry 1547257.
+                for my $atom (@$bond) {
+                    my %bond_types = _neighbours_per_bond_type( $moiety,
+                                                                $atom );
+                    foreach ('/', '\\') {
+                        if( $bond_types{$_} && @{$bond_types{$_}} > 1 ) {
+                            warn sprintf 'atom %s(%d) has %d bonds of type \'%s\', ' .
+                                         'cis/trans definitions must not conflict' . "\n",
+                                         $atom->{symbol},
+                                         $atom->{number},
+                                         scalar @{$bond_types{$_}},
+                                         $_;
+                        }
+                    }
+                }
+            } elsif( $bond_type =~ /^[\\\/]$/ ) {
+                # Test if next to a double bond.
+                # FIXME: Yields false-positives for delocalised bonds,
+                # see COD entry 1501863.
+                # FIXME: What about triple bond? See COD entry 4103591.
+                my %bond_types;
+                for my $atom (@$bond) {
+                    my %bond_types_now = _neighbours_per_bond_type( $moiety,
+                                                                    $atom );
+                    for my $key (keys %bond_types_now) {
+                        push @{$bond_types{$key}}, @{$bond_types_now{$key}};
+                    }
+                }
+                if( !$bond_types{'='} ) {
+                    warn sprintf 'cis/trans bond is defined between atoms ' .
+                                 '%s(%d) and %s(%d), but neither of them ' .
+                                 'is attached to a double bond' . "\n",
+                                 $A->{symbol},
+                                 $A->{number},
+                                 $B->{symbol},
+                                 $B->{number};
+                }
+            }
+        }
+    }
+
     # TODO: SP, TB, OH chiral centers
+}
+
+sub _neighbours_per_bond_type
+{
+    my( $moiety, $atom ) = @_;
+    my %bond_types;
+    for my $neighbour ($moiety->neighbours($atom)) {
+        my $bond_type;
+        if( $moiety->has_edge_attribute( $atom, $neighbour, 'bond' ) ) {
+            $bond_type = $moiety->get_edge_attribute( $atom, $neighbour, 'bond' );
+        } else {
+            $bond_type = '';
+        }
+        if( $bond_type =~ /^[\\\/]$/ &&
+            $atom->{number} > $neighbour->{number} ) {
+            $bond_type = $bond_type eq '\\' ? '/' : '\\';
+        }
+        push @{$bond_types{$bond_type}}, $neighbour;
+    }
+    return %bond_types;
 }
 
 1;

@@ -1,3 +1,8 @@
+1.000 2021-03-09 13:18:26-0600
+  - Bump dependency to Data::Printer >= v1.0.0. Not backwards compatible.
+  - Update to support Data::Printer v1.0.0 filter API.
+  - Use themes from Data::Printer v1.0.0.
+
 0.007 2015-06-05 11:19:29-0500
   - fix test: p() needs to have the return_value => 'dump' option when used
     with Data::Printer 0.36. Thanks to Slaven Rezic (SREZIC++) for the bug report.

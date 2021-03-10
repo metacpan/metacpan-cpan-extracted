@@ -2,9 +2,9 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.335 of Calendar::Indonesia::Holiday
+    This document describes version 0.337 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2021-01-16.
+    2021-03-09.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
@@ -743,7 +743,7 @@ FUNCTIONS
 
      list_idn_workdays(%args) -> [status, msg, payload, meta]
 
-    .
+    List Indonesian workdays (non-holidays) in calendar.
 
     This function is not exported.
 

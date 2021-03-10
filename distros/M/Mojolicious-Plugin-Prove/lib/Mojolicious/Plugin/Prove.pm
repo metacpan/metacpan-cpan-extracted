@@ -1,13 +1,9 @@
 package Mojolicious::Plugin::Prove;
-
+$Mojolicious::Plugin::Prove::VERSION = '0.11';
 # ABSTRACT: run test scripts via browser
 
 use Mojo::Base 'Mojolicious::Plugin::Prove::Base';
-
-use File::Basename;
-use File::Spec;
-
-our $VERSION = '0.08';
+use Mojo::File;
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -25,13 +21,14 @@ sub register {
     $self->add_template_path($app->renderer, __PACKAGE__);
     
     # Add public path
-    my $static_path = File::Spec->catdir( dirname(__FILE__), 'Prove', 'public' );
+    my $static_path = Mojo::File->new(__FILE__)->sibling('Prove', 'public' )->to_string;
     push @{ $app->static->paths }, $static_path;
     
     $app->plugin( 'PPI' => { no_check_file => 1 } );
     
     # Routes
-    my $r      = $conf->{route}  // $app->routes;
+    my $r      = $app->routes;
+    $r         = $conf->{route}  if $conf->{route};
     my $prefix = $conf->{prefix} // 'prove';
     
     $self->prefix($prefix);
@@ -39,7 +36,7 @@ sub register {
     
     
     {
-        my $r = $r->route("/$prefix")->to(
+        my $pr = $r->any("/$prefix")->to(
             'controller#',
             namespace => 'Mojolicious::Plugin::Prove',
             plugin    => $self,
@@ -47,11 +44,11 @@ sub register {
             conf      => $self->conf,
         );
         
-        $r->get('/')->to( '#list' );
-        $r->get('/test/*name/file/*file/run')->to( '#run' );
-        $r->get('/test/*name/file/*file')->to( '#file' );
-        $r->get('/test/*name/run')->to( '#run' );
-        $r->get('/test/*name')->to( '#list' );
+        $pr->get('/')->to( '#list' )->name('mpp_prove_list');
+        $pr->get('/test/*name/file/*file/run')->to( '#run' )->name('mpp_run_file');
+        $pr->get('/test/*name/file/*file')->to( '#file' )->name('mpp_file');
+        $pr->get('/test/*name/run')->to( '#run' )->name('mpp_run_all');
+        $pr->get('/test/*name')->to( '#list' )->name('mpp_file_list');
     }
 }
 
@@ -69,7 +66,7 @@ Mojolicious::Plugin::Prove - run test scripts via browser
 
 =head1 VERSION
 
-version 0.08
+version 0.11
 
 =head1 SYNOPSIS
 

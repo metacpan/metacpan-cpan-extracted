@@ -9,13 +9,13 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='1.09';
+our $VERSION='1.10';
 
 =head1 NAME
 
 Vote::Count::Method::MinMax
 
-=head1 VERSION 1.09
+=head1 VERSION 1.10
 
 =cut
 
@@ -64,7 +64,7 @@ As a Tie Breaker it is recommended to use the next worst pairing score. Because 
 
 no warnings 'experimental';
 
-use Vote::Count::TextTableTiny qw/generate_markdown_table/;
+use Vote::Count::TextTableTiny qw/generate_table/;
 use Carp;
 use Try::Tiny;
 # use Data::Dumper;
@@ -134,7 +134,7 @@ sub _pairmatrixtable1 ( $I, $scores ) {
       push @rows, [ ' ', $Cstr, $CVote, $Ostr, $OVote, $Score ];
     }
   }
-  return generate_markdown_table( rows => \@rows );
+  return generate_table( rows => \@rows );
 }
 
 sub _pairmatrixtable2 ( $I, $scores ) {
@@ -144,7 +144,7 @@ sub _pairmatrixtable2 ( $I, $scores ) {
     my $scores = join ', ', ( $scores->{$Choice}{'score'}->@* );
     push @rows, [ $Choice, $scores ];
   }
-  return generate_markdown_table( rows => \@rows );
+  return generate_table( rows => \@rows );
 }
 
 =pod

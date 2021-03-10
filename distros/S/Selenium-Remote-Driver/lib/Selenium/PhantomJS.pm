@@ -1,5 +1,5 @@
 package Selenium::PhantomJS;
-$Selenium::PhantomJS::VERSION = '1.39';
+$Selenium::PhantomJS::VERSION = '1.40';
 use strict;
 use warnings;
 
@@ -54,7 +54,7 @@ Selenium::PhantomJS - Use GhostDriver without a Selenium server
 
 =head1 VERSION
 
-version 1.39
+version 1.40
 
 =head1 SYNOPSIS
 
@@ -151,30 +151,19 @@ we can do.
 
 =for Pod::Coverage has_binary
 
-=head1 SEE ALSO
+=head1 AUTHORS
 
-Please see those modules/websites for more information related to this module.
+Current Maintainers:
 
 =over 4
 
 =item *
 
-L<Selenium::Remote::Driver|Selenium::Remote::Driver>
+George S. Baugh <george@troglodyne.net>
 
 =back
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/teodesian/Selenium-Remote-Driver/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=head1 AUTHORS
-
-Current Maintainers:
+Previous maintainers:
 
 =over 4
 
@@ -185,12 +174,6 @@ Daniel Gempesaw <gempesaw@gmail.com>
 =item *
 
 Emmanuel Peroumalnaïk <peroumalnaik.emmanuel@gmail.com>
-
-=back
-
-Previous maintainers:
-
-=over 4
 
 =item *
 
@@ -217,6 +200,8 @@ Aditya Ivaturi <ivaturi@gmail.com>
 Copyright (c) 2010-2011 Aditya Ivaturi, Gordon Child
 
 Copyright (c) 2014-2017 Daniel Gempesaw
+
+Copyright (c) 2018-2021 George S. Baugh
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

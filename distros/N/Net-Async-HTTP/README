@@ -4,6 +4,8 @@ NAME
 
 SYNOPSIS
 
+       use Future::AsyncAwait;
+    
        use IO::Async::Loop;
        use Net::Async::HTTP;
        use URI;
@@ -14,9 +16,9 @@ SYNOPSIS
     
        $loop->add( $http );
     
-       my ( $response ) = $http->do_request(
+       my $response = await $http->do_request(
           uri => URI->new( "http://www.cpan.org/" ),
-       )->get;
+       );
     
        print "Front page of http://www.cpan.org/ is:\n";
        print $response->as_string;
@@ -249,8 +251,8 @@ PARAMETERS
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
     When returning a Future, the following methods all indicate HTTP-level
     errors using the Future failure name of http. If the error relates to a
@@ -259,7 +261,9 @@ METHODS
 
        $f->fail( $message, "http", $response, $request )
 
- $response = $http->do_request( %args )->get
+ do_request
+
+       $response = await $http->do_request( %args );
 
     Send an HTTP request to a server, returning a Future that will yield
     the response. The request may be represented by an HTTP::Request
@@ -410,7 +414,9 @@ METHODS
 
          ( $message, "timeout" ) = $f->failure
 
- $http->do_request( %args )
+ do_request (void)
+
+       $http->do_request( %args )
 
     When not returning a future, the following extra arguments are used as
     callbacks instead:
@@ -451,16 +457,21 @@ METHODS
 
          $on_error->( $message, $response, $request )
 
- $response = $http->GET( $uri, %args )->get
+ GET, HEAD, PUT, ...
 
- $response = $http->HEAD( $uri, %args )->get
+       $response = await $http->GET( $uri, %args );
+    
+       $response = await $http->HEAD( $uri, %args );
+    
+       $response = await $http->PUT( $uri, $content, %args );
+    
+       $response = await $http->POST( $uri, $content, %args );
+    
+       $response = await $http->PATCH( $uri, $content, %args );
 
- $response = $http->PUT( $uri, $content, %args )->get
-
- $response = $http->POST( $uri, $content, %args )->get
-
-    Convenient wrappers for performing GET, HEAD, PUT or POST requests with
-    a URI object and few if any other arguments, returning a Future.
+    Convenient wrappers for performing GET, HEAD, PUT, POST or PATCH
+    requests with a URI object and few if any other arguments, returning a
+    Future.
 
     Remember that POST with non-form data (as indicated by a plain scalar
     instead of an ARRAY reference of form data name/value pairs) needs a
@@ -471,11 +482,15 @@ SUBCLASS METHODS
     The following methods are intended as points for subclasses to
     override, to add extra functionallity.
 
- $http->prepare_request( $request )
+ prepare_request
+
+       $http->prepare_request( $request )
 
     Called just before the HTTP::Request object is sent to the server.
 
- $http->process_response( $response )
+ process_response
+
+       $http->process_response( $response )
 
     Called after a non-redirect HTTP::Response has been received from a
     server. The originating request will be set in the object.
@@ -505,7 +520,9 @@ CONTENT DECODING
     Other content encoding types can be registered by calling the following
     method
 
- Net::Async::HTTP->register_decoder( $name, $q, $make_decoder )
+ register_decoder
+
+       Net::Async::HTTP->register_decoder( $name, $q, $make_decoder )
 
     Registers an encoding type called $name, at the quality value $q. In
     order to decode this encoding type, $make_decoder will be invoked with
@@ -527,6 +544,7 @@ EXAMPLES
     The Future-returning GET method makes it easy to await multiple URLs at
     once, by using the Future::Utils fmap_void utility
 
+       use Future::AsyncAwait;
        use Future::Utils qw( fmap_void );
     
        my @URLs = ( ... );
@@ -549,7 +567,7 @@ EXAMPLES
        } foreach => \@URLs,
          concurrent => 5;
     
-       $loop->await( $future );
+       await $future;
 
 SEE ALSO
 

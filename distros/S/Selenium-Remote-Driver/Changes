@@ -1,10 +1,17 @@
 Revision history for Selenium-Remote-Driver
 
-1.39  01-08-2021 TEODESIAN
+1.41  02-03-2021 TEODESIAN
+        [BUG FIXES]
+        - suppress warning in CanStartBinary when geckodriver not in PWD
+
+1.40  12-04-2020 TEODESIAN
+        [BUG FIX]
+        - fix double_click
+
+1.39  10-20-2020 TEODESIAN
         [NEW FEATURES]
         - Add execute_script and execute_async_script convenience methods to WebElements.
         - Add die flag to Selenium::Waiter
-        - fix double_click
         [BUG FIXES]
         - Fix a couple more documentation issues with driver specific problems
         [REMOVALS]

@@ -10,20 +10,20 @@ use Moose::Role;
 no warnings 'experimental';
 use List::Util qw( min max );
 use Vote::Count::RankCount;
-use Vote::Count::TextTableTiny 'generate_markdown_table';
+use Vote::Count::TextTableTiny 'generate_table';
 
 use Math::BigRat try => 'GMP';
 use Storable 'dclone';
 
 # ABSTRACT: TopCount and related methods for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='1.09';
+our $VERSION='1.10';
 
 =head1 NAME
 
 Vote::Count::TopCount
 
-=head1 VERSION 1.09
+=head1 VERSION 1.10
 
 =head1 Synopsis
 
@@ -41,6 +41,12 @@ Returns a RankCount object containing the TopCount.
 
 TopCount supports both Ranked and Range Ballot Types.
 
+For RCV, TopCount respects weighting, 'votevalue' is defaulted to 1 by readballots. Integers or Floating point values may be used.
+
+=head3 LastTopCountUnWeighted
+
+Returns a hashref of the unweighted raw count from the last TopCount operation.
+
 =head3 Top Counting Range Ballots
 
 Since Range Ballots often allow ranking choices equally, those equal votes need to be split. To prevent Rounding errors in the addition on large sets the fractions are added as Rational Numbers. The totals are converted to floating point numbers with a precision of 3 places. Three was arbitrarily chosen because it is reasonable for display, but precise enough as a truncation point to be unlikely to cause an error.
@@ -48,6 +54,12 @@ Since Range Ballots often allow ranking choices equally, those equal votes need 
 It is recommended to install Math::BigInt::GMP to improve performance on the Rational Number math used for Top Count on Range Ballots.
 
 =cut
+
+has 'LastTopCountUnWeighted' => (
+  is => 'rw',
+  isa     => 'HashRef',
+  required => 0,
+);
 
 sub _RangeTopCount ( $self, $active = undef ) {
   $active = $self->Active() unless defined $active;
@@ -79,26 +91,47 @@ sub _RCVTopCount ( $self, $active = undef ) {
   my %ballots   = ( $ballotset{'ballots'}->%* );
   $active = $self->Active() unless defined $active;
   my %topcount = ( map { $_ => 0 } keys( $active->%* ) );
+  my %lasttopcount = ( map { $_ => 0 } keys( $active->%* ) );
 TOPCOUNTBALLOTS:
   for my $b ( keys %ballots ) {
+    # reset topchoice so that if there is none the value will be false.
+    $ballots{$b}{'topchoice'} = 'NONE';
     my @votes = $ballots{$b}->{'votes'}->@*;
     for my $v (@votes) {
       if ( defined $topcount{$v} ) {
-        $topcount{$v} += $ballots{$b}{'count'};
+        $topcount{$v} += $ballots{$b}{'count'} * $ballots{$b}{'votevalue'};
+        $lasttopcount{$v} += $ballots{$b}{'count'};
+        $ballots{$b}{'topchoice'} = $v;
         next TOPCOUNTBALLOTS;
       }
     }
   }
+  $self->LastTopCountUnWeighted( \%lasttopcount );
   return Vote::Count::RankCount->Rank( \%topcount );
 }
 
 sub TopCount ( $self, $active = undef ) {
+  # An STV method was performing a TopCount to reset the topchoices
+  # after elimination. Decided it was better to check here.
+  unless( keys( $self->Active()->%* ) or defined( $active) ) {
+    return { 'error' => 'no active choices'};
+  }
   if ( $self->BallotSet()->{'options'}{'rcv'} == 1 ) {
     return $self->_RCVTopCount($active);
   }
   elsif ( $self->BallotSet()->{'options'}{'range'} == 1 ) {
     return $self->_RangeTopCount($active);
   }
+}
+
+=head3 TopChoice( $ballot_identifier )
+
+Returns the Top Choice on a ballot from the last TopCount operation
+
+=cut
+
+sub TopChoice( $self, $ballot ) {
+  return $self->BallotSet()->{ballots}{$ballot}{topchoice};
 }
 
 =head2 Method TopCountMajority
@@ -159,9 +192,9 @@ sub EvaluateTopCountMajority ( $self, $topcount = undef, $active = undef ) {
     ];
     $self->logt(
       '---',
-      generate_markdown_table(
+      generate_table(
         rows       => $rows,
-        header_row => 0
+        header_row => 0,
       )
     );
   }

@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-Block
 
+4.11    Mon, 08 Mar 2021 18:03:02 +0100
+        * FIXED: overflow bug in diff()
+
+4.10    Mon, 08 Mar 2021 18:03:02 +0100
+        * better aggregate algo, much more KISS
+
 4.00    Sat, 06 Feb 2021 23:03:36 +0100
         * revert using internals from Net::IPAM::IP
         * maybe a little bit slower in sorting, but better module decoupling!

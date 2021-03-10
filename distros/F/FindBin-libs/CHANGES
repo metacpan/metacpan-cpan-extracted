@@ -1,3 +1,11 @@
+-   2.21.0 Mon Mar  8 01:04:13 PM EST 2021
+
+    Minor change in taint extraction: Check for non-whitespace
+    in library path after m{ (.+) }x, remove 's' in regex to
+    avoid issues with paths including embedded newlines. Up the
+    minor number: if anyone really does depend on locating all-
+    whitespace paths or ones with embedded newlines warn me.
+
 -   2.20.2 Thu Dec 31 09:38:28 AM EST 2020
 
     Fix: Revise the 08* test to use generic regexen on non-word 

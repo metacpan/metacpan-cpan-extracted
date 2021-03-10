@@ -14,6 +14,7 @@ lib/Text/TokenStream/Token.pm
 lib/Text/TokenStream/Types.pm
 metamerge.json
 t/lexer.t
+t/next-wrapper.pm
 t/token.t
 t/tokenstream.t
 t/types.t

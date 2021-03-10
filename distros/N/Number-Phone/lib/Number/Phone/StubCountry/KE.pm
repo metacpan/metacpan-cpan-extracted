@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210204173826;
+our $VERSION = 1.20210309172132;
 
 my $formatters = [
                 {
@@ -95,33 +95,33 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"25454", "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
-"25445", "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
-"25450", "Naivasha\/Narok\/Gilgil",
-"25469", "Marsabit\/Moyale",
-"25465", "Nyahururu\/Maralal",
-"25452", "Kericho\/Bomet",
-"25443", "Voi\/Wundanyi\/Mwatate\/Taveta",
-"25457", "Kisumu\/Siaya\/Maseno",
-"25441", "Mombasa\/Mariakani\/Kilifi",
-"25456", "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga",
+$areanames{en} = {"25456", "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga",
 "25461", "Nyeri\/Karatina",
-"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",
-"25451", "Nakuru\/Njoro\/Molo",
-"25468", "Embu",
-"2542", "Nairobi",
-"25446", "Garissa\/Hola\/Wajir\/Mandera",
-"25467", "Kiambu\/Kikuyu",
-"25466", "Thika\/Ruiru",
-"25459", "Homabay\/Migori",
-"25444", "Machakos\/Makueni\/Mwingi\/Kitui",
-"25462", "Nanyuki",
 "25455", "Bungoma\/Busia",
 "25440", "Kwale\/Ukunda\/Msambweni\/Lungalunga",
-"25464", "Meru\/Maua\/Chuka",
-"25442", "Malindi\/Lamu\/Garsen",
+"25457", "Kisumu\/Siaya\/Maseno",
+"25450", "Naivasha\/Narok\/Gilgil",
+"25446", "Garissa\/Hola\/Wajir\/Mandera",
+"25445", "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
+"25467", "Kiambu\/Kikuyu",
+"25466", "Thika\/Ruiru",
+"25451", "Nakuru\/Njoro\/Molo",
+"25453", "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",
+"25465", "Nyahururu\/Maralal",
+"25441", "Mombasa\/Mariakani\/Kilifi",
+"25443", "Voi\/Wundanyi\/Mwatate\/Taveta",
 "25460", "Muranga\/Kerugoya",
-"25453", "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",};
+"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",
+"25462", "Nanyuki",
+"25464", "Meru\/Maua\/Chuka",
+"25459", "Homabay\/Migori",
+"25454", "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
+"25468", "Embu",
+"25452", "Kericho\/Bomet",
+"2542", "Nairobi",
+"25442", "Malindi\/Lamu\/Garsen",
+"25469", "Marsabit\/Moyale",
+"25444", "Machakos\/Makueni\/Mwingi\/Kitui",};
 
     sub new {
       my $class = shift;

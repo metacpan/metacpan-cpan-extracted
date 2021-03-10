@@ -6,8 +6,7 @@ use Test::More;
 use Test::Mojo;
 use Test::LongString;
 
-use File::Spec;
-use File::Basename;
+use Mojo::File qw(curfile);
 
 use lib 'lib';
 use lib '../lib';
@@ -16,7 +15,7 @@ diag( Mojolicious->VERSION );
 
 ## Webapp START
 
-my $testdir = File::Spec->catdir( dirname(__FILE__), '..', 'test' );
+my $testdir = curfile->dirname->child( '..', 'test' )->to_string;
 
 plugin('Prove' => {
   tests => {
@@ -52,7 +51,7 @@ my $close = Mojolicious->VERSION >= 5.73 ? '' : ' /';
 $t->get_ok( '/prove/test/base/file/01_success.t' )->status_is( 200 );
 is_string $t->tx->res->body, <<"HTML";
 <link href="/ppi.css" rel="stylesheet"$close>
-<script src="/jquery-1.9.1.min.js"></script>
+<script src="/jquery-3.3.1.min.js"></script>
 <script src="/ppi.js"></script>
 <script src="/prove_funcs.js"></script>
   <script src="/ppi_js.js"></script>
@@ -77,7 +76,7 @@ HTML
 $t->get_ok( '/prove/test/base/file/02_fail.t' )->status_is( 200 );
 is_string $t->tx->res->body, <<"HTML";
 <link href="/ppi.css" rel="stylesheet"$close>
-<script src="/jquery-1.9.1.min.js"></script>
+<script src="/jquery-3.3.1.min.js"></script>
 <script src="/ppi.js"></script>
 <script src="/prove_funcs.js"></script>
   <script src="/ppi_js.js"></script>
@@ -99,37 +98,20 @@ is_string $t->tx->res->body, <<"HTML";
 <div id="test_02_fail.t"><button onclick="prove( 'base', '02_fail.t', 'prove' );" value="Run tests">Run tests</button></div>
 HTML
 
-$t->get_ok( '/prove/test/base/file/01_success.t/run' )->status_is( 200 );
+$t->get_ok( '/prove/test/base/file/01_success.t/run?format=text' )->status_is( 200 );
 
 my $content_success = $t->tx->res->body;
-my $regex_success   = qr!t/../test/01_success.t .. ok
-All tests successful.
-Files=1, Tests=1, .*
-Result: PASS!;
+my $regex_success   = qr!01_success.t .. ok\s+All tests successful.\s+Files=1, Tests=1, .*\s+Result: PASS!;
 
 like_string $content_success, $regex_success;
 if ( $content_success !~ $regex_success ) {
   diag $content_success;
 }
 
-$t->get_ok( '/prove/test/base/file/02_fail.t/run' )->status_is( 200 );
+$t->get_ok( '/prove/test/base/file/02_fail.t/run?format=text' )->status_is( 200 );
 my $content_fail = $t->tx->res->body;
-my $regex_fail   = qr!t/../test/02_fail.t .. 
-Dubious, test returned 1 \(wstat 256, 0x100\)
-Failed 1/1 subtests 
-
-Test Summary Report
--------------------
-t/../test/02_fail.t \(Wstat: 256 Tests: 1 Failed: 1\)
-  Failed test:  1
-  Non-zero exit status: 1
-Files=1, Tests=1, .*
-Result: FAIL!;
-
-like_string $content_fail, $regex_fail;
-if ( $content_fail !~ $regex_fail ) {
-  diag $content_fail;
-}
+like_string $content_fail, qr!02_fail.t ..\s+Dubious, test returned 1 \(wstat 256, 0x100\)\s+Failed 1/1 subtests!;
+like_string $content_fail, qr!Test Summary Report\s+-------------------\s+.*?02_fail.t \(Wstat: 256 Tests: 1 Failed: 1\)\s+  Failed test:  1\s+  Non-zero exit status: 1\s+Files=1, Tests=1, .*\s+Result: FAIL!;
 
 done_testing();
 

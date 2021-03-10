@@ -6,7 +6,7 @@ use feature qw /postderef signatures/;
 package Vote::Count::Matrix;
 use Moose;
 
-with 
+with
   'Vote::Count::Common',
   'Vote::Count::Approval',
   'Vote::Count::Borda',
@@ -19,7 +19,7 @@ use Vote::Count::RankCount;
 
 no warnings 'experimental';
 use List::Util qw( min max sum );
-use Vote::Count::TextTableTiny qw/generate_markdown_table/;
+use Vote::Count::TextTableTiny qw/generate_table/;
 use Sort::Hash;
 use Storable 3.15 'dclone';
 
@@ -28,13 +28,13 @@ use Storable 3.15 'dclone';
 
 use YAML::XS;
 
-our $VERSION='1.09';
+our $VERSION='1.10';
 
 =head1 NAME
 
 Vote::Count::Matrix
 
-=head1 VERSION 1.09
+=head1 VERSION 1.10
 
 =cut
 
@@ -66,11 +66,11 @@ FORVOTES:
   for my $b ( keys $ballots->%* ) {
     for my $v ( values $ballots->{$b}{'votes'}->@* ) {
       if ( $v eq $A ) {
-        $countA += $ballots->{$b}{'count'};
+        $countA += $ballots->{$b}{'count'} * $ballots->{$b}{'votevalue'};
         next FORVOTES;
       }
       elsif ( $v eq $B ) {
-        $countB += $ballots->{$b}{'count'};
+        $countB += $ballots->{$b}{'count'}  * $ballots->{$b}{'votevalue'};
         next FORVOTES;
       }
     }
@@ -330,7 +330,7 @@ sub ScoreTable ( $self ) {
     # for my $c ( sort ( keys $scores->%* ) ) {
     push @rows, [ $c, $scores->{$c} ];
   }
-  return generate_markdown_table( rows => \@rows );
+  return generate_table( rows => \@rows );
 }
 
 sub MatrixTable ( $self, $options = {} ) {
@@ -365,7 +365,7 @@ sub MatrixTable ( $self, $options = {} ) {
     push @newrow, $topcount if $o_topcount;
     push @rows, \@newrow;
   }
-  return generate_markdown_table( rows => \@rows );
+  return generate_table( rows => \@rows );
 }
 
 sub PairingVotesTable ( $self ) {
@@ -388,7 +388,7 @@ sub PairingVotesTable ( $self ) {
       push @rows, [ ' ', $Cstr, $CVote, $Ostr, $OVote ];
     }
   }
-  return generate_markdown_table( rows => \@rows );
+  return generate_table( rows => \@rows );
 }
 
 1;
@@ -404,7 +404,7 @@ Condorcet Pairwise Methods require a Win-Loss Matrix. This object takes an RCV B
 
 =head1 SYNOPSIS
 
- 
+
  my $Matrix =
    Vote::Count::Matrix->new(
      'BallotSet' => $myVoteCount->BallotSet() );
@@ -458,7 +458,7 @@ Returns a MarkDown formatted table with the votes for all of the pairings.
 
 Returns the results of the pairing of two choices as a hashref.
 
- 
+
    {
     'FUDGESWIRL' =>  6,
     'loser'      =>  "STRAWBERRY",
@@ -494,7 +494,7 @@ Returns an array of the choice or choices with the fewest wins.
 
 Eliminates all Condorcet Losers from the Matrix Object's Active list. Returns a hashref. Takes an optional true false argument (default is false) to include choices that have tied but not won in the elimination.
 
- 
+
    {
      verbose => 'verbose message',
      terse   => 'terse message',

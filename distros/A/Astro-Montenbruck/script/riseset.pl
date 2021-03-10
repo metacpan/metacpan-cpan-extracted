@@ -58,7 +58,7 @@ sub print_twilight_row {
             title_width => 7 );
     }
     else {
-        $theme->print_data->(' — ');
+        $theme->print_data( $TWILIGHT_TITLE{$evt}, ' --------', title_width => 7 );      
     }
 }
 

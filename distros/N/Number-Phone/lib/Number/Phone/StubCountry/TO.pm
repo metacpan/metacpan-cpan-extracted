@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210204173827;
+our $VERSION = 1.20210309172133;
 
 my $formatters = [
                 {
@@ -42,7 +42,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '[5-8]',
+                  'leading_digits' => '[5-9]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
@@ -71,15 +71,18 @@ my $validators = {
           )\\d{3}
         ',
                 'mobile' => '
-          6(?:
-            3[02]|
-            8[5-9]
-          )\\d{4}|
           (?:
-            6[09]|
-            7\\d|
-            8[46-9]
-          )\\d{5}
+            6(?:
+              [09]\\d|
+              3[02]|
+              8[15-9]
+            )|
+            (?:
+              7\\d|
+              8[46-9]
+            )\\d|
+            999
+          )\\d{4}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -88,33 +91,33 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"67629", "Pea",
-"67641", "Masilamea",
-"67631", "Muʻa",
-"67675", "Vava\’u",
-"67679", "Vava\’u",
-"67635", "Nakolo",
-"67650", "\‘Eua",
+$areanames{en} = {"67672", "Vava\’u",
+"67674", "Vava\’u",
+"67632", "Muʻa",
+"6762", "Nuku\'alofa",
+"67642", "Masilamea",
 "67669", "Ha\’apai",
-"67633", "Kolonga",
-"67671", "Vava\’u",
-"67685", "Niuas",
-"67643", "Matangiake",
-"67630", "Pea",
 "67634", "Kolonga",
+"67679", "Vava\’u",
+"67638", "Vaini",
+"67671", "Vava\’u",
+"67629", "Pea",
+"67685", "Niuas",
+"67660", "Ha\’apai",
+"67631", "Muʻa",
+"67633", "Kolonga",
+"67641", "Masilamea",
+"67680", "Niuas",
+"67643", "Matangiake",
 "67640", "Kolovai",
 "67676", "Vava\’u",
-"67632", "Muʻa",
-"67660", "Ha\’apai",
-"67642", "Masilamea",
-"67680", "Niuas",
-"67636", "Nakolo",
-"67672", "Vava\’u",
+"67630", "Pea",
+"67675", "Vava\’u",
 "67637", "Vaini",
-"6762", "Nuku\'alofa",
-"67638", "Vaini",
+"67636", "Nakolo",
 "67670", "Vava\’u",
-"67674", "Vava\’u",};
+"67650", "\‘Eua",
+"67635", "Nakolo",};
 
     sub new {
       my $class = shift;

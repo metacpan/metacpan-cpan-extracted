@@ -8,7 +8,6 @@ build_requires:
   Test::CheckManifest: '0.9'
   Test::Harness: '3.38'
   Test::More: '1.30'
-  Test::Number::Delta: '1.06'
   Test::Pod::Coverage: '1.08'
   Test::Simple: '1.30'
 configure_requires:
@@ -124,5 +123,6 @@ requires:
   Memoize: '1.03'
   Readonly: '2.05'
   Term::ANSIColor: '1.00'
+  Test::Number::Delta: '1.06'
 version: '1.2'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -105,7 +105,7 @@ Functions dealing with ecliptic obliquity.
 
 Calculates the effects of nutation on the ecliptic longitude and on the
 obliquity of the ecliptic with accuracy of about 1 arcsecond.
-Given time in Julian centuries since J200, return delta-psi and delta-eps.
+Given time in Julian centuries since J2000, return delta-psi and delta-eps.
 
 =head3 Arguments
 
@@ -140,7 +140,7 @@ of a planet and returns ecliptic rectangular coordinates, referred to the I<equi
 
 =head2 obliquity( $t )
 
-Given time in Julian centuries since J200, return I<mean obliquity of the ecliptic>,
+Given time in Julian centuries since J2000, return I<mean obliquity of the ecliptic>,
 in arc-degrees.
 
 =head1 AUTHOR

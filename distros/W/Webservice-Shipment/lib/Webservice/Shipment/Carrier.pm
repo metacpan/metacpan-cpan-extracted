@@ -5,6 +5,7 @@ use Mojo::Base -base;
 use Mojo::URL;
 use Mojo::UserAgent;
 use Mojo::IOLoop;
+use Mojo::IOLoop::Delay;
 
 use Carp;
 our @CARP_NOT = ('Webservice::Shipment'); # don't carp from AUTOLOAD
@@ -59,7 +60,7 @@ sub track {
     return $self->parse($id, $res);
   }
 
-  Mojo::IOLoop->delay(
+  Mojo::IOLoop::Delay->new->steps(
     sub { $self->request($id, shift->begin) },
     sub {
       my ($delay, $err, $res) = @_;

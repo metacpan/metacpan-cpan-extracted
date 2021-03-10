@@ -1,31 +1,33 @@
 ---
-abstract: 'Filter for L<Data::Printer> that handles L<PDL> data.'
+abstract: 'Filter for Data::Printer that handles PDL data.'
 author:
   - 'Zakariyya Mughal <zmughal@cpan.org>'
 build_requires:
-  Data::Printer: 0.36
-  PDL: 0
-  Test::More: 0
-  perl: 5.006
+  Data::Printer: v1.0.0
+  PDL: '0'
+  Test::More: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-  perl: 5.006
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-Printer-Filter-PDL
 requires:
-  Data::Printer: 0.36
-  Data::Printer::Filter: 0
-  Term::ANSIColor: 0
-  constant: 0
-  perl: 5.006
-  strict: 0
-  warnings: 0
+  Data::Printer: v1.0.0
+  Data::Printer::Filter: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
-  homepage: https://github.com/zmughal/Data-Printer-Filter-PDL
-  repository: https://github.com/zmughal/Data-Printer-Filter-PDL.git
-version: 0.007
+  homepage: https://github.com/EntropyOrg/p5-Data-Printer-Filter-PDL
+  repository: https://github.com/EntropyOrg/p5-Data-Printer-Filter-PDL.git
+version: '1.000'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,5 +1,5 @@
 package OpenTracing::WrapScope;
-our $VERSION = 'v0.107.0';
+our $VERSION = 'v0.107.1';
 use strict;
 use warnings;
 use warnings::register;
@@ -35,8 +35,8 @@ sub _register_to_install {
 
 sub _split_signature {
     my ($sig) = @_;
-    $sig =~ s/\s*\((.*)\)\s*\z//;
-    return ($sig, $1 // ());    # just the name left over
+    return $sig unless $sig =~ s/\s*\((.*)\)\s*\z//;
+    return ($sig, $1);    # just the name left over
 }
 
 # try to install any available subs whenever we get new code

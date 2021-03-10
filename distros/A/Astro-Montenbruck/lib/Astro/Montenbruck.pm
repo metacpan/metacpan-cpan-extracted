@@ -3,7 +3,7 @@ use 5.22.0;
 use strict;
 use warnings;
 
-our $VERSION = 1.20;
+our $VERSION = 1.24;
 
 1;
 __END__

@@ -1,0 +1,40 @@
+---
+abstract: 'A scrypt encoder for Crypt::Passphrase'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-Passphrase-Scrypt
+provides:
+  Crypt::Passphrase::Scrypt:
+    file: lib/Crypt/Passphrase/Scrypt.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Crypt::Passphrase::Encoder: '0'
+  Crypt::ScryptKDF: '0'
+  MIME::Base64: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Leont/crypt-passphrase-scrypt/issues
+  repository: git://github.com/Leont/crypt-passphrase-scrypt.git
+version: '0.001'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

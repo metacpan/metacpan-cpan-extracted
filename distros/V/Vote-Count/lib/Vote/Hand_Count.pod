@@ -2,11 +2,11 @@
 
 =pod
 
-=head1 VERSION 1.09
+=head1 VERSION 1.10
 
 =head1 NAME
 
-HandI<Count>Methods
+Hand Count Methods
 
 
 =head1 Description
@@ -74,7 +74,7 @@ Elect a Majority Winner if present.
 
 =item *
 
-Start a sheet for each choice with a Wins and Losses Column. 
+Start a sheet for each choice with a Wins and Losses Column.
 
 
 
@@ -202,7 +202,7 @@ Your Election Rules should specify a tiebreaker, the default is Eliminate All; t
 
 =item *
 
-Determine the IRV Winner. 
+Determine the IRV Winner.
 
 
 
@@ -220,7 +220,7 @@ If there is no Condorcet Winner or the Condorcet Winner is the IRV Winner, elect
 
 =item *
 
-Repeat the Condorcet Process. Treat all ballots with the IRV Winner as the First Choice as ballots only for the IRV Winner. The pairings involving the IRV Winner will be unchanged, but other pairings will need to be rechecked (the approval count will change if you are using it to shortcut). If there is a Condorcet Winner, elect the FIRST Condorcet Winner. 
+Repeat the Condorcet Process. Treat all ballots with the IRV Winner as the First Choice as ballots only for the IRV Winner. The pairings involving the IRV Winner will be unchanged, but other pairings will need to be rechecked (the approval count will change if you are using it to shortcut). If there is a Condorcet Winner, elect the FIRST Condorcet Winner.
 
 
 

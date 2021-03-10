@@ -5,7 +5,7 @@ use 5.022;
 # since later versions may break things.
 use Test2::V0;
 use Test2::Bundle::More;
-use Test::Exception;
+use Test2::Tools::Exception qw/dies lives/;
 
 use Path::Tiny;
 
@@ -13,9 +13,9 @@ use Vote::Count;
 use Vote::Count::ReadBallots 'read_ballots', 'read_range_ballots';
 use Vote::Count::RankCount;
 
-use feature qw/signatures postderef/;
+use Data::Dumper;
 
-# my $VC1 = Vote::Count->new( ballotset => read_ballots('t/data/data2.txt'), );
+use feature qw/signatures postderef/;
 
 # my $tc1       = $VC1->TopCount();
 my %set1 = (
@@ -128,13 +128,29 @@ my $bigtie = {
   'BRONZE' => 5,
 };
 
-my $bt  = Vote::Count::RankCount->Rank($bigtie);
-my $bto = $bt->HashByRank();
-is_deeply(
-  $bto->{2},
-  [qw/ BRASS BRONZE COPPER PEARL RUBY/],
-  'Check that the arrayref from HashByRank is sorted.'
-);
+subtest 'HashByRank HashWithOrder' => sub {
+  my $bt  = Vote::Count::RankCount->Rank($bigtie);
+  my $bto = $bt->HashByRank();
+  my $btr = $bt->HashWithOrder();
+  is_deeply(
+    $bto->{2},
+    [qw/ BRASS BRONZE COPPER PEARL RUBY/],
+    'Check that the arrayref from HashByRank is sorted.'
+  );
+  is_deeply(
+    $btr,
+    {
+      'BRASS'  => 2,
+      'BRONZE' => 2,
+      'SILVER' => 1,
+      'COPPER' => 2,
+      'PEARL'  => 2,
+      'RUBY'   => 2,
+      'GOLD'   => 1
+    },
+    'HashWithOrder reflects tied positions'
+  );
+};
 
 subtest 'Bigger Than 10' => sub {
 
@@ -164,6 +180,60 @@ LONGTABLE
   # note $brexit->Approval->RankTable();
   is( $brexit->Approval->RankTable(),
     $longtable, 'Check a long table (sorting with more than 10 choices)' );
+};
+
+subtest 'RankTableWeighted' => sub {
+
+  my $weightable = q%| Rank | Choice     | Votes | VoteValue |
+|:-----|:-----------|------:|----------:|
+| 1    | VANILLA    |  7.00 |       700 |
+| 2    | MINTCHIP   |  5.00 |       500 |
+| 3    | PISTACHIO  |  2.00 |       200 |
+| 4    | CHOCOLATE  |  1.00 |       100 |
+| 5    | CARAMEL    |  0.00 |         0 |
+| 5    | ROCKYROAD  |  0.00 |         0 |
+| 5    | RUMRAISIN  |  0.00 |         0 |
+| 5    | STRAWBERRY |  0.00 |         0 |
+%;
+
+  my $weighted = Vote::Count->new(
+    BallotSet => read_ballots('t/data/data2.txt'),
+    VoteValue => 100
+  );
+
+  my $ballots = $weighted->GetBallots();
+  for my $b ( keys $ballots->%* ) {
+    $ballots->{$b}->{'votevalue'} = 100;
+  }
+  is( $weighted->TopCount()->RankTableWeighted(100),
+    $weightable, 'generate weighted table' );
+};
+
+subtest 'newFromList' => sub {
+  my @quartet  = ( 'VIOLIN', 'VIOLA', 'GAMBA', 'CELLO' );
+  my $fromlist = Vote::Count::RankCount->newFromList(@quartet);
+  is( $fromlist->Leader()->{'winner'},
+    'VIOLIN', 'from list has correct leader' );
+  my $orderd = $fromlist->HashWithOrder();
+  my $rawc   = $fromlist->RawCount();
+  for my $instrument (@quartet) {
+    is(
+      abs( $rawc->{$instrument} ),
+      $orderd->{$instrument},
+      "$instrument Position in Order is absolute value of raw count: " .
+      "abs $rawc->{$instrument} == $orderd->{$instrument}"
+    );
+  }
+  like(
+    dies { $brexit->TopCount->OrderedList; },
+    qr/OrderedList may only be used/,
+    "DIES The OrderedList method is only valid when created from one."
+  );
+  is_deeply(
+    [ $fromlist->OrderedList() ],
+    [ @quartet ],
+    'OrderedList returned the original list.'
+  );
 };
 
 done_testing();

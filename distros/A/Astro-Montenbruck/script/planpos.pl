@@ -345,7 +345,7 @@ B<D> decimal: arc-degrees or hours
 
 =item * 
 
-B<S> sexadecimal: degrees (hours), minutes, seconds
+B<S> sexagesimal: degrees (hours), minutes, seconds
 
 =back
 

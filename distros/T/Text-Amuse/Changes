@@ -1,5 +1,13 @@
 Revision history for perl module Text::Amuse
 
+1.74 2021-03-10
+
+ - Fix manifest.
+
+1.73 2021-03-09
+
+ - Remove redundant <br> from <verse> environment
+
 1.72 2021-02-06
 
  - Support <sc> (small caps) and <sf> (sans-serif) inline tags. GH#65

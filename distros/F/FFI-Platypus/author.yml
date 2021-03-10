@@ -137,6 +137,12 @@ pod_spelling_system:
     - kindof
     - thet
     - unitof
+    - const
+    - IKEGAMI
+    - BMP
+    - WebAssembly
+    - sensical
+    - eXtensions
 
 pod_coverage:
   skip: 0

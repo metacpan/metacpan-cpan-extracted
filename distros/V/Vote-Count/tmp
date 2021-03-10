@@ -1,0 +1,304 @@
+t/cascademethod.t .. 
+# Seeded srand with seed '20210306' from local date.
+ok 1 - first run winners ***
+ok 2 - second run winners
+# Sat Mar  6 02:39:39 2021
+# Order for Random Tie Breakers is: George_BLACK_WDCP, Brian_WALKER_Con, Andrew_MUIR_Ind, Karen_CONAGHAN_SNP, Elizabeth_RUINE_Lab, David_MCBRIDE_Lab, Iain_MCLAREN_SNP
+# Applying Floor Rule of 1% First Choice Votes.
+# None Eliminated
+# ## Tie Breaker Precedence:
+# 1. George_BLACK_WDCP
+# 2. Brian_WALKER_Con
+# 3. Andrew_MUIR_Ind
+# 4. Karen_CONAGHAN_SNP
+# 5. Elizabeth_RUINE_Lab
+# 6. David_MCBRIDE_Lab
+# 7. Iain_MCLAREN_SNP
+# ## Round 1
+# | Rank | Choice              |   Votes | VoteValue | Approval | Approval Value |
+# |:-----|:--------------------|--------:|----------:|---------:|---------------:|
+# | 1    | David_MCBRIDE_Lab   | 1762.00 |    176200 |  3937.00 |         393700 |
+# | 2    | Karen_CONAGHAN_SNP  | 1499.00 |    149900 |  3205.00 |         320500 |
+# | 3    | Brian_WALKER_Con    |  957.00 |     95700 |  2427.00 |         242700 |
+# | 4    | Iain_MCLAREN_SNP    |  809.00 |     80900 |  3044.00 |         304400 |
+# | 5    | George_BLACK_WDCP   |  792.00 |     79200 |  2909.00 |         290900 |
+# | 6    | Elizabeth_RUINE_Lab |  584.00 |     58400 |  3499.00 |         349900 |
+# | 7    | Andrew_MUIR_Ind     |  159.00 |     15900 |  2276.00 |         227600 |
+# 
+# Active Vote Value: 656200 (6562) 
+# Quota is 131241 (1312)
+# Elected: David_MCBRIDE_Lab, Karen_CONAGHAN_SNP
+# | Choice             | Charge | Value Charged | Votes Charged | Surplus |
+# |:-------------------|:-------|--------------:|--------------:|--------:|
+# | David_MCBRIDE_Lab  | 74     |        131545 |          1851 |     304 |
+# | Karen_CONAGHAN_SNP | 87     |        132155 |          1566 |     914 |
+# 
+# ## Round 2
+# | Rank | Choice              |  Votes | VoteValue | Approval | Approval Value |
+# |:-----|:--------------------|-------:|----------:|---------:|---------------:|
+# | 1    | Iain_MCLAREN_SNP    | 983.85 |     98385 |  1602.24 |         160224 |
+# | 2    | Brian_WALKER_Con    | 980.92 |     98092 |  1790.78 |         179078 |
+# | 3    | Elizabeth_RUINE_Lab | 916.28 |     91628 |  1995.24 |         199524 |
+# | 4    | George_BLACK_WDCP   | 825.41 |     82541 |  1967.35 |         196735 |
+# | 5    | Andrew_MUIR_Ind     | 169.92 |     16992 |  1517.18 |         151718 |
+# 
+# Active Vote Value: 651338 (6513) 
+# Quota is 130268 (1302)
+# No Choices Meet Quota
+# Defeating: Andrew_MUIR_Ind
+# ## Round 3
+# | Rank | Choice              |   Votes | VoteValue | Approval | Approval Value |
+# |:-----|:--------------------|--------:|----------:|---------:|---------------:|
+# | 1    | Brian_WALKER_Con    | 1009.70 |    100970 |  1790.78 |         179078 |
+# | 2    | Iain_MCLAREN_SNP    |  992.76 |     99276 |  1602.24 |         160224 |
+# | 3    | Elizabeth_RUINE_Lab |  938.27 |     93827 |  1995.24 |         199524 |
+# | 4    | George_BLACK_WDCP   |  886.27 |     88627 |  1967.35 |         196735 |
+# 
+# Active Vote Value: 646400 (6464) 
+# Quota is 129281 (1292)
+# No Choices Meet Quota
+# Defeating: George_BLACK_WDCP
+# ## Round 4
+# | Rank | Choice              |   Votes | VoteValue | Approval | Approval Value |
+# |:-----|:--------------------|--------:|----------:|---------:|---------------:|
+# | 1    | Iain_MCLAREN_SNP    | 1247.65 |    124765 |  1602.24 |         160224 |
+# | 2    | Brian_WALKER_Con    | 1147.60 |    114760 |  1790.78 |         179078 |
+# | 3    | Elizabeth_RUINE_Lab | 1104.45 |    110445 |  1995.24 |         199524 |
+# 
+# Active Vote Value: 613670 (6136) 
+# Quota is 122735 (1227)
+# Elected: Iain_MCLAREN_SNP
+# | Choice             | Charge | Value Charged | Votes Charged | Surplus |
+# |:-------------------|:-------|--------------:|--------------:|--------:|
+# | David_MCBRIDE_Lab  | 59     |        123189 |          2119 |     454 |
+# | Iain_MCLAREN_SNP   | 61     |        124512 |          2392 |    1777 |
+# | Karen_CONAGHAN_SNP | 53     |        125272 |          2596 |    2537 |
+# 
+# ## Round 5
+# | Rank | Choice              |   Votes | VoteValue | Approval | Approval Value |
+# |:-----|:--------------------|--------:|----------:|---------:|---------------:|
+# | 1    | Elizabeth_RUINE_Lab | 1257.66 |    125766 |  1739.11 |         173911 |
+# | 2    | Brian_WALKER_Con    | 1151.44 |    115144 |  1500.63 |         150063 |
+# 
+# Active Vote Value: 613883 (6138) 
+# Quota is 122777 (1227)
+# Elected: Elizabeth_RUINE_Lab
+# | Choice              | Charge | Value Charged | Votes Charged | Surplus |
+# |:--------------------|:-------|--------------:|--------------:|--------:|
+# | David_MCBRIDE_Lab   | 56     |        123265 |          2610 |     488 |
+# | Elizabeth_RUINE_Lab | 89     |        122967 |          2114 |     190 |
+# | Iain_MCLAREN_SNP    | 54     |        124437 |          2411 |    1660 |
+# | Karen_CONAGHAN_SNP  | 49     |        124641 |          2625 |    1864 |
+# 
+# Elected: David_MCBRIDE_Lab, Elizabeth_RUINE_Lab, Iain_MCLAREN_SNP, Karen_CONAGHAN_SNP
+# Sat Mar  6 02:39:39 2021
+# Order for Random Tie Breakers is: CARAMEL, STRAWBERRY, VANILLA, RUMRAISIN, SOGGYCHIPS, CHOCOLATE, CHOCOANTS, ROCKYROAD, TOAD, MINTCHIP, VOMIT, PISTACHIO
+# Applying Floor Rule of 1% First Choice Votes.
+# Removing: ROCKYROAD: 0, minimum is 2.
+# Removing: RUMRAISIN: 0, minimum is 2.
+# Removing: SOGGYCHIPS: 1, minimum is 2.
+# Removing: STRAWBERRY: 0, minimum is 2.
+# Removing: CARAMEL: 0, minimum is 2.
+# Floor Rule Eliminated: 
+# ROCKYROAD, RUMRAISIN, SOGGYCHIPS, STRAWBERRY, CARAMEL
+# Remaining: 
+# TOAD, CHOCOANTS, VANILLA, CHOCOLATE, MINTCHIP, PISTACHIO, VOMIT
+# ## Tie Breaker Precedence:
+# 1. CARAMEL
+# 2. STRAWBERRY
+# 3. VANILLA
+# 4. RUMRAISIN
+# 5. SOGGYCHIPS
+# 6. CHOCOLATE
+# 7. CHOCOANTS
+# 8. ROCKYROAD
+# 9. TOAD
+# 10. MINTCHIP
+# 11. VOMIT
+# 12. PISTACHIO
+# ## Round 1
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | VANILLA   | 94.00 |      9400 |   149.00 |          14900 |
+# | 2    | MINTCHIP  | 67.00 |      6700 |   122.00 |          12200 |
+# | 3    | CHOCOLATE | 34.00 |      3400 |   108.00 |          10800 |
+# | 4    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 5    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 5    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 6    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 22400 (224) 
+# Quota is 4481 (44)
+# Elected: MINTCHIP, VANILLA
+# | Choice   | Charge | Value Charged | Votes Charged | Surplus |
+# |:---------|:-------|--------------:|--------------:|--------:|
+# | MINTCHIP | 67     |          4489 |            67 |       8 |
+# | VANILLA  | 48     |          4512 |            94 |      31 |
+# 
+# ## Round 2
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | CHOCOLATE | 60.00 |      6000 |    84.00 |           8400 |
+# | 2    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 3    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 3    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 4    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 17901 (179) 
+# Quota is 3581 (35)
+# Elected: CHOCOLATE
+# | Choice    | Charge | Value Charged | Votes Charged | Surplus |
+# |:----------|:-------|--------------:|--------------:|--------:|
+# | CHOCOLATE | 43     |          3612 |            84 |      31 |
+# | MINTCHIP  | 36     |          3636 |           101 |      55 |
+# | VANILLA   | 31     |          3628 |           128 |      47 |
+# 
+# ## Round 3
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# Defeating: TOAD
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# 
+# Active Vote Value: 13576 (135) 
+# Quota is 2716 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# ## Round 4
+# | Rank | Choice    | Votes | VoteValue | Approval | Approval Value |
+# |:-----|:----------|------:|----------:|---------:|---------------:|
+# | 1    | PISTACHIO | 21.00 |      2100 |    21.00 |           2100 |
+# | 2    | CHOCOANTS |  3.00 |       300 |     3.00 |            300 |
+# | 2    | VOMIT     |  3.00 |       300 |     3.00 |            300 |
+# | 3    | TOAD      |  2.00 |       200 |     3.00 |            300 |
+# 
+# Active Vote Value: 13776 (137) 
+# Quota is 2756 (27)
+# No Choices Meet Quota
+# Elected: CHOCOLATE, MINTCHIP, VANILLA
+1..2
+ok
+All tests successful.
+Files=1, Tests=2,  1 wallclock secs ( 0.02 usr  0.00 sys +  1.54 cusr  0.02 csys =  1.58 CPU)
+Result: PASS

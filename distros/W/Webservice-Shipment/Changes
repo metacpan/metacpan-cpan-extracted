@@ -1,5 +1,8 @@
 Revision history for Perl module Webservice::Shipment
 
+0.06 2021-03-08
+  - Fix compatibility with Mojolicious 9.0
+
 0.05 2017-11-13
   - Add FedEx carrier (rperry)
   - Protect against upcoming changes to Mojo::IOLoop::Delay yet again

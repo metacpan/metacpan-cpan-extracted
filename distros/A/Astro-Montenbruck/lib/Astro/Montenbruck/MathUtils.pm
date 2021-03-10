@@ -255,7 +255,7 @@ minutes, int, and seconds, float.
 
 =over
 
-=item * B<places> (optional) amount of required sexadecimal values to be returned (1-3);
+=item * B<places> (optional) amount of required sexagesimal values to be returned (1-3);
                   default = 3 (degrees/hours, minutes, seconds)
 
 =back
@@ -296,13 +296,13 @@ Converts decimal degrees to zodiac sign number (zero based), zodiac degrees, min
 
 =head2 ddd($deg[, $min[, $sec]])
 
-Converts sexadecimal values to decimal.
+Converts sexagesimal values to decimal.
 
 =head3 Arguments
 
 =over
 
-1 to 3 sexadecimal values, such as: degrees, minutes and
+1 to 3 sexagesimal values, such as: degrees, minutes and
 seconds, or degrees and minutes, or just degrees:
 
 =over
@@ -414,7 +414,7 @@ Calculates shortest arc in radians between $x and $y.
 
 =head2 angle_s($x1, $y1, $x2, $y2)
 
-Calculates arc between 2 points on a sphera.
+Calculates arc between 2 points on a sphere.
 Expected arguments: 2 pairs of coordinates (X, Y) of the 2 points.
 
 The coordinates may be ecliptic, equatorial or horizontal.

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20210204173823;
+our $VERSION = 1.20210309172128;
 
 my $formatters = [
                 {
@@ -62,33 +62,33 @@ my $validators = {
                 'voip' => '5[34]\\d{5}'
               };
 my %areanames = ();
-$areanames{en} = {"67357", "Temburong",
-"67329", "Brunei\ Muara",
-"673225", "Brunei\ Muara",
-"67356", "Temburong",
-"67325", "Brunei\ Muara",
-"673222", "Brunei\ Muara",
-"673226", "Brunei\ Muara",
-"67358", "Temburong",
-"67323", "Brunei\ Muara",
-"67321", "Brunei\ Muara",
-"67350", "Temburong",
-"673224", "Brunei\ Muara",
-"673220", "Brunei\ Muara",
-"67352", "Temburong",
-"673227", "Brunei\ Muara",
-"67359", "Temburong",
-"67327", "Brunei\ Muara",
+$areanames{en} = {"67350", "Temburong",
 "6733", "Beliat",
-"67355", "Temburong",
-"673223", "Brunei\ Muara",
-"6734", "Tutong",
-"67326", "Brunei\ Muara",
-"67328", "Brunei\ Muara",
-"67351", "Temburong",
-"67320", "Brunei\ Muara",
 "67324", "Brunei\ Muara",
-"673221", "Brunei\ Muara",};
+"6734", "Tutong",
+"673222", "Brunei\ Muara",
+"67356", "Temburong",
+"67355", "Temburong",
+"67357", "Temburong",
+"67328", "Brunei\ Muara",
+"673226", "Brunei\ Muara",
+"67351", "Temburong",
+"673224", "Brunei\ Muara",
+"673227", "Brunei\ Muara",
+"67329", "Brunei\ Muara",
+"67321", "Brunei\ Muara",
+"67359", "Temburong",
+"67323", "Brunei\ Muara",
+"67358", "Temburong",
+"673220", "Brunei\ Muara",
+"673223", "Brunei\ Muara",
+"67326", "Brunei\ Muara",
+"673221", "Brunei\ Muara",
+"67325", "Brunei\ Muara",
+"673225", "Brunei\ Muara",
+"67327", "Brunei\ Muara",
+"67320", "Brunei\ Muara",
+"67352", "Temburong",};
 
     sub new {
       my $class = shift;

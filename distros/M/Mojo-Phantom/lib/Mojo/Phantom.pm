@@ -2,7 +2,7 @@ package Mojo::Phantom;
 
 use Mojo::Base -base;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 $VERSION = eval $VERSION;
 
 use Mojo::Phantom::Process;
@@ -213,7 +213,7 @@ Please note that this class is not yet as stable as the public api for the test 
 =head1 WARNING
 
 The upstream phantom.js has been retired in favor of headless chrome.
-A L<Mojo::Chrome> (and related L<Test::Mojo::Role::Chrome>) is planned and is already in the works (perhaps it is released already who knows?!).
+A C<Mojo::Chrome> (and related C<Test::Mojo::Role::Chrome>) was planned but has been stalled for lack of certain necessary usage documentation that has not been forthcoming.
 While this module will continue to function, just know that it depends on a project that is defunct.
 
 =head1 ATTRIBUTES

@@ -298,4 +298,19 @@ subtest 'ScoreTable' => sub {
   );
 };
 
+subtest 'weighted' => sub {
+  is( $M1->GetPairResult( 'VANILLA','CHERRY')->{'tie'}, 1,
+    'Unweighted Pair Result that is a tie');
+  $M1->{'BallotSet'}{'ballots'}{'VANILLA:BUBBLEGUM:MINTCHIP:CHOCOLATE'}{'votevalue'} = .1;
+  $M1->{'BallotSet'}{'ballots'}{'VANILLA:CHOCOLATE:STRAWBERRY'}{'votevalue'} = .1;
+  my $W =
+  Vote::Count::Matrix->new( 'BallotSet' => $M1->{'BallotSet'},
+  )->GetPairResult( 'VANILLA','CHERRY');
+  is( $W->{'tie'}, 0,
+    'unweighted this pair was a tie, weighted it is not a tie');
+  is( $W->{'winner'}, 'CHERRY',
+    'unweighted this pair was a tie, weighted it has a winner');
+  is( $W->{'VANILLA'}, 0.6, 'weight of choice reduced in weighting shows decimal');
+};
+
 done_testing();

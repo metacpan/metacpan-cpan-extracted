@@ -7,7 +7,7 @@ use FFI::Platypus;
 use base qw( Exporter );
 
 # ABSTRACT: Memory functions for FFI
-our $VERSION = '1.34'; # VERSION
+our $VERSION = '1.38'; # VERSION
 
 
 our @EXPORT = qw( malloc free calloc realloc memcpy memset strdup strndup strcpy );
@@ -33,8 +33,17 @@ eval {
   $ffi->attach(strdup  => ['string'] => 'opaque' => '$');
   $_strdup_impl = 'libc';
 };
+if($@ && $^O eq 'MSWin32')
+{
+  eval {
+    die "do not use c impl" if ($ENV{FFI_PLATYPUS_MEMORY_STRDUP_IMPL}||'libc') eq 'ffi';
+    $ffi->attach([ _strdup => 'strdup' ] => ['string'] => 'opaque' => '$');
+    $_strdup_impl = 'libc';
+  };
+}
 if($@)
 {
+  warn "using bundled strdup";
   $_strdup_impl = 'ffi';
   $ffi->attach([ ffi_platypus_memory__strdup => 'strdup' ] => ['string'] => 'opaque' => '$');
 }
@@ -53,6 +62,10 @@ if($@)
   $ffi->attach([ ffi_platypus_memory__strndup => 'strndup' ] => ['string','size_t'] => 'opaque' => '$$');
 }
 
+# used internally by FFI::Platypus::Type::WideString, may go away.
+eval { $ffi->attach( [ wcslen  => '_wcslen' ]  => [ 'opaque'           ] => 'size_t' => '$' ) };
+eval { $ffi->attach( [ wcsnlen => '_wcsnlen' ] => [ 'string', 'size_t' ] => 'size_t' => '$$' ) };
+
 1;
 
 __END__
@@ -67,7 +80,7 @@ FFI::Platypus::Memory - Memory functions for FFI
 
 =head1 VERSION
 
-version 1.34
+version 1.38
 
 =head1 SYNOPSIS
 
@@ -208,6 +221,8 @@ Håkon Hægland (hakonhagland, HAKONH)
 Meredith (merrilymeredith, MHOWARD)
 
 Diab Jerius (DJERIUS)
+
+Eric Brine (IKEGAMI)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+use Mojolicious::Lite;
+
+use Mojo::File qw(path);
+
+my $dir   = $ARGV[0] // path(__FILE__)->dirname->child('..', 't')->to_string;
+my $label = path( $dir )->to_array;
+
+plugin(
+    Prove => {
+        tests => {
+            $label->[-1] => $dir,
+        },
+    },
+);
+
+get '/' => sub {
+    my $c = shift;
+    return $c->redirect_to( $c->url_for('mpp_prove_list') );
+};
+
+app->start;

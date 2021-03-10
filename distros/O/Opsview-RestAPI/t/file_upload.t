@@ -43,6 +43,12 @@ EOF
             remote_file => basename( $fh->filename ),
         );
     };
+
+    # No point continuing if the uplaods are blocked
+    skip $trap->die->message if $trap->die->message =~ m/Upload blocked/;
+
+    diag "RETURN: ", $trap->die;
+
     $trap->did_return(" ... returned");
     $trap->quiet(" ... quietly");
     is( $result->{return_code}, 0, "Uploaded plugin successfully" );

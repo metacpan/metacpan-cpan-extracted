@@ -1,5 +1,5 @@
 %= stylesheet '/ppi.css'
-%= javascript '/jquery-1.9.1.min.js'
+%= javascript '/jquery-3.3.1.min.js'
 %= javascript '/ppi.js'
 %= javascript '/prove_funcs.js'
 %= ppi $code, line_numbers => 1 

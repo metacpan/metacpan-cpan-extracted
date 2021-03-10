@@ -12,6 +12,7 @@ my $build = Module::Build->new(
   configure_requires => { 'Module::Build' => 0.38 },
   requires => {
     'Mojolicious'  => '5.08',
+    'Mojo::IOLoop::Delay' => 0,
     'IO::Pipely'   => 0,
     'Perl::OSType' => 0,
   },

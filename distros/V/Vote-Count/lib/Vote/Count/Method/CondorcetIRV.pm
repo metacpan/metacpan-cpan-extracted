@@ -8,13 +8,13 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='1.09';
+our $VERSION='1.10';
 
 =head1 NAME
 
 Vote::Count::Method::CondorcetIRV
 
-=head1 VERSION 1.09
+=head1 VERSION 1.10
 
 =cut
 
@@ -26,10 +26,11 @@ Vote::Count::Method::CondorcetIRV
 
   use Vote::Count::Method::CondorcetIRV ;
 
-  my $SmithIRV = Vote::Count::Method::CondorcetIRV->new(
+  my $Election = Vote::Count::Method::CondorcetIRV->new(
     'BallotSet' => $someballotset,
+    'TieBreakMethod' => 'precedence', # defaults to all
   );
-  my $result = $SmithIRV->SmithSetIRV() ;
+  my $result = $Election->SmithSetIRV() ;
   say "Winner is: " . $result->{'winner'};
   say $Election->logv();
 
@@ -49,7 +50,7 @@ SmithSetIRV is exported and requires a Vote::Count object, an optional second ar
 
 =head3 Simplicity
 
-SmithSet IRV is easy to understand but requires a full matrix and thus is harder to handcount than Benham. An aggressive Floor Rule like TCA (see Floor module) is recommended. If it is desired to Hand Count, a more aggressive Floor Rule would be required, like 15% of First Choice votes. 15% First Choice limits to 6 choices, but 6 choices still require 15 pairings to complete the Matrix.
+SmithSet IRV is easy to understand but requires a full matrix and thus is harder to handcount than Benham. If it desired to handcount, an aggressive Floor Rule like TCA (see Floor module) is recommended, or an Approval or Top Count Floor of up to 15%. 15% Top Count permits at most 6 choices, but 6 choices still require 15 pairings to complete the Matrix.
 
 =head3 Later Harm
 
@@ -57,7 +58,7 @@ When there is no Condorcet Winner this method is Later Harm Sufficient. There mi
 
 The easiest way to imagine a case where a choice not in the Smith Set changed the outcome is by cloning the winner, such that there is a choice defeating them in early Top Count but not defeating them. The negative impact of the clone is an established weakness of IRV. It would appear that any possible Later Harm issue in addition to being very much at the edge is more than offset by consistency improvement.
 
-Smith Set IRV still inherits the Later Harm failure of requiring a Condorcet Winner, but it has the lowest possible Later Harm effect for a Condorcet Method. Woodhull and restricting Pairwise Opposition to the Smith Set have equal Later Harm effect to Smith Set IRV.
+Smith Set IRV still inherits the Later Harm failure of requiring a Condorcet Winner, but it has the lowest possible Later Harm effect for a Smith compliant Method. Woodhull and restricting Pairwise Opposition to the Smith Set have equal Later Harm effect to Smith Set IRV.
 
 =head3 Condorcet Criteria
 
@@ -69,9 +70,9 @@ By meeting the three Condorcet Criteria a level of consistency is guaranteed. Wh
 
 Smith Set IRV is therefore substantially more consistent than basic IRV, but less consistent than Condorcet methods like SSD that focus on Consistency.
 
-=head1 Smith Set Restricted MinMax (See Vote::Count::Method::MinMax)
+=head1 Smith Set Restricted MinMax (Currently Unimplemented, See Vote::Count::Method::MinMax)
 
-MinMax methods do not meet the Smith Criteria nor the Condorcet Loser Criteria, two do meet the Condorcet Winner Criteria, and one meets Later Harm. Restricting MinMax to the Smith Set will make all of the sub-methods meet all three Condorcet Criteria;  "Opposition" will match the Later Harm protection of Smith Set IRV
+MinMax methods do not meet the Smith Criteria nor the Condorcet Loser Criteria, two do meet the Condorcet Winner Criteria, and one meets Later Harm. Restricting MinMax to the Smith Set will make all of the sub-methods meet all three Condorcet Criteria;  "Opposition" will match the Later Harm protection of Smith Set IRV.
 
 =head1 Method Common Name: Woodhull Method (Currently Unimplemented)
 

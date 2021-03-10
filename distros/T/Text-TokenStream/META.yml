@@ -18,19 +18,19 @@ name: Text-TokenStream
 provides:
   Text::TokenStream:
     file: lib/Text/TokenStream.pm
-    version: '0.03'
+    version: '0.04'
   Text::TokenStream::Lexer:
     file: lib/Text/TokenStream/Lexer.pm
-    version: '0.03'
+    version: '0.04'
   Text::TokenStream::Role::Stream:
     file: lib/Text/TokenStream/Role/Stream.pm
-    version: '0.03'
+    version: '0.04'
   Text::TokenStream::Token:
     file: lib/Text/TokenStream/Token.pm
-    version: '0.03'
+    version: '0.04'
   Text::TokenStream::Types:
     file: lib/Text/TokenStream/Types.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Carp: '0'
   List::Util: '1.29'
@@ -46,6 +46,6 @@ requires:
 resources:
   bugtracker: https://github.com/arc/Text-TokenStream/issues
   repository: git://github.com/arc/Text-TokenStream.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

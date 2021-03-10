@@ -13,6 +13,8 @@ use Vote::Count;
 use Vote::Count::ReadBallots 'read_ballots';
 use Vote::Count::Redact qw/RedactPair RedactBullet RedactSingle/;
 
+use Carp::Always;
+
 use feature qw /postderef signatures/;
 no warnings 'experimental';
 
@@ -24,6 +26,7 @@ $B1->{'BallotSet'}{'ballots'}{'testonly'} = {
   'votes' =>
     [qw( VOMIT STRAWBERRY CHOCOLATE LEMON TOAD VANILLA ORANGE MINTCHIP)],
   'count' => 1,
+  'votevalue' => 1,
 };
 
 my $newBallot1 = RedactPair( $B1->BallotSet(), 'VANILLA', 'CHOCOLATE' );

@@ -1,4 +1,6 @@
 package Mojolicious::Plugin::Prove::Base;
+$Mojolicious::Plugin::Prove::Base::VERSION = '0.11';
+# ABSTRACT: Base class for Mojolicious::Plugin::Prove
 
 use Mojo::Base 'Mojolicious::Plugin';
 
@@ -29,11 +31,17 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Prove::Base
+Mojolicious::Plugin::Prove::Base - Base class for Mojolicious::Plugin::Prove
 
 =head1 VERSION
 
-version 0.08
+version 0.11
+
+=head1 METHODS
+
+=head2 add_template_path
+
+Adds the path to templates for some loaded classes
 
 =head1 AUTHOR
 

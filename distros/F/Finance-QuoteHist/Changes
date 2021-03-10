@@ -1,5 +1,8 @@
 Revision history for Perl extension Finance::QuoteHist.
 
+1.32  Tue 09 Mar 2021 10:01:14 AM EST
+    - patched to handle negative epochs
+
 1.30  Fri 19 Feb 2021 01:47:26 PM EST
     - Updated yahoo module to use json API
 

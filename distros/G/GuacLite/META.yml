@@ -1,0 +1,37 @@
+---
+abstract: 'Toolkit for implementing a frontend server/client the Apache Guacamole system'
+author:
+  - 'Joel Berger, <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GuacLite
+provides:
+  GuacLite:
+    file: lib/GuacLite.pm
+    version: '0.02'
+  GuacLite::Client::Guacd:
+    file: lib/GuacLite/Client/Guacd.pm
+  GuacLite::Client::Web:
+    file: lib/GuacLite/Client/Web.pm
+  GuacLite::Client::Web::Command::pack:
+    file: lib/GuacLite/Client/Web.pm
+  GuacLite::Plugin::Guacd:
+    file: lib/GuacLite/Plugin/Guacd.pm
+  GuacLite::Util:
+    file: lib/GuacLite/Util.pm
+requires:
+  File::ShareDir: '0'
+  Mojolicious: '8.15'
+resources:
+  bugtracker: http://github.com/jberger/GuacLite/issues
+  repository: http://github.com/jberger/GuacLite
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: Apache-2.0

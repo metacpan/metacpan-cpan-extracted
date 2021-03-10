@@ -15,7 +15,6 @@ use Vote::Count::ReadBallots 'read_ballots', 'read_range_ballots';
 
 my $VC1 = Vote::Count->new( BallotSet => read_ballots('t/data/data2.txt'), );
 
-# my $A1       = $VC1->Approval();
 my $expectA1 = {
   CARAMEL    => 1,
   CHOCOLATE  => 8,
@@ -64,10 +63,6 @@ my $expectA2 = {
 
 is_deeply( $A2->RawCount(), $expectA2,
   "Approval counted a small set with AN active list" );
-
-my $expectNonA2 = {
-
-};
 
 my $Range1 =
   Vote::Count->new(
@@ -145,5 +140,64 @@ my $expectR2B = {
 };
 is_deeply( $R2B->RawCount(), $expectR2B,
   'counted approval with a cutoff for second range ballotset' );
+
+subtest 'weighted approval' => sub {
+  my $B1 =  read_ballots('t/data/data2.txt');
+  my %bweight = (
+    'MINTCHIP:CARAMEL:RUMRAISIN' => 11,
+    'CHOCOLATE:MINTCHIP:VANILLA' => 6,
+    'VANILLA:CHOCOLATE:STRAWBERRY' => 4,
+    'MINTCHIP' => 2,
+    'VANILLA' => 1,
+    'PISTACHIO:ROCKYROAD:MINTCHIP:VANILLA:CHOCOLATE' => 3,
+  );
+  for my $b1 ( keys %bweight ) { $B1->{'ballots'}{$b1}{'votevalue'} = $bweight{$b1} }
+  # note( Dumper $B1->{'ballots'}->%* );
+  my $W1 = Vote::Count->new( BallotSet => $B1 );
+  my $W1Expect = {
+          'VANILLA' => 34,
+          'MINTCHIP' => 31,
+          'STRAWBERRY' => 20,
+          'PISTACHIO' => 6,
+          'RUMRAISIN' => 11,
+          'ROCKYROAD' => 6,
+          'CHOCOLATE' => 32,
+          'CARAMEL' => 11,
+  };
+  my $W1Result = $W1->Approval();
+  is_deeply( $W1Result->RawCount(), $W1Expect,
+    'Assigned Integer weights to data2' );
+  is( $W1Result->Leader()->{'winner'}, 'VANILLA', 'picked winner with int weights.');
+
+  # Do it again with Floats.
+  %bweight = (
+    'MINTCHIP:CARAMEL:RUMRAISIN' => .5,
+    'CHOCOLATE:MINTCHIP:VANILLA' => 1.6,
+    'VANILLA:CHOCOLATE:STRAWBERRY' => 4,
+    'MINTCHIP' => 2.2,
+    'VANILLA' => 1,
+    'PISTACHIO:ROCKYROAD:MINTCHIP:VANILLA:CHOCOLATE' => 3.1,
+  );
+  for my $b1 ( keys %bweight ) { $B1->{'ballots'}{$b1}{'votevalue'} = $bweight{$b1} }
+  my $W2 = Vote::Count->new( BallotSet => $B1 );
+  my $W2Expect = {
+          'VANILLA' => 29.8,
+          'MINTCHIP' => 17.1,
+          'STRAWBERRY' => 20,
+          'PISTACHIO' => 6.2,
+          'RUMRAISIN' => .5,
+          'ROCKYROAD' => 6.2,
+          'CHOCOLATE' => 27.8,
+          'CARAMEL' => .5,
+  };
+  my $W2Result = $W2->Approval();
+  is_deeply( $W2Result->RawCount(), $W2Expect,
+    'Assigned Floating Point weights to data2' );
+  is( $W2Result->Leader()->{'winner'}, 'VANILLA', 'picked winner with float weights.');
+  is_deeply( $expectA1, $W2->LastApprovalBallots(),
+      "LastApprovalBallots returns the same result as an earlier unweighted run");
+
+
+};
 
 done_testing();

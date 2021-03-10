@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,17 +15,18 @@ name: Mojo-IOLoop-ForkCall
 provides:
   Mojo::IOLoop::ForkCall:
     file: lib/Mojo/IOLoop/ForkCall.pm
-    version: '0.20'
+    version: '0.21'
   Mojolicious::Plugin::ForkCall:
     file: lib/Mojolicious/Plugin/ForkCall.pm
 requires:
   IO::Pipely: '0'
+  Mojo::IOLoop::Delay: '0'
   Mojolicious: '5.08'
   Perl::OSType: '0'
 resources:
   bugtracker: https://github.com/jberger/Mojo-IOLoop-ForkCall/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/jberger/Mojo-IOLoop-ForkCall
-version: '0.20'
+version: '0.21'
 x_deprecated: 1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

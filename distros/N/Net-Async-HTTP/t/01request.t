@@ -511,6 +511,31 @@ do_test_req( "simple PUT",
    },
 );
 
+$req = HTTP::Request->new( PATCH => "/handler", [ Host => "somewhere" ], "New content" );
+
+do_test_req( "simple PATCH",
+   req => $req,
+   host => "somewhere",
+
+   expect_req_firstline => "PATCH /handler HTTP/1.1",
+   expect_req_headers => {
+      Host => "somewhere",
+      'Content-Length' => 11,
+   },
+   expect_req_content => "New content",
+
+   response => "HTTP/1.1 201 Created$CRLF" . 
+   "Content-Length: 0$CRLF" .
+   "Connection: Keep-Alive$CRLF" .
+   $CRLF,
+
+   expect_res_code    => 201,
+   expect_res_headers => {
+      'Content-Length' => 0,
+      'Connection'     => "Keep-Alive",
+   },
+);
+
 $req = HTTP::Request->new( GET => "http://somehost/with/path" );
 
 do_test_req( "request-implied host",
