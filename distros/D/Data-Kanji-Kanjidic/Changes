@@ -1,5 +1,9 @@
 Revision history for perl module Data::Kanji::Kanjidic
 
+0.17 2021-03-11
+
+* Update links in documentation
+
 0.16 2018-10-05
 
 * Change api.metacpan.org links in documentation

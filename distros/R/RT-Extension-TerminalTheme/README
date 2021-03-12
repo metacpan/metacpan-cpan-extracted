@@ -1,0 +1,44 @@
+NAME
+    RT-Extension-TerminalTheme - Classic "green screen" terminal theme for
+    RT
+
+DESCRIPTION
+    Provides a theme with light and dark modes that resemble a classic CRT
+    "green screen" terminal and serve as a good example of how to theme
+    Request Tracker. You can read more
+    <https://bestpractical.com/blog/2021/1/terminal-theme-for-rt5> about
+    this theme on the Best Practical blog <https://bestpractical.com/blog>.
+
+RT VERSION
+    Works with RT 5.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions.
+
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::TerminalTheme');
+
+    Clear your mason cache
+            rm -rf /opt/rt5/var/mason_data/obj
+
+    Restart your webserver
+
+AUTHOR
+    Best Practical Solutions, LLC <modules@bestpractical.com>
+
+    All bugs should be reported via email to
+        bug-RT-Extension-TerminalTheme@rt.cpan.org
+    or via the web at
+        http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-TerminalTheme
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2021 by Best Practical Solutions, LLC
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

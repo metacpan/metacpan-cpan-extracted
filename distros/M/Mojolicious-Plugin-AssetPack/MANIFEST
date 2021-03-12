@@ -1,9 +1,12 @@
+.gitattributes
+.github/CONTRIBUTING.md
+.github/ISSUE_TEMPLATE.md
+.github/PULL_REQUEST_TEMPLATE.md
+.github/workflows/linux.yml
+.github/workflows/perltidy.yml
+.mergify/config.yml
 .perltidyrc
-.ship.conf
-.travis.yml
-.vscode/tasks.json
 Changes
-cpanfile
 examples/not-found.pl
 examples/rollup.pl
 examples/sprites.pl

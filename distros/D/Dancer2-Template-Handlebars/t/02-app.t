@@ -18,9 +18,7 @@ use Test::WWW::Mechanize::PSGI;
     set traces      => 1;
 
     set engines => {
-        handlebars => {
-            helpers => ['MyHelpers']
-        },
+        handlebars => { helpers => ['MyHelpers'] },
     };
 
     set template => 'handlebars';

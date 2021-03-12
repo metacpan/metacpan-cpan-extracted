@@ -1,5 +1,8 @@
 Revision history for the Perl extension Win32.
 
+0.57    [2021-03-10]
+        - fix calling convention for PFNRegGetValueA [PR/28]
+
 0.56    [2021-03-07]
         - added t/Privileges.t to MANIFEST
 

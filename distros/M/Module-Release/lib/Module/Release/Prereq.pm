@@ -8,7 +8,7 @@ use Exporter qw(import);
 
 our @EXPORT = qw( check_prereqs _get_prereq_ignore_list );
 
-our $VERSION = '2.127';
+our $VERSION = '2.128';
 
 =encoding utf8
 

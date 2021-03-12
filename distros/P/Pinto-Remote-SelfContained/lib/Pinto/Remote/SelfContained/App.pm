@@ -15,7 +15,7 @@ use Types::Standard qw(ArrayRef Bool HashRef Int Maybe Str);
 
 use namespace::clean;
 
-our $VERSION = '0.900';
+our $VERSION = '1.000';
 
 has root => (is => 'ro', isa => Uri, coerce => 1, required => 1);
 
@@ -138,9 +138,9 @@ sub command_info {
                 my ($opts) = splice @_, 0, 2;
                 if (my $cpanm_options = $opts->{cpanm_options}) {
                     my %new;
-                    for my $key (sort keys %$cpanm_options) {
-                        $key =~ s/^--?//;
-                        $new{$key} = $cpanm_options->{$key};
+                    for my $item (@$cpanm_options) {
+                        my ($name, $value) = $item =~ /\A--?(.+?)(?:=(.*?))?\z/ms;
+                        $new{$name} = $value;
                     }
                     $opts->{cpanm_options} = \%new;
                 }
@@ -151,7 +151,7 @@ sub command_info {
             opt_spec => [
                 [ 'cascade'                 => 'Always pick latest upstream package' ],
                 [ 'cpanm-exe|cpanm=s'       => 'Path to the cpanm executable' ],
-                [ 'cpanm-options|o:s%'      => 'name=value pairs of cpanm options' ],
+                [ 'cpanm-options|o=s@'      => 'name=value pairs of cpanm options' ],
                 [ 'diff-style=s'            => 'Set style of diff reports' ],
                 [ 'local-lib|l=s'           => 'install into a local lib directory' ],
                 [ 'local-lib-contained|L=s' => 'install into a contained local lib directory' ],

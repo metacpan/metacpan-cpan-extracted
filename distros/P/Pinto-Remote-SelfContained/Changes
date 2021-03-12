@@ -1,5 +1,24 @@
 Revision history for Pinto::Remote::SelfContained
 
+1.000   2021-03-11
+    - No further changes from 0.905
+
+0.905-TRIAL   2021-03-07
+    - Specify minimum HTTP::Tiny version for can_ssl
+
+0.904-TRIAL   2021-03-07
+    - Specify minimum Moo version for `coerce => 1`
+
+0.903-TRIAL   2021-03-07
+    - Second attempt to fix option parsing error; this may still not work
+
+0.902-TRIAL   2021-03-07
+    - Bump Path::Tiny dependency
+
+0.901-TRIAL   2021-03-07
+    - Attempt to fix option parsing error; this may not work
+    - Attempt to fix Win32 cpanm version detection test
+
 0.900   2021-03-06
     - Trial release
     - Initial release

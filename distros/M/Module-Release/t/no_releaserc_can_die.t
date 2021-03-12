@@ -13,7 +13,8 @@ Reported by Sagar Shah.
 
 use Test::More 1.0;
 
-require 't/lib/setup_common.pl';
+use lib qw(t/lib);
+require 'setup_common.pl';
 
 my $class = 'Module::Release';
 subtest setup => sub {

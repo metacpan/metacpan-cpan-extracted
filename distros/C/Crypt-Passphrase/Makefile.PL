@@ -18,7 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Crypt::Passphrase",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Encode" => 0,
     "Scalar::Util" => 0,
+    "Unicode::Normalize" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -29,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,11 +40,13 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Encode" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
+  "Unicode::Normalize" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

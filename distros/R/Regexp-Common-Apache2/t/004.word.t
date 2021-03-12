@@ -34,15 +34,13 @@ my $tests =
         name            => q{dot separated string},
         test            => q{"John"."Doe"},
         word            => q{"John"."Doe"},
-        word_enclosed   => q{John"."Doe},
-        word_quote      => q{"},
+        word_dot_word   => q{"John"."Doe"},
     },
     {
         name            => q{dot separated string - single quote},
         test            => q{'John'.'Doe'},
         word            => q{'John'.'Doe'},
-        word_enclosed   => q{John'.'Doe},
-        word_quote      => q{'},
+        word_dot_word   => q{'John'.'Doe'},
     },
     {
         name            => q{variable},
@@ -55,6 +53,20 @@ my $tests =
         test            => q{tolower("John")},
         word            => q{tolower("John")},
         word_function   => q{tolower("John")},
+    },
+    {
+        name            => q{ipv4 address},
+        test            => q{127.0.0.1},
+        word            => q{127.0.0.1},
+        word_ip         => q{127.0.0.1},
+        word_ip4        => q{127.0.0.1},
+    },
+    {
+        name            => q{ipv6 address},
+        test            => q{0000:0000:0000:0000:0000:FFFF:7F00:0001},
+        word            => q{0000:0000:0000:0000:0000:FFFF:7F00:0001},
+        word_ip         => q{0000:0000:0000:0000:0000:FFFF:7F00:0001},
+        word_ip6        => q{0000:0000:0000:0000:0000:FFFF:7F00:0001},
     },
 ];
 

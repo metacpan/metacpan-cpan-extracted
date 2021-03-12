@@ -7,7 +7,8 @@ use Test::Output;
 
 use Cwd;
 
-require 't/lib/setup_common.pl';
+use lib qw(t/lib);
+require 'setup_common.pl';
 
 my $class = 'Module::Release';
 subtest setup => sub {

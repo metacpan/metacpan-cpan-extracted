@@ -1,0 +1,410 @@
+@import "../terminal-light/main.css";
+
+/*
+  #000    - black
+  #252525 - medium grey
+  #151515 - dark grey
+  #03b601 - green
+  #056404 - dark green
+ */
+
+ .darkmode, .darkmode * {
+     background: #000;
+     color: #03b601;
+}
+ .dropdown.bootstrap-select.form-control *, .selectize-control.multi *, textarea.form-control {
+     background: #000 !important;
+     color: #03b601 !important;
+}
+ .darkmode input, .darkmode select, .darkmode .btn-light {
+     background: #000;
+     border-color: #03b601;
+}
+ .darkmode input::-webkit-input-placeholder {
+     color: #056404 !important;
+}
+ .darkmode input::-moz-placeholder {
+     color: #056404 !important;
+}
+ .darkmode input::-ms-input-placeholder {
+     color: #056404 !important;
+}
+ .darkmode input::-moz-placeholder {
+     color: #056404 !important;
+}
+ .darkmode textarea::-webkit-input-placeholder {
+     color: #056404 !important;
+}
+ .darkmode textarea::-moz-placeholder {
+     color: #056404 !important;
+}
+ .darkmode textarea::-ms-input-placeholder {
+     color: #056404 !important;
+}
+ .darkmode textarea::-moz-placeholder {
+     color: #056404 !important;
+}
+ .darkmode input:focus {
+     background: #000;
+     border-color: #03b601;
+     color: #03b601;
+}
+ .darkmode .dropdown-item:focus *, .darkmode .dropdown-item:hover *, .darkmode .dropdown-item:focus, .darkmode .dropdown-item:hover, .darkmode .page-menu.sf-menu a:focus *, .darkmode .page-menu.sf-menu a:hover *, .darkmode .page-menu.sf-menu a:focus, .darkmode .page-menu.sf-menu a:hover, .darkmode #main-navigation .sf-menu li ul a:focus, .darkmode #main-navigation .sf-menu li ul a:hover {
+     background: #000 !important;
+}
+ .darkmode .messagebox-container.action-private textarea, .darkmode .messagebox-container.action-response textarea {
+     color: #03b601 !important;
+}
+ .darkmode .cke_toolbar .cke_combo_button, .darkmode .cke_toolbox .cke_toolbar .cke_combo .cke_combo_text, .darkmode .cke_toolbox .cke_toolbar .cke_combo .cke_combo_open, .darkmode .cke_toolbox .cke_toolbar .cke_toolgroup, .darkmode .cke_toolbox .cke_toolbar .cke_toolgroup a, .darkmode #cke_Content .cke_contents .cke_wysiwyg_frame {
+     background-color: #000 !important;
+     color: #03b601 !important;
+}
+ .darkmode .cke_combo_arrow, .darkmode .cke_button_arrow {
+     border-top: 3px solid #03b601 !important;
+     color: #03b601 !important;
+}
+ .darkmode #cke_UpdateContent, .darkmode #cke_Content, .darkmode .cke_contents, .darkmode .cke_toolbar .cke_combo_button, .darkmode .cke_toolbar .cke_toolgroup {
+     border-color: #03b601 !important;
+}
+ .darkmode .cke_toolbox .cke_toolbar .cke_combo .cke_combo_text {
+     color: #03b601 !important;
+}
+ .darkmode a.cke_button .cke_button_icon {
+     -webkit-filter: invert(100%) brightness(110%);
+     -moz-filter: invert(100%) brightness(110%);
+     -ms-filter: invert(100%) brightness(110%);
+     -o-filter: invert(100%) brightness(110%);
+     filter: invert(100%) brightness(110%);
+}
+ .darkmode .cke_combo_text {
+     margin-top: 1px;
+     margin-bottom: 1px;
+     line-height: 24px;
+}
+/* Page */
+ body {
+     background-color: #000;
+     color: #03b601;
+     font-family: Menlo, monospace;
+}
+ div#body {
+     background-color: #000;
+     color: #03b601;
+     font-family: Menlo, monospace;
+}
+ h1, h2, h3, h4, h5, h6, div, p, ul, ol, input, textarea, label, option {
+     background-color: #000;
+     color: #03b601;
+     font-family: Menlo, monospace;
+}
+ a, a:visited {
+     color: #03b601;
+}
+ a:hover {
+     color: #056404;
+}
+ .card {
+     background-color: #000;
+     border-color: #03b601;
+}
+ .history .transaction, div.history-container, .history .transaction .messagebody {
+     border-color: #03b601;
+}
+ .transaction .message-header-key {
+     color: #056404;
+}
+ .titlebox.card, #ticket-update-message, #recipients {
+     border-color: #03b601 !important;
+}
+ ul li span, ol li span {
+     color: #056404;
+}
+ .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+     background-color: #03b601;
+     border-color: #03b601;
+     color: #151515;
+}
+ .nav-tabs {
+     border-color: #03b601;
+}
+ .nav-tabs .nav-link:hover, .nav-tabs .nav-link:focus {
+     border-color: #03b601;
+}
+ div.messagebox-container.action-response textarea, .messagebox-container.action-response iframe {
+     background-color: #056404;
+     color: #03b601 !important;
+}
+ div.messagebox-container.action-comment textarea, .messagebox-container.action-comment iframe {
+     background-color: #151515;
+     color: #03b601 !important;
+}
+ .cke_chrome {
+     background-color: #151515;
+}
+ .table th, .table td {
+     border-top: 1px solid #03b601;
+}
+ th.collection-as-table, td.collection-as-table, table.collection-as-table th.collection-as-table, table.queue-summary th.collection-as-table, .article-headers .label {
+     background-color: #000;
+     color: #03b601;
+}
+ table > tbody > tr > td.collection-as-table, table > tbody > tr > th.collection-as-table {
+     border-color: #03b601;
+}
+ .history .transaction.odd {
+     background-color: #000;
+}
+ .transaction .type {
+     background-color: #03b601 !important;
+     color: #000 !important;
+}
+ .transaction svg.svg-inline--fa {
+     color: #000 !important;
+}
+ .history .transaction div.metadata span.actions {
+     background-color: #03b601;
+     border-color: #03b601;
+}
+ table.collection-as-table th.collection-as-table, table.queue-summary th.collection-as-table, .article-headers .label {
+     color: #03b601;
+}
+ svg.svg-inline--fa {
+     color: #03b601;
+}
+ svg.icon-bordered {
+     border-color: #03b601;
+}
+ .titlebox .card-header span.toggle:before {
+     color: #03b601;
+     border-color: #03b601;
+}
+/* Menu bar */
+ div#quickbar {
+     color: #03b601;
+}
+ #main-navigation #app-nav.sf-shadow > li, #main-navigation #app-nav.sf-shadow > li > a, #prefs-menu > li, #prefs-menu > li > a, #logo .rtname {
+     color: #03b601;
+}
+ .menu-item.sf-with-ul, {
+     color: #03b601;
+}
+ ul.toplevel.sf-menu > li > a.sf-with-ul:after {
+     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" id="i-chevron-down" viewBox="0 0 12 8" height="100%" width="100%" fill="none" stroke="%2303b601" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M1 1 l5 5 5 -5" /></svg>');
+}
+ .current-user {
+     color: #03b601;
+     font-weight: bold;
+}
+ .sf-menu a:visited, .sf-menu a {
+     color: #03b601;
+}
+ .sf-menu li, .sf-menu li li, .sf-menu li li li {
+     background-color: #000;
+}
+ .sf-menu a {
+     background-color: #000;
+}
+ .sf-menu a:hover {
+     background-color: #056404;
+}
+ .sf-menu.sf-shadow ul {
+     box-shadow: 3px 3px 20px -5px #03b601;
+}
+ .page-menu.sf-menu > li {
+     border-color: #03b601;
+}
+ #page-navigation .sf-menu li li, #page-navigation .sf-menu li {
+     background-color: #000;
+     color: #03b601;
+}
+ .sf-menu li:hover, #main-navigation .sf-menu li:hover, #page-navigation .sf-menu li:hover {
+     background-color: #056404;
+}
+ .menu-item.sf-with-ul::after {
+     border-color: #03b601;
+}
+ .page-menu.pinned, .page-menu.pinned.sf-menu, .page-menu.pinned.sf-menu > li {
+     border-color: #03b601;
+}
+ .page-menu.pinned li:hover ul, .page-menu.pinned li.sfHover ul {
+     border-color: #03b601;
+}
+ .page-menu.pinned {
+     background-color: #000;
+}
+/* Title bar */
+ div#header {
+     color: #03b601;
+     border-bottom-color: #03b601;
+}
+ div#quickbar {
+     background-color: #000;
+}
+ #topactions form input.btn {
+     background-color: #03b601;
+     border-color: #03b601 !important;
+     color: #000;
+}
+ div.results .titlebox-content {
+     background-color: #056404;
+     color: #000;
+     border-color: #03b601 !important;
+}
+ div.titlebox div.card-body ul, div.titlebox div.card-body li {
+     background-color: #056404;
+     color: #000;
+}
+/* Page title */
+ div#header h1 {
+     color: #03b601;
+}
+/* Footer */
+ div#footer, div#footer p, div#footer a {
+     color: #03b601;
+     background-color: #000;
+}
+/* Page content */
+ div#body, .body-content-class {
+     color: #03b601;
+}
+/* Buttons */
+ input[type="reset"], input[type="submit"], input[class="button"] {
+     background-color: #03b601;
+     color: #151515;
+}
+ input[type="reset"]:hover, input[type="submit"]:hover, input[class="button"]:hover {
+     background-color: #056404;
+     color: #03b601;
+     border-color: #03b601;
+}
+ .button, .button:visited, .button:focus, input[type=reset], input[type=submit], input[class=button], button {
+     background-color: #03b601;
+     color: #151515;
+}
+ .button:hover, input[type=reset]:hover, input[type=submit]:hover, input[class=button]:hover, button:hover {
+     background-color: #03b601;
+     color: #000;
+     border-color: #03b601;
+}
+/* Search results */
+ table.collection-as-table th.collection-as-table a {
+     color: #03b601;
+}
+/* Portlet Text */
+ .titlebox .titlebox-title .left a, .titlebox .titlebox-title .left {
+     color: #03b601;
+}
+/* Selected bubble */
+ .selectize-control.multi .selectize-input [data-value] {
+     color: #03b601;
+     background-color: #056404;
+     background-image: none;
+}
+/* Form controls */
+ .form-control {
+     background-color: #151515;
+     color: #03b601;
+     border-color: #03b601;
+}
+ .form-control:focus {
+     background-color: #252525;
+     color: #03b601;
+     border-color: #03b601;
+}
+ .selectize-input, .selectize-control.single .selectize-input.input-active {
+     background-color: #151515;
+     color: #03b601;
+     font-family: Menlo, monospace;
+}
+ .selectize-input, .selectize-dropdown {
+     border-color: #03b601;
+}
+ .dropdown-menu {
+     background-color: #151515;
+     color: #03b601;
+     border-color: #03b601;
+}
+ .dropdown-item.active {
+     background-color: #056404;
+     color: #03b601;
+}
+ .btn-light {
+     background-color: #03b601;
+     color: #000;
+     border-color: #03b601;
+}
+ .btn-light:hover, .filter-option-inner:hover, .filter-option-inner-inner:hover {
+     background-color: #03b601;
+     color: #000;
+     border-color: #03b601;
+}
+ .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle {
+     background-color: #056404;
+     color: #000;
+}
+ .btn-primary:focus, .btn-primary.focus {
+     box-shadow: none;
+}
+ .dropdown-item, .filter-option, .filter-option-inner, .filter-option-inner-inner {
+     background-color: #151515;
+     color: #03b601;
+}
+ input, textarea, option, select {
+     background-color: #000;
+     color: #03b601;
+}
+ .list-group-item {
+     background-color: #000;
+     color: #03b601;
+}
+ span.accordion-title {
+     background-color: #000;
+     color: #03b601;
+}
+ span.accordion-title::after {
+     border-color: #03b601;
+}
+ .custom-file-label {
+     background-color: #151515;
+     color: #03b601;
+     border-color: #03b601;
+}
+ .custom-file-label::after {
+     background-color: #03b601;
+     color: #151515;
+}
+ input.custom-file-label:focus {
+     border-color: #03b601;
+}
+/* This is the default state */
+ .custom-radio .custom-control-label::before {
+     background-color: #000;
+     color: #03b601;
+     border: 1px solid #03b601;
+}
+/* This is the checked state */
+ .custom-radio .custom-control-input:checked~.custom-control-label::before, .custom-radio .custom-control-input:checked~.custom-control-label::after {
+     background-color: #000;
+     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-3.5 -3.5 8 8"><circle r="3.5" fill="%2303b601"/></svg>');
+     border-radius: 50%;
+     color: #03b601;
+     border: 1px solid #03b601;
+}
+/* active state i.e. displayed while the mouse is being pressed down */
+ .custom-radio .custom-control-input:active ~ .custom-control-label::before {
+     color: #000;
+     background-color: #03b601;
+     border: 1px solid #03b601;
+}
+ .btn-light:not(:disabled):not(.disabled):active:focus, .btn-light:not(:disabled):not(.disabled).active:focus, .show > .btn-light.dropdown-toggle:focus {
+     box-shadow: none !important;
+}
+ .btn-light:not(:disabled):not(.disabled):active, .btn-light:not(:disabled):not(.disabled).active, .show > .btn-light.dropdown-toggle {
+     border-color: #03b601;
+}
+ .bootstrap-select > select.mobile-device:focus + .dropdown-toggle, .bootstrap-select .dropdown-toggle:focus {
+     outline: none !important;
+}
+ div:focus, span:focus, li:focus, a:focus, input:focus, :focus {
+     outline: unset !important;
+}

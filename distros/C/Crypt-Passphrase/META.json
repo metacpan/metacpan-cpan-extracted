@@ -32,7 +32,9 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Encode" : "0",
             "Scalar::Util" : "0",
+            "Unicode::Normalize" : "0",
             "parent" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -52,19 +54,19 @@
    "provides" : {
       "Crypt::Passphrase" : {
          "file" : "lib/Crypt/Passphrase.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       },
       "Crypt::Passphrase::Encoder" : {
          "file" : "lib/Crypt/Passphrase/Encoder.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       },
       "Crypt::Passphrase::Fallback" : {
          "file" : "lib/Crypt/Passphrase/Fallback.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       },
       "Crypt::Passphrase::Validator" : {
          "file" : "lib/Crypt/Passphrase/Validator.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -78,7 +80,7 @@
          "web" : "https://github.com/Leont/crypt-passphrase"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

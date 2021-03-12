@@ -13,7 +13,7 @@ use constant PINTO_MINIMUM_CPANM_VERSION => '1.6920';
 
 use namespace::clean;
 
-our $VERSION = '0.900';
+our $VERSION = '1.000';
 
 extends qw(Pinto::Remote::SelfContained::Action);
 
@@ -33,6 +33,9 @@ has cpanm_exe => (
 
         my $output = `cpanm --version`
             // croak("Could not learn version of cpanm");
+
+        croak("Could not learn version of cpanm")
+            if $output eq '';
 
         my ($cpanm_version) = $output =~ m{version ([0-9.]+)}
             or croak("Could not parse cpanm version number from $output");
@@ -99,7 +102,7 @@ around execute => sub {
 
     # Process other cpanm options
     my $cpanm_options = $self->cpanm_options;
-    for my $opt (keys %$cpanm_options) {
+    for my $opt (sort keys %$cpanm_options) {
         my $dash = length $opt == 1 ? '-' : '--';
         push @opts, "$dash$opt", grep defined && length, $cpanm_options->{$opt}
     }

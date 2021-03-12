@@ -7,7 +7,7 @@ use Role::Tiny ();
 use Scalar::Util ();
 use Class::Method::Modifiers ();
 
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.13'; # VERSION
 
 my ( $store, $roles );
 
@@ -94,7 +94,6 @@ sub attr {
         set_has      => 1,
         self         => $self,
         obj_accessor => 1,
-        redefine     => 1,
     };
 
     $set->{value} = $value if ( @_ > 2 );
@@ -110,15 +109,7 @@ sub class_has {
     };
 
     $set->{value} = $value if ( @_ > 1 );
-
-    try {
-        ____attrs($set);
-    }
-    catch {
-        my $e = $_ || $@;
-        croak($$e);
-    };
-
+    ____attrs($set);
     return;
 }
 
@@ -132,24 +123,13 @@ sub has {
     };
 
     $set->{value} = $value if ( @_ > 1 );
-
-    try {
-        ____attrs($set);
-    }
-    catch {
-        my $e = $_ || $@;
-        croak($$e);
-    };
-
+    ____attrs($set);
     return;
 }
 
 sub ____attrs {
     for my $set (@_) {
         for my $name ( ( ref $set->{attrs} ) ? @{ $set->{attrs} } : $set->{attrs} ) {
-            die \"$name already defined"
-                if ( not $set->{redefine} and exists $store->{ $set->{caller} }->{name}{$name} );
-
             my $accessor = ( $set->{obj_accessor} )
                 ? sub {
                     my ( $self, $value ) = @_;
@@ -208,24 +188,59 @@ sub ____attrs {
     return;
 }
 
+sub ____role_attrs {
+    my ( $caller, $roles, $object ) = @_;
+
+    for my $role (@$roles) {
+        for my $name (
+            keys %{ $store->{$role}{name} }
+        ) {
+            my $set = {
+                attrs  => $name,
+                caller => $caller,
+            };
+
+            if ( $store->{$role}{has}{$name} ) {
+                $set->{self}         = $object;
+                $set->{obj_accessor} = 1;
+            }
+
+            $set->{value} = $store->{$role}{value}{$name} if ( exists $store->{$role}{value}{$name} );
+
+            ____attrs($set);
+        }
+    }
+
+    return;
+}
+
 sub with {
     my $caller = scalar(caller);
     push( @{ $roles->{$caller} }, @_ );
-    return Role::Tiny->apply_roles_to_package( $caller, @_ );
+    my $result = Role::Tiny->apply_roles_to_package( $caller, @_ );
+    ____role_attrs( $caller, [@_] );
+    return $result;
 }
 
 sub with_roles {
     my ( $self, @roles ) = @_;
+    my $object;
 
-    return Role::Tiny->create_class_with_roles(
-        $self,
-        map { /^\+(.+)$/ ? "${self}::Role::$1" : $_ } @roles
-    ) unless ( my $class = Scalar::Util::blessed $self );
+    unless ( my $class = Scalar::Util::blessed($self) ) {
+        $object = Role::Tiny->create_class_with_roles(
+            $self,
+            map { /^\+(.+)$/ ? "${self}::Role::$1" : $_ } @roles
+        );
+    }
+    else {
+        $object = Role::Tiny->apply_roles_to_object(
+            $self,
+            map { /^\+(.+)$/ ? "${class}::Role::$1" : $_ } @roles
+        );
+    }
 
-    return Role::Tiny->apply_roles_to_object(
-        $self,
-        map { /^\+(.+)$/ ? "${class}::Role::$1" : $_ } @roles
-    );
+    ____role_attrs( Scalar::Util::blessed($object) || $object, [@_], $object );
+    return $object;
 }
 
 1;
@@ -242,7 +257,7 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-class/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-class/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-class/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-class)
@@ -327,7 +342,7 @@ replace:
 
 =head2 Class::Method::Modifiers
 
-Note that Class::Method::Modifiers is injected into the namespace to provide
+Note that L<Class::Method::Modifiers> is injected into the namespace to provide
 support for: C<before>, C<around>, and C<after>.
 
 =head1 FUNCTIONS
@@ -478,6 +493,35 @@ can use the shorthand "+RoleName".
 
 You will almost certainly want to read the documentation for L<exact::role> for
 writing roles.
+
+=head1 CONSIDERATIONS AND CAVEATS
+
+Just as it is with L<Mojo::Base> and L<Role::Tiny>, if you redefine anything
+(like a C<has> or C<class_has> or method) either within the same class or via
+inheritance or use of roles in any variety of ways, it will be redefined
+silently. Last redefinition wins. Obviously, this sort of power can be dangerous
+if it falls into the wrong hands.
+
+However, unlike L<Role::Tiny>, composition using the C<with> keyword and via a
+call to C<with_roles> works exactly the same. For example, the C<$cat_1> and
+C<$cat_2> objects are equivalent with L<exact::class> but are not equivalent
+with L<Role::Tiny>:
+
+    package CatWithRole {
+        use exact -class;
+        with 'Attack';
+    }
+
+    package CatWithNoRole {
+        use exact -class;
+    }
+
+    my $cat_1 = CatWithRole->new;
+    my $cat_2 = CatWithNoRole->new->with_roles('Attack');
+
+What happens with calling C<with_roles> via L<Role::Tiny> is that the resulting
+object will have any duplicate attributes from the role override the class,
+versus the L<exact::class> way of the class overriding the role.
 
 =head1 SEE ALSO
 

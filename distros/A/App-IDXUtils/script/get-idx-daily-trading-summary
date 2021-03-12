@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-17'; # DATE
 our $DIST = 'App-IDXUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ get-idx-daily-trading-summary - Get daily trading summary
 
 =head1 VERSION
 
-This document describes version 0.005 of get-idx-daily-trading-summary (from Perl distribution App-IDXUtils), released on 2021-01-17.
+This document describes version 0.006 of get-idx-daily-trading-summary (from Perl distribution App-IDXUtils), released on 2021-01-17.
 
 =head1 SYNOPSIS
 

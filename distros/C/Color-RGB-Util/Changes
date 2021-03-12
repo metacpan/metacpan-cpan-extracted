@@ -1,3 +1,11 @@
+0.602   2021-01-19  Released-By: PERLANCAR; Urgency: medium
+
+	- rand_rgb_colors(): Make sure that each generated color are
+	  distinct enough from several previous ones.
+
+	- [doc] Give more description to the color difference algorithms.
+
+
 0.601   2020-06-08  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Wrap H in input HSL/HSV.

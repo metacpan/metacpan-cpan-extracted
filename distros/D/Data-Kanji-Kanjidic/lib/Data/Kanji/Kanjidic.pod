@@ -16,13 +16,13 @@ Data::Kanji::Kanjidic - parse the "kanjidic" kanji data file
         print "$k has radical number $kanji->{$k}{radical}.\n";
     }
 
-(This example is included as L<F<example.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/example.pl> in the distribution.)
+(This example is included as L<F<example.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.17/examples/example.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Data::Kanji::Kanjidic version 0.16
-corresponding to git commit L<fae7e516e66801df9d011eb61ac69dfca1ff55dd|https://github.com/benkasminbullock/Data-Kanji-Kanjidic/commit/fae7e516e66801df9d011eb61ac69dfca1ff55dd> released on Fri Oct 5 10:09:51 2018 +0900.
+This documents Data::Kanji::Kanjidic version 0.17
+corresponding to git commit L<24522d41fc1c917aa3f91855d0a7663aea8acd84|https://github.com/benkasminbullock/Data-Kanji-Kanjidic/commit/24522d41fc1c917aa3f91855d0a7663aea8acd84> released on Thu Mar 11 13:03:01 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -37,28 +37,76 @@ in the old format, rather than the new-format XML file.
 
 =head1 FUNCTIONS
 
-=head2 parse_kanjidic
+=head2 grade
+
+    my $grade2 = grade ($kanjidic_ref, 2);
+
+Given a school grade such as C<2> above, and the return value of
+L</parse_kanjidic>, C<$kanjidic_ref>, return an array reference
+containing a list of all of the kanji from that grade. See L<How is Japanese writing taught to Japanese
+children?|https://www.sljfaq.org/afaq/education.html>
+for more on details of the Japanese education system.
+
+The following example prints a list of the kanji from each school
+grade to standard output:
 
     
-    use utf8;
-    use Data::Kanji::Kanjidic 'parse_kanjidic';
+    use Data::Kanji::Kanjidic qw/parse_kanjidic grade/;
     my $kanjidic = parse_kanjidic ('/home/ben/data/edrdg/kanjidic');
-    print "@{$kanjidic->{猫}{english}}\n";
-    # This prints out "cat".
+    for my $grade (1..6) {
+        my $list = grade ($kanjidic, $grade);
+        print "Grade $grade:\n\n";
+        my $count = 0;
+        for (sort @$list) {
+            print "$_ ";
+            $count++;
+            if ($count % 20 == 0) {
+                print "\n";
+            }
+        }
+        print "\n";
+    }
     
 
-(This example is included as L<F<parse-kanjidic.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/parse-kanjidic.pl> in the distribution.)
+(This example is included as L<F<grades.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.17/examples/grades.pl> in the distribution.)
 
 
-The input is the file name where Kanjidic may be found. The return
-value is a hash reference. The keys of this hash reference are kanji,
-encoded as Unicode. Each of the values of the hash reference are
-entries corresponding to the kanji in the keys. Each value represents
-one line of Kanjidic. Each is a hash reference, with the keys
-described in L</parse_entry>.
+=head2 grade_stroke_order
 
-This function assumes that the kanjidic file is encoded using the
-EUC-JP encoding.
+This is like L</kanji_dictionary_order> and
+L</stroke_radical_jis_order>, except it sorts the kanji by school
+grade, then by stroke number, then by JIS number.
+
+This function is used to make this L<List of kanji
+by elementary school grade|https://www.sljfaq.org/afaq/grade-list.html>.
+
+=head2 kanji_dictionary_order
+
+    my @sorted = sort {kanji_dictionary_order ($kanjidic_ref, $a, $b)} @kanji;
+
+This is a comparision function which puts kanji in the order they
+would be found in a Japanese kanji dictionary. Elements are sorted by
+the value of the L</radical> field, then by the first stroke count
+value (the first entry of the L</S> field) if they both have the same
+radical. Elements with the same stroke count and radical are finally
+sorted in order of their JIS code value.
+
+This also adds a new field "kanji_id" to each element of
+C<$kanjidic_ref> so that the order can be reconstructed when referring
+to elements.
+
+See L<How is a kanji dictionary
+used?|https://www.sljfaq.org/afaq/using-a-kanji-dictionary.html>
+for more on kanji dictionary ordering. See L<What
+are kanji radicals?|https://www.sljfaq.org/afaq/radicals.html>
+for more on kanji radicals.
+
+=head2 kanjidic_order
+
+    my @order = kanjidic_order ($k);
+
+This returns a list of the keys of C<$k> sorted by their JIS code
+number, which is the ordering used by the Kanjidic file itself.
 
 =head2 parse_entry
 
@@ -81,7 +129,7 @@ The kanji itself (the same as the key).
 
 The JIS code for the kanji in hexadecimal. This is a two-byte number
 which identifies the kanji in the L<JIS X 0208 encoding
-scheme|http://www.sljfaq.org/afaq/encodings.html#encodings-JIS-X-0208>. The
+scheme|https://www.sljfaq.org/afaq/encodings.html#encodings-JIS-X-0208>. The
 JIS value is the second value in Kanjidic after the kanji in encoded
 form and before the Unicode code point.
 
@@ -186,7 +234,7 @@ frequently used.
     }
     
 
-(This example is included as L<F<frequency.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/frequency.pl> in the distribution.)
+(This example is included as L<F<frequency.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.17/examples/frequency.pl> in the distribution.)
 
 
 =item G
@@ -196,9 +244,9 @@ Year of elementary school this kanji is taught.
 This field is also used by kanjidic to give information on whether the
 kanji is part of the Joyo or Jinmeiyo Kanji sets. If the grade is
 between 1 and 8, the kanji is part of L<the Joyo
-Kanji|http://www.sljfaq.org/afaq/jouyou-kanji.html>. If the grade is 9 or 10, then the kanji is not part of the
+Kanji|https://www.sljfaq.org/afaq/jouyou-kanji.html>. If the grade is 9 or 10, then the kanji is not part of the
 Joyo kanji, but it is part of the L<Jinmeiyo
-Kanji|http://www.sljfaq.org/afaq/jinmeiyou-kanji.html>.
+Kanji|https://www.sljfaq.org/afaq/jinmeiyou-kanji.html>.
 
 See also L</grade>.
 
@@ -290,7 +338,7 @@ romanised. This example also requires L<Lingua::KO::Munja>.
         }
     }
 
-(This example is included as L<F<korean.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/korean.pl> in the distribution.)
+(This example is included as L<F<korean.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.17/examples/korean.pl> in the distribution.)
 
 
 =item X
@@ -360,7 +408,7 @@ the value of the C field rather than the B field.
 =item kokuji
 
 This has a true value (1) if the character is marked as a "kokuji" in
-Kanjidic. See L<Which kanji were created in Japan?|http://www.sljfaq.org/afaq/kokuji.html>
+Kanjidic. See L<Which kanji were created in Japan?|https://www.sljfaq.org/afaq/kokuji.html>
 for more on kokuji.
 
 =item english
@@ -396,7 +444,7 @@ English-language meanings listed.
     }
     
 
-(This example is included as L<F<english-to-kanji.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/english-to-kanji.pl> in the distribution.)
+(This example is included as L<F<english-to-kanji.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.17/examples/english-to-kanji.pl> in the distribution.)
 
 
 Given input like this,
@@ -415,7 +463,7 @@ it outputs this:
 
 =item onyomi
 
-This is an array reference which contains the L<on'yomi|http://www.sljfaq.org/afaq/kanji-pronunciation.html> of the kanji. It may be
+This is an array reference which contains the L<on'yomi|https://www.sljfaq.org/afaq/kanji-pronunciation.html> of the kanji. It may be
 undefined, if no I<on'yomi> readings are listed. The I<on'yomi>
 readings are in katakana, as per Kanjidic itself. It is encoded in
 Perl's internal Unicode encoding.
@@ -440,12 +488,12 @@ The following example prints a list of kanji which have the same on'yomi:
         }
     }
 
-(This example is included as L<F<onyomi-same.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/onyomi-same.pl> in the distribution.)
+(This example is included as L<F<onyomi-same.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.17/examples/onyomi-same.pl> in the distribution.)
 
 
 =item kunyomi
 
-This is an array reference which contains the L<kun'yomi|http://www.sljfaq.org/afaq/kanji-pronunciation.html>.  It may be undefined, if no
+This is an array reference which contains the L<kun'yomi|https://www.sljfaq.org/afaq/kanji-pronunciation.html>.  It may be undefined, if no
 I<kun'yomi> readings are listed. The I<kun'yomi> readings are in
 hiragana, as per Kanjidic itself. It is encoded in Perl's internal
 Unicode encoding.
@@ -495,7 +543,7 @@ For example, to print all the existing values,
     }
     
 
-(This example is included as L<F<morohashi.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/morohashi.pl> in the distribution.)
+(This example is included as L<F<morohashi.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.17/examples/morohashi.pl> in the distribution.)
 
 
 =back
@@ -503,33 +551,28 @@ For example, to print all the existing values,
 For detailed explanations of these codes, see the kanjidic
 documentation, which is linked to under L</About Kanjidic>.
 
-=head2 kanjidic_order
+=head2 parse_kanjidic
 
-    my @order = kanjidic_order ($k);
+    
+    use utf8;
+    use Data::Kanji::Kanjidic 'parse_kanjidic';
+    my $kanjidic = parse_kanjidic ('/home/ben/data/edrdg/kanjidic');
+    print "@{$kanjidic->{猫}{english}}\n";
+    # This prints out "cat".
+    
 
-This returns a list of the keys of C<$k> sorted by their JIS code
-number, which is the ordering used by the Kanjidic file itself.
+(This example is included as L<F<parse-kanjidic.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.17/examples/parse-kanjidic.pl> in the distribution.)
 
-=head2 kanji_dictionary_order
 
-    my @sorted = sort {kanji_dictionary_order ($kanjidic_ref, $a, $b)} @kanji;
+The input is the file name where Kanjidic may be found. The return
+value is a hash reference. The keys of this hash reference are kanji,
+encoded as Unicode. Each of the values of the hash reference are
+entries corresponding to the kanji in the keys. Each value represents
+one line of Kanjidic. Each is a hash reference, with the keys
+described in L</parse_entry>.
 
-This is a comparision function which puts kanji in the order they
-would be found in a Japanese kanji dictionary. Elements are sorted by
-the value of the L</radical> field, then by the first stroke count
-value (the first entry of the L</S> field) if they both have the same
-radical. Elements with the same stroke count and radical are finally
-sorted in order of their JIS code value.
-
-This also adds a new field "kanji_id" to each element of
-C<$kanjidic_ref> so that the order can be reconstructed when referring
-to elements.
-
-See L<How is a kanji dictionary
-used?|http://www.sljfaq.org/afaq/using-a-kanji-dictionary.html>
-for more on kanji dictionary ordering. See L<What
-are kanji radicals?|http://www.sljfaq.org/afaq/radicals.html>
-for more on kanji radicals.
+This function assumes that the kanjidic file is encoded using the
+EUC-JP encoding.
 
 =head2 stroke_radical_jis_order
 
@@ -540,49 +583,6 @@ according to stroke count, the L</S> field. If the stroke count is
 identical, it sorts them according to L</radical>. If both the stroke
 count and radical are the same, it sorts them according to
 L</jiscode>.
-
-=head2 grade_stroke_order
-
-This is like L</kanji_dictionary_order> and
-L</stroke_radical_jis_order>, except it sorts the kanji by school
-grade, then by stroke number, then by JIS number.
-
-This function is used to make this L<List of kanji
-by elementary school grade|http://www.sljfaq.org/afaq/grade-list.html>.
-
-=head2 grade
-
-    my $grade2 = grade ($kanjidic_ref, 2);
-
-Given a school grade such as C<2> above, and the return value of
-L</parse_kanjidic>, C<$kanjidic_ref>, return an array reference
-containing a list of all of the kanji from that grade. See L<How is Japanese writing taught to Japanese
-children?|http://www.sljfaq.org/afaq/education.html>
-for more on details of the Japanese education system.
-
-The following example prints a list of the kanji from each school
-grade to standard output:
-
-    
-    use Data::Kanji::Kanjidic qw/parse_kanjidic grade/;
-    my $kanjidic = parse_kanjidic ('/home/ben/data/edrdg/kanjidic');
-    for my $grade (1..6) {
-        my $list = grade ($kanjidic, $grade);
-        print "Grade $grade:\n\n";
-        my $count = 0;
-        for (sort @$list) {
-            print "$_ ";
-            $count++;
-            if ($count % 20 == 0) {
-                print "\n";
-            }
-        }
-        print "\n";
-    }
-    
-
-(This example is included as L<F<grades.pl>|https://fastapi.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.16/examples/grades.pl> in the distribution.)
-
 
 =head1 SEE ALSO
 
@@ -611,27 +611,12 @@ format of kanjidic.
 
 =item Documentation
 
-The following links point to the documentation of Kanjidic.
-
-=over
-
-=item L<Summary description of kanjidic|http://www.edrdg.org/kanjidic/kanjidic.html>
-
-=item L<Full documentation|http://www.edrdg.org/kanjidic/kanjidic_doc.html>
-
-=back
+The documentation of Kanjidic is at L<http://www.edrdg.org/wiki/index.php/KANJIDIC_Project>
 
 =item Download
 
-Download the F<kanjidic> file at one of the following sites:
-
-=over
-
-=item L<ftp://ftp.edrdg.org/pub/Nihongo/00INDEX.html>
-
-=item L<http://ftp.monash.edu.au/pub/nihongo/00INDEX.html>
-
-=back
+Download the F<kanjidic> file from the links at
+L<http://www.edrdg.org/wiki/index.php/KANJIDIC_Project#Introduction>
 
 =item Licence
 
@@ -656,7 +641,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2018
+2011-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

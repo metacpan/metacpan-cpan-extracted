@@ -1,0 +1,28 @@
+Linux-Sys-CPU-Affinity version 0.03
+=========================
+
+This module allows you to pin any process by its PID to some CPU's group on
+your LInux OS.
+
+Also it has some methods to operate with cpu masks.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+There are no requirements from other Perl libs.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2021 by dchernenko
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.1 or,
+at your option, any later version of Perl 5 you may have available.

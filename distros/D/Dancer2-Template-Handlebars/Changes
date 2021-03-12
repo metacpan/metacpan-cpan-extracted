@@ -1,0 +1,65 @@
+==================================================
+Changes from 2020-03-10 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.00 at 2021-03-10 22:37:52 +0000
+-----------------------------------------
+
+  Change: 618337af9af78d47451864988b740f77babfc0c6
+  Author: D Ruth Holloway <ruthh@clearbuilt.com>
+  Date : 2021-03-10 14:37:32 +0000
+
+    Minor doc updates, and a new perlcriticrc 
+
+  Change: 4bed7db2f39dbc65058e722df378992831539f27
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-02 20:48:53 +0000
+
+    Updated cpanfile 
+
+  Change: 755f0ff071a241d4ed677d6e81477f62f9712655
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-02 19:33:45 +0000
+
+    Update dist.ini 
+
+  Change: 86d4024053d3c943f827aad58324b36e68646532
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-02 19:33:45 +0000
+
+    Update dist.ini 
+
+  Change: 54aa2a2eb1a36eddd115cf876df166375d5b87f0
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-02 19:33:45 +0000
+
+    Add more docs, and linkage metadata. 
+
+  Change: a9b32df21f567d41dde96ef878d8d16945f644dc
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-02 19:33:45 +0000
+
+    Minor tweak, and a typo fix 
+
+  Change: e014abe7e1951c5807e6a91e16fc1d7e5e2134bd
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-02 19:33:45 +0000
+
+    Add some test requirements, and update dist.ini 
+
+  Change: e2a95c6ba93698e7661e61b882151d46181a86f3
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-02 19:33:45 +0000
+
+    ...can it be *tested*? 
+
+  Change: 733ad76824f55dc88a47c52d82fdbda90a085e1a
+  Author: D Ruth Holloway <ruth@hiruthie.me>
+  Date : 2021-01-02 19:33:45 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

@@ -5,21 +5,22 @@ require Exporter;
 use warnings;
 use strict;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw/parse_kanjidic
-		    parse_entry
-		    kanji_dictionary_order
-		    grade_stroke_order
-		    kanjidic_order
-		    stroke_radical_jis_order
-		    %codes
-		    %has_dupes
-		    grade
-		   /;
+our @EXPORT_OK = qw/
+    %codes
+    %has_dupes
+    grade
+    grade_stroke_order
+    kanji_dictionary_order
+    kanjidic_order
+    parse_entry
+    parse_kanjidic
+    stroke_radical_jis_order
+/;
 
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 use strict;
 use warnings;
 use Encode;
@@ -179,7 +180,7 @@ sub parse_entry
                 $found = 1;
             }
             else {
-                if ($entry =~ m/^([あ-ん\.-]+)$/) {
+                if ($entry =~ m/^([あ-んー\.-]+)$/) {
                     push @kunyomi, $entry;
                     $found = 1;
                 }

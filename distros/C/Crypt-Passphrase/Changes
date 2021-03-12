@@ -1,4 +1,10 @@
 Revision history for Crypt-Passphrase
 
+0.003     2021-03-11 20:50:59+01:00 Europe/Amsterdam
+          - Fix password encoding to utf8
+
+0.002     2021-03-11 19:54:06+01:00 Europe/Amsterdam
+          - Normalize passwords before hashing them
+
 0.001     2021-03-07 23:13:38+01:00 Europe/Amsterdam
           Initial release to an unsuspecting world

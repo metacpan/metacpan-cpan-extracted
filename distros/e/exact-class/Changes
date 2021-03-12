@@ -1,5 +1,8 @@
 Revision history for exact::class
 
+1.13      2021-03-11 08:58:31-08:00 America/Los_Angeles
+        - Role class_has attributes don't cross-contaminate beyond the class
+
 1.12      2021-02-04 14:44:44-08:00 America/Los_Angeles
         - Pre-support for exact v1.15 try implementation switch
 

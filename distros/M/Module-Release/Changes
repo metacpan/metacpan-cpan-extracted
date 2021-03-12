@@ -1,16 +1,33 @@
 Revision history for Perl module Module::Release
 
+2.128 2021-03-11T03:09:57Z
+	* promote to a user release.
+
+2.127_04 2021-02-26T15:13:29Z
+	* Tell the tests where to find t/lib/setup_common.pl, since v5.26
+	turned off the dot in @INC.
+
+2.127_03 2021-02-25T20:43:48Z
+	* Silence a warning from using a missing CPAN version
+
+2.127_02 2021-02-25T20:28:34Z
+	* Handle a problem looking for a new module on CPAN
+
+2.127_01 2021-02-13T12:11:43Z
+	* Test the new Changes UTF-8 stuff - åü⏎☃
+
 2.127 2021-02-13T11:46:58Z
 	* Move dist testing past quicker-to-fail sanity checks
 	* Check that the release will have a version larger than what is
-	already on CPAN
-	* Add Module::Release::Git 1.016 featues to control which branch 
+	already on CPAN. There's a new ::MetaCPAN plugin for that.
+	* Add Module::Release::Git 1.016 features to control which branch
 	can release and set the commit message format from config
 	* Clean up a lot of the output, adding more section headers as
 	the process moves through its stages
 	* see the "Configuration" section in script/release for what's
 	new. Most things should be fine even if you don't have the latest
 	modules.
+	* release now sets standard input to UTF-8.
 
 2.126_01 2021-01-29T18:36:09Z
 	* Fix the code to look back in git history to find the latest
@@ -21,8 +38,6 @@ Revision history for Perl module Module::Release
 	are modest. Time::Piece comes with Perl.
 	* Tux added a `require` field to configuration
 	* Dump Travis CI but add Github Actions
-
-2.125 2018-05-22T14:13:33Z
 	* Add "required" .releaserc entry to test perls before you use them
 
 2.125 2018-02-27T10:55:54Z

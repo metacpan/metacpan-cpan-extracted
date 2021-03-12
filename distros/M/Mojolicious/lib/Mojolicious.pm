@@ -8,6 +8,7 @@ use Mojo::Exception;
 use Mojo::Home;
 use Mojo::Loader;
 use Mojo::Log;
+use Mojo::Server;
 use Mojo::Util;
 use Mojo::UserAgent;
 use Mojolicious::Commands;
@@ -55,7 +56,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Waffle';
-our $VERSION  = '9.03';
+our $VERSION  = '9.07';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -146,7 +147,7 @@ sub helper { shift->renderer->add_helper(@_) }
 sub hook { shift->plugins->on(@_) }
 
 sub new {
-  my $self = shift->SUPER::new(@_);
+  my $self = shift->SUPER::new((ref $_[0] ? %{shift()} : @_), @Mojo::Server::ARGS_OVERRIDE);
 
   my $home = $self->home;
   push @{$self->renderer->paths}, $home->child('templates')->to_string;

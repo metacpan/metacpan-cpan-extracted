@@ -36,6 +36,7 @@ t/14-no-settings.t
 t/15-gh3-warnings-with-empty-sheet-name.t
 t/16-gh5-custom-styles.t
 t/16-warnings-with-styles.t
+t/17-gh7-OrderBySheet.t
 t/20200617_Testnummers_inclusief_omnummertabel_GBA-V.ods
 t/active-sheet-2.ods
 t/attr.ods

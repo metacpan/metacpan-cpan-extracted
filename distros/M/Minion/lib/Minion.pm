@@ -20,7 +20,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.18';
+our $VERSION = '10.19';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -1191,7 +1191,7 @@ Licensed under the CC-SA License, Version 4.0 L<http://creativecommons.org/licen
 
 =head2 Bootstrap
 
-  Copyright (C) 2011-2018 The Bootstrap Authors.
+  Copyright (C) 2011-2021 The Bootstrap Authors.
 
 Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
 

@@ -2,14 +2,13 @@ package Test2::Harness::UI::Controller::Upload;
 use strict;
 use warnings;
 
-our $VERSION = '0.000041';
+our $VERSION = '0.000043';
 
 use Text::Xslate();
 
 use Test2::Harness::Util::JSON qw/decode_json/;
 use Test2::Harness::Util qw/open_file/;
 
-use Test2::Harness::UI::Import();
 use Test2::Harness::UI::Queries();
 
 use Test2::Harness::UI::Util qw/share_dir/;

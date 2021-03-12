@@ -13,7 +13,7 @@ use Types::Standard qw(ArrayRef Enum HashRef Maybe Str);
 
 use namespace::clean;
 
-our $VERSION = '0.900';
+our $VERSION = '1.000';
 
 has username => (is => 'ro', isa => Username, required => 1);
 has password => (is => 'ro', isa => Maybe[Str], required => 1);

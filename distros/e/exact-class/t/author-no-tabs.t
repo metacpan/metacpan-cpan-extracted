@@ -30,6 +30,7 @@ my @files = (
     't/prop_inherit.t',
     't/release-kwalitee.t',
     't/role.t',
+    't/role_attrs.t',
     't/sub_attrs.t'
 );
 

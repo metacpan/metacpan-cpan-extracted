@@ -21,7 +21,12 @@
       },
       "develop" : {
          "requires" : {
-            "Test::Perl::Critic" : "0"
+            "Code::TidyAll" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
@@ -54,32 +59,29 @@
    "provides" : {
       "Dancer2::Template::Handlebars" : {
          "file" : "lib/Dancer2/Template/Handlebars.pm",
-         "version" : "0.4"
+         "version" : "1.00"
       },
       "Dancer2::Template::Handlebars::Helpers" : {
          "file" : "lib/Dancer2/Template/Handlebars/Helpers.pm",
-         "version" : "0.4"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/GeekRuthie/Dancer2-Template-Handlebars/-/issues"
+         "web" : "https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class/-/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://gitlab.com/GeekRuthie/Dancer2-Template-Handlebars.git",
-         "web" : "https://gitlab.com/GeekRuthie/Dancer2-Template-Handlebars"
+         "url" : "https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class.git",
+         "web" : "https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class"
       }
    },
-   "version" : "0.4",
-   "x_author_pledge" : {
-      "version" : 1
-   },
-   "x_contributor_covenant" : {
-      "version" : 0.02
-   },
-   "x_generated_by_perl" : "v5.30.3",
+   "version" : "1.00",
+   "x_contributors" : [
+      "D Ruth Holloway <ruthh@clearbuilt.com>"
+   ],
+   "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

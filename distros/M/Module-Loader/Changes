@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Loader
 
+0.04 2021-03-11 NEILB
+    - Include META.json in the release
+    - Switched to github issues rather than RT
+
 0.03 2014-10-07 NEILB
     - I was using my pod extension M<...> (from Text::Markdown::PerlExtensions)
       instead of L<...>. Thanks to GRANTM and OALDERS for reporting this.

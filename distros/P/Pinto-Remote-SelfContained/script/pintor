@@ -6,7 +6,7 @@ use warnings;
 
 use Pinto::Remote::SelfContained::App;
 
-our $VERSION = '0.900';
+our $VERSION = '1.000';
 
 Pinto::Remote::SelfContained::App->new_from_argv(\@ARGV)->run;
 

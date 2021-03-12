@@ -11,11 +11,14 @@ Makefile.PL
 README.md
 lib/Sys/Binmode.pm
 ppport.h
+t/constant.t
 t/do_require.t
 t/exec_and_system.t
 t/filesys.t
 t/net.t
 t/net_setsockopt.t
+t/overloaded.t
+t/readpipe.t
 t/syscall.t
 t/unimport.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

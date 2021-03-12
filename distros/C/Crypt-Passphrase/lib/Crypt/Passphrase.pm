@@ -1,10 +1,12 @@
 package Crypt::Passphrase;
-$Crypt::Passphrase::VERSION = '0.001';
+$Crypt::Passphrase::VERSION = '0.003';
 use strict;
 use warnings;
 
 use Carp 'croak';
 use Scalar::Util 'blessed';
+use Encode 'encode';
+use Unicode::Normalize 'NFC';
 
 sub _load_extension {
 	my $name = shift;
@@ -66,9 +68,14 @@ sub new {
 	return $self;
 }
 
+sub _normalize_password {
+	my $password = shift;
+	return encode('utf-8-strict', NFC($password));
+}
+
 sub hash_password {
 	my ($self, $password) = @_;
-	return $self->{encoder}->hash_password($password);
+	return $self->{encoder}->hash_password(_normalize_password($password));
 }
 
 sub needs_rehash {
@@ -82,7 +89,7 @@ sub verify_password {
 
 	for my $validator (@{ $self->{validators} }) {
 		if ($validator->accepts_hash($hash)) {
-			return $validator->verify_password($password, $hash);
+			return $validator->verify_password(_normalize_password($password), $hash);
 		}
 	}
 
@@ -105,7 +112,7 @@ Crypt::Passphrase - A module for managing passwords in a cryptographically agile
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -128,7 +135,9 @@ This module manages the passwords in a cryptographically agile manner. Following
 
 =head1 METHODS
 
-=head2 new(...)
+=head2 new(%args)
+
+This creates a new C<Crypt::Passphrase> object. It takes two named arguments:
 
 =over 4
 
@@ -177,6 +186,24 @@ This will check a password satisfies a certain hash.
 This will check if a hash needs to be rehashed, either because it's in the wrong cipher or because the parameters are insufficient.
 
 Calling this only ever makes sense after a password has been verified.
+
+=head1 TIPS AND TRICKS
+
+=head2 Custom configurations
+
+While encoders generally allow for a default configuration, I would strongly encourage anyone to research what settings work for your application. It is generally a trade-off between usability/resources and security.
+
+=head2 Unicode
+
+C<Crypt::Password> considers passwords to be text, and as such you should ensure any password input is decoded if it contains any non-ascii characters. C<Crypt::Password> will take care of both normalizing and encoding such input.
+
+=head2 DOS attacks
+
+Hashing passwords is by its nature a heavy operations. It can be abused by malignant actors who want to try to DOS your application. It may be wise to do some form of DOS protection such as a proof-of-work schemei or a captcha.
+
+=head2 Levels of security
+
+In some situations, it may be appropriate to have different password settings for different users (e.g. set them more strict for administrators than for ordinary users).
 
 =head1 SEE ALSO
 

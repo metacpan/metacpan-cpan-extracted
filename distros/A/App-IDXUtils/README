@@ -3,7 +3,7 @@ NAME
     Exchange
 
 VERSION
-    This document describes version 0.005 of App::IDXUtils (from Perl
+    This document describes version 0.006 of App::IDXUtils (from Perl
     distribution App-IDXUtils), released on 2021-01-17.
 
 SYNOPSIS
@@ -43,6 +43,9 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::idxdb
 
 AUTHOR
     perlancar <perlancar@cpan.org>

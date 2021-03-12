@@ -16,6 +16,7 @@ use Time::Piece;
 
 use lib qw(lib);
 use Dist::Zilla::PluginBundle::Author::GSG;
+use Dist::Zilla::Plugin::Author::GSG;
 
 $ENV{EMAIL} = 'fake@example.com'; # force a default for git
 delete $ENV{V}; # because it could mess up Git::NextVersion
@@ -31,18 +32,11 @@ delete $ENV{V}; # because it could mess up Git::NextVersion
     my $git = Git::Wrapper->new('.');
     plan skip_all => "No Git!" unless $git->has_git_in_path;
 
-    my $version = $git->version;
-    diag "Have git $version";
+    my $git_version = $git->version;
+    diag "Have git $git_version";
 
-    # This should make us skip tests if the version is unparsable
-    # but I actually want to see what the version is on cpantesters
-    # causing the "Invalid version format" error.
-    # http://www.cpantesters.org/cpan/report/10799c66-614d-11eb-8a9e-254c33959232
-    #$version = do { local $@; eval { local $SIG{__DIE__};
-    #        version->parse($version) } } || 'v0';
-
-    plan skip_all => "Git is too old: $version"
-        if $version < version->parse(v1.7.5);
+    plan skip_all => "Git is too old: $git_version"
+        unless Dist::Zilla::Plugin::Author::GSG::_git_version_ok($git_version);
 }
 
 my $year   = 1900 + (localtime)[5];
@@ -218,7 +212,7 @@ subtest 'NextVersion' => sub {
     is $tzil->version, 'v0.0.1', 'First version is v0.0.1';
 
     my ($version_plugin)
-        = $tzil->plugin_named('@Author::GSG/GSG::Git::NextVersion');
+        = $tzil->plugin_named('@Author::GSG/Author::GSG::Git::NextVersion');
     my ($changelog_plugin)
         = $tzil->plugin_named('@Author::GSG/ChangelogFromGit::CPAN::Changes');
     my ($git_tag_plugin)
@@ -543,6 +537,55 @@ subtest "Set correct GitHub Remote" => sub {
         is $set{github}, 2, "Set two Git::Push Plugin";
     }
 };
+
+subtest "Pass through MungeableFiles params" => sub {
+
+    my $dir = File::Temp->newdir("dzpbag-XXXXXXXXX");
+
+    my $git = Git::Wrapper->new($dir);
+    my $upstream = 'GrantStreetGroup/p5-OurExternal-Package';
+
+    $git->init;
+    $git->remote( qw/ add origin /,
+        "https://fake.github.com/$upstream.git" );
+
+    my $tzil = Builder->from_config(
+        { dist_root => 'corpus/dist/basic' },
+        {   also_copy => { $dir => 'source' },
+            add_files => {
+                'source/cpanfile' =>
+                    "requires 'perl', 'v5.10.0';",
+                'source/dist.ini' => dist_ini(
+                    { name => 'Test-Compile' },
+                    [   '@Author::GSG' => {
+                            dont_munge => [ qr/one-off/ ],
+                        },
+                    ],
+                ),
+                'source/one-off/script.sh' => 1,
+                'source/one-off/script.pl' => 1,
+                'source/one-off/script.pm' => 1,
+                'source/lib/MyPackage.pm'  =>
+                    "package Fake;\n# ABSTRACT: ABSTRACT\n1;"
+            }
+        }
+    );
+
+    my $source_git = Git::Wrapper->new( $tzil->tempdir->child('/source') );
+    $source_git->add('.');
+    $source_git->commit( -a => { m => "Add new files for Git::GatherDir" });
+
+    $tzil->build;
+
+    my ($plugin) = grep { $_->plugin_name =~ /MungeableFiles/ }
+        @{ $tzil->plugins };
+    ok $plugin, 'Find plugin.';
+
+    Test::Deep::cmp_bag [ map { $_->name } @{ $plugin->find_files } ], [
+        'lib/MyPackage.pm',
+    ], 'Exclude the one-off scripts.';
+};
+
 
 subtest "Pass through Git::GatherDir params" => sub {
     my $tzil = Builder->from_config(

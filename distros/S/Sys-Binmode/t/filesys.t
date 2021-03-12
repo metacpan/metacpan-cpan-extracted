@@ -9,6 +9,9 @@ use Test::FailWarnings;
 use File::Temp;
 use Errno;
 use Fcntl;
+use Config;
+
+$| = 1;
 
 my $dir = File::Temp::tempdir( CLEANUP => 1 );
 
@@ -29,7 +32,7 @@ do {
     ok( fileno($rfh), 'open() with upgraded string' );
 };
 
-if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
+{
     use Sys::Binmode;
 
     ok( (-e _get_path_up()), '-e with upgraded string' );
@@ -86,59 +89,90 @@ if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
         'chown with upgraded string',
     );
 
-    ok(
-        link( _get_path_up(), _get_path_up() . '-link' ),
-        'link with upgraded string',
-    );
+  SKIP: {
+        skip "No link() on $^O", 1 if !$Config{'d_link'};
+
+        ok(
+            link( _get_path_up(), _get_path_up() . '-link' ),
+            'link with upgraded string',
+        );
+    }
 
     ok( (lstat _get_path_up())[2], 'lstat with upgraded string' );
 
-    mkdir( _get_path_up() . '-dir' );
+    my $mkdir_ok = mkdir( _get_path_up() . '-dir' ) or warn "mkdir: $!";
+    ok( $mkdir_ok, 'mkdir with upgraded string: success' );
 
+    my $exists = (-e "$dir/$e_down-dir");
     ok(
-        (-e "$dir/$e_down-dir"),
-        'mkdir with upgraded string',
+        $exists,
+        'mkdir with upgraded string - did the thing',
     );
 
     # In case mkdir created the wrong-named directory, we delete
     # whatever it created and create the path we want to exist:
-    rmdir( _get_path_up() . '-dir' ) or warn "rmdir: $!";
+    if ($exists) {
+        rmdir( _get_path_up() . '-dir' ) or warn "rmdir: $!, $^E";
+    }
+
     mkdir "$dir/$e_down-dir";
 
-    ok(
-        opendir( my $dh, _get_path_up() . '-dir' ),
-        'opendir with upgraded string',
-    );
+    {
+        ok(
+            opendir( my $dh, _get_path_up() . '-dir' ),
+            'opendir with upgraded string',
+        );
 
-    () = readlink _get_path_up();
-    is( 0 + $!, Errno::EINVAL, 'readlink with upgraded string' );
+        closedir $dh;
+    }
+
+  SKIP: {
+        skip "No readlink in $^O", 1 if !$Config{'d_readlink'};
+
+        () = readlink _get_path_up();
+        is( 0 + $!, Errno::EINVAL, 'readlink with upgraded string' );
+    }
+
+    # Explicit close needed for Windows:
+    do { open my $w, '>', "$dir/$e_down-renameme"; close $w };
+
+    my $rename_ok = rename(
+        _get_path_up() . '-renameme',
+        _get_path_up() . '-rename2',
+    ) or warn "rename: $! ($^E)";
 
     ok(
-        rename( _get_path_up() . '-link', _get_path_up() . '-link2' ),
+        $rename_ok,
         'rename with upgraded string',
     );
 
+    my $removed_ok = rmdir( _get_path_up() . '-dir' ) or warn "rmdir: $!, $^E";
     ok(
-        rmdir( _get_path_up() . '-dir' ),
+        $removed_ok,
         'rmdir with upgraded string',
     );
 
     ok( (stat _get_path_up())[2], 'stat with upgraded string' );
 
-    symlink 'haha', _get_path_up() . '-symlink';
-    is(
-        (readlink "$dir/$e_down-symlink"),
-        'haha',
-        'symlink with upgraded string',
-    );
+    SKIP: {
+        skip "No symlink() in $^O", 1 if !$Config{'d_symlink'};
+
+        symlink 'haha', _get_path_up() . '-symlink' or diag "symlink: $!";
+        is(
+            (readlink "$dir/$e_down-symlink"),
+            'haha',
+            'symlink with upgraded string',
+        );
+    }
 
     ok(
         sysopen( my $rfh, _get_path_up(), Fcntl::O_RDONLY),
         'sysopen with upgraded string',
     );
 
+    do { open my $fh, '>', "$dir/$e_down-truncateme"; close $fh };
     ok(
-        truncate(_get_path_up(), 0),
+        truncate(_get_path_up() . '-truncateme', 0),
         'truncate with upgraded string',
     );
 
@@ -147,22 +181,21 @@ if ($^O =~ m<linux|darwin|bsd|cygwin>i) {
         'utime with upgraded string',
     );
 
+    do { open my $fh, '>', "$dir/$e_down-unlinkme"; close $fh };
     ok(
-        unlink( _get_path_up() ),
+        unlink( _get_path_up() . '-unlinkme' ),
         'unlink with upgraded string',
     );
 
-    mkdir( _get_path_up() . '-dir' );
+    mkdir( _get_path_up() . '-chdirdir' );
 
+    my $chdir_ok = chdir( _get_path_up() . '-chdirdir' ) or diag "chdir: $!";
     ok(
-        chdir( _get_path_up() . '-dir' ),
+        $chdir_ok,
         'chdir with upgraded string',
     );
 
     chdir '/';
-}
-else {
-    diag "Skipping most tests on this OS ($^O).";
 }
 
 done_testing();

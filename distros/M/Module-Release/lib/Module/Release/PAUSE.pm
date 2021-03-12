@@ -10,7 +10,7 @@ use Carp qw(croak);
 
 our @EXPORT = qw();
 
-our $VERSION = '2.127';
+our $VERSION = '2.128';
 
 =encoding utf8
 
@@ -34,7 +34,7 @@ L<Module::Release>
 
 =head1 SOURCE AVAILABILITY
 
-This source is in GitHub
+This source is in GitHub:
 
 	https://github.com/briandfoy/module-release
 

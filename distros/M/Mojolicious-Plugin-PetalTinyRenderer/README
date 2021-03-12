@@ -47,7 +47,7 @@ STASH
 
     The current controller instance can be accessed as c.
 
-     I see you are requesting a document from 
+     I see you are requesting a document from
      <span tal:replace="c/req/headers/host">Lorem ipsum</span>.
 
 USEFUL PATTERNS
@@ -121,11 +121,13 @@ SEE ALSO
 
 AUTHOR
 
+    jonasbn
+
     Lars Balker <lars@balker.dk>
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2014 by DK Hostmaster A/S.
+    This software is copyright (c) 2014-2021 by DK Hostmaster A/S.
 
     This is free software, licensed under:
 

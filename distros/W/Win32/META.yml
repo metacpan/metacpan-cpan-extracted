@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name: Win32
 abstract: Interfaces to some Win32 API Functions
-version: 0.56
+version: 0.57
 author:
   - Jan Dubois <jan@jandubois.com>
 license: perl

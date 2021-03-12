@@ -1,5 +1,8 @@
 Revision history for Perl extension Spreadsheet::ReadSXC.
 
+0.34  2021-03-10
+    * Fix OrderBySheet option in Spreadsheet::ReadSXC, thanks to Kuerbis!
+
 0.33  2020-12-28
     * Read style attributes immediately from Twig. This increases memory usage
       but removes problems when we recycle the Twig object for parsing another

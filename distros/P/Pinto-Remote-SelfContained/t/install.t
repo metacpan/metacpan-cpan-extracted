@@ -110,7 +110,7 @@ subtest 'install with pull and password', sub {
             'content-length' => re(qr/^(?:0|[1-9][0-9]*)\z/),
             'content-type' => re(qr{^multipart/form-data; boundary=[a-zA-Z0-9]+\z}),
             'host' => 'example.com',
-            'user-agent' => 'T-HTTPTiny/0.900',
+            'user-agent' => 'T-HTTPTiny/1.000',
         },
         host => 'example.com',
         host_port => 'example.com',

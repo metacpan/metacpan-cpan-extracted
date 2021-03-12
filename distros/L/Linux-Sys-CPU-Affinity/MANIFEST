@@ -1,0 +1,8 @@
+Affinity.xs
+Changes
+Makefile.PL
+MANIFEST
+README
+typemap
+t/Linux-Sys-CPU-Affinity.t
+lib/Linux/Sys/CPU/Affinity.pm

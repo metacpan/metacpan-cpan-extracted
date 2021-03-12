@@ -1,4 +1,4 @@
-package Dancer2::Template::Handlebars::Helpers 0.4;
+package Dancer2::Template::Handlebars::Helpers 1.00;
 
 # ABSTRACT: parent class for Handlebars' helper collections
 
@@ -37,7 +37,7 @@ Dancer2::Template::Handlebars::Helpers - parent class for Handlebars' helper col
 
 =head1 VERSION
 
-version 0.4
+version 1.00
 
 =head1 SYNOPSIS
 

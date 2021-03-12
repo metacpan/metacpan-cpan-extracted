@@ -391,15 +391,10 @@ my @vcs = (
 
 foreach my $vcs ( @vcs ) {
 	next unless -e $vcs->[0];
-
 	my $module = $vcs->[1];
-
 	$release->_debug( "I see an $vcs->[0] directory, so I'm loading $module\n" );
-
 	$release->load_mixin( $module );
-
 	$release->_die( "Could not load $module: $@\n" ) if $@;
-
 	last;
 	}
 }
@@ -455,8 +450,8 @@ unless( $opts{V} ) {
 	$release->dist;
 	$release->_print("Module name is <". $release->module_name . ">\n");
 
-	my $cpan = $release->cpan_version;
-	my $dist = $release->dist_version;
+	my $cpan = $release->cpan_version // '<undef>';
+	my $dist = eval { $release->dist_version } // '<error?>';
 
 	$release->_print("CPAN Version: $cpan\n");
 	$release->_print("Dist Version: $dist\n");
@@ -510,7 +505,7 @@ if ($skip_dist) {
 	}
 else {
 	$release->dist unless( $release->local_file and -e $release->local_file );
-	$Version = $release->dist_version;
+	$Version = eval { $release->dist_version } // 'error?';
 	$release->_debug( "dist version is <$Version>\n" );
 	}
 
@@ -524,8 +519,10 @@ $release->_debug( "dist version is <$Version>\n" );
 unless( $opts{T} ) {
 	my $old_perl = $release->get_perl;
 
-	PERL: foreach my $perl ( $release->perls ) {
-		$release->_print("============Testing with $perl\n");
+	my @perls = $release->perls;
+	my ($n, $N) = (1, scalar @perls);
+	PERL: foreach my $perl ( @perls ) {
+		$release->_print("============ Testing with $perl (", $n++, "/$N)\n");
 		$release->set_perl( $perl ) or next;
 
 		$release->clean;

@@ -7,7 +7,7 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 use PerlX::Maybe;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 =head1 NAME
 

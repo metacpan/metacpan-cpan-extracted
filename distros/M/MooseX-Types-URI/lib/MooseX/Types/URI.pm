@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package MooseX::Types::URI; # git description: v0.07-13-g73c0cd8
+package MooseX::Types::URI; # git description: v0.08-13-gb4d8e96
 # ABSTRACT: URI related types and coercions for Moose
 # KEYWORDS: moose types constraints coercions uri path web
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Scalar::Util qw(blessed);
 
@@ -13,7 +13,6 @@ use URI::QueryParam;
 use URI::WithBase;
 
 use MooseX::Types::Moose qw{Str ScalarRef HashRef};
-use MooseX::Types::Path::Class qw{File Dir};
 
 use MooseX::Types 0.40 -declare => [qw(Uri _UriWithBase _Uri FileUri DataUri)];
 use if MooseX::Types->VERSION >= 0.42, 'namespace::autoclean';
@@ -37,10 +36,13 @@ register_type_constraint($uri);
 
 coerce( Uri,
     from Str                 , via { URI->new($_) },
-    from "Path::Class::File" , via { require URI::file; URI::file::->new($_) },
-    from "Path::Class::Dir"  , via { require URI::file; URI::file::->new($_) },
-    from File                , via { require URI::file; URI::file::->new($_) },
-    from Dir                 , via { require URI::file; URI::file::->new($_) },
+    eval { +require MooseX::Types::Path::Class; 1 }
+      ? (
+        from "Path::Class::File", via { require URI::file; URI::file::->new($_) },
+        from "Path::Class::Dir" , via { require URI::file; URI::file::->new($_) },
+        from MooseX::Types::Path::Class::File() , via { require URI::file; URI::file::->new($_) },
+        from MooseX::Types::Path::Class::Dir()  , via { require URI::file; URI::file::->new($_) },
+      ) : (),
     from ScalarRef           , via { my $u = URI->new("data:"); $u->data($$_); $u },
     from HashRef             , via { require URI::FromHash; URI::FromHash::uri_object(%$_) },
 );
@@ -49,10 +51,13 @@ class_type FileUri, { class => "URI::file", parent => $uri };
 
 coerce( FileUri,
     from Str                 , via { require URI::file; URI::file::->new($_) },
-    from File                , via { require URI::file; URI::file::->new($_) },
-    from Dir                 , via { require URI::file; URI::file::->new($_) },
-    from "Path::Class::File" , via { require URI::file; URI::file::->new($_) },
-    from "Path::Class::Dir"  , via { require URI::file; URI::file::->new($_) },
+    eval { +require MooseX::Types::Path::Class; 1 }
+      ? (
+        from MooseX::Types::Path::Class::File() , via { require URI::file; URI::file::->new($_) },
+        from MooseX::Types::Path::Class::Dir()  , via { require URI::file; URI::file::->new($_) },
+        from "Path::Class::File" , via { require URI::file; URI::file::->new($_) },
+        from "Path::Class::Dir"  , via { require URI::file; URI::file::->new($_) },
+      ) : (),
 );
 
 class_type DataUri, { class => "URI::data" };
@@ -76,7 +81,7 @@ MooseX::Types::URI - URI related types and coercions for Moose
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -97,7 +102,8 @@ Either L<URI> or L<URI::WithBase>
 
 Coerces from C<Str> via L<URI/new>.
 
-Coerces from L<Path::Class::File> and L<Path::Class::Dir> via L<URI::file/new>.
+Coerces from L<Path::Class::File> and L<Path::Class::Dir> via L<URI::file/new> (but only if
+L<MooseX::Types::Path::Class> is installed)
 
 Coerces from C<ScalarRef> via L<URI::data/new>.
 
@@ -113,7 +119,7 @@ Coerces from C<Str> and C<ScalarRef> via L<URI::data/new>.
 
 A L<URI::file> class type.
 
-Has coercions from C<Str>, L<Path::Class::File> and L<Path::Class::Dir> via L<URI::file/new>
+Has coercions from C<Str> (and optionally L<Path::Class::File> and L<Path::Class::Dir>) via L<URI::file/new>
 
 =for stopwords DWIMier ducktyping
 
@@ -126,6 +132,17 @@ will work anyway (e.g. L<URI::WithBase> does not inherit L<URI>).
 =head1 TODO
 
 Think about L<Path::Resource> integration of some sort
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-Types-URI>
+(or L<bug-MooseX-Types-URI@rt.cpan.org|mailto:bug-MooseX-Types-URI@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://lists.perl.org/list/moose.html>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHOR
 
@@ -163,7 +180,7 @@ Shawn M Moore <sartak@gmail.com>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2008 by יובל קוג'מן (Yuval Kogman).
 

@@ -22,18 +22,11 @@ my $dir = File::Temp->newdir("dzpag-XXXXXXXXX");
     my $git = Git::Wrapper->new($dir);
     plan skip_all => "No Git!" unless $git->has_git_in_path;
 
-    my $version = $git->version;
-    diag "Have git $version";
+    my $git_version = $git->version;
+    diag "Have git $git_version";
 
-    # This should make us skip tests if the version is unparsable
-    # but I actually want to see what the version is on cpantesters
-    # causing the "Invalid version format" error.
-    # http://www.cpantesters.org/cpan/report/10799c66-614d-11eb-8a9e-254c33959232
-    #$version = do { local $@; eval { local $SIG{__DIE__};
-    #        version->parse($version) } } || 'v0';
-
-    plan skip_all => "Git is too old: $version"
-        if $version < version->parse(v1.7.5);
+    plan skip_all => "Git is too old: $git_version"
+        unless Dist::Zilla::Plugin::Author::GSG::_git_version_ok($git_version);
 
     $git->init;
     $git->commit( { m => 'init', date => '2001-02-03 04:05:06' },
@@ -45,22 +38,43 @@ my $holder = 'Grant Street Group';
 my $year   = 1900 + (localtime)[5];
 
 subtest 'Require git v1.7.5' => sub {
+    my $version;
     no warnings 'redefine';
-    local *Git::Wrapper::version = sub {'1.7.4.9'};
+    local *Git::Wrapper::version = sub {$version};
     use warnings 'redefine';
 
-    local $@;
-    eval { local $SIG{__DIE__}; Builder->from_config(
-        { dist_root => 'corpus/dist/old-git' },
-        {   add_files => {
-                'source/dist.ini' =>
-                    dist_ini( { name => 'Old-Git', }, 'Author::GSG', ),
+    for ( '1', '1.7', '1.7.4', '1.7.4.9') {
+        $version = $_;
+        local $@;
+        eval { local $SIG{__DIE__}; Builder->from_config(
+            { dist_root => 'corpus/dist/old-git' },
+            {   add_files => {
+                    'source/dist.ini' => dist_ini(
+                        { name => 'Old-Git', }, 'Author::GSG',
+                    ),
+                }
             }
-        }
-    ) };
+        ) };
 
-    like $@, qr/\QGit 1.7.5 or greater is required, only have 1.7.4.9./,
-        "Fatal error with old git versions";
+        like $@, qr/\QGit 1.7.5 or greater is required, only have $version./,
+            "[$version] Fatal error with old git versions";
+    }
+
+    for ( '1.7.5', '1.7.6', '1.70.0', '2.21.1 (Apple Git-122.3)' ) {
+        $version = $_;
+        local $@;
+        eval { local $SIG{__DIE__}; Builder->from_config(
+            { dist_root => 'corpus/dist/old-git' },
+            {   add_files => {
+                    'source/dist.ini' => dist_ini(
+                        { name => 'New-Git', }, 'Author::GSG',
+                    ),
+                }
+            }
+        ) };
+
+        ok !$@, "[$version] No errors with new git";
+    }
 };
 
 subtest 'Dist with defaults' => sub {

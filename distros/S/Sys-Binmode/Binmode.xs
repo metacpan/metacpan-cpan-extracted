@@ -7,6 +7,8 @@
 
 #include "ppport.h"
 
+#define DEBUG 0
+
 /* A duplicate of PL_ppaddr as we find it at BOOT time.
    We can thus overwrite PL_ppaddr with our own wrapper functions.
    This interacts better with wrap_op_checker(), which doesn’t provide
@@ -23,106 +25,151 @@ static Perl_ppaddr_t ORIG_PL_ppaddr[OP_max];
     #define dMARK_TOPMARK SV **mark = PL_stack_base + TOPMARK
 #endif
 
-#define MAKE_LIST_WRAPPER(OPID)                             \
-static OP* _wrapped_pp_##OPID(pTHX) {                       \
-    SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
-                                                            \
-    if (svp != &PL_sv_placeholder) {                        \
-        dSP;                                                \
-        dMARK_TOPMARK;                                      \
-        dORIGMARK;                                          \
-                                                            \
-        while (++MARK <= SP)                                \
-            if (SvPOK(*MARK))                               \
-                sv_utf8_downgrade(*MARK, FALSE);            \
-                                                            \
-        MARK = ORIGMARK;                                    \
-    }                                                       \
-                                                            \
-    return ORIG_PL_ppaddr[OPID](aTHX);                      \
+#define DOWNGRADE_SVPV(sv) if (SvPOK(sv) && SvUTF8(sv)) sv_utf8_downgrade(sv, FALSE)
+
+static inline void MY_DOWNGRADE(pTHX_ SV** svp) {
+    if (UNLIKELY(SvGAMAGIC(*svp))) {
+
+        /* If the parameter in question is magical/overloaded
+           then we need to fetch the (string) value, downgrade it,
+           then replace the overloaded object in the stack with
+           our fetched value.
+        */
+
+        SV* replacement = sv_newmortal();
+
+        /* fetches the overloadeed value */
+        sv_copypv(replacement, *svp);
+
+        DOWNGRADE_SVPV(replacement);
+
+        *svp = replacement;
+    }
+
+    /* NB: READONLY strings can be downgraded. */
+    else DOWNGRADE_SVPV(*svp);
 }
 
-/* Ops that take only 1 arg don’t always set a mark. We can’t
-   just iterate from MARK to SP in those cases; we just have to
-   grab *SP and go with it.
+#define BINMODE_IS_ON (cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0) != &PL_sv_placeholder)
+
+/* For ops that take an indefinite number of args. */
+#define MAKE_OPEN_LIST_WRAPPER(OPID) MAKE_CAPPED_LIST_WRAPPER(OPID, 0)
+
+/* For ops whose number of string args is a fixed range.
+
+   NB: In some perls, some list opts don’t set MARK. In those cases we
+   fall back to MAXARG. As of now mkdir is the known “offender”, and
+   only on Alpine Linux 3.11 & 3.12 (not 3.13).
 */
-#define MAKE_SCALAR_WRAPPER(OPID)                           \
-static OP* _wrapped_pp_##OPID(pTHX) {                       \
-    SV *svp = cop_hints_fetch_pvs(PL_curcop, HINT_KEY, 0);  \
-                                                            \
-    if (svp != &PL_sv_placeholder) {                        \
-        dSP;                                                \
-                                                            \
-        if (SvPOK(*SP))                                     \
-                sv_utf8_downgrade(*SP, FALSE);              \
-    }                                                       \
-                                                            \
-    return ORIG_PL_ppaddr[OPID](aTHX);                      \
+#define MAKE_CAPPED_LIST_WRAPPER(OPID, OP_MAXARG)       \
+static OP* _wrapped_pp_##OPID(pTHX) {                   \
+    if (BINMODE_IS_ON) {                                \
+        dSP;                                            \
+        dMARK_TOPMARK;                                  \
+                                                        \
+        /* The compiler should optimize this away       \
+           for MAKE_OPEN_LIST_WRAPPER:                  \
+        */                                              \
+        if (OP_MAXARG)                                  \
+            if (SP < MARK || (SP - MARK) > OP_MAXARG) { \
+                unsigned numargs = MAXARG;              \
+                MARK = SP;                              \
+                while (numargs--) MARK--;               \
+            }                                           \
+                                                        \
+        while (++MARK <= SP) MY_DOWNGRADE(aTHX_ MARK);  \
+    }                                                   \
+                                                        \
+    return ORIG_PL_ppaddr[OPID](aTHX);                  \
+}
+
+/* For ops that take a fixed number of args. */
+#define MAKE_FIXED_LIST_WRAPPER(OPID, NUMARGS)      \
+static OP* _wrapped_pp_##OPID(pTHX) {               \
+    if (BINMODE_IS_ON) {                            \
+        unsigned numargs = NUMARGS;                 \
+        dSP;                                        \
+        while (numargs--) MY_DOWNGRADE(aTHX_ SP--); \
+    }                                               \
+                                                    \
+    return ORIG_PL_ppaddr[OPID](aTHX);              \
+}
+
+/* For ops where only the last arg is a string. */
+#define MAKE_SP_WRAPPER(OPID)           \
+static OP* _wrapped_pp_##OPID(pTHX) {   \
+    if (BINMODE_IS_ON) {                \
+        dSP;                            \
+        MY_DOWNGRADE(aTHX_ SP);         \
+    }                                   \
+                                        \
+    return ORIG_PL_ppaddr[OPID](aTHX);  \
 }
 
 
-MAKE_LIST_WRAPPER(OP_OPEN);
-MAKE_LIST_WRAPPER(OP_SYSOPEN);
-MAKE_LIST_WRAPPER(OP_TRUNCATE);
-MAKE_LIST_WRAPPER(OP_EXEC);
-MAKE_LIST_WRAPPER(OP_SYSTEM);
+MAKE_OPEN_LIST_WRAPPER(OP_OPEN);
+MAKE_CAPPED_LIST_WRAPPER(OP_SYSOPEN, 4);
+MAKE_FIXED_LIST_WRAPPER(OP_TRUNCATE, 2);
+MAKE_OPEN_LIST_WRAPPER(OP_EXEC);
+MAKE_OPEN_LIST_WRAPPER(OP_SYSTEM);
 
-MAKE_LIST_WRAPPER(OP_BIND);
-MAKE_LIST_WRAPPER(OP_CONNECT);
-MAKE_LIST_WRAPPER(OP_SSOCKOPT);
+MAKE_SP_WRAPPER(OP_BIND);
+MAKE_SP_WRAPPER(OP_CONNECT);
+MAKE_SP_WRAPPER(OP_SSOCKOPT);
 
-MAKE_SCALAR_WRAPPER(OP_LSTAT);
-MAKE_SCALAR_WRAPPER(OP_STAT);
-MAKE_SCALAR_WRAPPER(OP_FTRREAD);
-MAKE_SCALAR_WRAPPER(OP_FTRWRITE);
-MAKE_SCALAR_WRAPPER(OP_FTREXEC);
-MAKE_SCALAR_WRAPPER(OP_FTEREAD);
-MAKE_SCALAR_WRAPPER(OP_FTEWRITE);
-MAKE_SCALAR_WRAPPER(OP_FTEEXEC);
-MAKE_SCALAR_WRAPPER(OP_FTIS);
-MAKE_SCALAR_WRAPPER(OP_FTSIZE);
-MAKE_SCALAR_WRAPPER(OP_FTMTIME);
-MAKE_SCALAR_WRAPPER(OP_FTATIME);
-MAKE_SCALAR_WRAPPER(OP_FTCTIME);
-MAKE_SCALAR_WRAPPER(OP_FTROWNED);
-MAKE_SCALAR_WRAPPER(OP_FTEOWNED);
-MAKE_SCALAR_WRAPPER(OP_FTZERO);
-MAKE_SCALAR_WRAPPER(OP_FTSOCK);
-MAKE_SCALAR_WRAPPER(OP_FTCHR);
-MAKE_SCALAR_WRAPPER(OP_FTBLK);
-MAKE_SCALAR_WRAPPER(OP_FTFILE);
-MAKE_SCALAR_WRAPPER(OP_FTDIR);
-MAKE_SCALAR_WRAPPER(OP_FTPIPE);
-MAKE_SCALAR_WRAPPER(OP_FTSUID);
-MAKE_SCALAR_WRAPPER(OP_FTSGID);
-MAKE_SCALAR_WRAPPER(OP_FTSVTX);
-MAKE_SCALAR_WRAPPER(OP_FTLINK);
-/* MAKE_SCALAR_WRAPPER(OP_FTTTY); */
-MAKE_SCALAR_WRAPPER(OP_FTTEXT);
-MAKE_SCALAR_WRAPPER(OP_FTBINARY);
-MAKE_SCALAR_WRAPPER(OP_CHDIR);
-MAKE_LIST_WRAPPER(OP_CHOWN);
-MAKE_SCALAR_WRAPPER(OP_CHROOT);
-MAKE_SCALAR_WRAPPER(OP_UNLINK);
-MAKE_LIST_WRAPPER(OP_CHMOD);
-MAKE_LIST_WRAPPER(OP_UTIME);
-MAKE_LIST_WRAPPER(OP_RENAME);
-MAKE_LIST_WRAPPER(OP_LINK);
-MAKE_LIST_WRAPPER(OP_SYMLINK);
-MAKE_SCALAR_WRAPPER(OP_READLINK);
-MAKE_LIST_WRAPPER(OP_MKDIR);
-MAKE_SCALAR_WRAPPER(OP_RMDIR);
-MAKE_LIST_WRAPPER(OP_OPEN_DIR);
+MAKE_SP_WRAPPER(OP_LSTAT);
+MAKE_SP_WRAPPER(OP_STAT);
+MAKE_SP_WRAPPER(OP_FTRREAD);
+MAKE_SP_WRAPPER(OP_FTRWRITE);
+MAKE_SP_WRAPPER(OP_FTREXEC);
+MAKE_SP_WRAPPER(OP_FTEREAD);
+MAKE_SP_WRAPPER(OP_FTEWRITE);
+MAKE_SP_WRAPPER(OP_FTEEXEC);
+MAKE_SP_WRAPPER(OP_FTIS);
+MAKE_SP_WRAPPER(OP_FTSIZE);
+MAKE_SP_WRAPPER(OP_FTMTIME);
+MAKE_SP_WRAPPER(OP_FTATIME);
+MAKE_SP_WRAPPER(OP_FTCTIME);
+MAKE_SP_WRAPPER(OP_FTROWNED);
+MAKE_SP_WRAPPER(OP_FTEOWNED);
+MAKE_SP_WRAPPER(OP_FTZERO);
+MAKE_SP_WRAPPER(OP_FTSOCK);
+MAKE_SP_WRAPPER(OP_FTCHR);
+MAKE_SP_WRAPPER(OP_FTBLK);
+MAKE_SP_WRAPPER(OP_FTFILE);
+MAKE_SP_WRAPPER(OP_FTDIR);
+MAKE_SP_WRAPPER(OP_FTPIPE);
+MAKE_SP_WRAPPER(OP_FTSUID);
+MAKE_SP_WRAPPER(OP_FTSGID);
+MAKE_SP_WRAPPER(OP_FTSVTX);
+MAKE_SP_WRAPPER(OP_FTLINK);
+/* MAKE_SP_WRAPPER(OP_FTTTY); */
+MAKE_SP_WRAPPER(OP_FTTEXT);
+MAKE_SP_WRAPPER(OP_FTBINARY);
+MAKE_SP_WRAPPER(OP_CHDIR);
+MAKE_OPEN_LIST_WRAPPER(OP_CHOWN);
+MAKE_SP_WRAPPER(OP_CHROOT);
+MAKE_OPEN_LIST_WRAPPER(OP_UNLINK);
+MAKE_OPEN_LIST_WRAPPER(OP_CHMOD);
+MAKE_OPEN_LIST_WRAPPER(OP_UTIME);
+MAKE_FIXED_LIST_WRAPPER(OP_RENAME, 2);
+MAKE_FIXED_LIST_WRAPPER(OP_LINK, 2);
+MAKE_FIXED_LIST_WRAPPER(OP_SYMLINK, 2);
+MAKE_SP_WRAPPER(OP_READLINK);
+MAKE_CAPPED_LIST_WRAPPER(OP_MKDIR, 2);
+MAKE_SP_WRAPPER(OP_RMDIR);
+MAKE_SP_WRAPPER(OP_OPEN_DIR);
 
-MAKE_SCALAR_WRAPPER(OP_REQUIRE);
-MAKE_SCALAR_WRAPPER(OP_DOFILE);
+MAKE_SP_WRAPPER(OP_REQUIRE);
+MAKE_SP_WRAPPER(OP_DOFILE);
+MAKE_SP_WRAPPER(OP_BACKTICK);
 
 /* (These appear to be fine already.)
-MAKE_SCALAR_WRAPPER(OP_GHBYADDR);
-MAKE_SCALAR_WRAPPER(OP_GNBYADDR);
+MAKE_SP_WRAPPER(OP_GHBYADDR);
+MAKE_SP_WRAPPER(OP_GNBYADDR);
 */
 
-MAKE_LIST_WRAPPER(OP_SYSCALL);
+MAKE_OPEN_LIST_WRAPPER(OP_SYSCALL);
 
 /* ---------------------------------------------------------------------- */
 
@@ -148,7 +195,7 @@ BOOT:
     OP_CHECK_MUTEX_LOCK;
 #endif
     if (!initialized) {
-        initialized = 1;
+        initialized = true;
 
         HV *stash = gv_stashpv(MYPKG, FALSE);
         newCONSTSUB(stash, "_HINT_KEY", newSVpvs(HINT_KEY));
@@ -208,6 +255,7 @@ BOOT:
 
         MAKE_BOOT_WRAPPER(OP_REQUIRE);
         MAKE_BOOT_WRAPPER(OP_DOFILE);
+        MAKE_BOOT_WRAPPER(OP_BACKTICK);
 
         /* (These appear to be fine already.)
         MAKE_BOOT_WRAPPER(OP_GHBYADDR);

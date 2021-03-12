@@ -16,7 +16,7 @@ use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '2.17';
+our $VERSION = '2.19';
 
 =encoding utf8
 
@@ -248,14 +248,23 @@ sub new {
 	return bless {}, $class unless defined $json;
 
 	my $type = reftype($json) // '';
-	return bless $json, $class if $type eq 'HASH' || $type eq 'ARRAY';
+	if ($type eq 'HASH' || $type eq 'ARRAY') {
+		# shallow blessing to avoid constructor overhead on large data structures
+		# on-fly blessing is performed on dynamic traversal in AUTOLOAD and loop
+		return bless $json, $class;
+	}
 
 	if ($type eq '') {
 		eval{
 			local $SIG{'__DIE__'};
 			$json = JSON->new->decode($json // '');
 		};
-		return bless $json, $class unless $@;
+
+		unless($@) {
+			# shallow blessing to avoid constructor overhead on large data structures
+			# on-fly blessing is performed on dynamic traversal in AUTOLOAD and loop
+			return bless $json, $class;
+		}
 	}
 
 	return 0;
@@ -455,7 +464,7 @@ sub run {
 			if ($self->{_inline}) {
 				$header->{'-disposition'} = 'inline';
 			} else {
-				$header->{'-attachment'} = $self->{_sendfile} =~ /([^\/]+)$/ ? $1 : '';
+				$header->{'-attachment'} = ($self->{_sendfile} // '') =~ /([^\/]+)$/ ? $1 : '';
 			}
 			print $r->header($header);
 			binmode $ofh;
@@ -479,6 +488,7 @@ sub run {
 
 sub _slurp {
 	my ($self, $filename) = @_;
+	return '' unless $filename && -e -f -r $filename;
 	open my $fh, '<', $filename;
 	local $/;
 	<$fh>;
@@ -751,7 +761,7 @@ sub logout {
 
 =head3 raiseError
 
-call this method in order to return an error message to the calling page. You can add as much messages you want, calling the method several times, it will be returned an array of messages to the calling page. The first argument could be either a string or a <B strings array reference>. The second argument is an optional HTTP status code, the default will be 200.
+call this method in order to return an error message to the calling page. You can add as much messages you want, calling the method several times, it will be returned an array of messages to the calling page. The first argument could be either a string or a B<strings array reference>. The second argument is an optional HTTP status code, the default will be 200.
 
 =cut
 
@@ -867,6 +877,8 @@ or copy its value to perform calculation with a copy. Returning the reference as
 won't stop until actual array end.
 Of course this method has the overhead of a function call on every cycle, so use it for convenience on small arrays when performance is not critical.
 You can also want to use this when the operation to perform on each cycle take a significant amount of time where the overhead becomes negligible.
+In general avoid to use it in tight high-performance needing loops. Note that the returned item will be a JSONP object (or a JSONP derived type if you subclass it) B<only if it is a non-blessed HASH or ARRAY reference, already blessed as other class object>, in case the returned item is a raw HASH or ARRAY, it will be blessed with the same class of the array we are looping onto (typically JSONP itself), so the item will hold all the JSONP syntactic sugar and methods.
+Never exit $array->loop cycles using I<last> to avoid memory leaks, you should avoid to use this method when you expect to early exit the cycle.
 
 	my $j = JSONP->new;
 	$j->an->array = [
@@ -888,8 +900,9 @@ You can also want to use this when the operation to perform on each cycle take a
 =cut
 
 sub loop {
-	my ($self, $node) = @_;
+	my ($self) = @_;
 	my $refself = reftype $self // '';
+	my $class = ref $self; # bless in cases we have not a deep recursive blessing
 	return undef unless $refself eq 'ARRAY';
 	# use different counter for every array
 	state $indexes = {};
@@ -902,9 +915,13 @@ sub loop {
 	if ($index < $size){
 		# refs are never undef so we can loop
 		# over false scalar items as well
-		return \$self->[$indexes->{$addr}++];
+		my  $item = $self->[$indexes->{$addr}++];
+		my $reftype = ref $item;
+		# bless the item if it is an unblessed hash or array reference (avoid to touch blessed objects)
+		bless $item, $class if $reftype eq 'HASH' || $reftype eq 'ARRAY';
+		return \$item;
 	} else {
-		#reset counter for next loops
+		# reset counter for next loops
 		# and avoid memory leaks...
 		# note that the loops exited with "last"
 		# will leak few bytes until program end,
@@ -1003,11 +1020,11 @@ sub _bless_tree {
 	my $class = ref $self;
 	my $refnode = ref $node;
 	# proceed only with hashes or arrays not already blessed
-	return if $refnode eq $class;
+	return $node if $refnode eq $class;
 	#my $reftype = reftype($node) // '';
 	#return unless $reftype eq 'HASH' || $reftype eq 'ARRAY';
 	# to not change class to objects grafted to JSONP tree
-	return unless $refnode eq 'HASH' || $refnode eq 'ARRAY';
+	return $node unless $refnode eq 'HASH' || $refnode eq 'ARRAY';
 	bless $node, $class;
 	if ($refnode eq 'HASH'){
 		$self->_bless_tree($node->{$_}) for keys %$node;

@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.010     2021-03-11 19:42:29+01:00 Europe/Amsterdam
+          - Correctly handle raw numbers as memory cost in argon2_needs_rehash
+
 0.009     2021-03-07 23:01:38+01:00 Europe/Amsterdam
           - Added argon2d_pass and argon2d_verify
           - Allow more strictly hashed values in argon2_needs_rehash

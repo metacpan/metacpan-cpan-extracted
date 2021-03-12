@@ -7,7 +7,7 @@ use warnings;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(read_sxc read_sxc_fh read_xml_file read_xml_string);
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Archive::Zip ':ERROR_CODES';
 use Carp qw(croak);
@@ -118,7 +118,7 @@ sub _parse_xml {
     };
 
     if ( $options_ref->{OrderBySheet} ) {
-        return [ map { $res->{ $_ } } $workbook->worksheets ]
+        return [ map { $res->{ $_->{label} } } $workbook->worksheets ]
     } else {
         return $res
     }

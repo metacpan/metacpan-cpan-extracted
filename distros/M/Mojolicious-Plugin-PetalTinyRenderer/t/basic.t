@@ -13,7 +13,7 @@ app->defaults(
 get '/inline' => sub {
     shift->render(inline => "<div tal:content='foo'/>\n", handler => 'tal');
 };
-for ( qw/ data ns file h c missing mc / ) {
+for ( qw/ data ns file h c mc / ) {
     get "/$_";
 }
 

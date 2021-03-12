@@ -1,5 +1,15 @@
 Revision history for Perl module Sys::Binmode
 
+0.03 Wed, 10 March 2021
+- FIX: Segfault in Alpine Linux 3.11 & 3.12 (maybe others?).
+- FIX: This now handles overloaded stringification.
+- FIX: This now handles multi-arg unlink().
+- This now handles readpipe/qx/backticks.
+- Filesystem tests now run on Windows.
+- Skip local-socket-dependent tests if we can’t bind().
+- Fix setsockopt test on Solaris.
+- More documentation improvements.
+
 0.02 Wed, 3 March 2021
 - FIX: do/require now work on Windows.
 - Perl 5.14 is now supported.

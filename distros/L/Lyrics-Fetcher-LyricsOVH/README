@@ -1,0 +1,90 @@
+NAME
+
+    Lyrics::Fetcher::ApiLyricsOVH - Get song lyrics from api.lyrics.ovh.
+
+SYNOPSIS
+
+        #!/usr/bin/perl
+    
+        use Lyrics::Fetcher;
+        print Lyrics::Fetcher->fetch("<artist>","<song>","ApiLyricsOVH");
+    
+        # or, if you want to use this module directly without Lyrics::Fetcher's involvement:
+    
+        use Lyrics::Fetcher::ApiLyricsOVH;
+        print Lyrics::Fetcher::ApiLyricsOVH->fetch("<artist>", "<song>");
+
+DESCRIPTION
+
+    This module tries to get song lyrics from api.lyrics.ovh. It's designed
+    to be called by Lyrics::Fetcher, but can be used directly if you'd
+    prefer.
+
+INTERFACE
+
+    fetch($artist, $title)
+
+      Attempts to fetch the lyrics for the given artist and title from
+      api.lyrics.ovh.
+
+      Returns lyrics as a string, or an empty string, if not found.
+
+    agent([$useragent_string])
+
+      Set the desired user-agent (ie. browser name) to pass to the lyrics
+      sites - some require you to look like a valid web browser in order to
+      respond in order to prevent their sites from being "scraped" by
+      programs, such as this. If not set, the current default is:
+      "Mozilla/5.0 (X11; Linux x86_64; rv:80.0) Gecko/20100101
+      Firefox/80.0"
+
+      If no argument is passed, it returns the current user-agent string in
+      effect.
+
+SPECIAL GLOBAL VARIABLES
+
+    $Lyrics::Fetcher::Error
+
+      Returns a description of the last error that occurred when failing to
+      fetch lyrics for various reasons, or "OK" if last operation
+      successful.
+
+    $Lyrics::Fetcher::ApiLyricsOph::VERSION
+
+      The current version# of Lyrics::Fetcher::ApiLyricsOph
+
+BUGS
+
+    Probably. If you find any, please let me know. If api.lyrics.ovh change
+    their site much, this module may well stop working. If you find any
+    songs which have lyrics listed on the api.lyrics.ovh site, but for
+    which this module is unable to fetch lyrics, please let me know also.
+
+    Please report any bugs or feature requests to
+    https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Lyrics-Fetcher-ApiLyricsOVH.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+AUTHOR
+
+    David Precious <davidp@preshweb.co.uk> (CPAN Id: BIGPRESH)
+
+ACKNOWLEDGEMENTS
+
+    Original version contributed by Jim Turner in RT 133624..
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2021 by David Precious
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+
+    Legal disclaimer: I have no connection with the owners of
+    api.lyrics.ovh. Lyrics fetched by this script may be copyrighted by the
+    authors, it's up to you to determine whether this is the case, and if
+    so, whether you are entitled to request/use those lyrics. You will
+    almost certainly not be allowed to use the lyrics obtained for any
+    commercial purposes.
+

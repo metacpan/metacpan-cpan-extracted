@@ -1,7 +1,9 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
+
+use Test::Without::Module 'MooseX::Types::Path::Class';
 
 use ok 'MooseX::Types::URI' => qw(Uri FileUri DataUri);
 

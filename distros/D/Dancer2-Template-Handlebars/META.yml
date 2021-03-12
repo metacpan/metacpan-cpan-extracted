@@ -23,10 +23,10 @@ name: Dancer2-Template-Handlebars
 provides:
   Dancer2::Template::Handlebars:
     file: lib/Dancer2/Template/Handlebars.pm
-    version: '0.4'
+    version: '1.00'
   Dancer2::Template::Handlebars::Helpers:
     file: lib/Dancer2/Template/Handlebars/Helpers.pm
-    version: '0.4'
+    version: '1.00'
 requires:
   Dancer2::Core::Role::Template: '0'
   Module::Runtime: '0'
@@ -36,13 +36,11 @@ requires:
   Try::Tiny: '0'
   perl: '5.012'
 resources:
-  bugtracker: https://gitlab.com/GeekRuthie/Dancer2-Template-Handlebars/-/issues
-  repository: https://gitlab.com/GeekRuthie/Dancer2-Template-Handlebars.git
-version: '0.4'
-x_author_pledge:
-  version: 1
-x_contributor_covenant:
-  version: 0.02
-x_generated_by_perl: v5.30.3
+  bugtracker: https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class/-/issues
+  repository: https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class.git
+version: '1.00'
+x_contributors:
+  - 'D Ruth Holloway <ruthh@clearbuilt.com>'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,4 +1,4 @@
-package Dancer2::Template::Handlebars 0.4;
+package Dancer2::Template::Handlebars 1.00;
 
 # ABSTRACT: Dancer2 wrapper for Handlebars templating engine
 
@@ -12,7 +12,7 @@ use Moo;
 use Try::Tiny;
 with 'Dancer2::Core::Role::Template';
 
-has '+default_tmpl_ext' => ( default => sub { 'hbs' }, );
+has '+default_tmpl_ext' => ( default => sub {'hbs'}, );
 
 has helpers => (
     is      => 'ro',
@@ -34,7 +34,7 @@ has _config => (
     lazy    => 1,
     default => sub {
         return $_[0]->settings->{engines}->{handlebars} || {};
-    }
+    },
 );
 
 sub _build_helpers {
@@ -85,11 +85,11 @@ Dancer2::Template::Handlebars - Dancer2 wrapper for Handlebars templating engine
 
 =head1 VERSION
 
-version 0.4
+version 1.00
 
 =head1 SYNOPSIS
 
-in your Dancer2 app config.yml:
+in your L<Dancer2> app config.yml:
 
     template: "handlebars"
 
@@ -109,10 +109,11 @@ Handlebars comes with helpers C<with>, C<each>, C<if>, and C<unless>.
 
 =head1 GRATEFUL THANKS
 
-...to Yanick, for his prior work on L<Dancer::Template::Handlebars> and
-L<Dancer2::Template::Mustache>. Most all of the code you see in this
-module is his work, or very, very close to his original code; I
-merely remixed it, and got tests working for my own purposes.
+...to L<Yanick|https://metacpan.org/author/YANICK>, for his prior work on
+L<Dancer::Template::Handlebars> and L<Dancer2::Template::Mustache>.
+Most all of the code you see in this module is his work, or very, very
+close to his original code; I merely remixed it, and got tests working
+for my own purposes.
 
 =head1 SEE ALSO
 

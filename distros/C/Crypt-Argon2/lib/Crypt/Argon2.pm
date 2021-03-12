@@ -1,5 +1,5 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.009';
+$Crypt::Argon2::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -21,7 +21,8 @@ my %multiplier = (
 
 sub argon2_needs_rehash {
 	my ($encoded, $type, $t_cost, $m_cost, $parallelism, $output_length, $salt_length) = @_;
-	$m_cost =~ s/ \A (\d+) ([kMG]) \z / $1 * $multiplier{$2} /xmse;
+	$m_cost =~ s/ \A (\d+) ([kMG]) \z / $1 * $multiplier{$2} * 1024 /xmse;
+	$m_cost /= 1024;
 	my (undef, $name, $version, $argstring, $salt, $hash) = split /\$/, $encoded;
 	return 1 if $name ne $type;
 	return 1 if $version !~ /v=(\d+)/ or $1 != 19;
@@ -50,7 +51,7 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

@@ -291,7 +291,7 @@ pass to this method the reference (or the name, either way will work) of the fun
 
 =head3 raiseError
 
-call this method in order to return an error message to the calling page. You can add as much messages you want, calling the method several times, it will be returned an array of messages to the calling page. The first argument could be either a string or a <B strings array reference>. The second argument is an optional HTTP status code, the default will be 200.
+call this method in order to return an error message to the calling page. You can add as much messages you want, calling the method several times, it will be returned an array of messages to the calling page. The first argument could be either a string or a B<strings array reference>. The second argument is an optional HTTP status code, the default will be 200.
 
 =head3 graft
 
@@ -348,6 +348,8 @@ or copy its value to perform calculation with a copy. Returning the reference as
 won't stop until actual array end.
 Of course this method has the overhead of a function call on every cycle, so use it for convenience on small arrays when performance is not critical.
 You can also want to use this when the operation to perform on each cycle take a significant amount of time where the overhead becomes negligible.
+In general avoid to use it in tight high-performance needing loops. Note that the returned item will be a JSONP object (or a JSONP derived type if you subclass it) B<only if it is a non-blessed HASH or ARRAY reference, already blessed as other class object>, in case the returned item is a raw HASH or ARRAY, it will be blessed with the same class of the array we are looping onto (typically JSONP itself), so the item will hold all the JSONP syntactic sugar and methods.
+Never exit $array->loop cycles using I<last> to avoid memory leaks, you should avoid to use this method when you expect to early exit the cycle.
 
 	my $j = JSONP->new;
 	$j->an->array = [

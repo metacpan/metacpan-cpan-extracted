@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/scripts/Apache2.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/02/14
@@ -18,7 +18,7 @@ BEGIN
     use warnings::register;
     use parent qw( Exporter );
     use Regexp::Common qw( pattern );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
     our $DEBUG   = 3;
     ## Ref: <http://httpd.apache.org/docs/trunk/en/expr.html>
     our $UNARY_OP   = qr/(?:(?<=\W)|(?<=^)|(?<=\A))\-[a-zA-Z]/;
@@ -29,6 +29,9 @@ BEGIN
     our $FUNCNAME   = qr/[a-zA-Z_]\w*/;
     our $VARNAME    = qr/[a-zA-Z_]\w*/;
     our $TEXT       = qr/[^[:cntrl:]]/;
+    ## See Regexp::Common::net
+    our $IPv4       = qr/(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))/;
+    our $IPv6       = qr/(?:(?|(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4})|(?::(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:)(?:)(?:)(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:):)))/;
     ##our $ap_true    = do{ bless( \( my $dummy = 1 ) => "Regexp::Common::Apache2::Boolean" ) };
     ##our $ap_false   = do{ bless( \( my $dummy = 0 ) => "Regexp::Common::Apache2::Boolean" ) };
     our $ap_true    = 1;
@@ -72,6 +75,7 @@ BEGIN
     cstring	    => qr/[^[:cntrl:]]+/,
     true        => qr/[1]/,
     false       => qr/[0]/,
+    ipaddr      => qr/(?:$IPv4|$IPv6)/,
     };
     
     $REGEXP->{is_true} = qr/
@@ -123,15 +127,17 @@ BEGIN
         )
         |
         (?<comp_binary>
-            (?<comp_worda> (?&word) )
+            (?<comp_worda> (?&word_lax) )
             [[:blank:]\h]+
             (?:
                 (?<comp_binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                 |
-                \-(?<comp_binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?:
+                    (?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<comp_binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                )
             )
             [[:blank:]\h]+
-            (?<comp_wordb> (?&word) )
+            (?<comp_wordb> (?&word_lax) )
         )
         |
         (?<comp_word_in_listfunc>
@@ -181,22 +187,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -229,7 +239,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -241,7 +251,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -309,7 +320,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -321,7 +332,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -402,6 +414,65 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
@@ -484,7 +555,15 @@ BEGIN
         )
         |
         (?:
-            (?:\([[:blank:]\h]*(?<cond_parenthesis>(?&cond_recur))[[:blank:]\h]*\))
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<cond_parenthesis>
+                    (?&cond_recur)
+                )
+                [[:blank:]\h]*
+                \)
+            )
         )
         |
         (?:
@@ -511,20 +590,20 @@ BEGIN
             (?(?=(?:.+?)\|\|(?:.+?))
                 (?<cond_or>
                     (?<cond_or_expr1>
-                        (?&cond_recur)
+                        (?: (?&cond_recur) )+
                     )
                     [[:blank:]\h]*
                     \|\|
                     [[:blank:]\h]*
                     (?<cond_or_expr2>
-                        (?&cond_recur)
+                        (?: (?&cond_recur) )+
                     )
                 )
             )
         )
         |
         (?:
-            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R]))|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
                 (?<cond_comp>(?&comp))
             )
         )
@@ -548,22 +627,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -612,33 +695,34 @@ BEGIN
                 \)
             )
             |
-            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R]))|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
                 (?<cond_comp>(?&comp))
             )
             |
             (?(?=(?:.+?)\|\|(?:.+?))
                 (?<cond_bool_and>
-                    (?<cond_bool_or_expr1> (?-3) )
+                        
+                    (?<cond_bool_or_expr1> (?: (?-3) )+ )
                     [[:blank:]\h]*
                     \|\|
                     [[:blank:]\h]*
-                    (?<cond_bool_or_expr2> (?-3) )
+                    (?<cond_bool_or_expr2> (?: (?-3) )+ )
                 )
             )
             |
             (?(?=(?:.+?)\&\&(?:.+?))
                 (?<cond_bool_and>
-                    (?<cond_bool_and_expr1> (?-3) )
+                    (?<cond_bool_and_expr1> (?: (?-3) )+ )
                     [[:blank:]\h]*
                     \&\&
                     [[:blank:]\h]*
-                    (?<cond_bool_and_expr2> (?-3) )
+                    (?<cond_bool_and_expr2> (?: (?-3) )+ )
                 )
             )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -650,7 +734,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -718,7 +803,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -730,7 +815,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -811,6 +897,65 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
@@ -906,22 +1051,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -970,33 +1119,34 @@ BEGIN
                 \)
             )
             |
-            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R]))|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
                 (?<cond_comp>(?&comp))
             )
             |
             (?(?=(?:.+?)\|\|(?:.+?))
                 (?<cond_bool_and>
-                    (?<cond_bool_or_expr1> (?-3) )
+                        
+                    (?<cond_bool_or_expr1> (?: (?-3) )+ )
                     [[:blank:]\h]*
                     \|\|
                     [[:blank:]\h]*
-                    (?<cond_bool_or_expr2> (?-3) )
+                    (?<cond_bool_or_expr2> (?: (?-3) )+ )
                 )
             )
             |
             (?(?=(?:.+?)\&\&(?:.+?))
                 (?<cond_bool_and>
-                    (?<cond_bool_and_expr1> (?-3) )
+                    (?<cond_bool_and_expr1> (?: (?-3) )+ )
                     [[:blank:]\h]*
                     \&\&
                     [[:blank:]\h]*
-                    (?<cond_bool_and_expr2> (?-3) )
+                    (?<cond_bool_and_expr2> (?: (?-3) )+ )
                 )
             )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -1008,7 +1158,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -1076,7 +1227,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -1088,7 +1239,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -1169,6 +1321,65 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
@@ -1238,7 +1449,7 @@ BEGIN
     $REGEXP->{function}	= qr/
     (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -1250,7 +1461,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -1284,22 +1496,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -1332,7 +1548,7 @@ BEGIN
         )
         (?<function_recur>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -1344,7 +1560,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -1412,7 +1629,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -1424,7 +1641,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -1505,6 +1723,65 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function_recur))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
@@ -1602,22 +1879,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -1650,7 +1931,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -1662,7 +1943,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -1730,7 +2012,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -1742,7 +2024,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -1823,6 +2106,65 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
@@ -1893,7 +2235,7 @@ BEGIN
     $REGEXP->{listfunc}	= qr/
     (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -1905,7 +2247,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -1939,22 +2282,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -2003,33 +2350,34 @@ BEGIN
                 \)
             )
             |
-            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R]))|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
                 (?<cond_comp>(?&comp))
             )
             |
             (?(?=(?:.+?)\|\|(?:.+?))
                 (?<cond_bool_and>
-                    (?<cond_bool_or_expr1> (?-3) )
+                        
+                    (?<cond_bool_or_expr1> (?: (?-3) )+ )
                     [[:blank:]\h]*
                     \|\|
                     [[:blank:]\h]*
-                    (?<cond_bool_or_expr2> (?-3) )
+                    (?<cond_bool_or_expr2> (?: (?-3) )+ )
                 )
             )
             |
             (?(?=(?:.+?)\&\&(?:.+?))
                 (?<cond_bool_and>
-                    (?<cond_bool_and_expr1> (?-3) )
+                    (?<cond_bool_and_expr1> (?: (?-3) )+ )
                     [[:blank:]\h]*
                     \&\&
                     [[:blank:]\h]*
-                    (?<cond_bool_and_expr2> (?-3) )
+                    (?<cond_bool_and_expr2> (?: (?-3) )+ )
                 )
             )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -2041,7 +2389,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -2109,7 +2458,7 @@ BEGIN
         )
         (?<listfunc_recur>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -2121,7 +2470,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -2203,6 +2553,65 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
             |
@@ -2271,7 +2680,7 @@ BEGIN
     $REGEXP->{string} = qr/
     (?<string>
         (?:
-            (?&substring) # Recurse on the entire substring regexp
+            (?&substring)
         )
         |
         (?:
@@ -2297,22 +2706,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -2345,7 +2758,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -2357,7 +2770,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -2425,7 +2839,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -2437,7 +2851,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -2518,6 +2933,65 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
@@ -2614,22 +3088,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -2662,7 +3140,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -2674,7 +3152,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -2742,7 +3221,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -2754,7 +3233,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -2836,6 +3316,65 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
             |
@@ -2907,7 +3446,7 @@ BEGIN
         (?:$Regexp::Common::Apache2::REGEXP->{cstring})
         |
         (?:
-            (?&variable)
+            (?<sub_variable> (?&variable) )
         )
         |
         (?:
@@ -2933,22 +3472,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -2981,7 +3524,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -2993,7 +3536,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -3061,7 +3605,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -3073,7 +3617,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -3108,10 +3653,16 @@ BEGIN
             )
         )
         (?<substring_recur>
-            (?:$Regexp::Common::Apache2::REGEXP->{cstring})
+            (?:
+                (?<substring_cstring>$Regexp::Common::Apache2::REGEXP->{cstring})
+            )
             |
             (?:
-                (?&variable)
+                (?<sub_var> (?&variable) )
+            )
+            |
+            (?:
+                \$(?<has_accolade>\{)?(?<sub_backref>${DIGIT})(?(<has_accolade>)\})
             )
         )
         (?<variable>
@@ -3144,6 +3695,65 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
@@ -3260,22 +3870,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -3308,7 +3922,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -3320,7 +3934,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -3388,7 +4003,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -3400,7 +4015,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -3482,6 +4098,65 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable_recur))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
             |
@@ -3557,24 +4232,32 @@ BEGIN
     $REGEXP->{word} = qr/
     (?<word>
         (?:
+            (?<word_ip>
+                (?<word_ip4>$IPv4)
+                |
+                (?<word_ip6>$IPv6)
+            )
+        )
+        |
+        (?:
             (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
         )
         |
-        (?:
-            (?<word_quote>\')
             (?:
-               (?<word_enclosed> (?&string) )
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
             )
-            \'
-        )
         |
-        (?:
-            (?<word_quote>\")
             (?:
-               (?<word_enclosed> (?&string) )
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
             )
-            \"
-        )
         |
         (?:
             (?<word_dot_word>
@@ -3617,22 +4300,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word_recur))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word_recur))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word_recur))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -3665,7 +4352,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -3677,7 +4364,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -3745,7 +4433,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -3757,7 +4445,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -3839,6 +4528,65 @@ BEGIN
         )
         (?<word_recur>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
             |
@@ -3907,9 +4655,11 @@ BEGIN
     $REGEXP->{words} = qr/
     (?<words>
         (?:
-            (?<words_word>(?&word))
-            [[:blank:]\h]*\,[[:blank:]\h]*
-            (?<words_list>(?&words_recur))
+            (?<words_list>
+                (?<words_word>(?&word))
+                [[:blank:]\h]*\,[[:blank:]\h]*
+                (?<words_sublist>(?&words_recur))
+            )
         )
         |
         (?:
@@ -3935,22 +4685,26 @@ BEGIN
             )
             |
             (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<unary_word>(?&word))
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<unary_word>(?&word_lax))
+                )
             )
             |
             (?:
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<binary_worda>(?&word))
+                (?<binary_worda>(?&word_lax))
             )
             |
             (?:
@@ -3983,7 +4737,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -3995,7 +4749,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -4063,7 +4818,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -4075,7 +4830,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -4157,6 +4913,65 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word>
+                    (?: (?: (?-2)\. )+ (?-2) )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function>(?&function))
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::REGEXP->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits>$Regexp::Common::Apache2::REGEXP->{digits})
             )
             |
@@ -4221,8 +5036,8 @@ BEGIN
     /x;
 
     ## Trunk regular expression
-    @$TRUNK{qw( unary_op digit digits rebackref regpattern regflags regsep regex funcname varname text cstring true false )} =
-    @$REGEXP{qw( unary_op digit digits rebackref regpattern regflags regsep regex funcname varname text cstring true false )};
+    @$TRUNK{qw( unary_op digit digits rebackref regpattern regflags regsep regex funcname varname text cstring true false is_true is_false )} =
+    @$REGEXP{qw( unary_op digit digits rebackref regpattern regflags regsep regex funcname varname text cstring true false is_true is_false )};
     
     ## stringcomp
     ## | integercomp
@@ -4253,15 +5068,17 @@ BEGIN
         )
         |
         (?<comp_binary>
-            (?<comp_worda>(?&word))
+            (?<comp_worda>(?&word_lax))
             [[:blank:]\h]+
             (?:
                 (?<comp_binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                 |
-                \-(?<comp_binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?:
+                    (?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<comp_binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                )
             )
             [[:blank:]\h]+
-            (?<comp_wordb>(?&word))
+            (?<comp_wordb>(?&word_lax))
         )
         |
         (?<comp_word_in_listfunc>
@@ -4295,7 +5112,7 @@ BEGIN
     (?(DEFINE)
         (?<comp_recur>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -4303,7 +5120,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -4314,19 +5131,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -4358,37 +5177,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -4398,10 +5193,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -4413,7 +5232,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -4508,7 +5328,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -4520,7 +5340,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -4672,6 +5493,87 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
             |
@@ -4776,11 +5678,11 @@ BEGIN
     $TRUNK->{cond} = qr/
     (?<cond>
         (?:
-            (?<cond_true>(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?<cond_true>$Regexp::Common::Apache2::TRUNK->{is_true})
         )
         |
         (?:
-            (?<cond_false>(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?<cond_false>$Regexp::Common::Apache2::TRUNK->{is_false})
         )
         |
         (?:
@@ -4803,13 +5705,13 @@ BEGIN
             (?(?=(?:.+?)\&\&(?:.+?))
                 (?<cond_and>
                     (?<cond_and_expr1>
-                        (?&cond_recur)
+                        (?: (?&cond_recur) )+
                     )
                     [[:blank:]\h]*
                     \&\&
                     [[:blank:]\h]*
                     (?<cond_and_expr2>
-                        (?&cond_recur)
+                        (?: (?&cond_recur) )+
                     )
                 )
             )
@@ -4819,26 +5721,26 @@ BEGIN
             (?(?=(?:.+?)\|\|(?:.+?))
                 (?<cond_or>
                     (?<cond_or_expr1>
-                        (?&cond_recur)
+                        (?: (?&cond_recur) )+
                     )
                     [[:blank:]\h]*
                     \|\|
                     [[:blank:]\h]*
                     (?<cond_or_expr2>
-                        (?&cond_recur)
+                        (?: (?&cond_recur) )+
                     )
                 )
             )
         )
         |
-        (?:
-            (?<cond_comp>(?&comp))
+        (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+            (?<cond_comp> (?&comp) )
         )
     )
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -4846,7 +5748,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -4857,19 +5759,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -4901,37 +5805,13 @@ BEGIN
             )
         )
         (?<cond_recur>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -4941,10 +5821,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -4956,7 +5860,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -5051,7 +5956,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -5063,7 +5968,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -5215,6 +6121,87 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
             |
@@ -5324,7 +6311,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -5332,7 +6319,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -5343,19 +6330,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -5387,37 +6376,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -5427,10 +6392,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -5442,7 +6431,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -5537,7 +6527,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -5549,7 +6539,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -5700,6 +6691,87 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
@@ -5800,7 +6872,7 @@ BEGIN
     $TRUNK->{function}	= qr/
     (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -5812,7 +6884,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -5830,7 +6903,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -5838,7 +6911,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -5849,19 +6922,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -5893,37 +6968,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -5933,10 +6984,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function_recur>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -5948,7 +7023,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -6043,7 +7119,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -6055,7 +7131,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -6206,6 +7283,87 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function_recur) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
@@ -6318,7 +7476,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -6326,7 +7484,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp_recur)
                     )
@@ -6337,19 +7495,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -6381,37 +7541,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -6421,10 +7557,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -6436,7 +7596,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -6531,7 +7692,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -6543,7 +7704,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -6694,6 +7856,87 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
@@ -6810,7 +8053,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -6818,7 +8061,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -6829,19 +8072,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -6873,37 +8118,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -6913,10 +8134,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -6928,7 +8173,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -7023,7 +8269,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -7035,7 +8281,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -7186,6 +8433,87 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join_recur) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
@@ -7314,7 +8642,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -7322,7 +8650,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -7333,19 +8661,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -7377,37 +8707,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -7417,10 +8723,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -7432,7 +8762,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -7527,7 +8858,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -7539,7 +8870,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -7691,6 +9023,87 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
             |
@@ -7791,7 +9204,7 @@ BEGIN
     $TRUNK->{listfunc}	= qr/
     (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -7803,7 +9216,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -7821,7 +9235,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -7829,7 +9243,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -7840,19 +9254,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -7884,37 +9300,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -7924,10 +9316,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -7939,7 +9355,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -8034,7 +9451,7 @@ BEGIN
         )
         (?<listfunc_recur>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -8046,7 +9463,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -8197,6 +9615,87 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
@@ -8350,7 +9849,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -8358,7 +9857,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -8369,19 +9868,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -8413,37 +9914,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -8453,10 +9930,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -8468,7 +9969,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -8563,7 +10065,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -8575,7 +10077,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -8727,6 +10230,87 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
             |
@@ -8836,7 +10420,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -8844,7 +10428,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -8855,19 +10439,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -8899,37 +10485,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -8939,10 +10501,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -8954,7 +10540,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -9049,7 +10636,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -9061,7 +10648,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -9213,6 +10801,87 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
             |
@@ -9323,7 +10992,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp_recur)
                     )
@@ -9331,7 +11000,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -9342,19 +11011,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -9386,37 +11057,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -9426,10 +11073,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -9441,7 +11112,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -9536,7 +11208,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -9548,7 +11220,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -9700,6 +11373,87 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
             |
@@ -9814,7 +11568,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -9822,7 +11576,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -9833,19 +11587,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -9877,37 +11633,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -9917,10 +11649,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -9932,7 +11688,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -10027,7 +11784,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -10039,7 +11796,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -10191,6 +11949,87 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub_recur) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
             |
@@ -10298,7 +12137,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -10306,7 +12145,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -10317,19 +12156,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -10361,37 +12202,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -10401,10 +12218,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -10416,7 +12257,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -10511,7 +12353,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -10523,7 +12365,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -10674,6 +12517,87 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
@@ -10832,7 +12756,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -10840,7 +12764,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -10851,19 +12775,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -10895,37 +12821,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -10935,10 +12837,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -10950,7 +12876,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -11045,7 +12972,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -11057,7 +12984,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -11209,6 +13137,87 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable_recur))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
             |
@@ -11315,29 +13324,37 @@ BEGIN
     $TRUNK->{word} = qr/
     (?<word>
         (?:
+            (?<word_ip>
+                (?<word_ip4>$IPv4)
+                |
+                (?<word_ip6>$IPv6)
+            )
+        )
+        |
+        (?:
             (?<word_digits>$Regexp::Common::Apache2::TRUNK->{digits})
         )
         |
-        (?:
-            (?<word_quote>\')
             (?:
-               (?<word_enclosed> (?&string) )
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
             )
-            \'
-        )
         |
-        (?:
-            (?<word_quote>\")
             (?:
-               (?<word_enclosed> (?&string) )
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
             )
-            \"
-        )
         |
         (?:
             (?<word_parens_open>\()
                 [[:blank:]\h]*
-                (?<word_enclosed>(?&word_recur))
+                (?<word_enclosed>(?&word_lax))
                 [[:blank:]\h]*
             (?<word_parens_close>\))
         )
@@ -11373,7 +13390,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -11381,7 +13398,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -11392,19 +13409,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word_recur) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word_recur) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word_recur) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -11436,37 +13455,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -11476,10 +13471,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -11491,7 +13510,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -11586,7 +13606,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -11598,7 +13618,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -11750,6 +13771,87 @@ BEGIN
         )
         (?<word_recur>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
             |
@@ -11852,21 +13954,53 @@ BEGIN
             (?:
                 (?<words_list_word>
                     (?:
-                        (?&word)
+                        (?<words_list_word1> (?&word) )
                         [[:blank:]\h]*\,[[:blank:]\h]*
                     )*
-                    (?&word)
+                    (?<words_list_word2> (?&word) )
                 )
-                (?:
-                    [[:blank:]\h]*\,[[:blank:]\h]*
-                    (?<words_word> (?&word) )
+                (?<words_list_more>
+                    (?<words_list_sep>[[:blank:]\h]*\,[[:blank:]\h]*)
+                    (?<words_word3> (?&word) )
                 )?
+                (?(<words_list_more>)
+                    (?<words_list>\g{words_list_word}\g{words_list_more})
+                    |
+                    (?(<words_list_word1>)
+                        (?<words_list>\g{words_list_word})
+                    )
+                )
+                (?(<words_list>)
+                    (?(<words_list_word1>)
+                        (?<words_word> \g{words_list_word1} )
+                        |
+                        (?<words_word> \g{words_list_word2} )
+                    )
+                    |
+                    (?(<words_list_word1>)
+                        |
+                        (?<words_word> \g{words_list_word2} )
+                    )
+                )
+                (?(<words_list>)
+                    (?(<words_list_more>)
+                        (?(<words_list_word1>)
+                            (?<words_sublist> \g{words_list_word2}\g{words_list_more} )
+                            |
+                            (?<words_sublist> \g{words_list_word1} )
+                        )
+                        |
+                        (?<words_sublist> \g{words_list_word2} )
+                    )
+                )
             )
             |
             (?:
-                (?<words_word>(?&word))
-                [[:blank:]\h]*\,[[:blank:]\h]*
-                (?<words_list>(?&list))
+                (?<words_list>
+                    (?<words_word>(?&word))
+                    [[:blank:]\h]*\,[[:blank:]\h]*
+                    (?<words_sublist>(?&list))
+                )
             )
             |
             (?:
@@ -11877,7 +14011,7 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_stringcomp>
                         (?&stringcomp)
                     )
@@ -11885,7 +14019,7 @@ BEGIN
             )
             |
             (?:
-                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))))
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|sub|join|${FUNCNAME}|\%\{))))
                     (?<comp_integercomp>
                         (?&integercomp)
                     )
@@ -11896,19 +14030,21 @@ BEGIN
                 (?:(?<=\W)|(?<=^)|(?<=\A))
                 \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
                 [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
+                (?<comp_unary_word> (?&word_lax) )
             )
             |
             (?:
-                (?<comp_binary_worda> (?&word) )
+                (?<comp_binary_worda> (?&word_lax) )
                 [[:blank:]\h]+
                 (?:
                     (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
                     |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    (?:
+                        (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                    )
                 )
                 [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
+                (?<comp_binary_wordb> (?&word_lax) )
             )
             |
             (?:
@@ -11940,37 +14076,13 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::TRUNK->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::TRUNK->{is_false})
             |
             (?:
                 \![[:blank:]\h]*
                 (?<cond_negative> (?-2) )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \&\&
-                    [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
-                    [[:blank:]\h]*
-                    \|\|
-                    [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
-                )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
             )
             |
             (?:
@@ -11980,10 +14092,34 @@ BEGIN
                 [[:blank:]\h]*
                 \)
             )
+            |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\&\&(?:.+?))
+                    (?<cond_and_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2> (?: (?-2) )+ )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:.+?)\|\|(?:.+?))
+                    (?<cond_or_expr1> (?: (?-2) )+ )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2> (?: (?-2) )+ )
+                )
+            )
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -11995,7 +14131,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -12090,7 +14227,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -12102,7 +14239,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -12254,6 +14392,87 @@ BEGIN
         )
         (?<word>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<word_parens> (?&word_lax) )
+                [[:blank:]\h]*
+                \)
+            )
+            |
+            (?:
+                (?(?=(?:(?>\\\.|(?!\.).)*+\.(?:.+?)))
+                    (?<word_dot_word>
+                        (?: (?: (?-2)\. )+ (?-2) )
+                    )
+                )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?(?=\bsub\b\()
+                    (?<word_sub> (?&sub) )
+                )
+            )
+            |
+            (?:
+                (?(?=\bjoin\b\()
+                    (?<word_join> (?&join) )
+                )
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                (?<word_regex> $Regexp::Common::Apache2::TRUNK->{regex} )
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP->{digits} )
             )
             |
@@ -12350,8 +14569,8 @@ BEGIN
 
     ## Here is the addition to be compliant with expression from 2.3.12 and before,
     ## ie old fashioned variable such as $REQUEST_URI instead of the modern version %{REQUEST_URI}
-    @$REGEXP_LEGACY{qw( unary_op digit digits rebackref regpattern regflags regsep regex funcname varname text cstring true false )} =
-           @$REGEXP{qw( unary_op digit digits rebackref regpattern regflags regsep regex funcname varname text cstring true false )};
+    @$REGEXP_LEGACY{qw( unary_op digit digits rebackref regpattern regflags regsep regex funcname varname text cstring true false is_true is_false )} =
+           @$REGEXP{qw( unary_op digit digits rebackref regpattern regflags regsep regex funcname varname text cstring true false is_true is_false )};
 
     ## stringcomp
     ## | integercomp
@@ -12368,42 +14587,56 @@ BEGIN
     $REGEXP_LEGACY->{comp} = qr/
     (?<comp>
         (?:
-            (?<comp_stringcomp>(?&stringcomp))
+            (?<comp_in_regexp_legacy>
+                (?<comp_word>(?&word))
+                [[:blank:]\h]+
+                (?<comp_regexp_op>[\=\=|\=|\!\=])
+                [[:blank:]\h]+
+                (?<comp_regexp>(?&regex))
+            )
         )
         |
         (?:
-            (?<comp_integercomp>(?&integercomp))
-        )
-        |
-        (?<comp_unary>
-            (?:(?<=\W)|(?<=^)|(?<=\A))
-            \-(?<comp_unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-            [[:blank:]\h]+
-            (?<comp_word>(?&word))
-        )
-        |
-        (?<comp_in_regexp_legacy>
-            (?<comp_word>(?&word))
-            [[:blank:]\h]+
-            (?<comp_regexp_op>[\=\=|\=|\!\=])
-            [[:blank:]\h]+
-            (?<comp_regexp>(?&regex))
-        )
-        |
-        (?<comp_binary>
-            (?<comp_worda>(?&word))
-            [[:blank:]\h]+
-            (?:
-                (?<comp_binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                |
-                \-(?<comp_binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+            (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                (?<comp_stringcomp>(?&stringcomp))
             )
-            [[:blank:]\h]+
-            (?<comp_wordb>(?&word))
+        )
+        |
+        (?:
+            (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                (?<comp_integercomp>(?&integercomp))
+            )
+        )
+        |
+        (?:
+            (?<comp_unary>
+                (?:(?<=\W)|(?<=^)|(?<=\A))
+                \-(?<comp_unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                [[:blank:]\h]+
+                (?<comp_word>(?&word_lax))
+            )
+        )
+        |
+        (?:
+            (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                (?<comp_binary>
+                    (?<comp_worda>(?&word_lax))
+                    [[:blank:]\h]+
+                    (?:
+                        (?<comp_binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<comp_binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_wordb>(?&word_lax))
+                )
+            )
         )
         |
         (?<comp_word_in_listfunc>
-            (?<comp_word> (?&word) )
+            (?<comp_word> (?&word_lax) )
             [[:blank:]\h]+
             \-?in
             [[:blank:]\h]+
@@ -12433,34 +14666,48 @@ BEGIN
     (?(DEFINE)
         (?<comp_recur>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -12498,7 +14745,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -12510,7 +14757,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -12551,9 +14799,9 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::REGEXP_LEGACY->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::REGEXP_LEGACY->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::REGEXP_LEGACY->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::REGEXP_LEGACY->{is_false})
             |
             (?:
                 \(
@@ -12568,28 +14816,33 @@ BEGIN
                 (?<cond_negative> (?-2) )
             )
             |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp_recur))
+            )
+            |
             (?:
                 (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
+                    (?<cond_and_expr1> (?: (?-2) )+ )
                     [[:blank:]\h]*
                     \&\&
                     [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
+                    (?<cond_and_expr2> (?: (?-2) )+ )
                 )
             )
             |
             (?:
                 (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
+                    (?<cond_or_expr1> (?: (?-2) )+ )
                     [[:blank:]\h]*
                     \|\|
                     [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
+                    (?<cond_or_expr2> (?: (?-2) )+ )
                 )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp_recur) )
+                (?(<cond_or_expr1>)
+                    (?(<cond_or_expr2>)
+                        (*ACCEPT)
+                    )
+                )
             )
             |
             (?:
@@ -12598,7 +14851,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -12610,7 +14863,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -12661,7 +14915,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -12673,7 +14927,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -12731,7 +14986,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -12792,6 +15047,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -12856,15 +15168,23 @@ BEGIN
     $REGEXP_LEGACY->{cond} = qr/
     (?<cond>
         (?:
-            (?<cond_true>(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::REGEXP_LEGACY->{true}(?=\W|\Z|$))
+            (?<cond_true>$Regexp::Common::Apache2::REGEXP_LEGACY->{is_true})
         )
         |
         (?:
-            (?<cond_false>(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::REGEXP_LEGACY->{false}(?=\W|\Z|$))
+            (?<cond_false>$Regexp::Common::Apache2::REGEXP_LEGACY->{is_false})
         )
         |
         (?:
-            (?:\([[:blank:]\h]*(?<cond_parenthesis>(?&cond_recur))[[:blank:]\h]*\))
+            (?:
+                \(
+                [[:blank:]\h]*
+                (?<cond_parenthesis>
+                    (?&cond_recur)
+                )
+                [[:blank:]\h]*
+                \)
+            )
         )
         |
         (?:
@@ -12873,18 +15193,40 @@ BEGIN
         |
         (?:
             (?(?=(?:.+?)\&\&(?:.+?))
-            (?<cond_and>(?<cond_and_expr1>(?&cond_recur))[[:blank:]\h]*\&\&[[:blank:]\h]*(?<cond_and_expr2>(?&cond_recur)))
+                (?<cond_and>
+                    (?<cond_and_expr1>
+                        (?: (?&cond_recur) )+
+                    )
+                    [[:blank:]\h]*
+                    \&\&
+                    [[:blank:]\h]*
+                    (?<cond_and_expr2>
+                        (?: (?&cond_recur) )+
+                    )
+                )
             )
         )
         |
         (?:
             (?(?=(?:.+?)\|\|(?:.+?))
-            (?<cond_or>(?<cond_or_expr1>(?&cond_recur))[[:blank:]\h]*\|\|[[:blank:]\h]*(?<cond_or_expr2>(?&cond_recur)))
+                (?<cond_or>
+                    (?<cond_or_expr1>
+                        (?: (?&cond_recur) )+
+                    )
+                    [[:blank:]\h]*
+                    \|\|
+                    [[:blank:]\h]*
+                    (?<cond_or_expr2>
+                        (?: (?&cond_recur) )+
+                    )
+                )
             )
         )
         |
         (?:
-            (?<cond_comp>(?&comp))
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp> (?&comp) )
+            )
         )
         |
         (?:
@@ -12894,34 +15236,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -12958,9 +15314,9 @@ BEGIN
             )
         )
         (?<cond_recur>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::REGEXP_LEGACY->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::REGEXP_LEGACY->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::REGEXP_LEGACY->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::REGEXP_LEGACY->{is_false})
             |
             (?:
                 \(
@@ -12975,28 +15331,33 @@ BEGIN
                 (?<cond_negative> (?-2) )
             )
             |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
             (?:
                 (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
+                    (?<cond_and_expr1> (?: (?-2) )+ )
                     [[:blank:]\h]*
                     \&\&
                     [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
+                    (?<cond_and_expr2> (?: (?-2) )+ )
                 )
             )
             |
             (?:
                 (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
+                    (?<cond_or_expr1> (?: (?-2) )+ )
                     [[:blank:]\h]*
                     \|\|
                     [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
+                    (?<cond_or_expr2> (?: (?-2) )+ )
                 )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
+                (?(<cond_or_expr1>)
+                    (?(<cond_or_expr2>)
+                        (*ACCEPT)
+                    )
+                )
             )
             |
             (?:
@@ -13005,7 +15366,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -13017,7 +15378,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -13068,7 +15430,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -13080,7 +15442,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -13138,7 +15501,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -13199,6 +15562,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -13268,34 +15688,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -13332,9 +15766,9 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::REGEXP_LEGACY->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::REGEXP_LEGACY->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::REGEXP_LEGACY->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::REGEXP_LEGACY->{is_false})
             |
             (?:
                 \(
@@ -13349,28 +15783,33 @@ BEGIN
                 (?<cond_negative> (?-2) )
             )
             |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
             (?:
                 (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
+                    (?<cond_and_expr1> (?: (?-2) )+ )
                     [[:blank:]\h]*
                     \&\&
                     [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
+                    (?<cond_and_expr2> (?: (?-2) )+ )
                 )
             )
             |
             (?:
                 (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
+                    (?<cond_or_expr1> (?: (?-2) )+ )
                     [[:blank:]\h]*
                     \|\|
                     [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
+                    (?<cond_or_expr2> (?: (?-2) )+ )
                 )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
+                (?(<cond_or_expr1>)
+                    (?(<cond_or_expr2>)
+                        (*ACCEPT)
+                    )
+                )
             )
             |
             (?:
@@ -13379,7 +15818,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -13391,7 +15830,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -13442,7 +15882,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -13454,7 +15894,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -13512,7 +15953,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -13573,6 +16014,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -13632,7 +16130,7 @@ BEGIN
     $REGEXP_LEGACY->{function}	= qr/
     (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -13644,7 +16142,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -13662,34 +16161,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -13727,7 +16240,7 @@ BEGIN
         )
         (?<function_recur>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -13739,7 +16252,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -13790,7 +16304,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -13802,7 +16316,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -13860,7 +16375,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -13921,6 +16436,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function_recur) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -13992,34 +16564,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp_recur) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp_recur)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -14057,7 +16643,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -14069,7 +16655,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -14120,7 +16707,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -14132,7 +16719,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -14190,7 +16778,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -14251,6 +16839,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -14311,7 +16956,7 @@ BEGIN
     $REGEXP_LEGACY->{listfunc}	= qr/
     (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -14323,7 +16968,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -14341,34 +16987,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -14405,9 +17065,9 @@ BEGIN
             )
         )
         (?<cond>
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::REGEXP_LEGACY->{true}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::REGEXP_LEGACY->{is_true})
             |
-            (?:(?:(?<=\W)|(?<=\A)|(?<=^))$Regexp::Common::Apache2::REGEXP_LEGACY->{false}(?=\W|\Z|$))
+            (?:$Regexp::Common::Apache2::REGEXP_LEGACY->{is_false})
             |
             (?:
                 \(
@@ -14422,28 +17082,33 @@ BEGIN
                 (?<cond_negative> (?-2) )
             )
             |
+            (?(?=(?:(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:(?:\=\=|\!\=|\<|\<\=|\>|\>\=)|(?:\-?(?:eq|ne|lt|le|gt|ge)))[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{)))|(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b)|(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch))))|(?:(?:.*?)[[:blank:]\h]+(?:in|[\=|\!]\~)[[:blank:]\h]+)))
+                (?<cond_comp>(?&comp))
+            )
+            |
             (?:
                 (?(?=(?:.+?)\&\&(?:.+?))
-                    (?<cond_and_expr1> (?-2) )
+                    (?<cond_and_expr1> (?: (?-2) )+ )
                     [[:blank:]\h]*
                     \&\&
                     [[:blank:]\h]*
-                    (?<cond_and_expr2> (?-2) )
+                    (?<cond_and_expr2> (?: (?-2) )+ )
                 )
             )
             |
             (?:
                 (?(?=(?:.+?)\|\|(?:.+?))
-                    (?<cond_or_expr1> (?-2) )
+                    (?<cond_or_expr1> (?: (?-2) )+ )
                     [[:blank:]\h]*
                     \|\|
                     [[:blank:]\h]*
-                    (?<cond_or_expr2> (?-2) )
+                    (?<cond_or_expr2> (?: (?-2) )+ )
                 )
-            )
-            |
-            (?:
-                (?<cond_comp> (?&comp) )
+                (?(<cond_or_expr1>)
+                    (?(<cond_or_expr2>)
+                        (*ACCEPT)
+                    )
+                )
             )
             |
             (?:
@@ -14452,7 +17117,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -14464,7 +17129,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -14515,7 +17181,7 @@ BEGIN
         )
         (?<listfunc_recur>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -14527,7 +17193,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -14585,7 +17252,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -14646,6 +17313,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -14715,34 +17439,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -14780,7 +17518,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -14792,7 +17530,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -14843,7 +17582,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -14855,7 +17594,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -14913,7 +17653,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -14974,6 +17714,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -15044,34 +17841,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp_recur) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp_recur)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -15109,7 +17920,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -15121,7 +17932,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -15172,7 +17984,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -15184,7 +17996,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -15242,7 +18055,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -15303,6 +18116,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -15372,34 +18242,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -15437,7 +18321,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -15449,7 +18333,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -15500,7 +18385,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -15512,7 +18397,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -15570,7 +18456,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -15631,6 +18517,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -15737,34 +18680,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -15802,7 +18759,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -15814,7 +18771,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -15865,7 +18823,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -15877,7 +18835,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -15948,7 +18907,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -15996,6 +18955,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable_recur))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -16062,24 +19078,32 @@ BEGIN
     $REGEXP_LEGACY->{word} = qr/
     (?<word>
         (?:
+            (?<word_ip>
+                (?<word_ip4>$IPv4)
+                |
+                (?<word_ip6>$IPv6)
+            )
+        )
+        |
+        (?:
             (?<word_digits>$Regexp::Common::Apache2::REGEXP_LEGACY->{digits})
         )
         |
-        (?:
-            (?<word_quote>\')
             (?:
-               (?<word_enclosed> (?&string) )
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
             )
-            \'
-        )
         |
-        (?:
-            (?<word_quote>\")
             (?:
-               (?<word_enclosed> (?&string) )
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
             )
-            \"
-        )
         |
         (?:
             (?<word_dot_word>
@@ -16106,34 +19130,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word_recur) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word_recur) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word_recur) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word_recur) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -16171,7 +19209,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -16183,7 +19221,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -16234,7 +19273,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -16246,7 +19285,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -16304,7 +19344,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word_recur))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word_recur))
             )
@@ -16366,6 +19406,63 @@ BEGIN
         )
         (?<word_recur>
             (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
             |
@@ -16425,9 +19522,11 @@ BEGIN
     (?<words>
         (?:
             (?:
-                (?<words_word>(?&word))
-                [[:blank:]\h]*\,[[:blank:]\h]*
-                (?<words_list>(?&words_recur))
+                (?<words_list>
+                    (?<words_word>(?&word))
+                    [[:blank:]\h]*\,[[:blank:]\h]*
+                    (?<words_sublist>(?&words_recur))
+                )
             )
             |
             (?:
@@ -16438,34 +19537,48 @@ BEGIN
     (?(DEFINE)
         (?<comp>
             (?:
-                (?<comp_stringcomp> (?&stringcomp) )
-            )
-            |
-            (?:
-                (?<comp_integercomp> (?&integercomp) )
-            )
-            |
-            (?:
-                (?:(?<=\W)|(?<=^)|(?<=\A))
-                \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
-                [[:blank:]\h]+
-                (?<comp_unary_word> (?&word) )
-            )
-            |
-            (?:
-                (?<comp_binary_worda> (?&word) )
-                [[:blank:]\h]+
-                (?:
-                    (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
-                    |
-                    \-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*(?:\=\=|\!\=|\<|\<\=|\>|\>\=)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_stringcomp>
+                        (?&stringcomp)
+                    )
                 )
-                [[:blank:]\h]+
-                (?<comp_binary_wordb> (?&word) )
             )
             |
             (?:
-                (?<comp_word_in_listfunc> (?&word) )
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{))(?:.+?)[[:blank:]\h]*\-?(?:eq|ne|lt|le|gt|ge)[[:blank:]\h]*(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))))
+                    (?<comp_integercomp>
+                        (?&integercomp)
+                    )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])\b))
+                    (?:(?<=\W)|(?<=^)|(?<=\A))
+                    \-(?<unaryop>[d|e|f|s|L|h|F|U|A|n|z|T|R])
+                    [[:blank:]\h]+
+                    (?<comp_unary_word> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?(?=(?:(?:(?:\([[:blank:]\h]*)?(?:[0-9\"\']|${FUNCNAME}\(|\%\{|\$\{?${VARNAME}\}?))(?:.+?)[[:blank:]\h]+(?:(?:\=\=|\=|\!\=|\<|\<\=|\>|\>\=)|(?:(?:(?<comp_binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?:ipmatch|strmatch|strcmatch|fnmatch)))))
+                    (?<comp_binary_worda> (?&word_lax) )
+                    [[:blank:]\h]+
+                    (?:
+                        (?<binaryop>\=\=|\=|\!\=|\<|\<\=|\>|\>\=|(?:\b\-?(?:eq|ne|le|le|gt|ge)\b))
+                        |
+                        (?:
+                            (?:(?<binary_is_neg>\!)[[:blank:]]*)?(?:(?<=\W)|(?<=^)|(?<=\A))\-(?<binaryop>ipmatch|strmatch|strcmatch|fnmatch)
+                        )
+                    )
+                    [[:blank:]\h]+
+                    (?<comp_binary_wordb> (?&word_lax) )
+                )
+            )
+            |
+            (?:
+                (?<comp_word_in_listfunc> (?&word_lax) )
                 [[:blank:]\h]+
                 \-?in
                 [[:blank:]\h]+
@@ -16503,7 +19616,7 @@ BEGIN
         )
         (?<function>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -16515,7 +19628,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -16566,7 +19680,7 @@ BEGIN
         )
         (?<listfunc>
             (?:
-                (?<func_name>[a-zA-Z]\w*)
+                (?!\bv\()(?<func_name>[a-zA-Z]\w*)
                 \(
                     [[:blank:]\h]*
                     (?<func_args>
@@ -16578,7 +19692,8 @@ BEGIN
             |
             (?:
                 (                                                # paren group 1 (full function)
-                    (?<func_name>[a-zA-Z_]\w*)?                  # possible a function with its name, or just parenthesis
+                    (?!\bv\()                                    # Take care to avoid catching modern-style variable v()
+                    (?<func_name>[a-zA-Z_]\w*)                   # possible a function with its name, or just parenthesis
                     (?<paren_group>                              # paren group 2 (parens)
                         \(
                             (?<func_args>                        # paren group 3 (contents of parens)
@@ -16636,7 +19751,7 @@ BEGIN
             (?:
                 (?<stringcomp_worda>(?&word))
                 [[:blank:]\h]+
-                (?<stringcomp_op>\=\=|\!\=|\<|\<\=|\>|\>\=)
+                (?<stringcomp_op>\=\=|\=|\!\=|\<|\<\=|\>|\>\=)
                 [[:blank:]\h]+
                 (?<stringcomp_wordb>(?&word))
             )
@@ -16697,6 +19812,63 @@ BEGIN
             )
         )
         (?<word>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
+            (?:
+                (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_quote>['"])
+                (?:
+                    (?<word_enclosed> (?>\\\g{word_quote}|(?!\g{word_quote}).)*+ )
+                )
+                \g{word_quote}
+            )
+            |
+            (?:
+                (?<word_dot_word> (?: (?-2)\. )+ (?-2) )
+            )
+            |
+            (?:
+                (?:^|\A|(?<!\\))\$(?<has_accolade>\{)?(?<word_rebackref>${DIGIT})(?(<has_accolade>)\})
+            )
+            |
+            (?:
+                (?<word_variable>(?&variable))
+            )
+            |
+            (?:
+                (?<word_function> (?&function) )
+            )
+            |
+            (?:
+                $Regexp::Common::Apache2::REGEXP_LEGACY->{regex}
+            )
+        )
+        (?<word_lax>
+            (?:
+                (?<word_ip>
+                    (?<word_ip4>$IPv4)
+                    |
+                    (?<word_ip6>$IPv6)
+                )
+            )
+            |
             (?:
                 (?<word_digits> $Regexp::Common::Apache2::REGEXP_LEGACY->{digits} )
             )
@@ -16989,7 +20161,7 @@ Regexp::Common::Apache2 - Apache2 Expressions
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

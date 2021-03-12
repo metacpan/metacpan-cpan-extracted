@@ -43,11 +43,11 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
       }
     }
     int32_t id = op_cur->id;
-    printf("%s", SPVM_OP_C_ID_NAMES[id]);
+    printf("%s", (SPVM_OP_C_ID_NAMES())[id]);
     if (op_cur->id == SPVM_OP_C_ID_CONSTANT) {
       SPVM_CONSTANT* constant = op_cur->uv.constant;
       if (constant->type->dimension == 0) {
-        printf(" %s", SPVM_BASIC_TYPE_C_ID_NAMES[constant->type->basic_type->id]);
+        printf(" %s", (SPVM_BASIC_TYPE_C_ID_NAMES())[constant->type->basic_type->id]);
         switch (constant->type->basic_type->id) {
           case SPVM_BASIC_TYPE_C_ID_BYTE:
             printf(" %" PRId8, constant->value.bval);
@@ -279,7 +279,7 @@ void SPVM_DUMPER_dump_opcode_array(SPVM_COMPILER* compiler, SPVM_OPCODE_ARRAY* o
     for (i = start_pos; i <= end_pos; i++) {
       
       SPVM_OPCODE opcode = opcode_array->values[i];
-      printf("        [%" PRId32 "] %-20s", i, SPVM_OPCODE_C_ID_NAMES[opcode.id]);
+      printf("        [%" PRId32 "] %-20s", i, (SPVM_OPCODE_C_ID_NAMES())[opcode.id]);
       printf(" %d %d %d %d\n", opcode.operand0, opcode.operand1, opcode.operand2, opcode.operand3);
     }
     

@@ -1,7 +1,7 @@
 package App::IDXUtils;
 
 our $DATE = '2021-01-17'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Command-line utilities related to Indonesian Stock Exchange
@@ -18,7 +18,7 @@ App::IDXUtils - Command-line utilities related to Indonesian Stock Exchange
 
 =head1 VERSION
 
-This document describes version 0.005 of App::IDXUtils (from Perl distribution App-IDXUtils), released on 2021-01-17.
+This document describes version 0.006 of App::IDXUtils (from Perl distribution App-IDXUtils), released on 2021-01-17.
 
 =head1 SYNOPSIS
 
@@ -64,6 +64,10 @@ Please report any bugs or feature requests on the bugtracker website L<https://g
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<App::idxdb>
 
 =head1 AUTHOR
 

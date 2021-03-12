@@ -1,4 +1,8 @@
 Revision history for Unit::Duration
 
+1.02      2021-03-11 10:52:09-08:00 America/Los_Angeles
+        - Trivial POD OCD edits
+        - Suppress warnings for empty duration strings (just throw exception)
+
 1.01      2021-02-24 14:48:04-08:00 America/Los_Angeles
         - First version, released on an unsuspecting world

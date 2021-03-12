@@ -145,6 +145,16 @@ my $tests =
         name            => q{%{REQUEST_STATUS} -in {'405','410'}},
         test            => q{%{REQUEST_STATUS} -in {'405','410'}},
     },
+    {
+        comp            => q{'192.168.1.10' !-ipmatch '192.168.2.0/24'},
+        comp_binary     => q{'192.168.1.10' !-ipmatch '192.168.2.0/24'},
+        comp_binary_is_neg => q{!},
+        comp_binaryop   => q{ipmatch},
+        comp_worda      => q{'192.168.1.10'},
+        comp_wordb      => q{'192.168.2.0/24'},
+        name            => q{'192.168.1.10' !-ipmatch '192.168.2.0/24'},
+        test            => q{'192.168.1.10' !-ipmatch '192.168.2.0/24'},
+    },
 ];
 
 my $sub = $ENV{AUTHOR_TESTING} ? \&dump_tests : \&run_tests;

@@ -16,6 +16,8 @@ if (length $rcvbuf_bin == 4) {
     my $rcvbuf = unpack 'L', $rcvbuf_bin;
     my $rcvbuf_orig = $rcvbuf;
 
+    diag "Original SO_RCVBUF: $rcvbuf_orig";
+
     my $newsize_bin = q<>;
 
     while ($rcvbuf > 0) {
@@ -31,11 +33,15 @@ if (length $rcvbuf_bin == 4) {
 
     utf8::upgrade $newsize_bin;
 
-    use Sys::Binmode;
-    ok(
-        setsockopt( $s, SOL_SOCKET, SO_RCVBUF, $newsize_bin ),
-        'setsockopt with upgraded string - no failure',
-    );
+    {
+        use Sys::Binmode;
+        my $ok = setsockopt( $s, SOL_SOCKET, SO_RCVBUF, $newsize_bin );
+        my $err = $!;
+        ok(
+            $ok,
+            'setsockopt with upgraded string - no failure',
+        ) or diag $!;
+    }
 
     my $rcvbuf_bin = getsockopt($s, SOL_SOCKET, SO_RCVBUF);
     my $rcvbuf2= unpack 'L', $rcvbuf_bin;
@@ -43,7 +49,10 @@ if (length $rcvbuf_bin == 4) {
     if ($^O =~ m<linux>) {
 
         # Linux doubles the SO_RCVBUF that you give. (weird?)
-        is( $rcvbuf2, 2 * $rcvbuf, 'setsockopt took effect');
+        is( $rcvbuf2, 2 * $rcvbuf, 'setsockopt took effect (twice given value, because Linux)');
+    }
+    elsif ($^O =~ m<solaris>) {
+        isnt( $rcvbuf2, $rcvbuf_orig, 'setsockopt took effect (some change from before, because Solaris)');
     }
     else {
         is( $rcvbuf2, $rcvbuf, 'setsockopt took effect');

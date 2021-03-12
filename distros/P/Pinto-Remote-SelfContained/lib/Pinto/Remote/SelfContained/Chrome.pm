@@ -10,7 +10,7 @@ use Types::Standard qw(Bool FileHandle Int);
 
 use namespace::clean;
 
-our $VERSION = '0.900';
+our $VERSION = '1.000';
 
 has verbose => (is => 'ro', isa => Int, default => 0);
 has quiet => (is => 'ro', isa => Bool, default => 0);

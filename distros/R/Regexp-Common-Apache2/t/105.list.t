@@ -18,13 +18,13 @@ my $tests =
     },
     {
         list            => q{({"John", "Doe"})},
-        list_func       => q{({"John", "Doe"})},
+        list_list       => q{{"John", "Doe"}},
         name            => q{list ({})},
         test            => q{({"John", "Doe"})},
     },
     {
         list            => q{( { "John", "Doe" } )},
-        list_func       => q{( { "John", "Doe" } )},
+        list_list       => q{{ "John", "Doe" }},
         name            => q{list ({}) with lose spaces},
         test            => q{( { "John", "Doe" } )},
     },
@@ -36,7 +36,7 @@ my $tests =
     },
     {
         list            => q{(split( /\w+/, "John Doe" ))},
-        list_func       => q{(split( /\w+/, "John Doe" ))},
+        list_list       => q{split( /\w+/, "John Doe" )},
         name            => q{list based on split enclosed in ()},
         test            => q{(split( /\w+/, "John Doe" ))},
     },

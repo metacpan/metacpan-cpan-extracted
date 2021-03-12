@@ -128,6 +128,14 @@ my $tests =
         name            => q{binary-op word},
         test            => q{!(192.168.1.10 -ipmatch 192.168.1.1/24)},
     },
+    {
+        cond            => q{-R '192.168.2.0/24' || -R '127.0.0.1/24'},
+        cond_or         => q{-R '192.168.2.0/24' || -R '127.0.0.1/24'},
+        cond_or_expr1   => q{-R '192.168.2.0/24'},
+        cond_or_expr2   => q{-R '127.0.0.1/24'},
+        name            => q{Priority of expression: condition over unary operation},
+        test            => q{-R '192.168.2.0/24' || -R '127.0.0.1/24'},
+    },
 ];
 
 my $sub = $ENV{AUTHOR_TESTING} ? \&dump_tests : \&run_tests;

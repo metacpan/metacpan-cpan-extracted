@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.1.5
+    version v0.2.0
 
 SYNOPSIS
 
@@ -43,8 +43,14 @@ SYNOPSIS
         ; The defaults for author and license come from
         [Author::GSG]
     
+        [ FileFinder::Filter / MungeableFiles ]
+        finder => :InstallModules
+        finder => :PerlExecFiles
+        ; dont_munge = (?^:bin) # can be used multiple times. passed in as "skip"
+    
         [MetaJSON]
         [OurPkgVersion]
+        finder = :MungableFiles
         [Prereqs::FromCPANfile]
         [$meta_provides] # defaults to MetaProvides::Package
     
@@ -56,6 +62,7 @@ SYNOPSIS
         dir = script    # in addition to bin/ for StaticInstall compatibility
     
         [PodWeaver]
+        finder     = :MungeableFiles
         replacer = replace_with_comment
         post_code_replacer = replace_with_nothing
         config_plugin = [ @Default, Contributors ]
@@ -187,6 +194,18 @@ ATTRIBUTES / PARAMETERS
       All options for Dist::Zilla::Plugin::Test::Compile should be
       supported with the test_compile_ prefix.
 
+    dont_munge
+
+          [@Author::GSG]
+          dont_munge = (?^:one-off)
+          dont_munge = (?^:docs/.*.txt)
+
+      Passed to Dist::Zilla::Plugin::FileFinder::Filter as c<skip> for the
+      MungableFiles plugin.
+
+      This plugin gets passed to Dist::Zilla::Plugin::OurPkgVersion and
+      Dist::Zilla::Plugin::PodWeaver as finder to filter matches.
+
 Setting up a new dist
 
  Create your dist.ini
@@ -313,7 +332,8 @@ Setting up a new dist
     Set github.user and github.token
 
       You can get a GitHub token by following GitHub's instructions
-      <https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line>.
+      <https://help.github.com/en/articles/creating-a-personal-access-token
+      -for-the-command-line>.
 
           git config --global github.user  github_login_name
           git config --global github.token token_from_instructions_above

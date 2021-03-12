@@ -1,0 +1,52 @@
+NAME
+
+    Task::Lyrics::Fetcher - install all known-to-work Lyrics::Fetcher
+    fetchers
+
+SYNOPSIS
+
+    A quick way to install Lyrics::Fetcher and a selection of
+    Lyrics::Fetcher::* modules for various services which are currently
+    known to work. Over time, newly-added and tested Fetcher modules will
+    be added to this Task, and any which no longer work (because the site
+    they talk to no longer exists, or has changed in a way they can no
+    longer operate with it) will be removed.
+
+    Perl one liner using CPAN.pm:
+
+      perl -MCPAN -e 'install Task::Lyrics::Fetcher'
+
+    Use of CPAN.pm in interactive mode:
+
+      $> perl -MCPAN -e shell
+      cpan> install Task::Lyrics::Fetcher
+      cpan> quit
+
+    Using cpanminus:
+
+      $> cpanm Task::Lyrics::Fetcher
+
+CONTENTS
+
+    Lyrics::Fetcher - manages all Lyrics::Fetcher fetchers
+
+    Lyrics::Fetcher::AZLyrics
+
+    Lyrics::Fetcher::Genius
+
+    Lyrics::Fetcher::LyricsOVH
+
+    Lyrics::Fetcher::LyricWiki
+
+AUTHOR
+
+    David Precious, <davidp at preshweb.co.uk>
+
+LICENSE AND COPYRIGHT
+
+    This software is Copyright (c) 2021 by David Precious.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

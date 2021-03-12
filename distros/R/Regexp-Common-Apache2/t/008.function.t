@@ -17,6 +17,11 @@ my $tests =
         name            => q{basic function},
         test            => q{someFunction("parameter1", "parameter2")},
     },
+    {
+        fail            => 1,
+        name            => q{Modern variable false positive},
+        test            => q{v('QUERY_STRING')},
+    },
 ];
 
 my $sub = $ENV{AUTHOR_TESTING} ? \&dump_tests : \&run_tests;

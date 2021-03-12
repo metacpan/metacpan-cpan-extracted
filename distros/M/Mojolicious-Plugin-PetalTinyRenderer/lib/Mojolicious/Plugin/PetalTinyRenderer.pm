@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::PetalTinyRenderer;
-$Mojolicious::Plugin::PetalTinyRenderer::VERSION = '0.05';
+$Mojolicious::Plugin::PetalTinyRenderer::VERSION = '0.06';
 use Mojo::Base 'Mojolicious::Plugin';
 use Try::Tiny;
 
@@ -220,7 +220,7 @@ Helpers are available via the C<h> entry in the stash.
 
 The current controller instance can be accessed as C<c>.
 
- I see you are requesting a document from 
+ I see you are requesting a document from
  <span tal:replace="c/req/headers/host">Lorem ipsum</span>.
 
 =head1 USEFUL PATTERNS
@@ -294,11 +294,17 @@ L<Petal::Tiny>, L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>.
 
 =head1 AUTHOR
 
-Lars Balker <lars@balker.dk>
+=over
+
+=item jonasbn
+
+=item Lars Balker <lars@balker.dk>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by DK Hostmaster A/S.
+This software is copyright (c) 2014-2021 by DK Hostmaster A/S.
 
 This is free software, licensed under:
 

@@ -14,4 +14,4 @@ lib/Crypt/Passphrase/Fallback.pm
 lib/Crypt/Passphrase/Validator.pm
 t/00-compile.t
 xt/author/pod-syntax.t
-xt/with-dependencies.t
+xt/author/with-dependencies.t

@@ -7,7 +7,7 @@ use warnings;
 use Type::Utils qw(:all);
 use Types::Standard qw(ArrayRef Dict InstanceOf Optional Str);
 
-our $VERSION = '0.900';
+our $VERSION = '1.000';
 
 use Type::Library -base, -declare => qw(
     BodyPart

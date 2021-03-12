@@ -9,7 +9,7 @@ use XML::Twig::XPath;
 use Carp qw(croak);
 use List::Util 'max';
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 our @CARP_NOT = (qw(XML::Twig));
 
 use Filter::signatures;

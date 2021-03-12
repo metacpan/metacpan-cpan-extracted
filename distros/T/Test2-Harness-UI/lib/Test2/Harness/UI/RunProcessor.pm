@@ -2,7 +2,7 @@ package Test2::Harness::UI::RunProcessor;
 use strict;
 use warnings;
 
-our $VERSION = '0.000041';
+our $VERSION = '0.000043';
 
 use DateTime;
 use Data::GUID;
@@ -15,7 +15,6 @@ use Test2::Util::Facets2Legacy qw/causes_fail/;
 
 use Test2::Harness::Util::UUID qw/gen_uuid/;
 use Test2::Harness::Util::JSON qw/encode_json decode_json/;
-use Test2::Formatter::Test2::Composer;
 
 use Test2::Harness::UI::Util::ImportModes qw{
     %MODES

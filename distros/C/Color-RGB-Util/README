@@ -2,8 +2,8 @@ NAME
     Color::RGB::Util - Utilities related to RGB colors
 
 VERSION
-    This document describes version 0.601 of Color::RGB::Util (from Perl
-    distribution Color-RGB-Util), released on 2020-06-08.
+    This document describes version 0.602 of Color::RGB::Util (from Perl
+    distribution Color-RGB-Util), released on 2021-01-19.
 
 SYNOPSIS
      use Color::RGB::Util qw(
@@ -259,7 +259,11 @@ FUNCTIONS
 
     *   approx1
 
-        This algorithm uses the following formula:
+        This algorithm, described in [1] as "a low cost approximation" and
+        "a combination both weighted Euclidean distance functions, where the
+        weight factors depend on how big the 'red' component of the colour
+        is" with "results that are very close to L*u*v" and "a more stable
+        algorithm", uses the following formula:
 
          ( 2*(R1-R2)**2 + 4*(G1-G2)**2 + 3*(B1-B2)**2 + Rm*((R1-R2)**2 - (B1-B2)**2)/256 )**0.5
 
@@ -285,8 +289,12 @@ FUNCTIONS
         This algorithm tends to choose the hued colors instead of favoring
         to fallback on white/gray, which is more preferred.
 
+    TODO: redmean low-cost approximation, CMC l:c.
+
     For more about color difference, try reading
     <https://en.wikipedia.org/wiki/Color_difference>.
+
+    [1] https://www.compuphase.com/cmetric.htm
 
   rgb_distance
     Usage:
@@ -344,11 +352,11 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-SHARYANTO-Color-Util>.
+    <https://github.com/perlancar/perl-Color-RGB-Util>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Color-RGB-Util>
+    <https://github.com/perlancar/perl-Color-RGB-Util/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -360,8 +368,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2015, 2014, 2013 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2015, 2014, 2013
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
