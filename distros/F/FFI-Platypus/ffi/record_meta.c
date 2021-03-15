@@ -1,17 +1,10 @@
-#include <ffi.h>
-#include <stdlib.h>
-#include <string.h>
+#include <ffi_platypus.h>
 
 #ifdef _MSC_VER
 #define EXPORT __declspec(dllexport)
 #else
 #define EXPORT
 #endif
-
-typedef struct meta_t {
-  ffi_type top;
-  ffi_type *elements[0];
-} meta_t;
 
 /*
  * Question: this is the documented way of creating a struct type.
@@ -20,23 +13,25 @@ typedef struct meta_t {
  */
 
 EXPORT
-meta_t *
-ffi_platypus_record_meta__new(ffi_type *list[])
+ffi_pl_record_meta_t *
+ffi_platypus_record_meta__new(ffi_type *list[], int safe_to_return_from_closure)
 {
   int size, i;
-  meta_t *t;
+  ffi_pl_record_meta_t *t;
 
   for(size=0; list[size] != NULL; size++)
     ;
 
-  t = malloc(sizeof(meta_t) + sizeof(ffi_type*)*(size+1) );
+  t = malloc(sizeof(ffi_pl_record_meta_t) + sizeof(ffi_type*)*(size+1) );
   if(t == NULL)
     return NULL;
 
-  t->top.size      = 0;
-  t->top.alignment = 0;
-  t->top.type      = FFI_TYPE_STRUCT;
-  t->top.elements  = (ffi_type**) &t->elements;
+  t->ffi_type.size      = 0;
+  t->ffi_type.alignment = 0;
+  t->ffi_type.type      = FFI_TYPE_STRUCT;
+  t->ffi_type.elements  = (ffi_type**) &t->elements;
+
+  t->can_return_from_closure = safe_to_return_from_closure;
 
 
   for(i=0; i<size+1; i++)
@@ -49,35 +44,35 @@ ffi_platypus_record_meta__new(ffi_type *list[])
 
 EXPORT
 ffi_type *
-ffi_platypus_record_meta__ffi_type(meta_t *t)
+ffi_platypus_record_meta__ffi_type(ffi_pl_record_meta_t *t)
 {
-  return &t->top;
+  return &t->ffi_type;
 }
 
 EXPORT
 size_t
-ffi_platypus_record_meta__size(meta_t *t)
+ffi_platypus_record_meta__size(ffi_pl_record_meta_t *t)
 {
-  return t->top.size;
+  return t->ffi_type.size;
 }
 
 EXPORT
 unsigned short
-ffi_platypus_record_meta__alignment(meta_t *t)
+ffi_platypus_record_meta__alignment(ffi_pl_record_meta_t *t)
 {
-  return t->top.alignment;
+  return t->ffi_type.alignment;
 }
 
 EXPORT
 ffi_type **
-ffi_platypus_record_meta__element_pointers(meta_t *t)
+ffi_platypus_record_meta__element_pointers(ffi_pl_record_meta_t *t)
 {
-  return t->top.elements;
+  return t->ffi_type.elements;
 }
 
 EXPORT
 void
-ffi_platypus_record_meta__DESTROY(meta_t *t)
+ffi_platypus_record_meta__DESTROY(ffi_pl_record_meta_t *t)
 {
   free(t);
 }

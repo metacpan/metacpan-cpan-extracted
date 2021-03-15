@@ -48,7 +48,7 @@ requires:
   Log::Any::Adapter: '0'
   Log::Any::Adapter::Log4perl: '0'
   Log::Log4perl: '0'
-  Smartcat::Client: v0.0.2
+  Smartcat::Client: v0.0.3
   Smartcat::Client::AccountApi: '0'
   Smartcat::Client::DocumentApi: '0'
   Smartcat::Client::DocumentExportApi: '0'
@@ -64,7 +64,7 @@ resources:
   bugtracker: https://github.com/smartcatai/smartcat-app-perl/issues
   homepage: https://github.com/smartcatai/smartcat-app-perl
   repository: https://github.com/smartcatai/smartcat-app-perl.git
-version: 0.0.5
+version: 0.0.6
 x_contributors:
   - 'Igor Afanasyev <igor.afanasyev@gmail.com>'
 x_generated_by_perl: v5.20.3

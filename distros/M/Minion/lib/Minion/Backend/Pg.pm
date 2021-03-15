@@ -426,8 +426,7 @@ Delay job for this many seconds (from now), defaults to C<0>.
 
   expire => 300
 
-Job is valid for this many seconds (from now) before it expires. Note that this option is B<EXPERIMENTAL> and might
-change without warning!
+Job is valid for this many seconds (from now) before it expires.
 
 =item lax
 
@@ -940,8 +939,7 @@ Delay job for this many seconds (from now), defaults to C<0>.
 
   expire => 300
 
-Job is valid for this many seconds (from now) before it expires. Note that this option is B<EXPERIMENTAL> and might
-change without warning!
+Job is valid for this many seconds (from now) before it expires.
 
 =item lax
 
@@ -1056,6 +1054,6 @@ Unregister worker.
 
 =head1 SEE ALSO
 
-L<Minion>, L<https://minion.pm>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+L<Minion>, L<Minion::Guide>, L<https://minion.pm>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

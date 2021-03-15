@@ -78,6 +78,10 @@ Note that when input is a perl scalar and the real-value based function
 would return NaN, it now returns a cdouble.
  Works inplace.
 
+=for bad
+
+acos processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -104,6 +108,10 @@ Note that when input is a perl scalar and the real-value based function
 would return NaN, it now returns a cdouble.
  Works inplace.
 
+=for bad
+
+asin processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -130,6 +138,10 @@ Note that when input is a perl scalar and the real-value based function
 would return NaN, it now returns a cdouble.
  Works inplace.
 
+=for bad
+
+atan processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -156,6 +168,10 @@ Note that when input is a perl scalar and the real-value based function
 would return NaN, it now returns a cdouble.
  Works inplace.
 
+=for bad
+
+cosh processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -182,6 +198,10 @@ Note that when input is a perl scalar and the real-value based function
 would return NaN, it now returns a cdouble.
  Works inplace.
 
+=for bad
+
+sinh processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -208,6 +228,10 @@ Note that when input is a perl scalar and the real-value based function
 would return NaN, it now returns a cdouble.
  Works inplace.
 
+=for bad
+
+tan processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -234,6 +258,10 @@ Note that when input is a perl scalar and the real-value based function
 would return NaN, it now returns a cdouble.
  Works inplace.
 
+=for bad
+
+tanh processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -259,6 +287,10 @@ would return NaN, it now returns a cdouble.
 
 Round to integer values in floating-point format. Works inplace.
 
+=for bad
+
+ceil processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -284,6 +316,10 @@ Round to integer values in floating-point format. Works inplace.
 
 Round to integer values in floating-point format. Works inplace.
 
+=for bad
+
+floor processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -320,6 +356,10 @@ If you are looking to round half-integers up (regardless of sign), try
 C<floor($x+0.5)>.  If you want to round half-integers away from zero,
 try C<< ceil(abs($x)+0.5)*($x<=>0) >>. Works inplace.
 
+=for bad
+
+rint processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -345,6 +385,10 @@ try C<< ceil(abs($x)+0.5)*($x<=>0) >>. Works inplace.
 
 Synonym for `**'. Works inplace.
 
+=for bad
+
+pow processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -371,6 +415,10 @@ Note that when input is a perl scalar and the real-value based function
 would return NaN, it now returns a cdouble.
  Works inplace.
 
+=for bad
+
+acosh processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -397,6 +445,10 @@ Note that when input is a perl scalar and the real-value based function
 would return NaN, it now returns a cdouble.
  Works inplace.
 
+=for bad
+
+asinh processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -423,6 +475,10 @@ Note that when input is a perl scalar and the real-value based function
 would return NaN, it now returns a cdouble.
  Works inplace.
 
+=for bad
+
+atanh processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -448,6 +504,10 @@ would return NaN, it now returns a cdouble.
 
 The error function. Works inplace.
 
+=for bad
+
+erf processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -473,6 +533,10 @@ The error function. Works inplace.
 
 The complement of the error function. Works inplace.
 
+=for bad
+
+erfc processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -498,6 +562,10 @@ The complement of the error function. Works inplace.
 
 The regular Bessel function of the first kind, J_n Works inplace.
 
+=for bad
+
+bessj0 processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -523,6 +591,10 @@ The regular Bessel function of the first kind, J_n Works inplace.
 
 The regular Bessel function of the first kind, J_n Works inplace.
 
+=for bad
+
+bessj1 processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -548,6 +620,10 @@ The regular Bessel function of the first kind, J_n Works inplace.
 
 The regular Bessel function of the second kind, Y_n. Works inplace.
 
+=for bad
+
+bessy0 processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -573,6 +649,10 @@ The regular Bessel function of the second kind, Y_n. Works inplace.
 
 The regular Bessel function of the second kind, Y_n. Works inplace.
 
+=for bad
+
+bessy1 processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -602,6 +682,10 @@ This takes a second int argument which gives the order
 of the function required.
  Works inplace.
 
+=for bad
+
+bessjn processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -631,6 +715,10 @@ This takes a second int argument which gives the order
 of the function required.
  Works inplace.
 
+=for bad
+
+bessyn processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -663,6 +751,10 @@ things.
 
 
 
+=for bad
+
+lgamma processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -695,7 +787,9 @@ badmask can be run with C<$x> inplace:
 
 
 
+=for bad
 
+If bad values are present, these are also cleared.
 
 =cut
 
@@ -720,7 +814,9 @@ badmask can be run with C<$x> inplace:
 
 Sets C<$mask> true if C<$a> is not a C<NaN> or C<inf> (either positive or negative). Works inplace.
 
+=for bad
 
+Bad values are treated as C<NaN> or C<inf>.
 
 =cut
 
@@ -745,6 +841,10 @@ Sets C<$mask> true if C<$a> is not a C<NaN> or C<inf> (either positive or negati
 
 The inverse of the error function. Works inplace.
 
+=for bad
+
+erfi processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -772,6 +872,10 @@ The value for which the area under the
 Gaussian probability density function (integrated from
 minus infinity) is equal to the argument (cf L</erfi>). Works inplace.
 
+=for bad
+
+ndtri processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -806,6 +910,10 @@ of decreasing powers.
 
 
 
+=for bad
+
+polyroots does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

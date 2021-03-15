@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Job;
 use strict;
 use warnings;
 
-our $VERSION = '1.000043';
+our $VERSION = '1.000044';
 
 use Carp qw/confess croak/;
 use Config qw/%Config/;
@@ -510,9 +510,10 @@ sub env_vars {
         HARNESS_ACTIVE       => 1,
         TEST2_HARNESS_ACTIVE => 1,
 
-        T2_HARNESS_JOB_FILE   => $self->rel_file,
-        T2_HARNESS_JOB_NAME   => $self->{+TASK}->{job_name},
-        T2_HARNESS_JOB_IS_TRY => $self->{+IS_TRY} // 0,
+        T2_HARNESS_JOB_FILE     => $self->rel_file,
+        T2_HARNESS_JOB_NAME     => $self->{+TASK}->{job_name},
+        T2_HARNESS_JOB_IS_TRY   => $self->{+IS_TRY}           // 0,
+        T2_HARNESS_JOB_DURATION => $self->{+TASK}->{duration} // '',
     };
 }
 

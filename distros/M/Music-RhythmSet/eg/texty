@@ -1,0 +1,126 @@
+#!/usr/bin/env perl
+#
+# texty - imports replay logs from the to_string form and optionally
+# emits those logs in various forms (if all goes well). the to_string
+# form can also be read from a MIDI file written by Music::RhythmSet:
+#
+#   $ perl -MMIDI -e 'MIDI::Opus->new({ from_file => "noise.midi" })->dump({dump_tracks=>1})' \
+#   | perl -nle '/^\s+\[\047text_event[^"]+"v(\d+) ([x.]+) (\d+)/a && print join "\t", 0, $1, $2, $3' > x
+#   # ... perhaps edit "x" here...
+#   $ perl texty x newnoise.midi
+#   $ perl texty -L noise.X.ly -CU < x > y
+#   $ sort -n y
+#   ...
+#   $ cat noise.*.ly
+#
+# which probably should be written up as a "from_midi" method but that's
+# more work (and testing...) and lacks the potential to edit the string
+# form of the replay log
+
+use 5.24.0;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use Music::RhythmSet;
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+    'channel|c=i'  => \my $Flag_Channel,
+    'divisor|d=i'  => \my $Flag_Divisor,
+    'help|h|?'     => \&emit_help,
+    'lilypond|L=s' => \my $Flag_Lilypond,
+    'no-changes|C' => \my $Flag_Nochanges,
+    'notes=s'      => \my $Flag_Notes,
+    'rs|R=s'       => \my $Flag_RS,
+    'sep|S=s'      => \my $Flag_Sep,
+    'sustain|sus'  => \my $Flag_Sustain,
+    'update|U'     => \my $Flag_Update,
+) or exit 1;
+
+$Flag_Channel //= 9;    # drum
+$Flag_Notes = [ split /,/, $Flag_Notes ] if defined $Flag_Notes;
+
+my ( $file, $midi ) = @ARGV;
+$file //= '-';
+my $fh;
+
+if ( $file eq '-' ) {
+    $fh = \*STDIN;
+} else {
+    open $fh, '+<', $file or die "could not open '$file': $!\n";
+}
+
+my $set = Music::RhythmSet->new->from_string(
+    do { local $/; readline $fh },
+    defined $Flag_RS  ? ( rs  => $Flag_RS )  : (),
+    defined $Flag_Sep ? ( sep => $Flag_Sep ) : (),
+);
+
+if ( defined $midi ) {
+    $set->to_midi(
+        chan => $Flag_Channel,
+        defined $Flag_Notes
+        ? ( track => [ map { { note => $_ } } $Flag_Notes->@* ] )
+        : (),
+        defined $Flag_Sustain ? ( sustain => 1 ) : (),
+    )->write_to_file($midi);
+}
+
+if ($Flag_Lilypond) {
+    if ( $Flag_Lilypond !~ m/X/ and $set->voices->@* > 1 ) {
+        warn "no X in lilypond filename...\n";
+        sleep 3;
+    }
+    my $x = 0;
+    for my $str ( $set->to_ly->@* ) {
+        my $lyfile = $Flag_Lilypond =~ s/(X+)/sprintf "%.*d", length $1, $x/er;
+        open my $lfh, '>', $lyfile or die "could not write '$lyfile': $!\n";
+        print $lfh $str;
+        $x++;
+    }
+}
+
+if ($Flag_Update) {
+    if ( $file eq '-' ) {
+        $fh = \*STDOUT;
+    } else {
+        # NOTE is not atomic, risk of data loss when something goes
+        # awry. you have backups, right?
+        seek $fh, 0, 0;
+    }
+    print $fh $set->to_string(
+        $Flag_Divisor     ? ( divisor => $Flag_Divisor ) : (),
+        defined $Flag_RS  ? ( rs      => $Flag_RS )      : (),
+        defined $Flag_Sep ? ( sep     => $Flag_Sep )     : (),
+    );
+}
+
+exit if $Flag_Nochanges;
+
+$set->changes(
+    $Flag_Divisor ? ( divisor => $Flag_Divisor ) : (),
+    header => sub { warn '# measure ' . $_[0] . "\n" },
+    voice  => sub {
+        my ( $mm, $id, $bpat, $bstr, $new, $repeat ) = @_;
+        warn join( "\t", $id, $bstr, ( $new ? 'n' : '' ) . ( $repeat ? 'r' : '' ) )
+          . "\n";
+    }
+);
+
+sub emit_help {
+    warn <<'END_USAGE';
+Usage: texty [options] file|- [midi-file]
+
+Options:
+  -C            Do not emit changes to stderr
+  -c chan       MIDI channel to use for all voices (default 9, drum)
+  -d [divisor]  Divide beat count by this many beats per measure
+  -L lyfile     Lilypond file; first X in filename gets counter var
+  --notes ...   Note to use for each MIDI track e.g.    --notes=60,67,68
+  -R recsep     Record sep for string import and export
+  -S fieldsep   Field sep for string import and export
+  --sustain     MIDI notes will be sustained until next onset
+  -U            Update file in place (or emit to stdout if no file)
+
+END_USAGE
+    exit 64;
+}

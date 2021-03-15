@@ -1,9 +1,3 @@
-# Build status of dev branch
-
-* Linux [![Build Status](https://travis-ci.org/beyondgrep/ack3.png?branch=dev)](https://travis-ci.org/beyondgrep/ack3)
-* Windows [![Build Status](https://ci.appveyor.com/api/projects/status/github/beyondgrep/ack3)](https://ci.appveyor.com/project/petdance/ack3)
-* [CPAN Testers](http://cpantesters.org/distro/A/ack.html)
-
 # ack 3
 
 ack is a code-searching tool, similar to grep but optimized for
@@ -19,6 +13,8 @@ ack is written and maintained by Andy Lester (andy@petdance.com).
     * [ack-announce](https://groups.google.com/d/forum/ack-announce), announcements-only
     * [ack-users](https://groups.google.com/d/forum/ack-users), for users of ack
     * [ack-dev](https://groups.google.com/d/forum/ack-dev), for ack development
+* [Build status ![Build Status](https://github.com/beyondgrep/ack3/workflows/testsuite/badge.svg?branch=dev)](https://github.com/beyondgrep/ack3/actions?query=workflow%3Atestsuite+branch%3Adev)
+* [CPAN Testers](https://cpantesters.org/distro/A/ack.html)
 
 # Building
 
@@ -75,7 +71,7 @@ See the [Community](https://beyondgrep.com/community/) page.
 
 # License
 
-Copyright 2005-2020 Andy Lester.
+Copyright 2005-2021 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the

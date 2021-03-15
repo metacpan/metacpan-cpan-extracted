@@ -27,7 +27,7 @@ USGB: {
 		CHI->import;
 	};
 	if($@) {
-		diag("CHI not installed");
+		diag('CHI not installed');
 		$cache = undef;
 	} else {
 		diag("Using CHI $CHI::VERSION");

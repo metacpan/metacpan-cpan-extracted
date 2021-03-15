@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+#
+# dorian-fugue-subject - find random phrases that allow a transposed
+# phrase to be played against the original phrase at various offsets
+#
+#   $ perl dorian-fugue-subject | sort -nr > foo
+#
+# however there are lots of things you may want to tweak in this
+# code first
+
+use strict;
+use warnings;
+use Music::LilyPondUtil;
+use Music::Tension::Counterpoint 1.03;
+use Music::VoiceGen;
+
+my $start     = 62;    # starting pitch
+my $len       = 8;     # phrase length
+my $transpose = 7;
+# perldoc Music::VoiceGen
+# the ambitus is somewhat restricted as I don't want "C B C" being
+# picked below the tonic (D, 62) as that is probably not very Dorian?
+# leaps of a major 6th or by 7ths are not allowed as is traditional in
+# counterpoint
+my $pitches   = [ 60, 62, 64, 65, 67, 69, 71, 72, 74 ];
+my $intervals = [ 1,  2,  3,  4, 5, 7, 8, 12, -1, -2, -3, -4, -5, -7, -8, -12 ];
+
+# how much CPU to waste searching for phrases (at some point the
+# randomness might better be replaced by just generating every possible
+# phrase, or a more systematic approach like studying what works for
+# shorter phrases, which is probably traditional for folks who didn't
+# have computers to brute force these sorts of things for them)
+my $trials = 1e5;
+
+my $tension = Music::Tension::Counterpoint->new;
+
+# phrase maker
+my $voice = Music::VoiceGen->new(
+    pitches   => $pitches,
+    intervals => $intervals,
+    weightfn  => sub {
+        my ( $from, $to, $interval ) = @_;
+        # favor smaller intervals
+        return 1 / ( $interval**1.01 );
+    }
+);
+
+my $lyu = Music::LilyPondUtil->new;
+$lyu->mode('relative');
+
+my %possible;
+
+for ( 1 .. $trials ) {
+    my ( $phrase, $okoff ) = random_phrase( $start, $len, $transpose );
+
+    # this test and more that follow will need tuning depending on the
+    # length of the phrase
+    #
+    # not enough different onsets to introduce the transposed phrase at
+    next if @$okoff < 3;
+
+    # particular end to the phrase (this could also allow for phrases
+    # that move to the Dominant, or whatever)
+    next if $phrase->[-1] != $start;
+
+    # TODO maybe want to filter out things that bounce around on "e f e"
+    # or such as these will increase the odds of A) counterpoint
+    # problems involving the tritone or B) excessive accidentals for the
+    # mode on account of pushing the tritone somewhere else
+
+    # unique pitch count; too few indicates that the phrase does not
+    # move around enough, e.g. {d c d e c d e d}
+    my %unique;
+    for my $pitch (@$phrase) {
+        $unique{$pitch}++;
+    }
+    my $uc = keys %unique;
+
+    next if $uc < 4;
+
+    # leap count (too many is probably no bueno) where "leap" is a
+    # perfect 5th or larger
+    my $lc = 0;
+
+    # skip count; too many skips of 3rds or 4ths may be a problem (too
+    # few could be a different problem)
+    my $sc = 0;
+
+    for my $i ( 1 .. $#{$phrase} ) {
+        my $interval = abs( $phrase->[$i] - $phrase->[ $i - 1 ] );
+        $lc++ if $interval > 6;
+        $sc++ if $interval > 2 and $interval < 6;
+    }
+
+    next if $lc > 3;
+    next if $sc > 5;
+
+    $possible{ join ".", @$phrase } = [ $phrase, $okoff, $lc, $sc, $uc ];
+}
+
+for my $key ( sort keys %possible ) {
+    my ( $phrase, $okoff, $lc, $sc, $uc ) = @{ $possible{$key} };
+    my $ly  = join ' ', $lyu->p2ly(@$phrase);
+    my $ly2 = join ' ', $lyu->p2ly( map { $_ + $transpose } @$phrase );
+    # some magic numbers and letters for the human to poke at
+    printf "$lc $sc $uc\t%-20s %-10s %-20s\n", $ly, join( ' ', @$okoff ), $ly2;
+}
+
+sub random_phrase {
+    my ( $start, $len, $transpose ) = @_;
+
+    $voice->context($start);
+    my @phrase = ( $start, map( $voice->rand, 1 .. ( $len - 1 ) ) );
+
+    # NOTE fugue subjects are sometimes fiddled with (e.g. {E F E} might
+    # become {A C B} in Aeolian (because, like, duh), a leap of a 5th
+    # becomes a 4th, etc); this only does an exact transpose
+    #
+    # TODO may want a scale- or mode-conforming transpose here...
+    my @imitate = map { $_ + $transpose } @phrase;
+
+    return \@phrase, [ $tension->usable_offsets( \@phrase, \@imitate ) ];
+}

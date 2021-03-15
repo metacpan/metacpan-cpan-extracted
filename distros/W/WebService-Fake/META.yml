@@ -23,17 +23,17 @@ no_index:
     - xt
 requires:
   Log::Any: '1.045'
-  Mojolicious: '7.10'
+  Mojolicious: '9.0'
   Path::Tiny: '0.096'
   Template::Perlish: '1.52'
   Try::Tiny: '0.27'
   YAML::XS: '0.63'
-  perl: '5.010'
+  perl: '5.016'
 resources:
   bugtracker: https://github.com/polettix/WebService-Fake/issues
   homepage: https://github.com/polettix/WebService-Fake
   repository: https://github.com/polettix/WebService-Fake.git
-version: '0.004'
+version: '0.006'
 x_contributors:
   - 'Alexey Melezhik <melezhik@gmail.com>'
   - 'Flavio Poletti <flavio@polettix.it>'

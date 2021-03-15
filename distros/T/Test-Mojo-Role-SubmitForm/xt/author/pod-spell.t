@@ -11,14 +11,17 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Graham
+Guillaume
 Mojo
 Ollis
 Role
+Rousse
 SubmitForm
 Test
 Znet
 Zoffix
 cpan
+guillaume
 lib
 plicease
 zoffixznet

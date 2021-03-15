@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Log[Gamma(x)], x not a negative integer Uses real Lanczos method. Determines the sign of Gamma[x] as well as Log[|Gamma[x]|] for x < 0. So Gamma[x] = sgn * Exp[result_lg].
 
+=for bad
+
+gsl_sf_lngamma does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -86,6 +90,10 @@ Log[Gamma(x)], x not a negative integer Uses real Lanczos method. Determines the
 
 Gamma(x), x not a negative integer
 
+=for bad
+
+gsl_sf_gamma does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -111,6 +119,10 @@ Gamma(x), x not a negative integer
 
 Regulated Gamma Function, x > 0 Gamma^*(x) = Gamma(x)/(Sqrt[2Pi] x^(x-1/2) exp(-x)) = (1 + 1/(12x) + ...),  x->Inf
 
+=for bad
+
+gsl_sf_gammastar does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -136,6 +148,10 @@ Regulated Gamma Function, x > 0 Gamma^*(x) = Gamma(x)/(Sqrt[2Pi] x^(x-1/2) exp(-
 
 1/Gamma(x)
 
+=for bad
+
+gsl_sf_gammainv does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -161,6 +177,10 @@ Regulated Gamma Function, x > 0 Gamma^*(x) = Gamma(x)/(Sqrt[2Pi] x^(x-1/2) exp(-
 
 Log[Gamma(z)] for z complex, z not a negative integer. Calculates: lnr = log|Gamma(z)|, arg = arg(Gamma(z))  in (-Pi, Pi]
 
+=for bad
+
+gsl_sf_lngamma_complex does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -186,6 +206,10 @@ Log[Gamma(z)] for z complex, z not a negative integer. Calculates: lnr = log|Gam
 
 x^n / n!
 
+=for bad
+
+gsl_sf_taylorcoeff does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -211,6 +235,10 @@ x^n / n!
 
 n!
 
+=for bad
+
+gsl_sf_fact does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -236,6 +264,10 @@ n!
 
 n!! = n(n-2)(n-4)
 
+=for bad
+
+gsl_sf_doublefact does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -261,6 +293,10 @@ n!! = n(n-2)(n-4)
 
 ln n!
 
+=for bad
+
+gsl_sf_lnfact does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -286,6 +322,10 @@ ln n!
 
 ln n!!
 
+=for bad
+
+gsl_sf_lndoublefact does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -311,6 +351,10 @@ ln n!!
 
 log(n choose m)
 
+=for bad
+
+gsl_sf_lnchoose does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -336,6 +380,10 @@ log(n choose m)
 
 n choose m
 
+=for bad
+
+gsl_sf_choose does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -361,6 +409,10 @@ n choose m
 
 Logarithm of Pochammer (Apell) symbol, with sign information. result = log( |(a)_x| ), sgn    = sgn( (a)_x ) where (a)_x := Gamma[a + x]/Gamma[a]
 
+=for bad
+
+gsl_sf_lnpoch does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -386,6 +438,10 @@ Logarithm of Pochammer (Apell) symbol, with sign information. result = log( |(a)
 
 Pochammer (Apell) symbol (a)_x := Gamma[a + x]/Gamma[x]
 
+=for bad
+
+gsl_sf_poch does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -411,6 +467,10 @@ Pochammer (Apell) symbol (a)_x := Gamma[a + x]/Gamma[x]
 
 Relative Pochammer (Apell) symbol ((a,x) - 1)/x where (a,x) = (a)_x := Gamma[a + x]/Gamma[a]
 
+=for bad
+
+gsl_sf_pochrel does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -436,6 +496,10 @@ Relative Pochammer (Apell) symbol ((a,x) - 1)/x where (a,x) = (a)_x := Gamma[a +
 
 Normalized Incomplete Gamma Function Q(a,x) = 1/Gamma(a) Integral[ t^(a-1) e^(-t), {t,x,Infinity} ]
 
+=for bad
+
+gsl_sf_gamma_inc_Q does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -461,6 +525,10 @@ Normalized Incomplete Gamma Function Q(a,x) = 1/Gamma(a) Integral[ t^(a-1) e^(-t
 
 Complementary Normalized Incomplete Gamma Function P(a,x) = 1/Gamma(a) Integral[ t^(a-1) e^(-t), {t,0,x} ]
 
+=for bad
+
+gsl_sf_gamma_inc_P does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -486,6 +554,10 @@ Complementary Normalized Incomplete Gamma Function P(a,x) = 1/Gamma(a) Integral[
 
 Logarithm of Beta Function Log[B(a,b)]
 
+=for bad
+
+gsl_sf_lnbeta does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -511,6 +583,10 @@ Logarithm of Beta Function Log[B(a,b)]
 
 Beta Function B(a,b)
 
+=for bad
+
+gsl_sf_beta does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

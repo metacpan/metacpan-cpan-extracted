@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 $VERSION = $VERSION;
 
 use strict;
@@ -145,7 +145,7 @@ sub confess {
 
 #---------------------------------------------------------------------
 # chop() for UTF-8 codepoint string
-sub UTF8::R2::chop {
+sub UTF8::R2::chop (@) {
     my $chop = '';
     for (@_ ? @_ : $_) {
         if (my @x = /\G$x/g) {
@@ -158,7 +158,7 @@ sub UTF8::R2::chop {
 
 #---------------------------------------------------------------------
 # chr() for UTF-8 codepoint string
-sub UTF8::R2::chr {
+sub UTF8::R2::chr (;$) {
     local $_ = @_ ? $_[0] : $_;
 
 # Negative values give the Unicode replacement character (chr(0xfffd)),
@@ -195,7 +195,7 @@ sub UTF8::R2::getc (;*) {
 
 #---------------------------------------------------------------------
 # index() for UTF-8 codepoint string
-sub UTF8::R2::index {
+sub UTF8::R2::index ($$;$) {
     my $index = 0;
     if (@_ == 3) {
         $index = CORE::index $_[0], $_[1], CORE::length(UTF8::R2::substr($_[0], 0, $_[2]));
@@ -213,7 +213,7 @@ sub UTF8::R2::index {
 
 #---------------------------------------------------------------------
 # universal lc() for UTF-8 codepoint string
-sub UTF8::R2::lc {
+sub UTF8::R2::lc (;$) {
     local $_ = @_ ? $_[0] : $_;
     #                          A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z
     return join '', map { {qw( A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z )}->{$_}||$_ } /\G$x/g;
@@ -222,7 +222,7 @@ sub UTF8::R2::lc {
 
 #---------------------------------------------------------------------
 # universal lcfirst() for UTF-8 codepoint string
-sub UTF8::R2::lcfirst {
+sub UTF8::R2::lcfirst (;$) {
     local $_ = @_ ? $_[0] : $_;
     if (/\A($x)(.*)\z/s) {
         return UTF8::R2::lc($1) . $2;
@@ -234,14 +234,14 @@ sub UTF8::R2::lcfirst {
 
 #---------------------------------------------------------------------
 # length() for UTF-8 codepoint string
-sub UTF8::R2::length {
+sub UTF8::R2::length (;$) {
     local $_ = @_ ? $_[0] : $_;
     return scalar(() = /\G$x/g);
 }
 
 #---------------------------------------------------------------------
 # ord() for UTF-8 codepoint string
-sub UTF8::R2::ord {
+sub UTF8::R2::ord (;$) {
     local $_ = @_ ? $_[0] : $_;
     my $ord = 0;
     if (/\A($x)/) {
@@ -397,7 +397,7 @@ $a[3] < 0xBF ?  sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF] [
 
 #---------------------------------------------------------------------
 # qr// for UTF-8 codepoint string
-sub UTF8::R2::qr {
+sub UTF8::R2::qr ($) {
     my $before_regex = $_[0];
     my($package,$filename,$line) = caller;
 
@@ -555,7 +555,7 @@ sub UTF8::R2::qr {
 
 #---------------------------------------------------------------------
 # reverse() for UTF-8 codepoint string
-sub UTF8::R2::reverse {
+sub UTF8::R2::reverse (@) {
 
     # in list context,
     if (wantarray) {
@@ -580,7 +580,7 @@ sub UTF8::R2::reverse {
 
 #---------------------------------------------------------------------
 # rindex() for UTF-8 codepoint string
-sub UTF8::R2::rindex {
+sub UTF8::R2::rindex ($$;$) {
     my $rindex = 0;
     if (@_ == 3) {
         $rindex = CORE::rindex $_[0], $_[1], CORE::length(UTF8::R2::substr($_[0], 0, $_[2]));
@@ -598,7 +598,7 @@ sub UTF8::R2::rindex {
 
 #---------------------------------------------------------------------
 # split() for UTF-8 codepoint string
-sub UTF8::R2::split {
+sub UTF8::R2::split (;$$$) {
     if (defined($_[0]) and (($_[0] eq '') or ($_[0] =~ /\A \( \? \^? [-a-z]* : \) \z/x))) {
         my @x = (defined($_[1]) ? $_[1] : $_) =~ /\G$x/g;
         if (defined($_[2]) and ($_[2] > 0) and (scalar(@x) > $_[2])) {
@@ -632,8 +632,8 @@ sub UTF8::R2::split {
 #---------------------------------------------------------------------
 # substr() for UTF-8 codepoint string
 CORE::eval sprintf <<'END', ($] >= 5.014) ? ':lvalue' : '';
-#                    vv----------------------*******
-sub UTF8::R2::substr %s {
+#                            vv--------------*******
+sub UTF8::R2::substr ($$;$$) %s {
     my @x = $_[0] =~ /\G$x/g;
 
     # If the substring is beyond either end of the string, substr() returns the undefined
@@ -716,7 +716,7 @@ sub _list_all_ASCII_by_hyphen {
 
 #---------------------------------------------------------------------
 # tr/// for UTF-8 codepoint string
-sub UTF8::R2::tr {
+sub UTF8::R2::tr ($$$;$) {
     my @x           = $_[0] =~ /\G$x/g;
     my @search      = _list_all_ASCII_by_hyphen($_[1] =~ /\G$x/g);
     my @replacement = _list_all_ASCII_by_hyphen($_[2] =~ /\G$x/g);
@@ -870,7 +870,7 @@ sub UTF8::R2::tr {
 
 #---------------------------------------------------------------------
 # universal uc() for UTF-8 codepoint string
-sub UTF8::R2::uc {
+sub UTF8::R2::uc (;$) {
     local $_ = @_ ? $_[0] : $_;
     #                          a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z
     return join '', map { {qw( a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z )}->{$_}||$_ } /\G$x/g;
@@ -879,7 +879,7 @@ sub UTF8::R2::uc {
 
 #---------------------------------------------------------------------
 # universal ucfirst() for UTF-8 codepoint string
-sub UTF8::R2::ucfirst {
+sub UTF8::R2::ucfirst (;$) {
     local $_ = @_ ? $_[0] : $_;
     if (/\A($x)(.*)\z/s) {
         return UTF8::R2::uc($1) . $2;

@@ -1,5 +1,5 @@
 package Photonic::WE::S::Metric;
-$Photonic::WE::S::Metric::VERSION = '0.014';
+$Photonic::WE::S::Metric::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -9,14 +9,14 @@ Photonic::WE::S::Metric
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 COPYRIGHT NOTICE
 
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ sub _value {
     if($eps->isa('PDL::Complex') || $k->isa('PDL::Complex')
        || $q->isa('PDL::Complex')) { #complex metric
 	#Make all complex
-	map {$_=r2C($_) unless $_->isa('PDL::Complex')} $q, $k, $eps;
+	$_ = $_->isa('PDL::Complex') ? $_ : r2C($_) for $q, $k, $eps;
 	croak "Wave vector must be ".$self->ndims."-dimensional vector" unless
 	    [$k->dims]->[1]==$self->ndims and $k->ndims==2;
 	my ($kPG, $kMG) = ($k+$G, $k-$G); #ri:xy:nx:ny

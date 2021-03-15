@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.28';
+$Geo::Coder::OpenCage::VERSION = '0.30';
 use strict;
 use warnings;
 
@@ -9,11 +9,11 @@ use HTTP::Tiny;
 use JSON::MaybeXS;
 use URI;
 # FIXME - must be a way to get this from dist.ini?
-my $version = 0.28;
+my $version = 0.30;
 my $ua_string;
 
 sub new {
-    my $class = shift;
+    my $class  = shift;
     my %params = @_;
 
     if (!$params{api_key}) {
@@ -21,12 +21,12 @@ sub new {
     }
 
     $ua_string = $class . ' ' . $version;
-    my $ua = $params{ua} || HTTP::Tiny->new(agent => $ua_string);
+    my $ua   = $params{ua} || HTTP::Tiny->new(agent => $ua_string);
     my $self = {
         version => $version,
         api_key => $params{api_key},
         ua      => $ua,
-        json    => JSON::MaybeXS->new( utf8 => 1 ),
+        json    => JSON::MaybeXS->new(utf8 => 1),
         url     => URI->new('https://api.opencagedata.com/geocode/v1/json/'),
     };
 
@@ -36,51 +36,50 @@ sub new {
 sub ua {
     my $self = shift;
     my $ua   = shift;
-    if (defined($ua)){
+    if (defined($ua)) {
         $ua->agent($ua_string);
         $self->{ua} = $ua;
-    }    
+    }
     return $self->{ua};
 }
 
 # see list: https://opencagedata.com/api#forward-opt
 my %valid_params = (
-    abbrv            => 1,
-    add_request      => 1,
-    bounds           => 1,
-    countrycode      => 1,
-    format           => 0,
-    jsonp            => 0,
-    language         => 1,
-    limit            => 1,
-    min_confidence   => 1,
-    no_annotations   => 1,
-    no_dedupe        => 1,
-    no_record        => 1,
-    q                => 1,
-    pretty           => 1,  # makes no actual difference
-    proximity        => 1,
-    roadinfo         => 1,
+    abbrv          => 1,
+    add_request    => 1,
+    bounds         => 1,
+    countrycode    => 1,
+    format         => 0,
+    jsonp          => 0,
+    language       => 1,
+    limit          => 1,
+    min_confidence => 1,
+    no_annotations => 1,
+    no_dedupe      => 1,
+    no_record      => 1,
+    q              => 1,
+    pretty         => 1, # makes no actual difference
+    proximity      => 1,
+    roadinfo       => 1,
 );
 
 sub geocode {
-    my $self = shift;
+    my $self   = shift;
     my %params = @_;
 
     if (defined($params{location})) {
         $params{q} = delete $params{location};
-    }
-    else {
+    } else {
         warn "location is a required parameter for geocode()";
         return undef;
     }
 
-    for my $k (keys %params){
-        if (!defined($params{$k})){
+    for my $k (keys %params) {
+        if (!defined($params{$k})) {
             warn "Unknown geocode parameter: $k";
             delete $params{$k};
         }
-        if (!$params{$k}){  # is a real parameter but we dont support it
+        if (!$params{$k}) { # is a real parameter but we dont support it
             warn "Unsupported geocode parameter: $k";
             delete $params{$k};
         }
@@ -94,35 +93,32 @@ sub geocode {
 
     my $response = $self->{ua}->get($URL);
 
-    if (!$response){
+    if (!$response) {
         warn "failed to fetch '$URL': ", $response->{reason};
         return undef;
     }
 
-    my $rh_content = $self->{json}->decode( $response->{content} );
+    my $rh_content = $self->{json}->decode($response->{content});
 
     if (!$response->{success}) {
-        warn "response when requesting '$URL': "
-            . $rh_content->{status}{code}
-            . ', '
-            . $rh_content->{status}{message};
+        warn "response when requesting '$URL': " . $rh_content->{status}{code} . ', ' . $rh_content->{status}{message};
         return undef;
     }
     return $rh_content;
 }
 
 sub reverse_geocode {
-    my $self = shift;
+    my $self   = shift;
     my %params = @_;
 
-    foreach my $k (qw(lat lng)){
-        if (!defined($params{$k})){
+    foreach my $k (qw(lat lng)) {
+        if (!defined($params{$k})) {
             warn "$k is a required parameter";
             return undef;
         }
     }
 
-    $params{location} = join(',', delete @params{'lat','lng'});
+    $params{location} = join(',', delete @params{'lat', 'lng'});
     return $self->geocode(%params);
 }
 
@@ -140,7 +136,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.28
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -279,7 +275,7 @@ edf <edf@opencagedata.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by OpenCage GmbH.
+This software is copyright (c) 2021 by OpenCage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

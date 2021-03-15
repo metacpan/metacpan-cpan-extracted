@@ -6,14 +6,14 @@ Photonic::Iterator
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 COPYRIGHT NOTICE
 
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -108,7 +108,7 @@ blessed iterators, so you don't have to import the function nextval.
 =cut
 
 package Photonic::Iterator;
-$Photonic::Iterator::VERSION='0.014';
+$Photonic::Iterator::VERSION='0.015';
 
 use strict;
 use warnings;

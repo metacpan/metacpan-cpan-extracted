@@ -1,0 +1,1239 @@
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::Make::Calendar - Make an HTML calendar
+
+=head1 SYNOPSIS
+
+    
+    use HTML::Make::Calendar 'calendar';
+    my $cal = calendar ();
+    print $cal->text ();
+    my $oldcal = calendar (year => 1966, month => 3);
+    print $oldcal->text ();
+    
+
+
+=begin html
+
+<p>The output HTML looks like this:</p>
+
+<table class="cal-month">
+<tbody><tr>
+<th colspan="7">January 2021</th>
+</tr>
+<tr>
+<th class="cal-dow">Mo</th>
+<th class="cal-dow">Tu</th>
+<th class="cal-dow">We</th>
+<th class="cal-dow">Th</th>
+<th class="cal-dow">Fr</th>
+<th class="cal-dow">Sa</th>
+<th class="cal-dow">Su</th>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-fri"><span class="cal-dom">1</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">2</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">3</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">4</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">5</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">6</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">7</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">8</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">9</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">10</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">11</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">12</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">13</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">14</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">15</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">16</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">17</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">18</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">19</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">20</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">21</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">22</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">23</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">24</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">25</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">26</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">27</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">28</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">29</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">30</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">31</span>
+</td>
+</tr>
+</tbody>
+</table>
+<table class="cal-month">
+<tbody><tr>
+<th colspan="7">March 1966</th>
+</tr>
+<tr>
+<th class="cal-dow">Mo</th>
+<th class="cal-dow">Tu</th>
+<th class="cal-dow">We</th>
+<th class="cal-dow">Th</th>
+<th class="cal-dow">Fr</th>
+<th class="cal-dow">Sa</th>
+<th class="cal-dow">Su</th>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-tue"><span class="cal-dom">1</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">2</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">3</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">4</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">5</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">6</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">7</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">8</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">9</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">10</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">11</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">12</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">13</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">14</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">15</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">16</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">17</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">18</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">19</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">20</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">21</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">22</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">23</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">24</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">25</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">26</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">27</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">28</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">29</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">30</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">31</span>
+</td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+</tr>
+</tbody>
+</table>
+
+
+=end html
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Calendar-0.01/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.01 of HTML-Make-Calendar
+corresponding to L<git commit 0a44bc7f4d5e94e6c7729395bd3083814175fb90|https://github.com/benkasminbullock/html-make-calendar/commit/0a44bc7f4d5e94e6c7729395bd3083814175fb90> released on Sun Mar 14 09:01:16 2021 +0900.
+
+=head1 DESCRIPTION
+
+This module constructs HTML calendars.
+
+=head1 FUNCTIONS
+
+=head2 calendar
+
+    my $out = calendar (year => 2010, month => 10);
+
+Make the calendar. The return value is an HTML::Make object. To get
+the actual HTML, call its C<text> method:
+
+    
+    use HTML::Make::Calendar 'calendar';
+    my $out = calendar (year => 2021, month => 1);
+    print $out->text ();
+
+
+=begin html
+
+<p>The output HTML looks like this:</p>
+
+<table class="cal-month">
+<tbody><tr>
+<th colspan="7">January 2021</th>
+</tr>
+<tr>
+<th class="cal-dow">Mo</th>
+<th class="cal-dow">Tu</th>
+<th class="cal-dow">We</th>
+<th class="cal-dow">Th</th>
+<th class="cal-dow">Fr</th>
+<th class="cal-dow">Sa</th>
+<th class="cal-dow">Su</th>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-fri"><span class="cal-dom">1</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">2</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">3</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">4</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">5</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">6</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">7</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">8</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">9</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">10</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">11</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">12</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">13</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">14</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">15</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">16</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">17</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">18</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">19</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">20</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">21</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">22</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">23</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">24</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span class="cal-dom">25</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">26</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">27</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">28</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">29</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">30</span>
+</td>
+<td class="cal-day cal-sun"><span class="cal-dom">31</span>
+</td>
+</tr>
+</tbody>
+</table>
+
+
+=end html
+
+(This example is included as L<F<calendar.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Calendar-0.01/examples/calendar.pl> in the distribution.)
+
+
+The possible arguments are
+
+=over
+
+=item cdata
+
+Callback data, see L</dayc>.
+
+=item day_html
+
+Override the HTML element used to make the "day" cells. The default is
+C<td>. If you override this then you also need to override the parent
+elements, otherwise HTML::Make will fuss about compatibility.
+
+=item dayc
+
+Day callback which fills in the "day" cell of the calendar. If this is
+omitted, a default element is added. The day callback is called with
+three arguments, first L</cdata>, your data, second the date as a hash
+reference with arguments C<year>, C<month> and C<dom> (day of month, a
+number from 1 to 31), and third the HTML element to attach the return
+value to, representing the cell of the calendar, like this:
+
+    &{$dayc} ($cdata, {year => 2020, month => 12, dom => 21}, $td);
+
+where C<$td> is an L<HTML::Make> object.
+
+=item daynames
+
+Specify the names of the days. See L</Japanese calendar> for an
+example.
+
+=item first
+
+The first day of the week. The default is 1 for Monday. Specify 7 to
+start on Sunday:
+
+    
+    use HTML::Make::Calendar 'calendar';
+    my $cal = calendar (first => 7);
+    print $cal->text ();
+    
+
+
+=begin html
+
+<p>The output HTML looks like this:</p>
+
+<table class="cal-month">
+<tbody><tr>
+<th colspan="7">January 2021</th>
+</tr>
+<tr>
+<th class="cal-dow">Su</th>
+<th class="cal-dow">Mo</th>
+<th class="cal-dow">Tu</th>
+<th class="cal-dow">We</th>
+<th class="cal-dow">Th</th>
+<th class="cal-dow">Fr</th>
+<th class="cal-dow">Sa</th>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-fri"><span class="cal-dom">1</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">2</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-sun"><span class="cal-dom">3</span>
+</td>
+<td class="cal-day cal-mon"><span class="cal-dom">4</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">5</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">6</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">7</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">8</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">9</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-sun"><span class="cal-dom">10</span>
+</td>
+<td class="cal-day cal-mon"><span class="cal-dom">11</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">12</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">13</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">14</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">15</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">16</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-sun"><span class="cal-dom">17</span>
+</td>
+<td class="cal-day cal-mon"><span class="cal-dom">18</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">19</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">20</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">21</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">22</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">23</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-sun"><span class="cal-dom">24</span>
+</td>
+<td class="cal-day cal-mon"><span class="cal-dom">25</span>
+</td>
+<td class="cal-day cal-tue"><span class="cal-dom">26</span>
+</td>
+<td class="cal-day cal-wed"><span class="cal-dom">27</span>
+</td>
+<td class="cal-day cal-thu"><span class="cal-dom">28</span>
+</td>
+<td class="cal-day cal-fri"><span class="cal-dom">29</span>
+</td>
+<td class="cal-day cal-sat"><span class="cal-dom">30</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-sun"><span class="cal-dom">31</span>
+</td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+</tr>
+</tbody>
+</table>
+
+
+=end html
+
+(This example is included as L<F<first.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Calendar-0.01/examples/first.pl> in the distribution.)
+
+
+Any other day of the week may also be used, for example specify 3 to
+start the weeks on Wednesdays.
+
+=item month
+
+The month, as a number from 1 to 12. If the month is omitted, the
+current month is used as given by L<Date::Calc/Today>.
+
+=item month_html
+
+The HTML element used to make a month of the calendar. The default is
+C<table>. You don't need to supply E<lt> and E<gt>, just the
+alphabetic part of the HTML element, as with the parent module
+HTML::Make.
+
+=item monthc
+
+Callback for month and year name. See L</Japanese calendar> for an
+example.
+
+=item week_html
+
+The HTML element used to make a week of the calendar. The default is
+C<tr>. You don't need to supply E<lt> and E<gt>, just the
+alphabetic part of the HTML element, as with the parent module
+HTML::Make.
+
+=item weekless
+
+Set to a true value to not use weeks. If you switch off weeks, the
+return value is the HTML elements but not subdivided into week blocks
+but whose parent is the month. This is for people who want to style
+their calendars with CSS, such as a CSS grid, rather than using HTML
+tables.
+
+=item year
+
+The year, as a four-digit number like C<2020>. If the year is omitted,
+the current year is used, as given by L<Date::Calc/Today>.
+
+=back
+
+=head3 Phases of the moon
+
+This example demonstrates the use of L</dayc> and L</cdata> by adding
+the phase of the moon to your calendar. It requires
+L<Astro::MoonPhase> (not included with this distribution).
+
+    
+    use utf8;
+    use HTML::Make::Calendar 'calendar';
+    use Astro::MoonPhase;
+    use Date::Calc 'Date_to_Time';
+    my @moons = qw!🌑 🌒 🌓 🌔 🌕 🌖 🌗 🌘!;
+    my $cal = calendar (dayc => \&daymoon, cdata => \@moons);
+    print $cal->text ();
+    exit;
+    
+    sub daymoon
+    {
+        my ($moons, $date, $element) = @_;
+        my $epochtime = Date_to_Time ($date->{year}, $date->{month},
+                                      $date->{dom}, 0, 0, 0);
+        my ($phase) = phase ($epochtime);
+        my $text = $moons->[int (8*$phase)] . " <b>$date->{dom}</b>";
+        $element->add_text ($text);
+    }
+    
+
+
+=begin html
+
+<p>The output HTML looks like this:</p>
+
+<table class="cal-month">
+<tbody><tr>
+<th colspan="7">March 2021</th>
+</tr>
+<tr>
+<th class="cal-dow">Mo</th>
+<th class="cal-dow">Tu</th>
+<th class="cal-dow">We</th>
+<th class="cal-dow">Th</th>
+<th class="cal-dow">Fr</th>
+<th class="cal-dow">Sa</th>
+<th class="cal-dow">Su</th>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon">🌕 <b>1</b></td>
+<td class="cal-day cal-tue">🌕 <b>2</b></td>
+<td class="cal-day cal-wed">🌖 <b>3</b></td>
+<td class="cal-day cal-thu">🌖 <b>4</b></td>
+<td class="cal-day cal-fri">🌖 <b>5</b></td>
+<td class="cal-day cal-sat">🌖 <b>6</b></td>
+<td class="cal-day cal-sun">🌗 <b>7</b></td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon">🌗 <b>8</b></td>
+<td class="cal-day cal-tue">🌗 <b>9</b></td>
+<td class="cal-day cal-wed">🌘 <b>10</b></td>
+<td class="cal-day cal-thu">🌘 <b>11</b></td>
+<td class="cal-day cal-fri">🌘 <b>12</b></td>
+<td class="cal-day cal-sat">🌘 <b>13</b></td>
+<td class="cal-day cal-sun">🌑 <b>14</b></td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon">🌑 <b>15</b></td>
+<td class="cal-day cal-tue">🌑 <b>16</b></td>
+<td class="cal-day cal-wed">🌑 <b>17</b></td>
+<td class="cal-day cal-thu">🌒 <b>18</b></td>
+<td class="cal-day cal-fri">🌒 <b>19</b></td>
+<td class="cal-day cal-sat">🌒 <b>20</b></td>
+<td class="cal-day cal-sun">🌒 <b>21</b></td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon">🌓 <b>22</b></td>
+<td class="cal-day cal-tue">🌓 <b>23</b></td>
+<td class="cal-day cal-wed">🌓 <b>24</b></td>
+<td class="cal-day cal-thu">🌓 <b>25</b></td>
+<td class="cal-day cal-fri">🌔 <b>26</b></td>
+<td class="cal-day cal-sat">🌔 <b>27</b></td>
+<td class="cal-day cal-sun">🌔 <b>28</b></td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon">🌕 <b>29</b></td>
+<td class="cal-day cal-tue">🌕 <b>30</b></td>
+<td class="cal-day cal-wed">🌕 <b>31</b></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+</tr>
+</tbody>
+</table>
+
+
+=end html
+
+(This example is included as L<F<moon.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Calendar-0.01/examples/moon.pl> in the distribution.)
+
+
+=head3 Daily menu
+
+This example demonstrates the use of L</dayc> and L</cdata>, and how
+to add your own HTML into the cells of the calendar.
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use HTML::Make::Calendar 'calendar';
+    my @foods = split '', <<EOF;
+    🍇🍈🍉🍊🍋🍌🍍🥭🍎🍏🍐🍑🍒🍓🥝🍅🥝
+    🍅🥒🥬🥦🧄🧅🍄🥜🌰🍘🍙🍚🍛🍜🍝🍠🍢
+    🍣🍤🍥🥮🍡🥟🥠🥡🦪🍦🍧🍨🍩🍪🎂🍰🧁
+    EOF
+    @foods = grep {!/\s/} @foods;
+    my $cal = calendar (cdata => \@foods, dayc => \&add_food);
+    print $cal->text ();
+    exit;
+    
+    sub add_food
+    {
+        my ($foods, $date, $element) = @_;
+        my $today = 
+        $element->push ('span', text => $date->{dom});
+        my $menu = HTML::Make->new ('ol');
+        for (1..3) {
+            my $food = $foods->[int (rand (@$foods))];
+            $menu->push ('li', text => $food);
+        }
+        $element->push ($menu);
+    }
+
+
+=begin html
+
+<p>The output HTML looks like this:</p>
+
+<table class="cal-month">
+<tbody><tr>
+<th colspan="7">January 2021</th>
+</tr>
+<tr>
+<th class="cal-dow">Mo</th>
+<th class="cal-dow">Tu</th>
+<th class="cal-dow">We</th>
+<th class="cal-dow">Th</th>
+<th class="cal-dow">Fr</th>
+<th class="cal-dow">Sa</th>
+<th class="cal-dow">Su</th>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-fri"><span>1</span>
+<ol>
+<li>🍍</li>
+<li>🍅</li>
+<li>🍅</li>
+</ol>
+</td>
+<td class="cal-day cal-sat"><span>2</span>
+<ol>
+<li>🧄</li>
+<li>🎂</li>
+<li>🌰</li>
+</ol>
+</td>
+<td class="cal-day cal-sun"><span>3</span>
+<ol>
+<li>🍌</li>
+<li>🍅</li>
+<li>🧄</li>
+</ol>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span>4</span>
+<ol>
+<li>🍪</li>
+<li>🧅</li>
+<li>🍑</li>
+</ol>
+</td>
+<td class="cal-day cal-tue"><span>5</span>
+<ol>
+<li>🍎</li>
+<li>🥦</li>
+<li>🍇</li>
+</ol>
+</td>
+<td class="cal-day cal-wed"><span>6</span>
+<ol>
+<li>🍛</li>
+<li>🍅</li>
+<li>🦪</li>
+</ol>
+</td>
+<td class="cal-day cal-thu"><span>7</span>
+<ol>
+<li>🍓</li>
+<li>🍅</li>
+<li>🍠</li>
+</ol>
+</td>
+<td class="cal-day cal-fri"><span>8</span>
+<ol>
+<li>🍑</li>
+<li>🍝</li>
+<li>🍒</li>
+</ol>
+</td>
+<td class="cal-day cal-sat"><span>9</span>
+<ol>
+<li>🍇</li>
+<li>🍐</li>
+<li>🥝</li>
+</ol>
+</td>
+<td class="cal-day cal-sun"><span>10</span>
+<ol>
+<li>🥠</li>
+<li>🍌</li>
+<li>🍥</li>
+</ol>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span>11</span>
+<ol>
+<li>🥜</li>
+<li>🥜</li>
+<li>🍌</li>
+</ol>
+</td>
+<td class="cal-day cal-tue"><span>12</span>
+<ol>
+<li>🍑</li>
+<li>🍙</li>
+<li>🦪</li>
+</ol>
+</td>
+<td class="cal-day cal-wed"><span>13</span>
+<ol>
+<li>🥮</li>
+<li>🍑</li>
+<li>🍜</li>
+</ol>
+</td>
+<td class="cal-day cal-thu"><span>14</span>
+<ol>
+<li>🍚</li>
+<li>🧁</li>
+<li>🍄</li>
+</ol>
+</td>
+<td class="cal-day cal-fri"><span>15</span>
+<ol>
+<li>🍜</li>
+<li>🦪</li>
+<li>🍚</li>
+</ol>
+</td>
+<td class="cal-day cal-sat"><span>16</span>
+<ol>
+<li>🌰</li>
+<li>🍩</li>
+<li>🍈</li>
+</ol>
+</td>
+<td class="cal-day cal-sun"><span>17</span>
+<ol>
+<li>🥟</li>
+<li>🍦</li>
+<li>🌰</li>
+</ol>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span>18</span>
+<ol>
+<li>🍝</li>
+<li>🍄</li>
+<li>🥮</li>
+</ol>
+</td>
+<td class="cal-day cal-tue"><span>19</span>
+<ol>
+<li>🍅</li>
+<li>🍡</li>
+<li>🍍</li>
+</ol>
+</td>
+<td class="cal-day cal-wed"><span>20</span>
+<ol>
+<li>🍍</li>
+<li>🍋</li>
+<li>🍝</li>
+</ol>
+</td>
+<td class="cal-day cal-thu"><span>21</span>
+<ol>
+<li>🥭</li>
+<li>🍤</li>
+<li>🍢</li>
+</ol>
+</td>
+<td class="cal-day cal-fri"><span>22</span>
+<ol>
+<li>🍜</li>
+<li>🍤</li>
+<li>🍣</li>
+</ol>
+</td>
+<td class="cal-day cal-sat"><span>23</span>
+<ol>
+<li>🧁</li>
+<li>🍒</li>
+<li>🍅</li>
+</ol>
+</td>
+<td class="cal-day cal-sun"><span>24</span>
+<ol>
+<li>🍧</li>
+<li>🍘</li>
+<li>🎂</li>
+</ol>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-mon"><span>25</span>
+<ol>
+<li>🍰</li>
+<li>🍒</li>
+<li>🍤</li>
+</ol>
+</td>
+<td class="cal-day cal-tue"><span>26</span>
+<ol>
+<li>🍓</li>
+<li>🍑</li>
+<li>🍠</li>
+</ol>
+</td>
+<td class="cal-day cal-wed"><span>27</span>
+<ol>
+<li>🍍</li>
+<li>🍄</li>
+<li>🍧</li>
+</ol>
+</td>
+<td class="cal-day cal-thu"><span>28</span>
+<ol>
+<li>🥠</li>
+<li>🍣</li>
+<li>🍒</li>
+</ol>
+</td>
+<td class="cal-day cal-fri"><span>29</span>
+<ol>
+<li>🧄</li>
+<li>🍓</li>
+<li>🧁</li>
+</ol>
+</td>
+<td class="cal-day cal-sat"><span>30</span>
+<ol>
+<li>🥒</li>
+<li>🧅</li>
+<li>🥡</li>
+</ol>
+</td>
+<td class="cal-day cal-sun"><span>31</span>
+<ol>
+<li>🧄</li>
+<li>🥟</li>
+<li>🍇</li>
+</ol>
+</td>
+</tr>
+</tbody>
+</table>
+
+
+=end html
+
+(This example is included as L<F<menu.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Calendar-0.01/examples/menu.pl> in the distribution.)
+
+
+=head3 Japanese calendar
+
+This example shows making a Japanese calendar using L</daynames> as
+well as L</monthc> to put the month name into Japanese. It uses
+L<Calendar::Japanese::Holiday>, L<Date::Qreki>,
+L<Lingua::JA::Numbers>, and L<Lingua::JA::FindDates> to make various
+bits of information typically found on Japanese calendars.
+
+    
+    use utf8;
+    use HTML::Make::Calendar 'calendar';
+    use Date::Qreki 'rokuyou_unicode';
+    use Calendar::Japanese::Holiday;
+    use Lingua::JA::Numbers 'num2ja';
+    use Lingua::JA::FindDates 'seireki_to_nengo';
+    my @daynames = (qw!月 火 水 木 金 土 日!);
+    my $calendar = calendar (daynames => \@daynames,
+                             monthc => \&jmonth,
+                             dayc => \&jday, first => 7);
+    print $calendar->text ();
+    exit;
+    
+    sub jday
+    {
+        my (undef, $date, $element) = @_;
+        my @jdate = ($date->{year}, $date->{month}, $date->{dom});
+        my $name = isHoliday (@jdate);
+        my $rokuyou = rokuyou_unicode (@jdate);
+        $element->push ('span', text => num2ja ($date->{dom}));
+        $element->push ('br');
+        $element->push ('span', text => $rokuyou, attr => {class => 'rokuyou'});
+        if ($name) {
+            $element->push ('br');
+            $element->push ('b', text => $name);
+            $element->add_class ('holiday');
+        }
+    }
+    
+    sub jmonth
+    {
+        my (undef, $date, $element) = @_;
+        my $month = $date->{month} . '月';
+        my $year = seireki_to_nengo ("$date->{year}年");
+        my $ym = "$year$month";
+        $ym =~ s/([0-9]+)/num2ja($1)/ge;
+        $element->add_text ($ym);
+    }
+
+
+=begin html
+
+<p>The output HTML looks like this:</p>
+
+<table class="cal-month">
+<tbody><tr>
+<th colspan="7">令和三年三月</th>
+</tr>
+<tr>
+<th class="cal-dow">日</th>
+<th class="cal-dow">月</th>
+<th class="cal-dow">火</th>
+<th class="cal-dow">水</th>
+<th class="cal-dow">木</th>
+<th class="cal-dow">金</th>
+<th class="cal-dow">土</th>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-mon"><span>一</span>
+<br><span class="rokuyou">赤口</span>
+</td>
+<td class="cal-day cal-tue"><span>二</span>
+<br><span class="rokuyou">先勝</span>
+</td>
+<td class="cal-day cal-wed"><span>三</span>
+<br><span class="rokuyou">友引</span>
+</td>
+<td class="cal-day cal-thu"><span>四</span>
+<br><span class="rokuyou">先負</span>
+</td>
+<td class="cal-day cal-fri"><span>五</span>
+<br><span class="rokuyou">仏滅</span>
+</td>
+<td class="cal-day cal-sat"><span>六</span>
+<br><span class="rokuyou">大安</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-sun"><span>七</span>
+<br><span class="rokuyou">赤口</span>
+</td>
+<td class="cal-day cal-mon"><span>八</span>
+<br><span class="rokuyou">先勝</span>
+</td>
+<td class="cal-day cal-tue"><span>九</span>
+<br><span class="rokuyou">友引</span>
+</td>
+<td class="cal-day cal-wed"><span>十</span>
+<br><span class="rokuyou">先負</span>
+</td>
+<td class="cal-day cal-thu"><span>十一</span>
+<br><span class="rokuyou">仏滅</span>
+</td>
+<td class="cal-day cal-fri"><span>十二</span>
+<br><span class="rokuyou">大安</span>
+</td>
+<td class="cal-day cal-sat"><span>十三</span>
+<br><span class="rokuyou">友引</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-sun"><span>十四</span>
+<br><span class="rokuyou">先負</span>
+</td>
+<td class="cal-day cal-mon"><span>十五</span>
+<br><span class="rokuyou">仏滅</span>
+</td>
+<td class="cal-day cal-tue"><span>十六</span>
+<br><span class="rokuyou">大安</span>
+</td>
+<td class="cal-day cal-wed"><span>十七</span>
+<br><span class="rokuyou">赤口</span>
+</td>
+<td class="cal-day cal-thu"><span>十八</span>
+<br><span class="rokuyou">先勝</span>
+</td>
+<td class="cal-day cal-fri"><span>十九</span>
+<br><span class="rokuyou">友引</span>
+</td>
+<td class="cal-day cal-sat holiday"><span>二十</span>
+<br><span class="rokuyou">先負</span>
+<br><b>春分の日</b>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-sun"><span>二十一</span>
+<br><span class="rokuyou">仏滅</span>
+</td>
+<td class="cal-day cal-mon"><span>二十二</span>
+<br><span class="rokuyou">大安</span>
+</td>
+<td class="cal-day cal-tue"><span>二十三</span>
+<br><span class="rokuyou">赤口</span>
+</td>
+<td class="cal-day cal-wed"><span>二十四</span>
+<br><span class="rokuyou">先勝</span>
+</td>
+<td class="cal-day cal-thu"><span>二十五</span>
+<br><span class="rokuyou">友引</span>
+</td>
+<td class="cal-day cal-fri"><span>二十六</span>
+<br><span class="rokuyou">先負</span>
+</td>
+<td class="cal-day cal-sat"><span>二十七</span>
+<br><span class="rokuyou">仏滅</span>
+</td>
+</tr>
+<tr class="cal-week">
+<td class="cal-day cal-sun"><span>二十八</span>
+<br><span class="rokuyou">大安</span>
+</td>
+<td class="cal-day cal-mon"><span>二十九</span>
+<br><span class="rokuyou">赤口</span>
+</td>
+<td class="cal-day cal-tue"><span>三十</span>
+<br><span class="rokuyou">先勝</span>
+</td>
+<td class="cal-day cal-wed"><span>三十一</span>
+<br><span class="rokuyou">友引</span>
+</td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+<td class="cal-day cal-noday"></td>
+</tr>
+</tbody>
+</table>
+
+
+=end html
+
+(This example is included as L<F<japanese.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Calendar-0.01/examples/japanese.pl> in the distribution.)
+
+
+=head1 DEFAULT HTML ELEMENTS AND CSS CLASSES
+
+The elements of the calendar have the following default HTML elements
+and CSS default style names:
+
+=over
+
+
+=item calendar
+
+The default HTML element for C<calendar> (the calendar itself) is C<< <table> >> with class C<calendar>.
+
+
+=item month
+
+The default HTML element for C<month> (a month) is C<< <table> >> with class C<cal-month>.
+
+
+=item week
+
+The default HTML element for C<week> (a week) is C<< <tr> >> with class C<cal-week>.
+
+
+=item day
+
+The default HTML element for C<day> (a day) is C<< <td> >> with class C<cal-day> as well as class C<cal-mon>, C<cal-tue>, etc.
+
+
+=item dow
+
+The default HTML element for C<dow> (the day of the week (Monday, Tuesday, etc.)) is C<< <th> >> with class C<cal-dow>.
+
+
+
+=back
+
+=head1 TERMINOLOGY
+
+=over
+
+=item dow = day of the week (Monday, Tuesday, etc.)
+
+=item dom = day of the month (1 to 31)
+
+=item wom = week of the month (corresponds to the rows of the calendar)
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Date::Calc>
+
+Date::Calc supplies the date information for the calendar.
+
+=item L<HTML::Make>
+
+HTML::Make is used to generate the HTML for the calendar.
+
+=item L<Table::Readable>
+
+Table::Readable is used to read a table of HTML element and CSS class
+defaults.
+
+=back
+
+=head1 SCRIPT
+
+See L<html-cal> in the distribution.
+
+=head1 SEE ALSO
+
+=head2 Other CPAN modules
+
+=over
+
+=item L<Calendar::List>
+
+=item L<Calendar::Schedule>
+
+=item L<Calendar::Simple>
+
+=item L<Date::Calendar>
+
+Includes a script L<cal2html> for making HTML.
+
+=item L<HTML::Calendar::Monthly>
+
+Fork of L</HTML::Calendar::Simple>. The documentation is largely
+copy-pasted from that with some alterations.
+
+=item L<HTML::Calendar::Simple>
+
+=item L<HTML::CalendarMonth>
+
+=item L<HTML::CalendarMonthSimple>
+
+=item L<SVG::Calendar>
+
+=back
+
+=head2 Other HTML calendar generators
+
+=over
+
+=item Python
+
+The defaults of HTML calendar are somewhat based on Python's
+L<calendar.HTMLCalendar|https://docs.python.org/3/library/calendar.html#calendar.HTMLCalendar>.
+
+=back
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2021
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

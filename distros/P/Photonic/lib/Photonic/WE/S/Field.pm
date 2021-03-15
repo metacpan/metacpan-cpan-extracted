@@ -1,5 +1,5 @@
 package Photonic::WE::S::Field;
-$Photonic::WE::S::Field::VERSION = '0.014';
+$Photonic::WE::S::Field::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -9,14 +9,14 @@ Photonic::WE::S::Field
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 COPYRIGHT NOTICE
 
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -140,7 +140,7 @@ use PDL::NiceSlice;
 use PDL::Complex;
 use PDL::FFTW3;
 use Photonic::WE::S::AllH;
-use Photonic::ExtraUtils qw(cgtsl);
+use Photonic::ExtraUtils qw(cgtsv);
 use Photonic::Types;
 use Photonic::Iterator;
 use Moose;
@@ -175,17 +175,18 @@ sub BUILD {
 sub evaluate {
     my $self=shift;
     my $as=$self->nr->as;
-    my $b2s=$self->nr->b2s;
     my $bs=$self->nr->bs;
     my $cs=$self->nr->cs;
     my $stateit=$self->nr->state_iterator;
     my $nh=$self->nh; #desired number of Haydock terms
     #don't go beyond available values.
     $nh=$self->nr->iteration if $nh>$self->nr->iteration;
-    # calculate using linpack for tridiag system
+    # calculate using lapack for tridiag system
     my $diag = 1-PDL->pdl($as)->(:,0:$nh-1)->complex;
-    my $subdiag = -PDL->pdl($bs)->(:,0:$nh-1)->complex;
     # rotate complex zero from first to last element.
+    my $subdiag = -PDL->pdl($bs)->(:,0:$nh-1)
+	->mv(0,-1)->rotate(-1)->mv(-1,0)
+	->complex;
     my $supradiag =-PDL->pdl($cs)->(:,0:$nh-1)
 	->mv(0,-1)->rotate(-1)->mv(-1,0)
 	->complex;
@@ -193,7 +194,7 @@ sub evaluate {
     $rhs->slice((0)).=1;
     $rhs=$rhs->r2C;
     #coefficients of g^{-1}E
-    my ($giEs_coeff, $info)= cgtsl($subdiag, $diag, $supradiag, $rhs);
+    my ($giEs_coeff, $info)= cgtsv($subdiag, $diag, $supradiag, $rhs);
     die "Error solving tridiag system" unless $info == 0;
     #
     my @giEs= map {PDL->pdl($_)->complex} @{$giEs_coeff->unpdl};

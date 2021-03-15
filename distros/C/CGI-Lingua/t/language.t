@@ -6,13 +6,11 @@ use Test::Most;
 use lib 't/lib';
 use MyLogger;
 
-unless(-e 't/online.enabled') {
-	plan skip_all => 'On-line tests disabled';
-} else {
-	plan tests => 137;
+if(-e 't/online.enabled') {
+	plan(tests => 146);
 
 	use_ok('CGI::Lingua');
-	require Test::NoWarnings;
+	require_ok('Test::NoWarnings');
 	Test::NoWarnings->import();
 
 	eval {
@@ -298,4 +296,32 @@ unless(-e 't/online.enabled') {
 	]);
 	ok($l->language() eq 'German');
 	ok(!defined($l->sublanguage()));
+
+	SKIP: {
+		eval { require CHI; CHI->import(); };
+		skip 'CHI not installed', 8 if($@);
+
+		diag("Using CHI $CHI::VERSION");
+
+		my $cache = CHI->new(driver => 'Memory', global => 1);
+
+		$l = new_ok('CGI::Lingua' => [
+			supported => [ 'en-zz', 'de' ],
+			cache => $cache,
+			info => new_ok('CGI::Info')
+		]);
+		ok($l->language() eq 'German');
+		ok(!defined($l->sublanguage()));
+
+		$l = undef;
+		$l = new_ok('CGI::Lingua' => [
+			supported => [ 'en-zz', 'de' ],
+			cache => $cache,
+			info => new_ok('CGI::Info')
+		]);
+		ok($l->language() eq 'German');
+		ok(!defined($l->sublanguage()));
+	}
+} else {
+	plan(skip_all => 'On-line tests disabled');
 }

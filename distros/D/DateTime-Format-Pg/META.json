@@ -4,7 +4,7 @@
       "Daisuke Maki <daisuke@endeworks.jp>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.2",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -41,7 +41,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -57,27 +57,32 @@
    "provides" : {
       "DateTime::Format::Pg" : {
          "file" : "lib/DateTime/Format/Pg.pm",
-         "version" : "0.16013"
+         "version" : "0.16014"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/lestrrat/DateTime-Format-Pg/issues"
+         "web" : "https://github.com/lestrrat-p5/DateTime-Format-Pg/issues"
       },
-      "homepage" : "https://github.com/lestrrat/DateTime-Format-Pg",
+      "homepage" : "https://github.com/lestrrat-p5/DateTime-Format-Pg",
       "repository" : {
-         "url" : "git://github.com/lestrrat/DateTime-Format-Pg.git",
-         "web" : "https://github.com/lestrrat/DateTime-Format-Pg"
+         "url" : "git://github.com/lestrrat-p5/DateTime-Format-Pg.git",
+         "web" : "https://github.com/lestrrat-p5/DateTime-Format-Pg"
       }
    },
-   "version" : "0.16013",
+   "version" : "0.16014",
    "x_contributors" : [
-      "Vasily Chekalkin <bacek@bacek.com>",
+      "Daisuke Maki <lestrrat+github@gmail.com>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
       "Henrik Pauli <henrik.pauli@gmail.com>",
-      "Nitish Bezzala <nbezzala@yahoo.com>",
       "Ilya Chesnokov <chesnokov.ilya@gmail.com>",
-      "lestrrat <lestrrat+github@gmail.com>"
-   ]
+      "Nitish Bezzala <nbezzala@yahoo.com>",
+      "Steve Rogerson <steve.git@yewtc.demon.co.uk>",
+      "Steve Rogerson <steve.rogerson@orionwt.co.uk>",
+      "Vasily Chekalkin <bacek@bacek.com>",
+      "lestrrat <49281+lestrrat@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
 }

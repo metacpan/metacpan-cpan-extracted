@@ -4,8 +4,11 @@ use strict;
 use warnings;
 
 use File::Basename;
-use File::Spec::Functions qw(catfile);
+use File::Spec::Functions qw(catfile splitpath splitdir);
 
+use Smartcat::App::Constants qw(
+  PATH_SEPARATOR
+);
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(
@@ -22,14 +25,29 @@ our @EXPORT = qw(
 
 
 sub get_language_from_ts_filepath {
-    $_ = shift;
-    return basename( dirname($_) );
+    my ($project_workdir, $path) = @_;
+
+    my $regexp = $project_workdir . '(' . PATH_SEPARATOR . ')*';
+    $path =~ s/$regexp//;
+
+    my ($volume, $dirs, $name) = splitpath($path);
+    my @dirs = splitdir($dirs);
+
+    return shift @dirs;
 }
 
 
 sub get_ts_file_key {
-    $_ = shift;
-    return basename($_) . ' (' . get_language_from_ts_filepath($_) . ')';
+    my ($project_workdir, $path) = @_;
+
+    my $regexp = $project_workdir . '(' . PATH_SEPARATOR . ')*';
+    $path =~ s/$regexp//;
+    my ($volume, $dirs, $name) = splitpath($path);
+    my @dirs = grep {$_ ne ""} splitdir($dirs);
+    my $language = shift @dirs;
+    my $filepath = @dirs > 0 ? join(PATH_SEPARATOR, @dirs) . PATH_SEPARATOR . $name : $name;
+
+    return "$filepath ($language)";
 }
 
 
@@ -43,11 +61,18 @@ sub get_document_key {
 
 
 sub prepare_document_name {
-    my ( $path, $filetype, $target_language ) = @_;
+    my ( $project_workdir, $path, $filetype, $target_language ) = @_;
 
-    my ( $filename, $_dirs, $ext ) = fileparse( $path, $filetype );
+    my $regexp = $project_workdir . '(' . PATH_SEPARATOR . ')*';
+    $path =~ s/$regexp//;
 
-    return $filename . '_' . $target_language . $ext;
+    my ( $filename, $dirs, $ext ) = fileparse( $path, $filetype );
+    my @path_items = grep { $_ ne '' } splitdir($dirs);
+    shift @path_items;
+    push @path_items, $filename;
+    my $filepath = join(PATH_SEPARATOR, @path_items);
+
+    return $filepath . '_' . $target_language . $ext;
 }
 
 

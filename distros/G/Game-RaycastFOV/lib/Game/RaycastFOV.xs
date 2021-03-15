@@ -6,6 +6,8 @@
 
 #include "ppport.h"
 
+#include "math.h"
+
 #define CALLTWOUP                                                              \
     ENTER;                                                                     \
     SAVETMPS;                                                                  \
@@ -15,13 +17,20 @@
     FREETMPS;                                                                  \
     LEAVE
 #define CIRCLECB(x, y)                                                         \
-    PUSHMARK(SP);                                                              \
-    EXTEND(SP, 2);                                                             \
-    mPUSHs(newSViv(x));                                                        \
-    mPUSHs(newSViv(y));                                                        \
-    PUTBACK;                                                                   \
-    call_sv(callback, G_DISCARD);                                              \
-    SPAGAIN
+    do {                                                                       \
+        key = Perl_form(aTHX_ "%d,%d", x, y);                                  \
+        len = strlen(key);                                                     \
+        if(!hv_exists(seen, key, len)) {                                       \
+            hv_store(seen, key, len, &PL_sv_yes, 0);                           \
+            PUSHMARK(SP);                                                      \
+            EXTEND(SP, 2);                                                     \
+            mPUSHs(newSViv(x));                                                \
+            mPUSHs(newSViv(y));                                                \
+            PUTBACK;                                                           \
+            call_sv(callback, G_DISCARD);                                      \
+            SPAGAIN;                                                           \
+        }                                                                      \
+    } while (0)
 
 MODULE = Game::RaycastFOV		PACKAGE = Game::RaycastFOV		
 PROTOTYPES: ENABLE
@@ -73,15 +82,19 @@ bypairall (callback, ...)
         }
 
 void
-circle(callback, int x0, int y0, int radius)
+circle (callback, int x0, int y0, int radius)
     SV *callback;
     PREINIT:
+        char *key;
         int f, ddF_x, ddF_y, x, y;
+        HV* seen;
+        STRLEN len;
     PROTOTYPE: &$$$
     PPCODE:
         dSP;
         ENTER;
         SAVETMPS;
+        sv_2mortal((SV *)(seen = newHV()));
         f = 1 - radius;
         ddF_x = 0;
         ddF_y = -2 * radius;
@@ -144,4 +157,34 @@ line (callback, int x0, int y0, int x1, int y1)
                 err += dx;
                 y0 += sy;
             }
+        }
+
+void
+sub_circle (callback, long x0, long y0, unsigned long radius, double swing, double angle, double max_angle)
+    SV *callback;
+    PREINIT:
+        char *key;
+        long newx, newy;
+        HV* seen;
+        STRLEN len;
+    PROTOTYPE: &$$$$$$
+    PPCODE:
+        dSP;
+        sv_2mortal((SV *)(seen = newHV()));
+        while (angle < max_angle) {
+            newx = x0 + lrint(radius * cos(angle));
+            newy = y0 + lrint(radius * sin(angle));
+            key = Perl_form(aTHX_ "%ld,%ld", newx, newy);
+            len = strlen(key);
+            if(!hv_exists(seen, key, len)) {
+                hv_store(seen, key, len, &PL_sv_yes, 0);
+                CALLTWOUP;
+                mPUSHs(newSViv(newx));
+                mPUSHs(newSViv(newy));
+                PUTBACK;
+                call_sv(callback, G_DISCARD);
+                SPAGAIN;
+                TWOUPDONE;
+            }
+            angle += swing;
         }

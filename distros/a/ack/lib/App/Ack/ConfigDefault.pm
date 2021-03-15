@@ -203,6 +203,17 @@ sub _options_block {
 --type-add=cmake:is:CMakeLists.txt
 --type-add=cmake:ext:cmake
 
+# Bazel build tool
+# https://docs.bazel.build/versions/master/skylark/bzl-style.html
+--type-add=bazel:ext:bzl
+# https://docs.bazel.build/versions/master/guide.html#bazelrc-the-bazel-configuration-file
+--type-add=bazel:ext:bazelrc
+# https://docs.bazel.build/versions/master/build-ref.html#BUILD_files
+--type-add=bazel:is:BUILD
+# https://docs.bazel.build/versions/master/build-ref.html#workspace
+--type-add=bazel:is:WORKSPACE
+
+
 # Actionscript
 --type-add=actionscript:ext:as,mxml
 
@@ -267,6 +278,10 @@ sub _options_block {
 # Elixir
 # https://elixir-lang.org/
 --type-add=elixir:ext:ex,exs
+
+# Elm
+# https://elm-lang.org
+--type-add=elm:ext:elm
 
 # Emacs Lisp
 # https://www.gnu.org/software/emacs
@@ -375,6 +390,10 @@ sub _options_block {
 # Plone
 # https://plone.org/
 --type-add=plone:ext:pt,cpt,metadata,cpy,py
+
+# PureScript
+# https://www.purescript.org
+--type-add=purescript:ext:purs
 
 # Python
 # https://www.python.org/

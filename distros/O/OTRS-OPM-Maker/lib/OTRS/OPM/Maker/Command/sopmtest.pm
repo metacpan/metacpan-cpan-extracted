@@ -1,5 +1,5 @@
 package OTRS::OPM::Maker::Command::sopmtest;
-
+$OTRS::OPM::Maker::Command::sopmtest::VERSION = '0.19';
 # ABSTRACT: Check if sopm is valid
 
 use strict;
@@ -9,8 +9,6 @@ use Path::Class ();
 use XML::LibXML;
 
 use OTRS::OPM::Maker -command;
-
-our $VERSION = '0.17';
 
 sub abstract {
     return "check .sopm if it is valid";
@@ -70,7 +68,7 @@ OTRS::OPM::Maker::Command::sopmtest - Check if sopm is valid
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 AUTHOR
 

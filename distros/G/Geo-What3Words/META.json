@@ -4,7 +4,7 @@
       "mtmail <mtmail-cpan@gmx.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,6 +21,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Code::TidyAll" : "0.78",
             "Cpanel::JSON::XS" : "0",
             "Data::Dumper" : "0",
             "HTTP::Tiny" : "0",
@@ -30,6 +31,7 @@
             "Net::Ping" : "0",
             "Net::Ping::External" : "0",
             "Net::SSLeay" : "1.49",
+            "Perl::Tidy" : "20210111",
             "Ref::Util" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0.88",
@@ -42,7 +44,7 @@
    "provides" : {
       "Geo::What3Words" : {
          "file" : "lib/Geo/What3Words.pm",
-         "version" : "v3.0.0"
+         "version" : "v3.0.3"
       }
    },
    "release_status" : "stable",
@@ -53,8 +55,9 @@
          "web" : "https://github.com/opencagedata/perl-Geo-What3Words"
       }
    },
-   "version" : "3.0.0",
+   "version" : "3.0.3",
    "x_generated_by_perl" : "v5.26.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

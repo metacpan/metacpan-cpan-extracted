@@ -1,6 +1,10 @@
 Revision history for WWW-Shorten
 
-3.093     2016-03-25 12:16:08-04:00 America/New_York
+3.094     2021-03-12
+    - Fixed up some documentation issues.
+    - No longer reference deprecated services in the docs.
+
+3.093     2016-03-25
     - lin.kz no longer exists, so WWW::Shorten::Linkz is deprecated
     - added deprecation/removal notices in accordance with issue #8
     - Folded ::Qurl into the deprecated modules

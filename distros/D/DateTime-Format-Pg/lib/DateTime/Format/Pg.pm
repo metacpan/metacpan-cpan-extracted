@@ -11,7 +11,7 @@ use DateTime::TimeZone 0.06;
 use DateTime::TimeZone::UTC;
 use DateTime::TimeZone::Floating;
 
-$VERSION = '0.16013';
+$VERSION = '0.16014';
 $VERSION = eval $VERSION;
 
 our @ISA = ('DateTime::Format::Builder');
@@ -222,12 +222,37 @@ my $pg_timeonly =
 #
 # 2003-04-18 17:20:24.373942+02 (USE_ISO_DATES)
 # (NB: always uses numerical tz)
-#
 my $pg_datetime_iso =
 {
-  regex		=> qr/^(\d{4,})-(\d{2,})-(\d{2,})[ T](\d{2,}):(\d{2,}):(\d{2,})(\.\d+)? *([-\+][\d:]+)?( BC)?$/,
-  params 	=> [ qw( year    month    day      hour     minute  second nanosecond time_zone       era) ],
-  postprocess 	=> [ \&_fix_era, \&_fix_timezone, \&_fix_nanosecond ],
+  regex =>
+    qr/^
+      (\d{4,})-(\d{2,})-(\d{2,}) # date part
+      [ T] # separator
+      (\d{2,}):(\d{2,}):(\d{2,})(\.\d+)? # time part
+      [ ]*
+      ([-\+][\d:]+)? # numerical timezone
+      ([ ]BC)?
+    $/x,
+  params => [ qw( year month day hour minute second nanosecond time_zone era) ],
+  postprocess	=> [ \&_fix_era, \&_fix_timezone, \&_fix_nanosecond ],
+};
+
+# * Added for https://github.com/lestrrat-p5/DateTime-Format-Pg/issues/18
+#   Concatenated dates/times are accepted
+#   e.g. YYYYMMDDTHHMMSS
+my $pg_datetime_iso_concat_date =
+{
+  regex =>
+    qr/^
+      (\d{4})(\d{2})(\d{2}) # concatenated date
+      [ T] # separator
+      (\d{2,}):(\d{2,}):(\d{2,})(\.\d+)? # time part
+      [ ]*
+      ([-\+][\d:]+)? # numerical timezone
+      ([ ]BC)?
+    $/x,
+  params => [ qw( year month day hour minute second nanosecond time_zone era) ],
+  postprocess	=> [ \&_fix_era, \&_fix_timezone, \&_fix_nanosecond ],
 };
 
 # Fri 18 Apr 17:20:24.373942 2003 CEST (USE_POSTGRES_DATES, EuroDates)
@@ -356,7 +381,7 @@ sub _fix_timezone {
   {
     # XXX This barfs because 'self' may not necessarily be initialized
     # Need to fix it
-    my $stz = $args{'self'}->_server_tz($args{'args'} ? @{$args{'args'}} : ());
+    my $stz = $args{'self'}->server_tz($args{'args'} ? @{$args{'args'}} : ());
     $args{'parsed'}->{'time_zone'} = $stz || 'floating';
   }
 
@@ -377,21 +402,39 @@ sub _fix_nanosecond {
 
 # Parser generation
 #
-DateTime::Format::Builder->create_class
-(
-  parsers =>
-  {
-    parse_date		=> [ $pg_dateonly_iso, $pg_dateonly_sql,
-    			     $pg_dateonly_german, $pg_infinity ],
-    parse_timetz	=> [ $pg_timeonly, ],
-    parse_timestamptz	=> [ $pg_datetime_iso, $pg_datetime_pg_eu,
-                             $pg_datetime_pg_us, $pg_datetime_sql,
-			     $pg_datetime_german, $pg_infinity ],
-    parse_datetime	=> [ $pg_datetime_iso, $pg_datetime_pg_eu,
-			     $pg_datetime_pg_us, $pg_datetime_sql,
-			     $pg_datetime_german,
-			     $pg_dateonly_iso, $pg_dateonly_german,
-			     $pg_dateonly_sql, $pg_timeonly, $pg_infinity],
+DateTime::Format::Builder->create_class(
+  parsers => {
+    parse_date => [
+      $pg_dateonly_iso,
+      $pg_dateonly_sql,
+      $pg_dateonly_german,
+      $pg_infinity,
+    ],
+    parse_timetz	=> [
+      $pg_timeonly,
+    ],
+    parse_timestamptz	=> [
+      $pg_datetime_iso,
+      $pg_datetime_iso_concat_date,
+      $pg_datetime_pg_eu,
+      $pg_datetime_pg_us,
+      $pg_datetime_sql,
+      $pg_datetime_german,
+      $pg_infinity,
+    ],
+    parse_datetime	=> [
+      $pg_datetime_iso,
+      $pg_datetime_iso_concat_date,
+      $pg_datetime_pg_eu,
+      $pg_datetime_pg_us,
+      $pg_datetime_sql,
+      $pg_datetime_german,
+      $pg_dateonly_iso,
+      $pg_dateonly_german,
+      $pg_dateonly_sql,
+      $pg_timeonly,
+      $pg_infinity,
+    ],
   }
 );
 
@@ -592,7 +635,7 @@ sub parse_duration {
 
     $string =~ s/\b(\d+):(\d\d):(\d\d)(\.\d+)?\b/$1h $2m $3$4s/g;
     $string =~ s/\b(\d+):(\d\d)\b/$1h $2m/g;
-    $string =~ s/(-\d+h)\s+(\d+m)\s+(\d+s)\s*/$1 -$2 -$3 /;
+    $string =~ s/(-\d+h)\s+(\d+m)\s+(\d+(?:\.\d+)?s)\s*/$1 -$2 -$3 /;
     $string =~ s/(-\d+h)\s+(\d+m)\s*/$1 -$2 /;
 
     while ($string =~ s/^\s*(-?\d+(?:[.,]\d+)?)\s*([a-zA-Z]+)(?:\s*(?:,|and)\s*)*//i) {
@@ -626,10 +669,11 @@ sub parse_duration {
             }
 
             # From the spec, Pg can take up to 6 digits for fractional part
-            # (duh, as 1 sec = 1_000_000 nano sec). If we're missing 0's,
+            # that is microseconds. If we're missing 0's,
             # we should pad them
-            $fractional .= '0'x (6 - length($fractional));
-            push @extra_args, ("nanoseconds" => $fractional);
+            $fractional .= '0'x (9 - length($fractional));
+            my $sign = ($amount > 0) ? 1 : -1;
+            push @extra_args, ("nanoseconds" => $sign * $fractional);
         }
 
         $du->$arith_method($base_unit => $amount * $num, @extra_args);

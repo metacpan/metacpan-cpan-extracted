@@ -33,6 +33,13 @@ BEGIN
         [ '-1 days'   => DateTime::Duration->new(days => -1)    ],
         [ '-23:59'    => DateTime::Duration->new(hours => -23, minutes => -59) ],
         [ '-1 days -00:01' => DateTime::Duration->new( days => -1, minutes => -1) ],
+        [ '-1 days -20:30:56.123456' => DateTime::Duration->new( 
+                days => -1, 
+                minutes => -1230,  # = 20 * 60 + 30
+                seconds => -56,
+                nanoseconds => -123456000,
+            ),
+        ],
         [ '1 mon -1 days' => DateTime::Duration->new(months => 1)->add(days => -1) ],
         [ '1 day 1 month' => DateTime::Duration->new(months => 1)->add(days => 1) ],
         [ '1 month -1 days' => DateTime::Duration->new(months => 1)->add(days => -1) ],

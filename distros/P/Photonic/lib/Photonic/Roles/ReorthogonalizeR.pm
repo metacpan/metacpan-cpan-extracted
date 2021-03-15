@@ -1,5 +1,5 @@
 package Photonic::Roles::ReorthogonalizeR;
-$Photonic::Roles::ReorthogonalizeR::VERSION = '0.014';
+$Photonic::Roles::ReorthogonalizeR::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -9,14 +9,14 @@ Photonic::Roles::ReorthogonalizeC
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 COPYRIGHT NOTICE
 
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -117,7 +117,6 @@ use Photonic::Iterator;
 use Machine::Epsilon;
 use PDL::Lite;
 use PDL::NiceSlice;
-use List::MoreUtils qw(pairwise);
 use Moose::Role;
 
 has 'previous_W' =>(is=>'ro',
@@ -168,9 +167,6 @@ around '_fullorthogonalize_indeed' => sub {
     $self->_fullorthogonalize_N($self->fullorthogonalize_N-1);
     $self->_orthogonalizations($self->orthogonalizations+1);
     $self->_write_justorthogonalized(1);
-    #foreach(pairwise {[$a, $b]} @{$self->states}, @{$self->gs}){
-	#for every saved state
-        #my ($s, $g)=($_->[0], $_->[1]); #state, metric
     my $it=$self->state_iterator;
     for my $g(@{$self->gs}){
 	#for every saved state

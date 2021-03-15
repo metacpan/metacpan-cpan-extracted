@@ -1,3 +1,4 @@
 See the git repository.
 
+ * 1.03 - add "offset_tensions" method. new Counterpoint.pm
  * 1.02 - relicense under BSD. fixup metadata foo. more speling fix

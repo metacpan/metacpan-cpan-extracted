@@ -1,0 +1,2997 @@
+
+examples/Ring.pl,952
+use constant PI=40,1119
+my $nh=nh61,1865
+my $N=N62,1876
+my $l=l63,1886
+my $r0=r068,2105
+my $r1=r169,2145
+my $B=B70,2188
+my $a=a78,2608
+my $epsA=epsA81,2793
+my ($hnu_all,$epsBall)($hnu_all,$epsBall82,2843
+my $k=k83,2922
+my $c=c86,3070
+my $elem=elem87,3122
+my $gmtnr=gmtnr105,4096
+my $allh=allh107,4239
+my $nr=nr110,4399
+my $gmtr=gmtr121,4839
+my @out=out125,5000
+    my $epsB=epsB133,5330
+    my $hnu=hnu134,5364
+    my $q=q135,5396
+    my $enr=enr142,5818
+    my $m=m152,6399
+    my $h=h155,6533
+    my $e=e157,6627
+    my $er=er158,6692
+    my $linea=linea160,6792
+my $o=o169,7247
+my $x=x171,7295
+my $y=y172,7309
+my $wgp=wgp173,7329
+sub ring 177,7464
+    my $N=N178,7475
+    my $ra=ra179,7492
+    my $rb=rb180,7539
+    my $z=z181,7568
+    my $B=B182,7602
+sub eps{186,7669
+    my $epsi=epsi187,7678
+    my @eps=eps188,7698
+	my $linea=linea192,7863
+    my $eps=eps195,7928
+
+examples/mortola.pl,806
+my $nh=nh56,1337
+my $seed=seed57,1348
+my $N=N59,1377
+my $l=l60,1388
+my $epsA=epsA61,1397
+my $epsB=epsB62,1457
+my $epsC=epsC63,1517
+my $epsD=epsD64,1577
+my $e=e65,1637
+my %epsM=epsM67,1684
+my $filename=filename72,2004
+my ($g,$allh,$nr)($g,$allh,$nr75,2313
+my %dir=dir77,2365
+sub checkerboard 86,2728
+    my $N=N87,2747
+    my $B=B88,2764
+    my $c=c89,2797
+    my $i=i90,2832
+sub ajedrez 97,3046
+    my $N=N98,3072
+    my $z=z99,3089
+    my $r=r100,3157
+    my $signopos=signopos101,3192
+sub FourPhases 106,3297
+    my $N=N107,3326
+    my $eA=eA108,3343
+    my $eB=eB109,3361
+    my $eC=eC110,3379
+    my $eD=eD111,3397
+    my $z=z114,3521
+sub eps{124,3803
+    my $epsi=epsi125,3812
+    my $epsilonIn;epsilonIn126,3832
+    my $eps=eps133,4079
+
+examples/LE/NR2/epsM-L.pl,646
+my $nh=nh54,1620
+my $N=N55,1631
+my $l=l56,1641
+my $B=B62,1819
+my $r=r68,2022
+my $epsA=epsA80,2500
+my ($hnu_all,$epsBall)($hnu_all,$epsBall81,2550
+my $elem=elem83,2659
+my $pdir=pdir89,2995
+my $L=L97,3251
+my $gmtnr=gmtnr103,3355
+my $allh=allh105,3481
+my $epsM_L=epsM_L108,3641
+my @out=out114,3922
+    my $epsB=epsB119,4101
+    my $hnu=hnu120,4135
+    my $epsM_pdir=epsM_pdir127,4578
+    my $linea=linea131,4809
+my $o=o140,5258
+my $x=x142,5306
+my $y=y143,5320
+my $wgp=wgp144,5340
+sub eps{149,5496
+    my $epsi=epsi150,5505
+    my @eps=eps151,5525
+	my $linea=linea155,5690
+    my $eps=eps158,5755
+
+examples/LE/NR2/field.pl,547
+my $N=N48,1294
+my $f=f49,1330
+my $nh=nh50,1342
+my $small=small51,1354
+my $epsA=epsA52,1371
+my $titulo=titulo53,1390
+my $epsB=epsB54,1410
+my $pdir=pdir56,1441
+my $l=l57,1462
+my $L=L58,1472
+my $B=B59,1490
+my $circle=circle60,1516
+my $nr=nr61,1590
+my $nrf=nrf62,1668
+my $field=field63,1754
+my $wf=wf65,1795
+sub plotfield 69,1899
+    my $titulo=titulo70,1915
+    my $field=field71,1937
+    my $fieldt=fieldt72,1958
+    my $fieldabs=fieldabs73,2032
+    my $fieldR=fieldR76,2215
+    my $fieldI=fieldI77,2271
+
+examples/WE/R2/field.pl,564
+my $N=N49,1322
+my $f=f50,1358
+my $nh=nh51,1370
+my $small=small52,1382
+my $epsA=epsA53,1399
+my $titulo=titulo54,1418
+my $epsB=epsB55,1438
+my $pdir=pdir57,1469
+my $l=l58,1490
+my $L=L59,1503
+my $B=B60,1521
+my $circle=circle61,1547
+my $m=m62,1621
+my $nr=nr65,1756
+my $nrf=nrf68,1936
+my $field=field69,2021
+my $wf=wf72,2085
+sub plotfield 76,2189
+    my $titulo=titulo77,2205
+    my $field=field78,2227
+    my $fieldt=fieldt79,2248
+    my $fieldabs=fieldabs80,2322
+    my $fieldR=fieldR83,2505
+    my $fieldI=fieldI84,2561
+
+_build/lib/MyModuleBuilder.pm,123
+package MyModuleBuilder;1,0
+        sub resume 6,109
+            my $class class7,130
+            my $self self8,161
+
+blib/lib/Photonic.pm,97
+package Photonic;1,0
+  my $g=g57,1260
+  my $eps=eps58,1300
+  my $epsValue=epsValue59,1371
+
+blib/lib/Photonic/Geometry.pm,115
+package Photonic::Geometry;1,0
+my @implementations=implementations39,1049
+my $g1=g157,1369
+my $g2=g259,1454
+
+blib/lib/Photonic/OneH.pm,121
+package Photonic::OneH;1,0
+my @implementations=implementations39,1041
+     my $g1=g157,1361
+     my $g1=g159,1457
+
+blib/lib/Photonic/LE.pm,96
+package Photonic::LE;2,22
+my @implementations=implementations40,1059
+     my $g1=g157,1355
+
+blib/lib/Photonic/Iterator.pm,478
+     sub makeiterator 42,1075
+         my $a=a43,1099
+         my $n=n44,1121
+         my $it it45,1139
+     sub makebiterator 50,1241
+         my $a=a51,1283
+         my $n=n52,1305
+         my $it=it53,1323
+     my @a=a58,1443
+     my $it=it59,1464
+     my $bit=bit60,1495
+    my $i=i83,2078
+   my $it=it89,2160
+   my $x=x95,2278
+   my $x=x96,2299
+package Photonic::Iterator;105,2472
+sub nextval 115,2662
+sub iterator(116,2693
+sub new(117,2726
+
+blib/lib/Photonic/Geometry/FromEpsilon.pm,109
+package Photonic::Geometry::FromEpsilon;1,0
+sub _B 54,1559
+    my $self=self55,1568
+    my $B=B56,1588
+
+blib/lib/Photonic/Geometry/FromB.pm,39
+package Photonic::Geometry::FromB;1,0
+
+blib/lib/Photonic/Geometry/FromImage2D.pm,172
+   my $g1=g143,1079
+package Photonic::Geometry::FromImage2D;97,2077
+sub _build_B 120,2719
+    my $self=self121,2734
+    my $path=path122,2754
+    my $B=B129,3008
+
+blib/lib/Photonic/Utils.pm,3174
+package Photonic::Utils;1,0
+sub linearCombine 50,1367
+    my $coefficients=coefficients51,1425
+    my $states=states52,1487
+    my $numCoeff=numCoeff53,1537
+    my $result=result56,1643
+sub linearCombineIt 63,1770
+    my $coefficients=coefficients64,1844
+    my $stateit=stateit65,1906
+    my $numCoeff=numCoeff66,1957
+    my $result=result67,1990
+	my $s=s69,2041
+sub HProd 76,2208
+    my $first=first77,2282
+    my $second=second78,2303
+    my $skip=skip79,2325
+    my $iscomplex iscomplex80,2348
+    my $ndims=ndims82,2434
+    my $prod=prod84,2537
+    my $result=result86,2660
+sub MHProd 94,2927
+    my $first=first96,3021
+    my $second=second97,3042
+    my $metric=metric98,3064
+    my $skip=skip100,3130
+    my $iscomplex iscomplex101,3153
+    my $ndims=ndims103,3239
+    my $mprod=mprod107,3484
+    my $prod=prod109,3603
+    my $result=result110,3656
+sub EProd 118,3923
+    my $first=first121,4048
+    my $second=second122,4069
+    my $skip=skip123,4091
+    my $iscomplex iscomplex124,4114
+    my $ndims=ndims126,4200
+    my $sl=sl129,4344
+    my $first_mG=first_mG132,4484
+    my $prod=prod137,4681
+    my $result=result139,4800
+sub SProd 148,5049
+    my $first=first151,5207
+    my $second=second152,5228
+    my $skip=skip153,5250
+    my $iscomplex iscomplex154,5273
+    my $ndims=ndims156,5359
+    my $sl=sl160,5552
+    my $first_mG=first_mG164,5752
+    my $prod=prod169,5971
+    my $result=result171,6111
+sub VSProd 182,6494
+    my $first=first184,6621
+    my $second=second185,6642
+    my $iscomplex iscomplex186,6664
+    my $ndims=ndims188,6750
+    my $sl=sl192,6934
+    my $first_mG=first_mG195,7098
+    my $prod=prod200,7338
+    my $result=result202,7434
+sub RtoG 213,7662
+    my $field=field215,7765
+    my $ndims=ndims216,7814
+    my $skip=skip217,7870
+    my $iscomplex=iscomplex218,7910
+    my $moved=moved219,7958
+    my $transformed=transformed221,8056
+    my $result=result222,8098
+sub GtoR 227,8237
+    my $field=field229,8340
+    my $ndims=ndims230,8389
+    my $skip=skip231,8445
+    my $iscomplex=iscomplex232,8485
+    my $moved=moved233,8533
+    my $transformed=transformed235,8631
+    my $result=result236,8674
+sub lentzCF 241,8813
+    my $as=as246,9006
+    my $bs=bs247,9024
+    my $max=max248,9042
+    my $small=small249,9061
+    my $tiny=tiny250,9082
+    my $converged=converged251,9103
+    my $fn=fn252,9124
+    my $n=n254,9194
+    my ($fnm1, $Cnm1, $Dnm1)($fnm1, $Cnm1, $Dnm1255,9207
+    my ($Cn, $Dn)($Cn, $Dn256,9274
+    my $Deltan;Deltan257,9310
+sub tile 276,9696
+    my $f=f277,9741
+    my @n=n278,9758
+    my $dim=dim280,9848
+    my $r=r281,9896
+	my $r1=r1284,9989
+sub vectors2Dlist 295,10127
+    my $f=f296,10186
+    my $s=s297,10217
+    my $d=d298,10241
+    my $f1=f1299,10270
+    my $coords=coords300,10335
+sub cmatmult 308,10541
+    my $a=a309,10556
+    my $b=b310,10573
+    my $ar=ar311,10590
+    my $ai=ai312,10620
+    my $br=br313,10656
+    my $bi=bi314,10686
+    my $cr=cr315,10722
+    my $ci=ci316,10760
+    my $c=c317,10798
+
+blib/lib/Photonic/CharacteristicFunctions.pm,794
+package Photonic::CharacteristicFunctions;1,0
+sub ellipse 48,1267
+    my $N=N50,1412
+    my $ff=ff51,1429
+    my $e=e52,1447
+    my $a=a53,1464
+    my $z=z54,1489
+    my $r=r55,1562
+    my $t=t60,1816
+sub triangle 64,1900
+    my $N=N65,1944
+    my $r0=r066,1961
+    my $deltar=deltar67,2003
+    my $theta0=theta068,2040
+    my $z=z70,2063
+    my $r=r71,2136
+    my $theta=theta72,2181
+    my $q=q73,2224
+    my $t=t75,2292
+sub isosceles 79,2365
+    my $N=N80,2419
+    my $r0=r081,2436
+    my $delta2=delta282,2478
+    my $delta3=delta383,2526
+    my $theta0=theta084,2574
+    my $z=z86,2597
+    my $r=r87,2670
+    my $theta=theta88,2715
+    my $q=q89,2758
+    my $t=t91,2826
+   my $e=e111,3122
+   my $t=t112,3153
+   my $i=i113,3199
+
+blib/lib/Photonic/LE/NR2/OneH.pm,554
+    my $nr=nr42,1064
+    my $state=state47,1214
+package Photonic::LE::NR2::OneH;118,2718
+sub _firstState 138,3320
+    my $self=self139,3351
+    my $v=v140,3371
+    my $arg=arg141,3438
+sub applyOperator 146,3562
+    my $self=self147,3582
+    my $psi_G=psi_G148,3602
+    my $mask=mask149,3623
+    my $Gpsi_G=Gpsi_G155,3833
+    my $Gpsi_R=Gpsi_R159,4016
+    my $BGpsi_R=BGpsi_R162,4185
+    my $BGpsi_G=BGpsi_G165,4309
+    my $GBGpsi_G=GBGpsi_G168,4445
+sub innerProduct 178,4761
+sub magnitude 182,4845
+sub changesign 187,4965
+
+blib/lib/Photonic/LE/NR2/SHP.pm,188
+   my $nrshp=nrshp42,1060
+package Photonic::LE::NR2::SHP;101,2052
+sub BUILD 127,3059
+    my $self=self128,3071
+    my $B=B129,3091
+sub _ndims 133,3187
+    my $self=self134,3200
+
+blib/lib/Photonic/LE/NR2/EpsTensor.pm,712
+   my $eps=eps42,1072
+   my $epsilonTensor=epsilonTensor43,1132
+package Photonic::LE::NR2::EpsTensor;125,2692
+sub evaluate 171,4821
+    my $self=self172,4836
+    my @eps;eps176,4964
+    my $converged=converged177,5020
+    my $reEpsL=reEpsL183,5181
+    my $imEpsL=imEpsL184,5227
+    my ($lu, $perm, $parity)($lu, $perm, $parity185,5273
+    my $reEps=reEps186,5335
+    my $imEps=imEps187,5391
+    my $nd=nd188,5447
+    my $epsTensor=epsTensor189,5485
+    my $n=n190,5538
+sub _build_nr 202,5802
+    my $self=self203,5871
+    my @nr;nr204,5891
+	my $g=g206,5947
+	my $nr=nr209,6082
+sub _build_epsL 220,6358
+    my $self=self221,6376
+    my @eps;eps222,6396
+	my $e=e224,6436
+
+blib/lib/Photonic/LE/NR2/Field.pm,713
+   my $nrf=nrf42,1064
+   my $field=field43,1111
+package Photonic::LE::NR2::Field;131,2582
+sub BUILD 171,4367
+    my $self=self172,4379
+sub evaluate 176,4450
+    my $self=self177,4465
+    my $as=as181,4593
+    my $b2s=b2s182,4619
+    my $bs=bs183,4647
+    my $stateit=stateit184,4673
+    my $nh=nh185,4716
+    my $diag=diag191,4982
+    my $subdiag=subdiag192,5035
+    my $supradiag=supradiag194,5137
+    my $rhs=rhs195,5212
+    my ($result, $info)($result, $info198,5282
+    my @Es=Es204,5583
+    my $ndims=ndims207,5710
+    my @dims=dims208,5769
+    my $field_G=field_G209,5825
+	my $GPsi_G=GPsi_G212,5954
+	my $EnGPsi_G=EnGPsi_G215,6090
+    my $field_R=field_R221,6333
+
+blib/lib/Photonic/LE/NR2/EpsL.pm,322
+   my $eps=eps42,1062
+   my $epsilonLongitudinal=epsilonLongitudinal43,1121
+package Photonic::LE::NR2::EpsL;121,2585
+sub evaluate 144,3306
+    my $self=self145,3321
+    my $as=as149,3449
+    my $b2s=b2s150,3475
+    my $min=min151,3503
+    my ($fn, $n)($fn, $n152,3554
+    my $converged=converged155,3668
+
+blib/lib/Photonic/LE/NR2/SHChiTensor.pm,1279
+   my $chi=chi42,1076
+   my $chiTensor=chiTensor45,1241
+package Photonic::LE::NR2::SHChiTensor;153,3740
+sub _nh 182,4768
+    my $self=self183,4826
+sub evaluate 231,7113
+    my $self=self232,7128
+    my %options=options237,7292
+    my $kind=kind238,7361
+    my $mask=mask240,7498
+    my $nd=nd241,7527
+    my $epsT=epsT242,7565
+    my @P2M;P2M243,7622
+	my $nrsh=nrsh245,7730
+	my $P2;P2250,7923
+	my $P2M=P2M259,8246
+	my $k=k264,8426
+	my $FPChi=FPChi265,8468
+	my $P2MLC=P2MLC266,8523
+	my $P2ML=P2ML267,8578
+	my $Dep2=Dep2268,8624
+	my $P2Mmask=P2Mmask269,8689
+	my $f=f270,8741
+    my $reP2M=reP2M289,9562
+    my $imP2M=imP2M290,9607
+    my ($lu, $perm, $parity)($lu, $perm, $parity291,9652
+    my $reChi=reChi295,9878
+    my $imChi=imChi296,9953
+    my $chiTensor=chiTensor298,10065
+    my $n=n300,10164
+sub _build_nrshp 314,10508
+    my $self=self315,10580
+    my @nrshp;nrshp316,10600
+	my $g=g318,10659
+	my $nr=nr322,10863
+	my @args=args325,11020
+	my $nrf=nrf327,11137
+	my $nrshp=nrshp328,11184
+sub _build_epsTensor 336,11348
+    my $self=self337,11371
+    my $geometry=geometry338,11391
+    my $nh=nh339,11425
+    my $smallH=smallH340,11480
+    my $smallE=smallE341,11521
+    my $eT=eT342,11562
+
+blib/lib/Photonic/LE/NR2/SH.pm,4420
+   my $nrsh=nrsh42,1058
+   my $PL_G=PL_G45,1200
+package Photonic::LE::NR2::SH;188,3894
+sub _alpha 319,9970
+    my $self=self320,9983
+    my $epsA1=epsA1321,10003
+    my $epsB1=epsB1322,10024
+    my $alphaA1=alphaA1323,10045
+    my $B=B330,10320
+sub _build_alpha1 334,10392
+    my $self=self335,10412
+sub _build_alpha2 339,10481
+    my $self=self340,10501
+sub _build_field1 345,10571
+    my $self=self346,10591
+sub _build_field2 350,10668
+    my $self=self351,10688
+sub _build_dipolar 356,10802
+    my $self=self357,10823
+    my $field=field358,10843
+    my $ndims=ndims359,10872
+    my $Esquare_R=Esquare_R362,10994
+    my $Esquare_G=Esquare_G365,11086
+    my $G=G367,11171
+    my $iG=iG369,11226
+    my $iGE2=iGE2371,11272
+    my $nablaE2=nablaE2374,11415
+    my $factor=factor375,11488
+    my $P=P377,11574
+sub _build_quadrupolar 382,11683
+    my $self=self383,11708
+    my $field=field384,11728
+    my $ndims=ndims385,11757
+    my $EE_R=EE_R388,11869
+    my $naa=naa390,11966
+    my $naaEE_R=naaEE_R392,12063
+    my $naaEE_G=naaEE_G396,12211
+    my $G=G399,12335
+    my $iG=iG401,12393
+    my $iGnaaEE_G=iGnaaEE_G404,12491
+    my $P=P410,12806
+sub _build_external 415,12898
+    my $self=self416,12920
+sub _build_external_G 420,12989
+    my $self=self421,13013
+    my $filterflag=filterflag422,13033
+    my $result=result425,13126
+sub _build_externalL_G 431,13294
+    my $self=self432,13319
+    my $filterflag=filterflag434,13368
+    my $result=result436,13432
+sub _build_externalVecL_G 442,13615
+    my $self=self443,13643
+    my $extG=extG444,13663
+    my $result=result445,13696
+sub _build_externalVecL 449,13777
+    my $self=self450,13803
+    my $extG=extG451,13823
+    my $result=result452,13859
+sub _build_HP 456,13927
+    my $self=self457,13972
+    my $ext=ext458,13992
+    my $normext=normext459,14024
+    my $extnorm=extnorm460,14064
+    my $hp=hp461,14104
+sub _build_externalL_n 468,14306
+    my $self=self469,14331
+    my $pol=pol470,14351
+    my $stateit=stateit471,14383
+    my $nh=nh472,14426
+    my @Pn=Pn475,14551
+sub _build_selfConsistentL_n 482,14738
+    my $self=self483,14769
+    my $external=external484,14789
+    my $nh=nh485,14826
+    my $as=as486,14859
+    my $bs=bs487,14885
+    my $u2=u2488,14911
+    my $diag=diag489,14933
+    my $subdiag=subdiag490,14987
+    my $supradiag=supradiag492,15090
+    my ($result, $info)($result, $info493,15150
+sub _build_selfConsistentL_G 500,15358
+    my $self=self501,15389
+    my $filterflag=filterflag502,15409
+    my $PLn=PLn504,15473
+    my $stateit=stateit505,15518
+    my $result=result506,15561
+sub _build_selfConsistentVecL_G 512,15723
+    my $self=self513,15757
+    my $sf=sf514,15777
+    my $result=result515,15814
+sub _build_selfConsistentVecL 519,15893
+    my $self=self520,15925
+    my $svf=svf521,15945
+    my $result=result522,15986
+sub _build_P2 526,16053
+    my $self=self527,16069
+    my $density=density528,16089
+    my $alpha2=alpha2529,16121
+    my $PL=PL530,16151
+    my $Pext=Pext531,16189
+    my $P2=P2532,16219
+sub _build_P2LMCalt 536,16292
+    my $self=self537,16314
+    my $PexL_G=PexL_G538,16334
+    my $PexM=PexM539,16400
+    my $ndims=ndims540,16470
+    my $nelem=nelem541,16517
+    my $k=k542,16566
+    my $GNorm=GNorm543,16614
+    my $epsA2=epsA2544,16661
+    my $u2=u2545,16689
+    my $B=B546,16711
+    my $as=as547,16750
+    my $b2s=b2s548,16781
+    my $bs=bs549,16814
+    my $states=states550,16845
+    my $nh=nh551,16884
+    my $diag=diag556,17139
+    my $subdiag=subdiag557,17209
+    my $supradiag=supradiag559,17312
+    my $rhs=rhs560,17387
+    my ($phi_n, $info)($phi_n, $info563,17457
+    my $phi_G=phi_G565,17581
+    my $Pphi=Pphi566,17634
+    my $beta_G=beta_G568,17697
+    my $betaV_G=betaV_G570,17821
+    my $betaV_n=betaV_n572,17896
+    my @Ppsi;Ppsi575,17995
+	my ($psi_n, $psiinfo)($psi_n, $psiinfo577,18035
+	my $psi_G=psi_G581,18209
+	my $Ppsi=Ppsi582,18259
+    my $Ppsi=Ppsi585,18319
+    my $P2M=P2M587,18384
+sub _build_u1 601,18882
+    my $self=self602,18898
+sub _build_u2 607,18992
+    my $self=self608,19008
+sub _filter 612,19075
+    my $self=self613,19131
+    my $field=field614,19151
+    my $skip=skip615,19172
+    my $filter=filter618,19317
+
+blib/lib/Photonic/LE/NR2/AllH.pm,183
+   my $iter=iter42,1062
+   my $haydock_as=haydock_as44,1148
+   my $haydock_bs=haydock_bs45,1177
+   my $haydock_b2s=haydock_b2s46,1206
+package Photonic::LE::NR2::AllH;98,2109
+
+blib/lib/Photonic/LE/S.pm,98
+package Photonic::EL::S;1,0
+my @implementations=implementations38,1042
+     my $g1=g155,1340
+
+blib/lib/Photonic/LE/NP.pm,99
+package Photonic::EL::NP;1,0
+my @implementations=implementations38,1044
+     my $g1=g155,1346
+
+blib/lib/Photonic/LE/NR2.pm,100
+package Photonic::EL::NR2;1,0
+my @implementations=implementations38,1046
+     my $g1=g155,1352
+
+blib/lib/Photonic/LE/NP/OneH.pm,738
+    my $nr=nr42,1061
+    my $state=state48,1240
+package Photonic::LE::NP::OneH;124,2920
+sub _epsilon 153,3784
+    my $self=self154,3799
+sub _firstState 162,3996
+    my $self=self163,4027
+    my $v=v164,4047
+    my $arg=arg165,4114
+sub applyOperator 170,4243
+    my $self=self171,4263
+    my $psi_G=psi_G172,4283
+    my $Gpsi_G=Gpsi_G178,4538
+    my $Gpsi_R=Gpsi_R185,4898
+    my $eGpsi_R=eGpsi_R189,5076
+    my $eGpsi_G=eGpsi_G192,5212
+    my $GeGpsi_G=GeGpsi_G195,5337
+sub innerProduct 203,5570
+    my $self=self205,5606
+    my $left=left206,5626
+    my $right=right207,5646
+    my $p=p208,5667
+sub magnitude 218,6043
+    my $self=self219,6059
+    my $psi=psi220,6079
+sub changesign 223,6155
+
+blib/lib/Photonic/LE/NP/EpsTensor.pm,719
+   my $eps=eps42,1070
+   my $epsilonTensor=epsilonTensor44,1164
+package Photonic::LE::NP::EpsTensor;118,2631
+sub _build_epsTensor 154,4002
+    my $self=self155,4025
+    my @eps;eps156,4045
+    my $converged=converged157,4101
+    my $reEpsL=reEpsL163,4244
+    my $imEpsL=imEpsL164,4290
+    my ($lu, $perm, $parity)($lu, $perm, $parity165,4336
+    my $reEps=reEps166,4398
+    my $imEps=imEps167,4454
+    my $nd=nd168,4510
+    my $epsTensor=epsTensor169,4548
+    my $n=n170,4601
+sub _build_nr 181,4830
+    my $self=self182,4899
+    my @nr;nr183,4919
+	my $g=g185,4975
+	my $nr=nr188,5109
+sub _build_epsL 197,5353
+    my $self=self198,5371
+    my @eps;eps199,5391
+	my $e=e201,5431
+
+blib/lib/Photonic/LE/NP/EpsL.pm,459
+   my $eps=eps42,1060
+   my $epsilonLongitudinal=epsilonLongitudinal43,1118
+package Photonic::LE::NP::EpsL;107,2212
+sub BUILD 137,3551
+    my $self=self138,3563
+    my $as=as140,3631
+    my $b2s=b2s141,3657
+    my $tiny=tiny144,3766
+    my $converged=converged145,3787
+    my $fn=fn150,3901
+    my $n=n152,3971
+    my ($fnm1, $Cnm1, $Dnm1)($fnm1, $Cnm1, $Dnm1153,3984
+    my ($Cn, $Dn)($Cn, $Dn154,4051
+    my $Deltan;Deltan155,4087
+
+blib/lib/Photonic/LE/NP/AllH.pm,229
+   my $iter=iter42,1060
+   my $haydock_as=haydock_as45,1185
+   my $haydock_bs=haydock_bs46,1214
+   my $haydock_b2s=haydock_b2s47,1243
+   my $haydock_states=haydock_states48,1274
+package Photonic::LE::NP::AllH;114,2344
+
+blib/lib/Photonic/LE/S/OneH.pm,657
+    my $nr=nr42,1059
+    my $state=state48,1237
+package Photonic::LE::S::OneH;125,2935
+sub _epsilon 148,3642
+    my $self=self149,3657
+sub _firstState 157,3854
+    my $self=self158,3885
+    my $v=v159,3905
+    my $arg=arg160,3970
+sub applyOperator 164,4091
+    my $self=self165,4111
+    my $psi_G=psi_G166,4131
+    my $mask=mask167,4152
+    my $Gpsi_G=Gpsi_G177,4652
+    my $Gpsi_R=Gpsi_R188,5202
+    my $eGpsi_R=eGpsi_R193,5425
+    my $eGpsi_G=eGpsi_G196,5564
+    my $GeGpsi_G=GeGpsi_G199,5718
+sub innerProduct 207,6007
+sub magnitude 211,6077
+    my $self=self212,6093
+    my $psi=psi213,6113
+sub changesign 216,6189
+
+blib/lib/Photonic/LE/S/EpsTensor.pm,807
+   my $eps=eps42,1068
+   my $epsilonTensor=epsilonTensor44,1161
+package Photonic::LE::S::EpsTensor;118,2626
+my $ghandles=ghandles136,3076
+sub _build_epsilon 170,4908
+    my $self=self171,4929
+sub _build_epsTensor 175,4984
+    my $self=self176,5007
+    my @eps;eps177,5027
+    my $converged=converged178,5083
+    my $reEpsL=reEpsL184,5226
+    my $imEpsL=imEpsL185,5272
+    my ($lu, $perm, $parity)($lu, $perm, $parity186,5318
+    my $reEps=reEps187,5380
+    my $imEps=imEps188,5436
+    my $nd=nd189,5492
+    my $epsTensor=epsTensor190,5530
+    my $n=n191,5583
+sub _build_nr 202,5812
+    my $self=self203,5881
+    my @nr;nr204,5901
+	my $g=g206,5957
+	my $nr=nr209,6090
+sub _build_epsL 220,6389
+    my $self=self221,6407
+    my @eps;eps222,6427
+	my $e=e224,6467
+
+blib/lib/Photonic/LE/S/Field.pm,737
+   my $nrf=nrf42,1060
+   my $field=field43,1105
+package Photonic::LE::S::Field;129,2454
+sub BUILD 169,4260
+    my $self=self170,4272
+sub evaluate 174,4343
+    my $self=self175,4358
+    my $as=as176,4378
+    my $b2s=b2s177,4404
+    my $bs=bs178,4432
+    my $stateit=stateit179,4458
+    my $nh=nh180,4501
+    my $diag=diag186,4766
+    my $subdiag=subdiag187,4816
+    my $supradiag=supradiag189,4923
+    my $rhs=rhs190,4998
+    my ($result, $info)($result, $info193,5068
+    my @Es=Es200,5407
+    my $ndims=ndims203,5526
+    my @dims=dims204,5585
+    my $field_G=field_G205,5641
+	my $GPsi_G=GPsi_G210,5814
+	my $EnGPsi_G=EnGPsi_G212,5903
+    my $Esp=Esp216,6010
+    my $field_R=field_R220,6216
+
+blib/lib/Photonic/LE/S/EpsL.pm,297
+   my $eps=eps42,1058
+   my $epsilonLongitudinal=epsilonLongitudinal43,1115
+package Photonic::LE::S::EpsL;107,2201
+    my $self=self129,2885
+    my $as=as130,2905
+    my $b2s=b2s131,2931
+    my $min=min132,2959
+    my ($fn, $n)($fn, $n133,3010
+    my $converged=converged135,3105
+
+blib/lib/Photonic/LE/S/AllH.pm,228
+   my $iter=iter42,1058
+   my $haydock_as=haydock_as45,1182
+   my $haydock_bs=haydock_bs46,1211
+   my $haydock_b2s=haydock_b2s47,1240
+   my $haydock_states=haydock_states48,1271
+package Photonic::LE::S::AllH;114,2338
+
+blib/lib/Photonic/WE/R2/EpsilonTensor.pm,361
+   my $epsT=epsT42,1078
+   my $EpsTensor=EpsTensor43,1149
+package Photonic::WE::R2::EpsilonTensor;92,2204
+    my $orig=orig113,2780
+    my $self=self114,2800
+    my $wave=wave115,2820
+    my $q=q116,2851
+    my $q2=q2117,2888
+    my $k=k118,2906
+    my $k2=k2119,2943
+    my $kk=kk120,2969
+    my $id=id121,2995
+    my $eps=eps122,3020
+
+blib/lib/Photonic/WE/R2/OneH.pm,877
+package Photonic::WE::R2::OneH;1,0
+sub applyOperator 56,1698
+    my $self=self57,1718
+    my $psi=psi58,1738
+    my $mask=mask59,1757
+    my $gpsi=gpsi61,1819
+    my $gpsi_r=gpsi_r64,1991
+    my $Bgpsi_r=Bgpsi_r67,2141
+    my $psi_G=psi_G70,2285
+sub applyMetric 77,2492
+    my $self=self78,2510
+    my $psi=psi79,2530
+    my $g=g81,2579
+    my $gpsi=gpsi83,2639
+sub innerProduct 88,2754
+    my $self=self89,2812
+    my $psi1=psi190,2832
+    my $psi2=psi291,2852
+    my $g=g92,2872
+sub magnitude 96,2944
+    my $self=self97,2960
+    my $psi=psi98,2980
+sub changesign 102,3057
+sub _firstState 106,3146
+    my $self=self107,3164
+    my $d=d108,3184
+    my $v=v109,3208
+    my $arg=arg110,3269
+    my $e=e112,3367
+    my $modulus2=modulus2117,3600
+    my $phi=phi122,3771
+    my $nr=nr143,4044
+    my $state=state148,4198
+
+blib/lib/Photonic/WE/R2/GreenP.pm,538
+   my $green=green42,1064
+   my $greenProjection=greenProjection43,1125
+package Photonic::WE::R2::GreenP;119,2495
+sub BUILD 149,3841
+    my $self=self150,3853
+sub evaluate 154,3934
+    my $self=self155,3949
+    my $as=as159,4100
+    my $bcs=bcs160,4131
+    my $tiny=tiny163,4245
+    my $converged=converged164,4266
+    my $fn=fn169,4437
+    my $n=n171,4510
+    my ($fnm1, $Cnm1, $Dnm1)($fnm1, $Cnm1, $Dnm1172,4523
+    my ($Cn, $Dn)($Cn, $Dn173,4590
+    my $Deltan;Deltan174,4626
+    my $g0b02=g0b02194,5283
+
+blib/lib/Photonic/WE/R2/WaveP.pm,223
+   my $W=W42,1062
+   my $WaveProjection=WaveProjection43,1135
+package Photonic::WE::R2::WaveP;91,2102
+    my $orig=orig112,2663
+    my $self=self113,2683
+    my $greenP=greenP114,2703
+    my $wave=wave115,2736
+
+blib/lib/Photonic/WE/R2/EpsilonP.pm,404
+   my $eps=eps42,1068
+   my $EpsTensor=EpsTensor43,1134
+package Photonic::WE::R2::EpsilonP;95,2270
+    my $orig=orig116,2829
+    my $self=self117,2849
+    my $wave=wave118,2869
+    my $q=q119,2900
+    my $q2=q2120,2946
+    my $k=k121,2964
+    my $k2=k2122,3010
+    my $p=p124,3063
+    my $p2=p2126,3180
+    my $pk=pk127,3209
+    my $proj=proj128,3238
+    my $eps=eps129,3278
+
+blib/lib/Photonic/WE/R2/Green.pm,734
+   my $G=G42,1062
+   my $GreenTensor=GreenTensor43,1122
+package Photonic::WE::R2::Green;132,2974
+    my $orig=orig165,3924
+    my $self=self166,3944
+    my $epsB=epsB167,3964
+    my $sym=sym168,3984
+    my @greenPc;greenPc171,4111
+    my $converged=converged172,4184
+    my $nd=nd178,4360
+    my $asy=asy179,4398
+    my @cpairs=cpairs180,4454
+    my $m=m181,4501
+	    my $pair=pair184,4564
+    my $greenTensor=greenTensor197,4870
+sub _build_cHaydock 203,4971
+    my $self=self205,5060
+    my @cHaydock;cHaydock206,5080
+	my $m=m208,5143
+	my $e=e209,5199
+	my $chaydock=chaydock211,5281
+sub _build_cGreenP 219,5494
+    my $self=self220,5515
+    my @cGreenP;cGreenP221,5535
+	my $g=g223,5585
+
+blib/lib/Photonic/WE/R2/GreenS.pm,778
+   my $G=G42,1064
+   my $GreenTensor=GreenTensor43,1125
+package Photonic::WE::R2::GreenS;131,2874
+sub evaluate 177,5031
+    my $self=self178,5046
+    my @greenP;greenP182,5196
+    my $converged=converged183,5270
+    my $reGreenP=reGreenP189,5429
+    my $imGreenP=imGreenP190,5480
+    my ($lu, $perm, $parity)($lu, $perm, $parity191,5531
+    my $reGreen=reGreen192,5593
+    my $imGreen=imGreen193,5653
+    my $nd=nd194,5713
+    my $greenTensor=greenTensor195,5738
+    my $n=n196,5793
+sub _build_haydock 208,6075
+    my $self=self209,6149
+    my @haydock;haydock210,6169
+	my $m=m213,6275
+	my $e=e214,6331
+	my $haydock=haydock216,6418
+sub _build_greenP 227,6729
+    my $self=self228,6749
+    my @greenP;greenP229,6769
+	my $g=g231,6817
+
+blib/lib/Photonic/WE/R2/Field.pm,763
+   my $nrf=nrf42,1062
+   my $field=field43,1108
+package Photonic::WE::R2::Field;125,2452
+sub BUILD 161,4083
+    my $self=self162,4095
+sub evaluate 166,4166
+    my $self=self167,4181
+    my $as=as171,4327
+    my $b2s=b2s172,4353
+    my $bs=bs173,4381
+    my $cs=cs174,4407
+    my $stateit=stateit175,4433
+    my $nh=nh176,4476
+    my $diag=diag180,4677
+    my $subdiag=subdiag181,4730
+    my $supradiag=supradiag183,4832
+    my $rhs=rhs184,4894
+    my ($giEs_coeff, $info)($giEs_coeff, $info188,5014
+    my @giEs=giEs191,5149
+    my $ndims=ndims194,5274
+    my @dims=dims195,5333
+    my $field_G=field_G196,5389
+	my $giE_G=giE_G200,5551
+    my $Es=Es204,5636
+    my $e_0=e_0205,5681
+    my $field_R=field_R212,6009
+
+blib/lib/Photonic/WE/R2/Wave.pm,392
+   my $W=W42,1060
+   my $WaveTensor=WaveTensor43,1119
+package Photonic::WE::R2::Wave;91,2160
+    my $orig=orig112,2723
+    my $self=self113,2743
+    my $green=green114,2763
+    my $greenreim=greenreim116,2859
+    my($lu, $perm, $par)($lu, $perm, $par118,2981
+    my $d=d119,3029
+    my $idreim=idreim120,3063
+    my $wavereim=wavereim121,3130
+    my $wave=wave122,3183
+
+blib/lib/Photonic/WE/R2/Metric.pm,368
+    my $gGG=gGG42,1065
+package Photonic::WE::R2::Metric;78,1970
+sub _value 97,2431
+    my $self self99,2498
+    my $G=G100,2520
+    my $q=q102,2610
+    my $eps=eps103,2639
+    my $k=k104,2667
+    my $kPG kPG107,2820
+    my $kPGkPG kPGkPG109,2877
+    my $kPG2 kPG2111,2954
+    my $id=id112,2998
+    my $k02=k02113,3033
+    my $gGG=gGG116,3153
+
+blib/lib/Photonic/WE/R2/AllH.pm,425
+   my $iter=iter42,1060
+   my $haydock_as=haydock_as45,1191
+   my $haydock_bs=haydock_bs46,1220
+   my $haydock_b2s=haydock_b2s47,1249
+   my $haydock_b2s=haydock_b2s48,1280
+   my $haydock_b2s=haydock_b2s49,1311
+   my $haydock_cs=haydock_cs50,1342
+   my $haydock_bcs=haydock_bcs51,1371
+   my $haydock_gs=haydock_gs52,1402
+   my $haydock_states=haydock_states53,1431
+package Photonic::WE::R2::AllH;134,2810
+
+blib/lib/Photonic/WE/S/EpsilonTensor.pm,453
+   my $epsT=epsT42,1076
+   my $EpsTensor=EpsTensor43,1146
+package Photonic::WE::S::EpsilonTensor;92,2199
+sub _build_epsilonTensor 112,2701
+    my $self=self113,2728
+    my $wave=wave114,2748
+    my $q=q115,2782
+    my $q2=q2116,2819
+    my $k=k117,2837
+	my $k2=k2121,3011
+	my $kk=kk122,3044
+	my $id=id123,3086
+	my $eps=eps124,3108
+    my $k2=k2127,3166
+    my $kk=kk128,3192
+    my $id=id129,3218
+    my $eps=eps130,3243
+
+blib/lib/Photonic/WE/S/OneH.pm,908
+package Photonic::WE::S::OneH;1,0
+sub _epsilon 60,1884
+    my $self=self61,1899
+sub applyOperator 69,2096
+    my $self=self70,2116
+    my $psi=psi71,2136
+    my $mask=mask72,2178
+    my $gpsi=gpsi74,2240
+    my $gpsi_r=gpsi_r77,2416
+    my $H=H79,2514
+    my $Hgpsi_r=Hgpsi_r80,2574
+    my $psi_G=psi_G82,2692
+sub applyMetric 91,2946
+    my $self=self92,2964
+    my $psi=psi93,2984
+    my $g=g95,3030
+    my $gpsi=gpsi98,3159
+sub innerProduct 103,3258
+    my $self=self104,3316
+    my $psi1=psi1105,3336
+    my $psi2=psi2106,3356
+    my $gpsi2=gpsi2107,3376
+sub magnitude 112,3455
+    my $self=self113,3471
+    my $psi=psi114,3491
+sub changesign 117,3567
+sub _firstState 121,3620
+    my $self=self122,3651
+    my $v=v123,3671
+    my $arg=arg124,3739
+    my $e=e126,3843
+    my $d=d127,3881
+    my $modulus2=modulus2132,4100
+    my $phi=phi139,4383
+
+blib/lib/Photonic/WE/S/GreenP.pm,519
+   my $green=green42,1062
+   my $greenProjection=greenProjection43,1122
+package Photonic::WE::S::GreenP;115,2419
+sub _build_Gpp 140,3460
+    my $self=self141,3477
+    my $epsR=epsR143,3555
+    my $as=as144,3594
+    my $bcs=bcs145,3625
+    my $tiny=tiny148,3739
+    my $converged=converged149,3760
+    my $fn=fn154,3931
+    my $n=n156,4003
+    my ($fnm1, $Cnm1, $Dnm1)($fnm1, $Cnm1, $Dnm1157,4016
+    my ($Cn, $Dn)($Cn, $Dn158,4083
+    my $Deltan;Deltan159,4119
+    my $g0b02=g0b02179,4774
+
+blib/lib/Photonic/WE/S/WaveP.pm,228
+   my $W=W42,1060
+   my $WaveProjection=WaveProjection43,1132
+package Photonic::WE::S::WaveP;91,2096
+sub _build_waveOperator 107,2524
+    my $self=self108,2550
+    my $greenP=greenP109,2570
+    my $wave=wave110,2597
+
+blib/lib/Photonic/WE/S/EpsilonP.pm,404
+   my $eps=eps42,1066
+   my $EpsTensor=EpsTensor43,1131
+package Photonic::WE::S::EpsilonP;95,2265
+sub _build_epsilon 115,2786
+    my $self=self116,2807
+    my $wave=wave117,2827
+    my $q=q118,2861
+    my $q2=q2119,2907
+    my $k=k120,2925
+    my $k2=k2121,2971
+    my $p=p122,3049
+    my $p2=p2124,3166
+    my $pk=pk125,3195
+    my $proj=proj126,3224
+    my $eps=eps127,3264
+
+blib/lib/Photonic/WE/S/Green.pm,786
+   my $G=G42,1060
+   my $GreenTensor=GreenTensor43,1119
+package Photonic::WE::S::Green;130,2823
+sub _build_greenTensor 170,4545
+    my $self=self171,4570
+    my @greenP;greenP172,4590
+    my $converged=converged173,4664
+    my $reGreenP=reGreenP179,4811
+    my $imGreenP=imGreenP180,4862
+    my ($lu, $perm, $parity)($lu, $perm, $parity181,4913
+    my $reGreen=reGreen182,4975
+    my $imGreen=imGreen183,5035
+    my $nd=nd184,5095
+    my $greenTensor=greenTensor185,5130
+    my $n=n186,5185
+sub _build_haydock 197,5428
+    my $self=self198,5502
+    my @haydock;haydock199,5522
+	my $m=m202,5628
+	my $e=e203,5684
+	my $haydock=haydock205,5770
+sub _build_greenP 216,6080
+    my $self=self217,6100
+    my @greenP;greenP218,6120
+	my $g=g220,6168
+
+blib/lib/Photonic/WE/S/Field.pm,788
+   my $nrf=nrf42,1060
+   my $field=field43,1105
+package Photonic::WE::S::Field;130,2554
+sub BUILD 167,4188
+    my $self=self168,4200
+sub evaluate 172,4271
+    my $self=self173,4286
+    my $as=as174,4306
+    my $b2s=b2s175,4332
+    my $bs=bs176,4360
+    my $cs=cs177,4386
+    my $stateit=stateit178,4412
+    my $nh=nh179,4455
+    my $diag diag183,4656
+    my $subdiag subdiag184,4710
+    my $supradiag supradiag186,4820
+    my $rhs=rhs189,4913
+    my ($giEs_coeff, $info)($giEs_coeff, $info193,5033
+    my @giEs=giEs196,5168
+    my $ndims=ndims198,5267
+    my @dims=dims199,5326
+    my $field_G=field_G201,5414
+	my $giE_G=giE_G205,5570
+    my $Es=Es209,5655
+    my $Esp=Esp212,5804
+    my $e_0=e_0213,5860
+    my $field_R=field_R220,6191
+
+blib/lib/Photonic/WE/S/Wave.pm,397
+   my $W=W42,1058
+   my $WaveTensor=WaveTensor43,1116
+package Photonic::WE::S::Wave;91,2154
+sub _build_waveOperator 111,2661
+    my $self=self112,2687
+    my $green=green113,2707
+    my $greenreim=greenreim115,2805
+    my($lu, $perm, $par)($lu, $perm, $par117,2927
+    my $d=d118,2975
+    my $idreim=idreim119,3009
+    my $wavereim=wavereim120,3076
+    my $wave=wave121,3129
+
+blib/lib/Photonic/WE/S/Metric.pm,720
+    my $gGG=gGG42,1063
+package Photonic::WE::S::Metric;78,1966
+sub _value 98,2449
+    my $self self100,2506
+    my $G=G101,2528
+    my $q=q103,2618
+    my $eps=eps104,2647
+    my $k=k105,2675
+	my ($kPG, $kMG)($kPG, $kMG112,3024
+	my ($kPGkPG, $kMGkMG)($kPGkPG, $kMGkMG114,3091
+	my ($kPG2,$kMG2)($kPG2,$kMG2117,3202
+	my $id=id118,3271
+	my $k02=k02119,3303
+	my $gPGG=gPGG122,3417
+	my $gMGG=gMGG123,3489
+	my $gGG=gGG124,3561
+    my ($kPG, $kMG)($kPG, $kMG130,3811
+    my ($kPGkPG, $kMGkMG)($kPGkPG, $kMGkMG132,3881
+    my ($kPG2,$kMG2)($kPG2,$kMG2134,3979
+    my $id=id135,4045
+    my $k02=k02136,4080
+    my $gPGG=gPGG139,4200
+    my $gMGG=gMGG140,4270
+    my $gGG=gGG141,4340
+
+blib/lib/Photonic/WE/S/AllH.pm,228
+   my $iter=iter42,1058
+   my $haydock_as=haydock_as45,1182
+   my $haydock_bs=haydock_bs46,1211
+   my $haydock_b2s=haydock_b2s47,1240
+   my $haydock_states=haydock_states48,1271
+package Photonic::WE::S::AllH;114,2338
+
+blib/lib/Photonic/Roles/Geometry.pm,2458
+package Photonic::Roles::Geometry;1,0
+use constant PI=45,1167
+sub _build_L 108,4282
+    my $self=self109,4297
+    my $L=L110,4317
+sub _build_units 114,4368
+    my $self=self115,4387
+    my @units;units116,4407
+    my $nd=nd117,4437
+	my $e=e119,4505
+sub _build_primitive 126,4594
+    my $self=self127,4617
+sub _build_primitiveNorm 131,4681
+    my $self=self132,4708
+sub _build_dualNorm 136,4766
+    my $self=self137,4788
+    my $pn=pn138,4808
+    my $dual=dual139,4847
+sub _build_dims 142,4896
+    my $self=self143,4914
+sub _build_ndims 147,4966
+    my $self=self148,4985
+sub _build_npoints 152,5036
+    my $self=self153,5057
+sub _build_scale 157,5108
+    my $self=self158,5127
+sub _build_r 162,5193
+    my $self=self163,5208
+    my $coords=coords164,5228
+    my $pr=pr165,5272
+    my $r=r166,5330
+sub _build_G 173,5434
+    my $self=self174,5449
+    my @N=N175,5469
+    my $coords=coords176,5518
+    my $rec=rec177,5591
+    my $G=G178,5642
+sub _build_GNorm 190,5856
+    my $self=self191,5901
+sub _build_mGNorm 197,6054
+    my $self=self199,6157
+sub _build_pmGNorm 202,6205
+    my $self=self205,6321
+sub _build_f 209,6404
+    my $self=self210,6447
+sub _build_unitPairs 214,6512
+    my $self=self215,6535
+    my $nd=nd216,6555
+    my $units=units217,6580
+    my @pairs;pairs218,6608
+	    my $v=v221,6695
+sub _build_cUnitPairs 228,6796
+    my $self=self229,6820
+    my $nd=nd230,6840
+    my $units=units231,6865
+    my @cpairs;cpairs232,6893
+	    my $vc=vc235,6983
+	    my $vcn=vcn236,7026
+	    my $vp=vp237,7092
+sub _build_unitDyads 244,7176
+    my $self=self245,7199
+    my $nd=nd246,7219
+    my $ne=ne247,7266
+    my $matrix=matrix248,7328
+    my $n=n249,7365
+	    my $m=m252,7449
+		    my $factor=factor255,7543
+sub _build_unitDyadsLU 268,7759
+    my $self=self269,7784
+    my ($lu, $perm, $parity)($lu, $perm, $parity270,7804
+sub _G0 275,7958
+    my $self=self276,7968
+    my $value=value277,7988
+    my $arg=arg281,8211
+sub Vec2LC_G 289,8548
+    my $self=self291,8649
+    my $field=field292,8669
+    my $iscomplex=iscomplex295,8798
+    my $gnorm=gnorm297,8892
+    my $result=result298,8920
+sub LC2Vec_G 303,9036
+    my $self=self305,9140
+    my $field=field306,9160
+    my $iscomplex=iscomplex309,9305
+    my $gnorm=gnorm311,9399
+    my $result=result315,9515
+    package Photonic::Geometry::FromB;344,9868
+
+blib/lib/Photonic/Roles/OneH.pm,819
+    my $nr=nr42,1061
+    my $state=state47,1211
+    package Photonic::LE::NR2::OneH.pm;53,1275
+package Photonic::Roles::OneH;130,2856
+sub _cero 180,4954
+    my $self=self181,4966
+sub iterate 186,5046
+    my $self=self187,5086
+sub _fullorthogonalize_indeed 194,5279
+sub _iterate_indeed 199,5381
+    my $self=self200,5403
+    my $opPsi=opPsi211,5927
+    my $a_n=a_n212,5971
+    my $bpsi_np1=bpsi_np1213,6025
+    my $b2_np1=b2_np1215,6135
+    my $g_np1=g_np1216,6193
+    my $b_np1=b_np1218,6273
+    my $c_np1=c_np1219,6302
+    my $bc_np1=bc_np1220,6336
+    my $psi_np1;psi_np1221,6372
+sub _firstRState 234,6775
+    my $self=self235,6794
+    my $phi=phi236,6814
+    my $b2=b2237,6876
+    my $g=g238,6919
+sub _coerce 253,7314
+    my $self=self254,7328
+    my $val=val255,7348
+
+blib/lib/Photonic/Roles/KeepStates.pm,85
+   package Photonic::MyPackage;41,1034
+package Photonic::Roles::KeepStates;61,1443
+
+blib/lib/Photonic/Roles/ReorthogonalizeR.pm,589
+package Photonic::Roles::ReorthogonalizeR;1,0
+sub _build_next_W 73,2441
+    my $self=self74,2461
+    my $g_n=g_n77,2543
+    my $orig=orig83,2650
+    my $self=self84,2681
+    my $psi=psi85,2701
+    my $it=it93,3106
+	my $s=s96,3193
+sub _checkorthogonalize 102,3289
+    my $self=self103,3315
+    my $n=n107,3488
+    my $a=a108,3516
+    my $b=b109,3547
+    my $c=c110,3578
+	my $current_W=current_W113,3683
+	my $next_W=next_W114,3726
+    my $next_W=next_W123,4018
+    my $max=max136,4497
+	my $orthos=orthos139,4637
+sub _sign 152,4964
+    my $s=s153,4976
+
+blib/lib/Photonic/Roles/EpsL.pm,259
+   my $eps=eps42,1060
+   my $epsilonLongitudinal=epsilonLongitudinal43,1119
+    package Photonic::LE::NR2::EpsL;49,1210
+package Photonic::Roles::EpsL;133,2782
+sub BUILD 156,3701
+    my $self=self157,3713
+sub _nh 161,3784
+    my $self=self162,3842
+
+blib/lib/Photonic/Roles/ReorthogonalizeC.pm,636
+package Photonic::Roles::ReorthogonalizeC;1,0
+sub _build_next_W 74,2463
+    my $self=self75,2483
+    my $g_n=g_n78,2567
+    my $orig=orig83,2675
+    my $self=self84,2706
+    my $psi=psi85,2726
+    my $it=it90,2985
+	my $s=s95,3187
+sub _checkorthogonalize 101,3283
+    my $self=self102,3309
+    my $n=n106,3482
+    my $a=a107,3510
+    my $b=b108,3550
+    my $c=c109,3590
+	my $current_W=current_W112,3704
+	my $next_W=next_W113,3752
+    my $next_W;next_W122,4063
+    my $max=max139,4709
+	my $orthos=orthos142,4857
+sub _arg 155,5184
+    my $s=s156,5195
+    my $a=a157,5218
+    my $arg=arg160,5292
+
+blib/lib/Photonic/Roles/EpsParams.pm,84
+   package Photonic::MyPackage;41,1033
+package Photonic::Roles::EpsParams;84,1693
+
+blib/lib/Photonic/Roles/UseMask.pm,222
+package Photonic::Roles::UseMask;1,0
+sub _build_mask 49,1426
+    my $self=self50,1485
+    my $ndims=ndims51,1505
+    my $dims=dims52,1533
+    my $mask=mask53,1559
+    my $masked=masked54,1591
+	my $N=N56,1635
+
+blib/lib/Photonic/Roles/Metric.pm,66
+    my $gGG=gGG42,1064
+package Photonic::Roles::Metric;78,1974
+
+blib/lib/Photonic/Roles/AllH.pm,1626
+   my $iter=iter42,1060
+   my $haydock_as=haydock_as45,1177
+   my $haydock_bs=haydock_bs46,1206
+   my $haydock_b2s=haydock_b2s47,1235
+   my $haydock_states=haydock_states48,1266
+    package Photonic::LE::NR2::AllH;54,1337
+package Photonic::Roles::AllH;128,2631
+my @allfields=allfields185,4966
+sub BUILD 190,5162
+    my $self=self191,5174
+sub state_iterator 196,5303
+    my $self=self197,5324
+    my $n=n200,5426
+    my $s=s201,5439
+    my $fh=fh208,5701
+	my $pos=pos212,5842
+	my $ref=ref214,5905
+sub states 219,5958
+sub _build_stateFD 223,6034
+    my $self=self224,6055
+    my $fn=fn225,6075
+    my $fh=fh227,6163
+    my $self=self242,6539
+    my $self=self251,6721
+sub run 256,6797
+    my $self=self257,6826
+sub loadall 264,6956
+    my $self=self265,6970
+    my $fn=fn266,6990
+    my $fh=fh268,7067
+    my $all=all270,7149
+sub storeall 280,7463
+    my $self=self281,7478
+    my $fn=fn282,7498
+    my $fh=fh284,7606
+    my %all=all287,7722
+    my $si=si290,7871
+sub _save_a 296,8012
+    my $self=self297,8026
+sub _save_b 301,8090
+    my $self=self302,8104
+sub _save_b2 306,8165
+    my $self=self307,8180
+sub _save_bc 311,8243
+    my $self=self312,8258
+sub _save_c 316,8321
+    my $self=self317,8335
+sub _save_g 321,8396
+    my $self=self322,8410
+sub _save_state 326,8471
+    my $self=self327,8489
+    my $fh=fh331,8638
+    my $lastpos=lastpos332,8666
+    my $pos=pos335,8814
+sub _pop_state 339,8876
+    my $self=self340,8893
+    my ($snm3, $snm2, $snm1)($snm3, $snm2, $snm1350,9212
+sub _pop 359,9455
+    my $self=self361,9570
+
+blib/lib/Photonic/ExtraUtils.pm,290
+package Photonic::ExtraUtils;5,45
+          sub PDL::dgtsl dgtsl162,3144
+	      my ($c, $d, $e, $y, $b, $i)($c, $d, $e, $y, $b, $i166,3285
+          sub PDL::cgtsl cgtsl213,4124
+	      my ($c, $d, $e, $y, $b, $i)($c, $d, $e, $y, $b, $i218,4290
+	      my $complex=complex219,4329
+
+blib/lib/Photonic/WE.pm,95
+package Photonic::WE;1,0
+my @implementations=implementations39,1037
+     my $g1=g157,1334
+
+blib/lib/Photonic/Types.pm,60
+package Photonic::Types;1,0
+   package MyPackage;104,2832
+
+blib/lib/Photonic/AllH.pm,97
+package Photonic::AllH;1,0
+my @implementations=implementations39,1041
+     my $g1=g157,1361
+
+t/rem.pl,756
+sub agree 54,1411
+    my $a=a55,1423
+    my $b=b56,1440
+    my $fn=fn62,1559
+    my $B=B63,1612
+    my $g=g64,1654
+    my $a=a65,1731
+    my $fh=fh68,1849
+    my $all=all69,1916
+    my $si=si75,2132
+    my (@readstates, @savedstates)(@readstates, @savedstates76,2163
+    my $fn=fn86,2434
+    my $B=B87,2487
+    my $g=g88,2529
+    my $a=a89,2606
+    my $fh=fh91,2697
+    my $all=all92,2764
+    my $si=si98,2989
+    my (@readstates, @savedstates)(@readstates, @savedstates99,3020
+    my $fn=fn109,3290
+    my $Bt=Bt110,3343
+    my $gt=gt111,3393
+    my $at=at113,3482
+    my $fh=fh116,3597
+    my $all=all117,3664
+    my $si=si122,3873
+    my (@readstates, @savedstates)(@readstates, @savedstates123,3905
+
+lib/Photonic.pm,97
+package Photonic;1,0
+  my $g=g57,1260
+  my $eps=eps58,1300
+  my $epsValue=epsValue59,1371
+
+lib/Photonic/Geometry.pm,115
+package Photonic::Geometry;1,0
+my @implementations=implementations39,1049
+my $g1=g157,1369
+my $g2=g259,1454
+
+lib/Photonic/OneH.pm,121
+package Photonic::OneH;1,0
+my @implementations=implementations39,1041
+     my $g1=g157,1361
+     my $g1=g159,1457
+
+lib/Photonic/LE.pm,96
+package Photonic::LE;2,22
+my @implementations=implementations40,1059
+     my $g1=g157,1355
+
+lib/Photonic/Iterator.pm,478
+     sub makeiterator 42,1075
+         my $a=a43,1099
+         my $n=n44,1121
+         my $it it45,1139
+     sub makebiterator 50,1241
+         my $a=a51,1283
+         my $n=n52,1305
+         my $it=it53,1323
+     my @a=a58,1443
+     my $it=it59,1464
+     my $bit=bit60,1495
+    my $i=i83,2078
+   my $it=it89,2160
+   my $x=x95,2278
+   my $x=x96,2299
+package Photonic::Iterator;105,2472
+sub nextval 115,2662
+sub iterator(116,2693
+sub new(117,2726
+
+lib/Photonic/Geometry/FromEpsilon.pm,109
+package Photonic::Geometry::FromEpsilon;1,0
+sub _B 54,1559
+    my $self=self55,1568
+    my $B=B56,1588
+
+lib/Photonic/Geometry/FromB.pm,39
+package Photonic::Geometry::FromB;1,0
+
+lib/Photonic/Geometry/FromImage2D.pm,172
+   my $g1=g143,1079
+package Photonic::Geometry::FromImage2D;97,2077
+sub _build_B 120,2719
+    my $self=self121,2734
+    my $path=path122,2754
+    my $B=B129,3008
+
+lib/Photonic/Utils.pm,3174
+package Photonic::Utils;1,0
+sub linearCombine 50,1367
+    my $coefficients=coefficients51,1425
+    my $states=states52,1487
+    my $numCoeff=numCoeff53,1537
+    my $result=result56,1643
+sub linearCombineIt 63,1770
+    my $coefficients=coefficients64,1844
+    my $stateit=stateit65,1906
+    my $numCoeff=numCoeff66,1957
+    my $result=result67,1990
+	my $s=s69,2041
+sub HProd 76,2208
+    my $first=first77,2282
+    my $second=second78,2303
+    my $skip=skip79,2325
+    my $iscomplex iscomplex80,2348
+    my $ndims=ndims82,2434
+    my $prod=prod84,2537
+    my $result=result86,2660
+sub MHProd 94,2927
+    my $first=first96,3021
+    my $second=second97,3042
+    my $metric=metric98,3064
+    my $skip=skip100,3130
+    my $iscomplex iscomplex101,3153
+    my $ndims=ndims103,3239
+    my $mprod=mprod107,3484
+    my $prod=prod109,3603
+    my $result=result110,3656
+sub EProd 118,3923
+    my $first=first121,4048
+    my $second=second122,4069
+    my $skip=skip123,4091
+    my $iscomplex iscomplex124,4114
+    my $ndims=ndims126,4200
+    my $sl=sl129,4344
+    my $first_mG=first_mG132,4484
+    my $prod=prod137,4681
+    my $result=result139,4800
+sub SProd 148,5049
+    my $first=first151,5207
+    my $second=second152,5228
+    my $skip=skip153,5250
+    my $iscomplex iscomplex154,5273
+    my $ndims=ndims156,5359
+    my $sl=sl160,5552
+    my $first_mG=first_mG164,5752
+    my $prod=prod169,5971
+    my $result=result171,6111
+sub VSProd 182,6494
+    my $first=first184,6621
+    my $second=second185,6642
+    my $iscomplex iscomplex186,6664
+    my $ndims=ndims188,6750
+    my $sl=sl192,6934
+    my $first_mG=first_mG195,7098
+    my $prod=prod200,7338
+    my $result=result202,7434
+sub RtoG 213,7662
+    my $field=field215,7765
+    my $ndims=ndims216,7814
+    my $skip=skip217,7870
+    my $iscomplex=iscomplex218,7910
+    my $moved=moved219,7958
+    my $transformed=transformed221,8056
+    my $result=result222,8098
+sub GtoR 227,8237
+    my $field=field229,8340
+    my $ndims=ndims230,8389
+    my $skip=skip231,8445
+    my $iscomplex=iscomplex232,8485
+    my $moved=moved233,8533
+    my $transformed=transformed235,8631
+    my $result=result236,8674
+sub lentzCF 241,8813
+    my $as=as246,9006
+    my $bs=bs247,9024
+    my $max=max248,9042
+    my $small=small249,9061
+    my $tiny=tiny250,9082
+    my $converged=converged251,9103
+    my $fn=fn252,9124
+    my $n=n254,9194
+    my ($fnm1, $Cnm1, $Dnm1)($fnm1, $Cnm1, $Dnm1255,9207
+    my ($Cn, $Dn)($Cn, $Dn256,9274
+    my $Deltan;Deltan257,9310
+sub tile 276,9696
+    my $f=f277,9741
+    my @n=n278,9758
+    my $dim=dim280,9848
+    my $r=r281,9896
+	my $r1=r1284,9989
+sub vectors2Dlist 295,10127
+    my $f=f296,10186
+    my $s=s297,10217
+    my $d=d298,10241
+    my $f1=f1299,10270
+    my $coords=coords300,10335
+sub cmatmult 308,10541
+    my $a=a309,10556
+    my $b=b310,10573
+    my $ar=ar311,10590
+    my $ai=ai312,10620
+    my $br=br313,10656
+    my $bi=bi314,10686
+    my $cr=cr315,10722
+    my $ci=ci316,10760
+    my $c=c317,10798
+
+lib/Photonic/CharacteristicFunctions.pm,794
+package Photonic::CharacteristicFunctions;1,0
+sub ellipse 48,1267
+    my $N=N50,1412
+    my $ff=ff51,1429
+    my $e=e52,1447
+    my $a=a53,1464
+    my $z=z54,1489
+    my $r=r55,1562
+    my $t=t60,1816
+sub triangle 64,1900
+    my $N=N65,1944
+    my $r0=r066,1961
+    my $deltar=deltar67,2003
+    my $theta0=theta068,2040
+    my $z=z70,2063
+    my $r=r71,2136
+    my $theta=theta72,2181
+    my $q=q73,2224
+    my $t=t75,2292
+sub isosceles 79,2365
+    my $N=N80,2419
+    my $r0=r081,2436
+    my $delta2=delta282,2478
+    my $delta3=delta383,2526
+    my $theta0=theta084,2574
+    my $z=z86,2597
+    my $r=r87,2670
+    my $theta=theta88,2715
+    my $q=q89,2758
+    my $t=t91,2826
+   my $e=e111,3122
+   my $t=t112,3153
+   my $i=i113,3199
+
+lib/Photonic/LE/NR2/OneH.pm,554
+    my $nr=nr42,1064
+    my $state=state47,1214
+package Photonic::LE::NR2::OneH;118,2718
+sub _firstState 138,3320
+    my $self=self139,3351
+    my $v=v140,3371
+    my $arg=arg141,3438
+sub applyOperator 146,3562
+    my $self=self147,3582
+    my $psi_G=psi_G148,3602
+    my $mask=mask149,3623
+    my $Gpsi_G=Gpsi_G155,3833
+    my $Gpsi_R=Gpsi_R159,4016
+    my $BGpsi_R=BGpsi_R162,4185
+    my $BGpsi_G=BGpsi_G165,4309
+    my $GBGpsi_G=GBGpsi_G168,4445
+sub innerProduct 178,4761
+sub magnitude 182,4845
+sub changesign 187,4965
+
+lib/Photonic/LE/NR2/SHP.pm,188
+   my $nrshp=nrshp42,1060
+package Photonic::LE::NR2::SHP;101,2052
+sub BUILD 127,3059
+    my $self=self128,3071
+    my $B=B129,3091
+sub _ndims 133,3187
+    my $self=self134,3200
+
+lib/Photonic/LE/NR2/EpsTensor.pm,712
+   my $eps=eps42,1072
+   my $epsilonTensor=epsilonTensor43,1132
+package Photonic::LE::NR2::EpsTensor;125,2692
+sub evaluate 171,4821
+    my $self=self172,4836
+    my @eps;eps176,4964
+    my $converged=converged177,5020
+    my $reEpsL=reEpsL183,5181
+    my $imEpsL=imEpsL184,5227
+    my ($lu, $perm, $parity)($lu, $perm, $parity185,5273
+    my $reEps=reEps186,5335
+    my $imEps=imEps187,5391
+    my $nd=nd188,5447
+    my $epsTensor=epsTensor189,5485
+    my $n=n190,5538
+sub _build_nr 202,5802
+    my $self=self203,5871
+    my @nr;nr204,5891
+	my $g=g206,5947
+	my $nr=nr209,6082
+sub _build_epsL 220,6358
+    my $self=self221,6376
+    my @eps;eps222,6396
+	my $e=e224,6436
+
+lib/Photonic/LE/NR2/Field.pm,713
+   my $nrf=nrf42,1064
+   my $field=field43,1111
+package Photonic::LE::NR2::Field;131,2582
+sub BUILD 171,4367
+    my $self=self172,4379
+sub evaluate 176,4450
+    my $self=self177,4465
+    my $as=as181,4593
+    my $b2s=b2s182,4619
+    my $bs=bs183,4647
+    my $stateit=stateit184,4673
+    my $nh=nh185,4716
+    my $diag=diag191,4982
+    my $subdiag=subdiag192,5035
+    my $supradiag=supradiag194,5137
+    my $rhs=rhs195,5212
+    my ($result, $info)($result, $info198,5282
+    my @Es=Es204,5583
+    my $ndims=ndims207,5710
+    my @dims=dims208,5769
+    my $field_G=field_G209,5825
+	my $GPsi_G=GPsi_G212,5954
+	my $EnGPsi_G=EnGPsi_G215,6090
+    my $field_R=field_R221,6333
+
+lib/Photonic/LE/NR2/EpsL.pm,322
+   my $eps=eps42,1062
+   my $epsilonLongitudinal=epsilonLongitudinal43,1121
+package Photonic::LE::NR2::EpsL;121,2585
+sub evaluate 144,3306
+    my $self=self145,3321
+    my $as=as149,3449
+    my $b2s=b2s150,3475
+    my $min=min151,3503
+    my ($fn, $n)($fn, $n152,3554
+    my $converged=converged155,3668
+
+lib/Photonic/LE/NR2/SHChiTensor.pm,1279
+   my $chi=chi42,1076
+   my $chiTensor=chiTensor45,1241
+package Photonic::LE::NR2::SHChiTensor;153,3740
+sub _nh 182,4768
+    my $self=self183,4826
+sub evaluate 231,7113
+    my $self=self232,7128
+    my %options=options237,7292
+    my $kind=kind238,7361
+    my $mask=mask240,7498
+    my $nd=nd241,7527
+    my $epsT=epsT242,7565
+    my @P2M;P2M243,7622
+	my $nrsh=nrsh245,7730
+	my $P2;P2250,7923
+	my $P2M=P2M259,8246
+	my $k=k264,8426
+	my $FPChi=FPChi265,8468
+	my $P2MLC=P2MLC266,8523
+	my $P2ML=P2ML267,8578
+	my $Dep2=Dep2268,8624
+	my $P2Mmask=P2Mmask269,8689
+	my $f=f270,8741
+    my $reP2M=reP2M289,9562
+    my $imP2M=imP2M290,9607
+    my ($lu, $perm, $parity)($lu, $perm, $parity291,9652
+    my $reChi=reChi295,9878
+    my $imChi=imChi296,9953
+    my $chiTensor=chiTensor298,10065
+    my $n=n300,10164
+sub _build_nrshp 314,10508
+    my $self=self315,10580
+    my @nrshp;nrshp316,10600
+	my $g=g318,10659
+	my $nr=nr322,10863
+	my @args=args325,11020
+	my $nrf=nrf327,11137
+	my $nrshp=nrshp328,11184
+sub _build_epsTensor 336,11348
+    my $self=self337,11371
+    my $geometry=geometry338,11391
+    my $nh=nh339,11425
+    my $smallH=smallH340,11480
+    my $smallE=smallE341,11521
+    my $eT=eT342,11562
+
+lib/Photonic/LE/NR2/SH.pm,4420
+   my $nrsh=nrsh42,1058
+   my $PL_G=PL_G45,1200
+package Photonic::LE::NR2::SH;188,3894
+sub _alpha 319,9970
+    my $self=self320,9983
+    my $epsA1=epsA1321,10003
+    my $epsB1=epsB1322,10024
+    my $alphaA1=alphaA1323,10045
+    my $B=B330,10320
+sub _build_alpha1 334,10392
+    my $self=self335,10412
+sub _build_alpha2 339,10481
+    my $self=self340,10501
+sub _build_field1 345,10571
+    my $self=self346,10591
+sub _build_field2 350,10668
+    my $self=self351,10688
+sub _build_dipolar 356,10802
+    my $self=self357,10823
+    my $field=field358,10843
+    my $ndims=ndims359,10872
+    my $Esquare_R=Esquare_R362,10994
+    my $Esquare_G=Esquare_G365,11086
+    my $G=G367,11171
+    my $iG=iG369,11226
+    my $iGE2=iGE2371,11272
+    my $nablaE2=nablaE2374,11415
+    my $factor=factor375,11488
+    my $P=P377,11574
+sub _build_quadrupolar 382,11683
+    my $self=self383,11708
+    my $field=field384,11728
+    my $ndims=ndims385,11757
+    my $EE_R=EE_R388,11869
+    my $naa=naa390,11966
+    my $naaEE_R=naaEE_R392,12063
+    my $naaEE_G=naaEE_G396,12211
+    my $G=G399,12335
+    my $iG=iG401,12393
+    my $iGnaaEE_G=iGnaaEE_G404,12491
+    my $P=P410,12806
+sub _build_external 415,12898
+    my $self=self416,12920
+sub _build_external_G 420,12989
+    my $self=self421,13013
+    my $filterflag=filterflag422,13033
+    my $result=result425,13126
+sub _build_externalL_G 431,13294
+    my $self=self432,13319
+    my $filterflag=filterflag434,13368
+    my $result=result436,13432
+sub _build_externalVecL_G 442,13615
+    my $self=self443,13643
+    my $extG=extG444,13663
+    my $result=result445,13696
+sub _build_externalVecL 449,13777
+    my $self=self450,13803
+    my $extG=extG451,13823
+    my $result=result452,13859
+sub _build_HP 456,13927
+    my $self=self457,13972
+    my $ext=ext458,13992
+    my $normext=normext459,14024
+    my $extnorm=extnorm460,14064
+    my $hp=hp461,14104
+sub _build_externalL_n 468,14306
+    my $self=self469,14331
+    my $pol=pol470,14351
+    my $stateit=stateit471,14383
+    my $nh=nh472,14426
+    my @Pn=Pn475,14551
+sub _build_selfConsistentL_n 482,14738
+    my $self=self483,14769
+    my $external=external484,14789
+    my $nh=nh485,14826
+    my $as=as486,14859
+    my $bs=bs487,14885
+    my $u2=u2488,14911
+    my $diag=diag489,14933
+    my $subdiag=subdiag490,14987
+    my $supradiag=supradiag492,15090
+    my ($result, $info)($result, $info493,15150
+sub _build_selfConsistentL_G 500,15358
+    my $self=self501,15389
+    my $filterflag=filterflag502,15409
+    my $PLn=PLn504,15473
+    my $stateit=stateit505,15518
+    my $result=result506,15561
+sub _build_selfConsistentVecL_G 512,15723
+    my $self=self513,15757
+    my $sf=sf514,15777
+    my $result=result515,15814
+sub _build_selfConsistentVecL 519,15893
+    my $self=self520,15925
+    my $svf=svf521,15945
+    my $result=result522,15986
+sub _build_P2 526,16053
+    my $self=self527,16069
+    my $density=density528,16089
+    my $alpha2=alpha2529,16121
+    my $PL=PL530,16151
+    my $Pext=Pext531,16189
+    my $P2=P2532,16219
+sub _build_P2LMCalt 536,16292
+    my $self=self537,16314
+    my $PexL_G=PexL_G538,16334
+    my $PexM=PexM539,16400
+    my $ndims=ndims540,16470
+    my $nelem=nelem541,16517
+    my $k=k542,16566
+    my $GNorm=GNorm543,16614
+    my $epsA2=epsA2544,16661
+    my $u2=u2545,16689
+    my $B=B546,16711
+    my $as=as547,16750
+    my $b2s=b2s548,16781
+    my $bs=bs549,16814
+    my $states=states550,16845
+    my $nh=nh551,16884
+    my $diag=diag556,17139
+    my $subdiag=subdiag557,17209
+    my $supradiag=supradiag559,17312
+    my $rhs=rhs560,17387
+    my ($phi_n, $info)($phi_n, $info563,17457
+    my $phi_G=phi_G565,17581
+    my $Pphi=Pphi566,17634
+    my $beta_G=beta_G568,17697
+    my $betaV_G=betaV_G570,17821
+    my $betaV_n=betaV_n572,17896
+    my @Ppsi;Ppsi575,17995
+	my ($psi_n, $psiinfo)($psi_n, $psiinfo577,18035
+	my $psi_G=psi_G581,18209
+	my $Ppsi=Ppsi582,18259
+    my $Ppsi=Ppsi585,18319
+    my $P2M=P2M587,18384
+sub _build_u1 601,18882
+    my $self=self602,18898
+sub _build_u2 607,18992
+    my $self=self608,19008
+sub _filter 612,19075
+    my $self=self613,19131
+    my $field=field614,19151
+    my $skip=skip615,19172
+    my $filter=filter618,19317
+
+lib/Photonic/LE/NR2/AllH.pm,183
+   my $iter=iter42,1062
+   my $haydock_as=haydock_as44,1148
+   my $haydock_bs=haydock_bs45,1177
+   my $haydock_b2s=haydock_b2s46,1206
+package Photonic::LE::NR2::AllH;98,2109
+
+lib/Photonic/LE/S.pm,98
+package Photonic::EL::S;1,0
+my @implementations=implementations38,1042
+     my $g1=g155,1340
+
+lib/Photonic/LE/NP.pm,99
+package Photonic::EL::NP;1,0
+my @implementations=implementations38,1044
+     my $g1=g155,1346
+
+lib/Photonic/LE/NR2.pm,100
+package Photonic::EL::NR2;1,0
+my @implementations=implementations38,1046
+     my $g1=g155,1352
+
+lib/Photonic/LE/NP/OneH.pm,738
+    my $nr=nr42,1061
+    my $state=state48,1240
+package Photonic::LE::NP::OneH;124,2920
+sub _epsilon 153,3784
+    my $self=self154,3799
+sub _firstState 162,3996
+    my $self=self163,4027
+    my $v=v164,4047
+    my $arg=arg165,4114
+sub applyOperator 170,4243
+    my $self=self171,4263
+    my $psi_G=psi_G172,4283
+    my $Gpsi_G=Gpsi_G178,4538
+    my $Gpsi_R=Gpsi_R185,4898
+    my $eGpsi_R=eGpsi_R189,5076
+    my $eGpsi_G=eGpsi_G192,5212
+    my $GeGpsi_G=GeGpsi_G195,5337
+sub innerProduct 203,5570
+    my $self=self205,5606
+    my $left=left206,5626
+    my $right=right207,5646
+    my $p=p208,5667
+sub magnitude 218,6043
+    my $self=self219,6059
+    my $psi=psi220,6079
+sub changesign 223,6155
+
+lib/Photonic/LE/NP/EpsTensor.pm,719
+   my $eps=eps42,1070
+   my $epsilonTensor=epsilonTensor44,1164
+package Photonic::LE::NP::EpsTensor;118,2631
+sub _build_epsTensor 154,4002
+    my $self=self155,4025
+    my @eps;eps156,4045
+    my $converged=converged157,4101
+    my $reEpsL=reEpsL163,4244
+    my $imEpsL=imEpsL164,4290
+    my ($lu, $perm, $parity)($lu, $perm, $parity165,4336
+    my $reEps=reEps166,4398
+    my $imEps=imEps167,4454
+    my $nd=nd168,4510
+    my $epsTensor=epsTensor169,4548
+    my $n=n170,4601
+sub _build_nr 181,4830
+    my $self=self182,4899
+    my @nr;nr183,4919
+	my $g=g185,4975
+	my $nr=nr188,5109
+sub _build_epsL 197,5353
+    my $self=self198,5371
+    my @eps;eps199,5391
+	my $e=e201,5431
+
+lib/Photonic/LE/NP/EpsL.pm,459
+   my $eps=eps42,1060
+   my $epsilonLongitudinal=epsilonLongitudinal43,1118
+package Photonic::LE::NP::EpsL;107,2212
+sub BUILD 137,3551
+    my $self=self138,3563
+    my $as=as140,3631
+    my $b2s=b2s141,3657
+    my $tiny=tiny144,3766
+    my $converged=converged145,3787
+    my $fn=fn150,3901
+    my $n=n152,3971
+    my ($fnm1, $Cnm1, $Dnm1)($fnm1, $Cnm1, $Dnm1153,3984
+    my ($Cn, $Dn)($Cn, $Dn154,4051
+    my $Deltan;Deltan155,4087
+
+lib/Photonic/LE/NP/AllH.pm,229
+   my $iter=iter42,1060
+   my $haydock_as=haydock_as45,1185
+   my $haydock_bs=haydock_bs46,1214
+   my $haydock_b2s=haydock_b2s47,1243
+   my $haydock_states=haydock_states48,1274
+package Photonic::LE::NP::AllH;114,2344
+
+lib/Photonic/LE/S/OneH.pm,657
+    my $nr=nr42,1059
+    my $state=state48,1237
+package Photonic::LE::S::OneH;125,2935
+sub _epsilon 148,3642
+    my $self=self149,3657
+sub _firstState 157,3854
+    my $self=self158,3885
+    my $v=v159,3905
+    my $arg=arg160,3970
+sub applyOperator 164,4091
+    my $self=self165,4111
+    my $psi_G=psi_G166,4131
+    my $mask=mask167,4152
+    my $Gpsi_G=Gpsi_G177,4652
+    my $Gpsi_R=Gpsi_R188,5202
+    my $eGpsi_R=eGpsi_R193,5425
+    my $eGpsi_G=eGpsi_G196,5564
+    my $GeGpsi_G=GeGpsi_G199,5718
+sub innerProduct 207,6007
+sub magnitude 211,6077
+    my $self=self212,6093
+    my $psi=psi213,6113
+sub changesign 216,6189
+
+lib/Photonic/LE/S/EpsTensor.pm,807
+   my $eps=eps42,1068
+   my $epsilonTensor=epsilonTensor44,1161
+package Photonic::LE::S::EpsTensor;118,2626
+my $ghandles=ghandles136,3076
+sub _build_epsilon 170,4908
+    my $self=self171,4929
+sub _build_epsTensor 175,4984
+    my $self=self176,5007
+    my @eps;eps177,5027
+    my $converged=converged178,5083
+    my $reEpsL=reEpsL184,5226
+    my $imEpsL=imEpsL185,5272
+    my ($lu, $perm, $parity)($lu, $perm, $parity186,5318
+    my $reEps=reEps187,5380
+    my $imEps=imEps188,5436
+    my $nd=nd189,5492
+    my $epsTensor=epsTensor190,5530
+    my $n=n191,5583
+sub _build_nr 202,5812
+    my $self=self203,5881
+    my @nr;nr204,5901
+	my $g=g206,5957
+	my $nr=nr209,6090
+sub _build_epsL 220,6389
+    my $self=self221,6407
+    my @eps;eps222,6427
+	my $e=e224,6467
+
+lib/Photonic/LE/S/Field.pm,737
+   my $nrf=nrf42,1060
+   my $field=field43,1105
+package Photonic::LE::S::Field;129,2454
+sub BUILD 169,4260
+    my $self=self170,4272
+sub evaluate 174,4343
+    my $self=self175,4358
+    my $as=as176,4378
+    my $b2s=b2s177,4404
+    my $bs=bs178,4432
+    my $stateit=stateit179,4458
+    my $nh=nh180,4501
+    my $diag=diag186,4766
+    my $subdiag=subdiag187,4816
+    my $supradiag=supradiag189,4923
+    my $rhs=rhs190,4998
+    my ($result, $info)($result, $info193,5068
+    my @Es=Es200,5407
+    my $ndims=ndims203,5526
+    my @dims=dims204,5585
+    my $field_G=field_G205,5641
+	my $GPsi_G=GPsi_G210,5814
+	my $EnGPsi_G=EnGPsi_G212,5903
+    my $Esp=Esp216,6010
+    my $field_R=field_R220,6216
+
+lib/Photonic/LE/S/EpsL.pm,297
+   my $eps=eps42,1058
+   my $epsilonLongitudinal=epsilonLongitudinal43,1115
+package Photonic::LE::S::EpsL;107,2201
+    my $self=self129,2885
+    my $as=as130,2905
+    my $b2s=b2s131,2931
+    my $min=min132,2959
+    my ($fn, $n)($fn, $n133,3010
+    my $converged=converged135,3105
+
+lib/Photonic/LE/S/AllH.pm,228
+   my $iter=iter42,1058
+   my $haydock_as=haydock_as45,1182
+   my $haydock_bs=haydock_bs46,1211
+   my $haydock_b2s=haydock_b2s47,1240
+   my $haydock_states=haydock_states48,1271
+package Photonic::LE::S::AllH;114,2338
+
+lib/Photonic/WE/R2/EpsilonTensor.pm,361
+   my $epsT=epsT42,1078
+   my $EpsTensor=EpsTensor43,1149
+package Photonic::WE::R2::EpsilonTensor;92,2204
+    my $orig=orig113,2780
+    my $self=self114,2800
+    my $wave=wave115,2820
+    my $q=q116,2851
+    my $q2=q2117,2888
+    my $k=k118,2906
+    my $k2=k2119,2943
+    my $kk=kk120,2969
+    my $id=id121,2995
+    my $eps=eps122,3020
+
+lib/Photonic/WE/R2/OneH.pm,877
+package Photonic::WE::R2::OneH;1,0
+sub applyOperator 56,1698
+    my $self=self57,1718
+    my $psi=psi58,1738
+    my $mask=mask59,1757
+    my $gpsi=gpsi61,1819
+    my $gpsi_r=gpsi_r64,1991
+    my $Bgpsi_r=Bgpsi_r67,2141
+    my $psi_G=psi_G70,2285
+sub applyMetric 77,2492
+    my $self=self78,2510
+    my $psi=psi79,2530
+    my $g=g81,2579
+    my $gpsi=gpsi83,2639
+sub innerProduct 88,2754
+    my $self=self89,2812
+    my $psi1=psi190,2832
+    my $psi2=psi291,2852
+    my $g=g92,2872
+sub magnitude 96,2944
+    my $self=self97,2960
+    my $psi=psi98,2980
+sub changesign 102,3057
+sub _firstState 106,3146
+    my $self=self107,3164
+    my $d=d108,3184
+    my $v=v109,3208
+    my $arg=arg110,3269
+    my $e=e112,3367
+    my $modulus2=modulus2117,3600
+    my $phi=phi122,3771
+    my $nr=nr143,4044
+    my $state=state148,4198
+
+lib/Photonic/WE/R2/GreenP.pm,538
+   my $green=green42,1064
+   my $greenProjection=greenProjection43,1125
+package Photonic::WE::R2::GreenP;119,2495
+sub BUILD 149,3841
+    my $self=self150,3853
+sub evaluate 154,3934
+    my $self=self155,3949
+    my $as=as159,4100
+    my $bcs=bcs160,4131
+    my $tiny=tiny163,4245
+    my $converged=converged164,4266
+    my $fn=fn169,4437
+    my $n=n171,4510
+    my ($fnm1, $Cnm1, $Dnm1)($fnm1, $Cnm1, $Dnm1172,4523
+    my ($Cn, $Dn)($Cn, $Dn173,4590
+    my $Deltan;Deltan174,4626
+    my $g0b02=g0b02194,5283
+
+lib/Photonic/WE/R2/WaveP.pm,223
+   my $W=W42,1062
+   my $WaveProjection=WaveProjection43,1135
+package Photonic::WE::R2::WaveP;91,2102
+    my $orig=orig112,2663
+    my $self=self113,2683
+    my $greenP=greenP114,2703
+    my $wave=wave115,2736
+
+lib/Photonic/WE/R2/EpsilonP.pm,404
+   my $eps=eps42,1068
+   my $EpsTensor=EpsTensor43,1134
+package Photonic::WE::R2::EpsilonP;95,2270
+    my $orig=orig116,2829
+    my $self=self117,2849
+    my $wave=wave118,2869
+    my $q=q119,2900
+    my $q2=q2120,2946
+    my $k=k121,2964
+    my $k2=k2122,3010
+    my $p=p124,3063
+    my $p2=p2126,3180
+    my $pk=pk127,3209
+    my $proj=proj128,3238
+    my $eps=eps129,3278
+
+lib/Photonic/WE/R2/Green.pm,734
+   my $G=G42,1062
+   my $GreenTensor=GreenTensor43,1122
+package Photonic::WE::R2::Green;132,2974
+    my $orig=orig165,3924
+    my $self=self166,3944
+    my $epsB=epsB167,3964
+    my $sym=sym168,3984
+    my @greenPc;greenPc171,4111
+    my $converged=converged172,4184
+    my $nd=nd178,4360
+    my $asy=asy179,4398
+    my @cpairs=cpairs180,4454
+    my $m=m181,4501
+	    my $pair=pair184,4564
+    my $greenTensor=greenTensor197,4870
+sub _build_cHaydock 203,4971
+    my $self=self205,5060
+    my @cHaydock;cHaydock206,5080
+	my $m=m208,5143
+	my $e=e209,5199
+	my $chaydock=chaydock211,5281
+sub _build_cGreenP 219,5494
+    my $self=self220,5515
+    my @cGreenP;cGreenP221,5535
+	my $g=g223,5585
+
+lib/Photonic/WE/R2/GreenS.pm,778
+   my $G=G42,1064
+   my $GreenTensor=GreenTensor43,1125
+package Photonic::WE::R2::GreenS;131,2874
+sub evaluate 177,5031
+    my $self=self178,5046
+    my @greenP;greenP182,5196
+    my $converged=converged183,5270
+    my $reGreenP=reGreenP189,5429
+    my $imGreenP=imGreenP190,5480
+    my ($lu, $perm, $parity)($lu, $perm, $parity191,5531
+    my $reGreen=reGreen192,5593
+    my $imGreen=imGreen193,5653
+    my $nd=nd194,5713
+    my $greenTensor=greenTensor195,5738
+    my $n=n196,5793
+sub _build_haydock 208,6075
+    my $self=self209,6149
+    my @haydock;haydock210,6169
+	my $m=m213,6275
+	my $e=e214,6331
+	my $haydock=haydock216,6418
+sub _build_greenP 227,6729
+    my $self=self228,6749
+    my @greenP;greenP229,6769
+	my $g=g231,6817
+
+lib/Photonic/WE/R2/Field.pm,763
+   my $nrf=nrf42,1062
+   my $field=field43,1108
+package Photonic::WE::R2::Field;125,2452
+sub BUILD 161,4083
+    my $self=self162,4095
+sub evaluate 166,4166
+    my $self=self167,4181
+    my $as=as171,4327
+    my $b2s=b2s172,4353
+    my $bs=bs173,4381
+    my $cs=cs174,4407
+    my $stateit=stateit175,4433
+    my $nh=nh176,4476
+    my $diag=diag180,4677
+    my $subdiag=subdiag181,4730
+    my $supradiag=supradiag183,4832
+    my $rhs=rhs184,4894
+    my ($giEs_coeff, $info)($giEs_coeff, $info188,5014
+    my @giEs=giEs191,5149
+    my $ndims=ndims194,5274
+    my @dims=dims195,5333
+    my $field_G=field_G196,5389
+	my $giE_G=giE_G200,5551
+    my $Es=Es204,5636
+    my $e_0=e_0205,5681
+    my $field_R=field_R212,6009
+
+lib/Photonic/WE/R2/Wave.pm,392
+   my $W=W42,1060
+   my $WaveTensor=WaveTensor43,1119
+package Photonic::WE::R2::Wave;91,2160
+    my $orig=orig112,2723
+    my $self=self113,2743
+    my $green=green114,2763
+    my $greenreim=greenreim116,2859
+    my($lu, $perm, $par)($lu, $perm, $par118,2981
+    my $d=d119,3029
+    my $idreim=idreim120,3063
+    my $wavereim=wavereim121,3130
+    my $wave=wave122,3183
+
+lib/Photonic/WE/R2/Metric.pm,368
+    my $gGG=gGG42,1065
+package Photonic::WE::R2::Metric;78,1970
+sub _value 97,2431
+    my $self self99,2498
+    my $G=G100,2520
+    my $q=q102,2610
+    my $eps=eps103,2639
+    my $k=k104,2667
+    my $kPG kPG107,2820
+    my $kPGkPG kPGkPG109,2877
+    my $kPG2 kPG2111,2954
+    my $id=id112,2998
+    my $k02=k02113,3033
+    my $gGG=gGG116,3153
+
+lib/Photonic/WE/R2/AllH.pm,425
+   my $iter=iter42,1060
+   my $haydock_as=haydock_as45,1191
+   my $haydock_bs=haydock_bs46,1220
+   my $haydock_b2s=haydock_b2s47,1249
+   my $haydock_b2s=haydock_b2s48,1280
+   my $haydock_b2s=haydock_b2s49,1311
+   my $haydock_cs=haydock_cs50,1342
+   my $haydock_bcs=haydock_bcs51,1371
+   my $haydock_gs=haydock_gs52,1402
+   my $haydock_states=haydock_states53,1431
+package Photonic::WE::R2::AllH;134,2810
+
+lib/Photonic/WE/S/EpsilonTensor.pm,453
+   my $epsT=epsT42,1076
+   my $EpsTensor=EpsTensor43,1146
+package Photonic::WE::S::EpsilonTensor;92,2199
+sub _build_epsilonTensor 112,2701
+    my $self=self113,2728
+    my $wave=wave114,2748
+    my $q=q115,2782
+    my $q2=q2116,2819
+    my $k=k117,2837
+	my $k2=k2121,3011
+	my $kk=kk122,3044
+	my $id=id123,3086
+	my $eps=eps124,3108
+    my $k2=k2127,3166
+    my $kk=kk128,3192
+    my $id=id129,3218
+    my $eps=eps130,3243
+
+lib/Photonic/WE/S/OneH.pm,908
+package Photonic::WE::S::OneH;1,0
+sub _epsilon 60,1884
+    my $self=self61,1899
+sub applyOperator 69,2096
+    my $self=self70,2116
+    my $psi=psi71,2136
+    my $mask=mask72,2178
+    my $gpsi=gpsi74,2240
+    my $gpsi_r=gpsi_r77,2416
+    my $H=H79,2514
+    my $Hgpsi_r=Hgpsi_r80,2574
+    my $psi_G=psi_G82,2692
+sub applyMetric 91,2946
+    my $self=self92,2964
+    my $psi=psi93,2984
+    my $g=g95,3030
+    my $gpsi=gpsi98,3159
+sub innerProduct 103,3258
+    my $self=self104,3316
+    my $psi1=psi1105,3336
+    my $psi2=psi2106,3356
+    my $gpsi2=gpsi2107,3376
+sub magnitude 112,3455
+    my $self=self113,3471
+    my $psi=psi114,3491
+sub changesign 117,3567
+sub _firstState 121,3620
+    my $self=self122,3651
+    my $v=v123,3671
+    my $arg=arg124,3739
+    my $e=e126,3843
+    my $d=d127,3881
+    my $modulus2=modulus2132,4100
+    my $phi=phi139,4383
+
+lib/Photonic/WE/S/GreenP.pm,519
+   my $green=green42,1062
+   my $greenProjection=greenProjection43,1122
+package Photonic::WE::S::GreenP;115,2419
+sub _build_Gpp 140,3460
+    my $self=self141,3477
+    my $epsR=epsR143,3555
+    my $as=as144,3594
+    my $bcs=bcs145,3625
+    my $tiny=tiny148,3739
+    my $converged=converged149,3760
+    my $fn=fn154,3931
+    my $n=n156,4003
+    my ($fnm1, $Cnm1, $Dnm1)($fnm1, $Cnm1, $Dnm1157,4016
+    my ($Cn, $Dn)($Cn, $Dn158,4083
+    my $Deltan;Deltan159,4119
+    my $g0b02=g0b02179,4774
+
+lib/Photonic/WE/S/WaveP.pm,228
+   my $W=W42,1060
+   my $WaveProjection=WaveProjection43,1132
+package Photonic::WE::S::WaveP;91,2096
+sub _build_waveOperator 107,2524
+    my $self=self108,2550
+    my $greenP=greenP109,2570
+    my $wave=wave110,2597
+
+lib/Photonic/WE/S/EpsilonP.pm,404
+   my $eps=eps42,1066
+   my $EpsTensor=EpsTensor43,1131
+package Photonic::WE::S::EpsilonP;95,2265
+sub _build_epsilon 115,2786
+    my $self=self116,2807
+    my $wave=wave117,2827
+    my $q=q118,2861
+    my $q2=q2119,2907
+    my $k=k120,2925
+    my $k2=k2121,2971
+    my $p=p122,3049
+    my $p2=p2124,3166
+    my $pk=pk125,3195
+    my $proj=proj126,3224
+    my $eps=eps127,3264
+
+lib/Photonic/WE/S/Green.pm,786
+   my $G=G42,1060
+   my $GreenTensor=GreenTensor43,1119
+package Photonic::WE::S::Green;130,2823
+sub _build_greenTensor 170,4545
+    my $self=self171,4570
+    my @greenP;greenP172,4590
+    my $converged=converged173,4664
+    my $reGreenP=reGreenP179,4811
+    my $imGreenP=imGreenP180,4862
+    my ($lu, $perm, $parity)($lu, $perm, $parity181,4913
+    my $reGreen=reGreen182,4975
+    my $imGreen=imGreen183,5035
+    my $nd=nd184,5095
+    my $greenTensor=greenTensor185,5130
+    my $n=n186,5185
+sub _build_haydock 197,5428
+    my $self=self198,5502
+    my @haydock;haydock199,5522
+	my $m=m202,5628
+	my $e=e203,5684
+	my $haydock=haydock205,5770
+sub _build_greenP 216,6080
+    my $self=self217,6100
+    my @greenP;greenP218,6120
+	my $g=g220,6168
+
+lib/Photonic/WE/S/Field.pm,788
+   my $nrf=nrf42,1060
+   my $field=field43,1105
+package Photonic::WE::S::Field;130,2554
+sub BUILD 167,4188
+    my $self=self168,4200
+sub evaluate 172,4271
+    my $self=self173,4286
+    my $as=as174,4306
+    my $b2s=b2s175,4332
+    my $bs=bs176,4360
+    my $cs=cs177,4386
+    my $stateit=stateit178,4412
+    my $nh=nh179,4455
+    my $diag diag183,4656
+    my $subdiag subdiag184,4710
+    my $supradiag supradiag186,4820
+    my $rhs=rhs189,4913
+    my ($giEs_coeff, $info)($giEs_coeff, $info193,5033
+    my @giEs=giEs196,5168
+    my $ndims=ndims198,5267
+    my @dims=dims199,5326
+    my $field_G=field_G201,5414
+	my $giE_G=giE_G205,5570
+    my $Es=Es209,5655
+    my $Esp=Esp212,5804
+    my $e_0=e_0213,5860
+    my $field_R=field_R220,6191
+
+lib/Photonic/WE/S/Wave.pm,397
+   my $W=W42,1058
+   my $WaveTensor=WaveTensor43,1116
+package Photonic::WE::S::Wave;91,2154
+sub _build_waveOperator 111,2661
+    my $self=self112,2687
+    my $green=green113,2707
+    my $greenreim=greenreim115,2805
+    my($lu, $perm, $par)($lu, $perm, $par117,2927
+    my $d=d118,2975
+    my $idreim=idreim119,3009
+    my $wavereim=wavereim120,3076
+    my $wave=wave121,3129
+
+lib/Photonic/WE/S/Metric.pm,720
+    my $gGG=gGG42,1063
+package Photonic::WE::S::Metric;78,1966
+sub _value 98,2449
+    my $self self100,2506
+    my $G=G101,2528
+    my $q=q103,2618
+    my $eps=eps104,2647
+    my $k=k105,2675
+	my ($kPG, $kMG)($kPG, $kMG112,3024
+	my ($kPGkPG, $kMGkMG)($kPGkPG, $kMGkMG114,3091
+	my ($kPG2,$kMG2)($kPG2,$kMG2117,3202
+	my $id=id118,3271
+	my $k02=k02119,3303
+	my $gPGG=gPGG122,3417
+	my $gMGG=gMGG123,3489
+	my $gGG=gGG124,3561
+    my ($kPG, $kMG)($kPG, $kMG130,3811
+    my ($kPGkPG, $kMGkMG)($kPGkPG, $kMGkMG132,3881
+    my ($kPG2,$kMG2)($kPG2,$kMG2134,3979
+    my $id=id135,4045
+    my $k02=k02136,4080
+    my $gPGG=gPGG139,4200
+    my $gMGG=gMGG140,4270
+    my $gGG=gGG141,4340
+
+lib/Photonic/WE/S/AllH.pm,228
+   my $iter=iter42,1058
+   my $haydock_as=haydock_as45,1182
+   my $haydock_bs=haydock_bs46,1211
+   my $haydock_b2s=haydock_b2s47,1240
+   my $haydock_states=haydock_states48,1271
+package Photonic::WE::S::AllH;114,2338
+
+lib/Photonic/Roles/Geometry.pm,2458
+package Photonic::Roles::Geometry;1,0
+use constant PI=45,1167
+sub _build_L 108,4282
+    my $self=self109,4297
+    my $L=L110,4317
+sub _build_units 114,4368
+    my $self=self115,4387
+    my @units;units116,4407
+    my $nd=nd117,4437
+	my $e=e119,4505
+sub _build_primitive 126,4594
+    my $self=self127,4617
+sub _build_primitiveNorm 131,4681
+    my $self=self132,4708
+sub _build_dualNorm 136,4766
+    my $self=self137,4788
+    my $pn=pn138,4808
+    my $dual=dual139,4847
+sub _build_dims 142,4896
+    my $self=self143,4914
+sub _build_ndims 147,4966
+    my $self=self148,4985
+sub _build_npoints 152,5036
+    my $self=self153,5057
+sub _build_scale 157,5108
+    my $self=self158,5127
+sub _build_r 162,5193
+    my $self=self163,5208
+    my $coords=coords164,5228
+    my $pr=pr165,5272
+    my $r=r166,5330
+sub _build_G 173,5434
+    my $self=self174,5449
+    my @N=N175,5469
+    my $coords=coords176,5518
+    my $rec=rec177,5591
+    my $G=G178,5642
+sub _build_GNorm 190,5856
+    my $self=self191,5901
+sub _build_mGNorm 197,6054
+    my $self=self199,6157
+sub _build_pmGNorm 202,6205
+    my $self=self205,6321
+sub _build_f 209,6404
+    my $self=self210,6447
+sub _build_unitPairs 214,6512
+    my $self=self215,6535
+    my $nd=nd216,6555
+    my $units=units217,6580
+    my @pairs;pairs218,6608
+	    my $v=v221,6695
+sub _build_cUnitPairs 228,6796
+    my $self=self229,6820
+    my $nd=nd230,6840
+    my $units=units231,6865
+    my @cpairs;cpairs232,6893
+	    my $vc=vc235,6983
+	    my $vcn=vcn236,7026
+	    my $vp=vp237,7092
+sub _build_unitDyads 244,7176
+    my $self=self245,7199
+    my $nd=nd246,7219
+    my $ne=ne247,7266
+    my $matrix=matrix248,7328
+    my $n=n249,7365
+	    my $m=m252,7449
+		    my $factor=factor255,7543
+sub _build_unitDyadsLU 268,7759
+    my $self=self269,7784
+    my ($lu, $perm, $parity)($lu, $perm, $parity270,7804
+sub _G0 275,7958
+    my $self=self276,7968
+    my $value=value277,7988
+    my $arg=arg281,8211
+sub Vec2LC_G 289,8548
+    my $self=self291,8649
+    my $field=field292,8669
+    my $iscomplex=iscomplex295,8798
+    my $gnorm=gnorm297,8892
+    my $result=result298,8920
+sub LC2Vec_G 303,9036
+    my $self=self305,9140
+    my $field=field306,9160
+    my $iscomplex=iscomplex309,9305
+    my $gnorm=gnorm311,9399
+    my $result=result315,9515
+    package Photonic::Geometry::FromB;344,9868
+
+lib/Photonic/Roles/OneH.pm,819
+    my $nr=nr42,1061
+    my $state=state47,1211
+    package Photonic::LE::NR2::OneH.pm;53,1275
+package Photonic::Roles::OneH;130,2856
+sub _cero 180,4954
+    my $self=self181,4966
+sub iterate 186,5046
+    my $self=self187,5086
+sub _fullorthogonalize_indeed 194,5279
+sub _iterate_indeed 199,5381
+    my $self=self200,5403
+    my $opPsi=opPsi211,5927
+    my $a_n=a_n212,5971
+    my $bpsi_np1=bpsi_np1213,6025
+    my $b2_np1=b2_np1215,6135
+    my $g_np1=g_np1216,6193
+    my $b_np1=b_np1218,6273
+    my $c_np1=c_np1219,6302
+    my $bc_np1=bc_np1220,6336
+    my $psi_np1;psi_np1221,6372
+sub _firstRState 234,6775
+    my $self=self235,6794
+    my $phi=phi236,6814
+    my $b2=b2237,6876
+    my $g=g238,6919
+sub _coerce 253,7314
+    my $self=self254,7328
+    my $val=val255,7348
+
+lib/Photonic/Roles/KeepStates.pm,85
+   package Photonic::MyPackage;41,1034
+package Photonic::Roles::KeepStates;61,1443
+
+lib/Photonic/Roles/ReorthogonalizeR.pm,589
+package Photonic::Roles::ReorthogonalizeR;1,0
+sub _build_next_W 73,2441
+    my $self=self74,2461
+    my $g_n=g_n77,2543
+    my $orig=orig83,2650
+    my $self=self84,2681
+    my $psi=psi85,2701
+    my $it=it93,3106
+	my $s=s96,3193
+sub _checkorthogonalize 102,3289
+    my $self=self103,3315
+    my $n=n107,3488
+    my $a=a108,3516
+    my $b=b109,3547
+    my $c=c110,3578
+	my $current_W=current_W113,3683
+	my $next_W=next_W114,3726
+    my $next_W=next_W123,4018
+    my $max=max136,4497
+	my $orthos=orthos139,4637
+sub _sign 152,4964
+    my $s=s153,4976
+
+lib/Photonic/Roles/EpsL.pm,259
+   my $eps=eps42,1060
+   my $epsilonLongitudinal=epsilonLongitudinal43,1119
+    package Photonic::LE::NR2::EpsL;49,1210
+package Photonic::Roles::EpsL;133,2782
+sub BUILD 156,3701
+    my $self=self157,3713
+sub _nh 161,3784
+    my $self=self162,3842
+
+lib/Photonic/Roles/ReorthogonalizeC.pm,636
+package Photonic::Roles::ReorthogonalizeC;1,0
+sub _build_next_W 74,2463
+    my $self=self75,2483
+    my $g_n=g_n78,2567
+    my $orig=orig83,2675
+    my $self=self84,2706
+    my $psi=psi85,2726
+    my $it=it90,2985
+	my $s=s95,3187
+sub _checkorthogonalize 101,3283
+    my $self=self102,3309
+    my $n=n106,3482
+    my $a=a107,3510
+    my $b=b108,3550
+    my $c=c109,3590
+	my $current_W=current_W112,3704
+	my $next_W=next_W113,3752
+    my $next_W;next_W122,4063
+    my $max=max139,4709
+	my $orthos=orthos142,4857
+sub _arg 155,5184
+    my $s=s156,5195
+    my $a=a157,5218
+    my $arg=arg160,5292
+
+lib/Photonic/Roles/EpsParams.pm,84
+   package Photonic::MyPackage;41,1033
+package Photonic::Roles::EpsParams;84,1693
+
+lib/Photonic/Roles/UseMask.pm,222
+package Photonic::Roles::UseMask;1,0
+sub _build_mask 49,1426
+    my $self=self50,1485
+    my $ndims=ndims51,1505
+    my $dims=dims52,1533
+    my $mask=mask53,1559
+    my $masked=masked54,1591
+	my $N=N56,1635
+
+lib/Photonic/Roles/Metric.pm,66
+    my $gGG=gGG42,1064
+package Photonic::Roles::Metric;78,1974
+
+lib/Photonic/Roles/AllH.pm,1626
+   my $iter=iter42,1060
+   my $haydock_as=haydock_as45,1177
+   my $haydock_bs=haydock_bs46,1206
+   my $haydock_b2s=haydock_b2s47,1235
+   my $haydock_states=haydock_states48,1266
+    package Photonic::LE::NR2::AllH;54,1337
+package Photonic::Roles::AllH;128,2631
+my @allfields=allfields185,4966
+sub BUILD 190,5162
+    my $self=self191,5174
+sub state_iterator 196,5303
+    my $self=self197,5324
+    my $n=n200,5426
+    my $s=s201,5439
+    my $fh=fh208,5701
+	my $pos=pos212,5842
+	my $ref=ref214,5905
+sub states 219,5958
+sub _build_stateFD 223,6034
+    my $self=self224,6055
+    my $fn=fn225,6075
+    my $fh=fh227,6163
+    my $self=self242,6539
+    my $self=self251,6721
+sub run 256,6797
+    my $self=self257,6826
+sub loadall 264,6956
+    my $self=self265,6970
+    my $fn=fn266,6990
+    my $fh=fh268,7067
+    my $all=all270,7149
+sub storeall 280,7463
+    my $self=self281,7478
+    my $fn=fn282,7498
+    my $fh=fh284,7606
+    my %all=all287,7722
+    my $si=si290,7871
+sub _save_a 296,8012
+    my $self=self297,8026
+sub _save_b 301,8090
+    my $self=self302,8104
+sub _save_b2 306,8165
+    my $self=self307,8180
+sub _save_bc 311,8243
+    my $self=self312,8258
+sub _save_c 316,8321
+    my $self=self317,8335
+sub _save_g 321,8396
+    my $self=self322,8410
+sub _save_state 326,8471
+    my $self=self327,8489
+    my $fh=fh331,8638
+    my $lastpos=lastpos332,8666
+    my $pos=pos335,8814
+sub _pop_state 339,8876
+    my $self=self340,8893
+    my ($snm3, $snm2, $snm1)($snm3, $snm2, $snm1350,9212
+sub _pop 359,9455
+    my $self=self361,9570
+
+lib/Photonic/ExtraUtils.pm,290
+package Photonic::ExtraUtils;5,45
+          sub PDL::dgtsl dgtsl162,3144
+	      my ($c, $d, $e, $y, $b, $i)($c, $d, $e, $y, $b, $i166,3285
+          sub PDL::cgtsl cgtsl213,4124
+	      my ($c, $d, $e, $y, $b, $i)($c, $d, $e, $y, $b, $i218,4290
+	      my $complex=complex219,4329
+
+lib/Photonic/WE.pm,95
+package Photonic::WE;1,0
+my @implementations=implementations39,1037
+     my $g1=g157,1334
+
+lib/Photonic/Types.pm,60
+package Photonic::Types;1,0
+   package MyPackage;104,2832
+
+lib/Photonic/AllH.pm,97
+package Photonic::AllH;1,0
+my @implementations=implementations39,1041
+     my $g1=g157,1361

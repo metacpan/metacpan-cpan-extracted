@@ -28,5 +28,4 @@ is_deeply \@pipe_names, [qw(stdin_read stdin_write stdout_read stdout_write)], '
 is_deeply \@pipe_ref, ['', 'IO::Pty', 'IO::Pty', ''], 'pipe types';
 like $buf, qr{$columns\r\n}s, 'changed columns';
 
-
 done_testing;

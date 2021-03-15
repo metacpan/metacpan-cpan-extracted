@@ -93,6 +93,10 @@ I<any> dimension.
 
 
 
+=for bad
+
+prodover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -138,6 +142,10 @@ precision.
 
 
 
+=for bad
+
+cprodover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -183,6 +191,10 @@ precision.
 
 
 
+=for bad
+
+dprodover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -230,6 +242,10 @@ is the first element of the parameter.
 
 
 
+=for bad
+
+cumuprodover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -278,6 +294,10 @@ precision.
 
 
 
+=for bad
+
+dcumuprodover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -322,6 +342,10 @@ I<any> dimension.
 
 
 
+=for bad
+
+sumover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -367,6 +391,10 @@ precision.
 
 
 
+=for bad
+
+csumover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -412,6 +440,10 @@ precision.
 
 
 
+=for bad
+
+dsumover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -459,6 +491,10 @@ is the first element of the parameter.
 
 
 
+=for bad
+
+cumusumover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -507,6 +543,10 @@ precision.
 
 
 
+=for bad
+
+dcumusumover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -551,7 +591,11 @@ I<any> dimension.
 
 
 
+=for bad
 
+If C<a()> contains only bad data (and its bad flag is set), 
+C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
+as it will not contain any bad values.
 
 =cut
 
@@ -595,7 +639,11 @@ I<any> dimension.
 
 
 
+=for bad
 
+If C<a()> contains only bad data (and its bad flag is set), 
+C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
+as it will not contain any bad values.
 
 =cut
 
@@ -639,7 +687,11 @@ I<any> dimension.
 
 
 
+=for bad
 
+If C<a()> contains only bad data (and its bad flag is set), 
+C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
+as it will not contain any bad values.
 
 =cut
 
@@ -683,7 +735,11 @@ I<any> dimension.
 
 
 
+=for bad
 
+If C<a()> contains only bad data (and its bad flag is set), 
+C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
+as it will not contain any bad values.
 
 =cut
 
@@ -727,7 +783,11 @@ I<any> dimension.
 
 
 
+=for bad
 
+If C<a()> contains only bad data (and its bad flag is set), 
+C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
+as it will not contain any bad values.
 
 =cut
 
@@ -780,6 +840,10 @@ is the natural (and correct) choice for binned data, of course.
 
 
 
+=for bad
+
+intover ignores the bad-value flag of the input piddles.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -824,6 +888,10 @@ I<any> dimension.
 
 
 
+=for bad
+
+average processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -885,6 +953,10 @@ precision.
 
 
 
+=for bad
+
+caverage processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -930,6 +1002,10 @@ precision.
 
 
 
+=for bad
+
+daverage processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -990,6 +1066,10 @@ I<any> dimension.
 
 
 
+=for bad
+
+medover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1042,6 +1122,10 @@ some circumstances.
 
 
 
+=for bad
+
+oddmedover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1097,6 +1181,10 @@ BAD is the most common element, the returned value is also BAD.
 
 
 
+=for bad
+
+modeover does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1146,6 +1234,10 @@ I<any> dimension.
 
 
 
+=for bad
+
+pctover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1191,6 +1283,10 @@ I<any> dimension.
 
 
 
+=for bad
+
+oddpctover processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1273,6 +1369,14 @@ See the documentation for L</average> for more information.
 
 
 
+=for bad
+
+This routine handles bad values.
+
+=cut
+
+
+
 
 *avg = \&PDL::avg;
 sub PDL::avg {
@@ -1294,6 +1398,14 @@ See the documentation for L</sumover> for more information.
 =for usage
 
  $x = sum($data);
+
+=cut
+
+
+
+=for bad
+
+This routine handles bad values.
 
 =cut
 
@@ -1325,6 +1437,14 @@ See the documentation for L</prodover> for more information.
 
 
 
+=for bad
+
+This routine handles bad values.
+
+=cut
+
+
+
 
 *prod = \&PDL::prod;
 sub PDL::prod {
@@ -1346,6 +1466,14 @@ See the documentation for L</daverage> for more information.
 =for usage
 
  $x = davg($data);
+
+=cut
+
+
+
+=for bad
+
+This routine handles bad values.
 
 =cut
 
@@ -1377,6 +1505,14 @@ See the documentation for L</dsumover> for more information.
 
 
 
+=for bad
+
+This routine handles bad values.
+
+=cut
+
+
+
 
 *dsum = \&PDL::dsum;
 sub PDL::dsum {
@@ -1398,6 +1534,14 @@ See the documentation for L</dprodover> for more information.
 =for usage
 
  $x = dprod($data);
+
+=cut
+
+
+
+=for bad
+
+This routine handles bad values.
 
 =cut
 
@@ -1429,6 +1573,14 @@ See the documentation for L</zcover> for more information.
 
 
 
+=for bad
+
+This routine handles bad values.
+
+=cut
+
+
+
 
 *zcheck = \&PDL::zcheck;
 sub PDL::zcheck {
@@ -1450,6 +1602,14 @@ See the documentation for L</andover> for more information.
 =for usage
 
  $x = and($data);
+
+=cut
+
+
+
+=for bad
+
+This routine handles bad values.
 
 =cut
 
@@ -1481,6 +1641,14 @@ See the documentation for L</bandover> for more information.
 
 
 
+=for bad
+
+This routine handles bad values.
+
+=cut
+
+
+
 
 *band = \&PDL::band;
 sub PDL::band {
@@ -1502,6 +1670,14 @@ See the documentation for L</orover> for more information.
 =for usage
 
  $x = or($data);
+
+=cut
+
+
+
+=for bad
+
+This routine handles bad values.
 
 =cut
 
@@ -1533,6 +1709,14 @@ See the documentation for L</borover> for more information.
 
 
 
+=for bad
+
+This routine handles bad values.
+
+=cut
+
+
+
 
 *bor = \&PDL::bor;
 sub PDL::bor {
@@ -1554,6 +1738,14 @@ See the documentation for L</minimum> for more information.
 =for usage
 
  $x = min($data);
+
+=cut
+
+
+
+=for bad
+
+This routine handles bad values.
 
 =cut
 
@@ -1585,6 +1777,14 @@ See the documentation for L</maximum> for more information.
 
 
 
+=for bad
+
+This routine handles bad values.
+
+=cut
+
+
+
 
 *max = \&PDL::max;
 sub PDL::max {
@@ -1606,6 +1806,14 @@ See the documentation for L</medover> for more information.
 =for usage
 
  $x = median($data);
+
+=cut
+
+
+
+=for bad
+
+This routine handles bad values.
 
 =cut
 
@@ -1637,6 +1845,14 @@ See the documentation for L</modeover> for more information.
 
 
 
+=for bad
+
+This routine handles bad values.
+
+=cut
+
+
+
 
 *mode = \&PDL::mode;
 sub PDL::mode {
@@ -1658,6 +1874,14 @@ See the documentation for L</oddmedover> for more information.
 =for usage
 
  $x = oddmedian($data);
+
+=cut
+
+
+
+=for bad
+
+This routine handles bad values.
 
 =cut
 
@@ -1689,6 +1913,15 @@ Useful in conditional expressions:
 
 
 
+=for bad
+
+See L</or> for comments on what happens when all elements
+in the check are bad.
+
+=cut
+
+
+
 *any = \&or;
 *PDL::any = \&PDL::or;
 
@@ -1703,6 +1936,15 @@ Useful in conditional expressions:
 =for example
 
  if (all $x>15) { print "all values are greater than 15\n" }
+
+=cut
+
+
+
+=for bad
+
+See L</and> for comments on what happens when all elements
+in the check are bad.
 
 =cut
 
@@ -1767,6 +2009,14 @@ Quicksort a vector into ascending order.
 
 
 
+=for bad
+
+Bad values are moved to the end of the array:
+
+ pdl> p $y
+ [42 47 98 BAD 22 96 74 41 79 76 96 BAD 32 76 25 59 BAD 96 32 BAD]
+ pdl> p qsort($y)
+ [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 
 
 =cut
@@ -1800,6 +2050,14 @@ Quicksort a vector and return index of elements in ascending order.
 
 
 
+=for bad
+
+Bad elements are moved to the end of the array:
+
+ pdl> p $y
+ [42 47 98 BAD 22 96 74 41 79 76 96 BAD 32 76 25 59 BAD 96 32 BAD]
+ pdl> p $y->index( qsorti($y) )
+ [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 
 
 =cut
@@ -1844,6 +2102,9 @@ the 1st dimension is list order.  Higher dimensions are threaded over.
 
 
 
+=for bad
+
+Vectors with bad components should be moved to the end of the array:
 
 
 =cut
@@ -1883,6 +2144,9 @@ so qsortveci may be thought of as a collapse operator of sorts (groan).
 
 
 
+=for bad
+
+Vectors with bad components should be moved to the end of the array:
 
 
 =cut
@@ -1927,6 +2191,14 @@ I<any> dimension.
 
 
 
+=for bad
+
+Output is set bad if all elements of the input are bad,
+otherwise the bad flag is cleared for the output piddle.
+
+Note that C<NaNs> are considered to be valid values;
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+for ways of masking NaNs.
 
 
 =cut
@@ -1952,7 +2224,10 @@ I<any> dimension.
 
 Like minimum but returns the index rather than the value
 
+=for bad
 
+Output is set bad if all elements of the input are bad,
+otherwise the bad flag is cleared for the output piddle.
 
 =cut
 
@@ -1977,7 +2252,9 @@ Like minimum but returns the index rather than the value
 
 Returns the index of C<m> minimum elements
 
+=for bad
 
+Not yet been converted to ignore bad values
 
 =cut
 
@@ -2021,6 +2298,14 @@ I<any> dimension.
 
 
 
+=for bad
+
+Output is set bad if all elements of the input are bad,
+otherwise the bad flag is cleared for the output piddle.
+
+Note that C<NaNs> are considered to be valid values;
+see L<isfinite|PDL::Math/isfinite> and L<badmask|PDL::Math/badmask>
+for ways of masking NaNs.
 
 
 =cut
@@ -2046,7 +2331,10 @@ I<any> dimension.
 
 Like maximum but returns the index rather than the value
 
+=for bad
 
+Output is set bad if all elements of the input are bad,
+otherwise the bad flag is cleared for the output piddle.
 
 =cut
 
@@ -2071,7 +2359,9 @@ Like maximum but returns the index rather than the value
 
 Returns the index of C<m> maximum elements
 
+=for bad
 
+Not yet been converted to ignore bad values
 
 =cut
 
@@ -2204,7 +2494,12 @@ See also L</minmax>, which clumps the piddle together.
 
 
 
+=for bad
 
+If C<a()> contains only bad data, then the output piddles will
+be set bad, along with their bad flag.
+Otherwise they will have their bad flags cleared,
+since they will not contain any bad values.
 
 =cut
 

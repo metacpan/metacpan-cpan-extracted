@@ -1,5 +1,11 @@
 Revision history for Path-Tiny-Archive-Tar
 
+0.003    2021-03-13
+
+    - Added tgz and tbz2 methods.
+
+    - Removed namespace::clean dependency.
+
 0.002    2021-03-03
 
     - Fixed using old versions of Compress::Raw::Zlib.

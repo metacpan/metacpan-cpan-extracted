@@ -55,7 +55,8 @@ be able to store and retrieve piddles via Storable.
 
 use Carp;
 
-{ package PDL;
+{ package # hide from PAUSE
+    PDL;
 # routines to make PDL work with Storable >= 1.03
 
 # pdlpack() serializes a piddle, while pdlunpack() unserializes it. Earlier

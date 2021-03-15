@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -551,6 +551,7 @@ sub abi
   }
 
   $self->{abi} = $newabi;
+  $self->{tp}->abi($newabi);
 
   $self;
 }
@@ -584,7 +585,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 1.38
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -850,7 +851,7 @@ definitions.
 
 Examples:
 
- $ffi->type('sint32');            # oly checks to see that sint32 is a valid type
+ $ffi->type('sint32');            # only checks to see that sint32 is a valid type
  $ffi->type('sint32' => 'myint'); # creates an alias myint for sint32
  $ffi->type('bogus');             # dies with appropriate diagnostic
 
@@ -2503,6 +2504,8 @@ Meredith (merrilymeredith, MHOWARD)
 Diab Jerius (DJERIUS)
 
 Eric Brine (IKEGAMI)
+
+szTheory
 
 =head1 COPYRIGHT AND LICENSE
 

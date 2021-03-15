@@ -3,12 +3,14 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 use Scalar::Util ();
 use Sub::Meta;
+use Sub::Identify;
 
 my %INFO;
+my %INDEX;
 
 sub _croak { require Carp; goto &Carp::croak }
 
@@ -28,6 +30,8 @@ sub register {
     }
 
     my $id = Scalar::Util::refaddr $sub;
+    my ($stash, $subname) = Sub::Identify::get_code_info($sub);
+    $INDEX{$stash}{$subname} = $id;
     $INFO{$id} = $meta;
     return;
 }
@@ -52,6 +56,45 @@ sub get {
 
     my $id = Scalar::Util::refaddr $sub;
     return $INFO{$id}
+}
+
+sub get_by_stash_subname {
+    my $class = shift;
+    my ($stash, $subname) = @_;
+
+    my $id = $INDEX{$stash}{$subname};
+    return $INFO{$id} if $id;
+    return;
+}
+
+sub get_all_subnames_by_stash {
+    my $class = shift;
+    my ($stash) = @_;
+
+    my $data = $INDEX{$stash};
+    return [ sort keys %$data ] if $data;
+    return [ ]
+}
+
+sub get_all_submeta_by_stash {
+    my $class = shift;
+    my ($stash) = @_;
+
+    my $data = $INDEX{$stash};
+    return [ map { $INFO{$data->{$_}} } sort keys %$data ] if $data;
+    return [ ]
+}
+
+sub remove {
+    my $class = shift;
+    my ($sub) = @_;
+
+    unless (ref $sub && ref $sub eq 'CODE') {
+        _croak "required coderef: $sub";
+    }
+
+    my $id = Scalar::Util::refaddr $sub;
+    return delete $INFO{$id}
 }
 
 1;
@@ -88,6 +131,22 @@ Register a list of coderef and submeta.
 =head3 get(\&sub)
 
 Get submeta of C<\&sub>.
+
+=head3 get_by_stash_subname($stash, $subname)
+
+Get submeta by stash and subname. e.g. C<get_by_stash_subname('Foo::Bar', 'hello')>
+
+=head3 get_all_subnames_by_stash($stash)
+
+Get all subnames by stash. e.g. C<get_all_subnames_by_stash('Foo::Bar')>;
+
+=head3 get_all_submeta_by_stash($stash)
+
+Get all submeta by stash. e.g. C<get_all_submeta_by_stash('Foo::Bar')>
+
+=head3 remove(\&sub)
+
+Remove submeta of C<\&sub> from the library.
 
 =head1 LICENSE
 

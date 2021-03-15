@@ -1,8 +1,8 @@
 Build.PL
 Changes
-eg/README
 eg/almanac
 eg/quarters
+eg/README
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 inc/My/Module/Test.pm
@@ -21,9 +21,10 @@ LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
 MANIFEST
+META.json
+META.yml
 README
 t/basic.t
-t/model_cutoff_definition.t
 t/data/vsop87d.jupiter
 t/data/vsop87d.mars
 t/data/vsop87d.mercury
@@ -35,6 +36,7 @@ t/data/vsop87d.venus
 t/meeus_25b.t
 t/meeus_33a.t
 t/model.t
+t/model_cutoff_definition.t
 t/planet_jupiter.t
 t/planet_mars.t
 t/planet_mercury.t
@@ -59,5 +61,4 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
-META.yml
-META.json
+xt/author/prereq.t

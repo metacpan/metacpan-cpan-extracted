@@ -1,0 +1,220 @@
+NAME
+    POE::Component::Client::WebSocket - A POE compatible websocket client
+
+VERSION
+    version 0.34
+
+WARNING: Work in progress! Only uploaded early for testing purposes!
+    This module appears to work perfectly, however its not really been
+    tested that much and I will be amazed if there are not bugs.
+
+SYNOPSIS
+        #!/usr/bin/env perl
+
+        use warnings;
+        use strict;
+
+        use POE qw(Component::Client::WebSocket);
+
+        POE::Session->create(
+            inline_states => {
+                _start => sub {
+                    my $ws = POE::Component::Client::WebSocket->new('wss://echo.websocket.org');
+                    $ws->handler('connected','connected');
+                    $ws->connect;
+
+                    $_[HEAP]->{ws} = $ws;
+
+                    $_[KERNEL]->yield("next")
+                },
+                next   => sub {
+                    $_[KERNEL]->delay(next => 1);
+                },
+                websocket_read => sub {
+                    my ($kernel,$read) = @_[KERNEL,ARG0];
+
+                    print "Read: $read\n";
+               },
+               websocket_disconnected => sub {
+                    warn "Disconnected";
+               },
+               connected => sub {
+                    my $req = $_[ARG0];
+               },
+               websocket_handshake => sub {
+                    my $res = $_[ARG0];
+
+                    $_[KERNEL]->post( $_[SENDER]->ID, 'send', 1234 );
+
+                    $_[HEAP]->{ws}->send(5678);
+               },
+            },
+        );
+
+        POE::Kernel->run();
+        exit;
+
+SUBROUTINES/METHODS
+  new
+    Create a new object, takes 1 argument.. a fully qualified websocket URI.
+
+Default handlers and arguments
+    All of these can be changed with the 'handler' function, note the 'event
+    key'.
+
+  read (websocket_read)
+    event key: read default handler: websocket_read
+
+    Data that has been read and decoded from the server.
+
+  disconnected (websocket_disconnected)
+    event key: disconnected default handler: websocket_disconnected
+
+    Called when the websocket is disconnected.
+
+  connected (websocket_connected)
+    event key: connected default handler: websocket_connected
+
+    Called when the websocket is connected (before the handshake) ARG0
+    contains the HTTP::Request sent.
+
+  handshake (websocket_handshake)
+    event key: handshake default handler: websocket_handshake
+
+    Called when the socket handshake is completed, ARG0 contains the
+    HTTP::Response from the server.
+
+  error (websocket_error)
+    event key: error default handler: websocket_error
+
+    Called when an error is retrieved, this is a bit vague at the moment
+    ARG0 should contain something.
+
+OOP mappings from obj to POE
+    These can be called with a standard POE style POST or directly from the
+    object (see SYNOPSIS for examples of both)
+
+  connect
+    Start the connection
+
+  handler
+    Adjust the handlers events are sent to
+
+  origin
+    Change the origin from the automatically generated one to something
+    else.
+
+  parent
+    Override the 'send to' parent for the module, by default this is the
+    module that the component was started from.
+
+  send
+    Send data to the server, arguments are: 1: 'data' the information you
+    want to send. 2: 'type' the type of information to send (default 'text')
+    3: 'fin' wether to send the 'fin' flag (default 1) 4: 'masked' wether
+    the frame should be masked (default 0)
+
+Internal functions (do not call these directly)
+  _start
+    Initial start handler
+
+  _stop
+    Default stop handler for tidying things up
+
+  _keep_alive
+    Do not allow the module to stop running
+
+  _connect
+    Initate a connect to the websocket
+
+  _handler
+    Adjust the distribution map for handlers
+
+  _origin
+    Change the origin used in the opening handshake
+
+  _parent
+    Change the currently targeted session to communicate events with.
+
+  _send
+    Send a frame encoded request to the server
+
+  _socket_birth
+    Handle a socket when it connects to something
+
+  _socket_death
+    Handle a socket when it is disconnected
+
+  _socket_input
+    Read data from the socket
+
+AUTHOR
+    Paul G Webster, "<daemon at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    <https://github.com/PaulGWebster/POE-Component-Client-Websocket>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::Client::WebSocket
+
+    You can also look for information at:
+
+    *   GitHub (please report bugs here)
+
+        <https://github.com/PaulGWebster/POE-Component-Client-Websocket/issu
+        es>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Component-Client-WebSocket>
+
+    *   Search MetaCPAN
+
+        <http://search.metacpan.org/dist/POE-Component-Client-WebSocket/>
+
+ACKNOWLEDGEMENTS
+    *   Tom Ryder - Multiple fixes for version including SNI 0.29
+        <https://metacpan.org/author/TEJR>
+
+LICENSE AND COPYRIGHT
+    Copyright 2021 Paul G Webster.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    <http://www.perlfoundation.org/artistic_license_2_0>
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by the
+    Package. If you institute patent litigation (including a cross-claim or
+    counterclaim) against any party alleging that the Package constitutes
+    direct or contributory patent infringement, then this Artistic License
+    to you shall terminate on the date that such litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

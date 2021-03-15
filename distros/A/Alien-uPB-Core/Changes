@@ -1,0 +1,66 @@
+Revision history for Alien-uPB-Core
+
+0.17      2021-03-13 09:47:58 CET
+
+    - Stop building googlepb binding
+    - Renamed to Alien::uPB::Core
+
+0.15      2021-01-25 01:00:25 CET
+
+    - IO::Socket::SSL is required for HTTPS download (thanks to Slaven Rezić)
+
+0.14      2021-01-22 22:31:24 CET
+
+    - New revision of uPB (compiles with Protobuf 3.9)
+
+0.13      2019-11-11 22:46:14 CET
+
+    - New revision of uPB (fixes JSON decoding of quoted numeric values)
+
+0.12      2018-11-10 22:41:46 CET
+
+    - New revision of uPB (compiles with Protobuf 3.6)
+
+0.11      2018-07-22 14:13:33 CEST
+
+    - Tweak build for FreeBSD
+
+0.10      2017-07-18 13:37:24 CEST
+
+    - Build fixes (patch by Mickey Nasriachi)
+
+0.09      2017-03-11 14:28:50 CET
+
+    - New revision of uPB (compiles with Protobuf 3.2)
+
+0.08      2016-10-01 20:22:07 CEST
+
+    - Perl 5.8 compatibility
+
+0.07      2016-07-04 16:37:21 CEST
+
+    - uPB requires GNU make (thanks to Slaven Rezić)
+
+0.06      2016-07-03 18:47:16 CEST
+
+    - New revision of uPB (propagates map_entry flag)
+
+0.05      2016-05-21 18:31:52 CEST
+
+    - New revision of uPB (changes to JSON support)
+
+0.04      2016-03-10 21:27:38 CET
+
+    - Fix configure_requires
+
+0.03      2016-02-21 15:08:42 CET
+
+    - Newer revision of uPB (GCC 4.4 compatibility)
+
+0.02      2016-01-10 15:46:28 CET
+
+    - Build a newer revision of uPB
+
+0.01      2015-12-31 22:11:51 CET
+
+    - First public release

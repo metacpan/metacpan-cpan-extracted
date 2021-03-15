@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,34 +12,38 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 9da4606be7e3f134d2ee0bd669c02bb8274e6dad Changes
-SHA1 185d91484ffce5a2349e64bf203db304744178fc LICENSE
-SHA1 1fa6b7ea8c048b3063fcac241cd1f422ba6ae4fe MANIFEST
-SHA1 40ae1b5e2aeebcb9d6e8b0424dec1f3656f90857 META.json
-SHA1 9f01d722c5d17339c652dcd23a0ad24dc6478c04 META.yml
-SHA1 22e693740cf2959e2c65604b92076125dc7c9853 Makefile.PL
-SHA1 fe7556ccbb65b4ec0ce87b10cda8d80204d9191c README
-SHA1 7cad32b004757a806b7fab9a1fbc525e88c6196c eg/calc-forte-tensions
-SHA1 4c0c357c7420b50df500376ee0973c40e018b219 eg/compare-tensions
-SHA1 baa078d046c4ea11690287d92e45b36c6c56c789 eg/fit-tensions
-SHA1 56ff6b5464f3e437bad051009dd9416075eaac31 eg/gen-pl-nums
-SHA1 81ab43211686a8bdfc2c83d32e47ca12fc8e0273 lib/Music/Tension.pm
-SHA1 5ee80736a1f4e264e4b45dca6bea290b810abac6 lib/Music/Tension/Cope.pm
-SHA1 1bc64a55341dfadee6ed109e63ec990c1815edf0 lib/Music/Tension/PlompLevelt.pm
-SHA1 87704f4cd40aa3dfb6c0dd2f73f67b53e7ce158c t/00-load.t
-SHA1 74a0937e074cb3488fb14a70a2427e78e052c90c t/Music-Tension-Cope.t
-SHA1 d0c366a2268df1350a66e10f3df1b9d63b9271d8 t/Music-Tension-PlompLevelt.t
-SHA1 5fd3f4b9e7f6cb8aa3e6a4c77be18d5dc9efb9af t/Music-Tension.t
-SHA1 3ef65383d82f059f56f43236663119c01974decb t/pod.t
+SHA256 24af8a861f73fff390d564c11e711d43308a8145e39bc9ffea037a542a7f422e Build.PL
+SHA256 0fed011a667c1e073cb189eb2572be4df4553ff092afcb06270cada2e0466af0 Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 fbe7d93d6feeba925334db1f4babdd9997fd1e48d47a80ef4a5cd5c0ced3f251 MANIFEST
+SHA256 9e36a76c1ee9bf06a000e8630c8d3d9906ccfc4a7d92edd46bc9ead3756dcb65 META.json
+SHA256 8e92cf80de3f9e698d4f34fe357488818f1a2d665f2c56031bf854849f139c18 META.yml
+SHA256 458a79d144368a6d44ba3df954b8c84d827931c6c581b6c86a7be94e9dc43822 README
+SHA256 7297771bc740f37c924666fc522ef467a465cd74308f86144cb04115257904ec eg/calc-forte-tensions
+SHA256 0fad4e609de434bd6ee59eac13eaf2f729e35e3ed11cfce1db022b075d65cced eg/compare-tensions
+SHA256 ae0aa4af1237f3219563ca14d559d2ee0d6381b5ed6461f78cd649ef37fd2789 eg/dorian-fugue-subject
+SHA256 ffa6ff568398710d8b68c1f96deb69a1be69fa6a8d661d3f23b796be80d5e8d1 eg/fit-tensions
+SHA256 a02c9a9923a7e9c01988c294a60fd6dda30d97ec8579f3862fdfc5bd01f6d339 eg/gen-pl-nums
+SHA256 313577d1c244ec1194e7a5248cc438fd3f2e5d1b3e1a2434fd99a7b7f43a2317 lib/Music/Tension.pm
+SHA256 bdf61aed8a77d5d8fee0fbf6517b0078347d0fb943c291a1ad68c538011ac00b lib/Music/Tension/Cope.pm
+SHA256 5a3c8d266994fdb9f2a6b60eef5c3d16c61303b5b08543d01c9532d7242f2332 lib/Music/Tension/Counterpoint.pm
+SHA256 310bde17184c5e901fb13a20089dd1c2eb634c561088c468511845e86ef57b3d lib/Music/Tension/PlompLevelt.pm
+SHA256 adc61f2a2c062fd6a5629af6832f49067ce59db94d465e25ea7a1913de064bee t/00-load.t
+SHA256 bbf9915d823ac34b7dece79752b7022ed10093177edfad79ea352bafabd4bd60 t/Music-Tension-Cope.t
+SHA256 b460117f4ac5f5fe9e00479f679edd80cb51b424dec73b23fb7f03bb809a751b t/Music-Tension-Counterpoint.t
+SHA256 fb2c9552be44a0cbbd4620916bdda814a4d83a08622d6b175c774f8d085eede3 t/Music-Tension-PlompLevelt.t
+SHA256 115a620a640f635d738a5781f41b30088e60efa08fddd5c30835b7181b682a49 t/Music-Tension.t
+SHA256 30fa954bb89a9895a6c4ae112db6d72fdac72ce0ce6da4005a902b33c385a049 t/pod-coverage.t
+SHA256 ca5a928bcc6a6b956753f022d06e5fc80b29f2890fed6c21e52297fee8db0e84 t/pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaY2nhAAoJEKSYBH5dablgD8MH/02pV8pAqswgZOBfRdbbTelU
-FrHMWDX26cguUFKYeGIpV6WT8IMI4y9GexvA5WX4J76TFEL2k0Jm1nOvyUtTCFcr
-1Y9vKE60r7f9+bXmH1eotIYD9GxtDFfe86UHbmQd+NsTbkq5VTjVc4zEBZNHx97p
-JO5LeqAvV+T7y1fKPkKaZ/9ZY6Qu12Ks1gzS6xup6Z1sIrogjZo8UvVRalCps2tb
-xDOQnPmsBk1LnCDXC+x2OzdfFGFpRLrhGFNQShUHSLr8SrL276Vw873LF2oIDBj4
-+EK1Ez9sqj7qJzvbdJjeM/yvmjMH/8w4pqpaViOSrcJ7v8DZQQlV46kS41GUCqo=
-=V6V3
+iQEcBAEBAwAGBQJgTPiuAAoJEIGZLuHhLAOF1EcH/iEc8FdpGjNt79neQrbWmiDq
+eg4xEGfjPiaYEQt/Eiu6gRqHxDVtzwgVBqdwMxN1Pqtpx/EBtfajcF5PuAaa00hi
+v4iGUKaIOhG+RBLiNxwjnPeoYCR3IkTvzkuwOKITolP7vEyDilvOnbTXc/DVxnyV
+D8E2geGBxj0uYib3thRUx7VH7UtJOVSlVi3e1O+yxWgXnofWUx7TT9LpaaWoCgRV
+jtySEosYBqgAGZdbCZTFxZHKNrLZcnZzsYtJ5cf5yPJe3/iMbx8drjxk+2K3M8KB
+rSvEnQAw8PZ/PDr+cmA3LhDYsKnCgzRr2bRG+URxFwhzLvKB27nNRBUag0rVOu0=
+=AqpG
 -----END PGP SIGNATURE-----

@@ -3,7 +3,7 @@
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -39,22 +39,9 @@ use Photonic::WE::S::AllH;
 use Photonic::WE::S::EpsilonP;
 use Photonic::WE::S::EpsilonTensor;
 
-use Machine::Epsilon;
-use List::Util;
-
 use Test::More tests => 11;
-
-sub agree {
-    my $a=shift;
-    my $b=shift//0;
-    return (($a-$b)*($a-$b))->sum<=1e-4;
-}
-
-sub Cagree {
-    my $a=shift;
-    my $b=shift//0;
-    return (($a-$b)->Cabs2)->sum<=1e-4;
-}
+use lib 't/lib';
+use TestUtils;
 
 #Check epsilontensor for simple 1D system
 #Non-retarded limit
@@ -140,12 +127,12 @@ $m=Photonic::WE::S::Metric->new(
 $et=Photonic::WE::S::EpsilonTensor->new(nh=>1000, metric=>$m,
 						  reorthogonalize=>1);
 $etv=$et->epsilonTensor->(:,(1),(1));
-ok(Cagree($epstm, $etv), "Epsilon agrees with transfer matrix. Complex case.");
+ok(Cagree($epstm, $etv, 1e-4), "Epsilon agrees with transfer matrix. Complex case.");
 
 my $h=Photonic::WE::S::AllH->new(nh=>1000, metric=>$m,
    polarization=>pdl([0,r2C(1)])->complex, reorthogonalize=>1);
 $et=Photonic::WE::S::EpsilonP->new(nh=>1000, haydock=>$h);
 $etv=$et->epsilon;
-ok(Cagree($epstm, $etv), "Projected eps agrees with trans mat. Complex case.");
+ok(Cagree($epstm, $etv, 1e-4), "Projected eps agrees with trans mat. Complex case.");
 
 #done_testing();

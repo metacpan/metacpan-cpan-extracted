@@ -21,7 +21,7 @@ sub ESC {
   $_;
 }
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 our @SAFE_SIG = grep {
   not /^(
@@ -256,6 +256,7 @@ sub _watch_pid {
     Scalar::Util::weaken($reactor->{forks}{$pid} = $self);
   }
   else {
+    Scalar::Util::weaken($self);
     $self->{ev_child} = EV::child($pid, 0, sub { _sigchld($self, $pid, $_[0]->rstatus); });
   }
 }
@@ -307,7 +308,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 =head1 VERSION
 
-0.40
+0.41
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ Const::Exporter - Declare constants for export.
 
 # VERSION
 
-version v1.1.1
+version v1.1.2
 
 # SYNOPSIS
 
@@ -229,6 +229,33 @@ use Const::Exporter
  ];
 ```
 
+## Export Tags
+
+By default, all symbols are exportable (in `@EXPORT_OK`.)
+
+The `:default` tag is the same as not specifying any exports.
+
+The `:all` tag exports all symbols.
+
+# KNOWN ISSUES
+
+## Support for older Perl versions
+
+This module requires Perl v5.10 or newer.
+
+Pull requests to support older versions of Perl are welcome. See
+["SOURCE"](#source).
+
+## Exporting Functions
+
+[Const::Exporter](https://metacpan.org/pod/Const::Exporter) is not intended for use with modules that also
+export functions.
+
+There are workarounds that you can use, such as getting
+[Const::Exporter](https://metacpan.org/pod/Const::Exporter) to export your functions, or munging `@EXPORT`
+etc. separately, but these are not supported and changes in the
+future my break our code.
+
 ## Mixing POD with Tags
 
 The following code is a syntax error, at least with some versions of
@@ -268,33 +295,6 @@ use Const::Exporter
 use Const::Exporter
   b => [ bar => 2 ];
 ```
-
-## Export Tags
-
-By default, all symbols are exportable (in `@EXPORT_OK`.)
-
-The `:default` tag is the same as not specifying any exports.
-
-The `:all` tag exports all symbols.
-
-# KNOWN ISSUES
-
-## Support for older Perl versions
-
-This module requires Perl v5.10 or newer.
-
-Pull requests to support older versions of Perl are welcome. See
-["SOURCE"](#source).
-
-## Exporting Functions
-
-[Const::Exporter](https://metacpan.org/pod/Const::Exporter) is not intended for use with modules that also
-export functions.
-
-There are workarounds that you can use, such as getting
-[Const::Exporter](https://metacpan.org/pod/Const::Exporter) to export your functions, or munging `@EXPORT`
-etc. separately, but these are not supported and changes in the
-future my break our code.
 
 # SEE ALSO
 
@@ -347,7 +347,7 @@ B. Estrade <estrabd@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2020 by Robert Rothenberg.
+This software is Copyright (c) 2014-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

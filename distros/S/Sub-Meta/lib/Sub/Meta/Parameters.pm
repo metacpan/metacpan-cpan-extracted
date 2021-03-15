@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 use Carp ();
 use Scalar::Util ();
@@ -27,16 +27,21 @@ sub new {
 
     my $self = bless \%args => $class;
     $self->set_args($args{args});
-    $self->set_nshift(exists $args{nshift} ? $args{nshift} : 0);
-    $self->set_slurpy($args{slurpy}) if exists $args{slurpy};
+
+    $self->set_invocant(delete $args{invocant}) if exists $args{invocant};
+    $self->set_nshift(delete $args{nshift}) if exists $args{nshift};
+    $self->set_slurpy(delete $args{slurpy}) if exists $args{slurpy};
+
     return $self;
 }
 
-sub nshift()   { $_[0]{nshift} }
-sub slurpy()   { $_[0]{slurpy} ? $_[0]{slurpy} : !!0 }
-sub args()     { $_[0]{args} }
+sub nshift()    { $_[0]{nshift} // 0 }
+sub slurpy()    { $_[0]{slurpy} ? $_[0]{slurpy} : !!0 }
+sub args()      { $_[0]{args} }
+sub invocant()  { $_[0]{invocant} }
+sub invocants() { defined $_[0]{invocant} ? [ $_[0]{invocant} ] : [] }
+sub all_args()  { [ @{$_[0]->invocants}, @{$_[0]->args} ] }
 
-sub set_nshift($) { $_[0]{nshift} = $_[1]; $_[0]->_assert_nshift; $_[0] }
 sub set_slurpy {
     my ($self, $v) = @_;
     $self->{slurpy} = Scalar::Util::blessed($v) && $v->isa('Sub::Meta::Param')
@@ -48,6 +53,45 @@ sub set_slurpy {
 sub set_args {
     my $self = shift;
     $self->{args} = $self->_normalize_args(@_);
+    return $self;
+}
+
+sub set_nshift {
+    my ($self, $v) = @_;
+
+    unless (defined $v && ($v == 0 || $v == 1) ) {
+        _croak sprintf("Can't set this nshift: %s", $v//'');
+    }
+
+    $self->{nshift} = $v;
+
+    if ($v == 1 && !defined $self->invocant) {
+        my $default_invocant = $self->param_class->new(invocant => 1);
+        $self->set_invocant($default_invocant)
+    }
+
+    if ($v == 0 && defined $self->invocant) {
+        delete $self->{invocant}
+    }
+
+    return $self;
+}
+
+sub set_invocant {
+    my ($self, $v) = @_;
+
+    my $invocant = Scalar::Util::blessed($v) && $v->isa('Sub::Meta::Param')
+                 ? $v
+                 : $self->param_class->new($v);
+
+    $invocant->set_invocant(1);
+
+    $self->{invocant} = $invocant;
+
+    if ($self->nshift == 0) {
+        $self->set_nshift(1);
+    }
+
     return $self;
 }
 
@@ -83,53 +127,19 @@ sub _normalize_args {
     ]
 }
 
-sub _assert_nshift {
-    my $self = shift;
-    return unless $self->nshift;
-    if (@{$self->_all_positional_required} < $self->nshift) {
-        _croak 'required positional parameters need more than nshift';
-    }
-}
-
 sub _all_positional_required() {
-    [ grep { $_->positional && $_->required } @{$_[0]->args} ];
-}
-
-sub positional() {
     my $self = shift;
-    my @p = grep { $_->positional } @{$self->args};
-    splice @p, 0, $self->nshift;
-    [ @p ];
+    [ @{$self->invocants}, @{$self->positional_required} ];
 }
 
-sub positional_required() {
-    my $self = shift;
-    my @p = @{$self->_all_positional_required};
-    splice @p, 0, $self->nshift;
-    [ @p ];
-}
 
+sub positional()          { [ grep { $_->positional                 } @{$_[0]->args} ] }
+sub positional_required() { [ grep { $_->positional && $_->required } @{$_[0]->args} ] }
 sub positional_optional() { [ grep { $_->positional && $_->optional } @{$_[0]->args} ] }
 
 sub named()               { [ grep { $_->named                      } @{$_[0]->args} ] }
 sub named_required()      { [ grep { $_->named && $_->required      } @{$_[0]->args} ] }
 sub named_optional()      { [ grep { $_->named && $_->optional      } @{$_[0]->args} ] }
-
-
-sub invocant() {
-    my $self = shift;
-    my $nshift = $self->nshift;
-    return undef if $nshift == 0;
-    return $self->_all_positional_required->[0] if $nshift == 1;
-    _croak "Can't return a single invocant; this function has $nshift";
-}
-
-sub invocants() {
-    my $self = shift;
-    my @p = @{$self->_all_positional_required};
-    splice @p, $self->nshift;
-    [ @p ]
-}
 
 sub args_min() {
     my $self = shift;
@@ -156,14 +166,13 @@ sub is_same_interface {
     return unless $self->slurpy ? $self->slurpy->is_same_interface($other->slurpy)
                                 : !$other->slurpy;
 
-    return unless @{$self->args} == @{$other->args};
+    return unless @{$self->all_args} == @{$other->all_args};
 
-    for (my $i = 0; $i < @{$self->args}; $i++) {
-        return unless $self->args->[$i]->is_same_interface($other->args->[$i]);
+    for (my $i = 0; $i < @{$self->all_args}; $i++) {
+        return unless $self->all_args->[$i]->is_same_interface($other->all_args->[$i]);
     }
 
-    return unless defined $self->nshift ? $self->nshift == $other->nshift
-                                        : !defined $other->nshift;
+    return unless $self->nshift == $other->nshift;
 
     return !!1;
 }
@@ -178,13 +187,13 @@ sub is_same_interface_inlined {
     push @src => $self->slurpy ? $self->slurpy->is_same_interface_inlined(sprintf('%s->slurpy', $v))
                                : sprintf('!%s->slurpy', $v);
 
-    push @src => sprintf('%d == @{%s->args}', scalar @{$self->args}, $v);
+    push @src => sprintf('%d == @{%s->all_args}', scalar @{$self->all_args}, $v);
 
-    for (my $i = 0; $i < @{$self->args}; $i++) {
-        push @src => $self->args->[$i]->is_same_interface_inlined(sprintf('%s->args->[%d]', $v, $i))
+    for (my $i = 0; $i < @{$self->all_args}; $i++) {
+        push @src => $self->all_args->[$i]->is_same_interface_inlined(sprintf('%s->all_args->[%d]', $v, $i))
     }
 
-    push @src => defined $self->nshift ? sprintf('%d == %s->nshift', $self->nshift, $v) : sprintf('!defined %s->nshift', $v);
+    push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
 
     return join "\n && ", @src;
 }
@@ -281,6 +290,10 @@ An element can be an argument of C<Sub::Meta::Param>.
     # single ref:
     $p->set_args(Str); # => $p->set_args([Str])
 
+=head3 all_args
+
+Subroutine invocants and arguments arrayref.
+
 =head3 nshift
 
 Number of shift arguments.
@@ -332,6 +345,17 @@ First element of invocants.
 =head3 invocants
 
 Returns an arrayref of parameter objects for the variables into which initial arguments are shifted automatically. This will usually return () for normal functions and ('$self') for methods.
+
+=head3 set_invocant
+
+Setter for invocant:
+
+    my $invocant = Sub::Meta::Param->new(name => '$self');
+    my $p = Sub::Meta::Parameters->new(args => []);
+    $p->set_invocant($invocant);
+
+    $p->invocant; # => Sub::Meta::Param->new(name => '$self', invocant => 1);
+    $p->nshift; # => 1
 
 =head3 args_min
 

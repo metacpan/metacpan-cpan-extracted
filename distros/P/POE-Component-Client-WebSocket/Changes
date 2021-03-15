@@ -1,28 +1,41 @@
 Revision history for POE-Component-Client-WebSocket
 
+0.34      2021-03-14 06:03:28 GMT
+        Set max_payload_size to 0 (unlimited) for Protocol::WebSocket::Frame, as a temporary fix - this needs handling better
+
+0.33      2021-03-14 04:45:50 GMT
+
+0.32      2021-03-14 04:41:36 GMT
+
+0.31      2021-03-14 04:32:09 GMT
+        Typo and spacing fixes for various files
+0.30
+        Updated acknoledgements
+        Fixed Changes template header for next
+
 0.29    13/02/2021 12:00 UTC
-	Moved the module over to a DZIL base
+        Moved the module over to a DZIL base
 
-0.28	01/05/2021 13:07 UTC
-	Include hostname in SNI
-	Correct ignored path in URL
-	Use \r\n line endings in HTTP requests
-	Choose HTTPS protocol for Origin header
+0.28    01/05/2021 13:07 UTC
+        Include hostname in SNI
+        Correct ignored path in URL
+        Use \r\n line endings in HTTP requests
+        Choose HTTPS protocol for Origin header
 
-0.27	01/05/2017 07:49
-	Connected missing socket_death handler (alerts of upstream disconnected)
+0.27    01/05/2017 07:49
+        Connected missing socket_death handler (alerts of upstream disconnected)
 
-0.26	18/03/2017 14:01
-	Had to push version due to error uploading 0.25, see 0.25 for change
+0.26    18/03/2017 14:01
+        Had to push version due to error uploading 0.25, see 0.25 for change
 
-0.25	18/03/2017 14:00
-	Updated the connect method to remove POE::HTTP::Parser after lots of long runnning debug problems
+0.25    18/03/2017 14:00
+        Updated the connect method to remove POE::HTTP::Parser after lots of long runnning debug problems
 
-0.24	21/03/2017 10:24
-	Updated defaults to make all messages masked and fin by default, also reversed order of Changes to be more standard
+0.24    21/03/2017 10:24
+        Updated defaults to make all messages masked and fin by default, also reversed order of Changes to be more standard
 
-0.23	30/01/2016 12:00
-	Forgot to create version entry for this version, unsure what changes (added on 0.24)
+0.23    30/01/2016 12:00
+        Forgot to create version entry for this version, unsure what changes (added on 0.24)
 
 0.22    29/01/2016 17:16
         Checking for mystery extra directory in tarbell, few DOC updates

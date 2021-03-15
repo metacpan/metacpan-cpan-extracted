@@ -4,7 +4,7 @@
       "Kang-min Liu <gugod@gugod.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.028",
+   "generated_by" : "App::ModuleBuildTiny version 0.029",
    "license" : [
       "mit"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.028"
+            "App::ModuleBuildTiny" : "0.029"
          }
       },
       "runtime" : {
@@ -49,6 +49,9 @@
          "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitExcessiveColons.pm",
          "version" : "0.01"
       },
+      "Perl::Critic::Policy::TooMuchCode::ProhibitExtraStricture" : {
+         "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitExtraStricture.pm"
+      },
       "Perl::Critic::Policy::TooMuchCode::ProhibitLargeBlock" : {
          "file" : "lib/Perl/Critic/Policy/TooMuchCode/ProhibitLargeBlock.pm"
       },
@@ -72,7 +75,7 @@
       },
       "Perl::Critic::TooMuchCode" : {
          "file" : "lib/Perl/Critic/TooMuchCode.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -86,7 +89,7 @@
          "web" : "https://github.com/gugod/Perl-Critic-TooMuchCode"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "MIT",
    "x_static_install" : "1"

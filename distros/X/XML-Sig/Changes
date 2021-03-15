@@ -1,68 +1,110 @@
-Changes
+Revision history for XML-Sig
 
-Version 0.39
+0.43 - 2021-03-14
 
-    Small release to fix a digest issue
+  [Significant features implemented since 0.39]
 
-    TBD     Update Changes and Increment version
-    993ed2a Add test for verify issues with embedded newlines in digest
-    8f0738f Fixes #20 Remove embedded newlines from reference digest
+  - User can specify Digest and Signature hashing algorithm
+  - Support ECDSA signatures
 
-Version 0.38
+  [Change Log]
+  - TBD     Update Changes and Increment version
 
-    Increment Version - Release Version same as 0.37-TRIAL
+0.42-TRIAL - 2021-03-14
 
-    de9b3d6 Fix issue with missing MANIFEST and META.yml
-    7a9e524 Update Changes and Increment version
+  [Change Log]
+  - 09bfd8f Update Changes and Increment version
+  - ae2dafe Reformat Changes to standard format
+  - 0ed7eda Crypt::PK::ECC needs CryptX gt 0.035
+  - a26766c Merge pull request #26 from perl-net-saml2/rmdzil1
+  - d836146 Remove Dizt::Zilla from GitHub action
 
-Version 0.37-TRIAL
-    3c18e4c Update Makefile Version
-    4936d2d Update Changes and Increment version
-    51f853d Add more patterns to .gitignore
-    adeb19c Allow you to build XML::Sig from git repo without dzil
-    2619ba4 Fix issue and add test for InclusiveNamespace in XML
-    3f06b78 Add extra debugging information
-    f8aef89 remove trailing # on TRANSFORM_C14N
-    15939af InclusiveNamespaces support from
+0.41-TRIAL - 2021-03-13
+
+  [Change Log]
+  - 11272d6 Update Changes and Increment version
+  - 1bb81bf Fix failing test when xmlsec1 not installed
+  - b38581c Minor fixes to build
+
+0.40-TRIAL - 2021-03-12
+
+  [Significant features implemented]
+  - User can specify Digest and Signature hashing algorithm
+  - Support ECDSA signatures
+
+  [Change Log]
+  - ba17031 Update Changes and Increment version
+  - 6443504 Merge pull request #25 from perl-net-saml2/ecdsa
+  - dd9c915 Fixes #21 Implement ecdsa signature support
+  - 32d7a5c Merge pull request #24 from perl-net-saml2/digest-config
+  - 4b900c6 Improve support for configurable Digest Hashing Algorithms
+  - e511b66 Improve support for configurable Signature Algorithms
+  - e4a27f7 fix pod formatting
+
+0.39 - 2021-01-12
+
+  [Small release to fix a digest issue]
+
+  - 01cf570 Update Changes and Increment version
+  - 993ed2a Add test for verify issues with embedded newlines in digest
+  - 8f0738f Fixes #20 Remove embedded newlines from reference digest
+
+0.38 - 2021-01-10
+
+  [Increment Version - Release Version same as 0.37-TRIAL]
+
+  - de9b3d6 Fix issue with missing MANIFEST and META.yml
+  - 7a9e524 Update Changes and Increment version
+
+0.37-TRIAL - 2021-01-10
+  - 3c18e4c Update Makefile Version
+  - 4936d2d Update Changes and Increment version
+  - 51f853d Add more patterns to .gitignore
+  - adeb19c Allow you to build XML::Sig from git repo without dzil
+  - 2619ba4 Fix issue and add test for InclusiveNamespace in XML
+  - 3f06b78 Add extra debugging information
+  - f8aef89 remove trailing # on TRANSFORM_C14N
+  - 15939af InclusiveNamespaces support from
         1d2dac1c3eaa42359899e61323a446d0d0af3e54 accidentally removed
 
-Version 0.36
+0.36 - 2021-01-08
 
-    Increment Version - Release Version same as 0.35 TRIAL
+  [Increment Version - Release Version same as 0.35 TRIAL]
 
-    24c09df (tag: 0.36) Increment Version - Release Version same as 0.35 TRIAL
+  - 24c09df (tag: 0.36) Increment Version - Release Version same as 0.35 TRIAL
 
-Version 0.35-TRIAL
+0.35-TRIAL - 2021-01-08
 
-Major items in this version include:
-    1. Ability to sign all XML sections containing the ID attribute
-    2. Bug Fix DSA signatures would fail sometimes for XML::Sig signed xml
-    3. Documentation updates
+  [Major items in this version include]
+  - Ability to sign all XML sections containing the ID attribute
+  - Bug Fix DSA signatures would fail sometimes for XML::Sig signed xml
+  - Documentation updates
 
-    a346d30 Update Changes and Increment Version 0.35-TRIAL
-    6a97c24 Add additional Perl version checks
-    dfb855c Fixes #19 r and r variable sizes but need to be 20 bytes xero padded
-    f867720 Merge pull request #18 from perl-net-saml2/pod-updates
-    56d605f Document xmlsec1 commands
-    57f7ceb More code documentation
-    a06417c Initial POD and Documentation updates
-    4f983b6 Fix space at EOL and missing letter
-    3b4230e Merge pull request #16 from perl-net-saml2/sign-multiple-sections
+  [Change Log]
+  - a346d30 Update Changes and Increment Version 0.35-TRIAL
+  - 6a97c24 Add additional Perl version checks
+  - dfb855c Fixes #19 r and r variable sizes but need to be 20 bytes xero padded
+  - f867720 Merge pull request #18 from perl-net-saml2/pod-updates
+  - 56d605f Document xmlsec1 commands
+  - 57f7ceb More code documentation
+  - a06417c Initial POD and Documentation updates
+  - 4f983b6 Fix space at EOL and missing letter
+  - 3b4230e Merge pull request #16 from perl-net-saml2/sign-multiple-sections
 
-Version 0.34-TRIAL
+0.34-TRIAL - 2020-12-06
 
-This version allows for the signing of multiple IDs in an XML
+  [This version allows for the signing of multiple IDs in an XML]
 
-    96ddf3c Increment version for 0.34-TRIAL
-    3119a7e Move xml files to unsigned
-    45fadd1 Move xml files to signed and unsigned
-    bf37f9b Add and clarify comments and fix one context
-    dbbfd63 Add tests for signing and verifying multiple nodes
-    3ebef38 Allows signing multiple ID sections
+  - 96ddf3c Increment version for 0.34-TRIAL
+  - 3119a7e Move xml files to unsigned
+  - 45fadd1 Move xml files to signed and unsigned
+  - bf37f9b Add and clarify comments and fix one context
+  - dbbfd63 Add tests for signing and verifying multiple nodes
+  - 3ebef38 Allows signing multiple ID sections
 
-Version 0.33
+0.33 - 2020-12-07
 
-This release is mostly clean up but does inclued one important fix.
+[This release is mostly clean up but does inclued one important fix]
 
 Commit 885ca9f65031dba617aac061370c8def6a3b70b8 introduced a bug related to verifying
 signed XML that include a Signature that is unassociated with any nodes in the XML.
@@ -71,21 +113,21 @@ In the event that there are no other signatures the previous version would incor
 consider the XML Signatures valid.  This would only occur with a single unassociated
 Signature.
 
-    3adc579 XML Containing Single Unassociated Signature should fail
-    89f722f Merge pull request #17 from perl-net-saml2/test-cleanup
-    ff00501 008_sign_saml move xml to signed and unsigned
-    95615b1 Move logout_response.xml to signed
-    6fc5c67 Move saml_response.xml to signed
-    46c97e1 Add signature back so it can be validated for ancestor node signatures
-    1a3a8be Fixes Issue #15 - Remove dependency on Crypt::OpenSSL::DSA::Signature
-    cf7b734 Version 0.32 release
+  - 3adc579 XML Containing Single Unassociated Signature should fail
+  - 89f722f Merge pull request #17 from perl-net-saml2/test-cleanup
+  - ff00501 008_sign_saml move xml to signed and unsigned
+  - 95615b1 Move logout_response.xml to signed
+  - 6fc5c67 Move saml_response.xml to signed
+  - 46c97e1 Add signature back so it can be validated for ancestor node signatures
+  - 1a3a8be Fixes Issue #15 - Remove dependency on Crypt::OpenSSL::DSA::Signature
+  - cf7b734 Version 0.32 release
 
-Version 0.32
+0.32 - 2020-12-02
 
-    Release Version of 0.31-TRIAL
-    Updates to Changes and verion number
+  - Release Version of 0.31-TRIAL
+  - Updates to Changes and verion number
 
-Version 0.31-TRIAL
+0.31-TRIAL - 2020-12-02
 
 This release fixes a number of issues.  The biggest changes are related to
 signing and verifying with DSA key.  Previously DSA signing and verifying
@@ -96,48 +138,46 @@ xmlsec1 and others.
 In addition, in signing xml XML::Sig now looks at the SignedInfo for the
 CanonicalMethod to ensure that it matches.
 
-    8d1ad9c Update Changes and Version
-    c317d09 Merge pull request #14 from perl-net-saml2/sign-dsa
-    4393a05 Update some of the documentation
-    d833f54 Remove unused _set_key_info function
-    e2fe47a Remove unused _find_prefixlist function
-    168beb5 Remove unused function
-    2bf5a02 Update saml request tests for DSA and xmlsec1 signed files
-    988888c Update linux.yml
-    b718a9f Merge pull request #13 from perl-net-saml2/sign-dsa
-    6c0168a Fixes #10 - Can now sign and validate DSA signed XML
+  - 8d1ad9c Update Changes and Version
+  - c317d09 Merge pull request #14 from perl-net-saml2/sign-dsa
+  - 4393a05 Update some of the documentation
+  - d833f54 Remove unused _set_key_info function
+  - e2fe47a Remove unused _find_prefixlist function
+  - 168beb5 Remove unused function
+  - 2bf5a02 Update saml request tests for DSA and xmlsec1 signed files
+  - 988888c Update linux.yml
+  - b718a9f Merge pull request #13 from perl-net-saml2/sign-dsa
+  - 6c0168a Fixes #10 - Can now sign and validate DSA signed XML
         that can be verified by xmlsec1 and other xmlsec verifiers
-    4843b7c Merge pull request #12 from perl-net-saml2/issue11
-    e14aec3 Fixes #11 - use CanonicalMethod from SignedInfo to sign
-    3df1cff Remove spaces on EOL
+  - 4843b7c Merge pull request #12 from perl-net-saml2/issue11
+  - e14aec3 Fixes #11 - use CanonicalMethod from SignedInfo to sign
+  - 3df1cff Remove spaces on EOL
 
-Known Issues:
-    #6 - Cannot sign xml with multiple ID references
+[Known Issues]
+  - #6 - Cannot sign xml with multiple ID references
 
-Version 0.30-TRIAL
+0.30-TRIAL - 2020-11-30
 
-    Fixes an issue with the calculation of the digest.  It should be
+  - Fixes an issue with the calculation of the digest.  It should be
     based on the Transforms not the CanonicalMethod
 
-Version 0.29-TRIAL
+0.29-TRIAL - 2020-11-29
 
-    Rewrite the sign and verify to fix issues validating some valid
-    documents
-    Change to XML::LibXML
-    Add support for more modern Canonicalization Methods
+  - Rewrite the sign and verify to fix issues validating some valid documents
+  - Change to XML::LibXML
+  - Add support for more modern Canonicalization Methods
 
-Version 0.28
-    Release version bump version
+0.28 - 2020-06-27
 
-Version 0.27
+  - Release version bump version
 
-    First release of XML::Sig since 2009
+0.27 - 2020-06-27
 
-    Includes all changes from Net::SAML2::XML::Sig.
-        Please see History.md for the details of how XML::Sig has
-        evolved
+  [First release of XML::Sig since 2009]
 
-    Fixes:
-        RSA|DSAKeyValue have KeyValue element which prevented signatures
-        from validating
-        Fix issue validating with xmlsec in the test suite
+  - Includes all changes from Net::SAML2::XML::Sig.
+  - Please see History.md for the details of how XML::Sig has evolved
+
+  [Fixes]
+  - RSA|DSAKeyValue have KeyValue element which prevented signatures from validating
+  - Fix issue validating with xmlsec in the test suite

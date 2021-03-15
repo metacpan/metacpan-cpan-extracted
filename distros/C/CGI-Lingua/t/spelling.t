@@ -1,20 +1,19 @@
-#!perl -w
+#!perl -wT
 
 use strict;
 use warnings;
-
 use Test::More;
 
-unless($ENV{RELEASE_TESTING}) {
-	plan( skip_all => "Author tests not required for installation" );
-}
-
-eval 'use Test::Spelling';
-if($@) {
-	plan skip_all => 'Test::Spelling required for testing POD spelling';
+if($ENV{AUTHOR_TESTING}) {
+	eval 'use Test::Spelling';
+	if($@) {
+		plan(skip_all => 'Test::Spelling required for testing POD spelling');
+	} else {
+		add_stopwords(<DATA>);
+		all_pod_files_spelling_ok();
+	}
 } else {
-	add_stopwords(<DATA>);
-	all_pod_files_spelling_ok();
+	plan(skip_all => 'Author tests not required for installation');
 }
 
 __END__

@@ -1,6 +1,6 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.59 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.61 {
 
-  use 5.014;
+  use 5.024;
   use Moose;
   use Dist::Zilla;
   use PerlX::Maybe qw( maybe );
@@ -310,7 +310,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.59
+version 2.61
 
 =head1 SYNOPSIS
 
@@ -571,7 +571,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012,2013,2014,2015,2016,2017,2018,2019,2020 by Graham Ollis.
+This software is copyright (c) 2012,2013,2014,2015,2016,2017,2018,2019,2020,2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

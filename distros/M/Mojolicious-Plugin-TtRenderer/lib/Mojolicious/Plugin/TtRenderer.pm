@@ -5,7 +5,7 @@ use warnings;
 use 5.016;
 
 # ABSTRACT: Template Renderer Plugin for Mojolicious
-our $VERSION = '1.61'; # VERSION
+our $VERSION = '1.62'; # VERSION
 
 use base 'Mojolicious::Plugin';
 
@@ -38,7 +38,7 @@ Mojolicious::Plugin::TtRenderer - Template Renderer Plugin for Mojolicious
 
 =head1 VERSION
 
-version 1.61
+version 1.62
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ L<Mojolicious::Lite>:
 
  plugin 'tt_renderer';
 
-L<Mojolicious>
+L<Mojolicious>:
 
  $self->plugin('tt_renderer');
 
@@ -163,7 +163,9 @@ The current controller instance can be accessed as C<c>.
 
 =head1 EXAMPLES
 
-L<Mojolicious::Lite> example:
+=over 4
+
+=item L<Mojolicious::Lite> example:
 
  use Mojolicious::Lite;
  
@@ -194,7 +196,9 @@ L<Mojolicious::Lite> example:
    <body>[% content %]</body>
  </html>
 
-L<Mojolicious> example:
+=item L<Mojolicious> example:
+
+C<lib/MyApp.pm>:
 
  package MyApp;
  use Mojo::Base 'Mojolicious';
@@ -207,6 +211,8 @@ L<Mojolicious> example:
  }
  
  1;
+
+C<lib/MyApp/Example.pm>:
 
  package MyApp::Example;
  use Mojo::Base 'Mojolicious::Controller';
@@ -221,6 +227,29 @@ L<Mojolicious> example:
  }
  
  1;
+
+C<templates/example/welcome.html.tt>:
+
+ [%
+   WRAPPER 'layouts/default.html.tt'
+   title = 'Welcome'
+ %]
+ <h2>[% message %]</h2>
+ This page was generated from the template "templates/example/welcome.html.tt"
+ and the layout "templates/layouts/default.html.tt",
+ <a href="[% url_for %]">click here</a> to reload the page or
+ <a href="/index.html">here</a> to move forward to a static page.
+ [% END %]
+
+C<templates/layouts/default.html.tt>:
+
+ <!DOCTYPE html>
+ <html>
+   <head><title>[% title %]</title></head>
+   <body>[% content %]</body>
+ </html>
+
+=back
 
 These are also included with the C<Mojolicious::Plugin::TtRenderer>
 distribution, including the support files required for the full
@@ -279,7 +308,7 @@ Matthew Lawrence (MATTLAW)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2009-2018 by Ask Bjørn Hansen.
+This software is copyright (c) 2009-2021 by Ask Bjørn Hansen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

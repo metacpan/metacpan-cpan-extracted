@@ -125,8 +125,9 @@ sub document_export_download_export_result {
 #
 #
 # @param ARRAY[string] $document_ids  (required)
+# @param string $mode  (optional)
 # @param string $type  (optional)
-# @param int $stage_number  (optional)
+# @param string $stage_number  (optional)
 {
     my $params = {
         'document_ids' => {
@@ -134,13 +135,18 @@ sub document_export_download_export_result {
             description => '',
             required    => '1',
         },
+        'mode' => {
+            data_type   => 'string',
+            description => '',
+            required    => '0',
+        },
         'type' => {
             data_type   => 'string',
             description => '',
             required    => '0',
         },
         'stage_number' => {
-            data_type   => 'int',
+            data_type   => 'string',
             description => '',
             required    => '0',
         },
@@ -185,6 +191,12 @@ sub document_export_request_export {
     if ( exists $args{'document_ids'} ) {
         $query_params->{'documentIds'} =
           $self->{api_client}->to_query_value( $args{'document_ids'} );
+    }
+
+    # query params
+    if ( exists $args{'mode'} ) {
+        $query_params->{'mode'} =
+          $self->{api_client}->to_query_value( $args{'mode'} );
     }
 
     # query params

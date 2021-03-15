@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Role::Tiny;
 use Carp qw/croak/;
 
-our $VERSION = '1.004002'; # VERSION
+our $VERSION = '1.004003'; # VERSION
 
 sub click_ok {
     my ( $self, $selector_or_dom, $extra_params ) = @_;
@@ -77,7 +77,9 @@ sub _get_controls {
     my ( $self, $form ) = @_;
 
     my @els = $form->find(
-        'input:not([type=button]):not([type=submit]):not([type=image]),'       . 'select, textarea'
+        'input:not([type=button]):not([type=submit]):not([type=image]):not([disabled]),' .
+        'select:not([disabled]),' .
+        'textarea:not([disabled])'
     )->each;
 
     my %controls;
@@ -244,6 +246,8 @@ to C<bug-test-mojo-role-SubmitForm at rt.cpan.org>
 =head1 CONTRIBUTORS
 
 =for html  <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-contributors.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
+
+    L<Guillaume "guillomovitch" Rousse|https://github.com/guillomovitch>
 
 =for html   <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/PLICEASE"> <img src="http://www.gravatar.com/avatar/0640fb1c0a5e82f5a777f2306efcac77?d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2F0640fb1c0a5e82f5a777f2306efcac77" alt="PLICEASE" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">PLICEASE</span> </a> </span>
 

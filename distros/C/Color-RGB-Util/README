@@ -2,7 +2,7 @@ NAME
     Color::RGB::Util - Utilities related to RGB colors
 
 VERSION
-    This document describes version 0.602 of Color::RGB::Util (from Perl
+    This document describes version 0.604 of Color::RGB::Util (from Perl
     distribution Color-RGB-Util), released on 2021-01-19.
 
 SYNOPSIS
@@ -169,7 +169,8 @@ FUNCTIONS
 
      my @rgbs = rand_rgb_colors([ \%opts ], $num=1);
 
-    Produce $num random RGB colors, with some options. Will make reasonable
+    Produce $num random RGB colors, with some options. It does not (yet)
+    create a palette of optimally distinct colors, but will make reasonable
     attempt to make the colors different from one another.
 
     Known options:
@@ -196,6 +197,11 @@ FUNCTIONS
 
         When the number of attempts has been exceeded, the generated color
         is used anyway.
+
+    *   hash_prefix
+
+        Whether to add hash prefix to produced color codes ("#123456") or
+        not ("123456").
 
   reverse_rgb_color
     Usage:

@@ -7,7 +7,7 @@ use Carp qw( croak );
 require FFI::Platypus;
 
 # ABSTRACT: Defining types for FFI::Platypus
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 # The TypeParser and Type classes are used internally ONLY and
 # are not to be exposed to the user.  External users should
@@ -58,7 +58,7 @@ FFI::Platypus::Type - Defining types for FFI::Platypus
 
 =head1 VERSION
 
-version 1.38
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -987,6 +987,13 @@ record, and finally freeing the original pointer.
  my $foo = $ffi->cast( 'opaque' => 'foo_t*', $foo_ptr );
  free $foo_ptr;
 
+You can pass records into a closure, but care needs to be taken.
+Records passed into a closure are read-only inside the closure,
+including C<string rw> members.  Although you can pass a "pointer"
+to a record into a closure, because of limitations of the
+implementation you actually have a copy, so all records passed
+into closures are passed by-value.
+
 =head2 Fixed length arrays
 
 Fixed length arrays of native types and strings are supported by
@@ -1062,16 +1069,19 @@ A closure (sometimes called a "callback", we use the C<libffi>
 terminology) is a Perl subroutine that can be called from C.  In order
 to be called from C it needs to be passed to a C function.  To define
 the closure type you need to provide a list of argument types and a
-return type.  As of this writing only native types and strings are
-supported as closure argument types and only native types are supported
-as closure return types.  Here is an example, with C code:
+return type.  Currently only native types (integers, floating point
+values, opaque), strings and records (by-value; you can pass a pointer
+to a record, but due to limitations of the record implementation this
+is actually a copy) are supported as closure argument types, and only
+native types and records (by-value; pointer records and records with
+string pointers cannot be returned from a closure) are supported as
+closure return types.  Inside the closure any records passed in are
+read-only.
 
-[ version 0.54 ]
+We plan to add other types, though they can be converted using the Platypus
+C<cast> or C<attach_cast> methods.
 
-EXPERIMENTAL: As of version 0.54, the record type (see L<FFI::Platypus::Record>)
-is also experimentally supported as a closure argument type.  One
-caveat is that  the record member type string_rw is NOT supported
-and probably never will be.
+Here is an example, with C code:
 
  /*
   * closure.c - on Linux compile with: gcc closure.c -shared -o closure.so -fPIC
@@ -1389,6 +1399,8 @@ Meredith (merrilymeredith, MHOWARD)
 Diab Jerius (DJERIUS)
 
 Eric Brine (IKEGAMI)
+
+szTheory
 
 =head1 COPYRIGHT AND LICENSE
 

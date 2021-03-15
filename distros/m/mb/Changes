@@ -1,5 +1,16 @@
 Revision history for this software.
 
+0.25  2021-03-15 00:00:00
+  - fix mb::_ignorecase()
+  - created by INABA Hitoshi
+
+0.24  2021-03-14 00:00:00
+  - supports print FILEHANDLE <<HEREDOC
+  - fix tr/A-Z/a-z/
+  - use subroutine prototype
+  - sorts POD document
+  - created by INABA Hitoshi
+
 0.23  2021-02-27 00:00:00
   - fix parse_expr_balanced()
   - fix cluck()

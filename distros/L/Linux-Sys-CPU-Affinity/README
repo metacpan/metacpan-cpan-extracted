@@ -1,4 +1,4 @@
-Linux-Sys-CPU-Affinity version 0.03
+Linux-Sys-CPU-Affinity version 0.10
 =========================
 
 This module allows you to pin any process by its PID to some CPU's group on
@@ -18,6 +18,16 @@ To install this module type the following:
 DEPENDENCIES
 
 There are no requirements from other Perl libs.
+
+DOCUMENTATION
+
+See the POD documentation. Viewable online at CPAN
+
+https://metacpan.org/pod/Linux::Sys::CPU::Affinity
+
+AUTHOR
+
+Chernenko Dmitriy <cdn@cpan.org>
 
 COPYRIGHT AND LICENCE
 

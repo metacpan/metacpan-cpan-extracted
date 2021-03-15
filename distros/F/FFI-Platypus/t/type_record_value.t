@@ -6,7 +6,7 @@ use FFI::CheckLib qw( find_lib );
 use FFI::Platypus::Memory qw( malloc free );
 use FFI::Platypus::ShareConfig;
 
-my $libtest = find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
+my @lib = find_lib lib => 'test', symbol => 'f0', libpath => 't/ffi';
 
 my $return_ok = FFI::Platypus::ShareConfig->get('probe')->{recordvalue};
 
@@ -21,8 +21,7 @@ my $return_ok = FFI::Platypus::ShareConfig->get('probe')->{recordvalue};
 }
 
 subtest 'is a reference' => sub {
-  my $ffi = FFI::Platypus->new( api => 1 );
-  $ffi->lib($libtest);
+  my $ffi = FFI::Platypus->new( lib => [@lib], api => 1 );
 
   $ffi->type("record(FooRecord)" => 'foo_record_t');
   my $get_name  = $ffi->function( foo_value_get_name    => [ 'foo_record_t' ] => 'string' );
@@ -92,6 +91,227 @@ subtest 'is a reference' => sub {
       is $rv->value, 47;
 
     };
+
+  };
+
+};
+
+subtest 'closure' => sub {
+
+  { package Closure::Record::RW;
+
+    use FFI::Platypus::Record;
+
+    record_layout_1(
+      'string rw' => 'one',
+      'string rw' => 'two',
+      'int'       => 'three',
+      'string rw' => 'four',
+      'int[2]'    => 'myarray1',
+      'opaque'    => 'opaque1',
+      'opaque[2]' => 'myarray2',
+      'string(5)' => 'fixedfive',
+    );
+  }
+
+  my $ffi = FFI::Platypus->new( lib => [@lib], api => 1 );
+
+  $ffi->type('record(Closure::Record::RW)' => 'cx_struct_rw_t');
+  {
+    local $@ = '';
+    eval { $ffi->type('(cx_struct_rw_t,int)->void' => 'cxv_closure_t') };
+    is $@, '', 'do allow record type as arg';
+  }
+
+  {
+    local $@ = '';
+    eval { $ffi->type('()->cx_struct_rw_t' )  };
+    like "$@", qr/Record return type contains types that cannot be returned from a closure/, 'do not allow record type with pointer strings as ret type';
+  }
+
+  my $cxv_closure_set = $ffi->function(cxv_closure_set => [ 'cxv_closure_t' ] => 'void' );
+  my $cxv_closure_call = $ffi->function(cxv_closure_call => [ 'cx_struct_rw_t', 'int' ] => 'void' );
+
+  my $r = Closure::Record::RW->new;
+  $r->one("one");
+  $r->two("two");
+  $r->three(3);
+  $r->four("four");
+  $r->myarray1([1,2]);
+  $r->opaque1(malloc(22));
+  $r->myarray2([malloc(33),malloc(44)]);
+  $r->fixedfive("five\0");
+  is($r->_ffi_record_ro, 0);
+
+  my $here = 0;
+
+  my $f = $ffi->closure(sub {
+    my($r2,$num) = @_;
+    note "first closure";
+    isa_ok $r2, 'Closure::Record::RW';
+    is($r2->_ffi_record_ro, 1);
+    is($r2->one, "one");
+    is($r2->two, "two");
+    is($r2->three, 3);
+    {
+      local $@ = '';
+      eval { $r2->three(64) };
+      isnt $@, '';
+      note "error = $@";
+    }
+    is($r2->three, 3);
+    is($r2->four, "four");
+    is_deeply($r2->myarray1, [1,2]);
+    {
+      local $@ = '';
+      eval { $r2->myarray1([3,4]) };
+      isnt $@, '';
+      note "error = $@";
+    }
+    is_deeply($r2->myarray1, [1,2]);
+    {
+      local $@ = '';
+      eval { $r2->myarray1(3,4) };
+      isnt $@, '';
+      note "error = $@";
+    }
+    is_deeply($r2->myarray1, [1,2]);
+
+    is($r2->opaque1, $r->opaque1);
+    {
+      local $@ = '';
+      eval { $r2->opaque1(undef) };
+      isnt $@, '';
+      note "error = $@";
+    }
+    is($r2->opaque1, $r->opaque1);
+
+    is_deeply($r2->myarray2, $r->myarray2);
+    {
+      local $@ = '';
+      eval { $r2->myarray2([undef,undef]) };
+      isnt $@, '';
+      note "error = $@";
+    }
+    is_deeply($r2->myarray2, $r->myarray2);
+    {
+      local $@ = '';
+      eval { $r2->myarray2(undef,undef) };
+      isnt $@, '';
+      note "error = $@";
+    }
+    is_deeply($r2->myarray2, $r->myarray2);
+
+    {
+      local $@ = '';
+      eval { $r2->one("new string!") };
+      isnt $@, '';
+      note "error = $@";
+    }
+    is($r2->one, "one");
+
+    is($r2->fixedfive, "five\0");
+    {
+      local $@ = '';
+      eval { $r2->fixedfive("xxxxx") };
+      isnt $@, '';
+      note "error = $@";
+    }
+    is($r2->fixedfive, "five\0");
+
+    is($num, 42);
+    $here = 1;
+  });
+
+  $cxv_closure_set->($f);
+  $cxv_closure_call->($r, 42);
+
+  is($here, 1);
+
+};
+
+subtest 'closure ret' => sub {
+
+  { package Closure::Record::Simple;
+
+    use FFI::Platypus::Record;
+
+    record_layout_1(
+      char  => 'foo',
+      short => 'bar',
+      int   => 'baz',
+    );
+
+  }
+
+  my $ffi = FFI::Platypus->new( lib => [@lib], api => 1 );
+
+  $ffi->type('record(Closure::Record::Simple)' => 'cx_struct_simple_t');
+
+  {
+    local $@ = '';
+    eval { $ffi->type('()->cx_struct_simple_t' => 'cxv_closure_simple_t' )  };
+    is "$@", '';
+  }
+
+  my $cxv_closure_simple_call = do {
+    local $@ = '';
+    my $f = eval { $ffi->function( cxv_closure_simple_call => ['cxv_closure_simple_t'] => 'cx_struct_simple_t*') };
+    is "$@", '';
+    $f;
+  };
+
+  subtest 'good' => sub {
+
+    my $f = $ffi->closure(sub {
+      return Closure::Record::Simple->new( foo => 1, bar => 2, baz => 3 );
+    });
+
+    my $r = $cxv_closure_simple_call->call($f);
+
+    isa_ok $r, 'Closure::Record::Simple';
+    is $r->foo, 1;
+    is $r->bar, 2;
+    is $r->baz, 3;
+  };
+
+  subtest 'bad' => sub {
+
+    my $f = $ffi->closure(sub {
+      return undef;
+    });
+
+    local $SIG{__WARN__} = sub {
+      note @_;
+    };
+
+    my $r = $cxv_closure_simple_call->call($f);
+
+    isa_ok $r, 'Closure::Record::Simple';
+    is $r->foo, 0;
+    is $r->bar, 0;
+    is $r->baz, 0;
+
+  };
+
+  subtest 'short' => sub {
+
+    my $f = $ffi->closure(sub {
+      my $r = Closure::Record::Simple->new;
+      $$r = "";
+      return $r;
+    });
+
+    local $SIG{__WARN__} = sub {
+      note @_;
+    };
+
+    my $r = $cxv_closure_simple_call->call($f);
+
+    isa_ok $r, 'Closure::Record::Simple';
+    is $r->foo, 0;
+    is $r->bar, 0;
+    is $r->baz, 0;
 
   };
 

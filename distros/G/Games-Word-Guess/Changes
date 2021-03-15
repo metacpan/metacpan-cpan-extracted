@@ -1,23 +1,36 @@
-Revision history for Games-Word-Guess
+0.091   2021-03-14  Released-By: PERLANCAR; Urgency: low
 
-0.08    2016-01-12 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Update description; wordlists are now searched from
+	  WordList::*, not Games::Word::Wordlist::*.
+
+
+0.090   2021-03-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to newer WordList (pick() returns a list).
+
+        - Skip WordList::ZH::*, WordList::Char::* by default.
+
+
+0.08    2016-01-12  Released-By: PERLANCAR
 
 	- Skip WordList::Test::* by default.
 
 
-0.07    2016-01-08 (PERLANCAR)
+0.07    2016-01-08  Released-By: PERLANCAR
 
 	- Switch from Games::Word::Wordlist::* to WordList::*.
 
 
-0.06    2015-01-03 (PERLANCAR)
+0.06    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.05    2014-08-08 (SHARYANTO)
+0.05    2014-08-08  Released-By: SHARYANTO
 
         - Rename dist from Games-WordGuess to Games-Word-Guess, because the
           former is already reserved on PAUSE.
@@ -26,18 +39,18 @@ Revision history for Games-Word-Guess
           words.
 
 
-0.04    2014-08-07 (SHARYANTO)
+0.04    2014-08-07  Released-By: SHARYANTO
 
         - Minor tweak (don't pick Indonesian KBBI wordlist unless locale is
           Indonesian).
 
 
-0.03    2014-08-07 (SHARYANTO)
+0.03    2014-08-07  Released-By: SHARYANTO
 
         - Minor fixes.
 
 
-0.02    2014-08-07 (SHARYANTO)
+0.02    2014-08-07  Released-By: SHARYANTO
 
         - Formatting.
 
@@ -45,6 +58,6 @@ Revision history for Games-Word-Guess
           as dependencies.
 
 
-0.01    2014-08-07 (SHARYANTO)
+0.01    2014-08-07  Released-By: SHARYANTO
 
         - First release.

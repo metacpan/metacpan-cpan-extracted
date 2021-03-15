@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Complementary Error Function erfc(x) := 2/Sqrt[Pi] Integrate[Exp[-t^2], {t,x,Infinity}]
 
+=for bad
+
+gsl_sf_erfc does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -86,6 +90,10 @@ Complementary Error Function erfc(x) := 2/Sqrt[Pi] Integrate[Exp[-t^2], {t,x,Inf
 
 Log Complementary Error Function
 
+=for bad
+
+gsl_sf_log_erfc does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -111,6 +119,10 @@ Log Complementary Error Function
 
 Error Function erf(x) := 2/Sqrt[Pi] Integrate[Exp[-t^2], {t,0,x}]
 
+=for bad
+
+gsl_sf_erf does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -136,6 +148,10 @@ Error Function erf(x) := 2/Sqrt[Pi] Integrate[Exp[-t^2], {t,0,x}]
 
 Z(x) :  Abramowitz+Stegun 26.2.1
 
+=for bad
+
+gsl_sf_erf_Z does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -161,6 +177,10 @@ Z(x) :  Abramowitz+Stegun 26.2.1
 
 Q(x) :  Abramowitz+Stegun 26.2.1
 
+=for bad
+
+gsl_sf_erf_Q does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

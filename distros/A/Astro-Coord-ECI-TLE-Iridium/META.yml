@@ -3,12 +3,18 @@ abstract: 'Class to compute Iridium Classic flares'
 author:
   - 'Tom Wyant (wyant at cpan dot org)'
 build_requires:
-  Config: '0'
-  Data::Dumper: '0'
-  Exporter: '5.64'
+  Safe: '0'
   Test::More: '0.88'
+  Time::Local: '0'
+  lib: '0'
 configure_requires:
+  Exporter: '5.64'
+  FileHandle: '0'
+  Getopt::Std: '0'
   Module::Build: '0.42'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -24,21 +30,21 @@ no_index:
 provides:
   Astro::Coord::ECI::TLE::Iridium:
     file: lib/Astro/Coord/ECI/TLE/Iridium.pm
-    version: '0.129'
+    version: '0.130'
 requires:
+  Astro::Coord::ECI: '0.091'
   Astro::Coord::ECI::TLE: '0.091'
   Astro::Coord::ECI::Utils: '0.091'
   Carp: '0'
   POSIX: '0'
-  Scalar::Util: '0'
   base: '0'
   constant: '0'
   perl: '5.006002'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-TLE-Iridium
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium.git
-version: '0.129'
+version: '0.130'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

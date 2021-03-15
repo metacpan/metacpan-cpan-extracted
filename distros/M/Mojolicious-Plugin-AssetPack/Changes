@@ -1,4 +1,7 @@
 
+2.13  2021-03-13
+  - Restored documentation.
+
 2.12  2021-03-11
   - Mojolicious::Plugin::AssetPack is now maintained by the Mojolicious team.
 

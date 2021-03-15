@@ -1,5 +1,5 @@
 package Photonic::LE::NR2::SH;
-$Photonic::LE::NR2::SH::VERSION = '0.014';
+$Photonic::LE::NR2::SH::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -9,14 +9,14 @@ Photonic::LE::NR2::SH
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 COPYRIGHT NOTICE
 
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -197,7 +197,7 @@ use PDL::Complex;
 use PDL::FFTW3;
 use Photonic::LE::NR2::AllH;
 use Photonic::Utils qw(RtoG GtoR HProd linearCombineIt);
-use Photonic::ExtraUtils qw(cgtsl);
+use Photonic::ExtraUtils qw(cgtsv);
 use Photonic::Iterator;
 use PDL::Constants qw(PI);
 use Moose;
@@ -490,10 +490,10 @@ sub _build_selfConsistentL_n {
     my $bs=$self->HP->bs;
     my $u2=$self->u2;
     my $diag=$u2->complex - PDL->pdl($as)->(0:$nh-1);
-    my $subdiag=-PDL->pdl(@$bs)->(0:$nh-1)->r2C;
     # rotate complex zero from first to last element.
-    my $supradiag=$subdiag->mv(0,-1)->rotate(-1)->mv(-1,0);
-    my ($result, $info)= cgtsl($subdiag, $diag, $supradiag, $external);
+    my $subdiag=-PDL->pdl(@$bs)->(0:$nh-1)->r2C->mv(0,-1)->rotate(-1)->mv(-1,0)->complex;
+    my $supradiag=$subdiag;
+    my ($result, $info)= cgtsv($subdiag, $diag, $supradiag, $external);
     die "Error solving tridiag system" unless $info == 0;
     $result->complex;
     $result *= $u2/$self->epsA2;
@@ -548,22 +548,21 @@ sub _build_P2LMCalt {
     my $u2=$self->u2;
     my $B=$self->nrf->nr->geometry->B;
     my $as=$self->nrf->nr->as;
-    my $b2s=$self->nrf->nr->b2s;
     my $bs=$self->nrf->nr->bs;
     my $states=$self->nrf->nr->states;
     my $nh=$self->nrf->nh; #desired number of Haydock terms
     #don't go beyond available values.
     $nh=$self->nrf->nr->iteration if $nh>=$self->nrf->nr->iteration;
-    # calculate using linpack for tridiag system
+    # calculate using lapack for tridiag system
     # solve \epsilon^LL \vec E^L=|0>.
     my $diag=$self->u2->Cconj->complex - PDL->pdl([@$as])->(0:$nh-1);
-    my $subdiag=-PDL->pdl(@$bs)->(0:$nh-1)->r2C;
     # rotate complex zero from first to last element.
+    my $subdiag=-PDL->pdl(@$bs)->(0:$nh-1)->r2C->mv(0,-1)->rotate(-1)->mv(-1,0)->complex;
     my $supradiag=$subdiag->real->mv(0,-1)->rotate(-1)->mv(-1,0)->complex;
     my $rhs=PDL->zeroes($nh);
     $rhs->((0)).=1;
     $rhs=$rhs->r2C;
-    my ($phi_n, $info)= cgtsl($subdiag, $diag, $supradiag, $rhs);
+    my ($phi_n, $info)= cgtsv($subdiag, $diag, $supradiag, $rhs);
     die "Error solving tridiag system" unless $info == 0;
     my $phi_G=linearCombine([$phi_n->dog], $states);
     my $Pphi=$k*(1-$epsA2)*$u2/$epsA2*HProd($phi_G, $PexL_G);
@@ -578,7 +577,7 @@ sub _build_P2LMCalt {
     my @Ppsi;
     foreach(0..$ndims-1){
 	my ($psi_n, $psiinfo)=
-	    cgtsl($subdiag, $diag, $supradiag, $betaV_n->(:,($_),:));
+	    cgtsv($subdiag, $diag, $supradiag, $betaV_n->(:,($_),:));
 	die "Error solving tridiag system" unless $psiinfo == 0;
 	# RorI nx ny .... cartesian
 	my $psi_G=linearCombine([$psi_n->dog], $states);

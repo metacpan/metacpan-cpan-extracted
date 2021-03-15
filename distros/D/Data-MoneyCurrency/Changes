@@ -1,5 +1,14 @@
 Revision history for Data-MoneyCurrency
 
+0.14    Sun Mar 14 10:18:09 CET 2021
+        add perltidy . files to build
+
+0.13    Sat Mar 13 10:55:50 CET 2021
+        - new ruby-money conf (submodule is now main not master)
+        - perltidy all files, add tidy test and precommit hook
+          many thanks to Olaf Alders for the step by step guide
+          http://www.perladvent.org/2020/2020-12-01.html
+
 0.12    Fri Nov 20 06:48:48 CET 2020
         fix version mismatch between Module and dist
 

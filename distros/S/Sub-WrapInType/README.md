@@ -1,4 +1,4 @@
-[![Build Status](https://circleci.com/gh/ybrliiu/p5-Sub-WrapInType.svg)](https://circleci.com/gh/ybrliiu/p5-Sub-WrapInType) [![Coverage Status](http://codecov.io/github/ybrliiu/p5-Sub-WrapInType/coverage.svg?branch=master)](https://codecov.io/github/ybrliiu/p5-Sub-WrapInType?branch=master)
+[![Build Status](https://circleci.com/gh/ybrliiu/p5-Sub-WrapInType.svg)](https://circleci.com/gh/ybrliiu/p5-Sub-WrapInType) [![Coverage Status](http://codecov.io/github/ybrliiu/p5-Sub-WrapInType/coverage.svg?branch=master)](https://codecov.io/github/ybrliiu/p5-Sub-WrapInType?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/Sub-WrapInType.svg)](https://metacpan.org/release/Sub-WrapInType)
 # NAME
 
 Sub::WrapInType - Wrap the subroutine to validate the argument type and return type.
@@ -67,7 +67,7 @@ You can pass named parameters.
       },
     );
 
-If the <PERL\_NDEBUG> or the <NDEBUG> environment variable is true, the subroutine will not check the argument type and return type.
+If the `PERL_NDEBUG` or the `NDEBUG` environment variable is true, the subroutine will not check the argument type and return type.
 
 If subroutine returns array or hash, Sub::WrapInType will not be able to check the type as you intended.
 You should rewrite the subroutine to returns array reference or hash reference.
@@ -87,6 +87,23 @@ This function skips the type check of the first argument:
     my $sub = wrap_method [Int, Int], Int, \&add;
     $sub->(__PACKAGE__, 1, 2); # => 3
 
+## install\_sub($name, \\@parameter\_types, $return\_type, $subroutine)
+
+Install the wrapped subroutine into the current package.
+
+    use Sub::WrapInType qw( install_sub );
+
+    install_sub sum => [ Int, Int ] => Int, sub {
+      my ($x, $y) = @_;
+      $x + $y;
+    };
+    sum(2, 5);  # Returns 7
+    sum('foo'); # Throws an exception
+
+## install\_method($name, \\@parameter\_types, $return\_type, $subroutine)
+
+Install the wrapped method into the current package.
+
 # METHODS
 
 ## new(\\@parameter\_types, $return\_type, $subroutine, $options)
@@ -97,7 +114,7 @@ Constract a new Sub::WrapInType object.
     use Sub::WrapInType;
     my $wraped_sub = Sub::WrapInType->new([Int, Int] => Int, sub { $_[0] + $_[1] });
 
-You can pass options.
+### options
 
 - **check**
 

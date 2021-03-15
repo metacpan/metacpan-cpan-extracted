@@ -7,8 +7,8 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,20 +16,22 @@ meta-spec:
 name: DateTime-Calendar-Julian
 no_index:
   directory:
-    - t
     - inc
     - t
     - xt
 provides:
   DateTime::Calendar::Julian:
     file: lib/DateTime/Calendar/Julian.pm
-    version: '0.103'
+    version: '0.104'
 requires:
   DateTime: '0.08'
-  perl: '5.008004'
+  perl: '5.006002'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-DateTime-Calendar-Julian/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Julian
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/trwyant/perl-DateTime-Calendar-Julian.git
-version: '0.103'
+  repository: git://github.com/trwyant/perl-Date-Tolkien-Shire.git
+version: '0.104'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,17 +7,14 @@ use Config;
 use File::Basename qw(&basename &dirname);
 
 require './Dev.pm'; PDL::Core::Dev->import;
-use vars qw( %PDL_DATATYPES );
+my $sym2type = PDL::Core::Dev::load_Types();
+PDL::Types->import(':All');
 
 # check for bad value support
 require './Config.pm'; # to load the PDL not the Perl one
 die "No PDL::Config found" unless %PDL::Config;
 my $bvalflag = $PDL::Config{WITH_BADVAL};
 my $usenan = $PDL::Config{BADVAL_USENAN};
-require './Types.pm';
-PDL::Types->import(':All');
-
-
 
 # This forces PL files to create target in same directory as PL file.
 # This is so that make depend always knows where to find PL derivatives.
@@ -327,7 +324,7 @@ print OUT <<'!NO!SUBS!';
 
    if(SvTYPE(SvRV(sv)) == SVt_PVHV) {
         HV *hash = (HV*)SvRV(sv);
-        SV **svp = hv_fetch(hash,"PDL",3,0);
+        SV **svp = hv_fetchs(hash,"PDL",0);
         if(svp == NULL) {
                 croak("Hash given as a pdl - but not {PDL} key!");
         }
@@ -869,7 +866,7 @@ pdl* pdl_from_array(AV* av, AV* dims, int type, pdl* p)
 # pdl_setav calls...
 #
   for my $type(typesrtkeys()){
-    my $t2 = $PDL_DATATYPES{$type};
+    my $t2 = $sym2type->{$type};
     $t2 =~ s/PDL_//;
     print OUT <<"!WITH!SUBS!";
   case $type:
@@ -931,7 +928,7 @@ pdl* pdl_from_array(AV* av, AV* dims, int type, pdl* p)
 
 for my $in ( typesrtkeys() ) {
 
-  (my $type = $PDL_DATATYPES{$in}) =~ s/^PDL_//;
+  (my $type = $sym2type->{$in}) =~ s/^PDL_//;
 
 print OUT <<"!WITH!SUBS!";
 

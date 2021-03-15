@@ -4,22 +4,20 @@ use strict;
 use warnings;
 use parent 'Exporter';
 use Class::InsideOut qw( register readonly id );
-use Carp ();
-use Hash::Util ();
-use Scalar::Util ();
 use Types::Standard -types;
 use Type::Params qw( multisig compile compile_named );
+use Sub::Util qw( set_subname );
 use namespace::autoclean;
 
-our $VERSION = '0.05';
-our @EXPORT  = qw( wrap_sub wrap_method );
+our $VERSION = '0.07';
+our @EXPORT  = qw( wrap_sub wrap_method install_sub install_method );
 
 readonly params    => my %params;
 readonly returns   => my %returns;
 readonly code      => my %code;
 readonly is_method => my %is_method;
 
-my $TypeConstraint  = HasMethods[qw( assert_valid )];
+my $TypeConstraint  = HasMethods[qw( check get_message )];
 my $ParamsTypes     = $TypeConstraint | ArrayRef[$TypeConstraint] | Map[Str, $TypeConstraint];
 my $ReturnTypes     = $TypeConstraint | ArrayRef[$TypeConstraint];
 my $Options         = Dict[
@@ -160,6 +158,59 @@ EOS
   __PACKAGE__->new($params_types, $return_types, $code, $options);
 }
 
+sub install_sub {
+  state $check = multisig(
+    +{ message => << 'EOS' },
+USAGE: install_sub($name, \@parameter_types, $return_type, $subroutine)
+    or install_sub(name => $name, params => \@params_types, returns => $return_types, code => $subroutine)
+EOS
+    [ Str, $ParamsTypes, $ReturnTypes, CodeRef ],
+    compile_named(
+      name   => Str,
+      params => $ParamsTypes,
+      isa    => $ReturnTypes,
+      code   => CodeRef,
+    ),
+  );
+  my ($name, $params_types, $return_types, $code) = do {
+    my @args = $check->(@_);
+    ${^TYPE_PARAMS_MULTISIG} == 0 ? @args : @{ $args[0] }{qw( name params isa code )};
+  };
+
+  _install($name, wrap_sub($params_types, $return_types, $code), scalar caller);
+}
+
+sub install_method {
+  state $check = multisig(
+    +{ message => << 'EOS' },
+USAGE: install_method($name, \@parameter_types, $return_type, $subroutine)
+    or install_method(name => $name, params => \@params_types, returns => $return_types, code => $subroutine)
+EOS
+    [ Str, $ParamsTypes, $ReturnTypes, CodeRef ],
+    compile_named(
+      name   => Str,
+      params => $ParamsTypes,
+      isa    => $ReturnTypes,
+      code   => CodeRef,
+    ),
+  );
+  my ($name, $params_types, $return_types, $code) = do {
+    my @args = $check->(@_);
+    ${^TYPE_PARAMS_MULTISIG} == 0 ? @args : @{ $args[0] }{qw( name params isa code )};
+  };
+
+  _install($name, wrap_method($params_types, $return_types, $code), scalar caller);
+}
+
+sub _install {
+  my ($name, $code, $pkg) = @_;
+  {
+    no strict 'refs';
+    *{"${pkg}::${name}"} = $code;
+  }
+  set_subname($name, $code);
+}
+
 1;
 
 __END__
@@ -234,7 +285,7 @@ You can pass named parameters.
     },
   );
 
-If the <PERL_NDEBUG> or the <NDEBUG> environment variable is true, the subroutine will not check the argument type and return type.
+If the C<PERL_NDEBUG> or the C<NDEBUG> environment variable is true, the subroutine will not check the argument type and return type.
 
 If subroutine returns array or hash, Sub::WrapInType will not be able to check the type as you intended.
 You should rewrite the subroutine to returns array reference or hash reference.
@@ -254,6 +305,23 @@ This function skips the type check of the first argument:
   my $sub = wrap_method [Int, Int], Int, \&add;
   $sub->(__PACKAGE__, 1, 2); # => 3
 
+=head2 install_sub($name, \@parameter_types, $return_type, $subroutine)
+
+Install the wrapped subroutine into the current package.
+
+  use Sub::WrapInType qw( install_sub );
+
+  install_sub sum => [ Int, Int ] => Int, sub {
+    my ($x, $y) = @_;
+    $x + $y;
+  };
+  sum(2, 5);  # Returns 7
+  sum('foo'); # Throws an exception
+
+=head2 install_method($name, \@parameter_types, $return_type, $subroutine)
+
+Install the wrapped method into the current package.
+
 =head1 METHODS
 
 =head2 new(\@parameter_types, $return_type, $subroutine, $options)
@@ -264,7 +332,7 @@ Constract a new Sub::WrapInType object.
   use Sub::WrapInType;
   my $wraped_sub = Sub::WrapInType->new([Int, Int] => Int, sub { $_[0] + $_[1] });
 
-You can pass options.
+=head3 options
 
 =over 2
 

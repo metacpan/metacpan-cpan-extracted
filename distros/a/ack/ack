@@ -3,12 +3,13 @@
 use strict;
 use warnings;
 
-our $VERSION = 'v3.4.0'; # Check https://beyondgrep.com/ for updates
+our $VERSION = 'v3.5.0'; # Check https://beyondgrep.com/ for updates
 
 use 5.010001;
 
 use File::Spec ();
 use File::Next ();
+use Getopt::Long ();
 
 use App::Ack ();
 use App::Ack::ConfigLoader ();
@@ -113,8 +114,8 @@ MAIN: {
         $ENV{ACK_COLOR_COLNO}    ||= 'bold yellow';
     }
 
-    my $p = App::Ack::ConfigLoader::opt_parser( 'no_auto_abbrev', 'pass_through' );
-    $p->getoptions(
+    App::Ack::ConfigLoader::configure_parser( 'no_auto_abbrev', 'pass_through' );
+    Getopt::Long::GetOptions(
         help     => sub { App::Ack::show_help(); exit; },
         version  => sub { App::Ack::print( App::Ack::get_version_statement() ); exit; },
         man      => sub { App::Ack::show_man(); },
@@ -2448,7 +2449,7 @@ Andy Lester, C<< <andy at petdance.com> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2020 Andy Lester.
+Copyright 2005-2021 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License v2.0.

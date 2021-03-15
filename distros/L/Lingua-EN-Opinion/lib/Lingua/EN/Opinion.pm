@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Measure the emotional sentiment of text
 
-our $VERSION = '0.1600';
+our $VERSION = '0.1701';
 
 use Moo;
 use strictures 2;
@@ -185,6 +185,18 @@ sub get_word {
 }
 
 
+sub set_word {
+    my ( $self, $word, $value ) = @_;
+
+    if ($value > 0) {
+        $self->positive->wordlist->{$word} = $value;
+    }
+    else {
+        $self->negative->wordlist->{$word} = $value;
+    }
+}
+
+
 sub nrc_get_word {
     my ( $self, $word ) = @_;
 
@@ -194,6 +206,35 @@ sub nrc_get_word {
     return exists $self->emotion->wordlist->{$word}
         ? $self->emotion->wordlist->{$word}
         : undef;
+}
+
+
+sub nrc_set_word {
+    my ( $self, $word, $value ) = @_;
+
+    my %emotion;
+
+    for my $emotion (qw(
+        anger
+        anticipation
+        disgust
+        fear
+        joy
+        negative
+        positive
+        sadness
+        surprise
+        trust
+    )) {
+        if (exists $value->{$emotion}) {
+            $emotion{$emotion} = $value->{$emotion};
+        }
+        else {
+            $emotion{$emotion} = 0;
+        }
+    }
+
+    $self->emotion->wordlist->{$word} = \%emotion;
 }
 
 
@@ -302,7 +343,7 @@ Lingua::EN::Opinion - Measure the emotional sentiment of text
 
 =head1 VERSION
 
-version 0.1600
+version 0.1701
 
 =head1 SYNOPSIS
 
@@ -336,6 +377,9 @@ version 0.1600
   $score = $opinion->nrc_get_word('happy');
   ( $score, $known, $unknown ) = $opinion->nrc_get_sentence($sentence);
   $score = $opinion->nrc_get_sentence($sentence);
+
+  $opinion->set_word(foo => 1);
+  $opinion->nrc_set_word(foo => { anger => 0, etc => '...' });
 
 =head1 DESCRIPTION
 
@@ -503,6 +547,13 @@ Get the positive/negative sentiment for a given word.  Return
 C<undef>, C<0> or C<1> for "does not exist", "is positive" or "is
 negative", respectively.
 
+=head2 set_word
+
+  $opinion->set_word($word => $value);
+
+Set the positive/negative sentiment for a given word as C<1>, C<-1>
+or C<undef>.
+
 =head2 nrc_get_word
 
   $sentiment = $opinion->nrc_get_word($word);
@@ -510,6 +561,15 @@ negative", respectively.
 Get the NRC emotional sentiment for a given word.  Return a hash
 reference of the NRC emotions as detailed in L</nrc_analyze>.  If the
 word does not exist, return C<undef>.
+
+=head2 nrc_set_word
+
+  $opinion->nrc_set_word($word => $value);
+
+Set the NRC emotional sentiment for a given word.
+
+The B<value> must be given as a hash-reference with any of the keys
+detailed in the C<nrc_analyze> method.
 
 =head2 get_sentence
 
@@ -579,7 +639,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

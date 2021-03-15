@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 3j Symbols:  (ja jb jc) over (ma mb mc).
 
+=for bad
+
+gsl_sf_coupling_3j does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -86,6 +90,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 6j Symbols:  (ja jb jc) over (jd je jf).
 
+=for bad
+
+gsl_sf_coupling_6j does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -111,6 +119,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 9j Symbols:  (ja jb jc) over (jd je jf) over (jg jh ji).
 
+=for bad
+
+gsl_sf_coupling_9j does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

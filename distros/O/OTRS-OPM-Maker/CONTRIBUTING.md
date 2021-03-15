@@ -5,7 +5,7 @@ The distribution is contained in a Git repository, so simply clone the
 repository
 
 ```
-$ git clone http://github.com/reneeb/OTRS-OPM-Maker.git
+$ git clone https://github.com/reneeb/OTRS-OPM-Maker.git
 ```
 
 and change into the newly-created directory.

@@ -167,6 +167,13 @@ __PACKAGE__->method_documentation(
             format      => '',
             read_only   => '',
         },
+        'full_path' => {
+            datatype => 'string',
+            base_name => 'fullPath',
+            description => '',
+            format => '',
+            read_only => '',
+        },
         'creation_date' => {
             datatype    => 'DateTime',
             base_name   => 'creationDate',
@@ -265,6 +272,7 @@ __PACKAGE__->swagger_types(
     {
         'id'                            => 'string',
         'name'                          => 'string',
+        'full_path'                     => 'string',
         'creation_date'                 => 'DateTime',
         'deadline'                      => 'DateTime',
         'source_language'               => 'string',
@@ -285,6 +293,7 @@ __PACKAGE__->attribute_map(
     {
         'id'                            => 'id',
         'name'                          => 'name',
+        'full_path'                     => 'fullPath',
         'creation_date'                 => 'creationDate',
         'deadline'                      => 'deadline',
         'source_language'               => 'sourceLanguage',

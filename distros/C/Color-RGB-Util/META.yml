@@ -28,7 +28,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Color-RGB-Util/issues
   homepage: https://metacpan.org/release/Color-RGB-Util
   repository: git://github.com/perlancar/perl-Color-RGB-Util.git
-version: '0.602'
+version: '0.604'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

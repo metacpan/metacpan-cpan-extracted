@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_package version="2.0">
+  <CVS>Test</CVS>
+  <Name>TestPackage</Name>
+  <Vendor>Perl-Services.de</Vendor>
+  <URL>https://Perl-Services.de</URL>
+  <Version>6.0.3</Version>
+  <Framework>3</Framework>
+  <Description Lang="de">TestPackage</Description>
+  <Description Lang="en">TestPackage</Description>
+  <ChangeLog Date="2020-12-30" Version="4.0.1">Test</ChangeLog>
+  <ChangeLog Version="4.0.0" Date="2020-12-29">Test</ChangeLog>
+  <IntroInstall Type="Post">...</IntroInstall>
+</otrs_package>

@@ -3,8 +3,8 @@ lib/DateTime/Calendar/Julian.pm
 LICENSE
 Makefile.PL
 MANIFEST
-META.yml
 META.json
+META.yml
 README
 t/1.t
 t/4doy.t
@@ -21,3 +21,4 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
+xt/author/prereq.t

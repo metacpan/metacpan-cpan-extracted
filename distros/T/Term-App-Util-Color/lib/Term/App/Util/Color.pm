@@ -1,9 +1,9 @@
 package Term::App::Util::Color;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-06'; # DATE
+our $DATE = '2021-03-13'; # DATE
 our $DIST = 'Term-App-Util-Color'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -75,12 +75,20 @@ $SPEC{term_app_color_depth} = {
     args => {},
     description => <<'_',
 
-Try to determine the suitable color depth to use. Will first check COLOR_DEPTH
-environment variable and use that if defined. Otherwise will check COLOR
-environment variable and use that as color depth if defined and the value looks
-like color depth (e.g. `256` or `24bit`). Otherwise will try to detect terminal
-emulation software and use the highest supported color depth of that terminal
-software. Otherwise will default to 16.
+Try to determine the suitable color depth to use.
+
+Will first check COLORTERM environment variable to see if its value is
+`truecolor`; if yes then depth is 2**24 (24 bit).
+
+Then will check COLOR_DEPTH environment variable and use that if defined.
+
+Otherwise will check COLOR environment variable and use that as color depth if
+defined and the value looks like color depth (e.g. `256` or `24bit`).
+
+Otherwise will try to detect terminal emulation software and use the highest
+supported color depth of that terminal software.
+
+Otherwise will default to 16.
 
 _
 
@@ -89,7 +97,11 @@ sub term_app_color_depth {
     my $res = [200, "OK", undef, {}];
 
     my $val;
-    if (defined($ENV{COLOR_DEPTH}) &&
+    if (defined $ENV{COLORTERM} &&
+            $ENV{COLOR_TERM} eq 'truecolor') {
+        $res->[2] = 2**24;
+        $res->[3]{'func.debug_info'}{color_depth_from} = 'COLORTERM env';
+    } elsif (defined($ENV{COLOR_DEPTH}) &&
             defined($val = __parse_color_depth($ENV{COLOR_DEPTH}))) {
         $res->[2] = $val;
         $res->[3]{'func.debug_info'}{color_depth_from} = 'COLOR_DEPTH env';
@@ -130,7 +142,7 @@ Term::App::Util::Color - Determine color depth and whether to use color or not
 
 =head1 VERSION
 
-This document describes version 0.001 of Term::App::Util::Color (from Perl distribution Term-App-Util-Color), released on 2020-06-06.
+This document describes version 0.002 of Term::App::Util::Color (from Perl distribution Term-App-Util-Color), released on 2021-03-13.
 
 =head1 DESCRIPTION
 
@@ -143,12 +155,20 @@ Usage:
 
  term_app_color_depth() -> [status, msg, payload, meta]
 
-Try to determine the suitable color depth to use. Will first check COLOR_DEPTH
-environment variable and use that if defined. Otherwise will check COLOR
-environment variable and use that as color depth if defined and the value looks
-like color depth (e.g. C<256> or C<24bit>). Otherwise will try to detect terminal
-emulation software and use the highest supported color depth of that terminal
-software. Otherwise will default to 16.
+Try to determine the suitable color depth to use.
+
+Will first check COLORTERM environment variable to see if its value is
+C<truecolor>; if yes then depth is 2**24 (24 bit).
+
+Then will check COLOR_DEPTH environment variable and use that if defined.
+
+Otherwise will check COLOR environment variable and use that as color depth if
+defined and the value looks like color depth (e.g. C<256> or C<24bit>).
+
+Otherwise will try to detect terminal emulation software and use the highest
+supported color depth of that terminal software.
+
+Otherwise will default to 16.
 
 This function is not exported.
 
@@ -201,6 +221,8 @@ Return value:  (any)
 
 =head2 COLOR_DEPTH
 
+=head2 COLORTERM
+
 =head2 NO_COLOR
 
 =head1 HOMEPAGE
@@ -213,7 +235,7 @@ Source repository is at L<https://github.com/perlancar/perl-Term-App-Util-Color>
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Term-App-Util-Color>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Term-App-Util-Color/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -231,7 +253,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

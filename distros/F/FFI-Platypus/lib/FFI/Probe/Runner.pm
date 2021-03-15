@@ -7,7 +7,7 @@ use Capture::Tiny qw( capture );
 use FFI::Probe::Runner::Result;
 
 # ABSTRACT: Probe runner for FFI
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 sub new
@@ -85,7 +85,7 @@ FFI::Probe::Runner - Probe runner for FFI
 
 =head1 VERSION
 
-version 1.38
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -185,6 +185,8 @@ Meredith (merrilymeredith, MHOWARD)
 Diab Jerius (DJERIUS)
 
 Eric Brine (IKEGAMI)
+
+szTheory
 
 =head1 COPYRIGHT AND LICENSE
 

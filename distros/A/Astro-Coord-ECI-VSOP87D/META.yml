@@ -3,11 +3,16 @@ abstract: 'Implement the VSOP87D position model.'
 author:
   - 'Thomas R. Wyant, III F<wyant at cpan dot org>'
 build_requires:
+  Config: '0'
   File::Basename: '0'
   File::Glob: '0'
   Test::More: '0.88'
   Time::Local: '0'
   lib: '0'
+configure_requires:
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -23,31 +28,31 @@ no_index:
 provides:
   Astro::Coord::ECI::VSOP87D:
     file: lib/Astro/Coord/ECI/VSOP87D.pm
-    version: '0.004'
+    version: '0.005'
   Astro::Coord::ECI::VSOP87D::Jupiter:
     file: lib/Astro/Coord/ECI/VSOP87D/Jupiter.pm
-    version: '0.004'
+    version: '0.005'
   Astro::Coord::ECI::VSOP87D::Mars:
     file: lib/Astro/Coord/ECI/VSOP87D/Mars.pm
-    version: '0.004'
+    version: '0.005'
   Astro::Coord::ECI::VSOP87D::Mercury:
     file: lib/Astro/Coord/ECI/VSOP87D/Mercury.pm
-    version: '0.004'
+    version: '0.005'
   Astro::Coord::ECI::VSOP87D::Neptune:
     file: lib/Astro/Coord/ECI/VSOP87D/Neptune.pm
-    version: '0.004'
+    version: '0.005'
   Astro::Coord::ECI::VSOP87D::Saturn:
     file: lib/Astro/Coord/ECI/VSOP87D/Saturn.pm
-    version: '0.004'
+    version: '0.005'
   Astro::Coord::ECI::VSOP87D::Sun:
     file: lib/Astro/Coord/ECI/VSOP87D/Sun.pm
-    version: '0.004'
+    version: '0.005'
   Astro::Coord::ECI::VSOP87D::Uranus:
     file: lib/Astro/Coord/ECI/VSOP87D/Uranus.pm
-    version: '0.004'
+    version: '0.005'
   Astro::Coord::ECI::VSOP87D::Venus:
     file: lib/Astro/Coord/ECI/VSOP87D/Venus.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Astro::Coord::ECI: '0.102'
   Astro::Coord::ECI::Mixin: '0.102'
@@ -64,8 +69,8 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-VSOP87D
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

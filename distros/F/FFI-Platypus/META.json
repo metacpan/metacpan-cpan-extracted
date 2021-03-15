@@ -90,7 +90,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.38",
+   "version" : "1.42",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",
@@ -108,9 +108,10 @@
       "H\u00e5kon H\u00e6gland (hakonhagland, HAKONH)",
       "Meredith (merrilymeredith, MHOWARD)",
       "Diab Jerius (DJERIUS)",
-      "Eric Brine (IKEGAMI)"
+      "Eric Brine (IKEGAMI)",
+      "szTheory"
    ],
-   "x_generated_by_perl" : "v5.33.6",
+   "x_generated_by_perl" : "v5.33.7",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

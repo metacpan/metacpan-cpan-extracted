@@ -1,0 +1,29 @@
+---
+abstract: 'Make an HTML calendar'
+author:
+  - 'Ben Bullock <bkb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Make-Calendar
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Calc: '6.4'
+  HTML::Make: '0.13'
+  Table::Readable: '0.03'
+  perl: '5.006001'
+resources:
+  bugtracker: https://github.com/benkasminbullock/html-make-calendar/issues
+  repository: git://github.com/benkasminbullock/html-make-calendar.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

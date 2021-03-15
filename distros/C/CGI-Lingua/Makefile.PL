@@ -8,39 +8,47 @@ use IO::Socket::INET;
 
 my $online_tests;
 
-if($ENV{RELEASE_TESTING}) {
+if($ENV{AUTHOR_TESTING}) {
 	$online_tests = are_online();
-} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING}) {
-	$online_tests = 0;
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
 
-	if(eval { require IP::Country; }) {
-		my $v = IP::Country->VERSION;
-		print "You have IP::Country version $v installed, so CGI::Lingua can work fast\n";
-		# It also shouldn't need to do anything with the Internet,
-		# so we can do all tests
-		$online_tests = 1;
-	} elsif(eval { require Geo::IP; }) {
-		my $v = Geo::IP->VERSION;
-		if(($^O ne 'MSWin32') && (! -r '/usr/local/share/GeoIP/GeoIP.dat')) {
-			print "Warning: Can't find your GeoIP.dat file for Geo::IP, disabling that module\n";
-			$online_tests = are_online();
-		} else {
-			print "You have Geo::IP version $v installed, so CGI::Lingua can work fast\n";
-			# It also shouldn't need to do anything with the Internet,
-			# so we can do all tests
-			$online_tests = 1;
-		}
-	} elsif(eval { require Geo::IPfree; }) {
-		my $v = Geo::IPfree->VERSION;
-		print "You have Geo::IPfree version $v installed, so CGI::Lingua can work fast\n";
-		# It also shouldn't need to do anything with the Internet,
-		# so we can do all tests
-		$online_tests = 1;
-	} elsif(!defined($online_tests)) {
+	if(!defined($online_tests)) {
 		$online_tests = are_online();
 	}
+	if(!$online_tests) {
+		print "On-line tests have been disabled\n";
+		$online_tests = 0;
+	}
+}
+
+if(eval { require IP::Country; }) {
+	my $v = IP::Country->VERSION;
+	print "You have IP::Country version $v installed, so CGI::Lingua can work fast\n";
+	# It also shouldn't need to do anything with the Internet,
+	# so we can do all tests
+	$online_tests = 1;
+} elsif(eval { require Geo::IP; }) {
+	my $v = Geo::IP->VERSION;
+	if(($^O ne 'MSWin32') && (! -r '/usr/local/share/GeoIP/GeoIP.dat')) {
+		print "Warning: Can't find your GeoIP.dat file for Geo::IP, disabling that module\n";
+		if(!defined($online_tests)) {
+			$online_tests = are_online();
+		}
+	} else {
+		print "You have Geo::IP version $v installed, so CGI::Lingua can work fast\n";
+		# It also shouldn't need to do anything with the Internet,
+		# so we can do all tests
+		$online_tests = 1;
+	}
+} elsif(eval { require Geo::IPfree; }) {
+	my $v = Geo::IPfree->VERSION;
+	print "You have Geo::IPfree version $v installed, so CGI::Lingua can work fast\n";
+	# It also shouldn't need to do anything with the Internet,
+	# so we can do all tests
+	$online_tests = 1;
+} elsif(!defined($online_tests)) {
+	$online_tests = are_online();
 }
 
 if($online_tests) {
@@ -69,9 +77,7 @@ WriteMakefile(
 	'IPC::System::Simple' => 0,
 	'Test::Compile' => 0,
 	'Test::Without::Module' => 0,
-	'WWW::RT::CPAN' => 0
-    },
-    PREREQ_PM => {
+    }, PREREQ_PM => {
 	'DBD::SQLite' => 0,	# Locale::Object doesn't declare this prerequisite
 	'Locale::Object::Country' => 0.78,	# Fix for RT#79214
 	'Locale::Object' => 0.80,	# Fix for RT#131347
@@ -95,11 +101,17 @@ WriteMakefile(
     META_MERGE		=> {
     	'meta-spec' => { version => 2 },
     	resources => {
-    		repository => {
+		repository => {
 			type => 'git',
 			url => 'git://github.com/nigelhorne/CGI-Lingua.git',
 			web => 'https://github.com/nigelhorne/CGI-Lingua',
-    		},
+			repository => 'https://github.com/nigelhorne/CGI-Lingua',
+		}, bugtracker => {
+			# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Lingua',
+			web => 'https://github.com/nigelhorne/CGI-Lingua/issues',
+			url => 'https://github.com/nigelhorne/CGI-Lingua/issues',
+			mailto => 'bug-CGI-Lingua@rt.cpan.org'
+		}
 	},
     },
     MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
@@ -107,13 +119,16 @@ WriteMakefile(
 
 sub are_online
 {
+	return 0 if($ENV{'NO_NETWORK_TESTING'});
+	return 0 if(!-t STDIN);
+
 	my $s = IO::Socket::INET->new(
 		# PeerAddr => 'www.ripe.net:43',
 		PeerAddr => 'whois.apnic.net:43',
 		Timeout => 5
 	);
 	if($s) {
-		if($ENV{'AUTOMATED_TESTING'}) {
+		if($ENV{'PERL_MM_USE_DEFAULT'} || $ENV{'AUTOMATED_TESTING'}) {
 			close($s);
 			return 1;
 		}

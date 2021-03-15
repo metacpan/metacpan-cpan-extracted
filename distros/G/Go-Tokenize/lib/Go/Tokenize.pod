@@ -13,8 +13,8 @@ Go::Tokenize - Tokenize Go
 
 =head1 VERSION
 
-This documents version 0.01 of Go-Tokenize
-corresponding to L<git commit 62708e18afa5676b39aff68935df240bd51d02c9|https://github.com/benkasminbullock/go-tokenize/commit/62708e18afa5676b39aff68935df240bd51d02c9> released on Wed Mar 10 19:10:53 2021 +0900.
+This documents version 0.02 of Go-Tokenize
+corresponding to L<git commit b750cdd6ab0a0d951dd19c1c8bf37c54f8ea73d5|https://github.com/benkasminbullock/go-tokenize/commit/b750cdd6ab0a0d951dd19c1c8bf37c54f8ea73d5> released on Sat Mar 13 17:18:20 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ Turn Go code into tokens.
 
 Given your Go program text in C<$go>, turn it into tokens. The return
 value is an array reference which contains hash references. The hash
-references have the following keys
+references have the following keys:
 
 =over
 
@@ -39,8 +39,9 @@ The text content of the token.
 =item end
 
 The position of the final character of the token, in characters. See
-L</start> for the numbering. This is the value of L<pos> as the regex
-used for matching matches components.
+L</start> for the numbering. This is the value of
+L<pos|https://perldoc.perl.org/functions/pos> as the regex used for
+matching matches components.
 
 =item line
 
@@ -62,13 +63,25 @@ The type of the token. Currently the following are supported:
 
 =over
 
+
+
 =item comment
+
+=item identifier
+
+=item integer
 
 =item keyword
 
+=item numeric
+
 =item operator
 
+=item rune
+
 =item string
+
+=item whitespace
 
 =back
 

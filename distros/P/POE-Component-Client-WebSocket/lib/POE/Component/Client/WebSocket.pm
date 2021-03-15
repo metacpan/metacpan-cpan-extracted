@@ -1,11 +1,11 @@
 package POE::Component::Client::WebSocket;
 
-use v5.26.0;;
+use v5.026;
 use strict;
 use warnings;
 
-use vars qw($VERSION);
-$VERSION = '0.29'; 
+# Correct version definition
+our $VERSION = '0.34';
 
 use Carp qw(carp croak);
 use Errno qw(ETIMEDOUT ECONNRESET);
@@ -49,7 +49,7 @@ POE::Component::Client::WebSocket - A POE compatible websocket client
 
 =head1 VERSION
 
-Version 0.29
+version 0.34
 
 =head1 WARNING: Work in progress! Only uploaded early for testing purposes!
 
@@ -174,7 +174,7 @@ sub new {
             },
             _state          => {
                 run                     =>  1,
-                frame                   =>  Protocol::WebSocket::Frame->new,
+                frame                   =>  Protocol::WebSocket::Frame->new(max_payload_size => 0),
             },
     
         }
@@ -545,10 +545,6 @@ sub _socket_input {
 
 Paul G Webster, C<< <daemon at cpan.org> >>
 
-=head1 Contributors
-
-Tom Ryder C << anonymous@while.verifying >>
-
 =head1 BUGS
 
 Please report any bugs or feature requests to L<https://github.com/PaulGWebster/POE-Component-Client-Websocket>
@@ -581,6 +577,11 @@ L<http://search.metacpan.org/dist/POE-Component-Client-WebSocket/>
 
 =head1 ACKNOWLEDGEMENTS
 
+=over 4
+
+=item * Tom Ryder - Multiple fixes for version including SNI 0.29 L<https://metacpan.org/author/TEJR>
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 

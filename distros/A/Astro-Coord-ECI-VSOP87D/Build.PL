@@ -14,14 +14,18 @@ use My::Module::Meta;
 my $meta = My::Module::Meta->new();
 
 my %args = (
-    dist_author => 'Thomas R. Wyant, III F<wyant at cpan dot org>',
-    dist_abstract => 'Implement the VSOP87D position model.',
-    module_name => 'Astro::Coord::ECI::VSOP87D',
-    build_requires => $meta->build_requires(),
-    requires => $meta->requires(
-	perl => $meta->requires_perl(),
+    add_to_cleanup	=> $meta->add_to_cleanup(),
+    build_requires	=> $meta->build_requires(),
+    configure_requires	=> $meta->configure_requires(),
+    dist_abstract	=> $meta->abstract(),
+    dist_author	=> $meta->author(),
+    dist_name	=> $meta->dist_name(),
+    license	=> $meta->license(),
+    module_name	=> $meta->module_name(),
+    requires	=> $meta->requires(
+	perl	=> $meta->requires_perl(),
     ),
-    license => 'perl',
+    script_files	=> $meta->script_files(),
 );
 
 if ( $mbv >= 0.28 ) {

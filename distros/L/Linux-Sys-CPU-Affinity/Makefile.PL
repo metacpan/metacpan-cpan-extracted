@@ -4,20 +4,26 @@ use Config ();
 
 my %Config = %Config::Config;
 
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
 WriteMakefile(
     NAME              => 'Linux::Sys::CPU::Affinity',
-    VERSION_FROM      => 'lib/Linux/Sys/CPU/Affinity.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {'XSLoader'    =>  0, }, # e.g., Module::Name => 1.1
+    VERSION_FROM      => 'lib/Linux/Sys/CPU/Affinity.pm',
+    PREREQ_PM         => {
+        'XSLoader'        =>  0,
+        'Test::More'      => '1.302183',
+        'Test::Deep'      => '1.130',
+        'Test::LeakTrace' => '0.14',
+    },
+    'META_MERGE'    => {
+        'resources' => {
+            'bugtracker' => 'https://github.com/KalessinD/perl_linux_sys_cpu_affinity/issues',
+            'repository' => 'https://github.com/KalessinD/perl_linux_sys_cpu_affinity',
+        },
+    },
     ABSTRACT_FROM     => 'lib/Linux/Sys/CPU/Affinity.pm', # retrieve abstract from module
-    AUTHOR            => 'dchernenko <dchernenko@>',
+    AUTHOR            => 'Chernenko Dmitriy <cdn@cpan.org>',
     #CCFLAGS           => "-x c++ ${Config{ccflags}}",
-    #PREREQ_PM         => {"Test::More" => "5.006",},
     #CONFIGURE_REQUIRES => {"ExtUtils::MakeMaker" => 0,},
-    #LICENSE           => 'perl',
-    #Value must be from legacy list of licenses here
-    #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
+    LICENSE           => 'perl',
     LIBS              => [''], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
 	# Insert -I. if you add *.h files later:

@@ -3,9 +3,9 @@
 ## no critic: (InputOutput::ProhibitReadlineInForLoop)
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-01'; # DATE
+our $DATE = '2021-03-14'; # DATE
 our $DIST = 'App-subsort'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.047'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -20,6 +20,8 @@ my %opts = (
     ignore_case => 0,
     reverse => 0,
     key => undef,
+    input_record_separator => "\n",
+    output_record_separator => "",
 );
 my ($routine, $meta);
 my $routine_args = {};
@@ -28,6 +30,22 @@ my $res = GetOptions(
     'ignore_case|f' => sub { $opts{ignore_case} = 1 },
     'reverse|r'     => sub { $opts{reverse} = 1 },
     'key|k=s'       => \$opts{key},
+    '0:s'           => sub {
+        if (!defined($_[1]) || $_[1] eq '') {
+            $opts{input_record_separator}  = "\0";
+        } elsif ($_[1] =~ /\A[0-7]{3}\z/) {
+            $opts{input_record_separator} = chr(oct($_[1]));
+        } elsif ($_[1] =~ /\Ax[0-9A-Fa-f]{2}\z/) {
+            $opts{input_record_separator} = chr(hex($_[1]));
+        } else {
+            warn "Invalid record separator (-0), please specify octal e.g. -0177 or hexadecimal e.g. -0x7f";
+            die "";
+        }
+    },
+    'para' => sub {
+        $opts{input_record_separator} = "";
+        #$opts{output_record_separator} = "\n\n";
+    },
     'help|h'        => sub {
         print <<'_';
 sortsub - Sort lines of text using Sort::Sub routines
@@ -48,10 +66,13 @@ Options:
   --help, -h         Show this help message and exit.
   --version, -v      Show version and exit.
   --list, -l         List available Sort::Sub routines.
+
   --ignore-case, -f  Do a case-insensitive sort.
   --reverse, -r      Do a reverse sort.
   --arg=s, -A        Argument to pass to sorter. In the form of name=val. Can
                        be specified multiple times.
+  -0[octal or hexa]  Specify record separator character (default is newline).
+  --para             Split input per paragraph (by blank lines).
   --key=s, -k        Perl code to generate sort key to sort against.
 
 _
@@ -173,10 +194,13 @@ $routine =~ s/-/_/g; # ux
     "with meta",
 );
 @ARGV = @files;
+local $/ = $opts{input_record_separator};
+local $\ = $opts{output_record_separator};
+#say "D:output_record_separator = <$opts{output_record_separator}>";
 if (defined $opts{key}) {
     my $code_gen_key = eval "sub { $opts{key} }";
     die "Can't compile code in --key: $@" if $@;
-    my @lines = map {chomp;$_} <>;
+    my @lines = map {$_} <>;
     my @keys; for (@lines) { push @keys, $code_gen_key->($_) }
     my @sorted_indices = sort {
         local $main::a = $keys[$a];
@@ -190,7 +214,7 @@ if (defined $opts{key}) {
             $main::a, $main::b, $res;
         $res;
     } 0..$#lines;
-    say $lines[$_] for @sorted_indices;
+    print $lines[$_] for @sorted_indices;
 } else {
     my $i = 0;
     for (sort {
@@ -205,12 +229,12 @@ if (defined $opts{key}) {
                 $main::a->[0], $main::b->[0], $res;
         }
         $res;
-    } map {chomp; [$_, $i++]} <>) {
-        say $_->[0];
+    } map {[$_, $i++]} <>) {
+        print $_->[0];
     }
 }
 
-# ABSTRACT: Sort lines of text using Sort::Sub routines
+# ABSTRACT: Sort lines of text (or records) using Sort::Sub routines
 # PODNAME: sortsub
 
 __END__
@@ -221,11 +245,11 @@ __END__
 
 =head1 NAME
 
-sortsub - Sort lines of text using Sort::Sub routines
+sortsub - Sort lines of text (or records) using Sort::Sub routines
 
 =head1 VERSION
 
-This document describes version 0.046 of sortsub (from Perl distribution App-subsort), released on 2020-05-01.
+This document describes version 0.047 of sortsub (from Perl distribution App-subsort), released on 2021-03-14.
 
 =head1 SYNOPSIS
 
@@ -257,10 +281,14 @@ L<Sort::Sub>.
   --help, -h         Show this help message and exit.
   --version, -v      Show version and exit.
   --list, -l         List available Sort::Sub routines.
+
   --ignore-case, -f  Do a case-insensitive sort.
   --reverse, -r      Do a reverse sort.
   --arg=s, -A        Argument to pass to sorter. In the form of name=val. Can
                        be specified multiple times.
+  --key=s, -k        Perl code to generate sort key to sort against.
+  -0[octal or hexa]  Specify record separator character (default is newline).
+  --para             Split input per paragraph (by blank lines).
 
 =head1 COMPLETION
 
@@ -327,7 +355,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

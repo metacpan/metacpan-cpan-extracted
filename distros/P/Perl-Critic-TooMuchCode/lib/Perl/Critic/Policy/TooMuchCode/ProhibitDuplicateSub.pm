@@ -9,6 +9,11 @@ sub applies_to           { return 'PPI::Document' }
 
 sub violates {
     my ($self, undef, $doc) = @_;
+    my $packages = $doc->find('PPI::Statement::Package') || [];
+    if (@$packages > 1) {
+        return ();
+    }
+
     my $subdefs = $doc->find('PPI::Statement::Sub') or return;
 
     my %seen;

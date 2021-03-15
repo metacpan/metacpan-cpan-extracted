@@ -159,4 +159,31 @@ $expected = {
 };
 is_deeply $got, $expected, 'nrc_get_sentence';
 
+my $word = 'very';
+is $obj->get_word($word), undef, 'get_word';
+$obj->set_word($word, 1);
+is $obj->get_word($word), 1, 'get_word';
+( $got, $known, $unknown ) = $obj->get_sentence($text);
+is $got, 3, 'get_sentence';
+is $known, 3, 'known';
+is $unknown, 4, 'unknown';
+
+$got = $obj->nrc_get_word($word);
+is_deeply $got, undef, 'nrc_get_word';
+$expected = {
+    anger        => 0,
+    anticipation => 0,
+    disgust      => 0,
+    fear         => 1,
+    joy          => 0,
+    negative     => 0,
+    positive     => 0,
+    sadness      => 0,
+    surprise     => 0,
+    trust        => 0,
+};
+$obj->nrc_set_word($word => $expected);
+$got = $obj->nrc_get_word($word);
+is_deeply $got, $expected, 'nrc_get_word';
+
 done_testing();

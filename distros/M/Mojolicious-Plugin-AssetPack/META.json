@@ -55,6 +55,6 @@
          "web" : "https://github.com/mojolicious/mojo-assetpack"
       }
    },
-   "version" : "2.12",
+   "version" : "2.13",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

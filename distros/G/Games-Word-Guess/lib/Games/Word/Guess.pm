@@ -1,12 +1,17 @@
+## no critic (ControlStructures::ProhibitMutatingListFunctions)
+
 package Games::Word::Guess;
 
-our $DATE = '2016-01-12'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-03-14'; # DATE
+our $DIST = 'Games-Word-Guess'; # DIST
+our $VERSION = '0.091'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
+use Log::ger;
 
 use Module::List qw(list_modules);
 use Module::Load;
@@ -18,12 +23,14 @@ sub new {
     # select and load default wordlist
     my $mods = list_modules("WordList::", {list_modules=>1, recurse=>1});
     my @wls = map {s/^WordList:://; $_}
-        grep {!/^WordList::(Test|Phrase)::/} keys %$mods;
+        grep {!/^WordList::(Char|Test|Phrase|ZH)::/} keys %$mods;
     print "Available wordlists: ", join(", ", @wls), "\n";
     my $wl = $attrs{word_list};
     if (!$wl) {
-        if (($ENV{LANG} // "") =~ /^id/ && "ID::KBBI" ~~ @wls) {
+        if (($ENV{LANG} // "") =~ /^en/ && "ID::KBBI" ~~ @wls) {
             $wl = "ID::KBBI";
+        } elsif (($ENV{LANG} // "") =~ /^id/ && "EN::Enable" ~~ @wls) {
+            $wl = "EN::Enable";
         } else {
             if (@wls > 1) {
                 @wls = grep {$_ ne 'ID::KBBI'} @wls;
@@ -67,7 +74,8 @@ sub ask_word {
         my $l2 = int($self->{max_len} // $l1 // 5);
         my $tries = 0;
         while (++$tries < 100) {
-            $word = $self->{_wlobj}->pick;
+            ($word) = $self->{_wlobj}->pick;
+            log_trace "Got word: $word";
             if ($word =~ qr/\A[a-z]{$l1,$l2}\z/) {
                 last PICK;
             }
@@ -166,8 +174,6 @@ sub show_final_score {
 1;
 # ABSTRACT: Word guess game
 
-
-
 __END__
 
 =pod
@@ -180,20 +186,13 @@ Games::Word::Guess - Word guess game
 
 =head1 VERSION
 
-This document describes version 0.08 of Games::Word::Guess (from Perl distribution Games-Word-Guess), released on 2016-01-12.
+This document describes version 0.091 of Games::Word::Guess (from Perl distribution Games-Word-Guess), released on 2021-03-14.
 
 =head1 SYNOPSIS
 
  % wordguess
 
 =for Pod::Coverage ^(.+)$
-
-=head1 SEE ALSO
-
-L<wordguess>
-
-L<Games::GuessWord> which is more akin to Hangman but, at the time of this
-writing, does not come with a readily-playable game.
 
 =head1 HOMEPAGE
 
@@ -211,16 +210,22 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<wordguess>
+
+L<Games::GuessWord> which is more akin to Hangman but, at the time of this
+writing, does not come with a readily-playable game.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

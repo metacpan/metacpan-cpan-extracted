@@ -15,6 +15,6 @@ Lhttps://github.com/smartcatai/smartcat-api-perl/
 
 package Smartcat::Client;
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 1;

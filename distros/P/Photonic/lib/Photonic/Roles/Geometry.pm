@@ -1,5 +1,5 @@
 package Photonic::Roles::Geometry;
-$Photonic::Roles::Geometry::VERSION = '0.014';
+$Photonic::Roles::Geometry::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -8,7 +8,7 @@ $Photonic::Roles::Geometry::VERSION = '0.014';
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -328,7 +328,7 @@ Photonic::Roles::Geometry
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -342,7 +342,7 @@ version 0.014
 =item (for developers)
 
     package Photonic::Geometry::FromB;
-    $Photonic::Geometry::Geometry::VERSION = '0.014';
+    $Photonic::Geometry::Geometry::VERSION = '0.015';
     use namespace::autoclean;
     use Moose;
     has 'B' =>(is=>'ro', isa=>'PDL', required=>1,

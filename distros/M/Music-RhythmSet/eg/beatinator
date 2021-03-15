@@ -1,0 +1,136 @@
+#!/usr/bin/env perl
+#
+# beatinator - generates three voices that vary their rhythmic patterns
+# over time. MIDI is generated along with other possible output forms
+#
+#   $ perl beatinator --notes=60,67,68 noise.midi
+#   ...
+#   $ timidity noise.midi
+
+use 5.24.0;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use Music::RhythmSet;
+use Music::RhythmSet::Util qw(filter_pattern);
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+    'channel|c=i'  => \my $Flag_Channel,
+    'divisor|d=i'  => \my $Flag_Divisor,
+    'help|h|?'     => \&emit_help,
+    'no-changes|C' => \my $Flag_Nochanges,
+    'notes=s'      => \my $Flag_Notes,
+    'rs|R=s'       => \my $Flag_RS,
+    'sep|S=s'      => \my $Flag_Sep,
+    'string|s'     => \my $Flag_Tostring,
+    'sustain|sus'  => \my $Flag_Sustain,
+) or exit 1;
+
+$Flag_Channel //= 9;    # drum
+$Flag_Notes = [ split /,/, $Flag_Notes ] if defined $Flag_Notes;
+
+my $filename = shift // die "Usage: $0 midi-file [measure-count]\n";
+my $measures = shift // 128;
+
+########################################################################
+#
+# GENERATION
+
+# all voices use the same number of beats per measure (this need not be
+# true but would make the "measures" harder to line up between voices)
+my $BPM  = 16;
+my $rest = [ (0) x $BPM ];
+
+# each voice has a consistent (but usually different) number of onsets
+# per measure. those with more onsets are given more trials to lower the
+# rhythmic variance (see eg/variance)
+my @onsets = ( [ 3, 150 ], [ 7, 500 ] );
+
+sub voice0 {
+    state $i = 0;
+    # mixup which of the two other voices is more active every so often
+    if ( ++$i == 2 ) { $i = 0; @onsets = reverse @onsets }
+    # if you know what rhythms you want to use it would be simpler to
+    # put them into a structure and use that. filter_pattern finds
+    # patterns that best fit a ranking system; this may not yield usable
+    # results but does allow rhythmic possibilities to be explored
+    filter_pattern( 5, $BPM, 250 ), 16;
+}
+
+sub voice1 {
+    # one time fixup of when the rhythm changes for this voice
+    state $i = 0;
+    my $ttl = $i++ ? 16 : 8;
+    filter_pattern( $onsets[0][0], $BPM, $onsets[0][1] ), $ttl;
+}
+
+sub voice2 {
+    filter_pattern( $onsets[1][0], $BPM, $onsets[1][1] ), 16;
+}
+
+# delayed onsets for two of the voices
+my $set = Music::RhythmSet->new->add(
+    { next => \&voice0 },
+    { next => \&voice1, pattern => $rest, ttl => 8 },
+    { next => \&voice2, pattern => $rest, ttl => 16 },
+);
+
+# generate the replay log
+$set->advance($measures);
+
+########################################################################
+#
+# OUTPUT
+
+# different notes for the different voices so they are easier to tell
+# apart (they might instead use the same note and then the MIDI player
+# could make them distinct by changing the instrument, etc)
+$set->to_midi(
+    chan => $Flag_Channel,
+    defined $Flag_Notes
+    ? ( track => [ map { { note => $_ } } $Flag_Notes->@* ] )
+    : (),
+    defined $Flag_Sustain ? ( sustain => 1 ) : (),
+)->write_to_file($filename);
+
+print $set->to_string(
+    $Flag_Divisor     ? ( divisor => $Flag_Divisor ) : (),
+    defined $Flag_RS  ? ( rs      => $Flag_RS )      : (),
+    defined $Flag_Sep ? ( sep     => $Flag_Sep )     : (),
+) if $Flag_Tostring;
+
+exit if $Flag_Nochanges;
+
+# show what the patterns are in each measure where a pattern changes
+# (there are also text_event in the MIDI to help locate the rhythms
+# should this script by accident produce something good)
+$set->changes(
+    $Flag_Divisor ? ( divisor => $Flag_Divisor ) : (),
+    header => sub { warn '# measure ' . $_[0] . "\n" },
+    voice  => sub {
+        my ( $mm, $id, $bp, $bs, $new, $repeat ) = @_;
+        # 'n' if there was a pattern change event for this voice, 'r' if
+        # that change event did not actually change the pattern
+        # (uncommon in this script)
+        warn join( "\t", $id, $bs, ( $new ? 'n' : '' ) . ( $repeat ? 'r' : '' ) )
+          . "\n";
+    }
+);
+
+sub emit_help {
+    warn <<'END_USAGE';
+Usage: beatinator [options] midi-file [measure-count]
+
+Options:
+  -C            Do not emit changes to stderr
+  -c chan       MIDI channel to use for all voices (default 9, drum)
+  -d [divisor]  Divide beat count by this many beats per measure
+  --notes ...   Note to use for each MIDI track e.g.    --notes=60,67,68
+  -R recsep     Record sep for string import and export
+  -S fieldsep   Field sep for string import and export
+  -s            Emit to_string form to stdout
+  --sustain     MIDI notes will be sustained until next onset
+
+END_USAGE
+    exit 64;
+}

@@ -2,7 +2,7 @@ package App::Yath::Command::reload;
 use strict;
 use warnings;
 
-our $VERSION = '1.000043';
+our $VERSION = '1.000044';
 
 use File::Spec();
 use Test2::Harness::Util::File::JSON;
@@ -257,6 +257,13 @@ Do not delete directories when done. This is useful if you want to inspect the d
 Yath-UI API key. This is not necessary if your Yath-UI instance is set to single-user
 
 
+=item --yathui-db
+
+=item --no-yathui-db
+
+Add the YathUI DB renderer in addition to other renderers
+
+
 =item --yathui-grace
 
 =item --no-yathui-grace
@@ -291,6 +298,36 @@ Minimum duration length (seconds) before a test goes from SHORT to MEDIUM
 Set the upload mode (default 'qvfd')
 
 
+=item --yathui-only
+
+=item --no-yathui-only
+
+Only use the YathUI renderer
+
+
+=item --yathui-only-db
+
+=item --no-yathui-only-db
+
+Only use the YathUI DB renderer
+
+
+=item --yathui-port 8080
+
+=item --no-yathui-port
+
+Port to use when running a local server
+
+
+=item --yathui-port-command get_port.sh
+
+=item --yathui-port-command get_port.sh --pid $$
+
+=item --no-yathui-port-command
+
+Use a command to get a port number. "$$" will be replaced with the PID of the yath process
+
+
 =item --yathui-project ARG
 
 =item --yathui-project=ARG
@@ -298,6 +335,13 @@ Set the upload mode (default 'qvfd')
 =item --no-yathui-project
 
 The Yath-UI project for your test results
+
+
+=item --yathui-render
+
+=item --no-yathui-render
+
+Add the YathUI renderer in addition to other renderers
 
 
 =item --yathui-retry
@@ -309,6 +353,17 @@ How many times to try an operation before giving up
 Can be specified multiple times
 
 
+=item --yathui-schema PostgreSQL
+
+=item --yathui-schema MySQL
+
+=item --yathui-schema MySQL56
+
+=item --no-yathui-schema
+
+What type of DB/schema to use when using a temporary database
+
+
 =item --yathui-url http://my-yath-ui.com/...
 
 =item --uri http://my-yath-ui.com/...
@@ -316,6 +371,120 @@ Can be specified multiple times
 =item --no-yathui-url
 
 Yath-UI url
+
+
+=item --yathui-user ARG
+
+=item --yathui-user=ARG
+
+=item --no-yathui-user
+
+Username to attach to the data sent to the db
+
+
+=item --yathui-db-buffering none
+
+=item --yathui-db-buffering job
+
+=item --yathui-db-buffering diag
+
+=item --yathui-db-buffering run
+
+=item --no-yathui-db-buffering
+
+Type of buffering to use, if "none" then events are written to the db one at a time, which is SLOW
+
+
+=item --yathui-db-config ARG
+
+=item --yathui-db-config=ARG
+
+=item --no-yathui-db-config
+
+Module that implements 'MODULE->yath_ui_config(%params)' which should return a Test2::Harness::UI::Config instance.
+
+
+=item --yathui-db-driver Pg
+
+=item --yathui-db-drivermysql
+
+=item --yathui-db-driverMariaDB
+
+=item --no-yathui-db-driver
+
+DBI Driver to use
+
+
+=item --yathui-db-dsn ARG
+
+=item --yathui-db-dsn=ARG
+
+=item --no-yathui-db-dsn
+
+DSN to use when connecting to the db
+
+
+=item --yathui-db-flush-interval 2
+
+=item --yathui-db-flush-interval 1.5
+
+=item --no-yathui-db-flush-interval
+
+When buffering DB writes, force a flush when an event is recieved at least N seconds after the last flush.
+
+
+=item --yathui-db-host ARG
+
+=item --yathui-db-host=ARG
+
+=item --no-yathui-db-host
+
+hostname to use when connecting to the db
+
+
+=item --yathui-db-name ARG
+
+=item --yathui-db-name=ARG
+
+=item --no-yathui-db-name
+
+Name of the database to use for yathui
+
+
+=item --yathui-db-pass ARG
+
+=item --yathui-db-pass=ARG
+
+=item --no-yathui-db-pass
+
+Password to use when connecting to the db
+
+
+=item --yathui-db-port ARG
+
+=item --yathui-db-port=ARG
+
+=item --no-yathui-db-port
+
+port to use when connecting to the db
+
+
+=item --yathui-db-socket ARG
+
+=item --yathui-db-socket=ARG
+
+=item --no-yathui-db-socket
+
+socket to use when connecting to the db
+
+
+=item --yathui-db-user ARG
+
+=item --yathui-db-user=ARG
+
+=item --no-yathui-db-user
+
+Username to use when connecting to the db
 
 
 =back

@@ -77,6 +77,10 @@ around a PDL array using the cursor keys.
 
 
 
+=for bad
+
+browse does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

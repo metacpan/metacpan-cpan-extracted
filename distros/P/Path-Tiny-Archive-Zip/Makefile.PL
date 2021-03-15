@@ -21,7 +21,6 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "Path::Tiny" => 0,
     "constant" => 0,
-    "namespace::clean" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -32,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +48,6 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "blib" => "1.01",
   "constant" => 0,
-  "namespace::clean" => 0,
   "strict" => 0,
   "warnings" => 0
 );

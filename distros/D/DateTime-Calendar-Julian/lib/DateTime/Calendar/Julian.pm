@@ -5,7 +5,7 @@ use warnings;
 
 use vars qw($VERSION @ISA);
 
-$VERSION = '0.103';
+$VERSION = '0.104';
 
 use DateTime 0.08;
 @ISA = 'DateTime';
@@ -192,6 +192,7 @@ Support for this module is provided via the F<datetime@perl.org> email
 list. See L<https://lists.perl.org/> for more details.
 
 Please report bugs to
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Julian>,
 L<https://github.com/trwyant/perl-DateTime-Calendar-Julian/issues>, or
 in electronic mail to F<wyant@cpan.org>.
 

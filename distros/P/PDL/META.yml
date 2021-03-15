@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl Data Language'
 author:
-  - 'PerlDL Developers (pdl-general@lists.sourceforge.net)'
+  - 'PerlDL Developers <pdl-general@lists.sourceforge.net>'
 build_requires:
   CPAN::Meta: '2.120900'
   ExtUtils::MakeMaker: '0'
@@ -31,13 +31,10 @@ no_index:
   file:
     - Doc/scantree.pl
 requires:
-  Astro::FITS::Header: '0'
   Carp: '0'
   Config: '0'
   Convert::UU: '0'
   Data::Dumper: '2.121'
-  English: '0'
-  ExtUtils::MakeMaker: '6.56'
   Fcntl: '0'
   File::Basename: '0'
   File::Find: '0'
@@ -58,11 +55,12 @@ requires:
   Storable: '1.03'
   Term::ReadKey: '2.34'
   Text::Balanced: '1.89'
+  autodie: '0'
   perl: '5.010'
 resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/PDLPorters/pdl/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl.git
-version: '2.028'
+version: '2.029'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

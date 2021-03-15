@@ -1,6 +1,6 @@
 ---
 pod_spelling_system:
-  skip: 0
+  skip: 1
   # list of words that are spelled correctly
   # (regardless of what spell check thinks)
   stopwords:

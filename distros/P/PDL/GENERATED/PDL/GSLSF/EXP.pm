@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Exponential
 
+=for bad
+
+gsl_sf_exp does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -86,6 +90,10 @@ Exponential
 
 N-relative Exponential. exprel_N(x) = N!/x^N (exp(x) - Sum[x^k/k!, {k,0,N-1}]) = 1 + x/(N+1) + x^2/((N+1)(N+2)) + ... = 1F1(1,1+N,x)
 
+=for bad
+
+gsl_sf_exprel_n does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -111,6 +119,10 @@ N-relative Exponential. exprel_N(x) = N!/x^N (exp(x) - Sum[x^k/k!, {k,0,N-1}]) =
 
 Exponential of a quantity with given error.
 
+=for bad
+
+gsl_sf_exp_err does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

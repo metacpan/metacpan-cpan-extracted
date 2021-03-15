@@ -4,7 +4,7 @@
       "Iain Truskett <spoon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,16 +13,31 @@
       "version" : 2
    },
    "name" : "WWW-Shorten",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.52",
+            "perl" : "5.008"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::PluginBundle::Starter" : "v4.0.0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.4",
+            "Test::CPAN::Meta" : "0",
             "Test::CheckManifest" : "1.29",
             "Test::Kwalitee" : "1.22",
             "Test::More" : "0.88",
@@ -30,7 +45,8 @@
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::Spelling::CommonMistakes" : "1.000",
-            "Test::Spelling" : "0.12"
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "2.00"
          }
       },
       "runtime" : {
@@ -39,73 +55,79 @@
             "Getopt::Long" : "2.4",
             "LWP::UserAgent" : "5.835",
             "Try::Tiny" : "0.24",
-            "perl" : "5.008001",
+            "perl" : "5.008",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.008"
          }
       }
    },
    "provides" : {
       "WWW::Shorten" : {
          "file" : "lib/WWW/Shorten.pm",
-         "version" : "3.093"
+         "version" : "3.094"
       },
       "WWW::Shorten::LinkToolbot" : {
          "file" : "lib/WWW/Shorten/LinkToolbot.pm",
-         "version" : "3.093",
+         "version" : "3.094",
          "x_deprecated" : 1
       },
       "WWW::Shorten::Linkz" : {
          "file" : "lib/WWW/Shorten/Linkz.pm",
-         "version" : "3.093",
+         "version" : "3.094",
          "x_deprecated" : 1
       },
       "WWW::Shorten::MakeAShorterLink" : {
          "file" : "lib/WWW/Shorten/MakeAShorterLink.pm",
-         "version" : "3.093",
+         "version" : "3.094",
          "x_deprecated" : 1
       },
       "WWW::Shorten::Metamark" : {
          "file" : "lib/WWW/Shorten/Metamark.pm",
-         "version" : "3.093",
+         "version" : "3.094",
          "x_deprecated" : 1
       },
       "WWW::Shorten::Qurl" : {
          "file" : "lib/WWW/Shorten/Qurl.pm",
-         "version" : "3.093",
+         "version" : "3.094",
          "x_deprecated" : 1
       },
       "WWW::Shorten::Qwer" : {
          "file" : "lib/WWW/Shorten/Qwer.pm",
-         "version" : "3.093",
+         "version" : "3.094",
          "x_deprecated" : 1
       },
       "WWW::Shorten::TinyClick" : {
          "file" : "lib/WWW/Shorten/TinyClick.pm",
-         "version" : "3.093",
+         "version" : "3.094",
          "x_deprecated" : 1
       },
       "WWW::Shorten::TinyURL" : {
          "file" : "lib/WWW/Shorten/TinyURL.pm",
-         "version" : "3.093"
+         "version" : "3.094"
       },
       "WWW::Shorten::Tinylink" : {
          "file" : "lib/WWW/Shorten/Tinylink.pm",
-         "version" : "3.093",
+         "version" : "3.094",
          "x_deprecated" : 1
       },
       "WWW::Shorten::UserAgent" : {
          "file" : "lib/WWW/Shorten/UserAgent.pm",
-         "version" : "3.093"
+         "version" : "3.094"
       },
       "WWW::Shorten::generic" : {
          "file" : "lib/WWW/Shorten/generic.pm",
-         "version" : "3.093"
+         "version" : "3.094"
       }
    },
    "release_status" : "stable",
@@ -120,15 +142,20 @@
          "web" : "https://github.com/p5-shorten/www-shorten"
       }
    },
-   "version" : "3.093",
+   "version" : "3.094",
    "x_contributors" : [
       "Alexandr Ciornii <chorny@cpan.org>",
       "ambs <ambs@cpan.org>",
       "Chase Whitener <capoeirab@cpan.org>",
       "Dave Cross <davecross@cpan.org>",
+      "Derek Schrock <dereks@lifeofadishwasher.com>",
       "Kazuhiro Osawa <yappo@cpan.org>",
       "Michiel Beijen <michielb@cpan.org>",
-      "Mohammad S Anwar <manwar@cpan.org>"
-   ]
+      "Mohammad S Anwar <manwar@cpan.org>",
+      "(no author) <(no author)>"
+   ],
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,7 +1,12 @@
-use strict;
+# The "experimental" below is not actually scary.  The feature went on to be
+# de-experimental-ized with no changes and is now on by default in perl v5.24
+# and later. -- rjbs, 2021-03-14
+use 5.020;
 use warnings;
+use experimental qw(postderef postderef_qq);
+
 package App::Cmd::Setup;
-$App::Cmd::Setup::VERSION = '0.331';
+$App::Cmd::Setup::VERSION = '0.333';
 # ABSTRACT: helper for setting up App::Cmd classes
 
 #pod =head1 OVERVIEW
@@ -19,7 +24,7 @@ $App::Cmd::Setup::VERSION = '0.331';
 #pod Instead of writing:
 #pod
 #pod   package MyApp;
-#pod   use base 'App::Cmd';
+#pod   use parent 'App::Cmd';
 #pod
 #pod ...you can write:
 #pod
@@ -123,7 +128,7 @@ sub _make_app_class {
   my $want_plugin_base = 'App::Cmd::Plugin';
 
   my @plugins;
-  for my $plugin (@{ $val->{plugins} || [] }) {
+  for my $plugin (@{ $val->{plugins} // [] }) {
     $plugin = String::RewritePrefix->rewrite(
       {
         ''  => 'App::Cmd::Plugin::',
@@ -185,7 +190,7 @@ sub _make_plugin_class {
   $val->{groups} = [ default => [ -all ] ] unless $val->{groups};
 
   my @exports;
-  for my $pair (@{ Data::OptList::mkopt($val->{exports}) }) {
+  for my $pair (Data::OptList::mkopt($val->{exports})->@*) {
     push @exports, $pair->[0], ($pair->[1] || \'_faux_curried_method');
   }
 
@@ -214,7 +219,7 @@ App::Cmd::Setup - helper for setting up App::Cmd classes
 
 =head1 VERSION
 
-version 0.331
+version 0.333
 
 =head1 OVERVIEW
 
@@ -231,7 +236,7 @@ This class is useful in three scenarios:
 Instead of writing:
 
   package MyApp;
-  use base 'App::Cmd';
+  use parent 'App::Cmd';
 
 ...you can write:
 
@@ -285,7 +290,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

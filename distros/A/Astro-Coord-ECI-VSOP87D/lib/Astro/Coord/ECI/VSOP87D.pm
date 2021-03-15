@@ -28,7 +28,7 @@ BEGIN {
 	or constant->import( DEBUG => 0 );
 }
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 my @basic_export = qw{
     SUN_CLASS
@@ -221,7 +221,6 @@ EOD
 	rad2dms( $delta_lambda), rad2deg( $lambda ), rad2dms( $lambda ),
 	rad2dms( $delta_beta), rad2deg( $beta ), rad2dms( $beta );
 
-
     } else {			# The Sun
 	( $lambda, $beta, $Delta ) = ( mod2pi( $Le + PI ), - $Be, $Re );
 	$long_sym = '☉';
@@ -249,7 +248,6 @@ EOD
 EOD
 	$long_sym, rad2deg( $lambda ),
 	rad2deg( $beta ), rad2dms( $beta ), $Delta;
-
 
     # Convert to FK5. Meeus says (ch. 25 pg 166) this is necessary for
     # high accuracy (though not if using his truncated VSOP87D), though
@@ -1359,6 +1357,7 @@ for daily events involving astronomical bodies.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-VSOP87D>,
 L<https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues>, or in
 electronic mail to the author.
 

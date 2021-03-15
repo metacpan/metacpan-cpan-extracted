@@ -15,7 +15,7 @@ use Astro::Coord::ECI::Utils qw{ PI find_first_true mod2pi };
 use Astro::Coord::ECI::VSOP87D qw{ :mixin };
 use Carp;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 sub new {
     my ( $class, %arg ) = @_;
@@ -412,6 +412,7 @@ L<Astro::Coord::ECI::VSOP87D|Astro::Coord::ECI::VSOP87D>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-VSOP87D>,
 L<https://github.com/trwyant/perl-Astro-Coord-ECI-VSOP87D/issues>, or in
 electronic mail to the author.
 

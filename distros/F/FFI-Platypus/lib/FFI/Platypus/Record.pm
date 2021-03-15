@@ -11,7 +11,7 @@ use constant 1.32 ();
 our @EXPORT = qw( record_layout record_layout_1 );
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 sub record_layout_1
@@ -74,6 +74,7 @@ sub record_layout
 
   my @destroy;
   my @ffi_types;
+  my $has_string;
 
   while(@_)
   {
@@ -87,10 +88,10 @@ sub record_layout
     croak "accessor/method $name already exists"
       if $caller->can($name);
 
-    my $size  = $type->sizeof;
-    my $align = $type->alignof;
+    my $size      = $type->sizeof;
+    my $align     = $type->alignof;
     $record_align = $align if $align > $record_align;
-    my $meta  = $type->meta;
+    my $meta      = $type->meta;
 
     $offset++ while $offset % $align;
 
@@ -108,6 +109,8 @@ sub record_layout
         $ffi_type = $meta->{ffi_type};
         $count    = $meta->{element_count};
         $count    = 1 unless defined $count;
+
+        $has_string = 1 if $meta->{type} eq 'string';
       }
       push @ffi_types, $ffi_type for 1..$count;
     }
@@ -166,6 +169,7 @@ sub record_layout
     require FFI::Platypus::Record::Meta;
     my $ffi_meta = FFI::Platypus::Record::Meta->new(
       \@ffi_types,
+      !$has_string,
     );
     *{join '::', $caller, '_ffi_meta'} = sub { $ffi_meta };
   }
@@ -200,7 +204,7 @@ FFI::Platypus::Record - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.38
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -223,11 +227,11 @@ Perl:
  
  use FFI::Platypus::Record;
  
- record_layout_1(qw(
-   int       age
-   string(3) title
-   string_rw name
- ));
+ record_layout_1(
+   'int'       => 'age',
+   'string(3)' => 'title',
+   'string rw' => 'name',
+ );
  
  package main;
  
@@ -276,7 +280,7 @@ Supports:
 
 =item C pointers to C<struct> types
 
-=item Passing C <struct>s by-value.
+=item Passing C C<struct>s by-value.
 
 =back
 
@@ -548,6 +552,8 @@ Meredith (merrilymeredith, MHOWARD)
 Diab Jerius (DJERIUS)
 
 Eric Brine (IKEGAMI)
+
+szTheory
 
 =head1 COPYRIGHT AND LICENSE
 

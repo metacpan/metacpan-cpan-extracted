@@ -1,0 +1,87 @@
+NAME
+    WordList::ID::AnimalName::PERLANCAR - List of animals in Indonesian
+
+VERSION
+    This document describes version 0.004 of
+    WordList::ID::AnimalName::PERLANCAR (from Perl distribution
+    WordList-ID-AnimalName-PERLANCAR), released on 2021-02-02.
+
+SYNOPSIS
+     use WordList::ID::AnimalName::PERLANCAR;
+
+     my $wl = WordList::ID::AnimalName::PERLANCAR->new;
+
+     # Pick a (or several) random word(s) from the list
+     my $word = $wl->pick;
+     my @words = $wl->pick(3);
+
+     # Check if a word exists in the list
+     if ($wl->word_exists('foo')) { ... }
+
+     # Call a callback for each word
+     $wl->each_word(sub { my $word = shift; ... });
+
+     # Iterate
+     my $first_word = $wl->first_word;
+     while (defined(my $word = $wl->next_word)) { ... }
+
+     # Get all the words
+     my @all_words = $wl->all_words;
+
+DESCRIPTION
+    Suitable for playing hangman.
+
+    Some spelling variations included (e.g. "orangutan" and "orang utan",
+    "onta" and "unta"). Multiple popular names for the same animals included
+    (e.g. "kalong" and "kelelawar", "lebah" and "tawon", "dolfin" and
+    "lumba-lumba"). Some two-word animal names included, especially if they
+    refer to distinct species or have popular single-word English
+    equivalents (e.g. "orang utan", "kuda laut", "kuda nil", "burung
+    hantu").
+
+WORDLIST STATISTICS
+     +----------------------------------+------------------+
+     | key                              | value            |
+     +----------------------------------+------------------+
+     | avg_word_len                     | 6.58962264150943 |
+     | longest_word_len                 | 15               |
+     | num_words                        | 212              |
+     | num_words_contain_nonword_chars  | 29               |
+     | num_words_contain_unicode        | 0                |
+     | num_words_contain_whitespace     | 17               |
+     | num_words_contains_nonword_chars | 29               |
+     | num_words_contains_unicode       | 0                |
+     | num_words_contains_whitespace    | 17               |
+     | shortest_word_len                | 3                |
+     +----------------------------------+------------------+
+
+    The statistics is available in the %STATS package variable.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-ID-AnimalName-PERLANCAR>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-ID-AnimalName-PERLANCAR>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-WordList-ID-AnimalName-PERLANCAR/issu
+    es>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    hangman from Games::Hangman
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

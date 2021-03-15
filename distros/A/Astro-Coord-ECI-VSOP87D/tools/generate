@@ -10,7 +10,7 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 use Storable qw{ dclone };
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 my %opt = (
     model	=> 'vsop87d',

@@ -13,6 +13,7 @@ subtest 'single arg' => sub {
     ok !$param->named, 'named';
     ok $param->required, 'required';
     ok !$param->optional, 'optional';
+    ok !$param->invocant, 'not invocant';
 };
 
 subtest 'hashref arg' => sub {
@@ -25,6 +26,7 @@ subtest 'hashref arg' => sub {
     ok $param->named, 'named';
     ok !$param->required, 'required';
     ok $param->optional, 'optional';
+    ok !$param->invocant, 'not invocant';
 };
 
 subtest 'setter' => sub {
@@ -63,6 +65,11 @@ subtest 'setter' => sub {
     ok $param->named, 'named';
     is $param->set_named(0), $param, 'set_named';
     ok !$param->named, 'named';
+
+    is $param->set_invocant, $param, 'set_invocant';
+    ok $param->invocant, 'invocant';
+    is $param->set_invocant(0), $param, 'set_invocant';
+    ok !$param->invocant, 'invocant';
 };
 
 subtest 'overload' => sub {
@@ -77,6 +84,9 @@ subtest 'new' => sub {
 
     ok(Sub::Meta::Param->new(required => 0)->optional, 'args required');
     ok(Sub::Meta::Param->new(positional => 0)->named, 'args positional');
+
+    ok(Sub::Meta::Param->new(invocant => 1)->invocant, 'args invocant');
+    ok(!Sub::Meta::Param->new(invocant => 0)->invocant, 'args invocant');
 };
 
 done_testing;

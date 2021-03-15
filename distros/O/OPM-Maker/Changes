@@ -1,0 +1,7 @@
+Changes file for OPM::Maker
+=================================
+
+1.00 2021-03-13 11:21:00
+
+  + Renamed OTRS::OPM::Maker to OPM::Maker as it supports OPM building for other ticketing systems (e.g. Znuny and OTOBO) as well
+

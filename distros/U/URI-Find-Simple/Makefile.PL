@@ -23,11 +23,11 @@ WriteMakefile(
         : (META_MERGE => {
             'meta-spec' => { version => 2 },
             resources => {
-                bugtracker  => 'http://rt.cpan.org/Public/Dist/Display.html?Name=URI-Find-Simple',
+                bugtracker  => 'https://github.com/neilb/URI-Find-Simple/issues',
                 repository  => {
                     type => 'git',
-                    web  => 'https://github.com/neilbowers/URI-Find-Simple',
-                    url  => 'git://github.com/neilbowers/URI-Find-Simple.git',
+                    web  => 'https://github.com/neilb/URI-Find-Simple',
+                    url  => 'git://github.com/neilb/URI-Find-Simple.git',
                 },
             },
           })

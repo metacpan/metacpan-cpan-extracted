@@ -4,6 +4,7 @@ use Sub::Meta::Parameters;
 
 my $p1 = Sub::Meta::Param->new("Str");
 my $p2 = Sub::Meta::Param->new("Int");
+sub param { Sub::Meta::Param->new(@_); }
 
 my $obj = bless {} => 'Some';
 
@@ -18,16 +19,6 @@ my @TEST = (
     ],
     OK => [
     { args => [], slurpy => 0, nshift => 0 }, 'valid',
-    ]},
-
-    # nshift undef
-    { args => [$p1], nshift => undef } => {
-    NG => [
-    { args => [$p1], nshift => 1 }, 'invalid nshift/1',
-    { args => [$p1], nshift => 0 }, 'invalid nshift/0',
-    ],
-    OK => [
-    { args => [$p1], nshift => undef }, 'valid',
     ]},
 
     # one args
@@ -90,12 +81,34 @@ my @TEST = (
     { args => [$p1, $p2], slurpy => 1, nshift => 1 }, 'too many args',
     { args => [$p1], slurpy => 0, nshift => 1 }, 'invalid slurpy',
     { args => [$p1], slurpy => 1, nshift => 0 }, 'invalid nshift',
+    { args => [$p1], slurpy => 1, invocant => param(invocant => 1, name => '$self') }, 'valid',
     ],
     OK => [
     { args => [$p1], slurpy => 1, nshift => 1 }, 'valid',
+    { args => [$p1], slurpy => 1, invocant => param(invocant => 1) }, 'valid',
     ]},
 
+    # default invocant
+    { args => [], invocant => param(invocant => 1) } => {
+    NG => [
+    { args => [], invocant => param(invocant => 1, name => '$class') }, 'invalid invocant',
+    ],
+    OK => [
+    { args => [], invocant => param(invocant => 1) }, 'valid',
+    { args => [], nshift => 1 }, 'valid nshift',
+    ]},
 
+    # invocant
+    { args => [], invocant => param(invocant => 1, name => '$self') } => {
+    NG => [
+    { args => [], nshift => 0 }, 'invalid nshift',
+    { args => [], nshift => 1 }, 'invalid nshift',
+    { args => [], invocant => param(invocant => 1, name => '$class') }, 'invalid invocant',
+    { args => [param(invocant => 1, name => '$self')] }, 'invalid invocant',
+    ],
+    OK => [
+    { args => [], invocant => param(invocant => 1, name => '$self') }, 'valid',
+    ]},
 );
 
 use JSON::PP;

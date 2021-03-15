@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,7 +26,7 @@
             "Alien::Build" : "0.51",
             "Alien::Build::MM" : "0.40",
             "Alien::Build::Plugin::Build::Autoconf" : "0.41",
-            "Alien::Build::Plugin::Probe::Vcpkg" : "2.14",
+            "Alien::Build::Plugin::Probe::Vcpkg" : "2.16",
             "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.006"
          }
@@ -71,22 +71,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Perl5-Alien/Alien-Hunspell/issues"
+         "web" : "https://github.com/PerlAlien/Alien-Hunspell/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alien::Hunspell",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Perl5-Alien/Alien-Hunspell.git",
-         "web" : "https://github.com/Perl5-Alien/Alien-Hunspell"
+         "url" : "git://github.com/PerlAlien/Alien-Hunspell.git",
+         "web" : "https://github.com/PerlAlien/Alien-Hunspell"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.30",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.31",
       "requires" : {
          "share" : {
-            "Alien::Autotools" : "1.02",
             "Alien::Build" : "0.75",
             "Archive::Tar" : "0",
             "Config" : "0",
@@ -102,8 +101,9 @@
          "system" : {}
       }
    },
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.18",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }
 

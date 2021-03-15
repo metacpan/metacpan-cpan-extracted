@@ -1,12 +1,12 @@
 # ABSTRACT: Get information for different currencies
 package Data::MoneyCurrency;
-
+$Data::MoneyCurrency::VERSION = '0.14';
 use strict;
 use warnings;
 use utf8;
 
 require Exporter;
-our @ISA = qw(Exporter);
+our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(get_currency get_currencies_for_country);
 
 use File::ShareDir qw(dist_file);
@@ -19,9 +19,6 @@ $Data::Dumper::Sortkeys = 1;
 my $rh_currency_for_country = {};
 
 
-our $VERSION = '0.12';
-
-
 my $rh_currency_iso; # contains character strings
 
 sub get_currency {
@@ -29,26 +26,25 @@ sub get_currency {
     my %args = @_;
 
     croak "get_currency cannot accept both currency and country" if $args{currency} && $args{country};
-    
+
     my $currency_abbreviation = lc(delete($args{currency}) || "");
-    my $country = lc(delete($args{country}) || "");
+    my $country               = lc(delete($args{country})  || "");
     croak "get_currency only accepts currency or country as args" if keys(%args) > 0;
-    if (! $currency_abbreviation) {
+    if (!$currency_abbreviation) {
         if ($country) {
             my $ra_currencies = get_currencies_for_country($country);
-            if (! $ra_currencies) {
+            if (!$ra_currencies) {
                 return;
             } elsif (@$ra_currencies > 1) {
                 croak "More than one currency known for country '$country'";
             }
             $currency_abbreviation = $ra_currencies->[0];
-        }
-        else {
+        } else {
             croak "Expected one of currency or country to be specified";
         }
     }
 
-    if (! defined($rh_currency_iso)) {
+    if (!defined($rh_currency_iso)) {
         my $path = dist_file('Data-MoneyCurrency', 'currency_iso.json');
         open my $fh, "<:raw", $path or die $!;
         my $octet_contents = join "", readline($fh);
@@ -56,17 +52,18 @@ sub get_currency {
         $rh_currency_iso = decode_json($octet_contents);
     }
 
-    if (! $rh_currency_iso->{$currency_abbreviation}) {
+    if (!$rh_currency_iso->{$currency_abbreviation}) {
         return;
     }
 
     # Shallow copy everytime deliberately, so that the caller can mutate the
     # return value if wished, without affecting rh_currency_iso
     my $rv = {};
-    for my $key (keys %{ $rh_currency_iso->{$currency_abbreviation} }) {
+    for my $key (keys %{$rh_currency_iso->{$currency_abbreviation}}) {
         my $value = $rh_currency_iso->{$currency_abbreviation}{$key};
-        if (Cpanel::JSON::XS::is_bool($value) 
-            or Types::Serialiser::is_bool($value)) {
+        if (   Cpanel::JSON::XS::is_bool($value)
+            or Types::Serialiser::is_bool($value))
+        {
             $value = $value ? 1 : 0;
         }
         $rv->{$key} = $value;
@@ -103,7 +100,7 @@ my $rh_currencies_for_country = {
     bs => ['bsd'],
     bt => ['btn'],
     bw => ['bwp'],
-    by => [ 'byn', 'byr' ],
+    by => ['byn', 'byr'],
     bz => ['bzd'],
     ca => ['cad'],
     cd => ['cdf'],
@@ -111,12 +108,12 @@ my $rh_currencies_for_country = {
     cg => ['xaf'],
     ch => ['chf'],
     ci => ['xof'],
-    cl => [ 'clf', 'clp' ],
+    cl => ['clf', 'clp'],
     cm => ['xaf'],
     cn => ['cny'],
     co => ['cop'],
     cr => ['crc'],
-    cu => [ 'cuc', 'cup' ],
+    cu => ['cuc', 'cup'],
     cv => ['cve'],
     cy => ['eur'],
     cz => ['czk'],
@@ -273,7 +270,7 @@ my $rh_currencies_for_country = {
 
 
 sub get_currencies_for_country {
-    croak "get_currencies_for_country received no arguments" if @_ == 0;
+    croak "get_currencies_for_country received no arguments"           if @_ == 0;
     croak "get_currencies_for_country received more than one argument" if @_ > 1;
     my $country = lc($_[0]);
 
@@ -300,7 +297,7 @@ Data::MoneyCurrency - Get information for different currencies
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -320,10 +317,6 @@ Get currency information for different currencies.
 This uses some data found in the Ruby library
 L<money|https://github.com/RubyMoney/money/tree/master/config>, but it has no
 dependency on it, the relevant data files are already included.
-
-=head1 VERSION
-
-Version 0.12
 
 =head1 EXPORT
 
@@ -385,7 +378,7 @@ edf <edf@opencagedata.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by OpenCage GmbH.
+This software is copyright (c) 2021 by OpenCage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

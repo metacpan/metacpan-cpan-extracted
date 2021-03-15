@@ -1,21 +1,24 @@
 Revision history for Perl extension Tk::Image::Calculation.
 
-0.04 Sun Mar 12 20:37:39 2006
- 	- the constructor was changed, the object is now always a hash
- 	- new graphic form added "polygon"
- 	
-0.03 Sat Feb 18 12:32:19 2006
- 	- change the returnvalue of the functions GetPointsOval an GetPointsCircle
- 	- Constructor extended
- 	- add some tests
+0.05    2021-03-12
+    - fix RT #85439: "for $x qw( … ) { is deprecated"
 
-0.02 Sun Feb 12 13:07:21 2006
- 	- wrong error check repaired 
- 	- abs() function removed
+0.04    2006-03-12
+    - the constructor was changed, the object is now always a hash
+    - new graphic form added "polygon"
+    
+0.03    2006-02-18
+    - change the return value of the functions GetPointsOval an GetPointsCircle
+    - Constructor extended
+    - add some tests
 
-0.01  Sun Feb  5 10:19:06 2006
-	- original version; created by h2xs 1.23 with options
-		-XAn Tk::Image::Calculation
+0.02    2006-02-12
+    - wrong error check repaired 
+    - abs() function removed
+
+0.01    2006-02-05
+    - original version; created by h2xs 1.23 with options
+        -XAn Tk::Image::Calculation
 
 
 

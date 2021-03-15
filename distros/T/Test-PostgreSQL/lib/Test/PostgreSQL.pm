@@ -13,7 +13,7 @@ use File::Which;
 use POSIX qw(SIGQUIT SIGKILL WNOHANG getuid setuid);
 use User::pwent;
 
-our $VERSION = '1.27';
+our $VERSION = '1.28';
 our $errstr;
 
 # Deprecate use of %Defaults as we want to remove this package global
@@ -178,7 +178,7 @@ method _pg_ctl_builder() {
   if ( $prog ) {
       # we only use pg_ctl if Pg version is >= 9
       my $ret = qx/"$prog" --version/;
-      if ( $ret =~ /(\d+)(?:\.|devel)/ && $1 >= 9 ) {
+      if ( $ret =~ /(\d+)(?:\.|devel|beta)/ && $1 >= 9 ) {
           return $prog;
       }
       warn "pg_ctl version earlier than 9";
@@ -390,7 +390,8 @@ method start() {
 method _find_port_and_launch() {
   my $tries = 10;
   my $port = $self->base_port;
-  # try by incrementing port number
+  srand(); # Re-seed the RNG in case the caller forked the process
+  # try by incrementing port number until PostgreSQL starts
   while (1) {
     my $good = try {
       $self->_try_start($port);
@@ -399,12 +400,14 @@ method _find_port_and_launch() {
     catch {
       # warn "Postgres failed to start on port $port\n";
       unless ($tries--) {
-        die "Failed to start postgres on port $port: $_";
+        die "Failed to start postgres after trying 10 potential ports: $_";
       }
       undef;
     };
     return if $good;
-    $port++;
+    # Increment port by a random number to avoid clashes with other Test::Postgresql processes
+    # Keep in mind that this increment is going to be made up to 10 times, so avoid exceeding 64k
+    $port += int(rand(500)) + 1;
   }
 }
 
@@ -814,7 +817,7 @@ to try and find it in PostgreSQL directory.
 Arguments to pass to C<initdb> program when creating a new PostgreSQL database
 cluster for Test::PostgreSQL session.
 
-Defaults to C<-U postgres -A trust>. See L</db_owner>.
+Defaults to C<-U postgres -A trust>. See L</dbowner>.
 
 =head2 extra_initdb_args
 
@@ -874,7 +877,7 @@ instance.
 
 Defaults to C<-U postgres -d test -h 127.0.0.1 -p $self-E<gt>port>.
 
-See also L</db_owner>, L</dbname>, L</host>, L</base_port>.
+See also L</dbowner>, L</dbname>, L</host>, L</base_port>.
 
 =head2 extra_psql_args
 

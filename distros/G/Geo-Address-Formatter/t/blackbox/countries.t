@@ -29,38 +29,38 @@ my $path = $af_path . '/testcases/';
 my $input_country;
 my $verbose = 0;
 
-GetOptions (
-    'country:s'  => \$input_country,
-    'verbose'    => \$verbose,
+GetOptions(
+    'country:s' => \$input_country,
+    'verbose'   => \$verbose,
 );
-if ( $input_country ){
+if ($input_country) {
     $input_country = lc($input_country);
 }
 
 ok(1);
 
-if ( -d $path ){
+if (-d $path) {
 
     my $CLASS = 'Geo::Address::Formatter';
-    use_ok($CLASS);    
+    use_ok($CLASS);
 
-    my $conf_path = $af_path . '/conf/';    
-    my $GAF = $CLASS->new( conf_path => $conf_path );
+    my $conf_path = $af_path . '/conf/';
+    my $GAF       = $CLASS->new(conf_path => $conf_path);
 
     # ok, time to actually run the country tests
     sub _one_testcase {
-        my $country    = shift;
+        my $country     = shift;
         my $rh_testcase = shift;
 
         my $expected = $rh_testcase->{expected};
-        my $actual = $GAF->format_address($rh_testcase->{components});
+        my $actual   = $GAF->format_address($rh_testcase->{components});
 
         if (0) { # turn on for char by char comparison
-            my @e = (split//, $expected);
-            my @a = (split//, $actual);
+            my @e = (split //, $expected);
+            my @a = (split //, $actual);
             my $c = 0;
-            foreach my $char (@e){
-                if ($e[$c] eq $a[$c]){
+            foreach my $char (@e) {
+                if ($e[$c] eq $a[$c]) {
                     warn "same $c same $a[$c]";
                 } else {
                     warn "not same $c " . $e[$c] . ' ' . $a[$c] . "\n";
@@ -69,23 +69,19 @@ if ( -d $path ){
             }
         }
 
-        is(
-          $actual,
-          $expected,
-          $country . ' - ' . ( $rh_testcase->{description} || 'no description set' )
-        );
+        is($actual, $expected, $country . ' - ' . ($rh_testcase->{description} || 'no description set'));
     }
 
     # get list of country specific tests
-    my @files = File::Find::Rule->file()->name( '*.yaml' )->in( $path );    
-    foreach my $filename (sort @files){
+    my @files = File::Find::Rule->file()->name('*.yaml')->in($path);
+    foreach my $filename (sort @files) {
 
         my $country = basename($filename);
         $country =~ s/\.\w+$//; # us.yaml => us
 
-        if (defined($input_country) && $input_country){
-            if ($country ne $input_country){
-                if ($verbose){
+        if (defined($input_country) && $input_country) {
+            if ($country ne $input_country) {
+                if ($verbose) {
                     warn "skipping $country tests";
                 }
                 next;
@@ -95,9 +91,10 @@ if ( -d $path ){
         my @a_testcases = ();
         lives_ok {
             @a_testcases = LoadFile($filename);
-        } "parsing file $filename";
+        }
+        "parsing file $filename";
 
-        foreach my $rh_testcase (@a_testcases){
+        foreach my $rh_testcase (@a_testcases) {
             _one_testcase($country, $rh_testcase);
         }
     }

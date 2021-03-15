@@ -11,7 +11,7 @@ our @ISA = qw{ My::Module::Recommend::Any };
 use Carp;
 use Exporter qw{ import };
 
-our $VERSION = '0.129';
+our $VERSION = '0.130';
 
 our @EXPORT_OK = qw{ __all };
 
@@ -29,7 +29,6 @@ sub check {
     }
     return @missing;
 }
-
 
 1;
 
@@ -91,8 +90,9 @@ modules in scalar context.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues>,
-or in electronic mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-TLE-Iridium>,
+L<https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

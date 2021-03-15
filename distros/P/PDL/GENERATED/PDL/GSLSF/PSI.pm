@@ -66,6 +66,10 @@ psi(m,x) := (d/dx)^m psi(0,x) = (d/dx)^{m+1} log(gamma(x))
 
 Di-Gamma Function psi(x).
 
+=for bad
+
+gsl_sf_psi does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -91,6 +95,10 @@ Di-Gamma Function psi(x).
 
 Di-Gamma Function Re[psi(1 + I y)]
 
+=for bad
+
+gsl_sf_psi_1piy does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -116,6 +124,10 @@ Di-Gamma Function Re[psi(1 + I y)]
 
 Poly-Gamma Function psi^(n)(x)
 
+=for bad
+
+gsl_sf_psi_n does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

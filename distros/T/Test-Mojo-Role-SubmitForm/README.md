@@ -161,6 +161,8 @@ to `bug-test-mojo-role-SubmitForm at rt.cpan.org`
     <div style="display: table; height: 91px; background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/section-contributors.png) no-repeat left; padding-left: 120px;" ><div style="display: table-cell; vertical-align: middle;">
 </div>
 
+    L<Guillaume "guillomovitch" Rousse|https://github.com/guillomovitch>
+
 <div>
     <span style="display: inline-block; text-align: center;"> <a href="http://metacpan.org/author/PLICEASE"> <img src="http://www.gravatar.com/avatar/0640fb1c0a5e82f5a777f2306efcac77?d=http%3A%2F%2Fwww.gravatar.com%2Favatar%2F0640fb1c0a5e82f5a777f2306efcac77" alt="PLICEASE" style="display: block; margin: 0 3px 5px 0!important; border: 1px solid #666; border-radius: 3px; "> <span style="color: #333; font-weight: bold;">PLICEASE</span> </a> </span>
 </div>

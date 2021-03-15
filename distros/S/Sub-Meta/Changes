@@ -1,5 +1,17 @@
 Revision history for Perl extension Sub-Meta
 
+0.08 2021-03-14T14:38:46Z
+    [IMPROVEMENTS]
+    - feat: add Sub::Meta::Library methods
+        - remove #17
+        - get_by_stash_subname, get_all_subnames_by_stash, get_all_submeta_by_stash #23
+    - feat: add Sub::Meta#apply_meta #20
+    - feat: add alias of invocant #21
+    - feat Sub::Meta::Creator, Sub::Meta::Finder #22
+
+    [INCOMPATIBLE CHANGES]
+    - Fixed: invocant feature. #19
+
 0.07 2021-03-08T00:50:45Z
     [IMPROVEMENTS]
     - feat: Sub::Meta::Library #16

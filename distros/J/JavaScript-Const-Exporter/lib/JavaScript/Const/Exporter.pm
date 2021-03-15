@@ -26,7 +26,7 @@ use Types::Standard qw/ ArrayRef Bool HashRef InstanceOf /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.4';
+our $VERSION = 'v0.1.5';
 
 
 option use_var => (
@@ -208,7 +208,7 @@ JavaScript::Const::Exporter - Convert exported Perl constants to JavaScript
 
 =head1 VERSION
 
-version v0.1.4
+version v0.1.5
 
 =head1 SYNOPSIS
 
@@ -316,9 +316,24 @@ On success, it will return a string containing the JavaScript.
 
 =head1 KNOWN ISSUES
 
+=head2 Support for older Perl versions
+
+This module requires Perl v5.10 or newer.
+
+Pull requests to support older versions of Perl are welcome. See
+L</SOURCE>.
+
+=head2 Const::Fast::Exporter
+
 When using with L<Const::Fast::Exporter>-based modules, you must
 explicitly list all of the constants to be exported, as that doesn't
 provide an C<@EXPORT_OK> variable that can be queried.
+
+=head2 Const::Exporter
+
+Exporting constant subs from L<Const::Exporter> v1.0.0 or earlier will
+emit warnings about the subs not being constant subs. The issue has
+been fixed in v1.1.0.
 
 =head1 SEE ALSO
 
@@ -344,7 +359,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Robert Rothenberg.
+This software is Copyright (c) 2020-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

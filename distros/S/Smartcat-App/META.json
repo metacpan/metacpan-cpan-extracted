@@ -58,7 +58,7 @@
             "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::Log4perl" : "0",
             "Log::Log4perl" : "0",
-            "Smartcat::Client" : "v0.0.2",
+            "Smartcat::Client" : "v0.0.3",
             "Smartcat::Client::AccountApi" : "0",
             "Smartcat::Client::DocumentApi" : "0",
             "Smartcat::Client::DocumentExportApi" : "0",
@@ -96,7 +96,7 @@
          "web" : "https://github.com/smartcatai/smartcat-app-perl"
       }
    },
-   "version" : "0.0.5",
+   "version" : "0.0.6",
    "x_contributors" : [
       "Igor Afanasyev <igor.afanasyev@gmail.com>"
    ],

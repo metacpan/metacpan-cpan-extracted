@@ -1,3 +1,8 @@
+0.15
+	- Released at 2021-03-15T08:11:11+0900
+	- New policy: ProhibitExtraStricture
+	- ProhibitDuplicateSub: Avoid one case of false positive when there are multiple packages in the same file. See: Github PR #10.
+
 0.14
 	- Released at 2020-10-29T09:26:59+0900
 	- ProhibitUnusedImport: Make %special_modules settable via an ignored_modules attribute. Github PR #17

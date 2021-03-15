@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.23';
+$VERSION = '0.25';
 $VERSION = $VERSION;
 
 # internal use
@@ -254,7 +254,7 @@ sub mtime {
 
 #---------------------------------------------------------------------
 # chop() for MBCS encoding
-sub mb::chop {
+sub mb::chop (@) {
     my $chop = '';
     for (@_ ? @_ : $_) {
         if (my @x = /\G$x/g) {
@@ -267,8 +267,8 @@ sub mb::chop {
 
 #---------------------------------------------------------------------
 # chr() for MBCS encoding
-sub mb::chr {
-    local $_ = @_ ? $_[0] : $_;
+sub mb::chr (;$) {
+    my $number = @_ ? $_[0] : $_;
 
 # Negative values give the Unicode replacement character (chr(0xfffd)),
 # except under the bytes pragma, where the low eight bits of the value
@@ -276,15 +276,15 @@ sub mb::chr {
 
     my @octet = ();
     CORE::do {
-        unshift @octet, ($_ % 0x100);
-        $_ = int($_ / 0x100);
-    } while ($_ > 0);
+        unshift @octet, ($number % 0x100);
+        $number = int($number / 0x100);
+    } while ($number > 0);
     return pack 'C*', @octet;
 }
 
 #---------------------------------------------------------------------
 # do FILE for MBCS encoding
-sub mb::do {
+sub mb::do ($) {
     my($file) = @_;
     for my $prefix_file ($file, map { "$_/$file" } @INC) {
         if (-f $prefix_file) {
@@ -329,7 +329,7 @@ END
 
 #---------------------------------------------------------------------
 # DOS-like glob() for MBCS encoding
-sub mb::dosglob {
+sub mb::dosglob (;$) {
     my $expr = @_ ? $_[0] : $_;
     my @glob = ();
 
@@ -372,7 +372,7 @@ sub mb::dosglob {
 
 #---------------------------------------------------------------------
 # eval STRING for MBCS encoding
-sub mb::eval {
+sub mb::eval (;$) {
     local $_ = @_ ? $_[0] : $_;
 
     # run as Perl script in caller package
@@ -385,7 +385,7 @@ END
 
 #---------------------------------------------------------------------
 # getc() for MBCS encoding
-sub mb::getc {
+sub mb::getc (;*) {
     my $fh = @_ ? shift(@_) : \*STDIN;
     confess 'Too many arguments for mb::getc' if @_ and not wantarray;
     my $getc = CORE::getc $fh;
@@ -432,7 +432,7 @@ sub mb::getc {
 
 #---------------------------------------------------------------------
 # index() for MBCS encoding
-sub mb::index {
+sub mb::index ($$;$) {
     my $index = 0;
     if (@_ == 3) {
         $index = mb::index_byte($_[0], $_[1], CORE::length(mb::substr($_[0], 0, $_[2])));
@@ -450,7 +450,7 @@ sub mb::index {
 
 #---------------------------------------------------------------------
 # JPerl like index() for MBCS encoding
-sub mb::index_byte {
+sub mb::index_byte ($$;$) {
     my($str,$substr,$position) = @_;
     $position ||= 0;
     my $pos = 0;
@@ -472,7 +472,7 @@ sub mb::index_byte {
 
 #---------------------------------------------------------------------
 # universal lc() for MBCS encoding
-sub mb::lc {
+sub mb::lc (;$) {
     local $_ = @_ ? $_[0] : $_;
     #                          A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z
     return join '', map { {qw( A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z )}->{$_}||$_ } /\G$x/g;
@@ -481,7 +481,7 @@ sub mb::lc {
 
 #---------------------------------------------------------------------
 # universal lcfirst() for MBCS encoding
-sub mb::lcfirst {
+sub mb::lcfirst (;$) {
     local $_ = @_ ? $_[0] : $_;
     if (/\A($x)(.*)\z/s) {
         return mb::lc($1) . $2;
@@ -493,14 +493,14 @@ sub mb::lcfirst {
 
 #---------------------------------------------------------------------
 # length() for MBCS encoding
-sub mb::length {
+sub mb::length (;$) {
     local $_ = @_ ? $_[0] : $_;
     return scalar(() = /\G$x/g);
 }
 
 #---------------------------------------------------------------------
 # ord() for MBCS encoding
-sub mb::ord {
+sub mb::ord (;$) {
     local $_ = @_ ? $_[0] : $_;
     my $ord = 0;
     if (/\A($x)/) {
@@ -513,7 +513,7 @@ sub mb::ord {
 
 #---------------------------------------------------------------------
 # require for MBCS encoding
-sub mb::require {
+sub mb::require (;$) {
     local $_ = @_ ? $_[0] : $_;
 
     # require perl version
@@ -597,7 +597,7 @@ END
 
 #---------------------------------------------------------------------
 # reverse() for MBCS encoding
-sub mb::reverse {
+sub mb::reverse (@) {
 
     # in list context,
     if (wantarray) {
@@ -622,7 +622,7 @@ sub mb::reverse {
 
 #---------------------------------------------------------------------
 # rindex() for MBCS encoding
-sub mb::rindex {
+sub mb::rindex ($$;$) {
     my $rindex = 0;
     if (@_ == 3) {
         $rindex = mb::rindex_byte($_[0], $_[1], CORE::length(mb::substr($_[0], 0, $_[2])));
@@ -640,7 +640,7 @@ sub mb::rindex {
 
 #---------------------------------------------------------------------
 # JPerl like rindex() for MBCS encoding
-sub mb::rindex_byte {
+sub mb::rindex_byte ($$;$) {
     my($str,$substr,$position) = @_;
     $position ||= CORE::length($str) - 1;
     my $pos = 0;
@@ -661,19 +661,19 @@ sub mb::rindex_byte {
 
 #---------------------------------------------------------------------
 # set OSNAME
-sub mb::set_OSNAME {
+sub mb::set_OSNAME ($) {
     $OSNAME = $_[0];
 }
 
 #---------------------------------------------------------------------
 # get OSNAME
-sub mb::get_OSNAME {
+sub mb::get_OSNAME () {
     return $OSNAME;
 }
 
 #---------------------------------------------------------------------
 # set script encoding name and more
-sub mb::set_script_encoding {
+sub mb::set_script_encoding ($) {
     $script_encoding = $_[0];
 
     # over US-ASCII
@@ -776,7 +776,7 @@ sub mb::set_script_encoding {
 
 #---------------------------------------------------------------------
 # get script encoding name
-sub mb::get_script_encoding {
+sub mb::get_script_encoding () {
     return $script_encoding;
 }
 
@@ -784,8 +784,8 @@ sub mb::get_script_encoding {
 # substr() for MBCS encoding
 BEGIN {
     CORE::eval sprintf <<'END', ($] >= 5.014) ? ':lvalue' : '';
-#              VV--------------------------------AAAAAAA
-sub mb::substr %s {
+#                      VV------------------------AAAAAAA
+sub mb::substr ($$;$$) %s {
     my @x = $_[0] =~ /\G$x/g;
 
     # If the substring is beyond either end of the string, substr() returns the undefined
@@ -835,44 +835,11 @@ END
 }
 
 #---------------------------------------------------------------------
-# tr/A-C/1-3/ for UTF-8 codepoint
-sub list_all_ASCII_by_hyphen {
-    my @hyphened = @_;
-    my @list_all = ();
-    for (my $i=0; $i <= $#hyphened; ) {
-        if (
-            ($i+1 < $#hyphened)      and
-            ($hyphened[$i+1] eq '-') and
-        1) {
-            if (0) { }
-            elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/oxms) {
-                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
-            }
-            elsif ($hyphened[$i+2] !~ m/\A [\x00-\x7F] \z/oxms) {
-                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
-            }
-            elsif ($hyphened[$i+0] gt $hyphened[$i+2]) {
-                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not "$hyphened[$i+0]" le "$hyphened[$i+2]"});
-            }
-            else {
-                push @list_all, ($hyphened[$i+0] .. $hyphened[$i+2]);
-                $i += 3;
-            }
-        }
-        else {
-            push @list_all, $hyphened[$i];
-            $i++;
-        }
-    }
-    return @list_all;
-}
-
-#---------------------------------------------------------------------
 # tr/// and y/// for MBCS encoding
-sub mb::tr {
-    my @x           = $_[0] =~ /\G$x/g;
-    my @search      = list_all_ASCII_by_hyphen($_[1] =~ /\G$x/g);
-    my @replacement = list_all_ASCII_by_hyphen($_[2] =~ /\G$x/g);
+sub mb::tr ($$$;$) {
+    my @x           = $_[0] =~ /\G($x)/xmsg;
+    my @search      = list_all_ASCII_by_hyphen($_[1] =~ /\G(\\-|$x)/xmsg);
+    my @replacement = list_all_ASCII_by_hyphen($_[2] =~ /\G(\\-|$x)/xmsg);
     my %modifier    = (defined $_[3]) ? (map { $_ => 1 } CORE::split //, $_[3]) : ();
 
     my %tr = ();
@@ -1023,7 +990,7 @@ sub mb::tr {
 
 #---------------------------------------------------------------------
 # universal uc() for MBCS encoding
-sub mb::uc {
+sub mb::uc (;$) {
     local $_ = @_ ? $_[0] : $_;
     #                          a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z
     return join '', map { {qw( a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z )}->{$_}||$_ } /\G$x/g;
@@ -1032,7 +999,7 @@ sub mb::uc {
 
 #---------------------------------------------------------------------
 # universal ucfirst() for MBCS encoding
-sub mb::ucfirst {
+sub mb::ucfirst (;$) {
     local $_ = @_ ? $_[0] : $_;
     if (/\A($x)(.*)\z/s) {
         return mb::uc($1) . $2;
@@ -1048,7 +1015,7 @@ sub mb::ucfirst {
 
 #---------------------------------------------------------------------
 # implement of special variable $1,$2,$3,...
-sub mb::_CAPTURE {
+sub mb::_CAPTURE (;$) {
     if ($mb::last_s_passed) {
         if (defined $_[0]) {
 
@@ -1095,7 +1062,7 @@ sub mb::_CAPTURE {
 
 #---------------------------------------------------------------------
 # implement of special variable @+
-sub mb::_LAST_MATCH_END {
+sub mb::_LAST_MATCH_END (@) {
 
     # perl 5.005 does not support @+, so it need CORE::eval
 
@@ -1119,7 +1086,7 @@ sub mb::_LAST_MATCH_END {
 
 #---------------------------------------------------------------------
 # implement of special variable @-
-sub mb::_LAST_MATCH_START {
+sub mb::_LAST_MATCH_START (@) {
 
     # perl 5.005 does not support @-, so it need CORE::eval
 
@@ -1143,7 +1110,7 @@ sub mb::_LAST_MATCH_START {
 
 #---------------------------------------------------------------------
 # implement of special variable $&
-sub mb::_MATCH {
+sub mb::_MATCH () {
     if (defined($&)) {
         if ($mb::last_s_passed) {
             if (defined($1) and (CORE::substr($&, 0, CORE::length($1)) eq $1)) {
@@ -1169,7 +1136,7 @@ sub mb::_MATCH {
 
 #---------------------------------------------------------------------
 # implement of special variable $`
-sub mb::_PREMATCH {
+sub mb::_PREMATCH () {
     if (defined($&)) {
         if ($mb::last_s_passed) {
             return $1;
@@ -1190,21 +1157,21 @@ sub mb::_PREMATCH {
 
 #---------------------------------------------------------------------
 # flag off if last m// was pass
-sub mb::_m_passed {
+sub mb::_m_passed () {
     $mb::last_s_passed = 0;
     return '';
 }
 
 #---------------------------------------------------------------------
 # flag on if last s/// was pass
-sub mb::_s_passed {
+sub mb::_s_passed () {
     $mb::last_s_passed = 1;
     return '';
 }
 
 #---------------------------------------------------------------------
 # ignore case of m//i, qr//i, s///i
-sub mb::_ignorecase {
+sub mb::_ignorecase ($) {
     local($_) = @_;
     my $regexp = '';
 
@@ -1212,7 +1179,7 @@ sub mb::_ignorecase {
     while (/\G (
         \(\? \^? [a-z]*        [:\)] | # cloister (?^x) (?^x: ...
         \(\? \^? [a-z]*-[a-z]+ [:\)] | # cloister (?^x-y) (?^x-y: ...
-        \[ ((?: \\$x | $x )+?) \]    |
+        \[ ((?: \\@{mb::_dot} | @{mb::_dot} )+?) \] |
         \\x\{ [0-9A-Fa-f]{2} \}      |
         \\o\{ [0-7]{3}       \}      |
         \\x   [0-9A-Fa-f]{2}         |
@@ -1303,7 +1270,7 @@ sub mb::_ignorecase {
 
 #---------------------------------------------------------------------
 # custom codepoint class in qq-like regular expression
-sub mb::_cc {
+sub mb::_cc ($) {
     my($classmate) = @_;
     if ($classmate =~ s{\A \^ }{}xms) {
         return '(?:(?!' . parse_re_codepoint_class($classmate) . ")$x)";
@@ -1315,7 +1282,7 @@ sub mb::_cc {
 
 #---------------------------------------------------------------------
 # makes clustered codepoint from string
-sub mb::_clustered_codepoint {
+sub mb::_clustered_codepoint ($) {
     if (my @codepoint = $_[0] =~ /\G($x)/xmsgc) {
         if (CORE::length($codepoint[$#codepoint]) == 1) {
             return $_[0];
@@ -1331,29 +1298,28 @@ sub mb::_clustered_codepoint {
 
 #---------------------------------------------------------------------
 # open for append by undefined filehandle
-sub mb::_open_a {
+sub mb::_open_a ($$) {
     $_[0] = \do { local *_ } if $] < 5.006;
     return open($_[0], ">> $_[1]");
 }
 
 #---------------------------------------------------------------------
 # open for read by undefined filehandle
-sub mb::_open_r {
+sub mb::_open_r ($$) {
     $_[0] = \do { local *_ } if $] < 5.006;
     return open($_[0], $_[1]);
 }
 
 #---------------------------------------------------------------------
 # open for write by undefined filehandle
-sub mb::_open_w {
+sub mb::_open_w ($$) {
     $_[0] = \do { local *_ } if $] < 5.006;
     return open($_[0], "> $_[1]");
 }
 
 #---------------------------------------------------------------------
 # split() for MBCS encoding
-# sub mb::_split (;$$$) {
-sub mb::_split {
+sub mb::_split (;$$$) {
     my $pattern = defined($_[0]) ? $_[0] : ' ';
     my $string  = defined($_[1]) ? $_[1] : $_;
     my @split = ();
@@ -1468,7 +1434,7 @@ sub mb::_split {
 
 #---------------------------------------------------------------------
 # chdir() for MSWin32
-sub mb::_chdir {
+sub mb::_chdir (;$) {
 
     # not on MSWin32 or UTF-8
     if (($OSNAME !~ /MSWin32/) or ($script_encoding !~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
@@ -1541,7 +1507,7 @@ sub mb::_filetest {
 
 #---------------------------------------------------------------------
 # lstat() for MSWin32
-sub mb::_lstat {
+sub mb::_lstat (;$) {
     local $_ = @_ ? $_[0] : $_;
     if ($_ eq '_') {
         confess qq{lstat doesn't support '_'\n};
@@ -1561,7 +1527,7 @@ sub mb::_lstat {
 
 #---------------------------------------------------------------------
 # opendir() for MSWin32
-sub mb::_opendir {
+sub mb::_opendir ($$) {
     if (not defined $_[0]) {
         $_[0] = \do { local *_ };
     }
@@ -1581,7 +1547,7 @@ sub mb::_opendir {
 
 #---------------------------------------------------------------------
 # stat() for MSWin32
-sub mb::_stat {
+sub mb::_stat (;$) {
     local $_ = @_ ? $_[0] : $_;
 
     # testee has "\x5C" octet at end
@@ -1598,7 +1564,7 @@ sub mb::_stat {
 
 #---------------------------------------------------------------------
 # unlink() for MSWin32
-sub mb::_unlink {
+sub mb::_unlink (@) {
 
     # works on MSWin32 only
     if (($OSNAME !~ /MSWin32/) or ($script_encoding !~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
@@ -2406,56 +2372,56 @@ sub parse_expr {
         my $search = '';
         my $comment = '';
         my $replacement = '';
-        if    (/\G ( [#] )        /xmsgc) { $search .= parse_q__like_endswith($1); $replacement .= parse_q__like_endswith($1); }       # tr#...#...#
-        elsif (/\G ( ['] )        /xmsgc) { $search .= parse_q__like_endswith($1); $replacement .= parse_q__like_endswith($1); }       # tr'...'...'
-        elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $search .= parse_q__like_balanced($1);                                                     # tr{...}...
-            if    (/\G ( [#] )        /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                          # tr{}#...#
-            elsif (/\G ( ['] )        /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                          # tr{}'...'
-            elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $replacement .= parse_q__like_balanced($1); }                                          # tr{}{...}
-            elsif (m{\G( [/] )        }xmsgc) { $replacement .= parse_q__like_endswith($1); }                                          # tr{}/.../
-            elsif (/\G ( [\S] )       /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                          # tr{}?...?
+        if    (/\G ( [#] )        /xmsgc) { $search .= parse_tr_like_endswith($1); $replacement .= parse_tr_like_endswith($1); }       # tr#...#...#
+        elsif (/\G ( ['] )        /xmsgc) { $search .= parse_tr_like_endswith($1); $replacement .= parse_tr_like_endswith($1); }       # tr'...'...'
+        elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $search .= parse_tr_like_balanced($1);                                                     # tr{...}...
+            if    (/\G ( [#] )        /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                          # tr{}#...#
+            elsif (/\G ( ['] )        /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                          # tr{}'...'
+            elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $replacement .= parse_tr_like_balanced($1); }                                          # tr{}{...}
+            elsif (m{\G( [/] )        }xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                          # tr{}/.../
+            elsif (/\G ( [\S] )       /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                          # tr{}?...?
             elsif (/\G ( \s+ )        /xmsgc) { $comment .= $1;                                                                        # tr{} SPACE ...
                 while (/\G ( \s+ | [#] [^\n]* ) /xmsgc) {
                     $comment .= $1;
                 }
-                if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                    # tr{} SPACE A...A
-                elsif (/\G ( ['] )          /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                    # tr{} SPACE '...'
-                elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $replacement .= parse_q__like_balanced($1); }                                    # tr{} SPACE {...}
-                elsif (m{\G( [/] )          }xmsgc) { $replacement .= parse_q__like_endswith($1); }                                    # tr{} SPACE /.../
-                elsif (/\G ( [\S] )         /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                    # tr{} SPACE ?...?
+                if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                    # tr{} SPACE A...A
+                elsif (/\G ( ['] )          /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                    # tr{} SPACE '...'
+                elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $replacement .= parse_tr_like_balanced($1); }                                    # tr{} SPACE {...}
+                elsif (m{\G( [/] )          }xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                    # tr{} SPACE /.../
+                elsif (/\G ( [\S] )         /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                    # tr{} SPACE ?...?
                 else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
             }
             else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
         }
-        elsif (m{\G( [/] )        }xmsgc) { $search .= parse_q__like_endswith($1); $replacement .= parse_q__like_endswith($1); }       # tr/.../.../
-        elsif (/\G ( [\S] )       /xmsgc) { $search .= parse_q__like_endswith($1); $replacement .= parse_q__like_endswith($1); }       # tr?...?...?
+        elsif (m{\G( [/] )        }xmsgc) { $search .= parse_tr_like_endswith($1); $replacement .= parse_tr_like_endswith($1); }       # tr/.../.../
+        elsif (/\G ( [\S] )       /xmsgc) { $search .= parse_tr_like_endswith($1); $replacement .= parse_tr_like_endswith($1); }       # tr?...?...?
         elsif (/\G ( \s+ )        /xmsgc) { $parsed .= $1;                                                                             # tr SPACE ...
             while (/\G ( \s+ | [#] [^\n]* ) /xmsgc) {
                 $parsed .= $1;
             }
-            if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $search .= parse_q__like_endswith($1); $replacement .= parse_q__like_endswith($1); } # tr SPACE A...A...A
-            elsif (/\G ( ['] )          /xmsgc) { $search .= parse_q__like_endswith($1); $replacement .= parse_q__like_endswith($1); } # tr SPACE '...'...'
-            elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $search .= parse_q__like_balanced($1);                                               # tr SPACE {...}...
-                if    (/\G ( [#] )        /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                      # tr SPACE {}#...#
-                elsif (/\G ( ['] )        /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                      # tr SPACE {}'...'
-                elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $replacement .= parse_q__like_balanced($1); }                                      # tr SPACE {}{...}
-                elsif (m{\G( [/] )        }xmsgc) { $replacement .= parse_q__like_endswith($1); }                                      # tr SPACE {}/.../
-                elsif (/\G ( [\S] )       /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                      # tr SPACE {}?...?
+            if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $search .= parse_tr_like_endswith($1); $replacement .= parse_tr_like_endswith($1); } # tr SPACE A...A...A
+            elsif (/\G ( ['] )          /xmsgc) { $search .= parse_tr_like_endswith($1); $replacement .= parse_tr_like_endswith($1); } # tr SPACE '...'...'
+            elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $search .= parse_tr_like_balanced($1);                                               # tr SPACE {...}...
+                if    (/\G ( [#] )        /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                      # tr SPACE {}#...#
+                elsif (/\G ( ['] )        /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                      # tr SPACE {}'...'
+                elsif (/\G ( [\(\{\[\<] ) /xmsgc) { $replacement .= parse_tr_like_balanced($1); }                                      # tr SPACE {}{...}
+                elsif (m{\G( [/] )        }xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                      # tr SPACE {}/.../
+                elsif (/\G ( [\S] )       /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                      # tr SPACE {}?...?
                 elsif (/\G ( \s+ )        /xmsgc) { $comment .= $1;                                                                    # tr SPACE {} SPACE ...
                     while (/\G ( \s+ | [#] [^\n]* ) /xmsgc) {
                         $comment .= $1;
                     }
-                    if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                # tr SPACE {} SPACE A...A
-                    elsif (/\G ( ['] )          /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                # tr SPACE {} SPACE '...'
-                    elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $replacement .= parse_q__like_balanced($1); }                                # tr SPACE {} SPACE {...}
-                    elsif (m{\G( [/] )          }xmsgc) { $replacement .= parse_q__like_endswith($1); }                                # tr SPACE {} SPACE /.../
-                    elsif (/\G ( [\S] )         /xmsgc) { $replacement .= parse_q__like_endswith($1); }                                # tr SPACE {} SPACE ?...?
+                    if    (/\G ( [A-Za-z_0-9] ) /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                # tr SPACE {} SPACE A...A
+                    elsif (/\G ( ['] )          /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                # tr SPACE {} SPACE '...'
+                    elsif (/\G ( [\(\{\[\<] )   /xmsgc) { $replacement .= parse_tr_like_balanced($1); }                                # tr SPACE {} SPACE {...}
+                    elsif (m{\G( [/] )          }xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                # tr SPACE {} SPACE /.../
+                    elsif (/\G ( [\S] )         /xmsgc) { $replacement .= parse_tr_like_endswith($1); }                                # tr SPACE {} SPACE ?...?
                     else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
                 }
                 else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
             }
-            elsif (m{\G( [/] )          }xmsgc) { $search .= parse_q__like_endswith($1); $replacement .= parse_q__like_endswith($1); } # tr SPACE /.../.../
-            elsif (/\G ( [\S] )         /xmsgc) { $search .= parse_q__like_endswith($1); $replacement .= parse_q__like_endswith($1); } # tr SPACE ?...?...?
+            elsif (m{\G( [/] )          }xmsgc) { $search .= parse_tr_like_endswith($1); $replacement .= parse_tr_like_endswith($1); } # tr SPACE /.../.../
+            elsif (/\G ( [\S] )         /xmsgc) { $search .= parse_tr_like_endswith($1); $replacement .= parse_tr_like_endswith($1); } # tr SPACE ?...?...?
             else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
         }
         else { die "$0(@{[__LINE__]}): $ARGV[0] has not closed:\n", $parsed; }
@@ -2463,15 +2429,70 @@ sub parse_expr {
         # modifier
         my($modifier_not_r, $modifier_r) = parse_tr_modifier();
         if ($modifier_r) {
-            $parsed .= sprintf(q<{[\x00-\xFF]*> .         q<}%s{mb::tr($&,q%s,q%s,'%sr')}er>,                                          $comment, $search, $replacement, $modifier_not_r);
+            $parsed .= sprintf(q<{[\x00-\xFF]*}%s{mb::tr($&,q%s,q%s,'%sr')}ser>, $comment, $search, $replacement, $modifier_not_r);
         }
         elsif ($modifier_not_r =~ /s/) {
-            # these implementations cannot return right number of codepoints replaced. if you want number, you can use mb::tr().
-            $parsed .= sprintf(q<{[\x00-\xFF]*> .         q<}%s{mb::tr($&,q%s,q%s,'%sr')}e>,                                           $comment, $search, $replacement, $modifier_not_r);
-#           $parsed .= sprintf(q<{(\\G${mb::_anchor})(%s+)}%s{$1.mb::tr($2,q%s,q%s,'%sr')}eg>, codepoint_tr($search, $modifier_not_r), $comment, $search, $replacement, $modifier_not_r);
+
+            # this implementation cannot return right count of codepoints replaced.
+            # if you want right count, you can call mb::tr() yourself.
+            $parsed .= sprintf(q<{[\x00-\xFF]+}%s{mb::tr($&,q%s,q%s,'%sr')}se>,  $comment, $search, $replacement, $modifier_not_r);
         }
         else {
-            $parsed .= sprintf(q<{(\\G${mb::_anchor})(%s)}%s{$1.mb::tr($2,q%s,q%s,'%sr')}eg>, codepoint_tr($search, $modifier_not_r),  $comment, $search, $replacement, $modifier_not_r);
+
+            # $parsed .= sprintf(q<{@{mb::_dot}}%s{mb::tr($&,q%s,q%s,'%sr')}msge>, $comment, $search, $replacement, $modifier_not_r);
+            #------------------------------------------------------------------------------------------------------------------------------------------------
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/;    ($r,$_) } => (9,111222DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/s;   ($r,$_) } => (9,111222DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/d;   ($r,$_) } => (9,11122DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/ds;  ($r,$_) } => (9,11122DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/c;   ($r,$_) } => (9,AAABBC22A)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cs;  ($r,$_) } => (9,AAABBC22A)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cd;  ($r,$_) } => (9,AAABBCA)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cds; ($r,$_) } => (9,AAABBCA)
+
+            # $parsed .= sprintf(q<{[\x00-\xFF]*}%s{mb::tr($&,q%s,q%s,'%sr')}msge>, $comment, $search, $replacement, $modifier_not_r);
+            #------------------------------------------------------------------------------------------------------------------------------------------------
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/;    ($r,$_) } => (2,111222DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/s;   ($r,$_) } => (2,12DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/d;   ($r,$_) } => (2,11122DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/ds;  ($r,$_) } => (2,12DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/c;   ($r,$_) } => (2,AAABBC22A)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cs;  ($r,$_) } => (2,AAABBC2A)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cd;  ($r,$_) } => (2,AAABBCA)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cds; ($r,$_) } => (2,AAABBCA)
+
+            # if ($modifier_not_r =~ /c/) {
+            #     $parsed .= sprintf(q<{@{[mb::_cc(q[^%s])]}}%s{mb::tr($&,q%s,q%s,'%sr')}msge>, $search, $comment, $search, $replacement, $modifier_not_r);
+            # }
+            # else {
+            #     $parsed .= sprintf(q<{@{[mb::_cc(q[%s])]}}%s{mb::tr($&,q%s,q%s,'%sr')}msge>, $search, $comment, $search, $replacement, $modifier_not_r);
+            # }
+            #------------------------------------------------------------------------------------------------------------------------------------------------
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/;    ($r,$_) } => (7,111222DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/s;   ($r,$_) } => (7,111222DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/d;   ($r,$_) } => (7,11122DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/ds;  ($r,$_) } => (7,11122DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/c;   ($r,$_) } => (2,AAABBC22A)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cs;  ($r,$_) } => (2,AAABBC22A)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cd;  ($r,$_) } => (2,AAABBCA)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cds; ($r,$_) } => (2,AAABBCA)
+
+            # better idea of mine
+            if ($modifier_not_r =~ /c/) {
+                $parsed .= sprintf(q<{(\\G${mb::_anchor})((?!%s)@{mb::_dot})}%s{$1.mb::tr($2,q%s,q%s,'%sr')}sge>, codepoint_tr($search), $comment, $search, $replacement, $modifier_not_r);
+            }
+            else {
+                $parsed .= sprintf(q<{(\\G${mb::_anchor})((?=%s)@{mb::_dot})}%s{$1.mb::tr($2,q%s,q%s,'%sr')}sge>, codepoint_tr($search), $comment, $search, $replacement, $modifier_not_r);
+            }
+            #------------------------------------------------------------------------------------------------------------------------------------------------
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/;    ($r,$_) } => (7,111222DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/s;   ($r,$_) } => (1,12DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/d;   ($r,$_) } => (7,11122DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/ds;  ($r,$_) } => (1,12DE1)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/c;   ($r,$_) } => (2,AAABBC22A)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cs;  ($r,$_) } => (1,AAABBC2A)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cd;  ($r,$_) } => (2,AAABBCA)
+            # do { $_='AAABBCDEA'; $r=tr/ABC/12/cds; ($r,$_) } => (1,AAABBCA)
         }
         $parsed .= parse_ambiguous_char();
     }
@@ -2881,6 +2902,41 @@ sub parse_expr {
         $parsed .= "mb::_$1";
     }
 
+    # printf <<HEREDOC
+    # print  <<HEREDOC
+    # say    <<HEREDOC
+    elsif (/\G ( printf | print | say ) (?= (?: \s+ | [#] .* )* << ) /xgc) {
+        $parsed .= $1;
+        # without $parsed .= parse_ambiguous_char();
+    }
+
+    # printf FILEHANDLE <<HEREDOC
+    # print  FILEHANDLE <<HEREDOC
+    # say    FILEHANDLE <<HEREDOC
+    elsif (/\G (
+        (?: printf | print | say )
+        (?: \s+ | [#] .* )*
+        (?: \b [A-Za-z_][A-Za-z_0-9]*(?: :: [A-Za-z_][A-Za-z_0-9]*)* |
+            \$ [A-Za-z_][A-Za-z_0-9]*(?: :: [A-Za-z_][A-Za-z_0-9]*)*
+        )
+    ) /xgc) {
+        $parsed .= $1;
+        # without $parsed .= parse_ambiguous_char();
+    }
+
+    # printf {FILEHANDLE} <<HEREDOC
+    # print  {FILEHANDLE} <<HEREDOC
+    # say    {FILEHANDLE} <<HEREDOC
+    elsif (/\G (
+        (?: printf | print | say )
+        (?: \s+ | [#] .* )*
+        ) (\{) 
+    /xgc) {
+        $parsed .= $1;
+        $parsed .= parse_expr_balanced($2);
+        # without $parsed .= parse_ambiguous_char();
+    }
+
     # any word
     # "\x5F" [_] LOW LINE (U+005F)
     # "\x41" [A] LATIN CAPITAL LETTER A (U+0041)
@@ -3288,7 +3344,17 @@ sub parse_qq_like_balanced {
     my $nest_bracket = 1;
     my $nest_escape = 0;
     while (1) {
-        if (/\G (\Q$open_bracket\E) /xmsgc) {
+
+        # blackets
+        if (/\G (\\ \Q$open_bracket\E) /xmsgc) {
+            $parsed_as_q  .= $1;
+            $parsed_as_qq .= $1;
+        }
+        elsif (/\G (\\ \Q$close_bracket\E) /xmsgc) {
+            $parsed_as_q  .= $1;
+            $parsed_as_qq .= $1;
+        }
+        elsif (/\G (\Q$open_bracket\E) /xmsgc) {
             $parsed_as_q  .= $1;
             $parsed_as_qq .= $1;
             $nest_bracket++;
@@ -3390,7 +3456,13 @@ sub parse_qq_like_endswith {
     my $parsed_as_qq = $endswith;
     my $nest_escape = 0;
     while (1) {
-        if (/\G (\Q$endswith\E) /xmsgc) {
+
+        # ends with
+        if (/\G (\\ \Q$endswith\E) /xmsgc) {
+            $parsed_as_q  .= $1;
+            $parsed_as_qq .= $1;
+        }
+        elsif (/\G (\Q$endswith\E) /xmsgc) {
             $parsed_as_q  .= $1;
             $parsed_as_qq .= ('>)]}' x $nest_escape);
             $parsed_as_qq .= "\n" if CORE::length($1) >= 2; # here document
@@ -3605,6 +3677,220 @@ END
     }
     else {
         return $parsed_as_qq;
+    }
+}
+
+#---------------------------------------------------------------------
+# tr/A-C/1-3/ for US-ASCII codepoint
+sub list_all_ASCII_by_hyphen {
+    my @hyphened = @_;
+    my @list_all = ();
+    for (my $i=0; $i <= $#hyphened; ) {
+        if (
+            ($i+1 < $#hyphened)      and
+            ($hyphened[$i+1] eq '-') and
+        1) {
+            $hyphened[$i+0] = ($hyphened[$i+0] eq '\\-') ? '-' : $hyphened[$i+0];
+            $hyphened[$i+2] = ($hyphened[$i+2] eq '\\-') ? '-' : $hyphened[$i+2];
+            if (0) { }
+            elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/oxms) {
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not US-ASCII});
+            }
+            elsif ($hyphened[$i+2] !~ m/\A [\x00-\x7F] \z/oxms) {
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not US-ASCII});
+            }
+            elsif ($hyphened[$i+0] gt $hyphened[$i+2]) {
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not "$hyphened[$i+0]" le "$hyphened[$i+2]"});
+            }
+            else {
+                push @list_all, map { CORE::chr($_) } (CORE::ord($hyphened[$i+0]) .. CORE::ord($hyphened[$i+2]));
+                $i += 3;
+            }
+        }
+        else {
+            if ($hyphened[$i] eq '\\-') {
+                push @list_all, '-';
+            }
+            else {
+                push @list_all, $hyphened[$i];
+            }
+            $i++;
+        }
+    }
+    return @list_all;
+}
+
+#---------------------------------------------------------------------
+# parse tr{here}{here} in balanced blackets
+sub parse_tr_like_balanced {
+    my($open_bracket) = @_;
+    my $close_bracket = {qw| ( ) { } [ ] < > |}->{$open_bracket} || die;
+    my @x = ();
+    my $nest_bracket = 1;
+    while (1) {
+
+        # blackets
+        if (/\G (\\ \Q$open_bracket\E) /xmsgc) {
+            push @x, $1;
+        }
+        elsif (/\G (\\ \Q$close_bracket\E) /xmsgc) {
+            push @x, $1;
+        }
+        elsif (/\G (\Q$open_bracket\E) /xmsgc) {
+            push @x, $1;
+            $nest_bracket++;
+        }
+        elsif (/\G (\Q$close_bracket\E) /xmsgc) {
+            if (--$nest_bracket <= 0) {
+                last;
+            }
+            push @x, $1;
+        }
+
+        # \-
+        elsif (/\G (\\ -) /xmsgc) {
+            push @x, $1;
+        }
+
+        else {
+            push @x, parse_tr_like($close_bracket);
+        }
+    }
+    return join('', $open_bracket, @x, $close_bracket);
+}
+
+#---------------------------------------------------------------------
+# parse tr/here/here/ that ends with a character
+sub parse_tr_like_endswith {
+    my($endswith) = @_;
+    my $openwith = $endswith;
+    my @x = ();
+    while (1) {
+        if (/\G (\\ \Q$endswith\E) /xmsgc) {
+            push @x, $1;
+        }
+        elsif (/\G (\Q$endswith\E) /xmsgc) {
+            last;
+        }
+
+        # \-
+        elsif (/\G (\\ -) /xmsgc) {
+            push @x, $1;
+        }
+
+        else {
+            push @x, parse_tr_like($endswith);
+        }
+    }
+    return join('', $openwith, @x, $endswith);
+}
+
+#---------------------------------------------------------------------
+# parse tr/here/here/ common routine
+sub parse_tr_like {
+    my($closewith) = @_;
+
+    if (0) {
+    }
+
+    # https://perldoc.perl.org/perlop#Interpolation
+    # tr///, y///
+    # No variable interpolation occurs.
+    # String modifying combinations for case and quoting such as \Q, \U, and \E are not recognized.
+    # The other escape sequences such as \200 and \t and backslashed characters such as \\ and \- are converted to appropriate literals.
+    # The character "-" is treated specially and therefore \- is treated as a literal "-".
+
+    # \ddd
+    elsif (/\G \\ ( [0-3][0-7][0-7] | [0-7][0-7] | [0-7] ) /xmsgc) {
+        return escape_tr(mb::chr(oct $1), $closewith);
+    }
+
+    # \oddd
+    elsif (/\G \\o ( [0-3][0-7][0-7] | [0-7][0-7] | [0-7] ) /xmsgc) {
+        return escape_tr(mb::chr(oct $1), $closewith);
+    }
+
+    # \o{...}
+    elsif (/\G \\o\{ (.*?) \} /xmsgc) {
+        return escape_tr(mb::chr(oct $1), $closewith);
+    }
+
+    # \xhh
+    elsif (/\G \\x ( [0-9A-Fa-f][0-9A-Fa-f] | [0-9A-Fa-f] ) /xmsgc) {
+        return escape_tr(mb::chr(hex $1), $closewith);
+    }
+
+    # \x{...}
+    elsif (/\G \\x\{ (.*?) \} /xmsgc) {
+        return escape_tr(mb::chr(hex $1), $closewith);
+    }
+
+    # \cX
+    elsif (/\G ( \\c [\@ABCDEFGHIJKLMNOPQRSTUVWXYZ\[\\\]^_?] ) /xmsgc) {
+        return {
+            '\\c@'  => "\c@",
+            '\\cA'  => "\cA",
+            '\\cB'  => "\cB",
+            '\\cC'  => "\cC",
+            '\\cD'  => "\cD",
+            '\\cE'  => "\cE",
+            '\\cF'  => "\cF",
+            '\\cG'  => "\cG",
+            '\\cH'  => "\cH",
+            '\\cI'  => "\cI",
+            '\\cJ'  => "\cJ",
+            '\\cK'  => "\cK",
+            '\\cL'  => "\cL",
+            '\\cM'  => "\cM",
+            '\\cN'  => "\cN",
+            '\\cO'  => "\cO",
+            '\\cP'  => "\cP",
+            '\\cQ'  => "\cQ",
+            '\\cR'  => "\cR",
+            '\\cS'  => "\cS",
+            '\\cT'  => "\cT",
+            '\\cU'  => "\cU",
+            '\\cV'  => "\cV",
+            '\\cW'  => "\cW",
+            '\\cX'  => "\cX",
+            '\\cY'  => "\cY",
+            '\\cZ'  => "\cZ",
+            '\\c['  => "\c[",
+            '\\c\\' => CORE::chr(0x1C),
+            '\\c]'  => "\c]",
+            '\\c^'  => "\c^",
+            '\\c_'  => "\c_",
+            '\\c?'  => CORE::chr(0x7F),
+        }->{$1} || die;
+    }
+
+    # \\ \a \b \e \f \n \r \t \E \l \L \u \U \Q
+    elsif (/\G ( \\ ([\\abefnrtElLuUQ]) ) /xmsgc) {
+        return {
+            "\x5C\x5C" => "\x5C\x5C",
+            '\a'       => "\a",
+            '\b'       => "\b",
+            '\e'       => "\e",
+            '\f'       => "\f",
+            '\n'       => "\n",
+            '\r'       => "\r",
+            '\t'       => "\t",
+        }->{$1} || $2;
+    }
+
+    # any
+    elsif (/\G ($x) /xmsgc) {
+        return escape_tr($1, $closewith);
+    }
+
+    # something wrong happened
+    else {
+        die sprintf(<<END, pos($_), CORE::substr($_,pos($_)));
+$0(@{[__LINE__]}): something wrong happened in script at pos=%s
+------------------------------------------------------------------------------
+%s
+------------------------------------------------------------------------------
+END
     }
 }
 
@@ -4623,33 +4909,25 @@ sub parse_tr_modifier {
 #---------------------------------------------------------------------
 # makes codepoint class from string
 sub codepoint_tr {
-    my($searchlist) = $_[0] =~ /\A [\x00-\xFF] (.*) [\x00-\xFF] \z/xms;
-    my $look_ahead = ($_[1] =~ /c/) ? '(?:(?!' : '(?:(?=';
-    my $charclass = '';
+    my $searchlist = quotee_of($_[0]);
+
     my @sbcs = ();
     my @xbcs = (); # "xbcs" means DBCS, TBCS, QBCS, ...
-    while (1) {
-        if ($searchlist =~ /\G \z /xmsgc) {
-            $charclass =
-                ( @sbcs and  @xbcs) ? $look_ahead . join('|', @xbcs, '['.join('',@sbcs).']') . ")$x)" :
-                (!@sbcs and  @xbcs) ? $look_ahead . join('|', @xbcs                        ) . ")$x)" :
-                ( @sbcs and !@xbcs) ? $look_ahead .                  '['.join('',@sbcs).']'  . ")$x)" :
-                die;
-            last;
+    while (not $searchlist =~ /\G \z /xmsgc) {
+
+        # \-
+        if ($searchlist =~ /\G (\\-) /xmsgc) {
+            push @sbcs, $1;
         }
 
-        # range specification by '-' in tr/// is not supported
-        # this limitation makes it easier to change the script encoding
+        # -
         elsif ($searchlist =~ /\G (-) /xmsgc) {
-            if ($^W) {
-                cluck <<END;
-"$searchlist" in tr///
+            push @sbcs, $1;
+        }
 
-range specification by '-' in tr/// is not supported.
-this limitation makes it easier to change the script encoding.
-END
-            }
-            push @sbcs, '\\x2D';
+        # any qq escapee
+        elsif ($searchlist =~ /\G ([$escapee_in_qq_like]) /xmsgc) {
+            push @sbcs, "\\$1";
         }
 
         # any
@@ -4658,7 +4936,7 @@ END
                 push @sbcs, $1;
             }
             else {
-                push @xbcs, '(?:' . escape_to_hex($1, ']') . ')';
+                push @xbcs, escape_qq($1, '\\');
             }
         }
 
@@ -4672,7 +4950,13 @@ $0(@{[__LINE__]}): something wrong happened in script at pos=%s
 END
         }
     }
-    return $charclass;
+
+    # return codepoint class
+    return
+        ( @sbcs and  @xbcs) ? join('|', @xbcs, '['.join('',@sbcs).']') :
+        (!@sbcs and  @xbcs) ? join('|', @xbcs                        ) :
+        ( @sbcs and !@xbcs) ?                  '['.join('',@sbcs).']'  :
+        die;
 }
 
 #---------------------------------------------------------------------
@@ -4719,6 +5003,24 @@ sub escape_qq {
         return "$1\\$2";
     }
     elsif ($codepoint =~ /\A ([^\x00-\x7F]) ([$escapee_in_qq_like]) \z/xms) {
+        return "$1\\$2";
+    }
+    else {
+        return $codepoint;
+    }
+}
+
+#---------------------------------------------------------------------
+# escape tr/here/here/ as tr-like quote
+sub escape_tr {
+    my($codepoint, $endswith) = @_;
+    if ($codepoint =~ /\A (\Q$endswith\E) \z/xms) {
+        return "\\$1";
+    }
+    elsif ($codepoint =~ /\A ([^\x00-\x7F]) (\Q$endswith\E) \z/xms) {
+        return "$1\\$2";
+    }
+    elsif ($codepoint =~ /\A ([^\x00-\x7F]) ($escapee_in_q__like) \z/xms) {
         return "$1\\$2";
     }
     else {
@@ -5018,53 +5320,53 @@ To install this software without make, type the following:
 
   elder <--                            age                              --> younger
   ---------------------------------------------------------------------------------
-  bare Perl4         JPerl4                                                        
-  bare Perl5         JPerl5             use utf8;          mb.pm                   
-  bare Perl7                            pragma             modulino                
+  bare Perl4         JPerl4
+  bare Perl5         JPerl5             use utf8;          mb.pm
+  bare Perl7                            pragma             modulino
   ---------------------------------------------------------------------------------
-  chop               ---                ---                chop                    
-  chr                chr                bytes::chr         chr                     
-  getc               getc               ---                getc                    
-  index              ---                bytes::index       index                   
-  lc                 lc                 ---                lc (by internal mb::lc) 
+  chop               ---                ---                chop
+  chr                chr                bytes::chr         chr
+  getc               getc               ---                getc
+  index              ---                bytes::index       index
+  lc                 lc                 ---                lc (by internal mb::lc)
   lcfirst            lcfirst            ---                lcfirst (by internal mb::lcfirst)
-  length             length             bytes::length      length                  
-  ord                ord                bytes::ord         ord                     
-  reverse            reverse            ---                reverse                 
-  rindex             ---                bytes::rindex      rindex                  
-  substr             substr             bytes::substr      substr                  
-  uc                 uc                 ---                uc (by internal mb::uc) 
+  length             length             bytes::length      length
+  ord                ord                bytes::ord         ord
+  reverse            reverse            ---                reverse
+  rindex             ---                bytes::rindex      rindex
+  substr             substr             bytes::substr      substr
+  uc                 uc                 ---                uc (by internal mb::uc)
   ucfirst            ucfirst            ---                ucfirst (by internal mb::ucfirst)
-  ---                chop               chop               mb::chop                
-  ---                ---                chr                mb::chr                 
-  ---                ---                getc               mb::getc                
-  ---                index              ---                mb::index_byte          
-  ---                ---                index              mb::index               
-  ---                ---                lc                 ---                     
-  ---                ---                lcfirst            ---                     
-  ---                ---                length             mb::length              
-  ---                ---                ord                mb::ord                 
-  ---                ---                reverse            mb::reverse             
-  ---                rindex             ---                mb::rindex_byte         
-  ---                ---                rindex             mb::rindex              
-  ---                ---                substr             mb::substr              
-  ---                ---                uc                 ---                     
-  ---                ---                ucfirst            ---                     
+  ---                chop               chop               mb::chop
+  ---                ---                chr                mb::chr
+  ---                ---                getc               mb::getc
+  ---                index              ---                mb::index_byte
+  ---                ---                index              mb::index
+  ---                ---                lc                 ---
+  ---                ---                lcfirst            ---
+  ---                ---                length             mb::length
+  ---                ---                ord                mb::ord
+  ---                ---                reverse            mb::reverse
+  ---                rindex             ---                mb::rindex_byte
+  ---                ---                rindex             mb::rindex
+  ---                ---                substr             mb::substr
+  ---                ---                uc                 ---
+  ---                ---                ucfirst            ---
   ---------------------------------------------------------------------------------
-  do 'file'          ---                ---                do 'file'               
-  eval 'string'      ---                ---                eval 'string'           
-  require 'file'     ---                ---                require 'file'          
-  use Module         ---                ---                use Module              
-  no Module          ---                ---                no Module               
-  ---                do 'file'          do 'file'          mb::do 'file'           
-  ---                eval 'string'      eval 'string'      mb::eval 'string'       
-  ---                require 'file'     require 'file'     mb::require 'file'      
-  ---                use Module         use Module         mb::use Module          
-  ---                no Module          no Module          mb::no Module           
-  $^X                ---                ---                $^X                     
-  ---                $^X                $^X                $mb::PERL               
-  $0                 $0                 $0                 $mb::ORIG_PROGRAM_NAME  
-  ---                ---                ---                $0                      
+  do 'file'          ---                ---                do 'file'
+  eval 'string'      ---                ---                eval 'string'
+  require 'file'     ---                ---                require 'file'
+  use Module         ---                ---                use Module
+  no Module          ---                ---                no Module
+  ---                do 'file'          do 'file'          mb::do 'file'
+  ---                eval 'string'      eval 'string'      mb::eval 'string'
+  ---                require 'file'     require 'file'     mb::require 'file'
+  ---                use Module         use Module         mb::use Module
+  ---                no Module          no Module          mb::no Module
+  $^X                ---                ---                $^X
+  ---                $^X                $^X                $mb::PERL
+  $0                 $0                 $0                 $mb::ORIG_PROGRAM_NAME
+  ---                ---                ---                $0
   ---------------------------------------------------------------------------------
 
   DOS-like glob() as MBCS subroutine
@@ -5073,6 +5375,7 @@ To install this software without make, type the following:
   -----------------------------------------------------------------
   mb::dosglob             glob, and <globbing*>
   -----------------------------------------------------------------
+  but everybody loves split(/\n/,`dir /b *.* 2>NUL`) since Perl4
 
   index brothers
   ------------------------------------------------------------------------------------------
@@ -5207,26 +5510,26 @@ To install this software without make, type the following:
   ------------------------------------------------------------------
   hex   character as US-ASCII
   ------------------------------------------------------------------
-  21    [!]    
-  22    ["]    
+  21    [!]
+  22    ["]
   23    [#]    regexp comment
   24    [$]    sigil of scalar variable
-  25    [%]    
-  26    [&]    
-  27    [']    
+  25    [%]
+  26    [&]
+  27    [']
   28    [(]    regexp group and capture
   29    [)]    regexp group and capture
   2A    [*]    regexp matches zero or more times
   2B    [+]    regexp matches one or more times
-  2C    [,]    
-  2D    [-]    
+  2C    [,]
+  2D    [-]
   2E    [.]    regexp matches any octet
-  2F    [/]    
-  3A    [:]    
-  3B    [;]    
-  3C    [<]    
-  3D    [=]    
-  3E    [>]    
+  2F    [/]
+  3A    [:]
+  3B    [;]
+  3C    [<]
+  3D    [=]
+  3E    [>]
   3F    [?]    regexp matches zero or one times
   40    [@]    sigil of array variable
   5B    [[]    regexp bracketed character class
@@ -5237,7 +5540,7 @@ To install this software without make, type the following:
   7B    [{]    regexp quantifier
   7C    [|]    regexp alternation
   7D    [}]    regexp quantifier
-  7E    [~]    
+  7E    [~]
   ------------------------------------------------------------------
 
 =head1 How to escape 2nd octet of DAMEMOJI
@@ -5340,12 +5643,12 @@ To install this software without make, type the following:
   m'MBCS-quotee'cgmosx                       m{\G${mb::_anchor}@{[qr'OO-quotee'mosx ]}@{[mb::_m_passed()]}}cg
   s'MBCS-regexp'MBCS-replacement'eegimosxr   s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'OO-regexp'mosx)]}@{[mb::_s_passed()]}}{$1 . mb::eval mb::eval q'OO-replacement'}egr
   s'MBCS-regexp'MBCS-replacement'eegmosxr    s{(\G${mb::_anchor})@{[qr'OO-regexp'mosx ]}@{[mb::_s_passed()]}}{$1 . mb::eval mb::eval q'OO-replacement'}egr
-  tr/MBCS-search/MBCS-replacement/cdsr       s{[\x00-\xFF]*}{mb::tr($&,q/OO-search/,q/OO-replacement/,'cdsr')}er
-  tr/MBCS-search/MBCS-replacement/cds        s{[\x00-\xFF]*}{mb::tr($&,q/OO-search/,q/OO-replacement/,'cdsr')}e
-  tr/MBCS-search/MBCS-replacement/ds         s{[\x00-\xFF]*}{mb::tr($&,q/OO-search/,q/OO-replacement/,'dsr')}e
-  y/MBCS-search/MBCS-replacement/cdsr        s{[\x00-\xFF]*}{mb::tr($&,q/OO-search/,q/OO-replacement/,'cdsr')}er
-  y/MBCS-search/MBCS-replacement/cds         s{[\x00-\xFF]*}{mb::tr($&,q/OO-search/,q/OO-replacement/,'cdsr')}e
-  y/MBCS-search/MBCS-replacement/ds          s{[\x00-\xFF]*}{mb::tr($&,q/OO-search/,q/OO-replacement/,'dsr')}e
+  tr/MBCS-search/MBCS-replacement/cdsr       s{[\x00-\xFF]*}{mb::tr($&,q/OO-search/,q/OO-replacement/,'cdsr')}ser
+  tr/MBCS-search/MBCS-replacement/cds        s{[\x00-\xFF]+}{mb::tr($&,q/OO-search/,q/OO-replacement/,'cdsr')}se
+  tr/MBCS-search/MBCS-replacement/ds         s{[\x00-\xFF]+}{mb::tr($&,q/OO-search/,q/OO-replacement/,'dsr')}se
+  y/MBCS-search/MBCS-replacement/cdsr        s{[\x00-\xFF]*}{mb::tr($&,q/OO-search/,q/OO-replacement/,'cdsr')}ser
+  y/MBCS-search/MBCS-replacement/cds         s{[\x00-\xFF]+}{mb::tr($&,q/OO-search/,q/OO-replacement/,'cdsr')}se
+  y/MBCS-search/MBCS-replacement/ds          s{[\x00-\xFF]+}{mb::tr($&,q/OO-search/,q/OO-replacement/,'dsr')}se
   qr'MBCS-quotee'cgimosx                     qr{\G${mb::_anchor}@{[mb::_ignorecase(qr'OO-quotee'mosx)]}@{[mb::_m_passed()]}}cg
   qr'MBCS-quotee'cgmosx                      qr{\G${mb::_anchor}@{[qr'OO-quotee'mosx ]}@{[mb::_m_passed()]}}cg
   split m'^'                                 mb::_split qr{@{[qr'^'m ]}}
@@ -5505,8 +5808,8 @@ To install this software without make, type the following:
   lstat(qw/a/)                               mb::_lstat(qw/a/)
   lstat(qx/a/)                               mb::_lstat(qx/a/)
   lstat(s/a/b/)                              mb::_lstat(s{(\G${mb::_anchor})@{[qr/a/ ]}@{[mb::_s_passed()]}}{$1 . qq /b/}e)
-  lstat(tr/a/b/)                             mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
-  lstat(y/a/b/)                              mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
+  lstat(tr/a/b/)                             mb::_lstat(s{(\G${mb::_anchor})((?=[a])@{mb::_dot})}{$1.mb::tr($2,q/a/,q/b/,'r')}sge)
+  lstat(y/a/b/)                              mb::_lstat(s{(\G${mb::_anchor})((?=[a])@{mb::_dot})}{$1.mb::tr($2,q/a/,q/b/,'r')}sge)
   lstat($fh)                                 mb::_lstat($fh)
   lstat(FILE)                                mb::_lstat(\*FILE)
   lstat(_)                                   mb::_lstat(\*_)
@@ -5525,8 +5828,8 @@ To install this software without make, type the following:
   stat(qw/a/)                                mb::_stat(qw/a/)
   stat(qx/a/)                                mb::_stat(qx/a/)
   stat(s/a/b/)                               mb::_stat(s{(\G${mb::_anchor})@{[qr/a/ ]}@{[mb::_s_passed()]}}{$1 . qq /b/}e)
-  stat(tr/a/b/)                              mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
-  stat(y/a/b/)                               mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
+  stat(tr/a/b/)                              mb::_stat(s{(\G${mb::_anchor})((?=[a])@{mb::_dot})}{$1.mb::tr($2,q/a/,q/b/,'r')}sge)
+  stat(y/a/b/)                               mb::_stat(s{(\G${mb::_anchor})((?=[a])@{mb::_dot})}{$1.mb::tr($2,q/a/,q/b/,'r')}sge)
   stat($fh)                                  mb::_stat($fh)
   stat(FILE)                                 mb::_stat(\*FILE)
   stat(_)                                    mb::_stat(\*_)
@@ -5791,11 +6094,62 @@ To install this software without make, type the following:
   This mb.pm modulino requires perl5.00503 or later to use. Also requires 'strict'
   module. It requires the 'warnings' module, too if perl 5.6 or later.
 
-=head1 BUGS Avoidable by Your Doing
+=head1 Fatal Bugs Unavoidable
 
 You can avoid the following bugs with little hacks.
 
 =over 2
+
+=item * chdir() on Microsoft Windows
+
+Function chdir() cannot work if path is ended by chr(0x5C).
+
+  This problem is specific to Microsoft Windows. It is not caused by the mb.pm
+  modulino or the perl interpreter.
+  
+  # chdir.pl
+  mkdir((qw( `/ ))[0], 0777);
+  print "got=", chdir((qw( `/ ))[0]), " cwd=", `cd`;
+  
+  C:\HOME>perl5.00503.exe chdir.pl
+    GOOD ==> got=1 cwd=C:\HOME\`/
+  
+  C:\HOME>strawberry-perl-5.8.9.5.exe chdir.pl
+    BAD ==> got=1 cwd=C:\HOME
+
+This is a lost technology in this century.
+
+  # suggested module name
+  use mb::WinDir; # supports for all MBCS on Microsoft Windows
+  my $wd = mb::WinDir->new('`/');
+  $wd->chdir('..');
+  $wd->open(my $fh, ...);
+
+=item * Look-behind Assertion
+
+The look-behind assertion like (?<=[A-Z]) or (?<![A-Z]) are not prevented from
+matching trail octet of the previous MBCS codepoint.
+
+Please give us your good hack on this.
+
+=item * Empty Variable in Regular Expression
+
+An empty literal string as regexp means empty string. Unlike original Perl, if
+'pattern' is an empty string, the last successfully matched regexp is NOT used.
+Similarly, empty string made by interpolated variable means empty string, too.
+
+=back
+
+=head1 Small Bugs Avoidable
+
+The following is a description of the minor incompatibilities. These are not
+likely to be programming constraints.
+
+=over 2
+
+=item * Hyphen of tr/// Supports US-ASCII Only
+
+Supported ranges of tr/// and y/// by hyphen are US-ASCII only.
 
 =item * Special Variables $` and $& need m/( Capture All )/
 
@@ -5818,11 +6172,7 @@ expression in parentheses. Because $` and $& needs $1 to implement its.
 In the past, Perl scripts with special variables $` and $& had a problem with
 slow execution. Both that era and today, capturing by parentheses works well.
 
-=item * character ranges by hyphen of tr///
-
-tr/// and y/// support ranges only US-ASCII by hyphen.
-
-=item * return value from tr///s
+=item * Return Value from tr///s
 
 tr/// (or y///) operator with /s modifier returns 1 always. If you need right
 number, you can use mb::tr().
@@ -5877,71 +6227,7 @@ If you use perl 5.14 or later, you can use lvalue feature.
 
 =back
 
-=head1 BUGS Unavoidable, LIMITATIONS, and COMPATIBILITY
-
-=over 2
-
-=item * Limitation of Regular Expression
-
-This software has limitation from \G in multibyte anchoring. Only perl 5.30.0 or
-later can treat the codepoint string which exceeds 65534 octets with a regular
-expression, and only perl 5.10.1 or later can 32766 octets.
-
-  see also,
-  
-  The upper limit "n" specifiable in a regular expression quantifier of the form "{m,n}" has been doubled to 65534
-  https://metacpan.org/pod/release/XSAWYERX/perl-5.30.0/pod/perldelta.pod#The-upper-limit-%22n%22-specifiable-in-a-regular-expression-quantifier-of-the-form-%22%7Bm,n%7D%22-has-been-doubled-to-65534
-  
-  In 5.10.0, the * quantifier in patterns was sometimes treated as {0,32767}
-  http://perldoc.perl.org/perl5101delta.html
-  
-  [perl #116379] \G can't treat over 32767 octet
-  http://www.nntp.perl.org/group/perl.perl5.porters/2013/01/msg197320.html
-  
-  perlre - Perl regular expressions
-  http://perldoc.perl.org/perlre.html
-  
-  perlre length limit
-  http://stackoverflow.com/questions/4592467/perlre-length-limit
-
-Everything in this world has limits. If you use perl 5.10 or later, or perl 5.30
-or later, you can increase those limits. That's all.
-
-=item * chdir
-
-Function chdir() cannot work if path is ended by chr(0x5C).
-
-  This problem is specific to Microsoft Windows. It is not caused by the mb.pm
-  modulino or the perl interpreter.
-  
-  # chdir.pl
-  mkdir((qw( `/ ))[0], 0777);
-  print "got=", chdir((qw( `/ ))[0]), " cwd=", `cd`;
-  
-  C:\HOME>perl5.00503.exe chdir.pl
-    GOOD ==> got=1 cwd=C:\HOME\`/
-  
-  C:\HOME>strawberry-perl-5.8.9.5.exe chdir.pl
-    BAD ==> got=1 cwd=C:\HOME
-
-This is a lost technology in this century.
-
-  # suggested module name
-  use mb::WinDir; # supports for all MBCS on Microsoft Windows
-  my $wd = mb::WinDir->new('`/');
-  $wd->chdir('..');
-  $wd->open(my $fh, ...);
-
-=item * Look-behind Assertion
-
-The look-behind assertion like (?<=[A-Z]) or (?<![A-Z]) are not prevented from
-matching trail octet of the previous MBCS codepoint.
-
-Please give us your good hack on this.
-
-=back
-
-=head1 BUGS Avoidable by Other Modules
+=head1 Not Supported Features
 
 mb.pm modulino does not support the following features. In our experience with
 JPerl, these features are rarely needed. Moreover, if we are going to implement
@@ -5950,6 +6236,12 @@ frequently. If we are going to implement these, it's better to implement them
 as other modules.
 
 =over 2
+
+=item * Delimiter of String and Regexp
+
+qq//, q//, qw//, qx//, qr//, m//, s///, tr///, and y/// can't use a wide codepoint
+as the delimiter.
+I didn't implement this feature because it's rarely needed.
 
 =item * fc(), lc(), lcfirst(), uc(), and ucfirst()
 
@@ -5962,6 +6254,13 @@ fc() not supported. lc(), lcfirst(), uc(), and ucfirst() support US-ASCII only.
   my $uc_string      = mb::Casing::uc($string);
   my $ucfirst_string = mb::Casing::ucfirst($string);
   my $fc_string      = mb::Casing::fc($string);
+
+=item * Cloister of Regular Expression
+
+The cloister (?i) and (?i:...) of a regular expression on encoding of big5,
+big5hkscs, gb18030, gbk, sjis, and uhc will not be implemented for the time being.
+I didn't implement this feature because it was difficult to implement and less
+necessary. If you're interested in this issue, try challenge it.
 
 =item * Named Codepoint
 
@@ -6010,40 +6309,6 @@ Following \b{...} \B{...} available starting in Perl 5.22 are not supported.
 
 This feature (\b{...} and \B{...}) considered not yet stable in the Perl specification.
 
-=back
-
-=head1 Other BUGS
-
-The following is a description of the minor incompatibilities. These are not
-likely to be programming constraints.
-
-=over 2
-
-=item * format
-
-Unlike JPerl, mb.pm modulino does not support the format feature. Because it is
-difficult to implement and you can write the same script in other any ways.
-
-=item * Delimiter of String and Regexp
-
-qq//, q//, qw//, qx//, qr//, m//, s///, tr///, and y/// can't use a wide codepoint
-as the delimiter.
-I didn't implement this feature because it's rarely needed.
-
-=item * Limitation of ?? and m??
-
-Multibyte character needs ( ) which is before {n,m}, {n,}, {n}, *, and + in ?? or
-m??. As a result, you need to rewrite a script about $1,$2,$3,... You cannot use
-(?: ), ?, {n,m}?, {n,}?, and {n}? in ?? and m??, because delimiter of m?? is '?'.
-Here's a quote words from Dan Kogai-san.
-"I'm just a programmer, so I can't fix the bug of the spec."
-
-=item * Empty Variable in Regular Expression
-
-An empty literal string as regexp means empty string. Unlike original Perl, if
-'pattern' is an empty string, the last successfully matched regexp is NOT used.
-Similarly, empty string made by interpolated variable means empty string, too.
-
 =item * Modifier /a /d /l and /u of Regular Expression
 
 I have removed these modifiers to remove your headache.
@@ -6052,12 +6317,50 @@ literal string and literal of regexp in one Perl script. Therefore, modifier
 /a, /d, /l, and /u are not supported.
 \d means [0-9] universally.
 
-=item * cloister of regular expression
+=item * ?? and m?? are Not Supported
 
-The cloister (?i) and (?i:...) of a regular expression on encoding of big5,
-big5hkscs, gb18030, gbk, sjis, and uhc will not be implemented for the time being.
-I didn't implement this feature because it was difficult to implement and less
-necessary. If you're interested in this issue, try challenge it.
+Multibyte character needs ( ) which is before {n,m}, {n,}, {n}, *, and + in ?? or
+m??. As a result, you need to rewrite a script about $1,$2,$3,... You cannot use
+(?: ), ?, {n,m}?, {n,}?, and {n}? in ?? and m??, because delimiter of m?? is '?'.
+Here's a quote words from Dan Kogai-san.
+"I'm just a programmer, so I can't fix the bug of the spec."
+
+=item * format
+
+Unlike JPerl, mb.pm modulino does not support the format feature. Because it is
+difficult to implement and you can write the same script in other any ways.
+
+=back
+
+=head1 Other Limitations
+
+=over 2
+
+=item * Limitation of Regular Expression
+
+This software has limitation from \G in multibyte anchoring. Only perl 5.30.0 or
+later can treat the codepoint string which exceeds 65534 octets with a regular
+expression, and only perl 5.10.1 or later can 32766 octets.
+
+  see also,
+  
+  The upper limit "n" specifiable in a regular expression quantifier of the form "{m,n}" has been doubled to 65534
+  https://metacpan.org/pod/release/XSAWYERX/perl-5.30.0/pod/perldelta.pod#The-upper-limit-%22n%22-specifiable-in-a-regular-expression-quantifier-of-the-form-%22%7Bm,n%7D%22-has-been-doubled-to-65534
+  
+  In 5.10.0, the * quantifier in patterns was sometimes treated as {0,32767}
+  http://perldoc.perl.org/perl5101delta.html
+  
+  [perl #116379] \G can't treat over 32767 octet
+  http://www.nntp.perl.org/group/perl.perl5.porters/2013/01/msg197320.html
+  
+  perlre - Perl regular expressions
+  http://perldoc.perl.org/perlre.html
+  
+  perlre length limit
+  http://stackoverflow.com/questions/4592467/perlre-length-limit
+
+Everything in this world has limits. If you use perl 5.10 or later, or perl 5.30
+or later, you can increase those limits. That's all.
 
 =back
 
@@ -6284,7 +6587,8 @@ This project was originated by INABA Hitoshi.
 =head1 LICENSE AND COPYRIGHT
 
 This software is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See perlartistic.
+modify it under the same terms as Perl itself. See the LICENSE
+file for details.
 
 This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

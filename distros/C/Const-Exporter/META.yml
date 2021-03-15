@@ -31,8 +31,9 @@ name: Const-Exporter
 provides:
   Const::Exporter:
     file: lib/Const/Exporter.pm
-    version: v1.1.1
+    version: v1.1.2
 recommends:
+  List::SomeUtils::XS: '0'
   Package::Stash::XS: '0'
   Ref::Util::XS: '0'
   Storable: '0'
@@ -49,7 +50,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Const-Exporter/issues
   repository: git://github.com/robrwo/Const-Exporter.git
-version: v1.1.1
+version: v1.1.2
 x_authority: cpan:RRWO
 x_contributors:
   - 'B. Estrade <estrabd@cpan.org>'

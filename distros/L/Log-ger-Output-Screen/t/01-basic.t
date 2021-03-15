@@ -47,7 +47,7 @@ subtest "basics" => sub {
     is($stdout, "");
 
     subtest "opt:use_color=1" => sub {
-        Log::ger::Output->set('Screen', use_color=>1);
+        Log::ger::Output->set('Screen', use_color=>1, color_depth=>16);
         Log::ger::init_target(hash => $h);
         ($stdout, $stderr, $exit) = capture {
             $h->{fatal}("fatal");

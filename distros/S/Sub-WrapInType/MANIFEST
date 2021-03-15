@@ -8,8 +8,10 @@ cpanfile.snapshot
 lib/Sub/WrapInType.pm
 minil.toml
 t/00_compile.t
-t/01_wrap_sub.t
-t/02_wrap_method.t
-t/03_new.t
+t/install_method.t
+t/install_sub.t
+t/new.t
+t/wrap_method.t
+t/wrap_sub.t
 META.yml
 MANIFEST

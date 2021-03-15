@@ -23,24 +23,30 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Config" : "0",
-            "Data::Dumper" : "0",
-            "Exporter" : "5.64",
-            "Test::More" : "0.88"
+            "Safe" : "0",
+            "Test::More" : "0.88",
+            "Time::Local" : "0",
+            "lib" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Exporter" : "5.64",
+            "FileHandle" : "0",
+            "Getopt::Std" : "0",
+            "Module::Build" : "0.42",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
+            "Astro::Coord::ECI" : "0.091",
             "Astro::Coord::ECI::TLE" : "0.091",
             "Astro::Coord::ECI::Utils" : "0.091",
             "Carp" : "0",
             "POSIX" : "0",
-            "Scalar::Util" : "0",
             "base" : "0",
             "constant" : "0",
             "perl" : "5.006002",
@@ -52,14 +58,14 @@
    "provides" : {
       "Astro::Coord::ECI::TLE::Iridium" : {
          "file" : "lib/Astro/Coord/ECI/TLE/Iridium.pm",
-         "version" : "0.129"
+         "version" : "0.130"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-TLE-Iridium"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -70,6 +76,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium"
       }
    },
-   "version" : "0.129",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.130",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

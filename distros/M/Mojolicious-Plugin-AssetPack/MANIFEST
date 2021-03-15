@@ -13,6 +13,9 @@ examples/sprites.pl
 lib/Mojolicious/Plugin/AssetPack.pm
 lib/Mojolicious/Plugin/AssetPack/Asset.pm
 lib/Mojolicious/Plugin/AssetPack/Asset/Null.pm
+lib/Mojolicious/Plugin/AssetPack/Guides/Cookbook.pod
+lib/Mojolicious/Plugin/AssetPack/Guides/Developing.pod
+lib/Mojolicious/Plugin/AssetPack/Guides/Tutorial.pod
 lib/Mojolicious/Plugin/AssetPack/Pipe.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/CoffeeScript.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/Combine.pm
@@ -33,6 +36,7 @@ lib/Mojolicious/Plugin/AssetPack/Pipe/TypeScript.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/Vuejs.pm
 lib/Mojolicious/Plugin/AssetPack/Store.pm
 lib/Mojolicious/Plugin/AssetPack/Util.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md

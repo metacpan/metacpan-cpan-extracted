@@ -1,33 +1,37 @@
 ---
 abstract: 'music tension analysis'
 author:
-  - 'Jeremy Mates <jmates@cpan.org>'
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
 build_requires:
   Test::Most: '0'
-  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
-  strict: '0'
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Music-Tension
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Music::Tension:
+    file: lib/Music/Tension.pm
+    version: '1.03'
+  Music::Tension::Cope:
+    file: lib/Music/Tension/Cope.pm
+    version: '1.03'
+  Music::Tension::Counterpoint:
+    file: lib/Music/Tension/Counterpoint.pm
+    version: '1.03'
+  Music::Tension::PlompLevelt:
+    file: lib/Music/Tension/PlompLevelt.pm
+    version: '1.03'
 requires:
   Carp: '0'
   List::Util: '0'
   Scalar::Util: '0'
-  strict: '0'
 resources:
-  bugtracker: https://github.com/thrig/Music-Tension/issues
-  homepage: https://github.com/thrig/Music-Tension
-  license: https://opensource.org/licenses/BSD-3-Clause
-  repository: git://github.com/thrig/Music-Tension.git
-version: '1.02'
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/thrig/Music-Tension
+version: '1.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

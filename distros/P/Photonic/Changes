@@ -1,3 +1,5 @@
+- convert from bundled Fortran code to PDL::LinearAlgebra
+
 0.014 2020-03-26
   - Fix (again) t/geometry.t's bug when netpbm files are not available
 

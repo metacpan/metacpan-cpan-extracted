@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package App::Cmd::Command::help;
-$App::Cmd::Command::help::VERSION = '0.331';
+$App::Cmd::Command::help::VERSION = '0.333';
 use App::Cmd::Command;
 BEGIN { our @ISA = 'App::Cmd::Command'; }
 
@@ -115,7 +115,7 @@ App::Cmd::Command::help - display a command's help screen
 
 =head1 VERSION
 
-version 0.331
+version 0.333
 
 =head1 DESCRIPTION
 
@@ -196,7 +196,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

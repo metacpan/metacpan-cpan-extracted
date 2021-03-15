@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<otrs_package version="1.1">
+    <Name>ProductNews</Name>
+    <Version>5.0.9</Version>
+    <Vendor>Perl-Services.de</Vendor>
+    <URL>http://perl-services.de/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Version="5.0.5" Date="2016-04-24 17:20:44">Added Hungarian translation, thanks to Balázs Úr.</ChangeLog>
+    <Description Lang="en">A module that adds own product news to OTRS.</Description>
+    <Description Lang="de">Ein Modul, mit dem eigene Produktneuigkeiten in OTRS gepflegt werden können.</Description>
+    <Description Lang="hu">Egy modul, amely saját termékhíreket ad az OTRS-hez.</Description>
+    <Framework>5.0.x</Framework>
+    <DatabaseInstall>
+        <TableCreate Name="product_news">
+            <Column AutoIncrement="true" Name="id" PrimaryKey="true" Required="true" Type="INTEGER"/>
+            <Column Name="headline" Required="true" Size="250" Type="VARCHAR"/>
+            <Column Name="teaser" Required="true" Size="250" Type="VARCHAR"/>
+            <Column Name="body" Required="true" Size="3000" Type="VARCHAR"/>
+            <Column Name="displays" Required="false" Size="3000" Type="VARCHAR"/>
+            <Column Name="invalidate_epoche" Required="false" Type="INTEGER"/>
+            <Column Name="open_news" Required="false" Type="SMALLINT"/>
+            <Column Name="valid_id" Required="true" Type="SMALLINT"/>
+            <Column Name="create_time" Required="true" Type="DATE"/>
+            <Column Name="create_by" Required="true" Type="INTEGER"/>
+            <Column Name="change_time" Required="true" Type="DATE"/>
+            <Column Name="change_by" Required="true" Type="INTEGER"/>
+            <ForeignKey ForeignTable="users">
+                <Reference Foreign="id" Local="create_by">
+                </Reference>
+                <Reference Foreign="id" Local="change_by">
+                </Reference>
+            </ForeignKey>
+            <ForeignKey ForeignTable="valid">
+                <Reference Foreign="id" Local="valid_id">
+                </Reference>
+            </ForeignKey>
+        </TableCreate>
+    </DatabaseInstall>
+    <DatabaseUpgrade>
+        <TableAlter Name="product_news" Version="4.0.2">
+            <ColumnAdd Name="displays" Required="false" Size="3000" Type="VARCHAR"/>
+        </TableAlter>
+        <TableAlter Name="product_news" Version="4.0.5">
+            <ColumnAdd Name="invalidate_epoche" Required="false" Type="INTEGER"/>
+        </TableAlter>
+        <TableAlter Name="product_news" Version="4.0.6">
+            <ColumnAdd Name="open_news" Required="false" Type="SMALLINT"/>
+        </TableAlter>
+    </DatabaseUpgrade>
+    <DatabaseUninstall>
+        <TableDrop Name="product_news"/>
+    </DatabaseUninstall>
+<BuildDate>2016-12-06 10:29:41</BuildDate><BuildHost>otrs5s</BuildHost></otrs_package>

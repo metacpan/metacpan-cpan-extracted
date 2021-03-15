@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-IOLoop-ReadWriteFork
 
+0.41 2021-03-15T17:26:23+0900
+ - Fix circular references
+
 0.40 2021-03-05T18:23:49+0900
  - Fix infinite loop, when die() is called inside "close" event
 

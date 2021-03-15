@@ -2,13 +2,11 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
-                                      },
-                        'suggests' => {
-                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
                       'requires' => {
+                                      'Encode' => '0',
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41'
                                     }
@@ -31,8 +29,9 @@ do { my $x = {
                                       'Sub::Install' => '0',
                                       'Text::Abbrev' => '0',
                                       'constant' => '0',
+                                      'experimental' => '0',
                                       'parent' => '0',
-                                      'perl' => '5.006',
+                                      'perl' => '5.020',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -48,7 +47,6 @@ do { my $x = {
                                    'IPC::Cmd' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0.96',
-                                   'base' => '0',
                                    'lib' => '0'
                                  }
                  }

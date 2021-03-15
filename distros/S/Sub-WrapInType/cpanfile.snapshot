@@ -138,7 +138,7 @@ DISTRIBUTIONS
       File::Spec 3.00
       File::Spec::Functions 0
       if 0
-      perl 5.00503
+      perl 5.005030
       strict 0
   Module-Runtime-0.016
     pathname: Z/ZE/ZEFRAM/Module-Runtime-0.016.tar.gz

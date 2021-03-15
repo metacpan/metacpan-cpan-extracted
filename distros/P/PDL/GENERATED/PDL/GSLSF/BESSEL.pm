@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Regular Bessel Function J_n(x).
 
+=for bad
+
+gsl_sf_bessel_Jn does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -86,6 +90,10 @@ Regular Bessel Function J_n(x).
 
 Array of Regular Bessel Functions J_{s}(x) to J_{s+n-1}(x).
 
+=for bad
+
+gsl_sf_bessel_J_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -111,6 +119,10 @@ Array of Regular Bessel Functions J_{s}(x) to J_{s+n-1}(x).
 
 IrRegular Bessel Function Y_n(x).
 
+=for bad
+
+gsl_sf_bessel_Yn does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -136,6 +148,10 @@ IrRegular Bessel Function Y_n(x).
 
 Array of Regular Bessel Functions Y_{s}(x) to Y_{s+n-1}(x).
 
+=for bad
+
+gsl_sf_bessel_Y_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -161,6 +177,10 @@ Array of Regular Bessel Functions Y_{s}(x) to Y_{s+n-1}(x).
 
 Regular Modified Bessel Function I_n(x).
 
+=for bad
+
+gsl_sf_bessel_In does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -186,6 +206,10 @@ Regular Modified Bessel Function I_n(x).
 
 Array of Regular Modified Bessel Functions I_{s}(x) to I_{s+n-1}(x).
 
+=for bad
+
+gsl_sf_bessel_I_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -211,6 +235,10 @@ Array of Regular Modified Bessel Functions I_{s}(x) to I_{s+n-1}(x).
 
 Scaled Regular Modified Bessel Function exp(-|x|) I_n(x).
 
+=for bad
+
+gsl_sf_bessel_In_scaled does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -236,6 +264,10 @@ Scaled Regular Modified Bessel Function exp(-|x|) I_n(x).
 
 Array of Scaled Regular Modified Bessel Functions exp(-|x|) I_{s}(x) to exp(-|x|) I_{s+n-1}(x).
 
+=for bad
+
+gsl_sf_bessel_I_scaled_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -261,6 +293,10 @@ Array of Scaled Regular Modified Bessel Functions exp(-|x|) I_{s}(x) to exp(-|x|
 
 IrRegular Modified Bessel Function K_n(x).
 
+=for bad
+
+gsl_sf_bessel_Kn does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -286,6 +322,10 @@ IrRegular Modified Bessel Function K_n(x).
 
 Array of IrRegular Modified Bessel Functions K_{s}(x) to K_{s+n-1}(x).
 
+=for bad
+
+gsl_sf_bessel_K_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -311,6 +351,10 @@ Array of IrRegular Modified Bessel Functions K_{s}(x) to K_{s+n-1}(x).
 
 Scaled IrRegular Modified Bessel Function exp(-|x|) K_n(x).
 
+=for bad
+
+gsl_sf_bessel_Kn_scaled does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -336,6 +380,10 @@ Scaled IrRegular Modified Bessel Function exp(-|x|) K_n(x).
 
 Array of Scaled IrRegular Modified Bessel Functions exp(-|x|) K_{s}(x) to exp(-|x|) K_{s+n-1}(x).
 
+=for bad
+
+gsl_sf_bessel_K_scaled_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -361,6 +409,10 @@ Array of Scaled IrRegular Modified Bessel Functions exp(-|x|) K_{s}(x) to exp(-|
 
 Regular Sphericl Bessel Function J_n(x).
 
+=for bad
+
+gsl_sf_bessel_jl does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -386,6 +438,10 @@ Regular Sphericl Bessel Function J_n(x).
 
 Array of Spherical Regular Bessel Functions J_{0}(x) to J_{n-1}(x).
 
+=for bad
+
+gsl_sf_bessel_j_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -411,6 +467,10 @@ Array of Spherical Regular Bessel Functions J_{0}(x) to J_{n-1}(x).
 
 IrRegular Spherical Bessel Function y_n(x).
 
+=for bad
+
+gsl_sf_bessel_yl does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -436,6 +496,10 @@ IrRegular Spherical Bessel Function y_n(x).
 
 Array of Regular Spherical Bessel Functions y_{0}(x) to y_{n-1}(x).
 
+=for bad
+
+gsl_sf_bessel_y_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -461,6 +525,10 @@ Array of Regular Spherical Bessel Functions y_{0}(x) to y_{n-1}(x).
 
 Scaled Regular Modified Spherical Bessel Function exp(-|x|) i_n(x).
 
+=for bad
+
+gsl_sf_bessel_il_scaled does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -486,6 +554,10 @@ Scaled Regular Modified Spherical Bessel Function exp(-|x|) i_n(x).
 
 Array of Scaled Regular Modified Spherical Bessel Functions exp(-|x|) i_{0}(x) to exp(-|x|) i_{n-1}(x).
 
+=for bad
+
+gsl_sf_bessel_i_scaled_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -511,6 +583,10 @@ Array of Scaled Regular Modified Spherical Bessel Functions exp(-|x|) i_{0}(x) t
 
 Scaled IrRegular Modified Spherical Bessel Function exp(-|x|) k_n(x).
 
+=for bad
+
+gsl_sf_bessel_kl_scaled does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -536,6 +612,10 @@ Scaled IrRegular Modified Spherical Bessel Function exp(-|x|) k_n(x).
 
 Array of Scaled IrRegular Modified Spherical Bessel Functions exp(-|x|) k_{s}(x) to exp(-|x|) k_{s+n-1}(x).
 
+=for bad
+
+gsl_sf_bessel_k_scaled_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -561,6 +641,10 @@ Array of Scaled IrRegular Modified Spherical Bessel Functions exp(-|x|) k_{s}(x)
 
 Regular Cylindrical Bessel Function J_nu(x).
 
+=for bad
+
+gsl_sf_bessel_Jnu does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -586,6 +670,10 @@ Regular Cylindrical Bessel Function J_nu(x).
 
 IrRegular Cylindrical Bessel Function J_nu(x).
 
+=for bad
+
+gsl_sf_bessel_Ynu does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -611,6 +699,10 @@ IrRegular Cylindrical Bessel Function J_nu(x).
 
 Scaled Modified Cylindrical Bessel Function exp(-|x|) I_nu(x).
 
+=for bad
+
+gsl_sf_bessel_Inu_scaled does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -636,6 +728,10 @@ Scaled Modified Cylindrical Bessel Function exp(-|x|) I_nu(x).
 
 Modified Cylindrical Bessel Function I_nu(x).
 
+=for bad
+
+gsl_sf_bessel_Inu does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -661,6 +757,10 @@ Modified Cylindrical Bessel Function I_nu(x).
 
 Scaled Modified Cylindrical Bessel Function exp(-|x|) K_nu(x).
 
+=for bad
+
+gsl_sf_bessel_Knu_scaled does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -686,6 +786,10 @@ Scaled Modified Cylindrical Bessel Function exp(-|x|) K_nu(x).
 
 Modified Cylindrical Bessel Function K_nu(x).
 
+=for bad
+
+gsl_sf_bessel_Knu does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -711,6 +815,10 @@ Modified Cylindrical Bessel Function K_nu(x).
 
 Logarithm of Modified Cylindrical Bessel Function K_nu(x).
 
+=for bad
+
+gsl_sf_bessel_lnKnu does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

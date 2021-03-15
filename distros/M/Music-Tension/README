@@ -1,26 +1,30 @@
 Music::Tension - musical interval tension analysis
 
-To install this module, use CPAN. For example:
+this module can be installed using cpanm:
 
-  cpan Music::Tension
-
-
-For the source code, see:
-
-https://github.com/thrig/Music-Tension
+  cpanm Music::Tension
 
 
-This can be built and installed by running:
-
-   perl Makefile.PL
-   make
-   make test
-   make install
+run perldoc(1) on Music::Tension for documentation
 
 
-Run perldoc(1) on Music::Tension for more documentation.
+to install from source code, with dependencies:
+
+    git clone https://github.com/thrig/Music-Tension
+    cd Music-Tension
+    cpanm .
+
+or the manual way:
+
+    perl Build.PL && ./Build test && ./Build install
 
 
-DEPENDENCIES
+to author a new release:
 
-Some knowledge of music theory will benefit the user.
+    ./Build testcover
+    RELEASE_TESTING=1 TEST_SIGNATURE=1 ./Build test
+    ./Build disttest
+    git tag -u ... -s v...
+    cpan-upload ...
+    git push ...
+    ./Build realclean

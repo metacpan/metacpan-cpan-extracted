@@ -1,0 +1,21 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use HTML::Make::Calendar 'calendar';
+use Getopt::Long;
+
+my $ok = GetOptions (
+    "year=i" => \my $year,
+    "month=i" => \my $month,
+    "verbose" => \my $verbose,
+);
+
+
+my $out = calendar (verbose => $verbose, year => $year, month => $month);
+print $out->{html};
+
+# Local variables:
+# mode: perl
+# End:

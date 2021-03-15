@@ -1,5 +1,21 @@
 Revision history for FFI-Platypus
 
+1.42      2021-03-15 05:42:23 -0600
+  - Production release identical to 1.41_01
+
+1.41_01   2021-03-14 12:49:38 -0600
+  - Adjusted test introduced in 1.40_01 to not rely on returning
+    a record-value for platforms that do not support that.  (gh#318, gh#319)
+
+1.40_01   2021-03-12 13:08:41 -0700
+  - Add support for closures returning records pass-by-value
+    if they do not include string pointers (gh#313, gh#315)
+
+1.39_01   2021-03-09 17:38:37 -0700
+  - Fix bug where closure ABI wasn't being used for non-default
+    ABIs (gh#313, gh#314)
+  - Add support for closures taking records pass-by-value (gh#312)
+
 1.38      2021-03-08 17:13:15 -0700
   - Production release identical to 1.37_01
 

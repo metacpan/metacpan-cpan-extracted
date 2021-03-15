@@ -121,6 +121,30 @@ subtest 'has sub' => sub {
 
         like dies { Sub::Meta->new->apply_attribute('lvalue') }, qr/apply_attribute requires subroutine reference/, 'apply_attribute requires subroutine reference';
     };
+
+    subtest 'apply_meta' => sub {
+        sub hello4 { }
+
+        my $meta = Sub::Meta->new(sub => \&hello4);
+        my $other = Sub::Meta->new(
+            subname   => 'other_hello',
+            prototype => '$',
+            attribute => ['lvalue', 'method'],
+        );
+
+        is [ Sub::Identify::get_code_info(\&hello4) ], ['main','hello4'];
+        is Sub::Util::prototype(\&hello4), undef;
+        is [ attributes::get(\&hello4) ], [];
+
+        is $meta->apply_meta($other), $meta, 'apply_meta';
+        is $meta->subname, 'other_hello';
+        is $meta->prototype, '$',
+        is $meta->attribute, ['lvalue', 'method'];
+
+        is [ Sub::Identify::get_code_info(\&hello4) ], ['main','other_hello'];
+        is Sub::Util::prototype(\&hello4), '$';
+        is [ attributes::get(\&hello4) ], ['lvalue', 'method'];
+    };
 };
 
 subtest 'new' => sub {
@@ -246,6 +270,22 @@ subtest 'set_nshift' => sub {
 
     like dies { $meta->set_nshift(0) },
     qr/nshift of method cannot be zero/, 'invalid nshift';
+};
+
+subtest 'invocant/invocants/set_invocant' => sub {
+    my $invocant = Sub::Meta::Param->new(name => '$self');
+    my $p1 = Sub::Meta::Param->new(type => 'Str');
+
+    my $meta = Sub::Meta->new(args => [$p1]);
+    is $meta->all_args, [ $p1 ];
+    is $meta->invocant, undef;
+
+    is $meta->set_invocant($invocant), $meta;
+    is $meta->invocant, $invocant;
+    is $meta->invocants, [ $invocant ];
+
+    is $meta->all_args, [ $invocant, $p1 ];
+    is $meta->args, [$p1];
 };
 
 done_testing;

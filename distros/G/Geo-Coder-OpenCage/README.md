@@ -8,6 +8,7 @@ This module provides a Perl interface to the [OpenCage geocoder](https://opencag
 [![Kritika Analysis Status](https://kritika.io/users/OpenCage/repos/2893424605329847/heads/master/status.svg)](https://kritika.io/orgs/OpenCage/repos/2893424605329847/heads/master/)
 [![CPAN](https://img.shields.io/cpan/v/Geo-Coder-OpenCage.svg?style=flat-square)](https://metacpan.org/pod/Geo::Coder::OpenCage)
 [![Coverage Status](https://coveralls.io/repos/github/OpenCageData/perl-Geo-Coder-OpenCage/badge.svg?branch=master)](https://coveralls.io/github/OpenCageData/perl-Geo-Coder-OpenCage?branch=master)
+[![Twitter Follow](https://img.shields.io/twitter/follow/OpenCage?label=Follow%20OpenCage&style=social)](https://twitter.com/opencage)
 
 ## Usage
 

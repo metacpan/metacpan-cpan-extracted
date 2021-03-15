@@ -60,3 +60,34 @@ cx_closure_call(cx_struct_t *s, int i)
 {
   my_cx_closure(s, i);
 }
+
+typedef void (*cxv_closure_t)(cx_struct_t, int);
+static cxv_closure_t my_cxv_closure;
+
+EXTERN void
+cxv_closure_set(cxv_closure_t closure)
+{
+  my_cxv_closure = closure;
+}
+
+EXTERN void
+cxv_closure_call(cx_struct_t s, int i)
+{
+  my_cxv_closure(s, i);
+}
+
+typedef struct {
+  char  foo;
+  short bar;
+  int   baz;
+} cx_struct_simple_t;
+
+typedef cx_struct_simple_t (*cxv_closure_simple_t)(void);
+
+EXTERN cx_struct_simple_t*
+cxv_closure_simple_call(cxv_closure_simple_t closure)
+{
+  static cx_struct_simple_t simple;
+  simple = closure();
+  return &simple;
+}

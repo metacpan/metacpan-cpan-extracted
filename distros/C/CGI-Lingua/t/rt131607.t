@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Without::Module qw(LWP::Simple);
+use Test::Without::Module qw(LWP::Simple::WithCache);
 
 use lib 't/lib';
 use MyLogger;
@@ -42,7 +42,7 @@ unless(-e 't/online.enabled') {
 		my $t = $l->time_zone();
 		die "Shouldn't succeed";
 	};
-	like($@, qr/^You must have LWP::Simple/, 'Need connection to ip-api.com');
+	like($@, qr/^You must have LWP::Simple::WithCache/, 'Need connection to ip-api.com');
 } else {
 	plan skip_all => 'Need either Geo::IP or JSON::Parse to test t/time_zone.t'
 }

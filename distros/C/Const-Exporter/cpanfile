@@ -10,6 +10,7 @@ requires "Ref::Util" => "0";
 requires "perl" => "v5.10.0";
 requires "strict" => "0";
 requires "warnings" => "0";
+recommends "List::SomeUtils::XS" => "0";
 recommends "Package::Stash::XS" => "0";
 recommends "Ref::Util::XS" => "0";
 recommends "Storable" => "0";

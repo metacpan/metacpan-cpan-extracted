@@ -5,7 +5,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '0.129';
+our $VERSION = '0.130';
 
 use Exporter qw{ import };
 
@@ -90,8 +90,9 @@ is used.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues>,
-or in electronic mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-TLE-Iridium>,
+L<https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

@@ -7,6 +7,7 @@ generic1: &generic1 |
         {{{house}}}
         {{{road}}} {{{house_number}}}
         {{{postcode}}} {{#first}} {{{postal_city}}} || {{{town}}} || {{{city}}} || {{{village}}} || {{{municipality}}} || {{{county}}} || {{{state}}} {{/first}}
+        {{{archipelago}}}
         {{{country}}}
 
 # postcode after city
@@ -14,7 +15,7 @@ generic2: &generic2 |
         {{{attention}}}
         {{#first}} {{{house}}}, {{{quarter}}} || {{{house}}} {{/first}}
         {{{house_number}}} {{{road}}}
-        {{#first}} {{{village}}} || {{{city}}} || {{{town}}} || {{{municipality}}} || {{{county}}} {{/first}} {{{postcode}}}
+        {{#first}} {{{village}}} || {{{town}}} || {{{city}}} || {{{municipality}}} || {{{county}}} {{/first}} {{{postcode}}}
         {{#first}} {{{country}}} || {{{state}}} {{/first}}
 
 # postcode before city
@@ -877,7 +878,7 @@ HK:
         {{{house}}}
         {{{house_number}}} {{{road}}} 
         {{{state_district}}}
-        {{{state}}}
+        {{#first}} {{{state}}} || {{{country}}} {{/first}}
 
 # Hong Kong - English
 HK_en:
@@ -958,6 +959,8 @@ IE:
         - [" City$",""]
         - ["The Municipal District of ",""]
         - ["The Metropolitan District of ",""]
+        - ["Municipal District",""]
+        - ["Electoral Division",""]        
     postformat_replace:
         - ["Dublin\nCounty Dublin","Dublin"]
         - ["Galway\nCounty Galway","Galway"]

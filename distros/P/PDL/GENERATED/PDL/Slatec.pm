@@ -465,6 +465,10 @@ sub PDL::polyvalue {
 
 singular value decomposition of a matrix
 
+=for bad
+
+svdc does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -489,6 +493,10 @@ singular value decomposition of a matrix
 Factor a real symmetric positive definite matrix
 and estimate the condition number of the matrix.
 
+=for bad
+
+poco does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -513,6 +521,10 @@ and estimate the condition number of the matrix.
 Factor a matrix using Gaussian elimination and estimate
 the condition number of the matrix.
 
+=for bad
+
+geco does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -538,6 +550,10 @@ the condition number of the matrix.
 
 Factor a matrix using Gaussian elimination.
 
+=for bad
+
+gefa does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -563,6 +579,10 @@ Compute the determinant and inverse of a certain real
 symmetric positive definite matrix using the factors
 computed by L</poco>.
 
+=for bad
+
+podi does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -587,6 +607,10 @@ computed by L</poco>.
 Compute the determinant and inverse of a matrix using the
 factors computed by L</geco> or L</gefa>.
 
+=for bad
+
+gedi does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -611,6 +635,10 @@ factors computed by L</geco> or L</gefa>.
 Solve the real system C<A*X=B> or C<TRANS(A)*X=B> using the
 factors computed by L</geco> or L</gefa>.
 
+=for bad
+
+gesl does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -637,6 +665,10 @@ subroutines from the eigensystem subroutine package (EISPACK)
 to find the eigenvalues and eigenvectors (if desired)
 of a REAL SYMMETRIC matrix.
 
+=for bad
+
+rs does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -665,6 +697,10 @@ The prime factorization
 of C<n> together with a tabulation of the trigonometric functions
 are computed and stored in C<wsave()>.
 
+=for bad
+
+ezffti does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -690,6 +726,10 @@ are computed and stored in C<wsave()>.
 
 
 
+=for bad
+
+ezfftf does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -715,6 +755,10 @@ are computed and stored in C<wsave()>.
 
 
 
+=for bad
+
+ezfftb does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -739,6 +783,10 @@ are computed and stored in C<wsave()>.
 Convert the C<polfit> coefficients to Taylor series form.
 C<c> and C<a()> must be of the same type.
 
+=for bad
+
+pcoef does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -765,6 +813,10 @@ polynomial fit of degree C<l>, along with the first C<nder> of
 its derivatives, at a specified point. C<x> and C<a> must be of the
 same type.
 
+=for bad
+
+pvalue does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -828,6 +880,10 @@ monotonicity (data still valid).
 
 
 
+=for bad
+
+chim does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -967,6 +1023,10 @@ for monotonicity.
 
 
 
+=for bad
+
+chic does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1083,6 +1143,10 @@ for the interior derivative values.
 
 
 
+=for bad
+
+chsp does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1149,6 +1213,10 @@ which should never happen.
 
 
 
+=for bad
+
+chfd does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1210,6 +1278,10 @@ E<gt>0 if extrapolation was performed at C<ierr> points
 
 
 
+=for bad
+
+chfe does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1284,6 +1356,10 @@ which should never happen.
 
 
 
+=for bad
+
+chia does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1346,6 +1422,10 @@ Error status returned by C<$ierr>:
 
 
 
+=for bad
+
+chid does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1436,6 +1516,10 @@ Error status returned by C<$ierr>:
 
 
 
+=for bad
+
+chcm does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1533,6 +1617,10 @@ Error status returned by C<$ierr>:
 
 
 
+=for bad
+
+chbs does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1558,6 +1646,10 @@ Fit discrete data in a least squares sense by polynomials
           in one variable. C<x()>, C<y()> and C<w()> must be of the same type.
 	  This version handles bad values appropriately
 
+=for bad
+
+polfit processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

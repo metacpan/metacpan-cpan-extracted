@@ -1,3 +1,8 @@
+0.047   2021-03-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Add options: -0 (like perl's), --para.
+
+
 0.046   2020-05-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to Getopt::Long::More 0.007 to avoid deprecation warning.

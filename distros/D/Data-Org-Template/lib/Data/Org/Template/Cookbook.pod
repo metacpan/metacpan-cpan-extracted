@@ -77,16 +77,14 @@ The getter will consult each source in turn until it gets a defined value.
 
     use Data::Org::Template;
 
-    my $t = Data::Org::Template->new ("First [[x]] then [[y]]");
-    my $data = {x => 'xval'};
-    $t->data_getter($data, {y=>'yval'});
+    my $t = Data::Org::Template->new ("First [[x]] then [[y]]\n");
+    my $data = {y => 'yval'};
+    $t->data_getter({x=>'xval'}, $data);
     
     print $t->text; # --> First xval then yval
     
-    $data->{yval} = 'not yval';
+    $data->{y} = 'not yval';
     print $t->text; # --> First xval then not yval
-
-Notice that the value for C<y> in the first hash now shadows the value in the second hash.
 
 =head2 Special cases in multiple-source retrieval
 

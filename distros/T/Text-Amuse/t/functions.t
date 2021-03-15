@@ -8,7 +8,7 @@ use Text::Amuse::Functions qw/muse_format_line
 use File::Temp;
 
 
-plan tests => 22;
+plan tests => 24;
 
 is(muse_format_line(html => q{<em>ciao</em>bella<script">}),
    "<em>ciao</em>bella&lt;script&quot;&gt;");
@@ -32,6 +32,9 @@ is(muse_format_line(html => "[1] [[http://pippo.org][mylink]]"),
 is(muse_format_line(ltx => "[1] [[http://pippo.org][mylink]]"),
   q([1] \href{http://pippo.org}{mylink}));
 
+
+is(muse_format_line(html => "test <<< test >>> test"), q{test <span dir="rtl"> test </span>&#x200E; test});
+is(muse_format_line(ltx => "test <<< test >>> test"), qq[test \\RL{ test \} test]);
 
 my $body  =<<'BODY';
 #author Pippo ć đ Đ à

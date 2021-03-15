@@ -6,7 +6,7 @@ use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
 use vars qw($VERSION);
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.62
+Version 0.63
 
 =cut
 
@@ -234,7 +234,8 @@ sub _warn {
 		require CGI::Info;
 
 		Sys::Syslog->import();
-		if(ref($syslog eq 'HASH')) {
+		CGI::Info->import();
+		if(ref($syslog) eq 'HASH') {
 			Sys::Syslog::setlogsock($syslog);
 		}
 		if(my $info = $self->{_info}) {
@@ -955,15 +956,15 @@ sub country {
 		delete($self->{_country});
 	}
 	if((!$self->{_country}) &&
-	   (eval { require LWP::Simple; require JSON::Parse } )) {
+	   (eval { require LWP::Simple::WithCache; require JSON::Parse } )) {
 		if($self->{_logger}) {
 			$self->{_logger}->debug("Look up $ip on geoplugin");
 		}
 
-		LWP::Simple->import();
+		LWP::Simple::WithCache->import();
 		JSON::Parse->import();
 
-		if(my $data = LWP::Simple::get("http://www.geoplugin.net/json.gp?ip=$ip")) {
+		if(my $data = LWP::Simple::WithCache::get("http://www.geoplugin.net/json.gp?ip=$ip")) {
 			$self->{_country} = JSON::Parse::parse_json($data)->{'geoplugin_countryCode'};
 		}
 	}
@@ -1192,24 +1193,34 @@ sub time_zone {
 			$self->{_have_geoip} = 0;
 		}
 	}
-	my $ip = $ENV{'REMOTE_ADDR'};
-	if($self->{_have_geoip} == 1) {
-		$self->{_timezone} = $self->{_geoip}->time_zone($ip);
-	}
-	if((!$self->{_timezone}) && $ip) {
-		if(eval { require LWP::Simple; require JSON::Parse } ) {
-			if($self->{_logger}) {
-				$self->{_logger}->debug("Look up $ip on ip-api.com");
-			}
+	if(my $ip = $ENV{'REMOTE_ADDR'}) {
+		if($self->{_have_geoip} == 1) {
+			$self->{_timezone} = $self->{_geoip}->time_zone($ip);
+		}
+		if(!$self->{_timezone}) {
+			if(eval { require LWP::Simple::WithCache; require JSON::Parse } ) {
+				if($self->{_logger}) {
+					$self->{_logger}->debug("Look up $ip on ip-api.com");
+				}
 
-			LWP::Simple->import();
-			JSON::Parse->import();
+				LWP::Simple::WithCache->import();
+				JSON::Parse->import();
 
-			if(my $data = LWP::Simple::get("http://ip-api.com/json/$ip")) {
-				$self->{_timezone} = JSON::Parse::parse_json($data)->{'timezone'};
+				if(my $data = LWP::Simple::WithCache::get("http://ip-api.com/json/$ip")) {
+					$self->{_timezone} = JSON::Parse::parse_json($data)->{'timezone'};
+				}
+			} else {
+				Carp::croak('You must have LWP::Simple::WithCache installed to connect to ip-api.com');
 			}
+		}
+	} else {
+		# Not a remote connection
+		if(open(my $fin, '<', '/etc/timezone')) {
+			my $tz = <$fin>;
+			chomp $tz;
+			$self->{_timezone} = $tz;
 		} else {
-			Carp::croak('You must have LWP::Simple installed to connect to ip-api.com');
+			$self->{_timezone} = DateTime::TimeZone::Local->TimeZone()->name();
 		}
 	}
 
@@ -1326,22 +1337,33 @@ You can find documentation for this module with the perldoc command.
 
     perldoc CGI::Lingua
 
-
 You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/release/CGI-Lingua>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Lingua>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Lingua>
+
+=item * CPANTS
+
+L<http://cpants.cpanauthors.org/dist/CGI-Lingua>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=CGI-Lingua>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Lingua>
 
-=item * Search CPAN
+=item * CPAN Testers Dependencies
 
-L<http://search.cpan.org/dist/CGI-Lingua/>
+L<http://deps.cpantesters.org/?module=CGI::Lingua>
 
 =back
 
@@ -1349,7 +1371,7 @@ L<http://search.cpan.org/dist/CGI-Lingua/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2020 Nigel Horne.
+Copyright 2010-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

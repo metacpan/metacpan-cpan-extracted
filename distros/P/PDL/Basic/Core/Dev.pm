@@ -20,15 +20,18 @@ PDL development and is often used from within Makefile.PL's.
 
 package PDL::Core::Dev;
 
+use strict;
+use warnings;
 use File::Path;
 use File::Basename;
 use ExtUtils::Manifest;
-use English; require Exporter;
+require Exporter;
+use Config;
 eval { require Devel::CheckLib };
 
-@ISA    = qw( Exporter );
+our @ISA    = qw( Exporter );
 
-@EXPORT = qw( isbigendian genpp %PDL_DATATYPES
+our @EXPORT = qw( isbigendian genpp
 	     PDL_INCLUDE PDL_TYPEMAP
 	     PDL_AUTO_INCLUDE PDL_BOOT
 		 PDL_INST_INCLUDE PDL_INST_TYPEMAP
@@ -38,6 +41,9 @@ eval { require Devel::CheckLib };
                 pdlpp_mkgen
                 got_complex_version
 		 );
+
+my $O_NONBLOCK = defined $Config{'o_nonblock'} ? $Config{'o_nonblock'}
+                : 'O_NONBLOCK';
 
 # Installation locations
 # beware: whereami_any now appends the /Basic or /PDL directory as appropriate
@@ -96,7 +102,7 @@ sub whereami_any {
 }
 
 sub whereami {
-   for $dir (@INC,qw|. .. ../.. ../../.. ../../../..|) {
+   for my $dir (qw|. .. ../.. ../../.. ../../../..|,@INC) {
       return ($_[0] ? $dir . '/Basic' : $dir)
 	if -e "$dir/Basic/Core/Dev.pm";
    }
@@ -106,7 +112,7 @@ sub whereami {
 }
 
 sub whereami_inst {
-   for $dir (@INC,map {$_."/blib"} qw|. .. ../.. ../../.. ../../../..|) {
+   for my $dir (@INC,map {$_."/blib"} qw|. .. ../.. ../../.. ../../../..|) {
       return ($_[0] ? $dir . '/PDL' : $dir)
 	if -e "$dir/PDL/Core/Dev.pm";
    }
@@ -148,38 +154,34 @@ unless ( %PDL::Config ) {
 
 # Data types to C types mapping
 # get the map from Types.pm
-{
-# load PDL::Types only if it has not been previously loaded
-  my $loaded_types = grep (m%(PDL|Core)/Types[.]pm$%, keys %INC);
-  $@ = ''; # reset
-  eval('require "'.whereami_any().'/Core/Types.pm"') # lets dist Types.pm win
-    unless $loaded_types; # only when PDL::Types not yet loaded
-  if($@) {  # if PDL::Types doesn't work try with full path (during build)
-    my $foo = $@;
-    $@="";
-    eval('require PDL::Types');
-    if($@) {
-      die "can't find PDL::Types: $foo and $@" unless $@ eq "";
-    }
-  }
+sub loadmod_Types {
+  # load PDL::Types only if it has not been previously loaded
+  return if grep (m%(PDL|Core)/Types[.]pm$%, keys %INC);
+  eval { require(whereami_any().'/Core/Types.pm') }; # lets dist Types.pm win
+  return if !$@;
+  # if PDL::Types doesn't work try with full path (during build)
+  my $foo = $@;
+  eval { require PDL::Types };
+  return if !$@;
+  die "can't find PDL::Types: $foo and $@";
 }
-PDL::Types->import();
+
+my %sym2type;
+sub load_Types {
+  loadmod_Types();
+  return \%sym2type if %sym2type;
+  %sym2type = map {
+    $PDL::Types::typehash{$_}->{'sym'} => $PDL::Types::typehash{$_}->{'ctype'}
+  } keys %PDL::Types::typehash;
+  \%sym2type;
+}
 
 my $inc = defined $PDL::Config{MALLOCDBG}->{include} ?
   "$PDL::Config{MALLOCDBG}->{include}" : '';
 my $libs = defined $PDL::Config{MALLOCDBG}->{libs} ?
   "$PDL::Config{MALLOCDBG}->{libs}" : '';
 
-%PDL_DATATYPES = ();
-foreach $key (keys %PDL::Types::typehash) {
-    $PDL_DATATYPES{$PDL::Types::typehash{$key}->{'sym'}} =
-	$PDL::Types::typehash{$key}->{'ctype'};
-}
-
 # non-blocking IO configuration
-
-$O_NONBLOCK = defined $Config{'o_nonblock'} ? $Config{'o_nonblock'}
-                : 'O_NONBLOCK';
 
 =head2 isbigendian
 
@@ -260,10 +262,11 @@ sub isbigendian {
 # (i) O_NONBLOCK - open flag for non-blocking I/O (5/Aug/96)
 #
 
-
+# return exit code, so 0 = OK
 sub genpp {
-
-   $gotstart = 0; @gencode = ();
+   my $sym2type = load_Types();
+   my $gotstart = 0; my @gencode = ();
+   my ($loopvar, $indent);
 
    while (<>) { # Process files in @ARGV list - result to STDOUT
 
@@ -277,10 +280,10 @@ sub genpp {
          die "Found GENERICLOOP while searching for ENDGENERICLOOP\n" if $gotstart;
          $loopvar = $2;
          $indent = $1;
-         print $PREMATCH;
+         print $`;
 
          @gencode = ();  # Start saving code
-         push @gencode, $POSTMATCH;
+         push @gencode, $';
          $gotstart = 1;
          next;
       }
@@ -289,11 +292,11 @@ sub genpp {
 
          die "Found ENDGENERICLOOP while searching for GENERICLOOP\n" unless $gotstart;
 
-         push @gencode, $PREMATCH;
+         push @gencode, $`;
 
-         flushgeneric();  # Output the generic code
+         print flushgeneric($indent, $loopvar, \@gencode, $sym2type);  # Output the generic code
 
-         print $POSTMATCH;  # End of genric code
+         print $';  # End of genric code
          $gotstart = 0;
          next;
       }
@@ -306,37 +309,40 @@ sub genpp {
       }
 
    } # End while
+   0;
 }
 
 sub flushgeneric {  # Construct the generic code switch
+   my ($indent, $loopvar, $gencode, $sym2type) = @_;
+   my @m;
+   push @m, $indent,"switch ($loopvar) {\n\n";
 
-   print $indent,"switch ($loopvar) {\n\n";
+   for my $case (PDL::Types::typesrtkeys()){
 
-   for $case (PDL::Types::typesrtkeys()){
-
-     $type = $PDL_DATATYPES{$case};
+     my $type = $sym2type->{$case};
 
      my $ppsym = $PDL::Types::typehash{$case}->{ppsym};
-     print $indent,"case $case:\n"; # Start of this case
-     print $indent,"   {";
+     push @m, $indent,"case $case:\n"; # Start of this case
+     push @m, $indent,"   {";
 
-     # Now output actual code with substutions
+     # Now output actual code with substitutions
 
-     for  (@gencode) {
-        $line = $_;
+     for  (@$gencode) {
+        my $line = $_;
 
         $line =~ s/\bgeneric\b/$type/g;
         $line =~ s/\bgeneric_ppsym\b/$ppsym/g;
 
-        print "   ",$line;
+        push @m, "   ",$line;
      }
 
-     print "}break;\n\n";  # End of this case
+     push @m, "}break;\n\n";  # End of this case
    }
-   print $indent,"default:\n";
-   print $indent,'   croak ("Not a known data type code=%d",'.$loopvar.");\n";
-   print $indent,"}";
+   push @m, $indent,"default:\n";
+   push @m, $indent,'   croak ("Not a known data type code=%d",'.$loopvar.");\n";
+   push @m, $indent,"}";
 
+   join '', @m;
 }
 
 sub _oneliner {
@@ -350,10 +356,9 @@ sub genpp_cmdline {
   my ($in, $out) = @_;
   my $devpm = whereami_any()."/Core/Dev.pm";
   sprintf(_oneliner(<<'EOF'), $devpm) . qq{ "$in" > "$out"};
-require "%s"; PDL::Core::Dev->import(); genpp();
+require "%s"; PDL::Core::Dev->import(); exit genpp();
 EOF
 }
-
 
 # Standard PDL postamble
 #
@@ -455,6 +460,7 @@ sub pdlpp_stdargs_int {
  my $mallocinc = exists $PDL::Config{MALLOCDBG}->{include} ?
    $PDL::Config{MALLOCDBG}->{include} : '';
 my $libsarg = $libs || $malloclib ? "$libs $malloclib " : ''; # for Win32
+ require ExtUtils::MakeMaker;
  return (
  	%::PDL_OPTIONS,
 	 'NAME'  	=> $mod,
@@ -473,6 +479,7 @@ my $libsarg = $libs || $malloclib ? "$libs $malloclib " : ''; # for Win32
 sub pdlpp_stdargs {
  my($rec) = @_;
  my($src,$pref,$mod) = @$rec;
+ require ExtUtils::MakeMaker;
  return (
  	%::PDL_OPTIONS,
 	 'NAME'  	=> $mod,
@@ -730,6 +737,7 @@ prints on C<STDOUT> XS text for F<Core.xs>.
 =cut
 
 sub datatypes_switch {
+  loadmod_Types();
   my $ntypes = $#PDL::Types::names;
   my @m;
   foreach my $i ( 0 .. $ntypes ) {
@@ -823,6 +831,7 @@ prints on C<STDOUT> XS text with badval initialisation, for F<Core.xs>.
 =cut
 
 sub generate_badval_init {
+  loadmod_Types();
   for my $type (PDL::Types::types()) {
     my $typename = $type->ctype;
     $typename =~ s/^PDL_//;

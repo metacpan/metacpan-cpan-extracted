@@ -35,7 +35,7 @@ name: JavaScript-Const-Exporter
 provides:
   JavaScript::Const::Exporter:
     file: lib/JavaScript/Const/Exporter.pm
-    version: v0.1.4
+    version: v0.1.5
 recommends:
   Cpanel::JSON::XS: '0'
   Package::Stash::XS: '0'
@@ -61,7 +61,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/JavaScript-Const-Exporter/issues
   repository: git://github.com/robrwo/JavaScript-Const-Exporter.git
-version: v0.1.4
+version: v0.1.5
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

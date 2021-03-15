@@ -1,5 +1,17 @@
 Revision history for Perl module Geo::What3Words.
 
+3.0.3   2021-03-13
+        - rename perltidy conf files so Dist::Zilla adds them to distribution
+        
+3.0.2   2021-03-12
+        - back to URI, URI::XS seems to cause memory problems
+        
+3.0.1   2021-03-12
+        - use URI::XS instead of URI
+        - perltidy all files, add tidy test and precommit hook
+        many thanks to Olaf Alders for the step by step guide
+        http://www.perladvent.org/2020/2020-12-01.html
+
 3.0.0   2019-12-18
         - uses v3 of the what3words API
           please note this

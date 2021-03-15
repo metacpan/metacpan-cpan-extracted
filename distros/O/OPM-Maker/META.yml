@@ -1,0 +1,68 @@
+---
+abstract: 'Module/App to build and test OPM packages for Znuny, OTOBO, ((OTRS)) Community edition.'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  Test::LongString: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OPM-Maker
+provides:
+  OPM::Maker:
+    file: lib/OPM/Maker.pm
+    version: '1.00'
+  OPM::Maker::Command::build:
+    file: lib/OPM/Maker/Command/build.pm
+    version: '1.00'
+  OPM::Maker::Command::dbtest:
+    file: lib/OPM/Maker/Command/dbtest.pm
+    version: '1.00'
+  OPM::Maker::Command::dependencies:
+    file: lib/OPM/Maker/Command/dependencies.pm
+    version: '1.00'
+  OPM::Maker::Command::filetest:
+    file: lib/OPM/Maker/Command/filetest.pm
+    version: '1.00'
+  OPM::Maker::Command::index:
+    file: lib/OPM/Maker/Command/index.pm
+    version: '1.00'
+  OPM::Maker::Command::sopmtest:
+    file: lib/OPM/Maker/Command/sopmtest.pm
+    version: '1.00'
+requires:
+  App::Cmd: '0'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  Getopt::Long: '0'
+  MIME::Base64: '0'
+  Path::Class: '0'
+  Sys::Hostname: '0'
+  XML::LibXML: '0'
+  XML::LibXML::PrettyPrint: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/reneeb/OPM-Maker/issues
+  homepage: https://github.com/reneeb/OPM-Maker
+  repository: https://github.com/reneeb/OPM-Maker.git
+version: '1.00'
+x_contributors:
+  - 'Cyrill Novgorodcev <cynovg@pause.org>'
+  - 'Michiel Beijen <michiel.beijen@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+  - 'Renee <reb@perl-services.de>'
+  - 'Tadeusz “tadzik” Sośnierz <tadeusz.sosnierz@onet.pl>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_spdx_expression: Artistic-2.0

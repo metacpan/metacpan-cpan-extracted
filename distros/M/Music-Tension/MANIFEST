@@ -1,20 +1,24 @@
+Build.PL
 Changes
 LICENSE
 MANIFEST
-Makefile.PL
+META.json
+META.yml
 README
 eg/calc-forte-tensions
 eg/compare-tensions
+eg/dorian-fugue-subject
 eg/fit-tensions
 eg/gen-pl-nums
 lib/Music/Tension.pm
 lib/Music/Tension/Cope.pm
+lib/Music/Tension/Counterpoint.pm
 lib/Music/Tension/PlompLevelt.pm
 t/00-load.t
 t/Music-Tension-Cope.t
+t/Music-Tension-Counterpoint.t
 t/Music-Tension-PlompLevelt.t
 t/Music-Tension.t
+t/pod-coverage.t
 t/pod.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
-SIGNATURE                                Public-key signature (added by MakeMaker)
+SIGNATURE    Added here by Module::Build

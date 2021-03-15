@@ -4,9 +4,10 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.08";
+our $VERSION = "2.0903";
 
 use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
 
@@ -85,6 +86,13 @@ our $DEFAULT_LINEBREAK = LINEBREAK_NONE;
 our $DEFAULT_RUNIN_WIDTH  = 2;
 our $DEFAULT_RUNOUT_WIDTH = 2;
 
+use charnames ':loose';
+my %tab_style = (
+    dot    => [ '.', '.' ],
+    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
+    shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
+    );
+
 sub new {
     my $class = shift;
     my $obj = bless {
@@ -146,7 +154,14 @@ sub configure {
     croak "invalid parameter" if @_ % 2;
     while (@_ >= 2) {
 	my($a, $b) = splice @_, 0, 2;
-	croak "$a: invalid parameter\n" if not exists $obj->{$a};
+
+	if ($a eq 'tabstyle') {
+	    my $style = $tab_style{$b} or croak "$b: invalid tabstyle";
+	    unshift @_, tabhead => $style->[0], tabspace => $style->[1];
+	    next;
+	}
+
+	croak "$a: invalid parameter" if not exists $obj->{$a};
 	$obj->{$a} = $b;
     }
     if (ref $obj->{discard} eq 'ARRAY') {
@@ -395,7 +410,7 @@ sub simple_fold {
 
 sub text {
     my $obj = shift;
-    croak "Invalid argument." unless @_;
+    croak "Invalid argument" unless @_;
     $obj->{text} = shift;
     $obj;
 }
@@ -450,7 +465,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.08
+Version 2.0903
 
 =head1 SYNOPSIS
 
@@ -500,8 +515,11 @@ the rest.
 
 Additional third result is the visual width of folded text.  You may
 want to know how many columns returned string takes for further
-processing.  If the width parameter is negative, it returns string
-untouched and the visual width of it.
+processing.
+
+Negative width value is taken as unlimited.  So the string is never
+folded, but you can use this to expand tabs and to get visual string
+width.
 
 This function returns at least one character in any situation.  If you
 provide Asian wide string and just one column as width, it trims off
@@ -692,6 +710,16 @@ Default tabstop is 8 and can be set by B<tabstop> option.
 Tab character is converted to B<tabhead> and following B<tabspace>
 characters.  Both are white space by default.
 
+=item B<tabstyle> => I<style>
+
+Set tab expansion style.  This parameter set both B<tabhead> and
+B<tabspace> at once according to the given style name.  Currently
+these names are available.
+
+    dot    => [ '.', '.' ],
+    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
+    shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
+
 =back
 
 =head1 EXAMPLE
@@ -722,6 +750,12 @@ characters with prohibited character handling.
 =head1 SEE ALSO
 
 =over 7
+
+=item L<Text::ANSI::Fold>
+
+=item L<https://github.com/kaz-utashiro/Text-ANSI-Fold>
+
+Distribution and repository.
 
 =item L<App::ansifold>
 
@@ -762,22 +796,16 @@ Control Functions for Coded Character Sets
 
 =back
 
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
 =head1 LICENSE
 
 Copyright 2018- Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-=head1 AUTHOR
-
-=over
-
-=item Kazumasa Utashiro
-
-=item L<https://github.com/kaz-utashiro/Text-ANSI-Fold>
-
-=back
 
 =cut
 

@@ -1,5 +1,16 @@
 
-9.04  2021-03-11
+9.10  2021-03-14
+  - Fixed top-level --help and -h options in Mojolicious::Commands.
+
+9.09  2021-03-13
+  - Added comma_separated filter to Mojolicious::Validator.
+  - Fixed built-in templates to be a bit more responsive.
+  - Fixed filter list handling in Mojolicious::Validator::Validation.
+
+9.08  2021-03-12
+  - Fixed a bug in Test::Mojo where Test::Mojo->new($app) would not work correctly.
+
+9.07  2021-03-11
   - Improved config override feature to work for Mojolicious::Lite applications.
   - Improved Mojo::UserAgent performance slightly by not including unnecessary "Content-Length: 0" request headers.
 

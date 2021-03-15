@@ -5,8 +5,7 @@ use warnings;
 
 use base 'LWP::UserAgent';
 
-our $VERSION = '3.093';
-$VERSION = eval $VERSION;
+our $VERSION = '3.094';
 
 sub get {
     my $self = shift;

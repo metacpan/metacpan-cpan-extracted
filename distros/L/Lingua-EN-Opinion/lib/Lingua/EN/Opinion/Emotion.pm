@@ -1,5 +1,5 @@
 package Lingua::EN::Opinion::Emotion;
-$Lingua::EN::Opinion::Emotion::VERSION = '0.1600';
+$Lingua::EN::Opinion::Emotion::VERSION = '0.1701';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
@@ -14213,7 +14213,7 @@ Lingua::EN::Opinion::Emotion
 
 =head1 VERSION
 
-version 0.1600
+version 0.1701
 
 =head1 AUTHOR
 
@@ -14221,7 +14221,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

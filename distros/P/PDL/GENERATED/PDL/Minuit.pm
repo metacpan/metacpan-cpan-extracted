@@ -118,6 +118,10 @@ sub mn_init{
 info not available
 
 
+=for bad
+
+mninit does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -145,6 +149,10 @@ info not available
 info not available
 
 
+=for bad
+
+mn_abre does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -172,6 +180,10 @@ info not available
 info not available
 
 
+=for bad
+
+mn_cierra does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -248,6 +260,10 @@ sub mn_def_pars{
 info not available
 
 
+=for bad
+
+mnparm does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -305,6 +321,10 @@ sub mn_excm{
 info not available
 
 
+=for bad
+
+mnexcm does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -359,6 +379,10 @@ info not available
 info not available
 
 
+=for bad
+
+mnpout does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -403,6 +427,10 @@ info not available
 info not available
 
 
+=for bad
+
+mnstat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -452,6 +480,10 @@ info not available
 info not available
 
 
+=for bad
+
+mnemat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -502,6 +534,10 @@ info not available
 info not available
 
 
+=for bad
+
+mnerrs does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -557,6 +593,10 @@ info not available
 info not available
 
 
+=for bad
+
+mncont does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

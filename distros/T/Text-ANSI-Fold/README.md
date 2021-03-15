@@ -4,7 +4,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 # VERSION
 
-Version 2.08
+Version 2.0903
 
 # SYNOPSIS
 
@@ -54,8 +54,11 @@ the rest.
 
 Additional third result is the visual width of folded text.  You may
 want to know how many columns returned string takes for further
-processing.  If the width parameter is negative, it returns string
-untouched and the visual width of it.
+processing.
+
+Negative width value is taken as unlimited.  So the string is never
+folded, but you can use this to expand tabs and to get visual string
+width.
 
 This function returns at least one character in any situation.  If you
 provide Asian wide string and just one column as width, it trims off
@@ -239,6 +242,16 @@ function as well as **new** and **configure** method.
     Tab character is converted to **tabhead** and following **tabspace**
     characters.  Both are white space by default.
 
+- **tabstyle** => _style_
+
+    Set tab expansion style.  This parameter set both **tabhead** and
+    **tabspace** at once according to the given style name.  Currently
+    these names are available.
+
+        dot    => [ '.', '.' ],
+        symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
+        shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
+
 # EXAMPLE
 
 Next code implements almost perfect fold command for multi byte
@@ -265,6 +278,11 @@ characters with prohibited character handling.
     }
 
 # SEE ALSO
+
+- [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold)
+- [https://github.com/kaz-utashiro/Text-ANSI-Fold](https://github.com/kaz-utashiro/Text-ANSI-Fold)
+
+    Distribution and repository.
 
 - [App::ansifold](https://metacpan.org/pod/App::ansifold)
 
@@ -303,14 +321,13 @@ characters with prohibited character handling.
 
     Control Functions for Coded Character Sets
 
+# AUTHOR
+
+Kazumasa Utashiro
+
 # LICENSE
 
 Copyright 2018- Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-# AUTHOR
-
-- Kazumasa Utashiro
-- [https://github.com/kaz-utashiro/Text-ANSI-Fold](https://github.com/kaz-utashiro/Text-ANSI-Fold)

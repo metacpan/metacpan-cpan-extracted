@@ -13,6 +13,8 @@ LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
 MANIFEST
+META.json
+META.yml
 README
 README.MacOS
 t/basic.t
@@ -32,5 +34,4 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
-META.yml
-META.json
+xt/author/prereq.t

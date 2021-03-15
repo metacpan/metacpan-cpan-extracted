@@ -1,7 +1,9 @@
+use lib 't/lib';
 use Test2::V0;
 
 use Sub::Meta::Parameters;
 use Sub::Meta::Param;
+use MySubMeta::Param;
 
 subtest 'exception' => sub {
     like dies { Sub::Meta::Parameters->new() },
@@ -9,9 +11,6 @@ subtest 'exception' => sub {
 
     like dies { Sub::Meta::Parameters->new(args => 'Str') },
         qr/args must be a reference/, 'args is not reference';
-
-    like dies { Sub::Meta::Parameters->new(args => [p(type => 'Foo', named => 1, optional => 1)], nshift => 1) },
-        qr/required positional parameters need more than nshift/, 'nshift';
 };
 
 my @TEST = (
@@ -19,6 +18,7 @@ my @TEST = (
         nshift                   => 0,
         slurpy                   => !!0,
         args                     => [],
+        all_args                 => [],
         _all_positional_required => [],
         positional               => [],
         positional_required      => [],
@@ -35,6 +35,7 @@ my @TEST = (
         nshift                   => 0,
         slurpy                   => !!0,
         args                     => [p(type => 'Foo')],
+        all_args                 => [p(type => 'Foo')],
         _all_positional_required => [p(type => 'Foo')],
         positional               => [p(type => 'Foo')],
         positional_required      => [p(type => 'Foo')],
@@ -51,38 +52,58 @@ my @TEST = (
         nshift                   => 1,
         slurpy                   => !!0,
         args                     => [p(type => 'Foo')],
-        _all_positional_required => [p(type => 'Foo')],
-        positional               => [],
-        positional_required      => [],
+        all_args                 => [p(invocant => 1), p(type => 'Foo')],
+        _all_positional_required => [p(invocant => 1), p(type => 'Foo')],
+        positional               => [p(type => 'Foo')],
+        positional_required      => [p(type => 'Foo')],
         positional_optional      => [],
         named                    => [],
         named_required           => [],
         named_optional           => [],
-        invocant                 => p(type => 'Foo'),
-        invocants                => [p(type => 'Foo')],
-        args_min                 => 1,
-        args_max                 => 1,
+        invocant                 => p(invocant => 1),
+        invocants                => [p(invocant => 1)],
+        args_min                 => 2,
+        args_max                 => 2,
+    ],
+    { args => [p(type => 'Foo')], invocant => p(name => '$self') } => [
+        nshift                   => 1,
+        slurpy                   => !!0,
+        args                     => [p(type => 'Foo')],
+        all_args                 => [p(name => '$self', invocant => 1), p(type => 'Foo')],
+        _all_positional_required => [p(name => '$self', invocant => 1), p(type => 'Foo')],
+        positional               => [p(type => 'Foo')],
+        positional_required      => [p(type => 'Foo')],
+        positional_optional      => [],
+        named                    => [],
+        named_required           => [],
+        named_optional           => [],
+        invocant                 => p(name => '$self', invocant => 1),
+        invocants                => [p(name => '$self', invocant => 1)],
+        args_min                 => 2,
+        args_max                 => 2,
     ],
     { args => [p(type => 'Foo')], nshift => 1, slurpy => 'Str' } => [
         nshift                   => 1,
         slurpy                   => p(type => 'Str'),
         args                     => [p(type => 'Foo')],
-        _all_positional_required => [p(type => 'Foo')],
-        positional               => [],
-        positional_required      => [],
+        all_args                 => [p(invocant => 1), p(type => 'Foo')],
+        _all_positional_required => [p(invocant => 1), p(type => 'Foo')],
+        positional               => [p(type => 'Foo')],
+        positional_required      => [p(type => 'Foo')],
         positional_optional      => [],
         named                    => [],
         named_required           => [],
         named_optional           => [],
-        invocant                 => p(type => 'Foo'),
-        invocants                => [p(type => 'Foo')],
-        args_min                 => 1,
+        invocant                 => p(invocant => 1),
+        invocants                => [p(invocant => 1)],
+        args_min                 => 2,
         args_max                 => 0 + 'Inf',
     ],
     { args => [p(type => 'Foo', named => 1)] } => [
         nshift                   => 0,
         slurpy                   => !!0,
         args                     => [p(type => 'Foo', named => 1)],
+        all_args                 => [p(type => 'Foo', named => 1)], 
         _all_positional_required => [],
         positional               => [],
         positional_required      => [],
@@ -99,6 +120,7 @@ my @TEST = (
         nshift                   => 0,
         slurpy                   => !!0,
         args                     => [p(type => 'Foo', optional => 1)],
+        all_args                 => [p(type => 'Foo', optional => 1)],
         _all_positional_required => [],
         positional               => [p(type => 'Foo', optional => 1)],
         positional_required      => [],
@@ -115,6 +137,7 @@ my @TEST = (
         nshift                   => 0,
         slurpy                   => !!0,
         args                     => [p(type => 'Foo', named => 1, optional => 1)],
+        all_args                 => [p(type => 'Foo', named => 1, optional => 1)],
         _all_positional_required => [],
         positional               => [],
         positional_required      => [],
@@ -131,6 +154,7 @@ my @TEST = (
         nshift                   => 0,
         slurpy                   => p(type => 'Str'),
         args                     => [p(type => 'Foo', named => 1, optional => 1)],
+        all_args                 => [p(type => 'Foo', named => 1, optional => 1)],
         _all_positional_required => [],
         positional               => [],
         positional_required      => [],
@@ -147,6 +171,7 @@ my @TEST = (
         nshift                   => 0,
         slurpy                   => !!0,
         args                     => [p(type => 'Foo'), p(type => 'Bar')],
+        all_args                 => [p(type => 'Foo'), p(type => 'Bar')],
         _all_positional_required => [p(type => 'Foo'), p(type => 'Bar')],
         positional               => [p(type => 'Foo'), p(type => 'Bar')],
         positional_required      => [p(type => 'Foo'), p(type => 'Bar')],
@@ -163,22 +188,24 @@ my @TEST = (
         nshift                   => 1,
         slurpy                   => !!0,
         args                     => [p(type => 'Foo'), p(type => 'Bar')],
-        _all_positional_required => [p(type => 'Foo'), p(type => 'Bar')],
-        positional               => [p(type => 'Bar')],
-        positional_required      => [p(type => 'Bar')],
+        all_args                 => [p(invocant => 1), p(type => 'Foo'), p(type => 'Bar')],
+        _all_positional_required => [p(invocant => 1), p(type => 'Foo'), p(type => 'Bar')],
+        positional               => [p(type => 'Foo'), p(type => 'Bar')],
+        positional_required      => [p(type => 'Foo'), p(type => 'Bar')],
         positional_optional      => [],
         named                    => [],
         named_required           => [],
         named_optional           => [],
-        invocant                 => p(type => 'Foo'),
-        invocants                => [p(type => 'Foo')],
-        args_min                 => 2,
-        args_max                 => 2,
+        invocant                 => p(invocant => 1),
+        invocants                => [p(invocant => 1)],
+        args_min                 => 3,
+        args_max                 => 3,
     ],
     { args => [p(type => 'Foo'), p(type => 'Bar', named => 1)] } => [
         nshift                   => 0,
         slurpy                   => !!0,
         args                     => [p(type => 'Foo'), p(type => 'Bar', named => 1)],
+        all_args                 => [p(type => 'Foo'), p(type => 'Bar', named => 1)],
         _all_positional_required => [p(type => 'Foo')],
         positional               => [p(type => 'Foo')],
         positional_required      => [p(type => 'Foo')],
@@ -195,6 +222,7 @@ my @TEST = (
         nshift                   => 0,
         slurpy                   => !!0,
         args                     => [p(type => 'Foo'), p(type => 'Bar', named => 1,optional => 1)],
+        all_args                 => [p(type => 'Foo'), p(type => 'Bar', named => 1,optional => 1)],
         _all_positional_required => [p(type => 'Foo')],
         positional               => [p(type => 'Foo')],
         positional_required      => [p(type => 'Foo')],
@@ -282,11 +310,29 @@ subtest '_normalize_args' => sub {
 
 subtest 'invocant' => sub {
     my $parameters = Sub::Meta::Parameters->new(args => [p('Foo'), p('Bar')]);
-    is $parameters->invocant, undef;
-    is $parameters->set_nshift(1), $parameters;
-    is $parameters->invocant, p('Foo');
-    is $parameters->set_nshift(2), $parameters;
-    dies { $parameters->invocant }, qr/Can't return a single invocant; this function has $parameters->nshift/;
+    is $parameters->invocant, undef, 'no invocant';
+    is $parameters->set_nshift(1), $parameters, 'if set nshift';
+    is $parameters->invocant, p(invocant => 1), 'then set default invocant';
+
+    like dies { $parameters->set_nshift(2) }, qr/^Can't set this nshift: /, $parameters;
+    like dies { $parameters->set_nshift(undef) }, qr/^Can't set this nshift: /, $parameters;
+
+    is $parameters->set_nshift(0), $parameters, 'if set nshift:0';
+    is $parameters->invocant, undef, 'then remove invocant';
+
+    is $parameters->set_invocant(p(name => '$self')), $parameters, 'if set original invocant';
+    is $parameters->invocant, p(name => '$self', invocant => 1), 'then original with invocant flag';
+
+    is $parameters->set_invocant({ name => '$class'}), $parameters, 'set_invocant can take hashref';
+    is $parameters->invocant, p(name => '$class', invocant => 1);
+
+    my $some = bless {}, 'Some';
+    is $parameters->set_invocant($some), $parameters, 'set_invocant can take type';
+    is $parameters->invocant, p(type=> $some, invocant => 1);
+
+    my $myparam = MySubMeta::Param->new(name => '$self');
+    is $parameters->set_invocant($myparam), $parameters, 'set_invocant can take your Sub::Meta::Param';
+    is $parameters->invocant, $myparam->set_invocant(1);
 };
 
 done_testing;

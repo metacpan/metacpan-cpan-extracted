@@ -1,5 +1,15 @@
 #Revision history for Const-Exporter
 
+v1.1.2    2021-03-13 12:17:00+00:00 Europe/London
+  [Documentation]
+  - Reorganised POD so that a the an issue with intermixed POD is
+    properly in the KNOWN ISSUES section.
+
+  - Bumped copyright year.
+
+  [Other]
+  - Add List::SomeUtils::XS to recommended prereqs.
+
 v1.1.1    2020-12-17 15:51:58+00:00 Europe/London
   [Tests]
   - Specify minimum version of Sub::Identify.

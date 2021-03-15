@@ -1,4 +1,4 @@
-requires 'perl' => '5.260';
+requires 'perl' => '5.026';
 requires 'POE::Session';
 requires 'POE::Driver::SysRW';
 requires 'POE::Wheel::ReadWrite';

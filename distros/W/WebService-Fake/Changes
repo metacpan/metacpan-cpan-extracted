@@ -1,3 +1,10 @@
+0.006  2021-03-13 05:13:41 CET
+   - increase minimum version of perl for keeping up with Mojolicious
+   - release
+
+0.005  2021-03-07 15:33:02 CET
+   - adapt to Mojolicious 9.x
+
 0.004  2018-09-30 18:38:59 CEST
    - release after 235 PASSes in CPAN Testers (Thanks!)
 

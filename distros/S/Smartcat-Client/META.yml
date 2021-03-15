@@ -59,10 +59,10 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/ta2-1/smartcat-api-perl/issues
-  homepage: https://github.com/ta2-1/smartcat-api-perl
-  repository: https://github.com/ta2-1/smartcat-api-perl.git
-version: 0.0.2
+  bugtracker: https://github.com/smartcatai/smartcat-api-perl/issues
+  homepage: https://github.com/smartcatai/smartcat-api-perl
+  repository: https://github.com/smartcatai/smartcat-api-perl.git
+version: 0.0.3
 x_contributors:
   - 'Taras Semenenko <taras.semenenko@gmail.com>'
 x_generated_by_perl: v5.20.3

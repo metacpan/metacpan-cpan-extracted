@@ -7,6 +7,9 @@ use Getopt::Long 'GetOptions';
 use Try::Tiny qw(try catch);
 use utf8;
 
+our $VERSION = '3.094';
+
+
 # modernize Getopt::Long
 Getopt::Long::Configure(qw(default gnu_getopt no_auto_abbrev no_ignore_case));
 GetOptions('s|service=s' => \my $service, 'l' => \my $long,);

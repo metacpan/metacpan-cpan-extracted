@@ -5,16 +5,13 @@ package Path::Tiny::Archive::Tar;
 use strict;
 use warnings;
 
-use Archive::Tar qw( COMPRESS_GZIP COMPRESS_BZIP );
+use Archive::Tar ();
 use Compress::Raw::Zlib ();
+use Exporter qw( import );
 use Path::Tiny qw( path );
 
-use namespace::clean;
 
-use Exporter qw( import );
-
-
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 our %EXPORT_TAGS = ( const =>[qw(
     COMPRESSION_NONE
@@ -43,7 +40,7 @@ use constant {
     COMPRESSION_GZIP_NONE    => '00',
     COMPRESSION_GZIP_FASTEST => Compress::Raw::Zlib::Z_BEST_SPEED,
     COMPRESSION_GZIP_BEST    => Compress::Raw::Zlib::Z_BEST_COMPRESSION,
-    COMPRESSION_BZIP2        => COMPRESS_BZIP,
+    COMPRESSION_BZIP2        => Archive::Tar::COMPRESS_BZIP,
 };
 
 
@@ -87,6 +84,16 @@ sub tar {
 }
 
 
+sub tgz {
+    return $_[0]->tar($_[1], COMPRESSION_GZIP);
+}
+
+
+sub tbz2 {
+    return $_[0]->tar($_[1], COMPRESSION_BZIP2);
+}
+
+
 sub untar {
     my ($self, $dest) = @_;
 
@@ -118,7 +125,7 @@ Path::Tiny::Archive::Tar - Tar/untar add-on for file path utility
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -138,7 +145,7 @@ tar archives.
 =head2 tar
 
     path("/tmp/foo.txt")->tar("/tmp/foo.tar");
-    path("/tmp/foo")->tar("/tmp/foo.tar");
+    path("/tmp/foo")->tar("/tmp/foo.tar.gz", COMPRESSION_GZIP);
 
 Creates a tar archive and appends a file or directory tree to it. Returns the
 path to the archive or undef.
@@ -177,6 +184,18 @@ zlib code). This is a synonym for C<COMPRESSION_GZIP>.
 =item * C<COMPRESSION_BZIP2>: Compress using C<bzip2>.
 
 =back
+
+=head2 tgz
+
+    path("/tmp/foo.txt")->tgz("/tmp/foo.tar.gz");
+
+Method C<tgz> is synonym for C<tar> with C<COMPRESSION_GZIP> type.
+
+=head2 tbz2
+
+    path("/tmp/foo.txt")->tbz2("/tmp/foo.tar.bzip2");
+
+Method C<tbz2> is synonym for C<tar> with C<COMPRESSION_BZIP2> type.
 
 =head2 untar
 

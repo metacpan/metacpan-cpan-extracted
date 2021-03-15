@@ -97,7 +97,7 @@
    "provides" : {
       "JavaScript::Const::Exporter" : {
          "file" : "lib/JavaScript/Const/Exporter.pm",
-         "version" : "v0.1.4"
+         "version" : "v0.1.5"
       }
    },
    "release_status" : "stable",
@@ -111,7 +111,7 @@
          "web" : "https://github.com/robrwo/JavaScript-Const-Exporter"
       }
    },
-   "version" : "v0.1.4",
+   "version" : "v0.1.5",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",

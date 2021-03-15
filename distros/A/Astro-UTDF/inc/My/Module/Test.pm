@@ -193,8 +193,9 @@ name by passing the desired name as the value of the C<name> key:
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<http://github.com/trwyant/perl-Astro-UTDF/issues>, or in electronic
-mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-UTDF>,
+L<https://github.com/trwyant/perl-Astro-UTDF/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

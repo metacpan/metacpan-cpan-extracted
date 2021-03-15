@@ -191,9 +191,9 @@ EOD
   # option).
   #
   my $flag_bad     = $PDL_CONFIG{WITH_BADVAL} || 0;
-  my $flag_per_pdl = $PDL_CONFIG{BADVAL_PER_PDL} || 0;
   my $flag_use_nan = $PDL_CONFIG{BADVAL_USENAN} || 0;
-  if ( $flag_bad and $flag_per_pdl and $flag_use_nan ) {
+  my $flag_per_pdl = $PDL_CONFIG{BADVAL_PER_PDL} || 0;
+  if ( $flag_bad and $flag_use_nan and $flag_per_pdl ) {
       print "WARNING: Setting BADVAL_USENAN=0 as BADVAL_PER_PDL option is set!\n\n";
       $PDL_CONFIG{BADVAL_USENAN} = 0;
   }
@@ -278,6 +278,7 @@ sub make_PDL_Config_pm {
   print "Writing Basic/Core/Config.pm\n";
 
   my $versionFile = "Basic/Core/Config.pm";
+  require IO::Handle; # enable method calls on FHs
   open my $fh, ">", $versionFile
     or die "Couldn't open $versionFile for writing";
   print $fh "
@@ -384,16 +385,13 @@ my %notestsifmodulesmissing = @hasnt ? # are any required modules missing ?
   (test => {TESTS => 't/requiredmods.t'}) : ();
 
 my @podpms = map { $_.".pod", '$(INST_LIBDIR)/PDL/' . $_ .".pod"}
-  qw/Bugs perldl pdldoc/;
+  qw/Bugs/;
 
 my @prereq = (
-	   'Astro::FITS::Header' => 0,
            'Carp'                => 0,         # Need to run
            'Config'              => 0,         #
            'Convert::UU'         => 0,         # for PDL::IO::Dumper
            'Data::Dumper'        => 2.121,     # for PDL::IO::Dumper
-           'English'             => 0,
-           'ExtUtils::MakeMaker' => 6.56,      # for CONFIGURE_REQUIRES support
            'Fcntl'               => 0,
            'File::Basename'      => 0,
            'File::Find'          => 0,
@@ -413,6 +411,7 @@ my @prereq = (
            'Storable'            => 1.03,      # for PDL::IO::Storable
            'Term::ReadKey'       => 2.34,      #for perldl shell
            'Text::Balanced'      => 1.89,      # for PDL::NiceSlice
+           'autodie'             => 0,         # for PDL::Graphics::LUT, Centos 7 doesn't have
 	  );
 
 # add OpenGL version dependency for CPAN to follow
@@ -442,103 +441,75 @@ my $preop = '$(PERL) -I$(INST_ARCHLIB) -I$(INST_LIB) -MPDL::Core::Dev -e pdlpp_m
 my @optimize = (OPTIMIZE => $PDL::Config{OPTIMIZE}) if $PDL::Config{OPTIMIZE};
 
 my %makefile_hash = (
-	      'PREREQ_PM' => { @prereq },
-              'LICENSE' => 'perl',
-              'CONFIGURE_REQUIRES' => {
-                'Devel::CheckLib' => 1.01,
-                'Carp'            => 1.20,    # EU::MM seems to need this not to crash
-                'ExtUtils::MakeMaker' => 6.56,
-                'File::Path'          => 0,
-                'ExtUtils::ParseXS'   => 3.01, # avoids 2.21, known broken
-                'ExtUtils::Depends' => '0.402',
-              },
-              TEST_REQUIRES => {
-                'CPAN::Meta' => '2.120900',
-                'IPC::Cmd' => 0.72,
-                'Test::Exception' => 0,
-                'Test::Warn' => 0,  # for t/pptest.t
-                'Test::Deep' => 0,
-              },
-              BUILD_REQUIRES => {
-                'ExtUtils::MakeMaker' => 0,
-                'File::Path'          => 0,
-              },
-              'MIN_PERL_VERSION' => '5.010',
-	      'NAME' => 'PDL',
-	      'VERSION_FROM' => 'Basic/Core/Version.pm',
-	      'EXE_FILES' => \@exe_files,
-	      'PM' => { @podpms }, #so that the script docs are picked up
-              'META_MERGE' => {
-                 "meta-spec" => { version => 2 },
-                 resources => {
-                    homepage => 'http://pdl.perl.org/',
-                    bugtracker  => {web=>'https://github.com/PDLPorters/pdl/issues'},
-                    repository  => {
-                       url => 'git://github.com/PDLPorters/pdl.git',
-                       type => 'git',
-                       web => 'https://github.com/PDLPorters/pdl',
-                    },
-                    x_IRC => 'irc://irc.perl.org/#pdl',
-                 },
-                 no_index => { file => ['Doc/scantree.pl'] },
-                 prereqs => {
-                    configure => {
-                       recommends => {
-                          'ExtUtils::F77' => '1.10',
-                          'PGPLOT' => 0,
-                       },
-                    },
-                 },
-              },
-              'MAN1PODS' => { 'Bugs.pod' => '$(INST_MAN1DIR)/PDL::Bugs.$(MAN1EXT)',
-                              'perldl' => '$(INST_MAN1DIR)/perldl.$(MAN1EXT)',
-                              'pdldoc' => '$(INST_MAN1DIR)/pdldoc.$(MAN1EXT)' },
-	      'MAN3PODS' => {}, # don't pick up the script pods again
-	      @optimize,
-	      'CCFLAGS' => $ccflags,
-	      'dist'     => { COMPRESS => 'gzip',
-                              SUFFIX   => 'gz',
-                              PREOP    => $preop },
-	      'clean' => {
-		'FILES' => join ' ', @cleanup, qw(
-                  tbyte.tif tmp0 tmp0.hdr tushort.tif
-                  MANIFEST.bak tmp1* tmpraw* t/tmpraw* t/tmp1*
-                  _Inline/ .inlinepdlpp/ .inline-ct/ .inlinewith/ *.xfig
-                ),
-              },
-	      'realclean' => {'FILES' => 'Basic/Core/Config.pm'},
-              'AUTHOR' => 'PerlDL Developers (pdl-general@lists.sourceforge.net)',
-              'ABSTRACT' => 'Perl Data Language',
-              'BINARY_LOCATION' => 'PDL.tar.gz',
-
-	      %notestsifmodulesmissing,
-    );
-
-=begin comment
-
-print "makefile hash is:\n";
-for $k(sort keys %makefile_hash) {
-    print "\t$k\t";
-    $v = $makefile_hash{$k};
-    unless(ref $v) {
-	print $v,"\n";
-    } elsif(ref $v eq 'HASH') {
-	print "HASH:\n";
-	for $vk(sort keys %$v) {
-	    print "\t\t$vk\t$v->{$vk}\n";
-	}
-    } elsif(ref $v eq 'ARRAY') {
-	print "ARRAY:\n";
-	for $vv(@$v) {
-	    print "\t\t$vv\n";
-	}
-    } else {print "$v\n";}
-
-}
-
-=end comment
-
-=cut
+  PREREQ_PM => { @prereq },
+  LICENSE => 'perl',
+  CONFIGURE_REQUIRES => {
+    'Devel::CheckLib' => 1.01,
+    'Carp'            => 1.20,    # EU::MM seems to need this not to crash
+    'ExtUtils::MakeMaker' => 6.56,
+    'File::Path'          => 0,
+    'ExtUtils::ParseXS'   => 3.01, # avoids 2.21, known broken
+    'ExtUtils::Depends' => '0.402',
+  },
+  TEST_REQUIRES => {
+    'CPAN::Meta' => '2.120900',
+    'IPC::Cmd' => 0.72,
+    'Test::Exception' => 0,
+    'Test::Warn' => 0,  # for t/pptest.t
+    'Test::Deep' => 0,
+  },
+  BUILD_REQUIRES => {
+    'ExtUtils::MakeMaker' => 0,
+    'File::Path'          => 0,
+  },
+  MIN_PERL_VERSION => '5.010',
+  NAME => 'PDL',
+  VERSION_FROM => 'Basic/Core/Version.pm',
+  EXE_FILES => \@exe_files,
+  PM => { @podpms }, #so that the script docs are picked up
+  META_MERGE => {
+     "meta-spec" => { version => 2 },
+     resources => {
+        homepage => 'http://pdl.perl.org/',
+        bugtracker  => {web=>'https://github.com/PDLPorters/pdl/issues'},
+        repository  => {
+           url => 'git://github.com/PDLPorters/pdl.git',
+           type => 'git',
+           web => 'https://github.com/PDLPorters/pdl',
+        },
+        x_IRC => 'irc://irc.perl.org/#pdl',
+     },
+     no_index => { file => ['Doc/scantree.pl'] },
+     prereqs => {
+        configure => {
+           recommends => {
+              'ExtUtils::F77' => '1.10',
+              'PGPLOT' => 0,
+           },
+        },
+        runtime => {
+           suggests => {
+              'Astro::FITS::Header' => 0,
+           },
+        },
+     },
+  },
+  @optimize,
+  CCFLAGS => $ccflags,
+  dist => { COMPRESS => 'gzip', SUFFIX => 'gz', PREOP => $preop },
+  clean => {
+    FILES => join ' ', @cleanup, qw(
+      tbyte.tif tmp0 tmp0.hdr tushort.tif
+      MANIFEST.bak tmp1* tmpraw* t/tmpraw* t/tmp1*
+      _Inline/ .inlinepdlpp/ .inline-ct/ .inlinewith/ *.xfig
+    ),
+  },
+  realclean => {'FILES' => 'Basic/Core/Config.pm'},
+  AUTHOR => 'PerlDL Developers <pdl-general@lists.sourceforge.net>',
+  ABSTRACT => 'Perl Data Language',
+  BINARY_LOCATION => 'PDL.tar.gz',
+  %notestsifmodulesmissing,
+);
 
 WriteMakefile(%makefile_hash);
 
@@ -582,16 +553,6 @@ doc_perl_install ::
   } else {
     $text=~ s/\%HTML\%//og; # Remove just %HTML% markers
   }
-
-$text .= << "EOPS" ;
-
-perldl.pod : perldl
-\t\$(PERLRUN) -MPod::Select -e "podselect('perldl');" > perldl.pod
-
-pdldoc.pod : pdldoc
-\t\$(PERLRUN) -MPod::Select -e "podselect('pdldoc');" > pdldoc.pod
-
-EOPS
 
 # Here, `pdl.c` is used directly because some makes (e.g., on Solaris) do not
 # support the `$<` variable in explicit rules
@@ -644,7 +605,6 @@ sub coretarget {
     # @targets is make targets within that dir
     # @prereqs are named targets - undef=[]
     # all a left's rights are made concurrently, no sequence - list ALL prereqs
-    my @up_blib = ((File::Spec->updir) x 2, qw(blib arch auto PDL));
     my @left2rights = (
         [
             basics => [
@@ -658,13 +618,7 @@ sub coretarget {
                 [ [ qw(Basic SourceFilter) ], [ qw(pm_to_blib) ], ],
                 map { [
                     [ 'Basic', $_ ],
-                    # this contortion is due to an intermittent failure of
-                    # "cd;make" to actually build the SO in blib with
-                    # gmake -j4, which doesn't happen if give actual
-                    # path. E.g. in Core it often doesn't build pdlcore.o
-                    # and sometimes not Core.o, then just stops and
-                    # indicates success
-                    [ 'pm_to_blib', File::Spec->catfile(@up_blib, $_, "$_.\$(DLEXT)") ],
+                    [ 'pm_to_blib', 'dynamic' ],
                     [ 'basics' ],
                 # the modules in PDL::LiteF, used in t/core.t
                 ] } qw(Core Ops Primitive Ufunc Slices Bad Math MatrixOps),
@@ -725,32 +679,6 @@ sub MY::init_dirscan {
     $self->SUPER::init_dirscan;
     $self->{C} = [];
     $self->{O_FILES} = [];
-}
-
-##############################
-# processPL: generate Makefile lines for top-level components that are created by just perling a .PL file.
-#EU::MM's processPL() is continually broken on Win32 ... hence:
-### This fix seems necessary with current versions of MM - otherwise it creates circular
-### dependencies to "pm_to_blib" for .PL files (!) -- CED 9-July-2008
-sub MY::processPL {
-    package MY;
-    my ($self) = @_;
-    return $self->SUPER::processPL if 0; ## || $^O =~ /MSWin32/i && $Config{make} =~ /\b[dn]make/i
-    return "" unless $self->{PL_FILES};
-    my @m;
-    my $alltarget = $ExtUtils::MakeMaker::VERSION >= 7.05_06 ? 'pure_nolink' : 'all';
-    my $colon = $Config::Config{make} =~ /\bdmake/i ? ':' : '::';
-    foreach my $plfile (sort keys %{$self->{PL_FILES}}) {
-        my $list = ref($self->{PL_FILES}->{$plfile})
-                     ?  $self->{PL_FILES}->{$plfile}
-                     : [$self->{PL_FILES}->{$plfile}];
-        foreach my $target (@$list) {
-            push @m,
-                "\n$alltarget :: $target\n\t\$(NOECHO) \$(NOOP)\n",
-                "\n$target $colon\n\t\$(PERLRUNINST) $plfile $target\n";
-        }
-    }
-    return join "", @m;
 }
 
 # warn if vital modules are missing

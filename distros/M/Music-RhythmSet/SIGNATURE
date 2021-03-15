@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 b276795776a3a53251ff3cb9287d4566f3d2bc15ab1fc8876628a8fe8bea6028 Build.PL
+SHA256 fcdd0a5111a1dbd5348c17a873b8deb6bcdeaabab2bd7d6ca16848f5c39c7526 Changes
+SHA256 344700874629434f6dd778e106f642fce051b58f9db3886590a0449494b11c75 MANIFEST
+SHA256 2ccc48af0fcfd66bd38a368cac0d5d975c2dd8b681e528603f5b88c2cd142398 META.json
+SHA256 772709c17e67f019d988b33e59db5ef2a1108be41334fb7a6a4cd55521e74a87 META.yml
+SHA256 b914daee38843227fea492ff53f997e407aa526cbdd50ece357fbc42ee267587 README
+SHA256 a7b99073650bd4ca09a394cc9dc0cf3c7d941aa52f44c9ba8fffcb023e7b580c eg/beatinator
+SHA256 005a0e37909ff02836b3dd28fac919e9a9968c188b0ec38a3ac309415b164ccb eg/texty
+SHA256 89ec960d6c136b45e48e337a2c89579d0267368bc4ce45e4177038593853518e eg/variance
+SHA256 25ac014a6260c15cd8b3ec4fb79aab55fa68f74ec416e6d582f72887bd54ff70 lib/Music/RhythmSet.pm
+SHA256 15540cd1cba85c9a251e006ceb5075e2491fe247e09032dfa65b06d4ff2054b8 lib/Music/RhythmSet/Util.pm
+SHA256 ade5bfdcab9767c7b95101f08a03cdee7801665d812a0aef3610d03f16621dd6 lib/Music/RhythmSet/Voice.pm
+SHA256 7d269068ae90ed944d1f7904d96450e33874505f0c829475ce8258c714ada476 t/00-load.t
+SHA256 6e191c5ce12addd709c5a3abd6afcb928def524800f01c3567845e9920c69d1f t/10-util.t
+SHA256 3dfeb362097ef0e862fe7e91121011648bb040bf794f96c53ca79e62862199ff t/20-voice.t
+SHA256 9abd854bf33842ed9a00bba5e6e9c5c2e7d3caa89ac1858c2d727497fd317942 t/60-rset.t
+SHA256 bbceeefe99293b696836371399a5e91a76c4342853c2a9221795941a2ed671d3 t/pod-coverage.t
+SHA256 345c725e555c7ce8ee3cf5b569e9b943fe71bbd802fb7331d25d4ca27ca3a2c1 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAwAGBQJgTPlYAAoJEIGZLuHhLAOFrXsH/R9G5VCLTAeg4V7PxJkQ/vrJ
+HDuJ9CJ3C2aEq7igB48VrmJ3J/5PTAKFdL+rTQiJwyVri0/7R7M15OzBVtC0zgm/
+cK6P+DZyGQA8uBI5xCqIeQ+HkA++8ws2jtA/jwYVn0Q3K8arMeMOwj0hIt3VyXjP
+9cv3813LlQVblrBfDJ0Bq3oqzemDxx5W9ooYLK2o3cZ7Z+8qLBk0RIBevhjb7cyS
+3gCqzY9pQQB/i8E/uO9Q2Xp87IRvtU87cuGiPLqmm5XYXHsEqQPuAn1mPCkZV3h/
+s8tP6Lci/XRI4pZD2Solmr0Qfm5KmByu/TohOAs7ttlnSu/EIONCqYjkYzBE5Rs=
+=6aWR
+-----END PGP SIGNATURE-----

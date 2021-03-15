@@ -1,3 +1,15 @@
+0.604   2021-01-19  Released-By: PERLANCAR; Urgency: medium
+
+	- rand_rgb_colors(): Add option 'hash_prefix'.
+
+
+0.603   2021-01-19  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add more description to the result of rand_rgb_colors().
+
+
 0.602   2021-01-19  Released-By: PERLANCAR; Urgency: medium
 
 	- rand_rgb_colors(): Make sure that each generated color are

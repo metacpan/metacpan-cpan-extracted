@@ -1,5 +1,11 @@
 Revision history for Path-Tiny-Archive-Zip
 
+0.004    2021-03-13
+
+    - Fixed (maybe) 8.3 filenames issue.
+
+    - Removed namespace::clean dependency.
+
 0.003    2021-02-28
 
     - Added compression level for zip() method.

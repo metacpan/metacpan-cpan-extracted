@@ -2,14 +2,14 @@ Build.PL
 Changes
 eg/query_utdf
 eg/README
-inc/My/Module/Test.pm
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
+inc/My/Module/Test.pm
 lib/Astro/UTDF.pm
 LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 META.json
 META.yml
 README
@@ -27,3 +27,4 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
+xt/author/prereq.t

@@ -1,5 +1,5 @@
 package Photonic::Roles::AllH;
-$Photonic::Roles::AllH::VERSION = '0.014';
+$Photonic::Roles::AllH::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -9,14 +9,14 @@ Photonic::Roles::AllH
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 COPYRIGHT NOTICE
 
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =head1 SYNOPSIS
 
    use Photonic::LE::NR2::AllH;
-   my $iter=Photonic::LE;;NR2::AllH->new(geometry=>$geometry,nh=>$Nh,
+   my $iter=Photonic::LE::NR2::AllH->new(geometry=>$geometry,nh=>$Nh,
             keepStates=>$save);
    $iter->run;
    my $haydock_as=$iter->as;
@@ -55,7 +55,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 =item (for developers)
 
     package Photonic::LE::NR2::AllH;
-    $Photonic::LE::NR2::AllH::VERSION= '0.014';
+    $Photonic::LE::NR2::AllH::VERSION= '0.015';
     use namespace::autoclean;
     use Moose;
     has...
@@ -295,7 +295,7 @@ sub storeall {
     my $fn=$self->storeAllFN;
     return unless defined $fn; # unless you actually want to store everything
     my $fh=IO::File->new($fn, "w")
-	or croak "Couldn't open $fn for writting: $!";
+	or croak "Couldn't open $fn for writing: $!";
     #save all results but states
     my %all=  map {($_=>$self->$_)} @allfields;
     store_fd \%all, $fh or croak "Couldn't store all info; $!";
@@ -356,7 +356,9 @@ sub _pop_state {
     unless(defined $self->stateFN){
 	$self->_nextState(pop @{$self->_states});
 	$self->_currentState($self->_states->[-1]);
-	$self->_previousState($self->_states->[-2]//r2C(0));
+	my $s2 = $self->_states->[-2];
+	$s2 = r2C(0) if !defined $s2;
+	$self->_previousState($s2);
 	return;
     }
     pop @{$self->_statePos};

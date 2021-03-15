@@ -1,5 +1,9 @@
 Revision history for `ansifold' command.
 
+1.06 2021-03-15T10:29:11Z
+
+    - Use --tabstyle option to set tab style.
+
 1.05 2020-12-22T07:15:13Z
 
     - Change default width from 70 to 72.

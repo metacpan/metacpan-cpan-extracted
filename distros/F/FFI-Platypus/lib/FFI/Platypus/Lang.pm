@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Language specific customizations
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 
@@ -23,7 +23,7 @@ FFI::Platypus::Lang - Language specific customizations
 
 =head1 VERSION
 
-version 1.38
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -118,6 +118,8 @@ Meredith (merrilymeredith, MHOWARD)
 Diab Jerius (DJERIUS)
 
 Eric Brine (IKEGAMI)
+
+szTheory
 
 =head1 COPYRIGHT AND LICENSE
 

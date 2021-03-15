@@ -6,7 +6,7 @@
 #   ./show-circle cached_circle 6
 #   ./show-circle swing_circle 6 0.4
 
-use 5.24.0;
+use strict;
 use warnings;
 use Game::RaycastFOV qw(cached_circle circle raycast swing_circle);
 
@@ -17,21 +17,24 @@ my $radius = shift;
 our @map;
 our $MAX_X = 79;
 our $MAX_Y = 24;
-for my $y (0 .. $MAX_Y) {
-    for my $x (0 .. $MAX_X) {
+for my $y ( 0 .. $MAX_Y ) {
+    for my $x ( 0 .. $MAX_X ) {
         $map[$y][$x] = '.';
     }
 }
 
-my %plotted;
-
 raycast(
-    \&{$method}, sub {
-        my ($lx, $ly) = @_;
+    \&{$method},
+    sub {
+        my ( $lx, $ly ) = @_;
         return -1 if $lx < 0 or $lx >= $MAX_X or $ly < 0 or $ly >= $MAX_Y;
-        $map[$ly][$lx] = '#' unless $plotted{ $lx . ',' . $ly }++;
+        $map[$ly][$lx] = '#';
         return 1;
-    }, 40, 12, $radius, $method eq 'swing_circle' ? shift() : ()
+    },
+    40,
+    12,
+    $radius,
+    $method eq 'swing_circle' ? shift() : ()
 );
 
-for my $y (0 .. $MAX_Y) { say join '', $map[$y]->@* }
+for my $y ( 0 .. $MAX_Y ) { print join( '', $map[$y]->@* ), "\n" }

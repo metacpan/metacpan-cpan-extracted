@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/mojolicious/mojo-assetpack/issues
   homepage: https://github.com/mojolicious/mojo-assetpack
   repository: https://github.com/mojolicious/mojo-assetpack.git
-version: '2.12'
+version: '2.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

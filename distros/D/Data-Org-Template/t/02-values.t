@@ -33,6 +33,12 @@ is ($g->get('. | html 49', $context), '&lt;html&gt;', 'formatted value with parm
 
 
 
+# Test a data getter that's specified as a list of values.
+my $hashref = {x => 'xval'};
+$g = $t->data_getter ($hashref, {y => 'yval'});
+is ($g->get ('x'), 'xval', 'list lookup');
+is ($g->get ('y'), 'yval', 'list lookup');
+
 
 
 done_testing();

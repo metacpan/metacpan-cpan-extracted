@@ -3,7 +3,7 @@ package Color::RGB::Util;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-19'; # DATE
 our $DIST = 'Color-RGB-Util'; # DIST
-our $VERSION = '0.602'; # VERSION
+our $VERSION = '0.604'; # VERSION
 
 use 5.010001;
 use strict;
@@ -155,6 +155,7 @@ sub rand_rgb_colors {
     my $light_color  = exists($opts->{light_color}) ? $opts->{light_color} : 1;
     my $max_attempts = $opts->{max_attempts} // 1000;
     my $avoid_colors = $opts->{avoid_colors};
+    my $hash_prefix = $opts->{hash_prefix};
 
     my $num_check = 10;
     my $min_distance = rgb_diff("000000", "ffffff", "approx2") / 2 / $num;
@@ -189,7 +190,7 @@ sub rand_rgb_colors {
             last if !$reject;
             last if ++$num_attempts >= $max_attempts;
         }
-        push @res, $rgb;
+        push @res, ($hash_prefix ? "#" : "") . $rgb;
     }
     @res;
 }
@@ -524,7 +525,7 @@ Color::RGB::Util - Utilities related to RGB colors
 
 =head1 VERSION
 
-This document describes version 0.602 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2021-01-19.
+This document describes version 0.604 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2021-01-19.
 
 =head1 SYNOPSIS
 
@@ -704,8 +705,9 @@ Usage:
 
  my @rgbs = rand_rgb_colors([ \%opts ], $num=1);
 
-Produce C<$num> random RGB colors, with some options. Will make reasonable
-attempt to make the colors different from one another.
+Produce C<$num> random RGB colors, with some options. It does not (yet) create a
+palette of optimally distinct colors, but will make reasonable attempt to make
+the colors different from one another.
 
 Known options:
 
@@ -732,6 +734,11 @@ C<avoid_colors>.
 
 When the number of attempts has been exceeded, the generated color is used
 anyway.
+
+=item * hash_prefix
+
+Whether to add hash prefix to produced color codes ("#123456") or not
+("123456").
 
 =back
 

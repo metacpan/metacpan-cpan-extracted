@@ -7,7 +7,6 @@ use Smartcat::Client::DocumentApi;
 
 use Smartcat::Client::Object::BilingualFileImportSetingsModel;
 use Smartcat::Client::Object::UploadDocumentPropertiesModel;
-use Smartcat::Client::Object::AssignMyTeamExecutivesRequestModel;
 use Smartcat::App::Utils;
 
 use Carp;
@@ -98,28 +97,6 @@ sub delete_documents {
     ) if $@;
 
     return;
-}
-
-sub assign_documents_to_my_team {
-    my ( $self, $document_ids, $stage_number ) = @_;
-
-    my %args = (
-        documentIds => $document_ids,
-        stageNumber => $stage_number
-    );
-    my $model = Smartcat::Client::Object::AssignMyTeamExecutivesRequestModel->new(%args);
-    %args = ( request_model => $model );
-
-    my $result = eval { $self->{api}->document_assign_my_team_executives(%args); };
-    die $log->error(
-        sprintf(
-            "Failed to assign documents: %s.\nError:\n%s",
-            join( ', ', @$document_ids ),
-            format_error_message($@)
-        )
-    ) if $@;
-
-    return $result;
 }
 
 1;

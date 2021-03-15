@@ -1,0 +1,23 @@
+0.004   2021-02-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module/dist WordList-ID-Animal{,Name}-PERLANCAR for
+	  consistency with other WordList-* modules.
+
+
+0.003   2021-02-02  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Games::Hangman.
+
+
+0.002   2020-10-04  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Grammar.
+
+
+0.001   2020-05-23  Released-By: PERLANCAR
+
+        - First release.

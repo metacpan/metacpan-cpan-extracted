@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Convert::Moji - objects to convert alphabets
+Convert::Moji - Convert between alphabets
 
 =head1 SYNOPSIS
 
@@ -33,13 +33,13 @@ produces output
     secret
 
 
-(This example is included as L<F<rot13.pl>|https://fastapi.metacpan.org/source/BKB/Convert-Moji-0.10/examples/rot13.pl> in the distribution.)
+(This example is included as L<F<rot13.pl>|https://fastapi.metacpan.org/source/BKB/Convert-Moji-0.11/examples/rot13.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Convert::Moji version 0.10
-corresponding to git commit L<d50903a067cce1095da4b872fa65afa550d69e6b|https://github.com/benkasminbullock/Convert-Moji/commit/d50903a067cce1095da4b872fa65afa550d69e6b> released on Thu Jul 20 11:44:58 2017 +0900.
+This documents Convert::Moji version 0.11
+corresponding to git commit L<7bf3dfd9543df5abd6e592144cae7075b7c27d3f|https://github.com/benkasminbullock/Convert-Moji/commit/7bf3dfd9543df5abd6e592144cae7075b7c27d3f> released on Sat Mar 13 17:13:45 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -91,7 +91,7 @@ produces output
     apple banana c, a b c
 
 
-(This example is included as L<F<crazyhash.pl>|https://fastapi.metacpan.org/source/BKB/Convert-Moji-0.10/examples/crazyhash.pl> in the distribution.)
+(This example is included as L<F<crazyhash.pl>|https://fastapi.metacpan.org/source/BKB/Convert-Moji-0.11/examples/crazyhash.pl> in the distribution.)
 
 
 The hash keys and values can be any length.
@@ -243,13 +243,11 @@ produces output
     max, bad, and trombone to know
 
 
-(This example is included as L<F<trombone.pl>|https://fastapi.metacpan.org/source/BKB/Convert-Moji-0.10/examples/trombone.pl> in the distribution.)
+(This example is included as L<F<trombone.pl>|https://fastapi.metacpan.org/source/BKB/Convert-Moji-0.11/examples/trombone.pl> in the distribution.)
 
 
-For more examples, see the "joke" program at
-L<Data::Kanji::Kanjidic/english>, or L<this example
-program|https://www.lemoda.net/perl/make-romaji/make-romaji.pl> which
-converts Japanese kanji words into romaji using the output of Mecab.
+For another example, see the "joke" program at
+L<Data::Kanji::Kanjidic/english>.
 
 =head2 unambiguous
 
@@ -258,6 +256,36 @@ converts Japanese kanji words into romaji using the output of Mecab.
 Returns true if all of the values in C<%table> are distinct, and false
 if any two of the values in C<%table> are the same. This is used by
 L</invert> to decide whether a table can be reversed.
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use Convert::Moji 'unambiguous';
+    my %ambig = (
+        a => 'b',
+        c => 'b',
+    );
+    my %unambig = (
+        a => 'b',
+        c => 'd',
+    );
+    for my $thing (\%ambig, \%unambig) {
+        if (unambiguous ($thing)) {
+            print "un";
+        }
+        print "ambiguous\n";
+    }
+    
+
+
+produces output
+
+    ambiguous
+    unambiguous
+
+
+(This example is included as L<F<unambiguous.pl>|https://fastapi.metacpan.org/source/BKB/Convert-Moji-0.11/examples/unambiguous.pl> in the distribution.)
+
 
 =head1 SEE ALSO
 
@@ -302,6 +330,7 @@ Functions C<carp> and C<croak> are used to report errors.
 =back
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -309,7 +338,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2008-2017
+2008-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

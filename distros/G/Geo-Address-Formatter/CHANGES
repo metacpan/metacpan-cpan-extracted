@@ -1,6 +1,13 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.87   2021-03-14
+       rename perltidy conf files so Dist::Zilla adds them to distribution
 
+1.86   2021-03-13
+       - perltidy all files, add tidy test and precommit hook
+         many thanks to Olaf Alders for the step by step guide
+         http://www.perladvent.org/2020/2020-12-01.html
+         
 1.85   2020-11-20
        - ugh, forgot to check in various files
        - newest address-formatting templates       

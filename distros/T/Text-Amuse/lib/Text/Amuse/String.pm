@@ -78,6 +78,8 @@ They return nothing, but nevertheless the Output module won't complain.
 
 =item language_code
 
+=item set_bidi_document
+
 =back
 
 =cut
@@ -97,6 +99,10 @@ sub attachments {
 
 sub language_code {
     shift->{_lang};
+}
+
+sub set_bidi_document {
+    return;
 }
 
 1;

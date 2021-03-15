@@ -1,16 +1,16 @@
 {
-   "abstract" : "Module/App to build and test OTRS packages",
+   "abstract" : "Module/App to build and test OTRS packages - (DEPRECATED)",
    "author" : [
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OTRS-OPM-Maker",
    "prereqs" : {
@@ -46,6 +46,7 @@
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0",
+            "File::Copy" : "0",
             "File::Spec" : "0",
             "Test::LongString" : "0",
             "Test::More" : "0"
@@ -55,47 +56,48 @@
    "provides" : {
       "OTRS::OPM::Maker" : {
          "file" : "lib/OTRS/OPM/Maker.pm",
-         "version" : "0.17"
+         "version" : "0.19"
       },
       "OTRS::OPM::Maker::Command::build" : {
          "file" : "lib/OTRS/OPM/Maker/Command/build.pm",
-         "version" : "0.17"
+         "version" : "0.19"
       },
       "OTRS::OPM::Maker::Command::dbtest" : {
          "file" : "lib/OTRS/OPM/Maker/Command/dbtest.pm",
-         "version" : "0.17"
+         "version" : "0.19"
       },
       "OTRS::OPM::Maker::Command::dependencies" : {
          "file" : "lib/OTRS/OPM/Maker/Command/dependencies.pm",
-         "version" : "0.17"
+         "version" : "0.19"
       },
       "OTRS::OPM::Maker::Command::filetest" : {
          "file" : "lib/OTRS/OPM/Maker/Command/filetest.pm",
-         "version" : "0.17"
+         "version" : "0.19"
       },
       "OTRS::OPM::Maker::Command::index" : {
          "file" : "lib/OTRS/OPM/Maker/Command/index.pm",
-         "version" : "0.17"
+         "version" : "0.19"
       },
       "OTRS::OPM::Maker::Command::sopmtest" : {
          "file" : "lib/OTRS/OPM/Maker/Command/sopmtest.pm",
-         "version" : "0.17"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/reneeb/OTRS-OPM-Maker/issues"
+         "web" : "https://github.com/reneeb/OTRS-OPM-Maker/issues"
       },
-      "homepage" : "http://github.com/reneeb/OTRS-OPM-Maker",
+      "homepage" : "https://github.com/reneeb/OTRS-OPM-Maker",
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/reneeb/OTRS-OPM-Maker.git",
-         "web" : "http://github.com/reneeb/OTRS-OPM-Maker"
+         "url" : "https://github.com/reneeb/OTRS-OPM-Maker.git",
+         "web" : "https://github.com/reneeb/OTRS-OPM-Maker"
       }
    },
-   "version" : "0.17",
+   "version" : "0.19",
    "x_contributors" : [
+      "Cyrill Novgorodcev <cynovg@pause.org>",
       "Michiel Beijen <michiel.beijen@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",
@@ -103,6 +105,8 @@
       "Renee <reb@perl-services.de>",
       "Tadeusz \u201ctadzik\u201d So\u015bnierz <tadeusz.sosnierz@onet.pl>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

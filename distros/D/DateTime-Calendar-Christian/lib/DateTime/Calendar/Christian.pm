@@ -5,7 +5,7 @@ use 5.008004;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use DateTime 0.1402;
 use DateTime::Calendar::Julian 0.04;
@@ -854,6 +854,7 @@ Support for this module is provided via the F<datetime@perl.org> email
 list. See L<https://lists.perl.org/> for more details.
 
 Please report bugs to
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Christian>,
 L<https://github.com/trwyant/perl-DateTime-Calendar-Christian/issues>, or
 in electronic mail to F<wyant@cpan.org>.
 

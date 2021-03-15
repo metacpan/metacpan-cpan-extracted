@@ -4,7 +4,7 @@ JavaScript::Const::Exporter - Convert exported Perl constants to JavaScript
 
 # VERSION
 
-version v0.1.4
+version v0.1.5
 
 # SYNOPSIS
 
@@ -118,9 +118,24 @@ On success, it will return a string containing the JavaScript.
 
 # KNOWN ISSUES
 
+## Support for older Perl versions
+
+This module requires Perl v5.10 or newer.
+
+Pull requests to support older versions of Perl are welcome. See
+["SOURCE"](#source).
+
+## Const::Fast::Exporter
+
 When using with [Const::Fast::Exporter](https://metacpan.org/pod/Const::Fast::Exporter)-based modules, you must
 explicitly list all of the constants to be exported, as that doesn't
 provide an `@EXPORT_OK` variable that can be queried.
+
+## Const::Exporter
+
+Exporting constant subs from [Const::Exporter](https://metacpan.org/pod/Const::Exporter) v1.0.0 or earlier will
+emit warnings about the subs not being constant subs. The issue has
+been fixed in v1.1.0.
 
 # SEE ALSO
 
@@ -146,7 +161,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Robert Rothenberg.
+This software is Copyright (c) 2020-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -1,0 +1,12 @@
+lib/JSON/JQ.pm
+lib/JSON/JQ.xs
+t/001_load.t
+t/002_basis.t
+Build.PL
+Changes
+LICENSE
+MANIFEST
+ppport.h
+README.md
+META.yml
+META.json

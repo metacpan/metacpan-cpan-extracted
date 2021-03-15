@@ -6,7 +6,7 @@
                                                           
 
 
-This is the README for Go::Tokenize version 0.01.
+This is the README for Go::Tokenize version 0.02.
 
 Go::Tokenize is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -58,11 +58,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Go::Tokenize
 
-To install the module from the source file, Go-Tokenize-0.01.tar.gz, follow
+To install the module from the source file, Go-Tokenize-0.02.tar.gz, follow
 this sequence of commands:
 
-    tar xfz Go-Tokenize-0.01.tar.gz
-    cd Go-Tokenize-0.01
+    tar xfz Go-Tokenize-0.02.tar.gz
+    cd Go-Tokenize-0.02
     perl Makefile.PL
     make
     make install
@@ -87,6 +87,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Wed Mar 10 19:11:22 2021.
+This README was written on Sat Mar 13 17:53:36 2021.
 
 -----------------------------------------------------------------------------

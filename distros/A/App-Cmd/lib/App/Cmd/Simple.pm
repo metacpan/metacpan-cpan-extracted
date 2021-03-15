@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package App::Cmd::Simple;
-$App::Cmd::Simple::VERSION = '0.331';
+$App::Cmd::Simple::VERSION = '0.333';
 use App::Cmd::Command;
 BEGIN { our @ISA = 'App::Cmd::Command' }
 
@@ -21,7 +21,7 @@ use Sub::Install;
 #pod in F<YourApp/Cmd.pm>:
 #pod
 #pod   package YourApp::Cmd;
-#pod   use base qw(App::Cmd::Simple);
+#pod   use parent qw(App::Cmd::Simple);
 #pod
 #pod   sub opt_spec {
 #pod     return (
@@ -224,7 +224,7 @@ App::Cmd::Simple - a helper for building one-command App::Cmd applications
 
 =head1 VERSION
 
-version 0.331
+version 0.333
 
 =head1 SYNOPSIS
 
@@ -236,7 +236,7 @@ in F<simplecmd>:
 in F<YourApp/Cmd.pm>:
 
   package YourApp::Cmd;
-  use base qw(App::Cmd::Simple);
+  use parent qw(App::Cmd::Simple);
 
   sub opt_spec {
     return (
@@ -335,7 +335,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

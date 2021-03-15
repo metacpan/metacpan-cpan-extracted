@@ -7,7 +7,7 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.1.1';
+our $VERSION = 'v1.1.2';
 
 use Carp;
 use Const::Fast;
@@ -16,6 +16,7 @@ use List::AllUtils '0.10' => qw/ pairs zip /;
 use Package::Stash;
 use Ref::Util qw/ is_blessed_ref is_arrayref is_coderef is_hashref is_ref /;
 
+# RECOMMEND PREREQ: List::SomeUtils::XS
 # RECOMMEND PREREQ: Package::Stash::XS
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Storable
@@ -242,7 +243,7 @@ Const::Exporter - Declare constants for export.
 
 =head1 VERSION
 
-version v1.1.1
+version v1.1.2
 
 =head1 SYNOPSIS
 
@@ -445,6 +446,33 @@ Objects are also supported,
       '$foo' => Something->new( 123 ),
     ];
 
+=head2 Export Tags
+
+By default, all symbols are exportable (in C<@EXPORT_OK>.)
+
+The C<:default> tag is the same as not specifying any exports.
+
+The C<:all> tag exports all symbols.
+
+=head1 KNOWN ISSUES
+
+=head2 Support for older Perl versions
+
+This module requires Perl v5.10 or newer.
+
+Pull requests to support older versions of Perl are welcome. See
+L</SOURCE>.
+
+=head2 Exporting Functions
+
+L<Const::Exporter> is not intended for use with modules that also
+export functions.
+
+There are workarounds that you can use, such as getting
+L<Const::Exporter> to export your functions, or munging C<@EXPORT>
+etc. separately, but these are not supported and changes in the
+future my break our code.
+
 =head2 Mixing POD with Tags
 
 The following code is a syntax error, at least with some versions of
@@ -480,33 +508,6 @@ e.g.
 
   use Const::Exporter
     b => [ bar => 2 ];
-
-=head2 Export Tags
-
-By default, all symbols are exportable (in C<@EXPORT_OK>.)
-
-The C<:default> tag is the same as not specifying any exports.
-
-The C<:all> tag exports all symbols.
-
-=head1 KNOWN ISSUES
-
-=head2 Support for older Perl versions
-
-This module requires Perl v5.10 or newer.
-
-Pull requests to support older versions of Perl are welcome. See
-L</SOURCE>.
-
-=head2 Exporting Functions
-
-L<Const::Exporter> is not intended for use with modules that also
-export functions.
-
-There are workarounds that you can use, such as getting
-L<Const::Exporter> to export your functions, or munging C<@EXPORT>
-etc. separately, but these are not supported and changes in the
-future my break our code.
 
 =for readme continue
 
@@ -567,7 +568,7 @@ B. Estrade <estrabd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2020 by Robert Rothenberg.
+This software is Copyright (c) 2014-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

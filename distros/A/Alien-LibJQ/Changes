@@ -1,6 +1,10 @@
 Revision history for Perl module Alien::LibJQ
 
-0.01 Sat Dec 19 15:25:00 2020
-    - original version; created by ExtUtils::ModuleMaker 0.63
-
-
+v0.05:
+   - switch back to github official site for package download.
+v0.04:
+   - 1st working build on both Windows (Strawberry Perl) and Linux.
+v0.02 - v0.03:
+   - not build on Linux due to Alien::Build version requirement.
+v0.01:
+   - original version, broken build.

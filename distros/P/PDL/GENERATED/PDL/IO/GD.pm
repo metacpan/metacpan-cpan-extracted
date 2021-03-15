@@ -92,6 +92,10 @@ Writes a 2-d PDL variable out to a PNG file, using the supplied color look-up-ta
 The LUT contains a line for each value 0-255 with a corresponding R, G, and B value.
 
 
+=for bad
+
+write_png does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -118,6 +122,10 @@ The LUT contains a line for each value 0-255 with a corresponding R, G, and B va
 Same as write_png(), except you can specify the compression level (0-9) as the last argument.
 
 
+=for bad
+
+write_png_ex does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -144,6 +152,10 @@ Writes an (x, y, z(3)) PDL variable out to a PNG file, using a true color format
 This means a larger file on disk, but can contain more than 256 colors.
 
 
+=for bad
+
+write_true_png does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -170,6 +182,10 @@ This means a larger file on disk, but can contain more than 256 colors.
 Same as write_true_png(), except you can specify the compression level (0-9) as the last argument.
 
 
+=for bad
+
+write_true_png_ex does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

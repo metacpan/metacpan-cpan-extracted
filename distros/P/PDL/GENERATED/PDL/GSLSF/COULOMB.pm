@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Normalized Hydrogenic bound states. Radial dipendence.
 
+=for bad
+
+gsl_sf_hydrogenicR does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -86,6 +90,10 @@ Normalized Hydrogenic bound states. Radial dipendence.
 
  Coulomb wave functions F_{lam_F}(eta,x), G_{lam_G}(eta,x) and their derivatives; lam_G := lam_F - k_lam_G. if ovfw is signaled then F_L(eta,x)  =  fc[k_L] * exp(fe) and similar. 
 
+=for bad
+
+gsl_sf_coulomb_wave_FGp_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -111,6 +119,10 @@ Normalized Hydrogenic bound states. Radial dipendence.
 
  Coulomb wave function divided by the argument, F(xi, eta)/xi. This is the function which reduces to spherical Bessel functions in the limit eta->0. 
 
+=for bad
+
+gsl_sf_coulomb_wave_sphF_array does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -136,6 +148,10 @@ Normalized Hydrogenic bound states. Radial dipendence.
 
 Coulomb wave function normalization constant. [Abramowitz+Stegun 14.1.8, 14.1.9].
 
+=for bad
+
+gsl_sf_coulomb_CL_e does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

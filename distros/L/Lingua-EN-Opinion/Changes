@@ -1,5 +1,11 @@
 Revision history for Lingua-EN-Opinion
 
+0.1701 2021-03-12 06:45:20
+    - Improve documentation.
+
+0.1700 2021-03-11 20:18:14
+    - Add and test the ->set_word & ->nrc_set_word methods.
+
 0.1600 2019-09-22 08:17:06
     - Improve documentation.
     - Multiple code fixes... `git log -p` for the intrepid.

@@ -3,7 +3,7 @@
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,24 +31,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 use strict;
 use warnings;
 use PDL;
-use PDL::NiceSlice;
 use PDL::Complex;
-use Photonic::Geometry::FromB;
 use Photonic::WE::R2::Metric;
 use Photonic::WE::R2::AllH;
 
-use Machine::Epsilon;
-use List::Util;
-
 use Test::More tests => 10;
+use lib 't/lib';
+use TestUtils;
 
-#my $pi=4*atan2(1,1);
-
-sub agree {
-    my $a=shift;
-    my $b=shift//0;
-    return (($a-$b)*($a-$b))->sum<=1e-7;
-}
+my $fn = make_fn();
+make_default_store($fn);
 
 #Check haydock coefficients for simple 1D system
 my $B=zeroes(11)->xvals<5; #1D system
@@ -131,7 +123,7 @@ ok(agree(pdl($b2s), pdl($bs)**2), "1D L b2==b^2");
 	->new(metric=>$m2s, polarization=>r2C(pdl([0,1])), nh=>3*10*10,
 	      reorthogonalize=>1, accuracy=>machine_epsilon(),
 	      noise=>1e0*machine_epsilon(), normOp=>1e0, smallH=>1e-7,
-	      use_mask=>1, stateFN=>"scratch/rem.dat");
+	      use_mask=>1, stateFN=>$fn);
     $al2s->run;
     ok($al2s->iteration <= 2*10*10,
        "No more iterations than dimensions. Small wavelength. Even. Disk.");

@@ -11,7 +11,7 @@ use Net::WebSocket::Server::Connection;
 use Time::HiRes qw(time);
 use List::Util qw(min);
 
-our $VERSION = '0.003004';
+our $VERSION = '0.004000';
 $VERSION = eval $VERSION;
 
 $SIG{PIPE} = 'IGNORE';
@@ -149,7 +149,7 @@ sub start {
   my $silence_nextcheck = $self->{silence_max} ? (time + $self->{silence_checkinterval}) : 0;
   my $tick_next = $self->{tick_period} ? (time + $self->{tick_period}) : 0;
 
-  while (%{$self->{conns}} || $self->{listen}->opened) {
+  while ($self->{listen}->opened) {
     my $silence_checktimeout = $self->{silence_max} ? ($silence_nextcheck - time) : undef;
     my $tick_timeout = $self->{tick_period} ? ($tick_next - time) : undef;
     my $timeout = min(grep {defined} ($silence_checktimeout, $tick_timeout));
@@ -207,6 +207,7 @@ sub shutdown {
   my ($self) = @_;
   $self->{on_shutdown}($self);
   $self->{select_readable}->remove($self->{listen});
+  $self->{listen}->shutdown(2);
   $self->{listen}->close();
   $_->disconnect(1001) for $self->connections;
 }
@@ -318,14 +319,18 @@ preconfigured L<IO::Socket::INET|IO::Socket::INET> TCP server to use.  Default C
 
 To create an SSL WebSocket server (such that you can connect to it via a
 C<wss://...> URL), pass an object which acts like L<IO::Socket::INET|IO::Socket::INET>
-and speaks SSL, such as L<IO::Socket::SSL|IO::Socket::SSL>.  For example:
+and speaks SSL, such as L<IO::Socket::SSL|IO::Socket::SSL>. To avoid blocking
+during the SSL handshake, pass C<< SSL_startHandshake => 0 >> to the
+L<IO::Socket::SSL|IO::Socket::SSL> constructor and the handshake will be handled
+automatically as part of the normal server loop.  For example:
 
     my $ssl_server = IO::Socket::SSL->new(
-      Listen        => 5,
-      LocalPort     => 8080,
-      Proto         => 'tcp',
-      SSL_cert_file => '/path/to/server.crt',
-      SSL_key_file  => '/path/to/server.key',
+      Listen             => 5,
+      LocalPort          => 8080,
+      Proto              => 'tcp',
+      SSL_startHandshake => 0,
+      SSL_cert_file      => '/path/to/server.crt',
+      SSL_key_file       => '/path/to/server.key',
     ) or die "failed to listen: $!";
 
     Net::WebSocket::Server->new(
@@ -391,7 +396,7 @@ L<constructor|/CONSTRUCTION> rather than later via this method.  See L</EVENTS>.
 =item C<start()>
 
 Starts the WebSocket server; registered callbacks will be invoked as
-interesting things happen.  Does not return until L<shutdown()/shutdown> is
+interesting things happen.  Does not return until L<shutdown()|/shutdown> is
 called.
 
 =item C<connections()>

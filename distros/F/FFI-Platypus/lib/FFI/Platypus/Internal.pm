@@ -12,7 +12,7 @@ _init();
 our @EXPORT = grep /^FFI_PL/, keys %FFI::Platypus::Internal::;
 
 # ABSTRACT: For internal use only
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 1;
@@ -29,7 +29,7 @@ FFI::Platypus::Internal - For internal use only
 
 =head1 VERSION
 
-version 1.38
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,8 @@ Meredith (merrilymeredith, MHOWARD)
 Diab Jerius (DJERIUS)
 
 Eric Brine (IKEGAMI)
+
+szTheory
 
 =head1 COPYRIGHT AND LICENSE
 

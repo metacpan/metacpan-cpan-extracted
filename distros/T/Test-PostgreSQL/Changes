@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::PostgreSQL.
 
+1.28 2021-03-12T10:50:46Z
+    - Increment port by random amount when trying to find a good port
+    - Allow using beta versions
+
 1.27 2018-10-17T02:06:08Z
     - Use pg_version attribute to better handle -b and -f psql switches
       depending on installed PostgreSQL version

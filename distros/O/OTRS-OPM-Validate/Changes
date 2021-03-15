@@ -1,6 +1,11 @@
 Revision history for OTRS::OPM::Validate
 ========================================
 
+0.05   2021-03-13 11:38:00
+
+    * Deprecate OTRS::OPM::Validate. Development will be done as OPM::Validate as we support
+      Znuny and OTOBO as well.
+
 0.04   2021-02-25 12:14:00
 
     * Support <PackageMerge> Tag

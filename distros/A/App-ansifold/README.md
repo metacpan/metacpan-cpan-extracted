@@ -4,7 +4,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 # VERSION
 
-Version 1.05
+Version 1.06
 
 # SYNOPSIS
 
@@ -26,12 +26,13 @@ ansifold \[ options \]
          --tabstop=n              Tab-stop position (default 8)
          --tabhead=char           Tab-head character (default space)
          --tabspace=char          Tab-space character (default space)
+         --tabstyle=style         Tab expansion style
 
 # DESCRIPTION
 
 **ansifold** is almost **fold** compatible command utilizing
 [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) module, which enables to handle ANSI terminal
-sequences and Unicode multibyte characters properly.
+sequences and Unicode multi-byte characters properly.
 
 It folds lines in 72 column by default.  Use option **-w** to change
 the folding width.
@@ -134,16 +135,10 @@ makes tab character visible keeping text layout.
 
     $ ansifold --expand --tabhead="MEDIUM SHADE" --tabspace="LIGHT SHADE"
 
-Option **--expand** also takes option of pre-defined names.  Currently
-these names are available.
-
-    dot    => [ '.', '.' ],
-    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
-    shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
-
-You can use like this:
-
-    $ ansifold --expand=symbol
+Option **--tabstyle** allow to set **--tabhead** and **--tabspace**
+characters at once according to the given style name.  Select from
+`dot`, `symbol` or `shade`.  Styles are defined in
+[Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) library.
 
 # SEE ALSO
 

@@ -3,7 +3,7 @@
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,29 +31,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 use strict;
 use warnings;
 use PDL;
-use PDL::NiceSlice;
 use PDL::Complex;
 use Photonic::Geometry::FromEpsilon;
 use Photonic::WE::S::Metric;
 use Photonic::WE::S::AllH;
 use Photonic::WE::S::GreenP;
 
-use Machine::Epsilon;
-use List::Util;
-
 use Test::More tests => 2;
-
-sub agree {
-    my $a=shift;
-    my $b=shift//0;
-    return (($a-$b)*($a-$b))->sum<=1e-7;
-}
-
-sub Cagree {
-    my $a=shift;
-    my $b=shift//0;
-    return (($a-$b)->Cabs2)->sum<=1e-7;
-}
+use lib 't/lib';
+use TestUtils;
 
 #Check greenp for simple 1D system
 my ($ea, $eb)=(r2C(1), r2C(2));

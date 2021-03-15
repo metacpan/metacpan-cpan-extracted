@@ -1,9 +1,9 @@
 package App::lens;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2021-03-13'; # DATE
 our $DIST = 'App-lens'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 1;
 # ABSTRACT: Transform colors in terminal output
@@ -20,7 +20,7 @@ App::lens - Transform colors in terminal output
 
 =head1 VERSION
 
-This document describes version 0.021 of App::lens (from Perl distribution App-lens), released on 2020-06-13.
+This document describes version 0.022 of App::lens (from Perl distribution App-lens), released on 2021-03-13.
 
 =head1 DESCRIPTION
 
@@ -36,7 +36,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-lens>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lens>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-lens/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -52,7 +52,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

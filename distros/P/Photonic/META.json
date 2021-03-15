@@ -1,5 +1,5 @@
 {
-   "abstract" : "A perl package for calculations on photonics and metamaterials.",
+   "abstract" : "unknown",
    "author" : [
       "W. Luis Mochan <mochan@fis.unam.mx>",
       "Guillermo Ortiz <gortiz@exa.unne.edu.ar>",
@@ -8,8 +8,8 @@
       "Lucila Juarez Reyes <lucilajuarezreyes@gmail.com>",
       "Merlyn Jaqueline Juarez-Gutierrez <merlynj@icf.unam.mx>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -18,46 +18,44 @@
       "version" : 2
    },
    "name" : "Photonic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0.23",
-            "ExtUtils::F77" : "0",
-            "Module::Build::Pluggable::Fortran" : "0.27",
-            "Module::Build::Pluggable::PDL" : "0.23",
-            "PDL" : "2.006"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "ExtUtils::F77" : "1.23",
-            "File::Basename" : "0",
-            "File::Copy" : "0",
-            "File::Spec" : "0",
-            "Module::Build" : "0.4224",
-            "Module::Build::Pluggable" : "0.10",
-            "Module::Build::Pluggable::Fortran" : "0.27",
-            "Module::Build::Pluggable::PDL" : "0.23"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Version" : "1.003001"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Cwd" : "0",
-            "DynaLoader" : "0",
-            "English" : "0",
             "ExtUtils::F77" : "1.23",
             "IO::File" : "0",
-            "Inline" : "0",
-            "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Machine::Epsilon" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
             "Moose::Util::TypeConstraints" : "0",
             "MooseX::StrictConstructor" : "0",
-            "PDL" : "2.006",
+            "PDL" : "0",
             "PDL::Complex" : "2.009",
             "PDL::Constants" : "0",
             "PDL::Core" : "0",
@@ -66,261 +64,28 @@
             "PDL::FFTW3" : "0",
             "PDL::IO::Pic" : "0",
             "PDL::IO::Storable" : "0",
+            "PDL::LinearAlgebra" : "0.15",
             "PDL::Lite" : "0",
             "PDL::MatrixOps" : "0",
             "PDL::NiceSlice" : "0",
             "Storable" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "5.014000"
          }
       },
       "test" : {
          "requires" : {
-            "Pod::Coverage::TrustPod" : "0",
-            "Test::More" : "0",
-            "Test::Pod" : "0",
-            "Test::Pod::Coverage" : "1.08"
+            "Machine::Epsilon" : "0",
+            "Test::More" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Photonic" : {
-         "file" : "lib/Photonic.pm",
-         "version" : "0.014"
-      },
-      "Photonic::CharacteristicFunctions" : {
-         "file" : "lib/Photonic/CharacteristicFunctions.pm",
-         "version" : "0.014"
-      },
-      "Photonic::ExtraUtils" : {
-         "file" : "lib/Photonic/ExtraUtils.pd",
-         "version" : "0.014"
-      },
-      "Photonic::Geometry::FromB" : {
-         "file" : "lib/Photonic/Geometry/FromB.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Geometry::FromEpsilon" : {
-         "file" : "lib/Photonic/Geometry/FromEpsilon.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Geometry::FromImage2D" : {
-         "file" : "lib/Photonic/Geometry/FromImage2D.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Iterator" : {
-         "file" : "lib/Photonic/Iterator.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NP::AllH" : {
-         "file" : "lib/Photonic/LE/NP/AllH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NP::EpsL" : {
-         "file" : "lib/Photonic/LE/NP/EpsL.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NP::EpsTensor" : {
-         "file" : "lib/Photonic/LE/NP/EpsTensor.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NP::OneH" : {
-         "file" : "lib/Photonic/LE/NP/OneH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NR2::AllH" : {
-         "file" : "lib/Photonic/LE/NR2/AllH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NR2::EpsL" : {
-         "file" : "lib/Photonic/LE/NR2/EpsL.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NR2::EpsTensor" : {
-         "file" : "lib/Photonic/LE/NR2/EpsTensor.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NR2::Field" : {
-         "file" : "lib/Photonic/LE/NR2/Field.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NR2::OneH" : {
-         "file" : "lib/Photonic/LE/NR2/OneH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NR2::SH" : {
-         "file" : "lib/Photonic/LE/NR2/SH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NR2::SHChiTensor" : {
-         "file" : "lib/Photonic/LE/NR2/SHChiTensor.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::NR2::SHP" : {
-         "file" : "lib/Photonic/LE/NR2/SHP.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::S::AllH" : {
-         "file" : "lib/Photonic/LE/S/AllH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::S::EpsL" : {
-         "file" : "lib/Photonic/LE/S/EpsL.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::S::EpsTensor" : {
-         "file" : "lib/Photonic/LE/S/EpsTensor.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::S::Field" : {
-         "file" : "lib/Photonic/LE/S/Field.pm",
-         "version" : "0.014"
-      },
-      "Photonic::LE::S::OneH" : {
-         "file" : "lib/Photonic/LE/S/OneH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Roles::AllH" : {
-         "file" : "lib/Photonic/Roles/AllH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Roles::EpsL" : {
-         "file" : "lib/Photonic/Roles/EpsL.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Roles::EpsParams" : {
-         "file" : "lib/Photonic/Roles/EpsParams.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Roles::Geometry" : {
-         "file" : "lib/Photonic/Roles/Geometry.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Roles::KeepStates" : {
-         "file" : "lib/Photonic/Roles/KeepStates.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Roles::Metric" : {
-         "file" : "lib/Photonic/Roles/Metric.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Roles::OneH" : {
-         "file" : "lib/Photonic/Roles/OneH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Roles::ReorthogonalizeC" : {
-         "file" : "lib/Photonic/Roles/ReorthogonalizeC.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Roles::ReorthogonalizeR" : {
-         "file" : "lib/Photonic/Roles/ReorthogonalizeR.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Roles::UseMask" : {
-         "file" : "lib/Photonic/Roles/UseMask.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Types" : {
-         "file" : "lib/Photonic/Types.pm",
-         "version" : "0.014"
-      },
-      "Photonic::Utils" : {
-         "file" : "lib/Photonic/Utils.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::AllH" : {
-         "file" : "lib/Photonic/WE/R2/AllH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::EpsilonP" : {
-         "file" : "lib/Photonic/WE/R2/EpsilonP.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::EpsilonTensor" : {
-         "file" : "lib/Photonic/WE/R2/EpsilonTensor.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::Field" : {
-         "file" : "lib/Photonic/WE/R2/Field.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::Green" : {
-         "file" : "lib/Photonic/WE/R2/Green.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::GreenP" : {
-         "file" : "lib/Photonic/WE/R2/GreenP.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::GreenS" : {
-         "file" : "lib/Photonic/WE/R2/GreenS.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::Metric" : {
-         "file" : "lib/Photonic/WE/R2/Metric.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::OneH" : {
-         "file" : "lib/Photonic/WE/R2/OneH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::Wave" : {
-         "file" : "lib/Photonic/WE/R2/Wave.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::R2::WaveP" : {
-         "file" : "lib/Photonic/WE/R2/WaveP.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::S::AllH" : {
-         "file" : "lib/Photonic/WE/S/AllH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::S::EpsilonP" : {
-         "file" : "lib/Photonic/WE/S/EpsilonP.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::S::EpsilonTensor" : {
-         "file" : "lib/Photonic/WE/S/EpsilonTensor.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::S::Field" : {
-         "file" : "lib/Photonic/WE/S/Field.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::S::Green" : {
-         "file" : "lib/Photonic/WE/S/Green.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::S::GreenP" : {
-         "file" : "lib/Photonic/WE/S/GreenP.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::S::Metric" : {
-         "file" : "lib/Photonic/WE/S/Metric.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::S::OneH" : {
-         "file" : "lib/Photonic/WE/S/OneH.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::S::Wave" : {
-         "file" : "lib/Photonic/WE/S/Wave.pm",
-         "version" : "0.014"
-      },
-      "Photonic::WE::S::WaveP" : {
-         "file" : "lib/Photonic/WE/S/WaveP.pm",
-         "version" : "0.014"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
-         "url" : "https://github.com/wlmb/Photonic"
+         "type" : "git",
+         "web" : "https://github.com/wlmb/Photonic"
       }
    },
-   "version" : "0.014",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.015",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

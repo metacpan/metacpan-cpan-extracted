@@ -1,5 +1,13 @@
 Revision history for Net-WebSocket-Server
 
+0.4.0   2021-03-14
+        Support for max_recv_size. Support for doing TLS handshake during server
+        loop by handling IO::Socket::SSL objects with SSL_startHandshake => 0,
+        preventing blocking during TLS accept(). shutdown() now exits main loop
+        without waiting for remaining clients. ip() and port() now return useful
+        values after socket disconnects. Listening TCP socket more thoroughly
+        cleaned up during shutdown().
+
 0.3.4   2016-01-27
         Ignore mid-handshake connections for pings and ->connections() list;
         provide $conn->is_ready() interface to accomodate this.

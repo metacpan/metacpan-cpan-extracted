@@ -36,6 +36,9 @@ src/sourcetree.cpp
 src/sourcetree.h
 src/thx_member.h
 src/unordered_map.h
+src/upb/LICENSE
+src/upb/bridge.cpp
+src/upb/bridge.h
 src/upbwrapper.h
 t/001_load.t
 t/010_basic.t

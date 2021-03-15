@@ -2,7 +2,7 @@ package Test2::Harness::Plugin;
 use strict;
 use warnings;
 
-our $VERSION = '1.000043';
+our $VERSION = '1.000044';
 
 # Document, but do not implement
 #sub changed_files {}
@@ -139,6 +139,49 @@ created with C<$path>.
 This is an opportunity for your plugin to modify the data for any test file
 that will be run. The first argument is an arrayref of
 L<Test2::Harness::TestFile> objects.
+
+=item $hashref = $plugin->duration_data()
+
+If defined, this can return a hashref of duration data. This should return
+undef if no duration data is provided. The first plugin listed that provides
+duration data wins, no other plugins will be checked once duration data is
+obtained.
+
+Example duration data:
+
+    {
+        't/foo.t' => 'medium',
+        't/bar.t' => 'short',
+        't/baz.t' => 'long',
+    }
+
+=item $hashref_or_arrayref = $plugin->coverage_data(\@changed)
+
+=item $hashref_or_arrayref = $plugin->coverage_data()
+
+If defined, this can return a hashref of all coverage data, or an arrayref of
+tests that cover the tests listed in @changed. This should return undef if no
+coverage data is available. The first plugin to provide coverage data wins, no
+other plugins will be checked once coverage data has been obtained.
+
+Examples:
+
+    [
+        'foo.t',
+        'bar.t',
+        'baz.t',
+    ]
+
+    {
+        'lib/Foo.pm' => [
+            't/foo.t',
+            't/integration.t',
+        ],
+        'lib/Bar.pm' => [
+            't/bar.t',
+            't/integration.t',
+        ],
+    }
 
 =item $plugin->inject_run_data(meta => $meta, fields => $fields, run => $run)
 

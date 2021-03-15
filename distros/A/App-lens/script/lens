@@ -1,13 +1,22 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2021-03-13'; # DATE
 our $DIST = 'App-lens'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
+
+# transform_FOO accepts numbers in @_
+# transform0_FOO accept the whole raw \e[...m sequence
+
+sub transform0_codes {
+    my $seq = shift;
+    $seq =~ s/\e/\\e/g;
+    $seq;
+}
 
 sub transform_bold {
     if ($_[0] == 1) {
@@ -163,31 +172,41 @@ EOF
     exit 0;
 } else {
     my $tname = shift @ARGV;
-    defined &{"transform_$tname"} or die "Unknown transform '$tname'\n";
-    my $tsub = \&{"transform_$tname"};
-    my $transform = sub {
-        my @codes = split ';', shift;
-        my @res;
-        while (@codes) {
-            my @args;
-            if (($codes[0] == 38 || $codes[0] == 48) && @codes > 1) {
-                if ($codes[1] == 2) {
-                    @args = splice @codes, 0, 5;
-                } elsif ($codes[1] == 5) {
-                    @args = splice @codes, 0, 3;
+
+    if (defined &{"transform0_$tname"}) {
+        my $transform0 = \&{"transform0_$tname"};
+        while (<STDIN>) {
+            s/(\e\[.+?m)/$transform0->($1)/eg;
+            print;
+        }
+    } elsif (defined &{"transform_$tname"}) {
+        my $tsub = \&{"transform_$tname"};
+        my $transform = sub {
+            my @codes = split ';', shift;
+            my @res;
+            while (@codes) {
+                my @args;
+                if (($codes[0] == 38 || $codes[0] == 48) && @codes > 1) {
+                    if ($codes[1] == 2) {
+                        @args = splice @codes, 0, 5;
+                    } elsif ($codes[1] == 5) {
+                        @args = splice @codes, 0, 3;
+                    } else {
+                        @args = (shift @codes);
+                    }
                 } else {
                     @args = (shift @codes);
                 }
-            } else {
-                @args = (shift @codes);
+                push @res, $tsub->(@args);
             }
-            push @res, $tsub->(@args);
+            "\e[" . join(';', @res) . "m";
+        };
+        while (<STDIN>) {
+            s/\e\[(.+?)m/$transform->($1)/eg;
+            print;
         }
-        join ';', @res;
-    };
-    while (<STDIN>) {
-        s/\e\[(.+?)m/"\e[" . $transform->($1) . "m"/eg;
-        print;
+    } else {
+        die "Unknown transform '$tname'\n";
     }
 }
 
@@ -207,7 +226,7 @@ lens - Transform colors in terminal output
 
 =head1 VERSION
 
-This document describes version 0.021 of lens (from Perl distribution App-lens), released on 2020-06-13.
+This document describes version 0.022 of lens (from Perl distribution App-lens), released on 2021-03-13.
 
 =head1 SYNOPSIS
 
@@ -247,6 +266,10 @@ Pastelize colors.
 
 Transform using one of ColorTransform::* modules.
 
+=item * codes
+
+Show color codes literally.
+
 =back
 
 Some examples:
@@ -269,7 +292,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-lens>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lens>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-lens/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -285,7 +308,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -28,11 +28,11 @@ my $path = $af_path . '/testcases/';
 my $input_country;
 my $verbose = 0;
 
-GetOptions (
-    'country:s'  => \$input_country,
-    'verbose'    => \$verbose,
+GetOptions(
+    'country:s' => \$input_country,
+    'verbose'   => \$verbose,
 );
-if ( $input_country ){
+if ($input_country) {
     $input_country = lc($input_country);
 }
 
@@ -40,30 +40,30 @@ ok(1);
 
 my @dirs = ('conf', 'testcases');
 
-if ( -d $path ){
+if (-d $path) {
 
-    foreach my $dir (@dirs){
+    foreach my $dir (@dirs) {
         my $conf_path = $af_path . '/' . $dir . '/';
         note('looking for yaml files in ' . $conf_path);
 
-        my @files = File::Find::Rule->file()->name( '*.yaml' )->in( $conf_path );
-        note('found ' . scalar(@files) . ' yaml files');    
+        my @files = File::Find::Rule->file()->name('*.yaml')->in($conf_path);
+        note('found ' . scalar(@files) . ' yaml files');
         ok(scalar(@files), 'found at least one yaml file');
 
-        foreach my $filename (sort @files){
+        foreach my $filename (sort @files) {
             note('checking ' . $filename);
 
             # special test for main conf file
-            if ($filename =~ m/worldwide.yaml/){
+            if ($filename =~ m/worldwide.yaml/) {
                 # escaped parens and \d need to be double escaped for python
                 my $no_bad_parens = 1;
                 open my $FH, "<:encoding(UTF-8)", $filename
                     or die "unable to open $filename $!";
-                while (my $line = <$FH>){
+                while (my $line = <$FH>) {
                     next if ($line =~ m/^\s*#/);
                     my @probchars = ('\(', '\)', 'd');
-                    foreach my $c (@probchars){
-                        if ($line =~ m/\\$c/ && $line !~ m/\\\\$c/){
+                    foreach my $c (@probchars) {
+                        if ($line =~ m/\\$c/ && $line !~ m/\\\\$c/) {
                             warn $line;
                             $no_bad_parens = 0;
                             last; # bail out
@@ -73,46 +73,31 @@ if ( -d $path ){
                 close $FH;
                 ok($no_bad_parens == 1, 'no badly escaped parens in worldwide conf file');
             }
-            
+
             my @a_testcases = ();
             lives_ok {
                 @a_testcases = LoadFile($filename);
-            } "parsing file $filename";
+            }
+            "parsing file $filename";
 
             {
                 my $text = read_text($filename);
 
                 ## example "Stauffenstra\u00dfe" which should be "Stauffenstraße"
-                if ( $text =~ m/\\u00/ ){
-                    unlike(
-                        $text,
-                        qr!\\u00!,
-                        'don\'t use Javascript utf8 encoding, use characters directly'
-                    );
+                if ($text =~ m/\\u00/) {
+                    unlike($text, qr!\\u00!, 'don\'t use Javascript utf8 encoding, use characters directly');
                 }
 
-                if ( $text =~ m/\t/ ){
-                    unlike(
-                        $text,
-                        qr/\t/,
-                        'there is a TAB in the YAML file. That will cause parsing errors'
-                    );
+                if ($text =~ m/\t/) {
+                    unlike($text, qr/\t/, 'there is a TAB in the YAML file. That will cause parsing errors');
                 }
-           
-                if ( $text !~ m/\n$/ ){
-                    like(
-                        $text,
-                        qr!\n$!,
-                        'file doesnt end in newline. This will cause parsing errors'
-                    );
+
+                if ($text !~ m/\n$/) {
+                    like($text, qr!\n$!, 'file doesnt end in newline. This will cause parsing errors');
                 }
-           
-                if ( $text =~ /:\s*0/ ){
-                    like(
-                        $text,
-                        qr!:s\*0!,
-                        'zero unquoted. The PHP YAML parser will convert 0012 to 12'
-                    );
+
+                if ($text =~ /:\s*0/) {
+                    like($text, qr!:s\*0!, 'zero unquoted. The PHP YAML parser will convert 0012 to 12');
                 }
             }
         }

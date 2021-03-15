@@ -7,7 +7,7 @@ use constant 1.32 ();
 use FFI::Platypus;
 
 # ABSTRACT: Define constants in C space for Perl
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 {
@@ -66,7 +66,7 @@ FFI::Platypus::Constant - Define constants in C space for Perl
 
 =head1 VERSION
 
-version 1.38
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -227,6 +227,8 @@ Meredith (merrilymeredith, MHOWARD)
 Diab Jerius (DJERIUS)
 
 Eric Brine (IKEGAMI)
+
+szTheory
 
 =head1 COPYRIGHT AND LICENSE
 

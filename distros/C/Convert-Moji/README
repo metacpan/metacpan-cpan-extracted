@@ -6,7 +6,7 @@
                                                         |__/   
 
 
-This is the README for Convert::Moji version 0.10.
+This is the README for Convert::Moji version 0.11.
 
 Convert::Moji is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -24,7 +24,7 @@ four sections:
 
 1. ABOUT
 
-Convert::Moji - objects to convert alphabets
+Convert::Moji - Convert between alphabets
 
 Convert::Moji objects convert between different alphabets. For
 example, a Convert::Moji object can convert between Greek letters and
@@ -41,12 +41,11 @@ alphabets.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?Convert::Moji
     * http://metacpan.org/release/Convert-Moji
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -67,11 +66,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Convert::Moji
 
-To install the module from the source file, Convert-Moji-0.10.tar.gz,
+To install the module from the source file, Convert-Moji-0.11.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Convert-Moji-0.10.tar.gz
-    cd Convert-Moji-0.10
+    tar xfz Convert-Moji-0.11.tar.gz
+    cd Convert-Moji-0.11
     perl Makefile.PL
     make
     make install
@@ -96,6 +95,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Jul 20 11:45:18 2017.
+This README was written on Sat Mar 13 17:14:17 2021.
 
 -----------------------------------------------------------------------------

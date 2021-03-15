@@ -8,8 +8,8 @@
          "FILES" : "cover_db"
       }
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -20,7 +20,6 @@
    "name" : "DateTime-Calendar-Christian",
    "no_index" : {
       "directory" : [
-         "t",
          "inc",
          "t",
          "xt"
@@ -29,6 +28,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Storable" : "0",
             "Test::More" : "0.88"
          }
       },
@@ -39,33 +39,38 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "DateTime" : "0.1402",
             "DateTime::Calendar::Julian" : "0.04",
-            "perl" : "5.008004"
+            "constant" : "0",
+            "overload" : "0",
+            "perl" : "5.006002",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "DateTime::Calendar::Christian" : {
          "file" : "lib/DateTime/Calendar/Christian.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Christian/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Christian"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/trwyant/perl-DateTime-Calendar-Christian.git",
-         "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Christian"
+         "url" : "git://github.com/trwyant/perl-Date-Tolkien-Shire.git",
+         "web" : "https://github.com/trwyant/perl-Date-Tolkien-Shire"
       }
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

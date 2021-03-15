@@ -4,23 +4,21 @@
 
 package Music::Tension::PlompLevelt;
 
-use 5.010000;
+our $VERSION = '1.03';
+
 use strict;
 use warnings;
-
 use Carp qw/croak/;
 use List::Util qw/sum/;
-use Music::Tension ();
 use Scalar::Util qw/looks_like_number/;
 
-our @ISA     = qw(Music::Tension);
-our $VERSION = '1.02';
+use parent qw(Music::Tension);
 
 # pianowire* are from [Helmholtz 1877 p.79] relative intensity of first
 # six harmonics of piano wire, struck at 1/7th its length, for various
 # hammer types. Via http://jjensen.org/DissonanceCurve.html
 my %AMPLITUDES = (
-    'ones' => [ (1) x 6 ],
+    'ones'              => [ (1) x 6 ],
     'pianowire-plucked' => [ 1, 0.8, 0.6, 0.3, 0.1, 0.03 ],
     'pianowire-soft'    => [ 1, 1.9, 1.1, 0.2, 0,   0.05 ],
     'pianowire-medium'  => [ 1, 2.9, 3.6, 2.6, 1.1, 0.2 ],
@@ -29,7 +27,7 @@ my %AMPLITUDES = (
 
 ########################################################################
 #
-# SUBROUTINES
+# METHODS
 
 sub new {
     my ( $class, %param ) = @_;
@@ -40,7 +38,7 @@ sub new {
     if ( exists $param{amplitudes} ) {
         for my $name ( keys %{ $param{amplitudes} } ) {
             croak "amplitude profile '$name' must be array reference"
-              unless ref $param{amplitudes}->{$name} eq 'ARRAY';
+              unless defined $param{amplitudes}->{$name} and ref $param{amplitudes}->{$name} eq 'ARRAY';
             $self->{_amplitudes}->{$name} = $param{amplitudes}->{$name};
         }
     }
@@ -68,14 +66,14 @@ sub new {
     return $self;
 }
 
-# Not sure if I've followed the papers correctly; they all operate on a
+# not sure if I've followed the papers correctly; they all operate on a
 # single frequency with overtones above that, while for tension I'm
 # interested in "given these two frequencies or pitches (with their own
 # sets of overtones), how dissonant are they to one another" so
 # hopefully I can just tally up the harmonics between the two different
 # sets of harmonics?
 #
-# Also, vertical scaling might take more looking at, perhaps arrange so
+# also, vertical scaling might take more looking at, perhaps arrange so
 # with normalize_amps the maximum dissonance has the value of 1? (or
 # that the most dissonant interval of the scale, e.g. minor 2nd in equal
 # temperament has the value of one?)
@@ -86,23 +84,24 @@ sub frequencies {
     if ( looks_like_number $f1) {
         for my $i ( 0 .. $#{ $self->{_amplitudes}->{ $self->{_amp_profile} } } ) {
             push @{ $harmonics[0] },
-              { amp => $self->{_amplitudes}->{ $self->{_amp_profile} }->[$i] || 0,
+              { amp  => $self->{_amplitudes}->{ $self->{_amp_profile} }->[$i] || 0,
                 freq => $f1 * ( $i + 1 ),
               };
         }
-    } elsif ( ref $f1 eq 'ARRAY' and @$f1 and ref $f1->[0] eq 'HASH' ) {
+    } elsif ( defined $f1 and ref $f1 eq 'ARRAY' and @$f1 and ref $f1->[0] eq 'HASH' ) {
         $harmonics[0] = $f1;
     } else {
         croak "unknown input for frequency1";
     }
+
     if ( looks_like_number $f2) {
         for my $j ( 0 .. $#{ $self->{_amplitudes}->{ $self->{_amp_profile} } } ) {
             push @{ $harmonics[1] },
-              { amp => $self->{_amplitudes}->{ $self->{_amp_profile} }->[$j] || 0,
+              { amp  => $self->{_amplitudes}->{ $self->{_amp_profile} }->[$j] || 0,
                 freq => $f2 * ( $j + 1 ),
               };
         }
-    } elsif ( ref $f2 eq 'ARRAY' and @$f2 and ref $f2->[0] eq 'HASH' ) {
+    } elsif ( defined $f2 and ref $f2 eq 'ARRAY' and @$f2 and ref $f2->[0] eq 'HASH' ) {
         $harmonics[1] = $f2;
     } else {
         croak "unknown input for frequency2";
@@ -129,8 +128,8 @@ sub pitches {
     my ( $self, $p1, $p2, $freq_harmonics ) = @_;
     croak "two pitches required" if !defined $p1 or !defined $p2;
     croak "pitches must be positive integers"
-      if $p1 !~ m/^\d+$/
-      or $p2 !~ m/^\d+$/;
+      if $p1 !~ m/^[0-9]+$/
+      or $p2 !~ m/^[0-9]+$/;
 
     return $self->frequencies( map( $self->pitch2freq($_), $p1, $p2 ),
         $freq_harmonics );
@@ -138,7 +137,7 @@ sub pitches {
 
 sub vertical {
     my ( $self, $pset ) = @_;
-    croak "pitch set must be array ref" unless ref $pset eq 'ARRAY';
+    croak "pitch set must be array ref" unless defined $pset and ref $pset eq 'ARRAY';
     croak "pitch set must contain multiple elements" if @$pset < 2;
 
     my @freqs = map $self->pitch2freq($_), @$pset;
@@ -180,8 +179,7 @@ Music::Tension::PlompLevelt - Plomp-Levelt consonance curve calculations
 =head1 DESCRIPTION
 
 Plomp-Levelt consonance curve calculations based on work by William
-Sethares and others (L</"SEE ALSO"> for links). None of this will make
-sense without some grounding in music theory and the referenced papers.
+Sethares and others (L</"SEE ALSO"> for links).
 
 Parsing music into a form suitable for use by this module and practical
 uses of the results are left as an exercise to the reader. Consult the
@@ -203,7 +201,7 @@ C<eg/> directory of this module's distribution for example programs.
   error         0        -0.01   -0.23   -0.01   +2.58   -0.46   +8.29
 
 The calculations use some number of harmonics, depending on the
-amplitude profile used, or frequency information supplied. Finding
+amplitude profile used or the frequency information supplied. Finding
 details on the harmonics for a particular instrument may require
 consulting a book, or performing spectral analysis on recordings of a
 particular instrument (e.g. via Audacity), or fiddling around with a
@@ -335,10 +333,9 @@ example code containing the above.
 =item B<pitches> I<pitch1>, I<pitch2>
 
 Accepts two integers (ideally MIDI note numbers) and converts those to
-frequencies via B<pitch2freq> (which does the MIDI number to frequency
-conversion equation) and then calls B<frequencies> with those values.
-Use B<frequencies> with the proper Hz if a non-equal temperament tuning
-is involved. Returns tension as a number.
+frequencies via B<pitch2freq> and then calls B<frequencies> with those
+values. Instead use B<frequencies> if a non-equal temperament tuning is
+involved. Returns tension as a number.
 
 =item B<vertical> I<pitch_set>
 
@@ -397,7 +394,7 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2012,2017,2018 by Jeremy Mates
+Copyright (C) 2012 by Jeremy Mates
 
 https://opensource.org/licenses/BSD-3-Clause
 

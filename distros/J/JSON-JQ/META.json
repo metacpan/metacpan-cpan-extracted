@@ -1,0 +1,57 @@
+{
+   "abstract" : "jq (https://stedolan.github.io/jq/) library binding",
+   "author" : [
+      "Dongxu Ma <dongxu _dot_ ma _at_ gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "JSON-JQ",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Base::Wrapper" : "0",
+            "Alien::LibJQ" : "0.04",
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::LibJQ" : "0.04",
+            "JSON" : "0",
+            "Path::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::JQ" : {
+         "file" : "lib/JSON/JQ.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dxma/perl5-json-jq/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/dxma/perl5-json-jq"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

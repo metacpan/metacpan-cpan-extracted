@@ -171,6 +171,10 @@ sub gslinteg_qng{
 info not available
 
 
+=for bad
+
+qng_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -214,6 +218,10 @@ sub gslinteg_qag{
 info not available
 
 
+=for bad
+
+qag_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -257,6 +265,10 @@ sub gslinteg_qags{
 info not available
 
 
+=for bad
+
+qags_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -300,6 +312,10 @@ sub gslinteg_qagp{
 info not available
 
 
+=for bad
+
+qagp_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -343,6 +359,10 @@ sub gslinteg_qagi{
 info not available
 
 
+=for bad
+
+qagi_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -386,6 +406,10 @@ sub gslinteg_qagiu{
 info not available
 
 
+=for bad
+
+qagiu_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -429,6 +453,10 @@ sub gslinteg_qagil{
 info not available
 
 
+=for bad
+
+qagil_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -472,6 +500,10 @@ sub gslinteg_qawc{
 info not available
 
 
+=for bad
+
+qawc_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -516,6 +548,10 @@ sub gslinteg_qaws{
 info not available
 
 
+=for bad
+
+qaws_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -567,6 +603,10 @@ sub gslinteg_qawo{
 info not available
 
 
+=for bad
+
+qawo_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -616,6 +656,10 @@ sub gslinteg_qawf{
 info not available
 
 
+=for bad
+
+qawf_meat does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

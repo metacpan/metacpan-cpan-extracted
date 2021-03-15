@@ -11,7 +11,7 @@ use Encode qw( encode );
 our @ISA = qw( Exporter );
 our @EXPORT_OK = qw( list_uris change_uris );
 
-our $VERSION = 1.06;
+our $VERSION = 1.07;
 
 our $CHARSET = "utf-8";
 
@@ -105,7 +105,7 @@ L<URI::Find>, L<URI::Find::Iterator>, L<URI>, L<HTML::LinkExtor>, L<HTML::LinkEx
 
 =head1 REPOSITORY
 
-L<https://github.com/neilbowers/URI-Find-Simple>
+L<https://github.com/neilb/URI-Find-Simple>
 
 =head1 AUTHOR
 

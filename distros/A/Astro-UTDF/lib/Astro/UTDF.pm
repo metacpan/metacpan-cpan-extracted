@@ -19,7 +19,7 @@ use constant SPEED_OF_LIGHT => 299792.458;	# Km/sec, per U.S. NIST
 use constant ARRAY_REF	=> ref [];
 use constant CODE_REF	=> ref sub {};
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 sub new {
     my $class = shift;
@@ -1761,8 +1761,9 @@ This information comes from byte 6 of the record.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-Astro-UTDF/issues>, or in electronic
-mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-UTDF>,
+L<https://github.com/trwyant/perl-Astro-UTDF/issues>, or in
+electronic mail to the author.
 
 =head1 ACKNOWLEDGMENT
 

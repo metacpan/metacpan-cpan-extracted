@@ -1,7 +1,7 @@
 package App::diffwc;
 
-our $DATE = '2020-04-23'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2021-03-13'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ sub postprocess {
     if ($ENV{COLOR_THEME}) {
         require Color::Theme::Util;
         my $theme = Color::Theme::Util::get_color_theme(
-            {module_prefixes => [qw/App::diffwc::ColorTheme Generic::ColorTheme/]}, $ENV{COLOR_THEME});
+            {module_prefixes => [qw/ColorTheme::App::diffwc ColorTheme::Generic/]}, $ENV{DIFFWC_COLOR_THEME});
         require Color::Theme::Util::ANSI;
         if ($theme->{colors}{path_line}) {
             for my $c (keys %Colors) {
@@ -107,7 +107,7 @@ App::diffwc - diff + /w/ord highlighting + /c/olor
 
 =head1 VERSION
 
-This document describes version 0.005 of App::diffwc (from Perl distribution App-diffwc), released on 2020-04-23.
+This document describes version 0.006 of App::diffwc (from Perl distribution App-diffwc), released on 2021-03-13.
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-diffwc>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-diffwc>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-diffwc/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -137,7 +137,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

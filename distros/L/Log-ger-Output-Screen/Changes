@@ -1,3 +1,11 @@
+0.016   2021-03-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add a brighter set of colors for terminals that support
+	  256-color; to make text easier to see on a laptop screen in a
+	  bright environment (non-bright red and blue are notoriously
+	  harder to see).
+
+
 0.015   2020-11-02  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Try to load Win32::Console::ANSI on Windows.

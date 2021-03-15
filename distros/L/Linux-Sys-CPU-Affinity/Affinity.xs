@@ -17,7 +17,7 @@ struct xs_state {
 
 typedef struct xs_state Linux_Sys_CPU_Affinity;
 
-int get_available_nprocs (void) {
+static inline int get_available_nprocs (void) {
 
     static int available_cpus_cnt = 0;
 
@@ -32,7 +32,7 @@ int get_available_nprocs (void) {
     return available_cpus_cnt;
 }
 
-void init_set (Linux_Sys_CPU_Affinity *cpuset, AV *av) {
+inline void init_set (Linux_Sys_CPU_Affinity *cpuset, AV *av) {
 
     if (cpuset->set != NULL)
         CPU_FREE(cpuset->set);
@@ -58,7 +58,7 @@ void init_set (Linux_Sys_CPU_Affinity *cpuset, AV *av) {
     }
 }
 
-AV* _extract_and_validate_av(SV *sv) {
+inline AV* _extract_and_validate_av(SV *sv) {
 
     if (!SvOK(sv))
         Perl_croak(aTHX_ "the CPU's list can't be undefined");
@@ -102,13 +102,10 @@ AV* _extract_and_validate_av(SV *sv) {
     return av;
 }
 
-Linux_Sys_CPU_Affinity* make_from_object(Linux_Sys_CPU_Affinity *cpuset, int copy_set) {
+inline Linux_Sys_CPU_Affinity* make_from_object(Linux_Sys_CPU_Affinity *cpuset, int copy_set) {
 
     Linux_Sys_CPU_Affinity *new_cpuset = (Linux_Sys_CPU_Affinity *) safemalloc(sizeof(Linux_Sys_CPU_Affinity));
     uint32_t cpu;
-
-    // memcpy makes "set" as reference, so if you change one - you change both (new and old ones)
-    // memcpy(&new_cpuset, &cpuset, sizeof(cpuset));
 
     new_cpuset->max_cpus = cpuset->max_cpus;
     new_cpuset->class_name = cpuset->class_name;
@@ -125,7 +122,7 @@ Linux_Sys_CPU_Affinity* make_from_object(Linux_Sys_CPU_Affinity *cpuset, int cop
     return new_cpuset;
 }
 
-AV* get_cpus_from_cpuset(Linux_Sys_CPU_Affinity *cpuset) {
+inline AV* get_cpus_from_cpuset(Linux_Sys_CPU_Affinity *cpuset) {
     AV* av = newAV();    
     uint32_t cpu;
     for (cpu = 0; cpu < cpuset->max_cpus; cpu++) {
@@ -254,16 +251,14 @@ OUTPUT:
     RETVAL
 
 
-SV* cpu_zero(cpuset)
+void cpu_zero(cpuset)
     Linux_Sys_CPU_Affinity *cpuset
 CODE:
     init_set(cpuset, NULL);
-    XSRETURN_UNDEF;
-OUTPUT:
-    RETVAL
+    XSRETURN_EMPTY;
 
 
-SV* reset(cpuset, sv = &PL_sv_undef)
+void reset(cpuset, sv = &PL_sv_undef)
     Linux_Sys_CPU_Affinity *cpuset
     SV *sv
 PREINIT:
@@ -272,7 +267,7 @@ CODE:
     if (SvOK(sv))
         av = _extract_and_validate_av(sv);
     init_set(cpuset, av);
-    XSRETURN_UNDEF;
+    XSRETURN_EMPTY;
 
 
 IV cpu_isset (cpuset, cpu)
@@ -284,20 +279,20 @@ PPCODE:
     XSRETURN(1);
 
 
-IV cpu_set (cpuset, cpu)
+void cpu_set (cpuset, cpu)
     Linux_Sys_CPU_Affinity *cpuset
     UV cpu
 PPCODE:
     CPU_SET_S((uint32_t) cpu, cpuset->size, cpuset->set);
-    XSRETURN_UNDEF;
+    XSRETURN_EMPTY;
 
 
-IV cpu_clr (cpuset, cpu)
+void cpu_clr (cpuset, cpu)
     Linux_Sys_CPU_Affinity *cpuset
     UV cpu
 PPCODE:
     CPU_CLR_S((uint32_t) cpu, cpuset->size, cpuset->set);
-    XSRETURN_UNDEF;
+    XSRETURN_EMPTY;
 
 
 UV cpu_count(cpuset)
@@ -338,7 +333,7 @@ CODE:
         Perl_croak(pTHX_ (char *) SvPV_nolen(error));
     }
     RETVAL = get_cpus_from_cpuset(new_cpuset);
-    free(new_cpuset);
+    safefree(new_cpuset);
 OUTPUT:
     RETVAL
 
@@ -359,9 +354,11 @@ PPCODE:
 void DESTROY (cpuset)
 PPCODE:
     Linux_Sys_CPU_Affinity *self = (Linux_Sys_CPU_Affinity *) SvUV(SvRV(ST(0)));
+    if (PL_dirty)
+        return;
     CPU_FREE(self->set);
     safefree(self);
-    XSRETURN_UNDEF;
+    XSRETURN_EMPTY;
 
 
 IV get_nprocs ()

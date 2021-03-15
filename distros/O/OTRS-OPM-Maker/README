@@ -1,12 +1,17 @@
 NAME
 
-    OTRS::OPM::Maker - Module/App to build and test OTRS packages
+    OTRS::OPM::Maker - Module/App to build and test OTRS packages -
+    (DEPRECATED)
 
 VERSION
 
-    version 0.17
+    version 0.19
 
 DESCRIPTION
+
+    This module is deprecated. We support different ticketing systems like
+    Znuny <https://znuny.org> and OTOBO <https://otobo.de>. So we renamed
+    it to OPM::Maker.
 
     If you do OTRS package development, you need to be able to check your
     package: Are all files of the package included in the file list in the

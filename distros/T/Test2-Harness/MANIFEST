@@ -226,6 +226,8 @@ t/integration/stamps.t
 t/integration/stamps/fail.tx
 t/integration/stamps/lib/App/Yath/Plugin/TestPlugin.pm
 t/integration/stamps/pass.tx
+t/integration/tapsubtest.t
+t/integration/tapsubtest/test.tx
 t/integration/test-broken-symlinks/keepme
 t/integration/test-broken-symlinks/pass.tx
 t/integration/test-durations.json

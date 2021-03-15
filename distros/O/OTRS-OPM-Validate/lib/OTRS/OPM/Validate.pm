@@ -1,6 +1,6 @@
 package OTRS::OPM::Validate;
-$OTRS::OPM::Validate::VERSION = '0.04';
-# ABSTRACT: Validate .opm files
+$OTRS::OPM::Validate::VERSION = '0.05';
+# ABSTRACT: Validate .opm files - DEPRECATED
 
 use v5.20;
 
@@ -424,11 +424,11 @@ __END__
 
 =head1 NAME
 
-OTRS::OPM::Validate - Validate .opm files
+OTRS::OPM::Validate - Validate .opm files - DEPRECATED
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -443,6 +443,8 @@ version 0.04
     say "It's valid" if $success;
 
 =head1 DESCRIPTION
+
+DEPRECATED - use L<OPM::Validate> instead
 
 I<.opm> files are used as addons for the ((OTRS)) Community Edition. They are
 XML files with specific XML tags.

@@ -9,8 +9,8 @@ use File::Spec;
 use Alien::Build;
 use Alien::Build::MM;
 
-my $alien_build_version   = 0;
-my $ext_makemaker_version = 0;
+my $alien_build_version   = '0';
+my $ext_makemaker_version = '0';
 
 my %WriteMakefileArgs = (
     NAME                => 'Alien::LibJQ',
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     BUILD_REQUIRES      => {
         'Alien::Build'        => $alien_build_version,
         'ExtUtils::MakeMaker' => $ext_makemaker_version,
-        'Alien::cmake3'       => 0,
+        'Alien::cmake3'       => '0',
     },
     CONFIGURE_REQUIRES  => {
         'Alien::Build'        => $alien_build_version,

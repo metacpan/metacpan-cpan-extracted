@@ -61,23 +61,33 @@
    "provides" : {
       "Sub::Meta" : {
          "file" : "lib/Sub/Meta.pm",
-         "version" : "0.07"
+         "version" : "0.08"
+      },
+      "Sub::Meta::Creator" : {
+         "file" : "lib/Sub/Meta/Creator.pm",
+         "version" : "0.08"
+      },
+      "Sub::Meta::Finder::FunctionParameters" : {
+         "file" : "lib/Sub/Meta/Finder/FunctionParameters.pm"
+      },
+      "Sub::Meta::Finder::SubWrapInType" : {
+         "file" : "lib/Sub/Meta/Finder/SubWrapInType.pm"
       },
       "Sub::Meta::Library" : {
          "file" : "lib/Sub/Meta/Library.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Sub::Meta::Param" : {
          "file" : "lib/Sub/Meta/Param.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Sub::Meta::Parameters" : {
          "file" : "lib/Sub/Meta/Parameters.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Sub::Meta::Returns" : {
          "file" : "lib/Sub/Meta/Returns.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -91,7 +101,7 @@
          "web" : "https://github.com/kfly8/p5-Sub-Meta"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_authority" : "cpan:KFLY",
    "x_contributors" : [
       "Kenta Kobayashi <kentafly88@gmail.com>"

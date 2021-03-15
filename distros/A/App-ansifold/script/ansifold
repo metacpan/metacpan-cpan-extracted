@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -36,12 +36,13 @@ ansifold [ options ]
          --tabstop=n              Tab-stop position (default 8)
          --tabhead=char           Tab-head character (default space)
          --tabspace=char          Tab-space character (default space)
+         --tabstyle=style         Tab expansion style
 
 =head1 DESCRIPTION
 
 B<ansifold> is almost B<fold> compatible command utilizing
 L<Text::ANSI::Fold> module, which enables to handle ANSI terminal
-sequences and Unicode multibyte characters properly.
+sequences and Unicode multi-byte characters properly.
 
 It folds lines in 72 column by default.  Use option B<-w> to change
 the folding width.
@@ -144,16 +145,10 @@ makes tab character visible keeping text layout.
 
     $ ansifold --expand --tabhead="MEDIUM SHADE" --tabspace="LIGHT SHADE"
 
-Option B<--expand> also takes option of pre-defined names.  Currently
-these names are available.
-
-    dot    => [ '.', '.' ],
-    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
-    shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
-
-You can use like this:
-
-    $ ansifold --expand=symbol
+Option B<--tabstyle> allow to set B<--tabhead> and B<--tabspace>
+characters at once according to the given style name.  Select from
+C<dot>, C<symbol> or C<shade>.  Styles are defined in
+L<Text::ANSI::Fold> library.
 
 =head1 SEE ALSO
 
@@ -202,6 +197,7 @@ my %opt = (
     tabstop => undef,
     tabhead => undef,
     tabspace => undef,
+    tabstyle => undef,
     discard => [],
     );
 
@@ -235,10 +231,11 @@ my @optargs = (
 	    }
 	};
     },
-    "expand:s"   => \$opt{expand},
+    "expand!"    => \$opt{expand},
     "tabstop=i"  => \$opt{tabstop},
     "tabhead=s"  => \$opt{tabhead},
     "tabspace=s" => \$opt{tabspace},
+    "tabstyle=s" => \$opt{tabstyle},
     "discard=s"  =>  $opt{discard},
     "version|v" => sub {
 	print "Version: $VERSION\n";
@@ -284,22 +281,10 @@ $opt{width} = do {
     }
 };
 
-my %tabs = (
-    dot    => [ '.', '.' ],
-    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
-    shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
-    );
-if (defined(my $expand = $opt{expand})) {
-    if (my $tabs = $tabs{$expand}) {
-	@opt{qw(tabhead tabspace)} = @$tabs;
-    }
-    $opt{expand} = 1;
-}
-
 use charnames ':loose';
 for (@opt{qw(tabhead tabspace)}) {
-    defined or next;
-    $_ = do { eval qq["\\N{$_}"] or die "$!" } if length > 1;
+    defined && length > 1 or next;
+    $_ = charnames::string_vianame($_) || die "$_: invalid name\n";
 }
 
 my $fold = Text::ANSI::Fold->new(
@@ -307,7 +292,7 @@ my $fold = Text::ANSI::Fold->new(
     grep { defined $opt{$_} }
     qw(width boundary padding padchar ambiguous
        linebreak runin runout
-       expand tabstop tabhead tabspace discard)
+       expand tabstyle tabstop tabhead tabspace discard)
     );
 
 my $separator = do {
@@ -328,3 +313,5 @@ while (<>) {
 }
 
 exit;
+
+#  LocalWords:  unicode ansifold LANG colrm KINSOKU

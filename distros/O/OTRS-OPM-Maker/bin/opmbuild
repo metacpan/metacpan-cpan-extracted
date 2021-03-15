@@ -11,6 +11,7 @@ use OTRS::OPM::Maker;
 OTRS::OPM::Maker->run;
 
 package opmbuild;
+$opmbuild::VERSION = '0.19';
 
 __END__
 
@@ -24,7 +25,7 @@ opmbuild - script to build/test OTRS packages
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 AUTHOR
 

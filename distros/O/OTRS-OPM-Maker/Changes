@@ -1,6 +1,14 @@
 Changes file for OTRS::OPM::Maker
 =================================
 
+0.19 2021-03-13 10:57:00
+
+     + Deprecated this module. As it supports OPM building for other ticketing systems (e.g. Znuny and OTOBO) as well
+
+0.18 2021-03-13 10:45:00
+
+     + Path to opm file was wrong when indexed directory was '.' (see #6 - https://github.com/reneeb/OTRS-OPM-Maker/issues/6)
+
 0.17 2019-01-14 10:07:00
 
      + fix test failures, thanks to CPANTesters

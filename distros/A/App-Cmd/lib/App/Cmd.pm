@@ -1,11 +1,13 @@
-use strict;
+# The "experimental" below is not actually scary.  The feature went on to be
+# de-experimental-ized with no changes and is now on by default in perl v5.24
+# and later. -- rjbs, 2021-03-14
+use 5.020;
 use warnings;
-use 5.006;
+use experimental qw(postderef postderef_qq);
 
 package App::Cmd;
-$App::Cmd::VERSION = '0.331';
-use App::Cmd::ArgProcessor;
-BEGIN { our @ISA = 'App::Cmd::ArgProcessor' };
+$App::Cmd::VERSION = '0.333';
+use parent 'App::Cmd::ArgProcessor';
 # ABSTRACT: write command line apps with less suffering
 
 use File::Basename ();
@@ -47,7 +49,7 @@ sub _setup_command {
 }
 
 sub _setup_ignore {
-  my ($self, $val, $data ) = @_;
+  my ($self, $val, $data) = @_;
   my $into = $data->{into};
 
   Carp::confess "App::Cmd -ignore setup requested for already-setup class"
@@ -165,13 +167,16 @@ sub new {
   my $base = File::Basename::basename $arg0;
 
   my $self = {
-    command      => $class->_command($arg),
     arg0         => $base,
     full_arg0    => $arg0,
-    show_version => $arg->{show_version_cmd} || 0,
+    show_version => $arg->{show_version_cmd} // 0,
   };
 
-  bless $self => $class;
+  bless $self, $class;
+
+  $self->{command} = $self->_command($arg);
+
+  return $self;
 }
 
 # effectively, returns the command-to-plugin mapping guts of a Cmd
@@ -233,7 +238,7 @@ sub _plugins {
   my ($self) = @_;
   my $class = ref $self || $self;
 
-  return @{ $plugins_for{$class} } if $plugins_for{$class};
+  return $plugins_for{$class}->@* if $plugins_for{$class};
 
   my $finder = Module::Pluggable::Object->new(
     search_path => $self->plugin_search_path,
@@ -251,16 +256,16 @@ sub _register_command {
   $self->_plugins;
 
   my $class = ref $self || $self;
-  push @{ $plugins_for{ $class } }, $cmd_class
-    unless grep { $_ eq $cmd_class } @{ $plugins_for{ $class } };
+  push $plugins_for{ $class }->@*, $cmd_class
+    unless grep { $_ eq $cmd_class } $plugins_for{ $class }->@*;
 }
 
 my %ignored_for;
 
 sub should_ignore {
-  my ( $self , $cmd_class ) = @_;
+  my ($self, $cmd_class) = @_;
   my $class = ref $self || $self;
-  for ( @{ $ignored_for{ $class } } ) {
+  for ($ignored_for{ $class }->@*) {
     return 1 if $_ eq $cmd_class;
   }
   return;
@@ -269,8 +274,8 @@ sub should_ignore {
 sub _register_ignore {
   my ($self, $cmd_class) = @_;
   my $class = ref $self || $self;
-  push @{ $ignored_for{ $class } }, $cmd_class
-    unless grep { $_ eq $cmd_class } @{ $ignored_for{ $class } };
+  push $ignored_for{ $class }->@*, $cmd_class
+    unless grep { $_ eq $cmd_class } $ignored_for{ $class }->@*;
 }
 
 sub _module_pluggable_options {
@@ -286,7 +291,7 @@ sub _load_default_plugin {
     my $plugin = "App::Cmd::Command::$plugin_name";
     Class::Load::load_class($plugin);
     for my $command (map { lc } $plugin->command_names) {
-      $plugin_href->{$command} ||= $plugin;
+      $plugin_href->{$command} //= $plugin;
     }
   }
 }
@@ -332,7 +337,7 @@ sub prepare_args {
   my ($self) = @_;
   return scalar(@ARGV)
     ? (@ARGV)
-    : (@{$self->default_args});
+    : ($self->default_args->@*);
 }
 
 #pod =method default_args
@@ -502,7 +507,7 @@ sub plugin_search_path {
   my @default = ($ccb, $self->_default_plugin_base);
 
   if (ref $self) {
-    return $self->{plugin_search_path} ||= \@default;
+    return $self->{plugin_search_path} //= \@default;
   } else {
     return \@default;
   }
@@ -536,7 +541,7 @@ sub allow_any_unambiguous_abbrev { return 0 }
 
 sub global_options {
 	my $self = shift;
-	return $self->{global_options} ||= {} if ref $self;
+	return $self->{global_options} //= {} if ref $self;
   return {};
 }
 
@@ -563,7 +568,7 @@ sub set_global_options {
 
 sub command_names {
   my ($self) = @_;
-  keys %{ $self->_command };
+  keys $self->_command->%*;
 }
 
 #pod =method command_groups
@@ -591,7 +596,7 @@ sub command_groups { }
 
 sub command_plugins {
   my ($self) = @_;
-  my %seen = map {; $_ => 1 } values %{ $self->_command };
+  my %seen = map {; $_ => 1 } values $self->_command->%*;
   keys %seen;
 }
 
@@ -742,7 +747,7 @@ App::Cmd - write command line apps with less suffering
 
 =head1 VERSION
 
-version 0.331
+version 0.333
 
 =head1 SYNOPSIS
 
@@ -1044,7 +1049,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Prime ambs Andreas Hernitscheck A. Sinan Unur Chris 'BinGOs' Williams David Golden Steinbrunner Davor Cubranic Denis Ibaev Diab Jerius Glenn Fowler Ingy dot Net Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Kent Fredric Matthew Astley mokko Olivier Mengué Ricardo SIGNES Ryan C. Thompson Salvatore Bonaccorso Sergey Romanov Stephen Caldwell Yuval Kogman
+=for stopwords Adam Prime ambs Andreas Hernitscheck A. Sinan Unur Chris 'BinGOs' Williams David Golden Steinbrunner Davor Cubranic Denis Ibaev Diab Jerius Glenn Fowler Ingy dot Net Jakob Voss Jérôme Quelin John SJ Anderson Karen Etheridge Kent Fredric Lucas Theisen Matthew Astley mokko Olivier Mengué Ricardo Signes Ryan C. Thompson Salvatore Bonaccorso Sergey Romanov Stephan Loyd Stephen Caldwell Yuval Kogman
 
 =over 4
 
@@ -1122,6 +1127,10 @@ Kent Fredric <kentfredric@gmail.com>
 
 =item *
 
+Lucas Theisen <ltheisen@mitre.org>
+
+=item *
+
 Matthew Astley <mca@sanger.ac.uk>
 
 =item *
@@ -1134,7 +1143,7 @@ Olivier Mengué <dolmen@cpan.org>
 
 =item *
 
-Ricardo SIGNES <rjbs@codesimply.com>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 
@@ -1150,6 +1159,10 @@ Sergey Romanov <sromanov-dev@yandex.ru>
 
 =item *
 
+Stephan Loyd <stephanloyd9@gmail.com>
+
+=item *
+
 Stephen Caldwell <steve@campusexplorer.com>
 
 =item *
@@ -1160,7 +1173,7 @@ Yuval Kogman <nuffin@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

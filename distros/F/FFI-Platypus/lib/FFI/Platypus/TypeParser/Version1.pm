@@ -7,7 +7,7 @@ use Carp qw( croak );
 use base qw( FFI::Platypus::TypeParser );
 
 # ABSTRACT: FFI Type Parser Version One
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus FFI::Platypus::TypeParser );
@@ -90,6 +90,7 @@ sub parse
   {
     my $rt = $2;
     return $self->types->{$name} = $self->create_type_closure(
+      $self->abi,
       $self->parse($rt, $opt),
       map { $self->parse($_, $opt) } map { my $t = $_; $t =~ s/^\s+//; $t =~ s/\s+$//; $t } split /,/, $at,
     );
@@ -137,7 +138,7 @@ sub parse
         1,
         $class->$size_method,
         $class,
-        $class->_ffi_meta->ffi_type,
+        $class->_ffi_meta->ptr,
       );
     }
   }
@@ -291,7 +292,7 @@ FFI::Platypus::TypeParser::Version1 - FFI Type Parser Version One
 
 =head1 VERSION
 
-version 1.38
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -362,6 +363,8 @@ Meredith (merrilymeredith, MHOWARD)
 Diab Jerius (DJERIUS)
 
 Eric Brine (IKEGAMI)
+
+szTheory
 
 =head1 COPYRIGHT AND LICENSE
 

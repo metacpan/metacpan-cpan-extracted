@@ -1,33 +1,72 @@
 #!/usr/bin/env perl
 #
 # Field of View (FOV) via shadowcast
+#
+#   # radius seven
+#   $ perl eg/shadowcast 7
+#   ...
+#   # radius seven, 60 degree view angle, looking up
+#   $ perl eg/shadowcast 7 60 90
+#   ...
+#   # disable walls (default is 0.5 fill)
+#   $ perl eg/shadowcast --fill=0 7
+#   ...
 
-use 5.24.0;
+use 5.10.0;
+use strict;
 use warnings;
 use Data::Dumper;
+use Getopt::Long qw(GetOptions);
 use Game::RaycastFOV v2.00 qw(shadowcast);
+use Math::Trig;
 
-sub at              { "\e[" . (1 + $_[1]) . ';' . (1 + $_[0]) . 'H' }
+sub at              { "\e[" . ( 1 + $_[1] ) . ';' . ( 1 + $_[0] ) . 'H' }
 sub clear_screen () { "\e[1;1H\e[2J" }
 sub t_norm ()       { "\e[m" }
 
 our $MAX_X = 78;
 our $MAX_Y = 23;
 
-my $radius = shift || 7;
+GetOptions( 'fill|F=f' => \my $Flag_FillPercent ) or exit 1;
+$Flag_FillPercent //= 0.5;
+
+my $radius    = shift || 7;
+my $fov_angle = shift;
+my $direction = shift;
+die "Usage: $0 [radius] [fov-angle direction]\n"
+  if defined $fov_angle and !defined $direction;
 
 # center
 my $x = 60;
 my $y = 12;
 
+my @bounds;
+
+if ( defined $fov_angle ) {
+    die "direction must be 0..359" if $direction < 0 or $direction > 359;
+    die "FOV angle must be 0..359" if $fov_angle < 0 or $fov_angle > 359;
+    $fov_angle = deg2rad($fov_angle) / 2;
+    $direction = deg2rad( 360 - $direction );
+    my $loangle = $direction - $fov_angle;
+    my $hiangle = $direction + $fov_angle;
+
+    if ( $loangle < 0 ) {
+        push @bounds, [ pi * 2 + $loangle, pi * 2 ], [ 0, $hiangle ];
+    } elsif ( $hiangle > pi * 2 ) {
+        push @bounds, [ $loangle, pi * 2 ], [ 0, $hiangle - pi * 2 ];
+    } else {
+        push @bounds, [ $loangle, $hiangle ];
+    }
+}
+
 *STDOUT->autoflush(1);
 print clear_screen, t_norm;
 
-# some random fill in a map to restrict FOV with, mirrored
+# some random fill to restrict the FOV with, mirrored
 my @map;
-for my $r (0 .. 23) {
-    for my $c (0 .. 40) {
-        my $ch = rand() > 0.5 ? '#' : '.';
+for my $r ( 0 .. 23 ) {
+    for my $c ( 0 .. 40 ) {
+        my $ch = rand() < $Flag_FillPercent ? '#' : '.';
         $map[$r][$c] = $ch;
         $map[$r][ $c + 40 ] = $ch;
     }
@@ -39,17 +78,54 @@ my $radius_sq = $radius**2;
 
 shadowcast(
     $x, $y, $radius,
-    sub {
-        my ($curx, $cury) = @_;
-        return $map[$cury][$curx] eq '#';
+    sub {    # does this cell block the FOV?
+        my ( $curx, $cury, $dx, $dy ) = @_;
+
+        return 1 if $map[$cury][$curx] eq '#';
+
+        # this results in more of a "keyhole" around the player though
+        # does avoid a problem where the FOV angle is too narrow and the
+        # direction is at 45 degrees where the view gets clipped down to
+        # a narrow strip, unlike at other angles
+        #return 0 if abs($dx+$dy) < 2;
+
+        return 0 if !defined $fov_angle;
+
+        # TODO better way to calculate this? raycast might be good to
+        # benchmark against this as it has the angle being used
+        my $angle = 0;
+        my $offx  = $curx - $x;
+        my $offy  = $cury - $y;
+        if ( $offx > 0 and $offy == 0 ) {
+            $angle = 0;
+        } elsif ( $offx == 0 and $offy > 0 ) {
+            $angle = 1.5707963267949;
+        } elsif ( $offx < 0 and $offy == 0 ) {
+            $angle = 3.14159265358979;
+        } elsif ( $offx == 0 and $offy < 0 ) {
+            $angle = 4.71238898038469;
+        } else {
+            eval { $angle = atan( $offy / $offx ) };
+            if ( $offx < 0 ) {    # quadrant II or III
+                $angle = 3.1415926535898 + $angle;
+            } elsif ( $offx > 0 and $offy < 0 ) {    # quadrant IV
+                $angle = 6.2831853071796 + $angle;
+            }
+        }
+
+        for my $bound (@bounds) {
+            return 0 if $angle >= $bound->[0] and $angle <= $bound->[1];
+        }
+
+        return 1;                                    # blocked
     },
-    sub {
-        my ($curx, $cury, $dx, $dy) = @_;
-        print at($curx, $cury), $map[$cury][$curx];
+    sub {                                            # light up this cell
+        my ( $curx, $cury, $dx, $dy ) = @_;
+        print at( $curx, $cury ), $map[$cury][$curx];
     },
-    sub {
-        my ($dx, $dy) = @_;
-        return ($dx**2 + $dy**2) < $radius_sq;
+    sub {    # is the cell inside the radius?
+        my ( $dx, $dy ) = @_;
+        return ( $dx**2 + $dy**2 ) < $radius_sq;
     }
 );
 
@@ -58,15 +134,15 @@ $map[$y][$x] = '@';
 
 shadowcast(
     $x, $y, $radius,
-    sub { return 0 },    # not blocked
+    sub { return 0 },    # nothing is blocked
     sub {
-        my ($curx, $cury, $dx, $dy) = @_;
-        print at($curx, $cury), $map[$cury][$curx];
+        my ( $curx, $cury, $dx, $dy ) = @_;
+        print at( $curx, $cury ), $map[$cury][$curx];
     },
     sub {
-        my ($dx, $dy) = @_;
-        return ($dx**2 + $dy**2) < $radius_sq;
+        my ( $dx, $dy ) = @_;
+        return ( $dx**2 + $dy**2 ) < $radius_sq;
     }
 );
 
-print at(0, $MAX_Y);
+print at( 0, $MAX_Y );

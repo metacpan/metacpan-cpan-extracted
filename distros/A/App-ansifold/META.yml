@@ -1,13 +1,13 @@
 ---
 abstract: 'fold command handling ANSI terminal sequences'
 author:
-  - '- Kazumasa Utashiro'
+  - 'Kazumasa Utashiro'
 build_requires:
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,16 +26,16 @@ no_index:
 provides:
   App::ansifold:
     file: lib/App/ansifold.pm
-    version: '1.05'
+    version: '1.06'
 requires:
   Getopt::EX: v1.21.1
-  Text::ANSI::Fold: '2.08'
-  perl: v5.14.0
+  Text::ANSI::Fold: '2.0903'
+  perl: '5.016'
 resources:
   bugtracker: https://github.com/kaz-utashiro/ansifold/issues
   homepage: https://github.com/kaz-utashiro/ansifold
   repository: git://github.com/kaz-utashiro/ansifold.git
-version: '1.05'
+version: '1.06'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

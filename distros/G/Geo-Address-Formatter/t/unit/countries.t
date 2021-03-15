@@ -21,7 +21,7 @@ binmode $builder->todo_output,    ":encoding(UTF-8)";
 
 my $path = dirname(__FILE__) . '/testcases1';
 
-my @files = File::Find::Rule->file()->name( '*.yaml' )->in( $path );
+my @files = File::Find::Rule->file()->name('*.yaml')->in($path);
 
 ok(scalar(@files), 'found at least one file');
 
@@ -29,28 +29,28 @@ my $CLASS = 'Geo::Address::Formatter';
 use_ok($CLASS);
 
 my $conf_path = dirname(__FILE__) . '/test_conf-general';
-my $GAF = $CLASS->new( conf_path => $conf_path );
+my $GAF       = $CLASS->new(conf_path => $conf_path);
 
 sub _one_testcase {
-    my $country    = shift;
+    my $country     = shift;
     my $rh_testcase = shift;
-    is(
-        $GAF->format_address($rh_testcase->{components}),
+    is( $GAF->format_address($rh_testcase->{components}),
         $rh_testcase->{expected},
         $country . ' - ' . $rh_testcase->{description}
     );
 }
 
-foreach my $filename (@files){
+foreach my $filename (@files) {
     my $country = basename($filename);
     $country =~ s/\.\w+$//; # us.yaml => us
 
     my @a_testcases = ();
     lives_ok {
         @a_testcases = LoadFile($filename);
-    } "parsing file $filename";
+    }
+    "parsing file $filename";
 
-    foreach my $rh_testcase (@a_testcases){
+    foreach my $rh_testcase (@a_testcases) {
         _one_testcase($country, $rh_testcase);
     }
 }

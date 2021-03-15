@@ -39,12 +39,12 @@
       "runtime" : {
          "requires" : {
             "Log::Any" : "1.045",
-            "Mojolicious" : "7.10",
+            "Mojolicious" : "9.0",
             "Path::Tiny" : "0.096",
             "Template::Perlish" : "1.52",
             "Try::Tiny" : "0.27",
             "YAML::XS" : "0.63",
-            "perl" : "5.010"
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -65,7 +65,7 @@
          "web" : "https://github.com/polettix/WebService-Fake"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_contributors" : [
       "Alexey Melezhik <melezhik@gmail.com>",
       "Flavio Poletti <flavio@polettix.it>"

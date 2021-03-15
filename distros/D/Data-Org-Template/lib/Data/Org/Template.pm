@@ -14,11 +14,11 @@ Data::Org::Template - template engine that plays well with iterators
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -165,60 +165,6 @@ sub _split_template {
    }
    return @out;
 }
-
-=head1 ANALYZING A TEMPLATE AND REGISTERING A DATA GETTER AND CUSTOM TRANSDUCERS
-
-Once a template has been parsed, we can scan it for the data fields it expects from its data source and for the transducers it uses.
-
-=head2 data_requested ()
-
-=cut
-
-=head2 transducers_requested ()
-
-=cut
-
-sub transducers_requested {
-   my $self = shift;
-   my $bag = {};
-   _list_transducers ($self->{template}, $bag);
-   my @list = sort {$a cmp $b} keys %$bag;
-   \@list;
-}
-sub _list_transducers {
-   my ($template, $bag) = @_;
-   foreach my $item (@$template) {
-      $bag->{$item->[0]} = 1;
-      if (scalar @$item > 2) {
-         while (my ($k, $v) = each (%{$item->[2]})) {
-            _list_transducers ($v->[2], $bag);
-         }
-      }
-   }
-}
-
-=head2 register_transducer ()
-
-=cut
-
-=head2 data_getter ([data getter])
-
-Sets or gets the current data getter for the template.
-
-=cut
-
-sub data_getter {
-   my $self = shift;
-   my $getter = shift;
-   $self->{data} = Data::Org::Template::Getter->new ($getter) if defined $getter;
-   $self->{data};
-}
-
-=head2 check_data_requested ()
-
-Checks the data requested against the current data getter, if any. Returns a list of values I<not> available in the getter.
-
-=cut
 
 =head1 EXPRESSING A TEMPLATE
 
@@ -385,6 +331,76 @@ sub quote_substream {
 sub undef_stream {
    sub { return undef };
 }
+
+=head1 REGISTERING A DATA GETTER
+
+A template can be expressed by providing a data getter (a map from name to value) at expression time, but you can also register a default data getter against
+the template when you define it, for convenience.
+
+=cut
+
+=head2 data_getter ([data getter])
+
+Sets or gets the current data getter for the template. If you pass one or more data getters (which can be a data getter object, a hashref, or an arrayref of other
+data getters) then each will be checked in sequence.
+
+=cut
+
+sub data_getter {
+   my $self = shift;
+   return $self->{data} unless @_;
+   if (scalar @_ eq 1) {
+      $self->{data} = Data::Org::Template::Getter->new ($_[0]);
+   } else {
+      $self->{data} = Data::Org::Template::Getter->new ([@_]);
+   }
+   $self->{data};
+}
+
+#=head2 check_data_requested ()
+# Checks the data requested against the current data getter, if any. Returns a list of values I<not> available in the getter.
+#=cut
+
+
+# --------------------------------------------------------------
+# Working with custom transducers, only sketched out
+# --------------------------------------------------------------
+#=head2 data_requested ()  -- this is yet to come
+#
+#=cut
+#
+#=head2 transducers_requested ()
+#
+#This provides a list of the transducers used in the template. It's really only of use if you're using custom transducers.
+#
+#=cut
+
+# This will really only come in handy once I have a need for custom transducers; it's left over from an earlier prototype where I was playing with exactly that.
+sub transducers_requested {
+   my $self = shift;
+   my $bag = {};
+   _list_transducers ($self->{template}, $bag);
+   my @list = sort {$a cmp $b} keys %$bag;
+   \@list;
+}
+sub _list_transducers {
+   my ($template, $bag) = @_;
+   foreach my $item (@$template) {
+      $bag->{$item->[0]} = 1;
+      if (scalar @$item > 2) {
+         while (my ($k, $v) = each (%{$item->[2]})) {
+            _list_transducers ($v->[2], $bag);
+         }
+      }
+   }
+}
+
+#=head2 register_transducer ()
+#
+#=cut
+
+
+
 
 # -----------------------------------------------------------------------------------------------------------
 # Default getter: Data::Org::Template::Getter

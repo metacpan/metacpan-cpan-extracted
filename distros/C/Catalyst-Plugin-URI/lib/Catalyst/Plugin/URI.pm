@@ -5,7 +5,7 @@ use Scalar::Util ();
 
 requires 'uri_for';
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 my $uri_v1 = sub {
   my ($c, $path, @args) = @_;
@@ -97,7 +97,7 @@ foreach my $method(qw/detach forward visit go/) {
   around $method, sub {
     my ($orig, $c, $action_proto, @args) = @_;
     my $action;
-    if($action_proto =~/^\/?#/) {
+    if(defined($action_proto) && $action_proto =~/^\/?#/) {
       die "$action_proto is not a named action"
         unless $action = $c->dispatcher->get_action_by_path($action_proto);
     } else {

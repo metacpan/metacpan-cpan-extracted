@@ -1,11 +1,18 @@
 Revision history for Smartcat-App
 
+0.0.6  2021-03-12 21:41:10 UTC
+        - Reverted addition of `auto-assign` paramenter
+        - Increased Smartcat::Client version to 0.0.3
+        - Add availability to set unit export mode in pull command
+        - Support projects with folders
+
 0.0.5  2021-01-27 18:48:23 UTC
         - Improved logging
         - Split file deletion into batches
         - Added some resilience to Windows-style line endings
         - Added `auto-asign` parameter to `push` command to assign
           users from my team to uploded documents
+        - Update project clientId and domainId properly
 
 0.0.4  2020-08-18 19:04:56 UTC
         - Fix the detection of empty .po files

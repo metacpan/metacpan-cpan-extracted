@@ -4,7 +4,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 # VERSION
 
-0.40
+0.41
 
 # SYNOPSIS
 

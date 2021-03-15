@@ -1,0 +1,19 @@
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+README
+eg/beatinator
+eg/texty
+eg/variance
+lib/Music/RhythmSet.pm
+lib/Music/RhythmSet/Util.pm
+lib/Music/RhythmSet/Voice.pm
+t/00-load.t
+t/10-util.t
+t/20-voice.t
+t/60-rset.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

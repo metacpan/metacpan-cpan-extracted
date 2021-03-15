@@ -1,5 +1,5 @@
 package Photonic::WE::S::OneH;
-$Photonic::WE::S::OneH::VERSION = '0.014';
+$Photonic::WE::S::OneH::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -9,7 +9,7 @@ Photonic::WE::S::OneH
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -144,7 +144,7 @@ Returns the fisrt state $v.
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

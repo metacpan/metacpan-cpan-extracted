@@ -85,16 +85,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ta2-1/smartcat-api-perl/issues"
+         "web" : "https://github.com/smartcatai/smartcat-api-perl/issues"
       },
-      "homepage" : "https://github.com/ta2-1/smartcat-api-perl",
+      "homepage" : "https://github.com/smartcatai/smartcat-api-perl",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/ta2-1/smartcat-api-perl.git",
-         "web" : "https://github.com/ta2-1/smartcat-api-perl"
+         "url" : "https://github.com/smartcatai/smartcat-api-perl.git",
+         "web" : "https://github.com/smartcatai/smartcat-api-perl"
       }
    },
-   "version" : "0.0.2",
+   "version" : "0.0.3",
    "x_contributors" : [
       "Taras Semenenko <taras.semenenko@gmail.com>"
    ],

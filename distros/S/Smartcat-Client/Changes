@@ -1,5 +1,9 @@
 Revision history for Smartcat-Client
 
+0.0.3  2021-03-12 11:49:53 UTC
+		- Added `fullPath` field to document model
+		- Added `mode` (segment export mode) parameter to document export request method
+
 0.0.2  2020-07-20 21:32:09 UTC
         - Added `presetDisassembleAlgorithm` to add and update document methods
         - Fixed CPAN indexing

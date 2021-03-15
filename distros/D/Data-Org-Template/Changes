@@ -5,3 +5,7 @@ Revision history for Data-Org-Template
 
 0.02    2020-09-15
         Bug found and fixed, thanks as always to CPANtesters
+        
+0.03    2021-03-12
+        Broken cookbook recipe found, this time thanks to my brilliant daughter. Also took the opportunity to make the POD slightly less terrible.
+       

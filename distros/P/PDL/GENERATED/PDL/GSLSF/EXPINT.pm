@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 E_1(x) := Re[ Integrate[ Exp[-xt]/t, {t,1,Infinity}] ]
 
+=for bad
+
+gsl_sf_expint_E1 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -86,6 +90,10 @@ E_1(x) := Re[ Integrate[ Exp[-xt]/t, {t,1,Infinity}] ]
 
 E_2(x) := Re[ Integrate[ Exp[-xt]/t^2, {t,1,Infity}] ]
 
+=for bad
+
+gsl_sf_expint_E2 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -111,6 +119,10 @@ E_2(x) := Re[ Integrate[ Exp[-xt]/t^2, {t,1,Infity}] ]
 
 Ei(x) := PV Integrate[ Exp[-t]/t, {t,-x,Infinity}]
 
+=for bad
+
+gsl_sf_expint_Ei does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -136,6 +148,10 @@ Ei(x) := PV Integrate[ Exp[-t]/t, {t,-x,Infinity}]
 
 Shi(x) := Integrate[ Sinh[t]/t, {t,0,x}]
 
+=for bad
+
+gsl_sf_Shi does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -161,6 +177,10 @@ Shi(x) := Integrate[ Sinh[t]/t, {t,0,x}]
 
 Chi(x) := Re[ M_EULER + log(x) + Integrate[(Cosh[t]-1)/t, {t,0,x}] ]
 
+=for bad
+
+gsl_sf_Chi does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -186,6 +206,10 @@ Chi(x) := Re[ M_EULER + log(x) + Integrate[(Cosh[t]-1)/t, {t,0,x}] ]
 
 Ei_3(x) := Integral[ Exp[-t^3], {t,0,x}]
 
+=for bad
+
+gsl_sf_expint_3 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -211,6 +235,10 @@ Ei_3(x) := Integral[ Exp[-t^3], {t,0,x}]
 
 Si(x) := Integrate[ Sin[t]/t, {t,0,x}]
 
+=for bad
+
+gsl_sf_Si does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -236,6 +264,10 @@ Si(x) := Integrate[ Sin[t]/t, {t,0,x}]
 
 Ci(x) := -Integrate[ Cos[t]/t, {t,x,Infinity}]
 
+=for bad
+
+gsl_sf_Ci does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -261,6 +293,10 @@ Ci(x) := -Integrate[ Cos[t]/t, {t,x,Infinity}]
 
 AtanInt(x) := Integral[ Arctan[t]/t, {t,0,x}]
 
+=for bad
+
+gsl_sf_atanint does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

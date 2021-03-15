@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 d9d16d0d9483d6a42b8242904d7ffe622a75e2e3dfa46922cfd41e7b0cdaa0a3 Build.PL
+SHA256 828315cc89b84aa0bcedc3b2bf740147dc33b5a4f317dcb2c3d46914dea5c693 Changes
+SHA256 2f77b3acaf7d1008a6ed402fcb774155f0ada8bcbc95cb9a084e20c88fed5b21 MANIFEST
+SHA256 1568562fceffbddc3ac5d57d79c7936b43db74eb5ef31cb903e147935d1af994 META.json
+SHA256 12f7ccaa66cdcf0da82f5e0970b0a682226a41f00ac0e5d86900d4f975c647bf META.yml
+SHA256 e4f491bf453aafdf73eedd0ec48b1f17fcf6d2a30d4d00eee7e43b4ac9d587c1 README
+SHA256 ab8678fedaa0ceef3bc2f728e9c8f1447e0c29b4d35a50fba1d98415e68c0aad lib/List/GroupingPriorityQueue.pm
+SHA256 005dafc7623cd373d1d8cccc230a934ea1027d4635464fed8317a59e9d31feab t/00-load.t
+SHA256 795fb1e95103cb345131d21a0de53a6d2b1854d8deb2c6d810b2eac92f8b132b t/pod-coverage.t
+SHA256 b7b479ee1db2993bcb9edecd52739f58e613e95000872e96c15ece91547c8c26 t/pod.t
+SHA256 2adeeff3590f2107275f5390c308289d0b966549a5d65978cdfedf61446ab217 t/queue.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAwAGBQJgTPkcAAoJEIGZLuHhLAOFmOcH/3Vy/ozoL9W+7mQ12wRgrGkq
+Xa8VmzfVFNC8MvUqm0rxeAacJ1G/HDHty9cSElUuhPbRWognlO7C/+1GRLIv+qKr
+xfPXq9qkmFgS62tXqVydyRxqkUm2IplPsS6XicHZw44WSRDrAEx3iWbE9IIebma8
+u7v67wnAnoAhPvHeeVLnsyVqZ7wsGA8oCkCCeFJZderRc5MJQI3GOVNe6DCBEYj6
+RDWC3PpWwo3x9kZFtpg9shLV5wfGOtUZh2bNUBrEw5DvL+Cx545QqlaxH3cIG9mR
+R/XvnGCkv3n3asw1ZJFYRnXAMktWSoQASQnUjJcpDBxmlFlog6stkLJ/La+R4hg=
+=9HDE
+-----END PGP SIGNATURE-----

@@ -525,6 +525,10 @@ sub PDL::fftconvolve_inplace {
 
 Internal routine doing maths for convolution
 
+=for bad
+
+convmath does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -550,6 +554,10 @@ Internal routine doing maths for convolution
 
 Complex multiplication
 
+=for bad
+
+cmul does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -575,6 +583,10 @@ Complex multiplication
 
 Complex division
 
+=for bad
+
+cdiv does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

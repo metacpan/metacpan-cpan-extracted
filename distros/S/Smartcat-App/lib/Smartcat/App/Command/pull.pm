@@ -17,7 +17,10 @@ sub opt_spec {
     push @opts,
       [ 'complete-documents' => 'Pull "complete" documents only' ],
       [ 'complete-projects'  => 'Pull "complete" projects only' ],
-      [ 'skip-missing'  => 'Do not create (skip) missing files' ],
+      [ 'skip-missing'       => 'Do not create (skip) missing files' ],
+      [ 'mode:s'             => 'Unit export mode, available values: current, confirmed, complete; default value: current',
+        { default => "current" }
+      ],
       $self->project_id_opt_spec,
       $self->project_workdir_opt_spec,
       $self->file_params_opt_spec,
@@ -33,6 +36,7 @@ sub validate_args {
     $self->validate_project_id( $opt, $args );
     $self->validate_project_workdir( $opt, $args );
     $self->validate_file_params( $opt, $args );
+    $self->validate_mode( $opt, $args );
 
     $self->app->{rundata}->{complete_projects} =
       defined $opt->{complete_projects} ? $opt->{complete_projects} : 0;
@@ -40,6 +44,14 @@ sub validate_args {
       defined $opt->{complete_documents} ? $opt->{complete_documents} : 0;
     $self->app->{rundata}->{skip_missing} =
       defined $opt->{skip_missing} ? $opt->{skip_missing} : 0;
+}
+
+sub validate_mode {
+    my ( $self, $opt, $args ) = @_;
+    my $rundata = $self->app->{rundata};
+    $self->usage_error("Incorrect 'mode' value, 'current', 'confirmed', 'complete' are possible")
+      if defined $opt->{mode} && $opt->{mode} !~ /current|confirmed|complete/;
+    $rundata->{mode} = $opt->{mode};
 }
 
 sub execute {

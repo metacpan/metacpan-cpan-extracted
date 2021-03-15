@@ -5,7 +5,7 @@
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,25 +34,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
 use strict;
 use warnings;
 use PDL;
-use PDL::NiceSlice;
 use PDL::Complex;
-use Photonic::Geometry::FromB;
-use Photonic::LE::NR2::AllH;
 use Photonic::LE::NR2::EpsL;
 
-use Machine::Epsilon;
-use List::Util;
-
 use Test::More tests => 6;
-
-#my $pi=4*atan2(1,1);
-
-sub Cagree {
-    my $a=shift;
-    my $b=shift//0;
-    my $prec=shift//1e-7;
-    return (($a-$b)->Cabs2)->sum<=$prec;
-}
+use lib 't/lib';
+use TestUtils;
 
 my $ea=1+2*i;
 my $eb=3+4*i;

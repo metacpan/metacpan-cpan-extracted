@@ -1,0 +1,45 @@
+{
+   "abstract" : "priority queue with grouping",
+   "author" : [
+      "Jeremy Mates <jeremy.mates@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "List-GroupingPriorityQueue",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "List::GroupingPriorityQueue" : {
+         "file" : "lib/List/GroupingPriorityQueue.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://github.com/thrig/List-GroupingPriorityQueue"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

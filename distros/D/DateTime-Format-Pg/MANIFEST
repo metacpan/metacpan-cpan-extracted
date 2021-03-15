@@ -6,6 +6,7 @@ Makefile
 README.md
 cpanfile
 lib/DateTime/Format/Pg.pm
+minil.toml
 t/1basic.t
 t/2new-param.t
 t/99-pod-coverage.t
@@ -15,6 +16,7 @@ t/format_datetime.t
 t/format_fractional.t
 t/format_interval.t
 t/gh12.t
+t/gh18.t
 t/parse_date.t
 t/parse_datetime.t
 t/parse_datetime2.t

@@ -7,7 +7,7 @@ use Test::More;
 BEGIN { $ENV{'WWW-SHORTEN-TESTING'} = 1; };
 
 my $url = 'https://metacpan.org/release/WWW-Shorten';
-my $prefix = 'http://tinyurl.com/';
+my $prefix = 'https://tinyurl.com/';
 
 {
     my $err = try { makeashorterlink(); } catch { $_ };
@@ -36,7 +36,7 @@ is($WWW::Shorten::TinyURL::_error_message, '', 'makeashorterlink: no errors');
 if ($short && $short =~ /(\w+)$/) {
     $code = $1;
 }
-is($short, 'http://tinyurl.com/abc12345', 'makeashorterlink: proper response');
+is($short, 'https://tinyurl.com/abc12345', 'makeashorterlink: proper response');
 is($code, 'abc12345', 'makeashorterlink: proper code');
 is($short, $prefix.$code, 'makeashorterlink: URL exactly as we expected');
 

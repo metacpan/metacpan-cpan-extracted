@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+#
+# how much variance is there from filter_pattern for the given inputs?
+# use this to determine roughly what the population of rhythms will be
+#
+#   $ perl variance 4 16 1000 200
+#   unique 9
+#   84      1000100010001000        42.0%
+#   42      1000100010010000        21.0%
+#   31      1001000010001000        15.5%
+#   16      1000100010000100        8.0%
+#   12      1000010010001000        6.0%
+#   8       1000100100001000        4.0%
+#   5       1000100001001000        2.5%
+#   1       1001000100001000        0.5%
+#   1       1000010001001000        0.5%
+#   $ perl variance 4 16  100 200   >/dev/null
+#   unique 53
+#   $ perl variance 4 16   10 200   >/dev/null
+#   unique 146
+
+use 5.24.0;
+use warnings;
+use Music::RhythmSet::Util qw(filter_pattern);
+
+die "Usage: $0 onsets beats trials repeat-count\n" unless @ARGV == 4;
+my ( $onsets, $beats, $trials, $times ) = @ARGV;
+
+my %tally;
+
+$tally{ join '', filter_pattern( $onsets, $beats, $trials )->@* }++
+  for 1 .. $times;
+
+my $total = 0;
+$total += $_ for values %tally;
+my $unique = keys %tally;
+
+warn "unique $unique\n";
+for my $k ( sort { $tally{$b} <=> $tally{$a} } keys %tally ) {
+    say join "\t", $tally{$k}, $k, sprintf "%.1f%%", $tally{$k} / $total * 100;
+}

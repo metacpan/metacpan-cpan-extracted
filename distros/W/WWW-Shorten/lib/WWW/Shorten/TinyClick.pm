@@ -3,8 +3,7 @@ package WWW::Shorten::TinyClick;
 use strict;
 use warnings;
 
-our $VERSION = '3.093';
-$VERSION = eval $VERSION;
+our $VERSION = '3.094';
 
 require WWW::Shorten::_dead;
 

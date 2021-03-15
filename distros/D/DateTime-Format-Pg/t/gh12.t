@@ -15,6 +15,6 @@ if (! ok !$e, "should succeed parsing '$offset' without errors") {
 }
 
 is $duration->seconds, 28, "seconds should be '28'";
-is $duration->nanoseconds, 369220, "seconds should be '369220'";
+is $duration->nanoseconds, 369220000, "nano-seconds should be '369220000'";
 
 done_testing;

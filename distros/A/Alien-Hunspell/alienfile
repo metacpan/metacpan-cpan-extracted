@@ -3,6 +3,7 @@ use alienfile;
 plugin 'Probe::Vcpkg' => (
   name     => 'hunspell',
   ffi_name => 'libhunspell',
+  include  => 'hunspell',
 );
 plugin 'PkgConfig' => (
   pkg_name => 'hunspell',
@@ -11,13 +12,16 @@ plugin 'PkgConfig' => (
 share {
 
   requires 'Alien::Build'     => '0.75';
-  requires 'Alien::Autotools' => '1.02';
 
   plugin 'Prefer::BadVersion' => ['1.7.0'] if $^O eq 'MSWin32';
 
+  my $version = $^O eq 'MSWin32' ? '1.6.2.1' : '1.7.0.1';
+
   plugin 'Download' => (
-    url => 'https://github.com/hunspell/hunspell/releases',
-    version => qr/^v([0-9\.]+)\.tar\.gz$/,
+    # trying to autoreconf + patch + whatnot hunspell has jus become too much
+    # trouble, so we're using a prepatched copy that already has been autoreconf'd
+    url => "https://github.com/PerlAlien/hunspell/archive/alien-$version.tar.gz",
+    version => qr/^([0-9\.]+)\\.[0-9]+.tar\.gz$/,
   );
 
   plugin 'Extract' => 'tar.gz';
@@ -29,8 +33,6 @@ share {
   unshift @acflags, '--disable-nls' if $^O =~ /^(?:MSWin32|darwin|freebsd)/;
 
   build [
-    [ 'sh', -c => 'libtoolize', ],
-    [ 'sh', -c => 'autoreconf -vfi' ],
     "%{configure} --disable-shared --enable-static @acflags",
     '%{make}',
     '%{make} install',
@@ -38,8 +40,6 @@ share {
 
   ffi {
     build [
-      [ 'sh', -c => 'libtoolize', ],
-      [ 'sh', -c => 'autoreconf -vfi' ],
       "%{configure} --disable-static --enable-shared --libdir=%{.install.autoconf_prefix}/dynamic @acflags",
       '%{make}',
       '%{make} install',

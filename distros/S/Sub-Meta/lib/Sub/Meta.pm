@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 use Carp ();
 use Scalar::Util ();
@@ -79,8 +79,11 @@ sub is_method()   { !!$_[0]{is_method} }
 sub parameters()  { $_[0]{parameters} }
 sub returns()     { $_[0]{returns} }
 sub args()        { $_[0]->parameters->args }
+sub all_args()    { $_[0]->parameters->all_args }
 sub slurpy()      { $_[0]->parameters->slurpy }
 sub nshift()      { $_[0]->parameters->nshift }
+sub invocant()    { $_[0]->parameters->invocant }
+sub invocants()   { $_[0]->parameters->invocants }
 
 sub set_sub($)    {
     $_[0]{sub} = $_[1];
@@ -152,6 +155,12 @@ sub set_nshift {
     return $self;
 }
 
+sub set_invocant {
+    my $self = shift;
+    $self->parameters->set_invocant(@_);
+    $self;
+}
+
 sub set_returns {
     my $self = shift;
     my $v = $_[0];
@@ -195,6 +204,16 @@ sub apply_attribute(@) {
         attributes->import($self->stashname, $self->sub, @attribute);
     }
     $self->set_attribute($self->_build_attribute);
+    return $self;
+}
+
+sub apply_meta {
+    my ($self, $other) = @_;
+
+    $self->apply_subname($other->subname);
+    $self->apply_prototype($other->prototype);
+    $self->apply_attribute(@{$other->attribute});
+
     return $self;
 }
 
@@ -363,6 +382,29 @@ Others are as follows:
         returns   => Str,
     );
 
+Another way to create a Sub::Meta is to use L<Sub::Meta::Creator>:
+
+    use Sub::Meta::Creator;
+    use Sub::Meta::Finder::FunctionParameters;
+
+    my $creator = Sub::Meta::Creator->new(
+        finders => [ \&Sub::Meta::Finder::FunctionParameters::find_materials ],
+    );
+
+    use Function::Parameters;
+    use Types::Standard -types;
+
+    method hello(Str $msg) { }
+    my $meta = $creator->create(\&hello);
+    # =>
+    # Sub::Meta
+    #   args [
+    #       [0] Sub::Meta::Param->new(name => '$msg', type => Str)
+    #   ],
+    #   invocant   Sub::Meta::Param->(name => '$self', invocant => 1),
+    #   nshift     1,
+    #   slurpy     !!0
+
 =head2 ACCESSORS
 
 =head3 sub
@@ -471,6 +513,10 @@ Setter for C<attribute>.
 
 Sets subroutine attributes and apply to the subroutine reference.
 
+=head3 apply_meta($other_meta)
+
+Apply subroutine subname, prototype and attributes of C<$other_meta>.
+
 =head3 is_method
 
 A boolean value indicating whether the subroutine is a method or not.
@@ -505,6 +551,10 @@ The alias of C<parameters.args>.
 
 The alias of C<parameters.set_args>.
 
+=head3 all_args
+
+The alias of C<parameters.all_args>.
+
 =head3 nshift
 
 The alias of C<parameters.nshift>.
@@ -512,6 +562,18 @@ The alias of C<parameters.nshift>.
 =head3 set_nshift($nshift)
 
 The alias of C<parameters.set_nshift>.
+
+=head3 invocant
+
+The alias of C<parameters.invocant>.
+
+=head3 invocants
+
+The alias of C<parameters.invocants>.
+
+=head3 set_invocant($invocant)
+
+The alias of C<parameters.set_invocant>.
 
 =head3 slurpy
 

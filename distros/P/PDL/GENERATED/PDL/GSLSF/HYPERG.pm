@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 /* Hypergeometric function related to Bessel functions 0F1[c,x] = Gamma[c]    x^(1/2(1-c)) I_{c-1}(2 Sqrt[x]) Gamma[c] (-x)^(1/2(1-c)) J_{c-1}(2 Sqrt[-x])
 
+=for bad
+
+gsl_sf_hyperg_0F1 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -86,6 +90,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Confluent hypergeometric function  for integer parameters. 1F1[a,b,x] = M(a,b,x)
 
+=for bad
+
+gsl_sf_hyperg_1F1 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -111,6 +119,10 @@ Confluent hypergeometric function  for integer parameters. 1F1[a,b,x] = M(a,b,x)
 
 Confluent hypergeometric function  for integer parameters. U(a,b,x)
 
+=for bad
+
+gsl_sf_hyperg_U does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -136,6 +148,10 @@ Confluent hypergeometric function  for integer parameters. U(a,b,x)
 
 Confluent hypergeometric function  for integer parameters. 2F1[a,b,c,x]
 
+=for bad
+
+gsl_sf_hyperg_2F1 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -161,6 +177,10 @@ Confluent hypergeometric function  for integer parameters. 2F1[a,b,c,x]
 
 Gauss hypergeometric function 2F1[aR + I aI, aR - I aI, c, x]
 
+=for bad
+
+gsl_sf_hyperg_2F1_conj does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -186,6 +206,10 @@ Gauss hypergeometric function 2F1[aR + I aI, aR - I aI, c, x]
 
 Renormalized Gauss hypergeometric function 2F1[a,b,c,x] / Gamma[c]
 
+=for bad
+
+gsl_sf_hyperg_2F1_renorm does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -211,6 +235,10 @@ Renormalized Gauss hypergeometric function 2F1[a,b,c,x] / Gamma[c]
 
 Renormalized Gauss hypergeometric function 2F1[aR + I aI, aR - I aI, c, x] / Gamma[c]
 
+=for bad
+
+gsl_sf_hyperg_2F1_conj_renorm does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -236,6 +264,10 @@ Renormalized Gauss hypergeometric function 2F1[aR + I aI, aR - I aI, c, x] / Gam
 
 Mysterious hypergeometric function. The series representation is a divergent hypergeometric series. However, for x < 0 we have 2F0(a,b,x) = (-1/x)^a U(a,1+a-b,-1/x)
 
+=for bad
+
+gsl_sf_hyperg_2F0 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

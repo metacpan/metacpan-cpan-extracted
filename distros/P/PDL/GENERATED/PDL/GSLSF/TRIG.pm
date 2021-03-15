@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Sin(x) with GSL semantics.
 
+=for bad
+
+gsl_sf_sin does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -86,6 +90,10 @@ Sin(x) with GSL semantics.
 
 Cos(x) with GSL semantics.
 
+=for bad
+
+gsl_sf_cos does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -111,6 +119,10 @@ Cos(x) with GSL semantics.
 
 Hypot(x,xx) with GSL semantics.
 
+=for bad
+
+gsl_sf_hypot does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -136,6 +148,10 @@ Hypot(x,xx) with GSL semantics.
 
 Sin(z) for complex z
 
+=for bad
+
+gsl_sf_complex_sin does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -161,6 +177,10 @@ Sin(z) for complex z
 
 Cos(z) for complex z
 
+=for bad
+
+gsl_sf_complex_cos does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -186,6 +206,10 @@ Cos(z) for complex z
 
 Log(Sin(z)) for complex z
 
+=for bad
+
+gsl_sf_complex_logsin does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -211,6 +235,10 @@ Log(Sin(z)) for complex z
 
 Log(Sinh(x)) with GSL semantics.
 
+=for bad
+
+gsl_sf_lnsinh does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -236,6 +264,10 @@ Log(Sinh(x)) with GSL semantics.
 
 Log(Cos(x)) with GSL semantics.
 
+=for bad
+
+gsl_sf_lncosh does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -261,6 +293,10 @@ Log(Cos(x)) with GSL semantics.
 
 Convert polar to rectlinear coordinates.
 
+=for bad
+
+gsl_sf_polar_to_rect does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -286,6 +322,10 @@ Convert polar to rectlinear coordinates.
 
 Convert rectlinear to polar coordinates. return argument in range [-pi, pi].
 
+=for bad
+
+gsl_sf_rect_to_polar does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -311,6 +351,10 @@ Convert rectlinear to polar coordinates. return argument in range [-pi, pi].
 
 Force an angle to lie in the range (-pi,pi].
 
+=for bad
+
+gsl_sf_angle_restrict_symm does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -336,6 +380,10 @@ Force an angle to lie in the range (-pi,pi].
 
 Force an angle to lie in the range [0,2 pi).
 
+=for bad
+
+gsl_sf_angle_restrict_pos does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -361,6 +409,10 @@ Force an angle to lie in the range [0,2 pi).
 
 Sin(x) for quantity with an associated error.
 
+=for bad
+
+gsl_sf_sin_err does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -386,6 +438,10 @@ Sin(x) for quantity with an associated error.
 
 Cos(x) for quantity with an associated error.
 
+=for bad
+
+gsl_sf_cos_err does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

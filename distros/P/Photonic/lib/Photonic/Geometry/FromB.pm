@@ -1,5 +1,5 @@
 package Photonic::Geometry::FromB;
-$Photonic::Geometry::FromB::VERSION = '0.014';
+$Photonic::Geometry::FromB::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -8,7 +8,7 @@ $Photonic::Geometry::FromB::VERSION = '0.014';
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ Photonic::Geometry::FromB
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 

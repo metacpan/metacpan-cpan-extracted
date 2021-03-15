@@ -1,3 +1,11 @@
+0.006   2021-03-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Update namespace to search for color themes to follow newer
+	  ColorTheme specification (ColorTheme::App::diffwc instead of
+	  App::diffwc::ColoTheme; observe DIFFWC_COLOR_THEME instead of
+	  COLOR_THEME.
+
+
 0.005   2020-04-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Return diff's exit code.

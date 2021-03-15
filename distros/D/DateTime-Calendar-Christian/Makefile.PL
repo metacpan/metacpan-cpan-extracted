@@ -5,12 +5,18 @@ use ExtUtils::MakeMaker;
 
 ( my $mmv = ExtUtils::MakeMaker->VERSION ) =~ s/_//g;
 
-my %attr = (
+my %args = (
     NAME		    => 'DateTime::Calendar::Christian',
     VERSION_FROM	=> 'lib/DateTime/Calendar/Christian.pm',
+    PL_FILES => {},	# Prevent old MakeMaker from running Build.PL
     PREREQ_PM		=> {
+			    'Carp'	=> 0,
 			    'DateTime' => 0.1402,
 			    'DateTime::Calendar::Julian' => 0.04,
+			    constant	=> 0,
+			    overload	=> 0,
+			    strict	=> 0,
+			    warnings	=> 0,
                        },
     ABSTRACT        => 'Dates in the Christian (combined Julian/Gregorian) calendar',
     AUTHOR          => [
@@ -20,46 +26,70 @@ my %attr = (
     ],
 );
 
-$mmv >= 6.31 and $attr{LICENSE} = 'perl';
-
-$mmv >= 6.4701 and $attr{MIN_PERL_VERSION} = '5.008004';
+$mmv >= 6.31
+    and $args{LICENSE} = 'perl';
 
 if ( $mmv >= 6.4501 ) {
-    $attr{META_MERGE} = {
+    $args{META_ADD} = {
+	no_index => {
+	    directory => [ qw{ inc t xt } ],
+	},
+    };
+    $args{META_MERGE} = {
 	'meta-spec'	=> {
 	    version	=> 2,
 	},
-	dynamic_config	=> 0,
-	no_index	=> {
-	    directory	=> [ qw{ t xt } ],
-	},
 	resources	=> {
 	    bugtracker	=> {
-                web	=> 'https://github.com/trwyant/perl-DateTime-Calendar-Christian/issues',
+		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Christian',
+		# web	=> 'https://github.com/trwyant/perl-DateTime-Calendar-Christian/issues',
                 mailto  => 'wyant@cpan.org',
             },
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {
 		type	=> 'git',
-		url	=> 'git://github.com/trwyant/perl-DateTime-Calendar-Christian.git',
-		web	=> 'https://github.com/trwyant/perl-DateTime-Calendar-Christian',
+		url	=> 'git://github.com/trwyant/perl-Date-Tolkien-Shire.git',
+		web	=> 'https://github.com/trwyant/perl-Date-Tolkien-Shire',
 	    },
 	},
 	provides(),
     };
 }
 
-my %build_requires = (
-    'Test::More'	=> 0.88,
-);
+$mmv >= 6.4701
+    and $args{MIN_PERL_VERSION} = 5.006002;
 
-if ( $mmv >= 6.5501 ) {
-    $attr{BUILD_REQUIRES} = \%build_requires;
+$mmv >= 6.5702
+    or $args{AUTHOR} = join ', ', @{ $args{AUTHOR} };
+
+my $build_requires = {
+    'Storable'		=> 0,
+    'Test::More'	=> 0.88,
+};
+
+my $configure_requires = {
+    'ExtUtils::MakeMaker'	=> 0,
+};
+
+if ( $mmv >= 6.52 ) {
+    $args{BUILD_REQUIRES} = $build_requires;
+    $args{CONFIGURE_REQUIRES} = $configure_requires;
+} elsif ( $mmv >= 6.5501 ) {
+    $args{BUILD_REQUIRES} = $build_requires;
+    $args{META_MERGE}{configure_requires} = $configure_requires;
+} elsif ( $mmv >= 6.4501 ) {
+    $args{META_MERGE}{build_requires} = $build_requires;
+    $args{META_MERGE}{configure_requires} = $configure_requires;
 } else {
-    @{ $attr{PREREQ_PM} }{ keys %build_requires } = values %build_requires;
+    foreach my $req ( $build_requires, $configure_requires ) {
+	foreach my $key ( keys %{ $req } ) {
+	    exists $args{PREREQ_PM}{$key}
+		or $args{PREREQ_PM}{$key} = $req->{$key};
+	}
+    }
 }
 
-WriteMakefile( %attr );
+WriteMakefile( %args );
 
 sub MY::postamble {
     my ( $self, @args ) = @_;

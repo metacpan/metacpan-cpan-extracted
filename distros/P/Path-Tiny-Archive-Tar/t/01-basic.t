@@ -12,9 +12,10 @@ use Path::Tiny::Archive::Tar ();
 my $s = tempdir();
 my $d = tempdir();
 
+can_ok $s, qw( tar tgz tbz2 untar );
+
 $s->child('foo.txt')->spew('Foo');
 $s->child('bar')->mkpath();
-
 
 ok $s->child('foo.txt')->tar($d->child('foo1.tar'));
 ok $s->tar($d->child('foo2.tar'));

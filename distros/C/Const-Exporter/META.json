@@ -47,6 +47,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "List::SomeUtils::XS" : "0",
             "Package::Stash::XS" : "0",
             "Ref::Util::XS" : "0",
             "Storable" : "0"
@@ -82,7 +83,7 @@
    "provides" : {
       "Const::Exporter" : {
          "file" : "lib/Const/Exporter.pm",
-         "version" : "v1.1.1"
+         "version" : "v1.1.2"
       }
    },
    "release_status" : "stable",
@@ -96,7 +97,7 @@
          "web" : "https://github.com/robrwo/Const-Exporter"
       }
    },
-   "version" : "v1.1.1",
+   "version" : "v1.1.2",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "B. Estrade <estrabd@cpan.org>"

@@ -12,9 +12,10 @@ use Path::Tiny::Archive::Zip ();
 my $s = tempdir();
 my $d = tempdir();
 
+can_ok $s, qw( zip unzip );
+
 $s->child('foo.txt')->spew('Foo');
 $s->child('bar')->mkpath();
-
 
 ok $s->child('foo.txt')->zip($d->child('foo1.zip'));
 ok $s->zip($d->child('foo2.zip'));

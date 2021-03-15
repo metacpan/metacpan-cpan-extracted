@@ -1,0 +1,43 @@
+---
+abstract: 'Simple XML parsing for POE'
+author:
+  - 'Mathieu Arnold <m@absolight.fr>'
+build_requires:
+  App::Prove::Plugin::Count: '0'
+  App::Prove::Watch: '0'
+  Devel::Cover: '0'
+  Dist::Zilla::App::Command::cover: '0'
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+  lib::relative: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Filter-SimpleXML
+requires:
+  Carp: '0'
+  English: '0'
+  Moose: '0'
+  Moose::Object: '0'
+  MooseX::NonMoose: '0'
+  POE::Filter: '0'
+  XML::LibXML: '0'
+  perl: '5.024'
+  strictures: '2'
+  utf8: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Filter-SimpleXML
+  homepage: https://github.com/mat813/POE-Filter-SimpleXML/wiki
+  repository: git://github.com/mat813/POE-Filter-SimpleXML.git
+version: '1.000'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: BSD

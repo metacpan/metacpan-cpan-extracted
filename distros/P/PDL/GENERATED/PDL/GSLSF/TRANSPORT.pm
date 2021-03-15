@@ -65,6 +65,10 @@ Transport function:
 
 J(2,x)
 
+=for bad
+
+gsl_sf_transport_2 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -90,6 +94,10 @@ J(2,x)
 
 J(3,x)
 
+=for bad
+
+gsl_sf_transport_3 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -115,6 +123,10 @@ J(3,x)
 
 J(4,x)
 
+=for bad
+
+gsl_sf_transport_4 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -140,6 +152,10 @@ J(4,x)
 
 J(5,x)
 
+=for bad
+
+gsl_sf_transport_5 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

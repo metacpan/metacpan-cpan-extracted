@@ -1,5 +1,5 @@
 package OTRS::OPM::Maker::Command::build;
-
+$OTRS::OPM::Maker::Command::build::VERSION = '0.19';
 use strict;
 use warnings;
 
@@ -11,8 +11,6 @@ use Path::Class ();
 use XML::LibXML;
 
 use OTRS::OPM::Maker -command;
-
-our $VERSION = '0.17';
 
 sub abstract {
     return "build package files for OTRS";
@@ -114,7 +112,7 @@ OTRS::OPM::Maker::Command::build - Build OTRS packages
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 AUTHOR
 

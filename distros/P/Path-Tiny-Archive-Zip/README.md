@@ -4,7 +4,7 @@ Path::Tiny::Archive::Zip - Zip/unzip add-on for file path utility
 
 # VERSION
 
-version 0.003
+version 0.004
 
 # SYNOPSIS
 

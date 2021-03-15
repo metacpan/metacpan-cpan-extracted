@@ -1,5 +1,5 @@
 package Photonic::Utils;
-$Photonic::Utils::VERSION = '0.014';
+$Photonic::Utils::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -8,7 +8,7 @@ $Photonic::Utils::VERSION = '0.014';
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -332,7 +332,7 @@ Photonic::Utils
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -432,14 +432,5 @@ of b and the result c. Recall that in pdl the first (row) index is
 faster. May thread over extra dimensions.
 
 =back
-
-=head1 NOTE
-
-Uses Inline::Pdlpp, so the first time it is run it compiles itself,
-and would take a little longer than the following. To recompile,
-remove the directory _Inline/ before running.
-
-B<You must make sure that the relative location of the libutils.so
-library is correct.> See $Bin below.
 
 =cut

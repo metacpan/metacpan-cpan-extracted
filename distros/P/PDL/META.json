@@ -1,7 +1,7 @@
 {
    "abstract" : "Perl Data Language",
    "author" : [
-      "PerlDL Developers (pdl-general@lists.sourceforge.net)"
+      "PerlDL Developers <pdl-general@lists.sourceforge.net>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
@@ -45,13 +45,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Astro::FITS::Header" : "0",
             "Carp" : "0",
             "Config" : "0",
             "Convert::UU" : "0",
             "Data::Dumper" : "2.121",
-            "English" : "0",
-            "ExtUtils::MakeMaker" : "6.56",
             "Fcntl" : "0",
             "File::Basename" : "0",
             "File::Find" : "0",
@@ -72,7 +69,11 @@
             "Storable" : "1.03",
             "Term::ReadKey" : "2.34",
             "Text::Balanced" : "1.89",
+            "autodie" : "0",
             "perl" : "5.010"
+         },
+         "suggests" : {
+            "Astro::FITS::Header" : "0"
          }
       },
       "test" : {
@@ -98,6 +99,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.028",
+   "version" : "2.029",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

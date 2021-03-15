@@ -80,6 +80,14 @@ Inner product over one dimension
 
 
 
+=for bad
+
+=for bad
+
+If C<a() * b()> contains only bad data,
+C<c()> is set bad. Otherwise C<c()> will have its bad flag cleared,
+as it will not contain any bad values.
+
 
 
 =cut
@@ -113,6 +121,10 @@ operator but this function is provided for convenience.
 
 
 
+=for bad
+
+outer processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -228,6 +240,10 @@ For usage, see L</x>, a description of the overloaded 'x' operator
 
 
 
+=for bad
+
+matmult ignores the bad-value flag of the input piddles.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -276,6 +292,10 @@ Weighted (i.e. triple) inner product
 
 
 
+=for bad
+
+innerwt processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -310,6 +330,10 @@ very wasteful. Instead, you should use a temporary for C<b*c>.
 
 
 
+=for bad
+
+inner2 processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -343,6 +367,10 @@ Equivalent to
 
 
 
+=for bad
+
+inner2d processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -384,6 +412,10 @@ closures at some point.
 
 
 
+=for bad
+
+inner2t processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -421,6 +453,10 @@ orthogonal to C<$x> and C<$y>
 
 
 
+=for bad
+
+crossp does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -446,6 +482,10 @@ orthogonal to C<$x> and C<$y>
 
 Normalises a vector to unit Euclidean length
 
+=for bad
+
+norm processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -498,6 +538,12 @@ Threaded Example:
   # [0 1 0 0 2 0 3 0 0 0]
 
 
+
+=for bad
+
+=for bad
+
+The routine barfs if any of the indices are bad.
 
 
 
@@ -574,6 +620,10 @@ unless special care is taken.
 
 
 
+=for bad
+
+conv1d ignores the bad-value flag of the input piddles.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -631,6 +681,10 @@ and is generally faster.
 
 
 
+=for bad
+
+in does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -669,6 +723,20 @@ of the result piddle.  This follows the Matlab usage.
 
 See L</uniqind> if you need the indices of the unique
 elements rather than the values.
+
+=cut
+
+
+
+
+=for bad
+
+Bad values are not considered unique by uniq and are ignored.
+
+ $x=sequence(10);
+ $x=$x->setbadif($x%3);
+ print $x->uniq;
+ [0 3 6 9]
 
 =cut
 
@@ -723,6 +791,15 @@ piddle is lost.
 
 See L</uniq> if you want the unique values instead of the
 indices.
+
+=cut
+
+
+
+
+=for bad
+
+Bad values are not considered unique by uniqind and are ignored.
 
 =cut
 
@@ -787,6 +864,20 @@ the 0th dimension for vector index) is lost.
 See also L</uniq> for a unique list of scalars; and
 L<qsortvec|PDL::Ufunc/qsortvec> for sorting a list of vectors
 lexicographcally.
+
+=cut
+
+
+
+
+=for bad
+
+If a vector contains all bad values, it is ignored as in L</uniq>.
+If some of the values are good, it is treated as a normal vector. For
+example, [1 2 BAD] and [BAD 2 3] could be returned, but [BAD BAD BAD]
+could not.  Vectors containing BAD values will be returned after any
+non-NaN and non-BAD containing vectors, followed by the NaN vectors.
+
 
 =cut
 
@@ -864,6 +955,10 @@ sub PDL::uniqvec {
 
 clip (threshold) C<$a> by C<$b> (C<$b> is upper bound)
 
+=for bad
+
+hclip processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -898,6 +993,10 @@ sub PDL::hclip {
 
 clip (threshold) C<$a> by C<$b> (C<$b> is lower bound)
 
+=for bad
+
+lclip processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -937,6 +1036,17 @@ Clip (threshold) a piddle by (optional) upper or lower bounds.
 
 
 
+=for bad
+
+clip handles bad values since it is just a
+wrapper around L</hclip> and
+L</lclip>.
+
+=cut
+
+
+
+
 
 =head2 clip
 
@@ -950,6 +1060,10 @@ Clip (threshold) a piddle by (optional) upper or lower bounds.
 info not available
 
 
+=for bad
+
+clip processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1016,6 +1130,13 @@ The formula is
  b() = (sum_i wt_i * (a_i ** degree - avg)) / (sum_i wt_i)
 
 
+
+=for bad
+
+=for bad
+
+Bad values are ignored in any calculation; C<$b> will only
+have its bad flag set if the output contains any bad data.
 
 
 
@@ -1096,6 +1217,13 @@ use C<clump(-1)> directly on the piddle or call C<stats>.
 
 
 
+=for bad
+
+=for bad
+
+Bad values are simply ignored in the calculation, effectively reducing
+the sample size.  If all data are bad then the output data are marked bad.
+
 
 
 =cut
@@ -1145,6 +1273,16 @@ It works the same way as L</statsover>, except that the quantities are
 calculated considering the entire input PDL as a single sample, rather
 than as a collection of rows. See L</statsover> for definitions of the
 returned quantities.
+
+=cut
+
+
+
+
+=for bad
+
+Bad values are handled; if all input values are bad, then all of the output
+values are flagged bad.
 
 =cut
 
@@ -1211,6 +1349,10 @@ For a higher-level interface, see L<hist|PDL::Basic/hist>.
 
 
 
+=for bad
+
+histogram processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1261,6 +1403,10 @@ you want.
 
 
 
+=for bad
+
+whistogram processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1316,6 +1462,10 @@ upper limit is put in the last bin.
 
 
 
+=for bad
+
+histogram2d processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1372,6 +1522,10 @@ upper limit is put in the last bin.
 
 
 
+=for bad
+
+whistogram2d processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1397,6 +1551,10 @@ upper limit is put in the last bin.
 
 Constructor - a vector with Fibonacci's sequence
 
+=for bad
+
+fibonacci does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1448,6 +1606,10 @@ have the same sized dimensions.
 
 
 
+=for bad
+
+append does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1563,6 +1725,10 @@ and alters its argument.
 
 
 
+=for bad
+
+axisvalues does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -1916,7 +2082,9 @@ function to obtain cumulative probabilities from absolute probabilities.
 
 
 
+=for bad
 
+needs major (?) work to handles bad values
 
 =cut
 
@@ -2008,7 +2176,9 @@ leftmost (by index in array) duplicate if I<V> matches.
 
 
 
+=for bad
 
+needs major (?) work to handles bad values
 
 =cut
 
@@ -2100,7 +2270,9 @@ leftmost (by index in array) duplicate if I<V> matches.
 
 
 
+=for bad
 
+needs major (?) work to handles bad values
 
 =cut
 
@@ -2150,7 +2322,9 @@ duplicated values, I<I> may refer to any of them.
 
 
 
+=for bad
 
+needs major (?) work to handles bad values
 
 =cut
 
@@ -2240,7 +2414,9 @@ righmost (by index in array) duplicate if I<V> matches.
 
 
 
+=for bad
 
+needs major (?) work to handles bad values
 
 =cut
 
@@ -2330,7 +2506,9 @@ righmost (by index in array) duplicate if I<V> matches.
 
 
 
+=for bad
 
+needs major (?) work to handles bad values
 
 =cut
 
@@ -2380,7 +2558,9 @@ is printed rather than returning an error piddle.
 
 
 
+=for bad
 
+needs major (?) work to handles bad values
 
 =cut
 
@@ -2784,6 +2964,10 @@ L</whichND> returns N-D indices into a multidimensional PDL.
 
 
 
+=for bad
+
+which processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -2834,6 +3018,10 @@ C<$c_i>.
 
 
 
+=for bad
+
+which_both processes bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

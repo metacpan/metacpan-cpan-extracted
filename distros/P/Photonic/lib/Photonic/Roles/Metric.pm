@@ -1,5 +1,5 @@
 package Photonic::Roles::Metric;
-$Photonic::Roles::Metric::VERSION = '0.014';
+$Photonic::Roles::Metric::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -9,14 +9,14 @@ Photonic::Roles::Metric
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 COPYRIGHT NOTICE
 
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA  02110-1301 USA
     use Photonic::WE::R2::Metric;
     my $gGG=Photonic::WE::R2::Metric->new(
             geometry=>$geometry, epsilon=>$eps,
-            wavenumber => $q, $wavevector=>k);
+            wavenumber => $q, wavevector=>k);
     f($gGG->value);
 
 =head1 DESCRIPTION
@@ -59,7 +59,7 @@ equation.
 
 =over 4
 
-=item * new(geometry=>$g, epsilon=>$e, $wavenumber=>$q, $wavevector=>$k);
+=item * new(geometry=>$g, epsilon=>$e, wavenumber=>$q, wavevector=>$k);
 
 Create a new Ph::WE::R2::Metric object with Geometry $g, dielectric
 function of the reference $e, vacuum wavenumber $q=omega/c  and wavevector

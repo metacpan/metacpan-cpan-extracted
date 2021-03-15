@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.59 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.61 {
 
   use 5.014;
   use Moose;
@@ -73,7 +73,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.59 {
       my $self = shift;
       my @workflow;
 
-      foreach my $workflow (qw( windows macos ))
+      foreach my $workflow (qw( linux windows macos ))
       {
         push @workflow, $workflow if $self->chrome->prompt_yn("workflow $workflow?");
       }
@@ -159,7 +159,6 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.59 {
 
     $self->gather_file_simple  ('.gitattributes');
     $self->gather_file_template('.gitignore');
-    $self->gather_file_simple  ('.travis.yml');
     $self->gather_file_simple  ('alienfile') if $self->type_alien;
     $self->gather_file_simple  ('author.yml');
     $self->gather_file_simple  ('Changes');
@@ -261,7 +260,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.59 {
     lazy    => 1,
     default => sub {
       my($self) = @_;
-      $self->chrome->prompt_str("github user/org", { default => 'plicease' });
+      $self->chrome->prompt_str("github user/org", { default => 'uperl' });
     },
   );
 
@@ -385,7 +384,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.59
+version 2.61
 
 =head1 DESCRIPTION
 
@@ -397,7 +396,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012,2013,2014,2015,2016,2017,2018,2019,2020 by Graham Ollis.
+This software is copyright (c) 2012,2013,2014,2015,2016,2017,2018,2019,2020,2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -436,44 +435,6 @@ pod_coverage:
   # format is "Class#method" or "Class",regex allowed
   # for either Class or method.
   private: []
-
-
-__[ dist/.travis.yml ]__
-language: minimal
-dist: xenial
-services:
-  - docker
-before_install:
-  - curl https://raw.githubusercontent.com/plicease/cip/main/bin/travis-bootstrap | bash
-  - cip before-install
-install:
-  - cip diag
-  - cip install
-script:
-  - cip script
-jobs:
-  include:
-    - env: CIP_TAG=static
-    - env: CIP_TAG=5.33
-    - env: CIP_TAG=5.32
-    - env: CIP_TAG=5.30
-    - env: CIP_TAG=5.28
-    - env: CIP_TAG=5.26
-    - env: CIP_TAG=5.24
-    - env: CIP_TAG=5.22
-    - env: CIP_TAG=5.20
-    - env: CIP_TAG=5.18
-    - env: CIP_TAG=5.16
-    - env: CIP_TAG=5.14
-    - env: CIP_TAG=5.12
-    - env: CIP_TAG=5.10
-    - env: CIP_TAG=5.8
-branches:
-  only:
-    - main
-cache:
-  directories:
-    - "$HOME/.cip"
 
 
 __[ dist/perlcriticrc ]__
@@ -690,6 +651,82 @@ package {{ $name =~ s/-/::/gr }} {
 }
 
 1;
+
+
+__[ dist/.github/workflows/linux.yml ]__
+name: linux
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  perl:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        cip_tag:
+          - static
+          - "5.33"
+          - "5.32"
+          - "5.30"
+          - "5.28"
+          - "5.26"
+          - "5.24"
+          - "5.22"
+          - "5.20"
+          - "5.18"
+          - "5.16"
+          - "5.14"
+          - "5.12"
+          - "5.10"
+          - "5.8"
+
+    env:
+      CIP_TAG: ${{ matrix.cip_tag }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Bootstrap CIP
+        run: |
+          curl -L https://raw.githubusercontent.com/uperl/cip/main/bin/github-bootstrap | bash
+
+      - name: Cache-Key
+        id: cache-key
+        run: |
+          echo -n '::set-output name=key::'
+          cip cache-key
+
+      - name: Cache CPAN modules
+        uses: actions/cache@v2
+        with:
+          path: ~/.cip
+          key: ${{ runner.os }}-build-${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ steps.cache-key.outputs.key }}
+
+      - name: Start-Container
+        run: |
+          cip start
+
+      - name: Diagnostics
+        run: |
+          cip diag
+
+      - name: Install-Dependencies
+        run: |
+          cip install
+
+      - name: Build + Test
+        run: |
+          cip script
 
 
 __[ dist/.github/workflows/windows.yml ]__

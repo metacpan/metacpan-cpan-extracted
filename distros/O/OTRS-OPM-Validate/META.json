@@ -1,5 +1,5 @@
 {
-   "abstract" : "Validate .opm files",
+   "abstract" : "Validate .opm files - DEPRECATED",
    "author" : [
       "Perl-Services.de <info@perl-services.de>"
    ],
@@ -41,7 +41,7 @@
    "provides" : {
       "OTRS::OPM::Validate" : {
          "file" : "lib/OTRS/OPM/Validate.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -56,7 +56,7 @@
          "web" : "http://github.com/perlservices/OTRS-OPM-Validate"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

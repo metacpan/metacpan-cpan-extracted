@@ -1,0 +1,30 @@
+Music::RhythmSet - sets of rhythms and various generation functions
+
+this module can be installed using cpanm:
+
+    cpanm Music::RhythmSet
+
+
+run perldoc(1) on Music::RhythmSet for documentation
+
+
+to install from source code, with dependencies:
+
+    git clone https://github.com/thrig/Music-RhythmSet
+    cd Music-RhythmSet
+    cpanm .
+
+or the manual way:
+
+    perl Build.PL && ./Build test && ./Build install
+
+
+to author a new release:
+
+    ./Build testcover
+    RELEASE_TESTING=1 TEST_SIGNATURE=1 ./Build test
+    ./Build disttest
+    git tag -u ... -s v...
+    cpan-upload ...
+    git push ...
+    ./Build realclean

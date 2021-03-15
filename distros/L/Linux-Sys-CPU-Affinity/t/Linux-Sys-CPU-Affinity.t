@@ -4,6 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
+use Test::LeakTrace qw/ no_leaks_ok /;
 use Test::Deep qw/ cmp_deeply /;
 use Test::More ('import' => [qw/ isa_ok is ok use_ok done_testing plan diag /]);
 BEGIN { use_ok('Linux::Sys::CPU::Affinity') };
@@ -87,6 +88,37 @@ if (Linux::Sys::CPU::Affinity::get_nprocs() < $MIN_CPU_CORES) {
     # or
     my $or = $ca->cpu_or($clone);
     cmp_deeply($or->get_cpus(), [1..3], "Checking the union of cpusets");
+
+    undef($ca);
+
+    # check for memory leaks
+    no_leaks_ok {
+
+        $ca = Linux::Sys::CPU::Affinity->new([0 .. 1]);
+
+        $ca->clone();
+        
+        $ca->set_affinity($$);
+        $ca->get_affinity($$);
+
+        $ca->get_cpus();
+
+        $ca->cpu_count();
+        $ca->cpu_isset(0);
+        $ca->cpu_equal( $ca->clone() );
+        $ca->cpu_clr(1);
+        $ca->cpu_set(1);
+        $ca->cpu_and( $ca->clone() );
+        $ca->cpu_xor( $ca->clone() );
+        $ca->cpu_or( $ca->clone() );
+
+        $ca->cpu_zero();
+
+        $ca->reset([0]);
+
+        Linux::Sys::CPU::Affinity::get_nprocs();
+
+    } 'no memory leaks';
 }
 
 done_testing();

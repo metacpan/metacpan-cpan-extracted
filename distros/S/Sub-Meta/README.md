@@ -126,6 +126,31 @@ Sub::Meta->new(
 );
 ```
 
+Another way to create a Sub::Meta is to use [Sub::Meta::Creator](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3ACreator):
+
+```perl
+use Sub::Meta::Creator;
+use Sub::Meta::Finder::FunctionParameters;
+
+my $creator = Sub::Meta::Creator->new(
+    finders => [ \&Sub::Meta::Finder::FunctionParameters::find_materials ],
+);
+
+use Function::Parameters;
+use Types::Standard -types;
+
+method hello(Str $msg) { }
+my $meta = $creator->create(\&hello);
+# =>
+# Sub::Meta
+#   args [
+#       [0] Sub::Meta::Param->new(name => '$msg', type => Str)
+#   ],
+#   invocant   Sub::Meta::Param->(name => '$self', invocant => 1),
+#   nshift     1,
+#   slurpy     !!0
+```
+
 ## ACCESSORS
 
 ### sub
@@ -240,6 +265,10 @@ Setter for `attribute`.
 
 Sets subroutine attributes and apply to the subroutine reference.
 
+### apply\_meta($other\_meta)
+
+Apply subroutine subname, prototype and attributes of `$other_meta`.
+
 ### is\_method
 
 A boolean value indicating whether the subroutine is a method or not.
@@ -276,6 +305,10 @@ The alias of `parameters.args`.
 
 The alias of `parameters.set_args`.
 
+### all\_args
+
+The alias of `parameters.all_args`.
+
 ### nshift
 
 The alias of `parameters.nshift`.
@@ -283,6 +316,18 @@ The alias of `parameters.nshift`.
 ### set\_nshift($nshift)
 
 The alias of `parameters.set_nshift`.
+
+### invocant
+
+The alias of `parameters.invocant`.
+
+### invocants
+
+The alias of `parameters.invocants`.
+
+### set\_invocant($invocant)
+
+The alias of `parameters.set_invocant`.
 
 ### slurpy
 

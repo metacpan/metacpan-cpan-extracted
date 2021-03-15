@@ -3,8 +3,8 @@ NAME
     or not
 
 VERSION
-    This document describes version 0.001 of Term::App::Util::Color (from
-    Perl distribution Term-App-Util-Color), released on 2020-06-06.
+    This document describes version 0.002 of Term::App::Util::Color (from
+    Perl distribution Term-App-Util-Color), released on 2021-03-13.
 
 DESCRIPTION
 FUNCTIONS
@@ -13,13 +13,22 @@ FUNCTIONS
 
      term_app_color_depth() -> [status, msg, payload, meta]
 
-    Try to determine the suitable color depth to use. Will first check
-    COLOR_DEPTH environment variable and use that if defined. Otherwise will
-    check COLOR environment variable and use that as color depth if defined
-    and the value looks like color depth (e.g. 256 or "24bit"). Otherwise
-    will try to detect terminal emulation software and use the highest
-    supported color depth of that terminal software. Otherwise will default
-    to 16.
+    Try to determine the suitable color depth to use.
+
+    Will first check COLORTERM environment variable to see if its value is
+    "truecolor"; if yes then depth is 2**24 (24 bit).
+
+    Then will check COLOR_DEPTH environment variable and use that if
+    defined.
+
+    Otherwise will check COLOR environment variable and use that as color
+    depth if defined and the value looks like color depth (e.g. 256 or
+    "24bit").
+
+    Otherwise will try to detect terminal emulation software and use the
+    highest supported color depth of that terminal software.
+
+    Otherwise will default to 16.
 
     This function is not exported.
 
@@ -67,6 +76,7 @@ FUNCTIONS
 ENVIRONMENT
   COLOR
   COLOR_DEPTH
+  COLORTERM
   NO_COLOR
 HOMEPAGE
     Please visit the project's homepage at
@@ -78,7 +88,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Term-App-Util-Color>
+    <https://github.com/perlancar/perl-Term-App-Util-Color/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -92,7 +102,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

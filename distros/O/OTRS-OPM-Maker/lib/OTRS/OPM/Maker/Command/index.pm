@@ -1,5 +1,5 @@
 package OTRS::OPM::Maker::Command::index;
-
+$OTRS::OPM::Maker::Command::index::VERSION = '0.19';
 use strict;
 use warnings;
 
@@ -14,8 +14,6 @@ use XML::LibXML;
 use XML::LibXML::PrettyPrint;
 
 use OTRS::OPM::Maker -command;
-
-our $VERSION = '0.17';
 
 sub abstract {
     return "build index for an OPM repository";
@@ -54,9 +52,9 @@ sub execute {
         },
     );
     
-    for my $file ( sort @opm_files ) {
+    for my $opm_file ( sort @opm_files ) {
         my $parser = XML::LibXML->new;
-        my $tree   = $parser->parse_file( $file );
+        my $tree   = $parser->parse_file( $opm_file );
         
         $tree->setStandalone( 0 );
         
@@ -99,7 +97,11 @@ sub execute {
         }
         
         my $file_node  = XML::LibXML::Element->new( 'File' );
-        (my $file_path = $file) =~ s/\Q$dir//;
+        my $file_path = $opm_file;
+
+        $file_path =~ s/\Q$dir//      if $dir ne '.';
+        $file_path = '/' . $file_path if '/' ne substr $file_path, 0, 1;
+
         $file_node->appendText( $file_path );
         $root_elem->addChild( $file_node );
         
@@ -132,7 +134,7 @@ OTRS::OPM::Maker::Command::index - Build index for an OPM repository
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 AUTHOR
 

@@ -18,7 +18,7 @@ our %EXPORT_TAGS = (
     	cpu_set
     	cpu_and
     	cpu_xor
-    	cpu_xor
+    	cpu_or
     / ],
     'nprocs' => [ qw/ get_nprocs / ]
 );
@@ -30,7 +30,7 @@ our @EXPORT_OK = (
 
 our @EXPORT = qw();
 
-our $VERSION = '0.03';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Linux::Sys::CPU::Affinity', $VERSION);
@@ -49,6 +49,9 @@ Linux::Sys::CPU::Affinity - Perl XS extension for setupping CPU affinity
 
   my $ca = Linux::Sys::CPU::Affinity->new(); # the same as below, but @cpus is empty
   my $ca = Linux::Sys::CPU::Affinity->new(\@cpus);
+
+  my $is_success = $ca->set_affinity($pid);
+  my $cpus_array = $ca->get_affinity($pid); # from the PID
 
   $ca->cpu_zero();
   cpu_zero($ca);
@@ -80,9 +83,6 @@ Linux::Sys::CPU::Affinity - Perl XS extension for setupping CPU affinity
   $ca->reset(); # the same as below, but @cpus is empty
   $ca->reset(\@new_cpus);
 
-  my $is_success = $ca->set_affinity($pid);
-  my $cpus_array = $ca->get_affinity($pid); # from the PID
-
   my $cpus_array = $ca->get_cpus(); # from current set in object
 
   my $new_ca = $ca->clone();
@@ -109,21 +109,6 @@ If code is failed to get that amount, then the CPU_SETSIZE constant will be used
 
 Returns an instance of class.
 
-=head2 reset
-
-It receives an array reference with CPU's number to be used in set creation.
-In case if the argument isn't specified, the empty array will be used.
-
-If the set had been set set before this method was invoked, then the old set will be destroyed,
-but it won't be applied automatically.
-
-=head2 cpu_zero
-
-Clears set, so that it contains no CPUs.
-New set won't be applied automatically.
-
-See CPU_ZERO, CPU_ZERO_S in cpu_set(3) Linux man page.
-
 =head2 set_affinity
 
 It receives the PID number and applies previously created set to the specified process.
@@ -139,6 +124,21 @@ Returns an array reference with list of CPU number.
 If pid is zero, then the mask of the calling thread is returned.
 
 See the method analog in sched_getaffinity(2) Linux man page.
+
+=head2 reset
+
+It receives an array reference with CPU's number to be used in set creation.
+In case if the argument isn't specified, the empty array will be used.
+
+If the set had been set set before this method was invoked, then the old set will be destroyed,
+but it won't be applied automatically.
+
+=head2 cpu_zero
+
+Clears set, so that it contains no CPUs.
+New set won't be applied automatically.
+
+See CPU_ZERO, CPU_ZERO_S in cpu_set(3) Linux man page.
 
 =head2 cpu_count
 

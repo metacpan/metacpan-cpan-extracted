@@ -1,5 +1,5 @@
 package Photonic::LE::S::Field;
-$Photonic::LE::S::Field::VERSION = '0.014';
+$Photonic::LE::S::Field::VERSION = '0.015';
 
 =encoding UTF-8
 
@@ -9,14 +9,14 @@ Photonic::LE::S::Field
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 COPYRIGHT NOTICE
 
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ use PDL::NiceSlice;
 use PDL::Complex;
 use PDL::FFTW3;
 use Photonic::LE::S::AllH;
-use Photonic::ExtraUtils qw(cgtsl);
+use Photonic::ExtraUtils qw(cgtsv);
 use Photonic::Types;
 use Photonic::Iterator;
 use Moose;
@@ -177,23 +177,22 @@ sub BUILD {
 sub evaluate {
     my $self=shift;
     my $as=$self->nr->as;
-    my $b2s=$self->nr->b2s;
     my $bs=$self->nr->bs;
     my $stateit=$self->nr->state_iterator;
     my $nh=$self->nh; #desired number of Haydock terms
     #don't go beyond available values.
     $nh=$self->nr->iteration if $nh>$self->nr->iteration;
-    # calculate using linpack for tridiag system
+    # calculate using lapack for tridiag system
     # solve \epsilon^LL \vec E^L=D^L.
     # At first take D=|0>
     my $diag=PDL->pdl($as)->(:,0:$nh-1)->complex;
-    my $subdiag=PDL->pdl($bs)->(:,0:$nh-1)->complex;
     # rotate complex zero from first to last element.
-    my $supradiag=$subdiag->real->mv(0,-1)->rotate(-1)->mv(-1,0)->complex;
+    my $subdiag=PDL->pdl($bs)->(:,0:$nh-1)->mv(0,-1)->rotate(-1)->mv(-1,0)->complex;
+    my $supradiag=$subdiag;
     my $rhs=PDL->zeroes($nh);
     $rhs->((0)).=1;
     $rhs=$rhs->r2C;
-    my ($result, $info)= cgtsl($subdiag, $diag, $supradiag, $rhs);
+    my ($result, $info)= cgtsv($subdiag, $diag, $supradiag, $rhs);
     die "Error solving tridiag system" unless $info == 0;
     # Obtain longitudinal macroscopic response from result
     # Add spinor normalization.

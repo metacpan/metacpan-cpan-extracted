@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Test::PostgreSQL:
     file: lib/Test/PostgreSQL.pm
-    version: '1.27'
+    version: '1.28'
 requires:
   DBD::Pg: '0'
   DBI: '0'
@@ -44,7 +44,7 @@ requires:
 resources:
   homepage: https://github.com/TJC/Test-postgresql
   repository: git://github.com/TJC/Test-postgresql.git
-version: '1.27'
+version: '1.28'
 x_contributors:
   - 'Alex Tokarev <nohuhu@users.noreply.github.com>'
   - 'Alex Tokarev <tokarev@cpan.org>'
@@ -55,12 +55,15 @@ x_contributors:
   - 'Eric Radman <ericshane@eradman.com>'
   - 'Matthew Somerville <matthew-github@dracos.co.uk>'
   - 'Michal Sedlák <sedlakmichal@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Paul Williams <kwakwaversal@gmail.com>'
   - 'Peter Mottram <peter@sysnix.com>'
   - 'Russell Jenkins <russell.jenkins@strategicdata.com.au>'
   - 'Russell Jenkins <russellj@strategicdata.com.au>'
   - 'Toby <tobyc@strategicdata.com.au>'
+  - 'Toby Corkindale <tcorkindale@zendesk.com>'
   - 'Toby Corkindale <tjc@wintrmute.net>'
+  - 'Veesh Goldman <rabbiveesh@gmail.com>'
   - 'root <root@altar.int.qindel.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

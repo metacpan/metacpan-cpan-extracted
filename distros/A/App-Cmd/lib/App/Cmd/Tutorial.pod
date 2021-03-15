@@ -102,9 +102,9 @@
 #pod
 #pod In this example
 #pod
-#pod   $ yourcmd reset -zB --new-seed xyzxy foo.db bar.db
+#pod   $ yourcmd reset -zB --new-seed xyzzy foo.db bar.db
 #pod
-#pod C<-zB> and C<--new-seed xyzxy> are "options" and C<foo.db> and C<bar.db>
+#pod C<-zB> and C<--new-seed xyzzy> are "options" and C<foo.db> and C<bar.db>
 #pod are "arguments."
 #pod
 #pod With a properly configured command class, the above invocation results in
@@ -338,7 +338,7 @@ App::Cmd::Tutorial - getting started with App::Cmd
 
 =head1 VERSION
 
-version 0.331
+version 0.333
 
 =head1 DESCRIPTION
 
@@ -443,9 +443,9 @@ L<App::Cmd>.
 
 In this example
 
-  $ yourcmd reset -zB --new-seed xyzxy foo.db bar.db
+  $ yourcmd reset -zB --new-seed xyzzy foo.db bar.db
 
-C<-zB> and C<--new-seed xyzxy> are "options" and C<foo.db> and C<bar.db>
+C<-zB> and C<--new-seed xyzzy> are "options" and C<foo.db> and C<bar.db>
 are "arguments."
 
 With a properly configured command class, the above invocation results in
@@ -667,7 +667,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

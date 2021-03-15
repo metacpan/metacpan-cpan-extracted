@@ -23,7 +23,15 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test::More" : "0.88",
+            "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
@@ -33,6 +41,8 @@
             "POSIX" : "0",
             "Scalar::Util" : "0",
             "Time::Local" : "0",
+            "bytes" : "0",
+            "constant" : "0",
             "perl" : "5.006002",
             "strict" : "0",
             "warnings" : "0"
@@ -42,14 +52,14 @@
    "provides" : {
       "Astro::UTDF" : {
          "file" : "lib/Astro/UTDF.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-Astro-UTDF/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-UTDF"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -60,6 +70,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-UTDF"
       }
    },
-   "version" : "0.010",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.011",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

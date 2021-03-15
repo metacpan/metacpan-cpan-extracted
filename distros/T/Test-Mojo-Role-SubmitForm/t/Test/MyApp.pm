@@ -32,6 +32,7 @@ __DATA__
   <p>Test</p>
   <!-- The usual stuff -->
   <input type="text" name="a" value="A">
+  <input type="text" name="a_disabled" value="A" disabled>
   <input type="checkbox" checked name="b" value="B">
   <input type="checkbox" name="c" value="C">
   <input type="checkbox" checked name="meows" value="42">
@@ -51,7 +52,9 @@ __DATA__
   </select>
   <select name="n"><option>N</option></select>
   <select name="l"><option selected>L</option></select>
+  <select name="l_disabled" disabled><option selected>L</option></select>
   <textarea name="m">M</textarea>
+  <textarea name="m_disabled" disabled>M</textarea>
   <button name="o" value="O">No!</button>
   <input type="button" name="s" value="S">
   <input type="submit" name="p" value="P">

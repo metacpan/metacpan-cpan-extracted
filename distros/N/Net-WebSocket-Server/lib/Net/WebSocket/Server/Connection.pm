@@ -20,6 +20,7 @@ sub new {
     server        => undef,
     nodelay       => 1,
     max_send_size => eval { Protocol::WebSocket::Frame->new->{max_payload_size} } || 65536,
+    max_recv_size => eval { Protocol::WebSocket::Frame->new->{max_payload_size} } || 65536,
     on_handshake  => sub{},
     on_ready      => sub{},
     on_disconnect => sub{},
@@ -38,6 +39,11 @@ sub new {
 
   $self->{handshake} = new Protocol::WebSocket::Handshake::Server();
   $self->{disconnecting} = 0;
+  $self->{ip} = $self->{socket}->peerhost;
+  $self->{port} = $self->{socket}->peerport;
+
+  # only attempt to start SSL if this is an IO::Socket::SSL-like socket that also has not completed its SSL handshake (SSL_startHandshake => 0)
+  $self->{needs_ssl} = 1 if $self->{socket}->can("accept_SSL") && !$self->{socket}->opened;
 
   bless $self, $class;
 }
@@ -62,15 +68,9 @@ sub socket { $_[0]->{socket} }
 
 sub is_ready { !$_[0]->{handshake} }
 
-sub ip {
-  my $sock = $_[0]->{socket};
-  return $sock && $sock->connected ? $sock->peerhost : "0.0.0.0";
-}
+sub ip { $_[0]{ip} }
 
-sub port {
-  my $sock = $_[0]->{socket};
-  return $sock && $sock->connected ? $sock->peerport : 0;
-}
+sub port { $_[0]{port} }
 
 sub nodelay {
   my $self = shift;
@@ -85,6 +85,15 @@ sub max_send_size {
   my $self = shift;
   $self->{max_send_size} = $_[0] if @_;
   return $self->{max_send_size};
+}
+
+sub max_recv_size {
+  my $self = shift;
+  if (@_) {
+    croak "Cannot change max_recv_size; handshake is already complete" if $self->{parser};
+    $self->{max_recv_size} = $_[0];
+  }
+  return $self->{max_recv_size};
 }
 
 
@@ -139,6 +148,16 @@ sub send {
 sub recv {
   my ($self) = @_;
 
+  if ($self->{needs_ssl}) {
+    my $ssl_done = $self->{socket}->accept_SSL;
+    if ($self->{socket}->errstr) {
+      $self->disconnect;
+      return;
+    }
+    return unless $ssl_done;
+    $self->{needs_ssl} = 0;
+  }
+
   my ($len, $data) = (0, "");
   if (!($len = sysread($self->{socket}, $data, 8192))) {
     $self->disconnect();
@@ -159,7 +178,7 @@ sub recv {
       syswrite($self->{socket}, $self->{handshake}->to_string);
       delete $self->{handshake};
 
-      $self->{parser} = new Protocol::WebSocket::Frame();
+      $self->{parser} = new Protocol::WebSocket::Frame(max_payload_size => $self->{max_recv_size});
       setsockopt($self->{socket}, IPPROTO_TCP, TCP_NODELAY, 1) if $self->{nodelay};
       $self->_event('on_ready');
     }
@@ -259,6 +278,15 @@ When building an outgoing message, this value is passed to new instances of
 L<Protocol::WebSocket::Frame|Protocol::WebSocket::Frame> as the
 C<max_payload_size> parameter.
 
+=item C<max_recv_size>
+
+The maximum size of an incoming payload.  Default
+C<< Protocol::WebSocket::Frame->new->{max_payload_size} >>.
+
+Once the handshake process is complete, this value is passed to the parser
+instance of L<Protocol::WebSocket::Frame|Protocol::WebSocket::Frame> as the
+C<max_payload_size> parameter.
+
 =item C<on_C<$event>>
 
 The callback to invoke when the given C<$event> occurs, such as C<ready>.  See
@@ -296,14 +324,13 @@ false if the connection is in the middle of the handshake process.
 
 =item C<ip()>
 
-Returns the connected remote IP as a string or C<'0.0.0.0'> with no active
-connection.
+Returns the remote IP of the connection.
 
 =item C<port()>
 
-Returns the connected remote port or C<0> with no active connection. (This will
-be some high-numbered port chosen by the remote host; it can be useful during
-debugging to help humans tell apart connections from the same IP.)
+Returns the remote TCP port of the connection. (This will be some high-numbered
+port chosen by the remote host; it can be useful during debugging to help humans
+tell apart connections from the same IP.)
 
 =item C<nodelay([I<$enable>])>
 
@@ -325,6 +352,17 @@ newly-set value.
 When building an outgoing message, this value is passed to new instances of
 L<Protocol::WebSocket::Frame|Protocol::WebSocket::Frame> as the
 C<max_payload_size> parameter.
+
+=item C<max_recv_size([I<$size>])>
+
+Sets the maximum allowed size of an incoming payload.  Returns the current or
+newly-set value.
+
+Once the handshake process is complete, this value is passed to the parser
+instance of L<Protocol::WebSocket::Frame|Protocol::WebSocket::Frame> as the
+C<max_payload_size> parameter.
+
+This value cannot be modified once the handshake is completed.
 
 =item C<disconnect(I<$code>, I<$reason>)>
 

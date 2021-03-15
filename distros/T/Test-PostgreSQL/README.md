@@ -94,7 +94,7 @@ to try and find it in PostgreSQL directory.
 Arguments to pass to `initdb` program when creating a new PostgreSQL database
 cluster for Test::PostgreSQL session.
 
-Defaults to `-U postgres -A trust`. See ["db\_owner"](#db_owner).
+Defaults to `-U postgres -A trust`. See ["dbowner"](#dbowner).
 
 ## extra\_initdb\_args
 
@@ -154,7 +154,7 @@ instance.
 
 Defaults to `-U postgres -d test -h 127.0.0.1 -p $self->port`.
 
-See also ["db\_owner"](#db_owner), ["dbname"](#dbname), ["host"](#host), ["base\_port"](#base_port).
+See also ["dbowner"](#dbowner), ["dbname"](#dbname), ["host"](#host), ["base\_port"](#base_port).
 
 ## extra\_psql\_args
 
@@ -219,7 +219,7 @@ Builds and returns dsn by using given parameters (if any).  Default username is
 ## uri
 
 Builds and returns a connection URI using the given parameters (if any). See
-[URI::db](https://metacpan.org/pod/URI::db) for details about the format.
+[URI::db](https://metacpan.org/pod/URI%3A%3Adb) for details about the format.
 
 Default username is `postgres`, and dbname is `test` (an empty database).
 
@@ -282,7 +282,7 @@ this environment variable to the desired path. For example:
     export POSTGRES_HOME='/usr/local/pgsql94beta'
 
 This is the same idea and variable name which is used by the installer of
-[DBD::Pg](https://metacpan.org/pod/DBD::Pg).
+[DBD::Pg](https://metacpan.org/pod/DBD%3A%3APg).
 
 # AUTHOR
 

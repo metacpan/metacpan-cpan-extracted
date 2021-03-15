@@ -5,18 +5,19 @@
 
 package Game::RaycastFOV;
 
-our $VERSION = '2.00';
+our $VERSION = '2.02';
 
 use strict;
 use warnings;
-use Exporter 'import';
 use Math::Trig ':pi';
+
 require XSLoader;
 
+use base qw(Exporter);
 our @EXPORT_OK =
-  qw(bypair bypairall cached_circle circle line raycast shadowcast swing_circle %circle_points);
+  qw(bypair bypairall cached_circle circle line raycast shadowcast sub_circle swing_circle %circle_points);
 
-XSLoader::load('Game::RaycastFOV', $VERSION);
+XSLoader::load( 'Game::RaycastFOV', $VERSION );
 
 # precomputed via swing_circle(). only up to 11 due to 80x24 terminal.
 # can be added to or changed as desired by caller. one could for example
@@ -118,75 +119,72 @@ our %circle_points = (
     ]
 );
 
-# shadowcast multipliers for transforming coordinates into other octants
-our @mult = (
-    [ 1, 0, 0,  -1, -1, 0,  0,  1 ],
-    [ 0, 1, -1, 0,  0,  -1, 1,  0 ],
-    [ 0, 1, 1,  0,  0,  -1, -1, 0 ],
-    [ 1, 0, 0,  1,  -1, 0,  0,  -1 ],
-);
-
 # the lack of checks are for speed, use at your own risk
 sub cached_circle (&$$$) {
-    my ($callback, $x, $y, $radius) = @_;
+    my ( $callback, $x, $y, $radius ) = @_;
     # process all the points on the assumption that the callback will
     # abort say line drawing should that wander outside a level map
-    bypairall(sub { $callback->($x + $_[0], $y + $_[1]) },
-        @{ $circle_points{$radius} });
+    bypairall( sub { $callback->( $x + $_[0], $y + $_[1] ) },
+        @{ $circle_points{$radius} } );
 }
 
 sub raycast {
-    my ($circle_cb, $line_cb, $x, $y, @rest) = @_;
-    $circle_cb->(sub { line($line_cb, $x, $y, $_[0], $_[1]) }, $x, $y, @rest);
+    my ( $circle_cb, $line_cb, $x, $y, @rest ) = @_;
+    $circle_cb->( sub { line( $line_cb, $x, $y, $_[0], $_[1] ) }, $x, $y, @rest );
 }
 
 # http://www.roguebasin.com/index.php?title=FOV_using_recursive_shadowcasting
 # or in particular the Java and Ruby implementations
 sub shadowcast {
-    my ($startx, $starty, $radius, $bcb, $lcb, $rcb) = @_;
-    $lcb->($startx, $starty, 0, 0);
-    for my $octet (0 .. 7) {
-        _shadowcast($startx, $starty, $bcb, $lcb, $rcb, 1, 1.0, 0.0, $radius,
-            $mult[0][$octet], $mult[1][$octet], $mult[2][$octet], $mult[3][$octet]);
+    my ( $startx, $starty, $radius, $bcb, $lcb, $rcb ) = @_;
+    $lcb->( $startx, $starty, 0, 0 );
+    for my $mult (
+        [ 1,  0,  0,  1 ],
+        [ 0,  1,  1,  0 ],
+        [ 0,  -1, 1,  0 ],
+        [ -1, 0,  0,  1 ],
+        [ -1, 0,  0,  -1 ],
+        [ 0,  -1, -1, 0 ],
+        [ 0,  1,  -1, 0 ],
+        [ 1,  0,  0,  -1 ]
+    ) {
+        _shadowcast( $startx, $starty, $radius, $bcb, $lcb, $rcb, 1, 1.0, 0.0, @$mult );
     }
 }
 
 sub _shadowcast {
-    my ($startx, $starty, $bcb, $lcb, $rcb, $row, $light_start, $light_end,
-        $radius, $xx, $xy, $yx, $yy)
+    my ( $startx, $starty, $radius, $bcb, $lcb, $rcb, $row, $light_start,
+        $light_end, $xx, $xy, $yx, $yy )
       = @_;
-    return if $light_start < $light_end;
-    my $new_start = 0.0;
     my $blocked   = 0;
-    for my $j ($row .. $radius) {
+    my $new_start = 0.0;
+    for my $j ( $row .. $radius ) {
         my $dy = -$j;
-        for my $dx ($dy .. 0) {
-            my $rslope = ($dx + 0.5) / ($dy - 0.5);
-            my $lslope = ($dx - 0.5) / ($dy + 0.5);
-            if    ($light_start < $rslope) { next }
-            elsif ($light_end > $lslope)   { last }
-            else {
-                my $curx = $startx + $dx * $xx + $dy * $xy;
-                my $cury = $starty + $dx * $yx + $dy * $yy;
-                $lcb->($curx, $cury, $dx, $dy) if $rcb->($dx, $dy);
-                if ($blocked) {
-                    if ($bcb->($curx, $cury)) {
-                        $new_start = $rslope;
-                        next;
-                    } else {
-                        $blocked     = 0;
-                        $light_start = $new_start;
-                    }
+        for my $dx ( $dy .. 0 ) {
+            my $rslope = ( $dx + 0.5 ) / ( $dy - 0.5 );
+            my $lslope = ( $dx - 0.5 ) / ( $dy + 0.5 );
+            if    ( $light_start < $rslope ) { next }
+            elsif ( $light_end > $lslope )   { last }
+            my $curx = $startx + $dx * $xx + $dy * $xy;
+            my $cury = $starty + $dx * $yx + $dy * $yy;
+            $lcb->( $curx, $cury, $dx, $dy ) if $rcb->( $dx, $dy );
+            if ($blocked) {
+                if ( $bcb->( $curx, $cury, $dx, $dy ) ) {
+                    $new_start = $rslope;
+                    next;
                 } else {
-                    if ($bcb->($curx, $cury) and $j < $radius) {
-                        $blocked = 1;
-                        _shadowcast(
-                            $startx, $starty,      $bcb,    $lcb,    $rcb,
-                            $j + 1,  $light_start, $lslope, $radius, $xx,
-                            $xy,     $yx,          $yy
-                        );
-                        $new_start = $rslope;
-                    }
+                    $blocked     = 0;
+                    $light_start = $new_start;
+                }
+            } else {
+                if ( $bcb->( $curx, $cury, $dx, $dy ) and $j < $radius ) {
+                    $blocked = 1;
+                    _shadowcast(
+                        $startx, $starty, $radius,      $bcb,    $lcb,
+                        $rcb,    $j + 1,  $light_start, $lslope, $xx,
+                        $xy,     $yx,     $yy
+                    ) unless $light_start < $lslope;
+                    $new_start = $rslope;
                 }
             }
         }
@@ -194,18 +192,25 @@ sub _shadowcast {
     }
 }
 
-sub swing_circle (&$$$$) {
-    my ($callback, $x, $y, $radius, $swing) = @_;
-    my $angle = 0;
-    my $rf    = 0.5 + int $radius;
-    my %seen;
-    while ($angle < pi2) {
-        my $nx = $x + int($rf * cos $angle);
-        my $ny = $y + int($rf * sin $angle);
-        $callback->($nx, $ny) unless $seen{ $nx . ',' . $ny }++;
-        $angle += $swing;
-    }
+sub swing_circle(&$$$$) {
+    push @_, 0, pi2;
+    goto &sub_circle;
 }
+
+# for reference; converted to XS in version 2.02 with the following
+# matching and updated code not being quite so stupid about rounding
+# ints and thus not needing a plus 0.5 fudge factor
+#sub swing_circle (&$$$$) {
+#    my ( $callback, $x, $y, $radius, $swing ) = @_;
+#    my $angle = 0;
+#    my %seen;
+#    while ( $angle < pi2 ) {
+#        my $nx = $x + sprintf( "%.0f", $radius * cos $angle );
+#        my $ny = $y + sprintf( "%.0f", $radius * sin $angle );
+#        $callback->( $nx, $ny ) unless $seen{ $nx . ',' . $ny }++;
+#        $angle += $swing;
+#    }
+#}
 
 1;
 __END__
@@ -216,30 +221,37 @@ Game::RaycastFOV - raycast field-of-view and related routines
 
 =head1 SYNOPSIS
 
-  use Game::RaycastFOV qw(bypair circle line);
+  use Game::RaycastFOV qw(
+    bypair circle line
+    cached_circle swing_circle
+    raycast shadowcast
+  );
 
-  bypair( { my ($x,$y) = @_; ... } $x1, $y1, $x2, $y2, ...);
+  # mostly internal utility routine
+  bypair( { my ($x,$y) = @_; ... } $x1, $y1, $x2, $y2, ... );
 
   # Bresenham in XS
-  circle( { my ($cx,$cy) = @_; ... } $x, $y, $radius);
-  line(   { my ($lx,$ly) = @_; ... } $x0, $y0, $x1, $y1);
+  circle( { my ($cx,$cy) = @_; ... } $x, $y, $radius );
+  line(   { my ($lx,$ly) = @_; ... } $x, $y, $x1, $y1 );
 
-  raycast( \&circle, sub { ... }, $x, $y, ...);
+  # fast, slower circle constructions
+  cached_circle( { my ($cx,$cy) ... } $x, $y, $radius );
+  swing_circle(  { my ($cx,$cy) ... } $x, $y, $radius, $swing );
 
-  # alternative (faster, slower) circle constructions
-  cached_circle( { my ($cx,$cy) ... } $x, $y, $radius)
-  swing_circle(  { my ($cx,$cy) ... } $x, $y, $radius, $swing);
+  # complicated, see docs and examples
+  raycast( \&circle, sub { ... }, $x, $y, ... );
+  shadowcast( ... );
 
 =head1 DESCRIPTION
 
-This module contains various subroutines for fast integer calculation of
-lines and circles (and a slow one, too) that help perform Field Of View
-(FOV) calculations to show what cells are visible from a given cell via
-raycasting out from that cell. Raycasting visits adjacent squares lots
-especially as the FOV grows so will benefit from caching and more
-closed-in than open level layouts.
+This module contains various subroutines that perform fast calculation
+of lines and circles; these in turn help with Field Of View (FOV)
+calculations. Raycasting and shadowcasting FOV calls are provided.
 
-=head2 Raycast Explained in One Thousand Words or Less
+Speed is favored over error checking; the XS code may not work for large
+integer values; etc.
+
+=head2 Raycasting Explained in One Thousand Words or Less
 
          .#.##
        .##.#####                 #
@@ -248,7 +260,7 @@ closed-in than open level layouts.
      #####..#.####             # #.
     .#.#.#.###.##..            #.#.##
     ####....#.##...            #....#
-    ##...#.@#....##              #.@#
+    ##...#.@#T...##              #.@#
     #..#.###....#.#              ###..
     .##.#####..#...                 #..
      .##...####.##                   ##.#
@@ -256,6 +268,8 @@ closed-in than open level layouts.
       ###.###.#..
        .######.#
          ....#
+
+Will our plucky hero stumble into that Troll unseen? Tune in next week!
 
 =head1 FUNCTIONS
 
@@ -266,73 +280,106 @@ closed-in than open level layouts.
 Utility function for slicing up an arbitrary list pairwise. Sort of like
 C<pairwise> of L<List::Util> only in a void context, and that returning
 the value C<-1> from the I<callback> subroutine will abort the
-processing of subsequent items in the input list.
+processing of subsequent items.
 
 =item B<bypairall> I<callback> I<...>
 
 Like B<bypair> but does not include code to abort processing the list.
+
 Since v1.01.
 
 =item B<cached_circle> I<callback> I<x> I<y> I<radius>
 
 This routine looks up the I<radius> in the C<%circle_points> variable
-(which can be modified by users of this module) to obtain a pre-computed
-list of circle points that are fed to the I<callback> as is done for the
-B<circle> call.
+(which is available for export and can be modified as need be) to obtain
+a pre-computed list of circle points (calculated by B<swing_circle>)
+that are fed to the I<callback> as is done for the B<circle> call.
 
 Will silently do nothing if the I<radius> is not found in the cache.
 This is by design so that B<cached_circle> is fast.
 
-NOTE these cached points may change without notice; applications should
-if necessary set their own specific sets of points to use.
+The cached points might (but are unlikely to) change without notice;
+calling code if paranoid should set specific sets of points to use or
+require a specific version of this module.
 
 =item B<circle> I<callback> I<x> I<y> I<radius>
 
-Bresenham circle via fast integer math. Note that this may not produce a
-completely filled-in FOV at various radius. Also note that this call
-will produce duplicate values for various points, especially for small
-I<radius>.
+Bresenham circle. Note that this may not produce a completely filled-in
+FOV at various radius.
+
+Since version 2.02 only unique points are passed to the I<callback>.
 
 =item B<line> I<callback> I<x0> I<y0> I<x1> I<y1>
 
-Bresenham line via fast integer math. Returning the value C<-1> from the
-I<callback> subroutine will abort the processing of the line at the
-given point.
+Bresenham line. Returning the value C<-1> from the I<callback>
+subroutine will abort the processing of the line at the given point.
 
 =item B<raycast> I<circle-fn> I<point-fn> I<x> I<y> I<...>
 
-Given a I<circle-fn> such as B<circle> or B<swing_circle>, the
-B<raycast> calls B<line> between I<x> and I<y> and the points returned
-by the circle function; B<line> in turn will call the user-supplied
-B<point-fn> to handle what should happen at each raycasted point.
-Additional arguments I<...> will be passed to the I<circle-fn> following
-I<x> and I<y> (the center of the circle. L</"EXAMPLES"> may be of more help?
+Given a I<circle-fn> such as B<circle> or B<swing_circle> and the center
+of a circle given by I<x> and I<y>, the B<raycast> calls B<line> between
+I<x>,I<y> and the points returned by the circle function; B<line> in
+turn will call the user-supplied B<point-fn> to handle what should
+happen at each raycasted point. Additional arguments I<...> will be
+passed to the I<circle-fn> following I<x> and I<y>.
+
+L</"EXAMPLES"> may be of more help than the above text.
 
 =item B<shadowcast> I<x> I<y> I<radius> I<blockcb> I<litcb> I<radiuscb>
 
-Performs a shadow cast FOV calculation of the given I<radius> around the
-point I<x>, I<y>. The I<blockcb> is called with I<nx>, I<ny> and should
-determine whether that coordinate is blocked on the level map. The
-I<litcb> is also called with coordinates and should indicate that that
-cell is visible.
+Performs a shadowcast FOV calculation of the given I<radius> around the
+point I<x>, I<y>. Callbacks:
 
-The I<radius> callback is given the I<deltax>, I<deltay>, and I<radius>
-and should return true if the deltas are within the radious. This allows
-for different FOV shapes.
+=over 4
 
-The callbacks may be called with points outside of the level map. The
-I<radius> callback delta values may be negative so may need to be run
-through C<abs> or C<** 2> to determine the distance.
+=item *
+
+I<blockcb> is called with I<newx>, I<newy> (the point shadowcasting has
+reached), I<deltax>, and I<deltay> (the delta from the origin for the
+point). It return a boolean indicating whether that coordinate is
+blocked on the level map (e.g. by a wall, a large monster, or maybe the
+angle from the starting point is no good, etc).
+
+The I<deltax> and I<deltay> values are only passed in module version
+2.02 or higher.
+
+=item *
+
+I<litcb> is called with I<newx>, I<newy>, I<deltax>, and I<deltay> and
+should do whatever needs to be done to present that point as visible.
+
+=item *
+
+I<radiuscb> is passed I<deltax>, I<deltay>, and I<radius> and must
+return true if the deltas are within the radius. This allows for
+different FOV shapes. The delta values could be negative so will need to
+be run through C<abs> or C<** 2> to determine the distance.
+
+=back
+
+B<The callbacks may be called with points outside of a level map>.
+
+=item B<sub_circle> I<callback> I<x0> I<y0> I<radius> I<swing> I<start-angle> I<max-angle>
+
+Finds points around the given I<radius> by rotating a ray by I<swing>
+radians starting from I<start-angle> and ending at I<max-angle>. Smaller
+I<swing> values will result in a more complete circle at the cost of
+additional CPU and memory use. Each unique point is passed to the
+I<callback> function:
+
+  sub_circle( sub { my ($newx, $newy) = @_; ... }, ... );
+
+Has limited to no error checking; the caller should ensure that the
+I<swing> value is positive, etc.
+
+Since version 2.02.
 
 =item B<swing_circle> I<callback> I<x0> I<y0> I<radius> I<swing>
 
-Constructs points around the given I<radius> by rotating a ray by
-I<swing> radians over a complete circle. Smaller I<swing> values will
-result in a more complete circle at the cost of additional CPU and
-memory use.
+Calls B<sub_circle> with a starting angle of C<0> and a max angle of
+C<pi * 2>.
 
-B<cached_circle> uses values pre-computed from this call but only for
-specific I<radius>.
+Prior to version 2.02 used distinct code.
 
 =back
 
@@ -352,7 +399,9 @@ subdirectory with example scripts.
 
   # assuming a rows/columns array-of-arrays with characters
   our @map = ( ... );
+  # something that updates the @map
   sub plot { ... }
+  # where the FOV happens and how big it is
   my ($x, $y, $radius) = ...;
 
   raycast(
@@ -381,8 +430,9 @@ subdirectory with example scripts.
     }, $x, $y, $radius, deg2rad(5)      # different arguments!
   );
 
-The B<plot> routine should cache whether something has been printed to
-the given cell to avoid repeated terminal or display updates.
+The B<plot> routine may need to cache whether something has been printed
+to the given cell as B<raycast> likes to revisit cells a lot, especially
+those close to the origin that are clear of FOV-blocking obstacles.
 
 =head1 BUGS
 
@@ -392,8 +442,7 @@ L<https://github.com/thrig/Game-RaycastFOV>
 
 =head1 SEE ALSO
 
-L<Game::Xomb> uses a modified version of this module's raycast code to
-provide FOV.
+L<Game::Xomb> uses modified code from this module.
 
 L<NetHack::FOV>
 

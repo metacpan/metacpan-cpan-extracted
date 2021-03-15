@@ -1,0 +1,28 @@
+item: calendar
+element: table
+class: calendar
+desc: the calendar itself
+
+item: month
+element: table
+class: cal-month
+desc: a month
+
+item: week
+element: tr
+class: cal-week
+desc: a week
+
+item: day
+element: td
+class: cal-day
+desc: a day
+
+item: dow
+element: th
+class: cal-dow
+desc: the day of the week (Monday, Tuesday, etc.)
+
+# Local variables:
+# mode: table-readable
+# End:

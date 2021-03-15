@@ -1,0 +1,39 @@
+---
+abstract: 'sets of rhythms and various generation functions'
+author:
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
+build_requires:
+  MIDI: '0'
+  Test::Most: '0'
+  perl: v5.24.0
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Music-RhythmSet
+provides:
+  Music::RhythmSet:
+    file: lib/Music/RhythmSet.pm
+    version: '0.01'
+  Music::RhythmSet::Util:
+    file: lib/Music/RhythmSet/Util.pm
+    version: '0.01'
+  Music::RhythmSet::Voice:
+    file: lib/Music/RhythmSet/Voice.pm
+    version: '0.01'
+requires:
+  List::GroupingPriorityQueue: '0'
+  MIDI: '0'
+  Moo: '0'
+  Statistics::Lite: '0'
+  namespace::clean: '0'
+  perl: v5.24.0
+resources:
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://github.com/thrig/Music-RhythmSet
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

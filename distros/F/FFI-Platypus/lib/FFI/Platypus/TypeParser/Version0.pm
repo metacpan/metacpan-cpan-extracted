@@ -7,7 +7,7 @@ use Carp qw( croak );
 use base qw( FFI::Platypus::TypeParser );
 
 # ABSTRACT: FFI Type Parser Version Zero
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 our @CARP_NOT = qw( FFI::Platypus FFI::Platypus::TypeParser );
@@ -65,7 +65,7 @@ sub parse
   {
     my @argument_types = map { $self->parse($_) } map { my $t = $_; $t =~ s/^\s+//; $t =~ s/\s+$//; $t } split /,/, $1;
     my $return_type = $self->parse($2);
-    return $self->types->{$name} = $self->create_type_closure($return_type, @argument_types);
+    return $self->types->{$name} = $self->create_type_closure($self->abi, $return_type, @argument_types);
   }
 
   if($name =~ /^ string \s* \( ([0-9]+) \) $/x)
@@ -165,7 +165,7 @@ FFI::Platypus::TypeParser::Version0 - FFI Type Parser Version Zero
 
 =head1 VERSION
 
-version 1.38
+version 1.42
 
 =head1 SYNOPSIS
 
@@ -266,6 +266,8 @@ Meredith (merrilymeredith, MHOWARD)
 Diab Jerius (DJERIUS)
 
 Eric Brine (IKEGAMI)
+
+szTheory
 
 =head1 COPYRIGHT AND LICENSE
 

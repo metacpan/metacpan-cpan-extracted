@@ -6,7 +6,6 @@ requires "Compress::Raw::Zlib" => "0";
 requires "Exporter" => "0";
 requires "Path::Tiny" => "0";
 requires "constant" => "0";
-requires "namespace::clean" => "0";
 requires "perl" => "5.008";
 requires "strict" => "0";
 requires "warnings" => "0";

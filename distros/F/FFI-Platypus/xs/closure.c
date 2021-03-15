@@ -60,7 +60,7 @@ ffi_pl_closure_call(ffi_cif *ffi_cif, void *result, void **arguments, void *user
   int flags = extra->flags;
   int i;
   int count;
-  SV *sv;
+  SV *sv,*ref;
 
   if(!(flags & G_NOARGS))
   {
@@ -149,7 +149,7 @@ ffi_pl_closure_call(ffi_cif *ffi_cif, void *result, void **arguments, void *user
             sv_setpvn(sv, *((char**)arguments[i]), extra->argument_types[i]->extra[0].record.size);
             if(extra->argument_types[i]->extra[0].record.class != NULL)
             {
-              SV *ref = newRV_inc(sv);
+              ref = newRV_inc(sv);
               sv_bless(ref, gv_stashpv(extra->argument_types[i]->extra[0].record.class, GV_ADD));
               SvREADONLY_on(sv);
               sv = ref;
@@ -160,6 +160,14 @@ ffi_pl_closure_call(ffi_cif *ffi_cif, void *result, void **arguments, void *user
             }
           }
           XPUSHs(sv);
+          break;
+        case FFI_PL_TYPE_RECORD_VALUE:
+          sv = sv_newmortal();
+          sv_setpvn(sv, (char*)arguments[i], extra->argument_types[i]->extra[0].record.size);
+          ref = newRV_inc(sv);
+          sv_bless(ref, gv_stashpv(extra->argument_types[i]->extra[0].record.class, GV_ADD));
+          SvREADONLY_on(sv);
+          XPUSHs(ref);
           break;
         default:
           warn("bad type");
@@ -257,6 +265,25 @@ ffi_pl_closure_call(ffi_cif *ffi_cif, void *result, void **arguments, void *user
         break;
       case FFI_PL_TYPE_OPAQUE:
         *((void**)result) = SvOK(sv) ? INT2PTR(void*, SvIV(sv)) : NULL;
+        break;
+      case FFI_PL_TYPE_RECORD_VALUE:
+        if(sv_isobject(sv) && sv_derived_from(sv, extra->return_type->extra[0].record.class))
+        {
+          char *ptr;
+          STRLEN len;
+          ptr = SvPV(SvRV(sv), len);
+          if(len > extra->return_type->extra[0].record.size)
+            len = extra->return_type->extra[0].record.size;
+          else if(len < extra->return_type->extra[0].record.size)
+          {
+            warn("Return record from closure is wrong size!");
+            memset(result, 0, extra->return_type->extra[0].record.size);
+          }
+          memcpy(result, ptr, len);
+          break;
+        }
+        warn("Return record from closure is wrong type!");
+        memset(result, 0, extra->return_type->extra[0].record.size);
         break;
       default:
         warn("bad type");

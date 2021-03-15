@@ -26,13 +26,11 @@ no_index:
 provides:
   Sub::WrapInType:
     file: lib/Sub/WrapInType.pm
-    version: '0.05'
+    version: '0.07'
 requires:
-  Carp: '0'
   Class::InsideOut: '0'
   Exporter: '0'
-  Hash::Util: '0'
-  Scalar::Util: '0'
+  Sub::Util: '1.40'
   Type::Tiny: '1.012000'
   namespace::autoclean: '0'
   perl: '5.010001'
@@ -40,7 +38,8 @@ resources:
   bugtracker: https://github.com/ybrliiu/p5-Sub-WrapInType/issues
   homepage: https://github.com/ybrliiu/p5-Sub-WrapInType
   repository: git://github.com/ybrliiu/p5-Sub-WrapInType.git
-version: '0.05'
+version: '0.07'
+x_authority: cpan:MPOLIIU
 x_contributors:
   - 'kfly8 <kfly@cpan.org>'
   - 'ybrliiu <raian@reeshome.org>'

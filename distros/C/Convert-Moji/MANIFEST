@@ -2,6 +2,7 @@ Changes
 examples/crazyhash.pl
 examples/rot13.pl
 examples/trombone.pl
+examples/unambiguous.pl
 lib/Convert/Moji.pm
 lib/Convert/Moji.pod
 Makefile.PL

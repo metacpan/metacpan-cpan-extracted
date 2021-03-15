@@ -1,5 +1,14 @@
 Revision history for App-Cmd
 
+0.333     2021-03-14 15:45:02-04:00 America/New_York
+        - dial back required perl to v5.20.0
+
+0.332     2021-03-12 21:25:38-05:00 America/New_York
+        - bump up minimum required perl to the one from 5yr ago
+        - make some tests laxer to prep for changes in Getopt::Long::Descriptive
+        - the App::Cmd object is constructed and blessed in new before _command
+          is called on it (thanks, Lucas Theisen)
+
 0.331     2016-07-17 15:56:11-04:00 America/New_York
         - documentation improvements (thanks, Davor Cubranic!)
 

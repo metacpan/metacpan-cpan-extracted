@@ -7,8 +7,7 @@ use Carp ();
 use base qw( WWW::Shorten::generic Exporter );
 our $_error_message = '';
 our @EXPORT         = qw( makeashorterlink makealongerlink );
-our $VERSION        = '3.093';
-$VERSION = eval $VERSION;
+our $VERSION = '3.094';
 
 sub makeashorterlink {
     my $url = shift or Carp::croak('No URL passed to makeashorterlink');
@@ -16,7 +15,7 @@ sub makeashorterlink {
 
     # terrible, bad!  skip live testing for now.
     if ( $ENV{'WWW-SHORTEN-TESTING'} ) {
-        return 'http://tinyurl.com/abc12345'
+        return 'https://tinyurl.com/abc12345'
             if ( $url eq 'https://metacpan.org/release/WWW-Shorten' );
         $_error_message = 'Incorrect URL for testing purposes';
         return undef;
@@ -24,7 +23,7 @@ sub makeashorterlink {
 
     # back to normality.
     my $ua      = __PACKAGE__->ua();
-    my $tinyurl = 'http://tinyurl.com/api-create.php';
+    my $tinyurl = 'https://tinyurl.com/api-create.php';
     my $resp
         = $ua->post($tinyurl, [url => $url, source => "PerlAPI-$VERSION",]);
     return undef unless $resp->is_success;
@@ -42,7 +41,7 @@ sub makeashorterlink {
         }
         return undef;
     }
-    if ($resp->content =~ m!(\Qhttp://tinyurl.com/\E\w+)!x) {
+    if ($resp->content =~ m!(\Qhttps://tinyurl.com/\E\w+)!x) {
         return $1;
     }
     return;
@@ -52,13 +51,13 @@ sub makealongerlink {
     my $url = shift
         or Carp::croak('No TinyURL key / URL passed to makealongerlink');
     $_error_message = '';
-    $url = "http://tinyurl.com/$url"
-        unless $url =~ m!^http://!i;
+    $url = "https://tinyurl.com/$url"
+        unless $url =~ m!^https://!i;
 
     # terrible, bad!  skip live testing for now.
     if ( $ENV{'WWW-SHORTEN-TESTING'} ) {
         return 'https://metacpan.org/release/WWW-Shorten'
-            if ( $url eq 'http://tinyurl.com/abc12345' );
+            if ( $url eq 'https://tinyurl.com/abc12345' );
         $_error_message = 'Incorrect URL for testing purposes';
         return undef;
     }
@@ -95,7 +94,7 @@ sub makealongerlink {
 
 =head1 NAME
 
-WWW::Shorten::TinyURL - Perl interface to L<http://tinyurl.com>
+WWW::Shorten::TinyURL - Perl interface to L<https://tinyurl.com>
 
 =head1 SYNOPSIS
 
@@ -105,19 +104,19 @@ WWW::Shorten::TinyURL - Perl interface to L<http://tinyurl.com>
   use WWW::Shorten::TinyURL;
   use WWW::Shorten 'TinyURL';
 
-  my $short_url = makeashorterlink('http://www.foo.com/some/long/url');
+  my $short_url = makeashorterlink('https://www.foo.com/some/long/url');
   my $long_url  = makealongerlink($short_url);
 
 =head1 DESCRIPTION
 
-A Perl interface to the web site L<http://tinyurl.com>.  The service simply maintains
+A Perl interface to the web site L<https://tinyurl.com>.  The service simply maintains
 a database of long URLs, each of which has a unique identifier.
 
 =head1 Functions
 
 =head2 makeashorterlink
 
-The function C<makeashorterlink> will call the L<http://TinyURL.com> web site passing
+The function C<makeashorterlink> will call the L<https://TinyURL.com> web site passing
 it your long URL and will return the shorter version.
 
 =head2 makealongerlink
@@ -141,6 +140,6 @@ Iain Truskett <spoon@cpan.org>
 
 =head1 SEE ALSO
 
-L<WWW::Shorten>, L<http://tinyurl.com/>
+L<WWW::Shorten>, L<https://tinyurl.com/>
 
 =cut

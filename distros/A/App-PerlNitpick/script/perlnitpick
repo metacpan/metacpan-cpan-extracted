@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Pod::Usage qw(pod2usage);
+use Getopt::Long qw(GetOptions);
+use Perl::Critic::Utils qw(all_perl_files);
+use App::PerlNitpick;
+use App::PerlNitpick::Nitpicker;
+
+unshift @ARGV, split ' ', $ENV{PERL_NITPICK_OPTS} || '';
+
+my %args;
+GetOptions(
+    \%args,
+    "h|help",
+    "l|list",
+    "r|rules=s",
+    "i|inplace",
+);
+
+if ($args{h} || (0 == keys %args)) {
+    pod2usage({ -sections => 'USAGE' });
+} elsif ($args{l}) {
+    App::PerlNitpick::Nitpicker->list_rules;
+} elsif ($args{r}) {
+    my @rules = split /\s*,\s*/, $args{r};
+    my @paths = @ARGV;
+    push @paths, "." if @paths == 0;
+
+    for my $file (all_perl_files(@paths)) {
+        my $x = App::PerlNitpick::Nitpicker->new(
+            file => $file,
+            rules => \@rules,
+            inplace => ($args{i} ? 1 : 0),
+        );
+        $x->rewrite;
+    }
+}
+
+__END__
+
+=head1 USAGE
+
+perlnitpick [options] [paths]
+
+   -h --help      Help messages
+   -l --list	  List available rules
+   -r --rules     Comma-separate list of rules to apply
+   -i --inplace   Rewrite files in-place
+
+perlnitpick rewrite perl code found under those paths according to the given rules.

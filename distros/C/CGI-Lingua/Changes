@@ -1,5 +1,9 @@
 Revision history for CGI-Lingua
 
+0.63	Sat Mar 13 10:12:46 EST 2021
+	time_zone now supports local connections
+	Use LWP::Simple::WithCache instead of LWP::Simple
+
 0.62	Wed Mar  4 09:06:06 EST 2020
 	Fix into RT#131607, cause spotted by SREZIC@cpan.org
 	Change timezone to time_zone to be compatible with DateTime

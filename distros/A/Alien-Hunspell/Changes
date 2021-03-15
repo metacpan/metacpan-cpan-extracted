@@ -1,5 +1,8 @@
 Revision history for Alien-Hunspell
 
+0.17      2021-03-14 11:02:53 -0600
+  - Remove dependency on Alien::Autotools
+
 0.16      2020-03-16 12:37:15 -0600
   - Add support for Visual C++ Perl + vcpkg (gh#9)
 

@@ -1,0 +1,8 @@
+Revision history for OPM::Validate
+========================================
+
+1.00   2021-03-14 08:48:00
+
+    * Renamed OTRS::OPM::Validate to OPM::Validate as we support
+      Znuny and OTOBO as well.
+

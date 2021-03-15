@@ -1,0 +1,39 @@
+NAME
+    Text::Table::Tiny::_ModuleFeatures - Features declaration for
+    Text::Table::Tiny
+
+VERSION
+    This document describes version 0.001 of
+    Text::Table::Tiny::_ModuleFeatures (from Perl distribution
+    Text-Table-Tiny-_ModuleFeatures), released on 2021-02-28.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-Table-Tiny-_ModuleFeatures>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-Table-Tiny-_ModuleFeatures>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Text-Table-Tiny-_ModuleFeatures/issue
+    s>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Text::Table::Tiny
+
+    Module::Features
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

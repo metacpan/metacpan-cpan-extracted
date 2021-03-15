@@ -137,7 +137,7 @@ use warnings;
 
 use base qw{ Astro::Coord::ECI::TLE };
 
-our $VERSION = '0.129';
+our $VERSION = '0.130';
 
 use Astro::Coord::ECI::Utils 0.091 qw{:all};
 use Carp;
@@ -196,7 +196,6 @@ my %statatr = (		# for convenience of get() and put().
 
 __PACKAGE__->alias (iridium => __PACKAGE__);
 
-
 #	Pre-compute the transform vectors for each of the three Main
 #	Mission Antennae, so that we do not have to repeatedly compute
 #	the sin and cos of the relevant angles. The transform we are
@@ -224,7 +223,6 @@ __PACKAGE__->alias (iridium => __PACKAGE__);
 #	  | -cos(theta) * sin(phi)   sin(theta) * sin(phi)  cos(phi) |
 #	  +-                                                        -+
 
-
 my @transform_vector;
 {	# Begin local symbol block.
 my $cosphi = cos (MMAPHI);
@@ -242,7 +240,6 @@ foreach my $mma (0 .. 2) {
 	];
     }
 }	# End local symbol block.
-
 
 #	We also pre-compute the inverse transforms, to facilitate the
 #	recovery of the virtual image of the illuminating body.
@@ -291,9 +288,7 @@ EOD
     }
 }
 
-
 #	see Astro::Coord::ECI->attribute ();
-
 
 sub attribute {
     my ($self, $name) = @_;
@@ -301,7 +296,6 @@ sub attribute {
 	__PACKAGE__ :
 	$self->SUPER::attribute ($name);
 }
-
 
 =item $tle->before_reblessing ()
 
@@ -319,7 +313,6 @@ sub before_reblessing {
     delete $self->{&ATTRIBUTE_KEY};
     return;
 }
-
 
 =item $tle->can_flare ($spare);
 
@@ -339,7 +332,6 @@ sub can_flare {
     my $status = $self->get ('status');
     return !$status || $spare && $status == $self->BODY_STATUS_IS_SPARE;
 }
-
 
 =item @flares = $tle->flare ($sta, $start, $end);
 
@@ -557,7 +549,6 @@ eod
     my $night_limit = $twilight + DAY_TOLERANCE;
     my $illum_tolerance = deg2rad (15);
 
-
 #	We assume our observing location is fixed on the surface of the
 #	Earth, and take advantage of the fact that an Iridium orbit is
 #	very nearly polar. We use these to calculate the intervals
@@ -603,19 +594,16 @@ eod
 	$self->universal ($time);
 	my ($satlat, $satlon, $satalt) = $self->geodetic;
 
-
 #	Correct time to put satellite at same latitude as station.
 
 	$time += ($asc ? $stalat - $satlat : $satlat - $stalat)
 	    / $angular_velocity;
 	($satlat, $satlon, $satalt) = $self->universal ($time)->geodetic;
 
-
 #	Calculate whether satellite is above horizon.
 
 	my ( undef, $elev, $rng ) = $station->azel_offset( $self, 0 );
 	$elev > $horizon or next;
-
 
 #	Check whether we are interested in this potential flare, based
 #	on whether it might be during the day, or am, or pm.
@@ -634,13 +622,11 @@ eod
 	    0;
 	    } || next);
 
-
 #	Calculate whether the satellite is illuminated.
 
 ##	my $lit = ($self->azel ($illum->universal ($time)))[1] >=
 	($self->azel ($illum->universal ($time)))[1] >=
 	    $self->dip () - $illum_tolerance or next;
-
 
 #	For our screening to work we need to know the maximum angular
 #	distance we can travel in 30 seconds. This is the arc tangent
@@ -652,7 +638,6 @@ eod
 	    * 30;
 	$max_angle += $max_mirror_angle;	# Take into account near misses.
 
-
 #	Iterate over a period of 16 minutes centered on our current
 #	time, calculating the location of the reflection of the sun
 #	versus the satellite, as seen by the observer.
@@ -661,14 +646,12 @@ eod
 	foreach my $deltat (-8 .. 8) {
 	    my $time = $deltat * 60 + $time;
 
-
 #	See if the satellite is illuminated at this time.
 #	TODO This code may need some slop; specifically we might want to
 #	assume the Sun is higher than it actually is by $max_angle.
 
 	    ($self->universal ($time)->azel ($illum->universal ($time)))[1] >=
 		$self->dip () or next;
-
 
 #	Transform the relevant coordinates into a coordinate system
 #	in which the axis of the satellite is along the Z axis (with
@@ -681,12 +664,10 @@ eod
 		$self->_flare_transform_coords_list (
 		$illum, $station->universal( $time ) );
 
-
 #	Now we do a second iteration over the Main Mission Antennae,
 #	checking for the position of the Sun's reflection.
 
 	    foreach my $mma (0 .. 2) {
-
 
 #	We clone the sun and the station, and then calculate the angle
 #	between the satellite and the reflection of the Sun, as seen by
@@ -699,30 +680,25 @@ eod
 		    my $angle = _flare_calculate_angle_list(
 		    $mma, $illum_vector, $station_vector ) );
 
-
 #	Save the angle, time, and cloned station for subsequent
 #	analysis.
 
 		push @{$flare_potential[$mma]},
 		    [$angle, $time, $illum_vector, $station_vector];
 
-
 #	End of iterating over Main Mission Antennae.
 
 	    }
-
 
 #	End of iterating over 16 minute period centered on current
 #	time.
 
 	}
 
-
 #	Now iterate over each MMA to calculate its flare, if any.
 
 MMA_LOOP:
 	foreach my $mma (0 .. 2) {
-
 
 #	Find the best possibility for a flare. If none, or the angle is
 #	more than the max possible, ignore this antenna.
@@ -760,7 +736,6 @@ MMA_LOOP:
 		    $flare_potential[$mma][$inx + 1]);
 	    };	# End local symbol block;
 
-
 #	Use successive approximation to find the time of minimum
 #	angle. We can not use a linear split-the-difference search,
 #	because the behavior is too far from linear. So we fudge by
@@ -770,7 +745,6 @@ MMA_LOOP:
 #	over the point we are trying to find.
 
 	    while (abs ($flare_approx[1][1] - $flare_approx[0][1]) > .1) {
-
 
 #	Calculate the next time to try as a weighted average of the
 #	previous two approximations, with the worse approximation
@@ -785,7 +759,6 @@ MMA_LOOP:
 		my $time = ($flare_approx[1][1] * 3 + $flare_approx[0][1]) / 4;
 ####		my $time = ($flare_approx[1][1] * 6 + $flare_approx[0][1]) / 7;
 
-
 #	Transform the relevant coordinates into a coordinate system
 #	in which the axis of the satellite is along the Z axis (with
 #	the Earth in the negative Z direction) and the direction of
@@ -798,7 +771,6 @@ MMA_LOOP:
 			$illum->universal( $time ),
 			$station->universal( $time ) );
 
-
 #	Calculate the angle between the satellite and the reflection
 #	of the Sun, as seen by the observer.
 
@@ -806,29 +778,24 @@ MMA_LOOP:
 		    $mma, $illum_vector, $station_vector );
 		defined $angle or next MMA_LOOP;
 
-
 #	Store the data in our approximation list, in order by angle.
 
 		pop @flare_approx;
 		splice @flare_approx, $angle >= $flare_approx[0][0], 0,
 		    [$angle, $time, $illum_vector, $station_vector];
 
-
 #	End of successive approximation of time of minimum angle.
 
 	    }
-
 
 #	Pull the (potential) flare data off the approximation list.
 
 	    my ($angle, $time, $illum_vector, $station_vector) =
 		    @{$flare_approx[0]};
 
-
 #	Skip it if the mirror angle is greater than the max.
 
 	    next if $angle > $max_mirror_angle;
-
 
 #	All our approximations may have left us with a satellite which
 #	is not quite lit. This happened with Iridium 32 (OID 24945) on
@@ -842,7 +809,6 @@ MMA_LOOP:
 	    ($self->universal ($time)->azel ($illum->universal ($time)))[1] >=
 		$self->dip () or next;
 
-
 #	Calculate all the flare data.
 
 	    my $flare = $self->_flare_char_list ($station, $mma, $angle,
@@ -853,11 +819,9 @@ MMA_LOOP:
 	    push @flares, $flare
 		if !$flare->{status} && $want{$flare->{type}};
 
-
 #	End of iteration over each MMA to calculate its flare.
 
 	}
-
 
 #	Compute the next approxiate crossing of the observer's
 #	latitude.
@@ -870,7 +834,6 @@ MMA_LOOP:
     return @flares;
 
 }
-
 
 #	[$angle, $time, $illum_vector, $station_vector] =
 #	    $self->_flare_entrance ($illum, $station, $mma, $start,
@@ -976,7 +939,6 @@ sub _flare_transform_coords_inverse_list {
     return @rslt;
 }
 
-
 #	$angle = _flare_calculate_angle_list($mma, $illum, $station)
 
 #	This private subroutine calculates the angle between the
@@ -1016,7 +978,6 @@ sub _flare_calculate_angle_list {
     return _list_angle( $station, $illum, [ 0, 0, 0 ] );
 }
 
-
 #	$hash_ref = $iridium->_flare_char_list (...)
 #
 #	Calculate the characteristics of the flare of the given body.
@@ -1044,12 +1005,10 @@ if ($elev < $horizon) {
 	'Satellite %.2f degrees below horizon', rad2deg ($horizon - $elev)));
     }
 
-
 #	Retrieve the illuminating body information.
 
 my $illum = $self->get ('illum');
 my $illum_radius = $illum->get ('diameter') / 2;
-
 
 #	Retrieve missing station information.
 
@@ -1060,7 +1019,6 @@ my $height = ($station->geodetic)[2];
 my $sun = $self->get( 'sun' );
 my $twilight = $self->get ('twilight');
 my $atm_extinct = $self->get ('extinction');
-
 
 #	Calculate the range to the satellite, and to the reflection of
 #	the Sun, from the observer.
@@ -1106,12 +1064,10 @@ my $central_mag = $central_magnitude + $area_correction;
 
 #	And for the test case, I got -8.0. Amazing.
 
-
 #	Calculate the atmospheric extinction of the flare.
 
 my $extinction = $atm_extinct ?
 	atmospheric_extinction ($elev, $height) : 0;
-
 
 #	The following off-axis magnitude calculation is the result of
 #	normalizing Ron Lee's magnitude data (made available by Randy
@@ -1187,13 +1143,11 @@ my $flare_mag = $limb_darkening > 0 ? do {
 	$extinction;
     min ($specular_mag, $off_axis_mag) } : $off_axis_mag;
 
-
 #	Compute the flare type (am, day, or pm)
 
 my $sun_elev = ($station->azel ($sun->universal ($time)))[1];
 my $flare_type = $sun_elev >= $twilight ? 'day' :
 	( $self->_time_in_zone( $time ) )[2] > 12 ? 'pm' : 'am';
-
 
 #	Compute the angle from the Sun to the flare.
 
@@ -1240,7 +1194,6 @@ my ($virtual_image, $image_vector) = do {
     ];
     $image_vector->[2] = - $image_vector->[2];
 
-
     # Undo the rotations that placed the MMA of interest in the X-Y
     # plane.
 
@@ -1248,7 +1201,6 @@ my ($virtual_image, $image_vector) = do {
 	map { vector_dot_product( $image_vector,
 	    $inverse_transform_vector[$mma][$_] ) } 0 .. 2
     ];
-
 
     # Transform from satellite-local coordinates to ECI coordinates.
 
@@ -1261,7 +1213,6 @@ my ($virtual_image, $image_vector) = do {
     ( Astro::Coord::ECI->universal( $time )->eci( @{ $image_vector } ),
 	$image_vector );
     };
-
 
 #	Compute the distance to the flare center.
 
@@ -1305,7 +1256,6 @@ my $sub_vector = do {
 my $sub_point = Astro::Coord::ECI->new(
     station => $station )->universal( $time )->eci( @$sub_vector );
 
-
 #	Stash the data.
 
 my %rslt = (
@@ -1335,7 +1285,6 @@ my %rslt = (
 
 return wantarray ? %rslt : \%rslt;
 }
-
 
 #	$ainv = _invert_matrix_list ($a)
 
@@ -1447,7 +1396,6 @@ sub magnitude {
     return $mag;
 }
 
-
 =item @data = $tle->reflection ($station, $time)
 
 This method returns a list of references to hashes containing the same
@@ -1482,7 +1430,6 @@ sub reflection {
     return $self->$method( $station, $time );
 }
 
-
 # Called as $self->$method, above
 sub _reflection_fixed {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ( $self, $station, $time ) = @_;
@@ -1490,7 +1437,6 @@ sub _reflection_fixed {	## no critic (ProhibitUnusedPrivateSubroutines)
 	or $time = $self->universal();
     my $debug = $self->get ('debug');
     my $illum = $self->get ('illum')->universal ($time);
-
 
 #	Calculate whether satellite is above horizon.
 
@@ -1500,7 +1446,6 @@ sub _reflection_fixed {	## no critic (ProhibitUnusedPrivateSubroutines)
 	sprintf ('Satellite %.2f degrees below horizon', rad2deg (-$elev)))
 	unless $elev >= 0;
 
-
 #	Calculate whether the satellite is illuminated.
 
     my $lit = ($self->azel ($illum->universal ($time)))[1] - $self->dip ();
@@ -1508,7 +1453,6 @@ sub _reflection_fixed {	## no critic (ProhibitUnusedPrivateSubroutines)
 	sprintf ('Satellite fails to be illuminated by %.2f degrees',
 	    rad2deg (-$lit)))
 	unless $lit >= 0;
-
 
 #	Transform the relevant coordinates into a coordinate system
 #	in which the axis of the satellite is along the Z axis (with
@@ -1543,7 +1487,6 @@ eod
 
     return wantarray ? @rslt : \@rslt;
 }
-
 
 =item $tle->set ($name => $value ...)
 
@@ -1631,7 +1574,6 @@ sub __parse_name {
 	return $encode_status[ $status ];
     }
 }
-
 
 {
 
@@ -1946,8 +1888,10 @@ effort.
 
 =head1 BUGS
 
-Bugs can be reported to the author by mail, or through
-L<https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues/>.
+Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-Coord-ECI-TLE-Iridium>,
+L<https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

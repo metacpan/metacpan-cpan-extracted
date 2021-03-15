@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.42'; # VERSION
 
 
 {
@@ -31,8 +31,8 @@ our $VERSION = '1.38'; # VERSION
 
   $ffi->attach( _find_symbol => ['string'] => 'ffi_type');
 
-  $ffi->attach( new => ['ffi_type[]'] => 'meta_t', sub {
-    my($xsub, $class, $elements) = @_;
+  $ffi->attach( new => ['ffi_type[]','int'] => 'meta_t', sub {
+    my($xsub, $class, $elements, $closure_safe) = @_;
 
     if(ref($elements) ne 'ARRAY')
     {
@@ -57,7 +57,7 @@ our $VERSION = '1.38'; # VERSION
 
     push @element_type_pointers, undef;
 
-    my $ptr = $xsub->(\@element_type_pointers);
+    my $ptr = $xsub->(\@element_type_pointers, $closure_safe);
     bless \$ptr, $class;
   });
 
@@ -68,6 +68,8 @@ our $VERSION = '1.38'; # VERSION
 
   $ffi->attach( DESTROY          => ['meta_t'] => 'void'       );
 }
+
+sub ptr { ${ shift() } }
 
 1;
 
@@ -83,7 +85,7 @@ FFI::Platypus::Record::Meta - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.38
+version 1.42
 
 =head1 DESCRIPTION
 
@@ -127,6 +129,8 @@ Meredith (merrilymeredith, MHOWARD)
 Diab Jerius (DJERIUS)
 
 Eric Brine (IKEGAMI)
+
+szTheory
 
 =head1 COPYRIGHT AND LICENSE
 

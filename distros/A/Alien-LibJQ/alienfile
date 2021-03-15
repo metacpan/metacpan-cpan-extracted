@@ -12,9 +12,9 @@ plugin 'Probe::CommandLine' => (
 );
 
 share {
-   #start_url 'https://github.com/stedolan/jq/releases/';
+   start_url 'https://github.com/stedolan/jq/releases/';
    # china mirror
-   start_url 'https://hub.fastgit.org/stedolan/jq/releases/';
+   #start_url 'https://hub.fastgit.org/stedolan/jq/releases/';
    plugin Download => (
       version => qr/^jq-([0-9\.]+)\.tar\.gz$/o,
    );

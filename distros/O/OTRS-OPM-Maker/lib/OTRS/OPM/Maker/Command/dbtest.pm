@@ -1,13 +1,11 @@
 package OTRS::OPM::Maker::Command::dbtest;
-
+$OTRS::OPM::Maker::Command::dbtest::VERSION = '0.19';
 # ABSTRACT: Test db definitions in .sopm files
 
 use strict;
 use warnings;
 
 use OTRS::OPM::Maker -command;
-
-our $VERSION = '0.17';
 
 sub abstract {
     return "Check if DatabaseInstall and DatabaseUninstall sections in the .sopm are correct";
@@ -46,7 +44,7 @@ OTRS::OPM::Maker::Command::dbtest - Test db definitions in .sopm files
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 AUTHOR
 

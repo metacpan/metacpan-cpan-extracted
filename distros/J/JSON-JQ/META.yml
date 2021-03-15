@@ -1,0 +1,31 @@
+---
+abstract: 'jq (https://stedolan.github.io/jq/) library binding'
+author:
+  - 'Dongxu Ma <dongxu _dot_ ma _at_ gmail.com>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+configure_requires:
+  Alien::Base::Wrapper: '0'
+  Alien::LibJQ: '0.04'
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-JQ
+provides:
+  JSON::JQ:
+    file: lib/JSON/JQ.pm
+    version: '0.01'
+requires:
+  Alien::LibJQ: '0.04'
+  JSON: '0'
+  Path::Tiny: '0'
+resources:
+  bugtracker: https://github.com/dxma/perl5-json-jq/issues
+  license: http://opensource.org/licenses/mit-license.php
+  repository: https://github.com/dxma/perl5-json-jq
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

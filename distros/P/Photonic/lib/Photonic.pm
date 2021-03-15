@@ -12,19 +12,19 @@ Photonic - A perl package for calculations on photonics and metamaterials.
 
 =head1 VERSION
 
-Version 0.014
+Version 0.015
 
 =cut
 
 
-$Photonic::VERSION = '0.014';
+$Photonic::VERSION = '0.015';
 
 =head1 COPYRIGHT NOTICE
 
 Photonic - A perl package for calculations on photonics and
 metamaterials.
 
-Copyright (C) 1916 by W. Luis Mochán
+Copyright (C) 2016 by W. Luis Mochán
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

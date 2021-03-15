@@ -4,6 +4,11 @@ author:
   - 'Tom Wyant (wyant at cpan dot org)'
 build_requires:
   Test::More: '0.88'
+  lib: '0'
+configure_requires:
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,19 +24,21 @@ no_index:
 provides:
   Astro::UTDF:
     file: lib/Astro/UTDF.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Carp: '0'
   IO::File: '0'
   POSIX: '0'
   Scalar::Util: '0'
   Time::Local: '0'
+  bytes: '0'
+  constant: '0'
   perl: '5.006002'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-Astro-UTDF/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-UTDF
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-UTDF.git
-version: '0.010'
+version: '0.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

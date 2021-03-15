@@ -4,7 +4,7 @@ Path::Tiny::Archive::Tar - Tar/untar add-on for file path utility
 
 # VERSION
 
-version 0.002
+version 0.003
 
 # SYNOPSIS
 
@@ -24,7 +24,7 @@ tar archives.
 ## tar
 
     path("/tmp/foo.txt")->tar("/tmp/foo.tar");
-    path("/tmp/foo")->tar("/tmp/foo.tar");
+    path("/tmp/foo")->tar("/tmp/foo.tar.gz", COMPRESSION_GZIP);
 
 Creates a tar archive and appends a file or directory tree to it. Returns the
 path to the archive or undef.
@@ -48,6 +48,18 @@ if not specified.
     and compression for `gzip`, and is currently equivalent to 6 (this is in the
     zlib code). This is a synonym for `COMPRESSION_GZIP`.
 - `COMPRESSION_BZIP2`: Compress using `bzip2`.
+
+## tgz
+
+    path("/tmp/foo.txt")->tgz("/tmp/foo.tar.gz");
+
+Method `tgz` is synonym for `tar` with `COMPRESSION_GZIP` type.
+
+## tbz2
+
+    path("/tmp/foo.txt")->tbz2("/tmp/foo.tar.bzip2");
+
+Method `tbz2` is synonym for `tar` with `COMPRESSION_BZIP2` type.
 
 ## untar
 

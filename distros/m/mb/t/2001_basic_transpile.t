@@ -2367,25 +2367,17 @@ lstat(s/a/b/)
 END1
 mb::_lstat(s{(\G${mb::_anchor})@{[qr/a/ ]}@{[mb::_s_passed()]}}{$1 . qq /b/}e)
 END2
-    sub { return 'SKIP' if $] >= 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 454
-lstat(tr/a/b/)
-END1
-mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
-END2
-    sub { return 'SKIP' if $] >= 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 455
-lstat(y/a/b/)
-END1
-mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
-END2
+    sub { return 'SKIP'; }, # test no 454
+    sub { return 'SKIP'; }, # test no 455
     sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 456
 lstat(tr/a/b/)
 END1
-mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
+mb::_lstat(s{(\G${mb::_anchor})((?=[a])@{mb::_dot})}{$1.mb::tr($2,q/a/,q/b/,'r')}sge)
 END2
     sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 457
 lstat(y/a/b/)
 END1
-mb::_lstat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
+mb::_lstat(s{(\G${mb::_anchor})((?=[a])@{mb::_dot})}{$1.mb::tr($2,q/a/,q/b/,'r')}sge)
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 458
 lstat($fh)
@@ -2482,25 +2474,17 @@ stat(s/a/b/)
 END1
 mb::_stat(s{(\G${mb::_anchor})@{[qr/a/ ]}@{[mb::_s_passed()]}}{$1 . qq /b/}e)
 END2
-    sub { return 'SKIP' if $] >= 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 477
-stat(tr/a/b/)
-END1
-mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
-END2
-    sub { return 'SKIP' if $] >= 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 478
-stat(y/a/b/)
-END1
-mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
-END2
+    sub { return 'SKIP'; }, # test no 477
+    sub { return 'SKIP'; }, # test no 478
     sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 479
 stat(tr/a/b/)
 END1
-mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
+mb::_stat(s{(\G${mb::_anchor})((?=[a])@{mb::_dot})}{$1.mb::tr($2,q/a/,q/b/,'r')}sge)
 END2
     sub { return 'SKIP' if $] < 5.014; $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 480
 stat(y/a/b/)
 END1
-mb::_stat(s{(\G${mb::_anchor})((?:(?=[a])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))}{$1.mb::tr($2,q/a/,q/b/,'r')}eg)
+mb::_stat(s{(\G${mb::_anchor})((?=[a])@{mb::_dot})}{$1.mb::tr($2,q/a/,q/b/,'r')}sge)
 END2
 
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 481

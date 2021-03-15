@@ -27,7 +27,7 @@ name: Test-Mojo-Role-SubmitForm
 provides:
   Test::Mojo::Role::SubmitForm:
     file: lib/Test/Mojo/Role/SubmitForm.pm
-    version: '1.004002'
+    version: '1.004003'
 requires:
   Carp: '0'
   Mojo::Base: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/zoffixznet/test-mojo-role-submitform/issues
   homepage: http://metacpan.org/release/Test-Mojo-Role-SubmitForm
   repository: git://github.com/zoffixznet/test-mojo-role-submitform.git
-version: '1.004002'
+version: '1.004003'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -308,7 +308,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 1.7.10.4
+          git_version: 2.29.2
           repo_root: .
       name: '@Author::ZOFFIX/Git::NextVersion'
       version: '2.047'
@@ -349,7 +349,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 1.7.10.4
+          git_version: 2.29.2
           repo_root: .
       name: '@Author::ZOFFIX/Git::Check'
       version: '2.047'
@@ -367,7 +367,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 1.7.10.4
+          git_version: 2.29.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -380,11 +380,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.004002
+          tag: v1.004003
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 1.7.10.4
+          git_version: 2.29.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -398,7 +398,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 1.7.10.4
+          git_version: 2.29.2
           repo_root: .
       name: '@Author::ZOFFIX/Git::Push'
       version: '2.047'
@@ -418,13 +418,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 1.7.10.4
+          git_version: 2.29.2
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.035'
+      version: '0.036'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -476,6 +476,7 @@ x_Dist_Zilla:
     version: '6.017'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
+  - 'Guillaume Rousse <guillaume.rousse@renater.fr>'
   - 'Zoffix Znet <zoffixznet@users.noreply.github.com>'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 Clausen Integral. Cl_2(x) := Integrate[-Log[2 Sin[t/2]], {t,0,x}]
 
+=for bad
+
+gsl_sf_clausen does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

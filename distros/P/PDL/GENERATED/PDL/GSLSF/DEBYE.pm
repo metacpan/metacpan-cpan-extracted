@@ -61,6 +61,10 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 
+=for bad
+
+gsl_sf_debye_1 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -86,6 +90,10 @@ D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 
 D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 
+=for bad
+
+gsl_sf_debye_2 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -111,6 +119,10 @@ D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 
 D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 
+=for bad
+
+gsl_sf_debye_3 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut
@@ -136,6 +148,10 @@ D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 
 D_n(x) := n/x^n Integrate[t^n/(e^t - 1), {t,0,x}]
 
+=for bad
+
+gsl_sf_debye_4 does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
 
 
 =cut

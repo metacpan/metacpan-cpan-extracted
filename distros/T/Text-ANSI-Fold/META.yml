@@ -1,13 +1,13 @@
 ---
 abstract: 'Text folding library supporting ANSI terminal sequence and Asian wide characters with prohibition character handling.'
 author:
-  - '- Kazumasa Utashiro.'
+  - 'Kazumasa Utashiro'
 build_requires:
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Text::ANSI::Fold:
     file: lib/Text/ANSI/Fold.pm
-    version: '2.08'
+    version: '2.0903'
   Text::ANSI::Fold::Japanese::W3C:
     file: lib/Text/ANSI/Fold/Japanese/W3C.pm
   Text::ANSI::Fold::Japanese::Wikipedia:
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Text-ANSI-Fold/issues
   homepage: https://github.com/kaz-utashiro/Text-ANSI-Fold
   repository: git://github.com/kaz-utashiro/Text-ANSI-Fold.git
-version: '2.08'
+version: '2.0903'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

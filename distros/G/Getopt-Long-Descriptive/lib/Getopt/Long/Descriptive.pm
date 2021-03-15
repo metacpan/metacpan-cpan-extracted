@@ -2,7 +2,9 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
-$Getopt::Long::Descriptive::VERSION = '0.105';
+$Getopt::Long::Descriptive::VERSION = '0.107';
+use v5.10.1;
+
 use Carp qw(carp croak);
 use File::Basename ();
 use Getopt::Long 2.33;
@@ -287,6 +289,26 @@ my %CONSTRAINT = (
 
 our $MungeOptions = 1;
 
+our $TERM_WIDTH;
+{
+  $TERM_WIDTH = $ENV{COLUMNS} || 80;
+
+  # So, this was the old code:
+  #
+  #   if (eval { require Term::ReadKey; 1 }) {
+  #     my ($width) = Term::ReadKey::GetTerminalSize();
+  #     $TERM_WIDTH = $width;
+  #   } else {
+  #     $TERM_WIDTH = $ENV{COLUMNS} || 80;
+  #   }
+  #
+  # ...but the problem is that Term::ReadKey will carp when it can't get an
+  # answer, it can't be trivially made to keep quiet.  (I decline to stick a
+  # local $SIG{__WARN__} here, as it's too heavy a hammer.)  With the new (as
+  # of 2021-03) formatting code, using the full width is less of an issue,
+  # anyway.
+}
+
 sub _nohidden {
   return grep { ! $_->{constraint}->{hidden} } @_;
 }
@@ -319,12 +341,10 @@ sub _strip_assignment {
   (my $copy = $str) =~ s{$SPEC_RE}{};
 
   if (wantarray) {
-      my $len = length $copy;
-      my $assignment = substr $str, $len;
-      if (!defined($assignment)) {
-          $assignment = '';
-      }
-      return ($copy, $assignment);
+    my $len = length $copy;
+    my $assignment = substr($str, $len) // q{};
+
+    return ($copy, $assignment);
   }
   return $copy;
 }
@@ -418,12 +438,22 @@ sub _build_describe_options {
       grep { $_->{desc} ne 'spacer' }
       _nohidden(@opts);
 
-    my $short = join q{},
-      sort  { lc $a cmp lc $b or $a cmp $b }
-      grep  { /^.$/ }
+    my @options =
       map   { split /\|/ }
       map   { scalar __PACKAGE__->_strip_assignment($_) }
       @specs;
+
+    my %opt_count;
+    $opt_count{$_}++ for @options;
+    my @redundant = sort grep {; $opt_count{$_} > 1 } keys %opt_count;
+
+    warn "Getopt::Long::Descriptive was configured with these ambiguous options: @redundant\n"
+      if @redundant;
+
+    my $short = join q{},
+      sort  { lc $a cmp lc $b or $a cmp $b }
+      grep  { /^.$/ }
+      @options;
 
     my $long = grep /\b[^|]{2,}/, @specs;
 
@@ -437,9 +467,8 @@ sub _build_describe_options {
     );
 
     (my $str = $format) =~ s<%(.)><
-      defined $replace{$1}
-      ? $replace{$1}
-      : Carp::croak("unknown sequence %$1 in first argument to describe_options")
+      $replace{$1}
+      // Carp::croak("unknown sequence %$1 in first argument to describe_options")
     >ge;
 
     $str =~ s/[\x20\t]{2,}/ /g;
@@ -480,7 +509,7 @@ sub _build_describe_options {
         given_keys => \@given_keys,
         parent_of  => \%parent_of,
       );
-      next unless (defined($new) || exists($return{$name}));
+      next unless defined $new || exists $return{$name};
       $return{$name} = $new;
 
       if ($is_shortcircuit) {
@@ -702,7 +731,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.105
+version 0.107
 
 =head1 SYNOPSIS
 
@@ -992,7 +1021,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Arthur Axel 'fREW' Schmidt Dave Rolsky Diab Jerius Hans Dieter Pearcey Harley Pig hdp@cpan.org Karen Etheridge Michael McClimon Niels Thykier Olaf Alders Roman Hubacek Smylers Thomas Neumann zhouzhen1
+=for stopwords Arthur Axel 'fREW' Schmidt Dave Rolsky Diab Jerius Hans Dieter Pearcey Harley Pig hdp@cpan.org Karen Etheridge Michael McClimon Niels Thykier Olaf Alders Ricardo Signes Roman Hubacek Smylers Thomas Neumann zhouzhen1
 
 =over 4
 
@@ -1039,6 +1068,10 @@ Niels Thykier <niels@thykier.net>
 =item *
 
 Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

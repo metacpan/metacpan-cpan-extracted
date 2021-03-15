@@ -60,19 +60,24 @@
             "Test::NoWarnings" : "0",
             "Test::Requires" : "0",
             "Test::Without::Module" : "0",
-            "WWW::RT::CPAN" : "0",
             "autodie" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-CGI-Lingua@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/CGI-Lingua/issues",
+         "x_url" : "https://github.com/nigelhorne/CGI-Lingua/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/CGI-Lingua.git",
-         "web" : "https://github.com/nigelhorne/CGI-Lingua"
+         "web" : "https://github.com/nigelhorne/CGI-Lingua",
+         "x_repository" : "https://github.com/nigelhorne/CGI-Lingua"
       }
    },
-   "version" : "0.62",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.63",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

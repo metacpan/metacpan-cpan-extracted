@@ -50,7 +50,8 @@ sub export_files {
         my @task_doc_ids = splice( @doc_ids, 0, EXPORT_ZIP_FILES_COUNT );
         my $task = eval {
             $api->document_export_request_export(
-                document_ids => \@task_doc_ids );
+                document_ids => \@task_doc_ids,
+                mode => $rundata->{mode} );
         };
         die $log->error(
             sprintf(
