@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/VitaminUtils/convert_vitamin_e_unit
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-03'; # DATE
+our $DATE = '2021-03-17'; # DATE
 our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ convert-vitamin-e-unit - Convert a vitamin E quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.002 of convert-vitamin-e-unit (from Perl distribution App-VitaminUtils), released on 2020-11-03.
+This document describes version 0.003 of convert-vitamin-e-unit (from Perl distribution App-VitaminUtils), released on 2021-03-17.
 
 =head1 SYNOPSIS
 
@@ -59,9 +59,13 @@ Show all possible conversions:
  +------------------+--------------------------------+
  | 1                | mg                             |
  | 1000             | mcg                            |
+ | 1                | mg-alpha-TE                    |
  | 1                | mg-alpha-tocopherol-equivalent |
  | 1                | mg-rrr-alpha-tocopherol        |
- | 1                | mg-rrr-alpha-tocopherol        |
+ | 1                | mg-d-alpha-tocopherol          |
+ | 1.09558823529412 | mg-d-alpha-tocopheryl-acetate  |
+ | 1.49             | mg-dl-alpha-tocopheryl-acetate |
+ | 1.35454545454545 | mg-dl-alpha-tocopherol         |
  | 2                | mg-beta-tocopherol             |
  | 10               | mg-gamma-tocopherol            |
  | 3.33333333333333 | mg-alpha-tocotrienol           |
@@ -213,7 +217,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-VitaminUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-VitaminUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-VitaminUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -225,7 +229,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

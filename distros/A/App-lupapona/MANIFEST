@@ -2,6 +2,7 @@ Changes
 CONTRIBUTING.md
 lib/App/lupapona.pm
 LICENSE
+Makefile.aperl
 Makefile.PL
 MANIFEST			This list of files
 MYMETA.json
@@ -9,5 +10,7 @@ MYMETA.yml
 README.md
 script/lupa-pona
 t/basic.t
+t/test.gmi
+t/test.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

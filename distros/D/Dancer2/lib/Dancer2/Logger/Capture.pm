@@ -1,6 +1,6 @@
 package Dancer2::Logger::Capture;
 # ABSTRACT: Capture dancer logs
-$Dancer2::Logger::Capture::VERSION = '0.300005';
+$Dancer2::Logger::Capture::VERSION = '0.301001';
 use Moo;
 use Dancer2::Logger::Capture::Trap;
 
@@ -38,7 +38,7 @@ Dancer2::Logger::Capture - Capture dancer logs
 
 =head1 VERSION
 
-version 0.300005
+version 0.301001
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ A worked-out real-world example:
 
 This is a logger class for L<Dancer2> which captures all logs to an object.
 
-It's primary purpose is for testing. Here is an example of a test:
+Its primary purpose is for testing. Here is an example of a test:
 
     use strict;
     use warnings;

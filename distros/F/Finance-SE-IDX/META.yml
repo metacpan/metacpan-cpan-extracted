@@ -21,6 +21,7 @@ requires:
   HTTP::Tiny::Cache: '0'
   HTTP::Tinyish: '0'
   JSON::MaybeXS: '0'
+  Log::ger: '0.037'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -28,7 +29,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Finance-SE-IDX/issues
   homepage: https://metacpan.org/release/Finance-SE-IDX
   repository: git://github.com/perlancar/perl-Finance-SE-IDX.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

@@ -2,7 +2,7 @@
 #
 # COPYRIGHT:
 #
-# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 #                                          <sales@bestpractical.com>
 #
 # (Except where explicitly superseded by other copyright notices)
@@ -53,14 +53,40 @@ use warnings;
 package RT::BugTracker::Public;
 use URI::Escape qw/ uri_escape /;
 
-our $VERSION = '1.05';
+our $VERSION = '1.09';
 
 RT->AddJavaScript("bugtracker-public.js");
 RT->AddStyleSheets("bugtracker-public.css");
 
 =head1 NAME
 
-RT::BugTracker::Public - Adds a public, (hopefully) userfriendly bug tracking UI to RT
+RT::BugTracker::Public - Adds a public, user-friendly bug tracking and
+reporting UI to RT
+
+=head1 DESCRIPTION
+
+RT::BugTracker::Public depends on RT::BugTracker.
+
+RT::BugTracker::Public depends on RT::Authen::Bitcard and
+Authen::Bitcard for external authentication through Bitcard.
+
+NB: External authentication through Bitcard is broken in RT 4.2 and
+4.4. The authors may eventually deprecate this functionality.
+
+This extension adds a public interface for searching and reporting
+bugs through an RT with RT::BugTracker installed. The public reporting
+UI is disabled, by default.
+
+The public interface entrypoint is on the RT login page. Click the
+C<public interface> link to access the public bug search page. The
+public search functionality is identical to the private interface in
+RT::BugTracker.
+
+To enable public bug reporting, follow the documentation for
+C<WebPublicUserReporting>, in the C<CONFIGURATION> section, below. To
+report bugs, public users must create a new ticket using the C<New
+ticket in> button, or click C<Report a new bug> from the bug list page
+for a distribution.
 
 =head1 INSTALLATION
 
@@ -74,17 +100,17 @@ RT::BugTracker::Public - Adds a public, (hopefully) userfriendly bug tracking UI
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item C<make initdb>
+
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 Add this line:
 
-    Set(@Plugins, qw(RT::BugTracker::Public));
-
-or add C<RT::BugTracker::Public> to your existing C<@Plugins> line.
+    Plugin('RT::BugTracker::Public');
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -98,24 +124,62 @@ define options there.
 
 =head2 WebPublicUser
 
-Make sure to create the public user in your RT system and add the line below
-to your F<RT_SiteConfig.pm>.
+Create the public user in your RT system through F<Admin \> Users \>
+Create> in RT. The public user must be able to access RT, and it must
+be privileged so it can have rights. Do not enter an email address for
+the public user.
+
+Add the line below to F<RT_SiteConfig.pm> and replace 'guest' with the
+name of the RT user you just created.
 
     Set( $WebPublicUser, 'guest' );
 
-If you didn't name your public user 'guest', then change accordingly.
+The public user needs the following rights on public distribution
+queues to search bugs:
 
-The public user should probably be unprivileged and have the following rights
-
-    CreateTicket
-    ModifyCustomField
-    ReplyToTicket
     SeeCustomField
     SeeQueue
     ShowTicket
 
-If you want the public UI to do anything useful. It should NOT have the
-ModifySelf right.
+The pubic user needs the following rights on public distribution
+queues to report bugs:
+
+    CreateTicket
+    ModifyCustomField
+    ReplyToTicket
+
+=head2 WebPublicUserReporting
+
+By default, the web public user cannot create bug reports through the
+web UI. To allow this, add this line:
+
+    Set($WebPublicUserReporting, 1);
+
+=head2 WebPublicUserQueryBuilder
+
+By default, the web public user cannot use RT's fully-featured query builder
+and is limited instead to simple search. To allow access to the query
+builder, add this line:
+
+    Set($WebPublicUserQueryBuilder, 1);
+
+=head2 WebPublicUserSortResults
+
+By default, the web public user cannot click column headers to re-sort search
+results due to performance implications. To permit this, add this line:
+
+    Set($WebPublicUserSortResults, 1);
+
+=head2 ScrubInlineArticleContent
+
+By default, inline articles such as AfterLoginForm are scrubbed for unsafe
+HTML tags just like ticket correspondence. If your articles are modifiable
+only by trusted users, you may set this to 0 to pass through article content
+unscrubbed.
+
+See the documentation below for L</GetArticleContent> for more information.
+
+    Set($ScrubInlineArticleContent, 0);
 
 =cut
 
@@ -156,8 +220,13 @@ sub RedirectToPublic {
         return "/Public$path";
     }
 
+    elsif ( RT->Config->Get('WebPublicUserQueryBuilder')) {
+        return undef if $path =~ '^/+Search/Build.html'
+                     || $path =~ '^/+Search/Results.html'
+    }
+
     # otherwise, drop the user at the Public default page
-    elsif (    $path !~ '^(/+)Public/'
+    if (       $path !~ '^(/+)Public/'
            and $path !~ RT->Config->Get('WebNoAuthRegex')
            and $path !~ '^/+Helpers/Autocomplete/Queues' ) {
         return "/Public/";
@@ -166,8 +235,8 @@ sub RedirectToPublic {
 }
 
 require RT::Interface::Web;
-%RT::Interface::Web::is_whitelisted_component = (
-    %RT::Interface::Web::is_whitelisted_component,
+%RT::Interface::Web::IS_WHITELISTED_COMPONENT = (
+    %RT::Interface::Web::IS_WHITELISTED_COMPONENT,
     "/Public/Browse.html"            => 1,
     "/Public/Dist/BeginsWith.html"   => 1,
     "/Public/Dist/Browse.html"       => 1,
@@ -178,6 +247,84 @@ require RT::Interface::Web;
     "/Public/Search/Simple.html"     => 1,
     "/Public/index.html"             => 1,
 );
+
+=head2 GetArticleContent
+
+Searches in articles for content for various configurable pages in the BugTracker
+interface. The article names are available for adding custom
+content in the listed locations. To customize, create or edit the article with the
+listed name.
+
+=over
+
+=item * AfterLoginForm
+
+Location: Login page, below username/password fields
+
+=back
+
+=cut
+
+sub GetArticleContent {
+    my $article_name = shift;
+
+    my $Class = RT::Class->new( RT->SystemUser );
+    my ($ret, $msg) = $Class->Load('BugTracker Pages');
+
+    unless ( $ret and $Class->Id ){
+        RT::Logger->warning('Unable to load BugTracker Pages class for articles');
+        return '';
+    }
+
+    my $Article = RT::Article->new( RT->SystemUser );
+    ($ret, $msg) = $Article->LoadByCols( Name => $article_name, Class => $Class->Id );
+
+    unless ($ret and $Article->id){
+        RT::Logger->debug("No article found for " . $article_name);
+        return '';
+    }
+
+    RT::Logger->debug("Found article id: " . $Article->Id);
+    my $class = $Article->ClassObj;
+    my $cfs = $class->ArticleCustomFields;
+
+    while (my $cf = $cfs->Next) {
+        my $values = $Article->CustomFieldValues($cf->Id);
+        my $value = $values->First;
+        return $value->Content;
+    }
+    return;
+}
+
+# "public" UsernameFormat
+package RT::User;
+
+sub _FormatUserPublic
+{
+    my $self = shift;
+    my %args = @_;
+    my $session = \%HTML::Mason::Commands::session;
+
+    if (!$args{User} && $args{Address}) {
+        $args{User} = RT::User->new( $session->{'CurrentUser'} );
+        $args{User}->LoadByEmail($args{Address}->address);
+        if ($args{User}->Id) {
+            $args{Address} = '';
+        } else {
+            $args{Address} = $args{Address}->address;
+        }
+    } else {
+        $args{Address} = $args{User}->EmailAddress;
+    }
+    if ( $args{Address} && RT::BugTracker::Public->IsPublicUser ) {
+        $args{Address} =~ s/@/ [...] /;
+    }
+
+    return $args{Address} || $args{User}->RealName || $args{User}->Name;
+}
+
+# Switch back to original package
+package RT::BugTracker::Public;
 
 =head1 AUTHOR
 
@@ -195,7 +342,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014 by Best Practical Solutions
+This software is Copyright (c) 2021 by Best Practical Solutions
 
 This is free software, licensed under:
 

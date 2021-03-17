@@ -31,7 +31,7 @@ sub init
     $self->{size} = MAX_SIZE;
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
-    return( $self->error( "Note under this system $^O are unsupported." ) ) if( !Apache2::SSI::SharedMem->supported );
+    return( $self->error( "Notes under this system $^O are unsupported." ) ) if( !Apache2::SSI::SharedMem->supported );
     my $mem = Apache2::SSI::SharedMem->new(
         key => ( length( $self->{key} ) ? $self->{key} : 'ap2_ssi_notes' ),
         ## 512 Kb max
@@ -260,7 +260,7 @@ However, this only works when L<Apache2::SSI> is in charge of parsing SSI files.
 
 =head2 new
 
-This instantiate a notes object. It takes the following parameters:
+This instantiates a notes object. It takes the following parameters:
 
 =over 4
 

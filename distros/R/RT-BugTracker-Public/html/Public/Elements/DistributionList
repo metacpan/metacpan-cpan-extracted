@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -45,32 +45,37 @@
 %# those contributions and any derivatives thereof.
 %#
 %# END BPS TAGGED BLOCK }}}
-<div class="dist-list">
-<ul>
+<div class="dist-list row mt-2">
+  <div class="col-6">
+    <ul class="list-group">
 % my $count  = $queues->Count;
 % my $broken = 0;
 %
 % while (my $queue = $queues->Next) {
-% 
+%
 %     if ($count > 10
 %           and not $broken
-%           and $queues->_ItemsCounter >= $count / 2)
+%           and $queues->_ItemsCounter > $count / 2)
 %     {
 %         $broken = 1;
-</ul>
-
-<ul>
+    </ul>
+  </div>
+  <div class="col-6">
+    <ul class="list-group">
 %     }
-  <li>
+  <li class="list-group-item">
     <span class="dist-actions">
       <a href="<% $RT::WebPath %>/Public/Dist/Display.html?Name=<% $queue->Name |u %>">Bug list</a>
+% if (RT->Config->Get('WebPublicUserReporting')) {
       &#8226;
       <a href="<% $RT::WebPath %>/Public/Bug/Report.html?Queue=<% $queue->Name |u %>">Report a bug</a>
+% }
     </span>
     <strong><% $queue->Name %></strong>
   </li>
 % }
-</ul>
+    </ul>
+  </div>
 </div>
 
 <%args>

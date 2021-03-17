@@ -86,12 +86,24 @@ die "$!: giving up after ${total}s\n" unless $ok;
 my $page = query_gemini("gemini://$host:$port/");
 like($page, qr"^20 text/gemini; charset=UTF-8\r\n", "Gemini header");
 like($page, qr/Welcome to Lupa Pona!/, "Title");
-like($page, qr/=> basic.t/, "one file shown");
-is(scalar(() = $page =~ m/=>/g), 1, "exactly one link");
+like($page, qr/=> basic\.t/, "basic.t");
+like($page, qr/=> test\.gmi/, "test.gmi");
+like($page, qr/=> test\.txt/, "test.txt");
+is(scalar(() = $page =~ m/=>/g), 3, "three links");
 
 $page = query_gemini("gemini://$host:$port/basic.t");
-like($page, qr"^20 text/gemini; charset=UTF-8\r\n", "File header");
+# the MIME type can be application/x-perl or text/troff, depending on the system
+# the test runs on…
+like($page, qr"^20 (application/x-perl|text/(troff|gemini); charset=UTF-8)\r\n", "File header");
 like($page, qr"GNU General Public License", "File content");
+
+$page = query_gemini("gemini://$host:$port/test.txt");
+like($page, qr"^20 text/plain; charset=UTF-8\r\n", "File header");
+like($page, qr"Alex Schröder", "File content");
+
+$page = query_gemini("gemini://$host:$port/test.gmi");
+like($page, qr"^20 text/gemini; charset=UTF-8\r\n", "File header");
+like($page, qr"Hallo", "File content");
 
 $page = query_gemini("gemini://$host:$port/cert.pem");
 like($page, qr"^50 ", "Do not serve cert.pem");

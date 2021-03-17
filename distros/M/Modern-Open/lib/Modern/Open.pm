@@ -5,10 +5,10 @@ package Modern::Open;
 #
 # https://metacpan.org/release/Modern-Open
 #
-# Copyright (c) 2014, 2015, 2018, 2019, 2020 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2014, 2015, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org>
 ######################################################################
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -21,7 +21,7 @@ sub Modern::Open::confess (@) {
     my $i = 0;
     my @confess = ();
     while (my($package,$filename,$line,$subroutine) = caller($i)) {
-        push @confess, "[$i] $filename($line) ${package}::$subroutine\n";
+        push @confess, "[$i] $filename($line) $package"."::$subroutine\n";
         $i++;
     }
     print STDERR CORE::reverse @confess;

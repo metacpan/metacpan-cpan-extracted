@@ -12,11 +12,7 @@ BEGIN
 my $tests =
 [
     {
-        expect => <<EOT,
-
-value: the "value"
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*value\: the "value"/,
         name => 'setting variable with escaped quotes',
         uri => "${BASE_URI}/06.01.escape.html",
         code => 200,

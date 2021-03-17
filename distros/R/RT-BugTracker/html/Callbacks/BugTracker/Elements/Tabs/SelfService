@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -51,7 +51,21 @@ my $escaped_uname = $m->interp->apply_escapes(
     $session{'CurrentUser'}->UserObj->Name, 'u'
 );
 
-my $tracker = Menu->child("search")->add_after(
+my $request_path = $HTML::Mason::Commands::r->path_info;
+$request_path =~ s!^/{2,}!/!;
+
+my $menu = Menu->child("search")
+        || Menu->child("tickets");
+
+# only include distributions in self-service menu if BugTracker's urls are
+# accessible to unprivileged users
+if ($request_path =~ RT->Config->Get('SelfServiceRegex')) {
+    if ("/Dist/Search.html" !~ RT->Config->Get('SelfServiceRegex')) {
+        return;
+    }
+}
+
+my $tracker = $menu->add_after(
     bugtracker => title => loc('Distributions'),
     path => '/Dist/ByMaintainer.html?Name=' . $escaped_uname,
 );
@@ -66,13 +80,13 @@ $tracker->child(
     path        => '/Dist/Search.html',
 );
 
-$tracker->child(
-    browse => title => loc('Browse'),
-    path        => '/Dist/Browse.html',
-);
+unless (RT->Config->Get('BugTracker_HideBrowseDistributions')) {
+    $tracker->child(
+        browse => title => loc('Browse'),
+        path        => '/Dist/Browse.html',
+    );
+}
 
-my $request_path = $HTML::Mason::Commands::r->path_info;
-$request_path =~ s!^/{2,}!/!;
 if ( $request_path =~ m{^/Dist/(?:Display|Manage)\.html} ) {
     my $Queue = $DECODED_ARGS->{'Name'} || $DECODED_ARGS->{'Queue'};
 
@@ -100,7 +114,7 @@ if ( $request_path =~ m{^/Dist/(?:Display|Manage)\.html} ) {
         );
         PageMenu()->child(
             active => title => loc("Active bugs"),
-            path => "/Dist/Display.html?Status=Active;Queue=" . $escaped_queue,
+            path => "/Dist/Display.html?Status=__Active__;Queue=" . $escaped_queue,
         );
 
         PageMenu()->child(

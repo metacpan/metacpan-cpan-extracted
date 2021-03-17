@@ -101,6 +101,9 @@ serve one of them)
 
 =item C<--port> is the port to use; the default is 1965
 
+=item C<--text_encoding> is the text encoding to use if you're not going to use
+UTF-8 (consider adding support for L<Encode::Guess>)
+
 =item C<--log_level> is the log level to use (error, warn, info, debug, trace);
 the default is C<warn>
 
@@ -174,6 +177,7 @@ use Getopt::Long;
 use File::Slurper qw(read_binary read_dir);
 use Encode qw(encode_utf8 decode_utf8);
 use Modern::Perl '2018';
+use File::MimeInfo qw(globs);
 use URI::Escape;
 use Pod::Text;
 use utf8;
@@ -182,6 +186,7 @@ our $host;
 our $port ||= 1965;
 our $cert_file ||= "cert.pem";
 our $key_file ||= "key.pem";
+our $encoding ||= "UTF-8";
 our $log_level ||= "warn";  # error, warn, info, debug, trace
 
 my %args = ();
@@ -189,6 +194,7 @@ GetOptions ("host=s"          => \$host,
 	    "port=i"          => \$port,
 	    "cert_file=s"     => \$cert_file,
 	    "key_file=s"      => \$key_file,
+	    "text_encoding=s" => \$encoding,
 	    "log_level=s"     => \$log_level)
     or die("Error in command line arguments\n");
 
@@ -228,6 +234,8 @@ Mojo::IOLoop->server(
     $stream->on(read => \&serve_gemini);
   });
 
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
 sub serve_gemini {
   my ($stream, $url) = @_;
   return unless $url =~ s/\r\n.*//s; # needs URL and CR LF in one chunk
@@ -260,7 +268,9 @@ sub serve_gemini {
   } elsif ($path =~ m!^/([^/]+)$!) {
     my $file = decode_utf8(uri_unescape($1));
     if (-f $file) {
-      $stream->write("20 text/gemini; charset=UTF-8\r\n");
+      my $mime = globs($file) || mime_type($file);
+      $mime .= "; charset=$encoding" if $mime =~ /^text\// and $encoding;
+      $stream->write("20 $mime\r\n");
       $stream->write(read_binary($file));
     } else {
       $stream->write("51 File not found: $file\r\n");
@@ -272,4 +282,13 @@ sub serve_gemini {
   $stream->close_gracefully();
 };
 
-Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+sub mime_type {
+  $_ = shift;
+  return 'text/plain' if /\.te?xt$/i;
+  return 'text/markdown' if /\.md$/i;
+  return 'text/html' if /\.html?$/i;
+  return 'image/png' if /\.png$/i;
+  return 'image/jpeg' if /\.jpe?g$/i;
+  return 'image/gif' if /\.gif$/i;
+  return 'text/gemini';
+}

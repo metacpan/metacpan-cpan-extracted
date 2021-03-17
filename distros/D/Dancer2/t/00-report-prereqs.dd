@@ -1,14 +1,8 @@
 do { my $x = {
-       'build' => {
-                    'requires' => {
-                                    'ExtUtils::MakeMaker' => '7.1101',
-                                    'Test::CPAN::Meta' => '0'
-                                  }
-                  },
        'configure' => {
                         'requires' => {
                                         'CPAN::Meta::Requirements' => '2.120620',
-                                        'ExtUtils::MakeMaker' => '7.1101',
+                                        'ExtUtils::MakeMaker' => '0',
                                         'File::ShareDir::Install' => '0.06',
                                         'Module::Metadata' => '0'
                                       }
@@ -33,7 +27,8 @@ do { my $x = {
                     },
        'runtime' => {
                       'conflicts' => {
-                                       'YAML' => '1.16'
+                                       'Role::Tiny' => '== 2.000007',
+                                       'YAML' => '== 1.16'
                                      },
                       'recommends' => {
                                         'CGI::Deurl::XS' => '0',
@@ -52,7 +47,6 @@ do { my $x = {
                                         'YAML::XS' => '0'
                                       },
                       'requires' => {
-                                      'App::Cmd::Setup' => '0',
                                       'Attribute::Handlers' => '0',
                                       'Carp' => '0',
                                       'Clone' => '0',
@@ -85,7 +79,7 @@ do { my $x = {
                                       'Plack::Middleware::FixMissingBodyInRedirect' => '0',
                                       'Plack::Middleware::RemoveRedundantBody' => '0',
                                       'Ref::Util' => '0',
-                                      'Role::Tiny' => '>= 2.000000, != 2.000007',
+                                      'Role::Tiny' => '2.000000',
                                       'Safe::Isa' => '0',
                                       'Sub::Quote' => '0',
                                       'Template' => '0',
@@ -109,7 +103,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'Capture::Tiny' => '0.12',
-                                   'ExtUtils::MakeMaker' => '7.1101',
+                                   'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'HTTP::Cookies' => '0',
                                    'HTTP::Headers' => '0',

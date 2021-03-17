@@ -19,19 +19,13 @@ my $size_formatted = $inc_size < 1024 ? $inc_size : $inc_size->format_bytes;
 my $tests =
 [
     {
-        expect => <<EOT,
-
-This file size is ${size_formatted}
-EOT
+        expect => qr/^[[:blank:]\h\v]*This file size is ${size_formatted}/,
         name => 'abbrev',
         uri => "${BASE_URI}/08.01.fsize.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-This file size is ${inc_size}
-EOT
+        expect => qr/^[[:blank:]\h\v]*This file size is ${inc_size}/,
         name => 'bytes',
         uri => "${BASE_URI}/08.02.fsize.html",
         code => 200,

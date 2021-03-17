@@ -1,6 +1,6 @@
-package MooseX::App::Cmd; # git description: v0.31-7-ge5f0159
+package MooseX::App::Cmd; # git description: v0.32-7-gf00a289
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Moose;
 use MooseX::NonMoose;
@@ -26,7 +26,7 @@ MooseX::App::Cmd - Mashes up MooseX::Getopt and App::Cmd
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -110,10 +110,10 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 (or L<bug-MooseX-App-Cmd@rt.cpan.org|mailto:bug-MooseX-App-Cmd@rt.cpan.org>).
 
 There is also a mailing list available for users of this distribution, at
-http://lists.perl.org/list/moose.html.
+L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHOR
 
@@ -121,7 +121,7 @@ irc://irc.perl.org/#moose.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Mark Gardner Karen Etheridge Graham Knop Daisuke Maki Offer Kaye brunov vovkasm Ken Crowell Michael Joyce Dann Guillermo Roditi
+=for stopwords Mark Gardner Karen Etheridge Graham Knop Daisuke Maki Offer Kaye brunov Ken Crowell vovkasm Dann Guillermo Roditi Michael Joyce
 
 =over 4
 
@@ -151,15 +151,11 @@ brunov <vecchi.b@gmail.com>
 
 =item *
 
-vovkasm <vovkasm@gmail.com>
-
-=item *
-
 Ken Crowell <oeuftete@gmail.com>
 
 =item *
 
-Michael Joyce <ubermichael@gmail.com>
+vovkasm <vovkasm@gmail.com>
 
 =item *
 
@@ -169,11 +165,15 @@ Dann <techmemo@gmail.com>
 
 Guillermo Roditi <groditi@gmail.com>
 
+=item *
+
+Michael Joyce <ubermichael@gmail.com>
+
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2008 by Infinity Interactive, Inc..
+This software is copyright (c) 2008 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

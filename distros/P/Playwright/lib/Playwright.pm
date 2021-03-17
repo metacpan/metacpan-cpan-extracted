@@ -1,9 +1,10 @@
 package Playwright;
-$Playwright::VERSION = '0.002';
+$Playwright::VERSION = '0.003';
 use strict;
 use warnings;
 
-use v5.28;
+use 5.006;
+use v5.28.0;    # Before 5.006, v5.10.0 would not be understood.
 
 use sigtrap qw/die normal-signals/;
 
@@ -24,9 +25,11 @@ use Playwright::Base();
 use Playwright::Util();
 
 #ABSTRACT: Perl client for Playwright
+use 5.006;
+use v5.28.0;    # Before 5.006, v5.10.0 would not be understood.
 
 no warnings 'experimental';
-use feature qw{signatures state};
+use feature qw{signatures};
 
 our ( $spec, $server_bin, $node_bin, %mapper, %methods_to_rename );
 
@@ -221,7 +224,9 @@ sub _check_and_build_spec ($self) {
 
     $spec =
       Playwright::Util::request( 'GET', 'spec', $self->{port}, $self->{ua}, );
-
+    confess(
+        "Could not retrieve Playwright specification.  Check that your playwright installation is correct and complete."
+    ) unless ref $spec eq 'HASH';
     return $spec;
 }
 
@@ -301,7 +306,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

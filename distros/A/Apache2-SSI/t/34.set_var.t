@@ -15,34 +15,17 @@ BEGIN
 my $tests =
 [
     {
-        expect => <<EOT,
-Set one: 
-Set two: 
-Echo two: hi
-EOT
+        expect => qr/^[[:blank:]\h\v]*Set one\:[[:blank:]\h\v]+Set two\:[[:blank:]\h\v]+Echo two: hi/,
         uri => "${BASE_URI}/04.01.set_var.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-foo = bar
-QUERY_STRING = query
-
-04.02.set_var.html
-
-foo = bar
-QUERY_STRING = query
-EOT
+        expect => qr/^[[:blank:]\h\v]*foo \= bar[[:blank:]\h\v]+QUERY_STRING \= query[[:blank:]\h\v]+04.02.set_var.html[[:blank:]\h\v]+foo \= bar[[:blank:]\h\v]+QUERY_STRING = query/,
         uri => "${BASE_URI}/04.02.set_var.html?query",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-The query string is: query
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*The query string is: query/,
         uri => "${BASE_URI}/04.03.set_var.html?query",
         code => 200,
     },

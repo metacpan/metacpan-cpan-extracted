@@ -1,6 +1,8 @@
 Revision history for WWW-Crawler-Mojo
 
-0.25 2019/08/16
+0.26 2019/11/13
+
+0.25 2019/11/13
   - Reduce memory usage.
 
 0.24 2019/08/16

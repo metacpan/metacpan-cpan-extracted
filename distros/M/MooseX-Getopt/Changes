@@ -1,5 +1,9 @@
 Revision history for MooseX-Getopt
 
+0.75      2021-03-16 19:25:29Z
+ - adjust tests to deal with formatting changes in Getopt::Long::Descriptive
+   0.106 (RT#134754)
+
 0.74      2018-09-23 23:41:10Z
  - fix init_arg when used in combination with an underscored attribute read
    from the config file (Andreas Koenig, github #11)

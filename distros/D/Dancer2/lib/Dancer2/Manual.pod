@@ -13,7 +13,7 @@ Dancer2::Manual - A gentle introduction to Dancer2
 
 =head1 VERSION
 
-version 0.300005
+version 0.301001
 
 =head1 DESCRIPTION
 
@@ -2717,6 +2717,14 @@ Returns a L<Hash::MultiValue> object from the body parameters.
         my $last_name = body_parameters->get('name');
         my @all_names = body_parameters->get_all('name');
     };
+
+=head2 request_data
+
+Returns the request's body in data form
+(in case a serializer is set, it will be in deserialized).
+
+This allows us to distinguish between C<body_parameters>, a representation
+of request parameters (L<Hash::MultiValue>) and other forms of content.
 
 =head2 pass
 

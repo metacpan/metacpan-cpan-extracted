@@ -26,6 +26,14 @@
             "Test::More" : "0.88"
          }
       },
+      "configure" : {
+         "requires" : {
+            "Module::Metadata" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -43,18 +51,24 @@
    "provides" : {
       "Date::Tolkien::Shire::Data" : {
          "file" : "lib/Date/Tolkien/Shire/Data.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/trwyant/perl-Date-Tolkien-Shire-Data/issues"
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Date-Tolkien-Shire-Data.git",
+         "web" : "https://github.com/trwyant/perl-Date-Tolkien-Shire-Data"
+      }
    },
-   "version" : "0.007",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.008",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

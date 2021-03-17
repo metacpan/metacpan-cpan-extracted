@@ -8,7 +8,7 @@ use warnings;
 use Getopt::Long 2.33 qw{ :config auto_version };
 use Pod::Usage;
 
-our $VERSION = '0.905';
+our $VERSION = '0.906';
 
 my %opt = (
     from	=> 'DateTime',

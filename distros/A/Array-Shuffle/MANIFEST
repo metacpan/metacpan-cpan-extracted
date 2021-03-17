@@ -5,9 +5,10 @@ MANIFEST
 ppport.h
 README
 samples/benchmark.pl
+samples/stats.pl
 Shuffle.xs
 t/Array-Shuffle.t
 t/pods.t
-samples/stats.pl
+t/tied.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

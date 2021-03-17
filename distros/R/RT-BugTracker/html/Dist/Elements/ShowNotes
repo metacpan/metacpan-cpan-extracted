@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -48,7 +48,7 @@
 % $m->callback( %ARGS, CallbackName => "Top" );
 
 % if ( $Queue->Disabled ) {
-<&| /Widgets/TitleBox, title => loc("Queue is disabled"), class => "error", hideable => 0 &>
+<&| /Widgets/TitleBox, title => loc("Queue is disabled"), class => "error-titlebox", hideable => 0 &>
 <&|/l&>This queue is disabled and you may not create new tickets in it.  Disabled queues are usually because the distribution was merged with another or changed names.  Sometimes they are the end result of a bad autocreate from PAUSE data before anyone noticed.</&>
 </&>
 % }

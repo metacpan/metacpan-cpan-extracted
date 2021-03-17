@@ -30,14 +30,15 @@
          "requires" : {
             "Alien::LibJQ" : "0.04",
             "JSON" : "0",
-            "Path::Tiny" : "0"
+            "Path::Tiny" : "0",
+            "enum" : "0"
          }
       }
    },
    "provides" : {
       "JSON::JQ" : {
          "file" : "lib/JSON/JQ.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -52,6 +53,6 @@
          "url" : "https://github.com/dxma/perl5-json-jq"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

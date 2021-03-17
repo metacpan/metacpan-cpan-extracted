@@ -1,4 +1,4 @@
-use Test::More tests => 52;
+use Test::More tests => 53;
 use strict;
 use warnings;
 use vars qw/$Class $quoter/;
@@ -111,7 +111,7 @@ my $repeat="abcdefg"x 20;
 	my @quotes=map{Text::Quote->quote($_,indent=>6,col_width=>60)}('"The time has come"
 	the	walrus said,
 	"to speak of many things..."',"\0\1\2\3\4\5\6\a\b\t\n\13\f\r\16\17\20\21\22\23\24\25\26\27\30\31\32\e\34\35".
-	"\36\37",("\6\a\b\t\n\13\f\r\32\e\34" x 5),2/3,10,'£20','00',);
+	"\36\37",("\6\a\b\t\n\13\f\r\32\e\34" x 5),10,'£20','00',);
 	my $res;
 	for my $i (1..@quotes) {
 		$res.= "\$var$i=".$quotes[$i-1].";\n";
@@ -122,9 +122,14 @@ $var1=qq'"The time has come"\n\tthe\twalrus said,\n\t"to speak of man'.
 $var2="\0\1\2\3\4\5\6\a\b\t\n\13\f\r\16\17\20\21\22\23\24\25\26\27".
       "\30\31\32\e\34\35\36\37";
 $var3=("\6\a\b\t\n\13\f\r\32\e\34" x 5);
-$var4=0.666666666666667;
-$var5=10;
-$var6='£20';
-$var7='00';
+$var4=10;
+$var5='£20';
+$var6='00';
 
+}
+
+{
+    my $res = sprintf("two-thirds=%s",
+                      Text::Quote->quote(2/3, indent => 6, col_width => 60));
+    like($res, qr/^two-thirds=0.66+7$/, "floating point test");
 }

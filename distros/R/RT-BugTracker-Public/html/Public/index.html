@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -50,31 +50,65 @@
 
 <& /Elements/ListActions, actions => \@results &>
 
+% unless (RT->Config->Get('BugTracker_ShowAllDistributions')) {
 <p>
   <form action="<% RT->Config->Get('WebPath') %><% $m->request_path %>" method="get">
-    <label for="form-dist-name"><&|/l&>Find a distribution by full name:</&></label>
-    <input type="text" name="Distribution" id="form-dist-name" data-autocomplete="Queues" data-autocomplete-autosubmit=1 />
-    <input type="submit" class="button" value="<&|/l&>Search</&>" />
+    <div class="form-row">
+      <div class="col-auto label">
+        <&|/l&>Find a distribution by full name:</&>
+      </div>
+      <div class="col-auto">
+        <input type="text" name="Distribution" data-autocomplete="Queues" data-autocomplete-autosubmit=1 autocomplete="off" />
+      </div>
+      <div class="col-auto">
+        <input type="submit" class="button btn btn-primary form-control" value="<&|/l&>Search</&>" />
+      </div>
+    </div>
   </form>
 </p>
 
 <p>
   <form action="<% RT->Config->Get('WebPath') %><% $m->request_path %>" method="get">
-    <label for="form-dist-maint"><&|/l&>Find distributions by maintainer:</&></label>
-    <input type="text" name="Maintainer" id="form-dist-maint" data-autocomplete="Users" data-autocomplete-autosubmit=1 />
-    <input type="submit" class="button" value="<&|/l&>Search</&>" />
+    <div class="form-row">
+      <div class="col-auto label">
+        <&|/l&>Find distributions by maintainer:</&>
+      </div>
+      <div class="col-auto">
+        <input class="form-control" type="text" name="Maintainer" id="form-dist-maint" data-autocomplete="Users" data-autocomplete-autosubmit=1 autocomplete="off" />
+      </div>
+      <div class="col-auto">
+        <input type="submit" class="button btn btn-primary form-control" value="<&|/l&>Search</&>" />
+      </div>
+    </div>
   </form>
 </p>
+% }
 
 <p>
   <form action="/Public/Search/Simple.html" method="get">
-    <label for="form-simple-query"><&|/l&>General search:</&></label>
-    <input type="text" name="q" id="form-simple-query" />
-    <input type="submit" class="button" value="<&|/l&>Search</&>" />
+    <div class="form-row">
+      <div class="col-auto label">
+        <&|/l&>General search:</&>
+      </div>
+      <div class="col-auto">
+        <input class="form-control" type="text" name="q" id="form-simple-query" />
+      </div>
+      <div class="col-auto">
+        <input type="submit" class="button btn btn-primary form-control" value="<&|/l&>Search</&>" />
+      </div>
+    </div>
   </form>
 
   <&|/l&>This search looks for bug report IDs, distribution names, usernames, and bug report descriptions among other fields.</&>
 </p>
+
+% if (RT->Config->Get('BugTracker_ShowAllDistributions')) {
+<h2><&|/l&>Distributions</&></h2>
+
+% my $queues = RT::Queues->new($session{CurrentUser});
+% $queues->UnLimit;
+    <& /Public/Elements/DistributionList, queues => $queues &>
+% }
 <%ARGS>
 $Distribution => ''
 $Maintainer   => ''
@@ -105,7 +139,8 @@ if ( defined $Maintainer && length $Maintainer ) {
 
 if ( defined $Distribution && length $Distribution ) {
     my $queue = RT::Queue->new( $session{'CurrentUser'} );
-    $Distribution =~ s/::/-/g;
+    my %NameRegex = RT->Config->Get("DistributionToQueueRegex");
+    $Distribution =~ s/$NameRegex{Pattern}/$NameRegex{Substitution}/g;
     $queue->Load( $Distribution );
     unless ( $queue->id ) {
         push @results, loc("No distribution '[_1]' in the system", $Distribution);

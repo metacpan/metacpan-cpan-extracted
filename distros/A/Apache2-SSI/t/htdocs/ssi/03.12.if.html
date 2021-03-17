@@ -1,4 +1,4 @@
-<!--#if expr="'192.168.1.10' !-R '192.168.2.0/24'" -->
+<!--#if expr="'192.168.1.10' !-ipmatch '192.168.2.0/24'" -->
 Ok, remote ip is not part of my subnet
 <!--#else -->
 Failed test

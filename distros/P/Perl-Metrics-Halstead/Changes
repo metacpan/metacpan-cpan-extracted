@@ -1,5 +1,8 @@
 Revision history for Perl-Metrics-Halstead
 
+0.0613 2021-03-15 10:07:21
+    - Fix up the bin/halstead program slightly.
+
 0.0612 2020-11-15 16:36:33
     - Fix up the eg/git-halstead program.
 

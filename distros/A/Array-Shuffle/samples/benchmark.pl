@@ -23,8 +23,8 @@ sub shuffle_perl (\@) {
 
 $| = 1;
 my @a;
-my $f = 10 ** (1/3);
-for (my $n = 1; ; $n *= $f) {
+my $f = 10 ** (1/10);
+for (my $n = 100; ; $n *= $f) {
     print "Generating array with " . int($n) . " elements...\n";
     my $c;
     my $s = $#a; $#a = $n; $#a = $s;
@@ -38,12 +38,15 @@ for (my $n = 1; ; $n *= $f) {
     system "ps vp $$";
     print "Shuffling it...\n";
 
-    my %bm = (sa  => sub { shuffle_array @a },
-              sha => sub { shuffle_huge_array @a });
+    my %bm = (sha => sub { shuffle_huge_array @a });
 
-    if ($n <= 1_000_000) {
-        $bm{lu} = sub { @a = shuffle @a };
-        $bm{pp} = sub { shuffle_perl @a };
+    if ($n < 10_000_000) {
+        $bm{sa} = sub { shuffle_array @a };
+
+        if ($n <= 1_000_000) {
+            $bm{lu} = sub { @a = shuffle @a };
+            $bm{pp} = sub { shuffle_perl @a };
+        }
     }
 
     cmpthese(-1, \%bm);

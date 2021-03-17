@@ -1,5 +1,6 @@
 Changes
 CONTRIBUTING.md
+lib/Apache2/Expression.pm
 lib/Apache2/SSI.pm
 lib/Apache2/SSI/Common.pm
 lib/Apache2/SSI/Datetime.pod
@@ -30,6 +31,8 @@ t/37.flastmod.t
 t/38.fsize.t
 t/39.functions.t
 t/40.misc.t
+t/41.ap2perl.t
+t/42.expression.t
 t/50.finfo.t
 t/60.uri.t
 t/70.file.t
@@ -59,6 +62,7 @@ t/htdocs/ssi/03.12.if.html
 t/htdocs/ssi/03.13.if.html
 t/htdocs/ssi/03.14.if.html
 t/htdocs/ssi/03.15.if.html
+t/htdocs/ssi/03.16.if.html
 t/htdocs/ssi/04.01.set_var.html
 t/htdocs/ssi/04.02.set_var.html
 t/htdocs/ssi/04.03.set_var.html
@@ -88,6 +92,12 @@ t/htdocs/ssi/09.13.functions.html
 t/htdocs/ssi/09.14.functions.html
 t/htdocs/ssi/09.15.functions.html
 t/htdocs/ssi/09.16.functions.html
+t/htdocs/ssi/10.01.expr.html
+t/htdocs/ssi/10.02.expr.html
+t/htdocs/ssi/10.03.expr.html
+t/htdocs/ssi/10.04.expr.html
+t/htdocs/ssi/10.05.expr.html
+t/htdocs/ssi/10.06.expr.html
 t/htdocs/ssi/include.01.txt
 t/htdocs/ssi/include.02.txt
 t/htdocs/ssi/include.cgi

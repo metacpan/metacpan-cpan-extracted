@@ -7,7 +7,8 @@
 void shuffle_array(SV **p, IV i) {
     if (i > 0) {
         do {
-            int j = (i + 1) * Drand01();
+            NV d = Drand01();
+            IV j = (i + 1) * d;
             SV *tmp = p[i];
             p[i] = p[j];
             p[j] = tmp;
@@ -39,7 +40,7 @@ shuffle_huge_array(SV **first, SV **last) {
     shuffle_array(first, i);
 }
 
-MODULE = Array::Shuffle		PACKAGE = Array::Shuffle		
+MODULE = Array::Shuffle         PACKAGE = Array::Shuffle
 
 PROTOTYPES: DISABLE
 
@@ -58,22 +59,29 @@ shuffle_array(av)
 CODE:
     if (SvREADONLY(av))
         Perl_croak(aTHX_ "can't shuffle a read only array");
-    if (SvTIED_mg((SV *)av, PERL_MAGIC_tied)) {
+    if (SvMAGICAL((SV *)av)) {
         IV i;
         for (i = av_len(av); i > 0; i--) {
-            int j = (i + 1) * Drand01();
-            SV **svpi = av_fetch(av, i, 0);
-            SV *svi = (svpi ? newSVsv(*svpi) : &PL_sv_undef);
-            SV **svpj = av_fetch(av, j, 0);
-            SV *svj = (svpj ? newSVsv(*svpj) : &PL_sv_undef);
-            if (!av_store(av, i, svj)) SvREFCNT_dec(svj);
-            if (!av_store(av, j, svi)) SvREFCNT_dec(svi);
+            NV d = Drand01();
+            IV j = (i + 1) * d;
+            if (i != j) {
+                SV **svpi = av_fetch(av, i, 0);
+                SV *svi = (svpi ? newSVsv(*svpi) : &PL_sv_undef);
+                SV **svpj = av_fetch(av, j, 0);
+                SV *svj = (svpj ? newSVsv(*svpj) : &PL_sv_undef);
+                SV **svj_stored = av_store(av, i, svj);
+                mg_set(svj);
+                if (svj_stored == NULL) SvREFCNT_dec(svj);
+                SV **svi_stored = av_store(av, j, svi);
+                mg_set(svi);
+                if (svi_stored == NULL) SvREFCNT_dec(svi);
+            }
         }
     }
     else
         shuffle_array(AvARRAY(av), av_len(av));
- 
-void                     
+
+void
 shuffle_huge_array(av)
     AV *av
 PREINIT:
@@ -81,7 +89,7 @@ PREINIT:
 CODE:
     if (SvREADONLY(av))
         Perl_croak(aTHX_ "can't shuffle a read only array");
-    if (SvTIED_mg((SV *)av, PERL_MAGIC_tied))
+    if (SvMAGICAL((SV *)av))
         Perl_croak(aTHX_ "shuffle_huge_array can not handle arrays with magic attached");
     p = AvARRAY(av);
     shuffle_huge_array(p, p + av_len(av));

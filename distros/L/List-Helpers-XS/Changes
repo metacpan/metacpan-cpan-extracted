@@ -1,5 +1,14 @@
 Revision history for Perl extension List::Helpers::XS.
 
+0.08  Sun Mar 16
+    - remove redundant file from package
+
+0.07  Sun Mar 16
+    - some optimisations for shuffle_multi" method; adding more test cases
+
+0.06  Sun Mar 16
+    - add "shuffle_multi" method
+
 0.05  Sun Feb 21
     - some optimisations for tied arrays
 

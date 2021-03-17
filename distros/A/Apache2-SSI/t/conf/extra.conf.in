@@ -22,6 +22,7 @@ PerlSetupEnv On
     </IfModule>
     # Alternatively, you can do also:
     PerlSetVar Apache2_SSI_NO_CACHE On
+    PerlSetVar Apache2_SSI_Expression "legacy"
     <Files ~ "\.(pl|cgi)$">
         Options All +Includes +ExecCGI -Indexes -MultiViews
         ## AllowOverride All

@@ -2,7 +2,7 @@ use 5.14.0;
 use warnings;
 package Task::BeLike::RJBS;
 # ABSTRACT: be more like RJBS -- use the modules he likes!
-$Task::BeLike::RJBS::VERSION = '20200521.000';
+$Task::BeLike::RJBS::VERSION = '20210316.000';
 
 1;
 
@@ -18,7 +18,7 @@ Task::BeLike::RJBS - be more like RJBS -- use the modules he likes!
 
 =head1 VERSION
 
-version 20200521.000
+version 20210316.000
 
 =head1 TASK CONTENTS
 
@@ -148,9 +148,7 @@ Version 0.51 required because: provides CLDR support with fewest known bugs
 
 Version 3.22 required because: has proper XML escaping
 
-=head3 L<JSON> 2.12
-
-Version 2.12 required because: fixes unicode handling from ASCII JSON
+=head3 L<JSON::MaybeXS>
 
 =head3 L<List::AllUtils>
 
@@ -220,7 +218,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

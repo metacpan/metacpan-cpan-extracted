@@ -1,0 +1,25 @@
+@Classes = (
+    {
+        Name              => 'BugTracker Pages',
+        Description       => 'Class to hold articles for customizing BugTracker extension pages',
+    },
+);
+
+our @Final = (
+    sub {
+        my %articles = (
+        'AfterLoginForm' => q{<h3>Don't have an account but want to browse bugs?</h3>
+<p>Use the <a href="/Public/">public interface</a></p>
+<p>Want to report a bug? Send it in via e-mail.</p>},
+        );
+
+        foreach my $article_name ( keys %articles ){
+            my $article = RT::Article->new(RT->SystemUser);
+            my ($ret, $msg) = $article->Create(
+                'Name' => $article_name,
+                'Class' => 'BugTracker Pages',
+                'CustomField-Content' => $articles{$article_name} );
+            RT::Logger->error("Unable to create new article $article_name: $msg") unless $ret;
+        }
+    },
+);

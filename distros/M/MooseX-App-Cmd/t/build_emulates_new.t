@@ -13,4 +13,8 @@ use Test::More tests => 1;
 
 }
 
-is_deeply( \%{ Bar->new }, \%{ Foo->new }, 'Internal hashes match' );
+my @attrs = qw(arg0 command full_arg0 show_version);
+my $foo; @{$foo}{@attrs} = @{ Foo->new }{@attrs};
+my $bar; @{$bar}{@attrs} = @{ Bar->new }{@attrs};
+
+is_deeply( $bar, $foo, 'Internal hashes match' );

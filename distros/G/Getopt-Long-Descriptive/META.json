@@ -17,7 +17,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.78"
          }
       },
       "develop" : {
@@ -70,7 +70,7 @@
          "web" : "https://github.com/rjbs/Getopt-Long-Descriptive"
       }
    },
-   "version" : "0.107",
+   "version" : "0.109",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032000"
@@ -443,7 +443,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.107",
+                  "tag" : "0.109",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -510,6 +510,17 @@
             },
             "name" : "Test::CheckBreaks",
             "version" : "0.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "configure",
+                  "type" : "requires"
+               }
+            },
+            "name" : "ConfigureRequires",
+            "version" : "6.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

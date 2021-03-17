@@ -47,7 +47,7 @@ use Test::More tests => 6;
                 },
             ]);
             
-            $self->routes->route('/*')->to(cb => sub{
+            $self->routes->any('/*')->to(cb => sub{
                 my $c = shift;
                 my $status = ($c->req->url->path =~ m!status/(\d+)!)[0] || 200;
                 $c->render(text => "Error: $status");

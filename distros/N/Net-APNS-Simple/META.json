@@ -4,7 +4,7 @@
       "Tooru Tsurukawa <rockbone.g at gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.4",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -68,7 +68,7 @@
    "provides" : {
       "Net::APNS::Simple" : {
          "file" : "lib/Net/APNS/Simple.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -82,9 +82,12 @@
          "web" : "https://github.com/rockbone/p5-Net-APNS-Simple"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Nikolay Pelov <npelov@gmail.com>",
-      "Tooru Tsurukawa <rockbone.g@gmail.com>"
-   ]
+      "Tooru Tsurukawa <rockbone.g@gmail.com>",
+      "jonas <jonas@denacode.se>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
 }

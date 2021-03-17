@@ -3,12 +3,12 @@
 # NOTE some of the utility routines do not do much error checking
 
 use 5.24.0;
-use Test::Most tests => 50;
+use Test::Most tests => 52;
 my $deeply = \&eq_or_diff;
 
 use MIDI;
 use Music::RhythmSet::Util
-  qw(beatstring compare_onsets duration filter_pattern flatten ocvec onset_count rand_onsets score_fourfour score_stddev upsize write_midi);
+  qw(beatstring compare_onsets duration filter_pattern flatten ocvec onset_count pattern_from rand_onsets score_fourfour score_stddev upsize write_midi);
 
 my @playback;
 
@@ -42,6 +42,9 @@ $deeply->(
     [ 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 ]
 );
 lives_ok { filter_pattern( 4, 16, 1000, 0, 1 ) };
+
+$deeply->( pattern_from( "x.x." ), [qw/1 0 1 0/] );
+$deeply->( pattern_from( "blah blah x.x. blah blah" ), [qw/1 0 1 0/] );
 
 my ( $on, @slots, $total );
 for ( 1 .. 100 ) {

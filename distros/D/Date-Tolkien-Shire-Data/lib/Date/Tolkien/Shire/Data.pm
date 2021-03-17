@@ -17,7 +17,7 @@ use Text::Abbrev();
 use Exporter ();
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 our @EXPORT_OK = qw{
     __am_or_pm
@@ -1734,7 +1734,6 @@ Given a month number C<(1-12)>, this subroutine returns that month's
 three-letter abbreviation. If the month number is C<0> (i.e. a holiday),
 the empty string is returned. Otherwise C<undef> is returned.
 
-
 =head2 __on_date
 
  say __on_date( $month, $day ) // '';
@@ -1991,6 +1990,7 @@ L<DateTime::Fiction::JRRTolkien::Shire|DateTime::Fiction::JRRTolkien::Shire>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data>,
 L<https://github.com/trwyant/perl-Date-Tolkien-Shire-Data/issues>, or in
 electronic mail to the author.
 

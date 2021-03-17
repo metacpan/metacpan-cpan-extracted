@@ -1,5 +1,5 @@
 package constant::Atom::Strict;
-$constant::Atom::Strict::VERSION = '0.10';
+$constant::Atom::Strict::VERSION = '0.11';
 use 5.006;
 use strict;
 use warnings;

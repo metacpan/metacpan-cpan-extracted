@@ -5,7 +5,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,7 +26,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Time::Local" : "0",
+            "charnames" : "0"
          }
       },
       "configure" : {
@@ -50,6 +52,7 @@
             "Specio::Library::String" : "0.18",
             "constant" : "0",
             "overload" : "0",
+            "parent" : "0",
             "perl" : "5.008004",
             "strict" : "0",
             "warnings" : "0"
@@ -59,22 +62,22 @@
    "provides" : {
       "DateTime::Fiction::JRRTolkien::Shire" : {
          "file" : "lib/DateTime/Fiction/JRRTolkien/Shire.pm",
-         "version" : "0.905"
+         "version" : "0.906"
       },
       "DateTime::Fiction::JRRTolkien::Shire::Duration" : {
          "file" : "lib/DateTime/Fiction/JRRTolkien/Shire/Duration.pm",
-         "version" : "0.905"
+         "version" : "0.906"
       },
       "DateTime::Fiction::JRRTolkien::Shire::Types" : {
          "file" : "lib/DateTime/Fiction/JRRTolkien/Shire/Types.pm",
-         "version" : "0.905"
+         "version" : "0.906"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Fiction-JRRTolkien-Shire"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -85,6 +88,6 @@
          "web" : "https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire"
       }
    },
-   "version" : "0.905",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.906",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

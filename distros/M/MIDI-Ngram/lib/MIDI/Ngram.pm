@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Find the top repeated note phrases of MIDI files
 
-our $VERSION = '0.1806';
+our $VERSION = '0.1807';
 
 use Moo;
 use strictures 2;
@@ -13,7 +13,7 @@ use Carp;
 use Lingua::EN::Ngram;
 use List::Util qw( shuffle uniq );
 use List::Util::WeightedChoice qw( choose_weighted );
-use MIDI::Util;
+use MIDI::Util qw(setup_score set_chan_patch);
 use Music::Note;
 
 
@@ -441,7 +441,7 @@ sub process {
 sub populate {
     my ($self) = @_;
 
-    my $score = MIDI::Util::setup_score( bpm => $self->bpm );
+    my $score = setup_score( bpm => $self->bpm );
     $self->score($score);
 
     my @phrases;
@@ -457,7 +457,7 @@ sub populate {
             my $func = sub {
                 my $patch = $self->random_patch ? $self->_random_patch() : 0;
 
-                MIDI::Util::set_chan_patch( $self->score, $track_chan, $patch );
+                set_chan_patch( $self->score, $track_chan, $patch );
 
                 for my $n ( 1 .. $self->loop ) {
                     my $choice = choose_weighted(
@@ -519,7 +519,7 @@ sub populate {
             my $func = sub {
                 my $patch = $self->random_patch ? $self->_random_patch() : 0;
 
-                MIDI::Util::set_chan_patch( $self->score, $track_chan, $patch);
+                set_chan_patch( $self->score, $track_chan, $patch);
 
                 for my $note ( @all ) {
                     if ( $note eq 'r' ) {
@@ -662,7 +662,7 @@ MIDI::Ngram - Find the top repeated note phrases of MIDI files
 
 =head1 VERSION
 
-version 0.1806
+version 0.1807
 
 =head1 SYNOPSIS
 
@@ -932,7 +932,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

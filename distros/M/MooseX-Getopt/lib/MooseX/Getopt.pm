@@ -1,8 +1,8 @@
-package MooseX::Getopt; # git description: v0.73-5-g75272b6
+package MooseX::Getopt; # git description: v0.74-5-g0d02d3b
 # ABSTRACT: A Moose role for processing command line options
 # KEYWORDS: moose extension command line options attributes executable flags switches arguments
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 use Moose::Role 0.56;
 use namespace::autoclean;
@@ -23,7 +23,7 @@ MooseX::Getopt - A Moose role for processing command line options
 
 =head1 VERSION
 
-version 0.74
+version 0.75
 
 =head1 SYNOPSIS
 
@@ -328,7 +328,7 @@ Stevan Little <stevan@iinteractive.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Tomas Doran Stevan Little Yuval Kogman Florian Ragwitz Brandon L Black Shlomi Fish Hans Dieter Pearcey Olaf Alders Nelo Onyiah Ryan D Johnson Dave Rolsky Ricardo SIGNES Ævar Arnfjörð Bjarmason Hinrik Örn Sigurðsson Damien Krotkine Todd Hepler Devin Austin Jose Luis Martinez Gregory Oschwald Chris Prather Jonathan Swartz Andreas König Dagfinn Ilmari Mannsåker Damyan Ivanov Drew Taylor Gordon Irving Jesse Luehrs John Goulah Koenig Justin Hunter Michael Schout Stuart A Johnston
+=for stopwords Karen Etheridge Tomas Doran Stevan Little Yuval Kogman Florian Ragwitz Brandon L Black Shlomi Fish Hans Dieter Pearcey Olaf Alders Dave Rolsky Nelo Onyiah Ryan D Johnson Ricardo SIGNES Ævar Arnfjörð Bjarmason Damien Krotkine Hinrik Örn Sigurðsson Chris Prather Devin Austin Gregory Oschwald Jose Luis Martinez Todd Hepler Andreas Koenig König Dagfinn Ilmari Mannsåker Damyan Ivanov Drew Taylor Gordon Irving Jesse Luehrs John Goulah Jonathan Swartz Justin Hunter Michael Schout Stuart A Johnston
 
 =over 4
 
@@ -370,15 +370,15 @@ Olaf Alders <olaf@wundersolutions.com>
 
 =item *
 
+Dave Rolsky <autarch@urth.org>
+
+=item *
+
 Nelo Onyiah <nelo.onyiah@gmail.com>
 
 =item *
 
 Ryan D Johnson <ryan@innerfence.com>
-
-=item *
-
-Dave Rolsky <autarch@urth.org>
 
 =item *
 
@@ -390,27 +390,11 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =item *
 
-Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
-
-=item *
-
 Damien Krotkine <dkrotkine@weborama.com>
 
 =item *
 
-Todd Hepler <thepler@employees.org>
-
-=item *
-
-Devin Austin <dhoss@cpan.org>
-
-=item *
-
-Jose Luis Martinez <jlmartinez@capside.com>
-
-=item *
-
-Gregory Oschwald <goschwald@maxmind.com>
+Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
 
 =item *
 
@@ -418,7 +402,23 @@ Chris Prather <chris@prather.org>
 
 =item *
 
-Jonathan Swartz <swartz@pobox.com>
+Devin Austin <dhoss@cpan.org>
+
+=item *
+
+Gregory Oschwald <goschwald@maxmind.com>
+
+=item *
+
+Jose Luis Martinez <jlmartinez@capside.com>
+
+=item *
+
+Todd Hepler <thepler@employees.org>
+
+=item *
+
+Andreas Koenig <andk@cpan.org>
 
 =item *
 
@@ -450,7 +450,7 @@ John Goulah <jgoulah@cpan.org>
 
 =item *
 
-Andreas Koenig <andk@cpan.org>
+Jonathan Swartz <swartz@pobox.com>
 
 =item *
 

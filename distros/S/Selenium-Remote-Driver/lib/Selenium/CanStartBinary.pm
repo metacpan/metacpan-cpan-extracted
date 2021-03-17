@@ -1,5 +1,5 @@
 package Selenium::CanStartBinary;
-$Selenium::CanStartBinary::VERSION = '1.40';
+$Selenium::CanStartBinary::VERSION = '1.41';
 use strict;
 use warnings;
 
@@ -381,7 +381,7 @@ Selenium::CanStartBinary - Teach a WebDriver how to start its own binary aka no 
 
 =head1 VERSION
 
-version 1.40
+version 1.41
 
 =head1 DESCRIPTION
 

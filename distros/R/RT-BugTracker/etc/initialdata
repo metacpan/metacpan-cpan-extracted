@@ -1,3 +1,30 @@
+@CustomFields = (
+    {
+        Name => 'Severity',
+        Description => 'Bug severity',
+        Type => 'Select',
+        MaxValues => '1',
+        LookupType => 'RT::Queue-RT::Ticket',
+        RenderType => 'Dropdown'
+    },
+    {
+        Name => 'Broken in',
+        Description => 'Distribution version where bug first appeared',
+        Type => 'Select',
+        MaxValues => '1',
+        LookupType => 'RT::Queue-RT::Ticket',
+        RenderType => 'Dropdown'
+    },
+    {
+        Name => 'Fixed in',
+        Description => 'Distribution version where bug was fixed',
+        Type => 'Select',
+        MaxValues => '1',
+        LookupType => 'RT::Queue-RT::Ticket',
+        RenderType => 'Dropdown'
+    },
+);
+
 @ScripActions = (
     {
         Name        => 'Notify Additional Addresses', # loc

@@ -20,13 +20,13 @@ exit
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.23';
+$VERSIONE = '0.25';
 $VERSIONE = $VERSIONE;
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use FindBin;
 use File::Path;
 use File::Copy;
@@ -260,7 +260,7 @@ for my $target (@ARGV) {
         binmode FH_MAKEFILEPL;
         printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author);
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -804,6 +804,34 @@ LICENSING
         close FH_LICENSE;
         check_usascii('LICENSE');
 
+        # write CONTRIBUTING
+        open(FH_CONTRIBUTING,'>CONTRIBUTING') || die "Can't open file: CONTRIBUTING\n";
+        binmode FH_CONTRIBUTING;
+        print FH_CONTRIBUTING <<'TO_CONTRIBUTE';
+# Contributing to this project
+
+Before you go crazy with huge changes, send some small e-mail to check
+that we want to change the tools in that way. E-mail that have one logical
+change are better.
+
+Good e-mail, patches, improvements, new features - are a fantastic help.
+They should remain focused in scope and avoid containing unrelated commits.
+
+**Please ask first** before embarking on any significant e-mail (e.g.
+implementing features, refactoring code, porting to a different language),
+otherwise you risk spending a lot of time working on something that the
+project's developers might not want to merge into the project.
+
+Please adhere to the coding conventions used throughout a project
+(indentation, accurate comments, etc.) and any other requirements (such
+as test coverage).
+
+**IMPORTANT**: By submitting a patch, you agree to allow the project owner
+to license your work under the same license as that used by the project.
+TO_CONTRIBUTE
+        close FH_CONTRIBUTING;
+        check_usascii('CONTRIBUTING');
+
         # make work directory
         my $dirname = (dirname($file[0]) eq 'bin') ? 'App' : dirname($file[0]);
         $dirname =~ tr#/#-#;
@@ -946,11 +974,11 @@ LICENSING
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 
 if ($ARGV[0] ne 'xzvf') {
     die <<END;
@@ -1086,7 +1114,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use Socket;
@@ -1226,32 +1254,32 @@ sub _runtests {
     my $scriptno = 0;
     for my $script (@script) {
         next if not -e $script;
-        my @result = qx{$^X $script};
-        my($tests) = shift(@result) =~ /^1..([0-9]+)/;
 
         my $testno = 1;
         my $ok = 0;
         my $not_ok = 0;
-        for my $result (@result) {
-            if ($result =~ /^ok /) {
-                $ok++;
+        if (my @result = qx{$^X $script}) {
+            if (my($tests) = shift(@result) =~ /^1..([0-9]+)/) {
+                for my $result (@result) {
+                    if ($result =~ /^ok /) {
+                        $ok++;
+                    }
+                    elsif ($result =~ /^not ok /) {
+                        push @{$fail_testno[$scriptno]}, $testno;
+                        $not_ok++;
+                    }
+                    $testno++;
+                }
+                if ($ok == $tests) {
+                    printf("$script ok\n");
+                    $ok_script++;
+                }
+                else {
+                    printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok);
+                    $not_ok_script++;
+                }
             }
-            elsif ($result =~ /^not ok /) {
-                push @{$fail_testno[$scriptno]}, $testno;
-                $not_ok++;
-            }
-            $testno++;
         }
-
-        if ($ok == $tests) {
-            printf("$script ok\n");
-            $ok_script++;
-        }
-        else {
-            printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok);
-            $not_ok_script++;
-        }
-
         $total_ok += $ok;
         $total_not_ok += $not_ok;
         $scriptno++;

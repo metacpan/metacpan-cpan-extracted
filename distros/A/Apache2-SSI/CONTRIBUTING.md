@@ -1,7 +1,7 @@
 ## How to contribute
  
 Thank you for considering contributing to this distribution.
-I welcome any contribution to Apache2::SSI, including, but not limited to bug reports, feature requests, general comments, and patches.
+I welcome any contribution to Apache2::Expression, including, but not limited to bug reports, feature requests, general comments, and patches.
 
 Feel free to clone it from its gitlab repository at <https://git.deguest.jp/jack/Apache2-SSI> and issue a pull request.
 
@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://rt.cpan.org/Publi
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Apache2-SSI-v0.1.2/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Apache2-Expression-v0.1.1/README.md)
 
 ## Author
 

@@ -46,11 +46,11 @@ use Test::More tests => 16;
                 JSONP => {callback_key => 'json.p'},
             ]);
             
-            $self->routes->route('/hash')->to(cb => sub{
+            $self->routes->any('/hash')->to(cb => sub{
                 my $json = {foo => 'bar'};
                 $_[0]->render(json => $json);
             });
-            $self->routes->route('/array')->to(cb => sub{
+            $self->routes->any('/array')->to(cb => sub{
                 my $json = ['hoo', 'bar'];
                 $_[0]->render(json => $json);
             });

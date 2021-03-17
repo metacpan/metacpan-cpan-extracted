@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use t::TestHTTP;
+use Test::Async::HTTP;
 
 use IO::Async::Test;
 use IO::Async::Loop;
@@ -17,7 +17,7 @@ my $loop = IO::Async::Loop->new;
 testing_loop( $loop );
 
 my $s3 = Net::Async::Webservice::S3->new(
-   http => my $http = TestHTTP->new,
+   http => my $http = Test::Async::HTTP->new,
    access_key => 'K'x20,
    secret_key => 's'x40,
 );
@@ -32,15 +32,17 @@ $loop->add( $s3 );
       delimiter => "/",
    );
 
-   wait_for { $http->pending_request };
-   $http->respond(
+   my $p;
+   wait_for { $p = $http->next_pending };
+   $p->respond(
       HTTP::Response->new( 500, "Service Unavailable", [], "" )
    );
 
    ok( !$f->is_ready, '$f not ready yet after first failure' );
 
-   wait_for { $http->pending_request };
-   $http->respond(
+   undef $p;
+   wait_for { $p = $http->next_pending };
+   $p->respond(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "application/xml",
       ], <<'EOF' )
@@ -71,8 +73,9 @@ EOF
    my $count = 0;
    while( !$f->is_ready ) {
       $count++;
-      wait_for { $http->pending_request };
-      $http->respond(
+      my $p;
+      wait_for { $p = $http->next_pending };
+      $p->respond(
          HTTP::Response->new( 500, "Service Unavailable", [], "" )
       );
    }
@@ -89,8 +92,9 @@ EOF
       delimiter => "/",
    );
 
-   wait_for { $http->pending_request };
-   $http->respond(
+   my $p;
+   wait_for { $p = $http->next_pending };
+   $p->respond(
       HTTP::Response->new( 404, "Not Found", [], "" )
    );
 

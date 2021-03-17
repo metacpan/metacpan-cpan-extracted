@@ -67,12 +67,16 @@ Inside Apache, in the VirtualHost configuration, for example:
             # PerlSetVar Apache2_SSI_Sizefmt "bytes"
             # To Set the default date time format
             # PerlSetVar Apache2_SSI_Timefmt ""
+            # To enable legacy mode:
+            # PerlSetVar Apache2_SSI_Expression "legacy"
+            # To enable trunk mode:
+            # PerlSetVar Apache2_SSI_Expression "trunk"
         </Directory>
 
 VERSION
 =======
 
-        v0.1.1
+        v0.2.0
 
 DESCRIPTION
 ===========
@@ -265,6 +269,27 @@ takes the following parameters:
     now. You can provide it to [\"parse\"](#parse){.perl-module} as its
     first argument when you call it.
 
+*legacy*
+
+:   Takes a boolean value suchas `1` or `0` to indicate whether the
+    Apache2 expression supported accepts legacy style.
+
+    Legacy Apache expression typically allows for perl style variable
+    `${REQUEST_URI}` versus the modern style of `%{REQUEST_URI}` and
+    just an equal sign to imply a regular expression such as:
+
+            $HTTP_COOKIES = /lang\%22\%3A\%22([a-zA-Z]+\-[a-zA-Z]+)\%22\%7D;?/
+
+    Modern expression equivalent would be:
+
+            %{HTTP_COOKIES} =~ /lang\%22\%3A\%22([a-zA-Z]+\-[a-zA-Z]+)\%22\%7D;?/
+
+    See
+    [Regexp::Common::Apache2](https://metacpan.org/pod/Regexp::Common::Apache2){.perl-module}
+    for more information.
+
+    See also the property *trunk* to enable experimental expressions.
+
 *remote\_ip*
 
 :   This is used when you want to artificially set the remote ip
@@ -303,6 +328,46 @@ takes the following parameters:
     documentation](https://httpd.apache.org/docs/current/en/howto/ssi.html){.perl-module}
     for more information on this.
 
+*trunk*
+
+:   This takes a boolean value such as `0` or `1` and when enabled this
+    allows the support for Apache2 experimental expressions.
+
+    See
+    [Regexp::Common::Apache2](https://metacpan.org/pod/Regexp::Common::Apache2){.perl-module}
+    for more information.
+
+    Also, see the property *legacy* to enable legacy Apache2
+    expressions.
+
+handler
+-------
+
+This is a key method expected by mod\_perl. Depending on how this module
+is used, it will redirect either to
+[\"apache\_filter\_handler\"](#apache_filter_handler){.perl-module} or
+to
+[\"apache\_response\_handler\"](#apache_response_handler){.perl-module}
+
+ap2perl\_expr
+-------------
+
+This method is used to convert Apache2 expressions into perl equivalents
+to be then eval\'ed.
+
+It takes an hash reference provided by [\"parse\" in
+Apache2::Expression](https://metacpan.org/pod/Apache2::Expression#parse){.perl-module},
+an array reference to store the output recursively and an optional hash
+reference of parameters.
+
+It parse recursively the structure provided in the hash reference to
+provide the perl equivalent for each Apache2 expression component.
+
+It returns the array reference provided used as the content buffer. This
+array is used by [\"parse\_expr\"](#parse_expr){.perl-module} and then
+joined using a single space to form a string of perl expression to be
+eval\'ed.
+
 apache\_filter
 --------------
 
@@ -312,6 +377,17 @@ object.
 
 When running under Apache mod\_perl this is set automatically from the
 special [\"handler\"](#handler){.perl-module} method.
+
+apache\_filter\_handler
+-----------------------
+
+This method is called from [\"handler\"](#handler){.perl-module} to
+handle the Apache response when this module
+[Apache2::SSI](https://metacpan.org/pod/Apache2::SSI){.perl-module} is
+used as a filter handler.
+
+See also
+[\"apache\_response\_handler\"](#apache_response_handler){.perl-module}
 
 apache\_request
 ---------------
@@ -330,6 +406,17 @@ When running under Apache mod\_perl this is set automatically from the
 special [\"handler\"](#handler){.perl-module} method, such as:
 
         my $r = $f->r; # $f is the Apache2::Filter object provided by Apache
+
+apache\_response\_handler
+-------------------------
+
+This method is called from [\"handler\"](#handler){.perl-module} to
+handle the Apache response when this module
+[Apache2::SSI](https://metacpan.org/pod/Apache2::SSI){.perl-module} is
+used as a response handler.
+
+See also
+[\"apache\_filter\_handler\"](#apache_filter_handler){.perl-module}
 
 clone
 -----
@@ -825,6 +912,29 @@ Example:
 
         <!--#echo var="LAST_MODIFIED" -->
 
+parse\_eval\_expr
+-----------------
+
+Provided with a string representing an Apache2 expression and this will
+parse it, transform it into a perl equivalent and return its value.
+
+It does the parsing using [\"parse\" in
+Apache2::Expression](https://metacpan.org/pod/Apache2::Expression#parse){.perl-module}
+called from [\"parse\_expr\"](#parse_expr){.perl-module}
+
+If the expression contains regular expression with capture groups, the
+value of capture groups will be stored and will be usable in later
+expressions, such as:
+
+        <!--#config errmsg="[Include error]" -->
+        <!--#if expr="%{HTTP_COOKIE} =~ /lang\%22\%3A\%22([a-zA-Z]+\-[a-zA-Z]+)\%22\%7D;?/"-->
+            <!--#set var="CONTENT_LANGUAGE" value="%{tolower:$1}"-->
+        <!--#elif expr="-z %{CONTENT_LANGUAGE}"-->
+            <!--#set var="CONTENT_LANGUAGE" value="en"-->
+        <!--#endif-->
+        <!DOCTYPE html>
+        <html lang="<!--#echo encoding="none" var="CONTENT_LANGUAGE" -->">
+
 parse\_exec
 -----------
 
@@ -838,6 +948,23 @@ Example:
 or
 
         <!--#exec cmd="/some/system/file/path.sh" -->
+
+parse\_expr
+-----------
+
+It takes a string representing an Apache2 expression and calls
+[\"parse\" in
+Apache2::Expression](https://metacpan.org/pod/Apache2::Expression#parse){.perl-module}
+to break it down, and then calls
+[\"ap2perl\_expr\"](#ap2perl_expr){.perl-module} to transform it into a
+perl expression that is then eval\'ed by
+[\"parse\_eval\_expr\"](#parse_eval_expr){.perl-module}.
+
+It returns the perl representation of the Apache2 expression.
+
+To make this work, certain Apache2 standard functions used such as
+`base64` or `md5` are converted to use this package function
+equivalents. See the `parse_func_*` methods for more information.
 
 parse\_elif
 -----------
@@ -1713,7 +1840,7 @@ which I borrowed some code.
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x558359487e08)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x556f0d70c748)"}\>
 
 CPAN ID: jdeguest
 

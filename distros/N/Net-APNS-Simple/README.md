@@ -116,6 +116,10 @@ And it also supports multiple stream at one connection.
 
     Sets the apns-collapse-id header.
 
+- apns\_push\_type : string
+
+    Sets the apns-push-type header.
+
 - proxy : string
 
     URL of a proxy server. Default $ENV{https\_proxy}. Pass undef to disable proxy.

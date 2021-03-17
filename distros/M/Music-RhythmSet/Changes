@@ -1,5 +1,8 @@
 Revision history for Music-RhythmSet
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.02    2021-03-16
+        Improve the next callback docs. Add the pattern_from()
+        utility method.
 
+0.01    2021-03-13
+        First version, released on an unsuspecting world.

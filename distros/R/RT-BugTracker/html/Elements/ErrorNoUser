@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -46,9 +46,9 @@
 %#
 %# END BPS TAGGED BLOCK }}}
 <& /Elements/Header, Title => loc("Error") &>
-<& /Public/Elements/Tabs, Title => loc("Unable to find user") &>
+<& /Elements/Tabs, Title => loc("Unable to find user") &>
 
-<p>
+<p class="mt-2">
   The user you specified, <strong><% $Name %></strong>, could not be found.
 </p>
 

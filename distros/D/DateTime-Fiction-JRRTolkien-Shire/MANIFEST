@@ -1,13 +1,13 @@
 Changes
-eg/README
 eg/date-convert
+eg/README
 lib/DateTime/Fiction/JRRTolkien/Shire.pm
 lib/DateTime/Fiction/JRRTolkien/Shire/Duration.pm
 lib/DateTime/Fiction/JRRTolkien/Shire/Types.pm
 LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 META.json
 META.yml
 README
@@ -22,8 +22,8 @@ t/06storable.t
 t/11duration.t
 t/12arithmetic.t
 tools/diff-methods
-tools/make-regression
 tools/lib/DateTime/Fiction/JRRTolkien/Shire.pm
+tools/make-regression
 xt/author/changes.t
 xt/author/critic.t
 xt/author/executable.t
@@ -35,3 +35,4 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
+xt/author/prereq.t

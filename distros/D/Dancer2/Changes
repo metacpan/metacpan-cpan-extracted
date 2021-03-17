@@ -1,3 +1,33 @@
+0.301001  2021-03-17 08:52:34-04:00 America/New_York
+
+    [ BUG FIXES ]
+    * PR #1607: Fix broken tests following App::Cmd removal (Jason Crome)
+
+    [ ENHANCEMENTS ]
+    * PR #1606: Clean up various build prereqs (Graham Knop)
+
+    [ DOCUMENTATION ]
+    * None
+
+0.301000  2021-03-15 18:58:17-04:00 America/New_York
+
+    [ BUG FIXES ]
+    * PR #1586: Run version checks against MetaCPAN (Jason A. Crome)
+    * PR #1604: Remove App::Cmd dependency; have script/dancer2 bail if
+      it's not installed (David Precious)
+    
+    [ ENHANCEMENTS ]
+    * GH #1064: Add DSL keyword request_data (Mickey Nasriachi)
+    * PR #1581: Disable scheduled GitHub action on Forks (Gabor Szabo)
+    * PR #1590: Improve install/documentation of XS modules (Jason A. Crome)
+    * PR #1591: Add more plugins to GitHub Actions CI (Gabor Szabo)
+
+    [ DOCUMENTATION ]
+    * GH #1582: Small fixes in Migration POD (Sergiy Borodych)
+    * PR #1595: Add cookbook recipe for enabling/disabling routes at 
+      runtime (Nick Tonkin)
+    * PR #1599: Punctuation correction in docs (Nick Tonkin)
+
 0.300005  2021-01-26 15:57:41-05:00 America/New_York
 
     [ BUG FIXES ]

@@ -24,7 +24,9 @@ for my $flag (@curl_wantflags) {
     } elsif (substr($flag, 0, 1) eq '/') {
         push @object, $flag;
     } else {
-        die "Unknown flag: $flag";
+        # Let MakeMaker figure it out, maybe
+        push @libs, $flag;
+        warn "Unknown flag: $flag";
     }
 }
 

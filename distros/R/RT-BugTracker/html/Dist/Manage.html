@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -53,25 +53,31 @@
 
 <& /Elements/ListActions, actions => \@results &>
 
-<form action="<% $RT::WebPath %><% $m->request_comp->path %>" method="post">
+<form action="<% $RT::WebPath %><% $m->request_comp->path %>" method="post" class="mx-auto max-width-lg">
 <input type="hidden" class="hidden" name="Queue" value="<% $QueueObj->Name %>" />
-
+<&| /Widgets/TitleBox, class => 'queue-info-basics', content_class => 'mx-auto width-lg' &>
 <& /Dist/Elements/EditNotes, Queue => $QueueObj &>
 
 <& /Dist/Elements/EditNotifyAddresses, Queue => $QueueObj &>
 
 <& /Dist/Elements/EditSubjectTag, Queue => $QueueObj &>
+</&>
 
-<& /Elements/Submit, Label => loc('Save Changes'), Name => 'Update' &>
+<div class="form-row">
+  <div class="col-12">
+    <& /Elements/Submit, Label => loc('Save Changes'), Name => 'Update' &>
+  </div>
+</div>
 
 </form>
 <%INIT>
 $Name = $Queue unless $Name;
-$Name =~ s/::/-/g;
+my %NameRegex = RT->Config->Get("DistributionToQueueRegex");
+$Name =~ s/$NameRegex{Pattern}/$NameRegex{Substitution}/g;
 my $QueueObj = RT::Queue->new( $session{CurrentUser} );
 $QueueObj->Load( $Name );
 unless ( $QueueObj->id ) {
-    $m->comp('/Public/Elements/ErrorNoDist', Queue => $Name, %ARGS);
+    $m->comp('/Elements/ErrorNoDist', Queue => $Name, %ARGS);
     $m->abort();
 }
 $ARGS{'Name'} = $Name = $QueueObj->Name;

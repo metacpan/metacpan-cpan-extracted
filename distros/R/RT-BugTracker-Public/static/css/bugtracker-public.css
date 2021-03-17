@@ -1,0 +1,22 @@
+/* Similar to core RT's "sidebyside" styles */
+
+#reporting-a-bug {
+    float: right;
+    width: 58%;
+    clear: right;
+}
+
+.reporting-a-bug-instructions {
+    float: left;
+    width: 40%;
+    clear: left;
+}
+
+@media (max-width: 950px) {
+    /* Revert to a single column when we're less than 1000px wide */
+    #reporting-a-bug, .reporting-a-bug-instructions {
+        float: none;
+        width: auto;
+        clear: both;
+    }
+}

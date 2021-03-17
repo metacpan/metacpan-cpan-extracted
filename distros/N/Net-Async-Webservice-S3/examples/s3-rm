@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Future::AsyncAwait;
+
 use IO::Async::Loop;
 use Net::Async::Webservice::S3;
 
@@ -24,6 +26,6 @@ my $s3 = Net::Async::Webservice::S3->new(
 
 $loop->add( $s3 );
 
-$s3->delete_object(
+await $s3->delete_object(
    key => shift @ARGV,
-)->get;
+);

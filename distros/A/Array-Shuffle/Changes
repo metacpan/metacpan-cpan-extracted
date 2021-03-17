@@ -1,5 +1,9 @@
 Revision history for Perl extension Array::Shuffle.
 
+0.04  Mar 15, 2021
+      - Fix support for tied arrays (bug report and test by Chernenko
+        Dmitiry).
+
 0.03  Feb 17, 2012
       - do not use Perl_croak_no_modify as it is not available on old
         perls

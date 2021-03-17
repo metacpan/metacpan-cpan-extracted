@@ -159,4 +159,11 @@ is_deeply ($t->transducers_requested(), ['first', 'lit']);
 ok (not eval { $t->text({}); }); 
 like ($@, qr/Unknown transducer 'first' used in template/, 'error message identifies unknown transducer');
 
+# 2021-03-16 - test the cookbook recipe that demonstrates dot-value expression (because the parser didn't handle it correctly).
+$t = Data::Org::Template->new ("Value: [[.]]");
+is ($t->text ('value'), "Value: value");
+
+$t = Data::Org::Template->new ("Value: [[.|html]]");
+is ($t->text ('value'), "Value: value");
+
 done_testing();

@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -81,11 +81,11 @@ public and indexed by search engines.
 <& /Dist/Elements/ShowBugtracker, Queue => $QueueObj &>
 <& /Dist/Elements/ShowNotes, Queue => $QueueObj &>
 
-% if ( $session{'CurrentUser'}->Name eq $RT::WebPublicUser ) {
+% if ( $session{'CurrentUser'}->Name eq $RT::WebPublicUser && !RT->Config->Get("WebPublicUserReporting") ) {
 
 <p style="font-weight: bold">
   The quickest way to report a bug in <% $QueueObj->Name %> is by sending email to
-  <a style="font-size: 1.2em" href="#" data-bug-email="<% $QueueObj->Name %>">bug-<% $QueueObj->Name %> <i>[at]</i> rt.cpan.org</a>.
+  <a style="font-size: 1.2em" href="#" data-bug-email="<% $QueueObj->Name %>">bug-<% $QueueObj->Name %> <i>[at]</i> <% RT->Config->Get("WebDomain") %></a>.
 </p>
 
 <p>
@@ -96,84 +96,63 @@ public and indexed by search engines.
 </p>
 
 % } else {
-<form action="<%$RT::WebPath%>/Public/Bug/Report.html" method="POST" enctype="multipart/form-data" name="TicketCreate">
+<form action="<% RT->Config->Get('WebPath') %>/Public/Bug/Report.html" method="POST" enctype="multipart/form-data" name="TicketCreate">
 <input type="hidden" class="hidden" name="id" value="new" />
 <input type="hidden" class="hidden" name="Status" value="new" />
-<div id="Ticket-Create-basics">
+
+<div id="Ticket-Create-basics" class="form-group">
 <a name="basics"></a>
-<table border="0" cellpadding="0" cellspacing="0">
-<tr><td class="label"><&|/l&>Distribution</&>:</td>
-<td class="value"><% $QueueObj->Name %>
+
+<div class="form-row">
+  <div class="label form-group col-3"><&|/l&>Distribution</&>:</div>
+  <div class="value form-group col-9"><% $QueueObj->Name %></div>
+</div>
 <input type="hidden" class="hidden" name="Queue" Value="<%$QueueObj->Name%>">
-</td>
-<tr>
-<td class="label">
-<&|/l&>Your email address</&>:
-</td>
-<td class="value" colspan="5">
-<input name="Requestors" Value="<% ($ARGS{Requestors}) || $session{CurrentUser}->EmailAddress %>" size="40">
-</td>
-</tr>
-<tr>
-<td class="label">
-<&|/l&>Subject</&>:
-</td>
-<td class="value" colspan="5">
-<input name="Subject" size="60" maxsize="100" value="<%$ARGS{Subject} || ''%>">
-</td>
-</tr>
-<tr>
-<td colspan="6">
-<& /Ticket/Elements/EditCustomFields, QueueObj => $QueueObj &>
-</td>
-</tr>
-% if ($TxnCFs->Count) {
-% while (my $CF = $TxnCFs->Next()) {
-<tr>
-<td align="RIGHT"><% $CF->Name %>:</td>
-<td><& /Elements/EditCustomField, CustomField => $CF, NamePrefix =>
-    "Object-RT::Transaction--CustomField-" &><em><% $CF->FriendlyType %></em></td>
-</td></tr>
-% }
-% }
-<tr>
-% if (exists $session{'Attachments'}) {
-<td class="label">
-<&|/l&>Attached file</&>:
-</td>
-<td colspan="5">
-<&|/l&>Check box to delete</&><br/>
-% foreach my $attach_name (keys %{$session{'Attachments'}}) {
-<input type="checkbox" class="checkbox" name="DeleteAttach-<%$attach_name%>" value="1"><%$attach_name%><br />
-% } # end of foreach
-</td>
-</tr>
-<tr>
-% } # end of if
-<td>
-<&|/l&>Attach file</&>:
-</td>
-<td class="value" colspan="5">
-<input type="FILE" name="Attach">
-<input type="SUBMIT" class="button" name="AddMoreAttach" value="<&|/l&>Add More Files</&>">
-</td>
-</tr>
-<tr>
-<td colspan="6">
-<&|/l&>Describe the issue below</&>:<br/>
+
+<div class="form-row">
+  <div class="label form-group col-3"><&|/l&>Your email address</&>:</div>
+  <div class="value form-group col-9"><input class="form-control" name="Requestors" Value="<% ($ARGS{Requestors}) || $session{CurrentUser}->EmailAddress %>" size="80" maxsize="200"></div>
+</div>
+
+<div class="form-row">
+  <div class="form-group label col-3">
+    <&|/l&>Subject</&>:
+  </div>
+  <div class="form-group value col-9">
+    <input class="form-control" type="text" name="Subject" size="80" maxsize="200" value="<%$ARGS{Subject} || ''%>" />
+% $m->callback( %ARGS, CallbackName => 'AfterSubject' );
+  </div>
+</div>
+
+<& /Elements/EditCustomFields,
+    Object => $ticket,
+    CustomFields => $CFs,
+    InTable => 1,
+    KeepValue => 1,
+    ForCreation => 1,
+&>
+
+<& /Ticket/Elements/EditTransactionCustomFields, %ARGS, QueueObj => $QueueObj, InTable => 1 &>
+<p></p>
+<div class="form-group">
+% $m->callback( %ARGS, QueueObj => $QueueObj, CallbackName => 'BeforeMessageBox' );
 % if (exists $ARGS{Content}) {
-<& /Elements/MessageBox, Default => $ARGS{Content}, IncludeSignature => 0 &>
+  <& /Elements/MessageBox, QueueObj => $QueueObj, Default => $ARGS{Content}, IncludeSignature => 0, IncludeDefaultArticle => 0 &>
+% } elsif ( $QuoteTransaction ) {
+  <& /Elements/MessageBox, QueueObj => $QueueObj, QuoteTransaction => $QuoteTransaction, IncludeDefaultArticle => 0 &>
 % } else {
-<& /Elements/MessageBox, QuoteTransaction => $QuoteTransaction &>
+  <& /Elements/MessageBox, QueueObj => $QueueObj, IncludeDefaultArticle => 1 &>
 %}
-</td>
-</tr>
-<tr>
-<td align="RIGHT" colspan="2">
-</td>
-</tr>
-</table>
-<& /Elements/Submit, Label => loc("Create")&>
+% $m->callback( %ARGS, QueueObj => $QueueObj, CallbackName => 'AfterMessageBox' );
+</div>
+
+<& /Ticket/Elements/AddAttachments, %ARGS, QueueObj => $QueueObj &>
+<div class="form-row">
+  <div class="col-12">
+    <& /Elements/Submit, Label => loc("Create"), Name => 'SubmitTicket', id => 'SubmitTicket' &>
+  </div>
+</div>
+
 </div>
 
 </form>
@@ -204,9 +183,12 @@ Other things that are often helpful:
 </div>
 
 <%INIT>
-$Queue =~ s/::/-/g;
+my $current_user = $session{'CurrentUser'};
 
-my $QueueObj = new RT::Queue($session{'CurrentUser'});
+my %NameRegex = RT->Config->Get("DistributionToQueueRegex");
+$Queue =~ s/$NameRegex{Pattern}/$NameRegex{Substitution}/g;
+
+my $QueueObj = RT::Queue->new($current_user);
 $QueueObj->Load($Queue);
 
 if (not $QueueObj->Id) {
@@ -223,13 +205,16 @@ my $ValidCFs = $m->comp(
     ARGSRef => \%ARGS
 );
 
+my $ticket = RT::Ticket->new($current_user); # empty ticket object
+
 # if no due date has been set explicitly, then use the
 # queue's default if it exists
-if ($QueueObj->DefaultDueIn && !$ARGS{'Due'}) {
+if ($RT::MAJOR_VERSION <= 4 && $RT::MINOR_VERSION <= 2
+    && $QueueObj->DefaultDueIn && !$ARGS{'Due'}) {
     my $default_due = RT::Date->new($session{'CurrentUser'});
     $default_due->SetToNow();
     $default_due->AddDays($QueueObj->DefaultDueIn);
-    $ARGS{'Due'} = $default_due->ISO();
+    $ARGS{'Due'} = $default_due->ISO(Timezone => 'user');
 }
 
 # {{{ deal with deleting uploaded attachments

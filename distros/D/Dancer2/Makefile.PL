@@ -4,7 +4,7 @@ use warnings;
 
 
 
-use ExtUtils::MakeMaker 7.1101;
+use ExtUtils::MakeMaker;
 
 use File::ShareDir::Install;
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
@@ -15,13 +15,9 @@ install_share dist => "share";
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Lightweight yet powerful web application framework",
   "AUTHOR" => "Dancer Core Developers",
-  "BUILD_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "7.1101",
-    "Test::CPAN::Meta" => 0
-  },
   "CONFIGURE_REQUIRES" => {
     "CPAN::Meta::Requirements" => "2.120620",
-    "ExtUtils::MakeMaker" => "7.1101",
+    "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06",
     "Module::Metadata" => 0
   },
@@ -32,7 +28,6 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Dancer2",
   "PREREQ_PM" => {
-    "App::Cmd::Setup" => 0,
     "Attribute::Handlers" => 0,
     "Carp" => 0,
     "Clone" => 0,
@@ -65,7 +60,7 @@ my %WriteMakefileArgs = (
     "Plack::Middleware::FixMissingBodyInRedirect" => 0,
     "Plack::Middleware::RemoveRedundantBody" => 0,
     "Ref::Util" => 0,
-    "Role::Tiny" => ">= 2.000000, != 2.000007",
+    "Role::Tiny" => "2.000000",
     "Safe::Isa" => 0,
     "Sub::Quote" => 0,
     "Template" => 0,
@@ -80,7 +75,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => "0.12",
-    "ExtUtils::MakeMaker" => "7.1101",
+    "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "HTTP::Cookies" => 0,
     "HTTP::Headers" => 0,
@@ -92,7 +87,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => "0.92"
   },
-  "VERSION" => "0.300005",
+  "VERSION" => "0.301001",
   "test" => {
     "TESTS" => "t/*.t t/classes/Dancer2-Core-Factory/*.t t/classes/Dancer2-Core-Hook/*.t t/classes/Dancer2-Core-Request/*.t t/classes/Dancer2-Core-Response-Delayed/*.t t/classes/Dancer2-Core-Response/*.t t/classes/Dancer2-Core-Role-Engine/*.t t/classes/Dancer2-Core-Role-Handler/*.t t/classes/Dancer2-Core-Role-HasLocation/*.t t/classes/Dancer2-Core-Role-Serializer/*.t t/classes/Dancer2-Core-Role-StandardResponses/*.t t/classes/Dancer2-Core-Route/*.t t/classes/Dancer2-Core-Runner/*.t t/classes/Dancer2-Core/*.t t/classes/Dancer2/*.t t/dsl/*.t t/examples/*.t t/issues/*.t t/issues/gh-1013/*.t t/issues/gh-1046/*.t t/issues/gh-1216/*.t t/issues/gh-1226/*.t t/issues/gh-1230/*.t t/issues/gh-639/fails/*.t t/issues/gh-639/succeeds/*.t t/issues/gh-650/*.t t/issues/gh-975/*.t t/issues/memleak/*.t t/plugin2/*.t t/roles/*.t t/route-pod-coverage/*.t t/scope_problems/*.t t/template_tiny/*.t"
   }
@@ -100,7 +95,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::Cmd::Setup" => 0,
   "Attribute::Handlers" => 0,
   "Capture::Tiny" => "0.12",
   "Carp" => 0,
@@ -110,7 +104,7 @@ my %FallbackPrereqs = (
   "Encode" => 0,
   "Exporter" => "5.57",
   "Exporter::Tiny" => 0,
-  "ExtUtils::MakeMaker" => "7.1101",
+  "ExtUtils::MakeMaker" => 0,
   "File::Basename" => 0,
   "File::Copy" => 0,
   "File::Find" => 0,
@@ -139,13 +133,12 @@ my %FallbackPrereqs = (
   "Plack::Middleware::FixMissingBodyInRedirect" => 0,
   "Plack::Middleware::RemoveRedundantBody" => 0,
   "Ref::Util" => 0,
-  "Role::Tiny" => ">= 2.000000, != 2.000007",
+  "Role::Tiny" => "2.000000",
   "Safe::Isa" => 0,
   "Sub::Quote" => 0,
   "Template" => 0,
   "Template::Tiny" => 0,
   "Test::Builder" => 0,
-  "Test::CPAN::Meta" => 0,
   "Test::EOL" => 0,
   "Test::Fatal" => 0,
   "Test::More" => "0.92",

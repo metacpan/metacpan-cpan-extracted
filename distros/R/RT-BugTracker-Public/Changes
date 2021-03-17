@@ -1,3 +1,20 @@
+1.09 2021-03-15
+ - Migrate to RT 5
+
+1.07 2017-03-29
+ - Add WebPublicUserQueryBuilder config setting
+ - Have WebPublicUserReporting hide create/reply UI more consistently
+ - Support RT::BugTracker BugTracker_ShowAllDistributions
+ - Only add an about menu if it's defined
+ - Remove the welcome message since the dead-end link is confusing
+ - Remove the 'welcome guest' menu option
+ - Relabel log out link
+ - Allow customization of select parts of the UI using articles
+
+1.06 2017-02-28
+ - RT 4.2 and 4.4 compatibility
+ - Drop 4.0 compatibility
+
 1.05 2016-07-19
  - Packaging updates
  - Whitelist all query endpoints from CSRF protection

@@ -6,13 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 58 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 55 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Dancer2.pm',
-    'Dancer2/CLI.pm',
-    'Dancer2/CLI/Command/gen.pm',
-    'Dancer2/CLI/Command/version.pm',
     'Dancer2/Core.pm',
     'Dancer2/Core/App.pm',
     'Dancer2/Core/Cookie.pm',

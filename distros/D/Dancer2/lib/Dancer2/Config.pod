@@ -13,7 +13,7 @@ Dancer2::Config - Configure Dancer2 to suit your needs
 
 =head1 VERSION
 
-version 0.300005
+version 0.301001
 
 =head1 DESCRIPTION
 

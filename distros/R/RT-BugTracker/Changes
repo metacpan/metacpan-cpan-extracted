@@ -1,3 +1,23 @@
+5.6 2021-03-15
+ - Migrate to RT 5
+
+5.5 2017-06-21
+ - Avoid breaking self-service UI
+
+5.4 2017-03-29
+ - Make several features configurable:
+   * BugTracker_CustomFieldsOnUpdate - specify CFs to update on maintainer reply
+   * BugTracker_SearchResultFormat - customize ticket listing columns
+   * BugTracker_HideBrowseDistributions - hide A..Z dist browsing
+   * BugTracker_ShowAllDistributions - show all dists by default
+ - Document skipping "make initdb"
+
+5.3 2017-03-08
+ - Add RT 4.2 and 4.4 compatibility
+ - Remove RT <=4.0 compatibility
+ - Add general functionality and configuration documentation
+ - Generalize site-specific configurations
+
 5.2 2014-12-18
  - Add no_index for core RT packages
  - Add repository metadata

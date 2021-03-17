@@ -2,19 +2,81 @@ NAME
     App::VitaminUtils - Utilities related to vitamins
 
 VERSION
-    This document describes version 0.002 of App::VitaminUtils (from Perl
-    distribution App-VitaminUtils), released on 2020-11-03.
+    This document describes version 0.003 of App::VitaminUtils (from Perl
+    distribution App-VitaminUtils), released on 2021-03-17.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
 
+    *   convert-choline-unit
+
+    *   convert-cobalamin-unit
+
+    *   convert-pantothenic-acid-unit
+
+    *   convert-pyridoxine-unit
+
     *   convert-vitamin-a-unit
+
+    *   convert-vitamin-b12-unit
+
+    *   convert-vitamin-b5-unit
+
+    *   convert-vitamin-b6-unit
 
     *   convert-vitamin-d-unit
 
     *   convert-vitamin-e-unit
 
 FUNCTIONS
+  convert_choline_unit
+    Usage:
+
+     convert_choline_unit(%args) -> [status, msg, payload, meta]
+
+    Convert a choline quantity from one unit to another.
+
+    Examples:
+
+    *   Show all possible conversions:
+
+         convert_choline_unit(quantity => "mcg");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             { amount => 0.001, unit => "mg" },
+             { amount => 1, unit => "mcg" },
+             { amount => 1, unit => "mcg-choline" },
+             { amount => 2.43112220408947, unit => "mcg-choline-bitartrate" },
+           ],
+           {},
+         ]
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity* => *str*
+
+    *   to_unit => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   convert_vitamin_a_unit
     Usage:
 
@@ -47,6 +109,15 @@ FUNCTIONS
                amount => 2,
                unit   => "mcg-all-trans-beta-carotene-as-food-supplement",
              },
+             { amount => 1.14655200007338, unit => "mcg-all-trans-retinyl-acetate" },
+             {
+               amount => 1.83333333333333,
+               unit   => "mcg-all-trans-retinyl-palmitate",
+             },
+             {
+               amount => 1.19666666666667,
+               unit   => "mcg-all-trans-retinyl-propionate",
+             },
              { amount => 3.33333333333333, unit => "IU" },
              { amount => 3.33333333333333, unit => "IU-retinol" },
              { amount => 1.66666666666667, unit => "IU-beta-carotene" },
@@ -69,6 +140,149 @@ FUNCTIONS
     *   Convert from IU to mg:
 
          convert_vitamin_a_unit(quantity => "5000 IU", to_unit => "mg"); # -> [200, "OK", 1.5, {}]
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity* => *str*
+
+    *   to_unit => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  convert_vitamin_b12_unit
+    Usage:
+
+     convert_vitamin_b12_unit(%args) -> [status, msg, payload, meta]
+
+    Convert a vitamin B12 (cobalamin) quantity from one unit to another.
+
+    Examples:
+
+    *   Show all possible conversions:
+
+         convert_vitamin_b12_unit(quantity => "mcg");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             { amount => 0.001, unit => "mg" },
+             { amount => 1, unit => "mcg" },
+             { amount => 1, unit => "mcg-cobalamin" },
+             { amount => 0.00100001106712952, unit => "mcg-cyanocobalamin" },
+           ],
+           {},
+         ]
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity* => *str*
+
+    *   to_unit => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  convert_vitamin_b5_unit
+    Usage:
+
+     convert_vitamin_b5_unit(%args) -> [status, msg, payload, meta]
+
+    Convert a vitamin B5 (pantothenic acid) quantity from one unit to
+    another.
+
+    Examples:
+
+    *   Show all possible conversions:
+
+         convert_vitamin_b5_unit(quantity => "mg");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             { amount => 1, unit => "mg" },
+             { amount => 1, unit => "mg-pantothenic-acid" },
+             { amount => 1.09170305676856, unit => "mg-d-calcium-pantothenate" },
+           ],
+           {},
+         ]
+
+    If target unit is not specified, will show all known conversions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quantity* => *str*
+
+    *   to_unit => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  convert_vitamin_b6_unit
+    Usage:
+
+     convert_vitamin_b6_unit(%args) -> [status, msg, payload, meta]
+
+    Convert a vitamin B6 (pyridoxine) quantity from one unit to another.
+
+    Examples:
+
+    *   Show all possible conversions:
+
+         convert_vitamin_b6_unit(quantity => "mg");
+
+        Result:
+
+         [
+           200,
+           "OK",
+           [
+             { amount => 1, unit => "mg" },
+             { amount => 1, unit => "mg-pyridoxine" },
+             { amount => 1.21550990640574, unit => "mg-pyridoxine-hydrochloride" },
+           ],
+           {},
+         ]
 
     If target unit is not specified, will show all known conversions.
 
@@ -167,9 +381,13 @@ FUNCTIONS
            [
              { amount => 1, unit => "mg" },
              { amount => 1000, unit => "mcg" },
+             { amount => 1, unit => "mg-alpha-TE" },
              { amount => 1, unit => "mg-alpha-tocopherol-equivalent" },
              { amount => 1, unit => "mg-rrr-alpha-tocopherol" },
-             { amount => 1, unit => "mg-rrr-alpha-tocopherol" },
+             { amount => 1, unit => "mg-d-alpha-tocopherol" },
+             { amount => 1.09558823529412, unit => "mg-d-alpha-tocopheryl-acetate" },
+             { amount => 1.49, unit => "mg-dl-alpha-tocopheryl-acetate" },
+             { amount => 1.35454545454545, unit => "mg-dl-alpha-tocopherol" },
              { amount => 2, unit => "mg-beta-tocopherol" },
              { amount => 10, unit => "mg-gamma-tocopherol" },
              { amount => 3.33333333333333, unit => "mg-alpha-tocotrienol" },
@@ -227,7 +445,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-VitaminUtils>
+    <https://github.com/perlancar/perl-App-VitaminUtils/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -235,11 +453,16 @@ BUGS
 SEE ALSO
     Physics::Unit
 
+    Online vitamin converters:
+    <https://www.rfaregulatoryaffairs.com/vitamin-converter>,
+    <https://avsnutrition.com.au/wp-content/themes/avs-nutrition/vitamin-con
+    verter.html>.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

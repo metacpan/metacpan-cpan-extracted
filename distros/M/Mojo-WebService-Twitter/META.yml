@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,22 +27,22 @@ no_index:
 provides:
   Mojo::WebService::Twitter:
     file: lib/Mojo/WebService/Twitter.pm
-    version: '1.001'
+    version: '1.003'
   Mojo::WebService::Twitter::Error:
     file: lib/Mojo/WebService/Twitter/Error.pm
-    version: '1.001'
+    version: '1.003'
   Mojo::WebService::Twitter::Media:
     file: lib/Mojo/WebService/Twitter/Media.pm
-    version: '1.001'
+    version: '1.003'
   Mojo::WebService::Twitter::Tweet:
     file: lib/Mojo/WebService/Twitter/Tweet.pm
-    version: '1.001'
+    version: '1.003'
   Mojo::WebService::Twitter::User:
     file: lib/Mojo/WebService/Twitter/User.pm
-    version: '1.001'
+    version: '1.003'
   Mojo::WebService::Twitter::Util:
     file: lib/Mojo/WebService/Twitter/Util.pm
-    version: '1.001'
+    version: '1.003'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -57,8 +57,9 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojo-WebService-Twitter/issues
   homepage: https://github.com/Grinnz/Mojo-WebService-Twitter
   repository: https://github.com/Grinnz/Mojo-WebService-Twitter.git
-version: '1.001'
+version: '1.003'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
-x_generated_by_perl: v5.30.1
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

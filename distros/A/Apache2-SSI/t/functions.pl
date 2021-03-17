@@ -14,6 +14,7 @@ BEGIN
     use URI::file;
     our $DEBUG = 0;
     use constant HAS_APACHE_TEST => $ENV{HAS_APACHE_TEST};
+    # use Devel::Confess;
     # use constant HAS_APACHE_TEST => 0;
     our $BASE_URI = '/ssi';
     our $DOC_ROOT = URI::file->new_abs( './t/htdocs' )->file;
@@ -51,13 +52,14 @@ sub run_tests
     ## The 5 tests above in the BEGIN block
     my $total_tests = 2 + ( HAS_APACHE_TEST ? 4 : 0 ) + ( exists( $opts->{total_tests} ) ? int( $opts->{total_tests} ) : 0 );
     $total_tests += ( scalar( @$tests ) * ( HAS_APACHE_TEST ? 3 : 1 ) );
+    $opts->{debug} = $ENV{AUTHOR_TESTING} if( exists( $ENV{AUTHOR_TESTING} ) );
     ## plan tests => $total_tests;
     &execute_tests( $tests, $opts );
     ## Same test, but for Apache this time, if enabled
     $opts->{with_apache} = 1;
     if( HAS_APACHE_TEST )
     {
-        diag( "Executing ", scalar( @$tests ), " test for Apache mod_perl2." ) if( $opts->{debug} );
+        diag( "Executing ", scalar( @$tests ), " test for Apache mod_perl2." ) if( $opts->{debug} > 1 );
         &execute_tests( $tests, $opts );
     }
     done_testing( $total_tests );
@@ -66,7 +68,7 @@ sub run_tests
 sub execute_tests
 {
     my $tests = shift( @_ );
-    ## no warnings qw( experimental::vlb );
+    # no warnings qw( experimental::vlb );
     my $opts  = {};
     $opts = shift( @_ ) if( ref( $_[0] ) eq 'HASH' );
     eval( "use warnings 'Apache2::SSI';" ) if( $opts->{debug} );
@@ -78,6 +80,8 @@ sub execute_tests
         my $expect = $def->{expect};
         $def->{quiet} = 0 if( !exists( $def->{quiet} ) );
         $def->{no_warning} = 0 if( !exists( $def->{no_warning} ) );
+        $def->{legacy} = 0 if( !exists( $def->{legacy} ) );
+        $def->{trunk} = 0 if( !exists( $def->{trunk} ) );
         if( !length( $text ) )
         {
             die( "Missing \"uri\" property for test $def->{type} No $i !\nTest data is: ", $ap->dump( $def ) ) if( !$def->{uri} );
@@ -92,20 +96,22 @@ sub execute_tests
                 next;
             }
             my $file = $u->filepath;
-            diag( "Reading file \"$file\" based on uri '$def->{uri}' and document root '$DOC_ROOT'." ) if( $opts->{debug} );
+            diag( "Reading file \"$file\" based on uri '$def->{uri}' and document root '$DOC_ROOT'." ) if( $opts->{debug} > 1 );
             $text = $u->slurp_utf8;
         }
         if( !length( $expect ) && !$def->{fail} )
         {
             die( "Missing \"expect\" property for test $def->{type} No $i !\nTest data is: ", $ap->dump( $def ) );
         }
-        diag( "Checking uri $def->{uri}" ) if( $opts->{debug} );
+        diag( "Checking uri $def->{uri} with legacy '$opts->{legacy}'" ) if( $opts->{debug} > 1 );
         my $ap = Apache2::SSI->new(
             debug => $opts->{debug},
             #document_root => $doc_root,
             #document_uri  => $doc_uri,
             document_root => $DOC_ROOT,
             document_uri => $def->{uri},
+            legacy => ( $def->{legacy} ? 1 : 0 ),
+            trunk => ( $def->{trunk} ? 1 : 0 ),
         ) || die( "Unable to instantiate a Apache2::SSI object: ", Apache2::SSI->error );
         $ap->remote_ip( $def->{remote_ip} ) if( exists( $def->{remote_ip} ) );
         
@@ -119,6 +125,10 @@ sub execute_tests
                    ( $def->{requires} eq 'mod_perl' && !$opts->{with_apache} ) )
             {
                 skip( "mod_perl is not enabled. Skipping Apache test" . ( $def->{name} ? " for $def->{name}" : '' ) . ".", 1 );
+            }
+            elsif( length( $def->{skip} ) )
+            {
+                skip( $def->{skip} . " Skipping test" . ( $def->{name} ? " for $def->{name}" : '' ) . ".", 1 );
             }
         
             if( exists( $def->{sub} ) &&
@@ -136,19 +146,45 @@ sub execute_tests
             my $code;
             if( $opts->{with_apache} )
             {
-                my $resp = GET( $def->{uri} );
+                my $resp = GET( $def->{uri}, ( scalar( keys( %{$def->{headers}} ) ) ? %{$def->{headers}} : () ) );
                 $code = $resp->code;
                 $result = Encode::decode( 'utf8', $resp->content );
             }
             else
             {
+                $ENV{REQUEST_URI} = $def->{uri};
+                $ENV{REQUEST_METHOD} = 'GET';
+                $ENV{HTTPS} = 'off';
+                $ENV{DOCUMENT_ROOT} = $DOC_ROOT;
+                if( exists( $def->{headers} ) && ref( $def->{headers} ) eq 'HASH' && scalar( keys( %{$def->{headers}} ) ) )
+                {
+                    while( my( $header, $value ) = each( %{$def->{headers}} ) )
+                    {
+                        if( $header eq 'Cookie' )
+                        {
+                            $ENV{HTTP_COOKIE} = $value;
+                        }
+                        elsif( $header eq 'Agent' )
+                        {
+                            $ENV{HTTP_USER_AGENT} = $value;
+                        }
+                        elsif( $header eq 'Host' )
+                        {
+                            $ENV{HTTP_HOST} = $value;
+                        }
+                        elsif( $header eq 'DNT' )
+                        {
+                            $ENV{HTTP_DNT} = $value;
+                        }
+                    }
+                }
                 $result = $ap->parse( $text );
             }
         
             $ap->quiet( 0 );
-            diag( "Checking result '$result' ", ( $opts->{with_apache} ? "and code '$code' from uri $def->{uri} " : '' ), "against expected result '$expect'", ( $opts->{with_apache}  ? "and code '$def->{code}'" : '' ), "." ) if( $opts->{debug} );
+            diag( "Checking result '$result' ", ( $opts->{with_apache} ? "and code '$code' from uri $def->{uri} " : '' ), "against expected result '$expect'", ( $opts->{with_apache}  ? "and code '$def->{code}'" : '' ), "." ) if( $opts->{debug} > 1 );
             ok( $code == $def->{code}, 'Response code' ) if( $opts->{with_apache} );
-            my $check = ( $result eq $expect );
+            my $check = ( ref( $expect ) eq 'Regexp' ? ( $result =~ /$expect/ ) : ( $result eq $expect ) );
             if( $check )
             {
                 ok( $check, sprintf( "$opts->{type} test No %d%s", $i + 1, ( length( $def->{name} ) ? " ($def->{name})" : '' ) . ( $opts->{with_apache} ? ' (using mod_perl2)' : '' ) ) );
@@ -159,6 +195,10 @@ sub execute_tests
             }
             else
             {
+                if( $ENV{AUTHOR_TESTING} )
+                {
+                    diag( "Failed: result found: '$result'. I was expecting '$expect'" );
+                }
                 fail( sprintf( "$opts->{type} test No %d%s", $i + 1, ( length( $def->{name} ) ? " ($def->{name})" : '' ) . ( $opts->{with_apache} ? ' (using mod_perl2)' : '' ) ) );
             }
         }

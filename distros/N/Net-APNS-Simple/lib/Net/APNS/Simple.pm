@@ -9,7 +9,7 @@ use Protocol::HTTP2::Client;
 use IO::Select;
 use IO::Socket::SSL qw();
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 has [qw/auth_key key_id team_id bundle_id development/] => (
     is => 'rw',
@@ -24,7 +24,7 @@ has [qw/proxy/] => (
     default => $ENV{https_proxy},
 );
 
-has [qw/apns_id apns_expiration apns_collapse_id/] => (
+has [qw/apns_id apns_expiration apns_collapse_id apns_push_type/] => (
     is => 'rw',
 );
 
@@ -107,7 +107,7 @@ sub prepare {
         'apns-topic' => $self->bundle_id,
     );
 
-    for (qw/apns_id apns_priority apns_expiration apns_collapse_id/) {
+    for (qw/apns_id apns_priority apns_expiration apns_collapse_id apns_push_type/) {
         my $v = $self->$_;
         next unless defined $v;
         my $k = $_;
@@ -309,6 +309,10 @@ Sets the apns-priority header. Default 10.
 =item apns_collapse_id : string
 
 Sets the apns-collapse-id header.
+
+=item apns_push_type : string
+
+Sets the apns-push-type header.
 
 =item proxy : string
 

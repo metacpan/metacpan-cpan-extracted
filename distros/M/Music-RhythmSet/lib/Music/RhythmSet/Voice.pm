@@ -4,7 +4,7 @@
 # ttl times
 
 package Music::RhythmSet::Voice;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use 5.24.0;
 use warnings;
@@ -391,7 +391,7 @@ Music::RhythmSet::Voice - a rhythmic line
       [ 15,
         30,
         20, ],
-      [ [qw/1 0 1 0 0 1 0 0/],
+      [ [qw/1 0 1 0 0 1/],
         [qw/1 0 1 0 0 0/],
         [qw/1 0 0 0 1 0/] ]);
   # and three ttl
@@ -409,6 +409,7 @@ Music::RhythmSet::Voice - a rhythmic line
   # generate 32 measures of (probably) noise
   $voice->advance(32);
 
+  # export
   my $track = $voice->to_midi(sustain => 1);
   write_midi('noise.midi', $track);
 
@@ -453,9 +454,36 @@ non-negative integer.
 A callback that runs when the I<ttl> expires. This routine must return
 a new pattern and TTL. The callback is passed a reference to the
 L<Music::RhythmSet::Voice> object, and a set of parameters with
-various metadata. See L</CALLBACK> for more details.
+various metadata. It may help to log what is going on:
 
-If no callback function is set the B<advance> method may throw an error.
+  use Data::Dumper;
+  use Music::RhythmSet::Voice;
+
+  my $voice = Music::RhythmSet::Voice->new(
+      next => sub {
+          my ( $self, %param ) = @_;
+          warn "CALLBACK\n", Dumper \%param;
+          return [ 1, 0, 0 ], 8;
+      }
+  );
+
+  $voice->advance( 16, _foo => 'bar' );
+
+  warn "REPLAY\n", Dumper $voice->replay;
+
+If no callback function is set B<advance> calls may throw an error.
+
+The parameters may optionally be passed in through B<advance> by the
+caller; certain parameters are set by code in this module. In particular
+the I<measure> number (counting from 0, not 1) and the current
+I<pattern> are set by B<advance>.
+
+The B<advance> method of L<Music::RhythmSet> will add a I<set>
+parameter so that callback code can access the set object that contains
+the voices.
+
+Callers may want to prefix any custom parameters with C<_> to minimize
+potential conflicts with future versions of this module.
 
 =item B<measure>
 
@@ -494,33 +522,45 @@ callback set.
 
 =item B<stash>
 
-A place for the caller to store whatever. For example, a B<next>
-callback could save the current callback into the stash, and restore it
-after some number of measures have passed. A voice could vary between a
-rhythm for seven measures and silence for one using the stash:
+A place for the caller to store whatever. For example, a voice could
+vary between a rhythm for seven measures and silence for one using
+the stash:
 
   sub silence {
-      my ($self) = @_;
-      $self->next($self->stash);    # restore previous
-      [ (0) x 16 ], 1
+      my ( $self, %param ) = @_;
+      $self->next( $self->stash );  # restore previous
+      return [ (0) x 16 ], 1;
   }
 
   sub voice {
-      my ($self) = @_;
-      $self->stash($self->next);    # save current method
-      $self->next(\&silence);       # go quiet
-      [ qw/1 0 0 0 1 0 0 0 1 0 0 0 1 0 1 0/ ], 7
+      my ( $self, %param ) = @_;
+      $self->stash( $self->next );  # save current method
+      $self->next( \&silence );     # go quiet
+      return [qw/1 0 0 0 1 0 0 0 1 0 0 0 1 0 1 0/], 7;
   }
 
   Music::RhythmSet::Voice->new( next => \&voice );
 
 The above code uses the stash as a scalar; a hash reference would make
 more sense if multiple values need be passed around. The above could
-also be done with a single callback function call that keeps track of
-how many times it has been called, though changing the callback may
-better suit more complicated arrangements.
+also be done in a single function that keeps track of how many times it
+has been called
 
-This attribute is not used by code in this distribution.
+  sub voice {
+      state $yesno = 0;
+      $yesno ^= 1;
+
+      if ($yesno) {
+          return [qw/1 0 0 0 1 0 0 0 1 0 0 0 1 0 1 0/], 7;
+      } else {
+          return [ (0) x 16 ], 1;
+      }
+  }
+
+though changing the callback function may suit more complicated
+arrangements.
+
+The B<stash> attribute is not used by code in this distribution.
 
 =item B<ttl>
 
@@ -636,23 +676,9 @@ field separator, default C<\t>.
 
 =back
 
-=head1 CALLBACK
-
-The B<next> callback is passed the object and a set of parameters; these
-are either passed in through B<advance> by the caller or are set by
-B<advance>. In particular the I<measure> number (counting from 0, not 1)
-and the current I<pattern> are set by B<advance>.
-
-The B<advance> method of L<Music::RhythmSet> will add a I<set>
-parameter so that callback code can access the set object that contains
-the voices.
-
-Callers may want to prefix any custom parameters with C<_> to minimize
-potential conflicts with future versions of this module.
-
 =head1 BUGS
 
-<https://github.com/thrig/Music-RhythmSet>
+None known.
 
 =head1 SEE ALSO
 

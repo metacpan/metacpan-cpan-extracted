@@ -5,6 +5,7 @@ author:
 build_requires:
   Test2::Tools::Explain: '0'
   Test2::V0: '0'
+  Test::Fatal: '0'
   Test::Mock::Cmd: '0'
   Test::MockFile: '0'
   Test::MockModule: '0'
@@ -20,13 +21,13 @@ name: Playwright
 provides:
   Playwright:
     file: lib/Playwright.pm
-    version: '0.002'
+    version: '0.003'
   Playwright::Base:
     file: lib/Playwright/Base.pm
-    version: '0.002'
+    version: '0.003'
   Playwright::Util:
     file: lib/Playwright/Util.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Async: '0'
   Capture::Tiny: '0'
@@ -53,6 +54,6 @@ resources:
   bugtracker: https://github.com/teodesian/playwright-perl/issues
   homepage: https://github.com/teodesian/playwright-perl
   repository: https://github.com/teodesian/playwright-perl.git
-version: '0.002'
+version: '0.003'
 x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

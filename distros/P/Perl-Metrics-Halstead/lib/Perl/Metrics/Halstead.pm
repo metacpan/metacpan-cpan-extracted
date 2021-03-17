@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0612';
+our $VERSION = '0.0613';
 
 use PPI::Document;
 use PPI::Dumper;
@@ -232,7 +232,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0612
+version 0.0613
 
 =head1 SYNOPSIS
 
@@ -408,7 +408,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

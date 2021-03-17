@@ -36,10 +36,6 @@ my $builder = Module::Build->new(
             },
         },
     },
-    meta_merge => {
-        resources =>
-          { repository => 'https://github.com/thrig/Music-RhythmSet' }
-    },
 );
 
 $builder->create_build_script();

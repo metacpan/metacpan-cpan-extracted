@@ -3,7 +3,15 @@ abstract: 'Fetch astronomical data from SIMBAD 4.'
 author:
   - 'Tom Wyant (wyant at cpan dot org)'
 build_requires:
+  Data::Dumper: '0'
   Test::More: '0.96'
+  lib: '0'
+configure_requires:
+  Config: '0'
+  Getopt::Std: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,21 +27,25 @@ no_index:
 provides:
   Astro::SIMBAD::Client:
     file: lib/Astro/SIMBAD/Client.pm
-    version: '0.043'
+    version: '0.044'
   Astro::SIMBAD::Client::WSQueryInterfaceService:
     file: lib/Astro/SIMBAD/Client/WSQueryInterfaceService.pm
-    version: '0.043'
+    version: '0.044'
 requires:
+  Carp: '0'
   HTTP::Request::Common: '0'
   LWP::Protocol: '0'
   LWP::UserAgent: '0'
   Scalar::Util: '1.01'
   URI::Escape: '0'
   XML::DoubleEncodedEntities: '1'
+  constant: '0'
   perl: '5.008'
+  strict: '0'
+  warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SIMBAD-Client
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-SIMBAD-Client.git
-version: '0.043'
+version: '0.044'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Text::Quote;
-$Text::Quote::VERSION = '0.32';
+$Text::Quote::VERSION = '0.33';
 use 5.006;
 use strict;
 use warnings;

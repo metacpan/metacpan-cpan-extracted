@@ -8,11 +8,39 @@ DESCRIPTION
     setups like <http://rt.cpan.org>. It's been developed to help authors of
     Perl modules.
 
-    It follows two basic rules to achieve the goal:
+    In RT::BugTracker, every queue is a software "distribution".
+    RT::BugTracker adds a new Distribution menu with options to search and
+    browse distributions. User and group rights apply normally to queues
+    through the Distribution menu search options.
 
-    Each queue associated with one package (distribution).
-    Queue's AdminCc list is used for maintainers of the coresponding
+    Users can search distributions by maintainer through Distribution
+    Search>. Maintainers are the AdminCc users and groups for the
     distribution.
+
+    The search functions under the Distribution menu return lists of
+    matching distributions. List items include a link to the bug list for
+    the distribution.
+
+    Bug list search results include columns for Severity, Broken in, and
+    Fixed in custom fields. The Configuration section, below, describes how
+    BugTracker administrators can configure these custom fields.
+
+    The bug list search result page includes a link to the distribution's
+    Manage page. Distribution maintainers and BugTracker admins can set
+    various attributes of the distribution here.
+
+  Distribution notes
+    These notes appear at the top of the distribution's bug list.
+
+  Additional addresses RT should notify
+    RT::BugTracker installs a new Scrip, On create and corresponds notify
+    additonal addresses, that fires on distribution ticket creation and
+    comment transactions. This Scrip sets the To: header to the email
+    addresses configured here.
+
+  Subject tag in addition to default
+    STUB: The additional subject tag is currently broken in 4.2/4.4. BPS
+    will document this functionality when it is fixed.
 
 INSTALLATION
     perl Makefile.PL
@@ -21,6 +49,10 @@ INSTALLATION
         May need root permissions
 
     make initdb
+        RT::BugTracker creates several custom fields for tracking bugs; you
+        may skip this step if you intend to use different custom fields. See
+        the section below on "Custom Fields".
+
         Only run this the first time you install this module.
 
         If you run this twice, you may end up with duplicate data in your
@@ -29,17 +61,92 @@ INSTALLATION
         If you are upgrading this module, check for upgrading instructions
         in case changes need to be made to your database.
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         Add this line:
 
-            Set(@Plugins, qw(RT::BugTracker));
-
-        or add RT::BugTracker to your existing @Plugins line.
+            Plugin('RT::BugTracker');
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
+
+CONFIGURATION
+  DistributionToQueueRegex
+    Some programming languages use characters in package names that may not
+    work well in email addresses. Perl modules use double colons, '::', to
+    separate package parents from children. BugTracker administrators could
+    name a distribution queue using these characters, like 'Data::Dumper',
+    for example. But the resulting public email address for bug reports
+    would be bugs-Data::Dumper@example.com.
+
+    While some characters may not be unallowed in email addresses,
+    BugTracker administrators may want to name their distribution queues so
+    that resulting public bug report addresses are more likely to get
+    through spam and other filters.
+
+    However, users want to search software distributions by the canonical
+    name of the package, like under Distributions > Search and Distributions
+    > Browse. Users expect to type "Data::Dumper" and find the distribution
+    queue named "Data-Dumper".
+
+    Use this config variable to define the character translation between
+    distribution search strings and distribution queue names. BugTracker
+    will use 'Pattern' and 'Substitution' in a subsitution regex match.
+    BugTracker will use this value:
+
+    Set(%DistributionToQueueRegex, 'Pattern' => '::', 'Substitution' => '-'
+    );
+
+    like this:
+
+    s/::/-/g
+
+    The values above translate Perl module names into their email-friendly
+    counterpart queue names.
+
+  BugTracker_CustomFieldsOnUpdate
+    Use this config variable to specify a list of custom field names to
+    display on the ticket reply page for privileged users. By default it
+    displays "Fixed in" to help maintainers quickly close out issues as the
+    fixes are released.
+
+  BugTracker_SearchResultFormat
+    Use this config variable to specify the search result format for a
+    distribution's list of tickets, much like DefaultSearchResultFormat in
+    core RT.
+
+  BugTracker_HideBrowseDistributions
+    Use this config variable to suppress the alphabetical distribution
+    browser UI, for users with fewer than tens of thousands of queues. :)
+
+  BugTracker_ShowAllDistributions
+    Use this config variable to always display all distributions, for users
+    with fewer than hundreds of queues. :)
+
+  Custom Fields
+    By default, when you run make initdb, RT::BugTracker creates three
+    custom fields on queues, globally, with empty values.
+
+    Severity
+        Bug severity levels, like 'Low', 'Medium', and 'High'.
+
+    Broken in
+        The distribution version where the bug in the ticket first appeared.
+        Since each distribution will have different release versions, the
+        BugTracker admin will need top populate these values for each
+        distribution.
+
+    Fixed in
+        The distribution version where the bug in the ticket was fixed.
+        Since each distribution will have different release versions, the
+        BugTracker admin will need top populate these values for each
+        distribution.
+
+    You may choose to skip creation of these custom fields by skipping the
+    make initdb step. If you would like to use your own custom fields, you
+    should investigate setting the BugTracker_CustomFieldsOnUpdate and
+    BugTracker_SearchResultFormat config options documented above.
 
 SEE ALSO
     RT::BugTracker::Public, RT::Extension::rt_cpan_org
@@ -57,7 +164,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-BugTracker>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014 by Best Practical Solutions
+    This software is Copyright (c) 2021 by Best Practical Solutions
 
     This is free software, licensed under:
 

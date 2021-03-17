@@ -24,6 +24,7 @@ no_index:
     - inc
 requires:
   Apache::Test: '0'
+  Config: '0'
   Cwd: '0'
   DateTime: '0'
   DateTime::Format::Strptime: '0'
@@ -34,15 +35,18 @@ requires:
   File::Which: '0'
   HTML::Entities: '0'
   IO::File: '0'
+  JSON: '0'
   MIME::Base64: '0'
   Module::Generic: v0.13.3
   Net::Subnet: '1.03'
   Nice::Try: v0.1.7
+  PPI: '1.270'
+  Regexp::Common::Apache2: v0.2.1
   Regexp::Common::net: '0'
   Scalar::Util: '1.50'
-  URI: '0'
+  URI: '5.05'
   URI::Escape::XS: '0'
-  URI::file: '0'
+  URI::file: '5.05'
   URL::Encode::XS: '0'
   parent: '0'
   perl: '5.022001'
@@ -52,5 +56,5 @@ requires:
 resources:
   bugtracker: https://git.deguest.jp/jack/Apache2-SSI/issues
   repository: https://git.deguest.jp/jack/Apache2-SSI
-version: v0.1.0
+version: v0.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

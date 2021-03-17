@@ -28,6 +28,7 @@ GetOptions(
     'divisor|d=i'  => \my $Flag_Divisor,
     'help|h|?'     => \&emit_help,
     'lilypond|L=s' => \my $Flag_Lilypond,
+    'measures|m=i' => \my $Flag_Measures,
     'no-changes|C' => \my $Flag_Nochanges,
     'notes=s'      => \my $Flag_Notes,
     'rs|R=s'       => \my $Flag_RS,
@@ -58,6 +59,7 @@ my $set = Music::RhythmSet->new->from_string(
 if ( defined $midi ) {
     $set->to_midi(
         chan => $Flag_Channel,
+        defined $Flag_Measures ? ( maxm => $Flag_Measures ) : (),
         defined $Flag_Notes
         ? ( track => [ map { { note => $_ } } $Flag_Notes->@* ] )
         : (),
@@ -71,7 +73,8 @@ if ($Flag_Lilypond) {
         sleep 3;
     }
     my $x = 0;
-    for my $str ( $set->to_ly->@* ) {
+    for my $str (
+        $set->to_ly( defined $Flag_Measures ? ( maxm => $Flag_Measures ) : (), )->@* ) {
         my $lyfile = $Flag_Lilypond =~ s/(X+)/sprintf "%.*d", length $1, $x/er;
         open my $lfh, '>', $lyfile or die "could not write '$lyfile': $!\n";
         print $lfh $str;
@@ -88,17 +91,22 @@ if ($Flag_Update) {
         seek $fh, 0, 0;
     }
     print $fh $set->to_string(
-        $Flag_Divisor     ? ( divisor => $Flag_Divisor ) : (),
-        defined $Flag_RS  ? ( rs      => $Flag_RS )      : (),
-        defined $Flag_Sep ? ( sep     => $Flag_Sep )     : (),
+        $Flag_Divisor          ? ( divisor => $Flag_Divisor )  : (),
+        defined $Flag_Measures ? ( maxm    => $Flag_Measures ) : (),
+        defined $Flag_RS       ? ( rs      => $Flag_RS )       : (),
+        defined $Flag_Sep      ? ( sep     => $Flag_Sep )      : (),
     );
 }
 
 exit if $Flag_Nochanges;
 
+# NOTE the 'max' limit here may disagree with that of the to_* calls
+# depending on the divisor value (especially if it is unset and on the
+# probable assumption of measures with more than one beat in them)
 $set->changes(
     $Flag_Divisor ? ( divisor => $Flag_Divisor ) : (),
     header => sub { warn '# measure ' . $_[0] . "\n" },
+    defined $Flag_Measures ? ( max => $Flag_Measures ) : (),
     voice  => sub {
         my ( $mm, $id, $bpat, $bstr, $new, $repeat ) = @_;
         warn join( "\t", $id, $bstr, ( $new ? 'n' : '' ) . ( $repeat ? 'r' : '' ) )
@@ -115,6 +123,7 @@ Options:
   -c chan       MIDI channel to use for all voices (default 9, drum)
   -d [divisor]  Divide beat count by this many beats per measure
   -L lyfile     Lilypond file; first X in filename gets counter var
+  -m measures   Only emit this many measures
   --notes ...   Note to use for each MIDI track e.g.    --notes=60,67,68
   -R recsep     Record sep for string import and export
   -S fieldsep   Field sep for string import and export

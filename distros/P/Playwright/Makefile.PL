@@ -44,11 +44,12 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::Tools::Explain" => 0,
     "Test2::V0" => 0,
+    "Test::Fatal" => 0,
     "Test::Mock::Cmd" => 0,
     "Test::MockFile" => 0,
     "Test::MockModule" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +75,7 @@ my %FallbackPrereqs = (
   "Sub::Install" => 0,
   "Test2::Tools::Explain" => 0,
   "Test2::V0" => 0,
+  "Test::Fatal" => 0,
   "Test::Mock::Cmd" => 0,
   "Test::MockFile" => 0,
   "Test::MockModule" => 0,

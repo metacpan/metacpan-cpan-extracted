@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-APNS-Simple
 
+0.06 2021-03-15T15:11:14Z
+    - Add property to allow for apns-push-type header
+
 0.05 2020-10-17T02:49:56Z
     - Add some modules to test requirements.
 

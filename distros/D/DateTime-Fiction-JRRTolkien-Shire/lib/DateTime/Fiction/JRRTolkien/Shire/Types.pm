@@ -18,7 +18,7 @@ use Specio::Library::Builtins;
 use Specio::Library::Numeric;
 use Specio::Library::String;
 
-our $VERSION = '0.905';
+our $VERSION = '0.906';
 
 declare(
     DayOfMonth	=>
@@ -113,7 +113,6 @@ union(
     of	=> [ map { t( $_ ) } qw{ Int Undef } ],
 );
 
-
 declare(
     LocaleObject	=>
     parent	=> t( 'Object' ),
@@ -179,7 +178,6 @@ declare(
 	$_[0]->parent->inline_check( $_[1] ) .  " && $_[1] < 62";
     },
 );
-
 
 object_can_type(
     'TimeZoneObject',
@@ -249,8 +247,9 @@ L<DateTime::Fiction::JRRTolkien::Shire|DateTime::Fiction::JRRTolkien::Shire>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire/issues>,
-or in electronic mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Fiction-JRRTolkien-Shire>,
+L<https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

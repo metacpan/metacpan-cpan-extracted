@@ -69,7 +69,28 @@ my ( @results, @transactions );
     $mock->save;
 }
 
-BAIL_OUT('Output file does not exist') unless ok(-e $output_file, 'Output file exists');
+subtest "Check that the file was recorded in a nice clean format" => sub {
+    open(my $mocks_fh, '<', $output_file) || BAIL_OUT('Output file does not exist');
+    foreach my $expected (
+        '[',
+        '   {',
+        '      "class" : "Mojo::Transaction::HTTP",',
+        '      "request" : {',
+        qr/^         "body" : "GET.*/,
+        '         "class" : "Mojo::Message::Request",',
+        '         "url" : {',
+        '            "host" : "www.random.org",',
+        '            "path" : "/integers/",',
+        qr/^            "query" : "num=5&min=0&max=1000000000&col=1&base=10&format=plain&quux=\d+",/,
+        '            "scheme" : "https"',
+        '         }',
+        '      },',
+    ) {
+        chomp(my $this_line = <$mocks_fh>);
+        ref($expected) ? like($this_line, $expected, $this_line)
+                       :   is($this_line, $expected, $this_line);
+    }
+};
 
 my $mock = Mojo::UserAgent::Mockable->new( mode => 'playback', file => $output_file );
 $mock->transactor->name('kit.peters@broadbean.com');

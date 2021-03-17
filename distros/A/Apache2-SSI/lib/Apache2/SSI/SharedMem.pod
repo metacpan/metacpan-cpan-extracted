@@ -47,7 +47,7 @@ Apache2::SSI::SharedMem - Apache2 SSI Notes Shared Memory Manipulation
 
     # Remove create bit
     use IPC::SysV qw( IPC_CREAT );
-    $flags >>= IPC_CREAT;
+    $flags ^= IPC_CREAT;
     my $s = $shmem->open || die( $shmem->error );
 
     # Get the shared memory id
@@ -57,7 +57,7 @@ Apache2::SSI::SharedMem - Apache2 SSI Notes Shared Memory Manipulation
 
     # Get the actual key used in interacting with shared memory
     # You should not mess with this unless you know what you are doing
-    my $shem_key = $s->key_shem;
+    my $shem_key = $s->serial;
 
     use Apache2::SSI::SharedMem qw( :all );
     $s->lock( LOCK_EX ) || die( $s->error );
@@ -125,7 +125,7 @@ To list all used shared memory, at least on Unix type systems such as Linux or F
 
 =head2 new
 
-This instantiate a notes object. It takes the following parameters:
+This instantiates a notes object. It takes the following parameters:
 
 =over 4
 
@@ -249,10 +249,6 @@ Returns the id of the shared memory once it has been opened with L</open>
 Sets or gets the shared memory key identifier.
 
     $shem->key( 'some_identifier' );
-
-=head2 key_shem
-
-Get the key identifier as encoded for use with L</open>
 
 =head2 lock
 

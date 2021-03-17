@@ -1,5 +1,5 @@
 # -*- perl -*-
-use Test::More tests => 11;
+use Test::More tests => 14;
 
 use strict;
 use warnings;
@@ -42,7 +42,8 @@ is_deeply($jq1->process({ data => $input107 }), $input107_expected);
 
 my $input108 = { key1 => 3.141592653589793238462643383279502884197169399375105820974944592307816406286 };
 my $input108_expected = $input108;
-is_deeply($jq1->process({ data => $input108 }), $input108_expected);
+( my $input108_got ) = $jq1->process({ data => $input108 });
+ok(abs($input108_got->{key1} - $input108_expected->{key1}) < 1e-14);
 
 my $input109 = { key1 => undef };
 my $input109_expected = $input109;
@@ -55,3 +56,18 @@ is_deeply($jq1->process({ data => $input110 }), $input110_expected);
 my $input111 = '{ "key1": null }';
 my $input111_expected = { key1 => undef };
 is_deeply($jq1->process({ json => $input111 }), $input111_expected);
+
+my $jq2 = JSON::JQ->new({ script => 'nan | isnan ' });
+my $input201 = undef;
+my $input201_expected = JSON::true();
+is_deeply($jq2->process({ data => $input201}), $input201_expected);
+
+my $jq3 = JSON::JQ->new({ script => 'infinite | isinfinite '});
+my $input301 = undef;
+my $input301_expected = JSON::true();
+is_deeply($jq3->process({ data => $input301 }), $input301_expected);
+
+my $jq4 = JSON::JQ->new({ script => ' (1,2) | (3,4) '});
+my $input401 = undef;
+my $input401_expected = [ qw/3 4 3 4/ ];
+is_deeply([ $jq4->process({ data => $input401 }) ], $input401_expected);

@@ -1,10 +1,10 @@
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{Modern::Open},
-    'VERSION'   => q{0.11},
+    'VERSION'   => q{0.12},
     'ABSTRACT'  => q{Autovivification, Autodie, and 3-args open support},
     'PREREQ_PM' => {
         'ExtUtils::MakeMaker' => '5.4302',

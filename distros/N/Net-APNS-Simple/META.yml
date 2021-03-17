@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ no_index:
 provides:
   Net::APNS::Simple:
     file: lib/Net/APNS/Simple.pm
-    version: '0.05'
+    version: '0.06'
 recommends:
   Crypt::JWT: '0.018'
   Crypt::PK::ECC: '0.059'
@@ -46,7 +46,10 @@ resources:
   bugtracker: https://github.com/rockbone/p5-Net-APNS-Simple/issues
   homepage: https://github.com/rockbone/p5-Net-APNS-Simple
   repository: git://github.com/rockbone/p5-Net-APNS-Simple.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Nikolay Pelov <npelov@gmail.com>'
   - 'Tooru Tsurukawa <rockbone.g@gmail.com>'
+  - 'jonas <jonas@denacode.se>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

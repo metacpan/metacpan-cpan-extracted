@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Getopt::Long::Descriptive;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
-$Getopt::Long::Descriptive::VERSION = '0.107';
+$Getopt::Long::Descriptive::VERSION = '0.109';
 use v5.10.1;
 
 use Carp qw(carp croak);
@@ -731,7 +731,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.107
+version 0.109
 
 =head1 SYNOPSIS
 

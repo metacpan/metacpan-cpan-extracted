@@ -1,0 +1,6 @@
+Iterator-Records-Lines
+
+This builds on Iterator::Records to provide an iterator for file content (and also for multiline text in strings).
+It's pretty straightforward, so see Iterator::Records for all the background you really need.
+
+

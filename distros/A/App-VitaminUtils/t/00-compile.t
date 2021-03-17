@@ -6,14 +6,21 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/VitaminUtils.pm'
 );
 
 my @scripts = (
+    'script/convert-choline-unit',
+    'script/convert-cobalamin-unit',
+    'script/convert-pantothenic-acid-unit',
+    'script/convert-pyridoxine-unit',
     'script/convert-vitamin-a-unit',
+    'script/convert-vitamin-b12-unit',
+    'script/convert-vitamin-b5-unit',
+    'script/convert-vitamin-b6-unit',
     'script/convert-vitamin-d-unit',
     'script/convert-vitamin-e-unit'
 );

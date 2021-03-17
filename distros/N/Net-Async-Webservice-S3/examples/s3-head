@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Future::AsyncAwait;
+
 use Getopt::Long;
 use IO::Async::Loop;
 use Net::Async::Webservice::S3;
@@ -29,9 +31,9 @@ my $s3 = Net::Async::Webservice::S3->new(
 
 $loop->add( $s3 );
 
-my ( $header, $meta ) = $s3->head_object(
+my ( $header, $meta ) = await $s3->head_object(
    key => shift @ARGV,
-)->get;
+);
 
 if( $META ) {
    print "$_=$meta->{$_}\n" for sort keys %$meta;

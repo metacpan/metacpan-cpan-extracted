@@ -5,7 +5,7 @@ use 5.006002;
 
 use ExtUtils::MakeMaker;
 
-(my $mmv = ExtUtils::MakeMaker->VERSION) =~ s/_//g;
+( my $mmv = ExtUtils::MakeMaker->VERSION ) =~ s/_//g;
 
 my %args = (
     NAME		=> 'Date::Tolkien::Shire',
@@ -13,10 +13,9 @@ my %args = (
     PREREQ_PM => {
 	'Date::Tolkien::Shire::Data'	=> 0.001,
 	'Time::Local'			=> 0,
-	'overload'			=> 0,
-	'strict'			=> 0,
-	'vars'				=> 0,
-	'warnings'			=> 0,
+	overload			=> 0,
+	strict				=> 0,
+	warnings			=> 0,
     },
     PL_FILES => {},	# Prevent old MakeMaker from running Build.PL
     'dist' => {
@@ -48,7 +47,8 @@ if ( $mmv >= 6.4501 ) {
 	},
 	resources	=> {
 	    bugtracker	=> {
-                web	=> 'https://github.com/trwyant/perl-Date-Tolkien-Shire/issues',
+		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire',
+		# web	=> 'https://github.com/trwyant/perl-Date-Tolkien-Shire/issues',
                 mailto  => 'wyant@cpan.org',
             },
 	    license	=> 'http://dev.perl.org/licenses/',
@@ -72,10 +72,27 @@ my $build_requires = {
     'Test::More'	=> 0.47,	# The best we can do with 5.6.2
 };
 
-$mmv >= 6.5501
-    and $args{BUILD_REQUIRES} = $build_requires
-    or $mmv >= 6.4501
-    and $args{META_MERGE}{build_requires} = $build_requires;
+my $configure_requires = {
+    'ExtUtils::MakeMaker'	=> 0,
+};
+
+if ( $mmv >= 6.52 ) {
+    $args{BUILD_REQUIRES} = $build_requires;
+    $args{CONFIGURE_REQUIRES} = $configure_requires;
+} elsif ( $mmv >= 6.5501 ) {
+    $args{BUILD_REQUIRES} = $build_requires;
+    $args{META_MERGE}{configure_requires} = $configure_requires;
+} elsif ( $mmv >= 6.4501 ) {
+    $args{META_MERGE}{build_requires} = $build_requires;
+    $args{META_MERGE}{configure_requires} = $configure_requires;
+} else {
+    foreach my $req ( $build_requires, $configure_requires ) {
+	foreach my $key ( keys %{ $req } ) {
+	    exists $args{PREREQ_PM}{$key}
+		or $args{PREREQ_PM}{$key} = $req->{$key};
+	}
+    }
+}
 
 WriteMakefile( %args );
 

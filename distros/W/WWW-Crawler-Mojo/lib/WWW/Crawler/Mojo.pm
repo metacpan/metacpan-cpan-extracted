@@ -8,7 +8,7 @@ use WWW::Crawler::Mojo::UserAgent;
 use WWW::Crawler::Mojo::ScraperUtil qw{
   collect_urls_css html_handler_presets reduce_html_handlers resolve_href decoded_body};
 use Mojo::Message::Request;
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 has clock_speed       => 0.25;
 has html_handlers     => sub { html_handler_presets() };

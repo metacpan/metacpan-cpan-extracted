@@ -20,6 +20,7 @@ WriteMakefile(
     'File::Slurper' => 0,
     'Modern::Perl' => 1.20180701, # for '2018'
     'URI::Escape' => 0,
+    'File::MimeInfo' => 0,
   },
   META_MERGE => {
     'meta-spec' => { version => 2 },

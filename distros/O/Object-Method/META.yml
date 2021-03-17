@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.023, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,11 +16,14 @@ name: Object-Method
 provides:
   Object::Method:
     file: lib/Object/Method.pm
-    version: '0.03'
+    version: '0.04'
   UNIVERSAL:
     file: lib/UNIVERSAL/Object/Method.pm
   UNIVERSAL::Object::Method:
     file: lib/UNIVERSAL/Object/Method.pm
-version: '0.03'
+resources:
+  repository: https://github.com/gugod/Object-Method.git
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_spdx_expression: MIT
 x_static_install: '1'

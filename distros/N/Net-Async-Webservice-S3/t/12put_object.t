@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use t::TestHTTP;
+use Test::Async::HTTP;
 
 use IO::Async::Test;
 use IO::Async::Loop;
@@ -19,7 +19,7 @@ testing_loop( $loop );
 
 my $s3 = Net::Async::Webservice::S3->new(
    max_retries => 1,
-   http => my $http = TestHTTP->new,
+   http => my $http = Test::Async::HTTP->new,
    access_key => 'K'x20,
    secret_key => 's'x40,
 );
@@ -30,9 +30,10 @@ sub await_upload_and_respond
 {
    my ( $key, $content ) = @_;
 
-   my $req;
-   wait_for { $req = $http->pending_request };
+   my $p;
+   wait_for { $p = $http->next_pending };
 
+   my $req = $p->request;
    is( $req->method,         "PUT",                     "Request method for $key" );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", "Request URI authority for $key" );
    is( $req->uri->path,      "/$key",                   "Request URI path for $key" );
@@ -40,7 +41,7 @@ sub await_upload_and_respond
 
    my $md5 = md5_hex( $req->content );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 200, "OK", [
          ETag => qq("$md5"),
       ], "" )
@@ -144,6 +145,7 @@ sub await_upload_and_respond
 # Test that timeout argument is set only for direct argument
 {
    my $f;
+   my $p;
    my $req;
 
    $s3->configure( timeout => 10 );
@@ -153,11 +155,12 @@ sub await_upload_and_respond
       value  => "a value",
    );
 
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   $req = $p->request;
    is( $req->header( "X-NaHTTP-Timeout" ), undef, 'Request has no timeout for configured' );
-   $http->respond( 200, "OK", [] );
+   $p->respond( 200, "OK", [] );
 
    $f = $s3->put_object(
       bucket  => "bucket",
@@ -166,11 +169,13 @@ sub await_upload_and_respond
       timeout => 20,
    );
 
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   undef $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   $req= $p->request;
    is( $req->header( "X-NaHTTP-Timeout" ), 20, 'Request has timeout set for immediate' );
-   $http->respond( 200, "OK", [] );
+   $p->respond( 200, "OK", [] );
 }
 
 done_testing;

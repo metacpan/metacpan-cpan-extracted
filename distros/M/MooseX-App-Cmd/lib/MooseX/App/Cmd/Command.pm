@@ -1,6 +1,6 @@
 package MooseX::App::Cmd::Command;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Moose;
 use Getopt::Long::Descriptive ();
@@ -88,7 +88,7 @@ MooseX::App::Cmd::Command - Base class for MooseX::Getopt based App::Cmd::Comman
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -135,18 +135,18 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 (or L<bug-MooseX-App-Cmd@rt.cpan.org|mailto:bug-MooseX-App-Cmd@rt.cpan.org>).
 
 There is also a mailing list available for users of this distribution, at
-http://lists.perl.org/list/moose.html.
+L<http://lists.perl.org/list/moose.html>.
 
 There is also an irc channel available for users of this distribution, at
-irc://irc.perl.org/#moose.
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
 
 =head1 AUTHOR
 
 יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2008 by Infinity Interactive, Inc..
+This software is copyright (c) 2008 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

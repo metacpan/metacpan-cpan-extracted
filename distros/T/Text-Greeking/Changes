@@ -1,5 +1,10 @@
 Revision history for Perl module Text::Greeking
 
+0.15 2021-03-17 NEILB
+    - include META.json in releases
+    - Switch to github issues for bug tracker
+    - Updated github repo URL, to reflect my changed github username
+
 0.14 2014-09-15 NEILB
     - I hadn't noticed that t/01_compile.t was expecting min perl 5.0061,
       where I set it on the dist as 5.006; this resulted in at least one

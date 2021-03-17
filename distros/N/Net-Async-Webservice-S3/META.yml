@@ -3,33 +3,38 @@ abstract: "use Amazon's S3 web service with C<IO::Async>"
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  IO::Async::Test: 0
-  Test::More: 0.88
+  IO::Async::Test: '0'
+  Test::Async::HTTP: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.133380'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-Async-Webservice-S3
 provides:
   Net::Async::Webservice::S3:
     file: lib/Net/Async/Webservice/S3.pm
-    version: 0.18
+    version: '0.19'
 recommends:
-  IO::Async::SSL: 0
+  IO::Async::SSL: '0'
 requires:
-  Digest::HMAC_SHA1: 0
-  Digest::MD5: 0
-  Future: 0.21
-  HTTP::Date: 0
-  HTTP::Request: 0
-  IO::Async::Stream: 0.57
-  IO::Async::Timer::Countdown: 0
-  MIME::Base64: 0
-  Net::Async::HTTP: 0.33
-  URI::Escape: 0
-  XML::LibXML: 0
+  Digest::HMAC_SHA1: '0'
+  Digest::MD5: '0'
+  Future: '0.26'
+  HTTP::Date: '0'
+  HTTP::Request: '0'
+  IO::Async::Stream: '0.57'
+  IO::Async::Timer::Countdown: '0'
+  MIME::Base64: '0'
+  Net::Async::HTTP: '0.33'
+  URI::Escape: '0'
+  XML::LibXML: '0'
+  perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.18
+version: '0.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

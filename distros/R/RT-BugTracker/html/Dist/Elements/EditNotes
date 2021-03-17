@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -45,8 +45,15 @@
 %# those contributions and any derivatives thereof.
 %#
 %# END BPS TAGGED BLOCK }}}
-<label class="dist-notes"><% loc('Distribution notes') %> (<% loc('HTML subset allowed') %>):
-<textarea cols="120" rows="20" name="Queue-<% $Queue->id %>-Notes"><% $value %></textarea></label><br />
+<div class="form-row dist-notes">
+  <div class="label col-3">
+    <% loc('Distribution notes') %>:
+    <span class="far fa-question-circle icon-helper" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('HTML subset allowed') %>"></span>
+  </div>
+  <div class="value col-8">
+    <textarea cols="120" rows="20" class="form-control" name="Queue-<% $Queue->id %>-Notes"><% $value %></textarea></label><br />
+  </div>
+</div>
 <%ARGS>
 $Queue => undef
 </%ARGS>

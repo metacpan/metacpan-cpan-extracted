@@ -143,6 +143,7 @@ t/classes/Dancer2-Core-Runner/psgi_app.t
 t/classes/Dancer2-Core/camelize.t
 t/classes/Dancer2/import-pragmas.t
 t/classes/Dancer2/import.t
+t/cli.t
 t/config.yml
 t/config/config.yml
 t/config/environments/failure.yml
@@ -186,6 +187,7 @@ t/dsl/parameters.t
 t/dsl/pass.t
 t/dsl/path.t
 t/dsl/request.t
+t/dsl/request_data.t
 t/dsl/route_retvals.t
 t/dsl/send_as.t
 t/dsl/send_file.t

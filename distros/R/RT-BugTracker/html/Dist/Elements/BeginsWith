@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -46,15 +46,24 @@
 %#
 %# END BPS TAGGED BLOCK }}}
 <form action="<% RT->Config->Get('WebPath') %><% $m->request_path %>" method="GET">
-<p>
+  <div class="form-row">
+    <div class="label col-auto">
+% if (RT->Config->Get('BugTracker_HideBrowseDistributions')) {
+ <% loc('Prefix is') %>
+% } else {
 <% loc('First letter is') %>
 % for my $letter ("A".."Z") {
 <a href="<% $RT::WebPath %><% $m->request_path %>?Name=<% $letter %>">
 <% $letter eq $Name ? "<strong>$letter</strong>" : $letter |n %>
 </a>
 % }
- <% loc('or prefix is') %> <input type="text" name="Name" value="<% length($Name) > 1? $Name : '' %>" data-autocomplete="Queues" data-autocomplete-autosubmit=1 />
-</p>
+ <% loc('or prefix is') %>
+% }
+    </div>
+    <div class="value col-auto">
+      <input type="text" name="Name" class="form-control" value="<% length($Name) > 1? $Name : '' %>" data-autocomplete="Queues" data-autocomplete-autosubmit=1 autocomplete="off" />
+    </div>
+  </div>
 </form>
 <%ARGS>
 $Name => undef

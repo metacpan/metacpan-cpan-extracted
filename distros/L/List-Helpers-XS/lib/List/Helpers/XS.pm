@@ -9,16 +9,16 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our %EXPORT_TAGS = (
-  'all' => [ qw/ shuffle random_slice random_slice_void / ],
+  'all' => [ qw/ shuffle_multi shuffle random_slice random_slice_void / ],
   'slice' => [ qw/ random_slice random_slice_void / ],
-  'shuffle' => [ qw/ shuffle / ],
+  'shuffle' => [ qw/ shuffle shuffle_multi / ],
 );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw//;
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('List::Helpers::XS', $VERSION);
@@ -39,6 +39,9 @@ List::Helpers::XS - Perl extension to provide some usefull functions with arrays
 
   shuffle(\@list);
   shuffle(@list);
+
+  # undef value will be skipped
+  shuffle_multi(\@list1, \@list2, undef, \@list3);
 
   # the same for tied arrays
 
@@ -83,7 +86,13 @@ In this case please consider the usage of C<random_slice_void> method.
   Shuffles the provided array.
   Doesn't return anything.
 
-=cut
+=head2 shuffle_multi
+
+  Shuffles multiple arrays.
+  Each array must be passed as array reference.
+  All undefined arrays will be skipped.
+  This method will allow you to save some time by getting rid of extra calls.
+  You can pass so many arguments as Perl stack allows.
 
 =head1 Benchmarks
 

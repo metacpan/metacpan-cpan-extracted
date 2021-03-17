@@ -1,3 +1,14 @@
+1.06
+
+- guess MIME type based on file extension (that is, .txt files are no
+  longer served as text/gemini, you need to use .gmi, or some other
+  file extension File::MimeInfo doesn't know about)
+
+- new dependency: File::MimeInfo
+
+- use --text_encoding=euc-jp to override UTF-8 charset for all text
+  files (all "text" types)
+
 1.04
 
 - Should work for more than one file, now! 😅

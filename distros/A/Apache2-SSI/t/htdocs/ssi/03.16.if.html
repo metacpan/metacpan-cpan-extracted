@@ -1,0 +1,8 @@
+<!--#config errmsg="[Include error]" -->
+<!--#if expr="$HTTP_COOKIE = /lang\%22\%3A\%22([a-zA-Z]+\-[a-zA-Z]+)\%22\%7D;?/"-->
+    <!--#set var="CONTENT_LANGUAGE" value="%{tolower:$1}"-->
+<!--#elif expr="!$CONTENT_LANGUAGE"-->
+    <!--#set var="CONTENT_LANGUAGE" value="en"-->
+<!--#endif-->
+<!--#set var="BASE_URI" value="https://${CONTENT_LANGUAGE}.example.com"-->
+<!--#echo var="BASE_URI" -->

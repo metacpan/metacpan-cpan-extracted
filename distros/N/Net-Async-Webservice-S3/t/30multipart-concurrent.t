@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use t::TestHTTP;
+use Test::Async::HTTP;
 
 use IO::Async::Test;
 use IO::Async::Loop;
@@ -19,7 +19,7 @@ testing_loop( $loop );
 
 my $s3 = Net::Async::Webservice::S3->new(
    max_retries => 1,
-   http => my $http = TestHTTP->new( concurrent => 1 ),
+   http => my $http = Test::Async::HTTP->new,
    access_key => 'K'x20,
    secret_key => 's'x40,
 );
@@ -30,9 +30,10 @@ sub await_multipart_initiate_and_respond
 {
    my ( $key ) = @_;
 
-   my $req;
-   wait_for { $req = $http->pending_request };
+   my $p;
+   wait_for { $p = $http->next_pending };
 
+   my $req = $p->request;
    is( $req->method,         "POST",                    "Initiate request method for $key" );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", "Initiate request URI authority for $key" );
    is( $req->uri->path,      "/$key",                   "Initiate request URI path for $key" );
@@ -40,7 +41,7 @@ sub await_multipart_initiate_and_respond
 
    # Technically this isn't a valid S3 UploadId but nothing checks the
    # formatting so it's probably OK
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "application/xml",
       ], <<"EOF" )
@@ -60,9 +61,10 @@ sub await_multipart_complete_and_respond
 {
    my ( $key, $want_etags ) = @_;
 
-   my $req;
-   wait_for { $req = $http->pending_request };
+   my $p;
+   wait_for { $p = $http->next_pending };
 
+   my $req = $p->request;
    is( $req->method,         "POST",                    "Complete request method for $key" );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", "Complete request URI authority for $key" );
    is( $req->uri->path,      "/$key",                   "Complete request URI path for $key" );
@@ -80,7 +82,7 @@ sub await_multipart_complete_and_respond
    }
    is_deeply( \%got_etags, $want_etags, "Complete request body etags for $key" ) if $want_etags;
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "application/xml",
       ], <<"EOF" )
@@ -120,7 +122,6 @@ EOF
 
    foreach my $p ( @p ) {
       my $req = $p->request;
-      $p->_pull_content( $p->content );
 
       is( $req->method,   "PUT", "Part request method for ten" );
       is( $req->uri->path, "/ten", "Part request URI path for ten" );
@@ -139,7 +140,6 @@ EOF
 
    foreach my $p ( @p ) {
       my $req = $p->request;
-      $p->_pull_content( $p->content );
 
       is( $req->method,   "PUT", "Part request method for ten" );
       is( $req->uri->path, "/ten", "Part request URI path for ten" );

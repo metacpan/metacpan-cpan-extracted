@@ -4,6 +4,7 @@ BEGIN
     use Test::More qw( no_plan );
     use lib './lib';
     use_ok( 'Apache2::SSI' ) || BAIL_OUT( "Unable to load Apache2::SSI" );
+    use constant HAS_APACHE_TEST => $ENV{HAS_APACHE_TEST};
     use URI::file;
     our $DEBUG = 0;
 };

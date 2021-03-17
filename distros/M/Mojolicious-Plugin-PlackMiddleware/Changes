@@ -1,6 +1,10 @@
 Revision history for Mojolicious::Plugin::PlackMiddleware
 
-0.38 2020/05/18
+0.39 2021/03/17
+  - Fixed for supporing Mojolicious version 9.
+
+0.38 2020/11/24
+  - Fixed for latest Mojolicious change.
 
 0.37 2020/05/18
   - Fix error handling (Larry Leszczynski)

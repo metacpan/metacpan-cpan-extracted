@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use t::TestHTTP;
+use Test::Async::HTTP;
 
 use IO::Async::Test;
 use IO::Async::Loop;
@@ -18,7 +18,7 @@ testing_loop( $loop );
 
 my $s3 = Net::Async::Webservice::S3->new(
    max_retries => 1,
-   http => my $http = TestHTTP->new,
+   http => my $http = Test::Async::HTTP->new,
    access_key => 'K'x20,
    secret_key => 's'x40,
 );
@@ -32,15 +32,16 @@ $loop->add( $s3 );
       key    => "one",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   my $req = $p->request;
    is( $req->method,         "GET",                     'Request method' );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", 'Request URI authority' );
    is( $req->uri->path,      "/one",                    'Request URI path' );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "text/plain",
       ], <<'EOF' )
@@ -66,22 +67,23 @@ EOF
       },
    );
 
-   wait_for { $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
-   $http->respond_header(
+   $p->respond_header(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "text/plain",
       ], "" )
    );
 
-   $http->respond_more( "some bytes" );
+   $p->respond_more( "some bytes" );
 
    wait_for { defined $header };
    is( $header->content_type, "text/plain", '$header->content_type for chunked get' );
    is( $bytes, "some bytes", '$bytes for chunked get' );
 
-   $http->respond_done;
+   $p->respond_done;
 
    wait_for { $f->is_ready };
 }
@@ -94,16 +96,17 @@ EOF
       byte_range => "8-",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   my $req = $p->request;
    is( $req->method,         "GET",                     'Request method' );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", 'Request URI authority' );
    is( $req->uri->path,      "/one",                    'Request URI path' );
    is( $req->header( "Range" ), "bytes=8-",             'Request Range header' );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 206, "Partial Content", [
          Content_Type => "text/plain",
          Content_Range => "bytes 8-15/16",
@@ -127,16 +130,17 @@ EOF
       if_match => '"my-etag-here"',
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   my $req = $p->request;
    is( $req->method,         "GET",                     'Request method' );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", 'Request URI authority' );
    is( $req->uri->path,      "/one",                    'Request URI path' );
    is( $req->header( "If-Match" ), '"my-etag-here"',    'Request If-Match header' );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 412, "Precondition Failed", [], "" ),
    );
 
@@ -158,15 +162,16 @@ EOF
       key => "1",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   my $req = $p->request;
    is( $req->method,         "GET",                     'Request method' );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", 'Request URI authority' );
    is( $req->uri->path,      "/subdir/1",               'Request URI path' );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "text/plain",
       ], <<'EOF' )
@@ -190,11 +195,11 @@ EOF
       key    => "ONE",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "text/plain",
          'X-Amz-Meta-One' => "one",
@@ -216,11 +221,11 @@ EOF
       key    => "five",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 404, "Not Found", [], '' )
    );
 
@@ -238,15 +243,16 @@ EOF
       key    => "one",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   my $req = $p->request;
    is( $req->method,         "HEAD",                    'Request method' );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", 'Request URI authority' );
    is( $req->uri->path,      "/one",                    'Request URI path' );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "text/plain",
       ], '' )
@@ -265,11 +271,11 @@ EOF
       key    => "five",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 404, "Not Found", [], '' )
    );
 
@@ -287,21 +293,22 @@ EOF
       key    => "one",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $head_f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $head_f->is_ready };
    $head_f->get if $head_f->is_ready and $head_f->failure;
 
+   my $req = $p->request;
    is( $req->method,         "GET",                     'Request method' );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", 'Request URI authority' );
    is( $req->uri->path,      "/one",                    'Request URI path' );
 
-   $http->respond_header(
+   $p->respond_header(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "text/plain",
          'X-Amz-Meta-One' => "one",
       ], "" )
    );
-   $http->respond_more( "And now here is some content\n" );
+   $p->respond_more( "And now here is some content\n" );
 
    wait_for { $head_f->is_ready };
 
@@ -311,7 +318,7 @@ EOF
    is( $header->content_type, "text/plain", '$header->content_type for head_then_get' );
    is_deeply( $meta, { One => "one" }, '$meta for head_then_get' );
 
-   $http->respond_done;
+   $p->respond_done;
 
    wait_for { $value_f->is_ready };
 
@@ -328,11 +335,11 @@ EOF
       key    => "five",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $head_f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $head_f->is_ready };
    $head_f->get if $head_f->is_ready and $head_f->failure;
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 404, "Not Found", [], "Object was not found" )
    );
 
@@ -350,33 +357,33 @@ EOF
       key    => "one",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $head_f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $head_f->is_ready };
    $head_f->get if $head_f->is_ready and $head_f->failure;
 
    $head_f->cancel;
 
-   $http->respond_header(
+   $p->respond_header(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "text/plain",
          'X-Amz-Meta-One' => "one",
       ], "" )
    );
-   $http->respond_more( "And now here is some content\n" );
-   $http->respond_done;
+   $p->respond_more( "And now here is some content\n" );
+   $p->respond_done;
 
    $head_f = $s3->head_then_get_object(
       bucket => "bucket",
       key    => "one",
    );
 
-   undef $req;
-   wait_for { $req = $http->pending_request or $head_f->is_ready };
+   undef $p;
+   wait_for { $p = $http->next_pending or $head_f->is_ready };
    $head_f->get if $head_f->is_ready and $head_f->failure;
 
    $head_f->cancel;
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 404, "Not Found", [], "" )
    );
 }
@@ -384,7 +391,7 @@ EOF
 # Test that timeout argument is set only for direct argument
 {
    my $f;
-   my $req;
+   my $p;
 
    $s3->configure( timeout => 10 );
    $f = $s3->get_object(
@@ -392,11 +399,12 @@ EOF
       key    => "-one-",
    );
 
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   my $req = $p->request;
    is( $req->header( "X-NaHTTP-Timeout" ), undef, 'Request has no timeout for configured' );
-   $http->respond( HTTP::Response->new( 200, "OK", [] ) );
+   $p->respond( HTTP::Response->new( 200, "OK", [] ) );
 
    $f = $s3->get_object(
       bucket  => "bucket",
@@ -404,11 +412,13 @@ EOF
       timeout => 20,
    );
 
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   undef $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   $req = $p->request;
    is( $req->header( "X-NaHTTP-Timeout" ), 20, 'Request has timeout set for immediate' );
-   $http->respond( HTTP::Response->new( 200, "OK", [] ) );
+   $p->respond( HTTP::Response->new( 200, "OK", [] ) );
 }
 
 done_testing;

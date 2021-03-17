@@ -23,4 +23,3 @@ t/20retry.t
 t/21resume.t
 t/30multipart-concurrent.t
 t/99pod.t
-t/TestHTTP.pm

@@ -11,7 +11,7 @@ use Text::ParseWords;
 local $Data::Dumper::Terse = 1;
 local $Data::Dumper::Sortkeys = 1;
 
-my $VERSION = '0.043';
+my $VERSION = '0.044';
 
 use constant HASH_REF	=> ref {};
 

@@ -13,6 +13,7 @@ use Mojo::URL;
 use WWW::Crawler::Mojo::UserAgent;
 use Test::More;
 use Test::Mojo;
+use Mojo::Promise;
 
 use Test::More tests => 46;
 
@@ -191,22 +192,23 @@ $ua = WWW::Crawler::Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
     "http://127.0.0.1:$port1" => "b:c",
     "http://127.0.0.1:$port2" => "a:b",
   );
-  my $delay = Mojo::IOLoop->delay;
   my $sum   = 0;
+  my @promises;
   for (1 .. 2) {
-    my $end = $delay->begin;
+    push @promises, (my $p = Mojo::Promise->new);
     $ua->get(
       "http://127.0.0.1:$port2/",
       sub {
         $sum += $ua->active_host("http://127.0.0.1:$port1");
-        $end->();
+        $p->resolve;
       }
     );
   }
   is $ua->active_host("http://127.0.0.1:$port1"), 0, 'right value';
   is $ua->active_host("http://127.0.0.1:$port2"), 2, 'right value';
-  $delay->wait;
-  is $ua->active_host("http://127.0.0.1:$port1"), 0, 'right value';
-  is $ua->active_host("http://127.0.0.1:$port2"), 0, 'right value';
-  is $sum, 1;
+  Mojo::Promise->all(@promises)->then(sub {
+    is $ua->active_host("http://127.0.0.1:$port1"), 0, 'right value';
+    is $ua->active_host("http://127.0.0.1:$port2"), 0, 'right value';
+    is $sum, 1;
+  })->wait;
 }

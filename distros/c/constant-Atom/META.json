@@ -1,0 +1,59 @@
+{
+   "abstract" : "define unique symbols (constant functions with opaque values)",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "constant-Atom",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Storable" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/neilb/constant-Atom/issues"
+      },
+      "homepage" : "https://github.com/neilb/constant-Atom",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/constant-Atom.git",
+         "web" : "https://github.com/neilb/constant-Atom"
+      }
+   },
+   "version" : "0.11",
+   "x_adopted_by" : {
+      "NEILB" : "2014-01-12"
+   },
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24"
+}
+

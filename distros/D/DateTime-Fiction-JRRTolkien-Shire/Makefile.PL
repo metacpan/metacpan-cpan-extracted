@@ -23,10 +23,11 @@ my %args = (
         'Specio::Library::Builtins'	=> 0.180,
         'Specio::Library::Numeric'	=> 0.180,
         'Specio::Library::String'	=> 0.180,
-        'constant'			=> 0,
-        'overload'			=> 0,
-        'strict'			=> 0,
-        'warnings'			=> 0,
+        constant			=> 0,
+        overload			=> 0,
+	parent				=> 0,
+        strict				=> 0,
+        warnings			=> 0,
     },
     PL_FILES => {},	# Prevent old MakeMaker from running Build.PL
     'dist' => {
@@ -59,7 +60,8 @@ $mmv >= 6.4501
 	},
 	resources	=> {
 	    bugtracker	=> {
-                web	=> 'https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire/issues',
+		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Fiction-JRRTolkien-Shire',
+		# web	=> 'https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire/issues',
                 mailto  => 'wyant@cpan.org',
             },
 	    license	=> 'http://dev.perl.org/licenses/',
@@ -80,12 +82,31 @@ $mmv >= 6.5702
 
 my $build_requires = {
     'Test::More'	=> 0,
+    'Time::Local'	=> 0,
+    charnames		=> 0,
 };
 
-$mmv >= 6.5501
-    and $args{BUILD_REQUIRES} = $build_requires
-    or $mmv >= 6.4501
-    and $args{META_MERGE}{build_requires} = $build_requires;
+my $configure_requires = {
+    'ExtUtils::MakeMaker'	=> 0,
+};
+
+if ( $mmv >= 6.52 ) {
+    $args{BUILD_REQUIRES} = $build_requires;
+    $args{CONFIGURE_REQUIRES} = $configure_requires;
+} elsif ( $mmv >= 6.5501 ) {
+    $args{BUILD_REQUIRES} = $build_requires;
+    $args{META_MERGE}{configure_requires} = $configure_requires;
+} elsif ( $mmv >= 6.4501 ) {
+    $args{META_MERGE}{build_requires} = $build_requires;
+    $args{META_MERGE}{configure_requires} = $configure_requires;
+} else {
+    foreach my $req ( $build_requires, $configure_requires ) {
+	foreach my $key ( keys %{ $req } ) {
+	    exists $args{PREREQ_PM}{$key}
+		or $args{PREREQ_PM}{$key} = $req->{$key};
+	}
+    }
+}
 
 WriteMakefile( %args );
 

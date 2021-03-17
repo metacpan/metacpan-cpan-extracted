@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -48,7 +48,7 @@
 <& /Elements/Header, Title => loc("Unable to find distribution") &>
 <& /Elements/Tabs &>
 
-<p>
+<p class="mt-2">
 % if ($Queue) {
   The distribution you specified, <strong><% $Queue %></strong>, could not be found.
 % }

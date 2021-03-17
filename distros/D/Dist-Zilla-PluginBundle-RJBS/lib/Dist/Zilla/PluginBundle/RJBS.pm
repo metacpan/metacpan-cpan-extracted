@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::RJBS;
 # ABSTRACT: BeLike::RJBS when you build your dists
-$Dist::Zilla::PluginBundle::RJBS::VERSION = '5.012';
+$Dist::Zilla::PluginBundle::RJBS::VERSION = '5.013';
 use Moose;
 use Dist::Zilla 2.100922; # TestRelease
 with
@@ -18,6 +18,7 @@ with
 #pod
 #pod   [MakeMaker]
 #pod   default_jobs = 9
+#pod   eumm_version = 6.78
 #pod
 #pod   [AutoPrereqs]
 #pod   [Git::NextVersion]
@@ -143,7 +144,12 @@ sub configure {
     '-remove' => [ 'GatherDir', 'ExtraTests', 'MakeMaker' ],
   });
 
-  $self->add_plugins([ MakeMaker => { default_jobs => 9 } ]);
+  $self->add_plugins([
+    MakeMaker => {
+      default_jobs  => 9,
+      eumm_version  =>  6.78, # Stop using -w when running tests.
+    }
+  ]);
 
   $self->add_plugins('AutoPrereqs');
 
@@ -241,7 +247,7 @@ Dist::Zilla::PluginBundle::RJBS - BeLike::RJBS when you build your dists
 
 =head1 VERSION
 
-version 5.012
+version 5.013
 
 =head1 DESCRIPTION
 
@@ -253,6 +259,7 @@ This is the plugin bundle that RJBS uses.  It is more or less equivalent to:
 
   [MakeMaker]
   default_jobs = 9
+  eumm_version = 6.78
 
   [AutoPrereqs]
   [Git::NextVersion]
@@ -293,25 +300,15 @@ L<Dist::Zilla::Role::PluginBundle::Config::Slicer> to allow further customizatio
 
 Ricardo Signes <rjbs@semiotic.systems>
 
-=head1 CONTRIBUTORS
+=head1 CONTRIBUTOR
 
-=for stopwords Karen Etheridge Ricardo SIGNES
-
-=over 4
-
-=item *
+=for stopwords Karen Etheridge
 
 Karen Etheridge <ether@cpan.org>
 
-=item *
-
-Ricardo SIGNES <rjbs@cpan.org>
-
-=back
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ricardo Signes.
+This software is copyright (c) 2021 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

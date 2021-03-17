@@ -53,7 +53,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 'TestFilter'
             ]);
             
-            $self->routes->route('/index')->to(cb => sub{
+            $self->routes->any('/index')->to(cb => sub{
                 $_[0]->render(text => 'original');
             });
         }
@@ -79,10 +79,10 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 'InvokeAppTwice'
             ]);
             
-            $self->routes->route('/index1')->to(cb => sub{
+            $self->routes->any('/index1')->to(cb => sub{
                 $_[0]->reply->not_found;
             });
-            $self->routes->route('/index2')->to(cb => sub{
+            $self->routes->any('/index2')->to(cb => sub{
                 $_[0]->render(text => 'index2');
             });
         }
@@ -107,7 +107,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 'TestFilter'
             ]);
             
-            $self->routes->route('/index')->to(cb => sub{
+            $self->routes->any('/index')->to(cb => sub{
                 my $content_type = $_[0]->req->headers->header('content-type');
                 is($content_type, 'application/x-www-form-urlencoded', 'right content type');
                 is($_[0]->req->body, 'a=b', 'req body set');
@@ -136,7 +136,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 'TestFilter'
             ]);
             
-            $self->routes->route('/index')->to(cb => sub{
+            $self->routes->any('/index')->to(cb => sub{
                 my $content_type = $_[0]->req->headers->header('content-type');
                 like($content_type, qr{multipart/form-data}, 'right content type');
                 is($_[0]->req->body_params->param('foo'), 'bar', 'right body param');
@@ -165,7 +165,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 'TestFilter4'
             ]);
             
-            $self->routes->route('/index.html')->to(cb => sub{
+            $self->routes->any('/index.html')->to(cb => sub{
                 $_[0]->render(text => 'ok');
             });
         }
@@ -193,7 +193,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 'TestFilter2',
             ]);
             
-            $self->routes->route('/index')->to(cb => sub{
+            $self->routes->any('/index')->to(cb => sub{
                 $_[0]->render(text => 'original');
             });
         }
@@ -220,7 +220,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 'TestFilter3' => {tag => 'aaa'},
             ]);
             
-            $self->routes->route('/index')->to(cb => sub{
+            $self->routes->any('/index')->to(cb => sub{
                 $_[0]->render(text => 'original');
             });
         }
@@ -247,7 +247,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 'GrowLargeFilter',
             ]);
             
-            $self->routes->route('/index')->to(cb => sub{
+            $self->routes->any('/index')->to(cb => sub{
                 $_[0]->render(text => '1');
             });
         }
@@ -275,7 +275,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 'ForceCharset', {charset => 'Shift_JIS'}
             ]);
             
-            $self->routes->route('/index')->to(cb => sub{
+            $self->routes->any('/index')->to(cb => sub{
                 $_[0]->render(text => '日本語');
             });
         }
@@ -302,7 +302,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 'TestFilter', sub {0}
             ]);
             
-            $self->routes->route('/index')->to(cb => sub{
+            $self->routes->any('/index')->to(cb => sub{
                 $_[0]->render(text => 'original');
             });
         }
@@ -335,7 +335,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
                 }
             ]);
             
-            $self->routes->route('/index')->to(cb => sub{
+            $self->routes->any('/index')->to(cb => sub{
                 $_[0]->render(text => 'original');
             });
         }
@@ -369,7 +369,7 @@ local $ENV{MOJO_HOME} = dirname(__FILE__);
             
             $self->plugin(plack_middleware => ["Auth::Basic", {authenticator => sub {1}}]);
             
-            $self->routes->route('/index')->to(cb => sub{
+            $self->routes->any('/index')->to(cb => sub{
                 $_[0]->render(text => 'original');
             });
         }

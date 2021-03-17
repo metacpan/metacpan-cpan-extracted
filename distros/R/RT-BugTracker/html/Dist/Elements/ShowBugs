@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -51,7 +51,8 @@
 <h3><% loc('Bugs') %></h3>
 % }
 
-<& /Elements/TicketList,
+<& /Elements/CollectionList,
+    Class   => 'RT::Tickets',
     Query   => $Query,
     Format  => $Format,
     OrderBy => $OrderBy,
@@ -63,32 +64,14 @@
 &>
 
 <%INIT>
-unless ( ($Status||'') eq 'Active' || $Queue->IsValidStatus( lc $Status ) ) {
+unless ( ($Status||'') =~ /__(?:active|inactive)__/i || $Queue->IsValidStatus( lc $Status ) ) {
     $m->comp('/Elements/Error', Why => q{no such status as '} . $Status . q{'});
     $m->abort();
 }
 
-my $Query = "Queue = '". $Queue->Name ."'";
-if ( $Status eq 'Active' ) {
-    $Query .= " AND ( "
-        .join( ' OR ', map "Status = '$_'", $Queue->ActiveStatusArray )
-        ." )";
-}
-else {
-    $Query .= " AND Status = '$Status'";
-}
-
+my $Query = "Queue = '". $Queue->Name ."' AND Status = '$Status'";
 my $RSSFeedURL = $m->comp('SELF:RSS', Query => $Query );
 
-$Format ||= <<EOF;
-'<a href="$RT::WebPath/Ticket/Display.html?id=__id__">__id__</a>/TITLE:ID',
-'<b><a href="$RT::WebPath/Ticket/Display.html?id=__id__">__Subject__</a></b>/TITLE:Subject',
-'__Status__',
-'__CustomField.{Severity}__',
-'<small>__LastUpdatedRelative__</small>',
-'__CustomField.{Broken in}__',
-'__CustomField.{Fixed in}__'
-EOF
 </%INIT>
 <%ARGS>
 # object
@@ -96,7 +79,7 @@ $Queue
 $Status
 $ShowRSSLink => 1
 
-$Format  => undef
+$Format  => RT->Config->Get('BugTracker_SearchResultFormat')
 $OrderBy => 'LastUpdated'
 $Order   => 'DESC'
 $Rows    => undef
@@ -109,30 +92,25 @@ $BaseURL => undef
 $Queue  => undef
 $Status => undef
 $Query  => undef
+$OrderBy => 'LastUpdated'
+$Order   => 'DESC'
 </%ARGS>
 <%INIT>
 
-if ( $Query ) {
-    return "$RT::WebPath/Search/Results.rdf?"
-        . $m->comp('/Elements/QueryString', Query => $Query);
+if ( !$Query ) {
+    unless ( ($Status||'') =~ /__(?:active|inactive)__/i || $Queue->IsValidStatus( lc $Status ) ) {
+        $m->comp( '/Elements/Error', Why => q{no such status as '} . $Status . q{'} );
+        $m->abort();
+    }
+
+    $Query = "Queue = '". $Queue->Name ."' AND Status = '$Status'";
 }
 
-unless ( ($Status||'') eq 'Active' || $Queue->IsValidStatus( lc $Status ) ) {
-    $m->comp('/Elements/Error', Why => q{no such status as '} . $Status . q{'});
-    $m->abort();
-}
+my $RSSQueryString = "?" . $m->comp('/Elements/QueryString', Query => $Query, Order => $Order, OrderBy => $OrderBy );
+my $RSSPath = join '/', map $HTML::Mason::Commands::m->interp->apply_escapes( $_, 'u' ),
+    $session{CurrentUser}->UserObj->Name,
+    $session{CurrentUser}->UserObj->GenerateAuthString( $Query . $Order . $OrderBy );
 
-$Query = "Queue = '". $Queue->Name ."'";
-if ( $Status eq 'Active' ) {
-    $Query .= " AND ( "
-        .join( ' OR ', map "Status = '$_'", $Queue->ActiveStatusArray )
-        ." )";
-}
-else {
-    $Query .= " AND Status = '$Status'";
-}
-
-return "$RT::WebPath/Search/Results.rdf?"
-    . $m->comp('/Elements/QueryString', Query => $Query);
+return "/NoAuth/rss/$RSSPath/$RSSQueryString";
 </%INIT>
 </%METHOD>

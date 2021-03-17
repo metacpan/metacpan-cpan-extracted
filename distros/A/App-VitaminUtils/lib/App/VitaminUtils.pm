@@ -1,9 +1,9 @@
 package App::VitaminUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-03'; # DATE
+our $DATE = '2021-03-17'; # DATE
 our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,12 +49,15 @@ sub convert_vitamin_a_unit {
 
     Physics::Unit::InitUnit(
         ['mcg'], '0.001 mg',
+        ['mcg-all-trans-beta-carotene-as-food-supplement'], '0.5 mcg',
         ['mcg-all-trans-retinol'], '1 mcg',
-        ['mcg-dietary-all-trans-beta-carotene'],            '0.083333333 mcg', # 1/12
+        ['mcg-all-trans-retinyl-acetate'], '0.872180241224122 mcg',            # https://www.rfaregulatoryaffairs.com/vitamin-converter: 1mg all-trans-retinyl-acetate = 2906.976744IU, 1mg all-trans-retinol = 3333IU
+        ['mcg-all-trans-retinyl-palmitate'], '0.545454545454545 mcg',          # "1 IU corresponds to the activity of 0.300  g of all-trans retinol, 0.359  g of all-trans retinyl propionate or 0.550  g of all-trans retinyl palmitate"
+        ['mcg-all-trans-retinyl-propionate'], '0.835654596100279 mcg',         # "1 IU corresponds to the activity of 0.300  g of all-trans retinol, 0.359  g of all-trans retinyl propionate or 0.550  g of all-trans retinyl palmitate"
         ['mcg-alpha-carotene'],                             '0.041666667 mcg', # 1/24
         ['mcg-beta-cryptoxanthin'],                         '0.041666667 mcg', # 1/24
-        ['mcg-all-trans-beta-carotene-as-food-supplement'], '0.5 mcg',
-        ['IU', 'iu'], '0.3 microgram',
+        ['mcg-dietary-all-trans-beta-carotene'],            '0.083333333 mcg', # 1/12
+        ['IU', 'iu'], '0.3 microgram', # definition from European pharmacopoeia
         ['IU-retinol', 'iu-retinol'], '0.3 microgram',
         ['IU-beta-carotene', 'iu-beta-carotene'], '0.6 microgram',
     );
@@ -75,9 +78,200 @@ sub convert_vitamin_a_unit {
             'mcg-alpha-carotene',
             'mcg-beta-cryptoxanthin',
             'mcg-all-trans-beta-carotene-as-food-supplement',
+            'mcg-all-trans-retinyl-acetate',
+            'mcg-all-trans-retinyl-palmitate',
+            'mcg-all-trans-retinyl-propionate',
             'IU',
             'IU-retinol',
             'IU-beta-carotene') {
+            push @rows, {
+                unit => $u,
+                amount => $quantity->convert($u),
+            };
+        }
+        [200, "OK", \@rows];
+    }
+}
+
+$SPEC{convert_vitamin_b5_unit} = {
+    v => 1.1,
+    summary => 'Convert a vitamin B5 (pantothenic acid) quantity from one unit to another',
+    description => <<'_',
+
+If target unit is not specified, will show all known conversions.
+
+_
+    args => {
+        %args_common,
+    },
+    examples => [
+        {args=>{quantity=>'mg'}, summary=>'Show all possible conversions'},
+    ],
+};
+sub convert_vitamin_b5_unit {
+    require Physics::Unit;
+
+    Physics::Unit::InitUnit(
+        ['mg-pantothenic-acid'], '1 mg',
+        ['mg-d-calcium-pantothenate'], '0.916 mg', # https://www.rfaregulatoryaffairs.com/vitamin-converter
+    );
+
+    my %args = @_;
+    my $quantity = Physics::Unit->new($args{quantity});
+    return [412, "Must be a Mass quantity"] unless $quantity->type eq 'Mass';
+
+    if ($args{to_unit}) {
+        my $new_amount = $quantity->convert($args{to_unit});
+        return [200, "OK", $new_amount];
+    } else {
+        my @rows;
+        for my $u (
+            'mg',
+            'mg-pantothenic-acid',
+            'mg-d-calcium-pantothenate',
+        ) {
+            push @rows, {
+                unit => $u,
+                amount => $quantity->convert($u),
+            };
+        }
+        [200, "OK", \@rows];
+    }
+}
+
+$SPEC{convert_vitamin_b6_unit} = {
+    v => 1.1,
+    summary => 'Convert a vitamin B6 (pyridoxine) quantity from one unit to another',
+    description => <<'_',
+
+If target unit is not specified, will show all known conversions.
+
+_
+    args => {
+        %args_common,
+    },
+    examples => [
+        {args=>{quantity=>'mg'}, summary=>'Show all possible conversions'},
+    ],
+};
+sub convert_vitamin_b6_unit {
+    require Physics::Unit;
+
+    Physics::Unit::InitUnit(
+        ['mg-pyridoxine'], '1 mg',
+        ['mg-pyridoxine-hydrochloride'], '0.8227 mg',
+    );
+
+    my %args = @_;
+    my $quantity = Physics::Unit->new($args{quantity});
+    return [412, "Must be a Mass quantity"] unless $quantity->type eq 'Mass';
+
+    if ($args{to_unit}) {
+        my $new_amount = $quantity->convert($args{to_unit});
+        return [200, "OK", $new_amount];
+    } else {
+        my @rows;
+        for my $u (
+            'mg',
+            'mg-pyridoxine',
+            'mg-pyridoxine-hydrochloride',
+        ) {
+            push @rows, {
+                unit => $u,
+                amount => $quantity->convert($u),
+            };
+        }
+        [200, "OK", \@rows];
+    }
+}
+
+$SPEC{convert_vitamin_b12_unit} = {
+    v => 1.1,
+    summary => 'Convert a vitamin B12 (cobalamin) quantity from one unit to another',
+    description => <<'_',
+
+If target unit is not specified, will show all known conversions.
+
+_
+    args => {
+        %args_common,
+    },
+    examples => [
+        {args=>{quantity=>'mcg'}, summary=>'Show all possible conversions'},
+    ],
+};
+sub convert_vitamin_b12_unit {
+    require Physics::Unit;
+
+    Physics::Unit::InitUnit(
+        ['mcg'], '0.001 mg',
+        ['mcg-cobalamin'], '0.001 mg',
+        ['mcg-cyanocobalamin'], '0.999988932992961 mg', # very close to cobalamin as it only adds CN-. molecular weight 1,355.38 g/mol vs 1,355.365
+    );
+
+    my %args = @_;
+    my $quantity = Physics::Unit->new($args{quantity});
+    return [412, "Must be a Mass quantity"] unless $quantity->type eq 'Mass';
+
+    if ($args{to_unit}) {
+        my $new_amount = $quantity->convert($args{to_unit});
+        return [200, "OK", $new_amount];
+    } else {
+        my @rows;
+        for my $u (
+            'mg',
+            'mcg',
+            'mcg-cobalamin',
+            'mcg-cyanocobalamin',
+        ) {
+            push @rows, {
+                unit => $u,
+                amount => $quantity->convert($u),
+            };
+        }
+        [200, "OK", \@rows];
+    }
+}
+
+$SPEC{convert_choline_unit} = {
+    v => 1.1,
+    summary => 'Convert a choline quantity from one unit to another',
+    description => <<'_',
+
+If target unit is not specified, will show all known conversions.
+
+_
+    args => {
+        %args_common,
+    },
+    examples => [
+        {args=>{quantity=>'mcg'}, summary=>'Show all possible conversions'},
+    ],
+};
+sub convert_choline_unit {
+    require Physics::Unit;
+
+    Physics::Unit::InitUnit(
+        ['mcg'], '0.001 mg',
+        ['mcg-choline'], '0.001 mg',
+        ['mcg-choline-bitartrate'], '0.000411332675222113 mg', # molecular weight: 253.25 vs 104.17
+    );
+
+    my %args = @_;
+    my $quantity = Physics::Unit->new($args{quantity});
+    return [412, "Must be a Mass quantity"] unless $quantity->type eq 'Mass';
+
+    if ($args{to_unit}) {
+        my $new_amount = $quantity->convert($args{to_unit});
+        return [200, "OK", $new_amount];
+    } else {
+        my @rows;
+        for my $u (
+            'mg',
+            'mcg',
+            'mcg-choline',
+            'mcg-choline-bitartrate',
+        ) {
             push @rows, {
                 unit => $u,
                 amount => $quantity->convert($u),
@@ -155,9 +349,15 @@ sub convert_vitamin_e_unit {
 
     Physics::Unit::InitUnit(
         ['mcg'], '0.001 mg',
-        ['mg-alpha-tocopherol-equivalent', 'mcg-alpha-TE'], '1 mg',
+        ['mg-alpha-tocopherol-equivalent'], '1 mg',
+        ['mg-alpha-TE'], '1 mg',
         ['mg-rrr-alpha-tocopherol'], '1 mg',
-        ['mg-rrr-alpha-tocopherol'], '1 mg',
+        ['mg-d-alpha-tocopherol'], '1 mg', # RRR- = d-
+        ['mg-dl-alpha-tocopherol'], '0.738255033557047 mg', # https://www.rfaregulatoryaffairs.com/vitamin-converter
+
+        ['mg-d-alpha-tocopheryl-acetate'], '0.912751677852349 mg', # https://www.rfaregulatoryaffairs.com/vitamin-converter
+        ['mg-dl-alpha-tocopheryl-acetate'], '0.671140939597315 mg', # https://www.rfaregulatoryaffairs.com/vitamin-converter
+
         ['mg-beta-tocopherol'], '0.5 mg',
         ['mg-gamma-tocopherol'], '0.1 mg',
         ['mg-alpha-tocotrienol'], '0.30 mg',
@@ -178,9 +378,13 @@ sub convert_vitamin_e_unit {
         for my $u (
             'mg',
             'mcg',
+            'mg-alpha-TE',
             'mg-alpha-tocopherol-equivalent',
             'mg-rrr-alpha-tocopherol',
-            'mg-rrr-alpha-tocopherol',
+            'mg-d-alpha-tocopherol',
+            'mg-d-alpha-tocopheryl-acetate',
+            'mg-dl-alpha-tocopheryl-acetate',
+            'mg-dl-alpha-tocopherol',
             'mg-beta-tocopherol',
             'mg-gamma-tocopherol',
             'mg-alpha-tocotrienol',
@@ -211,7 +415,7 @@ App::VitaminUtils - Utilities related to vitamins
 
 =head1 VERSION
 
-This document describes version 0.002 of App::VitaminUtils (from Perl distribution App-VitaminUtils), released on 2020-11-03.
+This document describes version 0.003 of App::VitaminUtils (from Perl distribution App-VitaminUtils), released on 2021-03-17.
 
 =head1 DESCRIPTION
 
@@ -219,7 +423,21 @@ This distributions provides the following command-line utilities:
 
 =over
 
+=item * L<convert-choline-unit>
+
+=item * L<convert-cobalamin-unit>
+
+=item * L<convert-pantothenic-acid-unit>
+
+=item * L<convert-pyridoxine-unit>
+
 =item * L<convert-vitamin-a-unit>
+
+=item * L<convert-vitamin-b12-unit>
+
+=item * L<convert-vitamin-b5-unit>
+
+=item * L<convert-vitamin-b6-unit>
 
 =item * L<convert-vitamin-d-unit>
 
@@ -228,6 +446,66 @@ This distributions provides the following command-line utilities:
 =back
 
 =head1 FUNCTIONS
+
+
+=head2 convert_choline_unit
+
+Usage:
+
+ convert_choline_unit(%args) -> [status, msg, payload, meta]
+
+Convert a choline quantity from one unit to another.
+
+Examples:
+
+=over
+
+=item * Show all possible conversions:
+
+ convert_choline_unit(quantity => "mcg");
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     { amount => 0.001, unit => "mg" },
+     { amount => 1, unit => "mcg" },
+     { amount => 1, unit => "mcg-choline" },
+     { amount => 2.43112220408947, unit => "mcg-choline-bitartrate" },
+   ],
+   {},
+ ]
+
+=back
+
+If target unit is not specified, will show all known conversions.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<quantity>* => I<str>
+
+=item * B<to_unit> => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 
 
 =head2 convert_vitamin_a_unit
@@ -265,6 +543,15 @@ Result:
        amount => 2,
        unit   => "mcg-all-trans-beta-carotene-as-food-supplement",
      },
+     { amount => 1.14655200007338, unit => "mcg-all-trans-retinyl-acetate" },
+     {
+       amount => 1.83333333333333,
+       unit   => "mcg-all-trans-retinyl-palmitate",
+     },
+     {
+       amount => 1.19666666666667,
+       unit   => "mcg-all-trans-retinyl-propionate",
+     },
      { amount => 3.33333333333333, unit => "IU" },
      { amount => 3.33333333333333, unit => "IU-retinol" },
      { amount => 1.66666666666667, unit => "IU-beta-carotene" },
@@ -287,6 +574,184 @@ Result:
 =item * Convert from IU to mg:
 
  convert_vitamin_a_unit(quantity => "5000 IU", to_unit => "mg"); # -> [200, "OK", 1.5, {}]
+
+=back
+
+If target unit is not specified, will show all known conversions.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<quantity>* => I<str>
+
+=item * B<to_unit> => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 convert_vitamin_b12_unit
+
+Usage:
+
+ convert_vitamin_b12_unit(%args) -> [status, msg, payload, meta]
+
+Convert a vitamin B12 (cobalamin) quantity from one unit to another.
+
+Examples:
+
+=over
+
+=item * Show all possible conversions:
+
+ convert_vitamin_b12_unit(quantity => "mcg");
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     { amount => 0.001, unit => "mg" },
+     { amount => 1, unit => "mcg" },
+     { amount => 1, unit => "mcg-cobalamin" },
+     { amount => 0.00100001106712952, unit => "mcg-cyanocobalamin" },
+   ],
+   {},
+ ]
+
+=back
+
+If target unit is not specified, will show all known conversions.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<quantity>* => I<str>
+
+=item * B<to_unit> => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 convert_vitamin_b5_unit
+
+Usage:
+
+ convert_vitamin_b5_unit(%args) -> [status, msg, payload, meta]
+
+Convert a vitamin B5 (pantothenic acid) quantity from one unit to another.
+
+Examples:
+
+=over
+
+=item * Show all possible conversions:
+
+ convert_vitamin_b5_unit(quantity => "mg");
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     { amount => 1, unit => "mg" },
+     { amount => 1, unit => "mg-pantothenic-acid" },
+     { amount => 1.09170305676856, unit => "mg-d-calcium-pantothenate" },
+   ],
+   {},
+ ]
+
+=back
+
+If target unit is not specified, will show all known conversions.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<quantity>* => I<str>
+
+=item * B<to_unit> => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 convert_vitamin_b6_unit
+
+Usage:
+
+ convert_vitamin_b6_unit(%args) -> [status, msg, payload, meta]
+
+Convert a vitamin B6 (pyridoxine) quantity from one unit to another.
+
+Examples:
+
+=over
+
+=item * Show all possible conversions:
+
+ convert_vitamin_b6_unit(quantity => "mg");
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     { amount => 1, unit => "mg" },
+     { amount => 1, unit => "mg-pyridoxine" },
+     { amount => 1.21550990640574, unit => "mg-pyridoxine-hydrochloride" },
+   ],
+   {},
+ ]
 
 =back
 
@@ -409,9 +874,13 @@ Result:
    [
      { amount => 1, unit => "mg" },
      { amount => 1000, unit => "mcg" },
+     { amount => 1, unit => "mg-alpha-TE" },
      { amount => 1, unit => "mg-alpha-tocopherol-equivalent" },
      { amount => 1, unit => "mg-rrr-alpha-tocopherol" },
-     { amount => 1, unit => "mg-rrr-alpha-tocopherol" },
+     { amount => 1, unit => "mg-d-alpha-tocopherol" },
+     { amount => 1.09558823529412, unit => "mg-d-alpha-tocopheryl-acetate" },
+     { amount => 1.49, unit => "mg-dl-alpha-tocopheryl-acetate" },
+     { amount => 1.35454545454545, unit => "mg-dl-alpha-tocopherol" },
      { amount => 2, unit => "mg-beta-tocopherol" },
      { amount => 10, unit => "mg-gamma-tocopherol" },
      { amount => 3.33333333333333, unit => "mg-alpha-tocotrienol" },
@@ -476,7 +945,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-VitaminUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-VitaminUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-VitaminUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -486,13 +955,17 @@ feature.
 
 L<Physics::Unit>
 
+Online vitamin converters:
+L<https://www.rfaregulatoryaffairs.com/vitamin-converter>,
+L<https://avsnutrition.com.au/wp-content/themes/avs-nutrition/vitamin-converter.html>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

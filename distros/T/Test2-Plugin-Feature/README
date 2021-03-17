@@ -1,6 +1,6 @@
 NAME
 
-    App::Yath::Plugin::feature - Plugin to allow testing Pherkin files.
+    App::Yath::Plugin::Feature - Plugin to allow testing Pherkin files.
 
 SYNOPSIS
 

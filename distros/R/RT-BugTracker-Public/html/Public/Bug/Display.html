@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -45,7 +45,7 @@
 %# those contributions and any derivatives thereof.
 %#
 %# END BPS TAGGED BLOCK }}}
-<& /Elements/Header, 
+<& /Elements/Header,
     Title => $title &>
 <& /Elements/Tabs &>
 
@@ -62,17 +62,14 @@
 
 % $m->callback(%ARGS, CallbackName => 'BeforeShowHistory', Ticket => $TicketObj);
 
-<& /Ticket/Elements/ShowHistory , 
-      Ticket => $TicketObj, 
-      Tickets => $Tickets, 
-      Collapsed => $ARGS{'Collapsed'}, 
+<& /Elements/ShowHistory ,
+      Object => $TicketObj,
+      Transactions => $TicketObj->Transactions,
       ShowHeaders => $ARGS{'ShowHeaders'},
       Attachments => $attachments,
       AttachmentContent => $attachment_content,
-      URIFile     => RT->Config->Get('WebPath') . '/Public/Bug/Display.html',
-      DisplayPath => RT->Config->Get('WebPath') . '/Public/Bug/Display.html?id='. $TicketObj->id,
-      UpdatePath  => RT->Config->Get('WebPath') . '/Public/Bug/Update.html',
-&> 
+      AttachmentPath => RT->Config->Get('WebPath')."/Ticket/Attachment",
+&>
 
 <%ARGS>
 $id => undef
@@ -93,12 +90,12 @@ unless ($id || $TicketObj) {
 
 if ($ARGS{'id'} eq 'new') {
     # {{{ Create a new ticket
-    
-    my $Queue = new RT::Queue($session{'CurrentUser'});	
+
+    my $Queue = new RT::Queue($session{'CurrentUser'});
     unless ($Queue->Load($ARGS{'Queue'})) {
 	Abort('Queue not found');
     }
-    
+
     unless ($Queue->CurrentUserHasRight('CreateTicket')) {
 	Abort('You have no permission to create tickets in that queue.');
     }
@@ -109,7 +106,7 @@ if ($ARGS{'id'} eq 'new') {
 	Abort("No permission to view newly created ticket #".$TicketObj->id.".");
 	}
     # }}}
-} else { 
+} else {
     if (!$TicketObj) {
 
 	$TicketObj = RT::Ticket->new($session{'CurrentUser'});
@@ -130,7 +127,7 @@ if ($ARGS{'id'} eq 'new') {
 
     $ARGS{'UpdateContent'} =~ s/\r\n/\n/g if defined $ARGS{'UpdateContent'};
     if ( $ARGS{'UpdateTimeWorked'} ||
-	 $session{'Attachments'} || 
+	 $session{'Attachments'} ||
 	 (   defined $ARGS{'UpdateContent'}
              && $ARGS{'UpdateContent'} ne ''
 	     && $ARGS{'UpdateContent'} ne "-- \n"
@@ -148,13 +145,13 @@ if ($ARGS{'id'} eq 'new') {
     push (@Actions, @BasicActions, @results);
 }
 
-# This code does automatic redirection if any updates happen. 
+# This code does automatic redirection if any updates happen.
 # It doesn't work for the client.
 
 
 
 if (@Actions) {
-    # We've done something, so we need to clear the decks to avoid 
+    # We've done something, so we need to clear the decks to avoid
     # resubmission on refresh.
     # But we need to store Actions somewhere too, so we don't lose them.
     $session{"Actions"} = \@Actions;
@@ -166,9 +163,8 @@ if (@Actions) {
 $m->callback(CallbackName => 'BeforeDisplay',
 	 TicketObj => \$TicketObj, Tickets => \$Tickets, ARGSRef => \%ARGS);
 
-
-my $attachments = $m->comp('/Ticket/Elements/FindAttachments', Ticket => $TicketObj, Tickets => $Tickets);
-my $attachment_content = $m->comp('/Ticket/Elements/LoadTextAttachments', Ticket => $TicketObj);
+my $attachments = $TicketObj->Attachments;
+my $attachment_content = $TicketObj->TextAttachments;
 
 my $title = loc(
     "Bug #[_1] for [_2]: [_3]",
@@ -206,7 +202,7 @@ sub _UpdateMessage {
 
         my $Message = MakeMIMEEntity(%mime);
 
-        $Message->head->add( 'Message-ID' => 
+        $Message->head->add( 'Message-ID' =>
               "<rt-"
               . $RT::VERSION . "-"
               . $$ . "-"
@@ -226,10 +222,10 @@ sub _UpdateMessage {
         }
 
         if ( $old_txn->Message && $old_txn->Message->First ) {
-            my @in_reply_to = split(/\s+/m, $old_txn->Message->First->GetHeader('In-Reply-To') || '');  
-            my @references = split(/\s+/m, $old_txn->Message->First->GetHeader('References') || '' );  
-            my @msgid = split(/\s+/m,$old_txn->Message->First->GetHeader('Message-ID') || ''); 
-            my @rtmsgid = split(/\s+/m,$old_txn->Message->First->GetHeader('RT-Message-ID') || ''); 
+            my @in_reply_to = split(/\s+/m, $old_txn->Message->First->GetHeader('In-Reply-To') || '');
+            my @references = split(/\s+/m, $old_txn->Message->First->GetHeader('References') || '' );
+            my @msgid = split(/\s+/m,$old_txn->Message->First->GetHeader('Message-ID') || '');
+            my @rtmsgid = split(/\s+/m,$old_txn->Message->First->GetHeader('RT-Message-ID') || '');
 
             $Message->head->replace( 'In-Reply-To', join (' ', @rtmsgid ? @rtmsgid : @msgid));
             $Message->head->replace( 'References', join(' ', @references, @msgid, @rtmsgid));

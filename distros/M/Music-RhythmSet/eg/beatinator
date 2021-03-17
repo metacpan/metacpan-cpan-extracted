@@ -87,6 +87,7 @@ $set->advance($measures);
 # could make them distinct by changing the instrument, etc)
 $set->to_midi(
     chan => $Flag_Channel,
+    maxm => $measures,
     defined $Flag_Notes
     ? ( track => [ map { { note => $_ } } $Flag_Notes->@* ] )
     : (),
@@ -94,9 +95,10 @@ $set->to_midi(
 )->write_to_file($filename);
 
 print $set->to_string(
-    $Flag_Divisor     ? ( divisor => $Flag_Divisor ) : (),
-    defined $Flag_RS  ? ( rs      => $Flag_RS )      : (),
-    defined $Flag_Sep ? ( sep     => $Flag_Sep )     : (),
+    $Flag_Divisor ? ( divisor => $Flag_Divisor ) : (),
+    maxm => $measures,
+    defined $Flag_RS  ? ( rs  => $Flag_RS )  : (),
+    defined $Flag_Sep ? ( sep => $Flag_Sep ) : (),
 ) if $Flag_Tostring;
 
 exit if $Flag_Nochanges;
@@ -104,9 +106,14 @@ exit if $Flag_Nochanges;
 # show what the patterns are in each measure where a pattern changes
 # (there are also text_event in the MIDI to help locate the rhythms
 # should this script by accident produce something good)
+#
+# NOTE the 'max' limit here may disagree with that of the to_* calls
+# depending on the divisor value (especially if it is unset and on the
+# probable assumption of measures with more than one beat in them)
 $set->changes(
     $Flag_Divisor ? ( divisor => $Flag_Divisor ) : (),
     header => sub { warn '# measure ' . $_[0] . "\n" },
+    max    => $measures,
     voice  => sub {
         my ( $mm, $id, $bp, $bs, $new, $repeat ) = @_;
         # 'n' if there was a pattern change event for this voice, 'r' if

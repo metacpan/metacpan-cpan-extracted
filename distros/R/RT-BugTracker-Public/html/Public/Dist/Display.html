@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -67,7 +67,8 @@
 
 <%INIT>
 $Name = $Queue unless $Name;
-$Name =~ s/::/-/g;
+my %NameRegex = RT->Config->Get("DistributionToQueueRegex");
+$Name =~ s/$NameRegex{Pattern}/$NameRegex{Substitution}/g;
 my $QueueObj = RT::Queue->new( $session{CurrentUser} );
 $QueueObj->Load( $Name );
 unless ( $QueueObj->id ) {
@@ -76,7 +77,18 @@ unless ( $QueueObj->id ) {
 }
 $ARGS{'Name'} = $Name = $QueueObj->Name;
 
-my $title = loc( "$Status bugs for [_1]", $Name );
+my $status_text;
+if ( $Status =~ /__active__/i ) {
+    $status_text = loc('Active');
+}
+elsif ( $Status =~ /__inactive__/i ) {
+    $status_text = loc('Inactive');
+}
+else {
+    $status_text = $Status;
+}
+
+my $title = loc( "[_1] bugs for [_2]", $status_text, $Name );
 
 my $current_tab = "Public/Dist/Display.html"
     ."?Status=". $m->interp->apply_escapes($Status, 'u')
@@ -90,5 +102,5 @@ $base_url .= '&';
 $Name   => undef
 # Queue is an alias for Name, Name has higher precendance
 $Queue  => undef
-$Status => 'Active'
+$Status => '__Active__'
 </%ARGS>

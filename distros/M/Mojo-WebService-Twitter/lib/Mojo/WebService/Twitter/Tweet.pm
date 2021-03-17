@@ -6,7 +6,7 @@ use Mojo::WebService::Twitter::User;
 use Mojo::WebService::Twitter::Util 'parse_twitter_timestamp';
 use Scalar::Util 'weaken';
 
-our $VERSION = '1.001';
+our $VERSION = '1.003';
 
 has [qw(source coordinates created_at favorites id in_reply_to_screen_name
 	in_reply_to_status_id in_reply_to_user_id retweets text user)];

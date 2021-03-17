@@ -15,173 +15,108 @@ $ENV{QUERY_STRING} = 'q=hello&l=ja-JP';
 my $tests =
 [
     {
-        text => <<'EOT',
-EOT
-        expect => <<'EOT',
-
- Hi, should print
-
-
-
- Hi, should print
-
-
-
- Hi, should print
-
-
-
- Hi, should print
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Hi, should print[[:blank:]\h\v]+Hi, should print[[:blank:]\h\v]+Hi, should print[[:blank:]\h\v]+Hi, should print/,
         name => 'basic expressions',
         uri => "${BASE_URI}/03.01.if.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-
-6
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*6/,
         name => 'expression with variable declared',
         uri => "${BASE_URI}/03.02.if.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-6
-
-EOT
+        expect => qr/^[[:blank:]\h\v]+6/,
         name => 'using pre-declared variable',
         uri => "${BASE_URI}/03.03.if.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-Found the query string
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Found the query string/,
         name => 'apache2 v() variable',
         uri => "${BASE_URI}/03.04.if.html?q=hello&l=ja-JP",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-Found the language in query string
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Found the language in query string/,
         name => 'basic regular expression v1',
         uri => "${BASE_URI}/03.05.if.html?q=hello&l=ja-JP",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-Non-existing file not found.
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Non-existing file not found\./,
         no_warning => 1,
         name => 'access with -A (non-existing)',
         uri => "${BASE_URI}/03.06.if.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-Found the expected file
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Found the expected file/,
         name => 'access with -A (existing)',
         uri => "${BASE_URI}/03.07.if.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-Oh good, nothing found
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Oh good, nothing found/,
         name => 'variable non-zero length with -n',
         uri => "${BASE_URI}/03.08.if.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-Ok, found the query string
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Ok, found the query string/,
         name => 'variable non-zero length with !-z',
         uri => "${BASE_URI}/03.09.if.html?q=hello&l=ja-JP",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-Remote ip is part of my private network
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Remote ip is part of my private network/,
         name => 'remote ip against ip block',
         uri => "${BASE_URI}/03.10.if.html",
         code => 200,
         remote_ip => '192.168.2.20',
     },
     {
-        expect => <<EOT,
-
-Ok, remote ip is not part of my subnet
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Ok, remote ip is not part of my subnet/,
         name => 'explicit ip against ip block',
         uri => "${BASE_URI}/03.11.if.html",
         code => 200,
         remote_ip => '192.168.2.20',
     },
     {
-        expect => <<EOT,
-
-Ok, remote ip is not part of my subnet
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Ok, remote ip is not part of my subnet/,
         name => 'explicit ip against ip block (negative)',
         uri => "${BASE_URI}/03.12.if.html",
         code => 200,
         remote_ip => '192.168.2.20',
     },
     {
-        expect => <<EOT,
-
-Good, query string has a positive value.
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Good, query string has a positive value\./,
         name => 'positive value of variable',
         uri => "${BASE_URI}/03.13.if.html?q=hello&l=ja-JP",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-Good, that variable is empty.
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Good, that variable is empty\./,
         name => 'positive value of non-existing variable',
         uri => "${BASE_URI}/03.14.if.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-Good, checked it was off.
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Good, checked it was off\./,
         name => 'positive value of string "off"',
         uri => "${BASE_URI}/03.15.if.html",
         code => 200,
+    },
+    {
+        expect => qr/^[[:blank:]\h\v]*https:\/\/ja-jp.example.com[[:blank:]\h\v]*$/,
+        name => 'using regex back reference',
+        uri => "${BASE_URI}/03.16.if.html",
+        code => 200,
+        headers => {
+            Cookie => q{sitePrefs=%7B%22lang%22%3A%22ja-JP%22%7D}
+        },
+        legacy => 1,
     },
 ];
 

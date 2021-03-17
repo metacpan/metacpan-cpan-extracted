@@ -3,7 +3,7 @@ package Test2::Harness::Runner::Job::pgTAP;
 use strict;
 use warnings;
 
-our $VERSION = '0.001103';
+our $VERSION = '0.001105';
 
 use Test2::Harness::Util::HashBase;
 use parent 'Test2::Harness::Runner::Job';
@@ -42,7 +42,7 @@ Test2::Harness::Runner::Job::pgTAP - Job runner.
 
 =head1 VERSION
 
-version 0.001103
+version 0.001105
 
 =head1 DESCRIPTION
 

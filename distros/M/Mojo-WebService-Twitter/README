@@ -197,6 +197,69 @@ METHODS
 
     Retrieve a Mojo::WebService::Twitter::User by user ID or screen name.
 
+ get_user_timeline
+
+ get_user_timeline_p
+
+    Available from version 1.002.
+
+     my $tweets = $twitter->get_user_timeline(user_id => $user_id);
+     my $tweets = $twitter->get_user_timeline(screen_name => $screen_name);
+     my $tweets = $twitter->get_user_timeline(user_id => $user_id, %options);
+     $twitter->get_user_timeline(screen_name => $screen_name, %options, sub {
+       my ($twitter, $err, $tweets) = @_;
+     });
+     my $p = $twitter->get_user_timeline_p(screen_name => $screen_name, %options);
+
+    Retrieve a Mojo::Collection of Mojo::WebService::Twitter::Tweet objects
+    for a user's timeline by user ID or screen name. Note that the embedded
+    user objects will only contain an id to avoid excess duplication of the
+    same user's information; use "get_user" to retrieve the user's
+    information.
+
+    Accepts the following options:
+
+    count
+
+       count => 5
+
+      Limit of tweets to try and retrieve per page. Actual returned count
+      may be smaller due to filtering of content that is no longer
+      available, RTs if the "exclude_rts" option is enabled, or replies if
+      the "exclude_replies" option is enabled. Maximum 200, default 20.
+
+    since_id
+
+       since_id => '12345'
+
+      Restricts results to those more recent than the given tweet ID. IDs
+      should be specified as a string to avoid issues with large integers.
+      See here
+      <https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/guides/working-with-timelines>
+      for more information on filtering results with since_id and max_id.
+
+    max_id
+
+       max_id => '54321'
+
+      Restricts results to those older than (or equal to) the given tweet
+      ID. IDs should be specified as a string to avoid issues with large
+      integers. See here
+      <https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/guides/working-with-timelines>
+      for more information on filtering results with since_id and max_id.
+
+    exclude_replies
+
+       exclude_replies => 1
+
+      If true, replies will be filtered from the results.
+
+    exclude_rts
+
+       exclude_rts => 1
+
+      If true, RTs will be filtered from the results.
+
  post_tweet
 
  post_tweet_p
@@ -280,8 +343,9 @@ METHODS
      my $p = $twitter->search_tweets_p($query, %options);
 
     Search Twitter and return a Mojo::Collection of
-    Mojo::WebService::Twitter::Tweet objects. Accepts the following
-    options:
+    Mojo::WebService::Twitter::Tweet objects.
+
+    Accepts the following options:
 
     geocode
 
@@ -327,8 +391,9 @@ METHODS
 
       Restricts results to those more recent than the given tweet ID. IDs
       should be specified as a string to avoid issues with large integers.
-      See here <https://dev.twitter.com/rest/public/timelines> for more
-      information on filtering results with since_id and max_id.
+      See here
+      <https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/guides/working-with-timelines>
+      for more information on filtering results with since_id and max_id.
 
     max_id
 
@@ -336,7 +401,8 @@ METHODS
 
       Restricts results to those older than (or equal to) the given tweet
       ID. IDs should be specified as a string to avoid issues with large
-      integers. See here <https://dev.twitter.com/rest/public/timelines>
+      integers. See here
+      <https://developer.twitter.com/en/docs/twitter-api/v1/tweets/timelines/guides/working-with-timelines>
       for more information on filtering results with since_id and max_id.
 
  verify_credentials

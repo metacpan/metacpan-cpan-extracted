@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 # internal flags
 our $DEBUG       = 0;
 our $DUMP_DISASM = 0;
@@ -33,7 +33,7 @@ sub new {
     # script initial arguments
     $self->{variable} = exists $param->{variable} ? $param->{variable} : {};
     # internal attributes
-    $self->{_attribute}->{JQ_ORIGIN} = path($FindBin::Bin)->realpath if $FindBin::Bin;
+    $self->{_attribute}->{JQ_ORIGIN} = path($FindBin::Bin)->realpath->stringify if $FindBin::Bin;
     $self->{_attribute}->{JQ_LIBRARY_PATH} = exists $param->{library_paths} ? $param->{library_paths} :
         [ '~/.jq', '$ORIGIN/../lib/jq', '$ORIGIN/lib' ];
     $self->{_attribute}->{PROGRAM_ORIGIN} = exists $param->{script_file} ? path($param->{script_file})->parent->stringify : '.';
@@ -118,11 +118,11 @@ I<script_file> parameter.
 
 =item * script
 
-A string of jq script. The simplist one is '.', which does data 'echo'.
+A string of jq script. The simplest one is '.', which does data 'echo'.
 
 =item * script_file
 
-A path to file which contains jq script. Shell-bang on first line will be ignored safely.
+A path to the file which contains jq script. Shell-bang on first line will be ignored safely.
 
 =item * variable
 
@@ -152,13 +152,13 @@ via one of the prameters below.
 
 =item * data
 
-A perl variable representing JSON formed data. The straigh way to understand its equivalent
+A perl variable representing JSON formed data. The straight way to understand its equivalent
 is the return of C<JSON::from_json> call.
 
 Any other type of data which jq engine will accept can do. Such as I<undef>, which says Null
 input. It is useful when the output data is created sorely by script itself.
 
-Bare in mind that jq engine cannot understand (blessed) perl objects, with one exception - object
+Bear in mind that jq engine cannot understand (blessed) perl objects, with one exception - object
 returned via C<JSON::true()> or C<JSON::false()>. They will be handled by underlying XS code
 properly before passing them to jq engine.
 
@@ -167,7 +167,7 @@ Check I<SPECIAL DATA MAPPING> section below.
 =item * json
 
 A json encoded string. It will be decoded using C<JSON::from_json> before handling to jq engine.
-Which also means, it must fully confirm with JSON speculation.
+Which also means, it must fully conform with JSON speculation.
 
 =item * json_file
 
@@ -177,7 +177,7 @@ Similar to I<json> parameter above, instead read the JSON string from given file
 
 =head1 SPECIAL DATA MAPPING
 
-Following JSON values are mapped to corresponding Perl values:
+The following JSON values are mapped to corresponding Perl values:
 
 =over 4
 
@@ -204,13 +204,13 @@ each method will croak on critical errors and show them.
 =item debug callback
 
 This is a builtin debug feature of the engine. It prints out debug messages when triggered.
-Check jq official docucmentation for more detail.
+Check the jq official documentation for more details.
 
 =back
 
 =head1 DEBUG
 
-Limited debug functionality is implemented via following module variables:
+Limited debug functionality is implemented via the following module variables:
 
 =over 4
 
@@ -226,7 +226,7 @@ B<Internal use only>. When on, print out debug messages from XS code.
 
 =head1 BUGS
 
-Please report bug to https://github.com/dxma/perl5-json-jq/issues
+Please report bugs to https://github.com/dxma/perl5-json-jq/issues
 
 =head1 AUTHOR
 

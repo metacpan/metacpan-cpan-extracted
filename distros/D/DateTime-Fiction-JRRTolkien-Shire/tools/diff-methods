@@ -11,7 +11,7 @@ use List::Util qw{ max };
 use Module::Load;
 use Pod::Usage;
 
-our $VERSION = '0.905';
+our $VERSION = '0.906';
 
 my %opt;
 

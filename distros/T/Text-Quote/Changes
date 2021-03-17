@@ -1,5 +1,10 @@
 Revision history for Perl module Text::Quote
 
+0.33 2021-03-15 NEILB
+    - Include META.json in releases
+    - RT#97340 cope with differences in floating point on 64-bit
+    - Switched to github issues for bug tracker
+
 0.32 2014-06-28 NEILB
     - Doh, the test for regexp serialization format clearly needs to
       check what version of Perl it's running under, and change expectations

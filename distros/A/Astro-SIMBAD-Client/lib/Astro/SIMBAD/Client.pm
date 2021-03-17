@@ -116,7 +116,7 @@ BEGIN {
 	|| sub { return $_[0] };
 }
 
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 our @CARP_NOT = qw{Astro::SIMBAD::Client::WSQueryInterfaceService};
 
@@ -321,7 +321,6 @@ sub Parse_TXT_Simple {
     }
     return @data;
 }
-
 
 =item $result = Parse_VO_Table ($data);
 
@@ -686,7 +685,6 @@ EOD
 
 }	# End local symbol block.
 
-
 =item $value = $simbad->queryObjectByBib ($bibcode, $format, $type);
 
 This method is B<deprecated>, and will cease to work on December 31
@@ -887,7 +885,6 @@ sub script {
     }
 }
 
-
 =item $value = $simbad->script_file ($filename);
 
 This method submits the given script file to SIMBAD, returning the
@@ -897,7 +894,6 @@ parser for 'script' has been specified, it will be applied to the
 output.
 
 =cut
-
 
 sub script_file {
     my ( $self, $file ) = @_;
@@ -1035,7 +1031,6 @@ it sets the default value of the attribute.
 
 }	# End local symbol block.
 
-
 =item $value = $simbad->url_query ($type => ...)
 
 This method performs a query by URL, returning the results. The type
@@ -1047,7 +1042,7 @@ is one of:
  sam = query by criteria.
 
 The arguments depend on on the type, and are documented at
-L<http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-url>. They are
+L<http://simbad.u-strasbg.fr/guide/sim-url.htx>. They are
 specified as name => value. For example:
 
  $simbad->url_query (id =>
@@ -1125,7 +1120,6 @@ eod
 
 }	# End local symbol block.
 
-
 ########################################################################
 #
 #	Utility routines
@@ -1181,7 +1175,6 @@ sub _callers_caller {
 	return ($last{$self->{server}} = time);
     }
 }
-
 
 #	$self->_deprecation_notice( $type, $name );
 #
@@ -1521,9 +1514,9 @@ Strasbourg shuts down its SOAP server.
 
 This attribute holds the default format for a given query()
 output type. It is specified as a reference to a hash. See
-L<http://simweb.u-strasbg.fr/simbad/sim-help?Page=sim-fscript> for how
-to specify formats for each output type. Output type 'script' is used to
-specify a format for the script() method.
+L<http://simbad.u-strasbg.fr/guide/sim-fscript.htx> for how to specify
+formats for each output type. Output type 'script' is used to specify a
+format for the script() method.
 
 The format can be specified either literally, or as a subroutine name or
 code reference. A string is assumed to be a subroutine name if it looks
@@ -1692,6 +1685,7 @@ server.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SIMBAD-Client>,
 L<https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues>, or in
 electronic mail to the author.
 

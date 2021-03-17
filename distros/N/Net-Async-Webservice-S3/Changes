@@ -1,5 +1,15 @@
 Revision history for Net-Async-Webservice-S3
 
+0.19    2021-03-16
+        [CHANGES]
+         * Use Test::Async::HTTP
+         * General modernisation of code:
+            + Neater Build.PL
+            + Use Future-construction forms of Future->done / Future->fail
+            + Documentation style
+         * Follow NextMarker when listing keys (RT119183)
+         * Enable SSL by default (RT133977)
+
 0.18    2014/01/23 01:33:53
         [CHANGES]
          * Allow fetching byte ranges

@@ -1,5 +1,8 @@
 Revision history for MIDI-Ngram
 
+0.1807 2021-03-16 10:12:46
+    - Use MIDI::Util explicitly imported functions.
+
 0.1806 2020-06-06 16:03:41
     - Fix eg/ngram-analyze syntax and documentation.
 

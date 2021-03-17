@@ -4,20 +4,19 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4203",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Async-Webservice-S3",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "IO::Async::Test" : "0",
-            "Test::More" : "0.88"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
@@ -27,7 +26,7 @@
          "requires" : {
             "Digest::HMAC_SHA1" : "0",
             "Digest::MD5" : "0",
-            "Future" : "0.21",
+            "Future" : "0.26",
             "HTTP::Date" : "0",
             "HTTP::Request" : "0",
             "IO::Async::Stream" : "0.57",
@@ -35,14 +34,22 @@
             "MIME::Base64" : "0",
             "Net::Async::HTTP" : "0.33",
             "URI::Escape" : "0",
-            "XML::LibXML" : "0"
+            "XML::LibXML" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Async::Test" : "0",
+            "Test::Async::HTTP" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Net::Async::Webservice::S3" : {
          "file" : "lib/Net/Async/Webservice/S3.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -51,5 +58,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.18"
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

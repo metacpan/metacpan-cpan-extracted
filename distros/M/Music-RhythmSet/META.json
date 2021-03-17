@@ -40,26 +40,23 @@
    "provides" : {
       "Music::RhythmSet" : {
          "file" : "lib/Music/RhythmSet.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Music::RhythmSet::Util" : {
          "file" : "lib/Music/RhythmSet/Util.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Music::RhythmSet::Voice" : {
          "file" : "lib/Music/RhythmSet/Voice.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://opensource.org/licenses/BSD-3-Clause"
-      ],
-      "repository" : {
-         "url" : "https://github.com/thrig/Music-RhythmSet"
-      }
+      ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

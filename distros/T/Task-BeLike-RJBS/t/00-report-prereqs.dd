@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
@@ -40,7 +40,7 @@ do { my $x = {
                                       'File::Rename' => '0',
                                       'HTML::Element' => '3.22',
                                       'IO::Socket::SSL' => '0',
-                                      'JSON' => '2.12',
+                                      'JSON::MaybeXS' => '0',
                                       'LWP::Protocol::https' => '0',
                                       'List::AllUtils' => '0',
                                       'Log::Dispatchouli' => '2.000',

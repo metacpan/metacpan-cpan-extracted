@@ -12,7 +12,7 @@ build_requires:
   Test::More: '0.96'
   Test::Warnings: '0.005'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.78'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://github.com/rjbs/Getopt-Long-Descriptive/issues
   homepage: https://github.com/rjbs/Getopt-Long-Descriptive
   repository: https://github.com/rjbs/Getopt-Long-Descriptive.git
-version: '0.107'
+version: '0.109'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -328,7 +328,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.107'
+          tag: '0.109'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -377,6 +377,14 @@ x_Dist_Zilla:
           version: '0.006'
       name: Test::CheckBreaks
       version: '0.019'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: configure
+          type: requires
+      name: ConfigureRequires
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

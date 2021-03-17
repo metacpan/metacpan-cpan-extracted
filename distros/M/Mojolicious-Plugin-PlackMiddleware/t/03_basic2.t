@@ -51,7 +51,7 @@ use Test::More tests => 6;
                 $c->res->body("<hook2>$org</hook2>");
             });
             
-            $self->routes->route('/default')->to(cb => sub{
+            $self->routes->any('/default')->to(cb => sub{
                 $_[0]->render(text => 'default');
             });
         }

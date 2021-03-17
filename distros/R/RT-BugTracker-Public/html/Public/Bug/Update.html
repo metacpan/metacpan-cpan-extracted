@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -89,7 +89,7 @@
 <tr><td align="right"><&|/l&>Attach</&>:</td><td><input name="Attach" type="file" /><input type="submit" class="button" name="AddMoreAttach" value="<&|/l&>Add More Files</&>" /><input type="hidden" class="hidden" name="UpdateAttach" value="1" />
 </td></tr>
 <tr><td align="right" valign="top"><&|/l&>Message</&>:</td><td>
-<& /Elements/Callback, _CallbackName => 'BeforeMessageBox', %ARGS &>
+% $m->callback( CallbackName => 'BeforeMessageBox', %ARGS );
 % if (exists $ARGS{UpdateContent}) {
 % # preserve QuoteTransaction so we can use it to set up sane references/in/reply to
 % my $temp = $ARGS{'QuoteTransaction'};
@@ -111,7 +111,8 @@
 % }
 </form>
 <%INIT>
-return if $session{'CurrentUser'}->Name eq $RT::WebPublicUser;
+return if $session{'CurrentUser'}->Name eq $RT::WebPublicUser
+       && !RT->Config->Get("WebPublicUserReporting");
 
 my $TicketObj = LoadTicket($id);
 

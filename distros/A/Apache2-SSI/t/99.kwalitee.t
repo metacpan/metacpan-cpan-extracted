@@ -2,7 +2,7 @@
 BEGIN 
 {
 	use Test::More;
-	unless( $ENV{RELEASE_TESTING} )
+	unless( $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} )
 	{
 		plan(skip_all => 'These tests are for author or release candidate testing');
 	}

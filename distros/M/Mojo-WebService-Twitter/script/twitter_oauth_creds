@@ -4,7 +4,7 @@ use warnings;
 use Mojo::WebService::Twitter;
 use Mojo::WebService::Twitter::Util 'twitter_authorize_url';
 
-our $VERSION = '1.001';
+our $VERSION = '1.003';
 
 my $api_key = $ENV{TWITTER_API_KEY};
 my $api_secret = $ENV{TWITTER_API_SECRET};

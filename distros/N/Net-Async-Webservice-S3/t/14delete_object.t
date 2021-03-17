@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use t::TestHTTP;
+use Test::Async::HTTP;
 
 use IO::Async::Test;
 use IO::Async::Loop;
@@ -18,7 +18,7 @@ testing_loop( $loop );
 
 my $s3 = Net::Async::Webservice::S3->new(
    max_retries => 1,
-   http => my $http = TestHTTP->new,
+   http => my $http = Test::Async::HTTP->new,
    access_key => 'K'x20,
    secret_key => 's'x40,
 );
@@ -32,15 +32,16 @@ $loop->add( $s3 );
       key    => "three",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   my $req = $p->request;
    is( $req->method,         "DELETE",                  'Request method' );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", 'Request URI authority' );
    is( $req->uri->path,      "/three",                  'Request URI path' );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 200, "OK", [], "" )
    );
 
@@ -52,6 +53,7 @@ $loop->add( $s3 );
 # Test that timeout argument is set
 {
    my $f;
+   my $p;
    my $req;
 
    $s3->configure( timeout => 10 );
@@ -60,11 +62,12 @@ $loop->add( $s3 );
       key    => "-four-",
    );
 
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   $req = $p->request;
    is( $req->header( "X-NaHTTP-Timeout" ), 10, 'Request has timeout set for configured' );
-   $http->respond( 200, "OK", [] );
+   $p->respond( 200, "OK", [] );
 
    $f = $s3->delete_object(
       bucket => "bucket",
@@ -72,11 +75,12 @@ $loop->add( $s3 );
       timeout => 20,
    );
 
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   $req = $p->request;
    is( $req->header( "X-NaHTTP-Timeout" ), 20, 'Request has timeout set for immediate' );
-   $http->respond( 200, "OK", [] );
+   $p->respond( 200, "OK", [] );
 }
 
 done_testing;

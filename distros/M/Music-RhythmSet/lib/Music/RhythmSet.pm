@@ -4,7 +4,7 @@
 # various utility functions
 
 package Music::RhythmSet;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use 5.24.0;
 use warnings;
@@ -151,7 +151,7 @@ sub from_string {
     croak "need a string" unless defined $str and length $str;
 
     $param{rs} //= "\n";
-    if ($param{sep}) {
+    if ( $param{sep} ) {
         $param{sep} = qr/\Q$param{sep}\E/;
     } else {
         $param{sep} = qr/\s+/;
@@ -431,6 +431,13 @@ the counting from zero thing, which musicians usually do not do).
 A positive integer for when to stop working through the "measures" of
 the replay log. Influenced by the I<divisor>.
 
+Note that B<changes> uses the total beat count possibly divided by a
+divisor to determine when to stop; B<to_ly> and B<to_midi> only use the
+measure count (and are ignorant of how many total beats have been
+generated). So I<max> here may produce different amounts of output than
+the I<maxm> parameter used by those other calls. B<to_string> supports a
+divisor but only uses that for display purposes.
+
 =back
 
 =item B<clone>
@@ -550,7 +557,7 @@ for details.
 
 =head1 BUGS
 
-<https://github.com/thrig/Music-RhythmSet>
+None known.
 
 =head1 SEE ALSO
 

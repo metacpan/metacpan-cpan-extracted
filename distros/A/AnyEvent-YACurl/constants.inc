@@ -16,6 +16,9 @@
 #if LIBCURL_HAS(CURLAUTH_ANYSAFE)
         hv_stores(the_hv, "CURLAUTH_ANYSAFE", newSViv(CURLAUTH_ANYSAFE));
 #endif
+#if LIBCURL_HAS(CURLAUTH_AWS_SIGV4)
+        hv_stores(the_hv, "CURLAUTH_AWS_SIGV4", newSViv(CURLAUTH_AWS_SIGV4));
+#endif
 #if LIBCURL_HAS(CURLAUTH_BASIC)
         hv_stores(the_hv, "CURLAUTH_BASIC", newSViv(CURLAUTH_BASIC));
 #endif
@@ -1060,6 +1063,9 @@
 #if LIBCURL_HAS(CURLOPT_AUTOREFERER)
         hv_stores(the_hv, "CURLOPT_AUTOREFERER", newSViv(CURLOPT_AUTOREFERER));
 #endif
+#if LIBCURL_HAS(CURLOPT_AWS_SIGV4)
+        hv_stores(the_hv, "CURLOPT_AWS_SIGV4", newSViv(CURLOPT_AWS_SIGV4));
+#endif
 #if LIBCURL_HAS(CURLOPT_BUFFERSIZE)
         hv_stores(the_hv, "CURLOPT_BUFFERSIZE", newSViv(CURLOPT_BUFFERSIZE));
 #endif
@@ -2008,6 +2014,9 @@
 #if LIBCURL_HAS(CURLPROTO_GOPHER)
         hv_stores(the_hv, "CURLPROTO_GOPHER", newSViv(CURLPROTO_GOPHER));
 #endif
+#if LIBCURL_HAS(CURLPROTO_GOPHERS)
+        hv_stores(the_hv, "CURLPROTO_GOPHERS", newSViv(CURLPROTO_GOPHERS));
+#endif
 #if LIBCURL_HAS(CURLPROTO_HTTP)
         hv_stores(the_hv, "CURLPROTO_HTTP", newSViv(CURLPROTO_HTTP));
 #endif
@@ -2502,6 +2511,9 @@
 #endif
 #if LIBCURL_HAS(CURLVERSION_FOURTH)
         hv_stores(the_hv, "CURLVERSION_FOURTH", newSViv(CURLVERSION_FOURTH));
+#endif
+#if LIBCURL_HAS(CURLVERSION_NINTH)
+        hv_stores(the_hv, "CURLVERSION_NINTH", newSViv(CURLVERSION_NINTH));
 #endif
 #if LIBCURL_HAS(CURLVERSION_NOW)
         hv_stores(the_hv, "CURLVERSION_NOW", newSViv(CURLVERSION_NOW));

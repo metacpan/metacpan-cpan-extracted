@@ -10,7 +10,7 @@ BEGIN
     use Apache2::Const -compile => qw( :common :http DECLINED );
     use APR::URI ();
     use URI::file;
-    use Devel::Confess;
+    # use Devel::Confess;
     use constant BASE_URI => '/ssi';
     use constant TEST_URI_1 => './ssi/include.cgi';
     use constant TEST_URI_2 => './not-existing.txt';

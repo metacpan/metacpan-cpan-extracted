@@ -1,21 +1,22 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 package Net::Async::Webservice::S3;
 
 use strict;
 use warnings;
 use base qw( IO::Async::Notifier );
+use 5.010; # //
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Carp;
 
 use Digest::HMAC_SHA1;
 use Digest::MD5 qw( md5 );
-use Future 0.21; # ->then_with_f
+use Future 0.26; # ->done, ->fail constructors
 use Future::Utils 0.16 qw( repeat try_repeat fmap1 );
 use HTTP::Date qw( time2str );
 use HTTP::Request;
@@ -37,30 +38,30 @@ C<Net::Async::Webservice::S3> - use Amazon's S3 web service with C<IO::Async>
 
 =head1 SYNOPSIS
 
- use IO::Async::Loop;
- use Net::Async::Webservice::S3;
+   use IO::Async::Loop;
+   use Net::Async::Webservice::S3;
 
- my $loop = IO::Async::Loop->new;
+   my $loop = IO::Async::Loop->new;
 
- my $s3 = Net::Async::Webservice::S3->new(
-    access_key => ...,
-    secret_key => ...,
-    bucket     => "my-bucket-here",
- );
- $loop->add( $s3 );
+   my $s3 = Net::Async::Webservice::S3->new(
+      access_key => ...,
+      secret_key => ...,
+      bucket     => "my-bucket-here",
+   );
+   $loop->add( $s3 );
 
- my $put_f = $s3->put_object(
-    key   => "the-key",
-    value => "A new value for the key\n";
- );
+   my $put_f = $s3->put_object(
+      key   => "the-key",
+      value => "A new value for the key\n";
+   );
 
- my $get_f = $s3->get_object(
-    key => "another-key",
- );
+   my $get_f = $s3->get_object(
+      key => "another-key",
+   );
 
- $loop->await_all( $put_f, $get_f );
+   $loop->await_all( $put_f, $get_f );
 
- print "The value is:\n", $get_f->get;
+   print "The value is:\n", $get_f->get;
 
 =head1 DESCRIPTION
 
@@ -101,40 +102,39 @@ sub _init
 
 The following named parameters may be passed to C<new> or C<configure>:
 
-=over 8
-
-=item http => Net::Async::HTTP
+=head2 http => Net::Async::HTTP
 
 Optional. Allows the caller to provide a specific asynchronous HTTP user agent
 object to use. This will be invoked with a single method, as documented by
 L<Net::Async::HTTP>:
 
- $response_f = $http->do_request( request => $request, ... )
+   $response_f = $http->do_request( request => $request, ... )
 
 If absent, a new instance will be created and added as a child notifier of
 this object. If a value is supplied, it will be used as supplied and I<not>
 specifically added as a child notifier. In this case, the caller must ensure
 it gets added to the underlying L<IO::Async::Loop> instance, if required.
 
-=item access_key => STRING
+=head2 access_key => STRING
 
-=item secret_key => STRING
+=head2 secret_key => STRING
 
 The twenty-character Access Key ID and forty-character Secret Key to use for
 authenticating requests to S3.
 
-=item ssl => BOOL
+=head2 ssl => BOOL
 
-Optional. If given a true value, will use C<https> URLs over SSL. Defaults to
-off. This feature requires the optional L<IO::Async::SSL> module if using
-L<Net::Async::HTTP>.
+Optional. If given a true value, will use C<https> URLs over SSL.
 
-=item bucket => STRING
+This setting defaults on, but can be disabled by passing a defined-but-false
+value (such as C<0>).
+
+=head2 bucket => STRING
 
 Optional. If supplied, gives the default bucket name to use, at which point it
 is optional to supply to the remaining methods.
 
-=item prefix => STRING
+=head2 prefix => STRING
 
 Optional. If supplied, this prefix string is prepended to any key names passed
 in methods, and stripped from the response from C<list_bucket>. It can be used
@@ -142,36 +142,36 @@ to keep operations of the object contained within the named key space. If this
 string is supplied, don't forget that it should end with the path delimiter in
 use by the key naming scheme (for example C</>).
 
-=item host => STRING
+=head2 host => STRING
 
 Optional. Sets the hostname to talk to the S3 service. Usually the default of
 C<s3.amazonaws.com> is sufficient. This setting allows for communication with
 other service providers who provide the same API as S3.
 
-=item max_retries => INT
+=head2 max_retries => INT
 
 Optional. Maximum number of times to retry a failed operation. Defaults to 3.
 
-=item list_max_keys => INT
+=head2 list_max_keys => INT
 
 Optional. Maximum number of keys at a time to request from S3 for the
 C<list_bucket> method. Larger values may be more efficient as fewer roundtrips
 will be required per method call. Defaults to 1000.
 
-=item part_size => INT
+=head2 part_size => INT
 
 Optional. Size in bytes to break content for using multipart upload. If an
 object key's size is no larger than this value, multipart upload will not be
 used. Defaults to 100 MiB.
 
-=item read_size => INT
+=head2 read_size => INT
 
 Optional. Size in bytes to read per call to the C<$gen_value> content
 generation function in C<put_object>. Defaults to 64 KiB. Be aware that too
 large a value may lead to the C<PUT> stall timer failing to be invoked on slow
 enough connections, causing spurious timeouts.
 
-=item timeout => NUM
+=head2 timeout => NUM
 
 Optional. If configured, this is passed into individual requests of the
 underlying C<Net::Async::HTTP> object, except for the actual content C<GET> or
@@ -180,17 +180,15 @@ and the multi-part metadata operations used by C<put_object>. To apply an
 overall timeout to an individual C<get_object> or C<put_object> operation,
 pass a specific C<timeout> argument to those methods specifically.
 
-=item stall_timeout => NUM
+=head2 stall_timeout => NUM
 
 Optional. If configured, this is passed into the underlying
 C<Net::Async::HTTP> object and used for all content uploads and downloads.
 
-=item put_concurrent => INT
+=head2 put_concurrent => INT
 
 Optional. If configured, gives a default value for the C<concurrent> parameter
 to C<put_object>.
-
-=back
 
 =cut
 
@@ -223,12 +221,8 @@ method.
 
 =back
 
-Each method below that yields a C<Future> is documented in the form
-
- $s3->METHOD( ARGS ) ==> YIELDS
-
-Where the C<YIELDS> part indicates the values that will eventually be returned
-by the C<get> method on the returned Future object, if it succeeds.
+The following methods documented with a trailing call to C<< ->get >> return
+L<Future> instances.
 
 =cut
 
@@ -250,7 +244,7 @@ sub _make_request
    my $bucket = $args{bucket} // $self->{bucket};
    my $path   = $args{abs_path} // join "", grep { defined } $self->{prefix}, $args{path};
 
-   my $scheme = $self->{ssl} ? "https" : "http";
+   my $scheme = ( $self->{ssl} // 1 ) ? "https" : "http";
 
    my $uri;
    if( length $bucket <= 63 and $bucket =~ m{^[A-Z0-9][A-Z0-9.-]+$}i ) {
@@ -347,7 +341,7 @@ sub _do_request
          my $message = $resp->message;
          $message =~ s/\r$//; # HTTP::Response leaves the \r on this
 
-         return Future->new->fail(
+         return Future->fail(
             "$code $message", http => $resp, $request
          );
       }
@@ -386,7 +380,7 @@ sub _retry
       # Add a small delay after failure before retrying
       my $delay_f =
          $prev_f ? $self->loop->delay_future( after => ( $delay *= 2 ) )
-                 : Future->new->done;
+                 : Future->done;
 
       $delay_f->then( sub { $self->$method( @args ) } );
    } while => sub {
@@ -398,7 +392,9 @@ sub _retry
    };
 }
 
-=head2 $s3->list_bucket( %args ) ==> ( $keys, $prefixes )
+=head2 list_bucket
+
+   ( $keys, $prefixes ) = $s3->list_bucket( %args )->get
 
 Requests a list of the keys in a bucket, optionally within some prefix.
 
@@ -508,10 +504,12 @@ sub _list_bucket
             push @prefixes, $key;
          }
 
+         $last_key //= $xpc->findvalue(".//s3:NextMarker"); 
+
          if( $xpc->findvalue( ".//s3:IsTruncated" ) eq "true" ) {
             return Future->wrap( $last_key );
          }
-         return Future->new->done;
+         return Future->done;
       });
    } while => sub {
       my $f = shift;
@@ -528,7 +526,9 @@ sub list_bucket
    $self->_retry( "_list_bucket", @_ );
 }
 
-=head2 $s3->get_object( %args ) ==> ( $value, $response, $meta )
+=head2 get_object
+
+   ( $value, $response, $meta ) = $s3->get_object( %args )
 
 Requests the value of a key from a bucket.
 
@@ -551,7 +551,7 @@ bytes of the key's value. It will be passed the L<HTTP::Response> object
 received in reply to the request, and a byte string containing more bytes of
 the value. Its return value is not important.
 
- $on_chunk->( $header, $bytes )
+   $on_chunk->( $header, $bytes )
 
 If this is supplied then the key's value will not be accumulated, and the
 final result of the Future will be an empty string.
@@ -721,7 +721,9 @@ sub get_object
    });
 }
 
-=head2 $s3->head_object( %args ) ==> ( $response, $meta )
+=head2 head_object
+
+   ( $response, $meta ) = $s3->head_object( %args )->get
 
 Requests the value metadata of a key from a bucket. This is similar to the
 C<get_object> method, but uses the C<HEAD> HTTP verb instead of C<GET>.
@@ -747,7 +749,11 @@ sub head_object
    });
 }
 
-=head2 $s3->head_then_get_object( %args ) ==> ( $value_f, $response, $meta )
+=head2 head_then_get_object
+
+   ( $value_f, $response, $meta ) = $s3->head_then_get_object( %args )->get
+
+   ( $value, $response, $meta ) = $value_f->get
 
 Performs a C<GET> operation similar to C<get_object>, but allows access to the
 metadata header before the body content is complete.
@@ -760,8 +766,6 @@ reference containing the metadata fields. The body future will eventually
 yield the actual body, along with another copy of the response and metadata
 hash reference.
 
- $value_f ==> $value, $response, $meta
-
 =cut
 
 sub head_then_get_object
@@ -770,7 +774,9 @@ sub head_then_get_object
    $self->_retry( "_head_then_get_object", @_, method => "GET" );
 }
 
-=head2 $s3->put_object( %args ) ==> ( $etag, $length )
+=head2 put_object
+
+   ( $etag, $length ) = $s3->put_object( %args ) ==> ( $etag, $length )
 
 Sets a new value for a key in the bucket.
 
@@ -801,7 +807,7 @@ Alternative form of C<value>, which is a C<CODE> reference to a generator
 function. It will be called repeatedly to generate small chunks of content,
 being passed the position and length it should yield.
 
- $chunk = $value->( $pos, $len )
+   $chunk = $value->( $pos, $len )
 
 Typically this can be provided either by a C<substr> operation on a larger
 string buffer, or a C<sysseek> and C<sysread> operation on a filehandle.
@@ -818,9 +824,9 @@ Alternative form of C<value>, in which a C<Future> eventually yields the value
 generation C<CODE> reference and length. The C<CODE> reference is invoked as
 documented above.
 
- ( $gen_value, $value_len ) = $value->get;
+   ( $gen_value, $value_len ) = $value->get;
 
- $chunk = $gen_value->( $pos, $len );
+   $chunk = $gen_value->( $pos, $len );
 
 =item gen_parts => CODE
 
@@ -830,12 +836,12 @@ upload. Each time C<gen_parts> is called it should return one of the forms of
 C<value> given above; namely, a byte string, a C<CODE> reference and size
 pair, or a C<Future> which will eventually yield either of these forms.
 
- ( $value ) = $gen_parts->()
+   ( $value ) = $gen_parts->()
 
- ( $gen_value, $value_length ) = $gen_parts->()
+   ( $gen_value, $value_length ) = $gen_parts->()
 
- ( $value_f ) = $gen_parts->(); $value = $value_f->get
-                                ( $gen_value, $value_length ) = $value_f->get
+   ( $value_f ) = $gen_parts->(); $value = $value_f->get
+                                  ( $gen_value, $value_length ) = $value_f->get
 
 Each case is analogous to the types that the C<value> key can take.
 
@@ -870,7 +876,7 @@ kernel. It will be passed the total byte length that has been written for this
 call to C<put_object>. By the time the call has completed, this will be the
 total written length of the object.
 
- $on_write->( $bytes_written )
+   $on_write->( $bytes_written )
 
 Note that because of retries it is possible this count will decrease, if a
 part has to be retried due to e.g. a failing MD5 checksum.
@@ -975,18 +981,18 @@ sub _put_object
       my $resp = shift;
 
       defined( my $etag = $resp->header( "ETag" ) ) or
-         return Future->new->die( "Response did not provide an ETag header" );
+         return Future->fail( "Response did not provide an ETag header", s3 => $resp );
 
       # Amazon S3 currently documents that the returned ETag header will be
       # the MD5 hash of the content, surrounded in quote marks. We'd better
       # hope this continues to be true... :/
       my ( $got_md5 ) = lc($etag) =~ m/^"([0-9a-f]{32})"$/ or
-         return Future->new->die( "Returned ETag ($etag) does not look like an MD5 sum", $resp );
+         return Future->fail( "Returned ETag ($etag) does not look like an MD5 sum", s3 => $resp );
 
       my $expect_md5 = lc($md5ctx->hexdigest);
 
       if( $got_md5 ne $expect_md5 ) {
-         return Future->new->die( "Returned MD5 hash ($got_md5) did not match expected ($expect_md5)", $resp );
+         return Future->fail( "Returned MD5 hash ($got_md5) did not match expected ($expect_md5)", s3 => $resp );
       }
 
       return Future->wrap( $etag, $pos );
@@ -1194,7 +1200,9 @@ sub put_object
    });
 }
 
-=head2 $s3->delete_object( %args ) ==> ()
+=head2 delete_object
+
+   $s3->delete_object( %args )->get
 
 Deletes a key from the bucket.
 
@@ -1232,7 +1240,7 @@ sub _delete_object
       timeout       => $args{timeout} // $self->{timeout},
       stall_timeout => $args{stall_timeout} // $self->{stall_timeout},
    )->then( sub {
-      return Future->new->done;
+      return Future->done;
    });
 }
 
@@ -1255,6 +1263,10 @@ SocialFlow L<http://www.socialflow.com>
 =item *
 
 Shadowcat Systems L<http://www.shadow.cat>
+
+=item *
+
+Deriv L<http://deriv.com>
 
 =back
 

@@ -3,7 +3,7 @@ package App::Yath::Plugin::pgTAP;
 use strict;
 use warnings;
 
-our $VERSION = '0.001103';
+our $VERSION = '0.001105';
 
 use parent 'App::Yath::Plugin';
 use App::Yath::Options;
@@ -177,7 +177,7 @@ App::Yath::Plugin::pgTAP - Plugin to allow testing pgTAP files.
 
 =head1 VERSION
 
-version 0.001103
+version 0.001105
 
 =head1 SYNOPSIS
 

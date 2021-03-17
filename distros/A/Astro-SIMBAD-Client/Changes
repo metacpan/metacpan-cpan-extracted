@@ -1,3 +1,14 @@
+0.044		2021-03-17	T. R. Wyant
+    Add rt.cpan.org back to bug reporting methods. Long live RT!
+
+    Refactor authortest into three, to avoid writing stub test files to
+    exclude the optional modules.
+
+    Fix POD link errors.
+
+    Get prerequisites up to snuff and add xt/author/prereq.t to ensure
+    they stay that way.
+
 0.043		2021-01-09	T. R. Wyant
     Add Travis CI testing.
 

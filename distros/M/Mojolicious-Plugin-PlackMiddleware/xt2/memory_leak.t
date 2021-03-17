@@ -16,7 +16,7 @@ use Test::More tests => 4;
         my $self = shift;
         $self->plugin(plack_middleware => []);
         my $r = $self->routes;
-        $r->route('/test')->to(cb => sub{
+        $r->any('/test')->to(cb => sub{
             my $c = shift;
             $c->render(text => 'Hello world');
         });

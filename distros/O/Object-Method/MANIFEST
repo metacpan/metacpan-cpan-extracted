@@ -4,7 +4,6 @@ LICENSE
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 cpanfile
 lib/Object/Method.pm

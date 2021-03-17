@@ -1,0 +1,14 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Carp: 0
+    Exporter: 0
+    IO::Socket::SSL: '1.94'
+    Mojolicious: '7.62'
+    Scalar::Util: 0
+    Time::Piece: '1.17' # %z in strptime
+    WWW::OAuth: 0
+test:
+  requires:
+    List::Util: 0
+    Test::More: '0.88'

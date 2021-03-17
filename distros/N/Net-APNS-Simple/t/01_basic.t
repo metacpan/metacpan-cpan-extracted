@@ -10,6 +10,7 @@ my $apns = new_ok('Net::APNS::Simple' => [
     development     => 0,
     apns_expiration => 0,
     apns_priority   => 5,
+    apns_push_type  => 'background',
 ]);
 
 is($apns->auth_key => 'SAMPLE.p8');
@@ -19,6 +20,7 @@ is($apns->bundle_id => 'opqrstu');
 is($apns->development => 0);
 is($apns->apns_expiration => 0);
 is($apns->apns_priority => 5);
+is($apns->apns_push_type => 'background');
 is($apns->algorithm => 'ES256');
 is($apns->_host => 'api.push.apple.com');
 $apns->development(1);

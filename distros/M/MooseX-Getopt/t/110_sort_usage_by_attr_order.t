@@ -13,6 +13,8 @@ use warnings;
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 
+$ENV{COLUMNS} = 80;
+
 {
     package MyClass;
     use strict; use warnings;
@@ -31,10 +33,10 @@ my $obj = MyClass->new_with_options();
 like(
     $obj->usage->text,
     qr/\A\Qusage: 110_sort_usage_by_attr_order.t [-?h] [long options...]\E
-\t-h -\? --usage --help\s+Prints this usage information.
+\t.*--help.+Prints this usage information\..*
 \t--foo (STR)?\s+Documentation for "foo"
 \t--bar (STR)?\s+Documentation for "bar"
-\t--baz (STR)?\s+Documentation for "baz"\Z/,
+\t--baz (STR)?\s+Documentation for "baz"\Z/ms,
     'Usage text has nicely sorted options',
 );
 

@@ -1,7 +1,7 @@
 # ABSTRACT: Dancer2's Domain Specific Language (DSL)
 
 package Dancer2::Core::DSL;
-$Dancer2::Core::DSL::VERSION = '0.300005';
+$Dancer2::Core::DSL::VERSION = '0.301001';
 use Moo;
 use Carp;
 use Module::Runtime 'require_module';
@@ -99,6 +99,7 @@ sub dsl_keywords {
         put                  => { is_global => 1 },
         redirect             => { is_global => 0 },
         request              => { is_global => 0 },
+        request_data         => { is_global => 0 },
         request_header       => { is_global => 0 },
         response             => { is_global => 0 },
         response_header      => { is_global => 0 },
@@ -430,6 +431,8 @@ sub query_parameters { shift; $Dancer2::Core::Route::REQUEST->query_parameters(@
 sub body_parameters  { shift; $Dancer2::Core::Route::REQUEST->body_parameters(@_);  }
 sub route_parameters { shift; $Dancer2::Core::Route::REQUEST->route_parameters(@_); }
 
+sub request_data { shift; $Dancer2::Core::Route::REQUEST->body_data(@_); }
+
 sub redirect { shift->app->redirect(@_) }
 
 sub forward { shift->app->forward(@_) }
@@ -519,7 +522,7 @@ Dancer2::Core::DSL - Dancer2's Domain Specific Language (DSL)
 
 =head1 VERSION
 
-version 0.300005
+version 0.301001
 
 =head1 FUNCTIONS
 

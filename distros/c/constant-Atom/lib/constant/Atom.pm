@@ -1,5 +1,5 @@
 package constant::Atom;
-$constant::Atom::VERSION = '0.10';
+$constant::Atom::VERSION = '0.11';
 use 5.006;
 use strict;
 use warnings;
@@ -265,12 +265,14 @@ There are L<plenty of other constant modules|http://neilb.org/reviews/constants.
 
 =head1 REPOSITORY
 
-L<https://github.com/neilbowers/constant-Atom>
+L<https://github.com/neilb/constant-Atom>
 
 =head1 AUTHOR
 
-This module was originally created by Jonathan R. Warden E<lt>john@newchester.comE<gt>,
-but is currently being maintained by Neil Bowers E<lt>neilb@cpan.orgE<gt>.
+This module was originally created by
+Jonathan R. Warden E<lt>john@newchester.comE<gt> in 2004,
+but has been maintained by Neil Bowers E<lt>neilb@cpan.orgE<gt>
+since 2012.
 
 =head1 COPYRIGHT
 

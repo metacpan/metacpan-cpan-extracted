@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Future::AsyncAwait;
+
 use IO::Async::Loop;
 use Net::Async::Webservice::S3;
 
@@ -29,11 +31,11 @@ my $s3 = Net::Async::Webservice::S3->new(
 
 $loop->add( $s3 );
 
-$s3->get_object(
+await $s3->get_object(
    key => shift @ARGV,
    byte_range => $BYTE_RANGE,
    on_chunk => sub {
       my ( undef, $chunk ) = @_;
       print $chunk;
    },
-)->get;
+);

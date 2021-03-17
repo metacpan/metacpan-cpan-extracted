@@ -81,6 +81,8 @@ all connections (use this option if your machine is reachable via multiple
 names, e.g. `alexschroeder.ch` and `emacswiki.org` and you just want want to
 serve one of them)
 - `--port` is the port to use; the default is 1965
+- `--text_encoding` is the text encoding to use if you're not going to use
+UTF-8 (consider adding support for [Encode::Guess](https://metacpan.org/pod/Encode%3A%3AGuess))
 - `--log_level` is the log level to use (error, warn, info, debug, trace);
 the default is `warn`
 - `--cert_file` is the certificate file to use; the default is `cert.pem`

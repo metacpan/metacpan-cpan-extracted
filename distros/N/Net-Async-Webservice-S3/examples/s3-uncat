@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Future::AsyncAwait;
+
 use Getopt::Long;
 use IO::Async::Stream 0.57;
 use IO::Async::Loop;
@@ -36,7 +38,7 @@ $loop->add( my $stdin = IO::Async::Stream->new_for_stdin( on_read => sub { 0 } )
 # handler returns, so we need to capture $eof here to detect the EOF condition
 
 my $eof;
-$s3->put_object(
+await $s3->put_object(
    key => shift @ARGV,
    gen_parts => sub {
       return if $eof;
@@ -44,4 +46,4 @@ $s3->put_object(
          ->on_done( sub { ( undef, $eof ) = @_; } );
    },
    meta => \%META,
-)->get;
+);

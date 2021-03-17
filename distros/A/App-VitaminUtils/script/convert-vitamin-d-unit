@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/VitaminUtils/convert_vitamin_d_unit
-# and generated automatically using Perinci::CmdLine::Gen version 0.497
+# and generated automatically using Perinci::CmdLine::Gen version 0.498
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-03'; # DATE
+our $DATE = '2021-03-17'; # DATE
 our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ convert-vitamin-d-unit - Convert a vitamin D quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.002 of convert-vitamin-d-unit (from Perl distribution App-VitaminUtils), released on 2020-11-03.
+This document describes version 0.003 of convert-vitamin-d-unit (from Perl distribution App-VitaminUtils), released on 2021-03-17.
 
 =head1 SYNOPSIS
 
@@ -195,7 +195,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-VitaminUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-VitaminUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-VitaminUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -207,7 +207,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,17 @@
+0.003   2021-03-17  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utilities:
+	  convert-{vitamin-b5,pantothenic-acid,vitamin-b6,pyridoxine,vitamin-b12,cobalamin,choline}-unit.
+
+        - [cli convert-vitamin-a-unit] Add units: mcg-all-trans-retinyl-acetate,
+          mcg-all-trans-retinyl-palmitate, mcg-all-trans-retinyl-propionate.
+
+        - [cli convert-vitamin-a-unit] Add units: mg-d-alpha-tocopherol,
+          mg-dl-alpha-tocopherol, mg-d-alpha-tocopheryl-acetate,
+          mg-dl-alpha-tocopheryl-acetate - [doc] Mention URL's to some online
+          vitamin converters.
+
+
 0.002   2020-11-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Add more units for vitamin A & E.

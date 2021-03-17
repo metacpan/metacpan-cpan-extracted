@@ -1,3 +1,9 @@
+1.003     2021-03-15 20:12:50 EDT
+  - Fix query parameter encoding for get_user_timeline as in other methods.
+
+1.002     2021-03-15 19:58:15 EDT
+  - Add get_user_timeline and get_user_timeline_p request methods.
+
 1.001     2020-03-09 18:32:29 EDT
   - Use strict RFC 3986 URL encoding for parameters sent to twitter to match
     signature generation. (#2)

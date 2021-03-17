@@ -1,7 +1,7 @@
 use 5.014;
 
 package Mojo::UserAgent::Mockable;
-$Mojo::UserAgent::Mockable::VERSION = '1.57';
+$Mojo::UserAgent::Mockable::VERSION = '1.58';
 use warnings::register;
 
 use Carp;
@@ -268,7 +268,7 @@ Mojo::UserAgent::Mockable - A Mojo User-Agent that can record and play back requ
 
 =head1 VERSION
 
-version 1.57
+version 1.58
 
 =head1 SYNOPSIS
 
@@ -382,6 +382,9 @@ For the life of a given instance of this class, all transactions made using that
 serialized and stored in memory.  When the instance goes out of scope, or at any time  L</save> is 
 called, the transaction cache will be written to the file specfied by L</file> in JSON format. 
 Transactions are stored in the cache in the order they were made.
+
+The file's contents are pretty-printed and canonicalized (ie hash keys are sorted) so that mocks
+are easy to read and diffs are minimized.
 
 =head2 Playback mode
 
@@ -590,6 +593,8 @@ Mohammad Anwar C<< mohammad.anwar@yahoo.com >>
 
 Johan Lindstrom C<< johanl@cpan.org >>
 
+David Cantrell C<< david@cantrell.org.uk >>
+
 Everyone on #mojo on irc.perl.org
 
 =head1 AUTHOR
@@ -598,7 +603,7 @@ Kit Peters <popefelix@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Kit Peters.
+This software is copyright (c) 2021 by Kit Peters.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

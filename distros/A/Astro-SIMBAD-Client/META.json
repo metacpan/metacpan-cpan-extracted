@@ -23,35 +23,51 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.96"
+            "Data::Dumper" : "0",
+            "Test::More" : "0.96",
+            "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "Getopt::Std" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "HTTP::Request::Common" : "0",
             "LWP::Protocol" : "0",
             "LWP::UserAgent" : "0",
             "Scalar::Util" : "1.01",
             "URI::Escape" : "0",
             "XML::DoubleEncodedEntities" : "1",
-            "perl" : "5.008"
+            "constant" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Astro::SIMBAD::Client" : {
          "file" : "lib/Astro/SIMBAD/Client.pm",
-         "version" : "0.043"
+         "version" : "0.044"
       },
       "Astro::SIMBAD::Client::WSQueryInterfaceService" : {
          "file" : "lib/Astro/SIMBAD/Client/WSQueryInterfaceService.pm",
-         "version" : "0.043"
+         "version" : "0.044"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues"
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SIMBAD-Client"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -62,6 +78,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-SIMBAD-Client"
       }
    },
-   "version" : "0.043",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.044",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

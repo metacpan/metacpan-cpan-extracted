@@ -14,7 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-VitaminUtils",
   "EXE_FILES" => [
+    "script/convert-choline-unit",
+    "script/convert-cobalamin-unit",
+    "script/convert-pantothenic-acid-unit",
+    "script/convert-pyridoxine-unit",
     "script/convert-vitamin-a-unit",
+    "script/convert-vitamin-b12-unit",
+    "script/convert-vitamin-b5-unit",
+    "script/convert-vitamin-b6-unit",
     "script/convert-vitamin-d-unit",
     "script/convert-vitamin-e-unit"
   ],
@@ -35,7 +42,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

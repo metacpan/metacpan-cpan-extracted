@@ -11,37 +11,49 @@ use My::Module::Recommend;
 use Module::Build;
 use Config;
 
-(my $mbv = Module::Build->VERSION) =~ s/_//g;
+( my $mbv = Module::Build->VERSION() ) =~ s/_//g;
 
 my $meta = My::Module::Meta->new();
 
 My::Module::Recommend->recommend();
 
-my %attr = (
-    dist_author => 'Tom Wyant (wyant at cpan dot org)',
-    dist_abstract => 'Fetch astronomical data from SIMBAD 4.',
-    module_name => 'Astro::SIMBAD::Client',
-    build_requires => $meta->build_requires(),
-    get_options => {y => {}, n => {}},
-    requires => $meta->requires(
-	perl => $meta->requires_perl(),
+my %args = (
+    add_to_cleanup	=> [],
+    build_requires	=> $meta->build_requires(),
+    configure_requires	=> $meta->configure_requires(),
+    dist_abstract	=> $meta->abstract(),
+    dist_author	=> $meta->author(),
+    dist_name	=> $meta->dist_name(),
+    license	=> $meta->license(),
+    module_name	=> $meta->module_name(),
+    requires	=> $meta->requires(
+	perl	=> $meta->requires_perl(),
     ),
-    add_to_cleanup => [ qw{ cover_db xt/author/optionals } ],
-    dynamic_config => 1,
-    license => 'perl',
+    script_files	=> [],
 );
 
-$mbv >= 0.28
-    and $attr{meta_merge} = $meta->meta_merge();
+$mbv >= 0.26
+    and $args{get_options} = {
+	n	=> { type => '!' },
+	y	=> { type => '!' },
+    };
+
+
+if ( $mbv >= 0.28 ) {
+    $args{meta_merge} = $meta->meta_merge();
+    $args{meta_add} = {
+	no_index	=> $meta->no_index(),
+    };
+}
 
 $mbv >= 0.34
-    and $attr{auto_configure_requires} = 0;	# Don't require Module::Build
+    and $args{auto_configure_requires} = 0;	# Don't require Module::Build
 
-my $bldr = My::Module::Build->new (%attr);
+my $bldr = My::Module::Build->new( %args );
 
 my %opt = $bldr->args();
 
-my (@exe_files, @clean_files);
+my ( @exe_files, @clean_files );
 
 print <<EOD;
 
@@ -81,7 +93,11 @@ if ($^O eq 'MSWin32') {
     @exe_files = map {"script/$_"} @exe_files;
 }
 
-@clean_files and $bldr->add_to_cleanup (\@clean_files);
+$bldr->add_to_cleanup( [
+	@{ $meta->add_to_cleanup() },
+	@clean_files,
+    ],
+);
 @exe_files and $bldr->script_files (\@exe_files);
 
 $bldr->create_build_script ();

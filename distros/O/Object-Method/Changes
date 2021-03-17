@@ -1,5 +1,9 @@
 Revision history for Perl extension Object::Method
 
+0.04    2021-03-16T09:41:47+0900
+        - Cleanup unnecessary file in distribution tarball.
+          No feature changes or bug fixes.
+
 0.03    2018-06-09T17:37:39+0900
         - Re-release the distribution with Module::Build::Tiny.
           No feature changes or bug fixes.

@@ -9,3 +9,6 @@ Revision history for Data-Org-Template
 0.03    2021-03-12
         Broken cookbook recipe found, this time thanks to my brilliant daughter. Also took the opportunity to make the POD slightly less terrible.
        
+0.04    2021-03-16
+        Another broken cookbook recipe, this one involving the template parser.
+       

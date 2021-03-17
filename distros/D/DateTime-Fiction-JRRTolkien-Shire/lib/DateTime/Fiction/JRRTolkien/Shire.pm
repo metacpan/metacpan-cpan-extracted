@@ -34,7 +34,7 @@ use Params::ValidationCompiler 0.13 ();
 # namespace::autoclean.
 *__t = \&DateTime::Fiction::JRRTolkien::Shire::Types::t;
 
-our $VERSION = '0.905';
+our $VERSION = '0.906';
 
 use constant DAY_NUMBER_MIDYEARS_DAY	=> 183;
 
@@ -1770,7 +1770,6 @@ This method returns a true value if the dates returned by
 L<on_date()|/on_date>, L<strftime()|/strftime>, and stringification are
 to use traditional rather than common weekday names.
 
-
 =head2 "Set" Methods
 
 =head3 set
@@ -1978,9 +1977,10 @@ not a developer on the other classes in the DateTime project. For
 support on them, please see the support options in the DateTime
 documentation.
 
-Please file bug reports at
-L<https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire/issues>,
-or in electronic mail to F<wyant@cpan.org>.
+Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Fiction-JRRTolkien-Shire>,
+L<https://github.com/trwyant/perl-DateTime-Fiction-JRRTolkien-Shire/issues>, or in
+electronic mail to the author.
 
 =head1 BIBLIOGRAPHY
 

@@ -10,7 +10,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Getopt::Long, but simpler and more powerful",
   "AUTHOR" => "Hans Dieter Pearcey <hdp\@cpan.org>, Ricardo Signes <rjbs\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "ExtUtils::MakeMaker" => "6.78"
   },
   "DISTNAME" => "Getopt-Long-Descriptive",
   "LICENSE" => "perl",
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Warnings" => "0.005"
   },
-  "VERSION" => "0.107",
+  "VERSION" => "0.109",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,3 +1,9 @@
+0.007   2021-01-18  Released-By: PERLANCAR; Urgency: medium
+
+	- get_idx_daily_trading_summary(): Implement paging because turns
+	  out the server only returns 500 records at a time, not 1000.
+
+
 0.006   2021-01-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Add function: get_idx_daily_trading_summary().

@@ -1,0 +1,14 @@
+<!--#if expr="-n ${MOD_PERL}" -->
+    <!--#if expr="${REQUEST_METHOD} = 'GET' || ${REQUEST_METHOD} = 'POST'" -->
+Ok, found request method under mod_perl
+    <!--#else -->
+Nope, could not find the request method.
+    <!--#endif -->
+<!--#else -->
+    <!--#if expr="${REQUEST_METHOD} = 'GET'" -->
+Ok, found request method.
+    <!--#else -->
+Nope, could not find the request method.
+    <!--#endif -->
+<!--#endif -->
+

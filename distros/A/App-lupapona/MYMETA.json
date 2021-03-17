@@ -4,7 +4,7 @@
       "Alex Schroeder"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "agpl_3"
    ],
@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "File::MimeInfo" : "0",
             "File::Slurper" : "0",
             "IO::Socket::SSL" : "0",
             "Modern::Perl" : "1.20180701",
@@ -51,6 +52,6 @@
          "web" : "https://alexschroeder.ch/cgit/lupa-pona/about/"
       }
    },
-   "version" : 1.05,
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : 1.07,
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

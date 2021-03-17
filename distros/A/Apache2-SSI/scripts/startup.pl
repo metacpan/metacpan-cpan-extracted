@@ -29,7 +29,7 @@ sub cleanup
     $s->log->info( "startup.pl: cleanup Apache2::SSI::Notes..." );
     ## print( STDERR "startup.pl: cleanup Apache2::SSI::Notes...\n" );
     my $notes = Apache2::SSI::Notes->new ||
-        die( "Unable to get a Apache2::SSI::Notes object: ", Apache2::SSI::Notes->error, "\n" );
+        warn( "Unable to get a Apache2::SSI::Notes object: ", Apache2::SSI::Notes->error, "\n" );
     $notes->shem->remove if( $notes );
 }
 

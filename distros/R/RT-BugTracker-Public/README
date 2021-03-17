@@ -1,6 +1,30 @@
 NAME
-    RT::BugTracker::Public - Adds a public, (hopefully) userfriendly bug
-    tracking UI to RT
+    RT::BugTracker::Public - Adds a public, user-friendly bug tracking and
+    reporting UI to RT
+
+DESCRIPTION
+    RT::BugTracker::Public depends on RT::BugTracker.
+
+    RT::BugTracker::Public depends on RT::Authen::Bitcard and
+    Authen::Bitcard for external authentication through Bitcard.
+
+    NB: External authentication through Bitcard is broken in RT 4.2 and 4.4.
+    The authors may eventually deprecate this functionality.
+
+    This extension adds a public interface for searching and reporting bugs
+    through an RT with RT::BugTracker installed. The public reporting UI is
+    disabled, by default.
+
+    The public interface entrypoint is on the RT login page. Click the
+    public interface link to access the public bug search page. The public
+    search functionality is identical to the private interface in
+    RT::BugTracker.
+
+    To enable public bug reporting, follow the documentation for
+    WebPublicUserReporting, in the CONFIGURATION section, below. To report
+    bugs, public users must create a new ticket using the New ticket in
+    button, or click Report a new bug from the bug list page for a
+    distribution.
 
 INSTALLATION
     perl Makefile.PL
@@ -8,15 +32,14 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    make initdb
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         Add this line:
 
-            Set(@Plugins, qw(RT::BugTracker::Public));
-
-        or add RT::BugTracker::Public to your existing @Plugins line.
+            Plugin('RT::BugTracker::Public');
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
@@ -26,25 +49,70 @@ CONFIGURATION
     RT_SiteConfig.pm or define options there.
 
   WebPublicUser
-    Make sure to create the public user in your RT system and add the line
-    below to your RT_SiteConfig.pm.
+    Create the public user in your RT system through Admin \ Users \>
+    Create> in RT. The public user must be able to access RT, and it must be
+    privileged so it can have rights. Do not enter an email address for the
+    public user.
+
+    Add the line below to RT_SiteConfig.pm and replace 'guest' with the name
+    of the RT user you just created.
 
         Set( $WebPublicUser, 'guest' );
 
-    If you didn't name your public user 'guest', then change accordingly.
+    The public user needs the following rights on public distribution queues
+    to search bugs:
 
-    The public user should probably be unprivileged and have the following
-    rights
-
-        CreateTicket
-        ModifyCustomField
-        ReplyToTicket
         SeeCustomField
         SeeQueue
         ShowTicket
 
-    If you want the public UI to do anything useful. It should NOT have the
-    ModifySelf right.
+    The pubic user needs the following rights on public distribution queues
+    to report bugs:
+
+        CreateTicket
+        ModifyCustomField
+        ReplyToTicket
+
+  WebPublicUserReporting
+    By default, the web public user cannot create bug reports through the
+    web UI. To allow this, add this line:
+
+        Set($WebPublicUserReporting, 1);
+
+  WebPublicUserQueryBuilder
+    By default, the web public user cannot use RT's fully-featured query
+    builder and is limited instead to simple search. To allow access to the
+    query builder, add this line:
+
+        Set($WebPublicUserQueryBuilder, 1);
+
+  WebPublicUserSortResults
+    By default, the web public user cannot click column headers to re-sort
+    search results due to performance implications. To permit this, add this
+    line:
+
+        Set($WebPublicUserSortResults, 1);
+
+  ScrubInlineArticleContent
+    By default, inline articles such as AfterLoginForm are scrubbed for
+    unsafe HTML tags just like ticket correspondence. If your articles are
+    modifiable only by trusted users, you may set this to 0 to pass through
+    article content unscrubbed.
+
+    See the documentation below for "GetArticleContent" for more
+    information.
+
+        Set($ScrubInlineArticleContent, 0);
+
+  GetArticleContent
+    Searches in articles for content for various configurable pages in the
+    BugTracker interface. The article names are available for adding custom
+    content in the listed locations. To customize, create or edit the
+    article with the listed name.
+
+    *   AfterLoginForm
+
+        Location: Login page, below username/password fields
 
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
@@ -59,7 +127,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-BugTracker-Public>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014 by Best Practical Solutions
+    This software is Copyright (c) 2021 by Best Practical Solutions
 
     This is free software, licensed under:
 

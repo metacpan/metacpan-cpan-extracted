@@ -15,22 +15,13 @@ $ENV{PATH_INFO}    = '/path';
 my $tests =
 [
     {
-        expect => <<EOT,
-Hi, here's a 5:
-5; path_info: /path; query_string: query;
-Right?
-EOT
+        expect => qr/^[[:blank:]\h\v]*Hi\, here's a 5\:[[:blank:]\h\v]+5\; path_info\: \/path\; query_string\: query\;[[:blank:]\h\v]+Right\?/,
         name => 'executing cgi',
         uri => "${BASE_URI}/05.01.exec.html/path?query",
         code => 200,
     },
     {
-        expect => <<EOT,
-Hi, here's a 5:
-5
-
-Right?
-EOT
+        expect => qr/^[[:blank:]\h\v]*Hi, here's a 5\:[[:blank:]\h\v]+5[[:blank:]\h\v]+Right\?/,
         name => 'executing cmd',
         uri => "${BASE_URI}/05.02.exec.html",
         code => 200,

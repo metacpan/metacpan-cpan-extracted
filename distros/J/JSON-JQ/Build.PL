@@ -15,6 +15,7 @@ my $build = Module::Build->new(
         'Alien::LibJQ'         => '>= 0.04',
         'JSON'                 => '0',
         'Path::Tiny'           => '0',
+        'enum'                 => '0',
     },
     needs_compiler => 1,
     include_dirs   => [ '.' ], # for ppport.h

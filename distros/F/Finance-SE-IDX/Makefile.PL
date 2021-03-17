@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "HTTP::Tiny::Cache" => 0,
     "HTTP::Tinyish" => 0,
     "JSON::MaybeXS" => 0,
+    "Log::ger" => "0.037",
     "strict" => 0,
     "warnings" => 0
   },
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
+  "Log::ger" => "0.037",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

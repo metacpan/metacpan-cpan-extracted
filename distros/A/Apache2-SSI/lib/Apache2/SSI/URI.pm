@@ -73,8 +73,8 @@ sub init
     $self->{document_root} ||= $self->env( 'DOCUMENT_ROOT' );
     $self->{base_uri}      ||= $self->env( 'DOCUMENT_URI' );
     ## $self->message( 4, "Apache RequestRec object provided ? '$self->{apache_request}' for document uri '$self->{document_uri}'." );
-    return( $self->error( "No document root was provided nor found." ) ) if( !length( $self->{document_root} ) );
-    return( $self->error( "No base uri was provided nor found." ) ) if( !length( $self->{base_uri} ) );
+    return( $self->error( "No document root was provided." ) ) if( !length( $self->{document_root} ) );
+    return( $self->error( "No base uri was provided." ) ) if( !length( $self->{base_uri} ) );
     return( $self->error( "No document uri was provided." ) ) if( !length( $self->{document_uri} ) );
     ## Small correction if necessary. If the base uri is a directory, it needs to have a trailing "/", so URI knows this is a directory and not a file.
     ## URI->new( "./file.pl" )->abs( "/ssi/plop" ) becomes "/ssi/file.pl" whereas it should be /ssi/plop/file.pl
@@ -236,7 +236,7 @@ sub base_uri
         elsif( $ref->{code} != 200 )
         {
             $self->message( 3, "URI \"$path\" is not found." );
-            return( $self->error( "Failed to resolve \"$u\". Resulting code is '$ref->{code}'." ) );
+            $self->error( "Failed to resolve \"$u\". Resulting code is '$ref->{code}'." );
         }
         $self->message( 4, "Creating object." );
         my $hash =

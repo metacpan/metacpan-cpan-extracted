@@ -1,247 +1,285 @@
 NAME
-    `Net::Async::Webservice::S3' - use Amazon's S3 web service with
-    `IO::Async'
+
+    Net::Async::Webservice::S3 - use Amazon's S3 web service with IO::Async
 
 SYNOPSIS
-     use IO::Async::Loop;
-     use Net::Async::Webservice::S3;
 
-     my $loop = IO::Async::Loop->new;
-
-     my $s3 = Net::Async::Webservice::S3->new(
-        access_key => ...,
-        secret_key => ...,
-        bucket     => "my-bucket-here",
-     );
-     $loop->add( $s3 );
-
-     my $put_f = $s3->put_object(
-        key   => "the-key",
-        value => "A new value for the key\n";
-     );
-
-     my $get_f = $s3->get_object(
-        key => "another-key",
-     );
-
-     $loop->await_all( $put_f, $get_f );
-
-     print "The value is:\n", $get_f->get;
+       use IO::Async::Loop;
+       use Net::Async::Webservice::S3;
+    
+       my $loop = IO::Async::Loop->new;
+    
+       my $s3 = Net::Async::Webservice::S3->new(
+          access_key => ...,
+          secret_key => ...,
+          bucket     => "my-bucket-here",
+       );
+       $loop->add( $s3 );
+    
+       my $put_f = $s3->put_object(
+          key   => "the-key",
+          value => "A new value for the key\n";
+       );
+    
+       my $get_f = $s3->get_object(
+          key => "another-key",
+       );
+    
+       $loop->await_all( $put_f, $get_f );
+    
+       print "The value is:\n", $get_f->get;
 
 DESCRIPTION
-    This module provides a webservice API around Amazon's S3 web service for
-    use in an IO::Async-based program. Each S3 operation is represented by a
-    method that returns a Future; this future, if successful, will
+
+    This module provides a webservice API around Amazon's S3 web service
+    for use in an IO::Async-based program. Each S3 operation is represented
+    by a method that returns a Future; this future, if successful, will
     eventually return the result of the operation.
 
 PARAMETERS
-    The following named parameters may be passed to `new' or `configure':
 
-    http => Net::Async::HTTP
-            Optional. Allows the caller to provide a specific asynchronous
-            HTTP user agent object to use. This will be invoked with a
-            single method, as documented by Net::Async::HTTP:
+    The following named parameters may be passed to new or configure:
 
-             $response_f = $http->do_request( request => $request, ... )
+ http => Net::Async::HTTP
 
-            If absent, a new instance will be created and added as a child
-            notifier of this object. If a value is supplied, it will be used
-            as supplied and *not* specifically added as a child notifier. In
-            this case, the caller must ensure it gets added to the
-            underlying IO::Async::Loop instance, if required.
+    Optional. Allows the caller to provide a specific asynchronous HTTP
+    user agent object to use. This will be invoked with a single method, as
+    documented by Net::Async::HTTP:
 
-    access_key => STRING
-    secret_key => STRING
-            The twenty-character Access Key ID and forty-character Secret
-            Key to use for authenticating requests to S3.
+       $response_f = $http->do_request( request => $request, ... )
 
-    ssl => BOOL
-            Optional. If given a true value, will use `https' URLs over SSL.
-            Defaults to off. This feature requires the optional
-            IO::Async::SSL module if using Net::Async::HTTP.
+    If absent, a new instance will be created and added as a child notifier
+    of this object. If a value is supplied, it will be used as supplied and
+    not specifically added as a child notifier. In this case, the caller
+    must ensure it gets added to the underlying IO::Async::Loop instance,
+    if required.
 
-    bucket => STRING
-            Optional. If supplied, gives the default bucket name to use, at
-            which point it is optional to supply to the remaining methods.
+ access_key => STRING
 
-    prefix => STRING
-            Optional. If supplied, this prefix string is prepended to any
-            key names passed in methods, and stripped from the response from
-            `list_bucket'. It can be used to keep operations of the object
-            contained within the named key space. If this string is
-            supplied, don't forget that it should end with the path
-            delimiter in use by the key naming scheme (for example `/').
+ secret_key => STRING
 
-    host => STRING
-            Optional. Sets the hostname to talk to the S3 service. Usually
-            the default of `s3.amazonaws.com' is sufficient. This setting
-            allows for communication with other service providers who
-            provide the same API as S3.
+    The twenty-character Access Key ID and forty-character Secret Key to
+    use for authenticating requests to S3.
 
-    max_retries => INT
-            Optional. Maximum number of times to retry a failed operation.
-            Defaults to 3.
+ ssl => BOOL
 
-    list_max_keys => INT
-            Optional. Maximum number of keys at a time to request from S3
-            for the `list_bucket' method. Larger values may be more
-            efficient as fewer roundtrips will be required per method call.
-            Defaults to 1000.
+    Optional. If given a true value, will use https URLs over SSL.
 
-    part_size => INT
-            Optional. Size in bytes to break content for using multipart
-            upload. If an object key's size is no larger than this value,
-            multipart upload will not be used. Defaults to 100 MiB.
+    This setting defaults on, but can be disabled by passing a
+    defined-but-false value (such as 0).
 
-    read_size => INT
-            Optional. Size in bytes to read per call to the `$gen_value'
-            content generation function in `put_object'. Defaults to 64 KiB.
-            Be aware that too large a value may lead to the `PUT' stall
-            timer failing to be invoked on slow enough connections, causing
-            spurious timeouts.
+ bucket => STRING
 
-    timeout => NUM
-            Optional. If configured, this is passed into individual requests
-            of the underlying `Net::Async::HTTP' object, except for the
-            actual content `GET' or `PUT' operations. It is therefore used
-            by `list_bucket', `delete_object', and the multi-part metadata
-            operations used by `put_object'. To apply an overall timeout to
-            an individual `get_object' or `put_object' operation, pass a
-            specific `timeout' argument to those methods specifically.
+    Optional. If supplied, gives the default bucket name to use, at which
+    point it is optional to supply to the remaining methods.
 
-    stall_timeout => NUM
-            Optional. If configured, this is passed into the underlying
-            `Net::Async::HTTP' object and used for all content uploads and
-            downloads.
+ prefix => STRING
 
-    put_concurrent => INT
-            Optional. If configured, gives a default value for the
-            `concurrent' parameter to `put_object'.
+    Optional. If supplied, this prefix string is prepended to any key names
+    passed in methods, and stripped from the response from list_bucket. It
+    can be used to keep operations of the object contained within the named
+    key space. If this string is supplied, don't forget that it should end
+    with the path delimiter in use by the key naming scheme (for example
+    /).
+
+ host => STRING
+
+    Optional. Sets the hostname to talk to the S3 service. Usually the
+    default of s3.amazonaws.com is sufficient. This setting allows for
+    communication with other service providers who provide the same API as
+    S3.
+
+ max_retries => INT
+
+    Optional. Maximum number of times to retry a failed operation. Defaults
+    to 3.
+
+ list_max_keys => INT
+
+    Optional. Maximum number of keys at a time to request from S3 for the
+    list_bucket method. Larger values may be more efficient as fewer
+    roundtrips will be required per method call. Defaults to 1000.
+
+ part_size => INT
+
+    Optional. Size in bytes to break content for using multipart upload. If
+    an object key's size is no larger than this value, multipart upload
+    will not be used. Defaults to 100 MiB.
+
+ read_size => INT
+
+    Optional. Size in bytes to read per call to the $gen_value content
+    generation function in put_object. Defaults to 64 KiB. Be aware that
+    too large a value may lead to the PUT stall timer failing to be invoked
+    on slow enough connections, causing spurious timeouts.
+
+ timeout => NUM
+
+    Optional. If configured, this is passed into individual requests of the
+    underlying Net::Async::HTTP object, except for the actual content GET
+    or PUT operations. It is therefore used by list_bucket, delete_object,
+    and the multi-part metadata operations used by put_object. To apply an
+    overall timeout to an individual get_object or put_object operation,
+    pass a specific timeout argument to those methods specifically.
+
+ stall_timeout => NUM
+
+    Optional. If configured, this is passed into the underlying
+    Net::Async::HTTP object and used for all content uploads and downloads.
+
+ put_concurrent => INT
+
+    Optional. If configured, gives a default value for the concurrent
+    parameter to put_object.
 
 METHODS
+
     The following methods all support the following common arguments:
 
     timeout => NUM
+
     stall_timeout => NUM
-            Optional. Passed directly to the underlying
-            `Net::Async::HTTP->request' method.
 
-    Each method below that yields a `Future' is documented in the form
+      Optional. Passed directly to the underlying Net::Async::HTTP->request
+      method.
 
-     $s3->METHOD( ARGS ) ==> YIELDS
+    The following methods documented with a trailing call to ->get return
+    Future instances.
 
-    Where the `YIELDS' part indicates the values that will eventually be
-    returned by the `get' method on the returned Future object, if it
-    succeeds.
+ list_bucket
 
-  $s3->list_bucket( %args ) ==> ( $keys, $prefixes )
+       ( $keys, $prefixes ) = $s3->list_bucket( %args )->get
+
     Requests a list of the keys in a bucket, optionally within some prefix.
 
     Takes the following named arguments:
 
     bucket => STR
-            The name of the S3 bucket to query
+
+      The name of the S3 bucket to query
 
     prefix => STR
+
     delimiter => STR
-            Optional. If supplied, the prefix and delimiter to use to divide
-            up the key namespace. Keys will be divided on the `delimiter'
-            parameter, and only the key space beginning with the given
-            prefix will be queried.
+
+      Optional. If supplied, the prefix and delimiter to use to divide up
+      the key namespace. Keys will be divided on the delimiter parameter,
+      and only the key space beginning with the given prefix will be
+      queried.
 
     The Future will return two ARRAY references. The first provides a list
     of the keys found within the given prefix, and the second will return a
     list of the common prefixes of further nested keys.
 
-    Each key in the `$keys' list is given in a HASH reference containing
+    Each key in the $keys list is given in a HASH reference containing
 
     key => STRING
-            The key's name
+
+      The key's name
 
     last_modified => STRING
-            The last modification time of the key given in ISO 8601 format
+
+      The last modification time of the key given in ISO 8601 format
 
     etag => STRING
-            The entity tag of the key
+
+      The entity tag of the key
 
     size => INT
-            The size of the key's value, in bytes
+
+      The size of the key's value, in bytes
 
     storage_class => STRING
-            The S3 storage class of the key
 
-    Each key in the `$prefixes' list is given as a plain string.
+      The S3 storage class of the key
 
-  $s3->get_object( %args ) ==> ( $value, $response, $meta )
+    Each key in the $prefixes list is given as a plain string.
+
+ get_object
+
+       ( $value, $response, $meta ) = $s3->get_object( %args )
+
     Requests the value of a key from a bucket.
 
     Takes the following named arguments:
 
     bucket => STR
-            The name of the S3 bucket to query
+
+      The name of the S3 bucket to query
 
     key => STR
-            The name of the key to query
+
+      The name of the key to query
 
     on_chunk => CODE
-            Optional. If supplied, this code will be invoked repeatedly on
-            receipt of more bytes of the key's value. It will be passed the
-            HTTP::Response object received in reply to the request, and a
-            byte string containing more bytes of the value. Its return value
-            is not important.
 
-             $on_chunk->( $header, $bytes )
+      Optional. If supplied, this code will be invoked repeatedly on
+      receipt of more bytes of the key's value. It will be passed the
+      HTTP::Response object received in reply to the request, and a byte
+      string containing more bytes of the value. Its return value is not
+      important.
 
-            If this is supplied then the key's value will not be
-            accumulated, and the final result of the Future will be an empty
-            string.
+         $on_chunk->( $header, $bytes )
+
+      If this is supplied then the key's value will not be accumulated, and
+      the final result of the Future will be an empty string.
 
     byte_range => STRING
-            Optional. If supplied, is used to set the `Range' request header
-            with `bytes' as the units. This gives a range of bytes of the
-            object to fetch, rather than fetching the entire content. The
-            value must be as specified by HTTP/1.1; i.e. a comma-separated
-            list of ranges, where each range specifies a start and
-            optionally an inclusive stop byte index, separated by hypens.
+
+      Optional. If supplied, is used to set the Range request header with
+      bytes as the units. This gives a range of bytes of the object to
+      fetch, rather than fetching the entire content. The value must be as
+      specified by HTTP/1.1; i.e. a comma-separated list of ranges, where
+      each range specifies a start and optionally an inclusive stop byte
+      index, separated by hypens.
 
     if_match => STRING
-            Optional. If supplied, is used to set the `If-Match' request
-            header to the given string, which should be an entity etag. If
-            the requested object no longer has this etag, the request will
-            fail with an `http' failure whose response code is 412.
+
+      Optional. If supplied, is used to set the If-Match request header to
+      the given string, which should be an entity etag. If the requested
+      object no longer has this etag, the request will fail with an http
+      failure whose response code is 412.
 
     The Future will return a byte string containing the key's value, the
-    HTTP::Response that was received, and a hash reference containing any of
-    the metadata fields, if found in the response. If an `on_chunk' code
-    reference is passed, the `$value' string will be empty.
+    HTTP::Response that was received, and a hash reference containing any
+    of the metadata fields, if found in the response. If an on_chunk code
+    reference is passed, the $value string will be empty.
 
-    If the entire content of the object is requested (i.e. if `byte_range'
-    is not supplied) then stall timeout failures will be handled specially.
-    If a stall timeout happens while receiving the content, the request will
-    be retried using the `Range' header to resume from progress so far. This
+    If the entire content of the object is requested (i.e. if byte_range is
+    not supplied) then stall timeout failures will be handled specially. If
+    a stall timeout happens while receiving the content, the request will
+    be retried using the Range header to resume from progress so far. This
     will be repeated while every attempt still makes progress, and such
     resumes will not be counted as part of the normal retry count. The
-    resume request also uses `If-Match' to ensure it only resumes the
+    resume request also uses If-Match to ensure it only resumes the
     resource with matching ETag. If a resume request fails for some reason
     (either because the ETag no longer matches or something else) then this
     error is ignored, and the original stall timeout failure is returned.
 
-  $s3->head_object( %args ) ==> ( $response, $meta )
-    Requests the value metadata of a key from a bucket. This is similar to
-    the `get_object' method, but uses the `HEAD' HTTP verb instead of `GET'.
+ head_object
 
-    Takes the same named arguments as `get_object', but will ignore an
-    `on_chunk' callback, if provided.
+       ( $response, $meta ) = $s3->head_object( %args )->get
+
+    Requests the value metadata of a key from a bucket. This is similar to
+    the get_object method, but uses the HEAD HTTP verb instead of GET.
+
+    Takes the same named arguments as get_object, but will ignore an
+    on_chunk callback, if provided.
 
     The Future will return the HTTP::Response object and metadata hash
     reference, without the content string (as no content is returned to a
-    `HEAD' request).
+    HEAD request).
 
-  $s3->head_then_get_object( %args ) ==> ( $value_f, $response, $meta )
-    Performs a `GET' operation similar to `get_object', but allows access to
+ head_then_get_object
+
+       ( $value_f, $response, $meta ) = $s3->head_then_get_object( %args )->get
+    
+       ( $value, $response, $meta ) = $value_f->get
+
+    Performs a GET operation similar to get_object, but allows access to
     the metadata header before the body content is complete.
 
-    Takes the same named arguments as `get_object'.
+    Takes the same named arguments as get_object.
 
     The returned Future completes as soon as the metadata header has been
     received and yields a second future (the body future), the
@@ -249,110 +287,119 @@ METHODS
     body future will eventually yield the actual body, along with another
     copy of the response and metadata hash reference.
 
-     $value_f ==> $value, $response, $meta
+ put_object
 
-  $s3->put_object( %args ) ==> ( $etag, $length )
+       ( $etag, $length ) = $s3->put_object( %args ) ==> ( $etag, $length )
+
     Sets a new value for a key in the bucket.
 
     Takes the following named arguments:
 
     bucket => STRING
-            The name of the S3 bucket to put the value in
+
+      The name of the S3 bucket to put the value in
 
     key => STRING
-            The name of the key to put the value in
+
+      The name of the key to put the value in
 
     value => STRING
+
     value => Future giving STRING
-            Optional. If provided, gives a byte string as the new value for
-            the key or a Future which will eventually yield such.
+
+      Optional. If provided, gives a byte string as the new value for the
+      key or a Future which will eventually yield such.
 
     value => CODE
+
     value_length => INT
-            Alternative form of `value', which is a `CODE' reference to a
-            generator function. It will be called repeatedly to generate
-            small chunks of content, being passed the position and length it
-            should yield.
 
-             $chunk = $value->( $pos, $len )
+      Alternative form of value, which is a CODE reference to a generator
+      function. It will be called repeatedly to generate small chunks of
+      content, being passed the position and length it should yield.
 
-            Typically this can be provided either by a `substr' operation on
-            a larger string buffer, or a `sysseek' and `sysread' operation
-            on a filehandle.
+         $chunk = $value->( $pos, $len )
 
-            In normal operation the function will just be called in a single
-            sweep in contiguous regions up to the extent given by
-            `value_length'. If however, the MD5sum check fails at the end of
-            upload, it will be called again to retry the operation. The
-            function must therefore be prepared to be invoked multiple times
-            over its range.
+      Typically this can be provided either by a substr operation on a
+      larger string buffer, or a sysseek and sysread operation on a
+      filehandle.
+
+      In normal operation the function will just be called in a single
+      sweep in contiguous regions up to the extent given by value_length.
+      If however, the MD5sum check fails at the end of upload, it will be
+      called again to retry the operation. The function must therefore be
+      prepared to be invoked multiple times over its range.
 
     value => Future giving ( CODE, INT )
-            Alternative form of `value', in which a `Future' eventually
-            yields the value generation `CODE' reference and length. The
-            `CODE' reference is invoked as documented above.
 
-             ( $gen_value, $value_len ) = $value->get;
+      Alternative form of value, in which a Future eventually yields the
+      value generation CODE reference and length. The CODE reference is
+      invoked as documented above.
 
-             $chunk = $gen_value->( $pos, $len );
+         ( $gen_value, $value_len ) = $value->get;
+      
+         $chunk = $gen_value->( $pos, $len );
 
     gen_parts => CODE
-            Alternative to `value' in the case of larger values, and implies
-            the use of multipart upload. Called repeatedly to generate
-            successive parts of the upload. Each time `gen_parts' is called
-            it should return one of the forms of `value' given above;
-            namely, a byte string, a `CODE' reference and size pair, or a
-            `Future' which will eventually yield either of these forms.
 
-             ( $value ) = $gen_parts->()
+      Alternative to value in the case of larger values, and implies the
+      use of multipart upload. Called repeatedly to generate successive
+      parts of the upload. Each time gen_parts is called it should return
+      one of the forms of value given above; namely, a byte string, a CODE
+      reference and size pair, or a Future which will eventually yield
+      either of these forms.
 
-             ( $gen_value, $value_length ) = $gen_parts->()
+         ( $value ) = $gen_parts->()
+      
+         ( $gen_value, $value_length ) = $gen_parts->()
+      
+         ( $value_f ) = $gen_parts->(); $value = $value_f->get
+                                        ( $gen_value, $value_length ) = $value_f->get
 
-             ( $value_f ) = $gen_parts->(); $value = $value_f->get
-                                            ( $gen_value, $value_length ) = $value_f->get
-
-            Each case is analogous to the types that the `value' key can
-            take.
+      Each case is analogous to the types that the value key can take.
 
     meta => HASH
-            Optional. If provided, gives additional user metadata fields to
-            set on the object, using the `X-Amz-Meta-' fields.
+
+      Optional. If provided, gives additional user metadata fields to set
+      on the object, using the X-Amz-Meta- fields.
 
     timeout => NUM
-            Optional. For single-part uploads, this sets the `timeout'
-            argument to use for the actual `PUT' request. For multi-part
-            uploads, this argument is currently ignored.
+
+      Optional. For single-part uploads, this sets the timeout argument to
+      use for the actual PUT request. For multi-part uploads, this argument
+      is currently ignored.
 
     meta_timeout => NUM
-            Optional. For multipart uploads, this sets the `timeout'
-            argument to use for the initiate and complete requests,
-            overriding a configured `timeout'. Ignored for single-part
-            uploads.
+
+      Optional. For multipart uploads, this sets the timeout argument to
+      use for the initiate and complete requests, overriding a configured
+      timeout. Ignored for single-part uploads.
 
     part_timeout => NUM
-            Optional. For multipart uploads, this sets the `timeout'
-            argument to use for the individual part `PUT' requests. Ignored
-            for single-part uploads.
+
+      Optional. For multipart uploads, this sets the timeout argument to
+      use for the individual part PUT requests. Ignored for single-part
+      uploads.
 
     on_write => CODE
-            Optional. If provided, this code will be invoked after each
-            successful `syswrite' call on the underlying filehandle when
-            writing actual file content, indicating that the data was at
-            least written as far as the kernel. It will be passed the total
-            byte length that has been written for this call to `put_object'.
-            By the time the call has completed, this will be the total
-            written length of the object.
 
-             $on_write->( $bytes_written )
+      Optional. If provided, this code will be invoked after each
+      successful syswrite call on the underlying filehandle when writing
+      actual file content, indicating that the data was at least written as
+      far as the kernel. It will be passed the total byte length that has
+      been written for this call to put_object. By the time the call has
+      completed, this will be the total written length of the object.
 
-            Note that because of retries it is possible this count will
-            decrease, if a part has to be retried due to e.g. a failing MD5
-            checksum.
+         $on_write->( $bytes_written )
+
+      Note that because of retries it is possible this count will decrease,
+      if a part has to be retried due to e.g. a failing MD5 checksum.
 
     concurrent => INT
-            Optional. If present, gives the number of parts to upload
-            concurrently. If absent, a default of 1 will apply (i.e. no
-            concurrency).
+
+      Optional. If present, gives the number of parts to upload
+      concurrently. If absent, a default of 1 will apply (i.e. no
+      concurrency).
 
     The Future will return a string containing the S3 ETag of the newly-set
     key, and the length of the value in bytes.
@@ -365,26 +412,35 @@ METHODS
     internally-generated MD5 sum of the content that was sent, and an error
     result will be returned if these do not match.
 
-  $s3->delete_object( %args ) ==> ()
+ delete_object
+
+       $s3->delete_object( %args )->get
+
     Deletes a key from the bucket.
 
     Takes the following named arguments:
 
     bucket => STRING
-            The name of the S3 bucket to put the value in
+
+      The name of the S3 bucket to put the value in
 
     key => STRING
-            The name of the key to put the value in
+
+      The name of the key to put the value in
 
     The Future will return nothing.
 
 SPONSORS
+
     Parts of this code were paid for by
 
-    * SocialFlow http://www.socialflow.com
+      * SocialFlow http://www.socialflow.com
 
-    * Shadowcat Systems http://www.shadow.cat
+      * Shadowcat Systems http://www.shadow.cat
+
+      * Deriv http://deriv.com
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

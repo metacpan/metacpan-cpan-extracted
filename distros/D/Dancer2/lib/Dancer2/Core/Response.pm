@@ -1,7 +1,7 @@
 # ABSTRACT: Response object for Dancer2
 
 package Dancer2::Core::Response;
-$Dancer2::Core::Response::VERSION = '0.300005';
+$Dancer2::Core::Response::VERSION = '0.301001';
 use Moo;
 
 use Encode;
@@ -276,7 +276,7 @@ Dancer2::Core::Response - Response object for Dancer2
 
 =head1 VERSION
 
-version 0.300005
+version 0.301001
 
 =head1 ATTRIBUTES
 

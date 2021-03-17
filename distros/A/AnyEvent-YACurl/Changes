@@ -1,5 +1,9 @@
 Revision history for Perl extension AnyEvent::YACurl.
 
+0.21  Mon Mar 03 2021
+    - curl 7.75.0 compatibility
+    - make Makefile.PL less strict
+
 0.20  Fri Jan 29 2021
     - curl 7.74.0 compatibility
 

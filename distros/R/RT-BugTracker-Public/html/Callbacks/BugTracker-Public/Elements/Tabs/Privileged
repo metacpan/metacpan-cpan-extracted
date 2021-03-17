@@ -2,7 +2,7 @@
 %#
 %# COPYRIGHT:
 %#
-%# This software is Copyright (c) 1996-2014 Best Practical Solutions, LLC
+%# This software is Copyright (c) 1996-2021 Best Practical Solutions, LLC
 %#                                          <sales@bestpractical.com>
 %#
 %# (Except where explicitly superseded by other copyright notices)
@@ -62,32 +62,48 @@ RT::Interface::Web::InitializeMenu();
 PageWidgets()->child( simple_search => raw_html => $m->scomp(
     '/Elements/SimpleSearch', SendTo => '/Public/Search/Simple.html' ));
 
-PageWidgets()->child( create_ticket => raw_html => $m->scomp(
-    '/Elements/CreateTicket', SendTo => '/Public/Bug/Report.html' ));
+if (RT->Config->Get('WebPublicUserReporting')) {
+    PageWidgets()->child( create_ticket => raw_html => $m->scomp(
+        '/Elements/CreateTicket', SendTo => '/Public/Bug/Report.html' ));
+}
 
 Menu()->child(
     search_dist => title => loc('Search Distributions'),
     path        => '/Public/',
 );
 
-Menu()->child(
-    browse_dist => title => loc('Browse Distributions'),
-    path        => '/Public/Dist/Browse.html',
-);
+if (RT->Config->Get('WebPublicUserQueryBuilder')) {
+    Menu()->child(
+        query_builder => title => loc('Advanced Search'),
+        path        => '/Search/Build.html?NewQuery=1',
+    );
+}
 
-Menu->child( "about", menu => $about );
+unless (RT->Config->Get('BugTracker_ShowAllDistributions')) {
+    Menu()->child(
+        browse_dist => title => loc('Browse Distributions'),
+        path        => '/Public/Dist/Browse.html',
+    );
+}
+
+Menu->child( "about", menu => $about ) if $about;
 
 if ($session{CurrentUser}->Name eq RT->Config->Get("WebPublicUser")) {
-    Menu->child(
-        'preferences' => title => loc( 'Welcome [_1]anonymous guest[_2].', '<span class="current-user">', '</span>' ),
-        escape_title  => 0,
-        sort_order    => 1000,
-    );
+
+    # This creates a welcome message that reminds the current user they are logged
+    # in as a guest. However, it renders as a link with no target
+    # because RT doesn't currently support menu items that don't link somewhere.
+    # Comment out until RT's menus support a 'no-link' option.
+#    Menu->child(
+#        'preferences' => title => loc( 'Welcome [_1]anonymous guest[_2].', '<span class="current-user">', '</span>' ),
+#        escape_title  => 0,
+#        sort_order    => 1000,
+#    );
 
     # Public user must logout to login
     Menu->child(
         "login",
-        title       => loc('Login as another user'),
+        title       => loc('Log out guest user'),
         path        => '/NoAuth/Logout.html',
         sort_order  => 1001,
     );
@@ -119,7 +135,7 @@ if ( $queue and $queue->id ) {
     my $escaped = $m->interp->apply_escapes($queue->Name, 'u');
     PageMenu()->child(
         active_bugs => title => loc("Active bugs"),
-        path => "/Public/Dist/Display.html?Status=Active;Name=" . $escaped,
+        path => "/Public/Dist/Display.html?Status=__Active__;Name=" . $escaped,
     );
 
     PageMenu()->child( resolved_bugs =>
@@ -132,13 +148,15 @@ if ( $queue and $queue->id ) {
             path  => "/Public/Dist/Display.html?Status=Rejected;Name=". $escaped,
     );
 
-    PageMenu()->child( report => 
-            title => loc("Report a new bug"),
-            path  => '/Public/Bug/Report.html?Queue='. $escaped,
-    );
+    if (RT->Config->Get('WebPublicUserReporting')) {
+        PageMenu()->child( report =>
+                title => loc("Report a new bug"),
+                path  => '/Public/Bug/Report.html?Queue='. $escaped,
+        );
+    }
 
     if ($ticket and $ticket->id
-        and $queue->Lifecycle->IsInactive($ticket->Status)
+        and $queue->LifecycleObj->IsInactive($ticket->Status)
         and $ticket->CurrentUserHasRight("OpenTicket")) {
 
         PageMenu->child(

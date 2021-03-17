@@ -69,7 +69,8 @@ jv my_jv_input(pTHX_ void * arg) {
         if (len < 0) {
             return jval;
         }
-        for (SSize_t i = 0; i <= len; i++) {
+        SSize_t i;
+        for (i = 0; i <= len; i++) {
             jval = jv_array_append(jval, my_jv_input(aTHX_ *av_fetch(p_av, i, 0)));
         }
         return jval;
@@ -79,7 +80,8 @@ jv my_jv_input(pTHX_ void * arg) {
         jv jval = jv_object();
         HV * p_hv = (HV *)SvRV(p_sv);
         I32 len = hv_iterinit(p_hv);
-        for (I32 i = 0; i < len; i++) {
+        I32 i;
+        for (i = 0; i < len; i++) {
             char * key = NULL;
             I32 klen = 0;
             SV * val = hv_iternextsv(p_hv, &key, &klen);
@@ -134,7 +136,8 @@ void * my_jv_output(pTHX_ jv jval) {
         AV * p_av = newAV();
         SSize_t len = (SSize_t)jv_array_length(jv_copy(jval));
         av_extend(p_av, len - 1);
-        for (SSize_t i = 0; i < len; i++) {
+        SSize_t i;
+        for (i = 0; i < len; i++) {
             jv val = jv_array_get(jv_copy(jval), i);
             av_push(p_av, (SV *)my_jv_output(aTHX_ val));
             jv_free(val);
@@ -244,7 +247,8 @@ _init(self)
         // step 3. set initial attributes
         hv_attr = (HV *)SvRV(*hv_fetchs(self, "_attribute", 0));
         I32 len = hv_iterinit(hv_attr);
-        for (I32 i = 0; i < len; i++) {
+        I32 i;
+        for (i = 0; i < len; i++) {
             char * key = NULL;
             I32 klen = 0;
             SV * val = hv_iternextsv(hv_attr, &key, &klen);
@@ -313,7 +317,7 @@ _process(self, sv_input, av_output)
             else {
                 ret = 0;
             }
-            jv_free(result);
+            //jv_free(result);
         }
         if (jq_halted(_jq)) {
             // jq program invoked `halt` or `halt_error`
@@ -376,7 +380,7 @@ DESTROY(self)
         _jq = INT2PTR(jq_state *, SvIV(sv_jq));
         if (_jq != NULL) {
             if (SvTRUE(get_sv("JSON::JQ::DEBUG", 0))) {
-                fprintf(stderr, "destroying jq object: %i\n", _jq);
+                fprintf(stderr, "destroying jq object: %p\n", _jq);
             }
             jq_teardown(&_jq);
         }

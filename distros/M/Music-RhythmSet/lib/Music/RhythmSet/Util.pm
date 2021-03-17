@@ -4,7 +4,7 @@
 # of beats, and etc
 
 package Music::RhythmSet::Util;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use 5.24.0;
 use warnings;
@@ -15,7 +15,7 @@ use constant { NOTE_ON => 1, NOTE_OFF => 0 };
 
 use parent qw(Exporter);
 our @EXPORT_OK =
-  qw(beatstring compare_onsets duration filter_pattern flatten ocvec onset_count rand_onsets score_fourfour score_stddev upsize write_midi);
+  qw(beatstring compare_onsets duration filter_pattern flatten ocvec onset_count pattern_from rand_onsets score_fourfour score_stddev upsize write_midi);
 
 sub beatstring {
     my ($bpat) = @_;
@@ -113,6 +113,13 @@ sub onset_count {
     }
 
     return $onsets;
+}
+
+sub pattern_from {
+    my ($string) = @_;
+    $string =~ tr/x.//cd;
+    $string =~ tr/x./10/;
+    return [ split '', $string ];
 }
 
 sub rand_onsets {
@@ -236,7 +243,7 @@ qualified or by importing them on the C<use> line.
 =item B<beatstring> I<pattern>
 
 Converts a I<pattern> such as C<[qw/1 0 1 0/]> to a string such
-as C<x.x.>.
+as C<x.x.>. Opposite of B<pattern_from>.
 
 =item B<compare_onsets> I<pattern1> I<pattern2>
 
@@ -271,6 +278,17 @@ format is suitable to be fed to L<Music::AtonalUtil>.
 =item B<onset_count> I<pattern>
 
 Returns a count of how many onsets there are in the I<pattern>.
+
+=item B<pattern_from> I<string>
+
+Since version 0.02.
+
+Converts a beat string such as C<x.x.> into an array reference such as
+C<[qw/1 0 1 0/]>. Opposite of B<beatstring>.
+
+It may be more sensible to use B<from_string> in
+L<Music::RhythmSet::Voice> or L<Music::RhythmSet> especially if there
+are multiple patterns and TTL being parsed.
 
 =item B<rand_onsets> I<onsets> I<total>
 
@@ -337,7 +355,7 @@ I<ticks> (see the MIDI specification).
 
 =head1 BUGS
 
-<https://github.com/thrig/Music-RhythmSet>
+None known.
 
 =head1 SEE ALSO
 

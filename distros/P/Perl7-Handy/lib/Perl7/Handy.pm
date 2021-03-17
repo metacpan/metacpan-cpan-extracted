@@ -5,13 +5,13 @@ package Perl7::Handy;
 #
 # https://metacpan.org/release/Perl7-Handy
 #
-# Copyright (c) 2020 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2020, 2001 INABA Hitoshi <ina@cpan.org>
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 $VERSION = $VERSION;
 
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
@@ -26,7 +26,7 @@ sub Perl7::Handy::confess (@) {
     my $i = 0;
     my @confess = ();
     while (my($package,$filename,$line,$subroutine) = caller($i)) {
-        push @confess, "[$i] $filename($line) ${package}::$subroutine\n";
+        push @confess, "[$i] $filename($line) $package"."::$subroutine\n";
         $i++;
     }
     print STDERR __PACKAGE__, " says:\n";
@@ -358,7 +358,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =item * L<Three-arg open() (Migrating to Modern Perl)|http://modernperlbooks.com/mt/2010/04/three-arg-open-migrating-to-modern-perl.html> - modernperlbooks.com
 
-=item * L<perl - open my $fh, "comand |"; # isn't modern|http://blog.livedoor.jp/dankogai/archives/51176081.html> - 404 Blog Not Found
+=item * L<perl - open my $fh, "comand (pipe)"; # isn't modern|http://blog.livedoor.jp/dankogai/archives/51176081.html> - 404 Blog Not Found
 
 =item * L<13.15. Creating Magic Variables with tie|https://docstore.mik.ua/orelly/perl3/cookbook/ch13_16.htm> - Perl Cookbook
 
@@ -367,6 +367,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 =item * L<CVE-2016-1238|https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-1238> - CVE
 
 =item * L<CVE-2016-1238: Important unsafe module load path flaw|https://www.nntp.perl.org/group/perl.perl5.porters/2016/07/msg238271.html> - perl.org
+
+=item * L<signatures - Subroutine signatures with no source filter|https://metacpan.org/release/signatures> - CPAN
+
+=item * L<indirect - Lexically warn about using the indirect method call syntax.|https://metacpan.org/release/indirect> - CPAN
 
 =item * L<ina|http://search.cpan.org/~ina/> - cpan.org
 

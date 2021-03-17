@@ -5,6 +5,7 @@ BEGIN
     use lib './lib';
     require( "./t/functions.pl" ) || BAIL_OUT( "Unable to find library \"functions.pl\"." );
     our $BASE_URI;
+    use Path::Tiny;
     use DateTime;
     use DateTime::Format::Strptime;
     use Nice::Try;
@@ -16,9 +17,9 @@ try
 {
     my $dt = DateTime->now( time_zone => 'local' );
     $year = $dt->year;
-    my $inc_mtime = ( stat( "./t/htdocs${BASE_URI}/include.01.txt" ) )[9];
+    my $inc = Path::Tiny->new( "./t/htdocs${BASE_URI}/include.01.txt" );
     ## diag( "File $inc last modified time is ", $inc->stat->mtime, " (", scalar( localtime( $inc->stat->mtime ) ), ")." );
-    $inc_ts = DateTime->from_epoch( epoch => $inc_mtime, time_zone => 'local' );
+    $inc_ts = DateTime->from_epoch( epoch => $inc->stat->mtime, time_zone => 'local' );
     my $params =
     {
         pattern => '%A %B %d, %Y',
@@ -27,8 +28,8 @@ try
     $params->{locale} = $ENV{lang} if( length( $ENV{lang} ) );
     my $fmt = DateTime::Format::Strptime->new( %$params );
     $inc_ts->set_formatter( $fmt );
-    my $me_mtime = ( stat( "./t/htdocs${BASE_URI}/07.03.flastmod.html" ) )[9];
-    $me_ts = DateTime->from_epoch( epoch => $me_mtime, time_zone => 'local' );
+    my $me = Path::Tiny->new( "./t/htdocs${BASE_URI}/07.03.flastmod.html" );
+    $me_ts = DateTime->from_epoch( epoch => $me->stat->mtime, time_zone => 'local' );
     my $fmt2 = DateTime::Format::Strptime->new(
         pattern => '%D',
         time_zone => 'local',
@@ -45,28 +46,19 @@ catch( $e )
 my $tests =
 [
     {
-        expect => <<EOT,
-
-This file last modified ${inc_ts}
-EOT
+        expect => qr/^[[:blank:]\h\v]*This file last modified ${inc_ts}/,
         name => 'with time format preset',
         uri => "${BASE_URI}/07.01.flastmod.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-Year: ${year}
-EOT
+        expect => qr/^[[:blank:]\h\v]*Year\: ${year}/,
         name => 'using DATE_LOCAL',
         uri => "${BASE_URI}/07.02.flastmod.html",
         code => 200,
     },
     {
-        expect => <<EOT,
-
-This file last modified ${me_ts}
-EOT
+        expect => qr/^[[:blank:]\h\v]*This file last modified ${me_ts}/,
         name => 'using LAST_MODIFIED',
         uri => "${BASE_URI}/07.03.flastmod.html",
         code => 200,

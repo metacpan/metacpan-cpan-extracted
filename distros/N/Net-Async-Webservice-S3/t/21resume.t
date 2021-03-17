@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use t::TestHTTP;
+use Test::Async::HTTP;
 
 use IO::Async::Test;
 use IO::Async::Loop;
@@ -17,7 +17,7 @@ my $loop = IO::Async::Loop->new;
 testing_loop( $loop );
 
 my $s3 = Net::Async::Webservice::S3->new(
-   http => my $http = TestHTTP->new,
+   http => my $http = Test::Async::HTTP->new,
    access_key => 'K'x20,
    secret_key => 's'x40,
    max_retries => 1,
@@ -37,23 +37,26 @@ my $stall_after = 10;
    );
    $f->on_fail( sub { die $_[0] } );
 
-   my $req;
-   wait_for { $req = $http->pending_request };
+   my $p;
+   wait_for { $p = $http->next_pending };
 
+   my $req = $p->request;
    is( $req->method,         "GET",                     'Request method' );
    is( $req->uri->authority, "bucket.s3.amazonaws.com", 'Request URI authority' );
    is( $req->uri->path,      "/one",                    'Request URI path' );
 
-   $http->respond_header(
+   $p->respond_header(
       HTTP::Response->new( 200, "OK", [
          ETag => $etag,
       ], "" )
    );
-   $http->respond_more( substr( $content, 0, $stall_after ) );
-   $http->fail( "Stall timeout", stall_timeout => );
+   $p->respond_more( substr( $content, 0, $stall_after ) );
+   $p->fail( "Stall timeout", stall_timeout => );
 
-   wait_for { $req = $http->pending_request };
+   undef $p;
+   wait_for { $p = $http->next_pending };
 
+   $req = $p->request;
    ok( $req, 'Received a second request after stall_timeout' );
 
    is( $req->method,         "GET",                     'Request method for resume' );
@@ -63,7 +66,7 @@ my $stall_after = 10;
    is( $req->header( "If-Match" ), $etag,       'Request If-Match header for resume' );
    is( $req->header( "Range" ),    "bytes=10-", 'Request Range header for resume' );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 206, "Partial Content", [
          "Content-Range" => sprintf( "bytes=%d-%d/%d", $stall_after, length( $content ) - $stall_after + 1, length( $content ) ),
          ETag            => $etag,
@@ -89,22 +92,24 @@ my $stall_after = 10;
    );
    $f->on_fail( sub { die $_[0] } );
 
-   my $req;
-   wait_for { $req = $http->pending_request };
-   $http->respond_header(
+   my $p;
+   wait_for { $p = $http->next_pending };
+   $p->respond_header(
       HTTP::Response->new( 200, "OK", [
          ETag => $etag,
       ], "" )
    );
-   $http->respond_more( substr( $content, 0, $stall_after ) );
-   $http->fail( "Stall timeout", stall_timeout => );
+   $p->respond_more( substr( $content, 0, $stall_after ) );
+   $p->fail( "Stall timeout", stall_timeout => );
 
-   wait_for { $req = $http->pending_request };
+   undef $p;
+   wait_for { $p = $http->next_pending };
 
+   my $req = $p->request;
    ok( $req, 'Received a second request after stall_timeout' );
    is( $req->header( "Range" ),    "bytes=10-", 'Request Range header for resume' );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 206, "Partial Content", [
          "Content-Range" => sprintf( "bytes=%d-%d/%d", $stall_after, length( $content ) - $stall_after + 1, length( $content ) ),
          ETag            => $etag,
@@ -124,22 +129,24 @@ my $stall_after = 10;
       key    => "one",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request };
-   $http->respond_header(
+   my $p;
+   wait_for { $p = $http->next_pending };
+   $p->respond_header(
       HTTP::Response->new( 200, "OK", [
          ETag => $etag,
       ], "" )
    );
-   $http->respond_more( substr( $content, 0, $stall_after ) );
-   $http->fail( "Stall timeout", stall_timeout => );
+   $p->respond_more( substr( $content, 0, $stall_after ) );
+   $p->fail( "Stall timeout", stall_timeout => );
 
-   wait_for { $req = $http->pending_request };
+   undef $p;
+   wait_for { $p = $http->next_pending };
 
+   my $req = $p->request;
    ok( $req, 'Received a second request after stall_timeout' );
    is( $req->header( "If-Match" ), $etag,       'Request If-Match header for resume' );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 412, "Precondition Failed", [], "" )
    );
 

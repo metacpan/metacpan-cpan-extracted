@@ -14,6 +14,7 @@ package Apache2::SSI::File;
 BEGIN
 {
     use strict;
+    use warnings;
     use warnings::register;
     use parent qw( Apache2::SSI::Common );
     use Apache2::SSI::Finfo;
@@ -294,7 +295,7 @@ This packages serves to resolve files whether inside Apache scope with mod_perl 
 
 =head2 new
 
-This instantiate an object that is used to access other key methods. It takes the following parameters:
+This instantiates an object that is used to access other key methods. It takes the following parameters:
 
 =over 4
 
@@ -356,7 +357,7 @@ Sets or gets the system file path to the file, as a string.
 
 If a new file name is provided, under Apache/mod_perl2, this will perform a query with L<Apache2::SubRequest/lookup_file>
 
-Any filename provided will be resolved with itd dots flattened and transformed into an absolute system file path if it is not already.
+Any filename provided will be resolved with its dots flattened and transformed into an absolute system file path if it is not already.
 
 =head2 finfo
 

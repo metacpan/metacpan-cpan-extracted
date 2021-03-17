@@ -10,12 +10,7 @@ BEGIN
 my $tests =
 [
     {
-        expect => <<EOT,
-Hi.
-
-There.
-
-EOT
+        expect => qr/^[[:blank:]\h\v]*Hi.[[:blank:]\h\v]+There\./,
         uri => "${BASE_URI}/01.file.html",
         code => 200,
     },

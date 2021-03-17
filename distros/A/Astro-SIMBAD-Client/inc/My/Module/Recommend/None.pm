@@ -11,7 +11,7 @@ our @ISA = qw{ My::Module::Recommend::Any };
 use Carp;
 use Exporter qw{ import };
 
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 
 our @EXPORT_OK = qw{ __none };
 
@@ -23,7 +23,6 @@ sub __none {
 sub check {
     return;
 }
-
 
 1;
 
@@ -84,7 +83,8 @@ This method simply returns.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues/>, or in
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SIMBAD-Client>,
+L<https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues>, or in
 electronic mail to the author.
 
 =head1 AUTHOR

@@ -1,5 +1,9 @@
 Revision history for Task-BeLike-RJBS
 
+20210316.000 2021-03-16 22:36:57-04:00 America/New_York
+              JSON::MaybeXS, not JSON
+              turn on declared_refs when possible
+
 20200521.000 2020-05-21 09:16:14-04:00 America/New_York
               drop Crypt::SSLeay -- that'd be nice if it pans out!
 

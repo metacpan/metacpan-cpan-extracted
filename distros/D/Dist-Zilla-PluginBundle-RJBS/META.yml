@@ -7,9 +7,9 @@ build_requires:
   File::Spec: '0'
   Test::More: '0.96'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.78'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS/issues
   homepage: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS
   repository: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS.git
-version: '5.012'
+version: '5.013'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -102,64 +102,64 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@RJBS/@Filter/PruneCruft'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@RJBS/@Filter/ManifestSkip'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@RJBS/@Filter/MetaYAML'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::License
       name: '@RJBS/@Filter/License'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@RJBS/@Filter/Readme'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@RJBS/@Filter/ExecDir'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@RJBS/@Filter/ShareDir'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@RJBS/@Filter/Manifest'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@RJBS/@Filter/TestRelease'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@RJBS/@Filter/ConfirmRelease'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@RJBS/@Filter/UploadToCPAN'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
       name: '@RJBS/MakeMaker'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@RJBS/AutoPrereqs'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
         Dist::Zilla::Plugin::Git::NextVersion:
           first_version: '0.001'
-          version_by_branch: 0
+          version_by_branch: 1
           version_regexp: (?^:^([0-9]+\.[0-9]+)$)
         Dist::Zilla::Role::Git::Repo:
           git_version: '2.24.3 (Apple Git-128)'
@@ -169,19 +169,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@RJBS/PkgVersion'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@RJBS/MetaConfig'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@RJBS/MetaJSON'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@RJBS/NextRelease'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@RJBS/Test::ChangesHasContent'
@@ -189,7 +189,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@RJBS/PodSyntaxTests'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@RJBS/Test::ReportPrereqs'
@@ -201,7 +201,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@RJBS/TestMoreWithSubtests'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -337,7 +337,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '5.012'
+          tag: '5.013'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -352,7 +352,6 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Git::Push:
           push_to:
-            - 'origin :'
             - 'github :'
           remotes_must_exist: 0
         Dist::Zilla::Role::Git::Repo:
@@ -370,7 +369,7 @@ x_Dist_Zilla:
           order_by: name
           paths: []
       name: '@RJBS/Git::Contributors'
-      version: '0.035'
+      version: '0.036'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -378,55 +377,54 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.015'
+      version: '6.017'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.015'
+    version: '6.017'
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
-  - 'Ricardo SIGNES <rjbs@cpan.org>'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

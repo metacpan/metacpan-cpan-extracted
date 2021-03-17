@@ -6,6 +6,8 @@ use Test::Trap;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Moose::Util 'find_meta';
 
+$ENV{COLUMNS} = 80;
+
 {
     package MyScript;
     use Moose;
@@ -17,9 +19,8 @@ with newline and some 123456789 123456789 123456789 characters' );
 }
 
 my $usage = qr/^\Qusage: 104_override_usage.t [-?h] [long options...]\E
-\t-h -\? --usage --help\s+Prints this usage information\.
-\t--foo (INT)?\s+A foo .+
-\t\s+.+characters/m;
+.*\t.*--help.+Prints this usage information\.
+.*\t--foo (INT)?\s+A foo.+characters/ms;
 
 {
     local @ARGV = ('--foo', '1');

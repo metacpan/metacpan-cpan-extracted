@@ -2,8 +2,8 @@ NAME
     Finance::SE::IDX - Get information from Indonesian Stock Exchange
 
 VERSION
-    This document describes version 0.006 of Finance::SE::IDX (from Perl
-    distribution Finance-SE-IDX), released on 2021-01-17.
+    This document describes version 0.007 of Finance::SE::IDX (from Perl
+    distribution Finance-SE-IDX), released on 2021-01-18.
 
 FUNCTIONS
   get_idx_daily_trading_summary

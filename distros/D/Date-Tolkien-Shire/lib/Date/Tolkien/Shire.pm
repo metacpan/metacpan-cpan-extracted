@@ -21,7 +21,7 @@ use Date::Tolkien::Shire::Data qw{
 use Time::Local;
 
 our $ERROR;
-our $VERSION = '1.903';
+our $VERSION = '1.904';
 
 sub new {
     my ( $class, $date, %arg ) = @_;
@@ -766,9 +766,10 @@ epoch time doesn't support (currently values before 1902 or after 2037).  The
 module should automatically expand in available dates directly with epoch time
 support on your system.
 
-Please file bug reports at
+Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire>,
 L<https://github.com/trwyant/perl-Date-Tolkien-Shire/issues>, or in
-electronic mail to F<wyant@cpan.org>.
+electronic mail to the author.
 
 =head1 AUTHOR
 

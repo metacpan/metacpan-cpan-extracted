@@ -15,11 +15,7 @@ Hi.
 
 This was a test.
 EOT
-        expect => <<EOT,
-Hi.
-
-This was a test.
-EOT
+        expect => qr/^[[:blank:]\h\v]*Hi.[[:blank:]\h\v]+This was a test\./,
         uri => "${BASE_URI}/00.bare.html",
         code => 200,
     },

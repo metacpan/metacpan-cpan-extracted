@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use t::TestHTTP;
+use Test::Async::HTTP;
 
 use IO::Async::Test;
 use IO::Async::Loop;
@@ -27,7 +27,7 @@ testing_loop( $loop );
 my $s3 = Net::Async::Webservice::S3->new(
    max_retries => 1,
 
-   http => my $http = TestHTTP->new,
+   http => my $http = Test::Async::HTTP->new,
    access_key => 'ABCDEFGHIJKLMNOPQRST',
    secret_key => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLOP',
 );
@@ -47,12 +47,13 @@ isa_ok( $s3, "Net::Async::Webservice::S3", '$s3' );
       delimiter => "/",
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request or $f->is_ready };
+   my $p;
+   wait_for { $p = $http->next_pending or $f->is_ready };
    $f->get if $f->is_ready and $f->failure;
 
+   my $req = $p->request;
    is( $req->method, "GET", '$req->method' );
-   is( $req->uri, "http://bucket.s3.amazonaws.com/?delimiter=%2F&max-keys=1000&prefix=", '$req->uri' );
+   is( $req->uri, "https://bucket.s3.amazonaws.com/?delimiter=%2F&max-keys=1000&prefix=", '$req->uri' );
 
    # Assert the date header, as auth depends on it
    is( $req->header( "Date" ), "Sun, 26 May 2013 17:06:17 GMT", '$req->header("Date")' );
@@ -61,7 +62,7 @@ isa_ok( $s3, "Net::Async::Webservice::S3", '$s3' );
        "AWS ABCDEFGHIJKLMNOPQRST:L0A3s2Ks+IdDGuW9NNad5iIsKn4=",
        '$req->authorization' );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 200, "OK", [
          Content_Type => "application/xml",
       ], <<'EOF' )
@@ -93,11 +94,12 @@ EOF
       },
    );
 
-   my $req;
-   wait_for { $req = $http->pending_request };
+   my $p;
+   wait_for { $p = $http->next_pending };
 
+   my $req = $p->request;
    is( $req->method, "PUT", '$req->method' );
-   is( $req->uri, "http://bucket.s3.amazonaws.com/key", '$req->uri' );
+   is( $req->uri, "https://bucket.s3.amazonaws.com/key", '$req->uri' );
 
    # Assert the date header, as auth depends on it
    is( $req->header( "Date" ), "Sun, 26 May 2013 17:06:17 GMT", '$req->header("Date")' );
@@ -108,7 +110,7 @@ EOF
 
    my $md5 = md5_hex( $req->content );
 
-   $http->respond(
+   $p->respond(
       HTTP::Response->new( 200, "OK", [
          Etag => qq("$md5"),
       ], '' )

@@ -1,7 +1,7 @@
 package Mojo::WebService::Twitter::Media;
 use Mojo::Base -base;
 
-our $VERSION = '1.001';
+our $VERSION = '1.003';
 
 has [qw(source display_url expanded_url id media_url source_status_id tweet type url)];
 has variants => sub { [] };

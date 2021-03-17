@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 
+use Future::AsyncAwait;
+
 use IO::Async::Loop;
 use Net::Async::Webservice::S3;
 
@@ -24,14 +26,10 @@ my $s3 = Net::Async::Webservice::S3->new(
 
 $loop->add( $s3 );
 
-$s3->list_bucket(
+my ( $keys, $prefixes ) = await $s3->list_bucket(
    prefix => shift @ARGV,
    delimiter => "/",
-)->then( sub {
-   my ( $keys, $prefixes ) = @_;
+);
 
-   print "$_->{key}\n" for @$keys;
-   print "$_\n" for @$prefixes;
-
-   Future->new->done;
-})->get;
+print "$_->{key}\n" for @$keys;
+print "$_\n" for @$prefixes;
