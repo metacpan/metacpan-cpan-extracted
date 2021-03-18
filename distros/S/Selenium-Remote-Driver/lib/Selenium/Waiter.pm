@@ -1,5 +1,5 @@
 package Selenium::Waiter;
-$Selenium::Waiter::VERSION = '1.41';
+$Selenium::Waiter::VERSION = '1.42';
 use strict;
 use warnings;
 
@@ -67,7 +67,7 @@ Selenium::Waiter - Provides a utility wait_until function
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 SYNOPSIS
 

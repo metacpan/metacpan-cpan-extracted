@@ -17,10 +17,10 @@ inline static void shuffle_tied_av_last_num_elements (AV *av, SSize_t len, SSize
 
     static SSize_t rand_index = 0;
     SSize_t cur_index  = len;
-    static SV* a;
-    static SV* b;
-    static SV** ap;
-    static SV** bp;
+    SV* a;
+    SV* b;
+    SV** ap;
+    SV** bp;
 
     while (cur_index > 1) {
         rand_index = (cur_index + 1) * Drand01(); // rand() % cur_index;
@@ -49,10 +49,10 @@ inline static void shuffle_av_last_num_elements (AV *av, SSize_t len, SSize_t nu
     if (SvTIED_mg((SV *)av, PERL_MAGIC_tied)) {
         shuffle_tied_av_last_num_elements(av, len, num);
     } else {
-        static SV* a;
         static SSize_t rand_index = 0;
         SSize_t cur_index  = len;
         SV **pav = AvARRAY(av);
+        SV* a;
 
         while (cur_index > 1) {
             rand_index = (cur_index + 1) * Drand01(); // rand() % cur_index;
@@ -78,14 +78,14 @@ inline static void shuffle_av_first_num_elements (AV *av, SSize_t len, SSize_t n
 
     static SSize_t rand_index = 0;
     static SSize_t cur_index  = 0;
-    static SV* a;
+    SV* a;
 
     len++;
 
     if (SvTIED_mg((SV *)av, PERL_MAGIC_tied)) {
-        static SV* b;
-        static SV** ap;
-        static SV** bp;
+        SV* b;
+        SV** ap;
+        SV** bp;
 
         while (cur_index <= num) {
             rand_index = cur_index + (len - cur_index) * Drand01(); // rand() % cur_index;
@@ -155,17 +155,18 @@ PPCODE:
         if (num < last_index) {
 
             SSize_t cur_index;
+            AV *slice;
+            SV **svp;
+            SV *sv;
 
             shuffle_av_first_num_elements(av, last_index, num);
-
-            AV *slice;
 
             if (SvTIED_mg((SV *)av, PERL_MAGIC_tied)) {
                 SSize_t k = 0;
                 slice = newAV();
                 for (k = 0; k <= num; k++) {
-                    SV **svp = av_fetch(av,  k, 0);
-                    SV *sv = (svp ? newSVsv(*svp) : &PL_sv_undef);
+                    svp = av_fetch(av,  k, 0);
+                    sv = (svp ? newSVsv(*svp) : &PL_sv_undef);
                     av_push(slice, sv);
                     mg_set(sv);
                 }

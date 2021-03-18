@@ -86,7 +86,9 @@ my %WriteMakefileArgs = (
     "App::Cmd" => "0.321",
     "App::Cmd::Command" => 0,
     "Getopt::Long::Descriptive" => "0.091",
+    "Moose" => 0,
     "Moose::Object" => 0,
+    "MooseX::Getopt" => 0,
     "MooseX::NonMoose" => 0,
     "namespace::autoclean" => 0
   },
@@ -100,7 +102,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.33",
+  "VERSION" => "0.34",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -113,7 +115,9 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "Getopt::Long::Descriptive" => "0.091",
   "Module::Metadata" => 0,
+  "Moose" => 0,
   "Moose::Object" => 0,
+  "MooseX::Getopt" => 0,
   "MooseX::NonMoose" => 0,
   "Test::More" => 0,
   "base" => 0,

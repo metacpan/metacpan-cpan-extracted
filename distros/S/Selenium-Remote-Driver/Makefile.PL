@@ -66,11 +66,11 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::Fatal" => 0,
     "Test::LWP::UserAgent" => 0,
-    "Test::MockModule" => 0,
+    "Test::MockModule" => "0.13.0",
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.41",
+  "VERSION" => "1.42",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -116,7 +116,7 @@ my %FallbackPrereqs = (
   "Test::Fatal" => 0,
   "Test::LWP::UserAgent" => 0,
   "Test::LongString" => 0,
-  "Test::MockModule" => 0,
+  "Test::MockModule" => "0.13.0",
   "Test::More" => 0,
   "Time::HiRes" => 0,
   "Try::Tiny" => 0,

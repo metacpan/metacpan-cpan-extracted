@@ -1,0 +1,90 @@
+=head1 NAME
+
+MIME::DB - Media Type Database, a port of the mime-db JavaScript package
+
+=head1 SYNOPSIS
+
+    use MIME::DB;
+    my $db = MIME::DB->data;
+
+=head1 DESCRIPTION
+
+C<MIME::DB> is a direct port of the L<mime-db|https://www.npmjs.com/package/mime-db> JavaScript package.
+
+=head2 USAGE
+
+The database does not include any logic, allowing it to remain as un-opinionated as possible.
+
+    my $db = MIME::DB->data;
+
+    my @known_html_extensions = @{ $db->{'text/html'}->{extensions} || [] };
+
+    my $version = MIME::DB->VERSION;
+
+    print "As of version $version:\n";
+
+    for (qw(text/html video/mp4 text/yaml)) {
+        if (defined $db->{$_}->{compressible}) {
+            if ($db->{$_}->{compressible}) {
+                print "  - $_ is compressible\n"
+            } else {
+                print "  - $_ is not compressible\n"
+            }
+        } else {
+            print "  - $_ compressibility is unknown\n"
+        }
+    }
+
+C<data> returns the database as a HASH reference.
+
+Each call to C<data> returns an independant copy of the database, so it can be modified without affecting others.
+
+=head1 Data Structure
+
+The database is a HASH reference with lowercased mime types as keys. Each value is a HASH reference with following keys:
+
+=over 4
+
+=item * source - where the mime type is defined. If not set, it's probably a custom media type.
+
+=over 4
+
+=item * apache - Apache common media types
+
+=item * iana - IANA-defined media types
+
+=item * nginx - nginx media types
+
+=back
+
+=item * extensions - an ARRAY reference of known extensions associated with this mime type.
+
+=item * compressible - a 0 or 1 value indicating whether a file of this type can be gzipped.
+
+=item * charset - the default charset associated with this type, if any.
+
+=back
+
+If unknown, every property could be undefined.
+
+=head1 SEE ALSO
+
+L<mime-db github homepage|https://github.com/jshttp/mime-db>
+
+=head1 AUTHORS
+
+=over 2
+
+=item * Jonathan Ong E<lt>me@jongleberry.comE<gt> (original JavaScript package)
+
+=item * Thomas Drugeon, E<lt>tdrugeon@cpan.orgE<gt> (Perl port)
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+L<mime-db|https://github.com/jshttp/mime-db> is copyright (c) 2014 Jonathan Ong and licensed under the MIT License
+
+L<MIME::DB> is copyright (c) 2021 Thomas Drugeon and licensed under the MIT License
+
+=cut

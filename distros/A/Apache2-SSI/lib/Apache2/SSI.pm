@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/17
-## Modified 2021/03/17
+## Modified 2021/03/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -75,7 +75,7 @@ BEGIN
     use URL::Encode ();
     use URI::Escape::XS ();
     use version;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
     use constant PERLIO_IS_ENABLED => $Config{useperlio};
     ## As of Apache 2.4.41 and mod perl 2.0.11 Apache2::SubProcess::spawn_proc_prog() is not working
     use constant MOD_PERL_SPAWN_PROC_PROG_WORKING => 0;
@@ -2034,7 +2034,7 @@ sub parse_expr
     try
     {
         local $SIG{ALRM} = sub{ die( "Timeout!\n" ) };
-        alarm( 20 );
+        alarm( 90 );
         $hash = $exp->parse( $text );
         alarm( 0 );
     }

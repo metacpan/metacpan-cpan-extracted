@@ -5,7 +5,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 # VERSION
 
-Version 1.05
+Version 1.06
 
 # SYNOPSIS
 
@@ -202,6 +202,18 @@ default, from the standard input.
 - **--tabstop**=#
 
     Set tab width.
+
+- **--tabhead**=#
+- **--tabspace**=#
+
+    Set head and following space characters.  Both are space by default.
+    If the option value is longer than single characger, it is evaluated
+    as unicode name.
+
+- **--tabstyle**=#
+
+    Set the style how tab is expanded.  Select from `dot`, `symbol` or
+    `shade`.  Styles are defined in [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) library.
 
 - **--column-unit**=#
 

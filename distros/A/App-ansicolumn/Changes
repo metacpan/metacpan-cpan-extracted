@@ -1,5 +1,10 @@
 Revision history for Perl extension App-ansicolumn
 
+1.06 2021-03-18T12:13:22Z
+
+    - Add --tabstyle option.
+    - Accept negative value for --height option.
+
 1.05 2021-01-29T02:23:48Z
 
     - Accept empty line with -t option.

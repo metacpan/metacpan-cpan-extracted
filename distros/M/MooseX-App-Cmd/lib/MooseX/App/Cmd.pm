@@ -1,6 +1,6 @@
-package MooseX::App::Cmd; # git description: v0.32-7-gf00a289
+package MooseX::App::Cmd; # git description: v0.33-2-ga6c151d
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Moose;
 use MooseX::NonMoose;
@@ -26,7 +26,7 @@ MooseX::App::Cmd - Mashes up MooseX::Getopt and App::Cmd
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 

@@ -37,9 +37,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Moose" : "0",
             "MooseX::ConfigFromFile" : "0",
-            "MooseX::Getopt" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
             "Test::CPAN::Changes" : "0.19",
@@ -69,14 +67,12 @@
             "App::Cmd" : "0.321",
             "App::Cmd::Command" : "0",
             "Getopt::Long::Descriptive" : "0.091",
+            "Moose" : "0",
             "Moose::Object" : "0",
+            "MooseX::Getopt" : "0",
             "MooseX::NonMoose" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.008005"
-         },
-         "suggests" : {
-            "Moose" : "0",
-            "MooseX::Getopt" : "0"
          }
       },
       "test" : {
@@ -185,11 +181,11 @@
    "provides" : {
       "MooseX::App::Cmd" : {
          "file" : "lib/MooseX/App/Cmd.pm",
-         "version" : "0.33"
+         "version" : "0.34"
       },
       "MooseX::App::Cmd::Command" : {
          "file" : "lib/MooseX/App/Cmd/Command.pm",
-         "version" : "0.33"
+         "version" : "0.34"
       }
    },
    "release_status" : "stable",
@@ -207,7 +203,7 @@
       "x_IRC" : "irc://irc.perl.org/#moose",
       "x_MailingList" : "http://lists.perl.org/list/moose.html"
    },
-   "version" : "0.33",
+   "version" : "0.34",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.033007"
@@ -253,7 +249,7 @@
                   "exclude_filename" : [
                      "CONTRIBUTING",
                      "INSTALL",
-                     "LICENSE",
+                     "LICENCE",
                      "README.pod",
                      "TODO"
                   ],
@@ -1009,21 +1005,6 @@
             "version" : "6.017"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Run::AfterRelease",
-            "config" : {
-               "Dist::Zilla::Plugin::Run::Role::Runner" : {
-                  "eval" : [
-                     "unlink 'LICENSE'"
-                  ],
-                  "fatal_errors" : 1,
-                  "quiet" : 1,
-                  "version" : "0.048"
-               }
-            },
-            "name" : "@Author::ETHER/remove old LICENSE",
-            "version" : "0.048"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromRelease",
             "config" : {
                "Dist::Zilla::Plugin::CopyFilesFromRelease" : {
@@ -1111,7 +1092,7 @@
                      "CONTRIBUTING",
                      "Changes",
                      "INSTALL",
-                     "LICENSE",
+                     "LICENCE",
                      "README.pod"
                   ],
                   "allow_dirty_match" : [],
@@ -1135,7 +1116,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.33",
+                  "tag" : "v0.34",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1309,8 +1290,6 @@
                      "develop.requires"
                   ],
                   "modules" : [
-                     "Moose",
-                     "MooseX::Getopt",
                      "MooseX::ConfigFromFile",
                      "YAML",
                      "Test::Output"

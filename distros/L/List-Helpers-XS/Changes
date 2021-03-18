@@ -1,5 +1,8 @@
 Revision history for Perl extension List::Helpers::XS.
 
+0.09  Sun Mar 17
+    - tiny optimisations
+
 0.08  Sun Mar 16
     - remove redundant file from package
 

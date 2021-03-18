@@ -1,3 +1,7 @@
+1.0.11 2021-03-17 17:25:51 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - rerelease to sync versions
+
 1.0.10 2021-01-11 17:14:17 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - use any instead of deprecated route call

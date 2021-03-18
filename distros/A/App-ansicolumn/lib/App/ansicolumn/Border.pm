@@ -8,16 +8,18 @@ App::ansicolumn::Border - App::ansicolumn Border module
 
 =head1 DESCRIPTION
 
-Each item has five elements; L<right>, L<center>, L<left>, L<top>,
-L<bottom>.
+Each item has five elements; C<right>, C<center>, C<left>, C<top>,
+C<bottom>.
 
-L<right>, L<left> and L<center> items can hold string value or list
-reference.  String value is equivalent to a list of single item.  If
-the list has single item, it is used on all position.  If the second
-item exists, it is used on middle positions.  Third item is for bottom
-position.
+C<top> and C<bottom> items have single string.
 
-Class method L<add_style> can be used to add new border style.
+C<right>, C<left> and C<center> items can hold string value or list
+reference, and string value is equivalent to a list of single item.
+If the list has single item, it is used on all positions.  If the
+second item exists, it is used on middle position.  Third item is for
+bottom position.
+
+Class method C<add_style> can be used to add new border style.
 
 This is experimental implementation and subject to change.
 

@@ -1,3 +1,9 @@
+0.002   2021-01-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add alias name Sah::Schemas::ColorScheme and mention about 'color
+	  theme' vs 'color scheme' terms.
+
+
 0.001   2020-06-10  Released-By: PERLANCAR
 
         - First release.

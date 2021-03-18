@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 use v5.14;
 use warnings;
@@ -37,6 +37,7 @@ sub new {
 	tabstop          => 8,
 	tabhead          => undef,
 	tabspace         => undef,
+	tabstyle         => undef,
 	ignore_space     => 1,
 	fullwidth        => undef,
 	linestyle        => '',
@@ -67,42 +68,43 @@ sub run {
     local @ARGV = map { utf8::is_utf8($_) ? $_ : decode('utf8', $_) } @_;
     GetOptions(
 	$obj,
-	map { s/^(?=\w+_)(\w+)\K/"|".$1=~tr[_][-]r."|".$1=~tr[_][]dr/er }
-	"output_width|c=i",
-	"fillrows|x",
-	"table|t",
-	"table_right|R=s",
-	"separator|s=s",
-	"output_separator|o=s",
-	"page|P:i",
-	"height=i",
-	"column_unit|cu=i",
-	"pane|C=i",
-	"pane_width|pw|S=i",
-	"tabstop=i",
-	"tabhead=s",
-	"tabspace=s",
-	"ignore_space|is!",
-	"fullwidth|F!",
-	"linestyle|ls=s",
-	"boundary=s",
-	"linebreak|lb=s", "runin=i", "runout=i",
-	"pagebreak!",
-	"border:s",
-	"border_style|bs=s",
-	"document|D",
-	"colormap|cm=s@",
-	"insert_space|paragraph!",
-	"white_space!",
-	"isolation!",
-	"fillup:s",
-	"fillup_str:s",
-	"ambiguous=s",
-	"discard_el!",
-	"padchar=s",
-	"debug",
-	"version|v",
-	) || pod2usage();
+	map { s/^(?=\w+_)(\w+)\K/"|".$1=~tr[_][-]r."|".$1=~tr[_][]dr/er } qw(
+	output_width|c=i
+	fillrows|x
+	table|t
+	table_right|R=s
+	separator|s=s
+	output_separator|o=s
+	page|P:i
+	height=i
+	column_unit|cu=i
+	pane|C=i
+	pane_width|pw|S=i
+	tabstop=i
+	tabhead=s
+	tabspace=s
+	tabstyle=s
+	ignore_space|is!
+	fullwidth|F!
+	linestyle|ls=s
+	boundary=s
+	linebreak|lb=s runin=i runout=i
+	pagebreak!
+	border:s
+	border_style|bs=s
+	document|D
+	colormap|cm=s@
+	insert_space|paragraph!
+	white_space!
+	isolation!
+	fillup:s
+	fillup_str:s
+	ambiguous=s
+	discard_el!
+	padchar=s
+	debug
+	version|v
+	)) || pod2usage();
     $obj->{version} and do { say $VERSION; exit };
     $obj->setup_options;
 
@@ -156,6 +158,11 @@ sub setup_options {
 	$obj->{isolation} = 0 if $obj->{isolation} > 1;
     }
 
+    ## --height
+    if ($obj->{height} < 0) {
+	$obj->{height} += $obj->term_height;
+    }
+
     ## --colormap
     use Getopt::EX::Colormap;
     my $cm = Getopt::EX::Colormap
@@ -165,7 +172,7 @@ sub setup_options {
 
     ## --border
     if ($obj->{border}) {
-	my $style =$obj->{border_style};
+	my $style = $obj->{border_style};
 	($obj->{BORDER} = App::ansicolumn::Border->new)
 	    ->style($style) // die "$style: Unknown style.\n";
     }
@@ -174,6 +181,13 @@ sub setup_options {
     if ($obj->{ambiguous} eq 'wide') {
 	$Text::VisualWidth::PP::EastAsian = 1;
 	Text::ANSI::Fold->configure(ambiguous => 'wide');
+    }
+
+    ## --tabstop, --tabstyle
+    for my $opt (qw(tabstop tabstyle)) {
+	if (my $v = $obj->{$opt}) {
+	    Text::ANSI::Fold->configure($opt => $v);
+	}
     }
 
     ## --tabhead, --tabspace
@@ -197,8 +211,7 @@ sub column_out {
     my @data;
     my @length;
     for (@_) {
-	my($expanded, $dmy, $length) =
-	    ansi_fold($_, -1, expand => 1, tabstop => $obj->{tabstop});
+	my($expanded, $dmy, $length) = ansi_fold($_, -1, expand => 1);
 	push @data, $expanded;
 	push @length, $length;
     }

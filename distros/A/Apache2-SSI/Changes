@@ -1,5 +1,8 @@
 Revision history for Perl module Apache2::SSI
 
+0.2.2 2021-03-18T15:02:07+0900
+    - Corrected too short timeout
+
 0.2.1 2021-03-17T12:11:59+0900
     - Removing use of Devel::Confess used initially for debugging
 

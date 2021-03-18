@@ -5,7 +5,7 @@ use warnings;
 
 use Carp qw/confess/;
 
-our $VERSION = '0.000046';
+our $VERSION = '0.000047';
 
 BEGIN {
     confess "You must first load a Test2::Harness::UI::Schema::NAME module"
@@ -48,6 +48,15 @@ sub complete {
     return 1 if $status eq 'canceled';
     return 1 if $status eq 'broken';
     return 0;
+}
+
+sub sig {
+    my $self = shift;
+
+    return join ";" => (
+        (map {$self->$_ // ''} qw/status pinned passed failed retried/),
+        (map {length($self->$_ // '')} qw/fields parameters/),
+    );
 }
 
 sub TO_JSON {

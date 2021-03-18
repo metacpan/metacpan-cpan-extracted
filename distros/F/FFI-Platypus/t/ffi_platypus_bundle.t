@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use Test::Cleanup;
 use FFI::Platypus;
 use FFI::Temp;
 use FFI::Build;
@@ -52,7 +54,10 @@ EOF
 
   ok( !! FFI::Platypus->can('_bundle') );
 
-  $build->clean;
+  cleanup(
+    sub { $build->clean },
+    $root,
+  );
 
 };
 
@@ -95,7 +100,10 @@ EOF
   is "$@", '';
   is( Foo::Bar2::bar2(), 43 );
 
-  $build->clean;
+  cleanup(
+    sub { $build->clean },
+    $root,
+  );
 };
 
 subtest 'not loaded yet' => sub {
@@ -133,7 +141,10 @@ EOF
   $ffi->attach("bar3" => [] => 'sint32');
   is( bar3(), 44 );
 
-  $build->clean;
+  cleanup(
+    sub { $build->clean },
+    $root,
+  );
 
 };
 
@@ -142,6 +153,7 @@ subtest 'with a ffi dir' => sub {
   local @INC = @INC;
 
   my $root = FFI::Temp->newdir;
+  cleanup($root);
 
   spew("$root/lib/Foo/Bar4.pm", <<'EOF');
     package Foo::Bar4;
@@ -173,6 +185,7 @@ EOF
 subtest 'entry points' => sub {
 
   my $root = FFI::Temp->newdir;
+  cleanup($root);
 
   our @log;
   our $log_closure = do {

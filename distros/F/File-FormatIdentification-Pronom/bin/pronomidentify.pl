@@ -26,18 +26,16 @@ use File::FormatIdentification::Pronom;
 use Getopt::Long;
 use Carp;
 use List::Util qw( all );
+use Path::Tiny;
 
 ################################################################################
 # main
 ################################################################################
 my $pronomfile;
-my $binaryfile;
-
 GetOptions (
     "signature=s" => \$pronomfile,
-    "binary=s" => \$binaryfile,
     "help" => sub {
-        say "$0 --signature=droid_signature_filename --binary=binary_filename";
+        say "$0 --signature=droid_signature_filename <files or directory>";
         say "$0 --help ";
         say "";
         exit 1;
@@ -48,8 +46,25 @@ if ( !defined $pronomfile ) {
     say "you need at least a pronom signature file";
     exit;
 }
-if ( !defined $binaryfile ) {
-    say "you need an binaryfile";
+my @files;
+if (scalar @ARGV > 1) {
+      # assert all are files
+    if (any {path($_)->is_dir} @ARGV) {
+        say "you should use either files or one directory!";
+        exit;
+    } else {
+        @files = @ARGV;
+    }
+} elsif (scalar @ARGV == 1) {
+    my $path = path( $ARGV[0] );
+    if ($path->is_dir) {
+        @files = grep { $_->is_file() } $path->children;
+    }
+    if ($path->is_file) {
+        push @files, $path;
+    }
+} else {
+    say "you should use at least a file or directory!";
     exit;
 }
 
@@ -57,18 +72,23 @@ my $pronom = File::FormatIdentification::Pronom->new(
     "droid_signature_filename" => $pronomfile
 );
 
-map_file my $filestream, $binaryfile, "<";
-advise( $filestream, 'random' );
 
-foreach my $internalid ( $pronom->get_all_internal_ids() ) {
-    my $sig = $pronom->get_signature_id_by_internal_id($internalid);
-    if (!defined $sig) {next;}
-    my $puid = $pronom->get_puid_by_signature_id($sig);
-    my $name = $pronom->get_name_by_signature_id($sig);
-    my $quality = $pronom->get_qualities_by_internal_id($internalid);
-    my @regexes = $pronom->get_regular_expressions_by_internal_id($internalid);
-    if ( all {$filestream =~ m/$_/saa} @regexes ) {
-        say "$binaryfile identified as $name with PUID $puid (regex quality $quality)";
+
+foreach my $binaryfile ( @files ) {
+    map_file my $filestream, $binaryfile, "<";
+    advise( $filestream, 'random' );
+    say "checking $binaryfile";
+    foreach my $internalid ( $pronom->get_all_internal_ids() ) {
+        my @regexes = $pronom->get_regular_expressions_by_internal_id($internalid);
+        if (all {$filestream =~ m/$_/saa} @regexes ) {
+            my $sig = $pronom->get_signature_id_by_internal_id($internalid);
+            if (!defined $sig) {next;}
+            my $puid = $pronom->get_puid_by_signature_id($sig);
+            my $name = $pronom->get_name_by_signature_id($sig);
+            my $quality = $pronom->get_qualities_by_internal_id($internalid);
+            say "\tidentified as $name with PUID $puid (regex quality $quality)";
+            last;
+        }
     }
 }
 ;
@@ -85,7 +105,7 @@ pronomidentify.pl
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

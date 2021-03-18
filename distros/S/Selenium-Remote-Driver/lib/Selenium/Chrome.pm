@@ -1,5 +1,5 @@
 package Selenium::Chrome;
-$Selenium::Chrome::VERSION = '1.41';
+$Selenium::Chrome::VERSION = '1.42';
 use strict;
 use warnings;
 
@@ -57,7 +57,7 @@ Selenium::Chrome - Use ChromeDriver without a Selenium server
 
 =head1 VERSION
 
-version 1.41
+version 1.42
 
 =head1 SYNOPSIS
 

@@ -12,7 +12,7 @@ use File::FormatIdentification::Regex;
 use v5.21; # special regex syntax introduced with 5.21 needed!
 use Moose;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # ABSTRACT Perl extension for parsing PRONOM-Signatures using DROID-Signature file
 
@@ -597,8 +597,7 @@ sub get_regular_expressions_by_internal_id {
     my $self       = shift;
     my $internalid = shift;
     if ( !defined $internalid ) { confess("internalid must exists!"); }
-    my @rx = @{ $self->{internal_signatures}->{$internalid}->{regex} };
-    return @rx;
+    return @{ $self->{internal_signatures}->{$internalid}->{regex} };
 }
 
 sub get_all_regular_expressions {
@@ -963,7 +962,7 @@ File::FormatIdentification::Pronom
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -1007,14 +1006,15 @@ There are better tools for the job, but as a proof of concept certainly not bad:
   );
   # .. $filestream is a scalar representing a file
   foreach my $internalid ( $pronom->get_all_internal_ids() ) {
-      my $sig = $pronom->get_signature_id_by_internal_id($internalid);
-      my $puid = $pronom->get_puid_by_signature_id($sig);
-      my $name = $pronom->get_name_by_signature_id($sig);
-      my $quality = $pronom->get_qualities_by_internal_id($internalid);
-      my @regexes = $pronom->get_regular_expressions_by_internal_id($internalid);
-      if ( all {$filestream =~ m/$_/saa} @regexes ) {
-          say "$binaryfile identified as $name with PUID $puid (regex quality $quality)";
-      }
+    my $sig = $pronom->get_signature_id_by_internal_id($internalid);
+    next unless defined $sig;
+    my @regexes = $pronom->get_regular_expressions_by_internal_id($internalid);
+    if ( all {$filestream =~ m/$_/saa} @regexes ) {
+        my $puid = $pronom->get_puid_by_signature_id($sig);
+        my $name = $pronom->get_name_by_signature_id($sig);
+        my $quality = $pronom->get_qualities_by_internal_id($internalid);
+        say "$binaryfile identified as $name with PUID $puid (regex quality $quality)";
+    }
   }
 
 See example file F<bin/pronomidentify.pl> for a  full working script.

@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Sah/Schema/perl/colorscheme/modname.pm','lib/Sah/SchemaR/perl/colorscheme/modname.pm','lib/Sah/Schemas/GraphicsColorNames.pm'];
+my $filenames = ['lib/Sah/Schema/perl/colorscheme/modname.pm','lib/Sah/SchemaR/perl/colorscheme/modname.pm','lib/Sah/Schemas/ColorScheme.pm','lib/Sah/Schemas/GraphicsColorNames.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

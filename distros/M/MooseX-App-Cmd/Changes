@@ -1,5 +1,8 @@
 Revision history for MooseX-App-Cmd
 
+0.34      2021-03-17 18:04:14Z
+    - fix prereqs - MooseX::Getopt is not optional (RT#134779)
+
 0.33      2021-03-16 20:57:41Z
     - soften tests to handle changes in App::Cmd 0.332 (RT#134752)
 

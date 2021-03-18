@@ -1,10 +1,10 @@
 {
-   "abstract" : "The great new Acme::Automatix!",
+   "abstract" : "The release of Acme::Automatix is automatix!",
    "author" : [
       "Thibault Duponchelle <thibault.duponchelle@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.4702, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -42,6 +42,14 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/thibaultduponchelle/Acme-Automatix/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/thibaultduponchelle/Acme-Automatix"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

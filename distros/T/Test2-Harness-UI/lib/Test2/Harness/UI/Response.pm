@@ -2,7 +2,7 @@ package Test2::Harness::UI::Response;
 use strict;
 use warnings;
 
-our $VERSION = '0.000046';
+our $VERSION = '0.000047';
 
 use Carp qw/croak/;
 use Time::HiRes qw/sleep/;
@@ -107,15 +107,14 @@ sub stream {
             while (!$end) {
                 $end = $done->();
 
-                last unless $env->{'psgix.io'}->connected;
-
                 my $seen = 0;
                 for my $item ($fetch->()) {
                     $writer->write($item);
+                    last unless $env->{'psgix.io'}->connected;
                     $seen++;
                 }
 
-                sleep $wait unless $seen || $done;
+                sleep $wait unless $seen || $end;
             }
 
             $cleanup->() if $cleanup;

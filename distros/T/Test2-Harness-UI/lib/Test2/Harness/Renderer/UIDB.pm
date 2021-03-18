@@ -11,7 +11,7 @@ use Test2::Harness::Util::UUID qw/gen_uuid/;
 
 use Test2::Harness::Util qw/mod2file/;
 
-our $VERSION = '0.000046';
+our $VERSION = '0.000047';
 
 use parent 'Test2::Harness::Renderer';
 use Test2::Harness::Util::HashBase qw{
@@ -95,7 +95,7 @@ sub links {
     return $self->{+LINKS} if defined $self->{+LINKS};
 
     if (my $url = $self->settings->yathui->url) {
-        $self->{+LINKS} = "\nThis run can be reviewed at: $url/run/" . $self->settings->run->run_id . "\n\n";
+        $self->{+LINKS} = "\nThis run can be reviewed at: $url/view/" . $self->settings->run->run_id . "\n\n";
     }
 
     return $self->{+LINKS} //= "";

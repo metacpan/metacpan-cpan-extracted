@@ -71282,3 +71282,16 @@ T/TE/TEODESIAN/Selenium-Remote-Driver-1.41.tar.gz
 N/NE/NEILB/Text-Greeking-0.15.tar.gz
 N/NE/NEILB/Text-Quote-0.33.tar.gz
 J/JA/JAMADAM/WWW-Crawler-Mojo-0.26.tar.gz
+C/CO/CONTRA/Acme-Automatix-0.04.tar.gz
+J/JD/JDEGUEST/Apache2-SSI-v0.2.2.tar.gz
+U/UT/UTASHIRO/App-ansicolumn-1.06.tar.gz
+E/EX/EXODIST/Test2-Harness-UI-0.000047.tar.gz
+P/PL/PLICEASE/FFI-Platypus-1.43.tar.gz
+A/AR/ART/File-FormatIdentification-Pronom-0.06.tar.gz
+J/JC/JCRISTY/Image-Magick-7.0.11.tar.gz
+C/CD/CDN/List-Helpers-XS-0.09.tar.gz
+T/TD/TDRUGEON/MIME-DB-v1.46.0.tar.gz
+O/OE/OETIKER/Mojolicious-Plugin-Qooxdoo-1.0.11.tar.gz
+E/ET/ETHER/MooseX-App-Cmd-0.34.tar.gz
+P/PE/PERLANCAR/Sah-Schemas-GraphicsColorNames-0.002.tar.gz
+T/TE/TEODESIAN/Selenium-Remote-Driver-1.42.tar.gz

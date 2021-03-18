@@ -87,7 +87,7 @@ EOW
         "\x{5d9}\x{5d5}\x{5d1}\x{5dc} \x{5e7}\x{5d5}\x{5d2}'\x{5de}\x{5df} (Yuval Kogman) <nothingmuch\@woobling.org>"
       ],
       "dist_name" => "MooseX-App-Cmd",
-      "dist_version" => "0.33",
+      "dist_version" => "0.34",
       "license" => "perl",
       "module_name" => "MooseX::App::Cmd",
       "recursive_test_files" => 1,
@@ -95,7 +95,9 @@ EOW
         "App::Cmd" => "0.321",
         "App::Cmd::Command" => 0,
         "Getopt::Long::Descriptive" => "0.091",
+        "Moose" => 0,
         "Moose::Object" => 0,
+        "MooseX::Getopt" => 0,
         "MooseX::NonMoose" => 0,
         "namespace::autoclean" => 0,
         "perl" => "5.008005"

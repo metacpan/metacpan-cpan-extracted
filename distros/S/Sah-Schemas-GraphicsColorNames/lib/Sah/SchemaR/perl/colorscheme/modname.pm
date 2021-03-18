@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::colorscheme::modname;
 
-our $DATE = '2020-06-10'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-01-20'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $rschema = ["str",[{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{"x.completion"=>["perl_modname",{ns_prefix=>"Graphics::ColorNames"}]}],["perl::modname","str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::colorscheme::modname -
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::perl::colorscheme::modname (from Perl distribution Sah-Schemas-GraphicsColorNames), released on 2020-06-10.
+This document describes version 0.002 of Sah::SchemaR::perl::colorscheme::modname (from Perl distribution Sah-Schemas-GraphicsColorNames), released on 2021-01-20.
 
 =head1 DESCRIPTION
 
@@ -38,7 +38,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Graphics
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-GraphicsColorNames>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-GraphicsColorNames/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,7 +17,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -221,6 +221,19 @@ it.
 =item B<--tabstop>=#
 
 Set tab width.
+
+=item B<--tabhead>=#
+
+=item B<--tabspace>=#
+
+Set head and following space characters.  Both are space by default.
+If the option value is longer than single characger, it is evaluated
+as unicode name.
+
+=item B<--tabstyle>=#
+
+Set the style how tab is expanded.  Select from C<dot>, C<symbol> or
+C<shade>.  Styles are defined in L<Text::ANSI::Fold> library.
 
 =item B<--column-unit>=#
 

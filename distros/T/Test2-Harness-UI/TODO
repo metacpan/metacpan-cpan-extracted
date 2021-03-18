@@ -1,0 +1,7 @@
+Operations:
+
+ * Stream events to db/ui
+ * Stream runs/jobs/events from db/ui
+  * Ability to filter runs by user, project, status, passed/failed
+ * Get coverage data
+ * Get duration data

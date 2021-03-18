@@ -30,15 +30,17 @@ no_index:
 provides:
   MooseX::App::Cmd:
     file: lib/MooseX/App/Cmd.pm
-    version: '0.33'
+    version: '0.34'
   MooseX::App::Cmd::Command:
     file: lib/MooseX/App/Cmd/Command.pm
-    version: '0.33'
+    version: '0.34'
 requires:
   App::Cmd: '0.321'
   App::Cmd::Command: '0'
   Getopt::Long::Descriptive: '0.091'
+  Moose: '0'
   Moose::Object: '0'
+  MooseX::Getopt: '0'
   MooseX::NonMoose: '0'
   namespace::autoclean: '0'
   perl: '5.008005'
@@ -48,7 +50,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooseX-App-Cmd
   homepage: https://github.com/moose/MooseX-App-Cmd
   repository: https://github.com/moose/MooseX-App-Cmd.git
-version: '0.33'
+version: '0.34'
 x_Dist_Zilla:
   perl:
     version: '5.033007'
@@ -85,7 +87,7 @@ x_Dist_Zilla:
           exclude_filename:
             - CONTRIBUTING
             - INSTALL
-            - LICENSE
+            - LICENCE
             - README.pod
             - TODO
           exclude_match: []
@@ -658,17 +660,6 @@ x_Dist_Zilla:
       name: '@Author::ETHER/UploadToCPAN'
       version: '6.017'
     -
-      class: Dist::Zilla::Plugin::Run::AfterRelease
-      config:
-        Dist::Zilla::Plugin::Run::Role::Runner:
-          eval:
-            - "unlink 'LICENSE'"
-          fatal_errors: 1
-          quiet: 1
-          version: '0.048'
-      name: '@Author::ETHER/remove old LICENSE'
-      version: '0.048'
-    -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
         Dist::Zilla::Plugin::CopyFilesFromRelease:
@@ -735,7 +726,7 @@ x_Dist_Zilla:
             - CONTRIBUTING
             - Changes
             - INSTALL
-            - LICENSE
+            - LICENCE
             - README.pod
           allow_dirty_match: []
           changelog: Changes
@@ -753,7 +744,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.33
+          tag: v0.34
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -881,8 +872,6 @@ x_Dist_Zilla:
           copy_to:
             - develop.requires
           modules:
-            - Moose
-            - MooseX::Getopt
             - MooseX::ConfigFromFile
             - YAML
             - Test::Output

@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Sah/Schema/perl/colorscheme/modname.pm',
     'Sah/SchemaR/perl/colorscheme/modname.pm',
+    'Sah/Schemas/ColorScheme.pm',
     'Sah/Schemas/GraphicsColorNames.pm'
 );
 

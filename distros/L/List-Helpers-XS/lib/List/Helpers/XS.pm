@@ -18,7 +18,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw//;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('List::Helpers::XS', $VERSION);

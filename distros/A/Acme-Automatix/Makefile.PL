@@ -10,6 +10,12 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Acme/Automatix.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.006',
+    META_MERGE => {
+        resources => {
+            bugtracker => 'https://github.com/thibaultduponchelle/Acme-Automatix/issues',
+            repository => 'https://github.com/thibaultduponchelle/Acme-Automatix',
+        },
+    },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
