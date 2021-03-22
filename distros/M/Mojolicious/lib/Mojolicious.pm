@@ -56,7 +56,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Waffle';
-our $VERSION  = '9.10';
+our $VERSION  = '9.12';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -441,7 +441,7 @@ a plugin.
 =head2 preload_namespaces
 
   my $namespaces = $app->preload_namespaces;
-  $app           = $app->preload_namespaces(['MyApp:Controller']);
+  $app           = $app->preload_namespaces(['MyApp::Controller']);
 
 Namespaces to preload classes from during application startup.
 

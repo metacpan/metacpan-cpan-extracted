@@ -20,11 +20,11 @@ lib/App/Followme/FormatPage.pm
 lib/App/Followme/Guide.pm
 lib/App/Followme/Initialize.pm
 lib/App/Followme/JpegData.pm
-lib/App/Followme/MarkdownData.pm
 lib/App/Followme/Module.pm
 lib/App/Followme/NestedText.pm
 lib/App/Followme/PodData.pm
 lib/App/Followme/Template.pm
+lib/App/Followme/TextData.pm
 lib/App/Followme/UploadData.pm
 lib/App/Followme/UploadFtp.pm
 lib/App/Followme/UploadLocal.pm
@@ -53,12 +53,12 @@ t/FormatPage.t
 t/Guide.t
 t/Initialize.t
 t/JpegData.t
-t/MarkdownData.t
 t/MockData.pm
 t/Module.t
 t/NestedText.t
 t/PodData.t
 t/Template.t
+t/TextData.t
 t/UploadData.t
 t/UploadFtp.t
 t/UploadLocal.t

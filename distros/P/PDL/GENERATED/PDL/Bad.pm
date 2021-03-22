@@ -4,8 +4,8 @@
 #
 package PDL::Bad;
 
-@EXPORT_OK  = qw(  badflag check_badflag badvalue orig_badvalue nbad nbadover ngood ngoodover setbadat  PDL::PP isbad PDL::PP isgood PDL::PP nbadover PDL::PP ngoodover PDL::PP setbadif PDL::PP setvaltobad PDL::PP setnantobad PDL::PP setbadtonan PDL::PP setbadtoval PDL::PP copybad );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw(  badflag check_badflag badvalue orig_badvalue nbad nbadover ngood ngoodover setbadat  PDL::PP isbad PDL::PP isgood PDL::PP nbadover PDL::PP ngoodover PDL::PP setbadif PDL::PP setvaltobad PDL::PP setnantobad PDL::PP setbadtonan PDL::PP setbadtoval PDL::PP copybad );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Bad ;
 

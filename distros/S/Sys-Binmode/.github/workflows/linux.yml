@@ -54,9 +54,9 @@ jobs:
       - name: Run Tests (no coverage)
         if: matrix.perl-version != '5.32'
         run: prove -wlvmb t
-      - name: Install Linux::Seccomp
+      - name: Install optional test modules
         if: matrix.perl-version == '5.32'
-        run: cpanm --notest Linux::Seccomp
+        run: cpanm --notest Linux::Seccomp IO::Pty
       - name: Run tests (with coverage)
         if: matrix.perl-version == '5.32'
         env:

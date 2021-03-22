@@ -4,7 +4,6 @@ author:
   - 'Shawn Laffan <shawnlaffan@cpan.org>'
 build_requires:
   Capture::Tiny: '0'
-  Data::Dump: '0'
   ExtUtils::MakeMaker: '0'
   Test2::Mock: '0.000060'
   Test2::V0: '0.000060'
@@ -12,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,5 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/Alien-Build-Plugin-PkgConfig-PPWrapper/issues
   repository: https://github.com/shawnlaffan/lib/Alien-Build-Plugin-PkgConfig-PPWrapper/
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

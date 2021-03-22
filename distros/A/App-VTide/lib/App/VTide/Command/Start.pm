@@ -17,7 +17,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.14');
+our $VERSION = version->new('0.1.15');
 our $NAME    = 'start';
 our $OPTIONS = [
     'windows|w=i',
@@ -158,7 +158,7 @@ App::VTide::Command::Start - Start a session
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Start version 0.1.14
+This documentation refers to App::VTide::Command::Start version 0.1.15
 
 =head1 SYNOPSIS
 

@@ -21,7 +21,9 @@ use Params::Validate ':all';
 use Scalar::Util qw(blessed);
 use Storable qw(dclone);
 
-our $VERSION = '1.11';
+use DateTime::Format::Natural::Utils qw(trim);
+
+our $VERSION = '1.12';
 
 validation_options(
     on_fail => sub
@@ -285,12 +287,7 @@ sub _params_init
         (${$params->{string}}) = @_;
     }
 
-    ${$params->{string}} = do {
-        local $_ = ${$params->{string}};
-        s/^\s+//;
-        s/\s+$//;
-        $_
-    };
+    trim($params->{string});
 }
 
 sub _parse_init

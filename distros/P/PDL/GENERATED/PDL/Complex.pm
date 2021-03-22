@@ -4,8 +4,8 @@
 #
 package PDL::Complex;
 
-@EXPORT_OK  = qw(  Ctan  Catan  re  im  i  cplx  real PDL::PP r2C PDL::PP i2C PDL::PP Cr2p PDL::PP Cp2r PDL::PP Cadd PDL::PP Csub PDL::PP Cmul PDL::PP Cprodover PDL::PP Cscale PDL::PP Cdiv PDL::PP Ccmp PDL::PP Cconj PDL::PP Cabs PDL::PP Cabs2 PDL::PP Carg PDL::PP Csin PDL::PP Ccos PDL::PP Cexp PDL::PP Clog PDL::PP Cpow PDL::PP Csqrt PDL::PP Casin PDL::PP Cacos PDL::PP Csinh PDL::PP Ccosh PDL::PP Ctanh PDL::PP Casinh PDL::PP Cacosh PDL::PP Catanh PDL::PP Cproj PDL::PP Croots PDL::PP rCpolynomial );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw(  Ctan  Catan  re  im  i  cplx  real PDL::PP r2C PDL::PP i2C PDL::PP Cr2p PDL::PP Cp2r PDL::PP Cadd PDL::PP Csub PDL::PP Cmul PDL::PP Cprodover PDL::PP Cscale PDL::PP Cdiv PDL::PP Ccmp PDL::PP Cconj PDL::PP Cabs PDL::PP Cabs2 PDL::PP Carg PDL::PP Csin PDL::PP Ccos PDL::PP Cexp PDL::PP Clog PDL::PP Cpow PDL::PP Csqrt PDL::PP Casin PDL::PP Cacos PDL::PP Csinh PDL::PP Ccosh PDL::PP Ctanh PDL::PP Casinh PDL::PP Cacosh PDL::PP Catanh PDL::PP Cproj PDL::PP Croots PDL::PP rCpolynomial );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 BEGIN {
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader','PDL' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader','PDL' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Complex ;
 }
@@ -97,7 +97,7 @@ The complex constant five is equal to C<pdl(1,0)>:
    pdl> p $x = r2C 5
    5 +0i
 
-Now calculate the three cubic roots of of five:
+Now calculate the three cubic roots of five:
 
    pdl> p $r = Croots $x, 3
    [1.70998 +0i  -0.854988 +1.48088i  -0.854988 -1.48088i]
@@ -113,11 +113,12 @@ Duh! Could be better. Now try by multiplying C<$r> three times with itself:
    [5 +0i  5 -4.72647e-15i  5 -7.53694e-15i]
 
 Well... maybe C<Cpow> (which is used by the C<**> operator) isn't as
-bad as I thought. Now multiply by C<i> and negate, which is just a very
-expensive way of swapping real and imaginary parts.
+bad as I thought. Now multiply by C<i> and negate, then take the complex
+conjugate, which is just a very expensive way of swapping real and
+imaginary parts.
 
-   pdl> p -($r*i)
-   [0 -1.70998i  1.48088 +0.854988i  -1.48088 +0.854988i]
+   pdl> p Cconj(-($r*i))
+   [0 +1.70998i  1.48088 -0.854988i  -1.48088 -0.854988i]
 
 Now plot the magnitude of (part of) the complex sine. First generate the
 coefficients:

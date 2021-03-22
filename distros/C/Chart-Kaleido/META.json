@@ -30,7 +30,7 @@
             "Alien::Plotly::Kaleido" : "0",
             "File::ShareDir" : "1.116",
             "File::Which" : "0",
-            "IPC::Run" : "0.99",
+            "IPC::Run" : "20200505.0",
             "JSON" : "0",
             "MIME::Base64" : "0",
             "Moo" : "2.0",
@@ -55,11 +55,11 @@
    "provides" : {
       "Chart::Kaleido" : {
          "file" : "lib/Chart/Kaleido.pm",
-         "version" : "0.006"
+         "version" : "0.008"
       },
       "Chart::Kaleido::Plotly" : {
          "file" : "lib/Chart/Kaleido/Plotly.pm",
-         "version" : "0.006"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "url" : "https://github.com/stphnlyd/perl5-Chart-Kaleido.git"
       }
    },
-   "version" : "0.006",
+   "version" : "0.008",
    "x_contributors" : [
       "Gabor Szabo <gabor@szabgab.com>"
    ],

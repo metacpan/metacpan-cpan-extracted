@@ -1,3 +1,15 @@
+0.000050  2021-03-18 13:23:43-07:00 America/Los_Angeles
+
+    - Fix MySQL timeout issue
+
+0.000049  2021-03-18 11:25:52-07:00 America/Los_Angeles
+
+    - Fix cache issue on streamed data
+
+0.000048  2021-03-18 10:26:52-07:00 America/Los_Angeles
+
+    - Better job order from stream. This lets more iteresting jobs come in first.
+
 0.000047  2021-03-18 07:52:55-07:00 America/Los_Angeles
 
     - Significant reworking into a view controller and a stream controller

@@ -10,7 +10,7 @@ use base qw(App::Followme::ConfiguredObject);
 use Net::FTP;
 use File::Spec::Functions qw(abs2rel splitdir catfile);
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

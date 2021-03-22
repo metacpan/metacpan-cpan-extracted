@@ -8,12 +8,11 @@ use lib '..';
 
 use base qw(App::Followme::Module);
 
-use Cwd;
 use IO::File;
 use File::Spec::Functions qw(splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -101,7 +100,6 @@ sub load_and_run_modules {
     my ($self, $modules, $base_directory, $directory, %configuration) = @_;
 
     $configuration{base_directory} = $base_directory;
-    $configuration{current_directory} = $directory;
 
     foreach my $module (@$modules) {
         eval "require $module" or die "Module not found: $module\n";
@@ -126,16 +124,6 @@ sub set_configuration {
     $self->{configuration}{case_sensitive} = 
         $self->check_sensitivity($configuration_files[0]);
 
-    return;
-}
-
-#----------------------------------------------------------------------
-#  Save the configuration for other modules
-
-sub setup {
-    my ($self, %configuration) = @_;
-
-    $self->{configuration} = \%configuration;
     return;
 }
 

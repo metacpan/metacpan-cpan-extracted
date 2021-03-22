@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -34,7 +33,6 @@ mkdir $remote_dir or die $!;
 chmod 0755, $remote_dir;
 
 chdir $local_dir or die $!;
-$local_dir = cwd();
 
 my %configuration = (
                      top_directory => $local_dir,

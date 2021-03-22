@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use List::AllUtils qw( all );
 use Markdent::Types;
@@ -60,13 +60,13 @@ Markdent::Role::BalancedEvent - A parameterized role for events which can check 
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
-This role provides behavior for start and end events which can be checked for
-a balancing event. This includes things like strong, emphasis, and code
-start/end events.
+This role provides behavior for start and end events which can be checked for a
+balancing event. This includes things like strong, emphasis, and code start/end
+events.
 
 =head1 ROLE PARAMETERS
 

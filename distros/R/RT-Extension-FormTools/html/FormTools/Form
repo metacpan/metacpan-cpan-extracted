@@ -10,6 +10,7 @@ $enable_persisting   => 1
 $forbid_persisting   => {}
 $form_id             => undef
 $form_name           => undef
+$form_classes        => undef
 $self_service        => 0
 </%args>
 <%init>
@@ -111,6 +112,7 @@ $next_for_validation ||= $m->caller(1)->path;
     enctype="multipart/form-data"
     <% defined $form_id ? ' id="'.$form_id.'"' : '' |n %>
     <% defined $form_name ? ' name="'.$form_name.'"' : '' |n %>
+    <% defined $form_classes ? ' class="'.$form_classes.'"' : '' |n %>
 >
 % if ($validation) {
 <input type="hidden" name="_form_tools_next" value="<%$next%>" />

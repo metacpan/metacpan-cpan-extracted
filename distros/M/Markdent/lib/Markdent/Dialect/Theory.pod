@@ -4,7 +4,8 @@ package Markdent::Dialect::Theory;
 
 =head1 NAME
 
-Markdent::Dialect::Theory - Markdown extensions proposed by David Wheeler (aka Theory)
+Markdent::Dialect::Theory - Markdown extensions proposed by David Wheeler (aka
+Theory)
 
 =head1 SYNOPSIS
 
@@ -22,9 +23,8 @@ details.
 
 =head2 DEVIATIONS
 
-The dialect differs from David Wheeler's proposals in a few ways. Most of
-these deviations were discussed with David Wheeler and included with his
-approval.
+The dialect differs from David Wheeler's proposals in a few ways. Most of these
+deviations were discussed with David Wheeler and included with his approval.
 
 =over 4
 
@@ -92,7 +92,7 @@ Dave Rolsky, E<lt>autarch@urth.orgE<gt>
 
 Copyright 2009-2012 Dave Rolsky, All Rights Reserved.
 
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

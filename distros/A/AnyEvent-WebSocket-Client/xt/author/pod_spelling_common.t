@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-BEGIN { 
-  plan skip_all => 'test requires Test::Pod::Spelling::CommonMistakes' 
+BEGIN {
+  plan skip_all => 'test requires Test::Pod::Spelling::CommonMistakes'
     unless eval q{ use Test::Pod::Spelling::CommonMistakes; 1 };
   plan skip_all => 'test requires YAML'
     unless eval q{ use YAML qw( LoadFile ); 1 };

@@ -23,7 +23,7 @@ sub start_server
   tcp_server undef, undef, sub {
     my $handshake = Protocol::WebSocket::Handshake::Server->new;
     my $frame     = Protocol::WebSocket::Frame->new( max_payload_size => 0 );
-  
+
     my $hdl = AnyEvent::Handle->new(
       $opt->{tls} ? (tls => 'accept', tls_ctx => $opt->{tls}) : (),
       fh => shift,
@@ -41,7 +41,7 @@ sub start_server
         $opt->{end}->() if $opt->{end};
       },
     );
-  
+
     $hdl->on_read(
       sub {
         my $chunk = $_[0]{rbuf};
@@ -57,9 +57,9 @@ sub start_server
           }
           return;
         }
-      
+
         $frame->append($chunk);
-      
+
         while(defined(my $message = $frame->next))
         {
           $opt->{message}->(frame => $frame, message => $message, hdl => $hdl);
@@ -72,7 +72,7 @@ sub start_server
   };
 
   my $port = $server_cv->recv;
-  
+
   my $uri = URI->new('ws://127.0.0.1/echo');
   $uri->port($port);
   $uri->scheme('wss') if $opt->{tls};
@@ -86,12 +86,12 @@ sub start_echo
 {
   start_server(message => sub {
     my $opt = { @_ };
-    
+
     return if !$opt->{frame}->is_text && !$opt->{frame}->is_binary;
 
-    
+
     $opt->{hdl}->push_write($opt->{frame}->new(buffer => $opt->{message}, max_payload_size => 0 )->to_bytes);
-        
+
     if($opt->{message} eq 'quit')
     {
       $opt->{hdl}->push_write($opt->{frame}->new(type => 'close')->to_bytes);

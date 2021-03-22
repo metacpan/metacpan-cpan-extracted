@@ -1,5 +1,10 @@
 Revision history for Perl extension App-ansicolumn
 
+1.07 2021-03-19T14:36:49Z
+
+    - Make --output-width as an alias for --width option.
+    - Accept Reverse Polish Notation in --height and --width options.
+
 1.06 2021-03-18T12:13:22Z
 
     - Add --tabstyle option.

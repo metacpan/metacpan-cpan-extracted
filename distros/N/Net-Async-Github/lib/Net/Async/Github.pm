@@ -3,7 +3,7 @@ package Net::Async::Github;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
@@ -114,6 +114,8 @@ Accepts the following optional named parameters:
 
 =item * C<page_cache_size> - number of GET responses to cache. Defaults to 1000, set to 0 to disable.
 
+=item * C<timeout> - How long in seconds to wait before giving up on a request. Defaults to 60. If set to 0, then no timeout will take place.
+
 =back
 
 B< You probably just want C<token> >, defaults should be fine for the
@@ -127,7 +129,7 @@ instance to the constructor for a new instance.
 
 sub configure {
     my ($self, %args) = @_;
-    for my $k (grep exists $args{$_}, qw(token endpoints api_key http base_uri mime_type page_cache_size)) {
+    for my $k (grep exists $args{$_}, qw(token endpoints api_key http base_uri mime_type page_cache_size timeout)) {
         $self->{$k} = delete $args{$k};
     }
     $self->SUPER::configure(%args);
@@ -169,7 +171,7 @@ sub reopen {
     )
 }
 
-=head2 pr
+=head2 pull_request
 
 Returns information about the given PR.
 
@@ -189,7 +191,7 @@ Resolves to the current status.
 
 =cut
 
-sub pr {
+sub pull_request {
     my ($self, %args) = @_;
     die "needs $_" for grep !$args{$_}, qw(owner repo id);
     $self->validate_args(%args);
@@ -210,6 +212,44 @@ sub pr {
         }
     )
 }
+
+# Provide an alias for anyone relying on previous name
+*pr = *pull_request;
+
+=head2 pull_requests
+
+Returns information of all PRs of given repository.
+
+Expects the following named parameters:
+
+=over 4
+
+=item * C<owner> - which user or organisation owns this PR
+
+=item * C<repo> - the repository this pull request is for
+
+=back
+
+Returns a L<Ryu::Source> instance, this will emit a L<Net::Async::Github::PullRequest>
+instance for each found repository.
+
+=cut
+
+sub pull_requests {
+    my ($self, %args) = @_;
+    $self->validate_args(%args);
+    $self->api_get_list(
+        endpoint => 'pull_request',
+        endpoint_args => {
+            owner => $args{owner},
+            repo => $args{repo},
+        },
+        class => 'Net::Async::Github::PullRequest'
+    );
+}
+
+# Provide an alias for anyone relying on previous name
+*prs = *pull_requests;
 
 sub teams {
     my ($self, %args) = @_;
@@ -584,7 +624,7 @@ sub repo {
         ),
     )->transform(
         done => sub {
-            $log->tracef('Github repo data was ', $_[0]);
+            $log->tracef('Github repo data was %s', $_[0]);
             Net::Async::Github::Repository->new(
                 %{$_[0]},
                 github => $self,
@@ -808,8 +848,12 @@ sub http {
                 pipeline                 => 1,
                 max_in_flight            => 4,
                 decode_content           => 1,
-                timeout                  => $self->timeout,
                 user_agent               => 'Mozilla/4.0 (perl; Net::Async::Github; TEAM@cpan.org)',
+                (
+                    $self->timeout
+                    ? (timeout => $self->timeout)
+                    : ()
+                ),
             )
         );
         $ua
@@ -839,7 +883,14 @@ sub connections_per_host { 4 }
 # Like connections, but for data modification - POST, PUT, PATCH etc.
 sub updates_per_host { 1 }
 
-sub timeout { 60 }
+=head2 timeout
+
+The parameter that will be used when create Net::Async::HTTP object. If it is undef, then a default value
+60 seconds will be used. If it is 0, then Net::Async::HTTP will never timeout.
+
+=cut
+
+sub timeout { shift->{timeout} //= 60 }
 
 =head2 auth_info
 
@@ -1311,7 +1362,13 @@ Will raise an exception on invalid input.
 sub validate_repo_name {
     my ($self, $repo) = @_;
     die "repo name not defined" unless defined $repo;
-    die "repo name contains invalid characters" if $repo =~ /[^a-z0-9-]/i;
+    # Not really as well-defined as I'd like, closest to an official answer seems to be here:
+    # https://github.community/t/github-repository-name-vs-description-vs-readme-heading-h1/3284
+    # There are repositories with underscores, but that seems to be strongly discouraged:
+    # https://github.com/Automattic/_s
+    # Canonical repositories with '. character would include the `.wiki` "magic" repo for each
+    # Github repo
+    die "repo name contains invalid characters" if $repo =~ /[^a-z0-9.]/i;
     die "repo name too long" if length($repo) > 100;
     return 1;
 }
@@ -1390,5 +1447,5 @@ Tom Molesworth <TEAM@cpan.org>, with contributions from C<< @chylli-binary >>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2014-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2014-2021. Licensed under the same terms as Perl itself.
 

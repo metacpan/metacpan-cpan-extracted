@@ -364,6 +364,10 @@ It returns the notes object to enable chaining.
 
 Provided with data, and this will write the data to the shared memory.
 
+=head1 CAVEAT
+
+L<Apache2::SSI::Notes> do not work under threaded perl
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>

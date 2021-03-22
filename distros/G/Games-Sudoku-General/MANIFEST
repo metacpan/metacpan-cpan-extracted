@@ -1,3 +1,4 @@
+Build.PL
 Changes
 eg/README
 eg/simple
@@ -8,12 +9,12 @@ inc/My/Module/Meta.pm
 inc/My/Module/Recommend.pm
 inc/My/Module/Recommend/Any.pm
 lib/Games/Sudoku/General.pm
-Build.PL
 LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
+META.json
 META.yml
 README
 README.MacOS
@@ -33,4 +34,4 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
-META.json
+xt/author/prereq.t

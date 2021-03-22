@@ -1,5 +1,9 @@
 Revision history for App-opan
 
+0.003003 - 2021-03-21
+  - Bump Mojolicious dep to avoid 'format' footgun
+  - Fixup routing names for Mojolicious 9+
+
 0.003002 - 2019-05-09
   - Document OPAN_MIRROR
   - Remove big scary warning

@@ -1,12 +1,12 @@
 package Sah::SchemaR::perl::colorscheme::modname;
 
-our $DATE = '2021-01-20'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-03-20'; # DATE
+our $VERSION = '0.004'; # VERSION
 
-our $rschema = ["str",[{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\\z",summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{"x.completion"=>["perl_modname",{ns_prefix=>"Graphics::ColorNames"}]}],["perl::modname","str"]];
+our $rschema = ["str",[{description=>"\nContains coercion rule so you can also input `Foo-Bar`, `Foo/Bar`, `Foo/Bar.pm`\nor even 'Foo.Bar' and it will be normalized into `Foo::Bar`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo::Bar",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*)\\z",summary=>"Perl module name, e.g. Foo::Bar","x.completion"=>"perl_modname","x.perl.coerce_rules"=>["From_str::normalize_perl_modname"]},{examples=>[{valid=>0,value=>""},{valid=>1,value=>"WWW"},{valid=>1,validated_value=>"WWW::Foo",value=>"WWW::Foo"},{valid=>1,validated_value=>"WWW::Foo",value=>"WWW/Foo"},{summary=>"contains whitespace",valid=>0,value=>"Foo Bar"}],summary=>"Perl module name in the Graphics::ColorNames:: namespace without the namespace prefix, e.g. WWW or X","x.completion"=>["perl_modname",{ns_prefix=>"Graphics::ColorNames",recurse=>undef,recurse_matching=>"all-at-once"}]}],["perl::modname","str"]];
 
 1;
-# ABSTRACT: 
+# ABSTRACT: Perl module name in the Graphics::ColorNames:: namespace without the namespace prefix, e.g. WWW or X
 
 __END__
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Sah::SchemaR::perl::colorscheme::modname -  
+Sah::SchemaR::perl::colorscheme::modname - Perl module name in the Graphics::ColorNames:: namespace without the namespace prefix, e.g. WWW or X
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::perl::colorscheme::modname (from Perl distribution Sah-Schemas-GraphicsColorNames), released on 2021-01-20.
+This document describes version 0.004 of Sah::SchemaR::perl::colorscheme::modname (from Perl distribution Sah-Schemas-GraphicsColorNames), released on 2021-03-20.
 
 =head1 DESCRIPTION
 

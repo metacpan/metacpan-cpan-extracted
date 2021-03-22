@@ -1,0 +1,43 @@
+0.10 2021-03-21
+- fix metadata gremlin
+
+0.09 2021-03-21
+- fix setting VERSION so visible to module-loaders
+
+0.08 2021-03-20
+- allow complex inputs that are PDL::Complex
+
+0.07 2021-02-21
+- change param names from "complex" which clashes with complex.h
+
+0.06: 2019-12-09
+- add licence info - thanks @manwar
+
+0.05: 2019-11-10
+- update metadata to point at GitHub
+
+0.04: 2015-06-17
+- updated to dep on PDL::Core
+
+0.03: 16 Jun 2015
+- Moved into own repo and CPAN distro
+
+0.02.2_02: 1 Feb 2014
+- portability: change `cat` to slurp
+- threading improvements
+
+0.02.2_01: 20 Jan 2014
+- reduce string-eval use
+- check validateArguments in/out types match
+- support compilers other than GCC
+
+0.02.2: 2 Nov 2013
+- use CONFIGURE_REQUIRES
+
+0.02.1: 26 Oct 2013
+- add deps on IPC::Run, PDL::Core::Dev, PDL::PP
+- typo fix in metadata
+- use parseVersion not VERSION_FROM
+
+0.02: 26 Oct 2013
+- first CPAN release

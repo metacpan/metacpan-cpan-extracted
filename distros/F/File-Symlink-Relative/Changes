@@ -1,3 +1,9 @@
+0.004		2021-03-20	T. R. Wyant
+    Add rt.cpan.org back to bug reporting methods. Long live RT!
+
+    Get prerequisites up to snuff and add xt/author/prereq.t to ensure
+    they stay that way.
+
 0.003		2021-01-12	T. R. Wyant
     Add Travis CI testing.
 

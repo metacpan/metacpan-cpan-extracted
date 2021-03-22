@@ -1,0 +1,73 @@
+{
+   "abstract" : "Export a Mojolicious site to a Git repository",
+   "author" : [
+      "Doug Bell <preaction@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-Export-Git",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Export::Git" : {
+         "file" : "lib/Mojolicious/Plugin/Export/Git.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/preaction/Mojolicious-Plugin-Export-Git/issues"
+      },
+      "homepage" : "https://github.com/preaction/Mojolicious-Plugin-Export-Git",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/preaction/Mojolicious-Plugin-Export-Git.git",
+         "web" : "https://github.com/preaction/Mojolicious-Plugin-Export-Git"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:PREACTION",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+}
+

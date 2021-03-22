@@ -10,7 +10,7 @@ use base qw(App::Followme::FileData);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -80,7 +80,7 @@ sub fetch_sections {
 # Initialize the extension if unset
 
 sub setup {
-    my ($self, %configuration) = @_;
+    my ($self) = @_;
 
     $self->{extension} ||= $self->{web_extension};
     return;

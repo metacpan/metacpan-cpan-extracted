@@ -4,8 +4,8 @@
 #
 package PDL::GSLSF::BESSEL;
 
-@EXPORT_OK  = qw( PDL::PP gsl_sf_bessel_Jn PDL::PP gsl_sf_bessel_J_array PDL::PP gsl_sf_bessel_Yn PDL::PP gsl_sf_bessel_Y_array PDL::PP gsl_sf_bessel_In PDL::PP gsl_sf_bessel_I_array PDL::PP gsl_sf_bessel_In_scaled PDL::PP gsl_sf_bessel_I_scaled_array PDL::PP gsl_sf_bessel_Kn PDL::PP gsl_sf_bessel_K_array PDL::PP gsl_sf_bessel_Kn_scaled PDL::PP gsl_sf_bessel_K_scaled_array PDL::PP gsl_sf_bessel_jl PDL::PP gsl_sf_bessel_j_array PDL::PP gsl_sf_bessel_yl PDL::PP gsl_sf_bessel_y_array PDL::PP gsl_sf_bessel_il_scaled PDL::PP gsl_sf_bessel_i_scaled_array PDL::PP gsl_sf_bessel_kl_scaled PDL::PP gsl_sf_bessel_k_scaled_array PDL::PP gsl_sf_bessel_Jnu PDL::PP gsl_sf_bessel_Ynu PDL::PP gsl_sf_bessel_Inu_scaled PDL::PP gsl_sf_bessel_Inu PDL::PP gsl_sf_bessel_Knu_scaled PDL::PP gsl_sf_bessel_Knu PDL::PP gsl_sf_bessel_lnKnu );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw( PDL::PP gsl_sf_bessel_Jn PDL::PP gsl_sf_bessel_J_array PDL::PP gsl_sf_bessel_Yn PDL::PP gsl_sf_bessel_Y_array PDL::PP gsl_sf_bessel_In PDL::PP gsl_sf_bessel_I_array PDL::PP gsl_sf_bessel_In_scaled PDL::PP gsl_sf_bessel_I_scaled_array PDL::PP gsl_sf_bessel_Kn PDL::PP gsl_sf_bessel_K_array PDL::PP gsl_sf_bessel_Kn_scaled PDL::PP gsl_sf_bessel_K_scaled_array PDL::PP gsl_sf_bessel_jl PDL::PP gsl_sf_bessel_j_array PDL::PP gsl_sf_bessel_yl PDL::PP gsl_sf_bessel_y_array PDL::PP gsl_sf_bessel_il_scaled PDL::PP gsl_sf_bessel_i_scaled_array PDL::PP gsl_sf_bessel_kl_scaled PDL::PP gsl_sf_bessel_k_scaled_array PDL::PP gsl_sf_bessel_Jnu PDL::PP gsl_sf_bessel_Ynu PDL::PP gsl_sf_bessel_Inu_scaled PDL::PP gsl_sf_bessel_Inu PDL::PP gsl_sf_bessel_Knu_scaled PDL::PP gsl_sf_bessel_Knu PDL::PP gsl_sf_bessel_lnKnu );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::BESSEL ;
 

@@ -13,6 +13,7 @@ dist.ini
 git/hooks/pre-commit
 git/setup.sh
 lib/Data/MoneyCurrency.pm
+opencage_logo_300_150.png
 perltidy.ini
 ruby-money/AUTHORS
 ruby-money/CHANGELOG.md

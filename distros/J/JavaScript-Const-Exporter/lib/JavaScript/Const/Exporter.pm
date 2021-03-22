@@ -26,7 +26,7 @@ use Types::Standard qw/ ArrayRef Bool HashRef InstanceOf /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.5';
+our $VERSION = 'v0.1.6';
 
 
 option use_var => (
@@ -208,7 +208,7 @@ JavaScript::Const::Exporter - Convert exported Perl constants to JavaScript
 
 =head1 VERSION
 
-version v0.1.5
+version v0.1.6
 
 =head1 SYNOPSIS
 

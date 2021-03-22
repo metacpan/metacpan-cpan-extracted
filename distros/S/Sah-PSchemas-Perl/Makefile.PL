@@ -16,6 +16,9 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Sah::PSchemas::Perl",
   "PREREQ_PM" => {
+    "Complete::Module" => "0.262",
+    "Sah::Schema::perl::modname" => "0.035",
+    "Sah::Schema::perl::modname_with_optional_args" => "0.035",
     "strict" => 0,
     "warnings" => 0
   },
@@ -25,7 +28,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,9 +36,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Complete::Module" => "0.262",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Sah::Schema::perl::modname" => "0.035",
+  "Sah::Schema::perl::modname_with_optional_args" => "0.035",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

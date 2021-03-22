@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.62      2021-03-19 05:38:03 -0600
+  - Additional CI defaults for freshly minted dists for cygwin
+    and msys2.
+
 2.61      2021-03-13 12:51:30 -0700
   - Follow recirects on cip, new location for cip repository
 

@@ -22,7 +22,7 @@ use constant _F_PEAK      =>  8;    # peak elements arrayref, initially undef
 use constant _F_ETA       =>  9;    # "eta" value, initially undef
 use constant _NFIELDS     => 10;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 our $_LOG_MAX_ORDER  = 22.1807;         # limit for integer exponentiation
 our $_MAX_ENUM_COUNT = 32768;           # limit for stored rotator set size
@@ -546,7 +546,7 @@ Math::DifferenceSet::Planar - object class for planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.012 of Math::DifferenceSet::Planar.
+This documentation refers to version 0.013 of Math::DifferenceSet::Planar.
 
 =head1 SYNOPSIS
 
@@ -1186,8 +1186,8 @@ Note, however, that the multiplier check as implemented here is based
 on conjectural matter and thus might inaccurately reject some sets.
 
 Bug reports and suggestions are welcome.
-Please submit them through the CPAN RT,
-L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-DifferenceSet-Planar>.
+Please submit them through the github issue tracker,
+L<https://github.com/mhasch/perl-Math-DifferenceSet-Planar/issues>.
 
 More information for potential contributors can be found in the file
 named F<CONTRIBUTING> in this distribution.

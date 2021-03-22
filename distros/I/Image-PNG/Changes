@@ -1,5 +1,12 @@
 Revision history for perl module Image::PNG
 
+0.25 2021-03-20
+
+* Remove the unimplemented "data" method, use "rows" instead.
+* Remove the unimplemented "error" method
+* Documentation updated
+* Doc of "data" and "error" removed to prevent misleading people
+
 0.24 2020-01-14
 
 * Add interlacing_method method

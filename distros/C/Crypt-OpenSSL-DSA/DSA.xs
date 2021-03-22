@@ -172,6 +172,14 @@ generate_key(dsa)
     OUTPUT:
         RETVAL
 
+int
+get_sig_size(dsa)
+        DSA * dsa
+    CODE:
+        RETVAL = DSA_size(dsa);
+    OUTPUT:
+        RETVAL
+
 DSA_SIG *
 do_sign(dsa, dgst)
         DSA * dsa
@@ -365,9 +373,11 @@ get_p(dsa)
         const BIGNUM *p;
         char *to;
         int len;
+        int bnlen;
     CODE:
         DSA_get0_pqg(dsa, &p, NULL, NULL);
-        to = malloc(sizeof(char) * 128);
+        bnlen = BN_num_bytes(p);
+        to = malloc(sizeof(char) * bnlen);
         len = BN_bn2bin(p, to);
         RETVAL = newSVpvn(to, len);
         free(to);
@@ -381,9 +391,11 @@ get_q(dsa)
         const BIGNUM *q;
         char *to;
         int len;
+        int bnlen;
     CODE:
         DSA_get0_pqg(dsa, NULL, &q, NULL);
-        to = malloc(sizeof(char) * 20);
+        bnlen = BN_num_bytes(q);
+        to = malloc(sizeof(char) * bnlen);
         len = BN_bn2bin(q, to);
         RETVAL = newSVpvn(to, len);
         free(to);
@@ -397,9 +409,11 @@ get_g(dsa)
         const BIGNUM *g;
         char *to;
         int len;
+        int bnlen;
     CODE:
         DSA_get0_pqg(dsa, NULL, NULL, &g);
-        to = malloc(sizeof(char) * 128);
+        bnlen = BN_num_bytes(g);
+        to = malloc(sizeof(char) * bnlen);
         len = BN_bn2bin(g, to);
         RETVAL = newSVpvn(to, len);
         free(to);
@@ -413,9 +427,11 @@ get_pub_key(dsa)
         const BIGNUM *pub_key;
         char *to;
         int len;
+        int bnlen;
     CODE:
         DSA_get0_key(dsa, &pub_key, NULL);
-        to = malloc(sizeof(char) * 128);
+        bnlen = BN_num_bytes(pub_key);
+        to = malloc(sizeof(char) * bnlen);
         len = BN_bn2bin(pub_key, to);
         RETVAL = newSVpvn(to, len);
         free(to);
@@ -429,9 +445,11 @@ get_priv_key(dsa)
         const BIGNUM *priv_key;
         char *to;
         int len;
+        int bnlen;
     CODE:
         DSA_get0_key(dsa, NULL, &priv_key);
-        to = malloc(sizeof(char) * 128);
+        bnlen = BN_num_bytes(priv_key);
+        to = malloc(sizeof(char) * bnlen);
         len = BN_bn2bin(priv_key, to);
         RETVAL = newSVpvn(to, len);
         free(to);
@@ -627,9 +645,11 @@ get_r(dsa_sig)
         const BIGNUM *r;
         char *to;
         int len;
+        int bnlen;
     CODE:
         DSA_SIG_get0(dsa_sig, &r, NULL);
-        to = malloc(sizeof(char) * 128);
+        bnlen = BN_num_bytes(r);
+        to = malloc(sizeof(char) * bnlen);
         len = BN_bn2bin(r, to);
         RETVAL = newSVpvn(to, len);
         free(to);
@@ -643,9 +663,11 @@ get_s(dsa_sig)
         const BIGNUM *s;
         char *to;
         int len;
+        int bnlen;
     CODE:
         DSA_SIG_get0(dsa_sig, NULL, &s);
-        to = malloc(sizeof(char) * 128);
+        bnlen = BN_num_bytes(s);
+        to = malloc(sizeof(char) * bnlen);
         len = BN_bn2bin(s, to);
         RETVAL = newSVpvn(to, len);
         free(to);

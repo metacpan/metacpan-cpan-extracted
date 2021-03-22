@@ -3,32 +3,37 @@ NAME
 
 SYNOPSIS
      use Acme::People::Happy;
+
      my $obj = Acme::People::Happy->new;
      my $text = $obj->are_you_happy;
      my $text = $obj->everybody;
 
 METHODS
-    *       "new()"
+  "new"
+     my $obj = Acme::People::Happy->new;
 
-             Constructor.
-             Returns object.
+    Constructor.
 
-    *       "are_you_happy()"
+    Returns instance of object.
 
-             Are you happy question?
-             Returns answer.
+  "are_you_happy"
+     my $text = $obj->are_you_happy;
 
-    *       "everybody()"
+    Are you happy question?
 
-             Everybody?
-             Returns answer.
+    Returns answer.
+
+  "everybody"
+     my $text = $obj->everybody;
+
+    Everybody?
+
+    Returns answer.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Acme::People::Happy;
 
      # Object.
@@ -44,20 +49,21 @@ DEPENDENCIES
     Class::Utils.
 
 REPOSITORY
-    <https://github.com/tupinek/Acme-People-Happy>
+    <https://github.com/michal-josef-spacek/Acme-People-Happy>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015 Michal Špaček
-     BSD 2-Clause License
+    © 2015-2021 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 DEDICATION
     To Mario for his ideas.
 
 VERSION
-    0.03
+    0.05
 

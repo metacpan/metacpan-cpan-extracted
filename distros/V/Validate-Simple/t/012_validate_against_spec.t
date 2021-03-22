@@ -888,6 +888,7 @@ my @tests = (
             # Array of type
             [ { arr_num => [] },             0 ],
             [ { arr_num => [ 1..5 ] },       1 ],
+            [ { arr_num => [ 1..5, 'a' ] },  0 ],
             [ { arr_num => [ qw/1 2 3/ ] },  1 ],
             [ { arr_num => 1 },              0 ],
             [ { arr_num => {} },             0 ],

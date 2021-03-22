@@ -2,8 +2,11 @@
 
 use strict;
 use warnings;
+use Test::More;
 use PDL::LiteF;
 use PDL::Types;
+use PDL::FFTW3;
+use PDL::Complex;
 
 # Please be careful about rearranging these tests, since they depend on the
 # global FFTW plan cache, and thus order can matter.
@@ -22,14 +25,6 @@ set_autopthread_size(0);
 # be created, so I disable plan-creation checks. When PDL itself produces only
 # aligned data buffers this should be re-enabled.
 my $do_check_plan_creations = undef;
-
-use Test::More;
-
-BEGIN
-{
-  plan tests => 178;
-  use_ok( 'PDL::FFTW3' );
-}
 
 use constant approx_eps_double => 1e-8;
 use constant approx_eps_single => 1e-3;
@@ -60,6 +55,9 @@ my $Nplans = 0;
 
   ok_should_make_plan( all( approx( fft1(float $x), float($Xref), approx_eps_single) ),
                       "Basic 1D complex FFT - single precision" );
+
+  ok_should_make_plan( all( approx( fft1(cplx $x), $Xref, approx_eps_double) ),
+                      "Basic 1D complex FFT with PDL::Complex" );
 
   ok_should_make_plan( all( approx( ifft1(fft1($x)), $x , approx_eps_double) ),
                       "Basic 1D complex FFT - inverse(forward) should be the same (normalized)" );
@@ -832,8 +830,7 @@ if(0)
   }
 }
 
-
-
+done_testing;
 
 sub ok_should_make_plan
 {

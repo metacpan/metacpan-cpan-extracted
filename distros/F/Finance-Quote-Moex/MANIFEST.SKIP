@@ -11,3 +11,6 @@ blib
 debian
 debian.bak
 \.sh$
+MYMETA.yml
+MYMETA.json
+Makefile$

@@ -13,7 +13,7 @@ use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile no_upwards);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -79,7 +79,7 @@ sub sections_are_filled {
 # Set exclude_index to true in the data package
 
 sub setup {
-    my ($self, %configuration) = @_;
+    my ($self) = @_;
 
     $self->{data}{exclude_index} = 1;
     return;

@@ -2,74 +2,54 @@
 
 use strict;
 use warnings;
-use English qw(-no_match_vars);
-use Carp qw();
-use Readonly;
-use Pod::Usage qw(pod2usage);
+
+use Getopt::Long;
 use Perl::Metrics::Simple qw(0.13);
+use Perl::Metrics::Simple::Output::HTML;
+use Perl::Metrics::Simple::Output::JSON;
+use Perl::Metrics::Simple::Output::PlainText;
+use Pod::Usage qw(pod2usage);
 
-Readonly::Scalar my $MAX_PLAINTEXT_LABEL_LENGTH => 25;
-Readonly::Scalar my $EMPTY_STRING               => q{};
-Readonly::Scalar my $ONE_SPACE                  => q{ };
+our $VERSION = '0.19';
 
-our $VERSION = '0.18';
+exit main() if not caller;
 
-my $COMPLEXITY_LEVEL_THRESHOLD = {
-    BTW => 10,
-    WTF => 20,
-    OMG => 30,
-};
-
-my $THRESHOLD_TO_CSS_CLASS = {
-    0                                  => 'fyi',
-    $COMPLEXITY_LEVEL_THRESHOLD->{BTW} => 'btw',
-    $COMPLEXITY_LEVEL_THRESHOLD->{WTF} => 'wtf',
-    $COMPLEXITY_LEVEL_THRESHOLD->{OMG} => 'omg',
-};
-
-my $CSS = {
-    body  => ['font-family:sans-serif;'],
-    table => [
-        'border-collapse:collapse;', 'border-spacing:0px;',
-        'margin:10px 0px;'
-    ],
-    tr       => [ 'text-align:left;',          'vertical-align:top;' ],
-    'td, th' => [ 'border:solid 1px #000000;', 'padding:2px;' ],
-    th       => ['background-color:#cccccc;'],
-    '.fyi'   => ['background-color:#99ff99;'],
-    '.btw'   => ['background-color:#ffff99;'],
-    '.wtf'   => ['background-color:#ffcc99;'],
-    '.omg'   => ['background-color:#ff9999;'],
-    '.w300'  => ['width:300px;'],
-    '.w200'  => ['width:200px;'],
-    '.w100'  => ['width:100px;'],
-    '.right' => ['text-align:right;']
-};
-
-my $ANALYSIS;
-my $HTML_OUTPUT = 0;
-my @FILES       = ();
-
-main();
-
-exit;
+#-------------------------------------------------------------------------------
 
 sub main {
-    parse_opts();
+    my ( $options, @files ) = parse_opts(@ARGV);
 
-    set_analysis();
+    if ( $options->{'help'} ) {
+        pod2usage( -verbose => 2, -exitval => 1 );    # exits program
+    }
 
-    if ($HTML_OUTPUT) {
-        print make_html() || Carp::croak "Cannot print! $OS_ERROR";
+    if ( my $modifiers = $options->{'method-modifiers'} ) {
+        push @Perl::Metrics::Simple::Analysis::File::METHOD_MODIFIERS,
+            split( /,/, $modifiers );
+    }
+
+    my $analysis = Perl::Metrics::Simple->new()->analyze_files(@files);
+
+    if ( $options->{'html'} ) {
+        my $html = Perl::Metrics::Simple::Output::HTML->new($analysis);
+        print $html->make_report();
+    }
+    elsif ( $options->{'json'} ) {
+        my $json = Perl::Metrics::Simple::Output::JSON->new($analysis);
+        print $json->make_report();
     }
     else {
-        print make_plain() || Carp::croak "Cannot print! $OS_ERROR";
+        my $plain = Perl::Metrics::Simple::Output::PlainText->new($analysis);
+        print $plain->make_report();
     }
-    return;
+
+    return 0;
 }
 
 sub parse_opts {
-    if ( !@ARGV ) {
+    my (@command_line_arguments) = @_;
+
+    if ( !@command_line_arguments ) {
         pod2usage(
             -msg     => "Missing required argument(s).\n",
             -exitval => 1,
@@ -77,410 +57,26 @@ sub parse_opts {
         );    # exits program
     }
 
-    foreach (@ARGV) {
-        if ( $_ eq '--html' ) {
-            $HTML_OUTPUT = 1;
-            next;
-        }
+    my %options;
 
-        if ( $_ eq '--help' ) {
-            pod2usage( -verbose => 2, -exitval => 1 );  # exits program
-        }
+    my $parsed_ok = Getopt::Long::GetOptionsFromArray(
+        \@command_line_arguments,
+        \%options,
+        'html',
+        'json',
+        'method-modifiers:s',
+    );
 
-        if ( /--method-modifiers=(\S+)/ ) {
-            push @Perl::Metrics::Simple::Analysis::File::METHOD_MODIFIERS,
-                split /,/, $1;
-            next;
-        }
-
-        push @FILES, $_;
+    if ( !$parsed_ok ) {
+        pod2usage(
+            -msg     => "Failed to parse command line.\n",
+            -exitval => 1,
+            -verbose => 1,
+        );    # exits program
     }
 
-    return;
+    return ( \%options, @command_line_arguments );
 }
-
-sub set_analysis {
-    $ANALYSIS = Perl::Metrics::Simple->new()->analyze_files(@FILES);
-    return $ANALYSIS;
-}
-
-sub _sort_by_complexity {
-    return $b->{mccabe_complexity} <=> $a->{mccabe_complexity};
-}
-
-### PLAIN
-
-sub make_plain {
-    my $report = 'Perl files found: ' . $ANALYSIS->file_count() . "\n\n";
-    $report .= make_counts_plain();
-    $report .= make_subroutine_size_plain();
-    $report .= make_code_complexity_plain();
-    $report .= make_list_of_subs_plain();
-    return $report;
-}
-
-sub make_counts_plain {
-    my $counts_plain = make_headline_plain('Counts');
-    $counts_plain .= make_line_plain( 'total code lines', $ANALYSIS->lines() );
-    $counts_plain .= make_line_plain( 'lines of non-sub code',
-        $ANALYSIS->main_stats()->{lines} );
-    $counts_plain
-        .= make_line_plain( 'packages found', $ANALYSIS->package_count() );
-    $counts_plain .= make_line_plain( 'subs/methods', $ANALYSIS->sub_count() );
-    $counts_plain .= "\n\n";
-    return $counts_plain;
-}
-
-sub make_line_plain {
-    my ( $key, $value ) = @_;
-    my $line = $key . q{:};
-    $line .= $ONE_SPACE x ( $MAX_PLAINTEXT_LABEL_LENGTH - length $key );
-    $line .= $value . "\n";
-    return $line;
-}
-
-sub make_headline_plain {
-    my ($headline) = @_;
-    my $formatted_headline = $headline . "\n";
-    $formatted_headline .= q{-} x length $headline;
-    $formatted_headline .= "\n";
-    return $formatted_headline;
-}
-
-sub make_subroutine_size_plain {
-    my $subroutine_size_plain = make_headline_plain('Subroutine/Method Size');
-    $subroutine_size_plain .= make_line_plain( 'min',
-        $ANALYSIS->summary_stats()->{sub_length}->{min} );
-    $subroutine_size_plain .= make_line_plain( 'max',
-        $ANALYSIS->summary_stats()->{sub_length}->{max} );
-    $subroutine_size_plain .= make_line_plain( 'mean',
-        $ANALYSIS->summary_stats()->{sub_length}->{mean} );
-    $subroutine_size_plain .= make_line_plain( 'std. deviation',
-        $ANALYSIS->summary_stats()->{sub_length}->{standard_deviation} );
-    $subroutine_size_plain .= make_line_plain( 'median',
-        $ANALYSIS->summary_stats()->{sub_length}->{median} );
-
-    $subroutine_size_plain .= "\n\n";
-    return $subroutine_size_plain;
-}
-
-sub make_code_complexity_plain {
-    my $code_complexity_plain = make_headline_plain('McCabe Complexity');
-
-    $code_complexity_plain
-        .= make_complexity_section_plain( 'Code not in any subroutine',
-        'main_complexity' );
-    $code_complexity_plain .= "\n";
-    $code_complexity_plain
-        .= make_complexity_section_plain( 'Subroutines/Methods',
-        'sub_complexity' );
-
-    $code_complexity_plain .= "\n\n";
-    return $code_complexity_plain;
-}
-
-sub make_complexity_section_plain {
-    my ( $section, $key ) = @_;
-
-    my $complexity_section_plain = $section . "\n";
-
-    $complexity_section_plain
-        .= make_line_plain( 'min', $ANALYSIS->summary_stats()->{$key}->{min} );
-    $complexity_section_plain
-        .= make_line_plain( 'max', $ANALYSIS->summary_stats()->{$key}->{max} );
-    $complexity_section_plain .= make_line_plain( 'mean',
-        $ANALYSIS->summary_stats()->{$key}->{mean} );
-    $complexity_section_plain .= make_line_plain( 'std. deviation',
-        $ANALYSIS->summary_stats()->{$key}->{standard_deviation} );
-    $complexity_section_plain .= make_line_plain( 'median',
-        $ANALYSIS->summary_stats()->{$key}->{median} );
-    return $complexity_section_plain;
-}
-
-sub make_list_of_subs_plain {
-    my @main_from_each_file
-        = map { $_->{main_stats} } @{ $ANALYSIS->file_stats() };
-    my @sorted_subs = sort _sort_by_complexity(),
-        ( @{ $ANALYSIS->subs() }, @main_from_each_file );
-
-    my $column_widths = get_column_widths(@main_from_each_file);
-
-    my $list_of_subs_plain
-        = make_headline_plain('List of subroutines, with most complex at top');
-
-    $list_of_subs_plain
-        .= make_column( 'complexity', $column_widths->{mccabe_complexity} );
-    $list_of_subs_plain .= make_column( 'sub',  $column_widths->{name} );
-    $list_of_subs_plain .= make_column( 'path', $column_widths->{path} );
-    $list_of_subs_plain .= make_column( 'size', $column_widths->{lines} );
-    $list_of_subs_plain .= "\n";
-
-    foreach my $sub (@sorted_subs) {
-        $list_of_subs_plain
-            .= make_list_of_subs_line_plain( $sub, $column_widths );
-    }
-
-    $list_of_subs_plain .= "\n\n";
-    return $list_of_subs_plain;
-}
-
-sub make_list_of_subs_line_plain {
-    my ( $sub, $column_widths ) = @_;
-
-    my $list_of_subs_line_plain;
-
-    foreach my $col ( 'mccabe_complexity', 'name', 'path', 'lines' ) {
-        $list_of_subs_line_plain
-            .= make_column( $sub->{$col}, $column_widths->{$col} );
-    }
-
-    $list_of_subs_line_plain .= "\n";
-    return $list_of_subs_line_plain;
-}
-
-sub make_column {
-    my ( $value, $width ) = @_;
-
-    my $column = $value;
-    $column .= $ONE_SPACE x ( $width - length($value) + 2 );
-    return $column;
-}
-
-sub get_column_widths {
-    my @main_from_each_file = @_;
-
-    my $column_widths = {
-        mccabe_complexity => 10,
-        name              => 3,
-        path              => 4,
-        lines             => 4,
-    };
-
-    foreach my $sub (@main_from_each_file) {
-        foreach my $col ( 'mccabe_complexity', 'name', 'path', 'lines' ) {
-            if ( length( $sub->{$col} ) > $column_widths->{$col} ) {
-                $column_widths->{$col} = length( $sub->{$col} );
-            }
-        }
-    }
-
-    return $column_widths;
-}
-
-### /PLAIN
-### HTML
-
-sub make_html {
-    my $html = '<!DOCTYPE html><html lang="en">';
-
-    $html .= make_head();
-
-    $html .= make_body();
-
-    $html .= '</html>';
-    return $html;
-}
-
-sub make_head {
-    my $head = '<head><title>countperl</title><meta charset="utf-8">';
-
-    $head .= make_css();
-
-    $head .= '</head>';
-    return $head;
-}
-
-sub make_css {
-    my $css = '<style type="text/css">';
-
-    foreach my $selector ( keys %{$CSS} ) {
-        $css .= $selector . '{';
-
-        foreach ( @{ $CSS->{$selector} } ) {
-            $css .= $_;
-        }
-
-        $css .= '}';
-    }
-
-    $css .= '</style>';
-
-    return $css;
-}
-
-sub make_body {
-    my $body = '<body><h3>';
-    $body .= 'Perl files found ' . $ANALYSIS->file_count();
-    $body .= '</h3>';
-
-    $body .= make_counts_html();
-    $body .= make_subroutine_size_html();
-    $body .= make_code_complexity_html();
-    $body .= make_list_of_subs_html();
-    $body .= make_complexity_levels();
-
-    $body .= '</body>';
-    return $body;
-}
-
-sub make_counts_html {
-    my $counts_html = '<table><tr><th colspan="2">Counts</th></tr>';
-
-    $counts_html .= make_tr( 'total code lines', $ANALYSIS->lines() );
-    $counts_html
-        .= make_tr( 'lines of non-sub code', $ANALYSIS->main_stats()->{lines} );
-    $counts_html .= make_tr( 'packages found', $ANALYSIS->package_count() );
-    $counts_html .= make_tr( 'subs/methods',   $ANALYSIS->sub_count() );
-
-    $counts_html .= '</table>';
-    return $counts_html;
-}
-
-sub make_tr {
-    my ( $key, $value, $css ) = @_;
-    $css = $css ? $ONE_SPACE . $css : $EMPTY_STRING;
-
-    my $tr = '<tr><td class="w200">';
-    $tr .= $key;
-    $tr .= '</td><td class="w100 right' . $css . '">';
-    $tr .= $value;
-    $tr .= '</td></tr>';
-
-    return $tr;
-}
-
-sub make_subroutine_size_html {
-    my $subroutine_size_html
-        = '<table><tr><th colspan="2">Subroutine/Method Size</th></tr>';
-
-    my $min                = $ANALYSIS->summary_stats()->{sub_length}->{min}                || 0;
-    my $max                = $ANALYSIS->summary_stats()->{sub_length}->{max}                || 0;
-    my $mean               = $ANALYSIS->summary_stats()->{sub_length}->{mean}               || '0.00';
-    my $standard_deviation = $ANALYSIS->summary_stats()->{sub_length}->{standard_deviation} || '0.00';
-    my $median             = $ANALYSIS->summary_stats()->{sub_length}->{median}             || '0.00';
-
-    $subroutine_size_html .= make_tr( 'min',            $min );
-    $subroutine_size_html .= make_tr( 'max',            $max );
-    $subroutine_size_html .= make_tr( 'mean',           $mean );
-    $subroutine_size_html .= make_tr( 'std. deviation', $standard_deviation );
-    $subroutine_size_html .= make_tr( 'median',         $median );
-
-    $subroutine_size_html .= '</table>';
-
-    return $subroutine_size_html;
-}
-
-sub make_code_complexity_html {
-    my $code_complexity_html
-        = '<table><tr><th colspan="3">McCabe Complexity</th></tr>';
-
-    $code_complexity_html
-        .= make_complexity_section_html( 'Code not in any subroutine',
-        'main_complexity' );
-    $code_complexity_html
-        .= make_complexity_section_html( 'Subroutines/Methods',
-        'sub_complexity' );
-
-    $code_complexity_html .= '</table>';
-
-    return $code_complexity_html;
-}
-
-sub make_complexity_section_html {
-    my ( $section, $key ) = @_;
-
-    my $complexity_section_html
-        = '<tr><td rowspan="5" class="w200">' . $section . '</td>';
-
-    my $min                = $ANALYSIS->summary_stats()->{$key}->{min}                || 0;
-    my $max                = $ANALYSIS->summary_stats()->{$key}->{max}                || 0;
-    my $mean               = $ANALYSIS->summary_stats()->{$key}->{mean}               || '0.00';
-    my $standard_deviation = $ANALYSIS->summary_stats()->{$key}->{standard_deviation} || '0.00';
-    my $median             = $ANALYSIS->summary_stats()->{$key}->{median}             || '0.00';
-
-    $complexity_section_html .= '<td class="w200">min</td><td class="w100 right ' . get_class_by_count( $min ) . '">';
-    $complexity_section_html .= $min;
-    $complexity_section_html .= '</td></tr>';
-
-    $complexity_section_html .= make_tr( 'max',            $max,                get_class_by_count( $max ) );
-    $complexity_section_html .= make_tr( 'mean',           $mean,               get_class_by_count( $mean ) );
-    $complexity_section_html .= make_tr( 'std. deviation', $standard_deviation, get_class_by_count( $standard_deviation ) );
-    $complexity_section_html .= make_tr( 'median',         $median,             get_class_by_count( $median ) );
-
-    return $complexity_section_html;
-}
-
-sub make_list_of_subs_tr {
-    my ($sub) = @_;
-
-    my $list_of_subs_tr
-        = '<tr><td class="'
-        . get_class_by_count( $sub->{mccabe_complexity} )
-        . ' right">'
-        . $sub->{mccabe_complexity}
-        . '</td><td>'
-        . $sub->{name}
-        . '</td><td>'
-        . $sub->{path}
-        . '</td><td class="right">'
-        . $sub->{lines}
-        . '</td></tr>';
-
-    return $list_of_subs_tr;
-}
-
-sub make_list_of_subs_html {
-    my @main_from_each_file
-        = map { $_->{main_stats} } @{ $ANALYSIS->file_stats() };
-    my @sorted_subs = sort _sort_by_complexity(),
-        ( @{ $ANALYSIS->subs() }, @main_from_each_file );
-
-    my $list_of_subs_html
-        = '<table><tr><th colspan="4">List of subroutines, with most complex at top</th></tr>'
-        . '<tr><td class="w100">complexity</td><td>sub</td><td>path</td><td class="w100">size</td><tr>';
-
-    foreach my $sub (@sorted_subs) {
-        $list_of_subs_html .= make_list_of_subs_tr($sub);
-    }
-
-    $list_of_subs_html .= '</table>';
-
-    return $list_of_subs_html;
-}
-
-sub make_complexity_levels {
-    my $complexity_levels
-        = '<table><tr><th colspan="2">Complexity Levels</th></tr>';
-
-    foreach my $level ( sort keys %{$THRESHOLD_TO_CSS_CLASS} ) {
-        $complexity_levels
-            .= '<tr><td class="'
-            . $THRESHOLD_TO_CSS_CLASS->{$level} . '">'
-            . $THRESHOLD_TO_CSS_CLASS->{$level}
-            . '</td><td class="'
-            . $THRESHOLD_TO_CSS_CLASS->{$level} . '">'
-            . '&gt;= '
-            . $level
-            . '</td></tr>';
-    }
-
-    $complexity_levels .= '</table>';
-
-    return $complexity_levels;
-}
-
-sub get_class_by_count {
-    my ($count) = @_;
-
-    my @level = reverse sort keys %{$THRESHOLD_TO_CSS_CLASS};
-
-    foreach (@level) {
-        return $THRESHOLD_TO_CSS_CLASS->{$_} if ( $count >= $_ );
-    }
-    return;
-}
-
-### /HTML
 
 __END__
 
@@ -507,6 +103,10 @@ Prints documentation to STDERR.
 =item --html
 
 Produces HTML output instead of the plain-text default.
+
+=item --json
+
+Produces JSON output instead of the plain-text default.
 
 =item --method-modifiers=a,b,c
 

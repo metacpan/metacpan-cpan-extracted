@@ -15,9 +15,9 @@ sub test_case
     my $finish_count = 0;
     my $cv_finish = AnyEvent->condvar;
     $conns[0]->on(finish => sub { $finish_count++; $cv_finish->send });
-    
+
     $code->(\@conns);
-    
+
     $cv_finish->recv;
     $conns[0]->send("hoge");
     $conns[0]->send("foo");

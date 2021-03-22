@@ -4,8 +4,8 @@
 #
 package PDL::Graphics::IIS;
 
-@EXPORT_OK  = qw(  iis iiscur iiscirc $stdimage $iisframe saoimage ximtool PDL::PP _iis PDL::PP _iiscirc );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw(  iis iiscur iiscirc $stdimage $iisframe saoimage ximtool PDL::PP _iis PDL::PP _iiscirc );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Graphics::IIS ;
 

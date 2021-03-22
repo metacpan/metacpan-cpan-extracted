@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -26,12 +25,7 @@ my $test_dir = catdir(@path, 'test');
 rmtree($test_dir);
 mkdir $test_dir  or die $!;
 chmod 0755, $test_dir;
-
-mkdir catfile(@path, 'test', "sub") or die $!;
-chmod 0755, catfile($test_dir, "sub");
-
 chdir $test_dir or die $!;
-$test_dir = cwd();
 
 #----------------------------------------------------------------------
 # Create pages to list in sitemap
@@ -56,6 +50,8 @@ do {
 EOQ
 
     my %configuration = (
+            top_directory => $test_dir,
+            base_directory => $test_dir,
             remote_url => 'http://www.example.com',
             sitemap => 'sitemap.txt',
             web_extension => 'html',
@@ -68,7 +64,7 @@ EOQ
         my $output = $page;
         $output =~ s/%%/$count/g;
 
-        my $filename = "$count.html";
+        my $filename = catfile($test_dir, "$count.html");
         fio_write_page($filename, $output);
 
         my $remote_url = $map->{data}->build('remote_url', $filename);

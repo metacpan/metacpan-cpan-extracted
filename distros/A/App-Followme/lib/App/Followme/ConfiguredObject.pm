@@ -5,7 +5,8 @@ use strict;
 use warnings;
 
 use Cwd;
-our $VERSION = "2.00";
+
+our $VERSION = "2.01";
 
 #----------------------------------------------------------------------
 # Create object that returns files in a directory tree
@@ -167,7 +168,7 @@ sub initialize {
 # Set up object fields (stub)
 
 sub setup {
-    my ($self, %configuration) = @_;
+    my ($self) = @_;
     return;
 }
 

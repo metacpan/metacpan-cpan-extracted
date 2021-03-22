@@ -1,6 +1,10 @@
-use Moo::_strictures;
+use strict;
+use warnings;
+
 use Test::More;
 use Test::Fatal;
+
+use Moo::_Utils qw(_linear_isa);
 
 BEGIN {
   package Method::Generate::Accessor::Role::ArrayRefInstance;
@@ -152,7 +156,7 @@ is_deeply([ @$o ], [ 1, 2, 3, 4 ], 'Subclass of non-Moo object');
     @{"${new_c}::ISA"} = ();
   }
   my $c = Moo::Role->create_class_with_roles('ArrayTest1', 'ArrayTestRole2');
-  is_deeply mro::get_linear_isa($c), [$c, 'ArrayTest1', 'Moo::Object'],
+  is_deeply +_linear_isa($c), [$c, 'ArrayTest1', 'Moo::Object'],
     'mro::get_linear_isa is correct if create_class_with_roles target class @ISA existed';
 }
 

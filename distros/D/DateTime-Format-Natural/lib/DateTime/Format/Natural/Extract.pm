@@ -12,7 +12,9 @@ use constant DATE_TYPE     => 0x01;
 use constant GRAMMAR_TYPE  => 0x02;
 use constant DURATION_TYPE => 0x04;
 
-our $VERSION = '0.11';
+use DateTime::Format::Natural::Utils qw(trim);
+
+our $VERSION = '0.13';
 
 my %grammar_durations = map { $_ => true } qw(for_count_unit);
 
@@ -37,8 +39,8 @@ sub _extract_expressions
     my $self = shift;
     my ($extract_string) = @_;
 
-    $extract_string =~ s/^\s*[,;.]?//;
-    $extract_string =~ s/[,;.]?\s*$//;
+    $extract_string =~ s/^[,;.]//;
+    $extract_string =~ s/[,;.]$//;
 
     while ($extract_string =~ /([,;.])/g) {
         my $mark = $1;
@@ -51,6 +53,11 @@ sub _extract_expressions
         $extract_string =~ s/\Q$mark\E \s+? $pattern/ [token] /x; # pretend punctuation marks are tokens
     }
 
+    my $timespan_sep = $self->{data}->__timespan('literal');
+
+    1 while $extract_string =~ s/^$timespan_sep\s+//i;
+    1 while $extract_string =~ s/\s+$timespan_sep$//i;
+
     $self->_rewrite(\$extract_string);
 
     my @tokens = split /\s+/, $extract_string;
@@ -58,52 +65,8 @@ sub _extract_expressions
 
     my (@expressions, %skip);
 
-    my $timespan_sep = $self->{data}->__timespan('literal');
-
     if ($extract_string =~ /\s+ $timespan_sep \s+/ix) {
-        my $trim = sub { local $_ = shift; s/^\s+//; s/\s+$//; $_ };
-
-        my @strings = grep /\S/, map $trim->($_), split /\b$timespan_sep\b/i, do {
-            local $_ = $extract_string;
-            1 while s/^$timespan_sep\s+//i;
-            1 while s/\s+$timespan_sep$//i;
-            $_
-        };
-        if (@strings) {
-            my $index = 0;
-            $index++ while $extract_string =~ /\G$timespan_sep\s+/gi;
-            my @indexes;
-            for (my $i = 0; $i < @strings; $i++) {
-                my @string_tokens = split /\s+/, $strings[$i];
-                push @indexes, [ $index, $index + $#string_tokens ];
-                $index += $#string_tokens + 1;
-                $index++ while defined $tokens[$index] && $tokens[$index] =~ /^$timespan_sep$/i;
-            }
-
-            my $duration = $self->{data}->{duration};
-
-            DURATION: {
-                for (my $i = 0; $i < @strings - 1; $i++) {
-                    next unless $extract_duration->(\%skip, \@indexes, $i);
-                    my $save_expression = false;
-                    my @chunks;
-                    foreach my $extract (qw(_first_to_last_extract _from_count_to_count_extract)) {
-                        if ($self->$extract($duration, $get_range->(\@strings, $i), $get_range->(\@indexes, $i), \@tokens, \@chunks)) {
-                            $save_expression = true;
-                            last;
-                        }
-                    }
-                    if ($save_expression) {
-                        my $timespan_sep_index = $chunks[0]->[0][1] + 1;
-                        my $expression = join ' ', ($chunks[0]->[1], $tokens[$timespan_sep_index], $chunks[1]->[1]);
-                        my @indexes = ($chunks[0]->[0][0], $chunks[1]->[0][1]);
-                        push @expressions, [ [ @indexes ], $expression, { flags => DURATION_TYPE } ];
-                        $skip{$_} = true foreach ($indexes[0] .. $indexes[1]);
-                        redo DURATION;
-                    }
-                }
-            }
-        }
+        $self->_extract_duration($extract_string, \@tokens, \@expressions, \%skip);
     }
 
     my (%expand, %lengths);
@@ -183,6 +146,47 @@ sub _extract_expressions
     } while ($seen_expression);
 
     return $self->_finalize_expressions(\@expressions, \@tokens);
+}
+
+sub _extract_duration
+{
+    my $self = shift;
+    my ($extract_string, $tokens, $expressions, $skip) = @_;
+
+    my $timespan_sep = $self->{data}->__timespan('literal');
+
+    my @strings = grep /\S/, map trim($_), split /\b $timespan_sep \b/ix, $extract_string;
+    if (@strings) {
+        my $index = 0;
+        my @indexes;
+        foreach my $string (@strings) {
+            my @string_tokens = split /\s+/, $string;
+            push @indexes, [ $index, $index + $#string_tokens ];
+            $index += $#string_tokens + 1;
+            $index++ while defined $tokens->[$index] && $tokens->[$index] =~ /^$timespan_sep$/i;
+        }
+        DURATION: {
+            for (my $i = 0; $i <= $#strings - 1; $i++) {
+                next unless $extract_duration->($skip, \@indexes, $i);
+                my $save_expression = false;
+                my @chunks;
+                foreach my $extract (qw(_first_to_last_extract _from_count_to_count_extract)) {
+                    if ($self->$extract($get_range->(\@strings, $i), $get_range->(\@indexes, $i), $tokens, \@chunks)) {
+                        $save_expression = true;
+                        last;
+                    }
+                }
+                if ($save_expression) {
+                    my $timespan_sep_index = $chunks[0]->[0][1] + 1;
+                    my $expression = join ' ', ($chunks[0]->[1], $tokens->[$timespan_sep_index], $chunks[1]->[1]);
+                    my @indexes = ($chunks[0]->[0][0], $chunks[1]->[0][1]);
+                    push @$expressions, [ [ @indexes ], $expression, { flags => DURATION_TYPE } ];
+                    $skip->{$_} = true foreach ($indexes[0] .. $indexes[1]);
+                    redo DURATION;
+                }
+            }
+        }
+    }
 }
 
 sub _finalize_expressions

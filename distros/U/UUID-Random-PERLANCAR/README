@@ -2,8 +2,8 @@ NAME
     UUID::Random::PERLANCAR - Another implementation of UUID::Random
 
 VERSION
-    This document describes version 0.003 of UUID::Random::PERLANCAR (from
-    Perl distribution UUID-Random-PERLANCAR), released on 2021-01-18.
+    This document describes version 0.004 of UUID::Random::PERLANCAR (from
+    Perl distribution UUID-Random-PERLANCAR), released on 2021-01-20.
 
 SYNOPSIS
     Use like you would UUID::Random:

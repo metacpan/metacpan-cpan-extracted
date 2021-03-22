@@ -3,7 +3,7 @@ package Validate::Simple;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 use Carp;
 
@@ -537,31 +537,42 @@ sub validate_value {
     # Check of
     $all_errors = !!$all_errors;
     if ( exists $spec->{of} && $type ne 'spec' ) {
-        my ( @keys, @values );
         if ( $type eq 'array' ) {
-            @values = @$value;
-            @keys   = @values ? ( 0..$#values ) : ();
+            my $arr_size = $#$value;
+            for ( my $i = 0; $i <= $arr_size; $i++ ) {
+                my $is_valid = $self->validate_value(
+                    "$name/$i",
+                    $value->[$i],
+                    $spec->{of},
+                    $all_errors,
+                );
+                if ( !$is_valid && !$all_errors ) {
+                    return;
+                }
+            }
         }
         elsif ( $type eq 'hash' ) {
-            @values = values %$value;
-            @keys   = keys %$value;
+            for my $key ( keys %$value ) {
+                my $is_valid = $self->validate_value(
+                    "$name/$key",
+                    $value->{$key},
+                    $spec->{of},
+                    $all_errors,
+                );
+                if ( !$is_valid && !$all_errors ) {
+                    return;
+                }
+            }
         }
         else {
             $self->_error( "$name: " . "Cannot set elements types for $type" );
             return;
         }
 
-        if ( !@values ) {
+        if ( ( $type eq 'array' && !@$value )
+             || ( $type eq 'hash' && !%$value ) ) {
             if ( !exists( $spec->{empty} ) || !$spec->{empty} ) {
                 $self->_error( "$name: " . ucfirst( $type ) . " cannot be empty" );
-                return;
-            }
-        }
-
-        for ( my $i = 0; $i < @values; $i++ ) {
-            my ( $k, $v ) = ( $keys[ $i ], $values[ $i ] );
-            my $is_valid = $self->validate_value( "$name/$k", $v, $spec->{of}, $all_errors );
-            if ( !$is_valid && !$all_errors ) {
                 return;
             }
         }

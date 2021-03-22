@@ -1,5 +1,6 @@
 Changes
 lib/Image/PNG.pm
+lib/Image/PNG.pod
 lib/Image/PNG/Container.pm
 lib/Image/PNG/Util.pm
 Makefile.PL

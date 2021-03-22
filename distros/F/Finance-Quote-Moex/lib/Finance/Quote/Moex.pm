@@ -26,7 +26,7 @@ use warnings;
 use vars qw($VERSION);
 
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 our %bond_group_urls = (tplus => "58", # Т+: Основной режим - безадрес.
                     tplus_usd => "193", # 	Т+: Основной режим (USD) - безадрес. 	0 	1
@@ -171,6 +171,7 @@ sub moex {
 	my $nkd_field;
 	my $currency;
 	my $url;
+	my $facevalue;
 	
 	foreach my $stock (@stocks) # Обнуляем признаки обработки тикеров
 	  {
@@ -251,7 +252,8 @@ sub moex {
 						{
 						if ($is_bond)
 							{
-							$price = $price * 10;
+							$facevalue = $q[$fields{"FACEVALUE"}]; # Номинал облигации
+							$price = $price * $facevalue / 100; 
 							if ($is_bond=="2")
 								{
 								$price = $price+$q[$fields{$nkd_field}]; # Прибавляем к цене облигации стоимость НКД

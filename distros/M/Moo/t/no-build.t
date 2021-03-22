@@ -1,6 +1,8 @@
-use Moo::_strictures;
+use strict;
+use warnings;
+
 use Test::More;
-use Moo::_mro;
+use Moo::_Utils ();
 
 BEGIN {
   package Class::Diminutive;
@@ -25,7 +27,7 @@ BEGIN {
     my @builds =
       grep { defined }
       map {; no strict 'refs'; *{$_.'::BUILD'}{CODE} }
-      @{mro::get_linear_isa($class)};
+      @{Moo::_Utils::_linear_isa($class)};
     for my $build (@builds) {
       $self->$build;
     }

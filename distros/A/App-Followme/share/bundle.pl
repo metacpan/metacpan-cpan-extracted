@@ -5,7 +5,6 @@ use warnings;
 
 use FindBin qw($Bin);
 
-use Cwd;
 use IO::Dir;
 use IO::File;
 use MIME::Base64  qw(encode_base64);

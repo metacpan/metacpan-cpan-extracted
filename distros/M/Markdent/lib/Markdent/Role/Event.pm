@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::Types;
 
@@ -170,7 +170,7 @@ Markdent::Role::Event - Implements behavior shared by all events
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
@@ -197,9 +197,9 @@ This returns a name like "start_blockquote", "end_strong", or "text".
 
 =head2 $event->kv_pairs_for_attributes
 
-This returns a hash representing the data stored in the object's
-attributes. If an attribute is not required and has not been set, it will not
-be present in the hash.
+This returns a hash representing the data stored in the object's attributes. If
+an attribute is not required and has not been set, it will not be present in
+the hash.
 
 =head2 $event->debug_dump
 

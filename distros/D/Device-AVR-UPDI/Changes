@@ -1,5 +1,15 @@
 Revision history for Device-AVR-UPDI
 
+0.08    2021-03-18
+        [CHANGES]
+         * Add DEBUG output for read_sib
+         * Documentation updates
+
+        [BUGFIXES]
+         * Fix for split-read conditions on UART
+         * Declare run-time depends on IO::Termios, even though unit tests
+           don't actually use it
+
 0.07    2021-03-05
         [CHANGES]
          * Support the NVM controller in the AVR DA and DB families

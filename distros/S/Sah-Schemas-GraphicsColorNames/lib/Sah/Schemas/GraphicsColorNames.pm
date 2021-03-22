@@ -1,7 +1,7 @@
 package Sah::Schemas::GraphicsColorNames;
 
-our $DATE = '2021-01-20'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-03-20'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to Graphics::ColorNames
@@ -18,7 +18,7 @@ Sah::Schemas::GraphicsColorNames - Sah schemas related to Graphics::ColorNames
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::GraphicsColorNames (from Perl distribution Sah-Schemas-GraphicsColorNames), released on 2021-01-20.
+This document describes version 0.004 of Sah::Schemas::GraphicsColorNames (from Perl distribution Sah-Schemas-GraphicsColorNames), released on 2021-03-20.
 
 =head1 HOMEPAGE
 

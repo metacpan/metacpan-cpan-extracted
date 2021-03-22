@@ -13,7 +13,7 @@ use Carp;
 use Exporter qw{ import };
 use File::Spec;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 our @EXPORT_OK = qw{
     symlink_r
@@ -44,7 +44,6 @@ sub symlink_r ($$) {	## no critic (ProhibitSubroutinePrototypes)
     my $relative = File::Spec->abs2rel( $source, $tgt_dir );
     return symlink $relative, $target;
 }
-
 
 1;
 
@@ -112,6 +111,7 @@ L<https://www.reddit.com/r/perl/comments/fluxay/can_i_make_relative_symbolic_lin
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Symlink-Relative>,
 L<https://github.com/trwyant/perl-File-Symlink-Relative/issues>, or in
 electronic mail to the author.
 

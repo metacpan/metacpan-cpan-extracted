@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Module::Metadata" => 0,
     "Test2::V0" => 0,
-    "Test::Deep" => 0,
+    "Test::Deep" => "1.127",
     "Test::Deep::Regexp" => 0,
     "Test::Deep::Set" => 0,
     "Test::Differences" => 0,
@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "version" => "0.77"
   },
-  "VERSION" => "v0.1.5",
+  "VERSION" => "v0.1.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,7 +74,7 @@ my %FallbackPrereqs = (
   "Ref::Util" => 0,
   "Sub::Identify" => "0.06",
   "Test2::V0" => 0,
-  "Test::Deep" => 0,
+  "Test::Deep" => "1.127",
   "Test::Deep::Regexp" => 0,
   "Test::Deep::Set" => 0,
   "Test::Differences" => 0,

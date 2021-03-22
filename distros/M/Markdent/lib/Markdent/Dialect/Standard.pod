@@ -72,7 +72,7 @@ Dave Rolsky, E<lt>autarch@urth.orgE<gt>
 
 Copyright 2009-2012 Dave Rolsky, All Rights Reserved.
 
-This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

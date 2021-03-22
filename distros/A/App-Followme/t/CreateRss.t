@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -52,6 +51,8 @@ my $site_url = 'http://www.example.com';
 my $remote_url = 'http://cloudhost.com';
 
 my %configuration = (
+        top_directory => $test_dir,
+        base_directory => $test_dir,
         author => 'Bernie Simon',
         site_url => $site_url,
         remote_url => $remote_url,

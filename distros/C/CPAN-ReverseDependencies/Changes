@@ -1,5 +1,11 @@
 Revision history for Perl module CPAN::ReverseDependencies
 
-0.01 2014-02-23
+0.02 2021-03-21 NEILB
+    - switched to using MetaCPAN::Client
+    - added functional interface
+    - include META.json in releases
+    - switch to github issues for bugtracker
+
+0.01 2014-02-23 NEILB
     - First release to CPAN
 

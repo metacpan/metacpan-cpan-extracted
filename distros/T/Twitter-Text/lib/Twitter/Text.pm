@@ -1,8 +1,10 @@
 package Twitter::Text;
-use 5.014001;
+use 5.010000;
 use strict;
 use warnings;
 use utf8;
+no if $^V lt v5.13.9, 'warnings', 'utf8'; ## no critic (ValuesAndExpressions::ProhibitMismatchedOperators)
+
 use constant {
     DEFAULT_TCO_URL_LENGTHS => {
         short_url_length => 23,
@@ -22,7 +24,7 @@ use Twitter::Text::Regexp;
 use Twitter::Text::Regexp::Emoji;
 use Unicode::Normalize qw(NFC);
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 our @EXPORT  = (
     # Extraction
     qw(
@@ -239,7 +241,9 @@ sub extract_urls_with_indices {
             # last_url only contains domain. Need to add path and query if they exist.
             if ($path) {
                 # last_url was not added. Add it to urls here.
-                $last_url->{url} = $url =~ s/$domain/$last_url->{url}/re;
+                my $last_url_after = $url;
+                $last_url_after =~ s/$domain/$last_url->{url}/e;
+                $last_url->{url} = $last_url_after;
                 $last_url->{indices}->[1] = $end;
             }
         } else {
@@ -337,6 +341,7 @@ sub is_valid_username {
     return scalar(@$extracted) == 1 && $extracted->[0] eq substr($username, 1);
 }
 
+## no critic (Subroutines::ProhibitExcessComplexity)
 sub parse_tweet {
     my ($text, $options) = @_;
     # merge options
@@ -440,6 +445,7 @@ sub parse_tweet {
         valid_range_end     => $valid_offset + $normalized_text_offset - 1,
     };
 }
+## use critic
 
 sub _empty_parse_results {
     return {

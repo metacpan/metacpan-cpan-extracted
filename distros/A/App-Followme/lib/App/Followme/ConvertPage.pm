@@ -10,7 +10,7 @@ use base qw(App::Followme::Module);
 use File::Spec::Functions qw(abs2rel rel2abs catfile splitdir);
 use App::Followme::FIO;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -20,7 +20,7 @@ sub parameters {
 
     return (
             template_file => 'convert_page.htm',
-            data_pkg => 'App::Followme::MarkdownData',
+            data_pkg => 'App::Followme::TextData',
     );
 }
 
@@ -38,7 +38,7 @@ sub run {
 # Set the date format to iso date format, overriding user
 
 sub setup {
-    my ($self, %configuration) = @_;
+    my ($self) = @_;
 
     $self->{data}{date_format} = 'yyyy-mm-ddThh:mm:ss';
     return;
@@ -146,7 +146,7 @@ __END__
 
 =head1 NAME
 
-App::Followme::ConvertPage - Convert Markdown files to html
+App::Followme::ConvertPage - Convert text files to html
 
 =head1 SYNOPSIS
 
@@ -156,10 +156,10 @@ App::Followme::ConvertPage - Convert Markdown files to html
 
 =head1 DESCRIPTION
 
-This module converts text files into web files by substtuting the content into
+This module converts text files into web files by substituting the content into
 a template. The type of file converted is determined by the value of the
-parameter data_pkg. By default, it converts Markdown files.  After the
-conversion the original file is deleted.
+parameter data_pkg. By default, it converts text files using the methods in
+App::Followme::TextData.  After the conversion the original file is deleted.
 
 Along with the content, other variables are calculated from the file name and
 modification date. Variables in the template are preceded by a sigil, most
@@ -183,7 +183,8 @@ The default value is 'convert_page.htm'.
 =item data_pkg
 
 The name of the module that parses and retrieves data from the text file. The
-default value is 'App::Followme::MarkdownData', which parses Markdown files.
+default value is 'App::Followme::TextData', which by default parses 
+Markdown files.
 
 =back
 

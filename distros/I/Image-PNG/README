@@ -6,7 +6,7 @@
                        |___/                                
 
 
-This is the README for Image::PNG version 0.24.
+This is the README for Image::PNG version 0.25.
 
 Image::PNG is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -26,17 +26,8 @@ four sections:
 
 Image::PNG - Read and write PNG files
 
-This module is an attempt to make a simple interface for dealing with
-images in the PNG format. See "About the PNG format" for details of
-the format.
-
-Image::PNG is a layer on top of "Image::PNG::Libpng". Whereas
-"Image::PNG::Libpng" copies the interface of the C library "libpng",
-Image::PNG is intended to be a more intuitive way to handle PNG
-images. 
-
-This module is not completed, so its interface is likely to
-change. It's also open to suggestions for improvements.
+This module is a simple interface for dealing with images in the PNG
+format. Image::PNG uses "Image::PNG::Libpng" to access PNG images.
 
 -----------------------------------------------------------------------------
 
@@ -68,11 +59,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Image::PNG
 
-To install the module from the source file, Image-PNG-0.24.tar.gz, follow
+To install the module from the source file, Image-PNG-0.25.tar.gz, follow
 this sequence of commands:
 
-    tar xfz Image-PNG-0.24.tar.gz
-    cd Image-PNG-0.24
+    tar xfz Image-PNG-0.25.tar.gz
+    cd Image-PNG-0.25
     perl Makefile.PL
     make
     make install
@@ -97,6 +88,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Tue Jan 14 08:50:00 2020.
+This README was written on Sat Mar 20 15:43:06 2021.
 
 -----------------------------------------------------------------------------

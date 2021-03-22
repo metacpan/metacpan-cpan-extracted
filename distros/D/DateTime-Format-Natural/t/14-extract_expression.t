@@ -98,7 +98,12 @@ my @durations = (
     { 'sat @ 2 to sun @ 6'              => [ 'sat 2:00 to sun 6:00'           ] },
 );
 
-foreach my $set (\@strings, \@expanded, \@rewrite, \@punctuation, \@spaces, \@duration, \@durations) {
+# Check that looping works for those kind of durations.
+my @assert = (
+    { 'jan 1st to 31st foo first to last day of dec' => [ 'jan 1st to 31st', 'first to last day of dec' ] },
+);
+
+foreach my $set (\@strings, \@expanded, \@rewrite, \@punctuation, \@spaces, \@duration, \@durations, \@assert) {
     compare($set);
 }
 

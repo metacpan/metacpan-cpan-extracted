@@ -5,7 +5,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 # VERSION
 
-Version 1.06
+Version 1.07
 
 # SYNOPSIS
 
@@ -24,7 +24,7 @@ The column utility formats its input into multiple columns.  Rows are
 filled before columns.  Input is taken from _file_ operands, or, by
 default, from the standard input.
 
-- **-c**#, **--output-width**=#
+- **-c**#, **--width**=#, **--output-width**=#
 
     Output is formatted for a display columns wide.
 
@@ -98,6 +98,15 @@ default, from the standard input.
     Use full width of the terminal.  Each panes are expanded to fill
     terminal width, unless **--pane-width** is specified.
 
+- **--height**=#
+
+    Set page height and page mode on.
+
+- **--column-unit**=#
+
+    Each columns are placed at the unit of 8 by default.  This option
+    changes the number of the unit.
+
 - **--linestyle**=_none_|_truncate_|_wrap_|_wordwrap_, **--ls**=_..._
 
     Set the style of treatment for longer lines.
@@ -167,10 +176,6 @@ default, from the standard input.
         },
         );
 
-- **--height**=#
-
-    Set page height and page mode on.
-
 - **--**\[**no-**\]**ignore-space**, **--**\[**no-**\]**is**
 
     When used **-t** option, leading spaces are ignored by default.  Use
@@ -215,15 +220,29 @@ default, from the standard input.
     Set the style how tab is expanded.  Select from `dot`, `symbol` or
     `shade`.  Styles are defined in [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) library.
 
-- **--column-unit**=#
-
-    Each columns are placed at unit of 8 by default.  This option changes
-    the number of unit.
-
 - **--ambiguous**=_width\_spec_
 
     Specifies how to treat Unicode ambiguous width characters.  Take a
     value of 'narrow' or 'wide.  Default is 'narrow'.
+
+# CALCULATION
+
+As for **--height**, **--width** and **--pane-width** options, besides
+giving numeric digits, you can calculate the number using terminal
+size.  If the expression contains non-digit character, it is evaluated
+as a Reverse Polish Notation with the terminal size pushed on the
+stack.
+
+    OPTION              VALUE
+    =============       =========================
+    --height 1-         height - 1
+    --height 2/         height / 2
+    --height 1-2/       (height - 1) / 2
+    --height dup2%-2/   (height - height % 2) / 2
+
+Space and comma characters are ignored in the expression.  So `1-2/`
+and `1 - 2 /` and `1,-,2,/` are all same.  See \`perldoc Math::RPN\`
+for the expression detail.
 
 # STARTUP
 
@@ -271,7 +290,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2020 Kazumasa Utashiro.
+Copyright 2020- Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

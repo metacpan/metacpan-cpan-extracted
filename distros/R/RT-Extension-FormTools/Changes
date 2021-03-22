@@ -1,5 +1,9 @@
 Revision history for RT-Extension-FormTools
 
+0.52 2020-04-30
+ - Prioritize user submitted args before default values in field component
+ - Add labels for radio and check inputs (Thanks Matt!)
+
 0.51 2018-07-24
 
  - Add enable_persisting argument to Form component

@@ -4,8 +4,8 @@
 #
 package PDL::Minuit;
 
-@EXPORT_OK  = qw(  mn_init mn_def_pars mn_excm mn_pout mn_stat mn_err mn_contour mn_emat PDL::PP mninit PDL::PP mn_abre PDL::PP mn_cierra PDL::PP mnparm PDL::PP mnexcm PDL::PP mnpout PDL::PP mnstat PDL::PP mnemat PDL::PP mnerrs PDL::PP mncont );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw(  mn_init mn_def_pars mn_excm mn_pout mn_stat mn_err mn_contour mn_emat PDL::PP mninit PDL::PP mn_abre PDL::PP mn_cierra PDL::PP mnparm PDL::PP mnexcm PDL::PP mnpout PDL::PP mnstat PDL::PP mnemat PDL::PP mnerrs PDL::PP mncont );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Minuit ;
 

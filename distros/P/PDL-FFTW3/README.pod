@@ -258,26 +258,6 @@ which is described in that section.
 Dima Kogan, C<< <dima@secretsauce.net> >>; contributions from Craig
 DeForest, C<< <craig@deforest.org> >>.
 
-=head1 HISTORY
-
-=head2 VERSION 0.02
-
-=over
-
-=item Use Alien::FFTW3 for build (if present)
-
-=item add parametric rank functions
-
-=item normalize inverses
-
-=item shorter abbreviation for realfft functions
-
-=back
-
-=head2 VERSION 0.01
-
-Early working version in github
-
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2013 Dima Kogan and Craig DeForest.

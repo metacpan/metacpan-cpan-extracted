@@ -3,17 +3,17 @@
 use Mojolicious::Lite;
 use Mojo::Pg;
 
-helper pg => sub { state $pg = Mojo::Pg->new('postgresql://postgres@/test') };
+helper sql => sub { state $pg = Mojo::Pg->new('postgresql://postgres@/test') };
 
 get '/' => 'index';
 
-websocket '/ajax' => sub {
+get '/ajax' => sub {
 
     my $c = shift;
 
     my $dt_ssp = $c->datatable->ssp(
         table   => 'users',
-        db      => $c->pg->db,
+        sql     => $c->sql,
         options => [
             {
                 label => 'UID',

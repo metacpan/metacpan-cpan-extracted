@@ -10,6 +10,7 @@ lib/Mojolicious/Plugin/resources/public/mojo-status/bootstrap/bootstrap.js
 lib/Mojolicious/Plugin/resources/public/mojo-status/fontawesome/fontawesome.css
 lib/Mojolicious/Plugin/resources/public/mojo-status/logo-black-2x.png
 lib/Mojolicious/Plugin/resources/public/mojo-status/logo-black.png
+lib/Mojolicious/Plugin/resources/public/mojo-status/pinstripe-light.png
 lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-brands-400.eot
 lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-brands-400.svg
 lib/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-brands-400.ttf

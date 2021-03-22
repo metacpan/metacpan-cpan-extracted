@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::Types;
 
@@ -31,12 +31,12 @@ Markdent::Event::EndTableBody - An event for the end of a table body
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
-This class represents the end of a table body. A table can have more than
-one body.
+This class represents the end of a table body. A table can have more than one
+body.
 
 =head1 ROLES
 

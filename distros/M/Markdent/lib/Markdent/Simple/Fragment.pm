@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::Handler::HTMLStream::Fragment;
 use Markdent::Parser;
@@ -66,7 +66,7 @@ Markdent::Simple::Fragment - Convert Markdown to an HTML Fragment
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -79,7 +79,8 @@ version 0.39
 
 =head1 DESCRIPTION
 
-This class provides a very simple interface for converting Markdown to an HTML fragment.
+This class provides a very simple interface for converting Markdown to an HTML
+fragment.
 
 =head1 METHODS
 

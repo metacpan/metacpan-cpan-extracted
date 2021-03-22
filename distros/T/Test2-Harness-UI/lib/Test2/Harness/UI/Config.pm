@@ -2,7 +2,7 @@ package Test2::Harness::UI::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.000047';
+our $VERSION = '0.000050';
 
 use Test2::Util qw/get_tid pkg_to_file/;
 
@@ -46,11 +46,19 @@ sub connect {
 
     require DBI;
 
+    my %params = (
+        AutoCommit => 1,
+        RaiseError => 1,
+    );
+
+    my $schema = $ENV{YATH_UI_SCHEMA} //= 'PostgreSQL';
+    $params{mysql_auto_reconnect} = 1 if $schema =~ m/mysql/i;
+
     return $DB_CACHE = DBI->connect(
         $self->{+DBI_DSN},
         $self->{+DBI_USER},
         $self->{+DBI_PASS},
-        {AutoCommit => 1, RaiseError => 1}
+        \%params,
     );
 }
 

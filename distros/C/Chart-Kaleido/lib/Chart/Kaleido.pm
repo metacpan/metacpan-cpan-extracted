@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use Moo;
 use Config;
@@ -29,6 +29,25 @@ has base_args => (
     is       => 'ro',
     init_arg => 0,
     default  => sub { [] },
+);
+
+has _default_chromium_args => (
+    is      => 'ro',
+    default => sub {
+        [
+            qw(
+              --disable-gpu
+              --allow-file-access-from-files
+              --disable-breakpad
+              --disable-dev-shm-usage
+            )
+        ];
+    }
+);
+
+has disable_gpu => (
+    is      => 'ro',
+    default => 1,
 );
 
 has _stall_timeout => (
@@ -67,6 +86,10 @@ sub kaleido_args {
     my ($self) = @_;
 
     my @args = @{ $self->base_args };
+    unless ( $self->disable_gpu ) {
+        @args = grep { $_ ne '--disable-gpu' } @args;
+    }
+
     no strict 'refs';
     push @args, map {
         my $val = $self->$_;
@@ -244,7 +267,7 @@ Chart::Kaleido - Base class for Chart::Kaleido
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -288,7 +311,7 @@ Gabor Szabo <gabor@szabgab.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Stephan Loyd.
+This software is copyright (c) 2020-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

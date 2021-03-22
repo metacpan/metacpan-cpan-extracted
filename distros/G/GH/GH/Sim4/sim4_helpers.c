@@ -12,6 +12,8 @@
 #include "encoding.h"
 #include "poly.h"
 #include "misc.h"
+#include "align.h"
+#include "seq.h"
 
 SV *package_sim4_results(int dist, sim4_stats_t *st,
 			 edit_script_list *Aligns, Exon *Exons,
@@ -174,7 +176,7 @@ sim4_helper(char *genomic, char *cDNA, SV *argsRef)
   }
   free_table();
 
-  Perl_croak(aTHX_ status_message);
+  Perl_croak(aTHX_ "%s", status_message);
 }
 
 SV *
@@ -471,7 +473,7 @@ set_sim4_args(sim4_args_t *rs, SV *argsRef)
 
   return(STAT_OK);
  bail:
-  Perl_croak(aTHX_ status_message);
+  Perl_croak(aTHX_ "%s", status_message);
 }
 
 /*

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 55 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 56 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CompleteCLIs.pm'
@@ -33,6 +33,7 @@ my @scripts = (
     'script/complete-gid',
     'script/complete-group',
     'script/complete-hash-key',
+    'script/complete-idx-listed-stock-code',
     'script/complete-int',
     'script/complete-kernel',
     'script/complete-known-host',

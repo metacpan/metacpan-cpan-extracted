@@ -4,8 +4,8 @@
 #
 package PDL::GSLSF::ELLINT;
 
-@EXPORT_OK  = qw( PDL::PP gsl_sf_ellint_Kcomp PDL::PP gsl_sf_ellint_Ecomp PDL::PP gsl_sf_ellint_F PDL::PP gsl_sf_ellint_E PDL::PP gsl_sf_ellint_P PDL::PP gsl_sf_ellint_D PDL::PP gsl_sf_ellint_RC PDL::PP gsl_sf_ellint_RD PDL::PP gsl_sf_ellint_RF PDL::PP gsl_sf_ellint_RJ );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw( PDL::PP gsl_sf_ellint_Kcomp PDL::PP gsl_sf_ellint_Ecomp PDL::PP gsl_sf_ellint_F PDL::PP gsl_sf_ellint_E PDL::PP gsl_sf_ellint_P PDL::PP gsl_sf_ellint_D PDL::PP gsl_sf_ellint_RC PDL::PP gsl_sf_ellint_RD PDL::PP gsl_sf_ellint_RF PDL::PP gsl_sf_ellint_RJ );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::ELLINT ;
 

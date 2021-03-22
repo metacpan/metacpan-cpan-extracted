@@ -11,7 +11,7 @@ use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
 use base qw(App::Followme::BaseData);
 use App::Followme::FIO;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -673,7 +673,7 @@ sub match_patterns {
 # Initialize the configuration parameters
 
 sub setup {
-    my ($self, %configuration) = @_;
+    my ($self) = @_;
 
     # Set filename extension if unset
     $self->{extension} ||= $self->{web_extension};
@@ -701,10 +701,10 @@ App::Followme::FolderData - Build metadata from folder information
 
     use Cwd;
     use App::Followme::FolderData;
-    my $directory = cwd();
-    my $data = App::Followme::FolderData->new(directory => $directory);
-    @filenames = $data->get_files();
-    foreach my $filename (@filename) {
+    my $directory = getcwd();
+    my $data = App::Followme::FolderData->new();
+    my $filenames = $data->get_files($directory);
+    foreach my $filename (@$filenames) {
         print "$filename\n";
     }
 

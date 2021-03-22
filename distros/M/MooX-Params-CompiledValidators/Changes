@@ -1,0 +1,32 @@
+Changes on 2021-03-19 for repository at:
+  Fetch URL: git@github.com:abeltje/MooX-Params-CompiledValidators.git
+  Push  URL: git@github.com:abeltje/MooX-Params-CompiledValidators.git
+
+Enjoy!
+
+0.02 2021-03-19T05:08:02+01:00 (c4a7206 => Abe Timmerman)
+ - (Abe Timmerman, 2 seconds ago) Autocommit for distribution
+   MooX::Params::CompiledValidators 0.02 (same)
+
+0.01 2021-03-19T04:43:32+01:00 (2b8c415 => Abe Timmerman)
+ - (Abe Timmerman, 25 minutes ago) Autocommit for distribution
+   MooX::Params::CompiledValidators 0.01 (same)
+
+ - (Abe Timmerman, 7 minutes ago) Clean up the MANIFEST* stuff
+ -     We want Changes in the tarbal...
+
+0.00_00 2021-02-19T01:11:57+01:00 (58b6456 => Abe Timmerman)
+ - (Abe Timmerman, 4 weeks ago) New repository
+   MooX::Params::CompiledValidations
+
+ - (Abe Timmerman, 7 days ago) Setup the new repository
+ -     Basic perl-distribution files
+ -     t::Test::abeltje (update_abeltje_testing)
+ -     The actual code
+ -     basic tests
+
+ - (Abe Timmerman, 7 days ago) VERSION doesn't work with whitespace in it
+
+ - (Abe Timmerman, 3 hours ago) Small POD changes
+
+ - (Abe Timmerman, 33 minutes ago) Add a README.md

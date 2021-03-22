@@ -2,9 +2,13 @@ package DateTime::Format::Natural::Utils;
 
 use strict;
 use warnings;
+use base qw(Exporter);
 use boolean qw(true false);
 
-our $VERSION = '0.05';
+our ($VERSION, @EXPORT_OK);
+
+$VERSION = '0.07';
+@EXPORT_OK = qw(trim);
 
 sub _valid_date
 {
@@ -73,12 +77,22 @@ sub _trace_string
       keys %$modified;
 }
 
+sub trim
+{
+    local $_ = ref $_[0] eq 'SCALAR' ? ${$_[0]} : $_[0];
+
+    s/^\s+//;
+    s/\s+$//;
+
+    return ref $_[0] eq 'SCALAR' ? do { ${$_[0]} = $_; '' } : $_;
+}
+
 1;
 __END__
 
 =head1 NAME
 
-DateTime::Format::Natural::Utils - Handy utility methods
+DateTime::Format::Natural::Utils - Handy utility functions/methods
 
 =head1 SYNOPSIS
 
@@ -86,7 +100,7 @@ DateTime::Format::Natural::Utils - Handy utility methods
 
 =head1 DESCRIPTION
 
-The C<DateTime::Format::Natural::Utils> class consists of utility methods.
+The C<DateTime::Format::Natural::Utils> class consists of utility functions/methods.
 
 =head1 SEE ALSO
 

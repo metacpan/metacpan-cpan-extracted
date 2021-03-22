@@ -4,8 +4,8 @@
 #
 package PDL::GSLSF::AIRY;
 
-@EXPORT_OK  = qw( PDL::PP gsl_sf_airy_Ai PDL::PP gsl_sf_airy_Bi PDL::PP gsl_sf_airy_Ai_scaled PDL::PP gsl_sf_airy_Bi_scaled PDL::PP gsl_sf_airy_Ai_deriv PDL::PP gsl_sf_airy_Bi_deriv PDL::PP gsl_sf_airy_Ai_deriv_scaled PDL::PP gsl_sf_airy_Bi_deriv_scaled );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw( PDL::PP gsl_sf_airy_Ai PDL::PP gsl_sf_airy_Bi PDL::PP gsl_sf_airy_Ai_scaled PDL::PP gsl_sf_airy_Bi_scaled PDL::PP gsl_sf_airy_Ai_deriv PDL::PP gsl_sf_airy_Bi_deriv PDL::PP gsl_sf_airy_Ai_deriv_scaled PDL::PP gsl_sf_airy_Bi_deriv_scaled );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::AIRY ;
 
@@ -32,7 +32,6 @@ This is an interface to the Special Function package present in the GNU Scientif
 =head1 SYNOPSIS
 
 =cut
-
 
 
 
@@ -295,7 +294,6 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL SF modules were written by G. Jungman.
 
 =cut
-
 
 
 

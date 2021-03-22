@@ -4,8 +4,8 @@
 #
 package PDL::IO::Misc;
 
-@EXPORT_OK  = qw(  rcols wcols swcols rgrep rdsa PDL::PP bswap2 PDL::PP bswap4 PDL::PP bswap8  isbigendian  rasc rcube PDL::PP _rasc );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw(  rcols wcols swcols rgrep rdsa PDL::PP bswap2 PDL::PP bswap4 PDL::PP bswap8  isbigendian  rasc rcube PDL::PP _rasc );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::Misc ;
 

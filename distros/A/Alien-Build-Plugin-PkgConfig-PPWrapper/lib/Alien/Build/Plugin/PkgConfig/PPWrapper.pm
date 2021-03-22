@@ -8,7 +8,7 @@ use Alien::Build::Plugin;
 use Path::Tiny qw /path/;
 use File::Which ();
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub init {

@@ -3,7 +3,7 @@ package Markdent::CheckedOutput;
 use strict;
 use warnings;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 sub new {
     my $class  = shift;
@@ -42,7 +42,7 @@ Markdent::CheckedOutput - This class has no user-facing parts
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SUPPORT
 

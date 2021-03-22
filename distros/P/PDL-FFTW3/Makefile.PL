@@ -10,29 +10,18 @@ use PDL::Core::Dev;
 # a Debian package won't have to include Alien::FFTW3.
 my $cflags;
 my $libs;
-my $version = parseVersion( 'FFTW3.pd');
 
 if( eval "require Alien::FFTW3" ) {
     ## Ensure at least version 3.3; die if we can't get it.
     Alien::FFTW3->VERSION(3.3);
-    
     my $p = Alien::FFTW3->precision;
     unless($p->{'d'} and $p->{'f'}) {
 	die "PDL::FFTW3 - needs both double-precision and single-precision fftw3 libraries\n\t(libfftw3 and libfftw3f). Alien::FFTW3 found only ".(join(",",keys %$p))."\n";
     }
-    
     $cflags = Alien::FFTW3->cflags;
     $libs   = Alien::FFTW3->libs;
 } else {
-#    if( $version =~ /_/ ) {
-#        die <<EOF;
-#Alien::FFTW3 not found, but it is required for dev snapshots, such as this.
-#Please use Alien::FFTW3 or use a release of this module.
-#Or remove this check from the source.
-#EOF
-#    }
-
-    printf "Alien::FFTW3 not found.  Using pkg-config instead...\n";
+    print "Alien::FFTW3 not found.  Using pkg-config instead...\n";
 
     require IPC::Run;
     $cflags = '';
@@ -56,7 +45,7 @@ if( eval "require Alien::FFTW3" ) {
 my @package = qw(FFTW3.pd FFTW3 PDL::FFTW3);
 my %descriptor = pdlpp_stdargs(\@package);
 
-$descriptor{VERSION}   = $version;
+$descriptor{VERSION_FROM} = 'FFTW3.pd';
 $descriptor{OPTIMIZE}  = ($Config{ccname} =~ m/gcc/) ? '-O2' : $Config{optimize};
 $descriptor{CCFLAGS} .= ( ($Config{ccname} =~ m/gcc/) ? '--std=gnu99 ' : '' ) . $Config{ccflags};
 
@@ -87,20 +76,21 @@ $descriptor{ABSTRACT} = "PDL interface to the Fastest Fourier Transform in the W
 $descriptor{LICENSE}  = "gpl_3";
 
 $descriptor{META_MERGE} = {
+  "meta-spec" => { version => 2 },
   resources => {
-    homepage => 'http://github.com/PDLPorters/pdl-fftw3',
-    repository => 'git://github.com/PDLPorters/pdl-fftw3.git',
-    bugtracker => 'http://github.com/PDLPorters/pdl-fftw3/issues',
+    web => 'http://github.com/PDLPorters/pdl-fftw3',
+    bugtracker => { web => 'http://github.com/PDLPorters/pdl-fftw3/issues' },
     url => 'git://github.com/PDLPorters/pdl-fftw3.git',
     type => 'git',
     x_IRC => 'irc://irc.perl.org/#pdl',
   },
-  provides => {
-    'PDL::FFTW3' => {
-      file => 'FFTW3.pd',
-      version => $descriptor{VERSION},
-    }
-  }
+  prereqs => {
+    develop => {
+      requires => {
+        'CPAN::Changes' => 0,
+      },
+    },
+  },
 };
 
 WriteMakefile( %descriptor );
@@ -112,17 +102,4 @@ install ::
 	@echo "Updating PDL documentation database...";
 	@$(PERL) -e "exit if $$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(q{PDL::FFTW3}); }; ";
 FOO
-}
-
-sub parseVersion {
-  my $file = shift;
-
-  my $infd;
-  open $infd, '<', $file or die "Error: couldn't open file '$file' for version parsing";
-
-  while(<$infd>) {
-    return $1 if /our \$VERSION = '([0-9\.a-zA-Z_]+)'/;
-  }
-
-  die "Error: couldn't parse version from '$file'";
 }

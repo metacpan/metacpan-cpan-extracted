@@ -1,7 +1,10 @@
 Revision history for Business::Barcode::EAN13.
 
-2.00  jan Willamowius, Sun Sep 8 2013
-    - fix country codes fro Germany and Russia (bug #37800)
+2.11  Jan Willamowius, Sat Mar 20 2021
+    - update country data
+
+2.00  Jan Willamowius, Sun Sep 8 2013
+    - fix country codes for Germany and Russia (bug #37800)
 
 1.01  Tony Bowden, Sat Sep 3 2005
 	- Make build_prefix private

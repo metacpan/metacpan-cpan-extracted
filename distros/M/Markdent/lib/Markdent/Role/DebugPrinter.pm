@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::Types;
 
@@ -57,11 +57,12 @@ Markdent::Role::DebugPrinter - A role for classes which output debugging informa
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
-This role implements behavior shared by all classes which output debugging information.
+This role implements behavior shared by all classes which output debugging
+information.
 
 =head1 ATTRIBUTES
 

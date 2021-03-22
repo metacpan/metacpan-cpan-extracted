@@ -318,8 +318,8 @@ in London, Berlin or Switzerland to get an introduction in person.
   examples scripts interactively, `Term::ReadLine::Gnu` and
   `PadWalker` (and optionally `Eval::WithLexicals` if you want to use
   the :m/:M modes, and `Capture::Tiny` to see code definition location
-  information and `Sub::Util` to see function names when displaying
-  code refs.)
+  information and `Sub::Util` from `Scalar::List::Utils` to see
+  function names when displaying code refs.)
 
 * to run the test suite: `Test::Requires`
 
@@ -330,6 +330,8 @@ in London, Berlin or Switzerland to get an introduction in person.
   `Clone`. Some of these are also necessary to run `htmlgen/gen` (or
   `website/gen` to build the website), see
   [Htmlgen](htmlgen/README.md) for details.
+
+* some examples also use: `JSON::PP`
 
 (Todo: should all of the above be listed in PREREQ_PM in Makefile.PL?)
 

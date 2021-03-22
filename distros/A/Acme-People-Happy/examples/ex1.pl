@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Acme::People::Happy;
 
 # Object.

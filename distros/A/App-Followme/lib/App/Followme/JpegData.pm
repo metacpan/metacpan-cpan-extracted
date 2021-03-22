@@ -12,7 +12,7 @@ use Image::Size;
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -70,7 +70,7 @@ sub get_url {
 # Set up exclude
 
 sub setup {
-    my ($self, %configuration) = @_;
+    my ($self) = @_;
 
     my $dir;
     my $thumb_files = $self->get_thumb_file("*.$self->{extension}");

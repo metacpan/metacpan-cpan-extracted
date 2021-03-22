@@ -11,14 +11,16 @@ $self->plugin('DataTables');
 # Mojolicious::Lite
 plugin 'DataTables';
 
+helper sql => sub { state $pg = Mojo::Pg->new('postgresql://postgres@/test') };
+
 get '/users_table' => sub {
 
     my $c = shift;
-    my $db = $c->dbi->db;
+    my $sql = $c->sql;
 
     my $dt_ssp = $c->datatable->ssp(
         table   => 'users',
-        db      => $db,
+        sql     => $sql,
         options => [
             {
                 label => 'UID',
@@ -81,4 +83,4 @@ To install this module type the following:
 
 ## Copyright
 
-Copyright (C) 2020 by Giuseppe Di Terlizzi
+Copyright (C) 2020-2021 by Giuseppe Di Terlizzi

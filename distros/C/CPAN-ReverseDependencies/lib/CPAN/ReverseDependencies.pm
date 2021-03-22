@@ -1,72 +1,47 @@
 package CPAN::ReverseDependencies;
 # ABSTRACT: given a CPAN dist name, find other CPAN dists that use it
-$CPAN::ReverseDependencies::VERSION = '0.01';
+$CPAN::ReverseDependencies::VERSION = '0.02';
 use 5.006;
 use strict;
 use warnings;
 use Moo;
 use Carp;
-use MetaCPAN::API;
+use MetaCPAN::Client;
+use parent 'Exporter';
 
-my $SLICE_SIZE = 100;
+our @EXPORT_OK = qw/ get_reverse_dependencies /;
 
-has ua => (
-           is      => 'ro',
-           default => sub { MetaCPAN::API->new() },
-          );
+has ua => ( is => 'lazy' );
+
+sub _build_ua
+{
+    return MetaCPAN::Client->new;
+}
 
 sub get_reverse_dependencies
 {
-    my $self     = shift;
-    my $distname = shift;
-    my @deps;
-    my $offset = 0;
-    my @deps_slice;
+    my $distname = pop @_;
+    my $ua;
 
-    do {
-        @deps_slice = $self->_get_dependency_slice($distname, $offset);
-        push(@deps, @deps_slice);
-        $offset += scalar @deps_slice;
-    } while (@deps_slice == $SLICE_SIZE);
+    if (@_ == 1) {
+        my $self = shift;
+        $ua = $self->ua;
+    }
+    else {
+        $ua = MetaCPAN::Client->new();
+    }
+    my $resultset = $ua->reverse_dependencies($distname);
+    my @dependents;
 
-    return @deps;
-}
-
-sub _get_dependency_slice
-{
-    my $self     = shift;
-    my $distname = shift;
-    my $offset   = shift;
-    my $result;
-
-    eval {
-
-        $result = $self->ua->post('/search/reverse_dependencies/'.$distname,
-                {
-                    query => {
-                        filtered => {
-                          query  => { 'match_all' => {} },
-                          filter => {
-                            and => [
-                              { term => { 'release.status'     => 'latest' } },
-                              { term => { 'release.authorized' => \1 } },
-                            ],
-                          },
-                        },
-                    },
-                    size => $SLICE_SIZE,
-                    from => $offset,
-                });
-
-    };
-
-    if ($@) {
-        croak "Failed to get reverse dependencies for $distname: $@";
+    # If you want more than just the names of
+    # the dependent distributions, take this loop
+    # and look at the doc of MetaCPAN::Client::Release
+    # to see what other information is easily available
+    while (my $release = $resultset->next) {
+        push(@dependents, $release->distribution);
     }
 
-    my @dists = map { $_->{_source}->{metadata}->{name} } @{ $result->{hits}->{hits} };
-
-    return @dists;
+    return @dependents;
 }
 
 1;
@@ -77,21 +52,24 @@ CPAN::ReverseDependencies - given a CPAN dist name, find other CPAN dists that u
 
 =head1 SYNOPSIS
 
- use CPAN::ReverseDependencies;
- 
- my $revua = CPAN::ReverseDependencies->new();
- my @deps  = $revua->get_reverse_dependencies('Module-Path');
+ use CPAN::ReverseDependencies qw/ get_reverse_dependencies /;
+
+ my @deps = get_reverse_dependencies('Module-Path');
 
 =head1 DESCRIPTION
 
-B<CPAN::ReverseDependencies> takes the name of a CPAN distribution and
+B<CPAN::ReverseDependencies> exports a single function,
+C<get_reverse_dependencies>,
+which takes the name of a CPAN distribution and
 returns a list containing names of other CPAN distributions that have declared
 a dependence on the specified distribution.
 
-It uses the L<MetaCPAN|https://www.cpan.org>
-L<API|https://github.com/CPAN-API/cpan-api/wiki/API-docs>
-to look up the reverse dependencies, so obviously you have to be online
-for this module to work.
+It uses L<MetaCPAN::Client> to look up the reverse dependencies,
+so obviously you have to be online for this module to work.
+If you want more than just the name of the dependent distributions,
+use L<MetaCPAN::Client> directly,
+and get the info you need from the L<MetaCPAN::Client::Release>
+objects returned by the C<reverse_dependencies> method.
 
 This module will C<croak> in a number of situations:
 
@@ -105,9 +83,19 @@ This module will C<croak> in a number of situations:
 
 =back
 
+=head2 OO Interface
+
+The first release had an OO interface, which is supported for backwards compatibility:
+
+ use CPAN::ReverseDependencies;
+ 
+ my $revua = CPAN::ReverseDependencies->new();
+ my @deps  = $revua->get_reverse_dependencies('Module-Path');
+
+
 =head1 REPOSITORY
 
-L<https://github.com/neilbowers/CPAN-ReverseDependencies>
+L<https://github.com/neilb/CPAN-ReverseDependencies>
 
 =head1 AUTHOR
 

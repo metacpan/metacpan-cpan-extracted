@@ -15,7 +15,7 @@
 
 
 package DIME::Tools;
-$DIME::Tools::VERSION = '0.04';
+$DIME::Tools::VERSION = '0.05';
 use 5.008;
 use strict;
 use warnings;
@@ -31,13 +31,7 @@ DIME::Tools - modules for parsing and generate DIME messages
 
 =head1 SYNOPSIS
 
-This is a collection of modules for processing DIME messages.
-It hasn't been actively developed since 2004,
-and the release in 2016 was to get the distribution following
-CPAN conventions, as there is one distribution depending on it.
-
-	Generating DIME messages
-	========================
+Generating DIME messages
 
 		my $payload = DIME::Payload->new();
 		$payload->attach(Path => "/mydata/index.html",
@@ -50,36 +44,42 @@ CPAN conventions, as there is one distribution depending on it.
 
 		my $message = DIME::Message->new();
 
-                my $payload = DIME::Payload->new();
-                $payload->attach(Path => "/mydata/index.html",
-                                 MIMEType => 'text/html',
-                                 Dynamic => 1);
+        my $payload = DIME::Payload->new();
+        $payload->attach(Path => "/mydata/index.html",
+                         MIMEType => 'text/html',
+                         Dynamic => 1);
+
 		$message->add_payload($payload);
 		$message->add_payload($payload2);
 
 		# Print the encoded message to STDOUT
 		$message->print(\*STDOUT);
 
-	Parsing DIME messages
-	=====================
+Parsing DIME messages
 
-	        my $parser = DIME::Parser->new();
+        my $parser = DIME::Parser->new();
 
 		# Open a file with a dime encoded message
-	        $f = IO::File->new("dime.message","r");
-	        my $message = $parser->parse($f);
-	        $f->close();
+        $f = IO::File->new("dime.message","r");
+        my $message = $parser->parse($f);
+        $f->close();
 
 		# Print the content of each payload to STDOUT
-	        for my $i ($message->payloads())
-	        {
-	                print $i->print_content(\*STDOUT);
-	        }
+        for my $i ($message->payloads())
+        {
+                print $i->print_content(\*STDOUT);
+        }
 
 
 =head1 DESCRIPTION
 
-DIME-tools is a collection of DIME:: modules for parse and generate DIME encoded messages ( Direct Internet Message Encapsulation ). DIME-tools support single-record and chunked payloads for sending big attachments.
+DIME-tools is a collection of DIME:: modules for parsing and generating DIME encoded messages
+(Direct Internet Message Encapsulation).
+DIME-tools support single-record and chunked payloads for sending big attachments.
+
+This distribution hasn't been actively developed since 2004.
+Subsequent releases have been to get the distribution following CPAN conventions,
+as there is one distribution depending on it
 
 =head1 GENERATING MESSAGES
 
@@ -92,17 +92,37 @@ For any content you want to send in a message, you have to create a Payload obje
 
 With the attach method you can specify the next keys:
 
-	Path: the name of the file you want to attach to the payload object. If the data you want to attach isn't in a file, you can use the Data key.
+=over 4
 
-	Data: it's the reference to a scalar in which you store the data you want to attach.
+=item B<Path>:
 
-	Dynamic: if Path is declared, the data is not loaded fully in memory. The only that you attach to the payload object is the name of the file of the Path key, not the content itself.
+the name of the file you want to attach to the payload object.
+If the data you want to attach isn't in a file, you can use the Data key.
 
-	Chunked: if it's declared, it represents the size of the chunk records in bytes. If you don't declare it, the message will not be chunked.
+=item B<Data>:
 
-	MIMEType: the type of the payload. It must be a string with a MIME standard type. Other possibility is to use URIType.
+it's the reference to a scalar in which you store the data you want to attach.
 
-	URIType: specifies an URI that defines that type of the content.
+=item B<Dynamic>:
+
+if Path is declared, the data is not loaded fully in memory.
+The only that you attach to the payload object is the name of the file of the Path key,
+not the content itself.
+
+=item B<Chunked>:
+
+if it's declared, it represents the size of the chunk records in bytes.
+If you don't declare it, the message will not be chunked.
+
+=item B<MIMEType>:
+
+the type of the payload. It must be a string with a MIME standard type. Other possibility is to use URIType.
+
+=item B<URIType>:
+
+specifies an URI that defines that type of the content.
+
+=back
 
 =head1 ATTACH A PAYLOAD TO A MESSAGE
 
@@ -144,9 +164,9 @@ And call print_content_data if what you want is to get a reference to the conten
 Direct Internet Message Encapsulation draft:
  http://www.gotdotnet.com/team/xml_wsspecs/dime/dime.htm
 
-DIME::Message
-DIME::Payload
-DIME::Record
+L<DIME::Message>,
+L<DIME::Payload>,
+L<DIME::Record>.
 
 =head1 AUTHOR
 

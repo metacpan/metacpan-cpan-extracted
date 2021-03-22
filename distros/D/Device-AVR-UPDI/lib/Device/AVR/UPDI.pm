@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
 
-package Device::AVR::UPDI 0.07;
+package Device::AVR::UPDI 0.08;
 
 use v5.20;
 use warnings;
@@ -78,12 +78,12 @@ This code expects to find a serial port connected to the UPDI pin of the
 microcontroller as a shared single-wire interface. Suitable hardware to
 provide this can be created using a USB-UART adapter, connecting the C<RX>
 line directly to the MCU's C<UPDI> pin, and connecting C<TX> via a
-current-limiting resistor of 4.7 kohm.
+current-limiting resistor of 1kohm.
 
    +------------+                    +-------------------+
    |         RX-|-------------+      |                   |
    | USB-UART   |             +------|-UPDI              |
-   |         TX-|---[ 4k7 ]---+      |  ATmega or ATtiny |
+   |         TX-|---[ 1k  ]---+      |  ATmega or ATtiny |
    +------------+                    +-------------------|
 
 =cut
@@ -94,7 +94,7 @@ current-limiting resistor of 4.7 kohm.
 
 =head2 new
 
-   $updi = Device::AVR::UPDI->new( ... )
+   $updi = Device::AVR::UPDI->new( ... );
 
 Constructs and returns a new C<Device::AVR::UPDI> instance.
 
@@ -174,29 +174,29 @@ sub new
 
 =head2 partinfo
 
-   $partinfo = $updi->partinfo
+   $partinfo = $updi->partinfo;
 
 Returns the Part Info structure containing base addresses and other parameters
 which may be useful for interacting with the chip.
 
 The returned structure provides the following fields
 
-   $name = $partinfo->name
+   $name = $partinfo->name;
 
-   $sig = $partinfo->signature
+   $sig = $partinfo->signature;
 
-   $addr = $partinfo->baseaddr_nvmctrl
-   $addr = $partinfo->baseaddr_fuse
-   $addr = $partinfo->baseaddr_flash
-   $addr = $partinfo->baseaddr_eeprom
-   $addr = $partinfo->baseaddr_sigrow
+   $addr = $partinfo->baseaddr_nvmctrl;
+   $addr = $partinfo->baseaddr_fuse;
+   $addr = $partinfo->baseaddr_flash;
+   $addr = $partinfo->baseaddr_eeprom;
+   $addr = $partinfo->baseaddr_sigrow;
 
-   $bytes = $partinfo->pagesize_flash
-   $bytes = $partinfo->pagesize_eeprom
-   $bytes = $partinfo->size_flash
-   $bytes = $partinfo->size_eeprom
+   $bytes = $partinfo->pagesize_flash;
+   $bytes = $partinfo->pagesize_eeprom;
+   $bytes = $partinfo->size_flash;
+   $bytes = $partinfo->size_eeprom;
 
-   $fusenames = $partinfo->fusenames
+   $fusenames = $partinfo->fusenames;
 
 =cut
 
@@ -229,6 +229,9 @@ sub fuseinfo
 }
 
 =head1 METHODS
+
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -330,7 +333,7 @@ async sub _op_writeread
       );
 
       my $got = substr( $buf,   0, length $write );
-      my $exp = substr( $write, 0, length $write );
+      my $exp = substr( $write, 0, length $buf );
 
       printf STDERR "RD: <= %v02X\n", $buf if DEBUG > 1;
 
@@ -497,7 +500,7 @@ async sub key
 
 =head2 init_link
 
-   $updi->init_link->get
+   await $updi->init_link;
 
 Initialise the UPDI link for proper communication.
 
@@ -526,7 +529,7 @@ async sub init_link
 
 =head2 read_updirev
 
-   $rev = $updi->read_updirev->get
+   $rev = await $updi->read_updirev;
 
 Reads the C<UPDIREV> field of the C<STATUSA> register.
 
@@ -554,7 +557,7 @@ async sub read_asi_sys_status
 
 =head2 read_sib
 
-   $sib = $updi->read_sib->get
+   $sib = await $updi->read_sib;
 
 Reads the System Information Block.
 
@@ -575,6 +578,8 @@ async sub read_sib
 
    my $bytes = await
       $self->_op_writeread( SYNC . pack( "C", OP_KEY_READSIB ), 16 );
+   printf STDERR ">> READSIB -> %v02X\n", $bytes if DEBUG;
+
    my ( $family, $nvm, $ocd, $dbgosc ) = unpack "A7 x A3 A3 x A1", $bytes;
    return {
       family       => $family,
@@ -586,7 +591,7 @@ async sub read_sib
 
 =head2 read_signature
 
-   $signature = $updi->read_signature->get
+   $signature = await $updi->read_signature;
 
 Reads the three signature bytes from the Signature Row of the device. This is
 returned as a plain byte string of length 3.
@@ -610,7 +615,7 @@ async sub read_signature
 
 =head2 request_reset
 
-   $updi->request_reset( $reset )->get
+   await $updi->request_reset( $reset );
 
 Sets or clears the system reset request. Typically used to issue a system
 reset by momentarilly toggling the request on and off again:
@@ -630,7 +635,7 @@ async sub request_reset
 
 =head2 erase_chip
 
-   $updi->erase_chip->get
+   await $updi->erase_chip;
 
 Requests a full chip erase, waiting until the erase is complete.
 
@@ -678,7 +683,7 @@ async sub erase_chip
 
 =head2 enable_nvmprog
 
-   $updi->enable_nvmprog->get
+   await $updi->enable_nvmprog;
 
 Requests the chip to enter NVM programming mode.
 
@@ -726,7 +731,7 @@ sub nvmctrl
 
 =head2 read_flash_page
 
-   $data = $updi->read_flash_page( $addr, $len )->get
+   $data = await $updi->read_flash_page( $addr, $len );
 
 Reads a single flash page and returns the data. C<$addr> is within the flash
 address space.
@@ -743,7 +748,7 @@ async sub read_flash_page
 
 =head2 write_flash_page
 
-   $updi->write_flash_page( $addr, $data )->get
+   await $updi->write_flash_page( $addr, $data );
 
 Writes a single flash page into the NVM controller in 16-bit word transfers.
 C<$addr> is within the flash address space.
@@ -760,7 +765,7 @@ async sub write_flash_page
 
 =head2 read_eeprom_page
 
-   $data = $updi->read_eeprom_page( $addr, $len )->get
+   $data = await $updi->read_eeprom_page( $addr, $len );
 
 Reads a single EEPROM page and returns the data. C<$addr> is within the EEPROM
 address space.
@@ -792,7 +797,7 @@ async sub write_eeprom_page
 
 =head2 write_fuse
 
-   $updi->write_fuse( $idx, $value )->get
+   await $updi->write_fuse( $idx, $value );
 
 Writes a fuse value. C<$idx> is the index of the fuse within the FUSES memory
 segment, from 0 onwards.
@@ -809,7 +814,7 @@ async sub write_fuse
 
 =head2 read_fuse
 
-   $value = $updi->read_fuse( $idx )->get
+   $value = await $updi->read_fuse( $idx );
 
 Reads a fuse value. C<$idx> is the index of the fuse within the FUSES memory
 segment, from 0 onwards.

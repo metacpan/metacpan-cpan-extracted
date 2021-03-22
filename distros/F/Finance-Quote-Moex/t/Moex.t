@@ -20,18 +20,45 @@ my $quoter = Finance::Quote->new("Moex");
  
 ok(defined $quoter, "created");
 
+# -----------------------------------------------
 # bond tplus test 
 
 my $ticker_ofz="SU26205RMFS3"; # ОФЗ 26218
 
 my %info = $quoter->fetch("moex_bond_tplus", $ticker_ofz);
+
 ok(%info, "fetched");
 ok($info{$ticker_ofz, "name"}, $ticker_ofz);
+
+diag("$ticker_ofz: (ОФЗ 26218)\n");
+diag("   date: $info{$ticker_ofz,'date'}\n");
+diag("   price: $info{$ticker_ofz,'price'}\n");
+diag("   currency: $info{$ticker_ofz,'currency'} \n");
+diag("   isodate: $info{$ticker_ofz,'isodate'} \n");
+
+# -----------------------------------------------
+# my $ticker_ofz="RU000A0JUQB7"; # БелгОб2014
+# 
+# my %info = $quoter->fetch("moex_bond_tplus", $ticker_ofz);
+# 
+# ok(%info, "fetched");
+# ok($info{$ticker_ofz, "name"}, $ticker_ofz);
+# 
+# diag("$ticker_ofz: (БелгОб2014)\n");
+# diag("   date: $info{$ticker_ofz,'date'}\n");
+# diag("   price: $info{$ticker_ofz,'price'}\n");
+# diag("   currency: $info{$ticker_ofz,'currency'} \n");
+# diag("   isodate: $info{$ticker_ofz,'isodate'} \n");
+
+# -----------------------------------------------
+# nkd
 
 my %info = $quoter->fetch("moex_bond_tplus_nkd", $ticker_ofz);
 ok(%info, "fetched");
 ok($info{$ticker_ofz, "name"}, $ticker_ofz);
 
+
+# -----------------------------------------------
 # stock test
 my $ticker="GAZP"; # Газпром
 
@@ -39,6 +66,11 @@ my %info = $quoter->fetch("moex_stock", $ticker);
 ok(%info, "fetched");
 ok($info{$ticker, "name"}, $ticker);
 
+diag("$ticker: (Газпром)\n");
+diag("   date: $info{$ticker,'date'}\n");
+diag("   price: $info{$ticker,'price'}\n");
+diag("   currency: $info{$ticker,'currency'} \n");
+diag("   isodate: $info{$ticker,'isodate'} \n");
 
 ##!/usr/bin/perl -w
 

@@ -1,5 +1,9 @@
 Revision history of Chart-Kaleido
 
+0.008       2021-03-19
+    - Add --no-sandbox which is needed by recent version of Kaleido.
+    - Bumped minimal IPC::Run version requirement.
+
 0.006       2020-10-24
     - Remove Chart::Plotly from build_requires to make installation easier.
 

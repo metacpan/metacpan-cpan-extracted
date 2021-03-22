@@ -5,8 +5,8 @@ Thank you for your interest in contributing to this Perl 5
 library.  Currently, it is in active development and maintained
 by its original author.  Bug reports (with or without patch),
 suggestions, feature requests, and comments are welcome.  You may
-submit them through this distribution's bug tracker on CPAN RT:
-https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-DifferenceSet-Planar
+submit them through this distribution's bug tracker on github:
+https://github.com/mhasch/perl-Math-DifferenceSet-Planar/issues
 
 You can also reach the author by e-mail:
 Martin Becker, <becker-cpan-mp (at) cozap.com>
@@ -95,43 +95,43 @@ need these files:
 
 data/extra_2096993.txt
 data/pdm_00002-04096.txt
-data/pdm_04099-10993.txt
-data/pdx_000002-004096.txt
-data/pdx_004099-008192.txt
-data/pdx_008209-012289.txt
-data/pdx_012301-016384.txt
-data/pdx_016411-020483.txt
-data/pdx_020507-024571.txt
-data/pdx_024593-028669.txt
-data/pdx_028687-032771.txt
-data/pdx_032779-036871.txt
-data/pdx_036877-040961.txt
-data/pdx_040973-045061.txt
-data/pdx_045077-049157.txt
-data/pdx_049169-053239.txt
-data/pdx_053267-057349.txt
-data/pdx_057367-061441.txt
-data/pdx_061463-065551.txt
-data/pdx_065557-069623.txt
-data/pdx_069653-073727.txt
-data/pdx_073751-077839.txt
-data/pdx_077849-081937.txt
-data/pdx_081943-086029.txt
-data/pdx_086069-090127.txt
-data/pdx_090149-094229.txt
-data/pdx_094249-098327.txt
-data/pdx_098347-102409.txt
-data/pdx_102433-106501.txt
-data/pdx_106531-110609.txt
-data/pdx_110623-114713.txt
-data/pdx_114743-118801.txt
-data/pdx_118819-122891.txt
-data/pdx_122921-126989.txt
-data/pdx_127031-131101.txt
+data/pdm_04099-10993.txt.bz2
+data/pdx_000002-004096.txt.bz2
+data/pdx_004099-008192.txt.bz2
+data/pdx_008209-012289.txt.bz2
+data/pdx_012301-016384.txt.bz2
+data/pdx_016411-020483.txt.bz2
+data/pdx_020507-024571.txt.bz2
+data/pdx_024593-028669.txt.bz2
+data/pdx_028687-032771.txt.bz2
+data/pdx_032779-036871.txt.bz2
+data/pdx_036877-040961.txt.bz2
+data/pdx_040973-045061.txt.bz2
+data/pdx_045077-049157.txt.bz2
+data/pdx_049169-053239.txt.bz2
+data/pdx_053267-057349.txt.bz2
+data/pdx_057367-061441.txt.bz2
+data/pdx_061463-065551.txt.bz2
+data/pdx_065557-069623.txt.bz2
+data/pdx_069653-073727.txt.bz2
+data/pdx_073751-077839.txt.bz2
+data/pdx_077849-081937.txt.bz2
+data/pdx_081943-086029.txt.bz2
+data/pdx_086069-090127.txt.bz2
+data/pdx_090149-094229.txt.bz2
+data/pdx_094249-098327.txt.bz2
+data/pdx_098347-102409.txt.bz2
+data/pdx_102433-106501.txt.bz2
+data/pdx_106531-110609.txt.bz2
+data/pdx_110623-114713.txt.bz2
+data/pdx_114743-118801.txt.bz2
+data/pdx_118819-122891.txt.bz2
+data/pdx_122921-126989.txt.bz2
+data/pdx_127031-131101.txt.bz2
 
 These text representations of planar difference sets are distributed
 separately in order not to bloat the software repository.  They occupy
-8.2 GB of storage.  A download location is yet to be determined.
+3.6 GB of storage.  A download location is yet to be determined.
 Please contact the author if you urgently need the data or want to help.
 
 For convenience, a subset sufficient to create the CPAN release is
@@ -143,4 +143,4 @@ Author's Note
 Thanks again for your interest.
 I am looking forward to your report or e-mail.
 
-Martin Becker, January 1, 2021.
+Martin Becker, February 24, 2021.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Moose;
 use MooseX::SemiAffordanceAccessor;
@@ -32,7 +32,7 @@ Markdent::Handler::HTMLStream::Fragment - Turns Markdent events into an HTML fra
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
@@ -51,8 +51,8 @@ This method creates a new handler. It accepts the following parameters:
 
 =item * output => $fh
 
-The file handle or object to which HTML output will be streamed. If you want
-to capture the output in a string, you can open a filehandle to a string:
+The file handle or object to which HTML output will be streamed. If you want to
+capture the output in a string, you can open a filehandle to a string:
 
   my $buffer = q{};
   open my $fh, '>', \$buffer;
@@ -60,8 +60,8 @@ to capture the output in a string, you can open a filehandle to a string:
 If you pass a file handle (or L<IO::Handle> object), then all calls to
 C<print()> will be checked, and an error will be thrown.
 
-You can pass an object of any other class, it must implement its own
-C<print()> method, and error handling is left up to this method.
+You can pass an object of any other class, it must implement its own C<print()>
+method, and error handling is left up to this method.
 
 =back
 

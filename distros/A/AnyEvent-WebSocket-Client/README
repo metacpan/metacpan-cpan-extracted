@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.53
+    version 0.54
 
 SYNOPSIS
 
@@ -24,10 +24,10 @@ SYNOPSIS
          warn $@;
          return;
        }
-       
+     
        # send a message through the websocket...
        $connection->send('a message');
-       
+     
        # recieve message from the websocket...
        $connection->on(each_message => sub {
          # $connection is the same connection object
@@ -35,20 +35,20 @@ SYNOPSIS
          my($connection, $message) = @_;
          ...
        });
-       
+     
        # handle a closed connection...
        $connection->on(finish => sub {
          # $connection is the same connection object
          my($connection) = @_;
          ...
        });
-    
+     
        # close the connection (either inside or
        # outside another callback)
        $connection->close;
      
      });
-    
+     
      ## uncomment to enter the event loop before exiting.
      ## Note that calling recv on a condition variable before
      ## it has been triggered does not work on all event loops
@@ -190,13 +190,13 @@ FAQ
      $client->connect("ws://foo/service")->cb(sub {
      
        my $connection = eval { shift->recv };
-       
+     
        if($@)
        {
          warn $@;
          return;
        }
-       
+     
        ...
      });
 

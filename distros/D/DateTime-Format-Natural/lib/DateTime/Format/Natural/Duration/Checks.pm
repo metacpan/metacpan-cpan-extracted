@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use boolean qw(true false);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub for
 {
@@ -85,9 +85,12 @@ my $has_timespan_sep = sub
 
 sub _first_to_last_extract
 {
-    my ($self, $duration, $date_strings, $indexes, $tokens, $chunks) = @_;
+    my $self = shift;
+    my ($date_strings, $indexes, $tokens, $chunks) = @_;
 
     return false unless @$date_strings == 2;
+
+    my $duration = $self->{data}->{duration};
 
     my %regexes = %{$duration->{first_to_last}{regexes}};
 
@@ -242,9 +245,12 @@ sub from_count_to_count
 
 sub _from_count_to_count_extract
 {
-    my ($self, $duration, $date_strings, $indexes, $tokens, $chunks) = @_;
+    my $self = shift;
+    my ($date_strings, $indexes, $tokens, $chunks) = @_;
 
     return false unless @$date_strings == 2;
+
+    my $duration = $self->{data}->{duration};
 
     my ($entry, $target);
     return false unless $duration_matches->($duration, $date_strings, \$entry, \$target);

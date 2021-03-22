@@ -4,8 +4,8 @@
 #
 package PDL::GSLSF::TRANSPORT;
 
-@EXPORT_OK  = qw( PDL::PP gsl_sf_transport_2 PDL::PP gsl_sf_transport_3 PDL::PP gsl_sf_transport_4 PDL::PP gsl_sf_transport_5 );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw( PDL::PP gsl_sf_transport_2 PDL::PP gsl_sf_transport_3 PDL::PP gsl_sf_transport_4 PDL::PP gsl_sf_transport_5 );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::TRANSPORT ;
 

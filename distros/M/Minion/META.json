@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Mojolicious" : "9.0",
-            "YAML::XS" : "0",
+            "YAML::XS" : "0.67",
             "perl" : "5.016"
          }
       }
@@ -58,6 +58,6 @@
          "web" : "https://webchat.freenode.net/#mojo"
       }
    },
-   "version" : "10.20",
+   "version" : "10.21",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

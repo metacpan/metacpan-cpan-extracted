@@ -17,7 +17,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ default, from the standard input.
 
 =over 7
 
-=item B<-c>#, B<--output-width>=#
+=item B<-c>#, B<--width>=#, B<--output-width>=#
 
 Output is formatted for a display columns wide.
 
@@ -116,6 +116,15 @@ Specify pane width.  This includes border spaces.
 Use full width of the terminal.  Each panes are expanded to fill
 terminal width, unless B<--pane-width> is specified.
 
+=item B<--height>=#
+
+Set page height and page mode on.
+
+=item B<--column-unit>=#
+
+Each columns are placed at the unit of 8 by default.  This option
+changes the number of the unit.
+
 =item B<--linestyle>=I<none>|I<truncate>|I<wrap>|I<wordwrap>, B<--ls>=I<...>
 
 Set the style of treatment for longer lines.
@@ -185,10 +194,6 @@ lines in your C<$HOME/.ansicolumnrc> file, for example.
     },
     );
 
-=item B<--height>=#
-
-Set page height and page mode on.
-
 =item B<-->[B<no->]B<ignore-space>, B<-->[B<no->]B<is>
 
 When used B<-t> option, leading spaces are ignored by default.  Use
@@ -235,11 +240,6 @@ as unicode name.
 Set the style how tab is expanded.  Select from C<dot>, C<symbol> or
 C<shade>.  Styles are defined in L<Text::ANSI::Fold> library.
 
-=item B<--column-unit>=#
-
-Each columns are placed at unit of 8 by default.  This option changes
-the number of unit.
-
 =item B<--ambiguous>=I<width_spec>
 
 Specifies how to treat Unicode ambiguous width characters.  Take a
@@ -258,6 +258,25 @@ Set padding chracter.
 =end comment
 
 =back
+
+=head1 CALCULATION
+
+As for B<--height>, B<--width> and B<--pane-width> options, besides
+giving numeric digits, you can calculate the number using terminal
+size.  If the expression contains non-digit character, it is evaluated
+as a Reverse Polish Notation with the terminal size pushed on the
+stack.
+
+    OPTION              VALUE
+    =============       =========================
+    --height 1-         height - 1
+    --height 2/         height / 2
+    --height 1-2/       (height - 1) / 2
+    --height dup2%-2/   (height - height % 2) / 2
+
+Space and comma characters are ignored in the expression.  So C<1-2/>
+and C<1 - 2 /> and C<1,-,2,/> are all same.  See `perldoc Math::RPN`
+for the expression detail.
 
 =head1 STARTUP
 
@@ -305,7 +324,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020 Kazumasa Utashiro.
+Copyright 2020- Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

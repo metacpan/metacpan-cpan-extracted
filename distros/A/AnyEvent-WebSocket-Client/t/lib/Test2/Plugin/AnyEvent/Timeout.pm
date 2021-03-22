@@ -33,7 +33,7 @@ boilerplate.
 sub import
 {
   return if defined $timeout;
-  
+
   $timeout = AnyEvent->timer(
     after => 30,
     cb => sub {

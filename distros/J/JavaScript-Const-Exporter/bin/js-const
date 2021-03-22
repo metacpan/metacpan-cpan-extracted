@@ -10,7 +10,7 @@ use warnings;
 use Path::Tiny qw/ path /;
 use JavaScript::Const::Exporter;
 
-our $VERSION = 'v0.1.5';
+our $VERSION = 'v0.1.6';
 
 my $exporter = JavaScript::Const::Exporter->new_with_options;
 
@@ -40,7 +40,7 @@ js-const - Generate JavaScript from exported Perl constants
 
 =head1 VERSION
 
-version v0.1.5
+version v0.1.6
 
 =head1 SYNOPSIS
 

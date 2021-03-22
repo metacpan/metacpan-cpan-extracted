@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use HTML::Entities qw( encode_entities );
 use Markdent::CheckedOutput;
@@ -669,12 +669,12 @@ Markdent::Role::HTMLStream - A role for handlers which generate HTML
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
-This role implements most of the code needed for event receivers which
-generate a stream of HTML output based on those events.
+This role implements most of the code needed for event receivers which generate
+a stream of HTML output based on those events.
 
 =head1 REQUIRED METHODS
 

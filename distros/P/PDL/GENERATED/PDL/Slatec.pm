@@ -4,8 +4,8 @@
 #
 package PDL::Slatec;
 
-@EXPORT_OK  = qw(  eigsys matinv polyfit polycoef polyvalue PDL::PP svdc PDL::PP poco PDL::PP geco PDL::PP gefa PDL::PP podi PDL::PP gedi PDL::PP gesl PDL::PP rs PDL::PP ezffti PDL::PP ezfftf PDL::PP ezfftb PDL::PP pcoef PDL::PP pvalue PDL::PP chim PDL::PP chic PDL::PP chsp PDL::PP chfd PDL::PP chfe PDL::PP chia PDL::PP chid PDL::PP chcm PDL::PP chbs PDL::PP polfit );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw(  eigsys matinv polyfit polycoef polyvalue PDL::PP svdc PDL::PP poco PDL::PP geco PDL::PP gefa PDL::PP podi PDL::PP gedi PDL::PP gesl PDL::PP rs PDL::PP ezffti PDL::PP ezfftf PDL::PP ezfftb PDL::PP pcoef PDL::PP pvalue PDL::PP chim PDL::PP chic PDL::PP chsp PDL::PP chfd PDL::PP chfe PDL::PP chia PDL::PP chid PDL::PP chcm PDL::PP chbs PDL::PP polfit );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Slatec ;
 

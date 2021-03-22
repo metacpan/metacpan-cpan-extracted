@@ -170,7 +170,6 @@ generates a topology that looks like this
  | x x x | x x x |
  +-------+-------+
 
-
 Originally there was a third argument giving the total size of the
 puzzle. Beginning with version 0.006 this was deprecated, since it
 appeared to me to be redundant. As of version 0.021, all uses of this
@@ -460,7 +459,6 @@ Sudoku' problem could be specified as
  . . .  . 6 .  9 . .         . . 7  . 4 .  . . .
  . . .  . . 4  . . .         . . .  2 . .  . . .
 
-
 Setting this attribute causes the rows and columns attributes to be set
 to (2 * order + gap) * order. The symbols attribute is set to '.' and
 the numbers 1, 2, ... up to order * order.
@@ -576,7 +574,7 @@ use warnings;
 
 use Exporter qw{ import };
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 our @EXPORT_OK = qw{
     SUDOKU_SUCCESS
     SUDOKU_NO_SOLUTION
@@ -693,7 +691,6 @@ eod
     return $self;
 }
 
-
 =head2 constraints_used
 
  %constraints_used = $su->constraints_used;
@@ -719,7 +716,6 @@ sub constraints_used {
 	$self->{constraints_used}{$_}} qw{F N B T X Y W ?};
     return $rslt;
 }
-
 
 =head2 copy
 
@@ -791,7 +787,6 @@ eod
     delete $self->{backtrack_stack};	# Force setting of new problem.
     return $self;
 }
-
 
 =head2 generate
 
@@ -1019,7 +1014,6 @@ sub _get_topology {
 
 sub _get_value {return $_[0]->{$_[1]}}
 
-
 =head2 paste
 
  $su->paste()
@@ -1049,7 +1043,6 @@ to work.
 	$self->_unload();
 	return $self;
     }
-
 
 }	#	End local symbol block
 
@@ -1604,7 +1597,6 @@ sub _set_topology {
 
 sub _set_value {$_[0]->{$_[1]} = $_[2]; return;}
 
-
 =head2 solution
 
  $string = $su->solution();
@@ -1638,7 +1630,6 @@ eod
 
     return $self->_constrain ();
 }
-
 
 =head2 steps
 
@@ -1714,7 +1705,6 @@ sub unload {
 ########################################################################
 
 #	Private methods and subroutines.
-
 
 #	$status_value = $su->_constrain ();
 
@@ -1792,7 +1782,6 @@ eod
 #	point a contradiction is found, they push 'backtrack' on the
 #	end of the list to be returned, and return immediately.
 
-
 #	F constraint - only one value possible. Unlike the other
 #	constraints, we keep iterating this one until we make no
 #	progress.
@@ -1845,7 +1834,6 @@ eod
     }
     return \@stack;
 }
-
 
 #	N constraint - the only cell which supplies a necessary value.
 
@@ -2035,7 +2023,6 @@ sub _constraint_T {
 		    }
 		}
 		@tcontr = map {$_ || 0} @tcontr;
-
 
 #	At this point, @tcontr contains how many cells in the tuple
 #	contribute each value. Calculate the number of discrete values
@@ -2338,9 +2325,7 @@ sub _looks_like_number {
     return 0;
 }
 
-
 #	_set_* subroutines are found right after the set() method.
-
 
 #	$su->_try ($cell, $value)
 
@@ -2391,7 +2376,6 @@ sub _try {
     $@ and _fatal ("Eval failed in _try", $@);
     return $rslt;
 }
-
 
 #	$string = $self->_unload (prefix, status_value)
 
@@ -2457,8 +2441,9 @@ The X, Y, and W constraints (to use Glenn Fowler's terminology) are
 not yet handled. The package can solve puzzles that need these
 constraints, but it does so by backtracking.
 
-Please report bugs either through
-L<https://github.com/trwyant/perl-Games-Sudoku-General/issues/> or by
+Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Sudoku-General>,
+L<https://github.com/trwyant/perl-Games-Sudoku-General/issues>, or in
 electronic mail to the author.
 
 =head1 ACKNOWLEDGMENTS

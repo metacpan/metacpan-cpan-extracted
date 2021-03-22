@@ -5,12 +5,15 @@ use Mojo::JSON qw(decode_json encode_json true false);
 use Mojo::Collection;
 use Mojo::DOM::HTML;
 use Mojo::ByteStream;
+use Mojo::Util qw(dumper deprecated);
+
+use Carp;
 
 use Mojolicious::Plugin::DataTables::SSP::Column;
 use Mojolicious::Plugin::DataTables::SSP::Params;
 use Mojolicious::Plugin::DataTables::SSP::Results;
 
-our $VERSION = '1.03';
+our $VERSION = '2.01';
 
 sub register {
 
@@ -28,7 +31,7 @@ sub _dt_js {
 
     my ( $c, $url ) = @_;
 
-    my $dt_version = '1.10.20';
+    my $dt_version = '1.10.24';
     my $dt_js_url  = $url || "//cdn.datatables.net/$dt_version/js/jquery.dataTables.min.js";
 
     return _tag( 'script', 'src' => $dt_js_url );
@@ -39,7 +42,7 @@ sub _dt_css {
 
     my ( $c, $url ) = @_;
 
-    my $dt_version = '1.10.20';
+    my $dt_version = '1.10.24';
     my $dt_js_url  = $url || "//cdn.datatables.net/$dt_version/css/jquery.dataTables.min.css";
 
     return _tag( 'link', 'rel' => 'stylesheet', 'href' => $dt_js_url );
@@ -50,23 +53,33 @@ sub _dt_ssp {
 
     my ( $c, %args ) = @_;
 
-    my $table   = delete $args{table};
+    my $table   = delete $args{table} || Carp::croak 'Missing table';
     my $options = delete $args{options};
-    my $db      = delete $args{db};
-    my @columns = delete $args{columns};
+    my $columns = delete $args{columns};
     my $debug   = delete $args{debug};
     my $where   = delete $args{where};
+    my $sql     = delete $args{sql};
 
-    if ( !$db ) {
-        $c->app->log->error('Missing "db" param') if ($debug);
-        return {};
+    if ( defined( $args{db} ) ) {
+
+        deprecated '[Mojolicious::Plugin::DataTables] db is DEPRECATED in favor of sql';
+
+        my $db = $args{db};
+
+        $sql = $db->sqlite if ( ref $db eq 'Mojo::SQLite::Database' );
+        $sql = $db->pg     if ( ref $db eq 'Mojo::Pg::Database' );
+        $sql = $db->mysql  if ( ref $db eq 'Mojo::mysql::Database' );
+
     }
 
+    my $log = $c->app->log->context('[DataTables]');
+
     my $regexp_operator = 'REGEXP';    # REGEXP operator for MySQL and SQLite
-    my $db_type         = ref $db;
+
+    my $sql_class = ref $sql;
 
     # "~" operator for PostgreSQL
-    if ( $db_type =~ /Mojo::Pg/ ) {
+    if ( $sql_class =~ /Mojo::Pg/ ) {
         $regexp_operator = '~';
     }
 
@@ -74,103 +87,96 @@ sub _dt_ssp {
 
     return {} if ( !$ssp->draw );
 
-    my $db_filter  = '';
-    my @db_filters = ();
-    my $db_order   = '';
-    my @db_bind    = ();
-    my @db_columns = $ssp->db_columns;
+    my @columns = $ssp->db_columns;
 
-    push @db_columns, @columns;
-
-    if ($where) {
-        if (ref $where eq 'ARRAY') {
-            my ($where_sql, @where_bind) = @{$where};
-            push @db_filters, $where_sql;
-            push @db_bind, @where_bind;
+    if ($columns) {
+        if ( ref $columns eq 'ARRAY' ) {
+            push @columns, @{$columns};
         } else {
-            push @db_filters, $where;
+            push @columns, $columns;
         }
     }
 
-    # Column filter
-    my @col_filters;
+    my $abstract = {
+        'where' => {
+            '-and' => [],
+            '-or'  => [],
+        },
+        'order'  => [],
+        'filter' => [],
+    };
 
+    # Global filter
+    if ($where) {
+        if ( ref $where eq 'ARRAY' ) {
+            my ( $where_stmt, @where_bind ) = @{$where};
+            foreach (@where_bind) {
+                $where_stmt =~ s/\?/'$_'/;    # TODO improve
+            }
+            push @{ $abstract->{where}->{'-and'} }, { '-bool' => $where_stmt };
+            push @{ $abstract->{filter} },          { '-bool' => $where_stmt };
+        } else {
+            push @{ $abstract->{where}->{'-and'} }, { '-bool' => $where };
+            push @{ $abstract->{filter} },          { '-bool' => $where };
+        }
+    }
+
+    # Column Search
     foreach ( @{ $ssp->columns } ) {
         if ( $_->database && $_->searchable != 0 && $_->search->{value} ) {
 
             if ( $_->search->{regex} ) {
-                push @col_filters, $_->database . " $regexp_operator ?";
-                push @db_bind,     $_->search->{value};
+                push @{ $abstract->{where}->{'-and'} }, { $_->database => { $regexp_operator => $_->search->{value} } };
             } else {
-                push @col_filters, $_->database . " LIKE ?";
-                push @db_bind,     '%' . $_->search->{value} . '%';
+                push @{ $abstract->{where}->{'-and'} },
+                    { $_->database => { -like => '%' . $_->search->{value} . '%' } };
             }
 
         }
-    }
-
-    if (@col_filters) {
-        push @db_filters, '(' . join( ' AND ', @col_filters ) . ')';
     }
 
     # Global Search
     if ( $ssp->search->{value} ) {
-
-        my @global_filters;
-
         foreach ( @{ $ssp->columns } ) {
             if ( $_->database && $_->searchable != 0 ) {
 
                 if ( $ssp->search->{regex} ) {
-                    push @global_filters, $_->database . " $regexp_operator ?";
-                    push @db_bind,        $ssp->search->{value};
+                    push @{ $abstract->{where}->{'-or'} },
+                        { $_->database => { $regexp_operator => $ssp->search->{value} } };
                 } else {
-                    push @global_filters, $_->database . " LIKE ?";
-                    push @db_bind,        '%' . $ssp->search->{value} . '%';
+                    push @{ $abstract->{where}->{'-or'} },
+                        { $_->database => { -like => '%' . $ssp->search->{value} . '%' } };
                 }
-
             }
         }
-
-        if (@global_filters) {
-            push @db_filters, '(' . join( ' OR ', @global_filters ) . ')';
-        }
-
-    }
-
-    # Filter
-    if (@db_filters) {
-        $db_filter = 'WHERE ' . join( ' AND ', @db_filters );
     }
 
     # Order
     if ( %{ $ssp->db_order } ) {
 
-        my @db_orders;
         my $order = $ssp->db_order;
 
-        foreach ( keys %{$order} ) {
-            push @db_orders, $_ . ' ' . $order->{$_};
+        foreach my $column ( keys %{$order} ) {
+            my $clausole = $order->{$column};
+            push @{ $abstract->{order} }, { "-$clausole" => $column };
         }
-
-        $db_order = 'ORDER BY ' . join( ',', @db_orders );
-
     }
 
-    my $sql = sprintf(
-        'SELECT %s FROM %s %s %s LIMIT %s OFFSET %s',
-        join( ',', @db_columns ),
-        $table, $db_filter, $db_order, $ssp->length, $ssp->start
-    );
+    delete $abstract->{where}->{'-and'} if ( scalar @{ $abstract->{where}->{'-and'} } < 1 );
+    delete $abstract->{where}->{'-or'}  if ( scalar @{ $abstract->{where}->{'-or'} } < 1 );
+
+    my ( $stmt, @bind ) = $sql->abstract->select( $table, \@columns, $abstract->{where}, $abstract->{order} );
+
+    $stmt .= sprintf ' LIMIT %s OFFSET %s', $ssp->length, $ssp->start;    # TODO
 
     if ($debug) {
-        $c->app->log->debug("SSP - Query: $sql");
-        $c->app->log->debug( "SSP - Bind: " . encode_json \@db_bind );
+        $log->debug("Query: $stmt");
+        $log->debug( "Bind: " . encode_json \@bind );
     }
 
-    my $query = $db->query( $sql, @db_bind );
+    my $query = $sql->db->query( $stmt, @bind );
 
-    my @results;
+    my @results = ();
 
     while ( my $row = $query->hash ) {
 
@@ -195,18 +201,27 @@ sub _dt_ssp {
 
     }
 
-    my $total    = $db->query( sprintf( 'SELECT COUNT(*) AS TOT FROM %s', $table ) )->hash->{tot};
-    my $filtered = $total;
+    my ( $stmt_total,  @bind_total )  = $sql->abstract->select( $table, [ \'COUNT(*) AS tot' ], $abstract->{filter} );
+    my ( $stmt_filter, @bind_filter ) = $sql->abstract->select( $table, [ \'COUNT(*) AS tot' ], $abstract->{where} );
 
-    if (@db_bind) {
-        $filtered
-            = $db->query( sprintf( 'SELECT COUNT(*) AS TOT FROM %s %s', $table, $db_filter ), @db_bind )->hash->{tot};
+    if ($debug) {
+        $log->debug("Query Total: $stmt_total");
+        $log->debug( "Bind Total: " . encode_json \@bind_total );
+        $log->debug("Query Filtered: $stmt_filter");
+        $log->debug( "Bind Filtered: " . encode_json \@bind_filter );
     }
 
-    my $ssp_results = $c->datatable->ssp_results(
-        draw             => $ssp->draw,
-        data             => \@results,
-        records_total    => $total,
+    my $total    = $sql->db->query( $stmt_total, @bind_total )->hash->{tot};
+    my $filtered = $total;
+
+    if (@bind_filter) {
+        $filtered = $sql->db->query( $stmt_filter, @bind_filter )->hash->{tot};
+    }
+
+    my $ssp_results = Mojolicious::Plugin::DataTables::SSP::Results->new(
+        draw           => $ssp->draw,
+        data           => \@results,
+        records_total  => $total,
         records_filtered => $filtered
     );
 
@@ -264,6 +279,10 @@ sub _decode_params {
 
         my $dt_option = $dt_options->[$i];
 
+        if ( !defined $dt_option->{dt} ) {
+            $dt_option->{dt} = $i;
+        }
+
         $dt_params->{columns}[ $dt_option->{dt} ]->{database}  = $dt_option->{db}        || undef;
         $dt_params->{columns}[ $dt_option->{dt} ]->{formatter} = $dt_option->{formatter} || undef;
         $dt_params->{columns}[ $dt_option->{dt} ]->{label}     = $dt_option->{label}     || undef;
@@ -310,9 +329,11 @@ Mojolicious::Plugin::DataTables - DataTables Plugin for Mojolicious
 
     [...]
 
+    my $sql = Mojo::Pg->new;
+
     my $dt_ssp = $c->datatable->ssp(
         table   => 'users',
-        db      => $db,
+        sql     => $sql,
         columns => qw/role create_date/,
         debug   => 1,
         where   => 'status = "active"'
@@ -366,13 +387,15 @@ Params:
 
 =item C<table>: Database table
 
-=item C<db>: An instance of L<Mojo::Pg> or compatible class
+=item C<sql>: An instance of L<Mojo::Pg>, L<Mojo::SQLite>, L<Mojo::mysql> or compatible class
+
+=item C<db>: An instance of L<Mojo::Pg::Database> or compatible class (B<DEPRECATED> use C<sql> instead)
 
 =item C<columns>: Extra columns to fetch
 
-=item C<debug>: Write debug information using L<Mojo::Log> class
+=item C<debug>: Write useful debug information using L<Mojo::Log> class
 
-=item C<where>: WHERE condition in SQL format
+=item C<where>: WHERE condition in L<SQL::Abstract> format
 
 =item C<options>: Array of options (see below)
 
@@ -382,11 +405,11 @@ Options:
 
 =over 4
 
-=item C<label>: Column label
+=item C<label>: Column label (optional)
 
-=item C<db>: Database column name
+=item C<db>: Database column name (required)
 
-=item C<dt>: DataTable column ID
+=item C<dt>: DataTable column ID (optional)
 
 =item C<formatter>: Formatter sub
 
@@ -425,7 +448,7 @@ Controller:
 
     $c->datatable->ssp(
         table   => 'users',
-        db      => $db,
+        sql     => $sql,
         options => [
             {
                 label => 'UID',
@@ -474,7 +497,7 @@ The anonymous C<formatter> sub accept this arguments:
 
 =head2 Search flag
 
-The C<searchable> flag enable or disable a filter for specified column.
+The C<searchable> flag enable=1 or disable=0 a filter for specified column.
 
     options => [
         {
@@ -490,12 +513,12 @@ The C<searchable> flag enable or disable a filter for specified column.
 
 =head2 Where condition
 
-Use the C<where> option to filter the table:
+Use the C<where> option to filter the table using L<SQL::Abstract> syntax:
 
     $c->datatable->ssp(
         table   => 'users',
-        db      => $db,
-        where   => 'status = 1',
+        sql     => $sql,
+        where   => { status => 'active' }
         options => [ ... ]
     );
 
@@ -503,7 +526,7 @@ It's possible to use array (C<[ where, bind_1, bind_2, ... ]>) to bind values:
 
     $c->datatable->ssp(
         table   => 'users',
-        db      => $db,
+        sql     => $sql,
         where   => [ 'status = ?', 'active' ],
         options => [ ... ]
     );
@@ -511,6 +534,43 @@ It's possible to use array (C<[ where, bind_1, bind_2, ... ]>) to bind values:
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>, L<https://datatables.net/>, L<Mojolicious::Plugin::DataTables::SSP::Params>, L<Mojolicious::Plugin::DataTables::SSP::Results>, L<Mojolicious::Plugin::DataTables::SSP::Column>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<https://mojolicious.org>, L<https://datatables.net/>, L<SQL::Abstract>
+L<Mojolicious::Plugin::DataTables::SSP::Params>, L<Mojolicious::Plugin::DataTables::SSP::Results>, L<Mojolicious::Plugin::DataTables::SSP::Column>.
+
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/giterlizzi/perl-Mojolicious-Plugin-DataTables/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/giterlizzi/perl-Mojolicious-Plugin-DataTables>
+
+    git clone https://github.com/giterlizzi/perl-Mojolicious-Plugin-DataTables.git
+
+
+=head1 AUTHOR
+
+=over 4
+
+=item * Giuseppe Di Terlizzi <gdt@cpan.org>
+
+=back
+
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2020-2021 by Giuseppe Di Terlizzi.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
+

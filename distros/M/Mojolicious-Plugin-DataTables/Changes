@@ -1,5 +1,15 @@
 Revision history for Perl extension Mojolicious::Plugin::DataTables.
 
+2.01  2021-03-20
+    - Fixed warning
+    - Added GitHub Workflow Actions CI
+    - Updated README.md
+
+2.00  2021-03-20
+    - Added support for SQL::Abstract
+    - DEPRECATED "db" option (use "sql" instead)
+    - Improved documentations
+
 1.03  2020-03-30
     - Improved "where" param with SQL bind values
 

@@ -1,17 +1,30 @@
 package Sah::Schema::perl::colorscheme::modname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-20'; # DATE
+our $DATE = '2021-03-20'; # DATE
 our $DIST = 'Sah-Schemas-GraphicsColorNames'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Sah::PSchema qw(get_schema);
-use Sah::Schema::perl::modname; # not detected yet
+use Sah::PSchema::perl::modname; # not detected yet
 
-our $schema = get_schema('perl::modname', {ns_prefix=>'Graphics::ColorNames'});
+our $schema = get_schema(
+    'perl::modname',
+    {ns_prefix=>'Graphics::ColorNames'},
+    {
+        summary => 'Perl module name in the Graphics::ColorNames:: namespace without the namespace prefix, e.g. WWW or X',
+        examples => [
+            {value=>'', valid=>0},
+            {value=>'WWW', valid=>1},
+            {value=>'WWW::Foo', valid=>1, validated_value=>'WWW::Foo'},
+            {value=>'WWW/Foo', valid=>1, validated_value=>'WWW::Foo'},
+            {value=>'Foo Bar', valid=>0, summary=>'contains whitespace'},
+        ],
+    },
+);
 
 1;
-# ABSTRACT: 
+# ABSTRACT: Perl module name in the Graphics::ColorNames:: namespace without the namespace prefix, e.g. WWW or X
 
 __END__
 
@@ -21,11 +34,11 @@ __END__
 
 =head1 NAME
 
-Sah::Schema::perl::colorscheme::modname -  
+Sah::Schema::perl::colorscheme::modname - Perl module name in the Graphics::ColorNames:: namespace without the namespace prefix, e.g. WWW or X
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schema::perl::colorscheme::modname (from Perl distribution Sah-Schemas-GraphicsColorNames), released on 2021-01-20.
+This document describes version 0.004 of Sah::Schema::perl::colorscheme::modname (from Perl distribution Sah-Schemas-GraphicsColorNames), released on 2021-03-20.
 
 =head1 SYNOPSIS
 
@@ -87,6 +100,18 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ ""  # INVALID
+
+ "WWW"  # valid
+
+ "WWW::Foo"  # valid, becomes "WWW::Foo"
+
+ "WWW/Foo"  # valid, becomes "WWW::Foo"
+
+ "Foo Bar"  # INVALID (contains whitespace)
 
 =head1 HOMEPAGE
 

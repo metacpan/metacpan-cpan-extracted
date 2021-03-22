@@ -13,12 +13,21 @@ PDL::FFTW3 - PDL interface to the Fastest Fourier Transform in the West v3
 # FFTW plan exists (or makes it). Then it calls the THREADED PP function to
 # actually compute the transform
 
+use strict;
+use warnings;
+
 # I generate code for up to 10-dimensional FFTs
 my $maxrank = 10;
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
+pp_setversion($VERSION);
 
-pp_addpm( {At => 'Top'}, slurp('README.pod') );
+pp_addpm( {At => 'Top'}, slurp('README.pod') . <<'EOF' );
+
+use strict;
+use warnings;
+
+EOF
 
 pp_addhdr( '
 #include <fftw3.h>
@@ -43,12 +52,10 @@ pp_export_nothing();
 pp_addxs('', slurp('compute_plan_template.xs'));
 pp_addpm( {At => 'Middle'}, slurp('FFTW3_header_include.pm') );
 
-
 for my $rank (1..$maxrank)
 {
-  my $shapestr,$rshapestr;
-  $shapestr =  sprintf(q{$a->shape->slice('1:%d')->prodover},$rank);
-  $rshapestr = sprintf(q{$a->shape->slice('0:%d')->prodover},$rank-1);
+  my $shapestr = sprintf(q{$a->shape->slice('1:%d')->prodover},$rank);
+  my $rshapestr = sprintf(q{$a->shape->slice('0:%d')->prodover},$rank-1);
 
   pp_addpm({At => 'Bot'}, <<EOF );
 sub fft$rank { __fft_internal( "fft$rank",\@_ ); }
@@ -71,7 +78,7 @@ EOF
 ##########
 # Generate the fftn case.  This should probably be done more prettily; for now it's just 
 # a springboard that jumps into __fft_internal.
-pp_addpm ( {At=> 'Bot'}, <<'EOF' );
+pp_addpm ( {At=> 'Bot'}, sprintf <<'EOF', $maxrank );
 sub _rank_springboard {
   my ($name, $source, $rank, @rest) = @_;
   my $inverse = ($name =~ m/^i/);
@@ -82,7 +89,7 @@ sub _rank_springboard {
   }
   $rank = 0+$rank;  # force numeric context
   unless($rank>=1 ) {
-    die "${name}n: second argument (rank) must be between 1 and $maxrank";
+    die "${name}n: second argument (rank) must be between 1 and %d";
   }
 
   my $active_lo = ($real ? 0 : 1);
@@ -132,7 +139,7 @@ sub generateDefinitions
 
   my %pp_def = ( HandleBad    => 0,
                  Pars         => "in($dims_string); [o]out($dims_string);",
-                 GenericTypes => [F,D],
+                 GenericTypes => [qw(F D)],
                  Code         => slurp('template_complex.c'),
                  OtherPars    => 'IV plan', # comes not from the user, but
                                             # from the pre-fft code

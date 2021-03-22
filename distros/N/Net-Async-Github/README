@@ -50,6 +50,10 @@ METHODS
       * page_cache_size - number of GET responses to cache. Defaults to
       1000, set to 0 to disable.
 
+      * timeout - How long in seconds to wait before giving up on a
+      request. Defaults to 60. If set to 0, then no timeout will take
+      place.
+
      You probably just want token , defaults should be fine for the other
     settings.
 
@@ -71,7 +75,7 @@ METHODS
 
     Resolves to the current status.
 
- pr
+ pull_request
 
     Returns information about the given PR.
 
@@ -84,6 +88,19 @@ METHODS
       * id - the pull request ID
 
     Resolves to the current status.
+
+ pull_requests
+
+    Returns information of all PRs of given repository.
+
+    Expects the following named parameters:
+
+      * owner - which user or organisation owns this PR
+
+      * repo - the repository this pull request is for
+
+    Returns a Ryu::Source instance, this will emit a
+    Net::Async::Github::PullRequest instance for each found repository.
 
  create_branch
 
@@ -208,6 +225,12 @@ METHODS - Internal
     Actual HTTP implementation is not guaranteed, and the default is likely
     to change in future.
 
+ timeout
+
+    The parameter that will be used when create Net::Async::HTTP object. If
+    it is undef, then a default value 60 seconds will be used. If it is 0,
+    then Net::Async::HTTP will never timeout.
+
  auth_info
 
     Returns authentication information used in the HTTP request.
@@ -271,6 +294,6 @@ AUTHOR
 
 LICENSE
 
-    Copyright Tom Molesworth 2014-2020. Licensed under the same terms as
+    Copyright Tom Molesworth 2014-2021. Licensed under the same terms as
     Perl itself.
 

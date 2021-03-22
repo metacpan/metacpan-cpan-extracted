@@ -4,8 +4,8 @@
 #
 package PDL::GSLSF::TRIG;
 
-@EXPORT_OK  = qw( PDL::PP gsl_sf_sin PDL::PP gsl_sf_cos PDL::PP gsl_sf_hypot PDL::PP gsl_sf_complex_sin PDL::PP gsl_sf_complex_cos PDL::PP gsl_sf_complex_logsin PDL::PP gsl_sf_lnsinh PDL::PP gsl_sf_lncosh PDL::PP gsl_sf_polar_to_rect PDL::PP gsl_sf_rect_to_polar PDL::PP gsl_sf_angle_restrict_symm PDL::PP gsl_sf_angle_restrict_pos PDL::PP gsl_sf_sin_err PDL::PP gsl_sf_cos_err );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw( PDL::PP gsl_sf_sin PDL::PP gsl_sf_cos PDL::PP gsl_sf_hypot PDL::PP gsl_sf_complex_sin PDL::PP gsl_sf_complex_cos PDL::PP gsl_sf_complex_logsin PDL::PP gsl_sf_lnsinh PDL::PP gsl_sf_lncosh PDL::PP gsl_sf_polar_to_rect PDL::PP gsl_sf_rect_to_polar PDL::PP gsl_sf_angle_restrict_symm PDL::PP gsl_sf_angle_restrict_pos PDL::PP gsl_sf_sin_err PDL::PP gsl_sf_cos_err );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::TRIG ;
 

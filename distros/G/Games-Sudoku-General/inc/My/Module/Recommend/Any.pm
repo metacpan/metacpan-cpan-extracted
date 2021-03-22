@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Exporter qw{ import };
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 our @EXPORT_OK = qw{ __any };
 
@@ -176,6 +176,7 @@ modules are needed it returns nothing.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Sudoku-General>,
 L<https://github.com/trwyant/perl-Games-Sudoku-General/issues>, or in
 electronic mail to the author.
 

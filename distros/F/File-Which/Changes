@@ -1,5 +1,9 @@
 Revision history for File-Which
 
+1.24      2021-03-19 05:50:14 -0600
+  - Documentation improvements
+  - Moved repository to new github org
+
 1.23      2018-12-31 14:28:16 -0500
   - Internally use IS_WIN instead of IS_DOS for DOS/Windows style
     operating systems.  This is 2018 (almost 2019) after all.

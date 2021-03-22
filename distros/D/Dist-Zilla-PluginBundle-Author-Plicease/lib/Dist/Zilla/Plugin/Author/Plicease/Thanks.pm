@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Thanks 2.61 {
+package Dist::Zilla::Plugin::Author::Plicease::Thanks 2.62 {
 
   use 5.014;
   use Moose;
@@ -115,7 +115,7 @@ Dist::Zilla::Plugin::Author::Plicease::Thanks - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.61
+version 2.62
 
 =head1 SYNOPSIS
 

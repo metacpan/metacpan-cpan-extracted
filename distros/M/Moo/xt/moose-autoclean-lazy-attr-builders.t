@@ -1,4 +1,8 @@
-use Moo::_strictures;
+use strict;
+use warnings;
+
+use Test::More;
+
 # when using an Moose object and namespace::autoclean
 # lazy attributes that get a value on initialize still
 # have their builders run
@@ -12,13 +16,14 @@ use Moo::_strictures;
     package BadObject;
     use Moo;
     # use MyMooseObject <- this is inferred here
-    use namespace::autoclean;
 
     has attr => ( is => 'lazy' );
     sub _build_attr {2}
+
+    # forces metaclass inflation like namespace::autoclean would
+    BEGIN { __PACKAGE__->meta->name }
 }
 
-use Test::More;
 # use BadObject <- this is inferred here
 
 is(

@@ -3,7 +3,6 @@ use strict;
 
 use Test::More tests => 10;
 
-use Cwd;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
@@ -34,12 +33,17 @@ mkdir $archive or die $!;
 chmod 0755, $archive;
 
 chdir($test_dir) or die $!;
-$test_dir = cwd();
 
 #----------------------------------------------------------------------
 # Create object
 
-my $obj = App::Followme::FileData->new(title_template => '<h1></h1>');
+my %configuration = (top_directory => $test_dir,
+                     base_directory => $test_dir,
+                     title_template => '<h1></h1>',
+                    );
+
+my $obj = App::Followme::FileData->new(%configuration);
+
 isa_ok($obj, "App::Followme::FileData"); # test 1
 can_ok($obj, qw(new build)); # test 2
 
@@ -69,9 +73,6 @@ EOQ
     $code[2] = <<'EOQ';
 <p>This is the description. This is the rest of the content.</p>
 EOQ
-
-    my $obj = App::Followme::FileData->new(directory => $test_dir,
-                                           title_template => '<h1></h1>');
 
     for (my $i=0 ; $i < 3; ++ $i) {
         my $output = $code[$i];

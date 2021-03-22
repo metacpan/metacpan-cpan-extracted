@@ -866,4 +866,5 @@ GENERATED/PDL/Primitive.pm               mod=PDL::Primitive pd=Basic/Primitive/p
 GENERATED/PDL/Slatec.pm                  mod=PDL::Slatec pd=Libtmp/Slatec/slatec.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Slices.pm                  mod=PDL::Slices pd=Basic/Slices/slices.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Transform.pm               mod=PDL::Transform pd=Libtmp/Transform/transform.pd (added by pdlpp_mkgen)
+GENERATED/PDL/Transform/Proj4.pm         mod=PDL::Transform::Proj4 pd=Libtmp/Transform/Proj4/Proj4.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Ufunc.pm                   mod=PDL::Ufunc pd=Basic/Ufunc/ufunc.pd (added by pdlpp_mkgen)

@@ -376,8 +376,9 @@ sub ref_value {
     my ($self, $value, $sigil, $data_field) = @_;
 
     my ($check, $ref_value);
+    $value = '' unless defined $value;
+
     if ($sigil eq '$'){
-        $value = '' unless defined $value;
         if (ref $value ne 'SCALAR') {
 			# Convert data structures for inclusion in template
 			$value = fio_flatten($value);
@@ -391,7 +392,7 @@ sub ref_value {
         $ref_value = $value;
         $check = ref $ref_value eq 'ARRAY';
 
-    } elsif ($sigil eq '' && defined $value) {
+    } elsif ($sigil eq '') {
         $ref_value = ref $value ? $value : \$value;
         $check = 1;
     }
@@ -404,7 +405,7 @@ sub ref_value {
 # Set up the cache for data
 
 sub setup {
-    my ($self, %configuration) = @_;
+    my ($self) = @_;
 
     $self->{cache} = {};
 }

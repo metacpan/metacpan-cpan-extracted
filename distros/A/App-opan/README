@@ -127,7 +127,7 @@ DESCRIPTION
    pull
       opan pull
 
-    Does an "fetch" then an "merge". There's no equivalent for others, on
+    Does a "fetch" and then a "merge". There's no equivalent for others, on
     the assumption what you'll do is roughly "pin", "add", "unpin", "unadd",
     ... repeat ..., "pull".
 
@@ -161,7 +161,7 @@ DESCRIPTION
    cpanm
       opan cpanm --installdeps .
 
-    Starts a temporary server process and runs
+    Starts a temporary server process and runs cpanm.
 
       cpanm --mirror http://localhost:<port>/combined/ --mirror-only <your args here>
 
@@ -176,7 +176,7 @@ DESCRIPTION
    carton
       opan carton install
 
-    Starts a temporary server process and runs
+    Starts a temporary server process and runs carton.
 
       PERL_CARTON_MIRROR=http://localhost:<port>/combined/ carton <your args here>
 

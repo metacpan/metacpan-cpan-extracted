@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-02'; # DATE
+our $DATE = '2021-01-18'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.147'; # VERSION
+our $VERSION = '0.148'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,14 +38,15 @@ complete-cwalitee-indicator - Complete from list of available cwalitee indicator
 
 =head1 VERSION
 
-This document describes version 0.147 of complete-cwalitee-indicator (from Perl distribution App-CompleteCLIs), released on 2020-08-02.
+This document describes version 0.148 of complete-cwalitee-indicator (from Perl distribution App-CompleteCLIs), released on 2021-01-18.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % complete-cwalitee-indicator [--format=name] [--json] [--(no)naked-res]
-     [--page-result[=program]] [--prefix=s] <word>
+     [--page-result[=program]] [--prefix=s] [--view-result[=program]]
+     <word>
 
 =head1 OPTIONS
 
@@ -112,6 +113,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
 Filter output through a pager.
 
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Other options
@@ -172,7 +177,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CompleteCLIs>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteCLIs>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CompleteCLIs/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -184,7 +189,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

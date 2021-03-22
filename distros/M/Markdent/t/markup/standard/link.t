@@ -430,6 +430,54 @@ EOF
 
 {
     my $text = <<'EOF';
+An auto link <mailto:foo@bar.com> and more text
+EOF
+
+    my $expect = [
+        { type => 'paragraph' },
+        [
+            {
+                type => 'text',
+                text => 'An auto link ',
+            }, {
+                type => 'auto_link',
+                uri  => 'mailto:foo@bar.com',
+            }, {
+                type => 'text',
+                text => " and more text\n",
+            },
+        ]
+    ];
+
+    parse_ok( $text, $expect, 'text with an email auto link' );
+}
+
+{
+    my $text = <<'EOF';
+An auto link <foo@bar.com> and more text
+EOF
+
+    my $expect = [
+        { type => 'paragraph' },
+        [
+            {
+                type => 'text',
+                text => 'An auto link ',
+            }, {
+                type => 'auto_link',
+                uri  => 'mailto:foo@bar.com',
+            }, {
+                type => 'text',
+                text => " and more text\n",
+            },
+        ]
+    ];
+
+    parse_ok( $text, $expect, 'text with an email only auto link' );
+}
+
+{
+    my $text = <<'EOF';
 (With outer parens and [parens in url](/foo(bar)))
 EOF
 

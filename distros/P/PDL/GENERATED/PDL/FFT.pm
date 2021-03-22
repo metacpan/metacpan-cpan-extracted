@@ -4,8 +4,8 @@
 #
 package PDL::FFT;
 
-@EXPORT_OK  = qw( PDL::PP _fft PDL::PP _ifft  fft ifft fftnd ifftnd fftconvolve realfft realifft kernctr PDL::PP convmath PDL::PP cmul PDL::PP cdiv );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw( PDL::PP _fft PDL::PP _ifft  fft ifft fftnd ifftnd fftconvolve realfft realifft kernctr PDL::PP convmath PDL::PP cmul PDL::PP cdiv );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::FFT ;
 

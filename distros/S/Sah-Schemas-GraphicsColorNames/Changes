@@ -1,3 +1,18 @@
+0.004   2021-03-20  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Add prereq the correct perl modules (GH#1).
+
+	- [doc] [ux] Add summary & examples.
+
+
+0.003   2021-03-18  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Remove mention of WHATEVER::ColorTheme::* because this is no
+	  longer used in ColorTheme 2.0.
+
+
 0.002   2021-01-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add alias name Sah::Schemas::ColorScheme and mention about 'color

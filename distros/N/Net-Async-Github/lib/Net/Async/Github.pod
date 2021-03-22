@@ -61,6 +61,8 @@ Accepts the following optional named parameters:
 
 =item * C<page_cache_size> - number of GET responses to cache. Defaults to 1000, set to 0 to disable.
 
+=item * C<timeout> - How long in seconds to wait before giving up on a request. Defaults to 60. If set to 0, then no timeout will take place.
+
 =back
 
 B<<  You probably just want C<token>  >>, defaults should be fine for the
@@ -88,7 +90,7 @@ Expects the following named parameters:
 
 Resolves to the current status.
 
-=head2 pr
+=head2 pull_request
 
 Returns information about the given PR.
 
@@ -105,6 +107,23 @@ Expects the following named parameters:
 =back
 
 Resolves to the current status.
+
+=head2 pull_requests
+
+Returns information of all PRs of given repository.
+
+Expects the following named parameters:
+
+=over 4
+
+=item * C<owner> - which user or organisation owns this PR
+
+=item * C<repo> - the repository this pull request is for
+
+=back
+
+Returns a L<Ryu::Source> instance, this will emit a L<Net::Async::Github::PullRequest>
+instance for each found repository.
 
 =head2 create_branch
 
@@ -244,6 +263,11 @@ if necessary.
 
 Actual HTTP implementation is not guaranteed, and the default is likely to change in future.
 
+=head2 timeout
+
+The parameter that will be used when create Net::Async::HTTP object. If it is undef, then a default value
+60 seconds will be used. If it is 0, then Net::Async::HTTP will never timeout.
+
 =head2 auth_info
 
 Returns authentication information used in the HTTP request.
@@ -324,5 +348,5 @@ Tom Molesworth <TEAM@cpan.org>, with contributions from C<@chylli-binary>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2014-2020. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2014-2021. Licensed under the same terms as Perl itself.
 

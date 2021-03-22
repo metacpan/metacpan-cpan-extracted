@@ -18,7 +18,7 @@ sub detect_kaleido_version {
             return $data;
         };
 
-        my @cmd = ( $kaleido, 'plotly', '--disable-gpu' );
+        my @cmd = ( $kaleido, 'plotly', '--disable-gpu', '--no-sandbox' );
         eval {
             require Chart::Plotly;
             my $plotlyjs =

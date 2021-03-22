@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::Types;
 
@@ -43,7 +43,7 @@ Markdent::Event::HTMLTag - An event for an inline self-closing HTML tag
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
@@ -59,8 +59,8 @@ The tag that is starting.
 
 =head2 attributes
 
-A hash reference of attributes as key/value pairs. An attribute without a
-value will have a value of C<undef> in the hash reference.
+A hash reference of attributes as key/value pairs. An attribute without a value
+will have a value of C<undef> in the hash reference.
 
 =head1 ROLES
 

@@ -23,6 +23,8 @@ Gene
 Plugin
 Statocles
 VideoTag
+allowfullscreen
+frameborder
 gene
 iframe
 lib

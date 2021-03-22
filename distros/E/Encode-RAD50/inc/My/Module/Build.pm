@@ -8,7 +8,6 @@ our @ISA = qw{ Module::Build };
 
 use Carp;
 
-
 sub ACTION_authortest {
 ##  my ( $self, @args ) = @_;
     my ( $self ) = @_;		# Arguments unused
@@ -71,8 +70,9 @@ C<--test_files> argument.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-Encode-RAD50/issues>, or in electronic
-mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-RAD50>,
+L<https://github.com/trwyant/perl-Encode-RAD50/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

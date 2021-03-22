@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use Moo;
 extends 'Chart::Kaleido';
@@ -73,7 +73,12 @@ has default_height => (
     default => 500,
 );
 
-has '+base_args' => ( default => sub { [qw(plotly --disable-gpu)] } );
+has '+base_args' => (
+    default => sub {
+        my $self = shift;
+        [ "plotly", @{ $self->_default_chromium_args }, "--no-sandbox" ];
+    }
+);
 
 sub all_formats { [qw(png jpg jpeg webp svg pdf eps json)] }
 sub scope_name  { 'plotly' }
@@ -169,7 +174,7 @@ Chart::Kaleido::Plotly - Export static images of Plotly charts using Kaleido
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -263,7 +268,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Stephan Loyd.
+This software is copyright (c) 2020-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

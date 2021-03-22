@@ -1,5 +1,9 @@
 Revision history for App-VTide
 
+0.1.15   2021-03-20
+        Updating for release of version 0.1.15
+        Fixing issue with undefined value (Ivan Wills)
+
 0.1.14   2021-01-04
         Updating for release of version 0.1.14
         Updated date (Ivan Wills)

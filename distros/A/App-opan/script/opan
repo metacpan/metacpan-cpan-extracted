@@ -4,7 +4,7 @@ package App::opan;
 
 use strictures 2;
 
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 
 use Dist::Metadata;
 use File::Open qw(fopen);
@@ -15,6 +15,14 @@ use Mojo::File qw(path);
 use Import::Into;
 
 our %TOKENS = map { $_=>1 } split/:/, $ENV{OPAN_AUTH_TOKENS} || '';
+
+sub cpan_fetch {
+  my $app = shift;
+  my $url = Mojo::URL->new(shift)->to_abs($app->cpan_url);
+  my $tx = $app->ua->get($url);
+  return $tx->res unless my $err = $tx->error;
+  die sprintf "%s %s: %s\n", $tx->req->method, $url, $err->{message};
+}
 
 sub packages_header {
   my ($count) = @_;
@@ -34,6 +42,24 @@ sub packages_header {
 sub extract_provides_from_tarball {
   my ($tarball) = @_;
   Dist::Metadata->new(file => $tarball)->package_versions;
+}
+
+sub pod_section {
+  my ($cmd, $for_description) = @_;
+  my $fh = fopen __FILE__;
+
+  my $pod = '';
+  while (<$fh>) { /^=head3 $cmd\s*$/ && last }
+  while (<$fh>) { /^=head/ && last || ($pod .= $_) }
+
+  if ($for_description) {
+    $pod = $pod =~ m!\n(\S+.*?\.)(?:\s|$)!s ? $1 : "$0 $cmd --help for more info";
+    $pod =~ s![\n\r]+! !g;
+    $pod =~ s![\s\.]+$!!;
+  }
+
+  $pod =~ s!\b[CIL]<\/?([^>]+)\>!$1!g; # Remove C<...> pod notation
+  return $pod;
 }
 
 sub provides_to_packages_entries {
@@ -137,8 +163,7 @@ sub do_init {
 sub do_fetch {
   my ($app) = @_;
   path('pans/upstream/index.gz')->spurt(
-    $app->ua->get($app->cpan_url.'modules/02packages.details.txt.gz')
-        ->res->body
+    cpan_fetch($app, 'modules/02packages.details.txt.gz')->body
   );
   path('pans/upstream/index')->spurt(
     scalar capture qw(gzip -dc), 'pans/upstream/index.gz'
@@ -184,11 +209,9 @@ sub do_pin {
   my ($app, $path_arg) = @_;
   $path_arg =~ /^(([A-Z])[A-Z])[A-Z]/ and $path_arg = join('/', $2, $1, $path_arg);
   my $path = path($path_arg);
+  my $res = cpan_fetch($app, "authors/id/$path");
   path("pans/pinset/dists/")->child($path->dirname)->make_path;
-  my $pan_path = path("pans/pinset/dists/${path}")->spurt(
-    $app->ua->get($app->cpan_url.'authors/id/'.$path)->res->body
-  );
-  add_dist_to_index('pans/pinset/index', $pan_path);
+  add_dist_to_index('pans/pinset/index', path("pans/pinset/dists/$path")->spurt($res->body));
 }
 
 sub do_unpin {
@@ -264,6 +287,8 @@ foreach my $cmd (
   my $pkg = "App::opan::Command::${cmd}";
   my $code = __PACKAGE__->can("do_${cmd}");
   Mojo::Base->import::into($pkg, 'Mojolicious::Command');
+  monkey_patch $pkg, description => sub { pod_section($cmd, 1) };
+  monkey_patch $pkg, usage => sub { pod_section($cmd, 0) };
   monkey_patch $pkg,
     run => sub { my $self = shift; $code->($self->app, @_) };
 }
@@ -293,7 +318,7 @@ post "/upload" => sub {
 
 push(@{app->commands->namespaces}, 'App::opan::Command');
 
-helper cpan_url => sub { $ENV{OPAN_MIRROR} || 'http://www.cpan.org/' };
+helper cpan_url => sub { Mojo::URL->new($ENV{OPAN_MIRROR} || 'http://www.cpan.org/') };
 
 my $nopin_static = Mojolicious::Static->new(
   paths => [ 'pans/custom/dists' ]
@@ -324,7 +349,7 @@ my $serve_upstream = sub {
   my ($c) = @_;
   $c->render_later;
   $c->ua->get(
-    $c->cpan_url.'authors/id/'.$c->stash->{path},
+    $c->cpan_url.'authors/id/'.$c->stash->{dist_path},
       sub {
       my (undef, $tx) = @_;
         $c->tx->res($tx->res);
@@ -334,13 +359,15 @@ my $serve_upstream = sub {
   return;
 };
 
-get '/upstream/authors/id/*path' => $serve_upstream;
+get '/upstream/authors/id/*dist_path' => $serve_upstream;
 
-get '/combined/authors/id/*path' => sub {
+get '/combined/authors/id/*dist_path' => sub {
+  $_[0]->stash(path => $_[0]->stash->{dist_path});
   $combined_static->dispatch($_[0]) or $serve_upstream->($_[0]);
 };
 
-get '/nopin/authors/id/*path' => sub {
+get '/nopin/authors/id/*dist_path' => sub {
+  $_[0]->stash(path => $_[0]->stash->{dist_path});
   $nopin_static->dispatch($_[0]) or $serve_upstream->($_[0]);
 };
 
@@ -356,10 +383,10 @@ get "/autopin/modules/02packages.details.txt.gz" => sub {
   $base_static->dispatch($_[0]->stash(path => "nopin/index.gz"));
 };
 
-get '/autopin/authors/id/*path' => sub {
+get '/autopin/authors/id/*dist_path' => sub {
   return $_[0]->render(text => 'Autopin off', status => 404)
     unless $ENV{OPAN_AUTOPIN};
-  return if $nopin_static->dispatch($_[0]);
+  return if $nopin_static->dispatch($_[0]->stash(path => $_[0]->stash->{dist_path}));
   return if eval {
     do_pin(app, $_[0]->stash->{path});
     $pinset_static->dispatch($_[0]);
@@ -509,7 +536,7 @@ Rebuilds the L</combined> and L</nopin> PANs' index files.
 
   opan pull
 
-Does an L</fetch> then an L</merge>. There's no equivalent for others,
+Does a L</fetch> and then a L</merge>. There's no equivalent for others,
 on the assumption what you'll do is roughly L</pin>, L</add>, L</unpin>,
 L</unadd>, ... repeat ..., L</pull>.
 
@@ -548,7 +575,7 @@ Runs a request against the opan URL space using L<Mojolicious::Command::get>.
 
   opan cpanm --installdeps .
 
-Starts a temporary server process and runs
+Starts a temporary server process and runs cpanm.
 
   cpanm --mirror http://localhost:<port>/combined/ --mirror-only <your args here>
 
@@ -564,7 +591,7 @@ to request a specific PAN.
 
   opan carton install
 
-Starts a temporary server process and runs
+Starts a temporary server process and runs carton.
 
   PERL_CARTON_MIRROR=http://localhost:<port>/combined/ carton <your args here>
 

@@ -8,7 +8,7 @@ use warnings;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-$VERSION = '0.43';
+$VERSION = '0.45';
 
 use base qw(Class::Accessor);
 XML::Sig->mk_accessors(qw(key));
@@ -66,33 +66,30 @@ sub new {
     if ( exists $params->{ 'cert_text' } ) {
         $self->_load_cert_text( $params->{ 'cert_text' } );
     }
-    if ( exists $params->{ sig_hash } ) {
-        if ( grep { $_ eq $params->{ sig_hash } } ('sha224', 'sha256', 'sha384', 'sha512')) {
-            $self->{ sig_hash } = $params->{ sig_hash };
-        }
-        else {
-            $self->{ sig_hash } = 'sha1';
-        }
+
+    if ( exists $params->{ sig_hash } && grep { $_ eq $params->{ sig_hash } } ('sha224', 'sha256', 'sha384', 'sha512'))
+    {
+        $self->{ sig_hash } = $params->{ sig_hash };
     }
     else {
         $self->{ sig_hash } = 'sha1';
     }
 
-    if ( exists $params->{ digest_hash } ) {
-        if ( grep { $_ eq $params->{ digest_hash } } ('sha1', 'sha224', 'sha256', 'sha384',, 'sha512')) {
-            $self->{ digest_hash } = $params->{ digest_hash };
-        }
-        else {
-            $self->{ digest_hash } = 'sha1';
-        }
+    if ( exists $params->{ digest_hash } && grep { $_ eq $params->{ digest_hash } } ('sha1', 'sha224', 'sha256', 'sha384',, 'sha512'))
+    {
+        $self->{ digest_hash } = $params->{ digest_hash };
     }
     else {
         $self->{ digest_hash } = 'sha1';
     }
 
     if (defined $self->{ key_type } && $self->{ key_type } eq 'dsa') {
-        $self->{ sig_hash } = 'sha1';
-        $self->{ digest_hash } = 'sha1';
+        if ( defined $params->{ sig_hash } && grep { $_ eq $params->{ sig_hash } } ('sha1', 'sha256')) {
+            $self->{ sig_hash } = $params->{ sig_hash };
+        }
+        else {
+            $self->{ sig_hash } = 'sha1';
+        }
     }
     return $self;
 }
@@ -151,7 +148,7 @@ sub sign {
             die("Can't handle $self->{ digest_hash }");
         }
 
-        # Calculate the sha1 digest of the XML being signed
+        # Calculate the digest of the XML being signed
         my $bin_digest    = $self->{digest_method}->( $xml_canon );
         my $digest        = encode_base64( $bin_digest, '' );
         print ("   Digest: $digest\n") if $DEBUG;
@@ -185,8 +182,16 @@ sub sign {
         my $signature;
         if ($self->{key_type} eq 'dsa') {
             print ("    Signing SignedInfo using DSA key type\n") if $DEBUG;
-            # DSA only permits the signing of 20 bytes or less, hence the sha1
-            my $bin_signature = $self->{key_obj}->do_sign( sha1($signed_info_canon) );
+            if(my $ref = Digest::SHA->can($self->{ sig_hash })) {
+                $self->{sig_method} = $ref;
+            }
+            else {
+                die("Can't handle $self->{ sig_hash }");
+            }
+
+            # DSA 1024-bit only permits the signing of 20 bytes or less, hence the sha1
+            # DSA 2048-bit only permits the signing sha256
+            my $bin_signature = $self->{key_obj}->do_sign( $self->{ sig_method }($signed_info_canon) );
 
             # https://www.w3.org/TR/2002/REC-xmldsig-core-20020212/#sec-SignatureAlg
             # The output of the DSA algorithm consists of a pair of integers
@@ -195,8 +200,9 @@ sub sign {
             my $r = $bin_signature->get_r;
             my $s = $bin_signature->get_s;
 
-            my $rs = _zero_fill_buffer(320);
-            _concat_dsa_sig_r_s(\$rs, $r, $s);
+            my $sig_size = ($self->{key_obj}->get_sig_size - 8) * 8;
+            my $rs = _zero_fill_buffer($sig_size);
+            _concat_dsa_sig_r_s(\$rs, $r, $s, $sig_size);
 
             $signature        = encode_base64( $rs, "\n" );
         } elsif ($self->{key_type} eq 'ecdsa') {
@@ -299,6 +305,7 @@ sub verify {
                 'dsig:SignedInfo/dsig:SignatureMethod/@Algorithm', $signature_node);
         $signature_method =~ s/^.*[#]//;
         $signature_method =~ s/^rsa-//;
+        $signature_method =~ s/^dsa-//;
         $signature_method =~ s/^ecdsa-//;
 
         $self->{ sig_hash } = $signature_method;
@@ -309,6 +316,14 @@ sub verify {
         my $signed_info_canon = $self->_canonicalize_xml($signed_info, $signature_node);
 
         print "$signed_info_canon\n" if $DEBUG;
+
+        if(my $ref = Digest::SHA->can($signature_method)) {
+            $self->{sig_method} = $ref;
+        }
+        else {
+            die("Can't handle $signature_method");
+        }
+
         if(my $ref = Digest::SHA->can($digest_method)) {
             $self->{digest_method} = $ref;
         }
@@ -689,6 +704,29 @@ sub _verify_x509_cert {
             return 1;
         }
     }
+    elsif ($cert->key_alg_name eq 'dsaEncryption') {
+        eval {
+            require Crypt::OpenSSL::DSA;
+        };
+        confess "Crypt::OpenSSL::DSA needs to be installed so
+                    that we can handle DSA X509 certificates" if $@;
+
+        my $dsa_pub  = Crypt::OpenSSL::DSA->read_pub_key_str( $cert->pubkey );
+        my $sig_size = ($dsa_pub->get_sig_size - 8)/2;
+        #my ($r, $s) = unpack('a20a20', $bin_signature);
+        my $unpk = "a" . $sig_size . "a" . $sig_size;
+        my ($r, $s) = unpack($unpk, $bin_signature);
+
+        # Create a new Signature Object from r and s
+        my $sigobj = Crypt::OpenSSL::DSA::Signature->new();
+        $sigobj->set_r($r);
+        $sigobj->set_s($s);
+
+        if ($dsa_pub->do_verify($self->{sig_method}->($canonical), $sigobj)) {
+            $self->{signer_cert} = $cert;
+            return 1;
+        }
+    }
     else {
         eval {
             require Crypt::OpenSSL::RSA;
@@ -742,18 +780,20 @@ sub _zero_fill_buffer {
 ##
 sub _concat_dsa_sig_r_s {
 
-    my ($buffer, $r, $s) = @_;
+    my ($buffer, $r, $s, $sig_size) = @_;
     my $bits_r = (length($r)*8)-1;
     my $bits_s = (length($s)*8)-1;
 
+    my $halfsize = $sig_size / 2;
+
     # Place $s right justified in $v starting at bit 319
     for (my $i = $bits_s; $i >=0; $i--) {
-        vec($$buffer, 160 + $i + (159 - $bits_s) , 1) = vec($s, $i, 1);
+        vec($$buffer, $halfsize + $i + (($halfsize -1) - $bits_s) , 1) = vec($s, $i, 1);
     }
 
     # Place $r right justified in $v starting at bit 159
     for (my $i = $bits_r; $i >= 0 ; $i--) {
-        vec($$buffer, $i + (159 - $bits_r) , 1) = vec($r, $i, 1);
+        vec($$buffer, $i + (($halfsize -1) - $bits_r) , 1) = vec($r, $i, 1);
     }
 
 }
@@ -799,7 +839,9 @@ sub _verify_dsa {
     # The signature value consists of the base64 encoding of the
     # concatenation of r and s in that order ($r . $s)
     # Binary Signature is stored as a concatenation of r and s
-    my ($r, $s) = unpack('a20a20', $bin_signature);
+    my $sig_size = ($dsa_pub->get_sig_size - 8)/2;
+    my $unpk = "a" . $sig_size . "a" . $sig_size;
+    my ($r, $s) = unpack($unpk, $bin_signature);
 
     # Create a new Signature Object from r and s
     my $sigobj = Crypt::OpenSSL::DSA::Signature->new();
@@ -807,7 +849,7 @@ sub _verify_dsa {
     $sigobj->set_s($s);
 
     # DSA signatures are limited to a message body of 20 characters, so a sha1 digest is taken
-    return 1 if ($dsa_pub->do_verify( $self->{digest_method}->($canonical),  $sigobj ));
+    return 1 if ($dsa_pub->do_verify( $self->{sig_method}->($canonical),  $sigobj ));
     return 0;
 }
 
@@ -1300,11 +1342,17 @@ sub _signedinfo_xml {
     my ($digest_xml) = @_;
 
     my $algorithm;
-    if ( $self->{ sig_hash } ne 'sha1' || $self->{key_type} eq 'ecdsa') {
+    if ( $self->{ sig_hash } eq 'sha1' && $self->{key_type} ne 'ecdsa' ) {
+        $algorithm = "http://www.w3.org/2000/09/xmldsig#$self->{key_type}-$self->{ sig_hash }";
+    }
+    elsif ( $self->{key_type} eq 'ecdsa' ) {
         $algorithm = "http://www.w3.org/2001/04/xmldsig-more#$self->{key_type}-$self->{ sig_hash }";
     }
+    elsif ( $self->{ key_type } eq 'dsa' && $self->{ sig_hash } eq 'sha256') {
+        $algorithm = "http://www.w3.org/2009/xmldsig11#$self->{key_type}-$self->{ sig_hash }";
+    }
     else {
-        $algorithm = "http://www.w3.org/2000/09/xmldsig#$self->{key_type}-$self->{ sig_hash }";
+        $algorithm = "http://www.w3.org/2001/04/xmldsig-more#$self->{key_type}-$self->{ sig_hash }";
     }
 
     #return qq{<dsig:SignedInfo xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
@@ -1420,7 +1468,7 @@ XML::Sig
 
 =head1 VERSION
 
-version 0.43
+version 0.45
 
 =head1 SYNOPSIS
 
@@ -1549,15 +1597,15 @@ Passing sig_hash to new allows you to specify the SignatureMethod
 hashing algorithm used when signing the SignedInfo.  RSA and ECDSA
 supports the hashes specified sha1, sha224, sha256, sha384 and sha512
 
-DSA currenly supports only sha1 (but you really should not sign
+DSA supports only sha1 and sha256 (but you really should not sign
 anything with DSA anyway).
 
 =item B<digest_hash>
 
 Passing digest_hash to new allows you to specify the DigestMethod
 hashing algorithm used when calculating the hash of the XML being
-signed.  RSA and ECDSA supports the hashes specified sha1, sha224,
-sha256, sha384, and sha512
+signed.  Supported hashes can be specified sha1, sha224, sha256,
+sha384, and sha512
 
 =back
 
@@ -1726,9 +1774,19 @@ Net::SAML2 embedded version amended by Chris Andrews <chris@nodnol.org>.
 
 Maintainer: Timothy Legge <timlegge@cpan.org>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Original Author: Byrne Reese <byrne@cpan.org>
+=over 4
+
+=item *
+
+Byrne Reese <byrne@cpan.org>
+
+=item *
+
+Timothy Legge <timlegge@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

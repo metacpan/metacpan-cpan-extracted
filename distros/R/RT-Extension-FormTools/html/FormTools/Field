@@ -77,15 +77,13 @@ if ( RT::Extension::FormTools::is_core_field($name) ) {
     }
 }
 
-
-unless ( $default ) {
-    my $request_args = $m->request_args();
-    if ( $field_type eq 'core' && $request_args->{$name} ) {
-        $default = $request_args->{$name};
-    } elsif ( $field_type eq 'custom' &&  $cf->Id ) {
-        $default = ($request_args->{ $input_name } || 
-                    $request_args->{ $input_name .'s' } );
-    }
+my $request_args = $m->request_args();
+if ( $field_type eq 'core' && exists $request_args->{$name} ) {
+    $default = $request_args->{$name};
+} elsif ( $field_type eq 'custom' && $cf->Id &&
+        ( exists $request_args->{ $input_name } ) ) {
+    $default = ($request_args->{ $input_name } ||
+                $request_args->{ $input_name .'s' } );
 }
 
 $default = '' unless defined $default;
@@ -201,15 +199,32 @@ $default = '' unless defined $default;
 % } elsif ($render_as =~ /^radio/)  {
 %       my $selected = 0;
 % if ($empty_allowed) {
-        <input type="radio" name="<% $input_name %>" value="" <% !$default ?  'CHECKED' : '' %>><span class="radio-label"><&|/l&>(no value)</&></span>
-%        if ($render_as =~ /vertical/) { 
+        <input
+            type="radio"
+            id="<% $input_name %>"
+            name="<% $input_name %>"
+            value=""
+            <% !$default ? 'CHECKED' : '' %>
+        >
+        <label
+            for="<% $input_name %>"
+            class="radio-label"
+        >
+            <&|/l&>(no value)</&>
+        </label>
+%        if ($render_as =~ /vertical/) {
             <br/>
 %        }
 
 % }
 % my $CFVs = $cf->Values;
 % while ($CFVs and my $value = $CFVs->Next ) {
-        <input type="radio" name="<% $input_name %>"  value="<%$value->Name%>" 
+%       my $labelid = "$input_name-". $value->id;
+        <input
+            type="radio"
+            id="<% $labelid %>"
+            name="<% $input_name %>"
+            value="<%$value->Name%>"
 %  if ($default) {
 %       if (ref $default) {
             <% (grep { $_ eq $value->Name} @$default) ? 'CHECKED' : '' %>
@@ -217,9 +232,15 @@ $default = '' unless defined $default;
             <% ($default eq $value->Name) ? 'CHECKED' : '' %>
 %       }
 % }
-            ><span class="radio-label"><% $value->Name%></span>
+        >
+        <label
+            for="<% $labelid %>"
+            class="radio-label"
+        >
+            <% $value->Name %>
+        </label>
 
-%        if ($render_as =~ /vertical/) { 
+%        if ($render_as =~ /vertical/) {
             <br/>
 %        }
 
@@ -227,7 +248,12 @@ $default = '' unless defined $default;
 % } elsif ($render_as =~  /^check/i)  {
 % my $CFVs = $cf->Values;
 % while ($CFVs and my $value = $CFVs->Next ) {
-        <input type="checkbox" name="<% $input_name %>"  value="<%$value->Name%>" 
+%       my $labelid = "$input_name-". $value->id;
+        <input
+            type="checkbox"
+            id="<% $labelid %>"
+            name="<% $input_name %>"
+            value="<%$value->Name%>"
 %  if ($default) {
 %       if (ref $default) {
             <% (grep { $_ eq $value->Name} @$default) ? 'CHECKED' : '' %>
@@ -235,13 +261,18 @@ $default = '' unless defined $default;
             <% ($default eq $value->Name) ? 'CHECKED' : '' %>
 %       }
 % }
-            ><% $value->Name%>
+        >
+        <label
+            for="<% $labelid %>"
+        >
+            <% $value->Name %>
+        </label>
 
 % if (defined $item_labels->{$value->Name}) {
     <% $item_labels->{$value->Name} %>
 % }
 
-%        if ($render_as =~ /vertical/) { 
+%        if ($render_as =~ /vertical/) {
             <br/>
 %        }
 

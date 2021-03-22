@@ -24,6 +24,7 @@
             "File::ShareDir" : "1.00",
             "Future::AsyncAwait" : "0",
             "Future::IO" : "0.03",
+            "IO::Termios" : "0",
             "Struct::Dumb" : "0",
             "YAML" : "0",
             "perl" : "5.020"
@@ -40,7 +41,7 @@
    "provides" : {
       "Device::AVR::UPDI" : {
          "file" : "lib/Device/AVR/UPDI.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -49,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

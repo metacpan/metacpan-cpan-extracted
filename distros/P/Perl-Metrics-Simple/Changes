@@ -1,13 +1,20 @@
 Revision history for Perl module Perl::Metrics::Simple
 
-0.18
+0.19 - March 2021
+  Merged JSON output option contributed by Saturo Abe (https://github.com/polamjag)
+  Moved generation of the plain text, HTML, and JSON into new modules:
+        Perl::Metrics::Simple::Output::HTML
+        Perl::Metrics::Simple::Output::JSON
+        Perl::Metrics::Simple::Output::PlainText
+
+0.18 - January 2015
   Merged changes by mephinet to support better reporting for projects
   using Moose, so that a method declared as 'foo' => sub {...} will
   be reported as a sub named _around_foo instead of being counted
   as part of the "Code not in any subroutine"
   Pull request was: https://github.com/matisse/Perl-Metrics-Simple/pull/5
 
-0.17
+0.17 - November 2012
   Merten Falk - Added default values for subroutine metrics if
   there is no subroutine.
   
@@ -17,7 +24,7 @@ Revision history for Perl module Perl::Metrics::Simple
   countperl now utilizes Pod::Usage for diagnostic and new --help option
     https://rt.cpan.org/Ticket/Display.html?id=80462
 
-0.16
+0.16 - October 2012
   The countperl script now offers HTML output as well as plain text,
   thanks to Merten Falk.
 

@@ -18,18 +18,13 @@ no_index:
   directory:
     - t
     - inc
-provides:
-  PDL::FFTW3:
-    file: FFTW3.pd
-    version: '0.07'
 requires:
   PDL::Core: '2.001'
 resources:
   IRC: irc://irc.perl.org/#pdl
   X_type: git
   X_url: git://github.com/PDLPorters/pdl-fftw3.git
+  X_web: http://github.com/PDLPorters/pdl-fftw3
   bugtracker: http://github.com/PDLPorters/pdl-fftw3/issues
-  homepage: http://github.com/PDLPorters/pdl-fftw3
-  repository: git://github.com/PDLPorters/pdl-fftw3.git
-version: '0.07'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

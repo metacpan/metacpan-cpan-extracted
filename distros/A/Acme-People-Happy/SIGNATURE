@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,39 +12,45 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 e156e4b412e2fe6142a9ce4874955c7b6a99f1bc Changes
-SHA1 3579e876ba966869dc0ee6defbf069f17930873b Happy.pm
-SHA1 341133f5320fc2d2aae43cac4a6a78d0e9e1f379 MANIFEST
-SHA1 e5c7f776c0f032a9491683da3bbc357672717165 META.yml
-SHA1 54105ce3e10fa79d71fbf34c2b94691f54a01889 Makefile.PL
-SHA1 74843780867a8612351b1770aceab61de369bae8 README
-SHA1 9c9718396b43cafe0ef1e331659b671274a15011 examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 ee30b983308ec08086eb1f0385792539ae5e2959 t/Acme-People-Happy/01-use.t
-SHA1 938c0d0e1f2f92d2f17b8e89d7418b10f3f78a75 t/Acme-People-Happy/02-version.t
-SHA1 341e9fbeff2575ad4ab9d0b7ccb7a4abff75ea61 t/Acme-People-Happy/03-new.t
-SHA1 3f9e15efe07cf97851e6aac72f894b6fffe127d6 xt/Acme-People-Happy/01-pod_coverage.t
-SHA1 13b61f3778113dd2471772b8d95cb99a715e9ef2 xt/Acme-People-Happy/02-pod.t
+SHA256 6af2ee67288f99081966219af8f4dd8a679a8dd1ddc7f9eeca77bcdfaa7a6d02 Changes
+SHA256 ef46f9b913bacbf97236f9f0d8921c6cf27e61fcaee288d37c64cf4408299cd6 Happy.pm
+SHA256 c2243e443d7ce9cdb60d55bb0c5e22f7774e9b378665661108b5300faebcce0d LICENSE
+SHA256 6c5475a0319ba86a4ebb953d494d2b70815418ada7ee70840076eb36e59e1596 MANIFEST
+SHA256 2c64a077307ae3b695291b578d13f5f03f67a5b27175dabe7b97f24c7449d934 META.yml
+SHA256 764f6ef5a07fd5ea448aca83b8abd2e5dd8d76ecfa7d8f537fbc2ff2efd20a08 Makefile.PL
+SHA256 42a76dddd98878b15e689c660e3ca4ac6963b92e254ad7912a1e039c8f48f573 README
+SHA256 4f0f3ade6d524dad9d876f4698d0b7763f34d08df23a40410b4d604526bcf4b8 examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3a1974d15affd2bc3db22965c65b055d43422c0f27af376c80f4e19011ae94eb t/Acme-People-Happy/01-use.t
+SHA256 615b2475cf76e28a38467fc3f670595ffbe68cff5fa55c72de46e65cd705d41a t/Acme-People-Happy/02-version.t
+SHA256 afd3daa0bdb176ffee26613a91d5b88a7d33a6725cfcbe5aa684f961daeceab4 t/Acme-People-Happy/03-new.t
+SHA256 08b91e010d7a63580a0bbac8b50d774734d6d8bc01f2d438cdd2c56d20d88830 t/Acme-People-Happy/04-are_you_happy.t
+SHA256 5a042b199a13794baad37b5e3c797876ae5ce950da123f6758a6061e623c2212 t/Acme-People-Happy/05-evetybody.t
+SHA256 ccd9c424332aa3c93bae65817466c97f4bc57dd142090441b89f9f6f56210afa xt/Acme-People-Happy/01-pod_coverage.t
+SHA256 42dc0f7d0bd6134851348cb096e1010dec7d30f37b5413e713e49bf0bcaa5abb xt/Acme-People-Happy/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWBl+8AAoJEJe+XXKaIuTlZA8H/00EomT80W3pay0nc/E2Tl5e
-iPKZgj01uyvmoxE9yWbGsnaIvmFiNWUOJByACAMeFJQYYMzucWs6cb9iqMPnTG5h
-sJhktZ1D/V1PkbW0O+r41W6kuaWj5ZoWjgU60fCMyhDq24DCkyxU3mIP1WiB8Ptt
-DKOSW36RZdwRqSAJNWvJdpfOabc+jZcpya9749XrBde9qybqQoSvLNbw82M7TzFP
-aW2yaLTRwouIVMtCrNt8yWhPCdguQY3HbPvcoZS2sFJQj6eXV401E+FqQJWPC2Z2
-70xC1SR1hM6FLX7Wo9VXHtuiWK2IcQlxxi5NETb5rYsLeIOdlwboi/VTlGGMl4k=
-=E67A
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmBU328ACgkQgmqNLzlX
+aReHVQwAkNGgx54KBLKoKHXFf1TvXSZGEzGqfvusROonSORiVvCDPibrREY8JyAj
+vvgo/W74UwmH6KqQSEVR4/8XYZXkoduIIIYgKbBKKaNivvCRDM2VfiRe3C+6ISCg
+WmAj5zoFPEh1lGM7hXbD+3w9eeCgX1saMvGP7QW4gR6NGPONIb0NIJEDwvxDZO0/
+UJ0uLJWa+j/sai32i+I3y0IzdriYosz86HrrA8bgxriwdpZ4dTapXGm+b01GAo1r
+qbvkq27tceaXzHL4zoiQFsqG8CIq3pVzypXUAmpApReS6cMFsUaCwYoGOvClXS6n
+xdhyjs/qZpyvhVkoRi0iMBnxmR+eOWca1v5b02fm3J4BFK6VnZa+5LGqkNj/nXzI
+8P2gdY9iGztiYBhWT9w7McUxqPtTd3fKqCmFBr9HrWciXSF+hsFLY8E70GEK5EG1
+tjJpDGjp2thfezUauWloRJ7Sc26eSo7Jql4uHslcgFPqvDS68MoCf3SOvlq61C0L
+d8ft7kPQ
+=buYN
 -----END PGP SIGNATURE-----

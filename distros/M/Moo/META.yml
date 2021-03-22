@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,12 +20,12 @@ no_index:
     - xt
 recommends:
   Class::XSAccessor: '1.18'
-  Sub::Name: '0.08'
-  strictures: '2'
+  Sub::Util: '0'
 requires:
+  Carp: '0'
   Class::Method::Modifiers: '1.10'
-  Exporter: '5.57'
-  Role::Tiny: '2.001004'
+  Exporter: '0'
+  Role::Tiny: '2.002003'
   Scalar::Util: '1.00'
   Sub::Defer: '2.006006'
   Sub::Quote: '2.006006'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Moo
   license: https://dev.perl.org/licenses/
   repository: https://github.com/moose/Moo.git
-version: '2.004004'
+version: '2.005003'
 x_authority: cpan:MSTROUT
 x_breaks:
   App::Commando: '<= 0.012'
@@ -44,8 +44,4 @@ x_breaks:
   MooX::Emulate::Class::Accessor::Fast: '<= 0.02'
   MySQL::Workbench::Parser: '<= 0.05'
   WebService::Shutterstock: '<= 0.006'
-x_cpants:
-  ignore:
-    use_strict: 'internal module used to apply strict'
-    use_warnings: 'internal module used to apply warnings'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

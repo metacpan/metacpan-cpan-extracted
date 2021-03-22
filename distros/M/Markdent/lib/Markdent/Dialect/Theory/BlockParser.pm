@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use List::AllUtils qw( insert_after_string sum );
 use Markdent::Event::StartTable;
@@ -467,15 +467,14 @@ Markdent::Dialect::Theory::BlockParser - Block parser for Theory's proposed Mark
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
 This role adds parsing for Markdown extensions proposed by David Wheeler (aka
-Theory). See
-L<http://justatheory.com/computers/markup/markdown-table-rfc.html> and
-L<http://justatheory.com/computers/markup/modest-markdown-proposal.html> for
-details.
+Theory). See L<http://justatheory.com/computers/markup/markdown-table-rfc.html>
+and L<http://justatheory.com/computers/markup/modest-markdown-proposal.html>
+for details.
 
 For now, this role handles tables only.
 

@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 use v5.14;
 use warnings;
@@ -23,7 +23,7 @@ use App::ansicolumn::Border;
 sub new {
     my $class = shift;
     bless {
-	output_width     => undef,
+	width            => undef,
 	fillrows         => undef,
 	table            => undef,
 	table_right      => '',
@@ -69,17 +69,17 @@ sub run {
     GetOptions(
 	$obj,
 	map { s/^(?=\w+_)(\w+)\K/"|".$1=~tr[_][-]r."|".$1=~tr[_][]dr/er } qw(
-	output_width|c=i
+	width|output_width|c=s
 	fillrows|x
 	table|t
 	table_right|R=s
 	separator|s=s
 	output_separator|o=s
 	page|P:i
-	height=i
+	height=s
 	column_unit|cu=i
 	pane|C=i
-	pane_width|pw|S=i
+	pane_width|pw|S=s
 	tabstop=i
 	tabhead=s
 	tabspace=s
@@ -131,6 +131,17 @@ sub setup_options {
 	$obj->{border} = 1;
     }
 
+    ## --height, --width
+    for my $param ([ 'height',      $obj->term_height ],
+		   [ 'width',       $obj->term_width  ],
+		   [ 'pane_width',  $obj->term_width  ]) {
+	my($name, @stack) = @$param;
+	my $exp = $obj->{$name} or next;
+	$exp =~ /\D/ or next;
+	$obj->{$name} = rpn_calc(@stack, $exp)
+	    or die "$exp: invalid $name.\n";
+    }
+
     ## --linestyle
     if ($obj->{linestyle} !~ /^(?<style>|none|wordwrap|wrap|truncate)$/) {
 	die "$obj->{linestyle}: unknown style.\n";
@@ -156,11 +167,6 @@ sub setup_options {
 	$obj->{boundary} ||= 'word';
 	$obj->{white_space} = 0 if $obj->{white_space} > 1;
 	$obj->{isolation} = 0 if $obj->{isolation} > 1;
-    }
-
-    ## --height
-    if ($obj->{height} < 0) {
-	$obj->{height} += $obj->term_height;
     }
 
     ## --colormap
@@ -331,7 +337,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020 Kazumasa Utashiro.
+Copyright 2020- Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,5 +1,5 @@
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use 5.006;
 
 my %META = (
@@ -23,29 +23,24 @@ my %META = (
     },
     runtime => {
       requires => {
-        'Class::Method::Modifiers'  => '1.10',  # for RT#80194
-        'Role::Tiny'                => '2.001004',
-        'Scalar::Util'              => '1.00',
         'perl'                      => '5.006',
-        'Exporter'                  => '5.57',  # Import 'import'
+        'Scalar::Util'              => '1.00',
+        'Exporter'                  => 0,
+        'Carp'                      => 0,
+        'Class::Method::Modifiers'  => '1.10',  # for RT#80194
+        'Role::Tiny'                => '2.002003',
         'Sub::Quote'                => '2.006006',
         'Sub::Defer'                => '2.006006',
       },
       recommends => {
         'Class::XSAccessor'         => '1.18',
-        'Sub::Name'                 => '0.08',
-        'strictures'                => '2',
+        'Sub::Util'                 => '0',
       },
     },
-    develop   => {
+    develop => {
       requires => {
-        'strictures'                      => '2',
-        'bareword::filehandles'           => 0,
-        'indirect'                        => 0,
-        'multidimensional'                => 0,
         'Class::Tiny'                     => '1.001',
         'Moose'                           => '1.15',
-        'MooseX::Types::Common::Numeric'  => 0,
         'Mouse'                           => 0,
         'namespace::autoclean'            => 0,
         'namespace::clean'                => 0,
@@ -78,18 +73,13 @@ my %META = (
     'App::Commando'             => '<= 0.012',
   },
   x_authority => 'cpan:MSTROUT',
-  x_cpants => { ignore => {
-    use_strict => 'internal module used to apply strict',
-    use_warnings => 'internal module used to apply warnings',
-  } },
 );
 
 my $xt = $ENV{EXTENDED_TESTING};
+
 my %MM_ARGS = (
   PREREQ_PM => {
-    ("$]" >= 5.008_000 ? () : ('Task::Weaken' => 0)),
-    ("$]" >= 5.010_000 ? () : ('MRO::Compat' => 0)),
-    ("$]" >= 5.014_000 ? () : ('Devel::GlobalDestruction' => 0.11)),
+    ("$]" < 5.014_000 ? ('Devel::GlobalDestruction' => '0.11') : ()),
   },
   ($xt ? (
     TEST_REQUIRES => {

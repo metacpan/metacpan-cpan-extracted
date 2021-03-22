@@ -4,8 +4,8 @@
 #
 package PDL::GSLSF::HYPERG;
 
-@EXPORT_OK  = qw( PDL::PP gsl_sf_hyperg_0F1 PDL::PP gsl_sf_hyperg_1F1 PDL::PP gsl_sf_hyperg_U PDL::PP gsl_sf_hyperg_2F1 PDL::PP gsl_sf_hyperg_2F1_conj PDL::PP gsl_sf_hyperg_2F1_renorm PDL::PP gsl_sf_hyperg_2F1_conj_renorm PDL::PP gsl_sf_hyperg_2F0 );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw( PDL::PP gsl_sf_hyperg_0F1 PDL::PP gsl_sf_hyperg_1F1 PDL::PP gsl_sf_hyperg_U PDL::PP gsl_sf_hyperg_2F1 PDL::PP gsl_sf_hyperg_2F1_conj PDL::PP gsl_sf_hyperg_2F1_renorm PDL::PP gsl_sf_hyperg_2F1_conj_renorm PDL::PP gsl_sf_hyperg_2F0 );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::HYPERG ;
 

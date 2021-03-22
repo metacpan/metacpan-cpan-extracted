@@ -2,25 +2,25 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A toolkit to help sign and verify XML Digital Signatures.",
-  "AUTHOR" => "Original Author: Byrne Reese <byrne\@cpan.org>",
+  "AUTHOR" => "Byrne Reese <byrne\@cpan.org>, Timothy Legge <timlegge\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "XML-Sig",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "XML::Sig",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Class::Accessor" => 0,
     "Crypt::OpenSSL::Bignum" => 0,
-    "Crypt::OpenSSL::DSA" => 0,
+    "Crypt::OpenSSL::DSA" => "0.20",
     "Crypt::OpenSSL::RSA" => 0,
     "Crypt::OpenSSL::X509" => 0,
     "CryptX" => "0.036",
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.43",
+  "VERSION" => "0.45",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +51,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Accessor" => 0,
   "Crypt::OpenSSL::Bignum" => 0,
-  "Crypt::OpenSSL::DSA" => 0,
+  "Crypt::OpenSSL::DSA" => "0.20",
   "Crypt::OpenSSL::RSA" => 0,
   "Crypt::OpenSSL::X509" => 0,
   "CryptX" => "0.036",

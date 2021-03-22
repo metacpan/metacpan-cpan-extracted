@@ -1,3 +1,18 @@
+0.05 2021-03-19T18:29:17+01:00
+ - Fix bugtracker.
+
+0.04 2021-03-19T18:24:58+01:00
+ - Add LICENSE file.
+ - Add tests.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rewrite doc to use =head2.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.03 2015-09-26T11:04:59+02:00
  - Move author tests to xt/ directory.
  - Update Module::Install to 1.16 version.

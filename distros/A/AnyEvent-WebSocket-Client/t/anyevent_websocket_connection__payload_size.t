@@ -38,7 +38,7 @@ my $connection;
     $message_cv = AE::cv;
     shift @messages;
   }
-  
+
   sub send_message
   {
     my($body,$cb) = @_;
@@ -71,7 +71,7 @@ subtest 'send payload with size > 65536' => sub {
     ok $rmessage;
     is $rmessage->body, $data;
   };
-  
+
   subtest 'message object' => sub {
     my $smessage = AnyEvent::WebSocket::Message->new(
       body => $data,
@@ -90,12 +90,12 @@ subtest 'receive payload with size > 65536' => sub {
   my $data = 'x' x 65537;
 
   send_message($data, sub {
-  
+
     my($connection, $message) = @_;
     is $message->body, $data;
-  
+
   });
-  
+
 };
 
 subtest 'receieve payload with size > max_payload_size' => sub {
@@ -103,7 +103,7 @@ subtest 'receieve payload with size > max_payload_size' => sub {
   my $data = 'x' x 65540;
   my $here = 1;
   my $cv = AE::cv;
-  
+
   $connection->on(parse_error => sub {
     my($connection, $error) = @_;
     return unless $here;

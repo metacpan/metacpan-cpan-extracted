@@ -35,7 +35,6 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny"      => 0,
-    "Data::Dump"         => 0,
     "Test2::Mock"        => "0.000060",
     "Test2::V0"          => "0.000060",
     "Test::Alien::Build" => 0,
@@ -61,7 +60,6 @@ my %FallbackPrereqs = (
   "Alien::Build"       => "0.62",
   "Capture::Tiny"      => 0,
   "Cwd"                => 0,
-  "Data::Dump"         => 0,
   "File::Which"        => 0,
   "Path::Tiny"         => 0,
   "Test2::Mock"        => "0.000060",

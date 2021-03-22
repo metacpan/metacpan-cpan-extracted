@@ -1,0 +1,340 @@
+=head1 NAME
+
+Image::PNG - Read and write PNG files
+
+
+
+=head1 SYNOPSIS
+
+    my $png = Image::PNG->new ();
+    $png->read ("example.png");
+    printf "Your PNG is %d x %d\n", $png->width, $png->height;
+
+=head1 VERSION
+
+This documents version 0.25 of Image::PNG corresponding
+to git commit L<33bd09704e977a7a2c48a728024c3e2c48c3defe|https://github.com/benkasminbullock/Image-PNG/commit/33bd09704e977a7a2c48a728024c3e2c48c3defe> made on Sat Mar 20 15:39:43 2021 +0900.
+
+=head1 DESCRIPTION
+
+This module is a simple interface for dealing with images in the PNG
+format. Image::PNG uses L<Image::PNG::Libpng> to access PNG images.
+
+=head1 General methods
+
+=head2 new
+
+    my $png = Image::PNG->new ();
+
+Create a new PNG-file reading or writing object.
+
+Options are
+
+=over
+
+=item read
+
+    my $png = Image::PNG->new ({read => 'some.png'});
+
+Set the file to read. The file is then read at the time of object
+creation.
+
+=item verbosity
+
+    my $png = Image::PNG->new ({verbosity => 1});
+
+If C<verbosity> is set to a true value, print verbose messages about
+what the module is doing.
+
+=back
+
+=head2 read
+
+    $png->read ("crazy.png");
+
+Read a PNG image from the file name specified as the argument. This
+dies if there is an error.
+
+=head2 write
+
+    $png->write ("crazy.png")
+        or die "Can't write it: " . $png->error ();
+
+Write the PNG to the file name specified as the argument. This dies
+if there is an error.
+
+=head1 PNG header-related methods
+
+These methods set and get PNG header data (the IHDR chunk of the PNG
+file).
+
+=head2 bit_depth
+
+    my $bit_depth = $png->bit_depth ();
+
+Get the bit depth of the current PNG image.
+
+=head2 color_type
+
+    my $color_type = $png->color_type ();
+
+Get the name of the colour type of the current PNG image. The possible
+return values are
+
+=over
+
+=item PALETTE
+
+=item GRAY
+
+=item GRAY_ALPHA
+
+=item RGB
+
+=item RGB_ALPHA
+
+=back
+
+=head2 height
+
+    my $height = $png->height ();
+
+Get the height of the current PNG image in pixels.
+
+=head2 interlacing_method
+
+    my $interlacing_method = $png->interlacing_method ();
+
+Get the name of the method of interlacing of the current PNG
+image. This may be either C<none> or C<adam7>.
+
+There is no method for dealing with the compression method
+field of the header, since this only has one possible value.
+
+=head2 width
+
+    my $height = $png->width ();
+
+Get the width of the current PNG image in pixels. For the number of
+bytes in a row, see the L</rowbytes> method.
+
+=head1 Image data-related methods
+
+=head2 rowbytes
+
+    my $rowbytes = $png->rowbytes;
+
+This method returns the number of bytes in each row of the image. If
+no image has been read yet, it returns the undefined value. For the
+number of pixels in a row, see the L</width> method.
+
+=head2 rows
+
+    my $rows = $png->rows ();
+
+This method returns the rows of the image as an array reference,
+C<$rows>. The array reference is a size equal to the height of the
+image. Each element has the length of the number of bytes in one row
+(as given by L</rowbytes>) plus one final zero byte. 
+
+The row data returned is binary data and may contain bytes with the
+value zero.
+
+If no image data has been read in, it prints a warning and returns the
+undefined value.
+
+=head1 Non-image chunks
+
+=head2 text
+
+    my @text = $png->text ();
+
+Get the text chunks of the image. Each element of the return value is
+a hash reference. The keys are the fields of the PNG text chunk, and
+the values are the values of those fields in the text chunk. The size
+of the array is equal to the number of text chunks.
+
+=head2 time
+
+    my $time_ref = $png->time ();
+    print "The PNG was last modified in $time_ref->{year}.\n";
+
+Get the last modified time of the image. The return value is a hash
+reference containing the following six fields:
+
+=over
+
+=item year
+
+=item month
+
+=item day
+
+=item hour
+
+=item minute
+
+=item second
+
+=back
+
+These represent the last modification time of the image. The
+modification time of a PNG file is meant to be in the GMT (UTC) time
+zone, so there is no time zone information.
+
+If there is no last modification time, the undefined value is returned.
+
+=head1 FUNCTIONS
+
+There are some convenience functions in this module, exported on request.
+
+=head2 display_text
+
+     use Image::PNG qw/display_text/;
+     my @text = $png->text;
+     display_text ($text[3]);
+
+Display the text chunk given as an argument on C<STDOUT>.
+
+This is a convenience function for debugging rather than a
+general-purpose routine.
+
+=head1 SEE ALSO
+
+=head2 About the PNG format
+
+=over
+
+=item Libpng.org website
+
+L<http://www.libpng.org/> is the website for PNG and for the libpng
+implementation. To download libpng, see
+L<http://www.libpng.org/pub/png/libpng.html>. See also L</Alien::PNG>.
+
+=item Wikipedia article
+
+There is L<an article on the format on Wikipedia|http://en.wikipedia.org/wiki/Portable_Network_Graphics>.
+
+=item The PNG specification
+
+L<The PNG specification|http://www.w3.org/TR/PNG/> (link to W3
+consortium) explains the details of the PNG format.
+
+
+=item PNG The Definitive Guide by Greg Roelofs
+
+The book "PNG - The Definitive Guide" by Greg Roelofs, published in
+1999 by O'Reilly is available online at
+L<http://www.faqs.org/docs/png/>. 
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Image::PNG::Libpng>
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item Image::PNG::Const
+
+L<Image::PNG::Const> contains the libpng constants taken from the libpng
+header file "png.h".
+
+=item Image::PNG::Libpng
+
+L<Image::PNG::Libpng> provides a Perl mirror of the interface of the C
+PNG library "libpng". Image::PNG is built on top of this module.
+
+=item Image::ExifTool
+
+L<Image::ExifTool> is a pure Perl (doesn't require a C compiler)
+solution for accessing the text segments of images. It has extensive
+support for PNG text segments.
+
+=item Alien::PNG
+
+L<Alien::PNG> claims to be a way of "building, finding and using PNG
+binaries". It may help in installing libpng. I didn't use it as a
+dependency for this module because it seems not to work in batch mode,
+but stop and prompt the user. I'm interested in hearing feedback from
+users whether this works or not on various platforms.
+
+=item Image::PNG::Rewriter
+
+L<Image::PNG::Rewriter> is a utility for unpacking and recompressing
+the IDAT (image data) part of a PNG image. The main purpose seems to
+be to recompress the image data with the module author's other module
+L<Compress::Deflate7>. Unfortunately that only works with Perl
+versions 5.12.
+
+=item Image::Pngslimmer
+
+L<Image::Pngslimmer> reduces the size of dynamically created PNG
+images. It's very, very slow at reading PNG data, but seems to work
+OK.
+
+=item Image::Info
+
+L<Image::Info> is a module for getting information out of various
+types of images. It has good support for PNG and is written in pure
+Perl (doesn't require a C compiler). As well as basics such as height,
+width, and colour type, it can get text chunks, modification time,
+palette, gamma (gAMA chunk), resolution (pHYs chunk), and significant
+bits (sBIT chunk). At the time of writing (version 1.31) it doesn't
+support other chunks.
+
+=item Image::Size
+
+If you only need to find the size of an image, L<Image::Size> can give
+you the size of PNG and various other image formats.
+
+=item Image::PNGwriter
+
+L<Image::PNGwriter> is an interface to a project called
+"PNGwriter". At the time of writing (2013-12-01), only one version has
+been released, in 2005. The most recent version of PNGwriter itself is
+from 2009.
+
+=item Image::PNG::Write::BW
+
+L<Image::PNG::Write::BW> is a pure-Perl module to write minimal black
+and white PNG images.
+
+
+
+
+=back
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+The Image::PNG package and associated files are copyright (C)
+2021 Ben Bullock.
+
+You can use, copy, modify and redistribute Image::PNG and
+associated files under the Perl Artistic Licence or the GNU General
+Public Licence.
+
+=head1 FOR PROGRAMMERS
+
+The distributed files are not the source code of the module. The
+source code lives in the "tmpl" directory of the distribution and the
+distribution is created via scripts.
+
+
+
+=cut
+
+# Local Variables:
+# mode: perl
+# End:
+

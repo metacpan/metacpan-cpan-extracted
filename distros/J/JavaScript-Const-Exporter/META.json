@@ -80,7 +80,7 @@
             "File::Spec" : "0",
             "Module::Metadata" : "0",
             "Test2::V0" : "0",
-            "Test::Deep" : "0",
+            "Test::Deep" : "1.127",
             "Test::Deep::Regexp" : "0",
             "Test::Deep::Set" : "0",
             "Test::Differences" : "0",
@@ -97,7 +97,7 @@
    "provides" : {
       "JavaScript::Const::Exporter" : {
          "file" : "lib/JavaScript/Const/Exporter.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       }
    },
    "release_status" : "stable",
@@ -111,7 +111,7 @@
          "web" : "https://github.com/robrwo/JavaScript-Const-Exporter"
       }
    },
-   "version" : "v0.1.5",
+   "version" : "v0.1.6",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",

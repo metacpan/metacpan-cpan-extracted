@@ -2,7 +2,7 @@ package Test2::Harness::UI::Response;
 use strict;
 use warnings;
 
-our $VERSION = '0.000047';
+our $VERSION = '0.000050';
 
 use Carp qw/croak/;
 use Time::HiRes qw/sleep/;
@@ -98,10 +98,14 @@ sub stream {
         my $cleanup = $params{cleanup};
 
         my $ct = $params{content_type} || $params{'content-type'} || $params{'Content-Type'} or croak "'content_type' is a required attribute";
+        my $cache = $params{cache} // 1;
+
+        my @headers = ('Content-Type' => $ct);
+        push @headers => ('Cache-Control' => 'no-store') unless $cache;
 
         $self->{stream} = sub {
             my $responder = shift;
-            my $writer = $responder->([200, ['Content-Type' => $ct]]);
+            my $writer = $responder->([200, \@headers]);
 
             my $end = 0;
             while (!$end) {

@@ -8,27 +8,27 @@ use AnyEvent::WebSocket::Connection;
 
 subtest 'send' => sub {
 
-  my($a,$b) = create_connection_pair;
+  my($x,$y) = create_connection_pair;
 
   my $round_trip = sub {
-  
+
     my($message) = @_;
-    
+
     my $done = AnyEvent->condvar;
-    
-    $b->on(next_message => sub {
+
+    $y->on(next_message => sub {
       my(undef, $message) = @_;
       $done->send($message);
     });
-    
-    $a->send($message);
-    
+
+    $x->send($message);
+
     $done->recv;
-  
+
   };
 
   subtest 'string' => sub {
-  
+
     is(
       $round_trip->('hello world'),
       object {
@@ -36,11 +36,11 @@ subtest 'send' => sub {
       },
     );
   };
-  
+
   require AnyEvent::WebSocket::Message;
-  
+
   subtest 'message object' => sub {
-  
+
     is(
       $round_trip->(AnyEvent::WebSocket::Message->new(
         body => 'And another one',
@@ -49,9 +49,9 @@ subtest 'send' => sub {
         call body => 'And another one';
       },
     );
-  
+
   };
-  
+
   subtest 'is_text' => sub {
 
     is(
@@ -64,10 +64,10 @@ subtest 'send' => sub {
         call is_text => T();
         call is_binary => F();
       },
-    );  
+    );
 
   };
-  
+
 
   subtest 'is_binary' => sub {
 
@@ -81,23 +81,23 @@ subtest 'send' => sub {
         call is_text => F();
         call is_binary => T();
       },
-    );  
+    );
 
   };
-  
+
   subtest 'ping' => sub {
 
     skip_all 'no pong callback... yet';
 
-    $a->send(
+    $x->send(
       AnyEvent::WebSocket::Message->new(
         opcode => 9,
         body   => 'zz',
       )
     );
-    
+
   };
-  
+
   {
     my @test_data = (
       {label => "single character", data => "a"},
@@ -106,7 +106,7 @@ subtest 'send' => sub {
       {label => "0", data => 0},
       {label => "utf8 charaters", data => 'ＵＴＦ８ ＷＩＤＥ ＣＨＡＲＡＣＴＥＲＳ'},
     );
-    
+
     foreach my $case (@test_data)
     {
       subtest $case->{label} => sub {
@@ -127,64 +127,64 @@ subtest 'send' => sub {
       };
     }
   }
-  
+
   subtest 'close' => sub {
-  
+
     my $done = AnyEvent->condvar;
-  
-    $b->on(finish => sub {
+
+    $y->on(finish => sub {
       $done->send;
     });
-  
-    $a->send(
+
+    $x->send(
       AnyEvent::WebSocket::Message->new(
         opcode => 8,
         body   => pack('naa', 1005, 'b','b'),
       ),
     );
-    
+
     $done->recv;
-    
+
     is(
-      $b,
+      $y,
       object {
         call close_code   => 1005;
         call close_reason => 'bb';
       },
     );
   };
-  
+
 };
 
 subtest 'masked attribute should control whether the frames sent by the Connection are masked or not' => sub {
 
   foreach my $masked (0,1)
   {
-  
+
     subtest "masked = $masked" => sub {
-      my ($a_conn, $b_handle) = create_connection_and_handle({masked => $masked});
+      my ($x_conn, $y_handle) = create_connection_and_handle({masked => $masked});
       my $cv_finish = AnyEvent->condvar;
-      $b_handle->on_read(sub {
+      $y_handle->on_read(sub {
         my ($handle) = @_;
         return if length($handle->{rbuf}) < 2;
         is substr($handle->{rbuf}, 0, 2), pack("C*", 0x81, ($masked ? 0x85 : 0x05)), "frame header OK";
         $cv_finish->send;
       });
-      $a_conn->send("Hello");
+      $x_conn->send("Hello");
       $cv_finish->recv;
     };
-  
+
   }
 
 };
 
 subtest 'Connection should respond to a ping frame with a pong frame' => sub {
 
-  my ($a_conn, $b_handle) = create_connection_and_handle;
+  my ($x_conn, $y_handle) = create_connection_and_handle;
 
   my $parser = Protocol::WebSocket::Frame->new;
   my $cv_finish = AnyEvent->condvar;
-  $b_handle->on_read(sub {
+  $y_handle->on_read(sub {
     my ($handle) = @_;
     $parser->append($handle->{rbuf});
     my $payload = $parser->next_bytes;
@@ -193,7 +193,7 @@ subtest 'Connection should respond to a ping frame with a pong frame' => sub {
     is $payload, "foobar", "... payload is identical to what b_handle has sent.";
     $cv_finish->send;
   });
-  $b_handle->push_write(Protocol::WebSocket::Frame->new(type => "ping", buffer => "foobar")->to_bytes);
+  $y_handle->push_write(Protocol::WebSocket::Frame->new(type => "ping", buffer => "foobar")->to_bytes);
 
   $cv_finish->recv;
 };
@@ -202,20 +202,20 @@ subtest 'connection close data' => sub {
 
   subtest 'ascii' => sub {
 
-    my($a, $b) = create_connection_pair;
+    my($x, $y) = create_connection_pair;
 
     my $cv = AnyEvent->condvar;
     my $reason;
     my $code;
 
-    $b->on(finish => sub {
+    $y->on(finish => sub {
       my($con) = @_;
       $code   = $con->close_code;
       $reason = $con->close_reason;
       $cv->send;
     });
 
-    $a->close(1009 => 'anything');
+    $x->close(1009 => 'anything');
 
     $cv->recv;
 
@@ -223,7 +223,7 @@ subtest 'connection close data' => sub {
     is $reason, 'anything', 'reason is available in finish callback';
 
     is(
-      $b,
+      $y,
       object {
         call close_code   => 1009;
         call close_reason => 'anything';
@@ -234,20 +234,20 @@ subtest 'connection close data' => sub {
 
   subtest 'unicode' => sub {
 
-    my($a, $b) = create_connection_pair;
+    my($x, $y) = create_connection_pair;
 
     my $cv = AnyEvent->condvar;
     my $reason;
     my $code;
 
-    $b->on(finish => sub {
+    $y->on(finish => sub {
       my($con) = @_;
       $code   = $con->close_code;
       $reason = $con->close_reason;
       $cv->send;
     });
 
-    $a->close(1009 => 'ＵＴＦ８ ＷＩＤＥ ＣＨＡＲＡＣＴＥＲＳ');
+    $x->close(1009 => 'ＵＴＦ８ ＷＩＤＥ ＣＨＡＲＡＣＴＥＲＳ');
 
     $cv->recv;
 
@@ -255,7 +255,7 @@ subtest 'connection close data' => sub {
     is $reason, 'ＵＴＦ８ ＷＩＤＥ ＣＨＡＲＡＣＴＥＲＳ', 'reason is available in finish callback';
 
     is(
-      $b,
+      $y,
       object {
         call close_code   => 1009;
         call close_reason => 'ＵＴＦ８ ＷＩＤＥ ＣＨＡＲＡＣＴＥＲＳ';
@@ -269,27 +269,27 @@ subtest 'connection close data' => sub {
 subtest 'Connection should not send after sending close frame, should not receive after receiving close frame' => sub {
 
   subtest "it should not send after sending close frame", sub {
-    my ($a_conn, $b_handle) = create_connection_and_handle;
+    my ($x_conn, $y_handle) = create_connection_and_handle;
 
-    my $b_received;
+    my $y_received;
     my $cv_finish = AnyEvent->condvar;
     $cv_finish->begin;
     $cv_finish->begin;
-    $b_handle->on_read(sub { });
-    $b_handle->on_error(sub {
-      $b_received = $_[0]->{rbuf};
+    $y_handle->on_read(sub { });
+    $y_handle->on_error(sub {
+      $y_received = $_[0]->{rbuf};
       $_[0]->{rbuf} = "";
       $cv_finish->end;
     });
-    $a_conn->on(finish => sub {
+    $x_conn->on(finish => sub {
       $cv_finish->end;
     });
-    $a_conn->close();
-    $a_conn->send("hoge");
+    $x_conn->close();
+    $x_conn->send("hoge");
     $cv_finish->recv;
 
     my $parser = Protocol::WebSocket::Frame->new();
-    $parser->append($b_received);
+    $parser->append($y_received);
     ok defined($parser->next_bytes), "received a complete frame";
     ok $parser->is_close, "... and it's a close frame";
     ok !defined($parser->next_bytes), "no more frame";
@@ -300,15 +300,15 @@ subtest 'Connection should not send after sending close frame, should not receiv
   };
 
   subtest "it should not receive after receiving close frame", sub {
-    my ($a_conn, $b_handle) = create_connection_and_handle;
+    my ($x_conn, $y_handle) = create_connection_and_handle;
 
     my @received_messages = ();
     my $cv_finish = AnyEvent->condvar;
-    $a_conn->on(each_message => sub { push(@received_messages, $_[1]) });
-    $a_conn->on(finish => sub { $cv_finish->send });
-    $b_handle->push_write($make_frame->(type => "close"));
-    $b_handle->push_write($make_frame->(buffer => "hoge"));
-    $b_handle->push_shutdown;
+    $x_conn->on(each_message => sub { push(@received_messages, $_[1]) });
+    $x_conn->on(finish => sub { $cv_finish->send });
+    $y_handle->push_write($make_frame->(type => "close"));
+    $y_handle->push_write($make_frame->(buffer => "hoge"));
+    $y_handle->push_shutdown;
     $cv_finish->recv;
     is scalar(@received_messages), 0, "the message 'hoge' should be discarded"
         or diag($received_messages[0]->body);
@@ -318,20 +318,20 @@ subtest 'Connection should not send after sending close frame, should not receiv
 
 subtest 'Connection should respond with close frame to close frame' => sub {
 
-  my ($a_conn, $b_handle) = create_connection_and_handle;
+  my ($x_conn, $y_handle) = create_connection_and_handle;
 
   my $cv_b_recv = AnyEvent->condvar;
-  $b_handle->on_error(sub {
+  $y_handle->on_error(sub {
     my $h = shift;
     $cv_b_recv->send($h->{rbuf});
     $h->{rbuf} = "";
   });
-  $b_handle->on_read(sub {});
-  $b_handle->push_write(Protocol::WebSocket::Frame->new(buffer => "", type => "close")->to_bytes);
+  $y_handle->on_read(sub {});
+  $y_handle->push_write(Protocol::WebSocket::Frame->new(buffer => "", type => "close")->to_bytes);
 
-  my $b_recv = $cv_b_recv->recv;
+  my $y_recv = $cv_b_recv->recv;
   my $parser = Protocol::WebSocket::Frame->new;
-  $parser->append($b_recv);
+  $parser->append($y_recv);
   ok defined($parser->next_bytes), "received a complete frame";
   ok $parser->is_close, "... and it's a close frame";
 
@@ -341,29 +341,29 @@ subtest 'Connection should refuse extremely huge messages' => sub {
 
   subtest "Connection should refuse huge frames", sub {
 
-    my ($a_conn, $b_handle) = create_connection_and_handle();
+    my ($x_conn, $y_handle) = create_connection_and_handle();
     my $cv_finish = AnyEvent->condvar;
     $cv_finish->begin;
     $cv_finish->begin;
     my @received_messages = ();
-    $a_conn->on(finish => sub {
+    $x_conn->on(finish => sub {
       $cv_finish->end;
     });
-    $a_conn->on(each_message => sub {
+    $x_conn->on(each_message => sub {
       push(@received_messages, $_[1]);
     });
-    $b_handle->on_error(sub {
+    $y_handle->on_error(sub {
       my $handle = shift;
       $handle->push_shutdown;
       $cv_finish->end;
     });
-    $b_handle->on_read(sub { });
+    $y_handle->on_read(sub { });
 
     my $frame_header = pack("H*", "827f00000000ffffffff"); # frame payload size = 2**32 - 1 bytes
     my $MAX_SEND_PAYLOAD = 1024; # for safety
     my $count_send_payload = 0;
-    $b_handle->push_write($frame_header);
-    $b_handle->on_drain(sub {
+    $y_handle->push_write($frame_header);
+    $y_handle->on_drain(sub {
       my $handle = shift;
       $count_send_payload++;
       if($count_send_payload >= $MAX_SEND_PAYLOAD)
@@ -374,9 +374,9 @@ subtest 'Connection should refuse extremely huge messages' => sub {
         $cv_finish->send;
         return;
       }
-    
+
       # push_write is delayed to prevent deep-recursion and to give
-      # $a_conn chance to receive data.
+      # $x_conn chance to receive data.
       my $w; $w = AnyEvent->idle(cb => sub {
         undef $w;
         $handle->push_write("A" x 256);
@@ -389,28 +389,28 @@ subtest 'Connection should refuse extremely huge messages' => sub {
 
 
   subtest "Connection should refuse messages with too many fragments", sub {
-    my ($a_conn, $b_handle) = create_connection_and_handle;
+    my ($x_conn, $y_handle) = create_connection_and_handle;
     my $cv_finish = AnyEvent->condvar;
     $cv_finish->begin;
     $cv_finish->begin;
     my @received_messages = ();
-    $a_conn->on(finish => sub {
+    $x_conn->on(finish => sub {
       $cv_finish->end;
     });
-    $a_conn->on(each_message => sub {
+    $x_conn->on(each_message => sub {
       push(@received_messages, $_[1])
     });
-    $b_handle->on_error(sub {
+    $y_handle->on_error(sub {
       my $handle = shift;
       $handle->push_shutdown;
-      $cv_finish->end; 
+      $cv_finish->end;
     });
-    $b_handle->on_read(sub {});
+    $y_handle->on_read(sub {});
 
     my $MAX_SEND_FRAMES = 10000;
     my $count_send_frame = 0;
-    $b_handle->push_write(Protocol::WebSocket::Frame->new(fin => 0, opcode => 1, buffer => "A")->to_bytes);
-    $b_handle->on_drain(sub {
+    $y_handle->push_write(Protocol::WebSocket::Frame->new(fin => 0, opcode => 1, buffer => "A")->to_bytes);
+    $y_handle->on_drain(sub {
       my $handle = shift;
       $count_send_frame++;
       if($count_send_frame >= $MAX_SEND_FRAMES)
@@ -434,29 +434,29 @@ subtest 'Connection should refuse extremely huge messages' => sub {
 
 subtest 'other end is closed' => sub {
 
-  my($a,$b) = create_connection_pair;
+  my($x,$y) = create_connection_pair;
 
   my $round_trip = sub {
-  
+
     my($message) = @_;
-    
+
     my $done = AnyEvent->condvar;
-    
-    $b->on(next_message => sub {
+
+    $y->on(next_message => sub {
       my(undef, $message) = @_;
       $done->send($message);
     });
-    
-    $a->send($message);
-    
+
+    $x->send($message);
+
     $done->recv;
-  
+
   };
 
   my $closed = 0;
 
   my $quit_cv = AnyEvent->condvar;
-  $b->on(finish => sub {
+  $y->on(finish => sub {
     $closed = 1;
     $quit_cv->send("finished");
   });
@@ -476,11 +476,11 @@ subtest 'other end is closed' => sub {
     },
     'quit',
   );
-  
-  $a->close;
-  
+
+  $x->close;
+
   $quit_cv->recv;
-  
+
   is $closed, 1, "closed";
 
 };
@@ -495,59 +495,59 @@ subtest 'close codes' => sub {
     [ [1000],             [1000, ''],         'normal close code'               ],
     [ [1000, 'a reason'], [1000, 'a reason'], 'normal close code with reason'   ],
   );
-  
+
   foreach my $test_data (@test_data)
   {
-    my($args, $expected, $label) = @$test_data;
+    my($xrgs, $expected, $label) = @$test_data;
     subtest $label => sub {
-    
-      my($a,$b) = create_connection_pair;
-      
+
+      my($x,$y) = create_connection_pair;
+
       my $done = AnyEvent->condvar;
-      
-      $b->on(finish => sub { $done->send });
-      
-      $a->close(@$args);
-      
+
+      $y->on(finish => sub { $done->send });
+
+      $x->close(@$xrgs);
+
       $done->recv;
-      
+
       is(
-        $b,
+        $y,
         object {
           call close_code   => $expected->[0];
           call close_reason => $expected->[1];
         },
       );
-    
+
     };
   }
 
 };
 
 subtest 'next_message callback can be set from within a next_message callback' => sub {
-  my($a,$b) = create_connection_pair;
+  my($x,$y) = create_connection_pair;
   my($first_msg, $second_msg);
 
   my $round_trip = sub {
     my $done = AnyEvent->condvar;
-    
-    $b->on(next_message => sub {
+
+    $y->on(next_message => sub {
       my(undef, $message) = @_;
       $first_msg = $message;
-      $a->send('second');
-      $b->on(next_message => sub {
+      $x->send('second');
+      $y->on(next_message => sub {
         my(undef, $message) = @_;
         $second_msg = $message;
         $done->send;
       });
     });
-    
-    $a->send('first');
+
+    $x->send('first');
     $done->recv;
   };
 
   my $quit_cv = AnyEvent->condvar;
-  $b->on(finish => sub { $quit_cv->send; });
+  $y->on(finish => sub { $quit_cv->send; });
   $round_trip->();
 
   is(
@@ -565,9 +565,9 @@ subtest 'next_message callback can be set from within a next_message callback' =
     },
     'second message',
   );
-  
-  $a->close;
-  
+
+  $x->close;
+
   $quit_cv->recv;
 };
 

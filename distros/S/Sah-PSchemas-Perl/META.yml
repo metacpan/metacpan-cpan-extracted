@@ -17,13 +17,16 @@ meta-spec:
   version: '1.4'
 name: Sah-PSchemas-Perl
 requires:
+  Complete::Module: '0.262'
+  Sah::Schema::perl::modname: '0.035'
+  Sah::Schema::perl::modname_with_optional_args: '0.035'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/perlancar/perl-Sah-PSchemas-Perl/issues
   homepage: https://metacpan.org/release/Sah-PSchemas-Perl
   repository: git://github.com/perlancar/perl-Sah-PSchemas-Perl.git
-version: '0.005'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

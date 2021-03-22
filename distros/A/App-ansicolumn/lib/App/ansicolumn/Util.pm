@@ -57,7 +57,19 @@ sub term_height {
 
 sub width {
     my $obj = shift;
-    $obj->{output_width} || $obj->term_width;
+    $obj->{width} || $obj->term_width;
+}
+
+sub rpn_calc {
+    use Math::RPN;
+    state $re = qr/(?:\d*\.)?\d+|[_a-z]+|--|\+\+|[<>!]=|\S/i;
+    my @terms = map { /$re/g } @_;
+    my @ans = rpn @terms;
+    if (@ans == 1 && $ans[0] && $ans[0] !~ /[^\.\d]/) {
+	int $ans[0];
+    } else {
+	return undef;
+    }
 }
 
 sub foldobj {

@@ -1,7 +1,24 @@
-use Moo::_strictures;
+use strict;
+use warnings;
+
 use Test::More;
+BEGIN {
+  if ("$]" >= 5.009_005) {
+    require mro;
+  }
+  elsif (eval { require MRO::Compat; 1 }) {
+    # do nothing
+  }
+  elsif ($ENV{RELEASE_TESTING}) {
+    plan tests => 1;
+    fail 'MRO::Compat required for testing on 5.8 under RELEASE_TESTING';
+    exit;
+  }
+  else {
+    plan skip_all => 'MRO::Compat is required for C3 testing on perl < 5.10';
+  }
+}
 use Moo ();
-use Moo::_mro;
 
 {
     package Foo;

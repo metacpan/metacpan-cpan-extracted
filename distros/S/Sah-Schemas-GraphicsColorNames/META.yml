@@ -19,12 +19,13 @@ name: Sah-Schemas-GraphicsColorNames
 requires:
   Perinci::Sub::XCompletion::perl_modname: '0'
   Sah::PSchema: '0'
-  Sah::Schema::perl::modname: '0'
+  Sah::PSchema::perl::modname: '0.008'
+  Sah::Schema::perl::modname: '0.035'
 resources:
   bugtracker: https://github.com/perlancar/perl-Sah-Schemas-GraphicsColorNames/issues
   homepage: https://metacpan.org/release/Sah-Schemas-GraphicsColorNames
   repository: git://github.com/perlancar/perl-Sah-Schemas-GraphicsColorNames.git
-version: '0.002'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

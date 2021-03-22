@@ -1,4 +1,6 @@
-use Moo::_strictures;
+use strict;
+use warnings;
+
 use Test::More;
 use Test::Fatal;
 
@@ -17,9 +19,11 @@ BEGIN {
 BEGIN {
   package ExtraClass;
 
+  our @ISA = qw(BaseClass);
+
   sub new {
     my $class = shift;
-    $class->next::method(@_);
+    $class->SUPER::new(@_);
   }
 }
 

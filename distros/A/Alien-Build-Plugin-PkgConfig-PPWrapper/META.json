@@ -4,7 +4,7 @@
       "Shawn Laffan <shawnlaffan@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,6 @@
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0",
-            "Data::Dump" : "0",
             "Test2::Mock" : "0.000060",
             "Test2::V0" : "0.000060",
             "Test::Alien::Build" : "0"
@@ -59,6 +58,6 @@
          "url" : "https://github.com/shawnlaffan/lib/Alien-Build-Plugin-PkgConfig-PPWrapper/"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

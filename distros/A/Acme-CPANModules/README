@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     0.1
 
 VERSION
-    This document describes version 0.1.5 of Acme::CPANModules (from Perl
-    distribution Acme-CPANModules), released on 2019-12-24.
+    This document describes version 0.1.6 of Acme::CPANModules (from Perl
+    distribution Acme-CPANModules), released on 2021-01-18.
 
 DESCRIPTION
     With the multitude of modules that are available on CPAN, it is
@@ -21,9 +21,6 @@ DESCRIPTION
     modules, e.g. CPAN Module Reviews by Neil Bowers
     <http://neilb.org/reviews/>.
 
-    For categorizing CPAN authors, there are also the Acme::CPANAuthors
-    project, complete with its own website <http://acme.cpanauthors.org/>.
-
     Acme::CPANModules is another mechanism to help, to let someone
     categorize modules in whatever way she likes.
 
@@ -31,10 +28,12 @@ DESCRIPTION
     eventually get to it :-), or perhaps when I get some help).
 
 CREATING AN ACME::CPANMODULES MODULE
-    The first step is to decide on a name of the module. It must be under
-    the "Acme::CPANModules::" namespace. I recommend that you prefix your
-    module with your CPAN ID, e.g. Acme::CPANModules::PERLANCAR::Unbless or
-    Acme::CPANModules::PERLANCAR::Task::PickingRandomLinesFromFile.
+    The first step is to decide on the name of your module. It must be under
+    the "Acme::CPANModules::" namespace. For example, if you create a list
+    of your favorite modules, you can use
+    "Acme::CPANModules::YOURCPANID::Favorite". Or if you are creating a list
+    of modules that predict the future, you can choose
+    "Acme::CPANModules::PredictingTheFuture".
 
     Inside the module, you must declare a hash named $LIST:
 
@@ -117,6 +116,38 @@ CREATING AN ACME::CPANMODULES MODULE
     That's it. After you have completed your list, publish your
     Acme::CPANModules module to CPAN.
 
+    Here's a sample of one of the simplest $LIST you can have:
+
+     $LIST = {
+         summary => 'Modules that predict the future',
+         entries => [
+             {module=>'Zorb'},
+             {module=>'Madame::Zita'},
+         ],
+     };
+
+    Here's another, more expanded sample:
+
+     $LIST = {
+         summary => 'Modules that predict the future',
+         description => <<'_',
+
+    This list catalogs modules that predict the future. Yes, the future is
+    unpredictable. But we can try anyway, right?
+
+    _ entries => [ { module => 'Zorb', summary => 'Contact the API for the
+    strange crystal Zorb', description => <<'_',
+
+    This module is an API client to Zorb, a strange crystal that supposedly
+    fell from the sky in 2017 near Ozark, that can change color depending on
+    what you feed to it. The API connects to Zorb API server managed by
+    Crooks, Inc.
+
+    _ }, { module => 'Madame::Zita', summary => 'Ask Madame Zita the fortune
+    teller', }, ], };
+
+    For more example, see existing "Acme::CPANModules::*" modules on CPAN.
+
     If you are using Dist::Zilla to release your distribution, this
     Pod::Weaver plugin might be useful for you:
     Pod::Weaver::Plugin::Acme::CPANModules. It will create an "=head2
@@ -151,7 +182,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules>
+    <https://github.com/perlancar/perl-Acme-CPANModules/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -163,11 +194,14 @@ SEE ALSO
 
     Bencher
 
+    For categorizing CPAN authors, there are also the Acme::CPANAuthors
+    project, complete with its own website <http://acme.cpanauthors.org/>.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

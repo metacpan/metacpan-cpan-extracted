@@ -1,89 +1,13 @@
-Revision history for Perl extension Test::AllModules
+## Test::AllModules commit log
 
-0.17    Wed Feb  5 00:22:52 JST 2020
-        - Change installing phase for Win32.pm
+https://github.com/bayashi/Test-AllModules/commits/main
 
-0.16    Mon Aug 26 06:16:11 JST 2019
-        - Improve POD (Thanks, Mohammad S Anwar)
-        - Fix CI config
+## Tags
 
-0.15    Sun Mar 20 21:49:24 JST 2016
-    [NEW FEATURE]
-        - add before/after hooks to the test
-    [IMPROVEMENT]
-        - tiny fix for tests
-        - sort .travis.yml
+https://github.com/bayashi/Test-AllModules/tags
 
-0.14    Tue Mar 15 09:27:34 JST 2016
-    [NEW FEATURE]
-        - added 'no_import' option for loading a test module.
-    [IMPROVEMENT]
-        - enhanced POD
+## Last Release
 
-0.13    Wed Sep 18 23:37:14 JST 2013
-    [BUG FIX]
-        - fixed bug: when an error happens, then the test will be fail.
-            thanks to @Spring_MT
+0.18   Sun Mar 21 04:46:37 GMT 2021
+    - https://github.com/bayashi/Test-AllModules/compare/0.17...0.18
 
-0.12    Sat Jun  8 15:28:35 JST 2013
-    [NEW FEATURE]
-        - added 'show_version' option. show the version of module.
-    [IMPROVEMENT]
-        - you can know the reason why tests failed.
-
-0.11    Tue Apr 16 00:14:58 JST 2013
-    [TEST FIXES]
-        - added lacking lib
-
-0.10    Sun Apr 14 20:51:12 JST 2013
-    [BUG FIX]
-        - 'fork' option in 'all_ok' method is NOT SUPPORTED for Windows
-
-0.091   Sun Apr 14 18:42:01 JST 2013
-    [IMPROVEMENT]
-        - fixed broken POD
-
-0.09    Sat Apr 13 16:35:18 JST 2013
-    [NEW FEATURE]
-        - new options for all_ok method: 'use' and 'require'.
-
-0.08    Sat Apr 13 15:06:56 JST 2013
-    [NEW FEATURE]
-        - module $count(number of order) is passed to check(s) code
-    [IMPROVEMENT]
-        - lessen a dependency: Export
-        - refactored code about parameters of all_ok
-        - POD enhancement
-
-0.07    Thu Apr 11 09:09:37 JST 2013
-    [NEW FEATURE]
-        - new option: 'fork'
-            1: use each module after forking.
-            2: use each module after forking and also show PID
-
-0.061   Wed Apr 10 00:19:46 JST 2013
-        - added POD: shuffle option
-
-0.06    Tue Apr  9 23:26:24 JST 2013
-    [NEW FEATURE]
-        - added new option: 'shuffle' is for sorting random modules
-    [IMPROVE]
-        - lessen dependencies
-        - fixed dependency list
-
-0.05    Wed Jan  2 00:32:47 JST 2013
-    [NO CODE CHANGE]
-        - require Win32.pm for windows OS
-
-0.04    Sat Dec 29 16:34:06 JST 2012
-    [NO CODE CHANGE]
-        - fixed wrong module in the test
-
-0.03    Sat Dec 29 12:12:15 JST 2012
-        - implemented more simple test(added document for this)
-
-0.02    Sat Dec 29 00:07:26 JST 2012
-        - changed the logic of loops for modules
-
-0.01    Fri Dec 28 23:27:04 JST 2012
-        - original version

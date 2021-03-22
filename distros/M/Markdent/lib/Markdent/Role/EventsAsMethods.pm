@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Scalar::Util qw( blessed );
 
@@ -37,12 +37,12 @@ Markdent::Role::EventsAsMethods - Turns events into method calls
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
-This role takes an object which does L<Markdent::Role::Event> role and turns
-it into a method call.
+This role takes an object which does L<Markdent::Role::Event> role and turns it
+into a method call.
 
 =head1 METHODS
 
@@ -53,13 +53,13 @@ This role provides the following methods:
 Given an object which does L<Markdent::Role::Event> role, this method makes a
 method call on C<$object> based on the event's name.
 
-The method name is the same as the value of C<< $event->event_name >>. The
-hash reference returned by C<< $event->attributes >> is turned into a set of
-named parameters for the method. However, any keys starting with "!" in the
+The method name is the same as the value of C<< $event->event_name >>. The hash
+reference returned by C<< $event->attributes >> is turned into a set of named
+parameters for the method. However, any keys starting with "!" in the
 attributes will not be passed to the method.
 
-So, for example, a L<Markdent::Event::StartLink> event turns into a method
-call like this:
+So, for example, a L<Markdent::Event::StartLink> event turns into a method call
+like this:
 
   $handler->start_link(
       uri            => $event->uri,

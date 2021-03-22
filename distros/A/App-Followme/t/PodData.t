@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
@@ -28,21 +27,22 @@ my $test_dir = catdir(@path, 'test');
 rmtree($test_dir);
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-
 chdir $test_dir or die $!;
-$test_dir = cwd();
 
 #----------------------------------------------------------------------
 # Create object
 
-my %parameters = (extension => 'pm,pod',
-                  title_template => '<h1></h1>',
-                  site_url => 'http://www.example.com/',
-                  package => 'App::Followme::PodData',
-                  pod_directory => $lib,
-                 );
+my %configuration = (top_directory => $test_dir,
+                    base_directory => $test_dir,
+                    extension => 'pm,pod',
+                    title_template => '<h1></h1>',
+                    site_url => 'http://www.example.com/',
+                    package => 'App::Followme::PodData',
+                    pod_directory => $lib,
+                   );
 
-my $obj = App::Followme::PodData->new(%parameters);
+my $obj = App::Followme::PodData->new(%configuration);
+
 isa_ok($obj, "App::Followme::PodData"); # test 1
 can_ok($obj, qw(new build)); # test 2
 
@@ -72,7 +72,6 @@ do {
 # Test conversion of pod files
 
 do {
-    $obj = App::Followme::PodData->new(%parameters);
     my ($pod_directory, $package_path) = $obj->find_base_directory();
     my $directory = catfile($pod_directory, @$package_path);
     my $ok_directory = catfile($lib, 'App');
@@ -83,7 +82,7 @@ do {
     ok(@$files > 25, "Build file list"); # test 7
 
     my @files = sort(@$files);
-    my $file = shift(@files);
+    my $file = $files[0];
     my $body = $obj->build('body', $file);
 
     ok(index($$body, "SYNOPSIS") > 0, "Convert Text"); # test 8
@@ -100,7 +99,7 @@ do {
         if ($basename eq 'Guide.pm') {
             my $body = $obj->build('body', $file);
             my @urls = $$body =~ /href="([^"]*)"/g;
-            like($urls[0], qr(^[\/a-z]+\.html$), "Test url conversion"); # test 11
+            like($urls[0], qr(^[\-\/a-z]+\.html$), "Test url conversion"); # test 11
             ok(@urls > 10, "Test finding all urls"); # test 12
         }
     }

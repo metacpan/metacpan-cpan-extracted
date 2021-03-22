@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::Types;
 
@@ -58,7 +58,7 @@ Markdent::Event::StartLink - An event for the start of a link
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
@@ -82,8 +82,8 @@ The link's id. This is optional.
 
 =head2 is_implicit_id
 
-This will be true if the link's id was not specified explicitly in the
-Markdown text.
+This will be true if the link's id was not specified explicitly in the Markdown
+text.
 
 =head1 ROLES
 

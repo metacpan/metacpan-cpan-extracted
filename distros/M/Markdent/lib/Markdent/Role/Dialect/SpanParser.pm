@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Moose::Role;
 
@@ -24,12 +24,12 @@ Markdent::Role::Dialect::SpanParser - A role for a dialect span parser
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
-This role has no internals, it simply indicates that the role which consumes
-it is a span parser role.
+This role has no internals, it simply indicates that the role which consumes it
+is a span parser role.
 
 =head1 BUGS
 

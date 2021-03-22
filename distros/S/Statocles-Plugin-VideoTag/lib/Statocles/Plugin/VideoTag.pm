@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Change video file anchors to video elements
 
-our $VERSION = '0.0200';
+our $VERSION = '0.0301';
 
 use Statocles::Base 'Class';
 with 'Statocles::Plugin';
@@ -16,6 +16,41 @@ has file_type => (
 );
 
 
+has width => (
+    is      => 'ro',
+    isa     => Int,
+    default => sub { 560 },
+);
+
+
+has height => (
+    is      => 'ro',
+    isa     => Int,
+    default => sub { 315 },
+);
+
+
+has frameborder => (
+    is      => 'ro',
+    isa     => Int,
+    default => sub { 0 },
+);
+
+
+has allow => (
+    is      => 'ro',
+    isa     => Str,
+    default => sub { 'accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture' },
+);
+
+
+has allowfullscreen => (
+    is      => 'ro',
+    isa     => Int,
+    default => sub { 1 },
+);
+
+
 sub video_tag {
     my ($self, $page) = @_;
     if ($page->has_dom) {
@@ -24,8 +59,12 @@ sub video_tag {
                 my ($el) = @_;
                 my $href = $el->attr('href');
                 $href =~ s/watch\?v=(.+)$/embed\/$1/;
-                my $replacement = sprintf '<iframe width="560" height="315" src="%s" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-                    $href;
+                my $replacement = sprintf '<iframe width="%d" height="%d" src="%s" frameborder="%d" allow="%s" %s></iframe>',
+                    $self->width, $self->height,
+                    $href,
+                    $self->frameborder,
+                    $self->allow,
+                    $self->allowfullscreen ? 'allowfullscreen' : '';
                 $el->replace($replacement);
             });
         }
@@ -66,7 +105,7 @@ Statocles::Plugin::VideoTag - Change video file anchors to video elements
 
 =head1 VERSION
 
-version 0.0200
+version 0.0301
 
 =head1 SYNOPSIS
 
@@ -79,6 +118,8 @@ version 0.0200
                 $class: Statocles::Plugin::VideoTag
                 $args:
                      file_type: 'youtu'
+                     width: 500
+                     height: 300
 
 =head1 DESCRIPTION
 
@@ -93,13 +134,43 @@ The file type to replace.
 
 Default: C<mp4>
 
+=head2 width
+
+Width of the iframe for an embedded YouTube video.
+
+Default: C<560>
+
+=head2 height
+
+Height of the iframe for an embedded YouTube video.
+
+Default: C<315>
+
+=head2 frameborder
+
+Whether to have a frameborder on the iframe for a YouTube video.
+
+Default: C<0>
+
+=head2 allow
+
+The iframe B<allow> attribute string for a YouTube video.
+
+Default: C<accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture>
+
+=head2 allowfullscreen
+
+Whether to allow full-screen for the iframe for a YouTube video.
+
+Default: C<1>
+
 =head1 METHODS
 
 =head2 video_tag
 
   $page = $plugin->video_tag($page);
 
-Process the video bits of a L<Statocles::Page>.
+Process the video links on a L<Statocles::Page>.
 
 If the B<file_type> is given as C<youtu>, YouTube links of this exact
 form will be converted to an embedded iframe:
@@ -108,13 +179,14 @@ form will be converted to an embedded iframe:
 
 Where the C<abcdefg1234567> is a placeholder for the actual video.
 
-* Currently, including a start time (e.g. C<&t=42>) in the link is not
-honored.  In fact including any argument other than C<v> will not
-render the embedded video correctly at this time...
+* Currently, for YouTube links, including a start time (e.g. C<&t=42>)
+in the link is not honored.  In fact including any argument other than
+C<v> will not render the embedded video correctly at this time...
 
 =head2 register
 
-Register this plugin to install its event handlers. Called automatically.
+Register this plugin to install its event handlers. (This method is
+called automatically.)
 
 =head1 SEE ALSO
 

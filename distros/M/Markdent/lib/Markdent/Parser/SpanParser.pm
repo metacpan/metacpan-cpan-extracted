@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use re 'eval';
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use List::AllUtils qw( uniq );
 use Markdent::Event::AutoLink;
@@ -470,9 +470,19 @@ sub _match_auto_link {
     my $self = shift;
     my $text = shift;
 
-    return unless ${$text} =~ /\G <( (?:https?|mailto|ftp): [^>]+ ) >/xgc;
+    my $uri;
 
-    my $link = $self->_make_event( AutoLink => uri => $1 );
+    if ( ${$text} =~ /\G <( (?:https?|mailto|ftp): [^>]+ ) >/xgc ) {
+        $uri = $1;
+    }
+    elsif ( ${$text} =~ /\G <( [^>]+ \@ [^>]+ ) >/xgc ) {
+        $uri = "mailto:$1";
+    }
+    else {
+        return;
+    }
+
+    my $link = $self->_make_event( AutoLink => uri => $uri );
 
     $self->_markup_event($link);
 
@@ -997,12 +1007,12 @@ Markdent::Parser::SpanParser - Span parser for standard Markdown
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
-This class parses spans for the standard Markdown dialect (as defined by
-Daring Fireball and mdtest).
+This class parses spans for the standard Markdown dialect (as defined by Daring
+Fireball and mdtest).
 
 =head1 METHODS
 
@@ -1014,9 +1024,9 @@ Creates a new span parser object. You must provide a span parser object.
 
 =head2 $span_parser->extract_link_ids(\$markdown)
 
-This method takes a reference to a markdown string and parses it for link
-ids. These are removed from the document and stored in the span parser for
-later use.
+This method takes a reference to a markdown string and parses it for link ids.
+These are removed from the document and stored in the span parser for later
+use.
 
 =head2 $span_parser->parse_block(\$block)
 

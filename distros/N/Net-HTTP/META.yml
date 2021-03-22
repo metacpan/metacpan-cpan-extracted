@@ -39,10 +39,10 @@ resources:
   bugtracker: https://github.com/libwww-perl/Net-HTTP/issues
   homepage: https://github.com/libwww-perl/Net-HTTP
   repository: https://github.com/libwww-perl/Net-HTTP.git
-version: '6.20'
+version: '6.21'
 x_Dist_Zilla:
   perl:
-    version: '5.030003'
+    version: '5.030002'
   plugins:
     -
       class: Dist::Zilla::Plugin::MetaResources
@@ -320,7 +320,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.0
+          git_version: 2.30.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.047'
@@ -328,7 +328,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.30.0
+          git_version: 2.30.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -404,7 +404,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.0
+          git_version: 2.30.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -417,11 +417,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.20
+          tag: v6.21
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.0
+          git_version: 2.30.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -459,7 +459,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.0
+          git_version: 2.30.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -473,7 +473,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.30.0
+          git_version: 2.30.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.047'
@@ -626,13 +626,14 @@ x_contributors:
   - 'Steve Hay <SteveHay@planit.com>'
   - 'Todd Lipcon <todd@amiestreet.com>'
   - 'Tom Hukins <tom@eborcom.com>'
+  - 'Tom Wyant <wyant@cpan.org>'
   - 'Tony Finch <dot@dotat.at>'
   - 'Toru Yamaguchi <zigorou@cpan.org>'
   - 'uid39246 <uid39246>'
   - 'Ville Skyttä <ville.skytta@iki.fi>'
   - 'Yuri Karaban <tech@askold.net>'
   - 'Zefram <zefram@fysh.org>'
-x_generated_by_perl: v5.30.3
+x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

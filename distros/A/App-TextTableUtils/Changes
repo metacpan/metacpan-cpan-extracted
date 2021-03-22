@@ -1,10 +1,19 @@
-0.005   2019-05-12 (PERLANCAR)
+0.006   2021-03-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add command line options --csv-sep & --csv-loose for CSV input files
+	  which are then passed along to Text::CSV. The two options allow to
+	  specify the separator character(s) in the CSV file (--csv-sep ";", -s)
+	  and to relax the CSV parsing (--csv-loose, -l). Thanks Markus Koch
+	  (GH#1).
+
+
+0.005   2019-05-12  Released-By: PERLANCAR
 
 	- [Removed] Remove tsv2csv, csv2tsv; we'll use the line-by-line
 	  (simpler, faster, streamable) version from App::CSVUtils.
 
 
-0.004   2019-01-17 (PERLANCAR)
+0.004   2019-01-17  Released-By: PERLANCAR
 
 	- Add utilities: ini2*, iod2*.
 
@@ -13,16 +22,16 @@
 	- [bugfix] Add header_row=>0 for outputing.
 
 
-0.003   2019-01-15 (PERLANCAR)
+0.003   2019-01-15  Released-By: PERLANCAR
 
 	- Add utilities: tsv2*, *2texttable.
 
 
-0.002   2016-09-03 (PERLANCAR)
+0.002   2016-09-03  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to implement rendering to ansitable.
 
 
-0.001   2016-09-03 (PERLANCAR)
+0.001   2016-09-03  Released-By: PERLANCAR
 
         - First release.

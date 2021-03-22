@@ -4,8 +4,8 @@
 #
 package PDL::Ops;
 
-@EXPORT_OK  = qw(  PDL::PP log10 PDL::PP assgn PDL::PP carg PDL::PP conj PDL::PP creal PDL::PP cimag PDL::PP _cabs PDL::PP ci PDL::PP ipow PDL::PP _rabs );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw(  PDL::PP log10 PDL::PP assgn PDL::PP carg PDL::PP conj PDL::PP creal PDL::PP cimag PDL::PP _cabs PDL::PP ci PDL::PP ipow PDL::PP _rabs );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Ops ;
 

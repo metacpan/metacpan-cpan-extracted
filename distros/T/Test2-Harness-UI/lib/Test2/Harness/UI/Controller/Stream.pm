@@ -2,13 +2,14 @@ package Test2::Harness::UI::Controller::Stream;
 use strict;
 use warnings;
 
-our $VERSION = '0.000047';
+our $VERSION = '0.000050';
 
 use Data::GUID;
 use List::Util qw/max/;
 use Test2::Harness::UI::Response qw/resp error/;
 use Test2::Harness::Util::JSON qw/encode_json/;
 use JSON::PP();
+use Carp qw/croak/;
 
 use parent 'Test2::Harness::UI::Controller';
 use Test2::Harness::UI::Util::HashBase qw{
@@ -33,9 +34,18 @@ sub handle {
         $self->stream_events($route),
     );
 
+    my $cache = 1;
+    for my $it ($self->{+RUN}, $self->{+JOB}) {
+        next unless $it;
+        next if $it->complete;
+        $cache = 0;
+        last;
+    }
+
     $res->stream(
         env          => $req->env,
         content_type => 'application/x-jsonl; charset=utf-8',
+        cache => $cache,
 
         done => sub {
             my @keep;
@@ -97,9 +107,10 @@ sub stream_jobs {
         track_status => 1,
         id_field     => 'job_key',
         ord_field    => 'job_ord',
-        sort_field   => 'job_ord',
         method       => 'glance_data',
         search_base  => scalar($run->jobs),
+
+        order_by => [{'-desc' => 'status'}, {'-asc' => [qw/file/]}, {'-desc' => [qw/job_try job_ord name/]}],
     );
 
     if (my $job_key = $route->{job_key}) {
@@ -185,7 +196,9 @@ sub stream_set {
     my $track        = $params{track_status};
     my $type         = $params{type};
 
-    my $items = $search_base->search($custom_query, {order_by => {$sort_dir => $sort_field}, $limit ? (rows => $limit) : ()});
+    my $order_by = $params{order_by} // $sort_field ? {$sort_dir => $sort_field} : croak "Must specify either 'order_by' or 'sort_field'";
+
+    my $items = $search_base->search($custom_query, {order_by => $order_by, $limit ? (rows => $limit) : ()});
 
     my $start = time;
     my $ord = 0;
@@ -217,7 +230,7 @@ sub stream_set {
 
                 $items = $search_base->search(
                     $query,
-                    {order_by => {$sort_dir => $sort_field}}
+                    {order_by => $order_by}
                 );
             }
 

@@ -1,7 +1,8 @@
 use Test2::V0;
+no if $^V lt v5.13.9, 'warnings', 'utf8'; ## no critic (ValuesAndExpressions::ProhibitMismatchedOperators)
 use Test2::Plugin::NoWarnings;
 BEGIN {
-    eval {
+    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
         require Test2::Plugin::GitHub::Actions::AnnotateFailedTest;
         Test2::Plugin::GitHub::Actions::AnnotateFailedTest->import;
     };

@@ -217,12 +217,28 @@ you can disable this module for a given block via
 - `exec`, `system`, and `readpipe`
 - `do` and `require`
 - File tests (e.g., `-e`) and the following:
-`chdir`, `chmod`, `chown`, `chroot`,
+`chdir`, `chmod`, `chown`, `chroot`, `ioctl`,
 `link`, `lstat`, `mkdir`, `open`, `opendir`, `readlink`, `rename`,
 `rmdir`, `stat`, `symlink`, `sysopen`, `truncate`,
 `unlink`, `utime`
-- `bind`, `connect`, and `setsockopt`
+- `bind`, `connect`, `setsockopt`, and `send` (last argument)
 - `syscall`
+
+## Omissions
+
+- `crypt` already does as Sys::Binmode would make it do.
+- `select` (the 4-argument one) has the bug that Sys::Binmode fixes,
+but since it’s a performance-sensitive call where upgraded strings are
+unlikely, this library doesn’t wrap it.
+
+# KNOWN ISSUES
+
+[autodie](https://metacpan.org/pod/autodie) creates functions named, e.g., `chmod` in the
+namespace of the module that `import()`s it. Those functions lack
+the compiler “hint” that tells Sys::Binmode to do its work; thus,
+[autodie “clobbers” Sys::Binmode](https://github.com/pjf/autodie/issues/113).
+`CORE::*` functions will still have Sys::Binmode, but of course they won’t
+throw exceptions.
 
 # TODO
 

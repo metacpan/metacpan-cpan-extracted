@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -30,9 +29,7 @@ chmod 0755, $test_dir;
 
 mkdir $state_dir or die $!;
 chmod 0755, $state_dir;
-
 chdir $test_dir or die $!;
-$test_dir = cwd();
 
 my %configuration = (
                      top_directory => $test_dir,

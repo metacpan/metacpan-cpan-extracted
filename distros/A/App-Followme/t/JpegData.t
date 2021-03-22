@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -28,11 +27,12 @@ my $data_dir = catdir(@path, 'tdata');
 rmtree($test_dir);
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-
 chdir $test_dir or die $!;
-$test_dir = cwd();
+
 
 my %configuration = (
+                    top_directory => $test_dir,
+                    base_directory => $test_dir,
                     extension => 'jpg',
                     target_prefix => 'img',
                     thumb_suffix => '-thumb',
@@ -42,6 +42,7 @@ my %configuration = (
 # Create object
 
 my $data = App::Followme::JpegData->new(%configuration);
+
 isa_ok($data, "App::Followme::JpegData"); # test 1
 can_ok($data, qw(new build)); # test 2
 

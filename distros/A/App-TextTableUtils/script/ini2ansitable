@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-05-12'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2021-03-20'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,6 +17,8 @@ my %Opts;
     Getopt::Long::GetOptions(
         "backend|b=s" => \$Opts{backend},
         "transpose|t" => \$Opts{transpose},
+        "csv-sep|s=s" => \$Opts{csv_sep},
+        "csv-loose|l" => \$Opts{csv_loose}
     ) or die "$0: Error in getting options, bailing out\n";
 }
 
@@ -40,6 +42,13 @@ my $rows;
         require Text::CSV;
         my $csv = Text::CSV->new({ binary => 1 })
             or die "Cannot use CSV: ".Text::CSV->error_diag;
+        if ($Opts{csv_sep}) {
+            $csv->sep($Opts{csv_sep});
+        }
+        if ($Opts{csv_loose}) {
+            $csv->allow_loose_quotes(1);
+            $csv->allow_loose_escapes(1);
+        }
         $rows = [];
         while ( my $row = $csv->getline($fh) ) {
             push @$rows, $row;
@@ -177,7 +186,7 @@ ini2ansitable - Convert/render {CSV,TSV,INI,IOD,JSON/Perl array-of-arrays} into 
 
 =head1 VERSION
 
-This document describes version 0.005 of ini2ansitable (from Perl distribution App-TextTableUtils), released on 2019-05-12.
+This document describes version 0.006 of ini2ansitable (from Perl distribution App-TextTableUtils), released on 2021-03-20.
 
 =head1 SYNOPSIS
 
@@ -299,6 +308,16 @@ Select L<Text::Table::Any> backend to use.
 
 Transpose table prior to output.
 
+=head2 --csv-sep (-s)
+
+Use the character(s) specified by this option, when input is a CSV files with a
+different separator.
+
+=head2 --csv-loose (-l)
+
+Enable C<allow_loose_escapes> and C<allow_loose_quotes> in L<Text::CSV> (the
+backend used to read CSV files).
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-TextTableUtils>.
@@ -309,7 +328,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-TextTableUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-TextTableUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-TextTableUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -325,7 +344,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

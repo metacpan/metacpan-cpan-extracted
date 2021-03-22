@@ -1,3 +1,10 @@
+0.40   2021-03-21
+
+- Add support for email auto-links without "mailto:", so "<autarch@urth.org>"
+  will now be treated as a "mailto:" link. Implemented by Konrad Bucheli. GH
+  #28.
+
+
 0.39   2021-02-12
 
 - Add support for strikethrough (~~) in the GitHub dialect. Implemented by

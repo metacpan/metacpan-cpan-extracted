@@ -14,9 +14,9 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT = qw(du dw dn dustr dwstr dnstr);
+our @EXPORT = qw(du dw de dn dustr dwstr destr dnstr);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub du {
   print STDERR dustr(@_);
@@ -41,6 +41,22 @@ sub dw {
 sub dwstr {
   my ($ref_data) = @_;
   $ref_data = _encode("cp932",$ref_data);
+  my $d = Data::Dumper->new([$ref_data]);
+  $d->Sortkeys(1)->Indent(1)->Terse(1);
+  my $ret = $d->Dump;
+  chomp $ret;
+  my $carp_short_message = Carp::shortmess($ret);
+
+  return $carp_short_message;
+}
+
+sub de {
+  print STDERR destr(@_);
+}
+
+sub destr {
+  my ($ref_data) = @_;
+  $ref_data = _encode("EUC-JP",$ref_data);
   my $d = Data::Dumper->new([$ref_data]);
   $d->Sortkeys(1)->Indent(1)->Terse(1);
   my $ret = $d->Dump;
@@ -137,7 +153,7 @@ D - Provides utility functions to encode data and dump it to STDERR.
   
   use utf8;
   
-  # Export du, dw, dn, dustr, dwstr, dnstr functions
+  # Export du, dw, de, dn, dustr, dwstr, destr, dnstr functions
   use D;
   
   # Reference data that contains decoded strings
@@ -149,12 +165,16 @@ D - Provides utility functions to encode data and dump it to STDERR.
   # Encode all strings in reference data to cp932 and dump the reference data to STDERR.
   dw $data;
 
+  # Encode all strings in reference data to EUC-JP and dump the reference data to STDERR.
+  de $data;
+
   # Dump reference data to STDERR without encoding.
   dn $data;
 
   # Examples of useful oneliner.
   use D;du $data;
   use D;dw $data;
+  use D;de $data;
   use D;dn $data;
 
   # Output example of du function.
@@ -175,13 +195,15 @@ D module provides utility functions to encode data and dump it to STDERR.
 
 =over 2
 
-=item * Export C<du> and C<dw> and C<dn> functions. Don't conflict debug command such as 'p' because these function names are consist of two characters.
+=item * Export C<du>, C<dw>, C<de>, and C<dn> functions. Don't conflict debug command such as 'p' because these function names are consist of two characters.
 
-=item * Encode all strings in reference data in C<dustr> and C<dwstr> function.
+=item * Encode all strings in reference data in C<dustr>, C<dwstr>, and C<destr> function.
 
 =item * C<du> is a short name of "dump UTF-8"
 
 =item * C<dw> is a short name of "dump Windows cp932"
+
+=item * C<de> is a short name of "dump EUC-JP"
 
 =item * C<dn> is a short name of "dump no encoding"
 
@@ -202,6 +224,7 @@ D module provides utility functions to encode data and dump it to STDERR.
 Encode all strings in reference data to UTF-8 and return string the reference data with file name and line number.
 
 If the argument is not reference data such as a string, it is also dumped in the same way as reference data.
+
 This function is exported.
 
   use D;
@@ -218,17 +241,31 @@ Following example is oneliner used. It can be used all functions.
 Encode all strings in reference data to cp932 and dump the reference data to STDERR with file name and line number.
 
 If the argument is not reference data such as a string, it is also dumped in the same way as reference data.
+
 This function is exported.
 
   use D;
   my $data = [{name => 'あ'}, {name => 'い'}];
   dw $data;
 
+=head2 de
+
+Encode all strings in reference data to EUC-JP and dump the reference data to STDERR with file name and line number.
+
+If the argument is not reference data such as a string, it is also dumped in the same way as reference data.
+
+This function is exported.
+
+  use D;
+  my $data = [{name => 'あ'}, {name => 'い'}];
+  de $data;
+
 =head2 dn
 
 Dump reference data to STDERR without encoding with file name and line number.
 
 If the argument is not reference data such as a string, it is also dumped in the same way as reference data.
+
 This function is exported.
 
   use D;
@@ -238,6 +275,7 @@ This function is exported.
 =head2 dustr
 
 This function is return that UTF-8 encoded string.
+
 This function is exported.
 
 Following example is get the UTF-8 encoded string.
@@ -249,6 +287,7 @@ Following example is get the UTF-8 encoded string.
 =head2 dwstr
 
 This function is return that cp932 encoded string.
+
 This function is exported.
 
 Following example is get the cp932 encoded string.
@@ -257,9 +296,22 @@ Following example is get the cp932 encoded string.
   my $data = [{name => 'あ'}, {name => 'い'}];
   my $str = dwstr $data;
 
+=head2 destr
+
+This function is return that EUC-JP encoded string.
+
+This function is exported.
+
+Following example is get the EUC-JP encoded string.
+
+  use D;
+  my $data = [{name => 'あ'}, {name => 'い'}];
+  my $str = destr $data;
+
 =head2 dnstr
 
 This function is return that without encoded string.
+
 This function is exported.
 
 Following example is get the without encoded string.

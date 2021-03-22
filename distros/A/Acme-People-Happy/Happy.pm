@@ -1,14 +1,12 @@
 package Acme::People::Happy;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 
 # Version.
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -49,38 +47,42 @@ Acme::People::Happy - Does people happy?
 =head1 SYNOPSIS
 
  use Acme::People::Happy;
+
  my $obj = Acme::People::Happy->new;
  my $text = $obj->are_you_happy;
  my $text = $obj->everybody;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item * C<new()>
+ my $obj = Acme::People::Happy->new;
 
- Constructor.
- Returns object.
+Constructor.
 
-=item * C<are_you_happy()>
+Returns instance of object.
 
- Are you happy question?
- Returns answer.
+=head2 C<are_you_happy>
 
-=item * C<everybody()>
+ my $text = $obj->are_you_happy;
 
- Everybody?
- Returns answer.
+Are you happy question?
 
-=back
+Returns answer.
+
+=head2 C<everybody>
+
+ my $text = $obj->everybody;
+
+Everybody?
+
+Returns answer.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Acme::People::Happy;
 
  # Object.
@@ -98,18 +100,19 @@ L<Class::Utils>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Acme-People-Happy>
+L<https://github.com/michal-josef-spacek/Acme-People-Happy>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
- BSD 2-Clause License
+© 2015-2021 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 DEDICATION
 
@@ -117,6 +120,6 @@ To Mario for his ideas.
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

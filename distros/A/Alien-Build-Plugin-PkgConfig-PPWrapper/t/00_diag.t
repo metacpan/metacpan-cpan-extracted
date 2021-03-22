@@ -12,7 +12,6 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   Alien::Build
   Cwd
-  Data::Dump
   ExtUtils::MakeMaker
   File::Path
   Path::Tiny

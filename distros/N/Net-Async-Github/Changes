@@ -1,5 +1,11 @@
 Revision history for Net-Async-Github
 
+0.009     2021-03-19 21:36:07+08:00 Asia/Kuala_Lumpur
+    New features, thanks to @chilli-binary for the patch:
+
+    - configurable timeout
+    - ->pull_requests method for retrieving all PRs for a repository
+
 0.008     2020-11-26 14:53:58+08:00 Asia/Kuala_Lumpur
     New features:
 

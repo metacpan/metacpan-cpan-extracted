@@ -14,7 +14,7 @@ use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -77,6 +77,8 @@ sub alter_url {
 sub convert_filename {
     my ($self, $filename) = @_;
 
+    die "Base directory is undefined" unless $self->{base_directory};
+
     my $new_file = abs2rel($filename, $self->{base_directory});
     $new_file = join('-', splitdir(lc($new_file)));
 
@@ -91,6 +93,8 @@ sub convert_filename {
 
 sub convert_source_directory {
     my ($self, $directory) = @_;
+
+    die "Base directory is undefined" unless $self->{base_directory};
 
     my $source_directory;
     if (fio_same_file($directory, $self->{final_directory},
@@ -293,7 +297,7 @@ sub initialize_parser {
 # Initialize pod parser and find pod directory
 
 sub setup {
-    my ($self, %configuration) = @_;
+    my ($self) = @_;
 
     my  ($pod_folder, $package_path) = $self->find_base_directory();
     die "Couldn't find folder for $self->{package}" 
@@ -302,7 +306,7 @@ sub setup {
     $self->{final_directory} = $self->{base_directory};
     $self->{base_directory} = catfile($pod_folder, @$package_path);
     $self->{package} = join('::', @$package_path);
-    
+
     return;
 }
 
@@ -348,9 +352,9 @@ a name to the build method, the sigil should not be used.
 
 =item $body
 
-All the contents of the file, minus the title if there is one. Markdown is
-called on the file's content to generate html before being stored in the body
-variable.
+All the contents of the file, minus the title if there is one. 
+Pod::Simple::XHTML is called on the file's content to generate html 
+before being stored in the body variable.
 
 =item $description
 

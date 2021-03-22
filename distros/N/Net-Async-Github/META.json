@@ -50,21 +50,21 @@
          "requires" : {
             "Cache::LRU" : "0.04",
             "Dir::Self" : "0",
-            "File::ShareDir" : "1.102",
-            "Future" : "0.39",
-            "IO::Async::Notifier" : "0.71",
-            "IO::Async::SSL" : "0.19",
-            "JSON::MaybeXS" : "1.004",
-            "Log::Any" : "1.045",
-            "Net::Async::HTTP" : "0.41",
+            "File::ShareDir" : "1.118",
+            "Future" : "0.47",
+            "IO::Async::Notifier" : "0.78",
+            "IO::Async::SSL" : "0.22",
+            "JSON::MaybeXS" : "1.004003",
+            "Log::Any" : "1.709",
+            "Net::Async::HTTP" : "0.48",
             "Net::Async::WebSocket" : "0",
-            "Path::Tiny" : "0.098",
-            "Ryu" : "0.031",
-            "Ryu::Async" : "0.013",
-            "Syntax::Keyword::Try" : "0.04",
-            "Time::Moment" : "0.41",
-            "URI" : "1.71",
-            "URI::Template" : "0.22",
+            "Path::Tiny" : "0.118",
+            "Ryu" : "2.007",
+            "Ryu::Async" : "0.019",
+            "Syntax::Keyword::Try" : "0.21",
+            "Time::Moment" : "0.44",
+            "URI" : "5.09",
+            "URI::Template" : "0.24",
             "indirect" : "0"
          }
       },
@@ -85,43 +85,43 @@
    "provides" : {
       "Net::Async::Github" : {
          "file" : "lib/Net/Async/Github.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "Net::Async::Github::Branch" : {
          "file" : "lib/Net/Async/Github/Branch.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "Net::Async::Github::Common" : {
          "file" : "lib/Net/Async/Github/Common.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "Net::Async::Github::Plan" : {
          "file" : "lib/Net/Async/Github/Plan.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "Net::Async::Github::PullRequest" : {
          "file" : "lib/Net/Async/Github/PullRequest.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "Net::Async::Github::RateLimit" : {
          "file" : "lib/Net/Async/Github/RateLimit.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "Net::Async::Github::RateLimit::Core" : {
          "file" : "lib/Net/Async/Github/RateLimit/Core.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "Net::Async::Github::Repository" : {
          "file" : "lib/Net/Async/Github/Repository.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "Net::Async::Github::Team" : {
          "file" : "lib/Net/Async/Github/Team.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "Net::Async::Github::User" : {
          "file" : "lib/Net/Async/Github/User.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -136,7 +136,7 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Github"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "chylli-binary <52912308+chylli-binary@users.noreply.github.com>"

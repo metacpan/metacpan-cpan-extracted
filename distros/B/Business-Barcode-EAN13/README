@@ -76,15 +76,8 @@ TODO
     Allow other barcode families than EAN-13
 
 AUTHOR
-    Colm Dougan, Tony Bowden and Jan Willamowius (http://www.ean-search.org/)
-
-BUGS and QUERIES
-    Please direct all correspondence regarding this module to:
-    bug-Business-Barcode-EAN13@rt.cpan.org
+    Colm Dougan, Tony Bowden and Jan Willamowius (https://www.ean-search.org/)
 
 LICENSE
     This program may be distributed under the same license as Perl itself.
-
-SEE ALSO
-    EAN barcode specification: http://www.mecsw.com/specs/ean_13.html
 

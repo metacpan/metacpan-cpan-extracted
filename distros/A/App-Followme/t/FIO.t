@@ -3,7 +3,6 @@ use strict;
 
 use Test::More tests => 32;
 
-use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -42,9 +41,7 @@ my $test_dir = catdir(@path, 'test');
 rmtree($test_dir);
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-
 chdir $test_dir or die $!;
-$test_dir = cwd();
 
 #----------------------------------------------------------------------
 # Test same file
@@ -126,9 +123,10 @@ EOQ
 
     foreach my $dir (('', 'sub-one', 'sub-two')) {
         if ($dir ne '') {
-            mkdir $dir or die $!;
-            chmod 0755, $dir;
-            push(@ok_folders, catfile($test_dir, $dir));
+            my $subdir = catfile($test_dir, $dir);
+            mkdir $subdir or die $!;
+            chmod 0755, $subdir;
+            push(@ok_folders, $subdir);
         }
 
         foreach my $count (qw(first second third)) {
@@ -192,7 +190,6 @@ do {
 EOQ
 
     chdir($test_dir) or die $!;
-    $test_dir = cwd();
 
     my $template = $code;
     $template =~ s/%%/Page \$count/g;

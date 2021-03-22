@@ -91,6 +91,9 @@ foreach my $pan (qw(upstream nopin combined)) {
   );
 }
 
+eval { run(pin => 'X/Y-0.00.tar.gz') };
+like $@, qr{^GET .*X/Y-0\.00\.tar\.gz: Not Found\n}, 'invalid pin distro';
+
 run(pin => 'MSCHWERN/AAAAAAAAA-1.00.tar.gz');
 
 ok(

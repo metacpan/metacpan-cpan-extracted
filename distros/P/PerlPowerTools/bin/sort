@@ -98,8 +98,7 @@ sub _sort_file {
         my $last;
 
         if ($opts->{I}[0] eq '-') {
-            open(F, '<', $opts->{I}[0])
-                or die "Can't open `$opts->{I}[0]' for reading: $!";
+            open F, '<-';
         } else {
             sysopen(F, $opts->{I}[0], O_RDONLY)
                 or die "Can't open `$opts->{I}[0]' for reading: $!";
@@ -157,8 +156,7 @@ sub _sort_file {
             _debug("Sorting file $filein ...\n") if $opts->{D};
 
             if ($filein eq '-') {
-                open(F, '<', $filein)
-                    or die "Can't open `$filein' for reading: $!";
+                open F, '<-' or die "Could not open '-': $!/$^E";
             } else {
                 sysopen(F, $filein, O_RDONLY)
                     or die "Can't open `$filein' for reading: $!";
@@ -188,6 +186,8 @@ sub _sort_file {
                         _debug("\nCreating temp files ...\n") if $opts->{D};
                     }
                 }
+            } continue {
+              close F if eof;
             }
 
             close F;

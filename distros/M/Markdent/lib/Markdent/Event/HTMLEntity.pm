@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::Types;
 
@@ -37,7 +37,7 @@ Markdent::Event::HTMLEntity - An event for an HTML entity
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
@@ -49,8 +49,7 @@ This class has the following attributes:
 
 =head2 entity
 
-The text of the entity. This omits the leading ampersand and ending
-semi-colon.
+The text of the entity. This omits the leading ampersand and ending semi-colon.
 
 =head1 ROLES
 

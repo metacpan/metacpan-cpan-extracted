@@ -4,13 +4,13 @@
       "matisse@eigenstate.net"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Perl-Metrics-Simple",
    "prereqs" : {
@@ -20,6 +20,7 @@
             "File::Spec" : "0",
             "Module::Build" : "0.2612",
             "Readonly" : "1.03",
+            "Test::Compile" : "0",
             "Test::Pod" : "1",
             "Test::Pod::Coverage" : "1.04"
          }
@@ -38,6 +39,7 @@
             "Data::Dumper" : "0",
             "File::Basename" : "0",
             "File::Find" : "1.01",
+            "Getopt::Long" : "0",
             "IO::File" : "1.14",
             "PPI" : "1.113",
             "Pod::Usage" : "0",
@@ -51,19 +53,38 @@
    "provides" : {
       "Perl::Metrics::Simple" : {
          "file" : "lib/Perl/Metrics/Simple.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       },
       "Perl::Metrics::Simple::Analysis" : {
          "file" : "lib/Perl/Metrics/Simple/Analysis.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       },
       "Perl::Metrics::Simple::Analysis::File" : {
          "file" : "lib/Perl/Metrics/Simple/Analysis/File.pm",
-         "version" : "0.18"
+         "version" : "0.19"
+      },
+      "Perl::Metrics::Simple::Output" : {
+         "file" : "lib/Perl/Metrics/Simple/Output.pm",
+         "version" : "0.19"
+      },
+      "Perl::Metrics::Simple::Output::HTML" : {
+         "file" : "lib/Perl/Metrics/Simple/Output/HTML.pm",
+         "version" : "0.19"
+      },
+      "Perl::Metrics::Simple::Output::JSON" : {
+         "file" : "lib/Perl/Metrics/Simple/Output/JSON.pm",
+         "version" : "0.19"
+      },
+      "Perl::Metrics::Simple::Output::PlainText" : {
+         "file" : "lib/Perl/Metrics/Simple/Output/PlainText.pm",
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/matisse/Perl-Metrics-Simple/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -71,5 +92,6 @@
          "url" : "https://github.com/matisse/Perl-Metrics-Simple"
       }
    },
-   "version" : "0.18"
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

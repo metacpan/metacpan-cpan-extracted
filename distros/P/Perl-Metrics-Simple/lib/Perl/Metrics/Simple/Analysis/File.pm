@@ -10,7 +10,7 @@ use PPI;
 use PPI::Document;
 use Readonly;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 Readonly::Scalar my $ALL_NEWLINES_REGEX =>
     qr/ ( \Q$INPUT_RECORD_SEPARATOR\E ) /sxm;

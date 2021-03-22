@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 use 5.008000;
 
-(do 'maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
+(do './maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
 
 WriteMakefile(
   NAME => 'App::opan',
@@ -14,7 +14,7 @@ WriteMakefile(
   ],
   PREREQ_PM => {
     'Dist::Metadata' => '0.926',
-    'Mojolicious' => '7.15',
+    'Mojolicious' => '9.11',
     strictures => 2,
     'List::UtilsBy' => '0.09',
     'Import::Into' => '1.002004',

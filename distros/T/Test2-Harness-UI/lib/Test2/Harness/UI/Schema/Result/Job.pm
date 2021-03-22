@@ -9,7 +9,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000047';
+our $VERSION = '0.000050';
 
 __PACKAGE__->inflate_column(
     parameters => {
@@ -42,17 +42,8 @@ sub short_file {
     return $file;
 }
 
-sub complete {
-    my $self = shift;
-
-    my $status = $self->status;
-
-    return 1 if $status eq 'complete';
-    return 1 if $status eq 'failed';
-    return 1 if $status eq 'canceled';
-    return 1 if $status eq 'broken';
-    return 0;
-}
+my %COMPLETE_STATUS = (complete => 1, failed => 1, canceled => 1, broken => 1);
+sub complete { return $COMPLETE_STATUS{$_[0]->status} // 0 }
 
 sub sig {
     my $self = shift;

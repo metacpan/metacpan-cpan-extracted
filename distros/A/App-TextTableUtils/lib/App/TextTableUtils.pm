@@ -1,7 +1,7 @@
 package App::TextTableUtils;
 
-our $DATE = '2019-05-12'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2021-03-20'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to text tables
@@ -18,7 +18,7 @@ App::TextTableUtils - CLI utilities related to text tables
 
 =head1 VERSION
 
-This document describes version 0.005 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2019-05-12.
+This document describes version 0.006 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2021-03-20.
 
 =head1 DESCRIPTION
 
@@ -125,7 +125,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-TextTableUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-TextTableUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-TextTableUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -143,7 +143,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

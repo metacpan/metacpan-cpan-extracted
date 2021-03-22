@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Alien::Plotly::Kaleido" => 0,
     "File::ShareDir" => "1.116",
     "File::Which" => 0,
-    "IPC::Run" => "0.99",
+    "IPC::Run" => "20200505.0",
     "JSON" => 0,
     "MIME::Base64" => 0,
     "Moo" => "2.0",
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V0" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "Alien::Plotly::Kaleido" => 0,
   "File::ShareDir" => "1.116",
   "File::Which" => 0,
-  "IPC::Run" => "0.99",
+  "IPC::Run" => "20200505.0",
   "JSON" => 0,
   "MIME::Base64" => 0,
   "Moo" => "2.0",

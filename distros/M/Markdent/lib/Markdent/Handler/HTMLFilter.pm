@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::CapturedEvents;
 
@@ -51,7 +51,7 @@ Markdent::Handler::HTMLFilter - Filters out HTML events from the event stream
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -65,8 +65,8 @@ version 0.39
 
 =head1 DESCRIPTION
 
-This class implements an event filter which drops all HTML events I<except>
-for HTML entities.
+This class implements an event filter which drops all HTML events I<except> for
+HTML entities.
 
 =head1 METHODS
 

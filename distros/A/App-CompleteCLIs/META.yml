@@ -17,7 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-CompleteCLIs
 requires:
-  App::perlmv: '0.600'
+  App::perlmv: '0.604'
   Complete::Acme::MetaSyntactic: '0.002'
   Complete::App::perlmv: '0'
   Complete::Chrome: '0'
@@ -28,6 +28,7 @@ requires:
   Complete::Dist::Zilla: '0'
   Complete::Env: '0'
   Complete::File: '0.440'
+  Complete::Finance::SE::IDX: '0'
   Complete::Firefox: '0'
   Complete::Host: '0.03'
   Complete::Kernel: '0'
@@ -69,10 +70,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteCLIs
+  bugtracker: https://github.com/perlancar/perl-App-CompleteCLIs/issues
   homepage: https://metacpan.org/release/App-CompleteCLIs
   repository: git://github.com/perlancar/perl-App-CompleteCLIs.git
-version: '0.147'
+version: '0.148'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -160,6 +161,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript complete-int'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript complete-idx-listed-stock-code'
       version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -298,6 +303,10 @@ x_Dist_Zilla:
       name: InsertExecsList
       version: '0.02'
     -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
+    -
       class: Dist::Zilla::Plugin::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
@@ -368,7 +377,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.600'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -384,7 +393,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -421,9 +430,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'

@@ -47,6 +47,8 @@ chmod 0755, $sub_dir;
 chdir $test_dir or die $!;
 
 my %configuration = (
+                    top_directory => $test_dir,
+                    base_directory => $test_dir,
                     remove_comments => 0,
                     data_pkg => 'App::Followme::WebData',
                     );

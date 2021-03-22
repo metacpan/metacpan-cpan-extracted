@@ -5,7 +5,7 @@ This is Perl module B<Test::AllModules>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/Test-AllModules"><img src="https://secure.travis-ci.org/bayashi/Test-AllModules.png?_t=1580829577"/></a> <a href="https://coveralls.io/r/bayashi/Test-AllModules"><img src="https://coveralls.io/repos/bayashi/Test-AllModules/badge.png?_t=1580829577&branch=master"/></a>
+<a href="https://github.com/bayashi/Test-AllModules/blob/main/README.pod"><img src="https://img.shields.io/badge/Version-0.20-green?style=flat"></a> <a href="https://github.com/bayashi/Test-AllModules/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Test-AllModules/actions"><img src="https://github.com/bayashi/Test-AllModules/workflows/main/badge.svg?_t=1587735883"/></a> <a href="https://coveralls.io/r/bayashi/Test-AllModules"><img src="https://coveralls.io/repos/bayashi/Test-AllModules/badge.png?_t=1587735883&branch=main"/></a>
 
 =end html
 

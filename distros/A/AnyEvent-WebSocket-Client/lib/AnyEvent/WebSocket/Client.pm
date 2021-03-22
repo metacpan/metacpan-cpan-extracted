@@ -7,14 +7,13 @@ use AE;
 use AnyEvent;
 use AnyEvent::Handle;
 use AnyEvent::Socket ();
-use AnyEvent::Connector;
 use Protocol::WebSocket::Request;
 use Protocol::WebSocket::Handshake::Client;
 use AnyEvent::WebSocket::Connection;
 use PerlX::Maybe qw( maybe provided );
 
 # ABSTRACT: WebSocket client for AnyEvent
-our $VERSION = '0.53'; # VERSION
+our $VERSION = '0.54'; # VERSION
 
 
 has timeout => (
@@ -116,14 +115,14 @@ sub connect
       maybe version => $self->protocol_version,
             req     => $req,
     );
-    
+
     my %subprotocol;
     if($self->subprotocol)
     {
       %subprotocol = map { $_ => 1 } @{ $self->subprotocol };
       $handshake->req->subprotocol(join(',', @{ $self->subprotocol }));
     }
-    
+
     my $hdl = AnyEvent::Handle->new(
                                                       fh       => $fh,
       provided $uri->secure,                          tls      => 'connect',
@@ -197,6 +196,7 @@ sub _make_tcp_connection
   {
     return &AnyEvent::Socket::tcp_connect(@_);
   }
+  require AnyEvent::Connector;
   my @connectors =
       $scheme eq "ws"
       ? (map { AnyEvent::Connector->new(env_proxy => $_) } qw(ws http))
@@ -227,7 +227,7 @@ AnyEvent::WebSocket::Client - WebSocket client for AnyEvent
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -247,10 +247,10 @@ version 0.53
      warn $@;
      return;
    }
-   
+ 
    # send a message through the websocket...
    $connection->send('a message');
-   
+ 
    # recieve message from the websocket...
    $connection->on(each_message => sub {
      # $connection is the same connection object
@@ -258,20 +258,20 @@ version 0.53
      my($connection, $message) = @_;
      ...
    });
-   
+ 
    # handle a closed connection...
    $connection->on(finish => sub {
      # $connection is the same connection object
      my($connection) = @_;
      ...
    });
-
+ 
    # close the connection (either inside or
    # outside another callback)
    $connection->close;
  
  });
-
+ 
  ## uncomment to enter the event loop before exiting.
  ## Note that calling recv on a condition variable before
  ## it has been triggered does not work on all event loops
@@ -281,7 +281,7 @@ version 0.53
 
 This class provides an interface to interact with a web server that provides
 services via the WebSocket protocol in an L<AnyEvent> context.  It uses
-L<Protocol::WebSocket> rather than reinventing the wheel.  You could use 
+L<Protocol::WebSocket> rather than reinventing the wheel.  You could use
 L<AnyEvent> and L<Protocol::WebSocket> directly if you wanted finer grain
 control, but if that is not necessary then this class may save you some time.
 
@@ -387,7 +387,7 @@ function's idiosyncrasies in the L<AnyEvent::Socket> documentation.  In
 particular,  you can pass in C<unix/> as the host and a filesystem path
 as the "port" to connect to a unix domain socket.
 
-This method will return an L<AnyEvent> condition variable which you can 
+This method will return an L<AnyEvent> condition variable which you can
 attach a callback to.  The value sent through the condition variable will
 be either an instance of L<AnyEvent::WebSocket::Connection> or a croak
 message indicating a failure.  The synopsis above shows how to catch
@@ -397,7 +397,7 @@ such errors using C<eval>.
 
 =head2 My program exits before doing anything, what is up with that?
 
-See this FAQ from L<AnyEvent>: 
+See this FAQ from L<AnyEvent>:
 L<AnyEvent::FAQ#My-program-exits-before-doing-anything-whats-going-on>.
 
 It is probably also a good idea to review the L<AnyEvent> documentation
@@ -412,13 +412,13 @@ example:
  $client->connect("ws://foo/service")->cb(sub {
  
    my $connection = eval { shift->recv };
-   
+ 
    if($@)
    {
      warn $@;
      return;
    }
-   
+ 
    ...
  });
 

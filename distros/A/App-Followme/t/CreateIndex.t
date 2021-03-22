@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -26,9 +25,7 @@ my $test_dir = catdir(@path, 'test');
 rmtree($test_dir);
 mkdir $test_dir  or die $!;
 chmod 0755, $test_dir;
-
 chdir $test_dir or die $!;
-$test_dir = cwd();
 
 my $archive_dir = catfile(@path, 'test', 'archive');
 	
@@ -40,7 +37,7 @@ my $prototype_file = 'index.html';
 
 my %configuration = (
         top_directory => $test_dir,
-        base__directory => $test_dir,
+        base_directory => $test_dir,
         template_directory => $test_dir,
         template_file => $template_file,
         web_extension => 'html',
@@ -136,23 +133,20 @@ EOQ
     mkdir($archive_dir) unless -e $archive_dir;
     chdir($archive_dir) or die $!;
 
-    $archive_dir = cwd();
-
     my ($index_name) = fio_to_file($archive_dir, $configuration{web_extension});
     fio_write_page($index_name, $index_page);
 
-    my @archived_files;
     foreach my $count (qw(four three two one)) {
         my $output = $page;
         $output =~ s/%%/$count/g;
 
-        my $filename = "$count.html";
+        my $filename = catfile($archive_dir, "$count.html");
         fio_write_page($filename, $output);
-        push(@archived_files, $filename);
     }
 
     chdir($archive_dir) or die $!;
 
+    $configuration{base_directory} = $archive_dir;
     my $idx = App::Followme::CreateIndex->new(%configuration);
     $idx->run($archive_dir);
 

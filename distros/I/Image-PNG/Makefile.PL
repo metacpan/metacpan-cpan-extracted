@@ -6,16 +6,17 @@ use ExtUtils::Constant;
 use 5.008001;
 
 my $pm = 'lib/Image/PNG.pm';
-my $pod = 'lib/Image/PNG.pm';
+my $pod = 'lib/Image/PNG.pod';
 
 WriteMakefile (
     NAME         => 'Image::PNG',
-    VERSION      => '0.24',
+    VERSION      => '0.25',
     ABSTRACT     => 'Read and write PNG files',
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
-	'Image::PNG::Libpng' => '0.39',
+	# Latest version as of 2021-03-20
+	'Image::PNG::Libpng' => '0.56',
     },
     META_MERGE => {
         resources => {

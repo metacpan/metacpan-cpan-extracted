@@ -28,5 +28,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: https://gitlab.com/as_pushkin/validate-simple.git
-version: v0.4.0
+version: v0.4.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

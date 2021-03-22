@@ -1,5 +1,5 @@
 (defun followme-after-save-hook ()
-  "After saving a markdown file, run followme"
+  "After saving a text file, run followme"
   (if buffer-file-name
       (progn
         (setq is-md-file (numberp (string-match "\.md$" buffer-file-name)))

@@ -53,7 +53,7 @@ subtest 'on_next_data' => sub {
     is $message->body, $test_cases[$test_index]->{recv_exp}->[0], "body = " . $message->body;
     my $method = $test_cases[$test_index]->{recv_exp}->[1];
     ok $message->$method, "\$message->$method is true";
-    
+
   }
   is($cb_count, scalar(@test_cases), "callback count OK");
 };

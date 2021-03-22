@@ -128,7 +128,7 @@ use File::Which qw(which where);
     $zero,
     "zero = $zero"
   );
-  
+
   my $empty_string = which '';
 
   is(

@@ -1,6 +1,10 @@
 Revision history for perl distribution Validate-Simple
 
-0.4.0
+0.4.1 2021-03-20
+
+  - Optimize array and hash validation
+
+0.4.0 2021-03-02
 
   - Add nested specification
   - Fix 'code' validation

@@ -12,6 +12,7 @@ my $build = Module::Build->new(
       'File::ShareDir' => 0,
       'Future::AsyncAwait' => 0,
       'Future::IO' => '0.03',
+      'IO::Termios' => 0,
       'Struct::Dumb' => 0,
       'YAML' => 0,
 

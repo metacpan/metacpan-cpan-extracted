@@ -1,7 +1,7 @@
 package Sah::Schemas::ColorScheme;
 
-our $DATE = '2021-01-20'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-03-20'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Alias for Sah::Schemas::GraphicsColorNames
@@ -18,15 +18,15 @@ Sah::Schemas::ColorScheme - Alias for Sah::Schemas::GraphicsColorNames
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::Schemas::ColorScheme (from Perl distribution Sah-Schemas-GraphicsColorNames), released on 2021-01-20.
+This document describes version 0.004 of Sah::Schemas::ColorScheme (from Perl distribution Sah-Schemas-GraphicsColorNames), released on 2021-03-20.
 
 =head1 DESCRIPTION
 
 I use "color schemes" to refer to modules in the L<Graphics::ColorNames>::*
-namespace, while "color themes" to refer to modules in the L<ColorTheme>::* (or
-C<WHATEVER::ColorTheme::*>) namespace. The color theme modules allow defining
-color items that have background color (in addition to foreground color), as
-well as dynamic color (coderef).
+namespace, while "color themes" to refer to modules in the L<ColorTheme>::*
+namespace. The color theme modules allow defining color items that have
+background color (in addition to foreground color), as well as dynamic color
+(coderef).
 
 =head1 HOMEPAGE
 

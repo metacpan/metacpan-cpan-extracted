@@ -6,7 +6,7 @@ use Moo;
 use Encode ();
 
 # ABSTRACT: WebSocket message for AnyEvent
-our $VERSION = '0.53'; # VERSION
+our $VERSION = '0.54'; # VERSION
 
 
 has body => ( is => 'ro', required => 1 );
@@ -39,14 +39,14 @@ AnyEvent::WebSocket::Message - WebSocket message for AnyEvent
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 
  $connection->send(
    AnyEvent::WebSocket::Message->new(body => "some message"),
  );
-
+ 
  $connection->on(each_message => sub {
    my($connection, $message) = @_;
    if($message->is_text || $message->is_binary)

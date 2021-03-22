@@ -22,16 +22,16 @@ sub test_case
       ($a_conn, $b_conn) = create_connection_pair;
       $a_conn_weak = $a_conn;
       weaken($a_conn_weak);
-      
+
       $a_conn_code->($a_conn, $cv_finish);
     }
     ok(defined($a_conn_weak), "a_conn is alive due to the cyclic ref in callback");
     $b_conn->on(finish => sub {
       $cv_finish->end;
     });
-    
+
     $b_conn_code->($b_conn, $cv_finish);
-    
+
     $cv_finish->recv;
     ok(!defined($a_conn_weak), "a_conn is now destroyed");
   };

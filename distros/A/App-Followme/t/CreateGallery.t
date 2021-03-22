@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 
-use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -29,14 +28,16 @@ my $photo_dir = catdir($test_dir, 'photos');
 rmtree($test_dir);
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-
-
 chdir $test_dir  or die $!;
-$test_dir = cwd();
+
+my $gallery_dir = catfile($test_dir, 'gallery');
+mkdir($gallery_dir) unless -e $gallery_dir;
+chmod 0755, $gallery_dir;
 
 my $template_name = catfile($test_dir, 'gallery_template.htm');
 
-my %configuration = (
+my %configuration = (top_directory => $test_dir,
+                    base_directory => $gallery_dir,
                     template_file => $template_name,
                     thumb_suffix => '-thumb',
                     web_extension => 'html',
@@ -73,15 +74,9 @@ do {
 </html>
 EOQ
 
-    fio_write_page($template_name, $gallery_template);
-
-    my $gallery_dir = catfile($test_dir, 'gallery');
-    mkdir($gallery_dir) unless -e $gallery_dir;
-    chmod 0755, $gallery_dir;
+    fio_write_page($template_name, $gallery_template); 
 
     chdir($gallery_dir);
-    $gallery_dir = cwd();
-
     my $gal = App::Followme::CreateGallery->new(%configuration);
 
     my @photo_files;
@@ -105,10 +100,10 @@ EOQ
     is($$title, 'Red', 'Red page title'); # test 1
 
     my $url = $gal->{data}->build('url', $photo_files[1]);
-    is($$url, 'green.jpg', 'Green photo url'); # test 2
+    is($$url, 'gallery/green.jpg', 'Green photo url'); # test 2
 
     $url = $gal->{data}->build('url', $thumb_files[2]);
-    is($$url, 'blue-thumb.jpg', 'Blue photo thumb url'); # test 3
+    is($$url, 'gallery/blue-thumb.jpg', 'Blue photo thumb url'); # test 3
 
     $gal->run($gallery_dir);
 

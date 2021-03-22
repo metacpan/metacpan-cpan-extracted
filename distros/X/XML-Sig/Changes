@@ -1,5 +1,35 @@
 Revision history for XML-Sig
 
+0.45 - 2021-03-20
+  [Significant features implemented since 0.43]
+
+  - Re-enable Perl 5.8 support
+  - Support for DSA 2048-bit and 3072-bit keys and signatures
+  - Allow verification of DSA signed XML using X509Certificate
+
+  [Full Change Log]
+
+  - TBD     Update Changes and Increment version
+
+
+0.44-TRIAL - 2021-03-20
+
+  [Significant features implemented]
+
+  - Added suport for DSA 2048-bit and 3072-bit keys and signatures
+  - Allow verification of DSA signed XML using X509Certificate
+
+  [Full Change Log]
+  - a1cbb96 Update Changes and Increment version
+  - 48a9f63 Missed dist.ini in Crypt::OpenSSL::DSA 0.20 commit
+  - ba5dd7c Fix author in dist.ini to match spec
+  - 7979049 Merge pull request #29 from perl-net-saml2/dsa2048
+  - d020cad Requires Crypt:OpenSSL::DSA 0.20
+  - fb6ebc9 Re-enable Perl 5.8 support
+  - 4d18776 Initial kick at 2048 and 3072 bit DSA signatures
+  - cb67138 Merge pull request #27 from perl-net-saml2/dsa2048
+  - 55c406e Allow verification of DSA signed XML using X509Certificate
+
 0.43 - 2021-03-14
 
   [Significant features implemented since 0.39]
@@ -8,7 +38,7 @@ Revision history for XML-Sig
   - Support ECDSA signatures
 
   [Change Log]
-  - TBD     Update Changes and Increment version
+  - da1465f Update Changes and Increment version
 
 0.42-TRIAL - 2021-03-14
 

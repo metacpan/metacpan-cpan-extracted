@@ -1,5 +1,11 @@
 Revision history for Data-MoneyCurrency
 
+0.16    Sat Mar 20 13:14:27 CET 2021
+        add Kosovo
+
+0.15    Fri Mar 19 10:26:27 CET 2021
+        add missing countrycodes, mainly for dependent territories
+
 0.14    Sun Mar 14 10:18:09 CET 2021
         add perltidy . files to build
 

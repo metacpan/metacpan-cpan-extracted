@@ -9,7 +9,7 @@ sub skip
 {
   eval "use Net::SSLeay 1.33 (); 1" or return "test requires Net::SSLeay 1.33";
   eval "use AnyEvent::TLS (); 1"    or return "test requires AnyEvent::TLS";
-  
+
   return 'user requested skip of SSL tests via environment'
       if $ENV{ANYEVENT_WEBSOCKET_TEST_SKIP_SSL};
 

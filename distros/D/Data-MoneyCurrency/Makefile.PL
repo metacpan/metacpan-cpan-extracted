@@ -14,7 +14,7 @@ install_share dist => "ruby\-money\/config";
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Get information for different currencies",
-  "AUTHOR" => "edf <edf\@opencagedata.com>",
+  "AUTHOR" => "edf <cpan\@opencagedata.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Types::Serialiser" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t"
   }

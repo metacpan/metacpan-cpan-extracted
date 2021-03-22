@@ -4,8 +4,6 @@ lib/Method/Generate/BuildAll.pm
 lib/Method/Generate/Constructor.pm
 lib/Method/Generate/DemolishAll.pm
 lib/Moo.pm
-lib/Moo/_mro.pm
-lib/Moo/_strictures.pm
 lib/Moo/_Utils.pm
 lib/Moo/HandleMoose.pm
 lib/Moo/HandleMoose/_TypeMap.pm
@@ -87,7 +85,6 @@ t/not-methods.t
 t/overloaded-coderefs.t
 t/overridden-core-funcs.t
 t/role-conflicts-moox.t
-t/strictures.t
 t/sub-and-handles.t
 t/subconstructor.t
 t/undef-bug.t
@@ -105,6 +102,7 @@ xt/implicit-moose-types.t
 xt/inflate-our-classes.t
 xt/inflate-undefer.t
 xt/jenga.t
+xt/lib/FatalWarnings.pm
 xt/moo-attr-handles-moose-role.t
 xt/moo-consume-moose-role-coerce.t
 xt/moo-consume-moose-role-multiple.t

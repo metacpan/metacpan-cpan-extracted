@@ -7,7 +7,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 sub import {
     return;
@@ -87,6 +87,7 @@ L<Games::Sudoku::General|Games::Sudoku::General>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Sudoku-General>,
 L<https://github.com/trwyant/perl-Games-Sudoku-General/issues>, or in
 electronic mail to the author.
 

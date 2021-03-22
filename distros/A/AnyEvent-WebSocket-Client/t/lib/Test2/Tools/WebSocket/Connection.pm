@@ -17,7 +17,7 @@ our @EXPORT_OK = qw( create_connection_pair create_connection_and_handle );
  use Test2::Tools::WebSocket::Connection qw( create_connection_pair );
  
  my($a, $b) = create_connection_pair;
- 
+
 =head1 DESCRIPTION
 
 This module provides a function for building a pair of L<AnyEvent::WebSocket::Connection>
@@ -47,13 +47,13 @@ sub _create_handle_pair
   );
   $cv_connect->recv;
   my $b_handle = AnyEvent::Handle->new(
-     fh => $cv_server_fh->recv  
+     fh => $cv_server_fh->recv
   );
-  
+
   my $ctx = context();
   $ctx->note("create connection pair " . join(':', @ports));
   $ctx->release;
-  
+
   return ($a_handle, $b_handle);
 }
 

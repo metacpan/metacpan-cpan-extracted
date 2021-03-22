@@ -4,8 +4,8 @@
 #
 package PDL::GSLSF::COULOMB;
 
-@EXPORT_OK  = qw( PDL::PP gsl_sf_hydrogenicR PDL::PP gsl_sf_coulomb_wave_FGp_array PDL::PP gsl_sf_coulomb_wave_sphF_array PDL::PP gsl_sf_coulomb_CL_e );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw( PDL::PP gsl_sf_hydrogenicR PDL::PP gsl_sf_coulomb_wave_FGp_array PDL::PP gsl_sf_coulomb_wave_sphF_array PDL::PP gsl_sf_coulomb_CL_e );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::COULOMB ;
 

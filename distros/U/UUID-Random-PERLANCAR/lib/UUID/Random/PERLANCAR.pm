@@ -1,24 +1,21 @@
 package UUID::Random::PERLANCAR;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-18'; # DATE
+our $DATE = '2021-01-20'; # DATE
 our $DIST = 'UUID-Random-PERLANCAR'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
 
 sub generate {
     sprintf(
-        "%04x%04x-%04x-%04x-%04x-%04x%04x%04x",
+        "%08x-%04x-%04x-%04x-%04x%08x",
+        rand(2**32),
         rand(2**16),
         rand(2**16),
         rand(2**16),
-        rand(2**16),
-        rand(2**16),
-        rand(2**16),
-        rand(2**16),
-        rand(2**16),
+        rand(2**16), rand(2**32),
     );
 }
 
@@ -37,7 +34,7 @@ UUID::Random::PERLANCAR - Another implementation of UUID::Random
 
 =head1 VERSION
 
-This document describes version 0.003 of UUID::Random::PERLANCAR (from Perl distribution UUID-Random-PERLANCAR), released on 2021-01-18.
+This document describes version 0.004 of UUID::Random::PERLANCAR (from Perl distribution UUID-Random-PERLANCAR), released on 2021-01-20.
 
 =head1 SYNOPSIS
 

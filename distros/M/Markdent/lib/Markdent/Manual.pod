@@ -11,10 +11,10 @@ Markdent::Manual - Using and Extending Markdent
 Markdent is an event-driven parser toolkit for Markdown. That's a mouthful, so
 let's go through that piece by piece, starting at the end.
 
-Markdown is a wiki-esque plain text markup format that is easy to read and
-easy to write. It draws inspiration from how people have communicated in plain
-text email for a long time. For example, some text like "*really*" is parsed
-as emphasis around the word "really".
+Markdown is a wiki-esque plain text markup format that is easy to read and easy
+to write. It draws inspiration from how people have communicated in plain text
+email for a long time. For example, some text like "*really*" is parsed as
+emphasis around the word "really".
 
 Existing Markdown tools in Perl (and in most other languages) are only able to
 convert Markdown directly to HTML. They are not really parsers, they're
@@ -38,13 +38,13 @@ to do with them. By decoupling parsing from other tasks, it gives you great
 power in dealing with the parse results.
 
 When I call Markdent a parser I<toolkit>, that means it is designed to be part
-of a larger ecosystem. You can write your handlers, and you can even write
-your own parser dialects as roles.
+of a larger ecosystem. You can write your handlers, and you can even write your
+own parser dialects as roles.
 
 =head1 HANDLERS
 
-A handler object receives events with the parser and does something with
-them. All handlers implement the L<Markdent::Role::Handler> role, which simply
+A handler object receives events with the parser and does something with them.
+All handlers implement the L<Markdent::Role::Handler> role, which simply
 requires a single method, C<< $handler->handle_event($event) >>.
 
 If you're writing your own handler, you may find it convenient to consume the
@@ -53,8 +53,8 @@ implementation that calls a different method for each type of event.
 
 This is used by the L<Markdent::Handler::HTMLStream::Document> and
 L<Markdent::Handler::HTMLStream::Fragment> handlers, for example. Since it
-generates a different tag for each event, it makes sense to have one method
-per event which knows what tag to generate.
+generates a different tag for each event, it makes sense to have one method per
+event which knows what tag to generate.
 
 On the other hand, the L<CaptureEvents
 handler|Markdent::Handler::CaptureEvents> doesn't care what type of event it
@@ -101,13 +101,13 @@ parsing process.
 
 Markdent divides parsing into blocks and spans. The block parser looks for
 block-level constructs like paragraphs, lists, blockquotes, etc. For most of
-these constructs, it passes the contents of the block on to the span
-parser. The span parser looks for things like strong and emphasis markup,
-links, HTML entities, and so on.
+these constructs, it passes the contents of the block on to the span parser.
+The span parser looks for things like strong and emphasis markup, links, HTML
+entities, and so on.
 
-Separating these two makes creating a Markdown dialect a bit easier, as you
-may find yourself just needing to alter the behavior of just the block I<or>
-the span parser.
+Separating these two makes creating a Markdown dialect a bit easier, as you may
+find yourself just needing to alter the behavior of just the block I<or> the
+span parser.
 
 For example, the L<Theory dialect|Markdent::Dialect::Theory> shipped with this
 distribution is mostly implemented as a role applied to the L<Standard

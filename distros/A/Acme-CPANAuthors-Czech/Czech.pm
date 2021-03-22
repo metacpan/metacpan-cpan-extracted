@@ -4,11 +4,12 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = 0.27;
+our $VERSION = 0.28;
 
 # Modules.
 use Acme::CPANAuthors::Register(
 	'CHOROBA' => 'E. Choroba',
+	'CONTYK' => 'Petr Šabata',
 	'DANIELR' => 'Roman Daniel',
 	'DANPEDER' => 'Daniel Peder',
 	'DOUGLISH' => 'Dalibor Hořínek',
@@ -95,7 +96,7 @@ See documentation for L<Acme::CPANAuthors> for more details.
  print "Count of Czech CPAN authors: $count\n";
 
  # Output:
- # Count of Czech CPAN authors: 40
+ # Count of Czech CPAN authors: 41
 
 =head1 EXAMPLE2
 
@@ -117,45 +118,46 @@ See documentation for L<Acme::CPANAuthors> for more details.
  # Output:
  # [
  #     [0]  "CHOROBA",
- #     [1]  "DANIELR",
- #     [2]  "DANPEDER",
- #     [3]  "DOUGLISH",
- #     [4]  "HIHIK",
- #     [5]  "HOLCAPEK",
- #     [6]  "HPA",
- #     [7]  "JANPAZ",
- #     [8]  "JANPOM",
- #     [9]  "JENDA",
- #     [10] "JIRA",
- #     [11] "JSPICAK",
- #     [12] "KLE",
- #     [13] "KOLCON",
- #     [14] "MAJLIS",
- #     [15] "MICHALS",
- #     [16] "MILSO",
- #     [17] "MJFO",
- #     [18] "PAJAS",
- #     [19] "PASKY",
- #     [20] "PCIMPRICH",
- #     [21] "PEK",
- #     [22] "POPEL",
- #     [23] "PSME",
- #     [24] "RUR",
- #     [25] "RVASICEK",
- #     [26] "SARFY",
- #     [27] "SEIDLJAN",
- #     [28] "SKIM",
- #     [29] "SMRZ",
- #     [30] "STRAKA",
- #     [31] "TKR",
- #     [32] "TRIPIE",
- #     [33] "TYNOVSKY",
- #     [34] "VARISD",
- #     [35] "VASEKD",
- #     [36] "YENYA",
- #     [37] "ZABA",
- #     [38] "ZEMAN",
- #     [39] "ZOUL"
+ #     [1]  "CONTYK",
+ #     [2]  "DANIELR",
+ #     [3]  "DANPEDER",
+ #     [4]  "DOUGLISH",
+ #     [5]  "HIHIK",
+ #     [6]  "HOLCAPEK",
+ #     [7]  "HPA",
+ #     [8]  "JANPAZ",
+ #     [9]  "JANPOM",
+ #     [10]  "JENDA",
+ #     [11] "JIRA",
+ #     [12] "JSPICAK",
+ #     [13] "KLE",
+ #     [14] "KOLCON",
+ #     [15] "MAJLIS",
+ #     [16] "MICHALS",
+ #     [17] "MILSO",
+ #     [18] "MJFO",
+ #     [19] "PAJAS",
+ #     [20] "PASKY",
+ #     [21] "PCIMPRICH",
+ #     [22] "PEK",
+ #     [23] "POPEL",
+ #     [24] "PSME",
+ #     [25] "RUR",
+ #     [26] "RVASICEK",
+ #     [27] "SARFY",
+ #     [28] "SEIDLJAN",
+ #     [29] "SKIM",
+ #     [30] "SMRZ",
+ #     [31] "STRAKA",
+ #     [32] "TKR",
+ #     [33] "TRIPIE",
+ #     [34] "TYNOVSKY",
+ #     [35] "VARISD",
+ #     [36] "VASEKD",
+ #     [37] "YENYA",
+ #     [38] "ZABA",
+ #     [39] "ZEMAN",
+ #     [40] "ZOUL"
  # ]
 
 =head1 DEPENDENCIES
@@ -180,6 +182,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.28
 
 =cut

@@ -18,4 +18,4 @@ my @modules;
 _find_modules(realpath(catfile($Bin, updir, 'lib')), \@modules, \@exclude);
 @modules = sort @modules;
 plan tests => scalar @modules;
-pod_coverage_ok($_) foreach @modules;
+pod_coverage_ok($_, { trustme => [qr/^trim$/] }) foreach @modules;

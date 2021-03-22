@@ -238,15 +238,16 @@ folder name is not a full path, it is the last folder in the path.
 
 =item L<App::Followme::ConvertPage>
 
-This module changes Markdown files to html files. Markdown format is described
-at:
+This module changes text files to html files. By default the text files are
+in Markdown format, though other converters can be used. Markdown format is 
+described at:
 
     http://daringfireball.net/projects/markdown/
 
 It builds several variables and substitutes them into the page template. The
 most significant variable is body, which is the contents of the text file
-after it has been converted by Markdown. The title is built from the title of
-the Markdown file if one is put at the top of the file. If the file has no
+after it has been converted to html. The title is built from the title of
+the file if one is put at the top of the file. If the file has no
 title, it is built from the file name, replacing dashes with blanks and
 capitalizing each word, The url and absolute_url are built from the html file
 name. To change the look of the html page, edit the page template. Only blocks

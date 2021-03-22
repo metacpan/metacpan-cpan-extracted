@@ -15,7 +15,7 @@
 
 
 package DIME::Payload;
-$DIME::Payload::VERSION = '0.04';
+$DIME::Payload::VERSION = '0.05';
 use 5.008;
 use strict;
 use warnings;

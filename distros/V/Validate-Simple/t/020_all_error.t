@@ -35,7 +35,9 @@ my @tests = (
         },
         params => [
             [ { arr => 'text' },    [ '/arr' ] ],
+            [ { arr => [] },        [ '/arr' ] ],
             [ { arr => [ 1, '' ] }, [ '/arr/1' ] ],
+            [ { arr => [ '', 1 ] }, [ '/arr/0' ] ],
         ],
     },
     {
@@ -49,8 +51,13 @@ my @tests = (
             },
         },
         params => [
-            [ { hash => 'text' },    [ '/hash' ] ],
-            [ { hash => { 1 => 2, 'key' => '' } }, [ '/hash/key' ] ],
+            [ { hash => 'text' }, [ '/hash' ] ],
+            [ { hash => {} },     [ '/hash' ] ],
+            [ { hash => {
+                1 => 2,
+                'foo' => '',
+                'bar' => [],
+            } }, [ '/hash/foo', '/hash/bar' ] ],
         ],
     },
     {
@@ -67,8 +74,9 @@ my @tests = (
             },
         },
         params => [
-            [ { arr => 'text' },    [ '/arr' ] ],
-            [ { arr => [ 1, 2 ] }, [ '/arr/0', '/arr/1' ] ],
+            [ { arr => 'text' },        [ '/arr' ] ],
+            [ { arr => [ 1, 2 ] },      [ '/arr/0', '/arr/1' ] ],
+            [ { arr => [ 1, [ 1 ], [] ] }, [ '/arr/0', '/arr/2' ] ],
             [ { arr => [ [ 0 ], [ 1, '', {} ] ] }, [ '/arr/1/1', '/arr/1/2' ] ],
             [ { arr => [ { 0 => 0 }, [ 1, '', {} ] ] }, [ '/arr/0', '/arr/1/1', '/arr/1/2' ] ],
         ],
@@ -110,7 +118,7 @@ my @tests = (
             [ { hash => 'text' }, [ '/hash' ] ],
             [ { hash => [ 1, 2 ] }, [ '/hash' ] ],
             [ { hash => { key => { 2 => 3, foo => 'bar' } } }, [ '/hash/key/foo' ] ],
-            [ { hash => { key => {}, foo => { 1 => 2 }, bar => { 3 => 4 } } }, [ '/hash/key' ] ],
+            [ { hash => { foo => {}, bar => [ 1 ], k1 => { 1 => 2 }, k2 => { 3 => 4 } } }, [ '/hash/foo', '/hash/bar' ] ],
         ],
     },
     {

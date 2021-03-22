@@ -17,11 +17,11 @@ my $done2 = AnyEvent->condvar;
 my $uri = start_server(
   message => sub {
     my $opt = { @_ };
-    
+
     return if !$opt->{frame}->is_text && !$opt->{frame}->is_binary;
-    
+
     $opt->{hdl}->push_write($opt->{frame}->new(buffer => $opt->{message}, max_payload_size => 0 )->to_bytes);
-    
+
   },
   end => sub {
     $finished = 1;

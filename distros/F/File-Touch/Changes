@@ -1,5 +1,26 @@
 Revision history for Perl module File::Touch
 
+0.12 2021-03-20 NEILB
+    - Fix for RT#128243, where touching a file in close succession wouldn't
+      register the second one for make & other purposes, on systems that
+      have finer granularity than seconds. Thanks to Slaven Rezic for
+      the suggested fix.
+    - Improved opening paragraphs of the DESCRIPTION, including a suggestion
+      to always require 0.12 or higher.
+
+0.11_03 2021-03-18 NEILB
+    - Time::HiRes doesn't provide utime() on Windows, so now we try and
+      load Time::HiRes in a BEGIN block, and only enforce the min version
+      if it loaded ok.
+
+0.11_02 2021-03-18 NEILB
+    - Looks like I should have specified a min version of
+      Time::HiRes. Was getting some fails from CPAN Testers,
+      about utime() not being available.
+
+0.11_01 2021-03-17 NEILB
+    - Try Slaven's suggested fix for RT#128243
+
 0.11 2016-11-26 NEILB
     - Document when reference gras the timestamps, and give example.
       Thanks to SMYLERS for the PR with this.

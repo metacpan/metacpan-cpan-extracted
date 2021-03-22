@@ -84,6 +84,6 @@
          "web" : "https://git.deguest.jp/jack/Apache2-SSI"
       }
    },
-   "version" : "v0.2.2",
+   "version" : "v0.2.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

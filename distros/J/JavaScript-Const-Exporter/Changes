@@ -1,5 +1,9 @@
 Revision history for JavaScript-Const-Exporter
 
+v0.1.6    2021-03-20 10:11:57+00:00 Europe/London
+  [Tests]
+  - Specify minimum version of Test::Deep, GH #1.
+
 v0.1.5    2021-03-13 11:58:48+00:00 Europe/London
   [Documentation]
   - Document issue with Const::Exporter v1.0.0 or earlier.

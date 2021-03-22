@@ -1,9 +1,9 @@
 package Sah::PSchema::perl::modname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-26'; # DATE
+our $DATE = '2021-03-20'; # DATE
 our $DIST = 'Sah-PSchemas-Perl'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use strict;
 use warnings;
@@ -18,15 +18,31 @@ sub meta {
                 schema => 'perl::modname*',
                 default => '',
             },
+            ns_prefixes => {
+                schema => 'perl::modname*',
+            },
+            complete_recurse => {
+                summary => 'Whether completion should recurse',
+                schema => 'bool*',
+            },
+        },
+        args_rels => {
+            choose_one => [qw/ns_prefix ns_prefixes/],
         },
     };
 }
 
 sub get_schema {
+    require Sah::Schema::perl::modname; # for scan_prereqs
+
     my ($class, $args, $merge) = @_;
 
     return ['perl::modname', {
-        'x.completion' => ['perl_modname' => {ns_prefix=>$args->{ns_prefix}}],
+        'x.completion' => ['perl_modname' => {
+            ($args->{ns_prefixes} ? (ns_prefixes => $args->{ns_prefixes}) : (ns_prefix => $args->{ns_prefix})),
+            recurse=>$args->{complete_recurse},
+            recurse_matching=>'all-at-once',
+        }],
         %{ $merge || {} },
     }, {}];
 }
@@ -46,7 +62,7 @@ Sah::PSchema::perl::modname - Perl module name (parameterized)
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::PSchema::perl::modname (from Perl distribution Sah-PSchemas-Perl), released on 2021-01-26.
+This document describes version 0.008 of Sah::PSchema::perl::modname (from Perl distribution Sah-PSchemas-Perl), released on 2021-03-20.
 
 =head1 DESCRIPTION
 

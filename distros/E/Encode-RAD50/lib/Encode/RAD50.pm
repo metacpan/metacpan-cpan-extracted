@@ -71,7 +71,7 @@ use warnings;
 
 use parent qw{ Encode::Encoding };
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Carp;
 use Encode qw{:fallback_all};
@@ -151,7 +151,6 @@ sub decode {		## no critic (RequireArgUnpacking)
     }
     return $out;
 }
-
 
 =item $octets = $object->encode ($string, $check)
 
@@ -236,8 +235,9 @@ if the backslash is an invalid character. Requests for these fallback
 modes will be ignored, and the replacement character inserted.
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-Encode-RAD50/issues>, or in electronic
-mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-RAD50>,
+L<https://github.com/trwyant/perl-Encode-RAD50/issues>, or in
+electronic mail to the author.
 
 =head1 SEE ALSO
 

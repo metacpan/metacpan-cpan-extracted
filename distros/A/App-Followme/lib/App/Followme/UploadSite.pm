@@ -8,13 +8,12 @@ use lib '../..';
 
 use base qw(App::Followme::Module);
 
-use Cwd;
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile catdir);
 
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 use constant SEED => 96;
 
@@ -48,7 +47,6 @@ sub run {
     $self->{upload}->open($user, $pass);
 
     eval {
-        my $old_directory = getcwd();
         chdir($self->{top_directory})
             or die "Can't cd to $self->{top_directory}";
 
@@ -56,7 +54,7 @@ sub run {
         $self->clean_files($hash, $local);
         $self->{upload}->close();
 
-        chdir($old_directory);
+        chdir($folder);
     };
 
     my $error = $@;
@@ -239,7 +237,7 @@ sub rewrite_base_tag {
 # Initialize the configuration parameters
 
 sub setup {
-    my ($self, %configuration) = @_;
+    my ($self) = @_;
 
     # Turn off messages when in quick mode
     $self->{verbose} = 0 if $self->{quick_mode};

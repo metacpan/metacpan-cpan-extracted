@@ -28,6 +28,7 @@ script/complete-float
 script/complete-gid
 script/complete-group
 script/complete-hash-key
+script/complete-idx-listed-stock-code
 script/complete-int
 script/complete-kernel
 script/complete-known-host

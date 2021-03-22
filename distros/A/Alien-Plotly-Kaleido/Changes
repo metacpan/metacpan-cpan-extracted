@@ -1,5 +1,9 @@
 Revision history of Alien-Plotly-Kaleido
 
+0.002       2021-03-20
+    - Use Kaleido version 0.2.1
+    - Fix MacOS installation. Thanks Carlos D. Álvaro!
+
 0.001       2020-10-03
     - First release.
 

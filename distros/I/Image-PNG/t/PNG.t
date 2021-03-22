@@ -7,13 +7,12 @@ use utf8;
 use FindBin '$Bin';
 use Test::More;
 
-# Set up outputs to not print wide character warnings (this is for
-# debugging this file, not for the end-user's benefit).
-
 my $builder = Test::More->builder;
-binmode $builder->output,         ":utf8";
-binmode $builder->failure_output, ":utf8";
-binmode $builder->todo_output,    ":utf8";
+binmode $builder->output,         ":encoding(utf8)";
+binmode $builder->failure_output, ":encoding(utf8)";
+binmode $builder->todo_output,    ":encoding(utf8)";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
 
 use Image::PNG;
 

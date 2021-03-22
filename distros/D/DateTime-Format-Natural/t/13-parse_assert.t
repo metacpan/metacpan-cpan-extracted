@@ -5,7 +5,7 @@ use warnings;
 use boolean qw(true false);
 
 use DateTime::Format::Natural;
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 {
     # Assert for prefixed dates that an extracted unit which is
@@ -114,4 +114,11 @@ use Test::More tests => 17;
     my $parser = DateTime::Format::Natural->new(format => 'd/m/y');
     $parser->parse_datetime('8/10');
     ok(!$parser->success, 'parsing month/day with an explicit ymd-format failed');
+}
+
+{
+    # Assert that error() returns '' on success.
+    my $parser = DateTime::Format::Natural->new;
+    $parser->parse_datetime('now'); # success
+    is($parser->error, '', "error() returns '' on success");
 }

@@ -117,7 +117,7 @@ foreach my $alg (@hash_alg) {
         ok( $verify_response =~ m/^OK/, "ECDSA Response is verified using xmlsec1" )
             or warn "calling xmlsec1 failed: '$verify_response'\n";
         if ($verify_response =~ m/^OK/) {
-         #   unlink 't/tmp.xml';
+            unlink 't/tmp.xml';
         } else{
             print $signed;
             die;

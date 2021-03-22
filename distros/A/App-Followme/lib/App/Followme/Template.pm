@@ -13,7 +13,7 @@ use App::Followme::Web;
 
 use base qw(App::Followme::ConfiguredObject);
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 use constant COMMAND_START => '<!-- ';
 use constant COMMAND_END => '-->';
@@ -154,7 +154,7 @@ sub parse_command {
 # Set the regular expression patterns used to match a command
 
 sub setup {
-    my ($self, %configuration) = @_;
+    my ($self) = @_;
 
     $self->{command_start_pattern} = '^\s*' . quotemeta(COMMAND_START);
     $self->{command_end_pattern} = '\s*' . quotemeta(COMMAND_END) . '\s*$';

@@ -1,5 +1,8 @@
 Revision history for PomBase-Chobo
 
+0.033     2021-03-19 16:06:08
+          Don't load obsolete relation terms
+
 0.032     2020-12-26 20:32:43
           Filter alt_ids from the definition xrefs to avoid
           duplicate key violations 

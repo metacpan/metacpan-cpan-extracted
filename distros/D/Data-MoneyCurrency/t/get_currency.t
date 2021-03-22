@@ -1,10 +1,13 @@
 use strict;
 use warnings;
+use lib 'lib';
 use utf8;
-use Test::More;
-use Test::Exception;
-use Data::MoneyCurrency qw(get_currency);
+use feature qw(say);
 use Data::Dumper;
+use Test::Exception;
+use Test::More;
+
+use Data::MoneyCurrency qw(get_currency);
 
 binmode STDOUT, ":encoding(UTF-8)";
 binmode STDERR, ":encoding(UTF-8)";

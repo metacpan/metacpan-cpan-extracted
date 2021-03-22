@@ -3,25 +3,27 @@
 use strict;
 use warnings;
 
-use Test::More tests => 3;
+use Test::More;
 
-sub _lines2re
-{
-    return join( qq#\r?\n#, @_ ) . qq#\r?\n?#;
-}
+use IPC::Run3 qw(run3);
 
-sub test_sort
-{
+sub test_sort {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    my ($args) = @_;
+    my( $args ) = @_;
 
-    my $re = _lines2re( @{ $args->{lines} } );
-    return like(
-        scalar(`"$^X" -Ilib bin/sort @{$args->{flags}} @{$args->{files}}`),
-        qr#\A$re\z#ms, $args->{blurb} );
-}
+	subtest $args->{blurb} => sub {
+		run3(
+			[ $^X, 'bin/sort', @{$args->{flags}}, @{$args->{files}} ],
+			undef, \my @output
+			);
+		is( $? >> 8, 0, 'Successful exit code' );
 
-# TEST
+		@output = map { s/[\r\n]+//; $_ } @output;
+
+		is_deeply( \@output, $args->{lines}, "Output for <$args->{blurb}> is sorted" );
+		};
+	}
+
 test_sort(
     {
         blurb => "letters sort",
@@ -31,7 +33,6 @@ test_sort(
     }
 );
 
-# TEST
 test_sort(
     {
         blurb => "integers sort",
@@ -41,7 +42,6 @@ test_sort(
     }
 );
 
-# TEST
 test_sort(
     {
         blurb => "multiple -k sort",
@@ -60,11 +60,54 @@ EOF
     }
 );
 
-__END__
+
+subtest sort_stdin => sub {
+	$ENV{TMPDIR} ||= '.';
+	my @letters = qw(a b c d);
+	my $input = join "\n", reverse qw(a b c d);
+
+	run3(
+		[$^X, 'bin/sort', '-' ],
+		\$input, \my @output, \my $error
+		);
+
+	@output = map { s/[\r\n]+//; $_ } @output;
+
+	is_deeply( \@letters, \@output );
+	};
+
+
+subtest is_sorted => sub {
+	$ENV{TMPDIR} ||= '.';
+	my @letters = qw(a b c d);
+	my $input = join "\n", qw(a b c d);
+
+	run3(
+		[$^X, 'bin/sort', '-c', '-' ],
+		\$input, \my @output, \my $error
+		);
+
+	is( $? >> 8, 0, "sorted list exits with 0" );
+	};
+
+subtest is_not_sorted => sub {
+	$ENV{TMPDIR} ||= '.';
+	my @letters = qw(a b c d);
+	my $input = join "\n", qw(b a d);
+
+	run3(
+		[$^X, 'bin/sort', '-c', '-' ],
+		\$input, \my @output, \my $error
+		);
+
+	is( $? >> 8, 1, "unsorted list exits with 1" );
+	};
+
+done_testing();
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2018 by Shlomi Fish
+Portions Copyright 2018 by Shlomi Fish
 
 This code is licensed under the Artistic License 2.0
 L<https://opensource.org/licenses/Artistic-2.0>, or at your option any later

@@ -6,6 +6,10 @@ INSTALL
 lib/Perl/Metrics/Simple.pm
 lib/Perl/Metrics/Simple/Analysis.pm
 lib/Perl/Metrics/Simple/Analysis/File.pm
+lib/Perl/Metrics/Simple/Output.pm
+lib/Perl/Metrics/Simple/Output/HTML.pm
+lib/Perl/Metrics/Simple/Output/JSON.pm
+lib/Perl/Metrics/Simple/Output/PlainText.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -13,11 +17,16 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
+t/000_compile.t
 t/001_load.t
 t/0020_find_files.t
 t/0030_analyze.t
 t/0040_statistics.t
 t/0050_file.t
+t/0100_output.t
+t/0100_output_html.t
+t/0100_output_json.t
+t/0100_output_plain.t
 t/0901_pod.t
 t/0902_pod_coverage.t
 t/lib/Perl/Metrics/Simple/TestData.pm

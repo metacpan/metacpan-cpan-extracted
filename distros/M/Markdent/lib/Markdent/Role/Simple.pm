@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Encode qw( decode );
 use Markdent::Parser;
@@ -71,12 +71,11 @@ Markdent::Role::Simple - A role for simple markdown to html converter classes
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 
-This role implements behavior shared by all simple markdown to html
-converters.
+This role implements behavior shared by all simple markdown to html converters.
 
 =head1 REQUIRED METHODS
 

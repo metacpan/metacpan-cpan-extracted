@@ -21,7 +21,7 @@ websocket '/count/:num' => sub {
 
   my $max = $self->param('num');
   my $counter = 1;
-  
+
   $self->on(message => sub {
    my($self, $payload) = @_;
      note "send $counter";

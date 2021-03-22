@@ -1,5 +1,10 @@
 Revision history for Perl extension App::Followme
 
+2.01 2021-03-19T21:50:49Z
+    - Replace MarkdownData with TextData, which generalizes it
+    - All tests initialize top_directory and base_directory before running
+    - Small changes to documentation
+
 2.00 2021-03-05T12:45:20Z
     - Revised test of format_date to be locale independent
     - Removed help directory from initial install and its tests in ZFunctional.t

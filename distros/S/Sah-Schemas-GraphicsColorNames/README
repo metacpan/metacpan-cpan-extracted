@@ -3,9 +3,9 @@ NAME
     Graphics::ColorNames
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.004 of
     Sah::Schemas::GraphicsColorNames (from Perl distribution
-    Sah-Schemas-GraphicsColorNames), released on 2021-01-20.
+    Sah-Schemas-GraphicsColorNames), released on 2021-03-20.
 
 HOMEPAGE
     Please visit the project's homepage at

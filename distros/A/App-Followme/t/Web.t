@@ -3,7 +3,6 @@ use strict;
 
 use Test::More tests => 27;
 
-use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -25,9 +24,7 @@ my $test_dir = catdir(@path, 'test');
 rmtree($test_dir);
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-
 chdir $test_dir or die $!;
-$test_dir = cwd();
 
 #----------------------------------------------------------------------
 # Test web_is_tag

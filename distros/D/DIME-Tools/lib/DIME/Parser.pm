@@ -14,7 +14,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307
 
 package DIME::Parser;
-$DIME::Parser::VERSION = '0.04';
+$DIME::Parser::VERSION = '0.05';
 use 5.008;
 use strict;
 use warnings;

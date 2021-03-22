@@ -29,12 +29,20 @@
             "Test2::V0" : "0"
          }
       },
+      "configure" : {
+         "requires" : {
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Exporter" : "0",
             "File::Spec" : "0",
             "constant" : "0",
+            "if" : "0",
             "perl" : "5.008001",
             "strict" : "0",
             "warnings" : "0"
@@ -44,14 +52,14 @@
    "provides" : {
       "File::Symlink::Relative" : {
          "file" : "lib/File/Symlink/Relative.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-File-Symlink-Relative/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=File-Symlink-Relative"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -62,6 +70,6 @@
          "web" : "https://github.com/trwyant/perl-File-Symlink-Relative"
       }
    },
-   "version" : "0.003",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.004",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

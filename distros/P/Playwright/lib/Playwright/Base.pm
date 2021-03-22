@@ -1,5 +1,5 @@
 package Playwright::Base;
-$Playwright::Base::VERSION = '0.003';
+$Playwright::Base::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -47,6 +47,9 @@ sub _coerce ( $spec, %args ) {
             $args{args}[$i] = $truthy ? JSON::true : JSON::false;
         }
         elsif ( $type->{name} eq 'Object' ) {
+            $type->{properties} =
+              Playwright::Util::arr2hash( $type->{properties}, 'name' )
+              if ref $type->{properties} eq 'ARRAY';
             foreach my $prop ( keys( %{ $type->{properties} } ) ) {
                 next unless exists $arg->{$prop};
                 my $truthy = int( !!$arg->{$prop} );
@@ -104,7 +107,7 @@ Playwright::Base - Object representing Playwright pages
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head2 DESCRIPTION
 

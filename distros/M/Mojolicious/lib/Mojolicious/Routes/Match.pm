@@ -13,21 +13,21 @@ sub path_for {
   my ($self, $name, %values) = (shift, Mojo::Util::_options(@_));
 
   # Current route
-  my $route;
-  if (!$name || $name eq 'current') { return {} unless $route = $self->endpoint }
+  my ($route, $current) = (undef, !$name || $name eq 'current');
+  if ($current) { return {} unless $route = $self->endpoint }
 
   # Find endpoint
   else { return {path => $name} unless $route = $self->root->lookup($name) }
 
   # Merge values (clear format)
-  my $captures = $self->stack->[-1] // {};
-  %values = (%$captures, format => undef, %values);
-  my $pattern = $route->pattern;
-  $values{format} //= defined $captures->{format} ? $captures->{format} : $pattern->defaults->{format}
-    if $pattern->constraints->{format};
+  my $captures    = $self->stack->[-1] // {};
+  my %merged      = (%$captures, format => undef, %values);
+  my $pattern     = $route->pattern;
+  my $constraints = $pattern->constraints;
+  $merged{format} = ($current ? $captures->{format} : undef) // $pattern->defaults->{format}
+    if !exists $values{format} && $constraints->{format} && $constraints->{format} ne '1';
 
-  my $path = $route->render(\%values);
-  return {path => $path, websocket => $route->has_websocket};
+  return {path => $route->render(\%merged), websocket => $route->has_websocket};
 }
 
 sub _match {

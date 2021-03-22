@@ -1,5 +1,5 @@
 package File::Touch;
-$File::Touch::VERSION = '0.11';
+$File::Touch::VERSION = '0.12';
 use 5.006;
 use warnings;
 use strict;
@@ -12,6 +12,16 @@ use Carp;
 use IO::File;
 use File::stat;
 use Fcntl;
+
+BEGIN {
+    eval {
+        require Time::HiRes;
+        Time::HiRes->import(qw/ time utime /);
+    };
+    if (not $@) {
+        Time::HiRes->VERSION(1.9764);
+    }
+}
 
 my $SYSOPEN_MODE = O_WRONLY|O_CREAT;
 eval {
@@ -142,7 +152,7 @@ File::Touch - update file access and modification times, optionally creating fil
 
 =head1 SYNOPSIS
 
- use File::Touch;
+ use File::Touch 0.12;
  @file_list = ('one.txt','../two.doc');
  $count = touch(@file_list);
 
@@ -157,7 +167,16 @@ File::Touch - update file access and modification times, optionally creating fil
 
 =head1 DESCRIPTION
 
-Here's a list of arguments that can be used with the object-oriented contruction:
+This module provides both a functional and OO interface
+for changing the file access and modification times on files.
+It can optionally create the file for you, if it doesn't exist.
+
+B<Note>: you should specify a minimum version of 0.12,
+as per the SYNOPSIS, as that fixed an issue that affected
+systems that have sub-second granularity on those file times.
+
+Here's a list of arguments that can be used with the
+object-oriented contruction:
 
 =over 4
 
@@ -175,23 +194,28 @@ If nonzero, do not create new files. Default is zero.
 
 =item reference => $reference_file
 
-If defined, use timestamps from this file instead of current time. The timestamps are read
-from the reference file when the object is created, not when C<<->touch>> is invoked.
+If defined, use timestamps from this file instead of current time.
+The timestamps are read from the reference file when the object is created,
+not when C<<->touch>> is invoked.
 Default is undefined.
 
 =item time => $time
 
-If defined, then this value will be used for both access time and modification time,
-whichever of those are set. This time is overridden by the C<atime> and C<mtime> arguments,
+If defined,
+then this value will be used for both access time and modification time,
+whichever of those are set.
+This time is overridden by the C<atime> and C<mtime> arguments,
 if you use them.
 
 =item atime => $time
 
-If defined, use this time (in epoch seconds) instead of current time for access time.
+If defined,
+use this time (in epoch seconds) instead of current time for access time.
 
 =item mtime => $time
 
-If defined, use this time (in epoch seconds) instead of current time for modification time.
+If defined,
+use this time (in epoch seconds) instead of current time for modification time.
 
 =back
 

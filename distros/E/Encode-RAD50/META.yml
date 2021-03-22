@@ -4,6 +4,11 @@ author:
   - 'Tom Wyant (wyant at cpan dot org)'
 build_requires:
   Test::More: '0.88'
+configure_requires:
+  Config: '0'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,7 +24,7 @@ no_index:
 provides:
   Encode::RAD50:
     file: lib/Encode/RAD50.pm
-    version: '0.015'
+    version: '0.016'
 requires:
   Carp: '0'
   Encode: '0'
@@ -30,8 +35,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-Encode-RAD50/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-RAD50
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Encode-RAD50.git
-version: '0.015'
+version: '0.016'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

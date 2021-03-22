@@ -4,8 +4,8 @@
 #
 package PDL::GSLSF::EXPINT;
 
-@EXPORT_OK  = qw( PDL::PP gsl_sf_expint_E1 PDL::PP gsl_sf_expint_E2 PDL::PP gsl_sf_expint_Ei PDL::PP gsl_sf_Shi PDL::PP gsl_sf_Chi PDL::PP gsl_sf_expint_3 PDL::PP gsl_sf_Si PDL::PP gsl_sf_Ci PDL::PP gsl_sf_atanint );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw( PDL::PP gsl_sf_expint_E1 PDL::PP gsl_sf_expint_E2 PDL::PP gsl_sf_expint_Ei PDL::PP gsl_sf_Shi PDL::PP gsl_sf_Chi PDL::PP gsl_sf_expint_3 PDL::PP gsl_sf_Si PDL::PP gsl_sf_Ci PDL::PP gsl_sf_atanint );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::EXPINT ;
 

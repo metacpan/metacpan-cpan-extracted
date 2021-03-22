@@ -1,0 +1,14 @@
+.travis.yml
+Changes
+cpanfile
+lib/Math/LinearApprox.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/1-basic.t
+t/2-oo.t
+t/3-args.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

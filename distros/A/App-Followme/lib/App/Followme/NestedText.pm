@@ -6,7 +6,7 @@ use warnings;
 use integer;
 use lib '../..';
 
-our $VERSION = "2.00";
+our $VERSION = "2.01";
 
 use App::Followme::FIO;
 

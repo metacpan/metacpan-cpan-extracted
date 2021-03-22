@@ -1,4 +1,10 @@
 Revision history for Alien-Build-Plugin-PkgConfig-PPWrapper
 
+0.03      2021-03-20
+  - Ensure version is increased this time
+
+0.02      2021-03-20
+  - Remove Data::Dump from prereqs
+
 0.01      2020-03-09
   - initial version, modified from Alien-Build-Plugin-Cleanse-BuildDir

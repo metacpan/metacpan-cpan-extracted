@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.530';
+our $VERSION = '0.531';
 use Exporter 'import';
 our @EXPORT_OK = qw( fill_form read_line );
 
@@ -58,20 +58,22 @@ sub _valid_options {
     my ( $caller ) = @_;
     if ( $caller eq 'new' ) {
         return {
-            clear_screen     => '[ 0 1 2 ]',
-            codepage_mapping => '[ 0 1 ]',
-            show_context     => '[ 0 1 ]',
-            auto_up          => '[ 0 1 2 ]',
-            color            => '[ 0 1 2 ]',     # hide_cursor == 2 # documentation
-            hide_cursor      => '[ 0 1 2 ]',
-            no_echo          => '[ 0 1 2 ]',
-            read_only        => 'Array_Int',
-            back             => 'Str',
-            confirm          => 'Str',
-            default          => 'Str',
-            extra            => 'Str', # experimental
-            info             => 'Str',
-            prompt           => 'Str',
+            clear_screen       => '[ 0 1 2 ]',
+            codepage_mapping   => '[ 0 1 ]',
+            show_context       => '[ 0 1 ]',
+            auto_up            => '[ 0 1 2 ]',
+            color              => '[ 0 1 2 ]',     # hide_cursor == 2 # documentation
+            hide_cursor        => '[ 0 1 2 ]',
+            no_echo            => '[ 0 1 2 ]',
+            read_only          => 'Array_Int',
+            section_separators => 'Array_Int', # experimental
+                                               # uses only the key, a passed value is ignored
+                                               # it's up to the user to remove the section separators from the returned array
+            back               => 'Str',
+            confirm            => 'Str',
+            default            => 'Str',
+            info               => 'Str',
+            prompt             => 'Str',
         };
     }
     if ( $caller eq 'readline' ) {
@@ -88,17 +90,17 @@ sub _valid_options {
     }
     if ( $caller eq 'fill_form' ) {
         return {
-            clear_screen     => '[ 0 1 2 ]',
-            codepage_mapping => '[ 0 1 ]',
-            auto_up          => '[ 0 1 2 ]',
-            color            => '[ 0 1 2 ]',
-            hide_cursor      => '[ 0 1 2 ]',
-            read_only        => 'Array_Int',
-            back             => 'Str',
-            confirm          => 'Str',
-            extra            => 'Str', # experimental
-            info             => 'Str',
-            prompt           => 'Str',
+            clear_screen       => '[ 0 1 2 ]',
+            codepage_mapping   => '[ 0 1 ]',
+            auto_up            => '[ 0 1 2 ]',
+            color              => '[ 0 1 2 ]',
+            hide_cursor        => '[ 0 1 2 ]',
+            read_only          => 'Array_Int',
+            section_separators => 'Array_Int',
+            back               => 'Str',
+            confirm            => 'Str',
+            info               => 'Str',
+            prompt             => 'Str',
         };
     }
 }
@@ -106,20 +108,20 @@ sub _valid_options {
 
 sub _defaults {
     return {
-        auto_up          => 0,
-        back             => '   BACK',
-        clear_screen     => 0,
-        codepage_mapping => 0,
-        color            => 0,
-        confirm          => 'CONFIRM',
-        default          => '',
-        extra            => '', # experimental
-        hide_cursor      => 1,
-        info             => '',
-        no_echo          => 0,
-        prompt           => '',
-        read_only        => [],
-        show_context     => 0,
+        auto_up            => 0,
+        back               => '   BACK',
+        clear_screen       => 0,
+        codepage_mapping   => 0,
+        color              => 0,
+        confirm            => 'CONFIRM',
+        default            => '',
+        hide_cursor        => 1,
+        info               => '',
+        no_echo            => 0,
+        prompt             => '',
+        read_only          => [],
+        section_separators => [],
+        show_context       => 0,
     };
 }
 
@@ -792,17 +794,18 @@ sub __unicode_trim {
 
 sub __length_longest_key {
     my ( $self, $list ) = @_;
-    my $len = []; #
     my $longest = 0;
     for my $i ( 0 .. $#$list ) {
-        $len->[$i] = print_columns( $list->[$i][0] );
         if ( $i < @{$self->{i}{pre}} ) {
             next;
         }
-        $longest = $len->[$i] if $len->[$i] > $longest;
+        if ( any { $_ == $i } @{$self->{i}{section_separators}} ) {
+            next;
+        }
+        my $len = print_columns( $list->[$i][0] );
+        $longest = $len if $len > $longest;
     }
     $self->{i}{max_key_w} = $longest;
-    $self->{i}{key_w} = $len;
 }
 
 
@@ -870,10 +873,40 @@ sub __print_current_row {
 }
 
 
+sub __get_row_section_separator {
+    my ( $self, $list, $idx ) = @_;
+    my $remainder = '';
+    my $val = '';
+    ( $self->{i}{keys}[$idx], $remainder ) = cut_to_printwidth( $list->[$idx][0], $self->{i}{max_key_w}, 1 );
+    if ( length $remainder ) {
+        ( $self->{i}{seps}[$idx], $remainder ) = cut_to_printwidth( $remainder, 2, 1 );
+        if ( length $remainder ) {
+            $val = cut_to_printwidth( $remainder, $self->{i}{avail_w}, 0 );
+        }
+    }
+    if ( ! length $self->{i}{seps}[$idx] ) {
+        $self->{i}{seps}[$idx] = '  ';
+    }
+    elsif ( length $self->{i}{seps}[$idx] == 1 ) {
+        $self->{i}{seps}[$idx] .= ' ';
+    }
+    my $row = $self->{i}{keys}[$idx] . $self->{i}{seps}[$idx] . $val;
+    if ( exists $self->{i}{key_colors} && @{$self->{i}{key_colors}[$idx]} ) {
+        my @key_colors = @{$self->{i}{key_colors}[$idx]};
+        $row =~ s/\x{feff}/shift @key_colors/ge;
+        $row .= normal();
+    }
+    return $row;
+}
+
+
 sub __get_row {
     my ( $self, $list, $idx ) = @_;
     if ( $idx < @{$self->{i}{pre}} ) {
         return $list->[$idx][0];
+    }
+    if ( any { $_ == $idx } @{$self->{i}{section_separators}} ) {
+        return $self->__get_row_section_separator( $list, $idx );
     }
     if ( ! defined $self->{i}{keys}[$idx] ) {
         my $key = $list->[$idx][0];
@@ -962,12 +995,10 @@ sub __write_first_screen {
     $self->__write_screen( $list );
 }
 
+
 sub __prepare_meta_menu_elements {
     my ( $self, $term_w ) = @_;
     my @meta_menu_elements = ( 'back', 'confirm' );
-    if ( defined $self->{extra} && length $self->{extra} ) {
-        unshift @meta_menu_elements, 'extra';
-    }
     $self->{i}{pre} = [];
     for my $meta_menu_element ( @meta_menu_elements ) {
         my @color;
@@ -1032,13 +1063,23 @@ sub fill_form {
     };
     $self->__init_term();
     my ( $term_w, $term_h ) = get_term_size();
-    $self->{i}{extra_orig}   = $self->{extra};
     $self->{i}{back_orig}    = $self->{back};
     $self->{i}{confirm_orig} = $self->{confirm};
     $self->__prepare_meta_menu_elements( $term_w );
     $self->{i}{read_only} = [];
     if ( @{$self->{read_only}} ) {
         $self->{i}{read_only} = [ map { $_ + @{$self->{i}{pre}} } @{$self->{read_only}} ];
+    }
+    $self->{i}{section_separators} = [];
+    if ( @{$self->{section_separators}} ) {
+        $self->{i}{end_down} = $#$orig_list;
+        my $id = -1;
+        if ( $self->{section_separators}[$id] == $#$orig_list ) {
+            while ( $self->{section_separators}[$id] - $self->{section_separators}[--$id] == 1 ) {
+                --$self->{i}{end_down};
+            }
+        }
+        $self->{i}{section_separators} = [ map { $_ + @{$self->{i}{pre}} } @{$self->{section_separators}} ];
     }
     my $list;
     if ( $self->{color} ) {
@@ -1058,9 +1099,6 @@ sub fill_form {
     }
     my $auto_up = $self->{auto_up};
     my $back_row = 0;
-    if ( $self->{extra} ) {
-        $back_row = 1;
-    }
     $self->__length_longest_key( $list );
     $self->__prepare_width( $term_w );
     $self->__prepare_hight( $list, $term_w, $term_h );
@@ -1083,7 +1121,19 @@ sub fill_form {
             }
             $self->__print_current_row( $list, $m );
         }
-        my $char = $self->{plugin}->__get_key_OS();
+        my $char;
+        if ( any { $_ == $self->{i}{curr_row} } @{$self->{i}{section_separators}} ) {
+            if ( $self->{i}{direction} eq 'up' || $self->{i}{curr_row} >= $self->{i}{end_down} ) {
+                $char = VK_UP;
+            }
+            else {
+                $char = VK_DOWN;
+            }
+        }
+        else {
+            $char = $self->{plugin}->__get_key_OS();
+        }
+        $self->{i}{direction} = 'down';
         if ( ! defined $char ) {
             $self->__reset_term();
             carp "EOT: $!";
@@ -1271,10 +1321,6 @@ sub fill_form {
                 $self->__reset_term( $up );
                 return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
             }
-            elsif ( $list->[$self->{i}{curr_row}][0] eq $self->{extra} ) {
-                $self->__reset_term( $up );
-                return -1;
-            }
             if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
                 print up( $up );
                 print "\r" . clear_to_end_of_screen();
@@ -1325,6 +1371,9 @@ sub __reset_previous_row {
     my ( $self, $list, $idx ) = @_;
     print "\r" . clear_to_end_of_line();
     print $self->__get_row( $list, $idx );
+    if ( $self->{i}{curr_row} < $idx ) {
+        $self->{i}{direction} = 'up';
+    }
 }
 
 
@@ -1335,6 +1384,9 @@ sub __print_next_page {
     $self->{i}{end_row}   = $#$list if $self->{i}{end_row} > $#$list;
     print "\r" . clear_to_end_of_screen();
     $self->__write_screen( $list );
+    if ( $self->{i}{curr_row} == $self->{i}{end_row} ) {
+        $self->{i}{direction} = 'up';
+    }
 }
 
 
@@ -1345,6 +1397,9 @@ sub __print_previous_page {
     $self->{i}{begin_row} = 0 if $self->{i}{begin_row} < 0;
     print "\r" . clear_to_end_of_screen();
     $self->__write_screen( $list );
+    if ( $self->{i}{curr_row} > $self->{i}{begin_row} ) {
+        $self->{i}{direction} = 'up';
+    }
 }
 
 
@@ -1365,7 +1420,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.530
+Version 0.531
 
 =cut
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::Event::AutoLink;
 use Markdent::Event::EndStrikethrough;
@@ -142,7 +142,7 @@ Markdent::Dialect::GitHub::SpanParser - Span parser for GitHub Markdown
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 

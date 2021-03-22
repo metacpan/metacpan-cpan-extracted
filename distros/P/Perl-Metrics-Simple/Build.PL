@@ -13,6 +13,7 @@ Module::Build->new(
         'Data::Dumper'              => 0,
         'File::Basename'            => 0,
         'File::Find'                => 1.01,
+        'Getopt::Long'              => 0,
         'IO::File'                  => 1.14,
         'Readonly'                  => 1.03,
         'PPI'                       => 1.113,
@@ -29,13 +30,16 @@ Module::Build->new(
         'File::Spec'          => 0,
         'Module::Build'       => 0.2612,
         'Readonly'            => 1.03,
+        'Test::Compile'       => 0,
         'Test::Pod'           => 1.00,
         'Test::Pod::Coverage' => 1.04,
     },
     script_files => { 'bin/countperl' => 1, },
     add_to_cleanup => [ '*.tar.gz', 'Makefile', 'Makefile.old' ],
     meta_merge     => {
-        resources =>
-            { repository => 'https://github.com/matisse/Perl-Metrics-Simple', },
+        resources => {
+                repository =>  'https://github.com/matisse/Perl-Metrics-Simple',
+                bugtracker =>  'https://github.com/matisse/Perl-Metrics-Simple/issues',
+            },
     },
 )->create_build_script;

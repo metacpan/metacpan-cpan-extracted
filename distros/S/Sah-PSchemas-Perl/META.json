@@ -29,6 +29,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Complete::Module" : "0.262",
+            "Sah::Schema::perl::modname" : "0.035",
+            "Sah::Schema::perl::modname_with_optional_args" : "0.035",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -54,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-PSchemas-Perl"
       }
    },
-   "version" : "0.005",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

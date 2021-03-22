@@ -235,16 +235,37 @@ C<no Sys::Binmode>, thus:
 =item * C<do> and C<require>
 
 =item * File tests (e.g., C<-e>) and the following:
-C<chdir>, C<chmod>, C<chown>, C<chroot>,
+C<chdir>, C<chmod>, C<chown>, C<chroot>, C<ioctl>,
 C<link>, C<lstat>, C<mkdir>, C<open>, C<opendir>, C<readlink>, C<rename>,
 C<rmdir>, C<stat>, C<symlink>, C<sysopen>, C<truncate>,
 C<unlink>, C<utime>
 
-=item * C<bind>, C<connect>, and C<setsockopt>
+=item * C<bind>, C<connect>, C<setsockopt>, and C<send> (last argument)
 
 =item * C<syscall>
 
 =back
+
+=head2 Omissions
+
+=over
+
+=item * C<crypt> already does as Sys::Binmode would make it do.
+
+=item * C<select> (the 4-argument one) has the bug that Sys::Binmode fixes,
+but since it’s a performance-sensitive call where upgraded strings are
+unlikely, this library doesn’t wrap it.
+
+=back
+
+=head1 KNOWN ISSUES
+
+L<autodie> creates functions named, e.g., C<chmod> in the
+namespace of the module that C<import()>s it. Those functions lack
+the compiler “hint” that tells Sys::Binmode to do its work; thus,
+L<autodie “clobbers” Sys::Binmode|https://github.com/pjf/autodie/issues/113>.
+C<CORE::*> functions will still have Sys::Binmode, but of course they won’t
+throw exceptions.
 
 =head1 TODO
 
@@ -266,7 +287,7 @@ Maybe someday!
 
 #----------------------------------------------------------------------
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);

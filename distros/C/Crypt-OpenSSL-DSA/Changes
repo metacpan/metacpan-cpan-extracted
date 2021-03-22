@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt::OpenSSL::DSA.
 
+0.20    2021/03/18
+        - fix #7 Add function to get signature size
+        - fix #8 Allocate buffer for 2048 bit keys
+
 0.19    2017/01/13
         - fix building against openssl 1.1.0 without compat modes (eroen)
 

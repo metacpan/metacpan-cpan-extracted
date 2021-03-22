@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.23
+    version 1.24
 
 SYNOPSIS
 
@@ -140,7 +140,7 @@ GLOBALS
 
      use File::Which qw( which );
      use Shell::Guess;
-    
+     
      my $path = do {
        my $is_power = Shell::Guess->running_shell->is_power;
        local $File::Which::IMPLICIT_CURRENT_DIR = !$is_power;
@@ -179,6 +179,8 @@ SEE ALSO
 
     IPC::Cmd
 
+      Requires Perl 5.8.3. Included as part of the Perl core as of 5.9.5.
+
       This module provides (among other things) a can_run function, which
       is similar to which. It is a much heavier module since it does a lot
       more, and if you use can_run it pulls in ExtUtils::MakeMaker. This
@@ -201,8 +203,13 @@ SEE ALSO
 
     Devel::CheckBin
 
+      Requires Perl 5.8.1.
+
       This module purports to "check that a command is available", but does
       not provide any documentation on how you might use it.
+
+      This module also relies on ExtUtils::MakeMaker so has the same
+      overhead burdens as IPC::Cmd.
 
 AUTHORS
 

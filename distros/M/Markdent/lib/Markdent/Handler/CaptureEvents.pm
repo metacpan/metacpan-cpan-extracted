@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::CapturedEvents;
 use Specio::Declare;
@@ -43,7 +43,7 @@ Markdent::Handler::CaptureEvents - Captures events for replaying later
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 

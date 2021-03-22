@@ -41,7 +41,7 @@ test_case "on_eof of a_conn", sub {
 
 test_case "on_error of a_conn", sub {
   my ($a_conn, $b_handle) = @_;
-  
+
   # force connection error on a_conn
   $a_conn->handle->push_shutdown;
   $a_conn->send("foo");

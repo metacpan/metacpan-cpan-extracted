@@ -1,0 +1,53 @@
+{
+   "abstract" : "A L<Moo::Role> for using L<Params::ValidationCompiler>.",
+   "author" : [
+      "Abe Timmerman <abeltje@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MooX-Params-CompiledValidators",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0.01",
+            "Test::More" : "0.88",
+            "Test::Warnings" : "0.028"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.55_02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "2.003",
+            "Params::ValidationCompiler" : "0.27",
+            "Sub::Util" : "1.50",
+            "Types::Standard" : "1.008",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://source.test-smoke.org/gitweb/?p=MooX-Params-CompiledValidators"
+      }
+   },
+   "version" : "0.02"
+}

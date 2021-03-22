@@ -4,8 +4,8 @@
 #
 package PDL::GSLSF::PSI;
 
-@EXPORT_OK  = qw( PDL::PP gsl_sf_psi PDL::PP gsl_sf_psi_1piy PDL::PP gsl_sf_psi_n );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK  = qw( PDL::PP gsl_sf_psi PDL::PP gsl_sf_psi_1piy PDL::PP gsl_sf_psi_n );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::PSI ;
 

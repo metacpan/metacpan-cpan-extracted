@@ -56,5 +56,5 @@ requires:
 resources:
   bugtracker: https://git.deguest.jp/jack/Apache2-SSI/issues
   repository: https://git.deguest.jp/jack/Apache2-SSI
-version: v0.2.2
+version: v0.2.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

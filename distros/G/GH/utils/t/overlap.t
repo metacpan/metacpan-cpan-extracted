@@ -18,7 +18,7 @@ $i = 1;
 ################################################################
 print "# simplest usage.  should find 116 base overlap.\n";
 
-open EXEC, "./overlap -s1 t/test1.fasta -s2 t/test2.fasta|" ||
+open EXEC, "perl -I.. -MGH::Status::Status ./overlap -s1 t/test1.fasta -s2 t/test2.fasta|" ||
   die "Could not exec command.";
 $/ = undef;
 $output = <EXEC>;
@@ -38,7 +38,7 @@ Not() if ($output ne $expected); Ok($i++);
 ################################################################
 print "# test the conversational output style\n";
 
-open EXEC, "./overlap -s1 t/test1.fasta -s2 t/test2.fasta -outputFormat 1|" ||
+open EXEC, "perl -I.. -MGH::Status::Status ./overlap -s1 t/test1.fasta -s2 t/test2.fasta -outputFormat 1|" ||
   die "Could not exec command.";
 $/ = undef;
 $output = <EXEC>;
@@ -58,7 +58,7 @@ Not() if ($output ne $expected); Ok($i++);
 ################################################################
 print "# test the alignment output style\n";
 
-open EXEC, "./overlap -s1 t/test1.fasta -s2 t/test2.fasta -outputFormat 2 |" ||
+open EXEC, "perl -I.. -MGH::Status::Status ./overlap -s1 t/test1.fasta -s2 t/test2.fasta -outputFormat 2 |" ||
   die "Could not exec command.";
 $/ = undef;
 $output = <EXEC>;
@@ -99,7 +99,7 @@ Not() if ($output ne $expected); Ok($i++);
 ################################################################
 print "# test some internal substitutions.\n";
 
-open EXEC, "./overlap -s1 t/test1a.fasta -s2 t/test2.fasta -outputFormat 2 |" ||
+open EXEC, "perl -I.. -MGH::Status::Status ./overlap -s1 t/test1a.fasta -s2 t/test2.fasta -outputFormat 2 |" ||
   die "Could not exec command.";
 $/ = undef;
 $output = <EXEC>;
@@ -140,7 +140,7 @@ Not() if ($output ne $expected); Ok($i++);
 ################################################################
 print "# test a single internal deletion in seq 1.\n";
 
-open EXEC, "./overlap -s1 t/test1b.fasta -s2 t/test2.fasta -outputFormat 2 |" ||
+open EXEC, "perl -I.. -MGH::Status::Status ./overlap -s1 t/test1b.fasta -s2 t/test2.fasta -outputFormat 2 |" ||
   die "Could not exec command.";
 $/ = undef;
 $output = <EXEC>;
@@ -182,7 +182,7 @@ Not() if ($output ne $expected); Ok($i++);
 ################################################################
 print "# test a single substitution in seq 1 at the start of the overlap\n";
 
-open EXEC, "./overlap -s1 t/test1c.fasta -s2 t/test2.fasta -outputFormat 2 |"
+open EXEC, "perl -I.. -MGH::Status::Status ./overlap -s1 t/test1c.fasta -s2 t/test2.fasta -outputFormat 2 |"
   || die "Could not exec command.";
 $/ = undef;
 $output = <EXEC>;
@@ -223,7 +223,7 @@ Not() if ($output ne $expected); Ok($i++);
 ################################################################
 print "# test a single substitution in seq 1 at the end of the overlap\n";
 
-open EXEC, "./overlap -s1 t/test1d.fasta -s2 t/test2.fasta -outputFormat 2 |"
+open EXEC, "perl -I.. -MGH::Status::Status ./overlap -s1 t/test1d.fasta -s2 t/test2.fasta -outputFormat 2 |"
   || die "Could not exec command.";
 $/ = undef;
 $output = <EXEC>;
@@ -265,7 +265,7 @@ Not() if ($output ne $expected); Ok($i++);
 ################################################################
 print "# test a single deletion in seq 1 at the end of the overlap\n";
 
-open EXEC, "./overlap -s1 t/test1e.fasta -s2 t/test2.fasta -outputFormat 2 |"
+open EXEC, "perl -I.. -MGH::Status::Status ./overlap -s1 t/test1e.fasta -s2 t/test2.fasta -outputFormat 2 |"
   || die "Could not exec command.";
 $/ = undef;
 $output = <EXEC>;
@@ -306,7 +306,7 @@ Not() if ($output ne $expected); Ok($i++);
 ################################################################
 print "# test a single deletion in seq 1 at the start of the overlap\n";
 
-open EXEC, "./overlap -s1 t/test1f.fasta -s2 t/test2.fasta -outputFormat 2 |"
+open EXEC, "perl -I.. -MGH::Status::Status ./overlap -s1 t/test1f.fasta -s2 t/test2.fasta -outputFormat 2 |"
   || die "Could not exec command.";
 $/ = undef;
 $output = <EXEC>;
@@ -347,7 +347,7 @@ Not() if ($output ne $expected); Ok($i++);
 ################################################################
 print "# test when there is NO overlap.\n";
 
-open EXEC, "./overlap -s1 t/aaa.fasta -s2 t/ttt.fasta |" ||
+open EXEC, "perl -I.. -MGH::Status::Status ./overlap -s1 t/aaa.fasta -s2 t/ttt.fasta |" ||
   die "Could not exec command.";
 $/ = undef;
 $output = <EXEC>;

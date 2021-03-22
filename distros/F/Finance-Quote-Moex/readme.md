@@ -27,7 +27,15 @@ FQ_LOAD_QUOTELET=-defaults Moex
 
 ### Установка из cpan
 
-Я таки добавил модуль на cpan. Можно установить из него. Инструкции сходу не нашел, замороченно, как и всё у perl :)
+Я добавил модуль на cpan. Можно установить из него.
+В любой полной версии Perl: 
+```
+cpan Finance::Quote::Moex
+```
+Если установлен cpanminus: 
+```
+cpanm Finance::Quote::Moex
+```
 
 ### Установка на Debian/Ubuntu
 
@@ -44,7 +52,7 @@ make install
 
 `make install` плохая команда. Попробуйте вместо неё `checkinstall`
 
-На Windows вроде make нет.
+На Windows в Strawberry perl использовать gmake (в старых версиях - dmake).
 
 ###  Ручная установка (не рекомендуется)
 

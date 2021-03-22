@@ -1,7 +1,7 @@
 package Acme::CPANModules;
 
-our $DATE = '2019-12-24'; # DATE
-our $VERSION = '0.1.5'; # VERSION
+our $DATE = '2021-01-18'; # DATE
+our $VERSION = '0.1.6'; # VERSION
 
 1;
 # ABSTRACT: CPAN modules
@@ -22,7 +22,7 @@ Acme::CPANModules - CPAN modules
 
 =head1 VERSION
 
-This document describes version 0.1.5 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2019-12-24.
+This document describes version 0.1.6 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2021-01-18.
 
 =head1 DESCRIPTION
 
@@ -37,9 +37,6 @@ of C<++>'s a distribution has) help to some extent. There are also various blog
 posts by Perl programmers which review modules, e.g. L<CPAN Module Reviews by
 Neil Bowers|http://neilb.org/reviews/>.
 
-For categorizing CPAN authors, there are also the L<Acme::CPANAuthors> project,
-complete with L<its own website|http://acme.cpanauthors.org/>.
-
 Acme::CPANModules is another mechanism to help, to let someone categorize
 modules in whatever way she likes.
 
@@ -48,10 +45,11 @@ get to it :-), or perhaps when I get some help).
 
 =head1 CREATING AN ACME::CPANMODULES MODULE
 
-The first step is to decide on a name of the module. It must be under the
-C<Acme::CPANModules::> namespace. I recommend that you prefix your module with
-your CPAN ID, e.g. L<Acme::CPANModules::PERLANCAR::Unbless> or
-L<Acme::CPANModules::PERLANCAR::Task::PickingRandomLinesFromFile>.
+The first step is to decide on the name of your module. It must be under the
+C<Acme::CPANModules::> namespace. For example, if you create a list of your
+favorite modules, you can use C<Acme::CPANModules::YOURCPANID::Favorite>. Or if
+you are creating a list of modules that predict the future, you can choose
+C<Acme::CPANModules::PredictingTheFuture>.
 
 Inside the module, you must declare a hash named C<$LIST>:
 
@@ -134,6 +132,47 @@ Each entry is another DefHash:
 That's it. After you have completed your list, publish your Acme::CPANModules
 module to CPAN.
 
+Here's a sample of one of the simplest C<$LIST> you can have:
+
+ $LIST = {
+     summary => 'Modules that predict the future',
+     entries => [
+         {module=>'Zorb'},
+         {module=>'Madame::Zita'},
+     ],
+ };
+
+Here's another, more expanded sample:
+
+ $LIST = {
+     summary => 'Modules that predict the future',
+     description => <<'_',
+
+This list catalogs modules that predict the future. Yes, the future is
+unpredictable. But we can try anyway, right?
+
+_
+     entries => [
+         {
+             module => 'Zorb',
+             summary => 'Contact the API for the strange crystal Zorb',
+             description => <<'_',
+
+This module is an API client to Zorb, a strange crystal that supposedly fell
+from the sky in 2017 near Ozark, that can change color depending on what you
+feed to it. The API connects to Zorb API server managed by Crooks, Inc.
+
+_
+         },
+         {
+             module => 'Madame::Zita',
+             summary => 'Ask Madame Zita the fortune teller',
+         },
+     ],
+ };
+
+For more example, see existing C<Acme::CPANModules::*> modules on CPAN.
+
 If you are using L<Dist::Zilla> to release your distribution, this
 L<Pod::Weaver> plugin might be useful for you:
 L<Pod::Weaver::Plugin::Acme::CPANModules>. It will create an C<=head2 Included
@@ -167,7 +206,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -181,13 +220,16 @@ L<cpanmodules> from L<App::cpanmodules>
 
 L<Bencher>
 
+For categorizing CPAN authors, there are also the L<Acme::CPANAuthors> project,
+complete with L<its own website|http://acme.cpanauthors.org/>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

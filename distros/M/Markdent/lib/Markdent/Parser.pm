@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean 0.09;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Markdent::Parser::BlockParser;
 use Markdent::Parser::SpanParser;
@@ -247,7 +247,7 @@ Markdent::Parser - A markdown parser
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -306,8 +306,8 @@ implements the L<Markdent::Role::SpanParser> role.
 
 =item * handler => $handler
 
-This can be any object which implements the L<Markdent::Role::Handler>
-role. It is required.
+This can be any object which implements the L<Markdent::Role::Handler> role. It
+is required.
 
 =back
 

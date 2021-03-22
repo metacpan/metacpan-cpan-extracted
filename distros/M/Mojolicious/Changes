@@ -1,4 +1,31 @@
 
+9.12  2021-03-21
+  - Improved mojo script startup time slightly with a Mojo::HelloWorld optimization.
+  - Improved design of built-in templates.
+
+9.11  2021-03-20
+  - This release contains fixes for security issues, everybody should upgrade!
+  - Disabled format detection by default to fix vulnerabilities in many Mojolicious applications. That means some of
+    your routes that previously matched "/foo" and "/foo.json", will only match "/foo" after upgrading. From now on you
+    will have to explicitly declare the formats your routes are allowed to handle.
+      # /foo
+      # /foo.html
+      # /foo.json
+      $r->get('/foo')->to('bar#yada');
+    becomes
+      $r->get('/foo' => [format => ['html', 'json']])->to('bar#yada', format => undef);
+    And if you are certain that your application is not vulnerable, you also have the option to re-enable format
+    detection for a route and all its nested routes. Due to the high risk of vulnerabilities, this feature is going to
+    be removed again in a future release however.
+      my $active = $r->any([format => 1]);
+      $active->get('/foo')->to('Test#first');
+      $active->put('/bar')->to('Test#second');
+  - Improved built-in templates not to show embedded apps in the stash snapshot.
+  - Improved built-in development not found page to include tooltips with the compiled regular expressions for each
+    route.
+  - Improved Mojo::UserAgent to include "Content-Length: 0" with non-GET requests for better compatibility with broken
+    web servers.
+
 9.10  2021-03-14
   - Fixed top-level --help and -h options in Mojolicious::Commands.
 

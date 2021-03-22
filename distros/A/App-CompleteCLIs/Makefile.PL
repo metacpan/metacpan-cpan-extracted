@@ -34,6 +34,7 @@ my %WriteMakefileArgs = (
     "script/complete-gid",
     "script/complete-group",
     "script/complete-hash-key",
+    "script/complete-idx-listed-stock-code",
     "script/complete-int",
     "script/complete-kernel",
     "script/complete-known-host",
@@ -73,7 +74,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::CompleteCLIs",
   "PREREQ_PM" => {
-    "App::perlmv" => "0.600",
+    "App::perlmv" => "0.604",
     "Complete::Acme::MetaSyntactic" => "0.002",
     "Complete::App::perlmv" => 0,
     "Complete::Chrome" => 0,
@@ -84,6 +85,7 @@ my %WriteMakefileArgs = (
     "Complete::Dist::Zilla" => 0,
     "Complete::Env" => 0,
     "Complete::File" => "0.440",
+    "Complete::Finance::SE::IDX" => 0,
     "Complete::Firefox" => 0,
     "Complete::Host" => "0.03",
     "Complete::Kernel" => 0,
@@ -130,7 +132,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.147",
+  "VERSION" => "0.148",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -138,7 +140,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::perlmv" => "0.600",
+  "App::perlmv" => "0.604",
   "Complete::Acme::MetaSyntactic" => "0.002",
   "Complete::App::perlmv" => 0,
   "Complete::Chrome" => 0,
@@ -149,6 +151,7 @@ my %FallbackPrereqs = (
   "Complete::Dist::Zilla" => 0,
   "Complete::Env" => 0,
   "Complete::File" => "0.440",
+  "Complete::Finance::SE::IDX" => 0,
   "Complete::Firefox" => 0,
   "Complete::Host" => "0.03",
   "Complete::Kernel" => 0,

@@ -4,7 +4,7 @@ Markdent - An event-based Markdown parser toolkit
 
 # VERSION
 
-version 0.39
+version 0.40
 
 # SYNOPSIS
 
@@ -36,8 +36,8 @@ use it.
 If you just want to do some quick Markdown to HTML conversion use either the
 [Markdent::Simple::Document](https://metacpan.org/pod/Markdent%3A%3ASimple%3A%3ADocument) or [Markdent::Simple::Fragment](https://metacpan.org/pod/Markdent%3A%3ASimple%3A%3AFragment) class.
 
-This distribution also ships with a command line tool called
-[markdent-html](https://metacpan.org/pod/markdent-html). See that tool's documentation for details on how to use it.
+This distribution also ships with a command line tool called [markdent-html](https://metacpan.org/pod/markdent-html).
+See that tool's documentation for details on how to use it.
 
 # PROCESSING PIPELINES
 
@@ -63,8 +63,8 @@ The start of a pipeline will generally be either the [Markdent::Parser](https://
 
 # CUSTOM DIALECTS
 
-You may also want to implement a custom dialect to add some additional
-features to the parser. Your parser classes will need to consume either the
+You may also want to implement a custom dialect to add some additional features
+to the parser. Your parser classes will need to consume either the
 [Markdent::Role::Dialect::BlockParser](https://metacpan.org/pod/Markdent%3A%3ARole%3A%3ADialect%3A%3ABlockParser) or the
 [Markdent::Role::Dialect::SpanParser](https://metacpan.org/pod/Markdent%3A%3ARole%3A%3ADialect%3A%3ASpanParser) role. The best way to understand how a
 dialect is implemented is to look at one of the existing dialect classes:
@@ -80,31 +80,27 @@ interact with the core parser.
 
 # DONATIONS
 
-If you'd like to thank me for the work I've done on this module,
-please consider making a "donation" to me via PayPal. I spend a lot of
-free time creating free software, and would appreciate any support
-you'd care to offer.
+If you'd like to thank me for the work I've done on this module, please
+consider making a "donation" to me via PayPal. I spend a lot of free time
+creating free software, and would appreciate any support you'd care to offer.
 
-Please note that **I am not suggesting that you must do this** in order
-for me to continue working on this particular software. I will
-continue to do so, inasmuch as I have in the past, for as long as it
-interests me.
+Please note that **I am not suggesting that you must do this** in order for me
+to continue working on this particular software. I will continue to do so,
+inasmuch as I have in the past, for as long as it interests me.
 
-Similarly, a donation made in this way will probably not make me work
-on this software much more, unless I get so many donations that I can
-consider working on free software full time, which seems unlikely at
-best.
+Similarly, a donation made in this way will probably not make me work on this
+software much more, unless I get so many donations that I can consider working
+on free software full time, which seems unlikely at best.
 
-To donate, log into PayPal and send money to autarch@urth.org or use
-the button on this page:
-[http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html)
+To donate, log into PayPal and send money to autarch@urth.org or use the button
+on this page: [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html)
 
 # BUGS
 
-Please report any bugs or feature requests to `bug-markdent@rt.cpan.org`,
-or through the web interface at [http://rt.cpan.org](http://rt.cpan.org).  I will be
-notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+Please report any bugs or feature requests to `bug-markdent@rt.cpan.org`, or
+through the web interface at [http://rt.cpan.org](http://rt.cpan.org).  I will be notified, and
+then you'll automatically be notified of progress on your bug as I make
+changes.
 
 Bugs may be submitted at [https://github.com/houseabsolute/Markdent/issues](https://github.com/houseabsolute/Markdent/issues).
 

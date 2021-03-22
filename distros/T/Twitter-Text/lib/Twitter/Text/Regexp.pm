@@ -3,6 +3,8 @@ package
 use strict;
 use warnings;
 use utf8;
+no if $^V lt v5.13.9, 'warnings', 'utf8'; ## no critic (ValuesAndExpressions::ProhibitMismatchedOperators)
+
 use Twitter::Text::Util qw(load_yaml);
 
 # internal use only, do not use this module directly.
@@ -16,6 +18,8 @@ sub regex_range {
         return pack('U', $from);
     }
 }
+
+## no critic (RegularExpressions::ProhibitComplexRegexes)
 
 our $TLDS = load_yaml("tld_lib.yml")->[0];
 our $PUNCTUATION_CHARS = '!"#$%&\'()*+,-./:;<=>?@\[\]^_\`{|}~';

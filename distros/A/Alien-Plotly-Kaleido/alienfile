@@ -10,7 +10,7 @@ use Config;
 
 # We download from plotly-orca's github repo releases.
 
-my $kaleido_version = 'v0.0.3.post1';
+my $kaleido_version = 'v0.2.1';
 
 my $github_base_url = "https://github.com/plotly/Kaleido/releases/download";
 
@@ -21,20 +21,23 @@ sub download_url {
         join( '/', $github_base_url, $kaleido_version, $_[0] );
     };
 
+    my $filename;
     if ( $^O eq 'linux' ) {
-        return $make_url_github->('kaleido_linux_x64.zip');
-    }
-    elsif ( $^O eq 'MSWin32' ) {
-        my $filename = sprintf( "kaleido_win_%s.zip",
-            $Config{ptrsize} == 4 ? 'x86' : 'x64' );
-        return $make_url_github->($filename);
+        $filename = sprintf( "kaleido_linux_%s.zip",
+            $Config{archname} =~ /^(?:arm64|aarch64)/ ? 'arm64' : 'x64');
     }
     elsif ( $^O eq 'darwin' ) {
-        return $make_url_github->('kaleido_linux_x64.zip');
+        $filename = sprintf( "kaleido_mac_%s.zip",
+            $Config{archname} =~ /^(?:arm64|aarch64)/ ? 'arm64' : 'x64');
+    }
+    elsif ( $^O eq 'MSWin32' ) {
+        $filename = sprintf( "kaleido_win_%s.zip",
+            ( $ENV{PROCESSOR_ARCHITECTURE} // '' ) eq 'x86' ? 'x86' : 'x64' );
     }
     else {
         die 'Unsupported OS';
     }
+    return $make_url_github->($filename);
 }
 
 configure {

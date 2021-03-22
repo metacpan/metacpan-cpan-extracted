@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use parent 'Alien::Base';
 
@@ -52,7 +52,7 @@ sub detect_kaleido_version {
             return $data;
         };
 
-        my @cmd = ( $kaleido, 'plotly', '--disable-gpu' );
+        my @cmd = ( $kaleido, 'plotly', '--disable-gpu', '--no-sandbox' );
         eval {
             require Chart::Plotly;
             my $plotlyjs =
@@ -100,7 +100,7 @@ Alien::Plotly::Kaleido - Finds or installs plotly kaleido
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -125,11 +125,25 @@ version 0.001
 =head1 DESCRIPTION
 
 This module finds L<plotly's kaleido|https://github.com/plotly/Kaleido>
-from your system, or installs it (version 0.0.3.post1).
+from your system, or installs it.
 
-For installation it uses prebuilt packages from
-L<kaleido's github release page|https://github.com/plotly/Kaleido/releases>.
 It supports 3 OS platforms: Windows, Linux and OSX.
+
+=head1 KALEIDO VERSION
+
+0.2.1
+
+=head1 INSTALLATION
+
+By default if it cannot detect Kaleido from your environment,
+it will download Kaleido package from
+L<kaleido's github release page|https://github.com/plotly/Kaleido/releases>.
+
+If you want to install from a different url, or from locally downloaded
+zipball, you can use environment variable =ALIEN_PLOTLY_KALEIDO_DOWNLOAD_URL=.
+For example, to install from a local zipball,
+
+    ALIEN_PLOTLY_KALEIDO_DOWNLOAD_URL=file:///your/local/kaleido/zip cpanm Alien::Plotly::Kaleido
 
 =head1 SEE ALSO
 
@@ -142,9 +156,15 @@ L<Chart::Plotly>
 
 Stephan Loyd <sloyd@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Carlos D. Álvaro
+
+Carlos D. Álvaro <github@cdalvaro.io>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Stephan Loyd.
+This software is copyright (c) 2020-2021 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
