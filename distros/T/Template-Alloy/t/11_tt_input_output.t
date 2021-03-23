@@ -6,7 +6,7 @@
 
 =cut
 
-use vars qw($module $is_tt);
+our ($module, $is_tt);
 BEGIN {
     $module = 'Template::Alloy';
     if (grep {/tt/i} @ARGV) {

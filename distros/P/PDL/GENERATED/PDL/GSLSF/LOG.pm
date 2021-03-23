@@ -4,7 +4,7 @@
 #
 package PDL::GSLSF::LOG;
 
-our @EXPORT_OK  = qw( PDL::PP gsl_sf_log PDL::PP gsl_sf_complex_log );
+our @EXPORT_OK = qw(PDL::PP gsl_sf_log PDL::PP gsl_sf_complex_log );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::LOG ;
 

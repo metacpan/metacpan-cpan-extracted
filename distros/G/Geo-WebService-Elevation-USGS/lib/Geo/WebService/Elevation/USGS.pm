@@ -76,7 +76,7 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.118';
+our $VERSION = '0.119';
 
 # use constant USGS_URL => 'https://ned.usgs.gov/epqs/pqs.php';
 use constant USGS_URL => 'https://nationalmap.gov/epqs/pqs.php';
@@ -285,13 +285,11 @@ This method was removed in version 0.116_01. Please use the
 C<elevation()> method instead. See the L<NOTICE|/NOTICE> above for
 details.
 
-
 =head3 $rslt = $eq->getElevation($lat, $lon, $source, $elevation_only);
 
 This method was removed in version 0.116_01. Please use the
 C<elevation()> method instead. See the L<NOTICE|/NOTICE> above for
 details.
-
 
 =cut
 
@@ -324,7 +322,6 @@ to allow call chaining. An attempt to set a non-existent attribute will
 result in an exception being thrown.
 
 =cut
-
 
 {
 
@@ -810,8 +807,10 @@ problem in my first module to rely heavily on Test::More.
 
 =head1 BUGS
 
-Bugs can be reported to the author by mail, or through
-L<https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS/issues/>.
+Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-WebService-Elevation-USGS>,
+L<https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS/issues>, or in
+electronic mail to the author.
 
 =head1 SEE ALSO
 

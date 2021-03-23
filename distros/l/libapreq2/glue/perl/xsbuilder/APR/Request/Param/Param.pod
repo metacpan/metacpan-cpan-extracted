@@ -76,7 +76,7 @@ The C<< APR::Request::Param >> module provides base methods
 for interfacing with libapreq2's param API.  It also provides
 a few utility functions and constants.
 
-This manpage documents version 2.15
+This manpage documents version 2.16
 of the APR::Request::Param, APR::Request::Brigade,
 and APR::Request::Brigade::IO packages.
 

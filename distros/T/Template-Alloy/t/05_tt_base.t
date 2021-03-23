@@ -104,7 +104,7 @@ local $INC{'FooTest2.pm'} = $0;
 {
     package FooTest2;
     use base qw(MyTestPlugin::FooTest);
-    use vars qw($AUTOLOAD);
+    our $AUTOLOAD;
     sub new {
         my $class   = shift;
         my $args    = shift || {}; # note - no plugin context
@@ -483,10 +483,10 @@ process_ok("[% n.fmt('%#o') %]" => '010', {n => 8}) if ! $is_tt;
 process_ok("[% n.fmt('%#o') %]" => '0', {n => 0}) if ! $is_tt;
 
 process_ok("[% n.fmt('%02d') %]" => '07', {n => 7}) if ! $is_tt;
-process_ok("[% n.fmt('%04.2d') %]" => ($five_eight ? '0007' : '  07'), {n => 7}) if ! $is_tt;
-process_ok("[% n.fmt('%+04.2d') %]" => ($five_eight ? '+007' : ' +07'), {n => 7}) if ! $is_tt;
-process_ok("[% n.fmt('% 04.2d') %]" => ($five_eight ? ' 007' : '  07'), {n => 7}) if ! $is_tt;
-process_ok("[% n.fmt('% +04.2d') %]" => ($five_eight ? '+007' : ' +07'), {n => 7}) if ! $is_tt;
+process_ok("[% n.fmt('%04.2d') %]" => ($^V < 5.008009 ? '0007' : '  07'), {n => 7}) if ! $is_tt;
+process_ok("[% n.fmt('%+04.2d') %]" => ($^V < 5.008009 ? '+007' : ' +07'), {n => 7}) if ! $is_tt;
+process_ok("[% n.fmt('% 04.2d') %]" => ($^V < 5.008009 ? ' 007' : '  07'), {n => 7}) if ! $is_tt;
+process_ok("[% n.fmt('% +04.2d') %]" => ($^V < 5.008009 ? '+007' : ' +07'), {n => 7}) if ! $is_tt;
 process_ok("[% n.fmt('%02f') %]" => '7.000000', {n => 7}) if ! $is_tt;
 process_ok("[% n.fmt('%04.2f') %]" => '7.00', {n => 7}) if ! $is_tt;
 process_ok("[% n.fmt('%05.2f') %]" => '07.00', {n => 7}) if ! $is_tt;

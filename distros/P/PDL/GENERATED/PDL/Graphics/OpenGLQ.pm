@@ -4,7 +4,7 @@
 #
 package PDL::Graphics::OpenGLQ;
 
-our @EXPORT_OK  = qw( PDL::PP line_3x_3c PDL::PP gl_points PDL::PP gl_lines PDL::PP gl_line_strip PDL::PP gl_texts PDL::PP gl_triangles_mat PDL::PP gl_triangles_n_mat PDL::PP gl_triangles_wn_mat PDL::PP gl_triangles PDL::PP gl_triangles_n PDL::PP gl_triangles_wn PDL::PP gl_arrows );
+our @EXPORT_OK = qw(PDL::PP line_3x_3c PDL::PP gl_points PDL::PP gl_lines PDL::PP gl_line_strip PDL::PP gl_texts PDL::PP gl_triangles_mat PDL::PP gl_triangles_n_mat PDL::PP gl_triangles_wn_mat PDL::PP gl_triangles PDL::PP gl_triangles_n PDL::PP gl_triangles_wn PDL::PP gl_arrows );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Graphics::OpenGLQ ;
 

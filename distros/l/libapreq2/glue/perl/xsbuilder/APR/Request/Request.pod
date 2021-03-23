@@ -69,7 +69,7 @@ The C<< APR::Request >> module provides the base methods
 for interfacing with libapreq2's module API.  It also provides
 a few utility functions and constants.
 
-This manpage documents version 2.15
+This manpage documents version 2.16
 of the APR::Request, APR::Request::Custom,
 APR::Request::Cookie::Table, and
 APR::Request::Param::Table packages.

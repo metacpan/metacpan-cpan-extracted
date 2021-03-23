@@ -4,7 +4,7 @@
 #
 package PDL::GSLSF::POLY;
 
-our @EXPORT_OK  = qw( PDL::PP gsl_poly_eval );
+our @EXPORT_OK = qw(PDL::PP gsl_poly_eval );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::POLY ;
 

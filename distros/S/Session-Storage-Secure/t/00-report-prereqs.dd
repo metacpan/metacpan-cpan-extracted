@@ -3,11 +3,16 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '6.17',
                                         'perl' => '5.008001'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
                       'requires' => {
                                       'Dist::Zilla' => '5',
+                                      'Dist::Zilla::Plugin::MinimumPerl' => '0',
+                                      'Dist::Zilla::Plugin::ReleaseStatus::FromVersion' => '0',
                                       'Dist::Zilla::PluginBundle::DAGOLDEN' => '0.072',
                                       'File::Spec' => '0',
                                       'File::Temp' => '0',
@@ -30,7 +35,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
-                                      'Crypt::CBC' => '0',
+                                      'Crypt::CBC' => '3.01',
                                       'Crypt::Rijndael' => '0',
                                       'Crypt::URandom' => '0',
                                       'Digest::SHA' => '0',

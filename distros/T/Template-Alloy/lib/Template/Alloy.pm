@@ -8,15 +8,12 @@ package Template::Alloy;
 
 use strict;
 use warnings;
-use 5.006;
 use Template::Alloy::Exception;
 use Template::Alloy::Operator qw(play_operator define_operator);
 use Template::Alloy::VMethod  qw(define_vmethod $SCALAR_OPS $ITEM_OPS $ITEM_METHODS $FILTER_OPS $LIST_OPS $HASH_OPS $VOBJS);
 
-use vars qw($VERSION);
-BEGIN {
-    $VERSION            = '1.020';
-};
+our $VERSION = '1.022';
+
 our $QR_PRIVATE         = qr/^[_.]/;
 our $WHILE_MAX          = 1000;
 our $MAX_EVAL_RECURSE   = 50;
@@ -604,6 +601,8 @@ sub play_expr {
                 } else {
                     $ref = undef;
                 }
+            } else {
+                $ref = undef;
             }
         }
 

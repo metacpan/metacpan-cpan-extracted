@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.53)
-AC_INIT(Apache HTTP Server Request Library, 2.15, apreq-dev@httpd.apache.org, libapreq2)
+AC_INIT(Apache HTTP Server Request Library, 2.16, apreq-dev@httpd.apache.org, libapreq2)
 dnl Generate config.nice script- macro must be here at the top
 dnl to avoid corruption of $0 and $@.
 APR_CONFIG_NICE(config.nice)
@@ -13,7 +13,7 @@ dnl aclocal.m4:817: required file `build/ltmain.sh' not found
 
 dnl debian woody's archaic auto* tools don't set PACKAGE/VERSION correctly via 
 dnl AC_INIT above, so we do it again here.
-AM_INIT_AUTOMAKE(libapreq2, 2.15)
+AM_INIT_AUTOMAKE(libapreq2, 2.16)
 
 AC_PROG_MAKE_SET
 

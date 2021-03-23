@@ -18,7 +18,7 @@ APR::Request::Parser - wrapper for libapreq2's parser API.
 =head1 DESCRIPTION
 
 
-This manpage documents version 2.15
+This manpage documents version 2.16
 of the APR::Request::Parser package.
 
 

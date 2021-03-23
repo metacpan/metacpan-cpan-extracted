@@ -1,0 +1,53 @@
+---
+- title:                   __GLOBAL__
+  type:                    CSV
+  rootdir:                 't'
+  files:
+    - left/%{title}.csv
+    - right/%{title}.csv
+  identity:
+    - Instrument
+  has_header:              1
+  decimal_separator:       ','
+  diff_relative:
+    - Delta
+  digital_grouping_symbol: '.'
+  ignore:
+    - KVN
+    - Type
+  limit_abs:               0.001
+  limit_rel:               0.01
+  reporter:                XLSX
+  report_filename:         ${SC_TMPD}/%{title}.xlsx
+#=============================================
+- title:                  csv_head_long
+  report_line_numbers:    0
+  report_line_source:     0
+  report_max_columns:     0
+  report_diff_row:        0
+  report_all_data:        0
+  report_ignored_columns: 0
+#=============================================
+- title:                  csv_head_long_diff
+  report_line_numbers:    0
+  report_line_source:     0
+  report_max_columns:     0
+  report_diff_row:        1
+  report_all_data:        0
+  report_ignored_columns: 0
+#=============================================
+- title:                  csv_head_long_num
+  report_line_numbers:    1
+  report_line_source:     0
+  report_max_columns:     0
+  report_diff_row:        1
+  report_all_data:        0
+  report_ignored_columns: 0
+#=============================================
+- title:                  csv_head_long_max
+  report_line_numbers:    1
+  report_line_source:     1
+  report_max_columns:     1
+  report_diff_row:        1
+  report_all_data:        0
+  report_ignored_columns: 1

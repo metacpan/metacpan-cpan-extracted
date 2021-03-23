@@ -19,6 +19,8 @@ HMAC
 Hukins
 Liu
 MAC's
+Petr
+Písař
 Rekeying
 Secure
 Sereal
@@ -34,6 +36,7 @@ decrypting
 et
 lib
 login
+ppisar
 scalability
 tom
 unencrypted

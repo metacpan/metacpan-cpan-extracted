@@ -48,7 +48,7 @@
    "provides" : {
       "Compiled::Params::OO" : {
          "file" : "lib/Compiled/Params/OO.pm",
-         "version" : "0.05"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Compiled-Params-OO"
       }
    },
-   "version" : "0.05",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

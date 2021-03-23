@@ -1,7 +1,12 @@
 /** @page apreq_changes CHANGES
 //! brief List of major changes.
 
-@section v2_15 Changes with libapreq2-2.15 (released November 12, 2020)
+@section v2_16 Changes with libapreq2-2.16 (released 17 March, 2021)
+
+- Build [Steve Hay]
+  Fix file attribute for modules listed as provided in META.yml.
+
+@section v2_15 Changes with libapreq2-2.15 (released 17 November, 2020)
 
 - SECURITY: CVE-2019-12412 (cve.mitre.org)
   C API [Max Kellermann]

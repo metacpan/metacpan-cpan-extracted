@@ -20,7 +20,7 @@ no_index:
 provides:
   App::Glacier:
     file: lib/App/Glacier.pm
-    version: '2.12'
+    version: '2.13'
   App::Glacier::Bre:
     file: lib/App/Glacier/Bre.pm
   App::Glacier::Command:
@@ -109,4 +109,4 @@ requires:
 resources:
   bugtracker: https://puszcza.gnu.org.ua/bugs/?group=glacier
   repository: git://git.gnu.org.ua/glacier.git
-version: '2.12'
+version: '2.13'

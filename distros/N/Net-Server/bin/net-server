@@ -62,7 +62,7 @@ net-server - Base Net::Server starting module
 
 The net-server program gives a simple way to test out code and try
 port connection parameters.  Though the running server can be robust
-enough for full tim use, it is anticipated that this binary will just
+enough for production, it is anticipated that this binary will just
 be used for basic testing of net-server ports, acting as a simple echo
 server, or for running development scripts as CGI.
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension Net::Server.
 
+2.010  Mar 22 2021
+        - Add SSL_verify_callback
+        - Fix SSLEAY connect spinloop
+        - Various pod typos
+        - Allow for logging to STDOUT for HTTP
+        - Add PATCH verb to HTTP
+
 2.009  Aug 09 2017
         - Several long awaited fixes
         - Log when a child exits abnormally. RT #86815

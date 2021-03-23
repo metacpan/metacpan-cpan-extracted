@@ -4,7 +4,7 @@
 #
 package PDL::Image2D;
 
-our @EXPORT_OK  = qw(  PDL::PP conv2d PDL::PP med2d PDL::PP med2df PDL::PP box2d PDL::PP patch2d PDL::PP patchbad2d PDL::PP max2d_ind PDL::PP centroid2d  cc8compt cc4compt PDL::PP ccNcompt polyfill  pnpoly  polyfillv  rotnewsz PDL::PP rot2d PDL::PP bilin2d PDL::PP rescale2d  fitwarp2d applywarp2d PDL::PP warp2d  warp2d_kernel PDL::PP warp2d_kernel );
+our @EXPORT_OK = qw( PDL::PP conv2d PDL::PP med2d PDL::PP med2df PDL::PP box2d PDL::PP patch2d PDL::PP patchbad2d PDL::PP max2d_ind PDL::PP centroid2d  cc8compt cc4compt PDL::PP ccNcompt polyfill  pnpoly  polyfillv  rotnewsz PDL::PP rot2d PDL::PP bilin2d PDL::PP rescale2d  fitwarp2d applywarp2d PDL::PP warp2d  warp2d_kernel PDL::PP warp2d_kernel );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Image2D ;
 

@@ -77,16 +77,20 @@ sub test_paste (@) {	## no critic (ProhibitSubroutinePrototypes, RequireArgUnpac
     my ($ext_got, $ext_want);
     ($got, $ext_got) = groom_paste ($got);
     ($want, $ext_want) = groom_paste ($want);
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     my $ref = ref $want;
     if ( REGEXP_REF eq $ref ) {
-	@_ = ( $got, $want, "@_" );
-	goto &like;
+	like $got, $want, "@_"
+	    and return 1;
+	return hex_diag( $got, $want );
     } elsif (defined $want) {
-	@_ = ( $got, $want, "@_" );
-	goto &is;
+	is $got, $want, "@_"
+	    and return 1;
+	return hex_diag( $got, $want );
     } else {
-	@_ = ( ! defined $got, "@_" );
-	goto &ok;
+	ok $got, "@_"
+	    and return 1;
+	return hex_diag( $got );
     }
 }
 

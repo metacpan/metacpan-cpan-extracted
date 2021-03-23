@@ -1,4 +1,8 @@
-Revision history for Net-Checkpoint-Management-v1: 0.001008
+Revision history for Net-Checkpoint-Management-v1: 0.001009
+
+0.001009  2021-03-22 11:59:27+01:00 Europe/Vienna
+    - improve error handling of underlying exceptions
+      like 'Could not connect to'
 
 0.001008  2020-09-22 18:00:28+02:00 Europe/Vienna
     - fix 'Use of uninitialized value in string eq' warning

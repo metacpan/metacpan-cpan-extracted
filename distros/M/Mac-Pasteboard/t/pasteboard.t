@@ -18,6 +18,25 @@ mess.
 
 EOD
 
+diag '';
+foreach my $name ( qw{ LANG LC_ALL LC_COLLATE LC_CTYPE LC_MONETARY
+    LC_NUMERIC LC_TIME LC_MESSAGES } ) {
+    if ( defined $ENV{$name} ) {
+	diag "$name='$ENV{$name}'";
+    } else {
+	diag "$name undefined";
+    }
+}
+{
+    local $@ = undef;
+    eval {
+	require I18N::Langinfo;
+	diag q<I18N::Langinfo CODESET='>, I18N::Langinfo::langinfo(
+	    I18N::Langinfo::CODESET() ), q<'>;
+	1;
+    } or diag 'I18N::Langinfo unavailable';
+}
+
 subtest 'Copy to clipboard' => sub {
     do './t/copy.tx';
 };

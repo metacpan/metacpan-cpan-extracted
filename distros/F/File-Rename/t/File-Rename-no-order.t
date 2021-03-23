@@ -7,9 +7,11 @@
 # change 'tests => 1' to 'tests => last_test_to_print';
 
 use Test::More tests => 2;
-BEGIN { push @INC, qw(blib/script) if -d 'blib' };
+push @INC, qw(blib/script) if -d 'blib';
+unshift @INC, 't' if -d 't';
+require 'testlib.pl';
 
-my $script = ($^O =~ m{Win} ? 'file-rename' : 'rename');
+my $script = script_name();
 my $require_ok =  eval { require($script) };
 ok( $require_ok, 'require script - '. $script);
 die $@ unless $require_ok;
@@ -18,9 +20,6 @@ die $@ unless $require_ok;
 
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
-
-unshift @INC, 't' if -d 't';
-require 'testlib.pl';
 
 my $dir = tempdir();
 

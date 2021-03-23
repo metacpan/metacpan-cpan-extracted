@@ -4,7 +4,7 @@
 #
 package PDL::GSLSF::AIRY;
 
-our @EXPORT_OK  = qw( PDL::PP gsl_sf_airy_Ai PDL::PP gsl_sf_airy_Bi PDL::PP gsl_sf_airy_Ai_scaled PDL::PP gsl_sf_airy_Bi_scaled PDL::PP gsl_sf_airy_Ai_deriv PDL::PP gsl_sf_airy_Bi_deriv PDL::PP gsl_sf_airy_Ai_deriv_scaled PDL::PP gsl_sf_airy_Bi_deriv_scaled );
+our @EXPORT_OK = qw(PDL::PP gsl_sf_airy_Ai PDL::PP gsl_sf_airy_Bi PDL::PP gsl_sf_airy_Ai_scaled PDL::PP gsl_sf_airy_Bi_scaled PDL::PP gsl_sf_airy_Ai_deriv PDL::PP gsl_sf_airy_Bi_deriv PDL::PP gsl_sf_airy_Ai_deriv_scaled PDL::PP gsl_sf_airy_Bi_deriv_scaled );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::AIRY ;
 

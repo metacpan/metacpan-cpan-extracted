@@ -4,7 +4,7 @@
 #
 package PDL::GSLSF::LEGENDRE;
 
-our @EXPORT_OK  = qw( PDL::PP gsl_sf_legendre_Pl PDL::PP gsl_sf_legendre_Pl_array PDL::PP gsl_sf_legendre_Ql PDL::PP gsl_sf_legendre_Plm PDL::PP gsl_sf_legendre_array PDL::PP gsl_sf_legendre_array_index PDL::PP gsl_sf_legendre_sphPlm PDL::PP gsl_sf_conicalP_half PDL::PP gsl_sf_conicalP_mhalf PDL::PP gsl_sf_conicalP_0 PDL::PP gsl_sf_conicalP_1 PDL::PP gsl_sf_conicalP_sph_reg PDL::PP gsl_sf_conicalP_cyl_reg_e PDL::PP gsl_sf_legendre_H3d PDL::PP gsl_sf_legendre_H3d_array );
+our @EXPORT_OK = qw(PDL::PP gsl_sf_legendre_Pl PDL::PP gsl_sf_legendre_Pl_array PDL::PP gsl_sf_legendre_Ql PDL::PP gsl_sf_legendre_Plm PDL::PP gsl_sf_legendre_array PDL::PP gsl_sf_legendre_array_index PDL::PP gsl_sf_legendre_sphPlm PDL::PP gsl_sf_conicalP_half PDL::PP gsl_sf_conicalP_mhalf PDL::PP gsl_sf_conicalP_0 PDL::PP gsl_sf_conicalP_1 PDL::PP gsl_sf_conicalP_sph_reg PDL::PP gsl_sf_conicalP_cyl_reg_e PDL::PP gsl_sf_legendre_H3d PDL::PP gsl_sf_legendre_H3d_array );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::LEGENDRE ;
 

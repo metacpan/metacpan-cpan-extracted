@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Operation::Buckets::List::Request;
-$Net::Amazon::S3::Operation::Buckets::List::Request::VERSION = '0.97';
+$Net::Amazon::S3::Operation::Buckets::List::Request::VERSION = '0.98';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 extends 'Net::Amazon::S3::Request::Service';
@@ -18,7 +18,7 @@ sub http_request {
 	my $self    = shift;
 	return $self->_build_http_request (
 		use_virtual_host => 0,
-		region => 'us-east-1',
+		region => $self->s3->vendor->default_region,
 	);
 }
 
@@ -36,7 +36,7 @@ Net::Amazon::S3::Operation::Buckets::List::Request - An internal class to list a
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

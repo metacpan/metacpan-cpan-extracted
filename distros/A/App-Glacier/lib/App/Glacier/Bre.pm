@@ -181,4 +181,6 @@ sub AUTOLOAD {
     croak "unknown method $AUTOLOAD";
 }
 
+sub DESTROY {}
+
 1;

@@ -2,11 +2,15 @@
 # output from Module::Build::Compat version 0.03
 use strict;
 use File::Spec;
-my $script = File::Spec->catfile( 'script',
-		    $^O =~ /win/i 
-			? 'file-rename' : 'rename' );
-
 use ExtUtils::MakeMaker;
+
+my $has_os = eval { require Perl::OSType; };
+warn "No Perl::OSType\n" unless ($has_os or $] < 5.014);
+my $is_win = ( $has_os ? Perl::OSType::is_os_type('Windows') 
+		 	: $INC{'ExtUtils/MM_Win32.pm'} );
+my $script = File::Spec->catfile( 'script',
+			$is_win ? 'file-rename' : 'rename' );
+
 WriteMakefile(
           NAME		=> 'File::Rename',
           VERSION_FROM	=> 'lib/File/Rename.pm',

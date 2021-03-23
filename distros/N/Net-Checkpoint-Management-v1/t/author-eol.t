@@ -21,6 +21,7 @@ my @files = (
     't/00-compile.t',
     't/api.t',
     't/author-critic.t',
+    't/author-distmeta.t',
     't/author-eol.t',
     't/author-minimum-version.t',
     't/author-mojibake.t',
@@ -34,7 +35,6 @@ my @files = (
     't/perlcriticrc',
     't/release-cpan-changes.t',
     't/release-dist-manifest.t',
-    't/release-distmeta.t',
     't/release-kwalitee.t',
     't/release-meta-json.t',
     't/release-unused-vars.t'

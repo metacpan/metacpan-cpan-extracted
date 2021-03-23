@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Constants;
 # Abstract: Misc constants used by S3
-$Net::Amazon::S3::Constants::VERSION = '0.97';
+$Net::Amazon::S3::Constants::VERSION = '0.98';
 use constant {
 	HEADER_BUCKET_REGION        => 'x-amz-bucket-region',
 	HEADER_CANNED_ACL           => 'x-amz-acl',
@@ -34,7 +34,7 @@ Net::Amazon::S3::Constants
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

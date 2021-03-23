@@ -2,6 +2,9 @@
 use strict;
 use warnings;
 
+use utf8;
+no utf8;
+
 package Smartcat::App::Command::push;
 use Smartcat::App -command;
 
@@ -88,15 +91,21 @@ sub execute {
     my %ts_files;
     find(
         sub {
-            if (   -f $File::Find::name
+            my $name = $File::Find::name;
+            if ($^O !~ /MSWin32/) { # assume we are on Unix if not on Windows
+                utf8::decode($name); # assume UTF8 filenames
+                utf8::decode($_);
+            }
+            if (   -f $name
                 && !m/^\.$/
                 && m/$rundata->{filetype}$/ )
             {
                 s/$rundata->{filetype}$//;
-                my $path = catfile( dirname($File::Find::name), $_ );
+                my $path = catfile( dirname($name), $_ );
                 my $key = &get_ts_file_key($rundata->{project_workdir}, $path);
+                utf8::decode($key);
                 $ts_files{$key} = [] unless defined $ts_files{$key};
-                push @{ $ts_files{$key} }, $File::Find::name;
+                push @{ $ts_files{$key} }, $name;
             }
         },
         $rundata->{project_workdir}

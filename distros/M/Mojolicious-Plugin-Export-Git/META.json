@@ -31,7 +31,9 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008"
+            "Mojolicious" : "8",
+            "Mojolicious::Plugin::Export" : "0.008",
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -50,7 +52,7 @@
    "provides" : {
       "Mojolicious::Plugin::Export::Git" : {
          "file" : "lib/Mojolicious/Plugin/Export/Git.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -65,7 +67,7 @@
          "web" : "https://github.com/preaction/Mojolicious-Plugin-Export-Git"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_authority" : "cpan:PREACTION",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"

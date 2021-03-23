@@ -1,5 +1,14 @@
 Changelog for Mojolicious-Plugin-DBIC
 
+0.004     2021-03-23 11:37:16-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed compatibility with Mojolicious 9:
+
+        - Fixed missing braces in CSS selectors in tests. Thanks @eserte
+          for reporting and @drdrew42 for fixing! [Github #3]
+
 0.003     2018-12-15 16:43:57-06:00 America/Chicago
 
     [Added]

@@ -15,12 +15,15 @@ my $data = {
 
 my $secret = "serenade viscount secretary frail";
 
+my $protocol_version = $ENV{Session_Storage_Secure_Version};
+
 sub _gen_store {
     my ($config) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my $store = Session::Storage::Secure->new(
         secret_key => $secret,
         %{ $config || {} },
+        ( $protocol_version ? ( protocol_version => $protocol_version ) : () ),
     );
     ok( $store, "created a storage object" );
     return $store;
@@ -37,7 +40,7 @@ subtest "defaults" => sub {
     my $store = _gen_store;
 
     my $encoded = $store->encode($data);
-    like( $encoded, qr/^\d+~~/, "no expiration set" );
+    like( $encoded, qr/^[^~]+~~/, "no expiration set" );
 
     my $decoded = $store->decode($encoded);
     cmp_deeply( $decoded, $data, "roundtrip" );
@@ -74,7 +77,7 @@ subtest "no data" => sub {
     my $store = _gen_store;
 
     my $encoded = $store->encode();
-    like( $encoded, qr/^\d+~~/, "no expiration set" );
+    like( $encoded, qr/^[^~]+~~/, "no expiration set" );
 
     my $decoded = $store->decode($encoded);
     cmp_deeply( $decoded, {}, "undefined data treated as empty hashref" );

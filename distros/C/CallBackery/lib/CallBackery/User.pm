@@ -249,7 +249,7 @@ sub may {
     my $self = shift;
     my $right = shift;
     # root has all the rights
-    if ($self->userId eq '__ROOT'){
+    if (($self->userId // '') eq '__ROOT'){
         return 1;
     }
     my $db = $self->db;

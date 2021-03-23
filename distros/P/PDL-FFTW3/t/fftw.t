@@ -31,6 +31,14 @@ use constant approx_eps_single => 1e-3;
 
 my $Nplans = 0;
 
+sub other2native {
+  my ($other) = @_;
+  my @other_dims = $other->dims;
+  shift @other_dims; # drop initial 2
+  $other = cplx $other if !UNIVERSAL::isa($other, 'PDL::Complex');
+  zeroes(cdouble, @other_dims) + $other->re + $other->im * ci();
+}
+
 # 1D basic test
 {
   my $x = sequence(10)->cat(sequence(10)**2)->mv(-1,0);
@@ -56,11 +64,21 @@ my $Nplans = 0;
   ok_should_make_plan( all( approx( fft1(float $x), float($Xref), approx_eps_single) ),
                       "Basic 1D complex FFT - single precision" );
 
-  ok_should_make_plan( all( approx( fft1(cplx $x), $Xref, approx_eps_double) ),
+  my $x_cplx = cplx $x;
+  my $cplx_result = fft1($x_cplx);
+  ok_should_make_plan( all( approx( $cplx_result, $Xref->cplx, approx_eps_double) ),
                       "Basic 1D complex FFT with PDL::Complex" );
+  isa_ok($cplx_result, 'PDL::Complex', "PDL::Complex return type");
 
-  ok_should_make_plan( all( approx( ifft1(fft1($x)), $x , approx_eps_double) ),
+  ok_should_make_plan( all( approx( ifft1(fft1($x)), $x, approx_eps_double) ),
                       "Basic 1D complex FFT - inverse(forward) should be the same (normalized)" );
+
+  my $x_nat = other2native($x_cplx);
+  ok_should_make_plan( all( approx( fft1($x_nat), other2native($Xref), approx_eps_double) ),
+                      "Basic 1D native complex FFT" );
+
+  ok_should_make_plan( all( approx( ifft1(fft1($x_nat)), $x_nat, approx_eps_double) ),
+                      "Basic 1D native complex FFT - inverse" );
 }
 
 # 2D basic test
@@ -80,6 +98,10 @@ my $Nplans = 0;
 
   ok_should_make_plan( all( approx( fft2($x), $Xref, approx_eps_double) ),
      "Basic 2D complex FFT - double precision" );
+
+  my $x_nat = other2native($x);
+  ok_should_make_plan( all( approx( fft2($x_nat), other2native($Xref), approx_eps_double) ),
+     "Basic 2D native complex FFT - double precision" );
 
   ok_should_make_plan( all( approx( fft2(float $x), float($Xref), approx_eps_single) ),
      "Basic 2D complex FFT - single precision" );
@@ -143,6 +165,11 @@ my $Nplans = 0;
 
   ok_should_reuse_plan( all( approx( $f, $Xref, approx_eps_double) ),
      "1D FFTs threaded inside a 3D piddle" );
+
+  my $x_nat = other2native($x);
+  my $f_nat = fft1($x_nat);
+  ok_should_reuse_plan( all( approx( $f_nat, other2native($Xref), approx_eps_double) ),
+     "1D native complex FFTs threaded inside a 3D piddle" );
 }
 
 # try out some different ways of calling the module, make sure the argument
@@ -494,6 +521,16 @@ my $Nplans = 0;
   ok_should_make_plan( all( approx( $x7, $x7_back, approx_eps_double) ),
                        "rfft basic test - backward - 7long" );
 
+  # Test real fft's with PDL::Complex arguments
+  my $fx6c=rfft1($x6, zeroes(2,4)->cplx);
+  isa_ok($fx6c, 'PDL::Complex', 'type of real to PDL::Complex forward transform');
+  ok_should_reuse_plan(all( approx($fx6c, $fx6_ref->slice(':,0:3')->cplx, approx_eps_double) ),
+		       'value of real to PDL::Complex forward transform');
+  my $x6c_back=irfft1($fx6c);
+  ok($x6c_back->isa('PDL') && !$x6c_back->isa('PDL::Complex'),
+     'type of PDL::Complex to real backward transform');
+  ok(all( approx($x6c_back, $x6, approx_eps_double) ),
+     'value of PDL::Complex to real backward transform');
 
   # Currently a single plan is made for ALL the thread slices. These tests are
   # meant to exercise cases where this is a bad assumption. I.e. where some
@@ -835,15 +872,19 @@ done_testing;
 sub ok_should_make_plan
 {
   my ($value, $planname) = @_;
-  ok( $value, $planname );
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  my $ret = ok( $value, $planname );
   check_new_plan( $planname );
+  $ret;
 }
 
 sub ok_should_reuse_plan
 {
   my ($value, $planname) = @_;
-  ok( $value, $planname );
+  local $Test::Builder::Level = $Test::Builder::Level + 1;
+  my $ret = ok( $value, $planname );
   check_reused_plan( $planname );
+  $ret;
 }
 
 sub check_new_plan
@@ -852,6 +893,7 @@ sub check_new_plan
 
  SKIP: {
     skip "Plan creation checks disabled because pdl memory may be unaligned", 1 unless $do_check_plan_creations;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     ok( $PDL::FFTW3::_Nplans == $Nplans+1,
         "$planname: should make a new plan" );
   }
@@ -865,6 +907,7 @@ sub check_reused_plan
 
  SKIP: {
     skip "Plan creation checks disabled because pdl memory may be unaligned", 1 unless $do_check_plan_creations;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     ok( $PDL::FFTW3::_Nplans == $Nplans,
         "$planname: should reuse an existing plan" );
   }

@@ -4,13 +4,13 @@
       "Sean Burke <sburke@bowers.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lingua-EN-Numbers-Ordinate",
    "prereqs" : {
@@ -35,13 +35,15 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/neilbowers/Lingua-EN-Numbers-Ordinate",
+      "homepage" : "https://github.com/neilb/Lingua-EN-Numbers-Ordinate",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/neilbowers/Lingua-EN-Numbers-Ordinate.git",
-         "web" : "https://github.com/neilbowers/Lingua-EN-Numbers-Ordinate"
+         "url" : "https://github.com/neilb/Lingua-EN-Numbers-Ordinate.git",
+         "web" : "https://github.com/neilb/Lingua-EN-Numbers-Ordinate"
       }
    },
-   "version" : "1.04"
+   "version" : "1.05",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24"
 }
 

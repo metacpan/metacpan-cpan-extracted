@@ -4,7 +4,7 @@
 #
 package PDL::Compression;
 
-our @EXPORT_OK  = qw( PDL::PP rice_compress PDL::PP rice_expand );
+our @EXPORT_OK = qw(PDL::PP rice_compress PDL::PP rice_expand );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Compression ;
 

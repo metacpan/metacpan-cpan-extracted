@@ -8,6 +8,9 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.42'
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -23,7 +26,7 @@ no_index:
 provides:
   Geo::WebService::Elevation::USGS:
     file: lib/Geo/WebService/Elevation/USGS.pm
-    version: '0.118'
+    version: '0.119'
 requires:
   Carp: '0'
   HTTP::Request::Common: '0'
@@ -31,12 +34,13 @@ requires:
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   Scalar::Util: '1.1'
+  constant: '0'
   perl: '5.008'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-Geo-WebService-Elevation-USGS/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-WebService-Elevation-USGS
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Geo-WebService-Elevation-USGS.git
-version: '0.118'
+version: '0.119'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

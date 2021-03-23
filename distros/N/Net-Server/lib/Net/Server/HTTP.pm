@@ -45,6 +45,19 @@ sub default_port { 80 }
 
 sub default_server_type { 'PreFork' }
 
+sub initialize_logging {
+    my $self = shift;
+    $self->SUPER::initialize_logging(@_);
+    my $prop = $self->{'server'};
+
+    my $d = {
+        access_log_format => '%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"',
+    };
+    $prop->{$_} = $d->{$_} foreach grep {!defined($prop->{$_})} keys %$d;
+
+    $self->_init_access_log;
+}
+
 sub post_configure {
     my $self = shift;
     $self->SUPER::post_configure(@_);
@@ -56,11 +69,8 @@ sub post_configure {
         timeout_idle    => 60,
         server_revision => __PACKAGE__."/$Net::Server::VERSION",
         max_header_size => 100_000,
-        access_log_format => '%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"',
     };
     $prop->{$_} = $d->{$_} foreach grep {!defined($prop->{$_})} keys %$d;
-
-    $self->_init_access_log;
 
     $self->_tie_client_stdout;
 }
@@ -79,7 +89,11 @@ sub _init_access_log {
     return if ! $log || $log eq '/dev/null';
     return if ! $prop->{'access_log_format'};
     $prop->{'access_log_format'} =~ s/\\([\\\"nt])/$1 eq 'n' ? "\n" : $1 eq 't' ? "\t" : $1/eg;
-    if ($log eq 'STDERR') {
+    if ($log eq 'STDOUT' || $log eq '/dev/stdout') {
+        open my $fh, '>&', \*STDOUT or die "Could not dup STDOUT: $!";
+        $fh->autoflush(1);
+        $prop->{'access_log_function'} = sub { print $fh @_,"\n" };
+    } elsif ($log eq 'STDERR' || $log eq '/dev/stderr') {
         $prop->{'access_log_function'} = sub { print STDERR @_,"\n" };
     } else {
         open my $fh, '>>', $log or die "Could not open access_log_file \"$log\": $!";
@@ -332,7 +346,7 @@ sub process_headers {
         ($req, my @lines) = split /\r?\n/, $headers;
         die "Missing request\n" if ! defined $req;
 
-        if (!defined($req) || $req !~ m{ ^\s*(GET|POST|PUT|DELETE|PUSH|HEAD|OPTIONS)\s+(.+)\s+(HTTP/1\.[01])\s*$ }ix) {
+        if (!defined($req) || $req !~ m{ ^\s*(GET|POST|PUT|PATCH|DELETE|PUSH|HEAD|OPTIONS)\s+(.+)\s+(HTTP/1\.[01])\s*$ }ix) {
             die "Invalid request\n";
         }
         $ENV{'REQUEST_METHOD'}  = uc $1;
@@ -958,8 +972,10 @@ request is closed.
 
 Defaults to undef.  If true, this represents the location of where
 the access log should be written to.  If a special value of STDERR
-is passed, the access log entry will be writing to the same location
-as the ERROR log.
+or F</dev/stderr> is passed, the access log entry will be written to
+the same location as the ERROR log.  If a special value of STDOUT or
+F</dev/stdout> is passed, the access log entry will be written to
+standard out.
 
 =item access_log_format
 

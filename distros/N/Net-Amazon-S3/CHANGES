@@ -1,5 +1,10 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.98 2021-03-22
+	- document how to use buckets with dots, Signature V4, and HTTPS together
+	- fix Net::Amazon::S3::Client::Object::exists (#94)
+	- improve compatibility with DigitalOcean Spaces (#95)
+
 0.97 2020-10-09
 	- presigned object access uri supports also PUT/DELETE methods (#89)
 

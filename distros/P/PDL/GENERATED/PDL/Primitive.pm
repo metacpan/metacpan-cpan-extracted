@@ -4,7 +4,7 @@
 #
 package PDL::Primitive;
 
-our @EXPORT_OK  = qw( PDL::PP inner PDL::PP outer  matmult PDL::PP matmult PDL::PP innerwt PDL::PP inner2 PDL::PP inner2d PDL::PP inner2t PDL::PP crossp PDL::PP norm PDL::PP indadd PDL::PP conv1d PDL::PP in  uniq  uniqind  uniqvec PDL::PP hclip PDL::PP lclip  clip PDL::PP clip PDL::PP wtstat PDL::PP statsover  stats PDL::PP histogram PDL::PP whistogram PDL::PP histogram2d PDL::PP whistogram2d PDL::PP fibonacci PDL::PP append PDL::PP axisvalues PDL::PP random PDL::PP randsym  grandom  vsearch PDL::PP vsearch_sample PDL::PP vsearch_insert_leftmost PDL::PP vsearch_insert_rightmost PDL::PP vsearch_match PDL::PP vsearch_bin_inclusive PDL::PP vsearch_bin_exclusive PDL::PP interpolate  interpol  interpND  one2nd PDL::PP which PDL::PP which_both  where  whereND  whichND  setops  intersect );
+our @EXPORT_OK = qw(PDL::PP inner PDL::PP outer  matmult PDL::PP matmult PDL::PP innerwt PDL::PP inner2 PDL::PP inner2d PDL::PP inner2t PDL::PP crossp PDL::PP norm PDL::PP indadd PDL::PP conv1d PDL::PP in  uniq  uniqind  uniqvec PDL::PP hclip PDL::PP lclip  clip PDL::PP clip PDL::PP wtstat PDL::PP statsover  stats PDL::PP histogram PDL::PP whistogram PDL::PP histogram2d PDL::PP whistogram2d PDL::PP fibonacci PDL::PP append PDL::PP axisvalues PDL::PP random PDL::PP randsym  grandom  vsearch PDL::PP vsearch_sample PDL::PP vsearch_insert_leftmost PDL::PP vsearch_insert_rightmost PDL::PP vsearch_match PDL::PP vsearch_bin_inclusive PDL::PP vsearch_bin_exclusive PDL::PP interpolate  interpol  interpND  one2nd PDL::PP which PDL::PP which_both  where  whereND  whichND  setops  intersect );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Primitive ;
 

@@ -4,7 +4,7 @@
 #
 package PDL::LinearAlgebra::Trans;
 
-@EXPORT_OK  = qw(   mexp mexpts mlog msqrt mpow 
+our @EXPORT_OK = qw(  mexp mexpts mlog msqrt mpow 
 			mcos msin mtan	msec mcsc mcot
 			mcosh  msinh  mtanh  msech  mcsch  mcoth
 			macos masin matan masec macsc macot 
@@ -12,7 +12,7 @@ package PDL::LinearAlgebra::Trans;
 			sec asec sech asech 
 			cot acot acoth coth mfun
 			csc acsc csch acsch toreal pi PDL::PP geexp PDL::PP cgeexp PDL::PP ctrsqrt PDL::PP ctrfun );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -20,8 +20,8 @@ use DynaLoader;
 
 
 
-   $PDL::LinearAlgebra::Trans::VERSION = '0.14';
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '0.14';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Trans $VERSION;
 

@@ -54,14 +54,13 @@ sub get_var2 { ref($_[1]) ? $_[1]->call($_[0]) : $_[1] }
     sub call { $_[1]->get_var2($_[0]->[0]) / $_[1]->get_var2($_[0]->[1]) }
     package A::B::Var;
     our @ISA = qw(A::B);
-use vars qw($HASH_OPS $LIST_OPS $SCALAR_OPS $FILTER_OPS $OP_FUNC);
-BEGIN {
-    $HASH_OPS   = $CGI::Ex::Template::HASH_OPS;
-    $LIST_OPS   = $CGI::Ex::Template::LIST_OPS;
-    $SCALAR_OPS = $CGI::Ex::Template::SCALAR_OPS;
-    $FILTER_OPS = $CGI::Ex::Template::FILTER_OPS;
-    $OP_FUNC    = $CGI::Ex::Template::OP_FUNC;
-}
+
+our $HASH_OPS   = $CGI::Ex::Template::HASH_OPS;
+our $LIST_OPS   = $CGI::Ex::Template::LIST_OPS;
+our $SCALAR_OPS = $CGI::Ex::Template::SCALAR_OPS;
+our $FILTER_OPS = $CGI::Ex::Template::FILTER_OPS;
+our $OP_FUNC    = $CGI::Ex::Template::OP_FUNC;
+
 use constant trace => 0;
 sub call {
     my $var  = shift;
@@ -370,14 +369,13 @@ cmpthese timethese (-2, {
 ### create libraries similar to those from CGI::Ex::Template 1.201
 
 use CGI::Ex::Template;
-use vars qw($HASH_OPS $LIST_OPS $SCALAR_OPS $FILTER_OPS $OP_FUNC);
-BEGIN {
-    $HASH_OPS   = $CGI::Ex::Template::HASH_OPS;
-    $LIST_OPS   = $CGI::Ex::Template::LIST_OPS;
-    $SCALAR_OPS = $CGI::Ex::Template::SCALAR_OPS;
-    $FILTER_OPS = $CGI::Ex::Template::FILTER_OPS;
-    $OP_FUNC    = $CGI::Ex::Template::OP_FUNC;
-}
+
+our $HASH_OPS   = $CGI::Ex::Template::HASH_OPS;
+our $LIST_OPS   = $CGI::Ex::Template::LIST_OPS;
+our $SCALAR_OPS = $CGI::Ex::Template::SCALAR_OPS;
+our $FILTER_OPS = $CGI::Ex::Template::FILTER_OPS;
+our $OP_FUNC    = $CGI::Ex::Template::OP_FUNC;
+
 use constant trace => 0;
 
 sub get_variable {
@@ -668,4 +666,3 @@ sub play_operator {
 
     $self->throw('operator', "Un-implemented operation $op");
 }
-

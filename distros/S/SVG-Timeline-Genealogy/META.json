@@ -60,6 +60,6 @@
          "web" : "https://github.com/davorg/svg-timeline-genealogy"
       }
    },
-   "version" : "v0.0.4",
+   "version" : "v0.0.5",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

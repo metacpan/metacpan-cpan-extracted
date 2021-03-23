@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 =encoding utf-8
 
@@ -14,7 +14,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =head1 SYNOPSIS
 
@@ -40,17 +40,23 @@ ansifold [ options ]
 
 =head1 DESCRIPTION
 
-B<ansifold> is almost B<fold> compatible command utilizing
+B<ansifold> is a fold(1) compatible command utilizing
 L<Text::ANSI::Fold> module, which enables to handle ANSI terminal
 sequences and Unicode multi-byte characters properly.
 
-It folds lines in 72 column by default.  Use option B<-w> to change
-the folding width.
+=head2 WIDTH
+
+B<ansifold> folds lines in 72 column by default.  Use option B<-w> to
+change the folding width.
 
     $ ansifold -w132
 
-Unlike original fold(1) command, multiple numbers can be specified
-like:
+Single field is used repeatedly for the same line.
+
+=head2 MULTIPLE WIDTH
+
+Unlike the original fold(1) command, multiple numbers can be
+specified.
 
     $ LANG=C date | ansifold -w 3,1,3,1,2 | cat -n
          1  Wed
@@ -59,26 +65,23 @@ like:
          4   
          5  19
 
+With multiple fields, unmatched part is discarded as in the above
+example.  So you can truncate lines by putting comma at the end of
+single field.
+
+    ansifold -w80,
+
+Option C<-w80,> is equivalent to C<-w80,0>.  Zero width is ignored
+when seen as a final number, but not ignored otherwise.
+
+=head2 NEGATIVE WIDTH
+
 Negative number fields are discarded.
 
     $ LANG=C date | ansifold -w 3,-1,3,-1,2
     Wed
     Dec
     19
-
-Option B<-n> (or B<--separate> '') eliminates newlines between
-columns.
-
-    $ LANG=C date | ansifold -w 3,-1,3,-1,2 -n
-    WedDec19
-
-Single field is used repeatedly for the same line, but multiple fields
-are not.  Put comma at the end of single field to discard the rest:
-
-    ansifold -w 80,
-
-Option C<-w 80,> is equivalent to C<-w 80,0>.  Zero width is ignored
-when seen as a final number, but not ignored otherwise.
 
 If the final width is negative, it is not discarded but takes all the
 rest instead.  So next commands do the same thing.
@@ -87,9 +90,12 @@ rest instead.  So next commands do the same thing.
 
     $ ansifold -nw 6,-4,-1
 
-Next command implements ANSI/Unicode aware L<expand(1)> command.
+Option C<-w -1> does nothing effectively.  Using it with B<--expand>
+option implements ANSI/Unicode aware L<expand(1)> command.
 
     $ ansifold -w -1 --expand
+
+=head2 NUMBERS
 
 Number description is handled by L<Getopt::EX::Numbers> module, and
 consists of C<start>, C<end>, C<step> and C<length> elements.  For
@@ -108,6 +114,23 @@ and produces output like this:
     CCCCCC
     DDDDDDDD
     EEEEEEEEEE
+
+=head2 SEPARATOR/TERMINATOR
+
+Option B<-n> (or B<--separate> '') eliminates newlines between
+columns.
+
+    $ LANG=C date | ansifold -w 3,-1,3,-1,2 -n
+    WedDec19
+
+Option B<--separate> set separator string.
+
+    $ echo ABCDEF | ansifold --separate=: -w 1,0,1,0,1,-1
+    A::B::C:DEF
+
+Option B<--paragraph> or B<-p> print extra newline after each lines.
+This is convenient when a paragraph is made up of single line, like
+microsoft word document.
 
 =head1 LINE BREAKING
 
@@ -160,9 +183,13 @@ L<Text::ANSI::Fold::Util|https://github.com/kaz-utashiro/Text-ANSI-Fold-Util>
 
 L<Getopt::EX::Numbers>
 
-L<https://www.w3.org/TR/2012/NOTE-jlreq-20120403/>,
+L<https://www.w3.org/TR/jlreq/>
 Requirements for Japanese Text Layout,
-W3C Working Group Note 3 April 2012
+W3C Working Group Note 11 August 2020
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
 
 =head1 LICENSE
 
@@ -170,10 +197,6 @@ Copyright 2018- Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-=head1 AUTHOR
-
-Kazumasa Utashiro
 
 =cut
 
@@ -183,23 +206,30 @@ map { $_ = decode 'utf8', $_ unless utf8::is_utf8($_) } @ARGV;
 
 use Pod::Usage;
 use List::Util qw(min);
+use Hash::Util qw(lock_keys);
 use Text::ANSI::Fold qw(:constants);
 use Data::Dumper;
 
 my %opt = (
-    width => [],
-    separate => "\n",
-    boundary => "none",
+    width     => [],
+    boundary  => "none",
+    padding   => undef,
+    padchar   => undef,
+    ambiguous => undef,
+    paragraph => 0,
+    separate  => "\n",
     linebreak => LINEBREAK_NONE,
-    runin => 4,
-    runout => 4,
-    expand => undef,
-    tabstop => undef,
-    tabhead => undef,
-    tabspace => undef,
-    tabstyle => undef,
-    discard => [],
+    runin     => 4,
+    runout    => 4,
+    expand    => undef,
+    tabstop   => undef,
+    tabhead   => undef,
+    tabspace  => undef,
+    tabstyle  => undef,
+    discard   => [],
     );
+
+lock_keys %opt;
 
 my @optargs = (
     "width|w=s"      =>  $opt{width},
@@ -207,17 +237,17 @@ my @optargs = (
     "padding!"       => \$opt{padding},
     "padchar=s"      => \$opt{padchar},
     "ambiguous=s"    => \$opt{ambiguous},
-    "paragraph|p"    => \$opt{paragraph},
+    "paragraph|p+"   => \$opt{paragraph},
     "separate=s"     => \$opt{separate},
     "linebreak|lb=s" => sub {
-	$opt{linebreak} = sub {
-	    local $_ = shift;
+	$opt{linebreak} = do {
+	    local $_ = $_[1];
 	    my $v = LINEBREAK_NONE;
 	    $v |= LINEBREAK_ALL    if /all/i;
 	    $v |= LINEBREAK_RUNIN  if /runin/i;
 	    $v |= LINEBREAK_RUNOUT if /runout/i;
 	    $v;
-	}->($_[1]);
+	};
     },
     "runin=i"  => \$opt{runin},
     "runout=i" => \$opt{runout},
@@ -309,7 +339,7 @@ while (<>) {
     }
     print join $separator, @chops;
     print "\n" if $chomped;
-    print "\n" if $opt{paragraph};
+    print "\n" x $opt{paragraph} if $opt{paragraph} > 0;
 }
 
 exit;

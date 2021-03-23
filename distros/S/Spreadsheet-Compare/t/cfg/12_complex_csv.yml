@@ -1,0 +1,155 @@
+---
+- title:   __GLOBAL__
+  type:    CSV
+  rootdir: t
+#=============================================
+- title:     csv_med_dup auto
+  files:
+    - left/csv_med_dup.csv
+    - right/csv_med_dup.csv
+  identity:  [0]
+  limit_abs: 0.01
+  limit_rel: 0.1
+#=============================================
+- title:      csv_med_dup no header
+  files:
+    - left/csv_med_dup.csv
+    - right/csv_med_dup.csv
+  identity:   [0]
+  limit_abs:  0.01
+  limit_rel:  0.1
+  has_header: 0
+#=============================================
+- title:      csv_med_dup chunked
+  files:
+    - left/csv_med_dup.csv
+    - right/csv_med_dup.csv
+  identity:   [0]
+  has_header: 0
+  chunk:
+    column: 0
+    regex:  '(\d)$'
+  limit_abs:  0.01
+  limit_rel:  0.1
+#=============================================
+- title:      csv_mixid
+  files:
+    - left/csv_mixid.csv
+    - right/csv_mixid.csv
+  identity:
+    - Cbegsbyvb
+    - Vafgehzrag
+  ignore:
+    - IrtnY
+    - PbagenpgFvmr
+    - '1 Z'
+    - '6 Z'
+    - '12 Z'
+  is_sorted:  0
+  fetch_size: 100
+  limit_abs:  0.001
+  limit_rel:  0.01
+  has_header: 1
+  csv_options:
+    sep_char: ';'
+#=============================================
+- title:      csv_mixid sorted
+  files:
+    - left/csv_mixid_sorted.csv
+    - right/csv_mixid_sorted.csv
+  identity:
+    - Cbegsbyvb
+    - Vafgehzrag
+  ignore:
+    - IrtnY
+    - PbagenpgFvmr
+    - '1 Z'
+    - '6 Z'
+    - '12 Z'
+  is_sorted:  1
+  fetch_size: 100
+  limit_abs:  0.001
+  limit_rel:  0.01
+  has_header: 1
+  csv_options:
+    sep_char: ';'
+#=============================================
+- title:       csv_mixid limit
+  files:
+    - left/csv_mixid_sorted.csv
+    - right/csv_mixid_sorted.csv
+  identity:
+    - Cbegsbyvb
+    - Vafgehzrag
+  ignore:
+    - IrtnY
+    - PbagenpgFvmr
+    - '1 Z'
+    - '6 Z'
+    - '12 Z'
+  is_sorted:   1
+  fetch_limit: 2
+  fetch_size:  100
+  limit_abs:   0.001
+  limit_rel:   0.01
+  has_header:  1
+  csv_options:
+    sep_char: ';'
+#=============================================
+- title:      csv_mixid chunked
+  files:
+    - left/csv_mixid.csv
+    - right/csv_mixid.csv
+  identity:
+    - Cbegsbyvb
+    - Vafgehzrag
+  ignore:
+    - IrtnY
+    - PbagenpgFvmr
+    - '1 Z'
+    - '6 Z'
+    - '12 Z'
+  is_sorted:  0
+  chunk:      Cbegsbyvb
+  fetch_size: 100
+  limit_abs:  0.001
+  limit_rel:  0.01
+  has_header: 1
+  csv_options:
+    sep_char: ';'
+#=============================================
+- title:              csv_desep_no_convert
+  files:
+    - left/csv_desep_convert.csv
+    - right/csv_desep_convert.csv
+  identity:
+    - BEQAE
+  has_header:         1
+  decimal_separator:  ','
+  is_sorted:          0
+  fetch_size:         100
+  limit_abs:          0.1
+  limit_rel:          1
+  has_header:         1
+  make_header_unique: 1
+  csv_options:
+    sep_char: ';'
+#=============================================
+- title:              csv_desep_convert
+  files:
+    - left/csv_desep_convert.csv
+    - right/csv_desep_convert.csv
+  identity:
+    - BEQAE
+  has_header:         1
+  decimal_separator:  ','
+  is_sorted:          0
+  fetch_size:         100
+  limit_abs:          0.1
+  limit_rel:          1
+  has_header:         1
+  convert_numbers:    1
+  make_header_unique: 1
+  csv_options:
+    sep_char: ';'
+

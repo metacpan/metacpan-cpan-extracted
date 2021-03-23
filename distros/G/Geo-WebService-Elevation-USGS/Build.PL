@@ -14,27 +14,34 @@ use Module::Build;
 my $meta = My::Module::Meta->new();
 
 my %args = (
-    dist_author => 'Tom Wyant (wyant at cpan dot org)',
-    dist_abstract => 'Get elevation data from the USGS',
-    module_name => 'Geo::WebService::Elevation::USGS',
-    build_requires => $meta->build_requires(),
-    requires => $meta->requires(
+    add_to_cleanup	=> $meta->add_to_cleanup(),
+    build_requires	=> $meta->build_requires(),
+    configure_requires	=> $meta->configure_requires(),
+    dist_abstract	=> $meta->abstract(),
+    dist_author	=> $meta->author(),
+    dist_name	=> $meta->dist_name(),
+    license	=> $meta->license(),
+    module_name	=> $meta->module_name(),
+    requires	=> $meta->requires(
 	perl	=> $meta->requires_perl(),
     ),
-    add_to_cleanup => [ qw{ cover_db xt/author/optionals } ],
-    license => 'perl',
+    script_files	=> $meta->script_files(),
 );
 
-$mbv >= 0.28
-    and $args{meta_merge} = $meta->meta_merge();
+if ( $mbv >= 0.28 ) {
+    $args{meta_merge} = $meta->meta_merge();
+    $args{meta_add} = {
+	no_index	=> $meta->no_index(),
+    };
+}
 
 # Don't require Module::Build if we're making a distribution, since the
 # user can use ExtUtils::MakeMaker.
 $mbv >= 0.34
     and $args{auto_configure_requires} = !$meta->distribution();
 
-my $bldr = My::Module::Build->new (%args);
+my $bldr = My::Module::Build->new( %args );
 
-$bldr->create_build_script ();
+$bldr->create_build_script();
 
 # ex: set textwidth=72 :

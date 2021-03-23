@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Operation::Object::Upload::Abort::Response;
 # ABSTRACT: An internal class to handle abort multipart upload response
-$Net::Amazon::S3::Operation::Object::Upload::Abort::Response::VERSION = '0.97';
+$Net::Amazon::S3::Operation::Object::Upload::Abort::Response::VERSION = '0.98';
 use Moose;
 
 extends 'Net::Amazon::S3::Response';
@@ -19,7 +19,7 @@ Net::Amazon::S3::Operation::Object::Upload::Abort::Response - An internal class 
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 DESCRIPTION
 
@@ -31,7 +31,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

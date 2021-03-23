@@ -4,7 +4,7 @@
 #
 package PDL::IO::GD;
 
-our @EXPORT_OK  = qw( PDL::PP write_png PDL::PP write_png_ex PDL::PP write_true_png PDL::PP write_true_png_ex  write_png_best write_true_png_best  recompress_png_best  load_lut read_png read_true_png PDL::PP _read_true_png PDL::PP _read_png PDL::PP _gd_image_to_pdl_true PDL::PP _gd_image_to_pdl PDL::PP _pdl_to_gd_image_true PDL::PP _pdl_to_gd_image_lut  read_png_lut PDL::PP _read_png_lut PDL::PP _gdImageColorAllocates PDL::PP _gdImageColorAllocateAlphas PDL::PP _gdImageSetPixels PDL::PP _gdImageLines PDL::PP _gdImageDashedLines PDL::PP _gdImageRectangles PDL::PP _gdImageFilledRectangles PDL::PP _gdImageFilledArcs PDL::PP _gdImageArcs PDL::PP _gdImageFilledEllipses  gdAlphaBlend   gdTrueColor   gdTrueColorAlpha   gdFree   gdFontGetLarge   gdFontGetSmall   gdFontGetMediumBold   gdFontGetGiant   gdFontGetTiny  );
+our @EXPORT_OK = qw(PDL::PP write_png PDL::PP write_png_ex PDL::PP write_true_png PDL::PP write_true_png_ex  write_png_best write_true_png_best  recompress_png_best  load_lut read_png read_true_png PDL::PP _read_true_png PDL::PP _read_png PDL::PP _gd_image_to_pdl_true PDL::PP _gd_image_to_pdl PDL::PP _pdl_to_gd_image_true PDL::PP _pdl_to_gd_image_lut  read_png_lut PDL::PP _read_png_lut PDL::PP _gdImageColorAllocates PDL::PP _gdImageColorAllocateAlphas PDL::PP _gdImageSetPixels PDL::PP _gdImageLines PDL::PP _gdImageDashedLines PDL::PP _gdImageRectangles PDL::PP _gdImageFilledRectangles PDL::PP _gdImageFilledArcs PDL::PP _gdImageArcs PDL::PP _gdImageFilledEllipses  gdAlphaBlend   gdTrueColor   gdTrueColorAlpha   gdFree   gdFontGetLarge   gdFontGetSmall   gdFontGetMediumBold   gdFontGetGiant   gdFontGetTiny  );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::GD ;
 

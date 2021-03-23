@@ -38,7 +38,7 @@
       },
       "runtime" : {
          "requires" : {
-            "PDL::Core" : "2.001"
+            "PDL" : "2.030"
          }
       }
    },
@@ -52,6 +52,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

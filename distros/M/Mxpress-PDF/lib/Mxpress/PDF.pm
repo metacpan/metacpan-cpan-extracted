@@ -4,7 +4,7 @@ use warnings;
 
 package Mxpress::PDF {
 	BEGIN {
-		our $VERSION = '0.27';
+		our $VERSION = '0.28';
 		our $AUTHORITY = 'cpan:LNATION';
 	};
 	use Zydeco;
@@ -222,7 +222,7 @@ package Mxpress::PDF {
 		method hf_offset {
 			return ($self->header->active ? $self->header->h : 0 ) + ($self->footer->active ? $self->footer->h : 0);
 		}
-		class +Component {
+		class Page::Component {
 			has parent (is => 'rw', type => Object);
 			has show_page_num (is => 'rw', type => Str);
 			has page_num_text (is => 'rw', type => Str);
@@ -271,7 +271,7 @@ package Mxpress::PDF {
 					$file->text->add($self->process_page_num_text, align => $self->show_page_num);
 				}
 			}
-			class +Cover {
+			class Page::Component::Cover {
 				has file (is => 'rw', type => Object);
 				factory cover (Object $file, Map %args) {
 					$args{$_} //= $file->page->$_ for qw/x y w h padding oh ow column columns row rows num page_size/;
@@ -293,7 +293,7 @@ package Mxpress::PDF {
 					return $self->file;
 				}
 			}
-			class +Header {
+			class Page::Component::Header {
 				factory header (Map %args) {
 					$args{$_} //= $args{parent}->$_ for qw/num page_size/;
 					$args{x} //= 0;
@@ -309,7 +309,7 @@ package Mxpress::PDF {
 					$self->parent->y($self->parent->oh - $self->h);
 				}
 			}
-			class +Footer {
+			class Page::Component::Footer {
 				factory footer (Map %args) {
 					$args{$_} //= $args{parent}->$_ for qw/num page_size/;
 					$args{x} //= 0;
@@ -402,7 +402,7 @@ package Mxpress::PDF {
 		with Utils;
 		has file (is => 'rw', type => Object);
 		has position (is => 'rw', type => ArrayRef);
-		class +Font {
+		class Plugin::Font {
 			has colour (is => 'rw', type => Str);
 			has size (is => 'rw', type => Num);
 			has family (is => 'rw', type => Str);
@@ -428,7 +428,7 @@ package Mxpress::PDF {
 				return $loaded->{$family};
 			}
 		}
-		class +Shape {
+		class Plugin::Shape {
 			has fill_colour ( is => 'rw', type => Str );
 			has radius ( is => 'rw', type => Num );
 			has start (is => 'rw', type => Num);
@@ -447,7 +447,7 @@ package Mxpress::PDF {
 				$self->shape($shape);
 				return $self->file;
 			}
-			class +Line {
+			class Plugin::Shape::Line {
 				has end_position (is => 'rw');
 				has type (is => 'rw', type => Str);
 				has dash (is => 'rw', type => ArrayRef);
@@ -473,7 +473,7 @@ package Mxpress::PDF {
 					$shape->line($x, $y);
 					$shape->stroke;
 				}
-				class Border {
+				class Plugin::Shape::Line::Border {
 					has border_top (is => 'rw', type => ArrayRef);	
 					has active (is => 'rw');
 					factory border (Object $file, Map %args) {
@@ -532,7 +532,7 @@ package Mxpress::PDF {
 				}
 
 			}
-			class +Box {
+			class Plugin::Shape::Box {
 				factory box (Object $file, Map %args) {
 					return $class->generic_new($file, %args);
 				}
@@ -546,7 +546,7 @@ package Mxpress::PDF {
 					$box->fill;
 				}
 			}
-			class +Circle {
+			class Plugin::Shape::Circle {
 				factory circle (Object $file, Map %args) {
 					$args{radius} ||= 50;	
 					return $class->generic_new($file, %args);
@@ -565,7 +565,7 @@ package Mxpress::PDF {
 					$circle->fill;
 				}
 			}
-			class +Pie {
+			class Plugin::Shape::Pie {
 				factory pie (Object $file, Map %args) {
 					$args{radius} ||= 50;
 					$args{start} ||= 180;
@@ -583,7 +583,7 @@ package Mxpress::PDF {
 					$pie->fill;
 				}
 			}
-			class +Ellipse {
+			class Plugin::Shape::Ellipse {
 				factory ellipse (Object $file, Map %args) {
 					$args{start} ||= 50;
 					$args{end} ||= 100;
@@ -600,7 +600,7 @@ package Mxpress::PDF {
 				}
 			}
 		}
-		class +Text {
+		class Plugin::Text {
 			has text (is => 'rw', type => Object);
 			has font (is => 'rw', type => Object);
 			has paragraph_space (is => 'rw', type => Num);
@@ -689,18 +689,14 @@ package Mxpress::PDF {
 							$self->concat(!!0);
 							$xpos = $self->end_w + $text->advancewidth(' ');
 							$ypos = $y;
-							$lw = $self->end_lw - $text->advancewidth(' '); 
-						use Data::Dumper;
-						warn Dumper $lw;
+							$lw = $self->end_lw - $text->advancewidth(' ');
 						} else { 	
 							($xpos, $lw) = $self->_set_indent($xpos, $lw, $fl, $fp);
 						}
-
 						while (@paragraph and ($line_width + (scalar(@line) * $space_width) + ($width{$paragraph[0]}||0)) < $lw) {
 							$line_width += $width{$paragraph[0]} || 0;
 							push @line, shift(@paragraph);
 						}
-
 						if (!@line && @paragraph) {
 							my $temp = shift(@paragraph);
 							my @letters = split //, $temp;
@@ -717,7 +713,6 @@ package Mxpress::PDF {
 							push @line, $lin;
 							unshift(@paragraph, $rest);
 						}
-
 						my ($wordspace, $align);
 						if ($self->align eq 'fulljustify' or $self->align eq 'justify' and @paragraph) {
 							if (scalar(@line) == 1) {
@@ -734,8 +729,8 @@ package Mxpress::PDF {
 							foreach my $word (@line) {
 								$text->translate($xpos, $ypos);
 								$text->text($word);
-								$width{$word} ||= 1;
-								$xpos += ($width{$word} + $wordspace) if (@line);
+								$width{$word} ||= $text->advancewidth($word);
+								$xpos += ($width{$word} + $wordspace);
 							}
 						} else {
 							if ($align eq 'right') {
@@ -811,63 +806,63 @@ package Mxpress::PDF {
 				}
 				return ($total_width, $space_width, %width);
 			}	
-			class +Title {
+			class Plugin::Text::Title {
 				factory title (Object $file, Map %args) {
 					$args{font}->{size} ||= 50/pt;
 					$args{font}->{line_height} ||= 40/pt;
 					$class->generic_new($file, %args);
 				}
 			}
-			class +Subtitle {
+			class Plugin::Text::Subtitle {
 				factory subtitle (Object $file, Map %args) {
 					$args{font}->{size} ||= 25;
 					$args{font}->{line_height} ||= 20;
 					$class->generic_new($file, %args);
 				}
 			}
-			class +Subsubtitle {
+			class Plugin::Text::Subsubtitle {
 				factory subsubtitle (Object $file, Map %args) {
 					$args{font}->{size} ||= 20;
 					$args{font}->{line_height} ||= 15;
 					$class->generic_new($file, %args);
 				}
 			}
-			class +H1 {
+			class Plugin::Text::H1 {
 				factory h1 (Object $file, Map %args) {
 					$args{font}->{size} ||= 50/pt;
 					$args{font}->{line_height} ||= 40/pt;
 					$class->generic_new($file, %args);
 				}
 			}
-			class +H2 {
+			class Plugin::Text::H2 {
 				factory h2 (Object $file, Map %args) {
 					$args{font}->{size} ||= 40/pt;
 					$args{font}->{line_height} ||= 30/pt;
 					$class->generic_new($file, %args);
 				}
 			}
-			class +H3 {
+			class Plugin::Text::H3 {
 				factory h3 (Object $file, Map %args) {
 					$args{font}->{size} ||= 30/pt;
 					$args{font}->{line_height} ||= 20/pt;
 					$class->generic_new($file, %args);
 				}
 			}
-			class +H4 {
+			class Plugin::Text::H4 {
 				factory h4 (Object $file, Map %args) {
 					$args{font}->{size} ||= 25/pt;
 					$args{font}->{line_height} ||= 15/pt;
 					$class->generic_new($file, %args);
 				}
 			}
-			class +H5 {
+			class Plugin::Text::H5 {
 				factory h5 (Object $file, Map %args) {
 					$args{font}->{size} ||= 20/pt;
 					$args{font}->{line_height} ||= 15/pt;
 					$class->generic_new($file, %args);
 				}
 			}
-			class +H6 {
+			class Plugin::Text::H6 {
 				factory h6 (Object $file, Map %args) {
 					$args{font}->{size} ||= 15/pt;
 					$args{font}->{line_height} ||= 10/pt;
@@ -875,7 +870,7 @@ package Mxpress::PDF {
 				}
 			}
 		}
-		class +TOC::Outline extends Plugin::Text {
+		class Plugin::TOC::Outline extends Plugin::Text {
 			has outline (is => 'rw', type => Object);
 			has x (is => 'rw', type => Num);
 			has y (is => 'rw', type => Num);
@@ -930,7 +925,7 @@ package Mxpress::PDF {
 				}
 			}
 		}
-		class +TOC {
+		class Plugin::TOC {
 			has count (is => 'rw', type => Num);
 			has toc_placeholder (is => 'rw', type => HashRef);
 			has outline (is => 'rw', type => Object);
@@ -1014,7 +1009,7 @@ package Mxpress::PDF {
 				}
 			}
 		}
-		class +Image {
+		class Plugin::Image {
 			has width (is => 'rw', type => Num);
 			has height (is => 'rw', type => Num);
 			has align (is => 'rw', type => Str);
@@ -1088,7 +1083,7 @@ package Mxpress::PDF {
 				return ($x, $y, $width, $height);
 			}
 		}
-		class +Annotation {
+		class Plugin::Annotation {
 			has type (is => 'rw', type => Str);
 			has w (is => 'rw', type => Num);
 			has h (is => 'rw', type => Num);
@@ -1122,7 +1117,7 @@ package Mxpress::PDF {
 				return $self->file;
 			}
 		}
-		class +List extends Plugin::Text {
+		class Plugin::List extends Plugin::Text {
 			has type ( is => 'rw', type => Str );
 			factory list (Object $file, Map %args) {
 				my $self = $class->generic_new($file, %args);
@@ -1151,7 +1146,7 @@ package Mxpress::PDF {
 				}
 			}
 		}
-		class +Form {
+		class Plugin::Form {
 			use PDF::API2::Basic::PDF::Utils;
 			has acro (is => 'rw', type => Object);
 			has fields (is => 'rw', type => ArrayRef);
@@ -1178,7 +1173,7 @@ package Mxpress::PDF {
 				push @{$fields}, $field;
 				return $self->fields($fields);
 			}
-			class +Field extends Plugin::Text {
+			class Plugin::Form::Field extends Plugin::Text {
 				use PDF::API2::Basic::PDF::Literal;
 				use PDF::API2::Basic::PDF::Utils;
 				has xo (is => 'rw', type => Object);
@@ -1217,7 +1212,7 @@ package Mxpress::PDF {
 					);
 					$self->annotate->rect(@pos);
 				}
-				class +Input {
+				class Plugin::Form::Field::Input {
 					factory input (Object $file, Map %args) {
 						$args{pad} ||= '_';
 						$args{margin_bottom} ||= 1.7;
@@ -1226,7 +1221,7 @@ package Mxpress::PDF {
 					method configure (Map %args) {
 						$self->annotate->{FT} = PDFName('Tx');
 					}	
-					class +Textarea {
+					class Plugin::Form::Field::Textarea {
 						has lines (is => 'rw', type => Num);
 						factory textarea (Object $file, Map %args) {
 							$args{pad} ||= '_';
@@ -1267,7 +1262,7 @@ package Mxpress::PDF {
 						}
 					}
 				}
-				class +Select {
+				class Plugin::Form::Field::Select {
 					factory select (Object $file, Map %args) {
 						$args{pad} ||= '_';
 						$args{margin_bottom} ||= 1.7;
@@ -1343,7 +1338,7 @@ Mxpress::PDF - PDF
 
 =head1 VERSION
 
-Version 0.27
+Version 0.28
 
 =cut
 

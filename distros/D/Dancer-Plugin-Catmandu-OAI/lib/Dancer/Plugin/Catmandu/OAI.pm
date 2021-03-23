@@ -6,7 +6,7 @@ Dancer::Plugin::Catmandu::OAI - OAI-PMH provider backed by a searchable Catmandu
 
 =cut
 
-our $VERSION = '0.0506';
+our $VERSION = '0.0507';
 
 use Catmandu::Sane;
 use Catmandu::Util qw(is_string is_array_ref);
@@ -95,7 +95,7 @@ sub _new_token {
     $token->{_m} = $params->{metadataPrefix}
         if defined $params->{metadataPrefix};
     $token->{_f} = $from if defined $from;
-    $token->{_u} = $from if defined $until;
+    $token->{_u} = $until if defined $until;
     $token;
 }
 

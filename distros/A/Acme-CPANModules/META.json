@@ -51,7 +51,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules"
       }
    },
-   "version" : "0.1.6",
+   "version" : "0.1.7",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

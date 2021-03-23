@@ -29,7 +29,7 @@ use Net::Server::Proto ();
 use Net::Server::Daemonize qw(check_pid_file create_pid_file safe_fork
                               get_uid get_gid set_uid set_gid);
 
-our $VERSION = '2.009';
+our $VERSION = '2.010';
 
 sub new {
     my $class = shift || die "Missing class";
@@ -86,7 +86,7 @@ sub _initialize {
     my $self = shift;
     my $prop = $self->{'server'} ||= {};
 
-    $self->commandline($self->_get_commandline) if ! eval { $self->commandline }; # save for a HUP
+    $self->commandline($self->_get_commandline) if ! eval { local $SIG{__DIE__}; $self->commandline }; # save for a HUP
     $self->configure_hook;      # user customizable hook
     $self->configure;           # allow for reading of commandline, program, and configuration file parameters
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension List::Helpers::XS.
 
+0.10  Mon Mar 22
+    - POD fixes
+
 0.09  Sun Mar 17
     - tiny optimisations
 

@@ -38,8 +38,9 @@ resources:
   bugtracker: https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI/issues
   homepage: https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI
   repository: https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI.git
-version: '0.0506'
+version: '0.0507'
 x_contributors:
+  - 'Dan Michael O. Heggø <danmichaelo@gmail.com>'
   - 'Nicolas Franck <Nicolas.Franck@ugent.be>'
   - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'
   - 'Nicolas Steenlant <nicolas.steenlant@gmail.com>'

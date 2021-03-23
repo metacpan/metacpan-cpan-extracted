@@ -25,6 +25,18 @@ sub accept {
 
 my $socket_dir = tempdir(CLEANUP => 1);
 my $socket_file = catfile($socket_dir, 'socket'); # must do before fork
+
+sub allow_deny_hook {
+    my ($server, $client) = @_;
+
+    ### check the properties of the client socket
+    if($client->NS_proto eq 'UNIX') {
+        return $client->NS_port eq $socket_file;
+    } else {
+        return $client->NS_port == $env->{'ports'}->[0];
+    }
+}
+
 my $ok = eval {
     local $SIG{'ALRM'} = sub { die "Timeout\n" };
     alarm $env->{'timeout'};

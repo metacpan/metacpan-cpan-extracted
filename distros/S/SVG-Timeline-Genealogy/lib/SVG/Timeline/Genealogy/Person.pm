@@ -76,7 +76,7 @@ has +colour => (
 
 sub _build_colour {
   my $self = shift;
-  return $self->colours->[$self->generation];
+  return $self->colours->[$self->generation] // 'rgb(127.127.127)';
 }
 
 =head1 METHODS AND ATTRIBUTES

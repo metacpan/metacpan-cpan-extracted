@@ -6,10 +6,8 @@
 
 =cut
 
-use vars qw($module $compile_perl);
-BEGIN {
-    $module = 'Template::Alloy';
-};
+our $compile_perl;
+our $module = 'Template::Alloy';
 
 use strict;
 use Test::More tests => 202;

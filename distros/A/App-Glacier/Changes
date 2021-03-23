@@ -1,4 +1,8 @@
-2.12 2021-01-12
+2.13 2021-03-22
+
+* Use explicit DESTROY with AUTOLOADs
+
+2.12 2021-02-12
 
 * Change bugtracker address.
 

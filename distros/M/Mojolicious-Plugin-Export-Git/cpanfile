@@ -1,4 +1,6 @@
-requires "perl" => "5.008";
+requires "Mojolicious" => "8";
+requires "Mojolicious::Plugin::Export" => "0.008";
+requires "perl" => "5.014";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";

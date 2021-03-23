@@ -1,0 +1,10 @@
+lib/Mojolicious/Plugin/GSSAPI.pm
+t/001_sanity.t
+eg/gssapi-ldap-demol.pl
+eg/gssapi-demo.pl
+LICENSE
+Makefile.PL
+README.md
+META.yml
+MANIFEST
+META.json                                Module JSON meta-data (added by MakeMaker)

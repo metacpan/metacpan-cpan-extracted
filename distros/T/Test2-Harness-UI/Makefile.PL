@@ -56,6 +56,7 @@ my %WriteMakefileArgs = (
     "Plack::App::File" => 0,
     "Plack::Builder" => 0,
     "Plack::Handler::Starman" => 0,
+    "Plack::Middleware::DBIx::DisconnectAll" => 0,
     "Plack::Runner" => 0,
     "Router::Simple" => 0,
     "Scalar::Util" => 0,
@@ -78,7 +79,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.000050",
+  "VERSION" => "0.000051",
   "test" => {
     "TESTS" => "t/*.t t/UI/*.t"
   }
@@ -115,6 +116,7 @@ my %FallbackPrereqs = (
   "Plack::App::File" => 0,
   "Plack::Builder" => 0,
   "Plack::Handler::Starman" => 0,
+  "Plack::Middleware::DBIx::DisconnectAll" => 0,
   "Plack::Runner" => 0,
   "Router::Simple" => 0,
   "Scalar::Util" => 0,

@@ -19,7 +19,7 @@ use warnings;
 # I generate code for up to 10-dimensional FFTs
 my $maxrank = 10;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 pp_setversion($VERSION);
 
 pp_addpm( {At => 'Top'}, slurp('README.pod') . <<'EOF' );
@@ -57,11 +57,15 @@ for my $rank (1..$maxrank)
   my $shapestr = sprintf(q{$a->shape->slice('1:%d')->prodover},$rank);
   my $rshapestr = sprintf(q{$a->shape->slice('0:%d')->prodover},$rank-1);
 
-  pp_addpm({At => 'Bot'}, <<EOF );
+  pp_addpm({At => 'Bot'}, pp_line_numbers(__LINE__, <<EOF));
 sub fft$rank { __fft_internal( "fft$rank",\@_ ); }
 *PDL::fft$rank = \\&fft$rank;
 
-sub ifft$rank { my \$a = __fft_internal( "ifft$rank", \@_ ); \$a /= $shapestr; \$a; }
+sub ifft$rank {
+  my \$a = __fft_internal( "ifft$rank", \@_ );
+  \$a /= \$_[0]->type->real ? $shapestr : $rshapestr;
+  \$a;
+}
 *PDL::ifft$rank = \\&ifft$rank;
 
 sub rfft$rank { __fft_internal( "rfft$rank", \@_ ); }
@@ -78,7 +82,7 @@ EOF
 ##########
 # Generate the fftn case.  This should probably be done more prettily; for now it's just 
 # a springboard that jumps into __fft_internal.
-pp_addpm ( {At=> 'Bot'}, sprintf <<'EOF', $maxrank );
+pp_addpm({At=> 'Bot'}, pp_line_numbers(__LINE__, sprintf <<'EOF', $maxrank));
 sub _rank_springboard {
   my ($name, $source, $rank, @rest) = @_;
   my $inverse = ($name =~ m/^i/);
@@ -118,7 +122,7 @@ sub irfftn  { _rank_springboard( "irfft", @_ ) }
 *PDL::irfftn = \&irfftn;
 
 EOF
-pp_add_exported( map { "${_}fftn" } ('','i','r','ir') );
+pp_add_exported( map "${_}fftn", '','i','r','ir' );
 
 pp_done();
 
@@ -127,47 +131,39 @@ sub generateDefinitions
 {
   my $rank = shift;
 
+  my %pp_def = (
+    HandleBad => 0,
+    GenericTypes => [qw(F D)],
+    OtherPars    => 'IV plan', # comes from pre-fft code not user
+    # this is a private function so I don't want to create
+    # user-visible documentation or exports
+    Doc          => undef,
+    PMFunc       => ''
+  );
+
   ################################################################################
   ####### first I generate the definitions for the simple complex-complex FFT case
-  my $funcname = "__fft$rank";
-
   # make dimension string 'n0=2,n1,n2,n3,n4...'. The leading 2 is for the
   # (real,imag) complex pair
-  my @dims = map {"n$_"} 1..$rank;
+  my @dims = map "n$_", 1..$rank;
   unshift @dims, 'n0=2';
   my $dims_string = join(',', @dims);
-
-  my %pp_def = ( HandleBad    => 0,
-                 Pars         => "in($dims_string); [o]out($dims_string);",
-                 GenericTypes => [qw(F D)],
-                 Code         => slurp('template_complex.c'),
-                 OtherPars    => 'IV plan', # comes not from the user, but
-                                            # from the pre-fft code
-
-                 # this is a private function so I don't want to create
-                 # user-visible documentation or exports
-                 Doc          => undef,
-                 PMFunc       => ''
-               );
-  pp_def( $funcname, %pp_def );
-
-
+  $pp_def{Pars} = "in($dims_string); [o]out($dims_string);";
+  $pp_def{Code} = slurp('template_complex.c');
+  pp_def( "__fft$rank", %pp_def );
 
   ##################################################################################
   ####### now I generate the definitions for the real-complex and complex-real cases
   my @dims_real    = @dims;
   my @dims_complex = @dims;
-
   shift @dims_real; # get rid of the (real,imag) dimension for the real numbers
   $dims_complex[1] = 'nhalf'; # first complex dim is real->dim(0)/2+1
   my $dims_real_string    = join(',', @dims_real);
   my $dims_complex_string = join(',', @dims_complex);
-
   my $code_real          =  slurp('template_real.c');
   $code_real             =~ s/RANK/$rank/ge;
   my $code_real_forward  =  $code_real;
   my $code_real_backward =  $code_real;
-
   $code_real_forward  =~ s/INVERSE/0/g;
   $code_real_backward =~ s/INVERSE/1/g;
 
@@ -200,6 +196,18 @@ EOF
   $pp_def{Pars} = "complexv($dims_complex_string); [o]real($dims_real_string);";
   $pp_def{Code} = $code_real_backward;
   pp_def( "__irfft$rank", %pp_def );
+
+  ################################################################################
+  ####### now native-complex version
+  shift @dims; # drop the (real,imag) dim
+  $dims_string = join(',', @dims);
+  delete $pp_def{RedoDimsCode};
+  $pp_def{Pars} = "in($dims_string); [o]out($dims_string);";
+  $pp_def{Code} = slurp('template_complex.c');
+  $pp_def{Code} =~ s/TFD/TGC/g;
+  $pp_def{Code} =~ s/\*2//g; # the sizeof-doubling
+  $pp_def{GenericTypes} = [qw(G C)];
+  pp_def( "__Nfft$rank", %pp_def );
 }
 
 sub slurp
@@ -210,5 +218,5 @@ sub slurp
   local $/ = undef;
   my $contents = <FD>;
   close FD;
-  return $contents;
+  return qq{#line 0 "$filename"\n\n} . $contents;
 }

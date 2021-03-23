@@ -1,4 +1,4 @@
-File-Rename version 1.10
+File-Rename version 1.20
 ========================
 
 File::Rename provides an implementation of Larry Wall's eg/rename
@@ -50,7 +50,7 @@ those modules for perl 5.005_05 and tested this module.
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005, 2006, 2007, 2011, 2018, 2020 by Robin Barker
+Copyright (C) 2005, 2006, 2007, 2011, 2018, 2020, 2021 by Robin Barker
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

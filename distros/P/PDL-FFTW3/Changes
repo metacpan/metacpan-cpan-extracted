@@ -1,3 +1,9 @@
+0.12 2021-03-23
+- PDL::Complex outputs where appropriate - thanks @wlmb
+
+0.11 2021-03-23
+- support PDL 2.027+ "native complex" inputs for fftn and ifftn
+
 0.10 2021-03-21
 - fix metadata gremlin
 

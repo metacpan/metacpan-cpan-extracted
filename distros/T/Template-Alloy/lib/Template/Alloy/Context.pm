@@ -11,7 +11,7 @@ use warnings;
 use Template::Alloy;
 
 our $VERSION = $Template::Alloy::VERSION;
-use vars qw($AUTOLOAD);
+our $AUTOLOAD;
 
 ###----------------------------------------------------------------###
 
@@ -134,7 +134,7 @@ sub DESTROY {}
 
 package Template::Alloy::_ContextStash;
 
-use vars qw($AUTOLOAD);
+our $AUTOLOAD;
 
 sub _template { shift->{'_template'} || die "Missing _template" }
 

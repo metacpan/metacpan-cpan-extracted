@@ -13,14 +13,16 @@ our @ISA = qw{ Exporter };
 
 no if "$]" >= 5.020, feature => qw{ signatures };
 
+# This occurs in both inc/My/Module/Meta.pm and inc/My/Module/Test.pm
 use constant CAN_USE_UNICODE	=> "$]" >= 5.008004;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 our @EXPORT =		## no critic (ProhibitAutomaticExportation)
 qw{
     check_testable
     do_utf
+    hex_diag
     pb_name
     pb_opt
     pb_putter
@@ -70,6 +72,22 @@ sub check_testable (;$) {	## no critic (ProhibitSubroutinePrototypes)
     }
 }
 
+sub hex_diag ($;$) {
+    my ( $got, $expect ) = @_;
+    foreach (
+	[ got => $got ],
+	( @_ > 1 ? [ expected => $expect ] : () ),
+    ) {
+	my ( $name, $value ) = @{ $_ };
+	use bytes;
+	my $hex = unpack 'H*', $value;
+	$hex =~ s/ ( .. ) /$1 /smxg;
+	$hex =~ s/ \s+ \z //smx;
+	diag sprintf '%12s: %s', $name, $hex;
+    }
+    return;
+}
+
 sub pb_name ($) {	## no critic (ProhibitSubroutinePrototypes, RequireArgUnpacking)
     $_[1] = 'name';
     goto &_pb_info;
@@ -115,8 +133,18 @@ sub set_test_output_encoding (;$) {	## no critic (ProhibitSubroutinePrototypes)
     my ( $encoding ) = @_;
     CAN_USE_UNICODE
 	or return;
+    unless ( defined $encoding ) {
+	local $@ = undef;
+	eval {
+	    require I18N::Langinfo;
+	    $encoding = I18N::Langinfo::langinfo(
+		I18N::Langinfo::CODESET() );
+	    1;
+	} or $encoding = '';
+    }
     defined $encoding
-	or $encoding = 'UTF-8';
+	and '' ne $encoding
+	or return;
     my $builder = Test::More->builder();
     foreach ( qw{ output failure_output todo_output } ) {
 	_my_binmode( $builder->$_(), ":encoding($encoding)" )
@@ -158,8 +186,10 @@ sub test_vs_pbpaste ($$$) {	## no critic (ProhibitSubroutinePrototypes, RequireA
     close $fh;
     chomp $got;
     chomp $expect;
-    @_ = ( $got, $expect, $name );
-    goto &is;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    is $got, $expect, $name
+	and return 1;
+    return hex_diag( $got, $expect );
 }
 
 1;

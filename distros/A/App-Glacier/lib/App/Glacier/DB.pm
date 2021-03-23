@@ -127,4 +127,6 @@ sub AUTOLOAD {
     $self->backend->${\$meth}(@_);
 }
 
+sub DESTROY {}
+
 1;

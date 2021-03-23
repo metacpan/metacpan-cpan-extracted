@@ -1,5 +1,10 @@
 Revision history for `ansifold' command.
 
+1.07 2021-03-23T14:39:32Z
+
+    - Move to github actions.
+    - Update document.
+
 1.06 2021-03-15T10:29:11Z
 
     - Use --tabstyle option to set tab style.

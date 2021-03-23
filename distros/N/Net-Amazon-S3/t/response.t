@@ -8,7 +8,7 @@ use lib $FindBin::Bin;
 
 BEGIN { require "test-helper-s3-response.pl" }
 
-plan tests => 6;
+plan tests => 8;
 
 use HTTP::Request;
 use HTTP::Response;
@@ -92,6 +92,26 @@ behaves_like_s3_response "S3 response - Common Response Headers" => (
 	),
 );
 
+behaves_like_s3_response "S3 response - content type text/xml" => (
+	response_class          => 'Net::Amazon::S3::Response',
+
+	with_content_type ('text/xml'),
+
+	expect_response         => all (
+		methods (is_xml_content => bool (1)),
+	),
+);
+
+behaves_like_s3_response "S3 response - vendor content type" => (
+	response_class          => 'Net::Amazon::S3::Response',
+
+	with_content_type ('application/vnd.foo.bar+xml'),
+
+	expect_response         => all (
+		methods (is_xml_content => bool (1)),
+	),
+);
+
 had_no_warnings;
 
 done_testing;
@@ -124,5 +144,20 @@ sub with_fixture_common_response_headers {
 			x_amz_request_id    => 'some-request-id',
 			x_amz_version_id    => 'some-version-id',
 		},
+	);
+}
+
+sub with_content_type {
+	my ($content_type) = @_;
+
+	+(
+		with_response_code => 200,
+		with_response_header => {
+			content_type        => $content_type,
+		},
+		with_response_data => << '			XML',
+			<?xml version="1.0"?>
+			<dummy/>
+			XML
 	);
 }

@@ -6,7 +6,7 @@
 
 =cut
 
-use vars qw($module $is_tt $compile_perl $use_stream);
+our ($module, $is_tt, $compile_perl, $use_stream);
 BEGIN {
     $module = 'Template::Alloy';
     if ($ENV{'USE_TT'} || grep {/tt/i} @ARGV) {

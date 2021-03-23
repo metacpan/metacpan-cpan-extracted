@@ -67,7 +67,7 @@ sub expect_operation_object_head_api {
 sub expect_operation_object_head_client {
 	expect_operation_plan
 		implementations => +{ @_ },
-		expect_operation => 'Net::Amazon::S3::Operation::Object::Fetch',
+		expect_operation => 'Net::Amazon::S3::Operation::Object::Head',
 		plan => {
 			"fetch object" => {
 				act_arguments => [
@@ -77,7 +77,6 @@ sub expect_operation_object_head_client {
 				expect_arguments => {
 					bucket => 'bucket-name',
 					key    => 'key-name',
-					method => 'HEAD',
 				},
 			},
 		}

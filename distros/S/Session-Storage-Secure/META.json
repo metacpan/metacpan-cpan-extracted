@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -29,11 +29,16 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.17",
             "perl" : "5.008001"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::Plugin::ReleaseStatus::FromVersion" : "0",
             "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -56,7 +61,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Crypt::CBC" : "0",
+            "Crypt::CBC" : "3.01",
             "Crypt::Rijndael" : "0",
             "Crypt::URandom" : "0",
             "Digest::SHA" : "0",
@@ -91,7 +96,7 @@
    "provides" : {
       "Session::Storage::Secure" : {
          "file" : "lib/Session/Storage/Secure.pm",
-         "version" : "0.011"
+         "version" : "1.000"
       }
    },
    "release_status" : "stable",
@@ -106,12 +111,14 @@
          "web" : "https://github.com/dagolden/Session-Storage-Secure"
       }
    },
-   "version" : "0.011",
+   "version" : "1.000",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
+      "Petr P\u00edsa\u0159 <ppisar@redhat.com>",
       "Tom Hukins <tom@eborcom.com>"
    ],
-   "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_spdx_expression" : "Apache-2.0"
 }
 

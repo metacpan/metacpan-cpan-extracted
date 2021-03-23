@@ -1,3 +1,10 @@
+0.35.8 2021-03-22 16:21:48 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - Handle SelectBox as part of Cards
+ - Make updates work generically for every text field
+ - Add some checks for undefined data
+
+
 0.35.7 2021-03-04 15:28:49 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix popup form regresson ... some debug code had made it into the releasse

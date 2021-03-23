@@ -21,7 +21,7 @@ APR::Request::Apache2 - wrapper for a mod_apreq2 handle.
 The APR::Request::Apache2 module provides a constructor
 for interfacing with the mod_apreq2 Apache module.
 
-This manpage documents version 2.15 of 
+This manpage documents version 2.16 of 
 the APR::Request::Apache2 package.
 
 

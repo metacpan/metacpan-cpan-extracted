@@ -30,10 +30,10 @@ no_index:
 provides:
   Mojolicious::Plugin::DBIC:
     file: lib/Mojolicious/Plugin/DBIC.pm
-    version: '0.003'
+    version: '0.004'
   Mojolicious::Plugin::DBIC::Controller::DBIC:
     file: lib/Mojolicious/Plugin/DBIC/Controller/DBIC.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   DBIx::Class: '0'
   Mojolicious: '8'
@@ -42,7 +42,9 @@ resources:
   bugtracker: https://github.com/preaction/Mojolicious-Plugin-DBIC/issues
   homepage: https://github.com/preaction/Mojolicious-Plugin-DBIC
   repository: https://github.com/preaction/Mojolicious-Plugin-DBIC.git
-version: '0.003'
+version: '0.004'
 x_authority: cpan:PREACTION
+x_contributors:
+  - 'K. Andrew Parker <kparker@citytech.cuny.edu>'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -21,4 +21,6 @@ sub AUTOLOAD {
     $self->{_sig}->method(@_);
 }
 
+sub DESTROY {}
+
 1;

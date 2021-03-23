@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -82,7 +82,7 @@ requires:
 resources:
   bugtracker: https://github.com/rustyconover/net-amazon-s3/issues
   repository: https://github.com/rustyconover/net-amazon-s3
-version: '0.97'
+version: '0.98'
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
   - 'Ali Anari <ali@anari.me>'

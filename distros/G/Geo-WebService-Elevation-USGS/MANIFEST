@@ -8,8 +8,9 @@ lib/Geo/WebService/Elevation/USGS.pm
 LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
+META.json
 META.yml
 README
 t/basic.t
@@ -25,4 +26,4 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
-META.json
+xt/author/prereq.t

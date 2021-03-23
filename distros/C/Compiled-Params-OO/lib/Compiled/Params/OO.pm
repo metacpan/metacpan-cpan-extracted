@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '1.00';
 
 use Type::Params qw/compile_named_oo compile/;
 use Types::Standard qw/CodeRef/;
@@ -38,7 +38,7 @@ Compiled::Params::OO - compiled params object oriented.
 
 =head1 VERSION
 
-Version 0.05
+Version 1.00
 
 =cut
 
@@ -181,7 +181,7 @@ L<https://metacpan.org/release/Compiled-Params-OO>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by lnation.
+This software is Copyright (c) 2021 by lnation.
 
 This is free software, licensed under:
 

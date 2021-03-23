@@ -2,7 +2,7 @@ use strictures;
 
 package WebService::GoogleAPI::Client::AuthStorage::ServiceAccount;
 
-our $VERSION = '0.25';    # VERSION
+our $VERSION = '0.26';    # VERSION
 
 # ABSTRACT: Manage access tokens from a service account file
 
@@ -92,7 +92,7 @@ WebService::GoogleAPI::Client::AuthStorage::ServiceAccount - Manage access token
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 

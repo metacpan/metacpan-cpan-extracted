@@ -1,0 +1,29 @@
+---
+- title: __GLOBAL__
+  type: FIX
+  rootdir: t
+#=============================================
+- title     : fixed format
+  files :
+    - left/simple01.fix
+    - right/simple01.fix
+  record_format: 'A2A3A3A3A3'
+  identity: [0]
+#=============================================
+- title     : fixed format chunked 1
+  files :
+    - left/simple01.fix
+    - right/simple01.fix
+  record_format: 'A2 A3 A3 A3 A3'
+  chunk: 0
+  identity: [0]
+#=============================================
+- title     : fixed format chunked 2
+  files :
+    - left/simple01.fix
+    - right/simple01.fix
+  record_format: 'A2A3A3A3A3'
+  chunk:
+    column: 0
+    regex: ^R(\d)
+  identity: [0]

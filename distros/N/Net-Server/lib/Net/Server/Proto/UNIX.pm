@@ -80,6 +80,20 @@ sub reconnect { # connect on a sig -HUP
     $sock->fdopen($fd, 'w') or $server->fatal("Error opening to file descriptor ($fd) [$!]");
 }
 
+sub accept {
+    my ($sock, $class) = (@_);
+    my ($client, $peername);
+    if (wantarray) {
+        ($client, $peername) = $sock->SUPER::accept($class);
+    } else {
+        $client = $sock->SUPER::accept($class);
+    }
+    if (defined $client) {
+        $client->NS_port($sock->NS_port);
+    }
+    return wantarray ? ($client, $peername) : $client;
+}
+
 # a string containing any information necessary for restarting the server
 # via a -HUP signal
 # a newline is not allowed

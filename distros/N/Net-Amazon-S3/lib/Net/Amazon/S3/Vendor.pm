@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Vendor;
-$Net::Amazon::S3::Vendor::VERSION = '0.97';
+$Net::Amazon::S3::Vendor::VERSION = '0.98';
 use Moose 0.85;
 
 # ABSTRACT: Base class for vendor specific behaviour
@@ -37,6 +37,12 @@ has use_virtual_host        => (
 has default_region          => (
 	is          => 'ro',
 	required    => 0,
+	default     => sub { 'us-east-1' },
+);
+
+has enforce_empty_content_length => (
+	is          => 'ro',
+	default     => sub { 1 },
 );
 
 sub guess_bucket_region {
@@ -59,7 +65,7 @@ Net::Amazon::S3::Vendor - Base class for vendor specific behaviour
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -153,7 +159,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

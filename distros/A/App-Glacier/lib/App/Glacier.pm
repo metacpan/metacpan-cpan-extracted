@@ -8,7 +8,7 @@ use App::Glacier::Command;
 use File::Basename;
 use Carp;
 
-our $VERSION = '2.12';
+our $VERSION = '2.13';
 
 
 my %comtab = (

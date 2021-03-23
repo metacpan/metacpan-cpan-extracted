@@ -4,7 +4,7 @@ use strictures;
 
 package goauth;
 
-our $VERSION = '0.25';    # VERSION
+our $VERSION = '0.26';    # VERSION
 
 use Carp;
 use Mojolicious::Lite;
@@ -12,6 +12,7 @@ use Mojo::File qw/path/;
 use Config::JSON;
 use feature 'say';
 use Net::EmptyPort qw(empty_port);
+use Crypt::JWT qw(decode_jwt);
 
 # ABSTRACT: CLI tool with mini http server for negotiating Google OAuth2 Authorisation access tokens that allow offline access to Google API Services on behalf of the user.
 
@@ -210,7 +211,7 @@ goauth - CLI tool with mini http server for negotiating Google OAuth2 Authorisat
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head2 SUMMARY
 

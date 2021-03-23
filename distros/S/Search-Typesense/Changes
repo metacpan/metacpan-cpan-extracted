@@ -1,0 +1,29 @@
+0.06      2021-03-23 18:09:49 CET
+
+0.05      2021-03-23 17:59:07 CET
+          - Collection and Document behaviors are now moved into their own
+            subclasses.
+
+0.04      2021-03-23 17:01:20 CET
+          - Move author tests to xt directory.
+          - Expose the Typesense version (this appears to not be documented)
+
+0.03      2021-03-23 09:32:02 CET
+          - Fix dependencies in the dist.ini file. This should resolve
+            https://github.com/Ovid/Search-Typesense/issues/1
+          - Start a proper Test::Search::Typesense module. It's only a stub
+            right now, but it simplifies some common code.
+          - Lay the groundwork for more i18n tests in the future.
+
+0.02      2021-03-22 15:38:24 CET
+          - port argument now defaults to 8108
+          - update_document() was broken. It's now fixed and tested.
+          - Renamed purge to delete_all_collections()
+          - Bump hard dependency on Perl to 5.16.0
+          - Make the Moo code more idiomatic
+          - Assert that the port is a PositiveInt
+          - Add kraih and mst to acknowledgements
+
+0.01      2021-03-22 13:22:28 CET
+          - Basic interface to Typesense.
+

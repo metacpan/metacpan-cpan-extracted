@@ -1,7 +1,9 @@
 package Acme::CPANModules;
 
-our $DATE = '2021-01-18'; # DATE
-our $VERSION = '0.1.6'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-20'; # DATE
+our $DIST = 'Acme-CPANModules'; # DIST
+our $VERSION = '0.1.7'; # VERSION
 
 1;
 # ABSTRACT: CPAN modules
@@ -22,7 +24,7 @@ Acme::CPANModules - CPAN modules
 
 =head1 VERSION
 
-This document describes version 0.1.6 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2021-01-18.
+This document describes version 0.1.7 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2021-01-20.
 
 =head1 DESCRIPTION
 
@@ -127,6 +129,14 @@ Each entry is another DefHash:
      # bench_code_template => 'Data::Dump::dump(<data>)',
      # ...
 
+     # list what functions are in the module. currently this is mainly used for
+     # specifying benchmark instructions for the functions.
+     functions => {
+         func1 => {
+             bench_code_template => 'Data::Dump::dump([])',
+         },
+     },
+
  }
 
 That's it. After you have completed your list, publish your Acme::CPANModules
@@ -171,7 +181,7 @@ _
      ],
  };
 
-For more example, see existing C<Acme::CPANModules::*> modules on CPAN.
+For more examples, see existing C<Acme::CPANModules::*> modules on CPAN.
 
 If you are using L<Dist::Zilla> to release your distribution, this
 L<Pod::Weaver> plugin might be useful for you:

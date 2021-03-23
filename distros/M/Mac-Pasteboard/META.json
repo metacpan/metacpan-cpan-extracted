@@ -24,6 +24,7 @@
       "build" : {
          "requires" : {
             "ExtUtils::CBuilder" : "0",
+            "I18N::Langinfo" : "0",
             "Test::More" : "0.96"
          }
       },
@@ -54,7 +55,7 @@
    "provides" : {
       "Mac::Pasteboard" : {
          "file" : "lib/Mac/Pasteboard.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -72,6 +73,6 @@
          "web" : "https://github.com/trwyant/perl-Mac-Pasteboard"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

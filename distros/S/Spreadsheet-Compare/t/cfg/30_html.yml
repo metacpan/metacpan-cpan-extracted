@@ -1,0 +1,27 @@
+---
+- title:                   __GLOBAL__
+  type:                    CSV
+  rootdir:                 't'
+  files:
+    - left/%{title}.csv
+    - right/%{title}.csv
+  identity: [ Instrument ]
+  decimal_separator:       ','
+  diff_relative:
+    - Delta
+  digital_grouping_symbol: '.'
+  ignore:
+    - KVN
+    - Type
+  limit_abs:               0.001
+  limit_rel:               0.01
+  reporter:                HTML
+  report_filename:         ${SC_TMPD}/%{title}.html
+  #=============================================
+- title:                  csv_head_long
+  report_ignored_columns: 0
+  report_line_numbers:    0
+  report_line_source:     0
+  report_max_columns:     0
+  report_diff_row:        0
+  report_all_data:        0

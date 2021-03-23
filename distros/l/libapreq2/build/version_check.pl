@@ -153,22 +153,31 @@ distribution_type: module
 dynamic_config: 1
 provides:
   Apache2::Request:
+    file: glue/perl/lib/Apache2/Request.pm
     version: $opts{version}
   Apache2::Cookie:
+    file: glue/perl/lib/Apache2/Cookie.pm
     version: $opts{version}
   Apache2::Upload:
+    file: glue/perl/lib/Apache2/Upload.pm
     version: $opts{version}
   APR::Request:
+    file: glue/perl/xsbuilder/APR/Request/Request.pm
     version: $opts{version}
   APR::Request::Apache2:
+    file: glue/perl/xsbuilder/APR/Request/Apache2/Apache2.pm
     version: $opts{version}
   APR::Request::CGI:
+    file: glue/perl/xsbuilder/APR/Request/CGI/CGI.pm
     version: $opts{version}
   APR::Request::Error:
+    file: glue/perl/xsbuilder/APR/Request/Error/Error.pm
     version: $opts{version}
   APR::Request::Cookie:
+    file: glue/perl/xsbuilder/APR/Request/Cookie/Cookie.pm
     version: $opts{version}
   APR::Request::Param:
+    file: glue/perl/xsbuilder/APR/Request/Param/Param.pm
     version: $opts{version}
 no_index:
   directory:

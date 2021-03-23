@@ -1,0 +1,74 @@
+{
+   "abstract" : "Module for comparing spreadsheet-like datasets",
+   "author" : [
+      "Thomas Kratz <tomk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Spreadsheet-Compare",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Class::Method::Modifiers" : "0",
+            "DBI" : "0",
+            "Excel::Writer::XLSX" : "1.00",
+            "Log::Log4perl" : "0",
+            "Mojolicious" : "8.06",
+            "Path::Tiny" : "0.100",
+            "Pod::Find" : "0",
+            "Pod::Usage" : "0",
+            "Spreadsheet::Read" : "0.80",
+            "Text::CSV" : "1.96",
+            "Try::Tiny" : "0",
+            "YAML::Any" : "0",
+            "perl" : "5.024"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "1.52",
+            "Spreadsheet::ParseODS" : "0.20",
+            "Spreadsheet::ParseXLSX" : "0.24",
+            "Test::Exception" : "0.43"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tomk3003/spreadsheet-compare.git",
+         "web" : "https://github.com/tomk3003/spreadsheet-compare"
+      }
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

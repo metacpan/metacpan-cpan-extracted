@@ -1,0 +1,21 @@
+---
+- title:     __GLOBAL__
+  files:
+    - left/csv_med_dup.csv
+    - right/csv_med_dup.csv
+  identity: [ 0 ]
+  limit_abs: 0.01
+  limit_rel: 0.1
+  report_line_source: 1
+  report_line_numbers: 1
+#=============================================
+- title: csv_med_dup auto
+  #=============================================
+- title:      csv_med_dup no header
+  has_header: 0
+  #=============================================
+- title:      csv_med_dup chunked
+  has_header: 0
+  chunk:
+    column: 0
+    regex:  '(\d)$'

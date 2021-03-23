@@ -1,5 +1,10 @@
 Revision history for Test-Future-IO
 
+0.03    2021-03-23
+        [BUGFIXES]
+         * ->sleep no longer returns immediate futures; must still call ->get
+           on them (RT134632)
+
 0.02    2020-11-24
         [CHANGES]
          * Use Test::ExpectAndCheck

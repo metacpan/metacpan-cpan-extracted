@@ -1,6 +1,6 @@
 package APR::Request::Magic;
 require base;
-our $VERSION = "2.15";
+our $VERSION = "2.16";
 my $ctx;
 eval { local $ENV{PERL_DL_NONLAZY} = 1; require APR::Request::Apache2; };
 if ($@) {

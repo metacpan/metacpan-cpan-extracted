@@ -1,3 +1,8 @@
+1.00 2021-03-05
+        - Improved documentation.
+        - api_p is no longer considered experimental.
+        - api_url is no longer considered experimental.
+
 0.29 2021-02-21
         - Replaced sojolicio.us with sojolicious.example.
 

@@ -4,7 +4,7 @@
 #
 package PDL::GSL::INTEG;
 
-our @EXPORT_OK  = qw(  gslinteg_qng gslinteg_qag gslinteg_qags gslinteg_qagp
+our @EXPORT_OK = qw( gslinteg_qng gslinteg_qag gslinteg_qags gslinteg_qagp
 	            gslinteg_qagi gslinteg_qagiu gslinteg_qagil gslinteg_qawc
  		    gslinteg_qaws gslinteg_qawo gslinteg_qawf PDL::PP qng_meat PDL::PP qag_meat PDL::PP qags_meat PDL::PP qagp_meat PDL::PP qagi_meat PDL::PP qagiu_meat PDL::PP qagil_meat PDL::PP qawc_meat PDL::PP qaws_meat PDL::PP qawo_meat PDL::PP qawf_meat );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
@@ -16,7 +16,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSL::INTEG ;
 

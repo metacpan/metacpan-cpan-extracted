@@ -1,5 +1,31 @@
 Revision history for Session-Storage-Secure
 
+1.000     2021-03-23 07:51:36-04:00 America/New_York
+
+    [!!! Compatibility Notice !!!]
+
+    - This version introduces protocol version 2.  By default, newly generated
+      output will be encoded using version 2.  Old data created with old
+      versions of this module will still be readable, whether using the same
+      secret or the old_secrets array.
+
+    - Protocol version 2 key features include: salt length increased to 256
+      bits and binary encoded; no longer uses a deprecated Crypt::CBC key
+      derivation function; protocol version appended to the generated output.
+
+    [FIXED]
+
+    - Protocol version 1 suppresses 'opensslv1' key-derivation function
+      deprecation warnings from Crypt::CBC.
+
+    [PREREQS]
+
+    - Requires Crypt::CBC 3.01
+
+0.903     2021-03-22 22:40:21-04:00 America/New_York (TRIAL RELEASE)
+
+0.901     2021-03-22 11:37:09-04:00 America/New_York (TRIAL RELEASE)
+
 0.011     2018-04-22 22:12:40+02:00 Europe/Oslo
 
     [CHANGED]

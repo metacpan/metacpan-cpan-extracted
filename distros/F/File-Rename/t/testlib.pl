@@ -112,4 +112,18 @@ sub options {
     return $opt;
 }
     
+sub is_windows {
+    unless ( $] < 5.014 ) {
+	if ( eval { require Perl::OSType; } ) { 
+            return Perl::OSType::is_os_type('Windows'); 
+	}
+	diag $@;
+    }
+    return ($^O =~ m{Win}) 
+} 
+
+sub script_name {
+    return +(is_windows() ? 'file-rename' : 'rename');
+}
+
 1;

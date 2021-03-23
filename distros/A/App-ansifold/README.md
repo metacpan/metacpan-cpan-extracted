@@ -1,10 +1,11 @@
+[![Actions Status](https://github.com/kaz-utashiro/ansifold/workflows/test/badge.svg)](https://github.com/kaz-utashiro/ansifold/actions)
 # NAME
 
 ansifold - fold command handling ANSI terminal sequences
 
 # VERSION
 
-Version 1.06
+Version 1.07
 
 # SYNOPSIS
 
@@ -30,17 +31,23 @@ ansifold \[ options \]
 
 # DESCRIPTION
 
-**ansifold** is almost **fold** compatible command utilizing
+**ansifold** is a fold(1) compatible command utilizing
 [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) module, which enables to handle ANSI terminal
 sequences and Unicode multi-byte characters properly.
 
-It folds lines in 72 column by default.  Use option **-w** to change
-the folding width.
+## WIDTH
+
+**ansifold** folds lines in 72 column by default.  Use option **-w** to
+change the folding width.
 
     $ ansifold -w132
 
-Unlike original fold(1) command, multiple numbers can be specified
-like:
+Single field is used repeatedly for the same line.
+
+## MULTIPLE WIDTH
+
+Unlike the original fold(1) command, multiple numbers can be
+specified.
 
     $ LANG=C date | ansifold -w 3,1,3,1,2 | cat -n
          1  Wed
@@ -49,26 +56,23 @@ like:
          4   
          5  19
 
+With multiple fields, unmatched part is discarded as in the above
+example.  So you can truncate lines by putting comma at the end of
+single field.
+
+    ansifold -w80,
+
+Option `-w80,` is equivalent to `-w80,0`.  Zero width is ignored
+when seen as a final number, but not ignored otherwise.
+
+## NEGATIVE WIDTH
+
 Negative number fields are discarded.
 
     $ LANG=C date | ansifold -w 3,-1,3,-1,2
     Wed
     Dec
     19
-
-Option **-n** (or **--separate** '') eliminates newlines between
-columns.
-
-    $ LANG=C date | ansifold -w 3,-1,3,-1,2 -n
-    WedDec19
-
-Single field is used repeatedly for the same line, but multiple fields
-are not.  Put comma at the end of single field to discard the rest:
-
-    ansifold -w 80,
-
-Option `-w 80,` is equivalent to `-w 80,0`.  Zero width is ignored
-when seen as a final number, but not ignored otherwise.
 
 If the final width is negative, it is not discarded but takes all the
 rest instead.  So next commands do the same thing.
@@ -77,9 +81,12 @@ rest instead.  So next commands do the same thing.
 
     $ ansifold -nw 6,-4,-1
 
-Next command implements ANSI/Unicode aware [expand(1)](http://man.he.net/man1/expand) command.
+Option `-w -1` does nothing effectively.  Using it with **--expand**
+option implements ANSI/Unicode aware [expand(1)](http://man.he.net/man1/expand) command.
 
     $ ansifold -w -1 --expand
+
+## NUMBERS
 
 Number description is handled by [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers) module, and
 consists of `start`, `end`, `step` and `length` elements.  For
@@ -98,6 +105,23 @@ and produces output like this:
     CCCCCC
     DDDDDDDD
     EEEEEEEEEE
+
+## SEPARATOR/TERMINATOR
+
+Option **-n** (or **--separate** '') eliminates newlines between
+columns.
+
+    $ LANG=C date | ansifold -w 3,-1,3,-1,2 -n
+    WedDec19
+
+Option **--separate** set separator string.
+
+    $ echo ABCDEF | ansifold --separate=: -w 1,0,1,0,1,-1
+    A::B::C:DEF
+
+Option **--paragraph** or **-p** print extra newline after each lines.
+This is convenient when a paragraph is made up of single line, like
+microsoft word document.
 
 # LINE BREAKING
 
@@ -150,9 +174,13 @@ characters at once according to the given style name.  Select from
 
 [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers)
 
-[https://www.w3.org/TR/2012/NOTE-jlreq-20120403/](https://www.w3.org/TR/2012/NOTE-jlreq-20120403/),
+[https://www.w3.org/TR/jlreq/](https://www.w3.org/TR/jlreq/)
 Requirements for Japanese Text Layout,
-W3C Working Group Note 3 April 2012
+W3C Working Group Note 11 August 2020
+
+# AUTHOR
+
+Kazumasa Utashiro
 
 # LICENSE
 
@@ -160,7 +188,3 @@ Copyright 2018- Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-# AUTHOR
-
-Kazumasa Utashiro

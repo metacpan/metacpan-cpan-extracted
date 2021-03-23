@@ -1,0 +1,19 @@
+on: [push]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    name: Build and release Acme::Automatix to CPAN
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      run: perl Makefile.PL
+    - name: Build
+      run: make
+    - name: Deliver locally
+      run: make dist
+    - name: Upload to CPAN
+      uses: thibaultduponchelle/upload-to-cpan@master
+      with:
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}

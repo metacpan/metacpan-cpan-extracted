@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1::Role::ObjectMethods;
-$Net::Cisco::FMC::v1::Role::ObjectMethods::VERSION = '0.005001';
+$Net::Cisco::FMC::v1::Role::ObjectMethods::VERSION = '0.006001';
 # ABSTRACT: Role for Cisco Firepower Management Center (FMC) API version 1 method generation
 
 use 5.024;
@@ -113,7 +113,7 @@ Net::Cisco::FMC::v1::Role::ObjectMethods - Role for Cisco Firepower Management C
 
 =head1 VERSION
 
-version 0.005001
+version 0.006001
 
 =head1 SYNOPSIS
 

@@ -9,6 +9,9 @@ use Carp;
 use Config;
 use POSIX qw{ uname };
 
+# This occurs in both inc/My/Module/Meta.pm and inc/My/Module/Test.pm
+use constant CAN_USE_UNICODE	=> "$]" >= 5.008004;
+
 sub new {
     my ( $class ) = @_;
     ref $class and $class = ref $class;
@@ -35,6 +38,9 @@ sub build_requires {
     my ( undef, @extra ) = @_;		# Invocant not used
     return +{
 	'ExtUtils::CBuilder'	=> 0,
+	( CAN_USE_UNICODE ?
+	    ( 'I18N::Langinfo'	=> 0 ) :
+	    () ),
 	'Test::More'	=> 0.96,	# Because of subtest().
 	@extra,
     };

@@ -1,4 +1,4 @@
-.TH "include/apreq.h" 3 "Thu Nov 5 2020" "Version 2.15" "libapreq2" \" -*- nroff -*-
+.TH "include/apreq.h" 3 "Wed Mar 10 2021" "Version 2.16" "libapreq2" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
@@ -282,7 +282,7 @@ Both the declaration and implementations must use the same macro\&. \fBAPREQ_DEC
 .PP
 \fBExamples\fP
 .in +1c
-\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+\fB/home/jorton/src/asf/apreq\-v2\&.16/include/apreq\&.h\fP\&.
 .SS "#define APREQ_DECLARE_DATA"
 The public APREQ variables are declared with APREQ_DECLARE_DATA\&. This assures the appropriate indirection is invoked at compile time\&. 
 .PP
@@ -387,7 +387,7 @@ Character encodings\&.
 .PP
 \fBExamples\fP
 .in +1c
-\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+\fB/home/jorton/src/asf/apreq\-v2\&.16/include/apreq\&.h\fP\&.
 .SS "enum \fBapreq_expires_t\fP"
 Expiration date format 
 .PP
@@ -402,7 +402,7 @@ Use format consistent with Netscape's Cookie Spec
 .PP
 \fBExamples\fP
 .in +1c
-\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+\fB/home/jorton/src/asf/apreq\-v2\&.16/include/apreq\&.h\fP\&.
 .SS "enum \fBapreq_join_t\fP"
 Join type 
 .PP
@@ -423,7 +423,7 @@ Quote the strings, backslashing existing quote marks\&.
 .PP
 \fBExamples\fP
 .in +1c
-\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+\fB/home/jorton/src/asf/apreq\-v2\&.16/include/apreq\&.h\fP\&.
 .SS "enum \fBapreq_match_t\fP"
 Match type 
 .PP
@@ -438,7 +438,7 @@ Partial matches are ok\&.
 .PP
 \fBExamples\fP
 .in +1c
-\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+\fB/home/jorton/src/asf/apreq\-v2\&.16/include/apreq\&.h\fP\&.
 .SH "Function Documentation"
 .PP 
 .SS "apr_status_t apreq_initialize (apr_pool_t * pool)"
@@ -458,7 +458,7 @@ after you detroy the pool, you have to call this function again with a new pool 
 .PP
 \fBExamples\fP
 .in +1c
-\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+\fB/home/jorton/src/asf/apreq\-v2\&.16/include/apreq\&.h\fP\&.
 .SS "apr_status_t apreq_post_initialize (apr_pool_t * pool)"
 Post-initialize libapreq2\&. Applications (except apache modules using mod_apreq2) should this exactly once before they use any libapreq2 modules for parsing\&.
 .PP
@@ -471,7 +471,7 @@ Post-initialize libapreq2\&. Applications (except apache modules using mod_apreq
 .PP
 \fBExamples\fP
 .in +1c
-\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+\fB/home/jorton/src/asf/apreq\-v2\&.16/include/apreq\&.h\fP\&.
 .SS "apr_status_t apreq_pre_initialize (apr_pool_t * pool)"
 Pre-initialize libapreq2\&. Applications (except apache modules using mod_apreq2) should call this exactly once before they register custom parsers with libapreq2\&. mod_apreq2 does this automatically during the post-config phase, so modules that need call apreq_register_parser should create a post-config hook using APR_HOOK_MIDDLE\&.
 .PP
@@ -489,7 +489,7 @@ after you detroyed the pool, you have to call this function again with a new poo
 .PP
 \fBExamples\fP
 .in +1c
-\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+\fB/home/jorton/src/asf/apreq\-v2\&.16/include/apreq\&.h\fP\&.
 .SS "static APR_INLINE void apreq_value_table_add (const \fBapreq_value_t\fP * v, apr_table_t * t)\fC [static]\fP"
 Adds the specified \fBapreq_value_t\fP to the apr_table_t\&.
 .PP
@@ -516,7 +516,7 @@ apr_value_t
 .PP
 \fBExamples\fP
 .in +1c
-\fB/home/jorton/src/asf/apreq\-v2\&.15/include/apreq\&.h\fP\&.
+\fB/home/jorton/src/asf/apreq\-v2\&.16/include/apreq\&.h\fP\&.
 .SH "Author"
 .PP 
 Generated automatically by Doxygen for libapreq2 from the source code\&.

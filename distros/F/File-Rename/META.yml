@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,21 +17,18 @@ name: File-Rename
 provides:
   File::Rename:
     file: lib/File/Rename.pm
-    version: '1.13'
+    version: '1.20'
   File::Rename::Options:
     file: lib/File/Rename/Options.pm
     version: '1.10'
 recommends:
   File::Spec: '0.82'
   Getopt::Long: '2.24'
-  IO::ScalarArray: '0'
   Pod::Parser: '0'
-  Test::Pod: '0'
-  Test::Pod::Coverage: '0'
 requires:
   Getopt::Long: '0'
   perl: '5'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.13'
+version: '1.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

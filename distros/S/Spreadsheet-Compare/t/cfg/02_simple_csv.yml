@@ -1,0 +1,105 @@
+---
+- title:   __GLOBAL__
+  type:    CSV
+  rootdir: 't'
+#=============================================
+- title: default file config
+  files:
+    - left/simple01.csv
+    - right/simple01.csv
+  identity:
+    - A
+#=============================================
+- title:                   fail with changing column
+  files:
+    - left/simple02.csv
+    - right/simple02.csv
+  identity:
+    - A
+  decimal_separator:       ','
+  digital_grouping_symbol: '.'
+#=============================================
+- title:                   ignore column fix decimal
+  files:
+    - left/simple02.csv
+    - right/simple02.csv
+  identity:
+    - A
+  ignore:
+    - Z
+  decimal_separator:       ','
+  digital_grouping_symbol: '.'
+#=============================================
+- title:                   individual limit
+  files:
+    - left/simple02.csv
+    - right/simple02.csv
+  identity:
+    - A
+  ignore:
+    - Z
+  decimal_separator:       ','
+  digital_grouping_symbol: '.'
+  limit_abs:
+    D: 0.1
+    B: 1
+  limit_rel:
+    D: 5
+    B: 1
+#=============================================
+- title:                   chunked
+  files:
+    - left/simple02.csv
+    - right/simple02.csv
+  identity:
+    - A
+  ignore:
+    - Z
+  decimal_separator:       ','
+  digital_grouping_symbol: '.'
+  limit_abs:
+    D: 0.1
+    B: 1
+  limit_rel:
+    D: 5
+    B: 1
+  chunk:
+    column: A
+    regex:  ^R(\d)
+#=============================================
+- title:                   explicit properties
+  files:
+    - left/simple02.csv
+    - right/simple02.csv
+  identity:
+    - A
+  ignore:
+    - Z
+  decimal_separator:       ','
+  digital_grouping_symbol: '.'
+  limit_abs:
+    D: 0.1
+    B: 1
+  limit_rel:
+    D: 5
+    B: 1
+  csv_options:
+    sep_char: ';'
+#=============================================
+- title:                   explicit sep_auto
+  files:
+    - left/simple02.csv
+    - right/simple02.csv
+  identity:
+    - A
+  ignore:
+    - Z
+  decimal_separator:       ','
+  digital_grouping_symbol: '.'
+  limit_abs:
+    D: 0.1
+    B: 1
+  limit_rel:
+    D: 5
+    B: 1
+  sep_auto: [ '|', ',', ';' ]

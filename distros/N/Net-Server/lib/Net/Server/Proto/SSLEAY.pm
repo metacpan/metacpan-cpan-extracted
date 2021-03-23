@@ -269,21 +269,30 @@ sub read_until {
             last;
         }
 
-        # this select appears to only cause read issues - in some cases the underlying select of Net::SSLeay enters into a spinloop
-        #vec(my $vec = '', $client->fileno, 1) = 1;
-        #select($vec, undef, undef, undef);
+        # 'select' prevents spinloops waiting for new data on the socket, and are necessary for non-blocking filehandles.
+        vec(my $vec = '', $client->fileno, 1) = 1;
+        select($vec, undef, undef, undef);
 
         my $n_empty = 0;
         while (1) {
             # 16384 is the maximum amount read() can return
             my $n = 16384;
             $n -= ($bytes - length($content)) if $non_greedy && ($bytes - length($content)) < $n;
-            my $buf = Net::SSLeay::read($ssl, 16384); # read the most we can - continue reading until the buffer won't read any more
+            my ($buf, $rv) = Net::SSLeay::read($ssl, 16384); # read the most we can - continue reading until the buffer won't read any more
             if ($client->SSLeay_check_error('SSLeay read_until read')) {
                 last OUTER;
             }
-            die "SSLeay read_until: $!\n" if ! defined($buf) && !$!{EAGAIN} && !$!{EINTR} && !$!{ENOBUFS};
-            last if ! defined($buf);
+
+            if (! defined($buf)) {
+                # Preserved from Net/Server/Proto/SSLEAY's version
+                last if $!{'EAGAIN'} || $!{'EINTR'} || $!{'ENOBUFS'};
+
+                # Treat these renegotiation errors like EAGAIN - select will handle it and the next SSL_read will resolve it.
+                last if $rv && ($rv == Net::SSLeay::ERROR_WANT_READ() || $rv == Net::SSLeay::ERROR_WANT_WRITE());
+
+                die "SSLeay read_until: $!\n";
+            }
+
             if (!length($buf)) {
                 last OUTER if !length($buf) && $n_empty++;
             }

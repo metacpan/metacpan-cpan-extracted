@@ -1,6 +1,6 @@
 package Net::Amazon::S3;
 # ABSTRACT: Use the Amazon S3 - Simple Storage Service
-$Net::Amazon::S3::VERSION = '0.97';
+$Net::Amazon::S3::VERSION = '0.98';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -27,8 +27,9 @@ use Net::Amazon::S3::Operation::Buckets::List;
 use Net::Amazon::S3::Operation::Object::Acl::Fetch;
 use Net::Amazon::S3::Operation::Object::Acl::Set;
 use Net::Amazon::S3::Operation::Object::Add;
-use Net::Amazon::S3::Operation::Object::Fetch;
 use Net::Amazon::S3::Operation::Object::Delete;
+use Net::Amazon::S3::Operation::Object::Fetch;
+use Net::Amazon::S3::Operation::Object::Head;
 use Net::Amazon::S3::Operation::Object::Restore;
 use Net::Amazon::S3::Operation::Object::Tags::Add;
 use Net::Amazon::S3::Operation::Object::Tags::Delete;
@@ -404,7 +405,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -512,6 +513,28 @@ Note: This is the legacy interface, please check out
 L<Net::Amazon::S3::Client> instead.
 
 Development of this code happens here: https://github.com/rustyconover/net-amazon-s3
+
+=head2 Bucket names with dots, HTTPS, and Signature V4
+
+At the moment Amazon S3 doesn't play well with HTTPS and virtual bucket hosts
+if bucket name contains dots.
+
+Due the current implementation of Signature V4 handling you should use workaround
+consisting of usage of region hostnames
+
+	my $bucket_region = $global_s3->bucket ($bucket)->_head_region;
+
+	my $region_s3 = Net::Amazon:S3->new (
+		...,
+		vendor => Net::Amazon::S3::Vendor::Amazon->new (
+			host => "s3-$bucket_region.amazonaws.com",
+			use_virtual_host => 0,
+		),
+	);
+
+	my $bucket = $region_s3->bucket ($bucket);
+
+And use bucket instance / region s3 connection.
 
 =head1 METHODS
 
@@ -1051,7 +1074,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

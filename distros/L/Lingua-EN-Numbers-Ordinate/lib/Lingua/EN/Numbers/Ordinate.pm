@@ -1,5 +1,5 @@
 package Lingua::EN::Numbers::Ordinate;
-$Lingua::EN::Numbers::Ordinate::VERSION = '1.04';
+$Lingua::EN::Numbers::Ordinate::VERSION = '1.05';
 # ABSTRACT: go from cardinal number (3) to ordinal ("3rd")
 
 use 5.006;
@@ -72,6 +72,7 @@ Not exported by default.
 The above functions are all prototyped to take a scalar value,
 so C<ordinate(@stuff)> is the same as C<ordinate(scalar @stuff)>.
 
+
 =head1 CAVEATS
 
 * Note that this library knows only about numbers, not number-words.
@@ -90,49 +91,6 @@ and implementation of ordinal numbers) is totally language specific.
 To pick a trivial example, consider that in French, 1 ordinates
 as "1ier", whereas 41 ordinates as "41ieme".
 
-=head1 STILL NOT SATISFIED?
-
-Bored of this...?
-
-  use Lingua::EN::Numbers::Ordinate qw(ordinate th);
-  ...
-  print th($n), " entry processed...\n";
-  ...
-
-Try this bit of lunacy:
-
-  {
-    my $th_object;
-    sub _th () { $th_object }
-
-    package Lingua::EN::Numbers::Ordinate::Overloader;
-    my $x; # Gotta have something to bless.
-    $th_object = bless \$x; # Define the object now, which _th returns
-    use Carp ();
-    use Lingua::EN::Numbers::Ordinate ();
-    sub overordinate {
-      Carp::croak "_th should be used only as postfix!" unless $_[2];
-      Lingua::EN::Numbers::Ordinate::ordinate($_[1]);
-    }
-    use overload '&' => \&overordinate;
-  }
-
-Then you get to do:
-
-  print 3 & _th, "\n";
-    # prints "3rd"
-  
-  print 1 + 2 & _th, "\n";
-    # prints "3rd" too!
-    # Because of the precedence of & !
-  
-  print _th & 3, "\n";
-    # dies with: "th should be used only as postfix!"
-
-Kooky, isn't it?  For more delightful deleria like this, see
-Damian Conway's I<Object Oriented Perl> from Manning Press.
-
-Kinda makes you like C<th(3)>, doesn't it?
 
 =head1 SEE ALSO
 
@@ -142,9 +100,13 @@ which returns the ordinal form of a cardinal number.
 L<Lingua::EN::Number::IsOrdinal> provides an C<is_ordinal>
 function, which returns true if passed an ordinal number.
 
+L<Lingua::EN::Numbers> provides function C<num2en_ordinal()>
+which will take a number and return the ordinal as a word.
+So 3 will result in "third".
+
 =head1 REPOSITORY
 
-L<https://github.com/neilbowers/Lingua-EN-Numbers-Ordinate>
+L<https://github.com/neilb/Lingua-EN-Numbers-Ordinate>
 
 =head1 COPYRIGHT
 
@@ -157,15 +119,18 @@ modify it under the same terms as Perl itself.
 
 Sean M. Burke C<sburke@cpan.org>
 
+This has been maintained by Neil Bowers (NEILB)
+since 2014.
+
 =cut
 
 ###########################################################################
 
 sub ordsuf ($) {
-  return 'th' if not(defined($_[0])) or not( 0 + $_[0] );
+  return 'th' if not(defined($_[0])) or $_[0] !~ /^-?[0-9]+$/;
    # 'th' for undef, 0, or anything non-number.
   my $n = abs($_[0]);  # Throw away the sign.
-  return 'th' unless $n == int($n); # Best possible, I guess.
+
   $n %= 100;
   return 'th' if $n == 11 or $n == 12 or $n == 13;
   $n %= 10;

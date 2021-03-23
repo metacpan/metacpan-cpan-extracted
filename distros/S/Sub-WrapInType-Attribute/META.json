@@ -1,0 +1,81 @@
+{
+   "abstract" : "attribute for Sub::WrapInType",
+   "author" : [
+      "kfly8 <kfly@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.11",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Sub-WrapInType-Attribute",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Handlers" : "0",
+            "B::Hooks::EndOfScope" : "0.23",
+            "Sub::Util" : "0",
+            "Sub::WrapInType" : "0.07",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "Test2::V0" : "0.000111"
+         }
+      }
+   },
+   "provides" : {
+      "Sub::WrapInType::Attribute" : {
+         "file" : "lib/Sub/WrapInType/Attribute.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/p5-Sub-WrapInType-Attribute/issues"
+      },
+      "homepage" : "https://github.com/kfly8/p5-Sub-WrapInType-Attribute",
+      "repository" : {
+         "url" : "git://github.com/kfly8/p5-Sub-WrapInType-Attribute.git",
+         "web" : "https://github.com/kfly8/p5-Sub-WrapInType-Attribute"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KFLY",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

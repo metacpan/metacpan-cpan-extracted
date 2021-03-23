@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -506,6 +506,7 @@ sub announce {
 	sub {
 		#say 'call returned: ', Dumper(\@_);
 		my ($steps, $e, $r) = @_;
+		$done++; # reply received, stop wating
 		if ($e) {
 			$self->log->debug("announce got error " . Dumper($e));
 			$err = $e->{message};
@@ -533,11 +534,10 @@ sub announce {
 			raw => 1,
 		);
 		$self->log->debug("succesfully announced $method");
-		$done++;
 	}],sub {
 		($err) = @_;
-		$self->log->debug("something went wrong with announce: $err");
 		$done++;
+		$self->log->debug("something went wrong with announce: $err");
 	});
 
 	$self->_loop(sub { !$done });

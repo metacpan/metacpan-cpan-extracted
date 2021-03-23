@@ -26,7 +26,7 @@
 #
 #========================================================================
 
-use vars qw($module $N $is_tt $compile_perl);
+our ($module, $N, $is_tt, $compile_perl);
 BEGIN {
     $module = 'Template::Alloy';
     if (grep {/tt/i} @ARGV) {

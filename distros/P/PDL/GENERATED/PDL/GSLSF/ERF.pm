@@ -4,7 +4,7 @@
 #
 package PDL::GSLSF::ERF;
 
-our @EXPORT_OK  = qw( PDL::PP gsl_sf_erfc PDL::PP gsl_sf_log_erfc PDL::PP gsl_sf_erf PDL::PP gsl_sf_erf_Z PDL::PP gsl_sf_erf_Q );
+our @EXPORT_OK = qw(PDL::PP gsl_sf_erfc PDL::PP gsl_sf_log_erfc PDL::PP gsl_sf_erf PDL::PP gsl_sf_erf_Z PDL::PP gsl_sf_erf_Q );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::ERF ;
 

@@ -4,7 +4,7 @@
 #
 package PDL::Transform;
 
-our @EXPORT_OK  = qw( apply invert map PDL::PP map unmap t_inverse t_compose t_wrap t_identity t_lookup t_linear t_scale t_offset  t_rot t_fits t_code  t_cylindrical t_radial t_quadratic t_cubic t_quadratic t_spherical t_projective );
+our @EXPORT_OK = qw(apply invert map PDL::PP map unmap t_inverse t_compose t_wrap t_identity t_lookup t_linear t_scale t_offset  t_rot t_fits t_code  t_cylindrical t_radial t_quadratic t_cubic t_quadratic t_spherical t_projective );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Transform ;
 

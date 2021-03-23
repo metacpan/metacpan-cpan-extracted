@@ -4,7 +4,7 @@
 #
 package PDL::IO::Pnm;
 
-our @EXPORT_OK  = qw(  rpnm wpnm PDL::PP pnminraw PDL::PP pnminascii PDL::PP pnmout );
+our @EXPORT_OK = qw( rpnm wpnm PDL::PP pnminraw PDL::PP pnminascii PDL::PP pnmout );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::IO::Pnm ;
 

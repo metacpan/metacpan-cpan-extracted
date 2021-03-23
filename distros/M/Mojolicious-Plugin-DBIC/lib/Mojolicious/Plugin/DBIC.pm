@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::DBIC;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: Mojolicious ♥ DBIx::Class
 
 #pod =head1 SYNOPSIS
@@ -118,13 +118,15 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::DBIC - Mojolicious ♥ DBIx::Class
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -202,6 +204,12 @@ L<Mojolicious>, L<DBIx::Class>, L<Yancy>
 =head1 AUTHOR
 
 Doug Bell <preaction@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords K. Andrew Parker
+
+K. Andrew Parker <kparker@citytech.cuny.edu>
 
 =head1 COPYRIGHT AND LICENSE
 

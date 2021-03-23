@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1;
-$Net::Cisco::FMC::v1::VERSION = '0.005001';
+$Net::Cisco::FMC::v1::VERSION = '0.006001';
 # ABSTRACT: Cisco Firepower Management Center (FMC) API version 1 client library
 
 use 5.024;
@@ -678,7 +678,7 @@ Net::Cisco::FMC::v1 - Cisco Firepower Management Center (FMC) API version 1 clie
 
 =head1 VERSION
 
-version 0.005001
+version 0.006001
 
 =head1 SYNOPSIS
 

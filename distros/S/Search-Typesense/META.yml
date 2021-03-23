@@ -1,0 +1,61 @@
+---
+abstract: 'Perl interface to Typesense search engine.'
+author:
+  - 'Curtis "Ovid" Poe <ovid@allaroundtheworld.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::Most: '0.37'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Search-Typesense
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Search::Typesense:
+    file: lib/Search/Typesense.pm
+    version: '0.06'
+  Search::Typesense::Collection:
+    file: lib/Search/Typesense/Collection.pm
+    version: '0.06'
+  Search::Typesense::Document:
+    file: lib/Search/Typesense/Document.pm
+    version: '0.06'
+  Search::Typesense::Role::Request:
+    file: lib/Search/Typesense/Role/Request.pm
+    version: '0.06'
+  Search::Typesense::Role::UserAgentInterface:
+    file: lib/Search/Typesense/Role/UserAgentInterface.pm
+    version: '0.06'
+  Search::Typesense::Types:
+    file: lib/Search/Typesense/Types.pm
+    version: '0.06'
+  Search::Typesense::Version:
+    file: lib/Search/Typesense/Version.pm
+    version: '0.06'
+requires:
+  Carp: '0'
+  Mojolicious: '9.11'
+  Moo: 2.005_000
+  Type::Tiny: 1.011_011
+  perl: v5.16.0
+resources:
+  bugtracker: https://github.com/Ovid/Search-Typesense/issues
+  homepage: https://metacpan.org/pod/Search::Typesense
+  repository: https://github.com/Ovid/Search-Typesense.git
+version: '0.06'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     0.1
 
 VERSION
-    This document describes version 0.1.6 of Acme::CPANModules (from Perl
-    distribution Acme-CPANModules), released on 2021-01-18.
+    This document describes version 0.1.7 of Acme::CPANModules (from Perl
+    distribution Acme-CPANModules), released on 2021-01-20.
 
 DESCRIPTION
     With the multitude of modules that are available on CPAN, it is
@@ -111,6 +111,14 @@ CREATING AN ACME::CPANMODULES MODULE
          # bench_code_template => 'Data::Dump::dump(<data>)',
          # ...
 
+         # list what functions are in the module. currently this is mainly used for
+         # specifying benchmark instructions for the functions.
+         functions => {
+             func1 => {
+                 bench_code_template => 'Data::Dump::dump([])',
+             },
+         },
+
      }
 
     That's it. After you have completed your list, publish your
@@ -146,7 +154,7 @@ CREATING AN ACME::CPANMODULES MODULE
     _ }, { module => 'Madame::Zita', summary => 'Ask Madame Zita the fortune
     teller', }, ], };
 
-    For more example, see existing "Acme::CPANModules::*" modules on CPAN.
+    For more examples, see existing "Acme::CPANModules::*" modules on CPAN.
 
     If you are using Dist::Zilla to release your distribution, this
     Pod::Weaver plugin might be useful for you:

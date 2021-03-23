@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
     "MojoX::NetstringStream" => "0.06",
     "Mojolicious" => "6.00"
   },
-  "VERSION" => "0.42",
+  "VERSION" => "0.43",
   "test" => {
     "TESTS" => "t/*.t"
   }

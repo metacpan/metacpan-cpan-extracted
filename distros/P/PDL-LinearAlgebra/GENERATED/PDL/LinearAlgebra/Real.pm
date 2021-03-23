@@ -4,8 +4,8 @@
 #
 package PDL::LinearAlgebra::Real;
 
-@EXPORT_OK  = qw( PDL::PP gtsv PDL::PP gesvd PDL::PP gesdd PDL::PP ggsvd PDL::PP geev PDL::PP geevx PDL::PP ggev PDL::PP ggevx PDL::PP gees PDL::PP geesx PDL::PP gges PDL::PP ggesx PDL::PP syev PDL::PP syevd PDL::PP syevx PDL::PP syevr PDL::PP sygv PDL::PP sygvd PDL::PP sygvx PDL::PP gesv PDL::PP gesvx PDL::PP sysv PDL::PP sysvx PDL::PP posv PDL::PP posvx PDL::PP gels PDL::PP gelsy PDL::PP gelss PDL::PP gelsd PDL::PP gglse PDL::PP ggglm PDL::PP getrf PDL::PP getf2 PDL::PP sytrf PDL::PP sytf2 PDL::PP potrf PDL::PP potf2 PDL::PP getri PDL::PP sytri PDL::PP potri PDL::PP trtri PDL::PP trti2 PDL::PP getrs PDL::PP sytrs PDL::PP potrs PDL::PP trtrs PDL::PP latrs PDL::PP gecon PDL::PP sycon PDL::PP pocon PDL::PP trcon PDL::PP geqp3 PDL::PP geqrf PDL::PP orgqr PDL::PP ormqr PDL::PP gelqf PDL::PP orglq PDL::PP ormlq PDL::PP geqlf PDL::PP orgql PDL::PP ormql PDL::PP gerqf PDL::PP orgrq PDL::PP ormrq PDL::PP tzrzf PDL::PP ormrz PDL::PP gehrd PDL::PP orghr PDL::PP hseqr PDL::PP trevc PDL::PP tgevc PDL::PP gebal PDL::PP gebak PDL::PP lange PDL::PP lansy PDL::PP lantr PDL::PP gemm PDL::PP mmult PDL::PP crossprod PDL::PP syrk PDL::PP dot PDL::PP axpy PDL::PP nrm2 PDL::PP asum PDL::PP scal PDL::PP rot PDL::PP rotg PDL::PP lasrt PDL::PP lacpy PDL::PP laswp PDL::PP lamch PDL::PP labad PDL::PP tricpy PDL::PP cplx_eigen PDL::PP augment PDL::PP mstack PDL::PP charpol );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(PDL::PP gtsv PDL::PP gesvd PDL::PP gesdd PDL::PP ggsvd PDL::PP geev PDL::PP geevx PDL::PP ggev PDL::PP ggevx PDL::PP gees PDL::PP geesx PDL::PP gges PDL::PP ggesx PDL::PP syev PDL::PP syevd PDL::PP syevx PDL::PP syevr PDL::PP sygv PDL::PP sygvd PDL::PP sygvx PDL::PP gesv PDL::PP gesvx PDL::PP sysv PDL::PP sysvx PDL::PP posv PDL::PP posvx PDL::PP gels PDL::PP gelsy PDL::PP gelss PDL::PP gelsd PDL::PP gglse PDL::PP ggglm PDL::PP getrf PDL::PP getf2 PDL::PP sytrf PDL::PP sytf2 PDL::PP potrf PDL::PP potf2 PDL::PP getri PDL::PP sytri PDL::PP potri PDL::PP trtri PDL::PP trti2 PDL::PP getrs PDL::PP sytrs PDL::PP potrs PDL::PP trtrs PDL::PP latrs PDL::PP gecon PDL::PP sycon PDL::PP pocon PDL::PP trcon PDL::PP geqp3 PDL::PP geqrf PDL::PP orgqr PDL::PP ormqr PDL::PP gelqf PDL::PP orglq PDL::PP ormlq PDL::PP geqlf PDL::PP orgql PDL::PP ormql PDL::PP gerqf PDL::PP orgrq PDL::PP ormrq PDL::PP tzrzf PDL::PP ormrz PDL::PP gehrd PDL::PP orghr PDL::PP hseqr PDL::PP trevc PDL::PP tgevc PDL::PP gebal PDL::PP gebak PDL::PP lange PDL::PP lansy PDL::PP lantr PDL::PP gemm PDL::PP mmult PDL::PP crossprod PDL::PP syrk PDL::PP dot PDL::PP axpy PDL::PP nrm2 PDL::PP asum PDL::PP scal PDL::PP rot PDL::PP rotg PDL::PP lasrt PDL::PP lacpy PDL::PP laswp PDL::PP lamch PDL::PP labad PDL::PP tricpy PDL::PP cplx_eigen PDL::PP augment PDL::PP mstack PDL::PP charpol );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -13,8 +13,8 @@ use DynaLoader;
 
 
 
-   $PDL::LinearAlgebra::Real::VERSION = '0.14';
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '0.14';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Real $VERSION;
 

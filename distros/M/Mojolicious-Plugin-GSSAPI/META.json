@@ -1,0 +1,59 @@
+{
+   "abstract" : "Provide Kerberos authentication for incomming https requests",
+   "author" : [
+      "Tobias Oetiker <tobi@oetiker.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-GSSAPI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "eg"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Net::LDAP" : "0",
+            "Pod::Markdown::Github" : "0.01"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GSSAPI" : "0",
+            "Mojolicious" : "9.12",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oetiker/mojolicious-plugin-gssapi/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/oetiker/mojolicious-plugin-gssapi"
+      }
+   },
+   "version" : "v0.1.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

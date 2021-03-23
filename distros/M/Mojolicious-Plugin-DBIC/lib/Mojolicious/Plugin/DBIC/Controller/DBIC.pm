@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::DBIC::Controller::DBIC;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: Build simple views to DBIC data
 
 #pod =head1 SYNOPSIS
@@ -469,13 +469,15 @@ __END__
 
 =pod
 
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::DBIC::Controller::DBIC - Build simple views to DBIC data
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

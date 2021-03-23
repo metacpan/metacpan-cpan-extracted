@@ -1,0 +1,33 @@
+---
+- title:      __GLOBAL__
+  files:
+    - left/csv_mixid.csv
+    - right/csv_mixid.csv
+  identity: [ Cbegsbyvb, Vafgehzrag ]
+  ignore:
+    - IrtnY
+    - PbagenpgFvmr
+    - '1 Z'
+    - '6 Z'
+    - '12 Z'
+  limit_abs:  0.001
+  limit_rel:  0.01
+  has_header: 1
+  csv_options:
+    sep_char: ';'
+#=============================================
+- title:     csv_mixid
+  is_sorted: 0
+#=============================================
+- title:      csv_mixid sorted
+  is_sorted:  1
+  fetch_size: 100
+#=============================================
+- title:       csv_mixid limit
+  is_sorted:   1
+  fetch_limit: 2
+  fetch_size:  100
+#=============================================
+- title:     csv_mixid chunked
+  is_sorted: 0
+  chunk:     Cbegsbyvb

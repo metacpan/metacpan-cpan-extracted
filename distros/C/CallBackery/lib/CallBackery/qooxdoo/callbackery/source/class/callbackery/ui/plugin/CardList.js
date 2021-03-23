@@ -10,8 +10,8 @@
  */
 qx.Class.define("callbackery.ui.plugin.CardList", {
     extend : callbackery.ui.plugin.Table,
-    construct : function(cfg,getParentFormData) {
-        this.base(arguments, cfg,getParentFormData);
+    construct : function(cfg, getParentFormData) {
+        this.base(arguments, cfg, getParentFormData);
         // replace setData method of parent class
         this._form['setData'] = qx.lang.Function.bind(this.setData, this);
     },
@@ -31,6 +31,10 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
         },
 
         setData: function (data){
+            if (!Array.isArray(data)) {
+                console.warn('data is not an array');
+                return;
+            }
             var cards = this.__cards;
             var currentKeys = {};
             var that = this;
@@ -44,19 +48,20 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
             
             // add new cards
             var buttonMap = this._action.getButtonMap();
-            data.forEach(function(row){
-                var key = row.id;
-                currentKeys[key] = 1;
-                if (!cards[key]){
-                    var card = cards[key] = new callbackery.ui.Card(this._cfg.name, this._cfg.cardCfg, cardActions, buttonMap, that);
-                    that.__cardList.addAt(card,0);
-                    card.addListener('reloadData',function(){
-                        this._loadData();
-                    }, that);
-                }
-                cards[key].setData(row);
-            },this);
-
+            if (data.forEach) {
+                data.forEach(function(row){
+                    var key = row.id;
+                    currentKeys[key] = 1;
+                    if (!cards[key]){
+                        var card = cards[key] = new callbackery.ui.Card(this._cfg.name, this._cfg.cardCfg, cardActions, buttonMap, that);
+                        that.__cardList.addAt(card,0);
+                        card.addListener('reloadData',function(){
+                            this._loadData();
+                        }, that);
+                    }
+                    cards[key].setData(row);
+                },this);
+            }
             // remove deleted cards
             for ( var key in cards ) {
                 if (!currentKeys[key]){

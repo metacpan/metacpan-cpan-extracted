@@ -59,7 +59,7 @@
    "provides" : {
       "App::Glacier" : {
          "file" : "lib/App/Glacier.pm",
-         "version" : "2.12"
+         "version" : "2.13"
       },
       "App::Glacier::Bre" : {
          "file" : "lib/App/Glacier/Bre.pm"
@@ -168,5 +168,5 @@
          "web" : "http://git.gnu.org.ua/cgit/glacier.git/"
       }
    },
-   "version" : "2.12"
+   "version" : "2.13"
 }

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,8 +27,9 @@ requires:
   Type::Tiny: '1.004002'
   perl: '5.024000'
 resources:
+  bugtracker: https://github.com/abraxxa/Net-Cisco-FMC-v1/issues
   repository: https://github.com/abraxxa/Net-Cisco-FMC-v1.git
-version: '0.005001'
+version: '0.006001'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -36,58 +37,58 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/ManifestSkip'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/MetaYAML'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/License'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/Readme'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Filter/ExtraTests'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/ExecDir'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/ShareDir'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Filter/MakeMaker'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/Manifest'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/TestRelease'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/ConfirmRelease'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -165,23 +166,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -206,15 +207,15 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: GatherDir
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::Test::Portability
       config:
@@ -252,7 +253,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.27.0
           repo_root: .
       name: '@Git/Check'
       version: '2.047'
@@ -262,7 +263,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: 'version %v%n%n%c'
-          signoff: '0'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -272,7 +273,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.27.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -285,11 +286,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.005001'
+          tag: '0.006001'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.27.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -303,7 +304,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.25.1
+          git_version: 2.27.0
           repo_root: .
       name: '@Git/Push'
       version: '2.047'
@@ -314,7 +315,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -322,52 +323,52 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.015'
+      version: '6.017'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.015'
+      version: '6.017'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.015'
+    version: '6.017'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -4,7 +4,7 @@
 #
 package PDL::Math;
 
-our @EXPORT_OK  = qw( PDL::PP acos PDL::PP asin PDL::PP atan PDL::PP cosh PDL::PP sinh PDL::PP tan PDL::PP tanh PDL::PP ceil PDL::PP floor PDL::PP rint PDL::PP pow PDL::PP acosh PDL::PP asinh PDL::PP atanh PDL::PP erf PDL::PP erfc PDL::PP bessj0 PDL::PP bessj1 PDL::PP bessy0 PDL::PP bessy1 PDL::PP bessjn PDL::PP bessyn PDL::PP lgamma PDL::PP badmask PDL::PP isfinite PDL::PP erfi PDL::PP ndtri PDL::PP polyroots );
+our @EXPORT_OK = qw(PDL::PP acos PDL::PP asin PDL::PP atan PDL::PP cosh PDL::PP sinh PDL::PP tan PDL::PP tanh PDL::PP ceil PDL::PP floor PDL::PP rint PDL::PP pow PDL::PP acosh PDL::PP asinh PDL::PP atanh PDL::PP erf PDL::PP erfc PDL::PP bessj0 PDL::PP bessj1 PDL::PP bessy0 PDL::PP bessy1 PDL::PP bessjn PDL::PP bessyn PDL::PP lgamma PDL::PP badmask PDL::PP isfinite PDL::PP erfi PDL::PP ndtri PDL::PP polyroots );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Math ;
 

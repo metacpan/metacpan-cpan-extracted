@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::HTTP" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.25",
+  "VERSION" => "0.26",
   "test" => {
     "TESTS" => "t/*.t t/WebService/GoogleAPI/Client/*.t"
   }

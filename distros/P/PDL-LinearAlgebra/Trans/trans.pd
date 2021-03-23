@@ -1,5 +1,5 @@
 our $VERSION = '0.14';
-pp_setversion(qq{'$VERSION'});
+pp_setversion($VERSION);
 $VERSION = eval $VERSION;
 
 use PDL::Exporter;

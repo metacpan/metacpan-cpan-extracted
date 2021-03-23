@@ -1,3 +1,8 @@
+0.1.7   2021-01-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Introduce per-function benchmark instruction.
+
+
 0.1.6   2021-01-18  Released-By: PERLANCAR; Urgency: low
 
         - No spec changes.

@@ -99,7 +99,10 @@ qx.Class.define("callbackery.ui.Screen", {
 
                     // Show (legal) disclaimer and hide screen content until
                     // checkbox is set and btn is executed.
-                    var disclaimerCfg = options.disclaimer;
+                    var disclaimerCfg;
+                    if (options) {
+                        disclaimerCfg = options.disclaimer;
+                    }
                     if (disclaimerCfg) {
                         content.hide();
                         // force widget visibility because it is tied to

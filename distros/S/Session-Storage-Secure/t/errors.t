@@ -40,6 +40,21 @@ subtest "bad data" => sub {
     );
 };
 
+subtest "bad protocol version" => sub {
+    for my $pv ( -1, 0, 3 ) {
+        like(
+            exception {
+                Session::Storage::Secure->new(
+                    secret_key       => $secret,
+                    protocol_version => $pv,
+                )
+            },
+            qr/Invalid protocol version for encoding/,
+            "Invalid protocol_version $pv throws error",
+        );
+    }
+};
+
 done_testing;
 #
 # This file is part of Session-Storage-Secure

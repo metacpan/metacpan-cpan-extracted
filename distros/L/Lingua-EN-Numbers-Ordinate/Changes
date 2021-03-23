@@ -1,5 +1,26 @@
 Revision history for Perl module Lingua::EN::Numbers::Ordinate
 
+1.05 2021-03-23 NEILB
+    - Improved test coverage
+    - Tweaked code to not warn on documented behaviour
+    - Fixed github repo URL
+    - Added mention of Lingua::EN::Numbers's num2en_ordinal
+      in SEE ALSO.
+    - Removed section from doc which suggested you might
+      like to try overloading & for ordinalisation. Let's not.
+
+1.04_02 2021-03-22 NEILB
+    - Sigh. I used // in the changes I made to tests,
+      which meant it failed on pre-5.10 perls. Refactored.
+
+1.04_01 2021-03-21 NEILB
+    - Extended tests to give full coverage, which prompted:
+    - Refactored logic in ordsuf(), which resolves a warning.
+      It says it will take cardinals, but then the doc also
+      says that if you send nonsense, you'll get back "th"
+      as the suffix. So maintained that behaviour.
+    - Fixed repo URL to reflect my changed github username
+
 1.04 2015-07-04 NEILB
     - Added [MetaJSON] to dist.ini, so release will include META.json.
       RT#105628 from ETHER++

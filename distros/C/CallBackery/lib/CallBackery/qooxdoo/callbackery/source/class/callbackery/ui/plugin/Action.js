@@ -46,6 +46,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                     break;
                 case 'reloadStatus':
                 case 'reload':
+                case 'updateEntry':
                     break;
                 default:
                     console.error('Unknown action', data.action);

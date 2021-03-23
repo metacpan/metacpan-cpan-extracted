@@ -678,6 +678,7 @@ This hook is called when a dead child is detected.
 A child is considered dead when the pid does no longer exist.
 This hook could be used to cleanup possible temporary files
 or locks left over by a dead child.
+
 =back
 
 =head1 HOT DEPLOY

@@ -4,7 +4,7 @@
 #
 package PDL::GSLSF::GAMMA;
 
-our @EXPORT_OK  = qw( PDL::PP gsl_sf_lngamma PDL::PP gsl_sf_gamma PDL::PP gsl_sf_gammastar PDL::PP gsl_sf_gammainv PDL::PP gsl_sf_lngamma_complex PDL::PP gsl_sf_taylorcoeff PDL::PP gsl_sf_fact PDL::PP gsl_sf_doublefact PDL::PP gsl_sf_lnfact PDL::PP gsl_sf_lndoublefact PDL::PP gsl_sf_lnchoose PDL::PP gsl_sf_choose PDL::PP gsl_sf_lnpoch PDL::PP gsl_sf_poch PDL::PP gsl_sf_pochrel PDL::PP gsl_sf_gamma_inc_Q PDL::PP gsl_sf_gamma_inc_P PDL::PP gsl_sf_lnbeta PDL::PP gsl_sf_beta );
+our @EXPORT_OK = qw(PDL::PP gsl_sf_lngamma PDL::PP gsl_sf_gamma PDL::PP gsl_sf_gammastar PDL::PP gsl_sf_gammainv PDL::PP gsl_sf_lngamma_complex PDL::PP gsl_sf_taylorcoeff PDL::PP gsl_sf_fact PDL::PP gsl_sf_doublefact PDL::PP gsl_sf_lnfact PDL::PP gsl_sf_lndoublefact PDL::PP gsl_sf_lnchoose PDL::PP gsl_sf_choose PDL::PP gsl_sf_lnpoch PDL::PP gsl_sf_poch PDL::PP gsl_sf_pochrel PDL::PP gsl_sf_gamma_inc_Q PDL::PP gsl_sf_gamma_inc_P PDL::PP gsl_sf_lnbeta PDL::PP gsl_sf_beta );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::GSLSF::GAMMA ;
 

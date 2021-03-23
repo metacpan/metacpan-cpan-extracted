@@ -825,7 +825,7 @@ sub play_USE {
 
     } elsif (my $pkg = $self->{'PLUGINS'}->{$module} || $self->{'PLUGINS'}->{lc $module}) {
         (my $req = "$pkg.pm") =~ s|::|/|g;
-        if (UNIVERSAL::isa($pkg, 'UNIVERSAL') || eval { require $req }) {
+        if ($INC{$req} || eval { require $req }) {
             my $shape = $pkg->load;
             $obj = $shape->new($self->context, $foreign ? @$foreign : map { $self->play_expr($_) } @args);
         }

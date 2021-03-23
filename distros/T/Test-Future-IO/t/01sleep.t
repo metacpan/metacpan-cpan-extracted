@@ -20,7 +20,9 @@ my $test_fio = Test::Future::IO->controller;
 
    $test_fio->expect_sleep( 0.5 )
       ->returns;
-   ok( Future::IO->sleep( 0.5 )->is_done, 'Future::IO->sleep is done' );
+
+   ok( eval { Future::IO->sleep( 0.5 )->is_done; 1 }, 'Future::IO->sleep is done' ) or
+      diag( "Failure was $@" );
    $test_fio->check_and_clear( '->sleep' );
 
    test_test 'sleep OK';

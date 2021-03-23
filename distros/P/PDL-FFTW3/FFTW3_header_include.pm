@@ -17,8 +17,7 @@ our $_last_do_double_precision;
 # PP-generated internals. Specifically, this function is called BEFORE any PDL
 # threading happens. Here I make sure the FFTW plan exists, or if it doesn't, I
 # make it. Thus the PP-based internals can safely assume that the plan exists
-sub __fft_internal
-{
+sub __fft_internal {
   my $thisfunction = shift;
 
   my ($do_inverse_fft, $is_real_fft, $rank) = $thisfunction =~ /^(i?)((?:r)?).*fft([0-9]+)/;
@@ -29,31 +28,22 @@ sub __fft_internal
   my $Nargs = scalar @_;
 
   my ($in, $out);
-  if( $Nargs == 2 )
-  {
+  if ( $Nargs == 2 ) {
     # all variables on stack, read in output and temp vars
     ($in, $out) = map {defined $_ ? PDL::Core::topdl($_) : $_} @_;
-  }
-  elsif( $Nargs == 1 )
-  {
+  } elsif ( $Nargs == 1 ) {
     $in = PDL::Core::topdl $_[0];
-    if( $in->is_inplace )
-    {
+    if ( $in->is_inplace ) {
       barf <<EOF if $is_real_fft;
 $thisfunction: in-place real FFTs are not supported since the input/output types and data sizes differ.
 Giving up.
 EOF
-
       $out = $in;
       $in->set_inplace(0);
-    }
-    else
-    {
+    } else {
       $out = PDL::null();
     }
-  }
-  else
-  {
+  } else {
     barf( <<EOF );
 $thisfunction must be given the input or the input and output as args.
 Exactly 1 or 2 arguments are required. Instead I got $Nargs args. Giving up.
@@ -61,58 +51,57 @@ EOF
   }
 
   # make sure the in/out types match. Convert $in if needed. This needs to
-  # happen before we instantiante $out (if it's null) to make sure we know the
+  # happen before we instantiate $out (if it's null) to make sure we know the
   # type
   processTypes( $thisfunction, \$in, \$out );
 
   # I now create a piddle for the null output. Normally PP does this, but I need
   # to have the piddle made to create plans. If I don't, the alignment may
   # differ between plan-time and run-time
-  if( $out->isnull )
-  {
-    my @dims = getOutDims($in, $is_real_fft, $do_inverse_fft);
-    $out .= zeros($in->type, @dims);
+  if ( $out->isnull ) {
+    my @args = getOutArgs($in, $is_real_fft, $do_inverse_fft);
+    $out .= zeros(@args);
   }
 
   validateArguments( $rank, $is_real_fft, $do_inverse_fft, $thisfunction, $in, $out );
 
   # I need to physical-ize the piddles before I make a plan. Again, normally PP
   # does this, but to make sure alignments match, I need to do this myself, now
-  $in ->make_physical;
+  $in->make_physical;
   $out->make_physical;
 
   my $plan = getPlan( $thisfunction, $rank, $is_real_fft, $do_inverse_fft, $in, $out );
   barf "$thisfunction couldn't make a plan. Giving up\n" unless defined $plan;
 
+  my $is_native = !$in->type->real; # native complex
   # I now have the arguments and the plan. Go!
-  my $internal_function =
-    $is_real_fft ?
-    ( $do_inverse_fft ? "PDL::__irfft$rank" : "PDL::__rfft$rank") : "PDL::__fft$rank";
-  eval( $internal_function . '( $in, $out, $plan );' );
-  barf "$thisfunction: eval failed calling the internal FFT routine: $@" if $@;
+  my $internal_function = 'PDL::__';
+  $internal_function .=
+    $is_native ? 'N' :
+    !$is_real_fft ? '' :
+    $do_inverse_fft ? 'ir' :
+    'r';
+  $internal_function .= "fft$rank";
+  eval { no strict 'refs'; $internal_function->( $in, $out, $plan ) };
+  barf $@ if $@;
 
-  return $out;
+  ($in->isa('PDL::Complex') && !($do_inverse_fft  && $is_real_fft))
+    ? $out->complex : $out;
 }
 
-sub getOutDims
-{
+sub getOutArgs {
   my ($in, $is_real_fft, $do_inverse_fft) = @_;
 
   my @dims = $in->dims;
 
-  if ( !$is_real_fft )
-  {
+  if ( !$is_real_fft ) {
     # complex fft. Output is the same size as the input.
-  }
-  elsif ( !$do_inverse_fft )
-  {
+  } elsif ( !$do_inverse_fft ) {
     # forward real fft
     my $d0 = shift @dims;
     unshift @dims, 1+int($d0/2);
     unshift @dims, 2;
-  }
-  else
-  {
+  } else {
     # backward real fft
     #
     # there's an ambiguity here. I want int($out->dim(0)/2) + 1 == $in->dim(1),
@@ -126,7 +115,7 @@ sub getOutDims
     shift @dims;
     $dims[0] = 2*($dims[0])-2;
   }
-  return @dims;
+  ($in->type, @dims);
 }
 
 sub validateArguments
@@ -143,10 +132,9 @@ EOF
 
     my $type = ref $arg;
     $type = 'scalar' unless defined $arg;
-
-    barf <<EOF unless ref $arg && ($type eq 'PDL' or (!$is_real_fft and $type eq 'PDL::Complex'));
-$thisfunction arguments must be of type 'PDL'. Instead I got an arg of
-type '$type'. Giving up.
+    barf <<EOF unless ref $arg && $arg->isa('PDL');
+$thisfunction arguments must be of type 'PDL' (including 'PDL::Complex').
+Instead I got an arg of type '$type'. Giving up.
 EOF
   }
 
@@ -179,81 +167,63 @@ EOF
 sub validateArgumentDimensions_complex
 {
   my ( $rank, $thisfunction, $arg ) = @_;
+  my $is_native = !$arg->type->real;
 
   # complex FFT. Identically-sized inputs/outputs
-  barf <<EOF if $arg->dim(0) != 2;
-$thisfunction must have dim(0) == 2 for the inputs and outputs.
+  barf <<EOF if !$is_native and $arg->dim(0) != 2;
+$thisfunction must have dim(0) == 2 for non-native complex inputs and outputs.
 This is the (real,imag) dimension. Giving up.
 EOF
 
-  barf <<EOF if $arg->ndims-1 < $rank;
+  my $dims_cmp = $arg->ndims - ($is_native ? 0 : 1);
+  barf <<EOF if $dims_cmp < $rank;
 Tried to compute a $rank-dimensional FFT, but an array has fewer than $rank dimensions.
 Giving up.
 EOF
 }
 
-sub validateArgumentDimensions_real
-{
+sub validateArgumentDimensions_real {
   my ( $rank, $do_inverse_fft, $thisfunction, $iarg, $arg ) = @_;
 
   # real FFT. Forward transform takes in real and spits out complex;
   # backward transform does the reverse
-  if ( $arg->dim(0) != 2 )
-  {
-    if ( !$do_inverse_fft && $iarg == 1 )
-    {
-      barf <<EOF;
-$thisfunction produces complex output, so \$output->dim(0) == 2 should be true,
+  if ( $arg->dim(0) != 2 ) {
+    my ($verb, $var);
+    if ( !$do_inverse_fft && $iarg == 1 ) {
+      ($verb, $var) = qw(produces output);
+    } elsif ( $do_inverse_fft && $iarg == 0 ) {
+      ($verb, $var) = qw(takes input);
+    }
+    barf <<EOF if $verb;
+$thisfunction $verb complex output, so \$$var->dim(0) == 2 should be true,
 but it's not. This is the (real,imag) dimension. Giving up.
 EOF
-    }
-    elsif ( $do_inverse_fft && $iarg == 0 )
-    {
-      barf <<EOF;
-$thisfunction takes complex input, so \$input->dim(0) == 2 should be true, but
-it's not. This is the (real,imag) dimension. Giving up.
-EOF
-    }
   }
 
-  if( $iarg == 0 )
-  {
+  my ($min_dimensionality, $var) = $rank;
+  if( $iarg == 0 ) {
     # The input needs at least $rank dimensions. If this is a backward
     # transform, the input is complex, so it needs an extra dimension
-    my $min_dimensionality = $rank;
     $min_dimensionality++ if $do_inverse_fft;
-    if ( $arg->ndims < $min_dimensionality )
-    {
-      barf <<EOF;
-$thisfunction: The input needs at least $min_dimensionality dimensions, but
-it has fewer. Giving up.
-EOF
-    }
-  }
-  else
-  {
+    $var = 'input';
+  } else {
     # The output needs at least $rank dimensions. If this is a forward
     # transform, the output is complex, so it needs an extra dimension
-    my $min_dimensionality = $rank;
     $min_dimensionality++ if !$do_inverse_fft;
-    if ( $arg->ndims < $min_dimensionality )
-    {
-      barf <<EOF;
-$thisfunction: The output needs at least $min_dimensionality dimensions, but
+    $var = 'output';
+  }
+  if ( $arg->ndims < $min_dimensionality ) {
+    barf <<EOF;
+$thisfunction: The $var needs at least $min_dimensionality dimensions, but
 it has fewer. Giving up.
 EOF
-    }
   }
 }
 
-sub matchDimensions_complex
-{
+sub matchDimensions_complex {
   my ($thisfunction, $rank, $in, $out) = @_;
-
-  for my $idim(0..$rank)
-  {
-    if( $in->dim($idim) != $out->dim($idim) )
-    {
+  for my $idim (0..$rank) {
+    if ( $in->dim($idim) != $out->dim($idim) ) {
       barf <<EOF;
 $thisfunction was given input/output matrices of non-matching sizes.
 Giving up.
@@ -262,56 +232,30 @@ EOF
   }
 }
 
-sub matchDimensions_real
-{
+sub matchDimensions_real {
   my ($thisfunction, $rank, $do_inverse_fft, $in, $out) = @_;
-
-  if( !$do_inverse_fft )
-  {
+  my ($varname1, $varname2, $var1, $var2);
+  if ( !$do_inverse_fft ) {
     # Forward FFT. The input is real, the output is complex. $output->dim(0)
     # == 2, since that's the (real, imag) dimension. Furthermore,
     # $output->dim(1) should be int($input->dim(0)/2) + 1 (Section 2.4 of
     # the FFTW3 documentation)
-
-    barf <<EOF if int($in->dim(0)/2) + 1 != $out->dim(1);
-$thisfunction: mismatched first dimension:
-\$output->dim(1) == int(\$input->dim(0)/2) + 1 wasn't true.
-Giving up.
-EOF
-
-    for my $idim (1..$rank-1)
-    {
-      if ( $in->dim($idim) != $out->dim($idim + 1) )
-      {
-        barf <<EOF;
-$thisfunction was given input/output matrices of non-matching sizes.
-Giving up.
-EOF
-      }
-    }
+    ($varname1, $varname2, $var1, $var2) = (qw(input output), $in, $out);
+  } else {
+    # Backward FFT. The input is complex, the output is real.
+    ($varname1, $varname2, $var1, $var2) = (qw(output input), $out, $in);
   }
-  else
-  {
-    # Backward FFT. The input is complex, the output is real. $input->dim(0)
-    # == 2, since that's the (real, imag) dimension. Furthermore,
-    # $input->dim(1) should be int($output->dim(0)/2) + 1 (Section 2.4 of
-    # the FFTW3 documentation)
-
-    barf <<EOF if int($out->dim(0)/2) + 1 != $in->dim(1);
+  barf <<EOF if int($var1->dim(0)/2) + 1 != $var2->dim(1);
 $thisfunction: mismatched first dimension:
-\$input->dim(1) == int(\$output->dim(0)/2) + 1 wasn't true.
+\$$varname2->dim(1) == int(\$$varname1->dim(0)/2) + 1 wasn't true.
 Giving up.
 EOF
-
-    for my $idim (1..$rank-1)
-    {
-      if ( $out->dim($idim) != $in->dim($idim + 1) )
-      {
-        barf <<EOF;
+  for my $idim (1..$rank-1) {
+    if ( $var1->dim($idim) != $var2->dim($idim + 1) ) {
+      barf <<EOF;
 $thisfunction was given input/output matrices of non-matching sizes.
 Giving up.
 EOF
-      }
     }
   }
 }
@@ -325,28 +269,19 @@ sub processTypes
   # Input and output types must match, and I can only really deal with float and
   # double. If given an output, I refuse to tweak the type of the output,
   # otherwise, I upgrade to float and then to double
-  if( $$out->isnull )
-  {
-    if( $$in->type < float )
-    {
+  if( $$out->isnull ) {
+    if( $$in->type < float ) {
       forceType( $in, (float) );
     }
-  }
-  else
-  {
+  } else {
     # I'm given an output. Make sure this is of a type I can work with,
     # otherwise give up
-    my $targetType;
-
     my $out_type = $$out->type;
-
     barf <<EOF if $out_type < float;
 $thisfunction can only generate 'float' or 'double' output. You gave an output
 of type '$out_type'. I can't change this so I give up
 EOF
-
-    $targetType = ( $out_type < float ) ? (float) : $out_type;
-
+    my $targetType = ( $out_type < float ) ? (float) : $out_type;
     forceType( $in,  $targetType );
     forceType( $out, $targetType );
   }
@@ -368,9 +303,9 @@ sub getPlan
   my @dims; # the dimensionality of the FFT
   if( !$is_real_fft )
   {
-    # complex FFT - ignore first dimension which is (real, imag)
+    # complex FFT
     @dims = $in->dims;
-    shift @dims;
+    shift @dims if $in->type->real; # ignore first dimension which is (real, imag)
   }
   elsif( !$do_inverse_fft )
   {

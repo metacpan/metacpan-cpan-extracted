@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,9 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mojolicious-Plugin-Export-Git",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Mojolicious::Plugin::Export::Git",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Mojolicious" => 8,
+    "Mojolicious::Plugin::Export" => "0.008"
+  },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
@@ -24,7 +27,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,6 +39,8 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Mojolicious" => 8,
+  "Mojolicious::Plugin::Export" => "0.008",
   "Test::More" => 0
 );
 

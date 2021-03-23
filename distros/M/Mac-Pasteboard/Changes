@@ -1,3 +1,8 @@
+0.014		2021-03-23	T. R. Wyant
+    Get more diagnostic information out of tests, so I can have a prayer
+    of diagnosing what is going on in smokers that (apparently) do not
+    use UTF-8.
+
 0.013		2021-03-02	T. R. Wyant
     Add rt.cpan.org back to bug reporting methods.
 

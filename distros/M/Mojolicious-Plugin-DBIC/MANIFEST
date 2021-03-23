@@ -13,6 +13,7 @@ eg/.gitignore
 eg/README.md
 eg/cpanfile
 eg/data.db
+eg/myapp.conf
 eg/myapp.pl
 lib/Mojolicious/Plugin/DBIC.pm
 lib/Mojolicious/Plugin/DBIC/Controller/DBIC.pm

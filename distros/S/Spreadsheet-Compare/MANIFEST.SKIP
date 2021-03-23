@@ -1,0 +1,14 @@
+^\.
+\.bak$
+\.tgz
+\.tar\.gz$
+\.tar$
+^Makefile$
+^MYMETA\.
+^blib
+^pm_to_blib
+^README.md
+^nytprof
+^cover_db
+^_Deparsed_XSubs\.pm
+^scratch

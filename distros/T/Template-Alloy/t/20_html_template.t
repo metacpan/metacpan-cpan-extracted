@@ -6,7 +6,7 @@
 
 =cut
 
-use vars qw($module $is_ht $is_hte $is_ta $compile_perl);
+our ($module, $is_ht, $is_hte, $is_ta, $compile_perl);
 BEGIN {
     $module = 'Template::Alloy';
     if (grep {/hte/i} @ARGV) {

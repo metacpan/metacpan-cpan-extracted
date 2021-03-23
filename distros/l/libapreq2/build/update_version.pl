@@ -42,12 +42,12 @@ system "perl -i -ple 's/$pattern1/$version/ or s/$pattern2/$version/' configure.
 #
 # win32/Configure.pl
 # my $VERSION = '[^']+'
-my $pattern3 = qr/my \$VERSION = "2.15"/;
+my $pattern3 = qr/my \$VERSION = "2.16"/;
 my $replace = "my \\\$VERSION = \"$version\"";
 system "perl -i -ple 's/$pattern3/$replace/' win32/Configure.pl";
 
 # RELEASE/WEBSITE/this script
-system "perl -i -ple 's/2.15/$version/' build/RELEASE";
-system "perl -i -ple 's/2.15/$version/' build/WEBSITE";
-system "perl -i -ple 's/2.15/$version/' build/update_version.pl";
+system "perl -i -ple 's/2.16/$version/' build/RELEASE";
+system "perl -i -ple 's/2.16/$version/' build/WEBSITE";
+system "perl -i -ple 's/2.16/$version/' build/update_version.pl";
 

@@ -17,12 +17,12 @@ name: Test-Future-IO
 provides:
   Test::Future::IO:
     file: lib/Test/Future/IO.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Future::IO: '0'
   Test::Deep: '0'
   Test::ExpectAndCheck::Future: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

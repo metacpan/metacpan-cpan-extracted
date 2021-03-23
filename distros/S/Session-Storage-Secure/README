@@ -3,7 +3,7 @@ NAME
     session data with integrity
 
 VERSION
-    version 0.011
+    version 1.000
 
 SYNOPSIS
       my $store = Session::Storage::Secure->new(
@@ -126,6 +126,11 @@ ATTRIBUTES
     A code reference to extract binary data (the encrypted data and the MAC)
     from a transport-safe form. It must be the complement to "encode".
     Defaults to MIME::Base64::decode_base64url.
+
+  protocol_version
+    An integer representing the protocol used by "Session::Storage::Secure".
+    Protocol 1 was the initial version, which used a now-deprecated mode of
+    Crypt::CBC. Protocol 2 is the current default.
 
 METHODS
   encode
@@ -306,25 +311,13 @@ SEE ALSO
 
     *   Data::Serializer
 
-SUPPORT
-  Bugs / Feature Requests
-    Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/dagolden/Session-Storage-Secure/issues>. You will be
-    notified automatically of any progress on your issue.
-
-  Source Code
-    This is open source software. The code repository is available for
-    public review and contribution under the terms of the license.
-
-    <https://github.com/dagolden/Session-Storage-Secure>
-
-      git clone https://github.com/dagolden/Session-Storage-Secure.git
-
 AUTHOR
     David Golden <dagolden@cpan.org>
 
-CONTRIBUTOR
-    Tom Hukins <tom@eborcom.com>
+CONTRIBUTORS
+    *   Petr Písař <ppisar@redhat.com>
+
+    *   Tom Hukins <tom@eborcom.com>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2013 by David Golden.

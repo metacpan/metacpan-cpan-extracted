@@ -1,0 +1,10 @@
+name = "Sub-WrapInType-Attribute"
+badges = ['github-actions/test', 'coveralls', 'metacpan']
+authority="cpan:KFLY"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+markdown_maker = "Pod::Markdown::Github"
+
+[release]
+hooks = ['author/check_release_branch.sh main']

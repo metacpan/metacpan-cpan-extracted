@@ -4,7 +4,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 # VERSION
 
-version 0.97
+version 0.98
 
 # SYNOPSIS
 
@@ -112,6 +112,28 @@ Note: This is the legacy interface, please check out
 [Net::Amazon::S3::Client](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3%3A%3AClient) instead.
 
 Development of this code happens here: https://github.com/rustyconover/net-amazon-s3
+
+## Bucket names with dots, HTTPS, and Signature V4
+
+At the moment Amazon S3 doesn't play well with HTTPS and virtual bucket hosts
+if bucket name contains dots.
+
+Due the current implementation of Signature V4 handling you should use workaround
+consisting of usage of region hostnames
+
+        my $bucket_region = $global_s3->bucket ($bucket)->_head_region;
+
+        my $region_s3 = Net::Amazon:S3->new (
+                ...,
+                vendor => Net::Amazon::S3::Vendor::Amazon->new (
+                        host => "s3-$bucket_region.amazonaws.com",
+                        use_virtual_host => 0,
+                ),
+        );
+
+        my $bucket = $region_s3->bucket ($bucket);
+
+And use bucket instance / region s3 connection.
 
 # METHODS
 
@@ -601,7 +623,7 @@ Branislav Zahradník <barney@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,8 +4,8 @@
 #
 package PDL::LinearAlgebra::Complex;
 
-@EXPORT_OK  = qw( PDL::PP cgtsv PDL::PP cgesvd PDL::PP cgesdd PDL::PP cggsvd PDL::PP cgeev PDL::PP cgeevx PDL::PP cggev PDL::PP cggevx PDL::PP cgees PDL::PP cgeesx PDL::PP cgges PDL::PP cggesx PDL::PP cheev PDL::PP cheevd PDL::PP cheevx PDL::PP cheevr PDL::PP chegv PDL::PP chegvd PDL::PP chegvx PDL::PP cgesv PDL::PP cgesvx PDL::PP csysv PDL::PP csysvx PDL::PP chesv PDL::PP chesvx PDL::PP cposv PDL::PP cposvx PDL::PP cgels PDL::PP cgelsy PDL::PP cgelss PDL::PP cgelsd PDL::PP cgglse PDL::PP cggglm PDL::PP cgetrf PDL::PP cgetf2 PDL::PP csytrf PDL::PP csytf2 PDL::PP cchetrf PDL::PP chetf2 PDL::PP cpotrf PDL::PP cpotf2 PDL::PP cgetri PDL::PP csytri PDL::PP chetri PDL::PP cpotri PDL::PP ctrtri PDL::PP ctrti2 PDL::PP cgetrs PDL::PP csytrs PDL::PP chetrs PDL::PP cpotrs PDL::PP ctrtrs PDL::PP clatrs PDL::PP cgecon PDL::PP csycon PDL::PP checon PDL::PP cpocon PDL::PP ctrcon PDL::PP cgeqp3 PDL::PP cgeqrf PDL::PP cungqr PDL::PP cunmqr PDL::PP cgelqf PDL::PP cunglq PDL::PP cunmlq PDL::PP cgeqlf PDL::PP cungql PDL::PP cunmql PDL::PP cgerqf PDL::PP cungrq PDL::PP cunmrq PDL::PP ctzrzf PDL::PP cunmrz PDL::PP cgehrd PDL::PP cunghr PDL::PP chseqr PDL::PP ctrevc PDL::PP ctgevc PDL::PP cgebal PDL::PP clange PDL::PP clansy PDL::PP clantr PDL::PP cgemm PDL::PP cmmult PDL::PP ccrossprod PDL::PP csyrk PDL::PP cdot PDL::PP cdotc PDL::PP caxpy PDL::PP cnrm2 PDL::PP casum PDL::PP cscal PDL::PP sscal PDL::PP crotg PDL::PP clacpy PDL::PP claswp PDL::PP ctricpy PDL::PP cmstack PDL::PP ccharpol );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(PDL::PP cgtsv PDL::PP cgesvd PDL::PP cgesdd PDL::PP cggsvd PDL::PP cgeev PDL::PP cgeevx PDL::PP cggev PDL::PP cggevx PDL::PP cgees PDL::PP cgeesx PDL::PP cgges PDL::PP cggesx PDL::PP cheev PDL::PP cheevd PDL::PP cheevx PDL::PP cheevr PDL::PP chegv PDL::PP chegvd PDL::PP chegvx PDL::PP cgesv PDL::PP cgesvx PDL::PP csysv PDL::PP csysvx PDL::PP chesv PDL::PP chesvx PDL::PP cposv PDL::PP cposvx PDL::PP cgels PDL::PP cgelsy PDL::PP cgelss PDL::PP cgelsd PDL::PP cgglse PDL::PP cggglm PDL::PP cgetrf PDL::PP cgetf2 PDL::PP csytrf PDL::PP csytf2 PDL::PP cchetrf PDL::PP chetf2 PDL::PP cpotrf PDL::PP cpotf2 PDL::PP cgetri PDL::PP csytri PDL::PP chetri PDL::PP cpotri PDL::PP ctrtri PDL::PP ctrti2 PDL::PP cgetrs PDL::PP csytrs PDL::PP chetrs PDL::PP cpotrs PDL::PP ctrtrs PDL::PP clatrs PDL::PP cgecon PDL::PP csycon PDL::PP checon PDL::PP cpocon PDL::PP ctrcon PDL::PP cgeqp3 PDL::PP cgeqrf PDL::PP cungqr PDL::PP cunmqr PDL::PP cgelqf PDL::PP cunglq PDL::PP cunmlq PDL::PP cgeqlf PDL::PP cungql PDL::PP cunmql PDL::PP cgerqf PDL::PP cungrq PDL::PP cunmrq PDL::PP ctzrzf PDL::PP cunmrz PDL::PP cgehrd PDL::PP cunghr PDL::PP chseqr PDL::PP ctrevc PDL::PP ctgevc PDL::PP cgebal PDL::PP clange PDL::PP clansy PDL::PP clantr PDL::PP cgemm PDL::PP cmmult PDL::PP ccrossprod PDL::PP csyrk PDL::PP cdot PDL::PP cdotc PDL::PP caxpy PDL::PP cnrm2 PDL::PP casum PDL::PP cscal PDL::PP sscal PDL::PP crotg PDL::PP clacpy PDL::PP claswp PDL::PP ctricpy PDL::PP cmstack PDL::PP ccharpol );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -13,8 +13,8 @@ use DynaLoader;
 
 
 
-   $PDL::LinearAlgebra::Complex::VERSION = '0.14';
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our $VERSION = '0.14';
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Complex $VERSION;
 

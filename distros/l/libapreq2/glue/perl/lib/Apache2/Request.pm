@@ -3,7 +3,7 @@ use APR::Request::Param;
 use APR::Request::Apache2;
 use Apache2::RequestRec;
 push our @ISA, qw/Apache2::RequestRec APR::Request::Apache2/;
-our $VERSION = "2.15";
+our $VERSION = "2.16";
 
 my %old_limits = (
     post_max => "read_limit",

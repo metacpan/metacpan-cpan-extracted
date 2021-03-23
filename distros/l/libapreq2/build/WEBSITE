@@ -61,7 +61,7 @@ UPDATING THE WEBSITE:
 
   7) commit the changes as follows:
     
-    $ svn commit -m "released libapreq2-2.15" xdocs/apreq/ docs/apreq/
+    $ svn commit -m "released libapreq2-2.16" xdocs/apreq/ docs/apreq/
 
     [do this before you make your RELEASE annoucement and deal with any issues first]
 

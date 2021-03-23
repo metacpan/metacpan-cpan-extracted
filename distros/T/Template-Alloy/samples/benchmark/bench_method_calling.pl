@@ -8,7 +8,7 @@ my $n = 500_000;
 
 {
   package A;
-  use vars qw($AUTOLOAD);
+  our $AUTOLOAD;
   sub AUTOLOAD {
     my $self = shift;
     my $meth = ($AUTOLOAD =~ /::(\w+)$/) ? $1 : die "Bad method $AUTOLOAD";

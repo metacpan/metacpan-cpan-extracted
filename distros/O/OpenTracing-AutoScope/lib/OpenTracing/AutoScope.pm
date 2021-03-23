@@ -3,7 +3,7 @@ package OpenTracing::AutoScope;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.107.2';
+our $VERSION = 'v0.107.3';
 
 
 
@@ -29,9 +29,7 @@ sub start_guarded_span {
     # use a closure, so we can carry over $scope until the end of the scope
     # where this coderef will be 'reaped'
     #
-    Scope::Context->up->reap(sub {
-        $scope->close unless $scope->can('closed') and $scope->closed
-    });
+    Scope::Context->up->reap(sub { $scope->close });
     
     return
 }

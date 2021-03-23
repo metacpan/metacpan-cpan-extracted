@@ -1,6 +1,6 @@
 package Net::Amazon::S3::Request::Role::Query::Param::Part_number;
 # ABSTRACT: partNumber query param role
-$Net::Amazon::S3::Request::Role::Query::Param::Part_number::VERSION = '0.97';
+$Net::Amazon::S3::Request::Role::Query::Param::Part_number::VERSION = '0.98';
 use Moose::Role;
 
 with 'Net::Amazon::S3::Request::Role::Query::Param' => {
@@ -24,7 +24,7 @@ Net::Amazon::S3::Request::Role::Query::Param::Part_number - partNumber query par
 
 =head1 VERSION
 
-version 0.97
+version 0.98
 
 =head1 AUTHOR
 
@@ -32,7 +32,7 @@ Branislav Zahradník <barney@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
+This software is copyright (c) 2021 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover, Branislav Zahradník.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

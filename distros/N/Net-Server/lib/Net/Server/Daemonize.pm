@@ -32,16 +32,16 @@ our @EXPORT_OK = qw(check_pid_file    create_pid_file   unlink_pid_file
 
 ###----------------------------------------------------------------###
 
-### check for existance of pid_file
+### check for existence of pid_file
 ### if the file exists, check for a running process
 sub check_pid_file ($) {
     my $pid_file = shift;
-    return 1 if ! -e $pid_file;
+    return 1 if ! -e $pid_file or ! -s $pid_file && -M _ > 0.01;
 
-    open my $fh, '<', $pid_file or die "Couldn't open existant pid_file \"$pid_file\" [$!]\n";
-    my $current_pid = <$fh>;
+    open my $fh, '<', $pid_file or die "$pid_file: Couldn't open existent pid_file [$!]\n";
+    my $current_pid = <$fh> || "";
     close $fh;
-    $current_pid = ($current_pid =~ /^(\d{1,10})/) ? $1 : die "Couldn't find pid in existing pid_file";
+    $current_pid = ($current_pid =~ /^(\d{1,10})/) ? $1 : die "$pid_file: Couldn't find pid in existent pid_file";
 
     my $exists;
     if ($$ == $current_pid) {
@@ -82,7 +82,7 @@ sub unlink_pid_file ($) {
     my $pid_file = shift;
     return 1 if ! -e $pid_file; # no pid_file = return success
 
-    open my $fh, '<', $pid_file or die "Couldn't open existant pid_file \"$pid_file\" [$!]\n"; # slight race
+    open my $fh, '<', $pid_file or die "$pid_file: Couldn't open existent pid_file [$!]\n"; # slight race
     my $current_pid = <$fh>;
     close $fh;
     chomp $current_pid;
@@ -90,7 +90,7 @@ sub unlink_pid_file ($) {
     die "Process $$ doesn't own pid_file \"$pid_file\". Can't remove it.\n"
         if $current_pid ne $$;
 
-    unlink($pid_file) || die "Couldn't unlink pid_file \"$pid_file\" [$!]\n";
+    unlink($pid_file) || die "$pid_file: Couldn't unlink pid_file [$!]\n";
     return 1;
 }
 
@@ -309,7 +309,7 @@ Determine if the process is running as root.  Returns 1 or undef.
 
 =item check_pid_file
 
-Arguments are pid_file (full path to pid_file).  Checks for existance
+Arguments are pid_file (full path to pid_file).  Checks for existence
 of pid_file.  If file exists, open it and determine if the process
 that created it is still running.  This is done first by checking for
 a /proc file system and second using a "ps" command (BSD syntax).  (If

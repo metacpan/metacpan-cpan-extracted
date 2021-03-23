@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+
+use Mojo::Base -strict;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Spreadsheet::Compare;
+use Getopt::Long;
+use Pod::Usage;
+use Pod::Find qw(pod_where);
+use Capture::Tiny qw(capture_merged);
+use Config;
+use Path::Tiny qw(tempfile);
+
+GetOptions( \my %opt, qw(config=s debug=s help jobs=i quiet man summary) )
+    or pod2usage(
+    -exitcode => 1,
+    -verbose  => 0,
+    );
+
+my $msg = <<'END';
+spreadcomp:
+
+    Compare spreadsheets or databases and create a report for the detected
+    differences. This is the command line frontend script for the Perl
+    module Spreadsheet::Compare.
+    See https://metacpan.org/pod/Spreadsheet::Compare for more information.
+END
+
+pod2usage(
+    -msg      => $msg,
+    -exitcode => 0,
+    -verbose  => 0,
+) if $opt{help};
+
+if ( $opt{man} ) {
+    my @modlist = qw(
+        Spreadsheet::Compare
+        Spreadsheet::Compare::Reader
+        Spreadsheet::Compare::Reader::CSV
+        Spreadsheet::Compare::Reader::DB
+        Spreadsheet::Compare::Reader::FIX
+        Spreadsheet::Compare::Reader::WB
+        Spreadsheet::Compare::Single
+        Spreadsheet::Compare::Reporter
+        Spreadsheet::Compare::Reporter::HTML
+        Spreadsheet::Compare::Reporter::XLSX
+    );
+    my($out) = capture_merged {
+        for my $mod (@modlist) {
+            pod2usage(
+                -exitcode  => 'NOEXIT',
+                -verbose   => 99,
+                -input     => pod_where( { -inc => 1 }, $mod ),
+                -sections  => 'NAME|ATTRIBUTES',
+                -noplerdoc => 1,
+            );
+        }
+    };
+    my $pager = $ENV{PAGER} || $Config{pager} || 'more';
+    my $tmp   = tempfile("spreadcomp-XXXX");
+    $tmp->spew($out);
+    system("$pager $tmp");
+    exit;
+}
+
+pod2usage(
+    -exitcode => 2,
+    -verbose  => 0,
+) unless $opt{config};
+
+my $sc = Spreadsheet::Compare->new(
+    config    => $opt{config},
+    log_level => $opt{debug},
+    jobs      => $opt{jobs} // 1,
+    stdout    => 1,
+    quiet     => $opt{quiet},
+)->run();
+
+exit $sc->exit_code;
+
+=pod
+
+=head1 SYNOPSIS
+
+    spreadcomp -c <YAML-config-file> [-d] [-j] [-q] [-h] [-m]
+
+    Options:
+        -c, --config
+            YAML config file for comparison (required)
+
+        -d, --debug
+            Set the debug level (optional), possible values are:
+              TRACE, DEBUG, INFO, WARN, ERROR or FATAL
+            This can also be set with the environment variable
+              SPREADSHEET_COMPARE_DEBUG
+
+        -j --jobs
+            Set the number of concurrent subprocesses to use (optional, defaults to 1)
+            This will use threads under Windows which means that the non thread safe
+            Text::CSV_XS cannot be used for CSV processing. By using Text::CSV_PP
+            processing can be slower than using the default.
+
+        -q --quiet
+            Don't show the line counter while running.
+
+        -h, --help
+             Display this message
+
+        -m, --manual
+             Display complete manual (e.g. config file specifications)
+
+=head1 DESCRIPTION
+
+spreadcomp: compare spreadsheets or databases and create a report for the detected differences
+
+This is the command line frontend script for L<Spreadsheet::Compare> a suite of perl modules for comparing
+spreadsheet like data and generating detailed reports about the found differences. The comparisons can be
+customized in various ways (ignore columns, set deviation limits, very large spreadsheet handling, etc.).
+The used config file structure allows for predefined suites designed to be run in automated regression tests.
+
+The return code will represent the number of failed comparisons (with a maximum of 255).
+
+=cut

@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.42'; # VERSION
+our $VERSION = '0.43'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -362,18 +362,17 @@ sub find_jobs {
 	sub {
 		#say 'find_jobs call returned: ', Dumper(\@_);
 		my ($steps, $e, $r) = @_;
+		$done++; # received something so done waiting
 		if ($e) {
 			$self->log->error("find_jobs got error $e->{message} ($e->{code})");
 			$err = $e->{message};
-			$done++;
 			return;
 		}
 		$jobs = $r;
-		$done++;
 	}], sub {
 		my ($err) = @_;
-		$self->log->error("something went wrong with get_job_status: $err");
 		$done++;
+		$self->log->error("something went wrong with get_job_status: $err");
 	});
 
 	$self->_loop(sub { !$done });
@@ -395,6 +394,7 @@ sub get_api_status {
 	sub {
 		#say 'call returned: ', Dumper(\@_);
 		my ($d, $e, $r) = @_;
+		$done++; # received something so done waiting
 		if ($e) {
 			$self->log->error("get_api_status got error $e->{message} ($e->{code})");
 			$result = $e->{message};
@@ -403,6 +403,7 @@ sub get_api_status {
 		$result = $r;
 	}], sub {
 		my ($err) = @_;
+		$done++;
 		$self->log->eror("something went wrong with get_api_status: $err");
 	});
 
@@ -554,17 +555,17 @@ sub create_slotgroup {
 	sub {
 		#say 'call returned: ', Dumper(\@_);
 		my ($steps, $e, $r) = @_;
+		$done++; # received something so done waiting
 		if ($e) {
 			$self->log->error("create_slotgroup got error $e->{message}");
 			$result = $e->{message};
 			return;
 		}
 		$result = $r;
-		$done++;
 	}], sub {
 		my ($err) = @_;
-		$self->log->eror("something went wrong with create_slotgroup: $err");
 		$done++;
+		$self->log->eror("something went wrong with create_slotgroup: $err");
 	});
 
 	$self->_loop(sub { !$done });
@@ -600,6 +601,7 @@ sub announce {
 	sub {
 		#say 'call returned: ', Dumper(\@_);
 		my ($steps, $e, $r) = @_;
+		$done++; # received something so done waiting
 		if ($e) {
 			$self->log->error("announce got error: $e->{message}");
 			$err = $e->{message};
@@ -614,11 +616,10 @@ sub announce {
 			addenv => $args{addenv} // 0,
 		} if $res;
 		$err = $msg unless $res;
-		$done++;
 	}], sub {
 		($err) = @_;
-		$self->log->error("something went wrong with announce: $err");
 		$done++;
+		$self->log->error("something went wrong with announce: $err");
 	});
 
 	$self->_loop(sub { !$done });

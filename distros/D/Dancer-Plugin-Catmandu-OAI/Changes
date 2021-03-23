@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-Catmandu-OAI
 
+0.0507  2021-03-23 15:11:37 CET
+  - fix until bug
+
 0.0506  2019-12-18 10:34:40 CET
   - fix bug in resumptionToken deserializing
 

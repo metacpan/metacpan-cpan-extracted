@@ -172,7 +172,11 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     throw new Error("unknown widget type " + s.widget);
                     break;
             }
-
+            if (s.autocomplete) {
+                var el = control.getContentElement();
+                var ac = s.autocomplete;
+                el.setAttribute('autocomplete',ac);
+            }
             if (s.set) {
                 if (s.widget == 'date') {
                     var dateValue = s.set.value;

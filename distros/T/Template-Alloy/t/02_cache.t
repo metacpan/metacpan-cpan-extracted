@@ -7,7 +7,7 @@
 =cut
 
 use 5.006;
-use vars qw($n_tests $has_encode);
+our ($n_tests, $has_encode);
 BEGIN {
     if (eval { require Encode; require utf8 }) {
         $has_encode = 1;

@@ -1,5 +1,6 @@
 name = "App-ansifold"
 # badges = ["travis"]
+badges = ['github-actions/test']
 authority="cpan:UTASHIRO"
 
 module_maker="ModuleBuildTiny"

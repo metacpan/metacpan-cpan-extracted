@@ -2,54 +2,55 @@ use strict;
 
 use Test::More;
 
-BEGIN { push @INC, qw(blib/script) if -d 'blib' };
+push @INC, qw(blib/script) if -d 'blib';
+unshift @INC, qw(t) if -d 't';
+require 'testlib.pl';
 
 eval { require Pod::Parser } or
-	plan skip_all => q(No Pod::Parser);
-
-eval { require IO::ScalarArray } or
-	plan skip_all => q(No IO::ScalarArray);
+	plan skip_all => qq(No Pod::Parser\n$@);
 
 package File::Rename::Test::Parser;
 our @ISA = qw(Pod::Parser);
+our $key = __PACKAGE__;
 
+sub begin_pod { shift->{$key} = []; }
 sub command { return }
 sub textblock { return }
 sub interior_sequence { return }
 sub verbatim {
-    my ($parser, $paragraph) = @_;
-    my $out_fh = $parser->output_handle();
-    print $out_fh $paragraph;
+    my ($self, $text) = @_;
+    push @{$self->{$key}}, $text;
 }
 
+sub data { @{shift->{$key}} }
 
 package main;
 
 my $generic = 'rename';
-my $script = ($^O =~ m{Win} ? 'file-'.$generic : $generic);
+my $script = script_name();
 eval { require($script) } or
-    BAIL_OUT qq{require($script)};
+    BAIL_OUT qq{Can't require $script\n$@};
 
 my $inc_script = $INC{$script};
 BAIL_OUT "\$INC($script) = '$inc_script', missing\n" 
     unless $inc_script and -e $inc_script;  
 
-File::Rename::Test::Parser->new
-    ->parse_from_file(	$inc_script,
-	    		IO::ScalarArray->new(\my @verbatim) );
-
-my @examples = grep /\s+$generic\s/, @verbatim;
+my $parser = File::Rename::Test::Parser->new;
+$parser->parse_from_file( $inc_script );
+my @examples = grep /\s+$generic\s/, $parser->data;
 
 #########################
 
-# Insert your test code below, the Test::More module 
-# is use()ed here so read its man page ( perldoc Test::More ) 
+# Insert your test code below, the Test::More
+# module is use()ed here so read its man page
+# ( perldoc Test::More ) 
 # for help writing this test script.
 
 plan tests => 2 + (@examples || 1);
 like( $inc_script, qr{/ $script \z}msx,
 	"required $script is $inc_script");
-ok( scalar(@examples) > 1, "enough examples in $inc_script" );
+ok( scalar(@examples) > 1,
+	"enough examples in $inc_script" );
 # Larry Wall wrote 2 examples in 1992!
 
 unshift @INC, 't' if -d 't';

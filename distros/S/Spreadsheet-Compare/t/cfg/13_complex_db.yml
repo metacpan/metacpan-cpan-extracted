@@ -1,0 +1,76 @@
+---
+- title   : __GLOBAL__
+  type    : DB
+  dsns :
+    - dsn: 'dbi:SQLite:dbname=t/left/db.sqlite'
+    - dsn: 'dbi:SQLite:dbname=t/right/db.sqlite'
+#=============================================
+- title     : csv_med_dup auto
+  sql :
+    - select * from csv_med_dup
+  identity :
+    - C1
+  limit_abs : 0.01
+  limit_rel : 0.1
+#=============================================
+- title     : csv_med_dup sorted
+  sql :
+    - select * from csv_med_dup order by C1
+  identity :
+    - C1
+  fetch_size: 10
+  limit_abs : 0.01
+  limit_rel : 0.1
+#=============================================
+- title     : csv_mixid
+  sql :
+    - select * from csv_mixid
+  identity :
+    - CBEGSBYVB
+    - VAFGEHZRAG
+  ignore :
+    - IRTNY
+    - PBAGENPGFVMR
+    - '1 Z'
+    - '6 Z'
+    - '12 Z'
+  is_sorted : 0
+  column_case: uc
+  fetch_size : 100
+  limit_abs : 0.001
+  limit_rel : 0.01
+#=============================================
+- title     : csv_mixid sorted
+  sql :
+    - select * from csv_mixid order by Cbegsbyvb, Vafgehzrag
+  identity :
+    - Cbegsbyvb
+    - Vafgehzrag
+  ignore :
+    - IrtnY
+    - PbagenpgFvmr
+    - '1 Z'
+    - '6 Z'
+    - '12 Z'
+  is_sorted : 1
+  fetch_size : 100
+  limit_abs : 0.001
+  limit_rel : 0.01
+#=============================================
+- title     : csv_mixid limit
+  sql :
+    - select * from csv_mixid order by Cbegsbyvb, Vafgehzrag
+  identity :
+    - Cbegsbyvb
+    - Vafgehzrag
+  ignore :
+    - IrtnY
+    - PbagenpgFvmr
+    - '1 Z'
+    - '6 Z'
+    - '12 Z'
+  is_sorted : 1
+  fetch_limit: 2
+  fetch_size : 100
+  limit_abs : 0.001
+  limit_rel : 0.01

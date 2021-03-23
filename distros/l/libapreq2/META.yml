@@ -1,29 +1,38 @@
 --- #YAML:1.0
 name: libapreq2
-version: 2.15
+version: 2.16
 license: Apache_2_0
 installdirs: site
 distribution_type: module
 dynamic_config: 1
 provides:
   Apache2::Request:
-    version: 2.15
+    file: glue/perl/lib/Apache2/Request.pm
+    version: 2.16
   Apache2::Cookie:
-    version: 2.15
+    file: glue/perl/lib/Apache2/Cookie.pm
+    version: 2.16
   Apache2::Upload:
-    version: 2.15
+    file: glue/perl/lib/Apache2/Upload.pm
+    version: 2.16
   APR::Request:
-    version: 2.15
+    file: glue/perl/xsbuilder/APR/Request/Request.pm
+    version: 2.16
   APR::Request::Apache2:
-    version: 2.15
+    file: glue/perl/xsbuilder/APR/Request/Apache2/Apache2.pm
+    version: 2.16
   APR::Request::CGI:
-    version: 2.15
+    file: glue/perl/xsbuilder/APR/Request/CGI/CGI.pm
+    version: 2.16
   APR::Request::Error:
-    version: 2.15
+    file: glue/perl/xsbuilder/APR/Request/Error/Error.pm
+    version: 2.16
   APR::Request::Cookie:
-    version: 2.15
+    file: glue/perl/xsbuilder/APR/Request/Cookie/Cookie.pm
+    version: 2.16
   APR::Request::Param:
-    version: 2.15
+    file: glue/perl/xsbuilder/APR/Request/Param/Param.pm
+    version: 2.16
 no_index:
   directory:
     - glue/perl/xsbuilder/tables/APR/Request

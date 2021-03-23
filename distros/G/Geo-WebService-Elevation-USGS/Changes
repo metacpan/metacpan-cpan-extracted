@@ -1,3 +1,12 @@
+0.119		2021-03-22	T. R. Wyant
+    Refactor authortest into three, to eliminate need for stub files to
+    test without optional modules.
+
+    Add rt.cpan.org back to bug reporting methods. Long live RT!
+
+    Get prerequisites up to snuff, and add xt/author/prereq.t to ensure
+    they stay that way.
+
 0.118		2021-01-13	T. R. Wyant
     Add Travis CI testing.
 

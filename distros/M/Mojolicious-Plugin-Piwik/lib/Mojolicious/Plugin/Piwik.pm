@@ -6,7 +6,7 @@ use Mojo::UserAgent;
 use Mojo::Promise;
 use Mojo::IOLoop;
 
-our $VERSION = '0.29';
+our $VERSION = '1.00';
 
 # Todo:
 # - Better test tracking API support
@@ -647,6 +647,10 @@ CSP as a valid C<script-src> and potentially C<img-src>.
 The special C<opt-out> tag renders an
 L<iframe|https://matomo.org/faq/general/faq_20000/>
 helping your visitors to disallow tracking via javascript.
+To make this work with strict L<Content Security Policies|https://matomo.org/faq/general/faq_20904/>,
+you need to add the domain of your Matomo (Piwik) instance to your
+CSP as a valid C<frame-src>.
+
 
   %= piwik_tag 'opt-out', width => 400
 
@@ -731,7 +735,7 @@ Defaults to the url given when the plugin was registered.
 =item
 
 C<secure> - Boolean value that indicates a request using the C<https> scheme.
-Defaults to false, in case the C<url> is given without or
+Defaults to false, in case the C<url> is given without any scheme or
 with a C<http> scheme.
 
 =item
@@ -780,8 +784,6 @@ ready to be embedded as the C<src> of an C<E<lt>img /E<gt>> tag.
 Same as L<piwik.api|/piwik.api>, but returns a L<Mojo::Promise>
 object.
 
-B<The promise variant is EXPERIMENTAL and may change without warnings!>
-
 
 =head2 piwik.api_url
 
@@ -803,8 +805,6 @@ Creates the URL of an API request and returns the L<Mojo::URL> object.
 Accepts the same parameters as the L<piwik.api|/piwik.api> helper,
 excluding the callback.
 
-B<This helper is EXPERIMENTAL and may change without warnings!>
-
 
 =head1 SHORTCUTS
 
@@ -823,8 +823,6 @@ C<track_script> - Returns a JavaScript file containing the
 tracking code for C<site_id> and C<url>.
 
 =back
-
-B<The shortcut is EXPERIMENTAL and may change without warnings!>
 
 =head1 LIMITATIONS
 

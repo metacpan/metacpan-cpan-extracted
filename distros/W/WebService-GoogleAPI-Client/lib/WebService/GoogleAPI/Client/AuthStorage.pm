@@ -4,7 +4,7 @@ package WebService::GoogleAPI::Client::AuthStorage;
 
 # ABSTRACT: Role for classes which store your auth credentials
 
-our $VERSION = '0.25';    # VERSION
+our $VERSION = '0.26';    # VERSION
 
 use Moo::Role;
 use Carp;
@@ -93,7 +93,7 @@ WebService::GoogleAPI::Client::AuthStorage - Role for classes which store your a
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,11 @@
 # Change Log
 
+## [UNRELEASED]
+
+### Added
+
+- Default to grey if a generation doesn't exist in the colour array
+
 ## [0.0.4] - 2020-12-17
 
 ### Added

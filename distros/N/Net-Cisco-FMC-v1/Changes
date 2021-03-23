@@ -1,4 +1,7 @@
-Revision history for Net-Cisco-FMC-v1: 0.005001
+Revision history for Net-Cisco-FMC-v1: 0.006001
+
+0.006001  2021-03-23 13:26:23+01:00 Europe/Vienna
+    - automatically relogin when access token becomes invalid
 
 0.005001  2020-09-28 17:47:29+02:00 Europe/Vienna
     - add methods for deployabledevices, deploymentrequest, devicerecords,

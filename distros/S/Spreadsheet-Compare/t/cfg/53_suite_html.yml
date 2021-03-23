@@ -1,0 +1,13 @@
+---
+- title:            __GLOBAL__
+  type:             CSV
+  rootdir:          t
+  summary:          HTML
+  reporter:         HTML
+  report_filename:  ${SC_TMPD}/%{title}.html
+  summary_filename: ${SC_TMPD}/53_suite_html.html
+  left:             My Left Side
+  right:            My Right Side
+- suite:
+    - cfg/53_suite_1_html.yml
+    - cfg/53_suite_2_html.yml

@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 
+use utf8;
+no utf8;
+
 package Smartcat::App::DocumentApi;
 
 use Smartcat::Client::DocumentApi;
@@ -41,10 +44,12 @@ sub update_document {
         bilingualFileImportSetings => $settings );
 
     $log->info("Updating document '$document_id' with '$path'...");
+    my $utf8_path = $path;
+    utf8::encode($utf8_path);
     my %args = (
         document_id           => $document_id,
         update_document_model => $doc_props,
-        file                  => $path
+        file                  => $utf8_path
     );
     $args{disassemble_algorithm_name} =
       $self->{rundata}->{disassemble_algorithm_name}

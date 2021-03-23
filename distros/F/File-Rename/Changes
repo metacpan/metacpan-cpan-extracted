@@ -1,5 +1,22 @@
 Revision history for Perl extension File::Rename.
 
+1.20	Robin Barker 2021-03-22
+	On darwin, when built with ExtUtils::MakeMaker, 
+	builds the correct script and passes tests; see
+	http://matrix.cpantesters.org/?dist=File-Rename%201.19_04;os=darwin;reports=1
+
+	1.19_04 Robin Barker 2021-03-20
+	Fix distribution file format
+
+	1.19_03 Robin Barker 2021-03-19
+	Fix META.* for Makefile.PL
+
+	1.19_02 Robin Barker 2021-03-18
+	More robust OSType handling
+
+	1.19_01	Robin Barker 2021-03-17
+	Fix Makefile and tests to find script on darwin
+
 1.13	Robin Barker 2020-06-17
         Fix 'examples' test script to do file globbing
 
@@ -8,7 +25,7 @@ Revision history for Perl extension File::Rename.
 
 1.11	Robin Barker 2020-06-16
 	Added more examples in the script POD, suggested by 'xavier'
-	Added a test script to test that exampples in POD are valid
+	Added a test script to test that examples in POD are valid
 
 1.10	Robin Barker 2018-09-25
 	Added option --filename [-d] to rename filename component only

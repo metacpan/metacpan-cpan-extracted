@@ -11,6 +11,20 @@ SKIP: {
             && exists $ENV{NET_CHECKPOINT_MANAGEMENT_V1_POLICY});
 };
 
+like(
+    dies {
+        my $cpmgmt_unreach = Net::Checkpoint::Management::v1->new(
+            server      => 'https://localhost',
+            user        => 'username',
+            passwd      => 'password',
+            clientattrs => { timeout => 1 },
+        );
+        $cpmgmt_unreach->login;
+    },
+    qr/Could not connect to/,
+    'connection failure throws exception'
+);
+
 my $cpmgmt = Net::Checkpoint::Management::v1->new(
     server      => 'https://' . $ENV{NET_CHECKPOINT_MANAGEMENT_V1_HOSTNAME},
     user        => $ENV{NET_CHECKPOINT_MANAGEMENT_V1_USERNAME},

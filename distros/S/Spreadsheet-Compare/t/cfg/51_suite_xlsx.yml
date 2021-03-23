@@ -1,0 +1,11 @@
+---
+- title:            __GLOBAL__
+  type:             CSV
+  rootdir:          t
+  summary:          XLSX
+  reporter:         XLSX
+  report_filename:  ${SC_TMPD}/%{title}.xlsx
+  summary_filename: ${SC_TMPD}/51_suite_xlsx.xlsx
+- suite:
+    - cfg/51_suite_1_xlsx.yml
+    - cfg/51_suite_2_xlsx.yml

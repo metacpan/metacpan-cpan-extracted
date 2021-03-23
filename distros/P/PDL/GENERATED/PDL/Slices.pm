@@ -4,7 +4,7 @@
 #
 package PDL::Slices;
 
-our @EXPORT_OK  = qw( PDL::PP affineinternal PDL::PP s_identity PDL::PP index PDL::PP index1d PDL::PP index2d  indexND indexNDb PDL::PP rangeb PDL::PP rld PDL::PP rle PDL::PP flowconvert PDL::PP converttypei PDL::PP _clump_int PDL::PP xchg PDL::PP mv PDL::PP oslice  using PDL::PP affine PDL::PP diagonalI PDL::PP lags PDL::PP splitdim PDL::PP rotate PDL::PP threadI PDL::PP identvaff PDL::PP unthread  dice dice_axis  slice PDL::PP sliceb );
+our @EXPORT_OK = qw(PDL::PP affineinternal PDL::PP s_identity PDL::PP index PDL::PP index1d PDL::PP index2d  indexND indexNDb PDL::PP rangeb PDL::PP rld PDL::PP rle PDL::PP flowconvert PDL::PP converttypei PDL::PP _clump_int PDL::PP xchg PDL::PP mv PDL::PP oslice  using PDL::PP affine PDL::PP diagonalI PDL::PP lags PDL::PP splitdim PDL::PP rotate PDL::PP threadI PDL::PP identvaff PDL::PP unthread  dice dice_axis  slice PDL::PP sliceb );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Slices ;
 

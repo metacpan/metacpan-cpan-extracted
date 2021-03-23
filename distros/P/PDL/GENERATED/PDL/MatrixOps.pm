@@ -4,7 +4,7 @@
 #
 package PDL::MatrixOps;
 
-our @EXPORT_OK  = qw(  identity  stretcher  inv  det  determinant PDL::PP eigens_sym PDL::PP eigens PDL::PP svd  lu_decomp  lu_decomp2  lu_backsub PDL::PP simq PDL::PP squaretotri );
+our @EXPORT_OK = qw( identity  stretcher  inv  det  determinant PDL::PP eigens_sym PDL::PP eigens PDL::PP svd  lu_decomp  lu_decomp2  lu_backsub PDL::PP simq PDL::PP squaretotri );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   our @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::MatrixOps ;
 

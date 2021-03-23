@@ -4,13 +4,13 @@
       "Paul Seamons"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Template-Alloy",
    "no_index" : {
@@ -37,5 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.020"
+   "version" : "1.022",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

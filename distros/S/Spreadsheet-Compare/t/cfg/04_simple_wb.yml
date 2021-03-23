@@ -1,0 +1,25 @@
+---
+- title: __GLOBAL__
+  type: WB
+  rootdir: t
+#=============================================
+- title     : ODS format
+  sheets :
+    - left/simple01.ods::sheet1
+    - right/simple01.ods::sheet1
+  identity: [0]
+#=============================================
+- title     : XLSX format
+  sheets :
+    - left/simple02.xlsx::xlsx_title
+    - right/simple02.xlsx::xlsx_title
+  identity: [A]
+  ignore:
+    - Z
+  has_header: 1
+  header_row: 2
+  header_col: 2
+  data_row:   4
+  data_col:   2
+  sr_options:
+    strip: 3
