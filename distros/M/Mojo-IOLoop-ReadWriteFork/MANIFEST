@@ -7,6 +7,7 @@ example/rwf.pl
 example/sshp.pl
 example/tail.pl
 lib/Mojo/IOLoop/ReadWriteFork.pm
+lib/Mojo/IOLoop/ReadWriteFork/SIGCHLD.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
@@ -21,6 +22,7 @@ t/code.t
 t/drain.t
 t/invalid.t
 t/leaky-errno.t
+t/memory.t
 t/minion.t
 t/poll.t
 t/premature-close.t

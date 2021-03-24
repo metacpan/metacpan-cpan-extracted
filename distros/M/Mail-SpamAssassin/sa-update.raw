@@ -22,11 +22,11 @@ use warnings;
 use re 'taint';
 
 my $VERSION = 'svnunknown';
-if ('$Id: sa-update.raw 1869639 2019-11-11 04:09:44Z kmcgrail $' =~ ':') {
-  # Subversion keyword "$Id: sa-update.raw 1869639 2019-11-11 04:09:44Z kmcgrail $" has been successfully expanded.
+if ('$Id: sa-update.raw 1881784 2020-09-17 07:17:40Z gbechis $' =~ ':') {
+  # Subversion keyword "$Id: sa-update.raw 1881784 2020-09-17 07:17:40Z gbechis $" has been successfully expanded.
   # Doesn't happen with automated launchpad builds:
   # https://bugs.launchpad.net/launchpad/+bug/780916
-  $VERSION = &Mail::SpamAssassin::Version . ' / svn' . (split(/\s+/, '$Id: sa-update.raw 1869639 2019-11-11 04:09:44Z kmcgrail $'))[2];
+  $VERSION = &Mail::SpamAssassin::Version . ' / svn' . (split(/\s+/, '$Id: sa-update.raw 1881784 2020-09-17 07:17:40Z gbechis $'))[2];
 }
 
 my $PREFIX          = '@@PREFIX@@';             # substituted at 'make' time
@@ -224,6 +224,7 @@ if ( $opt{'allowplugins'} && !$opt{'reallyallowplugins'} ) {
   warn "Security warning: dangerous option --allowplugins used:\n".
        "- there should never be need to use this option, see man sa-update(1)\n".
        "- specify --reallyallowplugins to allow activating plugins\n";
+  exit 2;
 }
 
 $use_inet4 = $have_inet4 && ( !$opt{'force_pf'} || $opt{'force_pf'} eq 'inet' );

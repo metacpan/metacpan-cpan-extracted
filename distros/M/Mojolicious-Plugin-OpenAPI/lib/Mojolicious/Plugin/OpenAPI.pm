@@ -8,8 +8,7 @@ use Mojolicious::Plugin::OpenAPI::Parameters;
 
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '4.00';
-my $X_RE = qr{^x-};
+our $VERSION = '4.02';
 
 has route     => sub {undef};
 has validator => sub { JSON::Validator::Schema->new; };
@@ -52,7 +51,8 @@ sub register {
   }
 
   $self->_add_routes($app, $config);
-  $self;
+
+  return $self;
 }
 
 sub _add_default_response {
@@ -88,24 +88,23 @@ sub _add_routes {
   my ($self, $app, $config) = @_;
   my (@routes, %uniq);
 
-  $self->_each_route(sub {
-    my ($http_method, $openapi_path) = @_;
-    my $op_spec = $self->validator->get([paths => $openapi_path => $http_method]);
+  for my $route ($self->validator->routes->each) {
+    my $op_spec = $self->validator->get([paths => @$route{qw(path method)}]);
     my $name    = $op_spec->{'x-mojo-name'} || $op_spec->{operationId};
-    my $to      = $op_spec->{'x-mojo-to'};
     my $r;
 
     die qq([OpenAPI] operationId "$op_spec->{operationId}" is not unique)
       if $op_spec->{operationId} and $uniq{o}{$op_spec->{operationId}}++;
     die qq([OpenAPI] Route name "$name" is not unique.) if $name and $uniq{r}{$name}++;
 
-    if (!$to and $name) {
+    if (!$op_spec->{'x-mojo-to'} and $name) {
       $r = $self->route->root->find($name);
       warn "[OpenAPI] Found existing route by name '$name'.\n" if DEBUG and $r;
-      $self->route->add_child($r) if $r;
+      $self->route->add_child($r)                              if $r;
     }
     if (!$r) {
-      my $route_path = $self->_openapi_path_to_route_path($http_method, $openapi_path);
+      my $http_method = $route->{method};
+      my $route_path  = $self->_openapi_path_to_route_path(@$route{qw(method path)});
       $name ||= $op_spec->{operationId};
       warn "[OpenAPI] Creating new route for '$route_path'.\n" if DEBUG;
       $r = $self->route->$http_method($route_path);
@@ -113,14 +112,11 @@ sub _add_routes {
     }
 
     $self->_add_default_response($op_spec);
-
-    $r->to(ref $to eq 'ARRAY' ? @$to : $to) if $to;
-    $r->to({'openapi.method' => $http_method});
-    $r->to({'openapi.path'   => $openapi_path});
-    warn "[OpenAPI] Add route $http_method @{[$r->to_string]} (@{[$r->name // '']})\n" if DEBUG;
+    $self->_modify_route($r, $route, $config, $op_spec);
+    warn "[OpenAPI] Add route $route->{method} @{[$r->to_string]} (@{[$r->name // '']})\n" if DEBUG;
 
     push @routes, $r;
-  });
+  }
 
   $app->plugins->emit_hook(openapi_routes_added => $self, \@routes);
 }
@@ -153,22 +149,24 @@ sub _before_render {
 
 sub _build_route {
   my ($self, $app, $config) = @_;
-  my $route = $config->{route};
+  my $validator = $self->validator;
+  my $route     = $config->{route};
 
   my $base_path
-    = $self->validator->moniker eq 'openapiv3'
-    ? Mojo::URL->new($self->validator->get('/servers/0/url') || '/')->path->to_string
-    : $self->validator->get('/basePath') || '/';
+    = $validator->moniker eq 'openapiv3'
+    ? Mojo::URL->new($validator->get('/servers/0/url') || '/')->path->to_string
+    : $validator->get('/basePath') || '/';
 
   $route     = $route->any($base_path) if $route and !$route->pattern->unparsed;
   $route     = $app->routes->any($base_path) unless $route;
-  $base_path = $self->validator->data->{basePath} = $route->to_string;
+  $base_path = $route->to_string;
   $base_path =~ s!/$!!;
 
   push @{$app->defaults->{'openapi.base_paths'}}, [$base_path, $self];
-  $route->to({handler => 'openapi', 'openapi.object' => $self});
+  $route->to({format => undef, handler => 'openapi', 'openapi.object' => $self});
+  $validator->data->{basePath} = $route->to_string if $validator->moniker eq 'openapiv2';
 
-  if (my $spec_route_name = $config->{spec_route_name} || $self->validator->get('/x-mojo-name')) {
+  if (my $spec_route_name = $config->{spec_route_name} || $validator->get('/x-mojo-name')) {
     $self->{route_prefix} = "$spec_route_name.";
   }
 
@@ -204,22 +202,6 @@ sub _default_schema_v3 {
     description => 'default Mojolicious::Plugin::OpenAPI response',
     content     => {'application/json' => {schema => $schema}},
   };
-}
-
-sub _each_route {
-  my ($self, $cb) = @_;
-
-  my @sorted_paths
-    = map { $_->[0] }
-    sort  { $a->[1] <=> $b->[1] || length $a->[0] <=> length $b->[0] }
-    map   { [$_, /\{/ ? 1 : 0] } grep { !/$X_RE/ } keys %{$self->validator->get('/paths') || {}};
-
-  my @routes;
-  for my $path (@sorted_paths) {
-    for my $http_method (sort keys %{$self->validator->get([paths => $path]) || {}}) {
-      $cb->($http_method => $path) unless $http_method =~ $X_RE or $http_method eq 'parameters';
-    }
-  }
 }
 
 sub _helper_get_spec {
@@ -291,6 +273,27 @@ sub _log {
     $c->req->url->path,
     Mojo::JSON::encode_json(@_)
   );
+}
+
+sub _modify_route {
+  my ($self, $r, $route, $config, $op_spec) = @_;
+  my $op_to = $op_spec->{'x-mojo-to'} // [];
+  my @args
+    = ref $op_to eq 'ARRAY' ? @$op_to : ref $op_to eq 'HASH' ? %$op_to : $op_to ? ($op_to) : ();
+
+  # x-mojo-to: controller#action
+  $r->to(shift @args) if @args and $args[0] =~ m!#!;
+
+  my ($constraints, @to) = ($r->pattern->constraints);
+  $constraints->{format} //= $config->{format} if $config->{format};
+  while (my $arg = shift @args) {
+    if    (ref $arg eq 'ARRAY') { %$constraints = (%$constraints, @$arg) }
+    elsif (ref $arg eq 'HASH')  { push @to, %$arg }
+    elsif (!ref $arg and @args) { push @to, $arg, shift @args }
+  }
+
+  $r->to(@to) if @to;
+  $r->to(format => undef, 'openapi.method' => $route->{method}, 'openapi.path' => $route->{path});
 }
 
 sub _render {
@@ -419,15 +422,10 @@ See L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2> or
 L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv3> for tutorials on how to
 write a "full" app with application class and controllers.
 
-=head1 IMPORTANT ANNOUNCEMENT
-
-Next version of L<Mojolicious::Plugin::OpenAPI> will not be shipped with
-L<JSON::Validator::OpenAPI::Mojolicious>. Instead, it will depend on the new
-L<JSON::Validator::Schema::OpenAPIv2> and L<JSON::Validator::Schema::OpenAPIv3>
-modules.
-
-The next version is available at
-L<https://github.com/jhthorsen/mojolicious-plugin-openapi/pull/160>.
+Looking at the documentation for
+L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2/x-mojo-to> can be especially
+useful if you are using extensions (formats) such as ".json". The logic is the
+same for OpenAPIv2 and OpenAPIv3.
 
 =head1 DESCRIPTION
 
@@ -589,6 +587,14 @@ The name of the "definition" in the spec that will be used for
 L</default_response_codes>. The default value is "DefaultResponse". See
 L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2/"Default response schema">
 for more details.
+
+=head3 format
+
+Set this to a default list of file extensions that your API accepts. This value
+can be overwritten by
+L<Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2/x-mojo-to>.
+
+This config parameter is EXPERIMENTAL and subject for change.
 
 =head3 log_level
 

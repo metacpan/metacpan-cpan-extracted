@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use 5.010;
 use Carp qw(confess);
-use FindBin qw($Bin);
+use FindBin qw($RealBin);
 use lib "$RealBin/../lib/";
 use FASTX::Reader;
 

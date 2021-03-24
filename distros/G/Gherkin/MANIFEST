@@ -7,11 +7,11 @@ META.json
 META.yml
 Makefile.PL
 README.md
-bin/gherkin-generate-ast
-bin/gherkin-generate-pickles
+bin/gherkin
 bin/gherkin-generate-tokens
 cpanfile
 dist.ini
+lib/App/gherkin.pm
 lib/Gherkin.pm
 lib/Gherkin/AstBuilder.pm
 lib/Gherkin/AstNode.pm
@@ -173,6 +173,11 @@ testdata/good/rule.feature.ast.ndjson
 testdata/good/rule.feature.pickles.ndjson
 testdata/good/rule.feature.source.ndjson
 testdata/good/rule.feature.tokens
+testdata/good/rule_with_tag.feature
+testdata/good/rule_with_tag.feature.ast.ndjson
+testdata/good/rule_with_tag.feature.pickles.ndjson
+testdata/good/rule_with_tag.feature.source.ndjson
+testdata/good/rule_with_tag.feature.tokens
 testdata/good/rule_without_name_and_description.feature
 testdata/good/rule_without_name_and_description.feature.ast.ndjson
 testdata/good/rule_without_name_and_description.feature.pickles.ndjson

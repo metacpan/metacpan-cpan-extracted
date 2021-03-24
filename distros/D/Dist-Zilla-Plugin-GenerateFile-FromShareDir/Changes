@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-Plugin-GenerateFile-FromShareDir
 
+0.015     2021-03-23 20:05:21Z
+          - removed Dist::Zilla::Plugin::GenerateFile::ShareDir, deprecated
+            since version 0.008
+          - now only look in the local directory for the template file if it
+            cannot be found in the installed sharedir
+
 0.014     2018-05-01 04:58:42Z
           - fix for Dist::Zilla 7: ensure that the proper directory is used
             for locating the distribution sharedir

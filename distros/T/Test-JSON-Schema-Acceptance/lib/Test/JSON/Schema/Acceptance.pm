@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.002-6-g278f665
+package Test::JSON::Schema::Acceptance; # git description: v1.004-2-g150a61e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.003';
+our $VERSION = '1.005';
 
 use 5.014;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -27,7 +27,7 @@ has specification => (
   is => 'ro',
   isa => Str,
   lazy => 1,
-  default => 'draft2019-09',
+  default => 'draft2020-12',
   predicate => '_has_specification',
 );
 
@@ -59,6 +59,14 @@ has include_optional => (
   default => 0,
 );
 
+has skip_dir => (
+  is => 'ro',
+  isa => ArrayRef[Str],
+  coerce => sub { ref($_[0]) ? $_[0] : [ $_[0] ] },
+  lazy => 1,
+  default => sub { [] },
+);
+
 has results => (
   is => 'rwp',
   init_arg => undef,
@@ -71,7 +79,7 @@ has results => (
 around BUILDARGS => sub {
   my ($orig, $class, @args) = @_;
   my %args = @args % 2 ? ( specification => 'draft'.$args[0] ) : @args;
-  $args{specification} = 'draft2019-09' if ($args{specification} // '') eq 'latest';
+  $args{specification} = 'draft2020-12' if ($args{specification} // '') eq 'latest';
   $class->$orig(\%args);
 };
 
@@ -299,6 +307,7 @@ sub _build__test_data {
   $self->test_dir->visit(
     sub {
       my ($path) = @_;
+      return if any { $self->test_dir->child($_)->subsumes($path) } @{ $self->skip_dir };
       return if not $path->is_file;
       return if $path !~ /\.json$/;
       my $data = $self->_json_decoder->decode($path->slurp_raw);
@@ -338,7 +347,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.003
+version 1.005
 
 =head1 SYNOPSIS
 
@@ -375,8 +384,8 @@ cases in the JSON Schema Test Suite, except for those listed in C<$skip_tests>.
 L<JSON Schema|http://json-schema.org> is an IETF draft (at time of writing) which allows you to
 define the structure of JSON.
 
-From the overview of the L<draft 2019-09 version of the
-specification|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.3>:
+From the overview of the L<draft 2020-12 version of the
+specification|https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.3>:
 
 =over 4
 
@@ -436,7 +445,11 @@ C<draft2019-09>
 
 =item *
 
-C<latest> (alias for C<draft2019-09>)
+C<draft2020-12>
+
+=item *
+
+C<latest> (alias for C<draft2020-12>)
 
 =back
 
@@ -469,6 +482,13 @@ during C<make test> or C<prove>.
 =head2 include_optional
 
 Optional. When true, tests in subdirectories (most notably F<optional/> are also included.
+
+=head2 skip_dir
+
+Optional. Pass a string or arrayref consisting of relative path name(s) to indicate directories
+(within the test directory as specified above with C<specification> or C<test_dir>) which will be
+skipped. Note that this is only useful currently with C<include_optional => 1>, as otherwise all
+subdirectories would be skipped anyway.
 
 =head1 SUBROUTINES/METHODS
 
@@ -511,7 +531,7 @@ associated with that URI, for use in some tests that use additional resources (s
 not provide this option, you will be responsible for ensuring that those additional resources are
 made available to your implementation for the successful execution of the tests that rely on them.
 
-For more information, see <https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8.2.4.5>.
+For more information, see <https://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.9.1.2>.
 
 =head3 tests
 

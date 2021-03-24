@@ -20,7 +20,6 @@ Karen
 Kent
 Plugin
 Rolsky
-ShareDir
 Zilla
 autarch
 ether

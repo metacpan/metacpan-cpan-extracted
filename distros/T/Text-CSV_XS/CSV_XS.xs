@@ -1,4 +1,4 @@
-/*  Copyright (c) 2007-2020 H.Merijn Brand.  All rights reserved.
+/*  Copyright (c) 2007-2021 H.Merijn Brand.  All rights reserved.
  *  Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
  *  This program is free software; you can redistribute it and/or
  *  modify it under the same terms as Perl itself.
@@ -155,8 +155,10 @@ static unsigned char ec, ebcdic2ascii[256] = {
 #define CACHE_ID__has_hooks		36
 #define CACHE_ID_formula		38
 #define CACHE_ID_strict			42
+#define CACHE_ID_skip_empty_rows	43
 #define CACHE_ID_undef_str		46
-#define CACHE_ID_types			50
+#define CACHE_ID_comment_str		54
+#define CACHE_ID_types			62
 
 #define	byte	unsigned char
 #define ulng	unsigned long
@@ -193,9 +195,14 @@ typedef struct {
 
     byte	quote_empty;
     byte	formula;
+    byte	utf8;
+    byte	has_ahead;
 
+    byte	eolx;
     byte	strict;
     short	strict_n;
+
+    byte	skip_empty_rows;
 
     long	is_bound;
     ulng	recno;
@@ -215,11 +222,9 @@ typedef struct {
 
     char *	bptr;
     SV *	tmp;
-    byte	utf8;
-    byte	has_ahead;
-    byte	eolx;
     byte	undef_flg;
     byte *	undef_str;
+    byte *	comment_str;
     int		eol_pos;
     STRLEN	size;
     STRLEN	used;
@@ -479,6 +484,7 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
 	case CACHE_ID_formula:               csv->formula               = bv; break;
 	case CACHE_ID_strict:                csv->strict                = bv; break;
 	case CACHE_ID_verbatim:              csv->verbatim              = bv; break;
+	case CACHE_ID_skip_empty_rows:       csv->skip_empty_rows       = bv; break;
 	case CACHE_ID_auto_diag:             csv->auto_diag             = bv; break;
 	case CACHE_ID_diag_verbose:          csv->diag_verbose          = bv; break;
 	case CACHE_ID__has_ahead:            csv->has_ahead             = bv; break;
@@ -517,6 +523,10 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
 		}
 	    break;
 
+	case CACHE_ID_comment_str:
+	    csv->comment_str = *cp ? (byte *)cp : NULL;
+	    break;
+
 	case CACHE_ID_types:
 	    if (cp && len) {
 		csv->types     = cp;
@@ -536,6 +546,7 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
     (void)memcpy (cache, csv, sizeof (csv_t));
     } /* cache_set */
 
+#define _pretty_strl(csv)	cx_pretty_str (aTHX_ csv, strlen (csv))
 #define _pretty_str(csv,xse)	cx_pretty_str (aTHX_ csv, xse)
 static char *cx_pretty_str (pTHX_ byte *s, STRLEN l) {
     SV *dsv = sv_2mortal (newSVpvs (""));
@@ -584,6 +595,7 @@ static void cx_xs_cache_diag (pTHX_ HV *hv) {
     _cache_show_byte ("diag_verbose",		csv->diag_verbose);
     _cache_show_byte ("formula",		csv->formula);
     _cache_show_byte ("strict",			csv->strict);
+    _cache_show_byte ("skip_empty_rows",	csv->skip_empty_rows);
     _cache_show_byte ("has_error_input",	csv->has_error_input);
     _cache_show_byte ("blank_is_undef",		csv->blank_is_undef);
     _cache_show_byte ("empty_is_undef",		csv->empty_is_undef);
@@ -602,15 +614,15 @@ static void cx_xs_cache_diag (pTHX_ HV *hv) {
     if (csv->quo_len > 1)
 	_cache_show_str ("quote", csv->quo_len,	csv->quo);
     if (csv->types_len)
-	_cache_show_str ("types", csv->types_len, csv->types);
+	_cache_show_str ("types", csv->types_len, (byte *)csv->types);
     else
-	_cache_show_str ("types", 0, "");
+	_cache_show_str ("types", 0, (byte *)"");
 
     if (csv->bptr)
-	_cache_show_str ("bptr", (int)strlen (csv->bptr), csv->bptr);
+	_cache_show_str ("bptr", (int)strlen (csv->bptr), (byte *)csv->bptr);
     if (csv->tmp && SvPOK (csv->tmp)) {
 	char *s = SvPV_nolen (csv->tmp);
-	_cache_show_str ("tmp",  (int)strlen (s), s);
+	_cache_show_str ("tmp",  (int)strlen (s), (byte *)s);
 	}
     } /* xs_cache_diag */
 
@@ -699,6 +711,11 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 	else
 	    csv->undef_str = NULL;
 
+	if ((svp = hv_fetchs (self, "comment_str",    FALSE)) && *svp && SvOK (*svp))
+	    csv->comment_str = (byte *)SvPV_nolen (*svp);
+	else
+	    csv->comment_str = NULL;
+
 	if ((svp = hv_fetchs (self, "_types",         FALSE)) && *svp && SvOK (*svp)) {
 	    csv->types = SvPV (*svp, len);
 	    csv->types_len = len;
@@ -718,6 +735,7 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 	csv->decode_utf8		= bool_opt ("decode_utf8");
 	csv->always_quote		= bool_opt ("always_quote");
 	csv->strict			= bool_opt ("strict");
+	csv->skip_empty_rows		= bool_opt ("skip_empty_rows");
 	csv->quote_empty		= bool_opt ("quote_empty");
 	csv->quote_space		= bool_opt_def ("quote_space",  1);
 	csv->escape_null		= bool_opt_def ("escape_null",  1);
@@ -1364,9 +1382,9 @@ restart:
 #endif
 	if (is_SEP (c)) {
 #if MAINT_DEBUG > 1
-	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = SEP %s\t'%s'\n",
+	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = SEP %s\t%s\n",
 		waitingForField ? 1 : 0, sv ? 1 : 0, f, spl,
-		_sep_string (csv), csv->bptr + csv->used);
+		_sep_string (csv), _pretty_strl (csv->bptr + csv->used));
 #endif
 	    if (waitingForField) {
 		/* ,1,"foo, 3",,bar,
@@ -1399,9 +1417,9 @@ restart:
 	else
 	if (is_QUOTE (c)) {
 #if MAINT_DEBUG > 1
-	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = QUO '%c'\t\t'%s'\n",
+	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = QUO '%c'\t\t%s\n",
 		waitingForField ? 1 : 0, sv ? 1 : 0, f, spl, c,
-		csv->bptr + csv->used);
+		_pretty_strl (csv->bptr + csv->used));
 #endif
 	    if (waitingForField) {
 		/* ,1,"foo, 3",,bar,\r\n
@@ -1515,16 +1533,26 @@ restart:
 			return TRUE;
 			}
 
-		    if (csv->useIO && csv->eol_len == 0 && !is_csv_binary (c3)) {
-			/* ,1,"foo\n 3",,"bar"\r
-			 * baz,4
-			 * ^
-			 */
-			set_eol_is_cr (csv);
-			csv->used--;
-			csv->has_ahead++;
-			AV_PUSH;
-			return TRUE;
+		    if (csv->useIO && csv->eol_len == 0) {
+			if (c3 == CH_CR) { /* \r followed by an empty line */
+			    /* ,1,"foo, 3"\r\r
+			     *              ^
+			     */
+			    set_eol_is_cr (csv);
+			    goto EOLX;
+			    }
+
+			if (!is_csv_binary (c3)) {
+			    /* ,1,"foo\n 3",,"bar"\r
+			     * baz,4
+			     * ^
+			     */
+			    set_eol_is_cr (csv);
+			    csv->used--;
+			    csv->has_ahead++;
+			    AV_PUSH;
+			    return TRUE;
+			    }
 			}
 
 		    ParseError (csv, quoesc ? 2023 : 2010, csv->used - 2);
@@ -1570,9 +1598,9 @@ restart:
 	else
 	if (c == csv->escape_char && csv->escape_char) {
 #if MAINT_DEBUG > 1
-	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = ESC '%c'\t'%s%\n",
+	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = ESC '%c'\t%s\n",
 		waitingForField ? 1 : 0, sv ? 1 : 0, f, spl, c,
-		csv->bptr + csv->used);
+		_pretty_strl (csv->bptr + csv->used));
 #endif
 	    /* This means quote_char != escape_char */
 	    if (waitingForField) {
@@ -1646,10 +1674,22 @@ restart:
 	if (c == CH_NL || is_EOL (c)) {
 EOLX:
 #if MAINT_DEBUG > 1
-	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = NL\t'%s'\n",
+	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = NL\t%s\n",
 		waitingForField ? 1 : 0, sv ? 1 : 0, f, spl,
-		csv->bptr + csv->used);
+		_pretty_strl (csv->bptr + csv->used));
 #endif
+	    if (fnum == 1 && f == 0 && SvCUR (sv) == 0 && csv->skip_empty_rows) {
+		csv->fld_idx = 0;
+		c = CSV_GET;
+		if (c == EOF) {
+		    sv_free (sv);
+		    sv = NULL;
+		    waitingForField = 0;
+		    break;
+		    }
+		goto restart;
+		}
+
 	    if (waitingForField) {
 		/* ,1,"foo, 3",,bar,
 		 *                  ^
@@ -1721,14 +1761,12 @@ EOLX:
 	    if (waitingForField) {
 		int	c2;
 
-		waitingForField = 0;
-
 		if (csv->eol_is_cr) {
 		    /* ,1,"foo\n 3",,bar,\r
 		     *                   ^
 		     */
 		    c = CH_NL;
-		    goto restart;
+		    goto EOLX;
 		    }
 
 		c2 = CSV_GET;
@@ -1753,19 +1791,42 @@ EOLX:
 		     *                     ^
 		     */
 		    c = c2;
-		    goto restart;
+		    goto EOLX;
 		    }
 
-		if (csv->useIO && csv->eol_len == 0 && !is_csv_binary (c2)) {
-		    /* ,1,"foo\n 3",,bar,\r
-		     * baz,4
-		     * ^
-		     */
-		    set_eol_is_cr (csv);
-		    csv->used--;
-		    csv->has_ahead++;
-		    AV_PUSH;
-		    return TRUE;
+		if (csv->useIO && csv->eol_len == 0) {
+		    if (c2 == CH_CR) { /* \r followed by an empty line */
+			/* ,1,"foo\n 3",,bar,\r\r
+			 *                     ^
+			 */
+			set_eol_is_cr (csv);
+			goto EOLX;
+			}
+
+		    waitingForField = 0;
+
+		    if (!is_csv_binary (c2)) {
+			/* ,1,"foo\n 3",,bar,\r
+			 * baz,4
+			 * ^
+			 */
+			set_eol_is_cr (csv);
+			csv->used--;
+			csv->has_ahead++;
+			if (fnum == 1 && f == 0 && SvCUR (sv) == 0 && csv->skip_empty_rows) {
+			    csv->fld_idx = 0;
+			    c = CSV_GET;
+			    if (c == EOF) {
+				sv_free (sv);
+				sv = NULL;
+				waitingForField = 0;
+				break;
+				}
+			    goto restart;
+			    }
+			AV_PUSH;
+			return TRUE;
+			}
 		    }
 
 		/* ,1,"foo\n 3",,bar,\r\t
@@ -1792,8 +1853,7 @@ EOLX:
 		    /* ,1,"foo\n 3",,bar\r
 		     *                  ^
 		     */
-		    AV_PUSH;
-		    return TRUE;
+		    goto EOLX;
 		    }
 
 		c2 = CSV_GET;
@@ -1802,20 +1862,36 @@ EOLX:
 		    /* ,1,"foo\n 3",,bar\r\n
 		     *                    ^
 		     */
-		    AV_PUSH;
-		    return TRUE;
+		    goto EOLX;
 		    }
 
-		if (csv->useIO && csv->eol_len == 0 && !is_csv_binary (c2)) {
-		    /* ,1,"foo\n 3",,bar\r
-		     * baz,4
-		     * ^
-		     */
-		    set_eol_is_cr (csv);
-		    csv->used--;
-		    csv->has_ahead++;
-		    AV_PUSH;
-		    return TRUE;
+		if (csv->useIO && csv->eol_len == 0) {
+		    if (!is_csv_binary (c2)
+			    /* ,1,"foo\n 3",,bar\r
+			     * baz,4
+			     * ^
+			     */
+			|| c2 == CH_CR) {
+			    /* ,1,"foo\n 3",,bar,\r\r
+			     *                     ^
+			     */
+			set_eol_is_cr (csv);
+			csv->used--;
+			csv->has_ahead++;
+			if (fnum == 1 && f == 0 && SvCUR (sv) == 0 && csv->skip_empty_rows) {
+			    csv->fld_idx = 0;
+			    c = CSV_GET;
+			    if (c == EOF) {
+				sv_free (sv);
+				sv = NULL;
+				waitingForField = 0;
+				break;
+				}
+			    goto restart;
+			    }
+			AV_PUSH;
+			return TRUE;
+			}
 		    }
 
 		/* ,1,"foo\n 3",,bar\r\t
@@ -1826,9 +1902,9 @@ EOLX:
 	    } /* CH_CR */
 	else {
 #if MAINT_DEBUG > 1
-	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = CCC '%c'\t\t'%s'\n",
+	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = CCC '%c'\t\t%s\n",
 		waitingForField ? 1 : 0, sv ? 1 : 0, f, spl, c,
-		csv->bptr + csv->used);
+		_pretty_strl (csv->bptr + csv->used));
 #endif
 	    /* Needed for non-IO parse, where EOL is not set during read */
 	    if (csv->eolx && c == CH_EOL &&
@@ -1843,6 +1919,28 @@ EOLX:
 		}
 
 	    if (waitingForField) {
+		if (csv->comment_str && !f && !spl && c == *csv->comment_str) {
+		    STRLEN cl = strlen (csv->comment_str);
+
+#if MAINT_DEBUG > 5
+		    (void)fprintf (stderr,
+			"COMMENT? cl = %d, size = %d, used = %d\n",
+			cl, csv->size, csv->used);
+#endif
+		    if (cl == 1 || (
+		       (csv->size - csv->used >= cl - 1 &&
+			 !memcmp (csv->bptr + csv->used, csv->comment_str + 1, cl - 1) &&
+			 (csv->used += cl - 1)))) {
+			csv->used    = csv->size;
+			csv->fld_idx = 0;
+			c = CSV_GET;
+#if MAINT_DEBUG > 5
+			(void)fprintf (stderr, "# COMMENT, SKIPPED\n");
+#endif
+			goto restart;
+			}
+		    }
+
 		if (csv->allow_whitespace && is_whitespace (c)) {
 		    do {
 			c = CSV_GET;
@@ -1874,6 +1972,8 @@ EOLX:
 		}
 	    else {
 		if (is_csv_binary (c)) {
+		    if (csv->useIO && c == EOF)
+			break;
 		    f |= CSV_FLAGS_BIN;
 		    unless (csv->binary || csv->utf8)
 			ERROR_INSIDE_FIELD (2037);

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::GenerateFile::FromShareDir; # git description: v0.013-9-g6265db6
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
-# ABSTRACT: Create files in the repository or in the build, based on a template located in a distribution sharedir
+package Dist::Zilla::Plugin::GenerateFile::FromShareDir; # git description: v0.014-9-g84393db
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
+# ABSTRACT: Create files in the repository or build, using a sharedir template
 # KEYWORDS: plugin distribution generate create file sharedir template
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 use Moose;
 with (
@@ -111,21 +111,21 @@ sub gather_files
 {
     my $self = shift;
 
-    my $file_path;
-    if ($self->dist eq $self->zilla->name)
-    {
+    my $file_path = eval { dist_file($self->dist, $self->source_filename) };
+
+    if (not $file_path) {
+      if ($self->dist eq $self->zilla->name) {
         if (my $sharedir = $self->zilla->_share_dir_map->{dist}) {
-            $file_path = path($self->zilla->root, $sharedir, $self->source_filename)->stringify;
+          $file_path = path($self->zilla->root, $sharedir, $self->source_filename)->stringify;
         }
+      }
+
+      $self->log_fatal('cannot find sharedir!') if not defined $file_path;
     }
-    else
-    {
-        # this should die if the file does not exist
-        $file_path = dist_file($self->dist, $self->source_filename);
-    }
+
+    $self->log_fatal([ 'cannot find %s', $file_path ]) if not -e $file_path;
 
     $self->log_debug([ 'using template in %s', $file_path ]);
-
     my $content = path($file_path)->slurp_raw;
     $content = Encode::decode($self->encoding, $content, Encode::FB_CROAK());
 
@@ -165,11 +165,6 @@ around munge_files => sub
 
     for my $file ($self->_repo_files)
     {
-        if ($file->can('is_bytes') and $file->is_bytes)
-        {
-            $self->log_debug([ '%s has \'bytes\' encoding, skipping...', $file->name ]);
-            next;
-        }
         $self->munge_file($file);
     }
 };
@@ -179,6 +174,13 @@ sub munge_file
     my ($self, $file) = @_;
 
     return unless $file->name eq $self->filename;
+
+    if ($file->can('is_bytes') and $file->is_bytes)
+    {
+        $self->log_debug([ '%s has \'bytes\' encoding, skipping...', $file->name ]);
+        return;
+    }
+
     $self->log_debug([ 'updating contents of %s in memory', $file->name ]);
 
     my $content = $self->fill_in_string(
@@ -220,11 +222,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::GenerateFile::FromShareDir - Create files in the repository or in the build, based on a template located in a distribution sharedir
+Dist::Zilla::Plugin::GenerateFile::FromShareDir - Create files in the repository or build, using a sharedir template
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -334,7 +336,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
 
 =head1 AUTHOR
 

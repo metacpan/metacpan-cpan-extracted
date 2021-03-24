@@ -127,6 +127,7 @@ sub verify {
 L<OAuth::Lite::SignatureMethod::HMAC_SHA1>
 L<OAuth::Lite::SignatureMethod::PLAINTEXT>
 L<OAuth::Lite::SignatureMethod::RSA_SHA1>
+L<OAuth::Lite::SignatureMethod::HMAC_SHA256>
 
 =head1 AUTHOR
 

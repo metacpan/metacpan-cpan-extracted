@@ -3,7 +3,7 @@ package Net::Async::Github;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
@@ -1368,7 +1368,7 @@ sub validate_repo_name {
     # https://github.com/Automattic/_s
     # Canonical repositories with '. character would include the `.wiki` "magic" repo for each
     # Github repo
-    die "repo name contains invalid characters" if $repo =~ /[^a-z0-9.]/i;
+    die "repo name contains invalid characters" if $repo =~ /[^a-z0-9.-]/i;
     die "repo name too long" if length($repo) > 100;
     return 1;
 }

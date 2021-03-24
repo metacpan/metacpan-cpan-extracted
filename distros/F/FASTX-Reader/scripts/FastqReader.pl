@@ -3,8 +3,8 @@ use 5.010;
 use Term::ANSIColor;
 use Data::Dumper;
 use Carp qw(confess);
-use FindBin qw($Bin);
-use lib "$Bin/../lib/";
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib/";
 use FASTX::Reader;
 say STDERR color('bold'), "TEST FASTA/FASTQ READER", color('reset');
 say STDERR color('bold'), "Read FASTA/FASTQ files, printing them back to the user", color('reset');
@@ -30,7 +30,7 @@ unless ($ARGV[0]) {
   could be the comment separator
 
 END
-push(@ARGV,"$Bin/../data/test.fastq", "$Bin/../data/test.fasta" )
+push(@ARGV,"$RealBin/../data/test.fastq", "$RealBin/../data/test.fasta" )
 }
 
 foreach my $input_file (@ARGV) {

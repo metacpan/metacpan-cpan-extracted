@@ -11,14 +11,14 @@ use Test::JSON::Schema::Acceptance;
 
 is(
   Test::JSON::Schema::Acceptance->new->specification,
-  'draft2019-09',
+  'draft2020-12',
   '"specification" defaults to latest draft'
 );
 
 is(
   Test::JSON::Schema::Acceptance->new(specification => 'latest')->specification,
-  'draft2019-09',
-  'latest becomes draft2019-09',
+  'draft2020-12',
+  'latest becomes draft2020-12',
 );
 
 foreach my $version (3,4,6,7) {
@@ -52,7 +52,7 @@ like(
 SKIP: {
   skip 'this test can only be run in the git repository', 1 if not -d '.git';
 
-  is(readlink('share/tests/latest'), 'draft2019-09', 'latest draft is still 2019-09')
+  is(readlink('share/tests/latest'), 'draft2020-12', 'latest draft is still 2020-12')
     or warn 'a new draft has been released! update the "latest" munging in BUILDARGS!';
 }
 

@@ -22,7 +22,7 @@ requires:
   BSD::Resource: '0'
   File::Map: '0'
   File::Temp: '0.2308'
-  Mojolicious: '8.50'
+  Mojolicious: '9.11'
   Sereal: '0'
   perl: '5.016'
 resources:
@@ -33,5 +33,5 @@ resources:
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/mojo-status.git
-version: '1.16'
+version: '1.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

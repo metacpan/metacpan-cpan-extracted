@@ -3,7 +3,7 @@ package Net::Async::Github::Team;
 use strict;
 use warnings;
 
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use parent qw(Net::Async::Github::Common);
 

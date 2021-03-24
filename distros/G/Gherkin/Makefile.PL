@@ -14,8 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Gherkin",
   "EXE_FILES" => [
-    "bin/gherkin-generate-ast",
-    "bin/gherkin-generate-pickles",
+    "bin/gherkin",
     "bin/gherkin-generate-tokens"
   ],
   "LICENSE" => "mit",
@@ -24,6 +23,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Class::XSAccessor" => 0,
     "Cpanel::JSON::XS" => 0,
+    "Data::UUID" => 0,
+    "Getopt::Long" => "2.36",
     "IO::Scalar" => 0
   },
   "TEST_REQUIRES" => {
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "17.0.2",
+  "VERSION" => "18.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,8 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Class::XSAccessor" => 0,
   "Cpanel::JSON::XS" => 0,
+  "Data::UUID" => 0,
+  "Getopt::Long" => "2.36",
   "IO::Scalar" => 0,
   "Path::Class" => 0,
   "Test::Differences" => 0,

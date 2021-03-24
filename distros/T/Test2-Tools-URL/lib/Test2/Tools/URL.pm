@@ -7,12 +7,13 @@ use Carp                   ();
 use Test2::Compare         ();
 use Test2::Compare::Hash   ();
 use Test2::Compare::String ();
+use Test2::Compare::Custom ();
 use base qw( Exporter );
 
-our @EXPORT = qw( url url_base url_component );
+our @EXPORT = qw( url url_base url_component url_scheme url_host url_secure url_insecure url_mail_to );
 
 # ABSTRACT: Compare a URL in your Test2 test
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub url (&)
@@ -35,14 +36,69 @@ sub url_base ($)
 
 sub url_component ($$)
 {
-  my($name, $expect) = @_;
-  
-  Carp::croak("$name is not a valid URL component")
-    unless $name =~ /^(?:scheme|authority|userinfo|hostport|host|port|path|query|fragment)$/;
-  
+  my($name, $expect, $lc, $check_name) = @_;
+
+  $check_name = 1 unless defined $check_name;
+  if($check_name)
+  {
+    Carp::croak("$name is not a valid URL component")
+      unless $name =~ /^(?:scheme|authority|userinfo|hostport|host|port|path|query|fragment|user|password|media_type|data)$/;
+  }
+
   my $build = Test2::Compare::get_build()or Carp::croak("No current build!");
-  $build->add_component($name, $expect);
-}  
+  $build->add_component($name, $expect, $lc);
+}
+
+
+sub url_scheme ($)
+{
+  unshift @_, 'scheme';
+  goto &url_component;
+}
+
+
+sub url_host ($)
+{
+  @_ = ('host', $_[0], 1);
+  goto &url_component;
+}
+
+
+sub url_secure ()
+{
+  my @caller = caller;
+  my $test = Test2::Compare::Custom->new(
+    code     => sub { defined $_ && ( ref $_ || $_ ) ? 1 : 0 },
+    name     => 'TRUE',
+    operator => 'TRUE()',
+    file     => $caller[1],
+    lines    => [$caller[2]],
+  );
+  @_ = ('secure', $test, undef, 0);
+  goto &url_component;
+}
+
+
+sub url_insecure ()
+{
+  my @caller = caller;
+  my $test = Test2::Compare::Custom->new(
+    code => sub { my %p = @_; $p{got} ? 0 : $p{exists} },
+    name => 'FALSE',
+    operator => 'FALSE()',
+    file     => $caller[1],
+    lines    => [$caller[2]],
+  );
+  @_ = ('secure', $test, undef, 0);
+  goto &url_component;
+}
+
+
+sub url_mail_to ($)
+{
+  @_ = ('to', $_[0], undef, 0);
+  goto &url_component;
+}
 
 package Test2::Tools::URL::Check;
 
@@ -70,16 +126,16 @@ sub verify
 {
   my($self, %params) = @_;
   my($got, $exists) = @params{qw/ got exists /};
-  
+
   return 0 unless $exists;
   return 0 unless $got;
   return 0 if ref($got) && !blessed($got);
   return 0 if ref($got) && !overload::Method($got, '""');
-  
-  my $url = eval { $self->_uri($got) };  
+
+  my $url = eval { $self->_uri($got) };
   return 0 if $@;
   return 0 if ! $url->has_recognized_scheme;
-  
+
   return 1;
 }
 
@@ -97,8 +153,8 @@ sub set_global_base
 
 sub add_component
 {
-  my($self, $name, $expect) = @_;
-  push @{ $self->{component} }, [ $name, $expect ];
+  my($self, $name, $expect, $lc) = @_;
+  push @{ $self->{component} }, [ $name, $expect, $lc ];
 }
 
 sub deltas
@@ -107,16 +163,17 @@ sub deltas
   my($got, $convert, $seen) = @args{'got', 'convert', 'seen'};
 
   my $uri = $self->_uri($got);
-  
+
   my @deltas;
-  
+
   foreach my $comp (@{ $self->{component} })
   {
-    my($name, $expect) = @$comp;
-    
+    my($name, $expect, $lc) = @$comp;
+
     my $method = $name;
     $method = 'host_port' if $method eq 'hostport';
-    my $value = $uri->$method;
+    my $value = $uri->can($method) ? $uri->$method : undef;
+    $value = lc $value if $lc && defined $value;
     my $check = $convert->($expect);
 
     if($^O eq 'MSWin32' && $method eq 'path')
@@ -145,7 +202,7 @@ sub deltas
       got     => $value,
     );
   }
-  
+
   @deltas;
 }
 
@@ -163,7 +220,7 @@ Test2::Tools::URL - Compare a URL in your Test2 test
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -173,8 +230,8 @@ version 0.05
  is(
    "http://example.com/path1/path2?query=1#fragment",
    url {
-     url_component scheme   => 'http';
-     url_component host     => 'example.com';
+     url_scheme             => 'http';
+     url_host               => 'example.com';
      url_component path     => '/path1/path2';
      url_component query    => { query => 1 };
      url_component fragment => 'fragment';
@@ -223,6 +280,8 @@ Check that the given URL component matches.
 
 =item scheme
 
+Note: scheme I<is> normalized to lower case for this test.
+
 =item authority
 
 =item userinfo
@@ -230,6 +289,8 @@ Check that the given URL component matches.
 =item hostport
 
 =item host
+
+Note: hostname I<is not> normalized to lower case for this test.  To test the normalized hostname use C<url_host> below.
 
 =item port
 
@@ -241,7 +302,84 @@ May be either a string, list or array!
 
 =item fragment
 
+=item user
+
+[version 0.06]
+
+Note: for C<ftp> URLs only.
+
+=item password
+
+[version 0.06]
+
+Note: for C<ftp> URLs only.
+
+=item media_type
+
+[version 0.06]
+
+Note: for C<data> URLs only.
+
+=item data
+
+[version 0.06]
+
+Note: for C<data> URLs only.
+
 =back
+
+=head2 url_scheme
+
+[version 0.06]
+
+ url {
+   url_scheme $check;
+ }
+
+Check that the given URL scheme matches C<$check>.  Note that the scheme I<is> normalized
+to lower case for this test, so it is identical to using C<url_component 'scheme', $check>.
+
+=head2 url_host
+
+[version 0.06]
+
+ url {
+   url_host $check;
+ }
+
+Check that the given URL host matches C<$check>.  Note that the host I<is> normalized to
+lower case for this test, unlike the C<url_component 'host', $check> test described above.
+
+=head2 url_secure
+
+[version 0.06]
+
+ url {
+   url_secure();
+ }
+
+Check that the given URL is using a secure protocol like C<https> or C<wss>.
+
+=head2 url_insecure
+
+[version 0.06]
+
+ url {
+   url_insecure();
+ }
+
+Check that the given URL is using an insecure protocol like C<http> or C<ftp>.
+
+=head2 url_mail_to
+
+[version 0.06]
+
+ url {
+   url_mail_to $check;
+ }
+
+Checks that the email address in the given C<mailto> URL matches the check.
+For non-C<mailto> URLs this check will fail.
 
 =head1 SEE ALSO
 
@@ -257,7 +395,7 @@ Paul Durden (alabamapaul, PDURDEN)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

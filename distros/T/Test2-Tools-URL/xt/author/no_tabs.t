@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-BEGIN { 
-  plan skip_all => 'test requires Test::NoTabs' 
+BEGIN {
+  plan skip_all => 'test requires Test::NoTabs'
     unless eval q{ use Test::NoTabs; 1 };
 };
 use Test::NoTabs;

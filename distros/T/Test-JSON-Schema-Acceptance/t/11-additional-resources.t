@@ -8,7 +8,7 @@ use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::File::ShareDir -share => { -dist => { 'Test-JSON-Schema-Acceptance' => 'share' } };
 use Test::JSON::Schema::Acceptance;
 
-my $accepter = Test::JSON::Schema::Acceptance->new(specification => 'draft2019-09');
+my $accepter = Test::JSON::Schema::Acceptance->new(specification => 'draft2020-12');
 
 ok($accepter->additional_resources->is_dir, 'additional_resources directory exists');
 

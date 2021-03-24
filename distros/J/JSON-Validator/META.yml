@@ -24,7 +24,7 @@ no_index:
 requires:
   List::Util: '1.45'
   Mojolicious: '7.28'
-  YAML::PP: '0.020'
+  YAML::XS: '0.67'
   perl: '5.010001'
 resources:
   IRC: irc://irc.freenode.net/#perl-openapi
@@ -32,5 +32,5 @@ resources:
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/json-validator.git
-version: '4.14'
+version: '4.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

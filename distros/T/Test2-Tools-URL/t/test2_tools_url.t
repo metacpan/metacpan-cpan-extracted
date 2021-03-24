@@ -5,6 +5,11 @@ imported_ok $_ for qw(
   url
   url_base
   url_component
+  url_scheme
+  url_host
+  url_secure
+  url_insecure
+  url_mail_to
 );
 
 subtest 'as string' => sub {
@@ -50,7 +55,7 @@ subtest 'non object references' => sub {
     },
     'fails when given undef',
   );
-  
+
   note $_->message for grep { $_->isa('Test2::Event::Diag') } @$e;
 
   is(
@@ -159,7 +164,7 @@ subtest 'component' => sub {
       url_component fragment  => 'fragment';
     },
   );
-  
+
   is(
     'http://foo:bar@example.com:1234/some/path?baz=1#fragment',
     url {
@@ -193,7 +198,7 @@ subtest 'component' => sub {
       },
       "$name does not match",
     );
-  
+
     note $_->message for grep { $_->isa('Test2::Event::Diag') } @$e;
   }
 
@@ -214,7 +219,7 @@ subtest 'component' => sub {
     },
     "query does not match hashref",
   );
-  
+
   note $_->message for grep { $_->isa('Test2::Event::Diag') } @$e;
 
   is(
@@ -232,7 +237,7 @@ subtest 'component' => sub {
     },
     "query does not match array",
   );
-  
+
   note $_->message for grep { $_->isa('Test2::Event::Diag') } @$e;
 };
 
@@ -262,7 +267,7 @@ subtest 'url_base' => sub {
       url_component port => 80;
     },
   );
-  
+
   url_base undef;
 
 };
@@ -296,6 +301,204 @@ subtest 'query as hash with repeated keys' => sub {
     },
     "expected query for hashref with repeated keys"
   );
+};
+
+subtest 'url_scheme' => sub {
+
+  is(
+    "htTp://foo.bar/",
+    url {
+      url_scheme 'http';
+    },
+    "test scheme in mixed case",
+  );
+
+  is(
+    intercept { is("http:://foo", url { url_scheme 'ftp' }) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'test schme fail',
+  );
+
+};
+
+subtest 'url_host' => sub {
+
+  is(
+    "http://fOo.bar/",
+    url {
+      url_host 'foo.bar';
+    },
+    "test host in mixed case",
+  );
+
+  is(
+    intercept { is("http:://foo", url { url_host 'baz' }) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'test schme fail',
+  );
+
+};
+
+subtest 'url_secure / url_insecure' => sub {
+
+  is(
+    "https://foo.bar",
+    url {
+      url_secure();
+    },
+    'secure pass',
+  );
+
+  is(
+    intercept { is("https://foo.bar", url { url_insecure() }) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'insecure fail',
+  );
+
+  is(
+    "http://foo.bar",
+    url {
+      url_insecure();
+    },
+    'insecure pass',
+  );
+
+  is(
+    intercept { is("http://foo.bar", url { url_secure() }) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'secure fail',
+  );
+
+};
+
+subtest 'url_mail_to' => sub {
+
+  is(
+    'mailto:plicease@foo.test',
+    url {
+      url_mail_to 'plicease@foo.test';
+    },
+    'matches good',
+  );
+
+  is(
+    intercept { is('mailto:plicease@foo.test', url { url_mail_to "baz" }) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'mail to fail',
+  );
+
+  is(
+    intercept { is('http://foo.test', url { url_mail_to "baz" }) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'mail to fail with non-mailto URL',
+  );
+
+};
+
+subtest 'ftp URLs' => sub {
+
+  is(
+    'ftp://plicease:pass@foo.test/',
+    url {
+      url_component 'user' => 'plicease';
+      url_component 'password' => 'pass';
+    },
+    'url user + password test pass',
+  );
+
+  is(
+    intercept { is('ftp://plicease:pass@foo.test/', url { url_component 'user' => 'bad' } ) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'url user test fail',
+  );
+
+  is(
+    intercept { is('ftp://plicease:pass@foo.test/', url { url_component 'password' => 'bad' } ) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'url user test fail',
+  );
+
+  is(
+    intercept { is("http://foo.test/", url { url_component 'user' => 'bad'; url_component 'password' => 'bad'; }) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'url user + password test fail on non-FTP URL',
+  );
+
+};
+
+subtest 'data URLs' => sub {
+
+  my $url = URI->new('data:');
+  $url->media_type('text/plain');
+  $url->data('Hello, World!');
+  $url = "$url";
+
+  note "url = $url";
+
+  is(
+    $url,
+    url {
+      url_component 'media_type' => 'text/plain';
+      url_component 'data'       => 'Hello, World!';
+    },
+    'url media type + data test pass',
+  );
+
+  is(
+    intercept { is($url, url { url_component 'media_type' => 'foo' }) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'url media type fail',
+  );
+
+  is(
+    intercept { is($url, url { url_component 'data' => 'foo' }) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'url data fail',
+  );
+
+  is(
+    intercept { is("http://foo.test", url { url_component 'media_type' => 'foo'; url_component 'data' => 'foo' }) },
+    array {
+      event 'Fail';
+      end;
+    },
+    'url media_type + data fail on non-data URL',
+  );
+
+
 };
 
 done_testing

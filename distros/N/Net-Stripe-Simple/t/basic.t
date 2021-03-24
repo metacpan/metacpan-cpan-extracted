@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use autodie;
 use Test::Exception;
-use Test::More tests => 20;
+use Test::More tests => 19;
 use Net::Stripe::Simple qw(:all);
 use DateTime;
 
@@ -639,98 +639,65 @@ subtest Tokens => sub {
     is $token->id, $id, 'retrieved a token';
 };
 
-my $recipient;
-subtest Recipients => sub {
-    plan tests => 8;
-    $recipient = $stripe->recipients(
+subtest PaymentIntents => sub {
+    plan tests => 9;
+    my $payment_intent = $stripe->payment_intents(
         create => {
-            name => 'I Am An Example',
-            type => 'individual',
+            amount   => 100,
+            currency => 'usd',
+            customer => $customer,
+            capture_method => 'manual', # Allow testing of capture functionality
+            payment_method => $card,
         }
     );
-    ok $recipient, 'created a recipient';
-    my $id = $recipient->id;
-    throws_ok { $stripe->recipients('retrieve') } qr/No .*\bid provided/,
+    ok $payment_intent, 'created a payment intent';
+    my $id = $payment_intent->id;
+    throws_ok { $stripe->payment_intents('retrieve') } qr/No .*\bid provided/,
       'retrieve requires id';
-    $recipient = $stripe->recipients( retrieve => $id );
-    is $recipient->id, $id, 'retrieved recipient';
-    my $recipients = $stripe->recipients('list');
-    ok scalar @{ $recipients->data }, 'listed recipients';
-    throws_ok {
-        $stripe->recipients(
-            update => {
-                metadata => { foo => 'bar' },
-            }
-          )
-    }
-    qr/No .*\bid provided/, 'update requires id';
-    $recipient = $stripe->recipients(
-        update => {
-            id       => $recipient,
-            metadata => { foo => 'bar' },
-        }
-    );
-    is $recipient->metadata->foo, 'bar', 'updated recipient';
-    throws_ok { $stripe->recipients('delete') } qr/No .*\bid provided/,
-      'delete requires id';
-    $recipient = $stripe->recipients( delete => $id );
-    ok $recipient->deleted, 'deleted recipient';
-    $recipient = $stripe->recipients(
-        create => {
-            name         => 'I Am An Example',
-            type         => 'individual',
-            bank_account => $token,
-        }
-    );
-};
-
-subtest Transfers => sub {
-    plan tests => 8;
-    my $transfer = $stripe->transfers(
-        create => {
-            amount    => 1,
-            currency  => 'usd',
-            recipient => $recipient,
-        }
-    );
-    ok $transfer, 'created a transfer';
-    my $id = $transfer->id;
-    throws_ok { $stripe->transfers('retrieve') } qr/No .*\bid provided/,
-      'retrieve requires id';
-    $transfer = $stripe->transfers( retrieve => $id );
-    is $transfer->id, $id, 'retrieved a transfer';
-    my $transfers = $stripe->transfers(
+    $payment_intent = $stripe->payment_intents( retrieve => $id );
+    is $payment_intent->id, $id, 'retrieved a payment intent';
+    my $payment_intents = $stripe->payment_intents(
         list => {
             created => { gt => $time }
         }
     );
-    ok( ( grep { $_->id eq $id } @{ $transfers->data } ), 'listed transfers' );
+    ok( ( grep { $_->id eq $id } @{ $payment_intents->data } ), 'listed payment intents' );
     throws_ok {
-        $stripe->transfers(
+        $stripe->payment_intents(
             update => {
                 metadata => { foo => 'bar' }
             }
           )
     }
     qr/No .*\bid provided/, 'update requires id';
-    $transfer = $stripe->transfers(
+    $payment_intent = $stripe->payment_intents(
         update => {
-            id       => $transfer,
+            id       => $payment_intent,
             metadata => { foo => 'bar' }
         }
     );
-    is $transfer->metadata->foo, 'bar', 'updated a transfer';
+    is $payment_intent->metadata->foo, 'bar', 'updated a payment intent';
+    # Confirm
+    $payment_intent = $stripe->payment_intents(
+        confirm => {
+            id       => $payment_intent,
+        }
+    );
+    is $payment_intent->status, 'requires_capture', 'confirmed a payment intent';
+    # Capture
+    $payment_intent = $stripe->payment_intents(
+        capture => {
+            id       => $payment_intent,
+        }
+    );
+    is $payment_intent->status, 'succeeded', 'captured a payment intent';
+
     eval {
-        throws_ok { $stripe->transfers('cancel') } qr/No .*\bid provided/,
+        throws_ok { $stripe->payment_intents('cancel') } qr/No .*\bid provided/,
           'cancel requires id';
-        $transfer = $stripe->transfers( cancel => $transfer );
-        ok $transfer->canceled, 'canceled a transfer';
+        $payment_intent = $stripe->payment_intents( cancel => $payment_intent );
+        ok $payment_intent->canceled_at, 'canceled a payment intent';
     };
-    if ( my $e = $@ ) {    # at least the path worked
-        ok $e->message =~
-          /Transfers to non-Stripe accounts can currently only be reversed while they are pending/,
-          'canceled a transfer';
-    }
 };
 
 subtest 'Application Fees' => sub {
@@ -745,7 +712,7 @@ subtest 'Application Fees' => sub {
         is $fee->id, $id, 'retrieved application fee';
     };
     if ( my $e = $@ ) {               # at least the path worked
-        is $e->message, "No such application fee: $id",
+        is $e->message, "No such application fee: '$id'",
           'retrieved application fee';
     }
     eval {
@@ -755,7 +722,7 @@ subtest 'Application Fees' => sub {
         is $fee->id, $id, 'refunded application fee';
     };
     if ( my $e = $@ ) {               # at least the path worked
-        is $e->message, "No such application fee: $id",
+        is $e->message, "No such application fee: '$id'",
           'refunded application fee';
     }
 };
@@ -781,7 +748,7 @@ subtest Balance => sub {
         ok $balance, 'retrieved a balance transaction';
     };
     if ( my $e = $@ ) {
-        is $e->message, "No such balance transaction: $charge",
+        is $e->message, "No such balance transaction: '$charge'",
           'retrieved a balance transaction';
     }
 };
@@ -824,5 +791,4 @@ END {
     };
     eval { $stripe->customers( delete => $customer ) if $customer };
     eval { $stripe->coupons( delete => $coupon ) if $coupon };
-    eval { $stripe->recipients( delete => $recipient ) if $recipient };
 }

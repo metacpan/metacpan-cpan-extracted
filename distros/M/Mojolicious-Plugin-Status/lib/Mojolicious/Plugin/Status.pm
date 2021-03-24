@@ -10,7 +10,7 @@ use Mojo::Util qw(humanize_bytes);
 
 use constant MACOS => $^O eq 'darwin';
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 sub register {
   my ($self, $app, $config) = @_;
@@ -35,7 +35,8 @@ sub register {
   push @{$app->renderer->paths}, $resources->child('templates')->to_string;
 
   # Routes
-  $prefix->get('/' => {mojo_status => $self} => \&_dashboard)->name('mojo_status');
+  $prefix->get('/' => => [format => ['json']] => {format => undef, mojo_status => $self} => \&_dashboard)
+    ->name('mojo_status');
 }
 
 sub _activity {

@@ -1,5 +1,10 @@
 Revision history for Test2-Tools-URL
 
+0.06      2021-03-23 15:29:53 -0600
+  - Added: url_scheme, url_host, url_secure and url_insecure, url_mail_to checks (gh#6)
+  - Added: user and password components for FTP URLs (gh#6)
+  - Move to new github org
+
 0.05      2019-07-15 13:03:09 -0400
   - Better handling of duplicate keys in query parameters (alabamapaul++ gh#4)
 

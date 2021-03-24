@@ -7,9 +7,9 @@ use Test::More;
 my ($base_url, $jv, $t, @e);
 
 use Mojolicious::Lite;
-get '/invalid-fragment'     => 'invalid-fragment';
-get '/invalid-relative'     => 'invalid-relative';
-get '/relative-to-the-root' => 'relative-to-the-root';
+get '/invalid-fragment'     => [format => ['json']] => 'invalid-fragment';
+get '/invalid-relative'     => [format => ['json']] => 'invalid-relative';
+get '/relative-to-the-root' => [format => ['json']] => 'relative-to-the-root';
 
 $t  = Test::Mojo->new;
 $jv = JSON::Validator->new(ua => $t->ua);
@@ -19,7 +19,6 @@ $base_url = $t->tx->req->url->to_abs->path('/');
 like $base_url, qr{^http}, 'got base_url to web server';
 is $jv->_id_key, 'id', 'default id_key';
 
-delete $jv->{version};
 eval { $jv->load_and_validate_schema("${base_url}relative-to-the-root.json") };
 ok !$@, "${base_url}relative-to-the-root.json" or diag $@;
 isa_ok $jv->schema, 'JSON::Validator::Schema::Draft4';

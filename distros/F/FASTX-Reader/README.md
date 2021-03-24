@@ -5,26 +5,26 @@
 [![Travis Build Status](https://travis-ci.org/telatin/FASTQ-Parser.svg?branch=master)](https://travis-ci.org/telatin/FASTQ-Parser)
 [![Kwalitee](https://cpants.cpanauthors.org/release/PROCH/FASTX-Reader-0.05.svg)](https://cpants.cpanauthors.org/release/PROCH/FASTX-Reader-0.60)
 
-### A Perl module to parse FASTA and FASTQ files
+## A Perl module to parse FASTA and FASTQ files
 
-This is a package built using Heng Li's _readfq()_ subroutine ([link](https://github.com/lh3/readfq)). For updated documentation, please visit *[Meta::CPAN](https://metacpan.org/pod/FASTX::Reader)*.
+This is a package built using Heng Li's _readfq()_ subroutine ([link](https://github.com/lh3/readfq)). For updated documentation, please visit _[Meta::CPAN](https://metacpan.org/pod/FASTX::Reader)_.
 
-The FASTX::Reader module also ships *fqc* (FASTQ counter), a program to quickly count the number of sequences in a set of FASTA/FASTQ files, also .gz compressed.
+The FASTX::Reader module also ships _fqc_ (FASTQ counter), a program to quickly count the number of sequences in a set of FASTA/FASTQ files, also .gz compressed.
 
 ### Installation
 
 With _CPAN minus_:
-```
+```bash
 cpanm FASTX::Reader
 ```
 
 If you don't have _CPAN minus_, you can install it with:
-```
+```bash
 cpan App::cpanminus
 ```
 
 ### Using 'fqc'
-```
+```bash
 fqc [options] FILE1 FILE2 ... FILEn
 ```
 
@@ -46,5 +46,6 @@ while (my $seq = $fasta_reader->getRead() ) {
 ```
 
 ### Contributors
-- Andrea Telatin
-- Fabrizio Levorin
+
+* Andrea Telatin
+* Fabrizio Levorin

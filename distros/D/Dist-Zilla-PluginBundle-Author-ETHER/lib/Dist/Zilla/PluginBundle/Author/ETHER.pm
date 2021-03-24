@@ -1,14 +1,15 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.158-6-g6e7b621
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.159-5-gda45ade
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.159';
+our $VERSION = '0.160';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use Moose;
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -373,7 +374,6 @@ sub configure {
         [ 'Test::EOL'           => { ':version' => '0.17', finder => [qw(:InstallModules :ExecFiles @Author::ETHER/Examples :TestFiles :ExtraTestFiles)] } ],
         'MetaTests',
         [ 'Test::CPAN::Changes' => { ':version' => '0.012' } ],
-        [ 'GenerateFile::FromShareDir' => 'generate xt/author/changes_has_content.t' => { -dist => 'Dist-Zilla-PluginBundle-Author-ETHER', -source_filename => 'changes_has_content.t', -destination_filename => 'xt/author/changes_has_content.t' } ],
         'Test::ChangesHasContent',
         [ 'Test::MinimumVersion' => { ':version' => '2.000010', max_target_perl => '5.006' } ],
         [ 'PodSyntaxTests'      => { ':version' => '5.040' } ],
@@ -516,6 +516,7 @@ sub configure {
         # if the caller set bump_only_matching_versions, then this global setting falls on the floor automatically
         # because the bundle uses the non-Transitional plugin in that case.
         'BumpVersionAfterRelease::Transitional.global' => 1,
+        'BumpVersionAfterRelease::Transitional.finder' => [ ':InstallModules' ],  # removed :ExecFiles
 
         'NextRelease.:version' => '5.033',
         'NextRelease.time_zone' => 'UTC',
@@ -663,7 +664,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.159
+version 0.160
 
 =head1 SYNOPSIS
 
@@ -758,10 +759,6 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     [MetaTests]
     [Test::CPAN::Changes]
     :version = 0.012
-    [GenerateFile::FromShareDir / generate xt/author/changes_has_content.t]
-    -dist = Dist-Zilla-PluginBundle-Author-ETHER
-    -source_filename = changes_has_content.t
-    -destinotion_filename = xt/author/changes_has_content.t
     [Test::ChangesHasContent]
     [Test::MinimumVersion]
     :version = 2.000010
@@ -1012,6 +1009,7 @@ following F<dist.ini> (following the preamble), minus some optimizations:
     [BumpVersionAfterRelease::Transitional]
     :version = 0.004
     global = 1
+    finder = :InstallModules  ; removed :ExecFiles
 
     [NextRelease]
     :version = 5.033

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.022-4-g2db4ba0
+package JSON::Schema::Draft201909; # git description: v0.023-11-g0d76ee9
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -55,7 +55,7 @@ has max_traversal_depth => (
 has validate_formats => (
   is => 'ro',
   isa => Bool,
-  default => 1,
+  default => 0, # as specified by https://json-schema.org/draft/2019-09/schema#/$vocabulary
 );
 
 has collect_annotations => (
@@ -547,7 +547,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -590,10 +590,8 @@ other, or badly-written schemas that could be optimized. Defaults to 50.
 
 =head2 validate_formats
 
-When false, the C<format> keyword will be treated as an annotation only (that is, no evaluation
-failure will result if the format of the data string is not as specified). When true, the C<format>
-keyword will be treated as an assertion, where failure is possible.
-Defaults to true.
+When true, the C<format> keyword will be treated as an assertion, not merely an annotation. Defaults
+to false.
 
 =head2 format_validations
 
@@ -696,7 +694,7 @@ The result is a L<JSON::Schema::Draft201909::Result> object, which can also be u
 =head2 traverse
 
   $result = $js->traverse($schema_data);
-  $result = $js->traverse($schema_data, { canonical_schema_uri => 'http://foo.com' });
+  $result = $js->traverse($schema_data, { canonical_schema_uri => 'http://example.com' });
 
 Traverses the provided schema data without evaluating it against any instance data. Returns the
 internal state object accumulated during the traversal, including any identifiers found therein, and
@@ -915,7 +913,7 @@ SOURCES.>
 
 =item *
 
-L<https://json-schema.org/>
+L<https://json-schema.org>
 
 =item *
 
@@ -928,6 +926,10 @@ L<RFC3986: Uniform Resource Identifier (URI): Generic Syntax|https://tools.ietf.
 =item *
 
 L<Test::JSON::Schema::Acceptance>
+
+=item *
+
+L<https://json-schema.org/draft/2019-09/release-notes.html>
 
 =back
 

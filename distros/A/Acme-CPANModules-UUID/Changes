@@ -1,3 +1,9 @@
+0.006   2021-01-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Benchmark both generate() & generate_rfc() for UUID::Random &
+	  UUID::Random::Secure.
+
+
 0.005   2021-01-18  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

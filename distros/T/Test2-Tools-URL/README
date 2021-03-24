@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.05
+    version 0.06
 
 SYNOPSIS
 
@@ -14,8 +14,8 @@ SYNOPSIS
      is(
        "http://example.com/path1/path2?query=1#fragment",
        url {
-         url_component scheme   => 'http';
-         url_component host     => 'example.com';
+         url_scheme             => 'http';
+         url_host               => 'example.com';
          url_component path     => '/path1/path2';
          url_component query    => { query => 1 };
          url_component fragment => 'fragment';
@@ -61,6 +61,8 @@ FUNCTIONS
 
     scheme
 
+      Note: scheme is normalized to lower case for this test.
+
     authority
 
     userinfo
@@ -68,6 +70,9 @@ FUNCTIONS
     hostport
 
     host
+
+      Note: hostname is not normalized to lower case for this test. To test
+      the normalized hostname use url_host below.
 
     port
 
@@ -78,6 +83,86 @@ FUNCTIONS
       May be either a string, list or array!
 
     fragment
+
+    user
+
+      [version 0.06]
+
+      Note: for ftp URLs only.
+
+    password
+
+      [version 0.06]
+
+      Note: for ftp URLs only.
+
+    media_type
+
+      [version 0.06]
+
+      Note: for data URLs only.
+
+    data
+
+      [version 0.06]
+
+      Note: for data URLs only.
+
+ url_scheme
+
+    [version 0.06]
+
+     url {
+       url_scheme $check;
+     }
+
+    Check that the given URL scheme matches $check. Note that the scheme is
+    normalized to lower case for this test, so it is identical to using
+    url_component 'scheme', $check.
+
+ url_host
+
+    [version 0.06]
+
+     url {
+       url_host $check;
+     }
+
+    Check that the given URL host matches $check. Note that the host is
+    normalized to lower case for this test, unlike the url_component
+    'host', $check test described above.
+
+ url_secure
+
+    [version 0.06]
+
+     url {
+       url_secure();
+     }
+
+    Check that the given URL is using a secure protocol like https or wss.
+
+ url_insecure
+
+    [version 0.06]
+
+     url {
+       url_insecure();
+     }
+
+    Check that the given URL is using an insecure protocol like http or
+    ftp.
+
+ url_mail_to
+
+    [version 0.06]
+
+     url {
+       url_mail_to $check;
+     }
+
+    Checks that the email address in the given mailto URL matches the
+    check. For non-mailto URLs this check will fail.
 
 SEE ALSO
 
@@ -93,7 +178,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Graham Ollis.
+    This software is copyright (c) 2017-2021 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

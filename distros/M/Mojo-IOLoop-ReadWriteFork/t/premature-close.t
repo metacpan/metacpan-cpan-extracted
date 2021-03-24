@@ -13,6 +13,15 @@ my $attempts = 0;
 my $len      = 4643;
 my $max_loop = 20;
 my $recv     = 0;
+my @forks;
+
+Mojo::IOLoop->next_tick(\&start_rwf);
+Mojo::IOLoop->start;
+
+is $recv, $len * $max_loop, 'got all bytes';
+
+@forks = ();
+done_testing;
 
 sub start_rwf {
   Mojo::IOLoop->stop if $attempts++ >= $max_loop;
@@ -24,14 +33,10 @@ sub start_rwf {
     close => sub {
       $txt =~ s/\r?\n//g;
       $recv += length($txt);
-      undef $fork;
       return Mojo::IOLoop->timer(0, sub { start_rwf() });
     }
   );
+
+  push @forks, $fork;
 }
 
-Mojo::IOLoop->next_tick(\&start_rwf);
-Mojo::IOLoop->start;
-
-is $recv, $len * $max_loop, 'got all bytes';
-done_testing;

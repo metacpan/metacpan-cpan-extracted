@@ -1,5 +1,5 @@
 package Net::Stripe::Simple;
-$Net::Stripe::Simple::VERSION = '0.004';
+$Net::Stripe::Simple::VERSION = '0.005';
 # ABSTRACT: simple, non-Moose interface to the Stripe API
 
 use v5.10;
@@ -204,6 +204,41 @@ sub _retrieve_customer { goto &_retrieve }
 sub _update_customer   { goto &_update }
 sub _delete_customer   { goto &_del }
 sub _list_customer     { goto &_list }
+
+
+sub payment_intents {
+    my $self = shift;
+    state $actions =
+      { map { $_ => undef } qw(create retrieve update confirm capture cancel list) };
+    my ( $args, $method ) = $self->_validate( 'payment_intent', $actions, @_ );
+    $args->{_base} = 'payment_intents';
+    return $self->$method($args);
+}
+sub _create_payment_intent   { goto &_create }
+sub _retrieve_payment_intent { goto &_retrieve }
+sub _update_payment_intent   { goto &_update }
+sub _confirm_payment_intent {
+    my ( $self, $args ) = @_;
+    my ( $base, $id )   = @$args{qw(_base id)};
+    _invalid('No id provided.') unless defined $id;
+    my $path = $base . '/' . uri_escape($id) . '/confirm';
+    return $self->_post($path);
+}
+sub _capture_payment_intent {
+    my ( $self, $args ) = @_;
+    my ( $base, $id )   = @$args{qw(_base id)};
+    _invalid('No id provided.') unless defined $id;
+    my $path = $base . '/' . uri_escape($id) . '/capture';
+    return $self->_post($path);
+}
+sub _cancel_payment_intent {
+    my ( $self, $args ) = @_;
+    my ( $base, $id )   = @$args{qw(_base id)};
+    _invalid('No id provided.') unless defined $id;
+    my $path = $base . '/' . uri_escape($id) . '/cancel';
+    return $self->_post($path);
+}
+sub _list_payment_intent     { goto &_list }
 
 
 sub cards {
@@ -462,43 +497,6 @@ sub _close_dispute {
 }
 
 
-sub transfers {
-    my $self = shift;
-    state $actions =
-      { map { $_ => undef } qw(create retrieve update cancel list) };
-    my ( $args, $method ) = $self->_validate( 'transfer', $actions, @_ );
-    $args->{_base} = 'transfers';
-    return $self->$method($args);
-}
-sub _create_transfer   { goto &_create }
-sub _retrieve_transfer { goto &_retrieve }
-sub _update_transfer   { goto &_update }
-
-sub _cancel_transfer {
-    my ( $self, $args ) = @_;
-    my ( $base, $id )   = @$args{qw(_base id)};
-    _invalid('No id provided.') unless defined $id;
-    my $path = $base . '/' . uri_escape($id) . '/cancel';
-    return $self->_post($path);
-}
-sub _list_transfer { goto &_list }
-
-
-sub recipients {
-    my $self = shift;
-    state $actions =
-      { map { $_ => undef } qw(create retrieve update delete list) };
-    my ( $args, $method ) = $self->_validate( 'recipient', $actions, @_ );
-    $args->{_base} = 'recipients';
-    return $self->$method($args);
-}
-sub _create_recipient   { goto &_create }
-sub _retrieve_recipient { goto &_retrieve }
-sub _update_recipient   { goto &_update }
-sub _delete_recipient   { goto &_del }
-sub _list_recipient     { goto &_list }
-
-
 sub application_fees {
     my $self = shift;
     state $actions = { map { $_ => undef } qw(retrieve refund list) };
@@ -628,7 +626,7 @@ sub _encode_params {
             }
         } else {
             $value =    # JSON boolean stringification magic has been erased
-              ref $value eq 'JSON::PP::Boolean'
+              blessed $value && $value->isa(ref(true())) # hack to work around inheritance issues with JSON booleans
               ? $value
                   ? 'true'
                   : 'false'
@@ -751,10 +749,6 @@ __END__
 
 Net::Stripe::Simple - simple, non-Moose interface to the Stripe API
 
-=head1 VERSION
-
-version 0.004
-
 =head1 SYNOPSIS
 
   use Net::Stripe::Simple;
@@ -838,10 +832,6 @@ The three constants plus C<data_object>.
 
 =back
 
-=head1 NAME
-
-Net::Stripe::Simple - simple, non-Moose interface to the Stripe API
-
 =head1 METHODS
 
 =head2 new
@@ -879,7 +869,7 @@ B<Available Actions>
             customer => $customer,
             amount   => 100,
             currency => 'usd',
-            capture  => 'false',
+            capture  => false,
         }
     );
 
@@ -1313,90 +1303,80 @@ B<Available Actions>
 
 =back
 
-=head2 transfers
+=head2 payment intents
 
-See L<https://stripe.com/docs/api#transfers>.
+See L<https://stripe.com/docs/api/payment_intents>.
 
 B<Available Actions>
 
 =over 4
 
+=item update
+
+    $stripe->disputes(
+        update => {
+            id       => $charge,
+            metadata => { foo => 'bar' }
+        }
+    );
+
 =item create
 
-    my $transfer = $stripe->transfers(
+    $stripe->payment_intents(
         create => {
-            amount    => 1,
-            currency  => 'usd',
-            recipient => $recipient,
+            amount         => 100,
+            currency       => 'usd',
+            customer       => $customer,
+            payment_method => $card,
         }
     );
 
 =item retrieve
 
-    $transfer = $stripe->transfers( retrieve => $id );
+    $payment_intent = $stripe->payment_intents( retrieve => $id );
 
-=item update
+=item list
 
-    $transfer = $stripe->transfers(
-        update => {
-            id       => $transfer,
-            metadata => { foo => 'bar' }
+    $stripe->payment_intents(
+        list => {
+            customer => $customer
+        }
+    );
+
+=item confirm
+
+    $stripe->payment_intents(
+        confirm => {
+            id => $payment_intent,
+        }
+    );
+
+=item capture
+
+    $stripe->payment_intents(
+        capture => {
+            id => $payment_intent,
         }
     );
 
 =item cancel
 
-    $transfer = $stripe->transfers( cancel => $transfer );
-
-=item list
-
-    my $transfers = $stripe->transfers(
-        list => {
-            created => { gt => $time }
-        }
-    );
+    $payment_intent = $stripe->payment_intents( cancel => $payment_intent );
 
 =back
+
+=head2 transfers
+
+Transfers in Stripe no longer have the meaning that this module originally
+implemented (see L<https://stripe.com/docs/transfer-payout-split>). As such,
+they have been removed from the module for the time being. They will be added
+in their new meaning with a suitable PR.
 
 =head2 recipients
 
-See L<https://stripe.com/docs/api#recipients>.
-
-B<Available Actions>
-
-=over 4
-
-=item create
-
-    $recipient = $stripe->recipients(
-        create => {
-            name => 'I Am An Example',
-            type => 'individual',
-        }
-    );
-
-=item retrieve
-
-    $recipient = $stripe->recipients( retrieve => $id );
-
-=item update
-
-    $recipient = $stripe->recipients(
-        update => {
-            id       => $recipient,
-            metadata => { foo => 'bar' },
-        }
-    );
-
-=item delete
-
-    $recipient = $stripe->recipients( delete => $id );
-
-=item list
-
-    my $recipients = $stripe->recipients('list');
-
-=back
+Recipients have been deprecated and are no longer available in the Stripe API,
+so have been removed from this module. They have been replaced by Custom
+accounts (see L<https://stripe.com/docs/connect/recipient-account-migrations>).
 
 =head2 application_fees
 
@@ -1570,6 +1550,10 @@ You can import the constants individually or all together with C<:const>.
 =head1 AUTHORS
 
 =over 4
+
+=item *
+
+Andy Beverley <andy@andybev.com>
 
 =item *
 

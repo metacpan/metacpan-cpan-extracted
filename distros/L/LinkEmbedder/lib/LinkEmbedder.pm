@@ -11,7 +11,7 @@ use constant TLS => eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -317,6 +317,9 @@ about the URL.
 Used as a helper for L<Mojolicious> web applications to reply to an oEmbed
 request. Will also set L<Mojo::UserAgent::Transactor/name> for L</ua> if
 the incoming request contains a "User-Agent" header.
+
+Note that in L<Mojolicious> 9.11 and later, you must define the format for your
+route to serve with extension .html, .json or .jsonp.
 
 =head1 AUTHOR
 

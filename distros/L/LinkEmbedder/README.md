@@ -119,6 +119,9 @@ Used as a helper for [Mojolicious](https://metacpan.org/pod/Mojolicious) web app
 request. Will also set ["name" in Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo%3A%3AUserAgent%3A%3ATransactor#name) for ["ua"](#ua) if
 the incoming request contains a "User-Agent" header.
 
+Note that in [Mojolicious](https://metacpan.org/pod/Mojolicious) 9.11 and later, you must define the format for your
+route to serve with extension .html, .json or .jsonp.
+
 # AUTHOR
 
 Jan Henning Thorsen

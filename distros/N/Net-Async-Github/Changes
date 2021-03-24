@@ -1,5 +1,13 @@
 Revision history for Net-Async-Github
 
+0.010     2021-03-24 10:32:12+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - repository names with `-` were reported as invalid, inadvertent regression from previous
+    version when adding support for `.`
+
 0.009     2021-03-19 21:36:07+08:00 Asia/Kuala_Lumpur
     New features, thanks to @chilli-binary for the patch:
 

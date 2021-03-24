@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.160     2021-03-23 20:02:54Z
+          - add boilerplate to disable bareword filehandles
+          - resolve inconsistency in $VERSION bumping in scripts (by not
+            expecting/munging $VERSIONs there)
+          - xt/author/changes_has_content.t (generated from
+            xt/release/changes_has_content.t) has been removed, as it seems to
+            cause confusion on behalf of pull request submitters
+
 0.159     2020-11-22 01:17:45Z
           - fix test that broke with Dist::Zilla 6.017 (a test changed its
             filename)

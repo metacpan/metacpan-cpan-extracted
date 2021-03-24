@@ -22,18 +22,12 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "develop" : {
-         "requires" : {
-            "Dist::Zilla" : "0",
-            "Dist::Zilla::Plugin::Hook" : "0",
-            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
-            "Dist::Zilla::Plugin::Test::UseAllModules" : "0"
-         }
-      },
       "runtime" : {
          "requires" : {
             "Class::XSAccessor" : "0",
             "Cpanel::JSON::XS" : "0",
+            "Data::UUID" : "0",
+            "Getopt::Long" : "2.36",
             "IO::Scalar" : "0",
             "perl" : "v5.10.1"
          }
@@ -58,7 +52,7 @@
          "web" : "https://github.com/cucumber/gherkin-perl"
       }
    },
-   "version" : "17.0.2",
+   "version" : "18.0.0",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "MIT"

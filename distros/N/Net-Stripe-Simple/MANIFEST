@@ -4,10 +4,8 @@ LICENSE
 MANIFEST
 META.yml
 Makefile.PL
-README
+README.md
 TODO.md
-cpanfile
-dist.ini
 lib/Net/Stripe/Simple.pm
 lib/Net/Stripe/Simple/Data.pm
 lib/Net/Stripe/Simple/Error.pm
@@ -20,4 +18,4 @@ t/basic.t
 t/data.t
 t/errors.t
 t/release-unused-vars.t
-weaver.ini
+META.json                                Module JSON meta-data (added by MakeMaker)

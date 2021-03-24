@@ -1,4 +1,6 @@
 package FASTX::PE;
+#ABSTRACT: A Paired-End FASTQ files reader, based on FASTX::Reader.
+
 use 5.012;
 use warnings;
 use Carp qw(confess cluck);
@@ -6,7 +8,6 @@ use Data::Dumper;
 use FASTX::Reader;
 use File::Basename;
 $FASTX::PE::VERSION = $FASTX::Reader::VERSION;
-#ABSTRACT: A Paired-End FASTQ files reader, based on FASTX::Reader.
 
 my $for_suffix_re = '(/1|_R?1)';
 my $rev_suffix_re = '(/2|_R?2)';
@@ -200,7 +201,7 @@ FASTX::PE - A Paired-End FASTQ files reader, based on FASTX::Reader.
 
 =head1 VERSION
 
-version 0.92
+version 1.0.0
 
 =head1 SYNOPSIS
 

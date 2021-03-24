@@ -30,7 +30,9 @@ $fork->on(
 
 $fork->start(program => 'sudo', program_args => [$^X, -e => q(print "hey $ENV{USER}!\n"; exit 3)], conduit => 'pty');
 
-Mojo::IOLoop->timer(0.5 => sub { $fork->kill(9) });
+my @killer = ($fork);
+Scalar::Util::weaken($killer[0]);
+Mojo::IOLoop->timer(0.5 => sub { $killer[0]->kill(9) });
 Mojo::IOLoop->timer(1   => sub { Mojo::IOLoop->stop; });
 Mojo::IOLoop->start;
 

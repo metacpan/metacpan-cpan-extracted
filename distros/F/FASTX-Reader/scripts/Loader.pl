@@ -3,8 +3,8 @@ use 5.010;
 use Term::ANSIColor;
 use Data::Dumper;
 use Carp qw(confess);
-use FindBin qw($Bin);
-use lib "$Bin/../lib/";
+use FindBin qw($RealBin);
+use lib "$RealBin/../lib/";
 use FASTX::Reader;
 $Data::Dumper::Terse = 1;
 # Print splash screen
@@ -13,7 +13,7 @@ print STDERR color('bold'), "Read FASTA/FASTQ files, printing them back to the u
 print STDERR "Usage: $0 FILE1 FILE2 ... FILEn\n\n";
 
 # Read two samples files if the user didnt provide any filename
-push(@ARGV,"$Bin/../data/test.fastq", "$Bin/../data/test.fasta" )
+push(@ARGV,"$RealBin/../data/test.fastq", "$RealBin/../data/test.fasta" )
   unless ($ARGV[0]);
 
 foreach my $input_file (@ARGV) {

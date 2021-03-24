@@ -1,8 +1,8 @@
-.travis.yml
 bin/perlcritic
 Build.PL
 Changes
 CONTRIBUTING.md
+cpanfile
 examples/generatestats
 examples/loadanalysisdb
 examples/perlcriticrc

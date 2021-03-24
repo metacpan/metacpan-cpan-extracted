@@ -13,8 +13,8 @@ use Term::ANSIColor qw(color);
 use JSON::PP;
 use Capture::Tiny qw(capture);
 use Time::HiRes qw( time );
-
-$FASTX::ScriptHelper::VERSION = '0.1.0';
+use Scalar::Util qw( blessed refaddr reftype);
+$FASTX::ScriptHelper::VERSION = '0.1.2';
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw(rc fu_printfasta fu_printfastq verbose);
@@ -161,7 +161,21 @@ sub verbose {
   if ( ref($_[0]) eq 'FASTX::ScriptHelper' ) {
     $self = shift @_;
   }
-  my ($message, $reference, $reference_name) = @_;
+  my ($message, $reference, $reference_name, @remainder) = @_;
+  if ($remainder[0]) {
+    $message .= $reference . $reference_name . join('', @remainder);
+    $reference = undef;
+    $reference_name = undef;
+  } elsif (defined $reference and reftype $reference eq undef) {
+    # Mistakenly passed list instead of string
+    $message .= $reference;
+    if (defined $reference_name) {
+      $message .= $reference_name;
+      $reference_name = undef;
+    }
+    $reference = undef;
+
+  }
   my $variable_name = $reference_name // 'data';
   my $timestamp = _getTimeStamp();
   if ( (defined $self and $self->{verbose} ) or (defined $main::opt_verbose and $main::opt_verbose) ) {
@@ -192,7 +206,7 @@ sub writelog  {
   my $timestamp = _getTimeStamp();
   say {$self->{logfh}} "[$timestamp] $message";
   say {$self->{logfh}}  Data::Dumper->Dump([$reference], [$variable_name]) if (defined $reference);
-  
+
 
 }
 
@@ -211,7 +225,7 @@ sub download  {
       $self->writelog( qq(Downloading "$url") );
   }
 
- 
+
   my $downloader = File::Fetch->new(uri => $url);
   my $file_path = $downloader->fetch( to => $destination ) or confess($downloader->error);
   my $end_time = time();
@@ -231,7 +245,7 @@ sub run  {
     candie => 1,
     logall => 1,
   );
-  
+
 
   my ($command, $options) = @_;
   _validate_attributes(\%valid_attributes, $options, 'run');
@@ -264,6 +278,18 @@ sub run  {
 
 }
 
+
+sub cpu_count {
+  if ( $^O =~ m/linux/i ) {
+    my($num) = qx(grep -c ^processor /proc/cpuinfo);
+    return $1 if $num =~ m/^(\d+)/;
+  }
+  elsif ( $^O =~ m/darwin/i ) {
+    my($num) = qx(system_profiler SPHardwareDataType | grep Cores);
+    return $1 if $num =~ /.*Cores: (\d+)/;
+  }
+  return 1;
+}
 
 sub _getTimeStamp {
 
@@ -318,7 +344,7 @@ FASTX::ScriptHelper - Shared routines for binaries using FASTX::Reader and FASTX
 
 =head1 VERSION
 
-version 0.92
+version 1.0.0
 
 =head2 new()
 
@@ -387,6 +413,10 @@ Download a remote file
 Execute a command. Options are:
   * candie BOOL, to tolerate non zero exit
   * logall BOOL, save to log STDOUT and STDERR
+
+=head2 cpu_count
+
+Returns the number of detected cores, default 1
 
 =head1 AUTHOR
 

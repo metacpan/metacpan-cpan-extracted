@@ -20,7 +20,7 @@ get '/' => sub {
   $fork->on(
     close => sub {
       my ($fork, $exit_value, $signal) = @_;
-      push @pids, $fork->{ev_child}->rpid;
+      push @pids, $fork->pid;
       $c->render(json => {output => $out, exit_value => $exit_value});
       delete $c->stash->{fork};    # <--- prevent leaks
     }

@@ -1,15 +1,12 @@
 use strict;
 use warnings;
 
+use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Path::Tiny;
 use utf8;
-
-binmode Test::More->builder->$_, ':encoding(UTF-8)' foreach qw(output failure_output todo_output);
-binmode STDOUT, ':encoding(UTF-8)';
-binmode STDERR, ':encoding(UTF-8)';
 
 use Test::File::ShareDir -share => { -dist => { 'Some-Other-Dist' => 't/corpus' } };
 

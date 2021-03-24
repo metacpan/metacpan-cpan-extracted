@@ -6,11 +6,10 @@ use warnings;
 
 use Test::More 0.94;
 
-plan tests => 3;
+plan tests => 2;
 
 my @module_files = (
-    'Dist/Zilla/Plugin/GenerateFile/FromShareDir.pm',
-    'Dist/Zilla/Plugin/GenerateFile/ShareDir.pm'
+    'Dist/Zilla/Plugin/GenerateFile/FromShareDir.pm'
 );
 
 

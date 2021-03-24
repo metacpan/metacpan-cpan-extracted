@@ -1,5 +1,5 @@
 ---
-abstract: 'A lightweight module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.'
+abstract: 'A simple module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.'
 author:
   - 'Andrea Telatin <andrea@telatin.com>'
 build_requires: {}
@@ -15,24 +15,25 @@ name: FASTX-Reader
 provides:
   FASTX::PE:
     file: lib/FASTX/PE.pm
-    version: '0.92'
+    version: v1.0.0
   FASTX::Reader:
     file: lib/FASTX/Reader.pm
-    version: '0.92'
+    version: v1.0.0
   FASTX::ScriptHelper:
     file: lib/FASTX/ScriptHelper.pm
-    version: '0.92'
+    version: v1.0.0
 recommends:
   File::Which: '0'
 requires:
   Capture::Tiny: '0.40'
   Carp: '1.2'
   Data::Dumper: '2.1'
+  File::Fetch: '0'
   FindBin: '1.3'
   Time::HiRes: '0'
   perl: '5.012'
 resources:
   repository: https://github.com/telatin/FASTQ-Parser
-version: '0.92'
+version: 1.0.0
 x_generated_by_perl: v5.22.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

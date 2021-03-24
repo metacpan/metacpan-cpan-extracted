@@ -1,0 +1,69 @@
+{
+   "abstract" : "simple, non-Moose interface to the Stripe API",
+   "author" : [
+      "Grant Street Group <developers@grantstreet.com>, David F. Houghton <dfhoughton@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Stripe-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::StackTrace" : "0",
+            "Exporter" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "Scalar::Util" : "0",
+            "URI::Escape" : "0",
+            "constant" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "5.010000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "autodie" : "0",
+            "blib" : "1.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

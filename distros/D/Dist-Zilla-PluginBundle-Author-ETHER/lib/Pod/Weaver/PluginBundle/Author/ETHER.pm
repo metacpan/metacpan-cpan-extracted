@@ -4,10 +4,11 @@ package Pod::Weaver::PluginBundle::Author::ETHER;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for pod woven by ETHER
 
-our $VERSION = '0.159';
+our $VERSION = '0.160';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use namespace::autoclean -also => ['_exp'];
 use Pod::Weaver::Config::Assembler;
 use Module::Runtime 'use_module';
@@ -177,7 +178,7 @@ Pod::Weaver::PluginBundle::Author::ETHER - A plugin bundle for pod woven by ETHE
 
 =head1 VERSION
 
-version 0.159
+version 0.160
 
 =head1 SYNOPSIS
 

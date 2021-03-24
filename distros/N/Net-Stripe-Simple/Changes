@@ -1,5 +1,10 @@
 Revision history for Net::Stripe::Simple
 
+0.005     2021-03-23 19:10:21-00:00 Europe/London
+  * Add payment intents functionality
+  * Remove recipients and transfers functionality (deprecated by Stripe)
+  * Handle booleans from any JSON class (RT #100274)
+
 0.004     2016-10-31 09:18:36-04:00 America/New_York
   * declare LWP::Protocol::https dependency
 

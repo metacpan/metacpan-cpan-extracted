@@ -55,15 +55,10 @@ See [Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2](https://metacpan.org/pod/M
 [Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv3](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AOpenAPI%3A%3AGuides%3A%3AOpenAPIv3) for tutorials on how to
 write a "full" app with application class and controllers.
 
-# IMPORTANT ANNOUNCEMENT
-
-Next version of [Mojolicious::Plugin::OpenAPI](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AOpenAPI) will not be shipped with
-[JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON%3A%3AValidator%3A%3AOpenAPI%3A%3AMojolicious). Instead, it will depend on the new
-[JSON::Validator::Schema::OpenAPIv2](https://metacpan.org/pod/JSON%3A%3AValidator%3A%3ASchema%3A%3AOpenAPIv2) and [JSON::Validator::Schema::OpenAPIv3](https://metacpan.org/pod/JSON%3A%3AValidator%3A%3ASchema%3A%3AOpenAPIv3)
-modules.
-
-The next version is available at
-[https://github.com/jhthorsen/mojolicious-plugin-openapi/pull/160](https://github.com/jhthorsen/mojolicious-plugin-openapi/pull/160).
+Looking at the documentation for
+["x-mojo-to" in Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AOpenAPI%3A%3AGuides%3A%3AOpenAPIv2#x-mojo-to) can be especially
+useful if you are using extensions (formats) such as ".json". The logic is the
+same for OpenAPIv2 and OpenAPIv3.
 
 # DESCRIPTION
 
@@ -225,6 +220,14 @@ The name of the "definition" in the spec that will be used for
 ["default\_response\_codes"](#default_response_codes). The default value is "DefaultResponse". See
 ["Default response schema" in Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AOpenAPI%3A%3AGuides%3A%3AOpenAPIv2#Default-response-schema)
 for more details.
+
+### format
+
+Set this to a default list of file extensions that your API accepts. This value
+can be overwritten by
+["x-mojo-to" in Mojolicious::Plugin::OpenAPI::Guides::OpenAPIv2](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3AOpenAPI%3A%3AGuides%3A%3AOpenAPIv2#x-mojo-to).
+
+This config parameter is EXPERIMENTAL and subject for change.
 
 ### log\_level
 

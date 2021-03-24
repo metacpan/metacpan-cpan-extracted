@@ -11,8 +11,10 @@ isa_ok($embedder->ua, 'Mojo::UserAgent');
 
 use Mojolicious::Lite;
 get '/example' => 'example';
-get '/oembed'  => sub { $embedder->serve(shift) };
-get '/header'  => sub {
+get
+  '/oembed' => [format => [qw(html json jsonp)]],
+  {format => undef}, sub { $embedder->serve(shift) };
+get '/header' => sub {
   my $c = shift;
   $c->res->headers->content_type('text/plain')->header('X-Provider-Name', 'Convos');
   $c->render(text => 'X-Provider-Name example');

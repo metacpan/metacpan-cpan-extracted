@@ -2,19 +2,6 @@ use Mojo::Base -strict;
 use Mojo::IOLoop::ReadWriteFork;
 use Test::More;
 
-Mojo::Util::monkey_patch(
-  'Mojo::IOLoop::ReadWriteFork',
-  DESTROY => sub {
-    warn <<"HERE" if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-
-  $_[0]->DESTROY() was not called: Mojo::IOLoop::ReadWriteFork is leaking objects!
-
-HERE
-
-    shift->_cleanup;
-  }
-);
-
 my $fork   = Mojo::IOLoop::ReadWriteFork->new;
 my $output = '';
 

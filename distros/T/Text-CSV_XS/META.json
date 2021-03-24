@@ -1,21 +1,50 @@
 {
+   "generated_by" : "Author",
+   "provides" : {
+      "Text::CSV_XS" : {
+         "file" : "CSV_XS.pm",
+         "version" : "1.46"
+         }
+      },
+   "name" : "Text-CSV_XS",
+   "version" : "1.46",
    "author" : [
       "H.Merijn Brand <h.m.brand@xs4all.nl>"
       ],
-   "abstract" : "Comma-Separated Values manipulation routines",
-   "license" : [
-      "perl_5"
-      ],
-   "generated_by" : "Author",
-   "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-            }
+   "resources" : {
+      "homepage" : "https://metacpan.org/pod/Text::CSV_XS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Tux/Text-CSV_XS",
+         "web" : "https://github.com/Tux/Text-CSV_XS"
          },
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-CSV_XS"
+         },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
+      },
+   "prereqs" : {
       "build" : {
          "requires" : {
             "Config" : "0"
+            }
+         },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0",
+            "perl" : "5.006001",
+            "IO::Handle" : "0"
+            },
+         "recommends" : {
+            "Encode" : "3.08"
+            }
+         },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
             }
          },
       "test" : {
@@ -23,45 +52,16 @@
             "Tie::Scalar" : "0",
             "Test::More" : "0"
             }
-         },
-      "runtime" : {
-         "recommends" : {
-            "Encode" : "3.08"
-            },
-         "requires" : {
-            "IO::Handle" : "0",
-            "XSLoader" : "0",
-            "perl" : "5.006001"
-            }
          }
       },
-   "name" : "Text-CSV_XS",
-   "dynamic_config" : 1,
-   "version" : "1.45",
+   "abstract" : "Comma-Separated Values manipulation routines",
    "meta-spec" : {
       "version" : 2,
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
       },
    "release_status" : "stable",
-   "provides" : {
-      "Text::CSV_XS" : {
-         "version" : "1.45",
-         "file" : "CSV_XS.pm"
-         }
-      },
-   "resources" : {
-      "repository" : {
-         "web" : "https://github.com/Tux/Text-CSV_XS",
-         "url" : "https://github.com/Tux/Text-CSV_XS",
-         "type" : "git"
-         },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ],
-      "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-CSV_XS"
-         },
-      "homepage" : "https://metacpan.org/pod/Text::CSV_XS",
-      "x_IRC" : "irc://irc.perl.org/#csv"
-      }
+   "license" : [
+      "perl_5"
+      ],
+   "dynamic_config" : 1
    }

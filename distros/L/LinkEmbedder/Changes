@@ -1,5 +1,8 @@
 Revision history for perl distribution LinkEmbedder
 
+1.18 2021-03-24T09:29:43+0900
+ - Fix compatibility with Mojolicious 9.11
+
 1.17 2021-02-03T10:35:43+0900
  - Add support for https://www.webex.com/
  - Add support for https://meet.google.com/

@@ -3,7 +3,7 @@ package OAuth::Lite;
 use strict;
 use warnings;
 
-our $VERSION = "1.34";
+our $VERSION = "1.35";
 our $OAUTH_DEFAULT_VERSION = "1.0";
 our $USE_DEPRECATED_NORMALIZER = 1;
 

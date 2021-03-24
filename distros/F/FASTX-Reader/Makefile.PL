@@ -7,7 +7,7 @@ use 5.012;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A lightweight module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.",
+  "ABSTRACT" => "A simple module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.",
   "AUTHOR" => "Andrea Telatin <andrea\@telatin.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -24,10 +24,11 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => "0.40",
     "Carp" => "1.2",
     "Data::Dumper" => "2.1",
+    "File::Fetch" => 0,
     "FindBin" => "1.3",
     "Time::HiRes" => 0
   },
-  "VERSION" => "0.92",
+  "VERSION" => "1.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %FallbackPrereqs = (
   "Capture::Tiny" => "0.40",
   "Carp" => "1.2",
   "Data::Dumper" => "2.1",
+  "File::Fetch" => 0,
   "FindBin" => "1.3",
   "Time::HiRes" => 0
 );

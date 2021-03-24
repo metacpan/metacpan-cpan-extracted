@@ -8,18 +8,15 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Dist/Zilla/Plugin/GenerateFile/FromShareDir.pm',
-    'lib/Dist/Zilla/Plugin/GenerateFile/ShareDir.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/01-basic.t',
     't/02-other-encoding.t',
     't/03-write-to-root.t',
-    't/04-generatefile-sharedir.t',
     't/05-build-release.t',
     't/06-locally-provided-sharedir.t',
     't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
-    'xt/author/changes_has_content.t',
     'xt/author/clean-namespaces.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',

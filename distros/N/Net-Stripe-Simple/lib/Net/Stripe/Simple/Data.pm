@@ -1,5 +1,5 @@
 package Net::Stripe::Simple::Data;
-$Net::Stripe::Simple::Data::VERSION = '0.004';
+$Net::Stripe::Simple::Data::VERSION = '0.005';
 # ABSTRACT: collection of methods to augment a JSON hash
 
 
@@ -66,10 +66,6 @@ __END__
 =head1 NAME
 
 Net::Stripe::Simple::Data - collection of methods to augment a JSON hash
-
-=head1 VERSION
-
-version 0.004
 
 =head1 SYNOPSIS
 

@@ -170,6 +170,10 @@ See Also L<http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/drafts/4/spec.
 
 The base site url of Service Provider
 
+=item ua
+
+An instance of L<OAuth::Lite::Agent> used to request. (optional)
+
 =item request_token_path
 
 =item access_token_path

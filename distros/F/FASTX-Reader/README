@@ -1,7 +1,7 @@
 This archive contains the distribution FASTX-Reader,
-version 0.92:
+version 1.0.0:
 
-  A lightweight module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.
+  A simple module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.
 
 This software is Copyright (c) 2019 by Andrea Telatin.
 

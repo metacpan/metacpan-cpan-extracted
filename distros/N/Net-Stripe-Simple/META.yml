@@ -1,8 +1,7 @@
 ---
 abstract: 'simple, non-Moose interface to the Stripe API'
 author:
-  - 'Grant Street Group <developers@grantstreet.com>'
-  - 'David F. Houghton <dfhoughton@gmail.com>'
+  - 'Grant Street Group <developers@grantstreet.com>, David F. Houghton <dfhoughton@gmail.com>'
 build_requires:
   DateTime: '0'
   ExtUtils::MakeMaker: '0'
@@ -13,18 +12,19 @@ build_requires:
   Test::More: '0'
   autodie: '0'
   blib: '1.01'
-  perl: v5.10.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: v5.10.0
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-Stripe-Simple
-no_index: {}
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Devel::StackTrace: '0'
   Exporter: '0'
@@ -38,10 +38,8 @@ requires:
   constant: '0'
   overload: '0'
   parent: '0'
-  perl: v5.10.0
+  perl: '5.010000'
   strict: '0'
   warnings: '0'
-resources:
-  repository: git://github.com/GrantStreetGroup/net-stripe-simple.git
-version: '0.004'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

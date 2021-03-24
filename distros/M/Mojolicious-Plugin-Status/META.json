@@ -36,7 +36,7 @@
             "BSD::Resource" : "0",
             "File::Map" : "0",
             "File::Temp" : "0.2308",
-            "Mojolicious" : "8.50",
+            "Mojolicious" : "9.11",
             "Sereal" : "0",
             "perl" : "5.016"
          }
@@ -61,6 +61,6 @@
          "web" : "https://webchat.freenode.net/#mojo"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

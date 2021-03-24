@@ -242,7 +242,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.159",
+  "VERSION" => "0.160",
   "test" => {
     "TESTS" => "t/*.t"
   }

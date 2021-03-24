@@ -34,7 +34,7 @@ my @tests = (
     },
     {
         test_name => 'remove things referenced by short form, full name, moniker',
-        remove_plugins => [ '=Dist::Zilla::Plugin::Keywords', 'generate CONTRIBUTING', 'generate xt/author/changes_has_content.t' ],
+        remove_plugins => [ '=Dist::Zilla::Plugin::Keywords', 'generate CONTRIBUTING' ],
         unwanted_plugins => [
             @network_plugins,
             qw(Keywords GenerateFile::FromShareDir),

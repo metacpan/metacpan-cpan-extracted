@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Draft201909
 
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -36,7 +36,7 @@ our @EXPORT_OK = qw(
   abort
   assert_keyword_type
   assert_pattern
-  assert_uri_ref
+  assert_uri_reference
   annotate_self
   true
   false
@@ -243,16 +243,16 @@ sub assert_pattern {
   return 1;
 }
 
-sub assert_uri_ref {
+sub assert_uri_reference {
   my ($state, $schema) = @_;
 
   # for now, we just check for fragment validity
   my $ref = $schema->{$state->{keyword}};
   return 1 if $ref !~ /#/
-    or $ref =~ /#$/                           # empty fragment
+    or $ref =~ m{#$}                          # empty fragment
     or $ref =~ m{#[A-Za-z][-A-Za-z0-9.:_]*$}  # plain-name fragment
     or $ref =~ m{#/(?:[^~]|~[01])*$};         # json pointer fragment
-  E($state, '%s value is not a valid schema reference', $state->{keyword});
+  E($state, '%s value is not a valid URI reference', $state->{keyword});
 }
 
 # produces an annotation whose value is the same as that of the current keyword
@@ -276,7 +276,7 @@ JSON::Schema::Draft201909::Utilities - Internal utilities for JSON::Schema::Draf
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 
@@ -287,7 +287,7 @@ version 0.023
 This class contains internal utilities to be used by L<JSON::Schema::Draft201909>.
 
 =for Pod::Coverage is_type get_type is_equal is_elements_unique jsonp local_annotations
-canonical_schema_uri E A abort assert_keyword_type assert_pattern assert_uri_ref annotate_self
+canonical_schema_uri E A abort assert_keyword_type assert_pattern assert_uri_reference annotate_self
 
 =head1 SUPPORT
 

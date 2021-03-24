@@ -1,5 +1,12 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.005     2021-03-23 21:24:15Z
+        - specification => latest now uses draft2020-12
+
+1.004     2021-03-23 20:37:27Z
+        - new "skip_dir" option, to be used in conjunction with include_optional => 1
+        - updated test suite to commit cd73775f22d4cae64587486c0ee7efca9131643c
+
 1.003     2020-12-05 07:09:12Z
         - updated test suite to commit 6505944d38c414039cd8f27e3312b9e3831a0a16
 

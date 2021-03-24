@@ -22,7 +22,7 @@ use PPIx::Regexp 0.010 qw< >;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.138';
+our $VERSION = '1.140';
 
 #-----------------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ sub ppi_document {
 
 #-----------------------------------------------------------------------------
 
-sub isa {
+sub isa {   ## no critic ( Subroutines::ProhibitBuiltinHomonyms )
     my ($self, @args) = @_;
     return $self->SUPER::isa(@args)
         || ( (ref $self) && $self->{_doc} && $self->{_doc}->isa(@args) );

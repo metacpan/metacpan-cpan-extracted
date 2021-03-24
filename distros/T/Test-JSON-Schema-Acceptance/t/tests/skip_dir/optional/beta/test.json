@@ -1,0 +1,13 @@
+[
+    {
+        "description": "test group",
+        "schema": true,
+        "tests": [
+            {
+                "description": "test",
+                "data": 1,
+                "valid": true
+            }
+        ]
+    }
+]

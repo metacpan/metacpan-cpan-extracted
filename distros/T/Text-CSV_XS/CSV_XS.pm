@@ -1,6 +1,6 @@
 package Text::CSV_XS;
 
-# Copyright (c) 2007-2020 H.Merijn Brand.  All rights reserved.
+# Copyright (c) 2007-2021 H.Merijn Brand.  All rights reserved.
 # Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
 # Copyright (c) 1997 Alan Citterman.       All rights reserved.
 #
@@ -26,7 +26,7 @@ use XSLoader;
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.45";
+$VERSION   = "1.46";
 @ISA       = qw( Exporter );
 @EXPORT_OK = qw( csv );
 XSLoader::load ("Text::CSV_XS", $VERSION);
@@ -78,7 +78,9 @@ my %def_attr = (
     'keep_meta_info'		=> 0,
     'verbatim'			=> 0,
     'formula'			=> 0,
+    'skip_empty_rows'		=> 0,
     'undef_str'			=> undef,
+    'comment_str'		=> undef,
     'types'			=> undef,
     'callbacks'			=> undef,
 
@@ -101,6 +103,7 @@ my %attr_alias = (
     'verbose_diag'		=> "diag_verbose",
     'quote_null'		=> "escape_null",
     'escape'			=> "escape_char",
+    'comment'			=> "comment_str",
     );
 my $last_new_err = Text::CSV_XS->SetDiag (0);
 my $ebcdic       = ord ("A") == 0xC1;	# Faster than $Config{'ebcdic'}
@@ -268,8 +271,10 @@ my %_cache_id = ( # Only expose what is accessed from within PM
     '_is_bound'			=> 26,	# 26 .. 29
     'formula'			=> 38,
     'strict'			=> 42,
+    'skip_empty_rows'		=> 43,
     'undef_str'			=> 46,
-    'types'			=> 50,
+    'comment_str'		=> 54,
+    'types'			=> 62,
     );
 
 # A `character'
@@ -433,6 +438,12 @@ sub strict {
     $self->{'strict'};
     } # always_quote
 
+sub skip_empty_rows {
+    my $self = shift;
+    @_ and $self->_set_attr_X ("skip_empty_rows", shift);
+    $self->{'skip_empty_rows'};
+    } # always_quote
+
 sub _SetDiagInfo {
     my ($self, $err, $msg) = @_;
     $self->SetDiag ($err);
@@ -545,6 +556,16 @@ sub undef_str {
 	}
     $self->{'undef_str'};
     } # undef_str
+
+sub comment_str {
+    my $self = shift;
+    if (@_) {
+	my $v = shift;
+	$self->{'comment_str'} = defined $v ? "$v" : undef;
+	$self->_cache_set ($_cache_id{'comment_str'}, $self->{'comment_str'});
+	}
+    $self->{'comment_str'};
+    } # comment_str
 
 sub auto_diag {
     my $self = shift;
@@ -1655,7 +1676,7 @@ meaning of possible present BOM.
 
 =head1 SPECIFICATION
 
-While no formal specification for CSV exists, L<RFC 4180|http://tools.ietf.org/html/rfc4180>
+While no formal specification for CSV exists, L<RFC 4180|https://tools.ietf.org/html/rfc4180>
 (I<1>) describes the common format and establishes  C<text/csv> as the MIME
 type registered with the IANA. L<RFC 7111|http://tools.ietf.org/html/rfc7111>
 (I<2>) adds fragments to CSV.
@@ -1665,8 +1686,8 @@ The Comma Separated Value (CSV) File Format"|http://www.creativyst.com/Doc/Artic
 (I<3>)  provides an overview of the  C<CSV>  format in the most widely used
 applications and explains how it can best be used and supported.
 
- 1) http://tools.ietf.org/html/rfc4180
- 2) http://tools.ietf.org/html/rfc7111
+ 1) https://tools.ietf.org/html/rfc4180
+ 2) https://tools.ietf.org/html/rfc7111
  3) http://www.creativyst.com/Doc/Articles/CSV/CSV01.htm
 
 The basic rules are as follows:
@@ -1900,6 +1921,19 @@ X<strict>
 
 If this attribute is set to C<1>, any row that parses to a different number
 of fields than the previous row will cause the parser to throw error 2014.
+
+=head3 skip_empty_rows
+X<skip_empty_rows>
+
+ my $csv = Text::CSV_XS->new ({ skip_empty_rows => 1 });
+         $csv->skip_empty_rows (0);
+ my $f = $csv->skip_empty_rows;
+
+If this attribute is set to C<1>,  any row that has an  L</eol> immediately
+following the start of line will be skipped.  Default behavior is to return
+one single empty field.
+
+This attribute is only used in parsing.
 
 =head3 formula_handling
 
@@ -2312,6 +2346,25 @@ loaders, like for MySQL, that recognize special sequences for C<NULL> data.
 
 This attribute has no meaning when parsing CSV data.
 
+=head3 comment_str
+X<comment_str>
+
+ my $csv = Text::CSV_XS->new ({ comment_str => "#" });
+         $csv->comment_str (undef);
+ my $s = $csv->comment_str;
+
+This attribute optionally defines a string to be recognized as comment.  If
+this attribute is defined,   all lines starting with this sequence will not
+be parsed as CSV but skipped as comment.
+
+This attribute has no meaning when generating CSV.
+
+Comment strings that start with any of the special characters/sequences are
+not supported (so it cannot start with any of L</sep_char>, L</quote_char>,
+L</escape_char>, L</sep>, L</quote>, or L</eol>).
+
+For convenience, C<comment> is an alias for C<comment_str>.
+
 =head3 verbatim
 X<verbatim>
 
@@ -2391,9 +2444,11 @@ is equivalent to
      quote_binary          => 1,
      keep_meta_info        => 0,
      strict                => 0,
+     skip_empty_rows       => 0,
      formula               => 0,
      verbatim              => 0,
      undef_str             => undef,
+     comment_str           => undef,
      types                 => undef,
      callbacks             => undef,
      });
@@ -3347,7 +3402,7 @@ If the C<in> argument point to something to parse, and the C<out> is set to
 a reference to an C<ARRAY> or a C<HASH>, the output is appended to the data
 in the existing reference. The result of the parse should match what exists
 in the reference passed. This might come handy when you have to parse a set
-of files with similar content (like data stored per period) and you want to 
+of files with similar content (like data stored per period) and you want to
 collect that into a single data structure:
 
  my %hash;
@@ -4866,7 +4921,7 @@ L</csv> function. See ChangeLog releases 0.25 and on.
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2007-2020 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2007-2021 H.Merijn Brand.  All rights reserved.
  Copyright (C) 1998-2001 Jochen Wiedmann. All rights reserved.
  Copyright (C) 1997      Alan Citterman.  All rights reserved.
 
