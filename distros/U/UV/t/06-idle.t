@@ -17,7 +17,8 @@ sub idle_cb {
 
 my $idle = UV::Idle->new(on_idle => \&idle_cb);
 isa_ok($idle, 'UV::Idle');
-$idle->start();
+my $ret = $idle->start();
+is($ret, $idle, '$idle->start returns $idle');
 
 is(UV::Loop->default()->run(), 0, 'Default loop ran');
 

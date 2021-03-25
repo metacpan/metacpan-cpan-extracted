@@ -1,5 +1,9 @@
 Revision history for Perl module Perl::Metrics::Simple
 
+v1.0.0 - March 2021
+  Declare dependency on Test::Compile v1.1.0 instead of 0, as v1.1.0
+  is first version that documents the OO way of using Test::Compile.
+
 0.19 - March 2021
   Merged JSON output option contributed by Saturo Abe (https://github.com/polamjag)
   Moved generation of the plain text, HTML, and JSON into new modules:

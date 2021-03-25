@@ -28,7 +28,10 @@ my $loop = UV::Loop->default;
             my $res = shift @results;
             is($res->family,   AF_INET,     '$res->family');
             is($res->socktype, SOCK_STREAM, '$res->socktype');
-            is($res->protocol, IPPROTO_TCP, '$res->protocol');
+
+            # MSWin32 just reports zero here
+            is($res->protocol, IPPROTO_TCP, '$res->protocol') unless $^O eq "MSWin32";
+
             is_deeply( [ unpack_sockaddr_in $res->addr ],
                        [ 1234, inet_aton("12.34.56.78") ],
                        '$res->addr' );

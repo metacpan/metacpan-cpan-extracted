@@ -11,9 +11,6 @@ use Socket;
 
 sub sockaddr_port { (Socket::unpack_sockaddr_in $_[0])[0] }
 
-# TODO: This test might not work on MSWin32. We might need to find a different
-#   implementation, or just skip it?
-
 my $tcp = UV::TCP->new;
 isa_ok($tcp, 'UV::TCP');
 

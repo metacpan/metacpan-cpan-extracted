@@ -17,6 +17,12 @@ my $extra_space
     = $Getopt::Long::Descriptive::VERSION >= 0.100 ? q{}
     : $Getopt::Long::Descriptive::VERSION >= 0.099 ? q{  }
     :                                                q{ };
+my $represent_v 
+    = $Getopt::Long::Descriptive::VERSION >= 0.106 ? '--verbose (or -v)'
+    :                                                '-v --verbose';
+my $represent_h 
+    = $Getopt::Long::Descriptive::VERSION >= 0.106 ? '--help           '
+    :                                                '--help      ';
 
 my $content = <<'EOT' . 'bla';
 =head1 FOO
@@ -60,9 +66,9 @@ foo
 =head1 USAGE
 
     my-program [-v] [long options...] <some-arg>
-        -v --verbose  ${extra_space}print extra stuff
+        $represent_v  ${extra_space}print extra stuff
 
-        --help        ${extra_space}print usage message and exit
+        $represent_h  ${extra_space}print usage message and exit
 
 =head1 BAR
 EOT

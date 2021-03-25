@@ -1,6 +1,6 @@
 package UV;
 
-our $VERSION = '1.903';
+our $VERSION = '1.906';
 our $XS_VERSION = $VERSION;
 
 use strict;
@@ -508,7 +508,11 @@ never be called.
 
     my $uint64_t = UV::hrtime();
 
-Get the current Hi-Res time (C<uint64_t>).
+Get the current Hi-Res time; a value given in nanoseconds since some arbitrary
+point in the past. On 64bit-capable perls this will be represented by an
+integer with full precision. On perls unable to represent a 64bit integer this
+will be given as a floating-point value so may lose some precision if the
+value is large enough.
 
 =head2 idle
 

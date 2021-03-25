@@ -20,7 +20,7 @@
             "File::Spec" : "0",
             "Module::Build" : "0.2612",
             "Readonly" : "1.03",
-            "Test::Compile" : "0",
+            "Test::Compile" : "v1.1.0",
             "Test::Pod" : "1",
             "Test::Pod::Coverage" : "1.04"
          }
@@ -53,31 +53,31 @@
    "provides" : {
       "Perl::Metrics::Simple" : {
          "file" : "lib/Perl/Metrics/Simple.pm",
-         "version" : "0.19"
+         "version" : "v1.0.0"
       },
       "Perl::Metrics::Simple::Analysis" : {
          "file" : "lib/Perl/Metrics/Simple/Analysis.pm",
-         "version" : "0.19"
+         "version" : "v1.0.0"
       },
       "Perl::Metrics::Simple::Analysis::File" : {
          "file" : "lib/Perl/Metrics/Simple/Analysis/File.pm",
-         "version" : "0.19"
+         "version" : "v1.0.0"
       },
       "Perl::Metrics::Simple::Output" : {
          "file" : "lib/Perl/Metrics/Simple/Output.pm",
-         "version" : "0.19"
+         "version" : "v1.0.0"
       },
       "Perl::Metrics::Simple::Output::HTML" : {
          "file" : "lib/Perl/Metrics/Simple/Output/HTML.pm",
-         "version" : "0.19"
+         "version" : "v1.0.0"
       },
       "Perl::Metrics::Simple::Output::JSON" : {
          "file" : "lib/Perl/Metrics/Simple/Output/JSON.pm",
-         "version" : "0.19"
+         "version" : "v1.0.0"
       },
       "Perl::Metrics::Simple::Output::PlainText" : {
          "file" : "lib/Perl/Metrics/Simple/Output/PlainText.pm",
-         "version" : "0.19"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
@@ -92,6 +92,6 @@
          "url" : "https://github.com/matisse/Perl-Metrics-Simple"
       }
    },
-   "version" : "0.19",
+   "version" : "v1.0.0",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

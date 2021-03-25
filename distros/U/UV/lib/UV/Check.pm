@@ -1,6 +1,6 @@
 package UV::Check;
 
-our $VERSION = '1.903';
+our $VERSION = '1.906';
 
 use strict;
 use warnings;
@@ -126,6 +126,8 @@ L<UV::Loop/"default_loop"> is assumed.
 
 The L<start|http://docs.libuv.org/en/v1.x/check.html#c.uv_check_start> method
 starts the check handle.
+
+Returns the C<$check> instance itself.
 
 =head2 stop
 

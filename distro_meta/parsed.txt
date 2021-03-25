@@ -71460,3 +71460,9 @@ L/LN/LNATION/Term-ProgressSpinner-1.00.tar.gz
 P/PL/PLICEASE/Test2-Tools-PerlCritic-0.04.tar.gz
 N/NE/NEILB/Text-Levenshtein-0.14.tar.gz
 J/JK/JKUTEJ/Web-PageMeta-0.03.tar.gz
+O/OE/OETIKER/CallBackery-0.35.10.tar.gz
+S/ST/STEFFENW/Getopt-Long-DescriptivePod-0.05.tar.gz
+M/MA/MATISSE/Perl-Metrics-Simple-v1.0.0.tar.gz
+P/PE/PEVANS/Syntax-Keyword-Defer-0.04.tar.gz
+R/RA/RAJ/TTS-Flite-0.05.tar.gz
+P/PE/PEVANS/UV-1.906.tar.gz

@@ -1,6 +1,6 @@
 package UV::Loop;
 
-our $VERSION = '1.903';
+our $VERSION = '1.906';
 
 use strict;
 use warnings;
@@ -32,9 +32,6 @@ sub new {
 
     my $self = $class->_new($args->{_default} // 0);
 
-    $self->on('walk', $args->{on_walk});
-    print STDERR "UV::Loop->new() walk callback added\n" if DEBUG;
-
     print STDERR "UV::Loop->new() done\n" if DEBUG;
     return $self;
 }
@@ -55,17 +52,8 @@ sub default {
 
 sub default_loop { return shift->default(); }
 
-sub on {
-    my $self = shift;
-    my $method = "_on_" . shift;
-    return $self->$method( @_ );
-}
-
 sub walk {
-    my $self = shift;
-    return unless $self->alive();
-    $self->on('walk', @_) if @_; # set the callback ahead of time if exists
-    $self->_walk();
+    Carp::croak "TODO: UV::Loop->walk";
 }
 
 sub getaddrinfo {
@@ -95,11 +83,6 @@ UV::Loop - Looping with libuv
 
   # A new, non-default loop
   my $loop = UV::Loop->new();
-
-  # a new loop with the walk callback provided:
-  $loop = UV::Loop->new(
-    on_walk => sub {say "walking!"},
-  );
 
   # A new default loop instance (Singleton)
   $loop = UV::Loop->default_loop(); # singleton constructor
@@ -140,31 +123,13 @@ Event loops that work properly on all platforms. YAY!
 =head3 UV_LOOP_BLOCK_SIGNAL
 
 
-=head1 EVENTS
-
-L<UV::Loop> makes the following extra events available.
-
-=head2 walk
-
-    $loop->on("walk", sub { say "We are walking!"});
-    $loop->on("walk", sub {
-        # the handle instance this event fired on and the buffer size in use
-        my ($handle) = @_;
-        say "walking over active handles";
-    });
-
-The L<walk|http://docs.libuv.org/en/v1.x/loop.html#c.uv_walk_cb> callback
-fires when a C<< $loop->walk() >> method gets called.
-
 =head1 METHODS
 
 L<UV::Loop> makes the following methods available.
 
 =head2 new
 
-    my $loop = UV::Loop->new(
-        on_walk => sub {say "walking!"},
-    );
+    my $loop = UV::Loop->new();
     my $default_loop = UV::Loop->default_loop();
     my $default_loop = UV::Loop->default();
 
@@ -262,21 +227,6 @@ make assumptions about the starting point, you will only get disappointed.
 
 B<* Note:> Use L<UV/"hrtime"> if you need sub-millisecond granularity.
 
-=head2 on
-
-    # set a walk event callback to print the handle's data attribute
-    $loop->on('walk', sub {
-        my $hndl = shift;
-        say $hndl->data();
-        say "walking!"
-    });
-
-    # clear out the walk event callback for the loop
-    $loop->on(walk => undef);
-
-The C<on> method allows you to subscribe to L<UV::Loop/"EVENTS"> emitted by
-any UV::Loop.
-
 =head2 run
 
     # use UV_RUN_DEFAULT by default
@@ -340,26 +290,10 @@ subjective but probably on the order of a millisecond or more.
 
 =head2 walk
 
-    # although you can do it, calling ->walk() without a callback is pretty
-    # useless.
-    # call with no callback
-    $loop->walk();
-    $loop->walk(undef);
+The L<walk|http://docs.libuv.org/en/v1.x/loop.html#c.uv_walk> method is
+currently not implemented. See also
 
-    # instead, let's walk the loop and cleanup any handles attached and then
-    # completely close the loop.
-    $loop->walk(sub {
-        my $handle = shift;
-        # check to make sure the handle can stop
-        $handle->stop() if $handle->can('stop');
-        $handle->close() unless $handle->closing();
-        $loop->run(UV::Loop::UV_RUN_DEFAULT);
-    });
-
-The L<walk|http://docs.libuv.org/en/v1.x/loop.html#c.uv_walk> method will
-C<walk> the list of handles and fire off the callback supplied.
-
-This is an excellent way to ensure your loop is completely cleaned up.
+L<https://github.com/p5-UV/p5-UV/issues/33>
 
 =head2 getaddrinfo
 

@@ -8,8 +8,7 @@ use Test::More;
 
 use IO::Socket::UNIX;
 
-# TODO: This test might not work on MSWin32. We might need to find a different
-#   implementation, or just skip it?
+plan skip_all => "MSWin32 does not support AF_UNIX sockets" if $^O eq "MSWin32";
 
 my $path = "test-tmp.sock";
 

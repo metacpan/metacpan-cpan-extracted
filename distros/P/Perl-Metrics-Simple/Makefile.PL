@@ -28,7 +28,7 @@ WriteMakefile(
         'Statistics::Basic::Mean'   => 0,
         'Statistics::Basic::Median' => 0,
         'Pod::Usage'                => 0,
-        'Test::Compile'             => 0,
+        'Test::Compile'             => 'v1.1.0',
         'Test::Pod'                 => 1.00,
         'Test::Pod::Coverage'       => 1.04,
     },

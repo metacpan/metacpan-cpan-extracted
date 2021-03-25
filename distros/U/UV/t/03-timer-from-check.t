@@ -9,12 +9,6 @@ use UV::Prepare;
 use UV::Idle;
 use UV::Timer;
 
-sub _cleanup_loop {
-    my $loop = shift;
-    $loop->walk(sub {shift->close()});
-    $loop->run(UV::Loop::UV_RUN_DEFAULT);
-}
-
 my $prepare_handle;
 my $check_handle;
 my $timer_handle;
@@ -79,7 +73,6 @@ sub check_cb {
     $timer_handle->close(sub {});
 
     is(0, UV::default_loop()->run(UV::Loop::UV_RUN_ONCE), 'loop run once');
-    _cleanup_loop(UV::default_loop());
 }
 
 done_testing();

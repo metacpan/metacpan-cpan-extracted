@@ -1,6 +1,6 @@
 package UV::UDP;
 
-our $VERSION = '1.903';
+our $VERSION = '1.906';
 
 use strict;
 use warnings;
@@ -119,6 +119,8 @@ The L<recv_start|http://docs.libuv.org/en/v1.x/udp.html#c.uv_udp_recv_start>
 method starts the receiving side of the UDP socket handle. The C<recv> event
 callback will be invoked whenever there is new data to be given to the
 application.
+
+Returns the C<$udp> instance itself.
 
 =head2 recv_stop
 

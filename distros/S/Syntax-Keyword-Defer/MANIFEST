@@ -1,0 +1,22 @@
+Build.PL
+Changes
+hax/cx_pushblock.c.inc
+hax/perl-additions.c.inc
+hax/perl-backcompat.c.inc
+hax/wrap_keyword_plugin.c.inc
+lib/Syntax/Keyword/Defer.pm
+lib/Syntax/Keyword/Defer.xs
+lib/Syntax/Keyword/Finally.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01defer.t
+t/02die.t
+t/10FINALLY.t
+t/80await+defer.t
+t/80defer+feature-try.t
+t/80defer+SKT.t
+t/99pod.t

@@ -1,6 +1,6 @@
 package UV::Poll;
 
-our $VERSION = '1.903';
+our $VERSION = '1.906';
 
 use strict;
 use warnings;
@@ -264,6 +264,8 @@ fine. Doing so will update the events mask that is being watched for.
 
 B<* Note:> Though C<UV_DISCONNECT> can be set, it is unsupported on AIX and as
 such will not be set on the C<$events> field in the callback.
+
+Returns the C<$poll> instance itself.
 
 =head2 stop
 

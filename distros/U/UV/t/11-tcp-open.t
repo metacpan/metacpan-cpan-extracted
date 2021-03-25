@@ -55,7 +55,8 @@ sub socketpair_inet
 
         $self->close;
     });
-    $tcp->read_start;
+    my $ret = $tcp->read_start;
+    is($ret, $tcp, '$tcp->read_start returns $tcp');
 
     $wr->syswrite("data to read");
 

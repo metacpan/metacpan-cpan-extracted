@@ -1,0 +1,32 @@
+Revision history for Syntax-Keyword-Defer
+
+0.04    2021-03-25
+        [CHANGES]
+         * Renamed distribution from Syntax-Keyword-Finally
+         * Make Defer the main module, have Finally be a (discouraged) alias
+           to it
+         * Require at least perl 5.22 on MSWin32 because older perls there
+           can't see block_start()/block_end()
+
+Formerly Syntax-Keyword-Finally
+
+0.03    2021-03-03
+        [CHANGES]
+         * Add Syntax::Keyword::Defer for `defer` syntax alias
+         * Document and test that caller() inside FINALLY does not see the
+           finally block at all
+         * Forbid `return` out of a FINALLY block
+         * Forbid the use of `goto` or `next/last/redo` in a FINALLY block at
+           all
+         * Detect the use of nonlocal flow control out of a FINALLY block and
+           at least turn the otherwise-segfault into a panic message
+         * Added cross-module integration tests to check the behaviour with
+           Syntax::Keyword::Try and perl 5.33.7's feature 'try'
+
+0.02    2021-02-03
+        [CHANGES]
+         * Implement FINALLY blocks as basic blocks, not full anonymous subs
+         * Test and document that exceptions can now be thrown from them
+
+0.01    2021-01-31
+        First version, released on an unsuspecting world.

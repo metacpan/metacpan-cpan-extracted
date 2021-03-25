@@ -1,6 +1,6 @@
 package UV::Handle;
 
-our $VERSION = '1.903';
+our $VERSION = '1.906';
 
 use strict;
 use warnings;

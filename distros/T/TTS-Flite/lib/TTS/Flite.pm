@@ -5,7 +5,7 @@ use utf8;
 use Kavorka -all;
 use FFI::Raw;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $flite = 'libflite.so.1';
 my $kal16 = 'libflite_cmu_us_kal16.so.1';
@@ -31,7 +31,7 @@ __END__
 
 =head1 NAME
 
-TTS::Flite - Perl extension for blah blah blah
+TTS::Flite - Perl bindings for libflite
 
 =head1 SYNOPSIS
 

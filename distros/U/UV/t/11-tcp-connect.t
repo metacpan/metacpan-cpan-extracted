@@ -9,9 +9,6 @@ use Test::More;
 use IO::Socket::INET;
 use Socket;
 
-# TODO: This test might not work on MSWin32. We might need to find a different
-#   implementation, or just skip it?
-
 my $listensock = IO::Socket::INET->new(
     LocalHost => "127.0.0.1",
     LocalPort => 0,

@@ -1,12 +1,11 @@
 .appveyor.cmd
-.gitattributes
+.appveyor.yml
 .mailmap
 .perltidyrc
-.vimrc
+.travis.yml
 Build.PL
 Changes
 CONTRIBUTING.md
-cpanfile
 hax/perl-backcompat.h
 hax/uv-backcompat.h
 lib/ppport.h
@@ -31,6 +30,9 @@ lib/UV/TTY.pm
 lib/UV/UDP.pm
 LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 README.md
 t/00-report-prereqs.t
 t/01-can-uv-async.t
@@ -76,6 +78,3 @@ t/20-getaddrinfo.t
 t/21-getnameinfo.t
 t/30-process.t
 t/31-process-root.t
-README
-META.yml
-META.json

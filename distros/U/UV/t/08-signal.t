@@ -2,11 +2,9 @@ use strict;
 use warnings;
 
 use UV::Loop ();
-use UV::Signal ();
+use UV::Signal qw(SIGHUP);
 
 use Test::More;
-
-use POSIX qw(SIGHUP);
 
 my $signal_cb_called = 0;
 
@@ -19,7 +17,8 @@ sub signal_cb {
 
 my $signal = UV::Signal->new(signal => SIGHUP, on_signal => \&signal_cb);
 isa_ok($signal, 'UV::Signal');
-$signal->start();
+my $ret = $signal->start();
+is($ret, $signal, '$signal->start returns $signal');
 
 kill SIGHUP => $$;
 is(UV::Loop->default()->run(), 0, 'Default loop ran');

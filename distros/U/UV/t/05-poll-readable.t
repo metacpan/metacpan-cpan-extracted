@@ -49,7 +49,7 @@ $wr->syswrite("Hello\n");
     my $err = do { local $@; eval { UV::Poll->_new(UV::Loop->default, -1, 0); 1 } ? undef : $@ };
     isa_ok($err, 'UV::Exception::EBADF');
     isa_ok($err, 'UV::Exception');
-    like($err, qr/^Couldn't initialise poll handle \(-\d+\): .* at \Q$FILE\E line \Q$LINE\E.\n/,
+    like($err, qr/^Couldn't initialise poll handle for non-socket \(-\d+\): .* at \Q$FILE\E line \Q$LINE\E.\n/,
         'Stringified error message');
     is($err->code, UV::UV_EBADF, 'Numerical error code');
 }

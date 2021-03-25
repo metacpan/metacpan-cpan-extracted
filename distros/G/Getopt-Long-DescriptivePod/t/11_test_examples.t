@@ -9,7 +9,7 @@ use Carp qw(confess);
 use Cwd qw(getcwd chdir);
 use English qw(-no_match_vars $OS_ERROR $INPUT_RECORD_SEPARATOR $CHILD_ERROR);
 
-$ENV{AUTHOR_TESTING} 
+$ENV{AUTHOR_TESTING}
     or plan skip_all => 'Set $ENV{AUTHOR_TESTING} to run this test.';
 
 plan tests => 2;
@@ -22,10 +22,11 @@ my @data = (
         params     => '-I../lib',
         cmd_result => <<'EOT',
 01_example.pl [-?hv] [long options...] <some-arg>
-    -v --verbose  Print extra stuff. And here I show, how to work with
-                  lots of lines as floating text.
+    --verbose (or -v)  Print extra stuff. And here I show, how to work
+                       with lots of lines as floating text.
 
-    -? -h --help  Print usage message and exit.
+    --help (or -h)     Print usage message and exit.
+                       aka -?
 EOT
         result     => <<'EOT',
     #!perl ## no critic (TidyCode)
@@ -92,10 +93,11 @@ EOT
     block with the usage inside.
 
         01_example.pl [-?hv] [long options...] <some-arg>
-            -v --verbose  Print extra stuff. And here I show, how to work with
-                          lots of lines as floating text.
+            --verbose (or -v)  Print extra stuff. And here I show, how to work
+                               with lots of lines as floating text.
 
-            -? -h --help  Print usage message and exit.
+            --help (or -h)     Print usage message and exit.
+                               aka -?
 
     This is floating text in Pod after that code
     block with the usage inside.

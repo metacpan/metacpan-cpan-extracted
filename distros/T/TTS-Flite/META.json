@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl extension for blah blah blah",
+   "abstract" : "Perl bindings for libflite",
    "author" : [
       "unknown"
    ],
@@ -40,6 +40,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

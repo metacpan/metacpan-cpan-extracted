@@ -6,9 +6,6 @@ use UV::Pipe ();
 
 use Test::More;
 
-# TODO: This test might not work on MSWin32. We might need to find a different
-#   implementation, or just skip it?
-
 # read
 {
     pipe my ($rd, $wr) or die "Cannot pipe - $!";
@@ -27,7 +24,8 @@ use Test::More;
 
         $self->close;
     });
-    $pipe->read_start;
+    my $ret = $pipe->read_start;
+    is($ret, $pipe, '$pipe->read_start returns $pipe');
 
     $wr->syswrite("data to read");
 

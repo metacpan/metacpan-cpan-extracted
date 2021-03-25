@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl extension for blah blah blah'
+abstract: 'Perl bindings for libflite'
 author:
   - unknown
 build_requires:
@@ -22,5 +22,5 @@ requires:
   FFI::Raw: '0.32'
   Kavorka: '0.039'
   Mouse: v2.5.6
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

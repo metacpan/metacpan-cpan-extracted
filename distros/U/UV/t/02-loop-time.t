@@ -5,19 +5,12 @@ use UV::Loop qw(UV_RUN_NOWAIT);
 use UV::Timer ();
 use Test::More;
 
-sub _cleanup_loop {
-    my $loop = shift;
-    $loop->walk(sub {diag(" -> walking");shift->close()});
-    $loop->run(UV::Loop::UV_RUN_DEFAULT);
-}
-
 {
     my $start = UV::Loop->default()->now();
     ok($start, "  Start time is $start");
     while (UV::Loop->default->now() - $start < 500) {
         is(0, UV::Loop->default()->run(UV_RUN_NOWAIT), "  run(UV_RUN_NOWAIT): ok for a half-second");
     }
-    _cleanup_loop(UV::Loop->default());
 }
 
 {
@@ -28,7 +21,6 @@ sub _cleanup_loop {
     while ($loop->now() - $start < 500) {
         is(0, $loop->run(UV_RUN_NOWAIT), "  run(UV_RUN_NOWAIT): ok for a half-second");
     }
-    _cleanup_loop($loop);
 }
 
 sub cb {
@@ -53,7 +45,6 @@ sub cb {
     is($loop->run(), 0, 'run: ran successfully');
 
     is($loop->backend_timeout(), 0, "backend_timeout now 0 secs");
-    _cleanup_loop($loop);
 }
 
 done_testing();

@@ -1,5 +1,25 @@
 Revision history for Perl extension UV
 
+1.906 2021-03-25
+    - Don't worry about `AI_V4MAPPED` on systems which don't provide it
+    - Removed now-dead `cpanfile`
+
+1.905 TRIAL 2021-03-23
+    - Various blind stabbings-in-the-dark that might be MSWin32 bugfixes
+       + Export SIG* constants because libuv emulates a few
+       + Handle CRLF linefeeds in Process tests
+       + Maybe we need to _MAKE_SOCK() when calling uv_tcp_open() and
+         uv_udp_open()
+       + Skip some AF_UNIX tests that won't work there
+    - Return hrtime() as an NV on platforms without 64bit int (thanks ilmari)
+
+1.904 TRIAL 2021-03-19
+    - Use cmp_ok() on unreliably-failing timer test so when it fails we at
+      least get a log of the numbers
+    - No need for _cleanup_loop() in unit tests
+    - Remove UV::Loop->walk and related code because it isn't implemented
+      and can't easily be made to work
+
 1.903 TRIAL 2021-01-19
     - Switch build system to Module::Build::Using::PkgConfig to see if the
       late-alien handling there works better for users to install

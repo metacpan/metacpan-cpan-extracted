@@ -37,36 +37,11 @@
 #  define _MAKE_SOCK(f) (f)
 #endif
 
-static void loop_walk_cb(uv_handle_t* handle, void* arg)
-{
-    SV *self;
-    SV *cb;
-
-    dTHX;
-
-    if (!handle || !arg) return;
-    cb = (SV *)arg;
-    if (!cb || !SvOK(cb)) return;
-
-    self = (SV *)(handle->data);
-
-    /* provide info to the caller: invocant, suggested_size */
-    dSP;
-    ENTER;
-    SAVETMPS;
-
-    if (self && SvROK(self)) {
-        PUSHMARK(SP);
-        EXTEND(SP, 1);
-        PUSHs(SvREFCNT_inc(self)); /* invocant */
-        PUTBACK;
-    }
-
-    call_sv(cb, G_DISCARD|G_VOID);
-
-    FREETMPS;
-    LEAVE;
-}
+#ifdef AI_V4MAPPED
+#  define DEFAULT_AI_FLAGS  (AI_V4MAPPED|AI_ADDRCONFIG)
+#else
+#  define DEFAULT_AI_FLAGS  (AI_ADDRCONFIG)
+#endif
 
 #define do_callback_accessor(var, cb) MY_do_callback_accessor(aTHX_ var, cb)
 static SV *MY_do_callback_accessor(pTHX_ SV **var, SV *cb)
@@ -947,13 +922,7 @@ static void on_getnameinfo_cb(uv_getnameinfo_t *_req, int status, const char *ho
 
 typedef struct UV__Loop {
     uv_loop_t *loop; /* may point to uv_default_loop() or past this struct */
-    SV *on_walk;     /* TODO as yet unused and probably not correct */
 } *UV__Loop;
-
-static void on_loop_walk(uv_handle_t* handle, void* arg)
-{
-    fprintf(stderr, "TODO: on_loop_walk\n");
-}
 
 MODULE = UV             PACKAGE = UV            PREFIX = uv_
 
@@ -1107,6 +1076,31 @@ BOOT:
         DO_CONST_IV(UV_PRIORITIZED);
     }
 
+    /* constants under UV::Signal */
+    {
+        stash = gv_stashpv("UV::Signal", GV_ADD);
+        export = get_av("UV::Signal::EXPORT_XS", TRUE);
+
+        /* Signal numbers - exported again because at least on MSWin32 several
+         * of these are emulated, and the values are not known to the rest of
+         * the system, including POSIX.xs
+         */
+        DO_CONST_IV(SIGINT);
+        DO_CONST_IV(SIGILL);
+        DO_CONST_IV(SIGABRT);
+        DO_CONST_IV(SIGFPE);
+        DO_CONST_IV(SIGSEGV);
+        DO_CONST_IV(SIGTERM);
+#ifdef SIGBREAK
+        DO_CONST_IV(SIGBREAK);
+#endif
+        DO_CONST_IV(SIGHUP);
+        DO_CONST_IV(SIGKILL);
+#ifdef SIGWINCH
+        DO_CONST_IV(SIGWINCH);
+#endif
+}
+
     /* constants under UV::TTY */
     {
         stash = gv_stashpv("UV::TTY", GV_ADD);
@@ -1131,11 +1125,23 @@ BOOT:
 
 const char* uv_err_name(int err)
 
+#if UVSIZE >= 8
+
 UV uv_hrtime()
     CODE:
         RETVAL = uv_hrtime();
     OUTPUT:
         RETVAL
+
+#else
+
+NV uv_hrtime()
+    CODE:
+        RETVAL = (NV)uv_hrtime();
+    OUTPUT:
+        RETVAL
+
+#endif
 
 const char* uv_strerror(int err)
 
@@ -1201,7 +1207,6 @@ loop(UV::Handle self)
     CODE:
         Newx(loop, 1, struct UV__Loop);
         loop->loop = self->h->loop;
-        loop->on_walk = NULL; /* this is a mess */
 
         RETVAL = newSV(0);
         sv_setref_pv(RETVAL, "UV::Loop", loop);
@@ -1300,10 +1305,13 @@ _on_check(UV::Check self, SV *cb = NULL)
     OUTPUT:
         RETVAL
 
-void
+SV *
 _start(UV::Check self)
     CODE:
         CHECKCALL(uv_check_start(self->h, on_check_cb));
+        RETVAL = SvREFCNT_inc(ST(0));
+    OUTPUT:
+        RETVAL
 
 void
 stop(UV::Check self)
@@ -1342,10 +1350,13 @@ _on_idle(UV::Idle self, SV *cb = NULL)
     OUTPUT:
         RETVAL
 
-void
+SV *
 _start(UV::Idle self)
     CODE:
         CHECKCALL(uv_idle_start(self->h, on_idle_cb));
+        RETVAL = SvREFCNT_inc(ST(0));
+    OUTPUT:
+        RETVAL
 
 void
 stop(UV::Idle self)
@@ -1446,13 +1457,19 @@ _new(char *class, UV::Loop loop, int fd, bool is_socket)
     CODE:
         NEW_UV__Handle(self, uv_poll_t);
 
-        if(is_socket)
+        if(is_socket) {
             err = uv_poll_init_socket(loop->loop, self->h, _MAKE_SOCK(fd));
-        else
+            if (err != 0) {
+                Safefree(self);
+                THROWERR("Couldn't initialise poll handle for socket", err);
+            }
+        }
+        else {
             err = uv_poll_init(loop->loop, self->h, fd);
-        if (err != 0) {
-            Safefree(self);
-            THROWERR("Couldn't initialise poll handle", err);
+            if (err != 0) {
+                Safefree(self);
+                THROWERR("Couldn't initialise poll handle for non-socket", err);
+            }
         }
 
         INIT_UV__Handle(self);
@@ -1471,10 +1488,13 @@ _on_poll(UV::Poll self, SV *cb = NULL)
     OUTPUT:
         RETVAL
 
-void
+SV *
 _start(UV::Poll self, int events = UV_READABLE)
     CODE:
         CHECKCALL(uv_poll_start(self->h, events, on_poll_cb));
+        RETVAL = SvREFCNT_inc(ST(0));
+    OUTPUT:
+        RETVAL
 
 void
 stop(UV::Poll self)
@@ -1513,10 +1533,13 @@ _on_prepare(UV::Prepare self, SV *cb = NULL)
     OUTPUT:
         RETVAL
 
-void
+SV *
 _start(UV::Prepare self)
     CODE:
         CHECKCALL(uv_prepare_start(self->h, on_prepare_cb));
+        RETVAL = SvREFCNT_inc(ST(0));
+    OUTPUT:
+        RETVAL
 
 void
 stop(UV::Prepare self)
@@ -1722,10 +1745,13 @@ _on_signal(UV::Signal self, SV *cb = NULL)
     OUTPUT:
         RETVAL
 
-void
+SV *
 _start(UV::Signal self)
     CODE:
         CHECKCALL(uv_signal_start(self->h, on_signal_cb, self->signum));
+        RETVAL = SvREFCNT_inc(ST(0));
+    OUTPUT:
+        RETVAL
 
 void
 stop(UV::Signal self)
@@ -1782,10 +1808,13 @@ shutdown(UV::Stream self, SV *cb)
     OUTPUT:
         RETVAL
 
-void
+SV *
 read_start(UV::Stream self)
     CODE:
         CHECKCALL(uv_read_start(self->h, on_alloc_cb, on_read_cb));
+        RETVAL = SvREFCNT_inc(ST(0));
+    OUTPUT:
+        RETVAL
 
 void
 read_stop(UV::Stream self)
@@ -1855,10 +1884,13 @@ _on_timer(UV::Timer self, SV *cb = NULL)
     OUTPUT:
         RETVAL
 
-void
+SV *
 _start(UV::Timer self, UV timeout, UV repeat)
     CODE:
         CHECKCALL(uv_timer_start(self->h, on_timer_cb, timeout, repeat));
+        RETVAL = SvREFCNT_inc(ST(0));
+    OUTPUT:
+        RETVAL
 
 UV
 _get_repeat(UV::Timer self)
@@ -1910,7 +1942,7 @@ _new(char *class, UV::Loop loop)
 void
 _open(UV::TCP self, int fd)
     CODE:
-        CHECKCALL(uv_tcp_open(self->h, fd));
+        CHECKCALL(uv_tcp_open(self->h, _MAKE_SOCK(fd)));
 
 void
 nodelay(UV::TCP self, bool enable)
@@ -2066,7 +2098,7 @@ _on_recv(UV::UDP self, SV *cb = NULL)
 void
 _open(UV::UDP self, int fd)
     CODE:
-        CHECKCALL(uv_udp_open(self->h, fd));
+        CHECKCALL(uv_udp_open(self->h, _MAKE_SOCK(fd)));
 
 void
 bind(UV::UDP self, SV *addr, int flags = 0)
@@ -2110,10 +2142,13 @@ getpeername(UV::UDP self)
     OUTPUT:
         RETVAL
 
-void
+SV *
 recv_start(UV::UDP self)
     CODE:
         CHECKCALL(uv_udp_recv_start(self->h, on_alloc_cb, on_recv_cb));
+        RETVAL = SvREFCNT_inc(ST(0));
+    OUTPUT:
+        RETVAL
 
 void
 recv_stop(UV::UDP self)
@@ -2271,7 +2306,6 @@ _new(char *class, int want_default)
     CODE:
         Newxc(self, sizeof(struct UV__Loop) + (!want_default * sizeof(uv_loop_t)),
             char, struct UV__Loop);
-        self->on_walk = NULL;
 
         if(want_default) {
             self->loop = uv_default_loop();
@@ -2289,24 +2323,6 @@ _new(char *class, int want_default)
         sv_setref_pv(RETVAL, "UV::Loop", self);
     OUTPUT:
         RETVAL
-
-SV *
-_on_walk(UV::Loop self, SV *cb = NULL)
-    CODE:
-        if(cb && SvOK(cb)) {
-            SvREFCNT_dec(self->on_walk);
-
-            self->on_walk = newSVsv(cb);
-        }
-
-        RETVAL = newSVsv(self->on_walk);
-    OUTPUT:
-        RETVAL
-
-void
-_walk(UV::Loop self)
-    CODE:
-        uv_walk(self->loop, on_loop_walk, self->on_walk);
 
 bool
 alive(UV::Loop self)
@@ -2382,7 +2398,7 @@ _getaddrinfo(UV::Loop self, char *node, char *service, SV *flags, SV *family, SV
         NEW_UV__Req(req, uv_getaddrinfo_t);
         INIT_UV__Req(req);
 
-        hints.ai_flags    = SvOK(flags)    ? SvIV(flags)    : (AI_V4MAPPED|AI_ADDRCONFIG);
+        hints.ai_flags    = SvOK(flags)    ? SvIV(flags)    : DEFAULT_AI_FLAGS;
         hints.ai_family   = SvOK(family)   ? SvIV(family)   : AF_UNSPEC;
         hints.ai_socktype = SvOK(socktype) ? SvIV(socktype) : 0;
         hints.ai_protocol = SvOK(protocol) ? SvIV(protocol) : 0;

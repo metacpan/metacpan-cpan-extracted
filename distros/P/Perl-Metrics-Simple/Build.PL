@@ -30,7 +30,7 @@ Module::Build->new(
         'File::Spec'          => 0,
         'Module::Build'       => 0.2612,
         'Readonly'            => 1.03,
-        'Test::Compile'       => 0,
+        'Test::Compile'       => 'v1.1.0',
         'Test::Pod'           => 1.00,
         'Test::Pod::Coverage' => 1.04,
     },

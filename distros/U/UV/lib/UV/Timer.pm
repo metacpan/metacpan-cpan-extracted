@@ -1,6 +1,6 @@
 package UV::Timer;
 
-our $VERSION = '1.903';
+our $VERSION = '1.906';
 
 use strict;
 use warnings;
@@ -180,6 +180,8 @@ then repeatedly after C<repeat> milliseconds.
 
 B<* Note:> Does not update the event loop's concept of L<UV::Loop/"now">. See
 L<UV::Loop/"update_time"> for more information.
+
+Returns the C<$timer> instance itself.
 
 =head2 stop
 

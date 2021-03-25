@@ -11,9 +11,6 @@ use Socket;
 
 sub sockaddr_port { (Socket::unpack_sockaddr_in $_[0])[0] }
 
-# TODO: This test might not work on MSWin32. We might need to find a different
-#   implementation, or just skip it?
-
 my $udp = UV::UDP->new;
 isa_ok($udp, 'UV::UDP');
 
@@ -36,7 +33,8 @@ my $port = sockaddr_port($udp->getsockname);
 
         $self->close;
     });
-    $udp->recv_start;
+    my $ret = $udp->recv_start;
+    is($ret, $udp, '$udp->read_start returns $udp');
 
     UV::Loop->default->run;
     ok($recv_cb_called, 'recv callback was called');

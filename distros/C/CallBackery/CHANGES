@@ -1,3 +1,7 @@
+0.35.10 2021-03-25 16:21:26 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - actually enable referential integrity
+
 0.35.9 2021-03-24 17:48:02 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - release cardlist update
