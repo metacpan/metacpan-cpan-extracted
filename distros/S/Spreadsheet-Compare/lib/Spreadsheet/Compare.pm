@@ -1,4 +1,4 @@
-package Spreadsheet::Compare 0.10;
+package Spreadsheet::Compare 0.12;
 
 # TODO: (issue) allow list for reporters
 
@@ -440,22 +440,25 @@ method chaining.
 =head2 config
 
     $sc->config($cfg);
-    my $conf = $sc-config;
+    my $conf = $sc->config;
 
 Get/Set the configuration for subsequent calls to run(). It hast to be either a hash reference
 with a single comparison configuration, a reference to an array with multiple configurations or
 the path to a YAML file.
 
-=head2 errors (readonly)
+=head2 errors
 
     say "found error: $_" for $sc->run->errors->@*;
 
-Returns a reference to an array of error messages. These are errors that prevented a single
+(B<readonly>) Returns a reference to an array of error messages. These are errors that prevented a single
 comparison from being executed.
 
-=head2 exit_code (readonly);
+=head2 exit_code;
 
     my $ec = $sc->run->exit_code;
+
+(B<readonly>) Exit code, will contain the number of comparisons with detected differences
+or 255 if the nuber exceeds 254.
 
 =head2 log_level
 
@@ -475,12 +478,12 @@ For a single comparison the log level can also be set with the C<log_level> opti
 
 Suppress the line counter when using L</stdout>.
 
-=head2 result (readonly)
+=head2 result
 
     my $res = $sc->run->result;
     say "$_ found $res->{$_}{diff} differences"  for sort keys %$res;
 
-The result is a reference to a hash with the test titles as keys and the comparison
+(B<readonly>) The result is a reference to a hash with the test titles as keys and the comparison
 counters as result.
 
     {
@@ -539,7 +542,7 @@ An example for a very basic configuration with 2 CSV comparisons:
           'left/simple01.csv',
           'right/simple01.csv'
         ],
-        identity => '[A]',
+        identity => ['A'],
       },
       {
         title => 'semicolon separator',
@@ -547,7 +550,7 @@ An example for a very basic configuration with 2 CSV comparisons:
           'left/simple02.csv',
           'right/simple02.csv',
         ],
-        identity => '[A]',
+        identity => ['A'],
         limit_abs => {
           D => '0.1',
           B => '1',
@@ -573,12 +576,12 @@ or as YAML config file
       files :
         - left/simple01.csv
         - right/simple01.csv
-      identity: '[A]'
+      identity: [A]
     - title: semicolon separator
       files:
         - left/simple02.csv
         - right/simple02.csv
-      identity: '[A]'
+      identity: [A]
       ignore:
         - Z
       limit_abs:

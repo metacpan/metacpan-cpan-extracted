@@ -1360,25 +1360,93 @@ SV * Rmpz_tstbit(pTHX_ mpz_t * num, SV * bit_index) {
 
 /* Turn a binary string into an mpz_t */
 void Rmpz_import(pTHX_ mpz_t * rop, SV * count, SV * order, SV * size, SV * endian, SV * nails, SV * op){
-     mpz_import(*rop, SvUV(count), SvIV(order), SvIV(size), SvIV(endian), SvUV(nails), SvPV_nolen(op));
+    int is_utf8 = 0;
+
+    if(SvUTF8(op) && !SvIV(get_sv("Math::GMPz::utf8_no_downgrade", 0))) {
+      if(!SvIV(get_sv("Math::GMPz::utf8_no_warn", 0))) {
+        warn( "%s", RMPZ_IMPORT_UTF8_WARN ); /* RMPZ_IMPORT_UTF8_WARN defined in math_gmpz_include.h */
+        warn("  To disable this warning set $Math::GMPz::utf8_no_warn to 1.");
+      }
+
+      is_utf8 = 1;
+      if(!sv_utf8_downgrade(op, SvIV(get_sv("Math::GMPz::utf8_no_croak", 0)))) {
+        /* downgrade has failed, and this will cause an immediate croak if     *
+         * $Math::GMPz::utf8_no_croak is false. If $Math::GMPz::utf8_no_croak  *
+         * is true && $Math::GMPz::utf8_no_fail is false, we warn as follows:  */
+
+        if(!SvIV(get_sv("Math::GMPz::utf8_no_fail", 0))) {
+          /* No need to check status of $Math::GMPz::utf8_no_croak. *
+           * If we've reached here then it must be true.            */
+          warn("%s", RMPZ_IMPORT_DOWNGRADE_WARN); /*RMPZ_IMPORT_DOWNGRADE_WARN defined in math_gmpz_include.h */
+          warn("  To disable this warning set $Math::GMPz::utf8_no_fail to 1");
+        }
+      }
+    }
+
+    mpz_import(*rop, SvUV(count), SvIV(order), SvIV(size), SvIV(endian), SvUV(nails), SvPV_nolen(op));
+    if(is_utf8) sv_utf8_upgrade(op);
 }
 
 /* Return an mpz_t to a binary string */
-SV * Rmpz_export(pTHX_ SV * order, SV * size, SV * endian, SV * nails, mpz_t * number) {
-     SV * outsv;
-     char * out;
-     size_t * cptr, count;
+SV * Rmpz_export(pTHX_ SV * order, SV * size, SV * endian, SV * nails, mpz_t * op) {
+    SV * outsv;
+    char * arr;
+    int count;
+    int numb = (8 * SvIV(size)) - SvUV(nails);
 
-     cptr = &count;
-     count = mpz_sizeinbase(*number, 2);
+    count = (mpz_sizeinbase (*op, 2) + numb - 1) / numb;
 
-     Newz(1, out, count / 8 + 7, char);
-     if(out == NULL) croak("Failed to allocate memory in Rmpz_export function");
+    Newxz(arr, count, char);
+    if(arr == NULL) croak("Couldn't allocate memory in Rmpz_export");
 
-     mpz_export(out, cptr, SvIV(order), SvIV(size), SvIV(endian), SvIV(nails), *number);
-     outsv = newSVpv(out, count);
-     Safefree(out);
-     return outsv;
+    mpz_export(arr, NULL, SvIV(order), SvIV(size), SvIV(endian), SvIV(nails), *op);
+    outsv = newSVpv(arr, count);
+    Safefree(arr);
+    return outsv;
+}
+
+/* Turn an array of UVs into an mpz_t */
+void Rmpz_import_UV(pTHX_ mpz_t * rop, SV * count, SV * order, SV * size, SV * endian, SV * nails, AV * op){
+    int len, i;
+    UV * arr;
+
+    len = av_len(op) + 1;
+
+    Newxz(arr, len, UV);
+    if(arr == NULL) croak("Couldn't allocate memory in Rmpz_import_UV");
+
+    for(i = 0; i < len; i++) {
+      arr[i] = SvUV(*(av_fetch(op, i, 0)));
+    }
+
+    mpz_import(*rop, SvUV(count), SvIV(order), SvIV(size), SvIV(endian), SvUV(nails), arr);
+
+    Safefree(arr);
+}
+
+
+/* Return an mpz_t to an array of UVs */
+void Rmpz_export_UV(pTHX_ SV * order, SV * size, SV * endian, SV * nails, mpz_t * op) {
+    dXSARGS;
+    UV * arr;
+    int count, i;
+    int numb = (8 * SvIV(size)) - SvUV(nails);
+
+    count = (mpz_sizeinbase (*op, 2) + numb - 1) / numb;
+
+    Newxz(arr, count, UV);
+    if(arr == NULL) croak("Couldn't allocate memory in Rmpz_export_UV");
+
+    mpz_export(arr, NULL, SvIV(order), SvIV(size), SvIV(endian), SvIV(nails), *op);
+
+    sp = mark;
+
+    for(i = 0; i < count; i++) {
+      XPUSHs(sv_2mortal(newSVuv(arr[i])));
+    }
+
+    Safefree(arr);
+    XSRETURN(count);
 }
 
 int Rmpz_fits_ulong_p(mpz_t * in) {
@@ -8339,15 +8407,57 @@ Rmpz_import (rop, count, order, size, endian, nails, op)
         return; /* assume stack size is correct */
 
 SV *
-Rmpz_export (order, size, endian, nails, number)
+Rmpz_export (order, size, endian, nails, op)
 	SV *	order
 	SV *	size
 	SV *	endian
 	SV *	nails
-	mpz_t *	number
+	mpz_t *	op
 CODE:
-  RETVAL = Rmpz_export (aTHX_ order, size, endian, nails, number);
+  RETVAL = Rmpz_export (aTHX_ order, size, endian, nails, op);
 OUTPUT:  RETVAL
+
+void
+Rmpz_import_UV (rop, count, order, size, endian, nails, op)
+	mpz_t *	rop
+	SV *	count
+	SV *	order
+	SV *	size
+	SV *	endian
+	SV *	nails
+	AV *	op
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpz_import_UV(aTHX_ rop, count, order, size, endian, nails, op);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
+
+void
+Rmpz_export_UV (order, size, endian, nails, op)
+	SV *	order
+	SV *	size
+	SV *	endian
+	SV *	nails
+	mpz_t *	op
+        PREINIT:
+        I32* temp;
+        PPCODE:
+        temp = PL_markstack_ptr++;
+        Rmpz_export_UV(aTHX_ order, size, endian, nails, op);
+        if (PL_markstack_ptr != temp) {
+          /* truly void, because dXSARGS not invoked */
+          PL_markstack_ptr = temp;
+          XSRETURN_EMPTY; /* return empty stack */
+        }
+        /* must have used dXSARGS; list context implied */
+        return; /* assume stack size is correct */
 
 int
 Rmpz_fits_ulong_p (in)

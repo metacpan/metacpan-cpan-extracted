@@ -2,7 +2,7 @@ package Hades::Myths;
 use strict;
 use warnings;
 use POSIX qw/locale_h/;
-our $VERSION = 0.03;
+our $VERSION = 0.19;
 our ($STASH);
 
 sub new {
@@ -33,7 +33,6 @@ sub import {
 			    qq{Optional[HashRef]: invalid value $locales for variable \$locales in method import};
 		}
 	}
-
 	my $caller = caller();
 	$STASH = delete $locales->{stash} || 'Hades::Myths::Object';
 	eval "require $STASH";

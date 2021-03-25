@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.020'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,11 +27,11 @@ requires:
   Test2::API: '1.302015'
   perl: '5.020'
 resources:
-  bugtracker: https://github.com/plicease/Test2-Tools-PerlCritic/issues
+  bugtracker: https://github.com/uperl/Test2-Tools-PerlCritic/issues
   homepage: https://metacpan.org/pod/Test2::Tools::PerlCritic
-  repository: git://github.com/plicease/Test2-Tools-PerlCritic.git
-version: '0.03'
-x_generated_by_perl: v5.30.2
+  repository: git://github.com/uperl/Test2-Tools-PerlCritic.git
+version: '0.04'
+x_generated_by_perl: v5.33.6
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

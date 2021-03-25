@@ -46,6 +46,10 @@ ACCESSORS
   url
     HTTP url to fetch data from.
 
+  user_agent
+    User-Agent header to use for http requests. Default is one from Chrome
+    89.0.4389.90.
+
   title
     Returns title of the page.
 

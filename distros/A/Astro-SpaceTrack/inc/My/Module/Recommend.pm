@@ -37,63 +37,6 @@ EOD
 EOD
 );
 
-sub make_optional_modules_tests {
-    eval {
-	require Test::Without::Module;
-	1;
-    } or return;
-    my $dir = 'xt/author/optionals';
-    -d $dir
-	or mkdir $dir
-	or die "Can not create $dir: $!\n";
-    opendir my $dh, 't'
-	or die "Can not access t/: $!\n";
-    while ( readdir $dh ) {
-	m/ \A [.] /smx
-	    and next;
-	m/ [.] t \z /smx
-	    or next;
-	my $fn = "$dir/$_";
-	-e $fn
-	    and next;
-	print "Creating $fn\n";
-	open my $fh, '>:encoding(utf-8)', $fn
-	    or die "Can not create $fn: $!\n";
-	print { $fh } <<"EOD";
-package main;
-
-use strict;
-use warnings;
-
-use Test::More 0.88;
-
-use lib qw{ inc };
-
-use My::Module::Recommend;
-
-BEGIN {
-    eval {
-	require Test::Without::Module;
-	Test::Without::Module->import(
-	    My::Module::Recommend->optionals() );
-	1;
-    } or plan skip_all => 'Test::Without::Module not available';
-}
-
-do 't/$_';
-
-1;
-
-__END__
-
-# ex: set textwidth=72 :
-EOD
-    }
-    closedir $dh;
-
-    return $dir;
-}
-
 sub optionals {
     return ( map { $_->modules() } @optionals );
 }
@@ -144,24 +87,6 @@ mechanism is not used because we find its output on the Draconian side.
 =head1 METHODS
 
 This class supports the following public methods:
-
-=head2 make_optional_modules_tests
-
- My::Module::Recommend->make_optional_modules_tests()
-
-This static method creates the optional module tests. These are stub
-files in F<xt/author/optionals/> that use C<Test::Without::Module> to
-hide all the optional modules and then invoke the normal tests in F<t/>.
-The aim of these tests is to ensure that we get no test failures if the
-optional modules are missing.
-
-This method is idempotent; that is, it only creates the directory and
-the individual stub files if they are missing.
-
-On success this method returns the name of the optional tests directory.
-If C<Test::Without::Module> can not be loaded this method returns
-nothing. If the directory or any file can not be created, an exception
-is thrown.
 
 =head2 optionals
 

@@ -1,5 +1,10 @@
 Revision history for Test2-Tools-PerlCritic
 
+0.04      2021-03-24 14:12:47 -0600
+  - Updated documentation to make it clear that you can pass
+    an array reference to file / directory paths.  (gh#4)
+  - Moved repository to new GitHub org
+
 0.03      2020-05-05 06:45:26 -0600
   - Fixed test on windows (gh#1, gh#2)
 

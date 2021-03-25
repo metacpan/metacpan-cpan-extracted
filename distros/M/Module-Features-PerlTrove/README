@@ -1,0 +1,145 @@
+NAME
+    Module::Features::PerlTrove - Put Perl trove classifiers in your module
+
+VERSION
+    This document describes version 0.001 of Module::Features::PerlTrove
+    (from Perl distribution Module-Features-PerlTrove), released on
+    2021-03-25.
+
+SYNOPSIS
+    To add Perl trove classifiers in your module, just define %FEATURES
+    variable:
+
+     package YourModule;
+     #ABSTRACT: An App::Cmd application to highlight Indonesian words in text
+
+     our %FEATURES = (
+         features => {
+             Perl => {
+                 # we use underscore (Development_Status instead of "Development
+                 # Status") because feature names in Module::Features need to be
+                 # /^\w+$/. feature values need not be.
+
+                 "Development_Status" => "3 - Alpha",
+
+                 "Framework" => "App::Cmd",
+
+                 "Intended_Audience" => "Developers",
+
+                 "License" => [
+                     "OSI Approved :: Artistic License",
+                     "OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+                 ],
+
+                 "Natural_Language" => "Indonesian",
+
+                 "Programming_Language" => "Perl",
+
+                 "Environment" => "Console",
+
+                 "Topic" => [
+                     "Software Development :: Libraries :: Perl Modules",
+                     "Text Processing :: Linguistic",
+                     "Utilities",
+                 ],
+             },
+
+             # other features you might want to define
+             # ...
+         },
+     };
+
+    To check whether your classifiers are valid (does not contain unknown
+    classifiers), you can use check-module-features from
+    App::ModuleFeaturesUtils:
+
+     % check-module-features YourModule
+
+    To see the trove classifiers, you can use get-features-decl from
+    App::ModuleFeaturesUtils:
+
+     % get-features-decl YourModule
+
+    There are other ways to read the trove classifiers, including accessing
+    the %FEATURES variable directly.
+
+DESCRIPTION
+    Perl trove classifiers are based on Python ones. Currently the only
+    difference is that the Python-specific framework classifiers in
+    "Framework :: *", e.g. "Framework :: Django", are replaced with
+    Perl-specific ones, e.g. "Framework :: Dancer2".
+
+DEFINED FEATURES
+    Features defined by this module:
+
+    *   Development_Status
+
+        Optional. Type: any.
+
+    *   Environment
+
+        Optional. Type: any.
+
+    *   Framework
+
+        Optional. Type: any.
+
+    *   Intended_Audience
+
+        Optional. Type: any.
+
+    *   License
+
+        Optional. Type: any.
+
+    *   Natural_Language
+
+        Optional. Type: any.
+
+    *   Operating_System
+
+        Optional. Type: any.
+
+    *   Programming_Language
+
+        Optional. Type: any.
+
+    *   Topic
+
+        Optional. Type: any.
+
+    *   Typing
+
+        Optional. Type: any.
+
+    For more details on module features, see Module::Features.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Features-PerlTrove>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Features-PerlTrove>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Module-Features-PerlTrove/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::Features::PythonTrove
+
+    Module::Features
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

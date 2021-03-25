@@ -37,6 +37,8 @@ t/11_block.t
 t/JA.txt
 t/SAMPLE.txt
 t/Util.pm
+t/line/00_load.t
+t/line/02_search.t
 t/pod-coverage.t
 t/pod.t
 META.yml

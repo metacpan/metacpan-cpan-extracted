@@ -48,7 +48,7 @@
    "provides" : {
       "Term::ProgressSpinner" : {
          "file" : "lib/Term/ProgressSpinner.pm",
-         "version" : "0.05"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -59,6 +59,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Term-ProgressSpinner"
       }
    },
-   "version" : "0.05",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

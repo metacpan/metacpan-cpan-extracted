@@ -132,7 +132,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.144';
+our $VERSION = '0.145';
 our @EXPORT_OK = qw{
     shell
 
@@ -5465,9 +5465,13 @@ sub _mutate_dump_headers {
     );
 
     sub __identity_file_name {
-	return ( $id_file_name{$^O} || sub {
+	my $id_file = ( $id_file_name{$^O} || sub {
 		return join '/', $ENV{HOME}, '.spacetrack-identity' }
 	)->();
+	my $gpg_file = "$id_file.gpg";
+	-e $gpg_file
+	    and return $gpg_file;
+	return $id_file;
     }
 
 }
@@ -6561,11 +6565,14 @@ user's home directory, and is F<spacetrack.id> under C<MSWin32> or
 C<VMS>, or F<.spacetrack-identity> under any other operating system.
 
 If desired, the file can be encrypted using GPG; in this case, to be
-useful, C<gpg2> and C<gpg-agent> must be installed and properly
+useful, C<gpg> and C<gpg-agent> must be installed and properly
 configured. Because of implementation details in
 L<Config::Identity|Config::Identity>, you may need to either ensure that
 C<gpg> is not in your C<PATH>, or set the C<CI_GPG> environment variable
-to the path to C<gpg2>.
+to the path to C<gpg2>. The encrypted file can optionally have C<.gpg>
+appended to its name for the convenience of users of the vim-gnupg
+plugin and similar software. If the identity file exists both with and
+without the C<.gpg> suffix, the suffixed version will be used.
 
 Note that this file is normally read only once during the life of the
 Perl process, and the result cached. The username and password that are

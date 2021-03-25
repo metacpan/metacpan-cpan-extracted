@@ -880,25 +880,107 @@
 
    INTEGER IMPORT AND EXPORT
 
-   Rmpz_import($rop, $len, $order, $size, $endian, $nails, $bstr);
+    NOTE: There's a demo (demos/imp_exp.p) in the source distro. It
+          contains comments that will hopefully explain the basics of the
+          import and export functions, if it's not clear from the following
+          documentation.
 
-    Take a binary string ("$bstr") and convert it to a GMP
-    bignum structure, treating the string as a base 256
-    number. "$rop" is a Math::GMPz object holding that number.
-    "$len" is the length of the string segment to be
-    converted to the GMP bignum. Normally, $len = length($bstr),
+   Rmpz_import($rop, $len, $order, $size, $endian, $nails, $str);
+
+    Take a string ($str) and convert it to a Math::GMPz object ($rop)
+    treating the string as a base 256 number.
+    $len many words are read, each of $size bytes.
+    Normally, $len = length($str) with $size set to 1,
     but you can opt not to take the entire string if you like.
+    Yet another alternative is to set $len = 1, and
+    $size = length($str).
 
-    Usually ($order, $size, $endian, $nails) = (1, 1, 0, 0);
+    $order can be 1 for most significant byte first or -1 for least significant
+    byte first.
 
-    See the GMP manual for a full explanation of what these
-    variables mean.
+    $endian can be 1 for most significant byte within each word first, -1 for
+    least significant byte in each word first, or 0 for native endianness.
+    If $size is 1, then the value given to $endian is irrelevant.
 
-   $bstr = Rmpz_export($order, $size, $endian, $nails, $op);
+    The most significant $nails bits of each word are skipped.
 
-    Rmpz_export() is simply the reverse of Rmpz_import().
-    It returns a base 256 string representation of the
-    number held by the Math::GMPz object, "$op".
+    UTF8 strings call for special treatment.
+    Rmpz_import, by default, does a utf8::downgrade of such strings before
+    calculating the value to be assigned to $rop.
+    Before terminating, Rmpz_import will then perform a utf8::upgrade of $str
+    if and only if $str was initially UTF8.
+
+    This automatic utf8::downgrade can be disallowed by setting the package
+    global $Math::GMPz::utf8_no_downgrade to 1.
+
+    If the automatic downgrade is permitted ($Math::GMPz::utf8_no_downgrade == 0,
+    which is the default), then a warning will be emitted every time Rmpz_import
+    receives a UTF8 string.
+    This warning can be suppressed by setting $Math::GMPz::utf8_no_warn to 1.
+    The default value of $Math::GMPz::utf8_no_warn = 0 enables the warning.
+
+    If the utf8::downgrade fails, default behaviour ($Math::GMPz::utf8_no_croak = 0)
+    is for the function to croak with the appropriate error message.
+    If you wish to avoid the croak(), and have Rmpz_import continue on regardless,
+    set $Math::GMPz::utf8_no_croak to 1.
+
+    If $Math::GMPz::utf8_no_croak is set to a true value, and the utf8::downgrade
+    fails then default behaviour ($Math::GMPz::utf8_no_fail = 0) is for you to be
+    warned of that failure.
+    To suppress such warnings, set $Math::GMPz::utf8_no_fail to 1.
+
+    IOW, if you're passing UTF8 strings to Rmpz_import, it's probably best if you
+    can do the downgrade and subsequent upgrade yourself - eg, something like:
+
+      ...
+      if(utf8::is_utf8($str)) {
+        utf8::downgrade($str);
+        Rmpz_import($rop, $len, $order, $size, $endian, $nails, $str);
+        utf8::upgrade($str)
+      }
+      else {
+        Rmpz_import($rop, $len, $order, $size, $endian, $nails, $str);
+      }
+      ...
+
+    That way, you don't have to concern yourself with those 4 package global
+    scalars at all !!
+
+    You might (or might not) find t/imp_exp.t from the Math-GMPz test suite
+    helpful in comprehending this documentation.
+
+   $str = Rmpz_export($order, $size, $endian, $nails, $op);
+
+    Returns a base 256 ASCII string representation of the number held by
+    the Math::GMPz object, "$op".  While Rmpz_import converts a string to a
+    number, this function can convert that number to an ASCII string.
+    Assuming that Rmpz_export and Rmpz_import receive a value of $nails = 0
+    && that they both also receive the same values for $order, $size and
+    $endian, then this returned $str will be equal to the original string
+    passed to Rmpz_import if and only if:
+     a) that original string was not UTF8;
+       or
+     b) the original string was UTF8 && was successfully downgraded during
+        the Rmpz_import processing.
+
+    However, in the case of b), the fact that the original string was UTF8
+    suggests that you might want to utf8::upgrade the string returned by
+    Rmpz_export.
+
+   Rmpz_import_UV($rop, $len, $order, $size, $endian, $nails, $arref);
+
+    As for Rmpz_import, except that the final argument is a reference to an
+    array of UVs (unsigned perl integers).
+
+   $arref = Rmpz_export_UV($order, $size, $endian, $nails, $op);
+
+    As for Rmpz_export, except that it returns a reference to an array of
+    UVs (unsigned perl integers).
+    Assuming that Rmpz_export_UV and Rmpz_import_UV receive a value of
+    $nails = 0 && that they both also receive the same values for $order,
+    $size and $endian, then the array of UVs returned by this function, when
+    given to Rmpz_import_UV will generate a Math::GMPz object whose value is
+    equivalent to that of $op.
 
    ###############################
 

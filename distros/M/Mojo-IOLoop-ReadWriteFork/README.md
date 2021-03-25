@@ -4,7 +4,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 # VERSION
 
-0.43
+1.00
 
 # SYNOPSIS
 
@@ -14,7 +14,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
     $fork->on(error => sub { my ($fork, $error) = @_; warn $error; });
 
     # Emitted when the child completes
-    $fork->on(close => sub { my ($fork, $exit_value, $signal) = @_; Mojo::IOLoop->stop; });
+    $fork->on(finish => sub { my ($fork, $exit_value, $signal) = @_; Mojo::IOLoop->stop; });
 
     # Emitted when the child prints to STDOUT or STDERR
     $fork->on(read => sub {
@@ -48,9 +48,72 @@ more than welcome.
 
 # EVENTS
 
-## before\_fork
+## asset
 
-    $self->on(before_fork => sub { my ($self, $pipes) = @_; });
+    $fork->on(asset => sub { my ($fork, $asset) = @_; });
+
+Emitted at least once when calling ["run\_and\_capture\_p"](#run_and_capture_p). `$asset` can be
+either a [Mojo::Asset::Memory](https://metacpan.org/pod/Mojo%3A%3AAsset%3A%3AMemory) or [Mojo::Asset::File](https://metacpan.org/pod/Mojo%3A%3AAsset%3A%3AFile) object.
+
+    $fork->on(asset => sub {
+      my ($fork, $asset) = @_;
+      # $asset->auto_upgrade(1) is set by default
+      $asset->max_memory_size(1) if $asset->can('max_memory_size');
+    });
+
+## error
+
+    $fork->on(error => sub { my ($fork, $str) = @_; });
+
+Emitted when when the there is an issue with creating, writing or reading
+from the child process.
+
+## drain
+
+    $fork->on(drain => sub { my ($fork) = @_; });
+
+Emitted when the buffer has been written to the sub process.
+
+## finish
+
+    $fork->on(finish => sub { my ($fork, $exit_value, $signal) = @_; });
+
+Emitted when the child process exit.
+
+## read
+
+    $fork->on(read => sub { my ($fork, $buf) = @_; });
+
+Emitted when the child has written a chunk of data to STDOUT or STDERR.
+
+## spawn
+
+    $fork->on(spawn => sub { my ($fork) = @_; });
+
+Emitted after `fork()` has been called. Note that the child process might not yet have
+been started. The order of things is impossible to say, but it's something like this:
+
+            .------.
+            | fork |
+            '------'
+               |
+           ___/ \_______________
+          |                     |
+          | (parent)            | (child)
+    .--------------.            |
+    | emit "spawn" |   .--------------------.
+    '--------------'   | set up filehandles |
+                       '--------------------'
+                                |
+                         .---------------.
+                         | exec $program |
+                         '---------------'
+
+See also ["pid"](#pid) for example usage of this event.
+
+## start
+
+    $fork->on(start => sub { my ($fork, $pipes) = @_; });
 
 Emitted right before the child process is forked. Example `$pipes`
 
@@ -64,71 +127,27 @@ Emitted right before the child process is forked. Example `$pipes`
       stdout_write => $pipe_fh_4,
     }
 
-## close
-
-    $self->on(close => sub { my ($self, $exit_value, $signal) = @_; });
-
-Emitted when the child process exit.
-
-## error
-
-    $self->on(error => sub { my ($self, $str) = @_; });
-
-Emitted when when the there is an issue with creating, writing or reading
-from the child process.
-
-## fork
-
-    $self->on(fork => sub { my ($self) = @_; });
-
-Emitted after `fork()` has been called. Note that the child process might not yet have
-been started. The order of things is impossible to say, but it's something like this:
-
-            .------.
-            | fork |
-            '------'
-               |
-           ___/ \_________________
-          |                       |
-          | (parent)              | (child)
-      .-------------.             |
-      | emit "fork" |    .--------------------.
-      '-------------'    | set up filehandles |
-                         '--------------------'
-                                  |
-                          .---------------.
-                          | exec $program |
-                          '---------------'
-
-See also ["pid"](#pid) for example usage of this event.
-
-## read
-
-    $self->on(read => sub { my ($self, $buf) = @_; });
-
-Emitted when the child has written a chunk of data to STDOUT or STDERR.
-
 # ATTRIBUTES
 
 ## conduit
 
-    $hash = $self->conduit;
-    $self = $self->conduit({type => "pipe"});
+    $hash = $fork->conduit;
+    $fork = $fork->conduit({type => "pipe"});
 
 Used to set the conduit and conduit options. Example:
 
-    $self->conduit({raw => 1, type => "pty"});
+    $fork->conduit({raw => 1, type => "pty"});
 
 ## ioloop
 
-    $ioloop = $self->ioloop;
-    $self = $self->ioloop(Mojo::IOLoop->singleton);
+    $ioloop = $fork->ioloop;
+    $fork = $fork->ioloop(Mojo::IOLoop->singleton);
 
 Holds a [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop) object.
 
 ## pid
 
-    $int = $self->pid;
+    $int = $fork->pid;
 
 Holds the child process ID. Note that ["start"](#start) will start the process after
 the IO loop is started. This means that the code below will not work:
@@ -138,36 +157,46 @@ the IO loop is started. This means that the code below will not work:
 
 This will work though:
 
-    $fork->on(fork => sub { my $self = shift; warn $self->pid });
+    $fork->on(fork => sub { my $fork = shift; warn $fork->pid });
     $fork->run("bash", -c => q(echo $YIKES foo bar baz));
 
 # METHODS
 
 ## close
 
-    $self = $self->close("stdin");
+    $fork = $fork->close("stdin");
 
 Close STDIN stream to the child process immediately.
 
 ## run
 
-    $self = $self->run($program, @program_args);
-    $self = $self->run(\&Some::Perl::function, @function_args);
+    $fork = $fork->run($program, @program_args);
+    $fork = $fork->run(\&Some::Perl::function, @function_args);
 
 Simpler version of ["start"](#start). Can either start an application or run a perl
 function.
 
+## run\_and\_capture\_p
+
+    $p = $fork->run_and_capture_p(...)->then(sub { my $asset = shift });
+
+["run\_and\_capture\_p"](#run_and_capture_p) takes the same arguments as ["run\_p"](#run_p), but the
+fullfillment callback will receive a [Mojo::Asset](https://metacpan.org/pod/Mojo%3A%3AAsset) object that holds the
+output from the command.
+
+See also the ["asset"](#asset) event.
+
 ## run\_p
 
-    $p = $self->run_p($program, @program_args);
-    $p = $self->run_p(\&Some::Perl::function, @function_args);
+    $p = $fork->run_p($program, @program_args);
+    $p = $fork->run_p(\&Some::Perl::function, @function_args);
 
 Promise based version of ["run"](#run). The [Mojo::Promise](https://metacpan.org/pod/Mojo%3A%3APromise) will be resolved on
-["close"](#close) and rejected on ["error"](#error).
+["finish"](#finish) and rejected on ["error"](#error).
 
 ## start
 
-    $self = $self->start(\%args);
+    $fork = $fork->start(\%args);
 
 Used to fork and exec a child process. `%args` can have:
 
@@ -211,23 +240,20 @@ Used to fork and exec a child process. `%args` can have:
 
 ## write
 
-    $self = $self->write($chunk);
-    $self = $self->write($chunk, $cb);
+    $fork = $fork->write($chunk);
+    $fork = $fork->write($chunk, $cb);
 
 Used to write data to the child process STDIN. An optional callback will be
 called once STDIN is drained.
 
 Example:
 
-    $self->write("some data\n", sub {
-      my ($self) = @_;
-      $self->close;
-    });
+    $fork->write("some data\n", sub { shift->close });
 
 ## kill
 
-    $bool = $self->kill;
-    $bool = $self->kill(15); # default
+    $bool = $fork->kill;
+    $bool = $fork->kill(15); # default
 
 Used to signal the child.
 

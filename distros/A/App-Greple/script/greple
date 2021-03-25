@@ -67,7 +67,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 8.4101
+Version 8.4201
 
 
 =head1 SYNOPSIS
@@ -150,6 +150,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --epilogue=func      call function after command execution
   OTHER
     --usage[=expand]     show this message
+    --exit=n             specify exit status
     --norc               skip reading startup file
     --man                display command or module manual page
     --show               display module file
@@ -223,6 +224,7 @@ my %opt_conceal = (read => 1, skip => 0);
 my $opt_persist = 0;
 my %opt_format = (LINE => '%d:', FILE => '%s:');
 my $opt_usage;
+my $opt_exit;
 
 my $opt_c;
 my @opt_d = ();
@@ -322,6 +324,7 @@ my @optargs = (
     'persist!'           => \$opt_persist,
     'format=s'           => \%opt_format,
     'usage:s'            => \$opt_usage,
+    'exit=i'             => \$opt_exit,
     'M:s'                => sub {
 	warn "Use -M option at the beginning with module name.\n";
 	if (my @modules = uniq($rcloader->modules())) {
@@ -386,8 +389,11 @@ $Getopt::EX::Loader::debug = 1 if $ENV{DEBUG_GETOPTEX};
 map { $_ = decode 'utf8', $_ unless utf8::is_utf8($_) } @ARGV;
 
 ## ~/.greplerc
-(@ARGV and $ARGV[0] eq "--norc" and shift) or
+unless ((@ARGV and $ARGV[0] eq "--norc" and shift)
+	or
+	($ENV{GREPLE_NORC}) ) {
     $rcloader->load(FILE => "$ENV{HOME}/.greplerc");
+}
 
 ## modules
 $rcloader->deal_with(\@ARGV);
@@ -827,7 +833,7 @@ for my $set (
 {
     my($opt, $flag) = @$set;
     for my $spec (@$opt) {
-	append $regions FLAG => $flag, SPEC => $spec;
+	$regions->append(FLAG => $flag, SPEC => $spec);
     }
 }
 
@@ -971,7 +977,7 @@ if ($opt_d{p}) {
     system "lsof -p $$";
 }
 
-exit($stat{match_effective} == 0);
+exit($opt_exit // ($stat{match_effective} == 0));
 
 ######################################################################
 
@@ -2052,7 +2058,7 @@ Reset sequential index on every block.
 
 =item R (Random)
 
-Use random color index everytime.
+Use random color index every time.
 
 =item S (Shuffle)
 
@@ -2519,6 +2525,13 @@ expanded, supply something not empty to B<--usage> option, like:
 
     greple -Mmodule --usage=expand
 
+=item B<--exit>=I<number>
+
+When B<greple> executed normally, it exit with status 0 or 1 depending
+on something matched or not.  Sometimes we want to get status 0 even
+if nothing matched.  This option set the status code for normal
+execution.  It still exits with non-zero status when error occurred.
+
 =item B<--man>, B<--doc>
 
 Show manual page.
@@ -2534,7 +2547,9 @@ Show module file path.  Use with B<-M> option.
 
 =item B<--norc>
 
-Do not read startup file: F<~/.greplerc>.
+Do not read startup file: F<~/.greplerc>.  This option have to be
+placed before any other options including B<-M> module options.
+Setting C<GREPLE_NORC> environment have same effect.
 
 =item B<--require>=I<filename>
 
@@ -2607,8 +2622,26 @@ Debug option is described in L<App::Greple::debug> module.
 =head1 ENVIRONMENT and STARTUP FILE
 
 
+=over 7
+
+=item B<GREPLEOPTS>
+
 Environment variable GREPLEOPTS is used as a default options.  They
 are inserted before command line options.
+
+=item B<GREPLE_NORC>
+
+If set non-empty string, startup file F<~/.greplerc> is not processed.
+
+=item B<DEBUG_GETOPT>
+
+Enable L<Getopt::Long> debug option.
+
+=item B<DEBUG_GETOPTEX>
+
+Enable L<Getopt::EX> debug option.
+
+=back
 
 Before starting execution, I<greple> reads the file named F<.greplerc>
 on user's home directory.  Following directives can be used.
@@ -2844,7 +2877,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 1991-2020 Kazumasa Utashiro
+Copyright 1991-2021 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -2861,4 +2894,4 @@ it under the same terms as Perl itself.
 #  LocalWords:  ocode gunzip gpg FILELABEL substr eval misc unicode
 #  LocalWords:  GREPLEOPTS shellwords Katakana builtin pgp autoload
 #  LocalWords:  ENV App ARGV mg Kazumasa Utashiro github colorindex
-#  LocalWords:  matchcount gzipped stdin func
+#  LocalWords:  matchcount gzipped stdin func CPANMINUS cpanm kana

@@ -1,5 +1,5 @@
 package Getopt::EX::Func;
-use version; our $VERSION = version->declare("v1.22.0");
+use version; our $VERSION = version->declare("v1.22.1");
 
 use v5.14;
 use warnings;
@@ -95,8 +95,8 @@ sub parse_func {
 sub arg2kvlist {
     my @kv;
     for (@_) {
-	while (/\G
-	       (?<k> [\w:]+ )
+	while (/\G \s*
+	       (?<k> [^,=]+ )
 	       (?: = (?<v> (?: [^,()]++ | ${paren_re} )*+ ) )?
 	       ,*/xgc
 	    ) {

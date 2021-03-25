@@ -26,35 +26,35 @@ no_index:
 provides:
   Getopt::EX:
     file: lib/Getopt/EX.pm
-    version: v1.22.0
+    version: v1.22.1
   Getopt::EX::Colormap:
     file: lib/Getopt/EX/Colormap.pm
-    version: v1.22.0
+    version: v1.22.1
   Getopt::EX::Func:
     file: lib/Getopt/EX/Func.pm
-    version: v1.22.0
+    version: v1.22.1
   Getopt::EX::LabeledParam:
     file: lib/Getopt/EX/LabeledParam.pm
-    version: v1.22.0
+    version: v1.22.1
   Getopt::EX::Loader:
     file: lib/Getopt/EX/Loader.pm
-    version: v1.22.0
+    version: v1.22.1
   Getopt::EX::Long:
     file: lib/Getopt/EX/Long.pm
-    version: v1.22.0
+    version: v1.22.1
   Getopt::EX::Long::Parser:
     file: lib/Getopt/EX/Long.pm
   Getopt::EX::Module:
     file: lib/Getopt/EX/Module.pm
-    version: v1.22.0
+    version: v1.22.1
   Getopt::EX::Numbers:
     file: lib/Getopt/EX/Numbers.pm
-    version: v1.22.0
+    version: v1.22.1
   Getopt::EX::ToggleValue:
     file: lib/Getopt/EX/Util.pm
   Getopt::EX::Util:
     file: lib/Getopt/EX/Util.pm
-    version: v1.22.0
+    version: v1.22.1
 requires:
   Graphics::ColorNames: '0'
   List::Util: '1.45'
@@ -64,7 +64,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Getopt-EX/issues
   homepage: https://github.com/kaz-utashiro/Getopt-EX
   repository: git://github.com/kaz-utashiro/Getopt-EX.git
-version: v1.22.0
+version: v1.22.1
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <utashiro@cpan.org>'

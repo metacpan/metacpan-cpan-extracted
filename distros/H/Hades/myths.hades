@@ -2,7 +2,7 @@ lib lib
 tlib t
 author LNATION
 email email@lnation.org
-version 0.03
+version 0.19
 macro {
 	Dolos
 	YAML
@@ -109,7 +109,7 @@ Quick summary of what the module does:
 	}
 	convert_locale $locale :t(Str) $fb :t(Str) :d(en) :pod(Split a locale into locale and language.) {
 		$locale =~ m/^(\w\w)_(\w\w).*/;
-		return $1 && $2 ? ( $1 . '_' . $2, $1, $fb ) : ($locale, undef, $fb);
+		return $1 && $2 ? ( $1 . '_' . $2, $1, $fb ) : ($locale, $fb, $fb);
 	}
 	add $key :t(Str) $locales :t(Map[Str, HashRef]) :pod(Add an item into the locales. This method expects a reference $key that should be a Str and a locales HashRef where the keys are locales and the values are the text string.) :example(
 	locales->add('stranger', {

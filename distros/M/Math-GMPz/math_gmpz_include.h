@@ -128,3 +128,22 @@
 #else
 #define CHECK_MP_BITCNT_T_OVERFLOW(x)
 #endif
+
+#define RMPZ_IMPORT_UTF8_WARN \
+"  UTF8 string encountered in Rmpz_import. It will be utf8-downgraded\n\
+  before being passed to mpz_import, and then will be restored to\n\
+  its original condition by a utf8::upgrade if:\n\
+    1) the downgrade was successful\n\
+      OR\n\
+    2) $Math::GMPz::utf8_no_croak is set to a true integer value.\n\
+  Otherwise, a downgrade failure will cause the program to croak\n\
+  with an explanatory error message.\n\
+  To disable the croak on downgrade failure set $Math::GMPz::utf8_no_croak to 1.\n\
+  See the Rmpz_import documentation for a more detailed explanation.\n"
+
+#define RMPZ_IMPORT_DOWNGRADE_WARN \
+"  An attempted utf8 downgrade has failed, but you have opted to allow\n\
+  the Rmpz_import() to continue. Should you decide that this is not the\n\
+  behaviour that you want, then please reset $Math::GMPz::utf8_no_croak\n\
+  to its original value of 0\n"
+

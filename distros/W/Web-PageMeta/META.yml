@@ -29,7 +29,7 @@ name: Web-PageMeta
 provides:
   Web::PageMeta:
     file: lib/Web/PageMeta.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   AnyEvent::HTTP: '0'
   Encode: '0'
@@ -47,8 +47,8 @@ requires:
   namespace::autoclean: '0'
   perl: '5.022'
 resources:
-  bugtracker: http://github.com/jozef/Web-PageMeta/issues
+  bugtracker: https://github.com/jozef/Web-PageMeta/issues
   license: http://dev.perl.org/licenses/
-  repository: http://github.com/jozef/Web-PageMeta
-version: '0.02'
+  repository: https://github.com/jozef/Web-PageMeta
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

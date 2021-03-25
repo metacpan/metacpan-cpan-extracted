@@ -35,7 +35,8 @@ has 'localeRoot';
 
 =item C<setLocale>($locale);
 
-Load the translations strings for $locale. First try the full name and then top-up with only the language part.
+Load the translations strings for $locale. First try the full name and
+then top-up with only the language part.
 
 =cut
 
@@ -99,8 +100,9 @@ sub tra {
 
 =item C<trm>(str[,arg,arg,...])
 
-mark for translation but return an array pointer so that the string can be translated
-dynamically in the forntend. I<This functionality is not yet fully implemented>.
+mark for translation but return an array pointer so that the string
+can be translated dynamically in the frontend. I<This functionality is
+not yet fully implemented>.
 
 =cut
 
@@ -110,7 +112,10 @@ dynamically in the forntend. I<This functionality is not yet fully implemented>.
 
 Make string and prepare for translation in the frontend.
 
-Note there is some major perl magic going on! by blessing the returned array into the current package, we then get to use the overload code on stringification AND Mojo::JSON gets to use the TO_JSON method when converting this into something to be transported to the frontend.
+Note there is some major perl magic going on! by blessing the returned
+array into the current package, we then get to use the overload code
+on stringification AND Mojo::JSON gets to use the TO_JSON method when
+converting this into something to be transported to the frontend.
 
 =cut
 

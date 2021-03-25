@@ -27,7 +27,7 @@ use warnings;
 use Math::GMPz qw(:mpz);
 use Scalar::Util qw(looks_like_number);
 
-die "Usage 'perl dec2rat.pl [leading] [recurring] [dp]'"
+die "Usage 'perl dec2rat.p [leading] [recurring] [dp]'"
   if(@ARGV != 3);
 
 die "1st arg must not be signed" if $ARGV[0] =~ /^[\-\+]/;

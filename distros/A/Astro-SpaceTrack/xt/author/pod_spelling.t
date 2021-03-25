@@ -47,6 +47,7 @@ globalstar
 Globalstar
 glonass
 GLONASS
+gnupg
 GoDaddy
 GPG
 hoc

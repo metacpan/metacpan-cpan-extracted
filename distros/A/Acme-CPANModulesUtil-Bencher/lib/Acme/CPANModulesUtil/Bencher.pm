@@ -1,7 +1,7 @@
 package Acme::CPANModulesUtil::Bencher;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-01-20'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -124,7 +124,7 @@ Acme::CPANModulesUtil::Bencher - Generate/extract Bencher scenario from informat
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModulesUtil::Bencher (from Perl distribution Acme-CPANModulesUtil-Bencher), released on 2019-02-24.
+This document describes version 0.002 of Acme::CPANModulesUtil::Bencher (from Perl distribution Acme-CPANModulesUtil-Bencher), released on 2021-01-20.
 
 =head1 FUNCTIONS
 
@@ -135,7 +135,7 @@ Usage:
 
  gen_bencher_scenario(%args) -> [status, msg, payload, meta]
 
-Generate/extract Bencher scenario from information in an Acme::CPANModules::* list.
+GenerateE<sol>extract Bencher scenario from information in an Acme::CPANModules::* list.
 
 An L<Acme::CPANModules>::* module can contain benchmark information, for
 example in L<Acme::CPANModules::TextTable>, each entry has the following
@@ -182,6 +182,7 @@ Arguments ('*' denotes required arguments):
 
 Name of Acme::CPANModules::* module, without the prefix.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -205,7 +206,7 @@ Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModulesUtil
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesUtil-Bencher>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModulesUtil-Bencher/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -223,7 +224,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,7 @@
+0.35.9 2021-03-24 17:48:02 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - release cardlist update
+
 0.35.8 2021-03-22 16:21:48 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - Handle SelectBox as part of Cards

@@ -41,6 +41,7 @@ lib/Minilla/Project.pm
 lib/Minilla/Release/BumpVersion.pm
 lib/Minilla/Release/CheckChanges.pm
 lib/Minilla/Release/CheckOrigin.pm
+lib/Minilla/Release/CheckReleaseBranch.pm
 lib/Minilla/Release/CheckUntrackedFiles.pm
 lib/Minilla/Release/Commit.pm
 lib/Minilla/Release/DistTest.pm
@@ -67,6 +68,7 @@ t/cli/build.t
 t/cli/clean.t
 t/cli/regenerate_BuildPL.t
 t/cli/release.t
+t/cli/release_check_branch.t
 t/cli/release_no_bump_versions.t
 t/cli/release_no_pause_file.t
 t/cli/release_notest.t

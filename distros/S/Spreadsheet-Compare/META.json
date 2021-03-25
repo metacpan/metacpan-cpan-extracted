@@ -35,14 +35,12 @@
          "requires" : {
             "Capture::Tiny" : "0",
             "Class::Method::Modifiers" : "0",
-            "DBI" : "0",
             "Excel::Writer::XLSX" : "1.00",
             "Log::Log4perl" : "0",
             "Mojolicious" : "8.06",
             "Path::Tiny" : "0.100",
             "Pod::Find" : "0",
             "Pod::Usage" : "0",
-            "Spreadsheet::Read" : "0.80",
             "Text::CSV" : "1.96",
             "Try::Tiny" : "0",
             "YAML::Any" : "0",
@@ -51,15 +49,15 @@
       },
       "test" : {
          "requires" : {
-            "DBD::SQLite" : "1.52",
-            "Spreadsheet::ParseODS" : "0.20",
-            "Spreadsheet::ParseXLSX" : "0.24",
             "Test::Exception" : "0.43"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tomk3003/spreadsheet-compare/issues"
+      },
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
@@ -69,6 +67,6 @@
          "web" : "https://github.com/tomk3003/spreadsheet-compare"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

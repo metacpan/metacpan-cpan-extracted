@@ -9,11 +9,11 @@ greple - extensible grep with lexical expression and region handling
 
 =head1 VERSION
 
-Version 8.4101
+Version 8.4201
 
 =cut
 
-our $VERSION = '8.4101';
+our $VERSION = '8.4201';
 
 =head1 AUTHOR
 
@@ -21,7 +21,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 1991-2019 Kazumasa Utashiro
+Copyright 1991-2021 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

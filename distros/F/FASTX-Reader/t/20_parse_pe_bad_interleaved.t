@@ -24,5 +24,5 @@ my $data = FASTX::PE->new({
 eval {
     my $pe = $data->getReads();  
 };
-ok($@, "[ERR] Bad interleaved file didnt pass check [$@]");
+ok($@, "[ERROR EXPECTED] Bad interleaved file didnt pass check [$@]");
 done_testing();

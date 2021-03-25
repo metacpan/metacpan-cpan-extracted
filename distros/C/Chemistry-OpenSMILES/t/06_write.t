@@ -19,6 +19,8 @@ my @cases = (
     # Chirality information is preserved:
     [ 'N[C@](Br)(O)C', 'N([C@](Br)(O)(C))' ],
     [ 'N[C@@](Br)(O)C', 'N([C@@](Br)(O)(C))' ],
+    # A regression test for previously incorrectly identified aromatic bond:
+    [ 'c1(c(cccc1)F)C(=O)[O-]', 'c:1(:c(:c(:c(:c(:c:1))))(F))(C(=O)([O-]))' ],
 );
 
 plan tests => 2 * scalar @cases;

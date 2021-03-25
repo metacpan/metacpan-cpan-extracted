@@ -34,11 +34,18 @@ Qooxdoo form.
 
 has screenCfg => sub {
     my $self = shift;
+    # prepend plugin name (see also messageConfig below)
+    my $name = $self->name;
+    for my $action (@{$self->actionCfg}) {
+        if ($action->{action} =~ /popup|wizzard/) {
+            $action->{name} = "${name}_$action->{name}";
+        }
+    }
     return {
-        type => 'form',
+        type    => 'form',
         options => $self->screenOpts,
-        form => $self->formCfg,
-        action => $self->actionCfg,
+        form    => $self->formCfg,
+        action  => $self->actionCfg,
     }
 };
 
@@ -281,14 +288,16 @@ sub massageConfig {
     my $cfg = shift;
     my $actionCfg = $self->actionCfg;
     for my $button (@$actionCfg){
-        if ($button->{action} =~ /popup|wizzard/){
-            my $name = $button->{name};
+        if ($button->{action} =~ /popup|wizzard/) {
+            # prepend plugin name (see also screenCfg above)
+            my $name = $self->name . '_' . $button->{name};
+            $button->{name} = $name;
             die "Plugin instance name $name is not unique\n"
                 if $cfg->{PLUGIN}{prototype}{$name};
             my $popup = $cfg->{PLUGIN}{prototype}{$name}
                 = $self->app->config->loadAndNewPlugin($button->{backend}{plugin});
             $popup->config($button->{backend}{config});
-            $popup->name($button->{name});
+            $popup->name($name);
             $popup->app($self->app);
             $popup->massageConfig($cfg);
         }

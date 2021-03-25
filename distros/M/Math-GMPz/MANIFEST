@@ -13,6 +13,7 @@ Random/Random.pm
 Random/Makefile.PL
 Random/t/gmp_random.t
 README
+demos/imp_exp.p
 demos/dec2rat.p
 demos/solitaire.p
 t/_1aaa_v.t
@@ -27,6 +28,7 @@ t/cmp_q.t
 t/constants.t
 t/fac.t
 t/imp_exp.t
+t/imp_warnings.t
 t/index_bug.t
 t/math_bigint.t
 t/math_bigint_gmp.t

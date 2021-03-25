@@ -930,11 +930,17 @@ had differences (key:column_index, value:false/true)
         # write record to stream;
     });
 
-Reporting event. write a formatted record to the 'Differences' output stream
+Reporting event. Write a formatted record to the 'Differences' output stream
 The record is an L<Spreadsheet::Compare::Record> and will contain information
 about the differences found (see L<Spreadsheet::Compare::Record/limit_mask>).
 
 =head2 write_header
+
+    $single->on(write_header => sub ($obj, $stream) {
+        # write header for stream;
+    });
+
+Reporting event. Write the header for an output stream.
 
 =head2 write_row
 
@@ -942,7 +948,7 @@ about the differences found (see L<Spreadsheet::Compare::Record/limit_mask>).
         # write record to stream;
     });
 
-Reporting event. write a default formatted record to an output stream.
+Reporting event. Write a default formatted record to an output stream.
 The record is an L<Spreadsheet::Compare::Record>
 
 =cut

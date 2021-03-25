@@ -60,7 +60,7 @@ chain: atom
 
             $_[2]->{graph}->add_edge( $_[1]->{last}, $_[2] );
 
-            if( is_aromatic $_[1]->{last} && is_aromatic $_[1]->{last} ) {
+            if( is_aromatic $_[1]->{last} && is_aromatic $_[2] ) {
                 $_[2]->{graph}->set_edge_attribute( $_[1]->{last},
                                                     $_[2],
                                                     'bond',

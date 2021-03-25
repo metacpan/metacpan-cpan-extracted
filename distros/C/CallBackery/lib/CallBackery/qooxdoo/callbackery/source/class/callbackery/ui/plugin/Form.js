@@ -87,7 +87,8 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             var cfg = this._cfg;
             this.setLayout(new qx.ui.layout.VBox(30));
             var form = this._form = new callbackery.ui.form.Auto(
-                cfg.form,null,callbackery.ui.form.renderer.NoteForm);
+                cfg.form,null,callbackery.ui.form.renderer.NoteForm
+            );
             if (cfg['options'] && cfg.options['warnAboutUnsavedData']){
                 form.addListener('changeData',function(){
                     if (this._loading == 0){ // only notify when update comes from human interaction
@@ -121,7 +122,12 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             cfg.form.forEach(function(s){
                 if (s.actionSet) {
                     for (var key in s.actionSet) {
-                        buttonMap[key].set(s.actionSet[key]);
+                        if (buttonMap[key]) {
+                            buttonMap[key].set(s.actionSet[key]);
+                        }
+                        else {
+                            console.warn('No buttonMap for key=', key);
+                        }
                     }
                 }
 
@@ -220,7 +226,12 @@ qx.Class.define("callbackery.ui.plugin.Form", {
             formCfg.forEach(function(s){
                 if (s.actionSet) {
                     for (var key in s.actionSet) {
-                        buttonMap[key].set(s.actionSet[key]);
+                        if (buttonMap[key]) {
+                            buttonMap[key].set(s.actionSet[key]);
+                        }
+                        else {
+                            console.warn('No buttonMap for key=', key);
+                        }
                     }
                 }
                 if (!s.key){

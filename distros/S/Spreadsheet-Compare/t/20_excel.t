@@ -31,7 +31,7 @@ lives_ok {
     my @reports;
     $cmp->on(
         report_finished => sub ( $c, $title, $class, $rfn ) {
-            my($t, $s) = reverse split(m!/!, $title);
+            my( $t, $s ) = reverse split( m!/!, $title );
             is( $class, 'Spreadsheet::Compare::Reporter::XLSX', 'class' );
             like( $rfn, qr/$t\.xlsx$/, 'file name ok' );
             push @reports, [ $t, $rfn ];
@@ -43,7 +43,12 @@ lives_ok {
 
     is_deeply( $counters{"$stitle/$_"}, $expect{$_}, "'$_' result ok" ) for sort keys %expect;
 
-    subtest "check $_->[0] report", \&_check_content, @$_ for @reports;
+    SKIP: {
+        my $sr_installed = try { load 'Spreadsheet::Read'; 1 } catch { undef };
+        skip "Spreadsheet::Read not installed" unless $sr_installed;
+
+        subtest "check $_->[0] report", \&_check_content, @$_ for @reports;
+    }
 
 }
 'no dying tests';

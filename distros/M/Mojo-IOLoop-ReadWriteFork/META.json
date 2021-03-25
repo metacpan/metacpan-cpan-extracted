@@ -52,7 +52,7 @@
          "web" : "https://github.com/jhthorsen/mojo-ioloop-readwritefork"
       }
    },
-   "version" : "0.43",
+   "version" : "1.00",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],

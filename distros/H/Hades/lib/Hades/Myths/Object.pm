@@ -2,7 +2,7 @@ package Hades::Myths::Object;
 use strict;
 use warnings;
 use POSIX qw/locale_h/;
-our $VERSION = 0.03;
+our $VERSION = 0.19;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -164,7 +164,7 @@ sub convert_locale {
 	}
 
 	$locale =~ m/^(\w\w)_(\w\w).*/;
-	return $1 && $2 ? ( $1 . '_' . $2, $1, $fb ) : ( $locale, undef, $fb );
+	return $1 && $2 ? ( $1 . '_' . $2, $1, $fb ) : ( $locale, $fb, $fb );
 
 }
 

@@ -1,12 +1,11 @@
 package Playwright;
-$Playwright::VERSION = '0.004';
+$Playwright::VERSION = '0.005';
 use strict;
 use warnings;
 
+#ABSTRACT: Perl client for Playwright
 use 5.006;
 use v5.28.0;    # Before 5.006, v5.10.0 would not be understood.
-
-use sigtrap qw/die normal-signals/;
 
 use File::pushd;
 use File::ShareDir();
@@ -18,15 +17,11 @@ use Net::EmptyPort();
 use JSON::MaybeXS();
 use File::Slurper();
 use File::Which();
-use Capture::Tiny qw{capture capture_stderr};
+use Capture::Tiny qw{capture_merged capture_stderr};
 use Carp qw{confess};
 
 use Playwright::Base();
 use Playwright::Util();
-
-#ABSTRACT: Perl client for Playwright
-use 5.006;
-use v5.28.0;    # Before 5.006, v5.10.0 would not be understood.
 
 no warnings 'experimental';
 use feature qw{signatures};
@@ -35,10 +30,14 @@ our ( $spec, $server_bin, $node_bin, %mapper, %methods_to_rename );
 
 sub _check_node {
 
+    # Check that node is installed
+    $node_bin = File::Which::which('node');
+    confess("node must exist, be in your PATH and executable")
+      unless -x $node_bin;
+
     my $global_install = '';
     my $path2here =
       File::Basename::dirname( Cwd::abs_path( $INC{'Playwright.pm'} ) );
-    my $decoder = JSON::MaybeXS->new();
 
     # Make sure it's possible to start the server
     $server_bin = "$path2here/../bin/playwright_server";
@@ -49,47 +48,34 @@ sub _check_node {
     confess("Can't locate Playwright server in '$server_bin'!")
       unless -f $server_bin;
 
-    # Check that node and npm are installed
-    $node_bin = File::Which::which('node');
-    confess("node must exist and be executable") unless -x $node_bin;
+    # Attempt to start the server.  If we can't do this, we almost certainly have dependency issues.
+    my ($output) =
+      capture_merged { system( $node_bin, $server_bin, '--check' ) };
+    return if $output =~ m/OK/;
 
     # Check for the necessary modules, this relies on package.json
     my $npm_bin = File::Which::which('npm');
     confess("npm must exist and be executable") unless -x $npm_bin;
-    my $dep_raw;
 
+    # pushd/popd closure
     {
-        #XXX the node Depsolver is deranged, global modules DO NOT WORK
         my $curdir = pushd( File::Basename::dirname($server_bin) );
-        ($dep_raw) = capture { system( $npm_bin, qw{list --json} ) };
-        confess("Could not list available node modules!") unless $dep_raw;
 
-        chomp $dep_raw;
-        my $deptree = $decoder->decode($dep_raw);
+        # Attempt to install deps automatically.
+        confess(
+            "Production install of node dependencies must be done manually by nonroot users. Run the following:\n\n pushd '$curdir' && sudo npm i yargs express playwright uuid; popd\n\n"
+        ) if $global_install;
 
-        my @needed = qw{express uuid yargs playwright};
-        my @has    = keys( %{ $deptree->{dependencies} } );
-        my @deps   = grep {
-            my $subj = $_;
-            grep { $_ eq $subj } @needed
-        } @has;
-        my $need_deps = scalar(@deps) != scalar(@needed);
+        my $err = capture_stderr { qx{npm i} };
 
-        #This is really just for developers
-        if ($need_deps) {
-            confess(
-                "Production install of node dependencies must be done manually by nonroot users. Run the following:\n\n pushd '$curdir' && sudo npm i yargs express playwright uuid; popd\n\n"
-            ) if $global_install;
+        # XXX apparently doing it 'once more with feeling' fixes issues on windows, lol
+        $err = capture_stderr { qx{npm i} };
+        my $exit = $? >> 8;
 
-            my $err  = capture_stderr { qx{npm i} };
-            my $exit = $? >> 8;
-
-            # Ignore failing for bogus reasons
-            if ( $err !~ m/package-lock/ ) {
-                confess("Error installing node dependencies:\n$err") if $exit;
-            }
+        # Ignore failing for bogus reasons
+        if ( $err !~ m/package-lock/ ) {
+            confess("Error installing node dependencies:\n$err") if $exit;
         }
-
     }
 }
 
@@ -200,14 +186,16 @@ sub BEGIN {
 sub new ( $class, %options ) {
 
     #XXX yes, this is a race, so we need retries in _start_server
-    my $port = Net::EmptyPort::empty_port();
-    my $self = bless(
+    my $port    = Net::EmptyPort::empty_port();
+    my $timeout = $options{timeout} // 30;
+    my $self    = bless(
         {
-            ua     => $options{ua} // LWP::UserAgent->new(),
-            port   => $port,
-            debug  => $options{debug},
-            pid    => _start_server( $port, $options{debug} ),
-            parent => $$,
+            ua      => $options{ua} // LWP::UserAgent->new(),
+            port    => $port,
+            debug   => $options{debug},
+            pid     => _start_server( $port, $timeout, $options{debug} ),
+            parent  => $$,
+            timeout => $timeout,
         },
         $class
     );
@@ -265,25 +253,49 @@ sub await ( $self, $promise ) {
 
 sub quit ($self) {
 
-    #Prevent destructor from firing in child processes so we can do things like async()
+    # Prevent double destroy after quit()
+    return if $self->{killed};
+
+    # Prevent destructor from firing in child processes so we can do things like async()
+    # This should also prevent the waitpid below from deadlocking due to two processes waiting on the same pid.
     return unless $$ == $self->{parent};
 
+    $self->{killed} = 1;
+    print "Attempting to terminate server process...\n" if $self->{debug};
     Playwright::Util::request( 'GET', 'shutdown', $self->{port}, $self->{ua} );
-    return waitpid( $self->{pid}, 0 );
+
+    # 0 is always WCONTINUED, 1 is always WNOHANG, and POSIX is an expensive import
+    # When 0 is returned, the process is still active, so it needs more persuasion
+    foreach ( 0 .. 3 ) {
+        return unless waitpid( $self->{pid}, 1 ) == 0;
+        sleep 1;
+    }
+
+    # Advanced persuasion
+    print "Forcibly terminating server process...\n" if $self->{debug};
+    kill( 'TERM', $self->{pid} );
+
+    #XXX unfortunately I can't just do a SIGALRM, because blocking system calls can't be intercepted on win32
+    foreach ( 0 .. $self->{timeout} ) {
+        return unless waitpid( $self->{pid}, 1 ) == 0;
+        sleep 1;
+    }
+    warn "Could not shut down playwright server!";
+    return;
 }
 
 sub DESTROY ($self) {
     $self->quit();
 }
 
-sub _start_server ( $port, $debug ) {
+sub _start_server ( $port, $timeout, $debug ) {
     $debug = $debug ? '-d' : '';
 
     $ENV{DEBUG} = 'pw:api' if $debug;
     my $pid = fork // confess("Could not fork");
     if ($pid) {
         print "Waiting for port to come up..." if $debug;
-        Net::EmptyPort::wait_port( $port, 30 )
+        Net::EmptyPort::wait_port( $port, $timeout )
           or confess("Server never came up after 30s!");
         print "done\n" if $debug;
         return $pid;
@@ -306,19 +318,28 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
-    use JSON::PP;
     use Playwright;
 
     my $handle = Playwright->new();
-    my $browser = $handle->launch( headless => JSON::PP::false, type => 'chrome' );
+    my $browser = $handle->launch( headless => 0, type => 'chrome' );
     my $page = $browser->newPage();
-    my $res = $page->goto('http://google.com', { waitUntil => 'networkidle' });
+    my $res = $page->goto('http://somewebsite.test', { waitUntil => 'networkidle' });
     my $frameset = $page->mainFrame();
     my $kidframes = $frameset->childFrames();
+
+    # Grab us some elements
+    my $body = $page->select('body');
+
+    # You can also get the innerText
+    my $text = $body->textContent();
+    $body->click();
+    $body->screenshot();
+
+    my $kids = $body->selectMulti('*');
 
 =head1 DESCRIPTION
 
@@ -327,10 +348,40 @@ Checks and automatically installs a copy of the node dependencies in the local f
 
 Currently understands commands you can send to all the playwright classes defined in api.json (installed wherever your OS puts shared files for CPAN distributions).
 
-See L<https://playwright.dev/#version=master&path=docs%2Fapi.md&q=>
+See L<https://playwright.dev/versions> and drill down into your relevant version (run `npm list playwright` )
 for what the classes do, and their usage.
 
-There are two major exceptions in how things work versus the documentation.
+All the classes mentioned there will correspond to a subclass of the Playwright namespace.  For example:
+
+    # ISA Playwright
+    my $playwright = Playwright->new();
+    # ISA Playwright::BrowserContext
+    my $ctx = $playwright->newContext(...);
+    # ISA Playwright::Page
+    my $page = $ctx->newPage(...);
+    # ISA Playwright::ElementHandle
+    my $element = $ctx->select('body');
+
+See example.pl for a more thoroughly fleshed-out display on how to use this module.
+
+=head3 Why this documentation does not list all available subclasses and their methods
+
+The documentation and names for the subclasses of Playwright follow the spec strictly:
+
+Playwright::BrowserContext => L<https://playwright.dev/docs/api/class-browsercontext>
+Playwright::Page           => L<https://playwright.dev/docs/api/class-page>
+Playwright::ElementHandle  => L<https://playwright.dev/docs/api/class-elementhandle>
+
+...And so on.  100% of the spec is accessible regardless of the Playwright version installed
+due to these classes & their methods being built dynamically at run time based on the specification
+which is shipped with Playwright itself.
+
+You can check what methods are installed for each subclass by doing the following:
+
+    use Data::Dumper;
+    print Dumper($instance->{spec});
+
+There are two major exceptions in how things work versus the upstream Playwright documentation, detailed below in the C<Selectors> section.
 
 =head2 Selectors
 
@@ -364,10 +415,23 @@ To maximize the usefulness of these, I have wrapped the string passed with the f
 
 As such you can effectively treat the script string as a function body.
 The same restriction on only being able to pass one arg remains from the upstream:
-L<https://playwright.dev/#version=master&path=docs%2Fapi.md&q=pageevaluatepagefunction-arg>
+L<https://playwright.dev/docs/api/class-page#pageevalselector-pagefunction-arg>
 
 You will have to refer to the arguments array as described here:
 L<https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments>
+
+=head3 example of evaluate()
+
+    # Read the console
+    $page->on('console',"return [...arguments]");
+
+    my $promise = $page->waitForEvent('console');
+    #TODO This request can race, the server framework I use to host the playwright spec is *not* FIFO (YET)
+    sleep 1;
+    $page->evaluate("console.log('hug')");
+    my $console_log = $handle->await( $promise );
+
+    print "Logged to console: '".$console_log->text()."'\n";
 
 =head2 Asynchronous operations
 
@@ -385,6 +449,8 @@ You will then need to wait on the result of the backgrounded action with the awa
 If you install this module from CPAN, you will likely encounter a croak() telling you to install node module dependencies.
 Follow the instructions and things should be just fine.
 
+If you aren't, please file a bug!
+
 =head1 CONSTRUCTOR
 
 =head2 new(HASH) = (Playwright)
@@ -394,13 +460,14 @@ Creates a new browser and returns a handle to interact with it.
 =head3 INPUT
 
     debug (BOOL) : Print extra messages from the Playwright server process
+    timeout (INTEGER) : Seconds to wait for the playwright server to spin up and down.  Default: 30s
 
 =head1 METHODS
 
 =head2 launch(HASH) = Playwright::Browser
 
 The Argument hash here is essentially those you'd see from browserType.launch().  See:
-L<https://playwright.dev/#version=v1.5.1&path=docs%2Fapi.md&q=browsertypelaunchoptions>
+L<https://playwright.dev/docs/api/class-browsertype#browsertypelaunchoptions>
 
 There is an additional "special" argument, that of 'type', which is used to specify what type of browser to use, e.g. 'firefox'.
 

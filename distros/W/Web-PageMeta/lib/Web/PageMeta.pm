@@ -1,6 +1,6 @@
 package Web::PageMeta;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use 5.010;
 use Moose;
@@ -23,6 +23,15 @@ has 'url' => (
     is       => 'ro',
     required => 1,
     coerce   => 1,
+);
+
+has 'user_agent' => (
+    isa      => 'Str',
+    is       => 'ro',
+    required => 1,
+    default =>
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
+    lazy => 1,
 );
 
 has 'title' => (
@@ -108,8 +117,13 @@ async sub _build__fetch_page_meta_ft {
 
     # await url htmp http download
     my $timer = time();
-    my ($body, $headers) =
-        await $self->_ua->http_get($self->url, headers => {'Accept' => 'text/html',},);
+    my ( $body, $headers ) = await $self->_ua->http_get(
+        $self->url,
+        headers => {
+            'Accept'     => 'text/html',
+            'User-Agent' => $self->user_agent,
+        },
+    );
     my $status = _get_update_status_reason($headers);
     $log->debugf('page meta fetch %d %s finished in %.3fs', $status, $self->url, time() - $timer);
     HTTP::Exception->throw($status, status_message => $headers->{Reason})
@@ -169,7 +183,12 @@ async sub _build__fetch_image_data_ft {
 
     # await image http download
     my $timer = time();
-    my ($body, $headers) = await $self->_ua->http_get($fetch_url);
+    my ($body, $headers) = await $self->_ua->http_get(
+        $fetch_url,
+        headers => {
+            'User-Agent' => $self->user_agent,
+        },
+    );
     my $status = _get_update_status_reason($headers);
     $log->debugf('img fetch %d %s for %s finished in %.3fs',
         $status, $fetch_url, $self->url, time() - $timer);
@@ -248,6 +267,11 @@ Constructor, only L</url> is required.
 =head2 url
 
 HTTP url to fetch data from.
+
+=head2 user_agent
+
+User-Agent header to use for http requests.
+Default is one from Chrome 89.0.4389.90.
 
 =head2 title
 

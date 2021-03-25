@@ -19,7 +19,7 @@ eval { local $^W=0; require "sys/ioctl.ph" };
 
 =head1 NAME
 
-CallBackery::GuiPlugin::Abstract - Reporter base class
+CallBackery::GuiPlugin::Abstract - GuiPlugin base class
 
 =head1 SYNOPSIS
 
@@ -344,7 +344,6 @@ Receive current data for plug-in screen content.
 =cut
 
 sub getData {
-
 }
 
 =head2 reConfigure
@@ -356,8 +355,6 @@ apply newly acquired data to to the running system.
 =cut
 
 sub reConfigure {
-
-
 }
 
 =head2 validateData(arguments)
@@ -367,7 +364,6 @@ Validate user supplied data prior to acting on it.
 =cut
 
 sub validateData {
-
 }
 
 =head2 mergeGrammar

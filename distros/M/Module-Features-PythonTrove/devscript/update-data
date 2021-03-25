@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use Log::ger::Screen;
+
+use HTTP::Tiny;
+use File::Slurper 'write_text';
+
+my $url = "https://pypi.org/pypi?%3Aaction=list_classifiers";
+my $res = HTTP::Tiny->new->get($url);
+unless ($res->{success}) {
+    log_error "Can't get %s: %s", $url, $res;
+    exit 1;
+}
+
+write_text("$Bin/../devdata/classifiers.txt", $res->{content});

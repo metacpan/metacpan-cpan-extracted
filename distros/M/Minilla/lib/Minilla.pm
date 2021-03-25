@@ -2,7 +2,7 @@ package Minilla;
 use strict;
 use warnings;
 use 5.010001;
-use version; our $VERSION = version->declare("v3.1.11");
+use version; our $VERSION = version->declare("v3.1.12");
 
 our $DEBUG;
 our $AUTO_INSTALL;
@@ -59,7 +59,7 @@ As stated above, Minilla is opinionated. Minilla has a bold assumption and conve
 =head1 GETTING STARTED
 
     # First time only
-    % cpanm Minilla
+    % cpanm --with-recommends Minilla
     # Minilla has only a few deps. It should be very quick
 
     # Make a new distribution
@@ -108,6 +108,10 @@ Checking git's untracked files. If there's untracked files, minilla will abort.
 =head2 CheckOrigin
 
 This step will run the `git remote`. If there's no remote, minilla will abort.
+
+=head2 CheckReleaseBranch
+
+Checking git's current branch is `release.branch` key in minil.toml. If no match, minilla will abort.
 
 =head2 BumpVersion
 
@@ -367,6 +371,13 @@ This variable disables CPAN upload feature.
     ]
 
 Commands that are specified by this option will be executed when releasing. If result of commands is not successful, it will abort.
+
+=item release.branch
+
+    [release]
+    branch = "main"
+
+If this value does not match the current branch, it will abort.
 
 =item unsupported.os
 

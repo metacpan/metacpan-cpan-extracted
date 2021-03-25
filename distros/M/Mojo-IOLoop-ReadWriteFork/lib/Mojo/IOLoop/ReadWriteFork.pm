@@ -3,6 +3,7 @@ use Mojo::Base 'Mojo::EventEmitter';
 
 use Errno qw(EAGAIN ECONNRESET EINTR EPIPE EWOULDBLOCK EIO);
 use IO::Pty;
+use Mojo::Asset::Memory;
 use Mojo::IOLoop;
 use Mojo::IOLoop::Stream;
 use Mojo::IOLoop::ReadWriteFork::SIGCHLD;
@@ -13,7 +14,7 @@ use Scalar::Util qw(blessed);
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 use constant DEBUG      => $ENV{MOJO_READWRITEFORK_DEBUG} && 1;
 
-our $VERSION = '0.43';
+our $VERSION = '1.00';
 
 our @SAFE_SIG
   = grep { !m!^(NUM\d+|__[A-Z0-9]+__|ALL|CATCHALL|DEFER|HOLD|IGNORE|MAX|PAUSE|RTMAX|RTMIN|SEGV|SETS)$! } keys %SIG;
@@ -38,12 +39,21 @@ sub run {
   return $self->start({%$args, program => $program, program_args => \@program_args});
 }
 
+sub run_and_capture_p {
+  my $self    = shift;
+  my $asset   = Mojo::Asset::Memory->new(auto_upgrade => 1);
+  my $read_cb = $self->on(read => sub { $asset->add_chunk($_[1]) });
+  $asset->once(upgrade => sub { $asset = $_[1]; $self->emit(asset => $asset) });
+  return $self->emit(asset => $asset)->run_p(@_)->then(sub {$asset})
+    ->finally(sub { $self->unsubscribe(read => $read_cb) });
+}
+
 sub run_p {
   my $self = shift;
   my $p    = Mojo::Promise->new;
   my @cb;
-  push @cb, $self->once(close => sub { shift->unsubscribe(error => $cb[1]); $p->resolve(@_) });
-  push @cb, $self->once(error => sub { shift->unsubscribe(close => $cb[0]); $p->reject(@_) });
+  push @cb, $self->once(error  => sub { shift->unsubscribe(finish => $cb[1]); $p->reject(@_) });
+  push @cb, $self->once(finish => sub { shift->unsubscribe(error  => $cb[0]); $p->resolve(@_) });
   $self->run(@_);
   return $p;
 }
@@ -81,14 +91,15 @@ sub _start {
     return $self->emit(error => "Invalid conduit ($args->{conduit})");
   }
 
-  $self->emit(
-    before_fork => {
-      stdin_read   => $stdin_read,
-      stdin_write  => $stdin_write,
-      stdout_read  => $stdout_read,
-      stdout_write => $stdout_write,
-    }
-  );
+  my $prepare_event = {
+    stdin_read   => $stdin_read,
+    stdin_write  => $stdin_write,
+    stdout_read  => $stdout_read,
+    stdout_write => $stdout_write,
+  };
+
+  $self->emit(before_fork => $prepare_event);    # LEGACY
+  $self->emit(prepare     => $prepare_event);
 
   return $self->emit(error => "Couldn't fork ($!)") unless defined($self->{pid} = fork);
   return $self->{pid}
@@ -154,13 +165,13 @@ sub _start_parent {
 
   $SIGCHLD->waitpid($self->{pid} => sub { $self->_sigchld(@_) });
   $self->{stream_id} = $self->ioloop->stream($stream);
-  $self->emit('fork');
+  $self->emit('fork');    # LEGACY
+  $self->emit('spawn');
   $self->_write;
 }
 
 sub write {
   my ($self, $chunk, $cb) = @_;
-
   $self->once(drain => $cb) if $cb;
   $self->{stdin_buffer} .= $chunk;
   $self->_write if $self->{stdin_write};
@@ -192,7 +203,7 @@ sub _maybe_terminate {
   delete $self->{stdout_read};
 
   my @errors;
-  for my $cb (@{$self->subscribers('close')}) {
+  for my $cb (@{$self->subscribers('close')}, @{$self->subscribers('finish')}) {
     push @errors, $@ unless eval { $self->$cb(@$self{qw(exit_value signal)}); 1 };
   }
 
@@ -238,7 +249,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 =head1 VERSION
 
-0.43
+1.00
 
 =head1 SYNOPSIS
 
@@ -248,7 +259,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
   $fork->on(error => sub { my ($fork, $error) = @_; warn $error; });
 
   # Emitted when the child completes
-  $fork->on(close => sub { my ($fork, $exit_value, $signal) = @_; Mojo::IOLoop->stop; });
+  $fork->on(finish => sub { my ($fork, $exit_value, $signal) = @_; Mojo::IOLoop->stop; });
 
   # Emitted when the child prints to STDOUT or STDERR
   $fork->on(read => sub {
@@ -282,9 +293,72 @@ more than welcome.
 
 =head1 EVENTS
 
-=head2 before_fork
+=head2 asset
 
-  $self->on(before_fork => sub { my ($self, $pipes) = @_; });
+  $fork->on(asset => sub { my ($fork, $asset) = @_; });
+
+Emitted at least once when calling L</run_and_capture_p>. C<$asset> can be
+either a L<Mojo::Asset::Memory> or L<Mojo::Asset::File> object.
+
+  $fork->on(asset => sub {
+    my ($fork, $asset) = @_;
+    # $asset->auto_upgrade(1) is set by default
+    $asset->max_memory_size(1) if $asset->can('max_memory_size');
+  });
+
+=head2 error
+
+  $fork->on(error => sub { my ($fork, $str) = @_; });
+
+Emitted when when the there is an issue with creating, writing or reading
+from the child process.
+
+=head2 drain
+
+  $fork->on(drain => sub { my ($fork) = @_; });
+
+Emitted when the buffer has been written to the sub process.
+
+=head2 finish
+
+  $fork->on(finish => sub { my ($fork, $exit_value, $signal) = @_; });
+
+Emitted when the child process exit.
+
+=head2 read
+
+  $fork->on(read => sub { my ($fork, $buf) = @_; });
+
+Emitted when the child has written a chunk of data to STDOUT or STDERR.
+
+=head2 spawn
+
+  $fork->on(spawn => sub { my ($fork) = @_; });
+
+Emitted after C<fork()> has been called. Note that the child process might not yet have
+been started. The order of things is impossible to say, but it's something like this:
+
+            .------.
+            | fork |
+            '------'
+               |
+           ___/ \_______________
+          |                     |
+          | (parent)            | (child)
+    .--------------.            |
+    | emit "spawn" |   .--------------------.
+    '--------------'   | set up filehandles |
+                       '--------------------'
+                                |
+                         .---------------.
+                         | exec $program |
+                         '---------------'
+
+See also L</pid> for example usage of this event.
+
+=head2 start
+
+  $fork->on(start => sub { my ($fork, $pipes) = @_; });
 
 Emitted right before the child process is forked. Example C<$pipes>
 
@@ -298,71 +372,27 @@ Emitted right before the child process is forked. Example C<$pipes>
     stdout_write => $pipe_fh_4,
   }
 
-=head2 close
-
-  $self->on(close => sub { my ($self, $exit_value, $signal) = @_; });
-
-Emitted when the child process exit.
-
-=head2 error
-
-  $self->on(error => sub { my ($self, $str) = @_; });
-
-Emitted when when the there is an issue with creating, writing or reading
-from the child process.
-
-=head2 fork
-
-  $self->on(fork => sub { my ($self) = @_; });
-
-Emitted after C<fork()> has been called. Note that the child process might not yet have
-been started. The order of things is impossible to say, but it's something like this:
-
-            .------.
-            | fork |
-            '------'
-               |
-           ___/ \_________________
-          |                       |
-          | (parent)              | (child)
-      .-------------.             |
-      | emit "fork" |    .--------------------.
-      '-------------'    | set up filehandles |
-                         '--------------------'
-                                  |
-                          .---------------.
-                          | exec $program |
-                          '---------------'
-
-See also L</pid> for example usage of this event.
-
-=head2 read
-
-  $self->on(read => sub { my ($self, $buf) = @_; });
-
-Emitted when the child has written a chunk of data to STDOUT or STDERR.
-
 =head1 ATTRIBUTES
 
 =head2 conduit
 
-  $hash = $self->conduit;
-  $self = $self->conduit({type => "pipe"});
+  $hash = $fork->conduit;
+  $fork = $fork->conduit({type => "pipe"});
 
 Used to set the conduit and conduit options. Example:
 
-  $self->conduit({raw => 1, type => "pty"});
+  $fork->conduit({raw => 1, type => "pty"});
 
 =head2 ioloop
 
-  $ioloop = $self->ioloop;
-  $self = $self->ioloop(Mojo::IOLoop->singleton);
+  $ioloop = $fork->ioloop;
+  $fork = $fork->ioloop(Mojo::IOLoop->singleton);
 
 Holds a L<Mojo::IOLoop> object.
 
 =head2 pid
 
-  $int = $self->pid;
+  $int = $fork->pid;
 
 Holds the child process ID. Note that L</start> will start the process after
 the IO loop is started. This means that the code below will not work:
@@ -372,36 +402,46 @@ the IO loop is started. This means that the code below will not work:
 
 This will work though:
 
-  $fork->on(fork => sub { my $self = shift; warn $self->pid });
+  $fork->on(fork => sub { my $fork = shift; warn $fork->pid });
   $fork->run("bash", -c => q(echo $YIKES foo bar baz));
 
 =head1 METHODS
 
 =head2 close
 
-  $self = $self->close("stdin");
+  $fork = $fork->close("stdin");
 
 Close STDIN stream to the child process immediately.
 
 =head2 run
 
-  $self = $self->run($program, @program_args);
-  $self = $self->run(\&Some::Perl::function, @function_args);
+  $fork = $fork->run($program, @program_args);
+  $fork = $fork->run(\&Some::Perl::function, @function_args);
 
 Simpler version of L</start>. Can either start an application or run a perl
 function.
 
+=head2 run_and_capture_p
+
+  $p = $fork->run_and_capture_p(...)->then(sub { my $asset = shift });
+
+L</run_and_capture_p> takes the same arguments as L</run_p>, but the
+fullfillment callback will receive a L<Mojo::Asset> object that holds the
+output from the command.
+
+See also the L</asset> event.
+
 =head2 run_p
 
-  $p = $self->run_p($program, @program_args);
-  $p = $self->run_p(\&Some::Perl::function, @function_args);
+  $p = $fork->run_p($program, @program_args);
+  $p = $fork->run_p(\&Some::Perl::function, @function_args);
 
 Promise based version of L</run>. The L<Mojo::Promise> will be resolved on
-L</close> and rejected on L</error>.
+L</finish> and rejected on L</error>.
 
 =head2 start
 
-  $self = $self->start(\%args);
+  $fork = $fork->start(\%args);
 
 Used to fork and exec a child process. C<%args> can have:
 
@@ -449,23 +489,20 @@ This can also be specified by using the L</conduit> attribute.
 
 =head2 write
 
-  $self = $self->write($chunk);
-  $self = $self->write($chunk, $cb);
+  $fork = $fork->write($chunk);
+  $fork = $fork->write($chunk, $cb);
 
 Used to write data to the child process STDIN. An optional callback will be
 called once STDIN is drained.
 
 Example:
 
-  $self->write("some data\n", sub {
-    my ($self) = @_;
-    $self->close;
-  });
+  $fork->write("some data\n", sub { shift->close });
 
 =head2 kill
 
-  $bool = $self->kill;
-  $bool = $self->kill(15); # default
+  $bool = $fork->kill;
+  $bool = $fork->kill(15); # default
 
 Used to signal the child.
 

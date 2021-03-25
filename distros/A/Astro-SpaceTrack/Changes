@@ -1,3 +1,10 @@
+0.145		2021-03-25	T. R. Wyant
+    Allow identity file to have .gpg suffix.  This is for the benefit of
+    the vim-gnupg plugin, and potentially other such things.
+
+    Refactor authortest into three, so that I can run the
+    optional-modules tests without generating stub files.
+
 0.144		2021-03-07	T. R. Wyant
     Add rt.cpan.org back to bug reporting methods. Long live RT!
 

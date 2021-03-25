@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Exporter" : "5.58"
+            "Exporter" : "5.58",
+            "Test::More" : "0.88"
          }
       }
    },
@@ -44,6 +45,6 @@
          "web" : "https://github.com/sisyphus/math-gmpz"
       }
    },
-   "version" : "0.49",
+   "version" : "0.50",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

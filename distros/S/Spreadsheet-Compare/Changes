@@ -1,2 +1,9 @@
-0.1.0 2021-02-15
+0.12 2021-03-25
+  - fix MANIFEST and bugtracker entry
+
+0.11 2021-03-24
+  - reduce hard dependencies
+  - documentation updates
+
+0.10 2021-03-23
   - first public release

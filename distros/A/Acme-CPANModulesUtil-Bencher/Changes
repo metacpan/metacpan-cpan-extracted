@@ -1,3 +1,10 @@
-0.001   2019-02-23 (PERLANCAR)
+0.002   2021-01-20  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [ux] Add alias module Bencher::Util::CPANModules.
+
+
+0.001   2019-02-23  Released-By: PERLANCAR
 
         - First release.

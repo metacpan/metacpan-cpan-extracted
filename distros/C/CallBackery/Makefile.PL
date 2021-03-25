@@ -12,8 +12,8 @@ WriteMakefile(
   AUTHOR       => 'Tobias Oetiker <tobi@oetiker.ch>',
   LICENSE      => 'gpl_3',
   PREREQ_PM    => {
-    'Mojolicious' => '8.26',
-    'Mojolicious::Plugin::Qooxdoo' => '1.0.9',
+    'Mojolicious' => '9.12',
+    'Mojolicious::Plugin::Qooxdoo' => '1.0.11',
     'Config::Grammar' => '1.13',
     'Locale::PO' => '0.27',
     'JSON::Validator' => 0,

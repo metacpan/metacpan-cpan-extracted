@@ -79,23 +79,43 @@ WriteMakefile( %args );
 sub MY::postamble {
     my ( $self, @args ) = @_;
 
-    my $authortest = $self->test_via_harness(
-	'$(FULLPERLRUN) "-Iinc" "-MMy::Module::Test"', '$(AUTHORTEST_FILES)' );
-    $authortest =~ s/ \s+ \z //smx;
-    $authortest =~ s/ \A \s+ //smx;
-    $authortest =~ s/ (?= \b test_harness \b ) /spacetrack_user(); /smx;
-    chomp $authortest;
+    my $test = $self->test_via_harness(
+	'$(FULLPERLRUN)', '$(TEST_FILES)' );
+    my $structural_test = $self->test_via_harness(
+	'$(FULLPERLRUN)', '$(STRUCTURAL_TEST_FILES)' );
+    foreach ( $test, $structural_test ) {
+	s/ \s+ \z //smx;
+	s/ \A \s+ //smx;
+    }
+    my $optionals = join ',', My::Module::Recommend->optionals();
 
     return <<"EOD";
 
-AUTHORTEST_FILES = t/*.t xt/author/*.t xt/author/optionals/*.t
+STRUCTURAL_TEST_FILES = xt/author/*.t
 
-authortest :: pure_all
-	\$(FULLPERLRUN) "-Iinc" "-MMy::Module::Recommend" \\
-	    "-e" "My::Module::Recommend->make_optional_modules_tests()"
-	AUTHOR_TESTING=1 $authortest
+functional_test :: pure_all
+	\$(NOECHO) \$(ECHO)
+	\$(NOECHO) \$(ECHO) functional_test
+	AUTHOR_TESTING=1 $test
+
+optionals_test :: pure_all
+	\$(NOECHO) \$(ECHO)
+	\$(NOECHO) \$(ECHO) optionals_test
+	AUTHOR_TESTING=1 PERL5OPT=-MTest::Without::Module=$optionals $test
+
+structural_test :: pure_all
+	\$(NOECHO) \$(ECHO)
+	\$(NOECHO) \$(ECHO) structural_test
+	AUTHOR_TESTING=1 $structural_test
+
+authortest :: functional_test optionals_test structural_test
 
 testcover :: pure_all
 	cover -test -ignore_re=inc/ -ignore_re=eg/
+
+.PHONY: functional_test optionals_test structural_test authortest testcover
+
 EOD
 }
+
+# ex: set textwidth=72 :

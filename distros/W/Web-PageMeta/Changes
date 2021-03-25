@@ -1,5 +1,8 @@
 Revision history for Web-PageMeta
 
+0.03    25.02.2021
+    - add option to set user-agent for http requests
+
 0.02    22.02.2021
     - use Future::HTTP::AnyEvent per default
     - use HTTP::Exception

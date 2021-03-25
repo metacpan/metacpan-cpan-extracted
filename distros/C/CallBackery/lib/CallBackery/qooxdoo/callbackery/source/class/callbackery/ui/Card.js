@@ -1,7 +1,7 @@
 /* ************************************************************************
-   Copyright: 2017 OETIKER+PARTNER AG
+   Copyright: 2021 OETIKER+PARTNER AG
    License:   GPLv3 or later
-   Authors:   Tobi Oetiker <tobi@oetiker.ch>
+   Authors:   Fritz Zaucker <fritz.zaucker@oetiker.ch>
    Utf8Check: äöü
 ************************************************************************ */
 
@@ -15,15 +15,22 @@ qx.Class.define("callbackery.ui.Card", {
      *
      * @param vizWidget {Widget} visualization widget to embedd
      */
-    construct: function(pluginName, cardCfg, actions, buttonMap, parentForm) {
+    construct: function(cfg, buttonMap, parentForm) {
         this.base(arguments);
-        this._cardCfg     = cardCfg;
-        this.__actions    = actions;
-        this.__parentForm = parentForm;
-        this.__buttonMap  = buttonMap;
-        this.__pluginName = pluginName;
-        this._formCfg = {};
-        this.__dataCache = {};
+        this._cardCfg      = cfg.cardCfg;
+        this._updateAction = cfg.updateAction;
+        this.__pluginName  = cfg.name;
+        this.__buttonMap   = buttonMap;
+        this.__parentForm  = parentForm;
+        this._formCfg      = {};
+        this.__dataCache   = {};
+
+        this.__actions = [];
+        cfg.action.forEach(function(action) {
+            if (action.addToContextMenu) {
+                this.__actions.push(action);
+            }
+        }, this);
 
         this.__buildForm();
     },
@@ -35,14 +42,15 @@ qx.Class.define("callbackery.ui.Card", {
     },
     events:  {reloadData: 'qx.event.type.Event'},
     members: {
-        _cardCfg     : null,
-        _formCfg     : null,
-        __actions    : null,
-        __dataCache  : null,
-        __fields     : null,
-        __pluginName : null,
-        __buttonMap  : null,
-        __parentForm : null,
+        _cardCfg      : null,
+        _formCfg      : null,
+        _updateAction : null,
+        __actions     : null,
+        __dataCache   : null,
+        __fields      : null,
+        __pluginName  : null,
+        __buttonMap   : null,
+        __parentForm  : null,
 
         setData: function(data) {
             var cardCfg = this._cardCfg;
@@ -158,11 +166,11 @@ qx.Class.define("callbackery.ui.Card", {
                             }
                             var rpc = callbackery.data.Server.getInstance();
                             this.__parentForm.setSelection({ data : this.__dataCache, key : fieldCfg.key, value : value });
-                            if (this.__buttonMap['updateEntry']) {
-                                this.__buttonMap['updateEntry'].execute();
+                            if (this.__buttonMap[this._updateAction]) {
+                                this.__buttonMap[this._updateAction].execute();
                             }
                             else {
-                                console.warn('No method for updateEntry');
+                                console.warn('No method for updateCard:', this._updateAction);
                             }
                         });
                     }
@@ -174,10 +182,9 @@ qx.Class.define("callbackery.ui.Card", {
             // add action buttons
             this.__actions.forEach(function(action) {
                 var btn = this.__createButton(action.label, action.buttonSet.icon);
-                var buttonMap = this.__buttonMap;
                 btn.addListener('execute', function() {
                     this.__parentForm.setSelection(this.__dataCache);
-                    buttonMap[action.key].execute();
+                    this.__buttonMap[action.key].execute();
                 }, this);
                 this._add(btn, action.cardAddSet);
             }, this);

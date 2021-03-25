@@ -50,6 +50,7 @@ sub import ( $class, %args ) {
         load_remote $pkg, 'Mojo::Base',   qw( -strict -signatures);
         load_remote $pkg, 'Mojo::Loader', qw(data_section);
         load_remote $pkg, 'FindBin',      qw($Bin $Script);
+        load_remote $pkg, 'Module::Load', qw(load autoload);
 
         autoload_remote $pkg, 'Test::More';
         autoload_remote $pkg, 'Test::Exception';

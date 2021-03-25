@@ -28,6 +28,8 @@ t/fixtures/version_undef/cpanfile
 t/fixtures/version_undef/cpanfile.snapshot
 t/fixtures/with_exact/cpanfile
 t/fixtures/with_exact/cpanfile.snapshot
+t/fixtures/with_same_distribution/cpanfile
+t/fixtures/with_same_distribution/cpanfile.snapshot
 t/fixtures/with_version/cpanfile
 t/fixtures/with_version/cpanfile.snapshot
 t/lib/SetupFixture.pm

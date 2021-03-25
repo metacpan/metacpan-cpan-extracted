@@ -37,7 +37,6 @@ my %WriteMakefileArgs = (
     "Net::EmptyPort" => 0,
     "Sub::Install" => 0,
     "feature" => 0,
-    "sigtrap" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -49,7 +48,7 @@ my %WriteMakefileArgs = (
     "Test::MockFile" => 0,
     "Test::MockModule" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -80,7 +79,6 @@ my %FallbackPrereqs = (
   "Test::MockFile" => 0,
   "Test::MockModule" => 0,
   "feature" => 0,
-  "sigtrap" => 0,
   "strict" => 0,
   "warnings" => 0
 );

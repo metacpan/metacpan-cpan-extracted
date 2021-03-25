@@ -6,18 +6,18 @@ use Scalar::Util qw(weaken);
 
 use constant WAIT_PID_INTERVAL => $ENV{WAIT_PID_INTERVAL} || 0.05;
 
+has pids => sub { +{} };
+
 sub is_waiting {
   my $self = shift;
-  return !!(%{$self->{pids} || {}} || $self->{tid});
+  return !!(%{$self->pids} || $self->{tid});
 }
 
 sub singleton { state $singleton = Mojo::IOLoop::ReadWriteFork::SIGCHLD->new }
 
 sub waitpid {
   my ($self, $pid, $cb) = @_;
-
-  my $pids = $self->{pids} //= {};
-  push @{$pids->{$pid}}, $cb;
+  push @{$self->pids->{$pid}}, $cb;
 
   # The CHLD test is for code, such as Minion::Command::minion::worker
   # where SIGCHLD is set up for manual waitpid() checks.
@@ -32,6 +32,7 @@ sub waitpid {
     WAIT_PID_INTERVAL,
     sub {
       my $ioloop = shift;
+      my $pids   = $self->pids;
       return $ioloop->remove(delete $self->{tid}) unless %$pids;
 
       for my $pid (keys %$pids) {
@@ -46,7 +47,7 @@ sub waitpid {
 sub _exit {
   my ($self, $pid, $status) = @_;
   delete $self->{ev}{$pid};
-  my $listeners = delete $self->{pids}{$pid};
+  my $listeners = delete $self->pids->{$pid};
   for my $cb (@$listeners) { $cb->($status, $pid) }
 }
 
@@ -62,13 +63,21 @@ L<Mojo::IOLoop::ReadWriteFork::SIGCHLD> is a module that can wait for a child
 process to exit. This is currently done either with L<EV/child> or a recurring
 timer and C<waitpid>.
 
+=head1 ATTRIBUTES
+
+  $hash_ref = $sigchld->pids;
+
+Returns a hash ref where the keys are active child process IDs and the values
+are array-refs of callbacks passed on to L</waitpid>.
+
 =head1 METHODS
 
 =head2 is_waiting
 
   $bool = $sigchld->is_waiting;
 
-Returns true if C<$sigchld> is still waiting for a process to exit.
+Returns true if C<$sigchld> is still has a recurring timer or waiting for a
+process to exit.
 
 =head2 singleton
 

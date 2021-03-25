@@ -1,5 +1,5 @@
 package Text::Levenshtein;
-$Text::Levenshtein::VERSION = '0.13';
+$Text::Levenshtein::VERSION = '0.14';
 use 5.006;
 use strict;
 use warnings;
@@ -183,6 +183,21 @@ L<Text::LevenshteinXS> and L<Text::Levenshtein::XS> are both versions
 of the Levenshtein algorithm that require a C compiler,
 but will be a lot faster than this module.
 
+L<Text::Levenshtein::Flexible> is another C implementation,
+but offers some twists: you can specify a maximum distance that
+you're interested in, which makes it faster;
+you can also give different costs to insertion, deletion,
+and substitution. Hasn't been updated since 2014.
+
+L<Text::Levenshtein::Edlib> is a Perl wrapper around a C++
+library that provides the Levenshtein edit distance and
+optimal alignment path for a pair of strings.
+It doesn't support UTF-8 strings, though.
+
+L<Text::Levenshtein::BV> implements the Levenshtein algorithm
+using bit vectors, and claims to be faster than this implementation.
+I haven't benchmarked them.
+
 The Damerau-Levenshtein edit distance is like the Levenshtein distance,
 but in addition to insertion, deletion and substitution, it also
 considers the transposition of two adjacent characters to be a single edit.
@@ -209,6 +224,9 @@ L<Text::Dice> calculates
 L<Dice's coefficient|https://en.wikipedia.org/wiki/Sørensen–Dice_coefficient>
 for two strings. This formula was originally developed to measure the
 similarity of two different populations in ecological research.
+
+L<String::KeyboardDistance> and L<String::KeyboardDistanceXS>
+calculate the "keyboard distance" between two strings.
 
 =head1 REPOSITORY
 

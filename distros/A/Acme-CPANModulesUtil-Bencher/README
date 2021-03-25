@@ -3,9 +3,9 @@ NAME
     information in an Acme::CPANModules::* list
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModulesUtil::Bencher
+    This document describes version 0.002 of Acme::CPANModulesUtil::Bencher
     (from Perl distribution Acme-CPANModulesUtil-Bencher), released on
-    2019-02-24.
+    2021-01-20.
 
 FUNCTIONS
   gen_bencher_scenario
@@ -80,8 +80,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesUtil-
-    Bencher>
+    <https://github.com/perlancar/perl-Acme-CPANModulesUtil-Bencher/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -95,7 +94,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 /* ************************************************************************
-   Copyright: 2017 OETIKER+PARTNER AG
+   Copyright: 2021 OETIKER+PARTNER AG
    License:   GPLv3 or later
-   Authors:   Tobi Oetiker <tobi@oetiker.ch>
+   Authors:   Fritz Zaucker <fritz.zaucker@oetiker.ch>
    Utf8Check: äöü
 ************************************************************************ */
 
@@ -12,6 +12,7 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
     extend : callbackery.ui.plugin.Table,
     construct : function(cfg, getParentFormData) {
         this.base(arguments, cfg, getParentFormData);
+
         // replace setData method of parent class
         this._form['setData'] = qx.lang.Function.bind(this.setData, this);
     },
@@ -19,18 +20,48 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
         __cards    : null,
         __cardList : null,
 
-        _addValidation: function(){
+        _addValidation : function() {
         },
         
         _createTable : function() {
-            this.__cards = {};
-            var scroll   = new qx.ui.container.Scroll().set({scrollbarX: 'off'});
             this.__cardList = new qx.ui.container.Composite(new qx.ui.layout.VBox(0));
+            this.__cards    = {};
+            var scroll      = new qx.ui.container.Scroll().set({scrollbarX: 'off'});
             scroll.add(this.__cardList);
+
+            this._form.addListener('changeData', this._loadData, this);
+
             return scroll;
         },
 
-        setData: function (data){
+        // called from form appear listener
+        _loadData : function() {
+            var that = this;
+            var rpc = callbackery.data.Server.getInstance();
+            var currentFormData = this._form.getData();
+            // console.log('_loadData(): currentFormData=', currentFormData);
+            var busy = callbackery.ui.Busy.getInstance();
+            busy.show(this.tr('Loading Card Data'));
+            this._loading++;
+            rpc.callAsync(function(data,exc){
+                // console.log('exc=', exc, ', data=', data);
+                if (!exc){
+                    that.setData(data,true);
+                    if (that._hasTrigger) {
+                        that._reconfForm();
+                    }
+                }
+                else {
+                    if (exc.code != 2){ /* 2 is for aborted calls, this happens when the popup is closed */
+                        callbackery.ui.MsgBox.getInstance().exc(exc);
+                    }
+                }
+                busy.hide();
+                that._loading--;
+            }, 'getPluginData', this._cfg.name, 'allCardData', currentFormData);
+        },
+
+        setData : function (data) {
             if (!Array.isArray(data)) {
                 console.warn('data is not an array');
                 return;
@@ -39,13 +70,6 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
             var currentKeys = {};
             var that = this;
 
-            var cardActions = [];
-            this._cfg.action.forEach(function(action) {
-                if (action.addToContextMenu) {
-                    cardActions.push(action);
-                }
-            }, this);
-            
             // add new cards
             var buttonMap = this._action.getButtonMap();
             if (data.forEach) {
@@ -53,9 +77,9 @@ qx.Class.define("callbackery.ui.plugin.CardList", {
                     var key = row.id;
                     currentKeys[key] = 1;
                     if (!cards[key]){
-                        var card = cards[key] = new callbackery.ui.Card(this._cfg.name, this._cfg.cardCfg, cardActions, buttonMap, that);
-                        that.__cardList.addAt(card,0);
-                        card.addListener('reloadData',function(){
+                        var card = cards[key] = new callbackery.ui.Card(this._cfg, buttonMap, that);
+                        that.__cardList.addAt(card, 0);
+                        card.addListener('reloadData', function(){
                             this._loadData();
                         }, that);
                     }

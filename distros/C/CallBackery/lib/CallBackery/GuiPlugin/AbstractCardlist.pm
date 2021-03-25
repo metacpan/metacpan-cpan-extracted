@@ -7,7 +7,7 @@ use POSIX qw(strftime);
 
 =head1 NAME
 
-CallBackery::GuiPlugin::AbstractCardlist - Base Class for a cardlist plugin
+CallBackery::GuiPlugin::AbstractCardlist - Base class for a cardlist plugin
 
 =head1 SYNOPSIS
 
@@ -15,7 +15,7 @@ CallBackery::GuiPlugin::AbstractCardlist - Base Class for a cardlist plugin
 
 =head1 DESCRIPTION
 
-The base class for cardlist plugins, derived from CallBackery::GuiPlugin::AbstractForm
+The base class for cardlist plugins, derived from CallBackery::GuiPlugin::AbstractTable
 
 =cut
 
@@ -30,8 +30,9 @@ The attributes of the L<CallBackery::GuiPlugin::AbstractTable> class and these:
 has screenCfg => sub {
     my $self = shift;
     my $screen = $self->SUPER::screenCfg;
-    $screen->{type}    = 'cardlist';
-    $screen->{cardCfg} = $self->cardCfg;
+    $screen->{type}         = 'cardlist';
+    $screen->{updateAction} = 'updateCard';
+    $screen->{cardCfg}      = $self->cardCfg;
     return $screen;
 };
 

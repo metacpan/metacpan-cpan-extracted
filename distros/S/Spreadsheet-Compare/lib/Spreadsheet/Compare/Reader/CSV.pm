@@ -266,7 +266,7 @@ Spreadsheet::Compare::Reader::CSV - CSV File Adapter for Spreadsheet::Compare
 
 =head1 DESCRIPTION
 
-This module provides an init/fetch interface for reading records from CSV files. It uses
+This module provides a fetch interface for reading records from CSV files. It uses
 L<Text::CSV|https://metacpan.org/pod/Text::CSV> to do the heavy lifting. This allows
 the interface to have maximal flexibility.
 
@@ -346,7 +346,7 @@ Example:
 
 Set the list of possible separators in header detection. If left undefined the
 value set by B<sep> or B<sep_char> in L</csv_options> will be used.
-(see B<sep_set> in L<Text::CSV/Options>).
+(see L<Text::CSV/sep_set>).
 
 =head2 skip_after_head
 

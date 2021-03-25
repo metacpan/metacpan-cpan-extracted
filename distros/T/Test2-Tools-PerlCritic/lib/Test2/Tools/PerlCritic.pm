@@ -15,7 +15,7 @@ use Path::Tiny ();
 our @EXPORT = qw( perl_critic_ok );
 
 # ABSTRACT: Testing tools to enforce Perl::Critic policies
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 sub _args
@@ -153,15 +153,14 @@ Test2::Tools::PerlCritic - Testing tools to enforce Perl::Critic policies
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
  use Test2::V0;
  use Test2::Tools::PerlCritic;
  
- perl_critic_ok 'lib', 'test library files';
- perl_critic_ok 't',   'test test files';
+ perl_critic_ok ['lib','t'], 'test library files';
  
  done_testing;
 
@@ -180,13 +179,20 @@ addressing violations.
 
 =head2 perl_critic_ok
 
- perl_critic_ok $file_or_directory, \@options, $test_name;
- perl_critic_ok $file_or_directory, \%options, $test_name;
- perl_critic_ok $file_or_directory, $critic, $test_name;
- perl_critic_ok $file_or_directory, $test_name;
- perl_critic_ok $file_or_directory;
+ perl_critic_ok $path, \@options, $test_name;
+ perl_critic_ok \@path, \@options, $test_name;
+ perl_critic_ok $path, \%options, $test_name;
+ perl_critic_ok \@path, \%options, $test_name;
+ perl_critic_ok $path, $critic, $test_name;
+ perl_critic_ok \@path, $critic, $test_name;
+ perl_critic_ok $path, $test_name;
+ perl_critic_ok \@path, $test_name;
+ perl_critic_ok $path;
+ perl_critic_ok \@path;
 
-Run L<Perl::Critic> on the given file or directory.  If C<\@options> or
+Run L<Perl::Critic> on the given files or directories.  The first argument
+(C<$path> or C<\@path>) can be either the path to a file or directory, or
+a array reference to a list of paths to files and directories.  If C<\@options> or
 C<\%options> are provided, then they will be passed into the
 L<Perl::Critic> constructor.  If C<$critic> (an instance of L<Perl::Critic>)
 is provided, then that L<Perl::Critic> instance will be used instead
@@ -202,6 +208,11 @@ Otherwise a false will be returned.
 
 C<done_testing> or the equivalent is NOT called by this function.
 You are responsible for calling that yourself.
+
+Since we do not automatically call C<done_testing>, you can call C<perl_critic_ok>
+multiple times, but keep in mind that the policy violations will only be grouped
+in each individual call, so it is probably better to provide a list of paths,
+rather than make multiple calls.
 
 =head1 CAVEATS
 
@@ -231,7 +242,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Graham Ollis.
+This software is copyright (c) 2019-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

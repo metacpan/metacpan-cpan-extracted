@@ -1,4 +1,3 @@
-bin/spreadcomp
 Changes
 lib/Spreadsheet/Compare.pm
 lib/Spreadsheet/Compare/Common.pm
@@ -15,15 +14,13 @@ lib/Spreadsheet/Compare/Reporter/XLSX.pm
 lib/Spreadsheet/Compare/Single.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
+script/spreadcomp
 t/00_common.t
-t/01_basic.t
 t/01_simple_fix.t
-t/02_file.t
 t/02_simple_csv.t
 t/03_simple_db.t
-t/03_url.t
 t/04_simple_wb.t
 t/11_complex_fix.t
 t/12_complex_csv.t

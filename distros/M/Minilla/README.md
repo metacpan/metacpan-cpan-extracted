@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tokuhirom/Minilla.svg?branch=master)](https://travis-ci.org/tokuhirom/Minilla) [![MetaCPAN Release](https://badge.fury.io/pl/Minilla.svg)](https://metacpan.org/release/Minilla)
+[![Actions Status](https://github.com/tokuhirom/Minilla/workflows/test/badge.svg)](https://github.com/tokuhirom/Minilla/actions) [![MetaCPAN Release](https://badge.fury.io/pl/Minilla.svg)](https://metacpan.org/release/Minilla)
 # NAME
 
 Minilla - CPAN module authoring tool
@@ -32,7 +32,7 @@ As stated above, Minilla is opinionated. Minilla has a bold assumption and conve
 # GETTING STARTED
 
     # First time only
-    % cpanm Minilla
+    % cpanm --with-recommends Minilla
     # Minilla has only a few deps. It should be very quick
 
     # Make a new distribution
@@ -81,6 +81,10 @@ Checking git's untracked files. If there's untracked files, minilla will abort.
 ## CheckOrigin
 
 This step will run the \`git remote\`. If there's no remote, minilla will abort.
+
+## CheckReleaseBranch
+
+Checking git's current branch is \`release.branch\` key in minil.toml. If no match, minilla will abort.
 
 ## BumpVersion
 
@@ -338,6 +342,13 @@ But, you can write configurations to _minil.toml_ file in [TOML](https://github.
         ]
 
     Commands that are specified by this option will be executed when releasing. If result of commands is not successful, it will abort.
+
+- release.branch
+
+        [release]
+        branch = "main"
+
+    If this value does not match the current branch, it will abort.
 
 - unsupported.os
 

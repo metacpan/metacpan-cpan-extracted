@@ -1,5 +1,5 @@
 package Term::ProgressSpinner; 
-our $VERSION = '0.05';
+our $VERSION = '1.00';
 use 5.006; use strict; use warnings;
 use IO::Handle; use Term::ANSIColor; use Time::HiRes qw//;
 use Term::Size::Any qw/chars/;
@@ -1013,7 +1013,7 @@ Term::ProgressSpinner - Terminal Progress bars!
 
 =head1 VERSION
 
-Version 0.05
+Version 1.00
 
 =cut
 
@@ -2231,10 +2231,9 @@ L<https://metacpan.org/release/Term-ProgressSpinner>
 
 =head1 ACKNOWLEDGEMENTS
 
-
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2021 by LNATION.
 
 This is free software, licensed under:
 

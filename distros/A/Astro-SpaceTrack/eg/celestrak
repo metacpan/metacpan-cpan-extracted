@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.144';
+our $VERSION = '0.145';
 
 use Astro::SpaceTrack;
 

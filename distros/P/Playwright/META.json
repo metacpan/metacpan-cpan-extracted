@@ -58,7 +58,6 @@
             "Sub::Install" : "0",
             "feature" : "0",
             "perl" : "v5.28.0",
-            "sigtrap" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -77,15 +76,15 @@
    "provides" : {
       "Playwright" : {
          "file" : "lib/Playwright.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Playwright::Base" : {
          "file" : "lib/Playwright/Base.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "Playwright::Util" : {
          "file" : "lib/Playwright/Util.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -100,7 +99,7 @@
          "web" : "https://github.com/teodesian/playwright-perl"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.21"
 }

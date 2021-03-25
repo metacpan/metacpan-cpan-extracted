@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use Log::ger::Screen;
+
+use Data::Dump;
+use HTTP::Tiny;
+use File::Slurper 'read_text', 'write_text';
+use Text::Fragment 'insert_fragment';
+
+my $path = "$Bin/../devdata/classifiers.txt";
+open my $fh, "<", $path or die "Can't open $path: $!";
+
+my %FEATURES_DEF = (
+    v => 1,
+    summary => 'Perl trove classifiers',
+    features => {},
+);
+while (my $cl = <$fh>) {
+    chomp $cl;
+    unless ($cl =~ /^([^:]+) :: (.+)$/) {
+        die "Invalid line $. in classifiers.txt, must be in /^FOO( :: BAR)+/ form: $cl";
+    }
+    my ($fname, $fval) = ($1, $2);
+    $fname =~ s/\W+/_/g;
+    $FEATURES_DEF{features}{$fname} //= {
+        schema => ['any*', {
+            of=>[
+                ['str*', {in=>[]}],
+                ['array*', {min_len=>1, of=>['str*', {in=>[]}]}],
+            ],
+        }],
+    };
+    push @{ $FEATURES_DEF{features}{$fname}{schema}[1]{of}[0][1]{in} }, $fval;
+    push @{ $FEATURES_DEF{features}{$fname}{schema}[1]{of}[1][1]{of}[1]{in} }, $fval;
+}
+
+$path = "$Bin/../lib/Module/Features/PerlTrove.pm";
+my $content = read_text($path);
+my $res = insert_fragment(text=>$content, id=>'def', payload=>'%FEATURES_DEF = %{ ' . Data::Dump::dump(\%FEATURES_DEF) . " };\n\n");
+die "Cannot insert fragment: $res->[0] - $res->[1]" unless $res->[0] == 200;
+write_text($path, $res->[2]{text});

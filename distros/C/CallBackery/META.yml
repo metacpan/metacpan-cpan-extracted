@@ -23,8 +23,8 @@ requires:
   Excel::Writer::XLSX: '0'
   JSON::Validator: '0'
   Locale::PO: '0.27'
-  Mojolicious: '8.26'
-  Mojolicious::Plugin::Qooxdoo: v1.0.9
+  Mojolicious: '9.12'
+  Mojolicious::Plugin::Qooxdoo: v1.0.11
   Text::CSV: '0'
   YAML::XS: '0'
   perl: '5.022000'
@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.35.8
+version: v0.35.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

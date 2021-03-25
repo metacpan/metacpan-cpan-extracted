@@ -227,7 +227,7 @@ Spreadsheet::Compare::Reader::FIX - Fixed-Width File Adapter for Spreadsheet::Co
 
 =head1 DESCRIPTION
 
-This module provides an init/fetch interface for reading records from files with fixed width columns.
+This module provides a fetch interface for reading records from files with fixed width columns.
 
 =head1 ATTRIBUTES
 
