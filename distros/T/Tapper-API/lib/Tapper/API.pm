@@ -1,8 +1,8 @@
 package Tapper::API;
-# git description: v5.0.0-2-g4bdeb86
+# git description: v5.0.1-6-g8c2b8e9
 
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::API::VERSION = '5.0.1';
+$Tapper::API::VERSION = '5.0.2';
 # ABSTRACT: Tapper - REST frontend
 
 use 5.010;
@@ -19,7 +19,7 @@ sub startup {
         my $cfg = Tapper::Config->subconfig;
         my $r = $self->routes;
         foreach my $target (@{$cfg->{api}->{routes}}) {
-                $r->any($target->{url})->detour($target->{module});
+                $r->any($target->{url})->partial(1)->to($target->{module});
         }
 
 }
@@ -42,7 +42,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Amazon.
+This software is Copyright (c) 2021 by Amazon.
 
 This is free software, licensed under:
 

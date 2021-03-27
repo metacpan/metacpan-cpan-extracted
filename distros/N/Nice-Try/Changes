@@ -1,5 +1,8 @@
 Revision history for Perl module Nice::Try
 
+0.1.11 2021-03-26T09:27:22+0900
+    - Implemented 2 bug fixes courtesy of Tilmann Haeberle: 1) on inheritance of exception class and 2) on fall through i.e. an exception is not caught and is not bubbling up
+
 0.1.10 2021-02-11T16:07:50+0900
     - Corrected perl minimum version requirement
 

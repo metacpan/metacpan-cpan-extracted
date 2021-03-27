@@ -10,8 +10,8 @@ use FindBin '$Bin';
 use File::Slurper qw!read_text write_text!;
 use Deploy 'make_date';
 
-my $newversion = '0.01';
-my $version = '0.00_03';
+my $newversion = '0.03';
+my $version = '0.02';
 
 my @pmfiles = qw!
 lib/CSS/Tidy.pm

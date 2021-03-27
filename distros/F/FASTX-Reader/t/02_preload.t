@@ -14,7 +14,7 @@ if (! -e $seq_file) {
   exit 0;
 }
 
-my $data = FASTX::Reader->new({ 
+my $data = FASTX::Reader->new({
 	filename => "$seq_file",
 	loadseqs => 'name'
 });
@@ -22,14 +22,16 @@ my $data = FASTX::Reader->new({
 ok(defined $data->{seqs}, 'Retrieved sequences');
 
 my $seq_num = scalar keys %{ $data->{seqs} };
-ok($seq_num == 3, 'Preloaded 3 sequenses');
+ok($seq_num == 3, "Preloaded 3 sequenses: $seq_num found");
 
+my $c = 0;
 for my $seq (keys %{ $data->{seqs} }) {
-	ok(defined ${ $data->{seqs} }{$seq}, "Sequence $seq has a defined value");
-	ok(${ $data->{seqs} }{$seq} =~/^[ACGTN]+$/i, "Sequence $seq has a SEQUENCE value: ${ $data->{seqs} }{$seq}");
+  $c++;
+	ok(defined ${ $data->{seqs} }{$seq}, "[Preloaded.$c] Sequence $seq has a defined value");
+	ok(${ $data->{seqs} }{$seq} =~/^[ACGTN]+$/i, "[Preloaded.$c] Sequence $seq has a SEQUENCE value: ${ $data->{seqs} }{$seq}");
 }
 
-$data = FASTX::Reader->new({ 
+$data = FASTX::Reader->new({
 	filename => "$seq_file",
 	loadseqs => 'seq'
 });

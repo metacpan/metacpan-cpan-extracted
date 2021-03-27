@@ -1,0 +1,59 @@
+[
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/ HTTP/1.1\r\nUser-Agent: Mojolicious (Perl)\r\nAccept-Encoding: gzip\r\nX-TYPESENSE-API-KEY: 777\r\nContent-Type: application/json\r\nHost: localhost:7777\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nContent-Length: 2\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nDate: Thu, 25 Mar 2021 14:39:20 GMT\r\nVary: accept-encoding\r\nAccept-Ranges: none\r\n\r\n[]",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 0
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /debug HTTP/1.1\r\nUser-Agent: Mojolicious (Perl)\r\nAccept-Encoding: gzip\r\nX-TYPESENSE-API-KEY: 777\r\nHost: localhost:7777\r\nContent-Type: application/json\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/debug",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nDate: Thu, 25 Mar 2021 14:39:20 GMT\r\nVary: accept-encoding\r\nAccept-Ranges: none\r\nContent-Length: 30\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\n\r\n{\"state\":1,\"version\":\"0.19.0\"}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 1
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/ HTTP/1.1\r\nX-TYPESENSE-API-KEY: 777\r\nUser-Agent: Mojolicious (Perl)\r\nAccept-Encoding: gzip\r\nHost: localhost:7777\r\nContent-Type: application/json\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nDate: Thu, 25 Mar 2021 14:39:20 GMT\r\nVary: accept-encoding\r\nAccept-Ranges: none\r\nContent-Length: 2\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\n\r\n[]",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 2
+   }
+]

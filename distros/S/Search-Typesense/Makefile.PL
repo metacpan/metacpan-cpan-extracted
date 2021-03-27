@@ -25,10 +25,14 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Mojo::UserAgent::Mockable" => "1.58",
     "Test::More" => 0,
-    "Test::Most" => "0.37"
+    "Test::Most" => "0.37",
+    "Test::Perl::Critic" => "1.04",
+    "Test::PerlTidy" => 20200930,
+    "autodie" => "2.29"
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,11 +43,15 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "Mojo::UserAgent::Mockable" => "1.58",
   "Mojolicious" => "9.11",
   "Moo" => "2.005_000",
   "Test::More" => 0,
   "Test::Most" => "0.37",
-  "Type::Tiny" => "1.011_011"
+  "Test::Perl::Critic" => "1.04",
+  "Test::PerlTidy" => 20200930,
+  "Type::Tiny" => "1.011_011",
+  "autodie" => "2.29"
 );
 
 

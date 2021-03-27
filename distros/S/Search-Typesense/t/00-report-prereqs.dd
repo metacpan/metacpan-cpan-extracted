@@ -29,8 +29,12 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'Mojo::UserAgent::Mockable' => '1.58',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0.37'
+                                   'Test::Most' => '0.37',
+                                   'Test::Perl::Critic' => '1.04',
+                                   'Test::PerlTidy' => '20200930',
+                                   'autodie' => '2.29'
                                  }
                  }
      };

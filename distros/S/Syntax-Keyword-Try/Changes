@@ -1,5 +1,11 @@
 Revision history for Syntax-Keyword-Try
 
+0.22    2021-03-26
+        [CHANGES]
+         * Preserve wantarray context within the try {} block (RT133616)
+         * List-context `try do {}` now works fine as well
+         * Apply unit-testing for RT134790
+
 0.21    2021-01-22
         [CHANGES]
          * Add some import configuration options required to make

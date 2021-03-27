@@ -1,7 +1,23 @@
-#define PERL_NO_GET_CONTEXT
+// PERL_NO_GET_CONTEXT is not used here, so it's OK to define it after inculding these files
 #include "EXTERN.h"
 #include "perl.h"
+
+// There are a lot of macro about threads: USE_ITHREADS, USE_5005THREADS, I_PTHREAD, I_MACH_CTHREADS, OLD_PTHREADS_API
+// This symbol, if defined, indicates that Perl should be built to use the interpreter-based threading implementation.
+#ifndef USE_ITHREADS
+#   define PERL_NO_GET_CONTEXT
+#endif
+
 #include "XSUB.h"
+
+#ifdef I_PTHREAD
+#   include "pthread.h"
+#endif
+
+#ifdef I_MACH_CTHREADS
+#   include "mach/cthreads.h"
+#endif
+
 
 #include <sched.h>
 #include <errno.h>
@@ -42,7 +58,7 @@ inline void init_set (Linux_Sys_CPU_Affinity *cpuset, AV *av) {
 
     if (cpuset->set == NULL) {
         SV *msg = sv_2mortal( newSVpvf("Failed to allocate memory for %i CPUs", cpuset->max_cpus) );
-        Perl_croak(pTHX_ (char *) SvPV_nolen(msg));
+        croak((char *) SvPV_nolen(msg));
     }
 
     CPU_ZERO_S(cpuset->size, cpuset->set);
@@ -61,13 +77,13 @@ inline void init_set (Linux_Sys_CPU_Affinity *cpuset, AV *av) {
 inline AV* _extract_and_validate_av(SV *sv) {
 
     if (!SvOK(sv))
-        Perl_croak(aTHX_ "the CPU's list can't be undefined");
+        croak("the CPU's list can't be undefined");
 
     if (SvTIED_mg(sv, PERL_MAGIC_tied))
-        Perl_croak(aTHX_ "tied objects aren't supported");
+        croak("tied objects aren't supported");
 
     if (!SvROK(sv))
-        Perl_croak(aTHX_ "the CPU's list must be an array reference");
+        croak("the CPU's list must be an array reference");
 
     SV *ref = SvRV(sv);
     AV *av;
@@ -77,7 +93,7 @@ inline AV* _extract_and_validate_av(SV *sv) {
             av = (AV *) ref;
             break;
         default:       // $ref ne "ARRAY"
-            Perl_croak(aTHX_ "the CPU's list must be an array reference");
+            croak("the CPU's list must be an array reference");
     }
 
     SSize_t i;
@@ -94,9 +110,7 @@ inline AV* _extract_and_validate_av(SV *sv) {
     }
 
     if (bad_arg != -1) {
-        // postpone SvREFCNT_dec(sv)
-        SV *msg = sv_2mortal( newSVpvf("Not an integer at position %i", bad_arg) );
-        Perl_croak(pTHX_ (char *) SvPV_nolen(msg));
+        croak("Not an integer at position %i", bad_arg);
     }
 
     return av;
@@ -207,7 +221,7 @@ CODE:
     char* class_name = cpusetA->class_name;
 
     if (cpusetA->size != cpusetB->size)
-        Perl_croak(pTHX_ "The size of given cpusets are different");
+        croak("The size of given cpusets are different");
     
     Linux_Sys_CPU_Affinity *new_cpuset = make_from_object(cpusetA, 1);
 
@@ -224,7 +238,7 @@ CODE:
     char* class_name = cpusetA->class_name;
 
     if (cpusetA->size != cpusetB->size)
-        Perl_croak(pTHX_ "The size of given cpusets are different");
+        croak("The size of given cpusets are different");
     
     Linux_Sys_CPU_Affinity *new_cpuset = make_from_object(cpusetA, 1);
 
@@ -241,7 +255,7 @@ CODE:
     char* class_name = cpusetA->class_name;
 
     if (cpusetA->size != cpusetB->size)
-        Perl_croak(pTHX_ "The size of given cpusets are different");
+        croak("The size of given cpusets are different");
     
     Linux_Sys_CPU_Affinity *new_cpuset = make_from_object(cpusetA, 1);
 
@@ -330,7 +344,7 @@ CODE:
     int res = sched_getaffinity((pid_t) pid, new_cpuset->size, new_cpuset->set);
     if (res == -1) {
         SV *error = get_sched_error_text(errno, 1);
-        Perl_croak(pTHX_ (char *) SvPV_nolen(error));
+        croak((char *) SvPV_nolen(error));
     }
     RETVAL = get_cpus_from_cpuset(new_cpuset);
     safefree(new_cpuset);
@@ -345,7 +359,7 @@ PPCODE:
     int res = sched_setaffinity((pid_t) pid, cpuset->size, cpuset->set);
     if (res == -1) {
         SV *error = get_sched_error_text(errno, 0);
-        Perl_croak(pTHX_ (char *) SvPV_nolen(error));
+        croak((char *) SvPV_nolen(error));
     }
     mXPUSHi( res );
     XSRETURN(1);

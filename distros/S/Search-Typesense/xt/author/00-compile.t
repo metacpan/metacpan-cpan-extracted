@@ -6,14 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8;
+plan tests => 7;
 
 my @module_files = (
     'Search/Typesense.pm',
     'Search/Typesense/Collection.pm',
     'Search/Typesense/Document.pm',
     'Search/Typesense/Role/Request.pm',
-    'Search/Typesense/Role/UserAgentInterface.pm',
     'Search/Typesense/Types.pm',
     'Search/Typesense/Version.pm'
 );

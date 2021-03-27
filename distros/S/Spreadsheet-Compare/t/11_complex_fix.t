@@ -7,7 +7,7 @@ lives_ok {
 
     my %expect = (
         'Fix Big'       => {qw/left   854 right   854 same   851 diff 3 limit 0 miss 0 add 0 dup 0/},
-        'Fix Big Limit' => {qw/left   854 right   854 same   851 diff 3 limit 1 miss 0 add 0 dup 0/},
+        'Fix Big Limit' => {qw/left   854 right   854 same   851 diff 3 limit 2 miss 0 add 0 dup 0/},
         'Duplicates'    => {qw/left 15536 right 15536 same 15535 diff 1 limit 0 miss 0 add 0 dup 0/},
     );
 

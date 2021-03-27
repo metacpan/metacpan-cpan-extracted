@@ -1,5 +1,5 @@
 package Selenium::InternetExplorer;
-$Selenium::InternetExplorer::VERSION = '1.42';
+$Selenium::InternetExplorer::VERSION = '1.44';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ Selenium::InternetExplorer - A convenience package for creating a IE instance
 
 =head1 VERSION
 
-version 1.42
+version 1.44
 
 =head1 SYNOPSIS
 

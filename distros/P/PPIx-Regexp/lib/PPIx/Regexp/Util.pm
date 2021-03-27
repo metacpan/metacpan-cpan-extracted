@@ -23,7 +23,7 @@ our @EXPORT_OK = qw{
     __to_ordinal_en
 };
 
-our $VERSION = '0.078';
+our $VERSION = '0.079';
 
 sub is_ppi_regexp_element {
     my ( $elem ) = @_;
@@ -175,8 +175,9 @@ C<_INSTANCE()> subroutine.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in electronic
-mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-Regexp>,
+L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

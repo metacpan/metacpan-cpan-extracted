@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
  */
 #include "EXTERN.h"
 #include "perl.h"
@@ -175,14 +175,6 @@ static OP *pp_pushfinally(pTHX)
   return PL_op->op_next;
 }
 
-#define newPUSHFINALLYOP(finally)  MY_newPUSHFINALLYOP(aTHX_ finally)
-static OP *MY_newPUSHFINALLYOP(pTHX_ CV *finally)
-{
-  OP *op = newSVOP_CUSTOM(0, (SV *)finally);
-  op->op_ppaddr = &pp_pushfinally;
-  return (OP *)op;
-}
-
 #define newLOCALISEOP(gv)  MY_newLOCALISEOP(aTHX_ gv)
 static OP *MY_newLOCALISEOP(pTHX_ GV *gv)
 {
@@ -216,15 +208,6 @@ static OP *MY_newSTATEOP_nowarnings(pTHX)
   warning_bits[(2*WARN_EXITING) / 8] &= ~(1 << (2*WARN_EXITING % 8));
 
   return op;
-}
-
-#define parse_scoped_block(flags)  MY_parse_scoped_block(aTHX_ flags)
-static OP *MY_parse_scoped_block(pTHX_ int flags)
-{
-  OP *ret;
-  I32 save_ix = block_start(TRUE);
-  ret = parse_block(flags);
-  return block_end(save_ix, ret);
 }
 
 static void rethread_op(OP *op, OP *old, OP *new)
@@ -352,10 +335,10 @@ static OP *pp_leave_keeping_stack(pTHX)
   return cUNOP->op_next;
 }
 
-#define newENTERTRYCATCHOP(try, catch)  MY_newENTERTRYCATCHOP(aTHX_ try, catch)
-static OP *MY_newENTERTRYCATCHOP(pTHX_ OP *try, OP *catch)
+#define newENTERTRYCATCHOP(flags, try, catch)  MY_newENTERTRYCATCHOP(aTHX_ flags, try, catch)
+static OP *MY_newENTERTRYCATCHOP(pTHX_ U32 flags, OP *try, OP *catch)
 {
-  OP *enter, *ret;
+  OP *enter, *entertry, *ret;
 
   /* Walk the block for OP_RETURN ops, so we can apply a hack to them to
    * make
@@ -368,16 +351,37 @@ static OP *MY_newENTERTRYCATCHOP(pTHX_ OP *try, OP *catch)
   /* despite calling newUNOP(OP_ENTERTRY,...) the returned root node is the
    * OP_LEAVETRY, whose first child is the ENTERTRY we wanted
    */
-  ((UNOP *)enter)->op_first->op_ppaddr = &pp_entertrycatch;
+  entertry = ((UNOP *)enter)->op_first;
+  entertry->op_ppaddr = &pp_entertrycatch;
 
-  ret = newLOGOP_CUSTOM(0,
-    enter,
-    newLISTOP(OP_SCOPE, 0, catch, NULL)
-  );
-  /* the returned op is actually an UNOP that's either NULL or NOT; the real
-   * logop is the op_next of it
+  /* If we call newLOGOP_CUSTOM it will op_contextualize the enter block into
+   * G_SCALAR. This is not what we want
    */
-  cUNOPx(ret)->op_first->op_ppaddr = &pp_catch;
+  {
+    LOGOP *logop;
+
+    OP *first = enter, *other = newLISTOP(OP_SCOPE, 0, catch, NULL);
+
+    NewOp(1101, logop, 1, LOGOP);
+
+    logop->op_type = OP_CUSTOM;
+    logop->op_ppaddr = &pp_catch;
+    logop->op_first = first;
+    logop->op_flags = OPf_KIDS;
+    logop->op_other = LINKLIST(other);
+
+    logop->op_next = LINKLIST(first);
+    enter->op_next = (OP *)logop;
+#if HAVE_PERL_VERSION(5, 22, 0)
+    op_sibling_splice((OP *)logop, first, 0, other);
+#else
+    first->op_sibling = other;
+#endif
+
+    ret = newUNOP(OP_NULL, 0, (OP *)logop);
+    other->op_next = ret;
+  }
+
   return ret;
 }
 
@@ -479,9 +483,8 @@ static int try_keyword(pTHX_ OP **op)
         if(type->op_type == OP_CONST)
           type->op_private &= ~(OPpCONST_BARE|OPpCONST_STRICT);
 
-        condop = newBINOP_CUSTOM(0,
+        condop = newBINOP_CUSTOM(&pp_isa, 0,
           newPADxVOP(OP_PADSV, catchvar, 0, 0), type);
-        condop->op_ppaddr = &pp_isa;
 #endif
       }
       else if(lex_consume("=~")) {
@@ -595,14 +598,16 @@ static int try_keyword(pTHX_ OP **op)
   ret = try;
 
   if(catch) {
-    ret = newENTERTRYCATCHOP(try, catch);
+    ret = newENTERTRYCATCHOP(is_value ? OPf_WANT_SCALAR : 0, try, catch);
   }
 
   /* If there's a finally, make
    *   $RET = OP_PUSHFINALLY($FINALLY); $RET
    */
   if(finally) {
-     ret = op_prepend_elem(OP_LINESEQ, newPUSHFINALLYOP(finally), ret);
+    ret = op_prepend_elem(OP_LINESEQ,
+      newSVOP_CUSTOM(&pp_pushfinally, 0, (SV *)finally),
+      ret);
   }
 
   ret = op_append_list(OP_LEAVE,

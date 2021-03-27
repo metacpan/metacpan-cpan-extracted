@@ -1,4 +1,4 @@
-package Spreadsheet::Compare 0.12;
+package Spreadsheet::Compare 0.13;
 
 # TODO: (issue) allow list for reporters
 
@@ -91,6 +91,7 @@ sub _setup_reporter ( $self, $test, $single ) {
 
     INFO "Reporter Args: ", Dump( \%args );
     $self->{_current_reporter} = my $rep_obj = $modname->new( \%args );
+    $rep_obj->{__ro__test_title} = $test->{title};
     $rep_obj->setup();
     for my $ev ( $self->_reporter_events->@* ) {
         $trace and TRACE "subscribe event $ev";

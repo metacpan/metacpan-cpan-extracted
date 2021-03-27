@@ -3,7 +3,7 @@
 use strict;
 
 use lib 'lib';
-use Test::Most tests => 5;
+use Test::Most tests => 6;
 use lib 't/lib';
 use MyLogger;
 
@@ -12,7 +12,7 @@ BEGIN {
 }
 
 SKIP: {
-	skip 'Database not installed', 3, if(!-r 'lib/Genealogy/ObituaryDailyTimes/database/obituaries.sql');
+	skip 'Database not installed', 5, if(!-r 'lib/Genealogy/ObituaryDailyTimes/database/obituaries.sql');
 
 	if($ENV{'TEST_VERBOSE'}) {
 		Genealogy::ObituaryDailyTimes::DB::init(logger => MyLogger->new());
@@ -31,4 +31,7 @@ SKIP: {
 
 	my $baal = $search->search({ first => 'Eric', last => 'Baal' });
 	is($baal->{'url'}, 'https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check URL');
+
+	my @empty = $search->search(last => 'xyzzy');
+	is(scalar(@empty), 0, 'Search for xyzzy should return an empty list');
 }

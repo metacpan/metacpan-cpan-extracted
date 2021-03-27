@@ -1,5 +1,5 @@
 package Selenium::Firefox::Profile;
-$Selenium::Firefox::Profile::VERSION = '1.42';
+$Selenium::Firefox::Profile::VERSION = '1.44';
 # ABSTRACT: Use custom profiles with Selenium::Remote::Driver
 # TODO: convert this to Moo!
 
@@ -107,18 +107,14 @@ sub add_extension {
 sub add_webdriver {
     my ( $self, $port, $is_marionette ) = @_;
 
-    my $prefs              = $self->_load_prefs;
     my $current_user_prefs = $self->{user_prefs};
 
     $self->set_preference(
-        %{ $prefs->{mutable} },
-
         # having the user prefs here allows them to overwrite the
         # mutable loaded prefs
         %{$current_user_prefs},
 
         # but the frozen ones cannot be overwritten
-        %{ $prefs->{frozen} },
         'webdriver_firefox_port' => $port
     );
 
@@ -129,29 +125,6 @@ sub add_webdriver {
     return $self;
 }
 
-sub _load_prefs {
-
-    # The appropriate webdriver preferences are stored in an adjacent
-    # JSON file; it's useful things like disabling default browser
-    # checks and setting an empty single page as the start up tab
-    # configuration. Unfortunately, these change with each version of
-    # webdriver.
-
-    my $this_dir               = dirname( abs_path(__FILE__) );
-    my $default_prefs_filename = $this_dir . '/webdriver_prefs.json';
-
-    my $json;
-    {
-        local $/;
-        open( my $fh, '<', $default_prefs_filename );
-        $json = <$fh>;
-        close($fh);
-    }
-
-    my $prefs = decode_json($json);
-
-    return $prefs;
-}
 
 
 sub _add_webdriver_xpi {
@@ -274,7 +247,7 @@ Selenium::Firefox::Profile - Use custom profiles with Selenium::Remote::Driver
 
 =head1 VERSION
 
-version 1.42
+version 1.44
 
 =head1 DESCRIPTION
 

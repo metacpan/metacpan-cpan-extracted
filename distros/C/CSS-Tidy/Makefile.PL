@@ -13,6 +13,8 @@ WriteMakefile (
     AUTHOR => 'Ben Bullock <bkb@cpan.org>',
     LICENSE => 'perl',
     PREREQ_PM => {
+	'C::Tokenize' => '0.18',
+	'File::Slurper' => '0.012',
     },
     EXE_FILES => [
 	'script/csstidy',

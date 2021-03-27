@@ -36,5 +36,5 @@ resources:
   bugtracker: https://github.com/tomk3003/spreadsheet-compare/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/tomk3003/spreadsheet-compare.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,7 +10,7 @@ use base qw{ PPIx::Regexp::Token };
 use Carp;
 use PPIx::Regexp::Constant qw{ MINIMUM_PERL @CARP_NOT };
 
-our $VERSION = '0.078';
+our $VERSION = '0.079';
 
 {
     my %when_removed = (
@@ -75,8 +75,9 @@ superclass.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in electronic
-mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-Regexp>,
+L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

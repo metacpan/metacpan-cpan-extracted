@@ -1,39 +1,49 @@
 Revision history for Perl extension List::Helpers::XS.
 
-0.12  Mon Mar 25
-    - fixes for tied arrays; some optimistions
-
-0.11  Mon Mar 24
-    - POD fixes; small optimisation for tied arrays
-
-0.10  Mon Mar 22
+0.15  2021 Mar 26
     - POD fixes
 
-0.09  Sun Mar 17
+0.14  2021 Mar 26
+    - added full support of Perl versiuons with threds;
+    - fixed issue with even element shuffling at first position of array (bug report and test by Dmitriy Novozhilov)
+
+0.13  2021 Mar 25
+    - fix issues with compilation in Perl with thread support
+
+0.12  2021 Mar 25
+    - fixes for tied arrays; some optimistions
+
+0.11  2021 Mar 24
+    - POD fixes; small optimisation for tied arrays
+
+0.10  2021 Mar 22
+    - POD fixes
+
+0.09  2021 Mar 17
     - tiny optimisations
 
-0.08  Sun Mar 16
+0.08  2021 Mar 16
     - remove redundant file from package
 
-0.07  Sun Mar 16
+0.07  2021 Mar 16
     - some optimisations for shuffle_multi" method; adding more test cases
 
-0.06  Sun Mar 16
+0.06  2021 Mar 16
     - add "shuffle_multi" method
 
-0.05  Sun Feb 21
+0.05  2021 Feb 21
     - some optimisations for tied arrays
 
-0.04  Sun Feb 21
+0.04  2021 Feb 21
     - some fixes in documentation
 
-0.03  Sun Feb 21
+0.03  2021 Feb 21
     - issues with tied arrays were fixed
 
-0.02  Sat Feb 20
+0.02  2021 Feb 20
 	- some fixes in POD
 
-0.01  Sat Feb 20
+0.01  2021 Feb 20
 	- initial version
 
 

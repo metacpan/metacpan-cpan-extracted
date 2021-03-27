@@ -96,6 +96,24 @@ All the methods of L<CallBackery::GuiPlugin::AbstractTable> plus:
 
 =cut
 
+=head2 getData ('allCardData');
+
+Return the requested card data and pass other types of request on to the upper levels.
+
+=cut
+
+sub getData {
+    my $self = shift;
+    my $call = shift // '';
+
+    if ($call eq 'allCardData') {
+        return $self->$call(@_);
+    }
+    else {
+        return $self->SUPER::getData($call, @_);
+    }
+}
+
 =head2 getTableRowCount({formData=>{}})
 
 is not used for card plugins.

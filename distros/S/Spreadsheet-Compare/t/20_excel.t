@@ -4,8 +4,6 @@ use Spreadsheet::Compare::Common
     test => 1,
     temp => 1;
 
-use Spreadsheet::Read;
-
 lives_ok {
     require_ok('Spreadsheet::Compare');
 
@@ -46,6 +44,9 @@ lives_ok {
     SKIP: {
         my $sr_installed = try { load 'Spreadsheet::Read'; 1 } catch { undef };
         skip "Spreadsheet::Read not installed" unless $sr_installed;
+
+        my $spx_installed = try { load 'Spreadsheet::ParseXLSX'; 1 } catch { undef };
+        skip "Spreadsheet::ParseXLSX not installed" unless $spx_installed;
 
         subtest "check $_->[0] report", \&_check_content, @$_ for @reports;
     }

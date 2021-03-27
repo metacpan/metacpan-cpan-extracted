@@ -36,7 +36,7 @@ sub setup ($self) {
     );
     $self->{__ro__dbh} = $dbh;
 
-    my $stmt = $self->sql->$#* ? $self->sql->[ $self->{index} ] : $self->sql->[0];
+    my $stmt = $self->sql->$#* ? $self->sql->[ $self->index ] : $self->sql->[0];
     LOGDIE "no sql statement configured" unless $stmt;
 
     $debug and DEBUG "preparing sql statement, '$stmt'";

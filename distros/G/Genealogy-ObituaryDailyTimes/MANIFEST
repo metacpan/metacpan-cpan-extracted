@@ -11,15 +11,18 @@ README.md
 t/00-load.t
 t/10-new.t
 t/coverage.t
+t/eof.t
 t/eol.t
 t/lib/MyLogger.pm
 t/links.t
 t/no404s.t
+t/noopentickets.t
 t/noplan.t
 t/pod-cm.t
 t/pod.t
 t/search.t
 t/snippets.t
+t/spelling.t
 t/strict.t
 t/unused.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

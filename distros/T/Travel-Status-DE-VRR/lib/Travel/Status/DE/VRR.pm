@@ -6,7 +6,7 @@ use 5.010;
 
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = '1.17';
+our $VERSION = '1.19';
 
 use parent 'Travel::Status::DE::EFA';
 
@@ -44,7 +44,7 @@ Travel::Status::DE::VRR - unofficial VRR departure monitor.
 
 =head1 VERSION
 
-version 1.17
+version 1.19
 
 =head1 DESCRIPTION
 

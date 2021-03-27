@@ -95,7 +95,7 @@ sub main {
 	pop @ignore_files;
 	my ($premature, @results) = run_tests(
 		sub {
-			is_dir($tdir_src1, $tdir_src2, 'src1 vs src2 with less ignore', \@ignore_files, 'verbose');
+			is_dir($tdir_src2, $tdir_src1, 'src1 vs src2 with less ignore', \@ignore_files, 'verbose');
 		}
 	);
 	my $result = $results[0];
@@ -105,7 +105,7 @@ sub main {
 		$result_diag,
 		join("\n",
 			'File "cba" differ',
-			'in '.$tdir_src1.' is a regular file while in '.$tdir_src2.' is a directory',
+			'in '.$tdir_src2.' is a directory while in '.$tdir_src1.' is a regular file',
 			'File "xxx" differ',
 			"---",
 			"+++",

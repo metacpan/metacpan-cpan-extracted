@@ -1,5 +1,5 @@
 package Selenium::Remote::Spec;
-$Selenium::Remote::Spec::VERSION = '1.42';
+$Selenium::Remote::Spec::VERSION = '1.44';
 use strict;
 use warnings;
 
@@ -254,7 +254,7 @@ Selenium::Remote::Spec - Implement commands for Selenium::Remote::Driver
 
 =head1 VERSION
 
-version 1.42
+version 1.44
 
 =head1 DESCRIPTION
 

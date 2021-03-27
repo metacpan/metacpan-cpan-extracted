@@ -1,6 +1,6 @@
 # Acme-Automatix
 
-This is a toy module just used to test [Github action "upload-to-cpan"](https://github.com/thibaultduponchelle/upload-to-cpan)
+This is a toy module just used to test [Github action "action-upload-to-cpan"](https://github.com/thibaultduponchelle/action-upload-to-cpan)
 
 The release is *automatix*! :D
 
@@ -15,7 +15,7 @@ To install this module (that actually has no goal), run the following commands:
 
 ## SUPPORT AND DOCUMENTATION
 
-You also look for information at [Acme-Automatix](https://github.com/thibaultduponchelle/Acme-Automatix) or [Github action "upload-to-cpan"](https://github.com/thibaultduponchelle/upload-to-cpan)
+You also look for information at [Acme-Automatix](https://github.com/thibaultduponchelle/Acme-Automatix) or [Github action "action-upload-to-cpan"](https://github.com/thibaultduponchelle/action-upload-to-cpan)
 
 ## LICENSE AND COPYRIGHT
 

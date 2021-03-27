@@ -17,29 +17,32 @@ meta-spec:
   version: '1.4'
 name: App-BencherUtils
 requires:
+  Acme::CPANModulesUtil::Bencher: '0'
   App::lcpan::Call: '0.11'
   Bencher::Backend: '1.041'
   Browser::Open: '0'
   Complete::Module: '0'
-  Complete::Util: '0.602'
+  Complete::Util: '0.608'
   Data::Clean::ForJSON: '0'
-  Data::Sah::Coerce::perl::str::str_normalize_perl_modname: '0'
+  Data::Sah::Coerce::perl::To_float::From_str::percent: '0'
+  Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::float: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   File::Slurper: '0'
-  File::Temp: '0'
+  File::Temp: '0.2307'
   Function::Fallback::CoreOrPP: '0'
   JSON::MaybeXS: '0'
-  Log::ger: '0.027'
+  Log::ger: '0.037'
   PERLANCAR::Module::List: '0.004004'
   POSIX: '0'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Lite: '1.820'
-  Perinci::Object: '0.310'
-  Perinci::Sub::Util: '0.46'
+  Perinci::CmdLine::Lite: '1.827'
+  Perinci::Object: '0.311'
+  Perinci::Sub::Util: '0.470'
+  Perinci::Sub::XCompletion::perl_modname: '0'
   PerlX::Maybe: '0'
   Sah::Schema::perl::modargs: '0'
   Sah::Schema::perl::modname: '0'
@@ -47,50 +50,58 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BencherUtils
+  bugtracker: https://github.com/perlancar/perl-App-BencherUtils/issues
   homepage: https://metacpan.org/release/App-BencherUtils
   repository: git://github.com/perlancar/perl-App-BencherUtils.git
-version: '0.242'
+version: '0.243'
 x_Dist_Zilla:
   perl:
-    version: '5.028002'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript chart-bencher-result'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript format-bencher-result'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript list-bencher-results'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript list-bencher-scenario-modules'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript cleanup-old-bencher-results'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript bencher-module-startup-overhead'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript bencher-code'
-      version: '0.421'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript bencher-for'
-      version: '0.421'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript gen-bencher-scenario-from-cpanmodules'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList
       version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -162,7 +173,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.597'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -178,7 +189,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -194,18 +205,18 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000036'
           version: '0.006'
       name: '@Author::PERLANCAR/CheckSelfDependency'
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -215,9 +226,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -229,7 +240,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: '@Author::PERLANCAR/OurPkgVersion'
-      version: '0.15'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -341,7 +352,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.082'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -355,7 +366,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
@@ -363,7 +374,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -387,9 +398,15 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.058'
     -
-      class: Dist::Zilla::Plugin::Test::Perl::Critic
-      name: '@Author::PERLANCAR/Test::Perl::Critic'
-      version: '3.001'
+      class: Dist::Zilla::Plugin::Test::Perl::Critic::Subset
+      config:
+        Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
+          finder:
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
+      name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
+      version: 3.001.005
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
@@ -492,6 +509,6 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.012'
 x_authority: cpan:PERLANCAR
-x_generated_by_perl: v5.28.2
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

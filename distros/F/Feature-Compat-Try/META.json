@@ -21,7 +21,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Syntax::Keyword::Try" : "0.21",
+            "Syntax::Keyword::Try" : "0.22",
             "perl" : "5.014"
          }
       },
@@ -34,7 +34,7 @@
    "provides" : {
       "Feature::Compat::Try" : {
          "file" : "lib/Feature/Compat/Try.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

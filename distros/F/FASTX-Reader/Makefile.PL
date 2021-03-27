@@ -26,9 +26,10 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => "2.1",
     "File::Fetch" => 0,
     "FindBin" => "1.3",
+    "JSON::PP" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "1.0.1",
+  "VERSION" => "1.0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "Data::Dumper" => "2.1",
   "File::Fetch" => 0,
   "FindBin" => "1.3",
+  "JSON::PP" => 0,
   "Time::HiRes" => 0
 );
 

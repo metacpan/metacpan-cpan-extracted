@@ -111,8 +111,6 @@ $t->get_ok('/.well-known/host-meta')
   ->element_exists('Host')
   ->text_is(Host => $hm_host);
 
-
-
 my $xrd = $t->app->hostmeta('example.org');
 ok(!$xrd->property, 'Property not found.');
 ok(!$xrd->property('bar'), 'Property not found.');
@@ -150,7 +148,7 @@ $app->hook(
     my ($c, $xrd_ref) = @_;
 
     my $link = $xrd_ref->link(salmon => {
-      href => 'http://www.sojolicio.us/'
+      href => 'http://www.sojolicious.example/'
     });
     $link->add('Title' => 'Salmon');
   });
@@ -173,7 +171,7 @@ is_deeply(
      "titles" => {
        "default" => "Salmon"
      },
-     "href" => 'http://www.sojolicio.us/'
+     "href" => 'http://www.sojolicious.example/'
    }
   ],
    "properties" => {
@@ -197,7 +195,7 @@ ok($xrd = $c->hostmeta, 'Get local HostMeta');
 is($xrd->property('permanentcheck')->text, 1, 'Property 1');
 is($xrd->property('foo')->text, 'bar', 'Property 2');
 is($xrd->property('check')->text, 7, 'Property 3');
-is($xrd->link('salmon')->attr('href'), 'http://www.sojolicio.us/', 'Link 1');
+is($xrd->link('salmon')->attr('href'), 'http://www.sojolicious.example/', 'Link 1');
 ok(!$xrd->link('author'), 'Link 2');
 
 ok($xrd = $c->hostmeta(['author']), 'Get local HostMeta');
@@ -214,7 +212,7 @@ $c->hostmeta(
     is($xrd->property('permanentcheck')->text, 1, 'Property 7');
     is($xrd->property('check')->text, 9, 'Property 8');
     is($xrd->link('salmon')->attr('href'),
-       'http://www.sojolicio.us/', 'Link 5');
+       'http://www.sojolicious.example/', 'Link 5');
 });
 
 $c->hostmeta(

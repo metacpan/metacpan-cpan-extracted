@@ -48,7 +48,7 @@ $document = {
 };
 $response = $typesense->documents->upsert( $collection, $document, );
 eq_or_diff $response, $document,
-'We should be able to call documents->upsert($collection, \%document) with a non-existent document';
+  'We should be able to call documents->upsert($collection, \%document) with a non-existent document';
 
 $document = {
     'id'            => '125',
@@ -58,10 +58,12 @@ $document = {
 };
 $response = $typesense->documents->upsert( $collection, $document );
 eq_or_diff $response, $document,
-'We should be able to call documents->upsert($collection, \%document) and update an existing document';
+  'We should be able to call documents->upsert($collection, \%document) and update an existing document';
 
-$response =
-  $typesense->documents->update( $collection, 125, { num_employees => 15 } );
+$response = $typesense->documents->update(
+    $collection, 125,
+    { num_employees => 15 }
+);
 eq_or_diff $response, { id => 125, num_employees => 15 },
   'We should be able to documents->upsert()';
 
@@ -73,7 +75,7 @@ my $deleted = {
     'num_employees' => 15
 };
 eq_or_diff $response, $deleted,
-'We should be able to call documents->delete($collection, $id) and delete a document';
+  'We should be able to call documents->delete($collection, $id) and delete a document';
 
 $response = $typesense->collections->search(
     $collection,
@@ -85,7 +87,8 @@ $response = $typesense->collections->search(
     }
 );
 
-is $response->{found}, 1, 'We should have one response found from our collections->search()';
+is $response->{found}, 1,
+  'We should have one response found from our collections->search()';
 is $response->{out_of}, 1, '... out of the total number of records';
 eq_or_diff $response->{hits}[0]{document},
   {
@@ -118,8 +121,8 @@ my $documents = [
 ];
 
 lives_ok {
-    $response =
-      $typesense->documents->import( $collection, 'upsert', $documents );
+    $response
+      = $typesense->documents->import( $collection, 'upsert', $documents );
 }
 'We should be able to import documents';
 
@@ -128,6 +131,6 @@ eq_or_diff $response, $documents,
   '... and we should be able to documents->export($collection)';
 $response = $typesense->documents->export('compani');
 ok !defined $response,
-'... but trying to export documents from a non-existing collection should fail';
+  '... but trying to export documents from a non-existing collection should fail';
 
 done_testing;

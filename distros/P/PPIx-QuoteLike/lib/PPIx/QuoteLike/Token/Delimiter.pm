@@ -9,7 +9,7 @@ use base qw{ PPIx::QuoteLike::Token::Structure };
 
 use PPIx::QuoteLike::Constant qw{ MINIMUM_PERL @CARP_NOT };
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 # Perl 5.29.0 disallows unassigned code points and combining code points
 # as delimiters. Unfortunately for me non-characters and illegal
@@ -101,6 +101,7 @@ L<PPIx::QuoteLike::Token|PPIx::QuoteLike::Token>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-QuoteLike>,
 L<https://github.com/trwyant/perl-PPIx-QuoteLike/issues>, or in
 electronic mail to the author.
 

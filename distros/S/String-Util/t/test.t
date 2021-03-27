@@ -20,6 +20,9 @@ ok(!defined collapse(undef), 'collapse undef should return undef');
 # crunch
 #------------------------------------------------------------------------------
 
+is(crunchlines("x\n\n\nx"), "x\nx", "crunchlines with three \\ns");
+is(crunchlines("x\nx")    , "x\nx", "crunchlines with one \\ns");
+is(crunchlines(undef)     , undef , "crunchlines with undef");
 
 #------------------------------------------------------------------------------
 # hascontent
@@ -48,14 +51,16 @@ ok(!nocontent('word'), "nocontent word");
 #
 
 # basic trimming
-is(trim(undef)                 , ""         , 'trim undef');
+is(trim(undef)                 , undef      , 'trim undef');
 is(trim("   Perl    ")         , "Perl"     , 'trim spaces');
 is(trim("\t\tPerl\t\t")        , "Perl"     , 'trim tabs');
 is(trim("\n\n\nPerl")          , "Perl"     , 'trim \n');
 is(trim("\n\n\t\nPerl   \t\n") , "Perl"     , 'trim all three');
 
-is(ltrim("\n\n\t\nPerl   ")    , "Perl   "  , 'ltrim');
-is(rtrim("\n\tPerl   ")        , "\n\tPerl" , 'rtrim');
+is(ltrim("\n\n\t\nPerl   "), "Perl   "  , 'ltrim');
+is(ltrim(undef)            , undef, 'ltrim undef');
+is(rtrim("\n\tPerl   ")    , "\n\tPerl" , 'rtrim');
+is(rtrim(undef)            , undef, 'rtrim undef');
 
 #
 # trim
@@ -79,10 +84,11 @@ is(nospace(undef)              , undef   , 'nospace undef');
 # startswith
 $val = "Quick brown fox";
 
-ok(startswith("Quick brown fox", 'Q')     , "Startswidth char");
-ok(startswith("Quick brown fox", 'Quick') , "Startswidth word");
-ok(!startswith("Quick brown fox", 'z')    , "Does NOT start with char");
-ok(!startswith("Quick brown fox", 'Qqq')  , "Does NOT start with string");
+ok(startswith("Quick brown fox" , 'Q')     , "Startswidth char");
+ok(startswith("Quick brown fox" , 'Quick') , "Startswidth word");
+ok(!startswith("Quick brown fox", 'z')     , "Does NOT start with char");
+ok(!startswith("Quick brown fox", 'Qqq')   , "Does NOT start with string");
+is(startswith(undef, 'foo')     , undef    , "Startswidth undef");
 #------------------------------------------------------------------------------
 
 
@@ -90,10 +96,11 @@ ok(!startswith("Quick brown fox", 'Qqq')  , "Does NOT start with string");
 # endswith
 $val = "Quick brown fox";
 
-ok(endswith($val, 'x')    , "Endswidth char");
-ok(endswith($val, 'fox')  , "Endswidth word");
-ok(endswith($val, ' fox') , "Endswidth space word");
-ok(!endswith($val, 'foq') , "Does not end width string");
+ok(endswith($val, 'x')    , "Endswith char");
+ok(endswith($val, 'fox')  , "Endswith word");
+ok(endswith($val, ' fox') , "Endswith space word");
+ok(!endswith($val, 'foq') , "Does not end with string");
+is(endswith(undef, 'foo'), undef    , "Endswith undef");
 #------------------------------------------------------------------------------
 
 
@@ -104,6 +111,7 @@ ok(contains($val, 'brown') , "Contains word");
 ok(contains($val, 'uick')  , "Contains word 2");
 ok(contains($val, 'n f')   , "Contains word with space");
 ok(!contains($val, 'bri')  , "Does not contains word");
+is(contains(undef, 'foo')  , undef    , "Contains undef");
 #------------------------------------------------------------------------------
 
 
@@ -211,6 +219,8 @@ is(jsquote("'yeah\n</script>'"), q|'\'yeah\n<' + '/script>\''|, 'jsquote');
 is(sanitize("http://www.google.com/"), 'http_www_google_com', 'Sanitize URL');
 is(sanitize("foo_bar()")             , 'foo_bar'            , 'Sanitize function name');
 is(sanitize("/path/to/file.txt")     , 'path_to_file_txt'   , 'Sanitize path');
+
+is(sanitize("Hello there!!!", '.')   , 'Hello.there'        , 'Sanitize with a custom separator');
 
 #------------------------------------------------------------------------------
 # randword

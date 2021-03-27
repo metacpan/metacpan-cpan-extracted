@@ -5,7 +5,7 @@ use warnings;
 
 use Carp qw/confess/;
 
-our $VERSION = '0.000051';
+our $VERSION = '0.000054';
 
 BEGIN {
     confess "You must first load a Test2::Harness::UI::Schema::NAME module"
@@ -45,7 +45,7 @@ sub sig {
     my $self = shift;
 
     return join ";" => (
-        (map {$self->$_ // ''} qw/status pinned passed failed retried/),
+        (map {$self->$_ // ''} qw/status pinned passed failed retried concurrency/),
         (map {length($self->$_ // '')} qw/fields parameters/),
     );
 }
@@ -67,8 +67,8 @@ sub TO_JSON {
     my $dt = DTF()->parse_datetime( $cols{added} );
 
     # Convert from UTC to localtime
-    $dt->set_time_zone('UTC');
-    $dt->set_time_zone('local');
+#    $dt->set_time_zone('UTC');
+#    $dt->set_time_zone('local');
 
     $cols{added} = $dt->strftime("%Y-%m-%d %I:%M%P");
 

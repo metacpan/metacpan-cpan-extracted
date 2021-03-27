@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 use Scalar::Util ();
 
@@ -91,6 +91,17 @@ sub is_same_interface_inlined {
     push @src => sprintf("'%s' eq %s->named", $self->named, $v);
 
     return join "\n && ", @src;
+}
+
+sub display {
+    my $self = shift;
+
+    my $s = '';
+    $s .= $self->type if $self->type;
+    $s .= ' ' if $s && $self->name;
+    $s .= ':' if $self->named;
+    $s .= $self->name if $self->name;
+    return $s;
 }
 
 
@@ -225,7 +236,7 @@ A boolean value indicating whether to be invocant. Default to false.
 
 Setter for C<invocant>.
 
-=head2 OTHERS
+=head2 METHODS
 
 =head3 is_same_interface($other_meta)
 
@@ -235,6 +246,18 @@ Specifically, check whether C<name>, C<type>, C<optional> and C<named> are equal
 =head3 is_same_interface_inlined($other_meta_inlined)
 
 Returns inlined C<is_same_interface> string.
+
+=head3 display
+
+Returns the display of Sub::Meta::Param:
+
+    use Sub::Meta::Param;
+    use Types::Standard qw(Str);
+    my $meta = Sub::Meta::Param->new(
+        type => Str,
+        name => '$message',
+    );
+    $meta->display;  # 'Str $message'
 
 =head1 SEE ALSO
 

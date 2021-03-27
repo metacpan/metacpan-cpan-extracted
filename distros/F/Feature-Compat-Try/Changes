@@ -1,5 +1,12 @@
 Revision history for Feature-Compat-Try
 
+0.03    2021-03-26
+        [CHANGES]
+         * Better detection of whether the 'try' core feature is available
+         * Updated documentation to remark that the core feature arrived in
+           perl 5.33.7
+         * Add unit test for RT134790
+
 0.02    2021-01-23
         [CHANGES]
          * Attempt to `use feature 'try';` to see if core perl supports the

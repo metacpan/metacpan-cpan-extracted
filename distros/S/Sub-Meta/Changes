@@ -1,5 +1,11 @@
 Revision history for Perl extension Sub-Meta
 
+0.09 2021-03-26T14:42:12Z
+    [IMPROVEMENTS]
+    - feat: diplay of Sub::Meta #26
+    - improve Sub::Meta#new #26
+    - improve test #24
+
 0.08 2021-03-14T14:38:46Z
     [IMPROVEMENTS]
     - feat: add Sub::Meta::Library methods

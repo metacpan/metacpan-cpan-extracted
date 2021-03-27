@@ -4,9 +4,6 @@ use Test::More tests => 14;
 use strict;
 use warnings;
 
-use blib;
-use FindBin;
-
 use JSON::JQ;
 use JSON qw/to_json/;
 
@@ -71,3 +68,5 @@ my $jq4 = JSON::JQ->new({ script => ' (1,2) | (3,4) '});
 my $input401 = undef;
 my $input401_expected = [ qw/3 4 3 4/ ];
 is_deeply([ $jq4->process({ data => $input401 }) ], $input401_expected);
+
+# TODO: variable

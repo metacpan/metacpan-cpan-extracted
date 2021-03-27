@@ -24,6 +24,7 @@ $meta->attribute   # ['method']
 $meta->is_method   # undef
 $meta->parameters  # undef
 $meta->returns     # undef
+$meta->display     # 'sub hello'
 
 # setter
 $meta->set_subname('world');
@@ -355,7 +356,7 @@ $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
 $meta->set_returns(MyReturns->new)
 ```
 
-## OTHERS
+## METHODS
 
 ### is\_same\_interface($other\_meta)
 
@@ -380,6 +381,24 @@ my $check = eval "sub { $inline }";
 $check->(Sub::Meta->new(subname => 'hello')); # => OK
 $check->(Sub::Meta->new(subname => 'world')); # => NG
 ```
+
+### display
+
+Returns the display of Sub::Meta:
+
+```perl
+use Sub::Meta;
+use Types::Standard qw(Str);
+my $meta = Sub::Meta->new(
+    subname => 'hello',
+    is_method => 1,
+    args => [Str],
+    returns => Str,
+);
+$meta->display;  # 'method hello(Str) => Str'
+```
+
+## OTHERS
 
 ### parameters\_class
 

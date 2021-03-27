@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 use Carp ();
 use Scalar::Util ();
@@ -41,17 +41,46 @@ sub new {
     $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
 
     if (exists $args{parameters}) {
+        my $is_method = $args{is_method}
+                     || $args{parameters}{nshift}
+                     || $args{parameters}{invocant};
+
+        my $exists_is_method = exists $args{is_method}
+                            || exists $args{parameters}{nshift}
+                            || exists $args{parameters}{invocant};
+
+        $self->set_is_method($is_method) if $exists_is_method;
         $self->set_parameters($args{parameters})
     }
     elsif(exists $args{args}) {
-        $self->set_parameters(
-            args => delete $args{args},
-            ( exists $args{slurpy} ? (slurpy => delete $args{slurpy}) : () ),
+        my $is_method = $args{is_method}
+                     || $args{nshift}
+                     || $args{invocant};
 
-            ( exists $args{nshift}    ? (nshift => delete $args{nshift}) :
-              exists $args{is_method} ? (nshift => $args{is_method} ? 1 : 0) : () ),
+        my $exists_is_method = exists $args{is_method}
+                            || exists $args{nshift}
+                            || exists $args{invocant};
+
+        $self->set_is_method($is_method) if $exists_is_method;
+
+        my $nshift = exists $args{nshift} ? $args{nshift}
+                   : $is_method           ? 1
+                   : $exists_is_method    ? 0
+                   : undef;
+
+        $self->set_parameters(
+            args => $args{args},
+            exists $args{slurpy}   ? (slurpy   => $args{slurpy})   : (),
+            exists $args{invocant} ? (invocant => $args{invocant}) : (),
+            defined $nshift        ? (nshift   => $nshift)         : (),
         );
     }
+
+    # cleaning
+    delete $args{args};
+    delete $args{slurpy};
+    delete $args{invocant};
+    delete $args{nshift};
 
     if (exists $args{returns}) {
         $self->set_returns($args{returns})
@@ -259,6 +288,18 @@ sub is_same_interface_inlined {
     return join "\n && ", @src;
 }
 
+sub display {
+    my $self = shift;
+
+    my $keyword = $self->is_method ? 'method' : 'sub';
+    my $subname = $self->subname // '';
+
+    my $s = $keyword;
+    $s .= ' ' . $subname if $subname;
+    $s .= '('. $self->parameters->display .')' if $self->parameters;
+    $s .= ' => ' . $self->returns->display if $self->returns;
+    return $s;
+}
 
 1;
 __END__
@@ -289,6 +330,7 @@ Sub::Meta - handle subroutine meta information
     $meta->is_method   # undef
     $meta->parameters  # undef
     $meta->returns     # undef
+    $meta->display     # 'sub hello'
 
     # setter
     $meta->set_subname('world');
@@ -599,7 +641,7 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
     $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
     $meta->set_returns(MyReturns->new)
 
-=head2 OTHERS
+=head2 METHODS
 
 =head3 is_same_interface($other_meta)
 
@@ -622,6 +664,22 @@ Returns inlined C<is_same_interface> string:
     my $check = eval "sub { $inline }";
     $check->(Sub::Meta->new(subname => 'hello')); # => OK
     $check->(Sub::Meta->new(subname => 'world')); # => NG
+
+=head3 display
+
+Returns the display of Sub::Meta:
+
+    use Sub::Meta;
+    use Types::Standard qw(Str);
+    my $meta = Sub::Meta->new(
+        subname => 'hello',
+        is_method => 1,
+        args => [Str],
+        returns => Str,
+    );
+    $meta->display;  # 'method hello(Str) => Str'
+
+=head2 OTHERS
 
 =head3 parameters_class
 

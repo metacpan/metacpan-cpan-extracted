@@ -7,7 +7,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.17';
+our $VERSION = '1.19';
 
 use Carp qw(confess cluck);
 use Encode qw(encode);
@@ -31,8 +31,8 @@ sub new {
 	my @time = @now[ 2, 1 ];
 	my @date = ( $now[3], $now[4] + 1, $now[5] + 1900 );
 
-	if ( not( $opt{place} and $opt{name} ) ) {
-		confess('You need to specify a place and a name');
+	if ( not( $opt{name} ) ) {
+		confess('You must specify a name');
 	}
 	if ( $opt{type} and not( $opt{type} ~~ [qw[stop address poi]] ) ) {
 		confess('type must be stop, address or poi');
@@ -93,9 +93,6 @@ sub new {
 			nameState_dm           => 'empty',
 			name_dm                => encode( 'UTF-8', $opt{name} ),
 			outputFormat           => 'XML',
-			placeInfo_dm           => 'invalid',
-			placeState_dm          => 'empty',
-			place_dm               => encode( 'UTF-8', $opt{place} ),
 			ptOptionsActive        => '1',
 			requestID              => '0',
 			reset                  => 'neue Anfrage',
@@ -108,6 +105,12 @@ sub new {
 		},
 		developer_mode => $opt{developer_mode},
 	};
+
+	if ( $opt{place} ) {
+		$self->{post}{placeInfo_dm}  = 'invalid';
+		$self->{post}{placeState_dm} = 'empty';
+		$self->{post}{place_dm}      = encode( 'UTF-8', $opt{place} );
+	}
 
 	if ( $opt{full_routes} ) {
 		$self->{post}->{depType}                = 'stopEvents';
@@ -437,11 +440,13 @@ sub results {
 
 		my $platform      = $e->getAttribute('platform');
 		my $platform_name = $e->getAttribute('platformName');
+		my $countdown     = $e->getAttribute('countdown');
+		my $occupancy     = $e->getAttribute('occupancy');
 		my $line          = $e_line->getAttribute('number');
+		my $train_no      = $e_line->getAttribute('trainNum');
 		my $dest          = $e_line->getAttribute('direction');
 		my $info          = $e_info->textContent;
 		my $key           = $e_line->getAttribute('key');
-		my $countdown     = $e->getAttribute('countdown');
 		my $delay         = $e_info->getAttribute('delay');
 		my $type          = $e_info->getAttribute('name');
 		my $mot           = $e_line->getAttribute('motType');
@@ -497,7 +502,9 @@ sub results {
 				key           => $key,
 				lineref       => $line_obj[0] // undef,
 				line          => $line,
+				train_no      => $train_no,
 				destination   => $dest,
+				occupancy     => $occupancy,
 				countdown     => $countdown,
 				info          => $info,
 				delay         => $delay,
@@ -654,7 +661,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
     my $status = Travel::Status::DE::EFA->new(
         efa_url => 'https://efa.vrr.de/vrr/XSLT_DM_REQUEST',
-        place => 'Essen', name => 'Helenenstr'
+        name => 'Essen Helenenstr'
     );
 
     for my $d ($status->results) {
@@ -666,7 +673,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 1.17
+version 1.19
 
 =head1 DESCRIPTION
 
@@ -682,7 +689,7 @@ It reports all upcoming tram/bus/train departures at a given place.
 =item my $status = Travel::Status::DE::EFA->new(I<%opt>)
 
 Requests the departures as specified by I<opts> and returns a new
-Travel::Status::DE::EFA object.  B<efa_url>, B<place> and B<name> are
+Travel::Status::DE::EFA object.  B<efa_url> and B<name> are
 mandatory.  Dies if the wrong I<opts> were passed.
 
 Arguments:

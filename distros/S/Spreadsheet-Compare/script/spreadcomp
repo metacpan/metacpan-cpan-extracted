@@ -10,13 +10,18 @@ use Pod::Usage;
 use Pod::Find qw(pod_where);
 use Capture::Tiny qw(capture_merged);
 use Config;
-use Path::Tiny qw(tempfile);
+use Path::Tiny qw(path tempfile);
 
-GetOptions( \my %opt, qw(config=s debug=s help jobs=i quiet man summary) )
+GetOptions( \my %opt, qw(config=s debug=s help jobs=i quiet man summary version) )
     or pod2usage(
     -exitcode => 1,
     -verbose  => 0,
     );
+
+if ( $opt{version} ) {
+    say "This is ", path($0)->basename, " version ", $Spreadsheet::Compare::VERSION;
+    exit;
+}
 
 my $msg = <<'END';
 spreadcomp:
@@ -109,6 +114,9 @@ exit $sc->exit_code;
 
         -m, --manual
              Display complete manual (e.g. config file specifications)
+
+        -v, --version
+             Display version number and exit
 
 =head1 DESCRIPTION
 

@@ -20,20 +20,24 @@ SYNOPSIS
 
 DESCRIPTION
 
-    This module is written in the aspiration that one day perl will gain
-    true native syntax support for try/catch control flow, and that it will
-    be spelled using the syntax defined here. The intention here is that on
-    such a version of perl that provides this syntax this module will
-    simply enable it, equivalent to perhaps
+    This module is written in preparation for when perl will gain true
+    native syntax support for try/catch control flow.
+
+    Perl added such syntax in the development version 5.33.7, which is
+    enabled by
 
        use feature 'try';
+
+    On that version of perl or later, this module simply enables the core
+    feature equivalent to using it directly. On such perls, this module
+    will install with no non-core dependencies, and requires no C compiler.
 
     On older versions of perl before such syntax is available, it is
     currently provided instead using the Syntax::Keyword::Try module,
     imported with a special set of options to configure it to recognise
-    exactly and only the same syntax as this as-yet-aspirational core perl
-    feature, thus ensuring that any code using it will still continue to
-    function on that newer perl.
+    exactly and only the same syntax as the core perl feature, thus
+    ensuring that any code using it will still continue to function on that
+    newer perl.
 
 KEYWORDS
 

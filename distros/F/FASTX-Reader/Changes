@@ -2,6 +2,20 @@ This is the changelog for FASTX::Reader. Version prior to v 0.1 are preliminary 
 Some APIs *can change* with the release of the first stable release (v 1.0).
 Version 0.61 has been available via BioConda
 
+1.0.2 2021-03-25
+  * Documentation updates
+  * Improved tests for PE reader
+  * ScriptHelper verbose() function now tolerant when passing multiple strings
+
+1.0.1 2021-03-24
+  * Migration of Continuous Integration from TravisCI to GitHub actions
+  * META.yaml ships with the package (for GitHub Actions)
+
+1.0.0 2021-03-20
+  * BUG FIX: Multiple instances of the same object were conflicting when mixing filetypes (tests 40_*)
+  * Semantic versioning
+  * Improved test suite
+
 0.94  2020-06-01
   * Accessory script updates
   * Requirements: File::Fetch

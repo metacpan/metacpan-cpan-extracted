@@ -2,8 +2,8 @@ NAME
     App::BencherUtils - Utilities related to bencher
 
 VERSION
-    This document describes version 0.242 of App::BencherUtils (from Perl
-    distribution App-BencherUtils), released on 2019-08-08.
+    This document describes version 0.243 of App::BencherUtils (from Perl
+    distribution App-BencherUtils), released on 2021-01-20.
 
 SYNOPSIS
 DESCRIPTION
@@ -20,6 +20,8 @@ DESCRIPTION
     *   cleanup-old-bencher-results
 
     *   format-bencher-result
+
+    *   gen-bencher-scenario-from-cpanmodules
 
     *   list-bencher-results
 
@@ -333,7 +335,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-BencherUtils>
+    <https://github.com/perlancar/perl-App-BencherUtils/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -342,7 +344,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    This software is copyright (c) 2021, 2019, 2018, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

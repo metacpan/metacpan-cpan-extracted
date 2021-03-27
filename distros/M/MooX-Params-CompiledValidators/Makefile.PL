@@ -16,6 +16,7 @@ WriteMakefile(
         'Params::ValidationCompiler' => '0.27',
         'Sub::Util'                  => '1.50',
         'Types::Standard'            => '1.008',
+        'namespace::autoclean'       => '0.28',
     },
 
     CONFIGURE_REQUIRES => {
@@ -35,13 +36,13 @@ WriteMakefile(
             version    => 2,
         },
         'resources' => {
-#            homepage  => "https://github.com/abeltje/MooX-Params-CompiledValidators",
+            homepage  => 'https://github.com/abeltje/MooX-Params-CompiledValidators',
             repository => {
-                type   => "git",
-#                url    => "git://github.com/abeltje/Passphrase-Generator.git",
-                web    => "https://source.test-smoke.org/gitweb/?p=MooX-Params-CompiledValidators",
+                type   => 'git',
+                url    => 'git@github.com:abeltje/MooX-Params-CompiledValidators.git',
+                web    => 'https://github.com/abeltje/MooX-Params-CompiledValidators.git',
             },
-#            x_IRC      => "irc://irc.perl.org/#amsterdam.pm",
+#            x_IRC      => 'irc://irc.perl.org/#amsterdam.pm',
         },
     },
 );

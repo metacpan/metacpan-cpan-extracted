@@ -1,3 +1,14 @@
+Travel::Status::DE::VRR 1.19 - Sat Mar 27 2021
+
+    * Result: Add ->train_no accessor
+
+Travel::Status::DE::VRR 1.18 - Thu Mar 25 2021
+
+    * EFA: "place" is now optional
+    * Result: Add ->occupancy accessor
+    * efa-m: The "place" argument is now optional
+    * efa-m: Show expected vehicle occupancy, if available
+
 Travel::Status::DE::VRR 1.17 - Sat May 02 2020
 
     * Add MVV (Münchner Verkehrs- und Tarifverbund) and VAG (Freiburger

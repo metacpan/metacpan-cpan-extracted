@@ -117,7 +117,7 @@ sub execute {
             my $filepath = get_file_path(
                 $rundata->{project_workdir},
                 $_->target_language,
-                $_->name, $rundata->{filetype});
+                $_->full_path, $rundata->{filetype});
 
             my $exists = -e $filepath;
 

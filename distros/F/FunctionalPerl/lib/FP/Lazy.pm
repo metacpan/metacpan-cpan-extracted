@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -48,17 +48,19 @@ FP::Lazy - lazy evaluation (delayed evaluation, promises)
     # just on the inputs, but also on how many elements were evaluated:
     use FP::Stream qw(stream_map); # uses `lazy` internally
     use FP::List;
-    my $tot = 0;
-    my $l = stream_map sub {
-        my ($x) = @_;
-        $tot += $x;
-        $x*$x
-    }, list (5,7,8);
-    is $tot, 0;
-    is $l->first, 25;
-    is $tot, 5;
-    is $l->length, 3;
-    is $tot, 20;
+    {
+        my $tot = 0;
+        my $l = stream_map sub {
+            my ($x) = @_;
+            $tot += $x;
+            $x*$x
+        }, list (5,7,8);
+        is $tot, 0;
+        is $l->first, 25;
+        is $tot, 5;
+        is $l->length, 3;
+        is $tot, 20;
+    }
 
     # Also note that `local` does mutation (even if in a somewhat
     # controlled way):
@@ -77,7 +79,7 @@ FP::Lazy - lazy evaluation (delayed evaluation, promises)
         lazy_if { 1 / 0 } $cond
     }
 
-    is is_promise(condprom 1), 1;
+    ok is_promise(condprom 1);
 
     eval {
         # immediate division by zero exception (still pays
@@ -85,6 +87,31 @@ FP::Lazy - lazy evaluation (delayed evaluation, promises)
         condprom 0
     };
     like $@, qr/^Illegal division by zero/;
+
+    # Calling methods on promises will automatically force them, which
+    # is normally necessary since there's no way to know the class of
+    # the object otherwise:
+    use FP::Lazy qw(is_forced);
+    {
+        my $l = lazy { cons(1, null) };
+        ok !is_forced($l);
+        my $l2 = $l->cons(10);
+        # $l was forced even though the only reason is to know which
+        # class to call `cons` on:
+        ok is_forced($l);
+    }
+
+    # There's `lazyT` which specifies the (or a base) class of the
+    # object statically, hence there's no need to evaluate a promise
+    # just to call a method. In this case the called method receives
+    # the unevaluated promise as its argument!
+    {
+        my $l = lazyT { cons(1, null) } "FP::List::Pair";
+        ok !is_forced($l);
+        my $l2 = $l->cons(10);
+        # $l has *not* been forced now.
+        ok !is_forced($l);
+    }
 
 
 =head1 DESCRIPTION
@@ -151,9 +178,6 @@ Provide safe promises for these situations? (But that would mean that
 they need to be implemented in C as Perl does not offer the features
 to implement them safely, correct?)
 
-FP_Show_show: instead of "DUMMY", show file/line of the thunk's
-definition?
-
 =head1 DEBUGGING
 
 Lazy code can be difficult to debug because the context in which the
@@ -197,8 +221,8 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 use Exporter "import";
 
-our @EXPORT      = qw(lazy lazy_if lazyLight force FORCE is_promise);
-our @EXPORT_OK   = qw(delay force_noeval lazy_backtrace);
+our @EXPORT      = qw(lazy lazyT lazy_if lazyLight force FORCE is_promise);
+our @EXPORT_OK   = qw(delay force_noeval lazy_backtrace is_forced);
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Carp;
@@ -218,7 +242,19 @@ sub die_not_a_Lazy_Promise {
 # A promise is an array with two fields:
 # index 0: thunk when unevaluated, undef once evaluated
 # index 1: value once evaluated
-# index 2: backtrace if $debug is true
+# index 2: maybe blessed(force($promise))
+# index 3: backtrace if $debug is true
+
+sub is_forced {
+    @_ == 1 or fp_croak_arity 1;
+    my ($v) = @_;
+
+    # Note that $v might not even be a promise (anymore), given FORCE
+    # and AUTOLOAD.
+
+    my $m;
+    blessed($v) ? (($m = $v->can("FP_Lazy_is_forced")) ? &$m($v) : 1) : 1
+}
 
 sub lazy_backtrace {    # not a method to avoid shadowing any
                         # 'contained' method
@@ -227,8 +263,8 @@ sub lazy_backtrace {    # not a method to avoid shadowing any
     blessed($v) // die_not_a_Lazy_Promise($v);
 
     # Consciously not working for Light ones!
-    if ($v->isa("FP::Lazy::Promise")) {
-        $$v[2]          # really assume such an access works, no fallback to a
+    if ($v->isa("FP::Lazy::AnyPromise")) {
+        $$v[3]          # really assume such an access works, no fallback to a
                         # method like in FP::List
     } else {
         die_not_a_Lazy_Promise($v);
@@ -236,17 +272,30 @@ sub lazy_backtrace {    # not a method to avoid shadowing any
 }
 
 sub lazy (&) {
-    $eager
-        ? goto $_[0]
-        : bless [$_[0], undef, $debug && FP::Repl::Stack->get(1)->backtrace],
+    $eager ? goto $_[0]
+        : $debug
+        ? bless([$_[0], undef, undef, FP::Repl::Stack->get(1)->backtrace],
+        "FP::Lazy::Promise")
+        : bless([$_[0], undef], "FP::Lazy::Promise")
+}
+
+sub lazyT (&$) {
+    $eager ? goto $_[0] : bless [
+        $_[0], undef,
+        $_[1], $debug ? FP::Repl::Stack->get(1)->backtrace : ()
+        ],
         "FP::Lazy::Promise"
 }
 
 sub lazy_if (&$) {
     (
         ($_[1] and not $eager)
-        ? bless([$_[0], undef, $debug && FP::Repl::Stack->get(1)->backtrace],
-            "FP::Lazy::Promise")
+        ? (
+            $debug
+            ? bless([$_[0], undef, undef, FP::Repl::Stack->get(1)->backtrace],
+                "FP::Lazy::Promise")
+            : bless([$_[0], undef], "FP::Lazy::Promise")
+            )
         : do {
             my ($thunk) = @_;
             @_ = ();
@@ -271,6 +320,13 @@ sub delay (&);
 sub delayLight (&);
 *delayLight = \&lazyLight;
 
+sub die_type_error {
+    my ($expected, $gotstr, $v) = @_;
+    die "promise expected to evaluate to an object "
+        . "of class '$expected' but got $gotstr: "
+        . show($v)
+}
+
 sub force {
     @_ >= 1 and @_ <= 2 or fp_croak_arity "1-2";
     my ($perhaps_promise, $nocache) = @_;
@@ -281,16 +337,26 @@ LP: {
                 redo LP;
             } elsif ($perhaps_promise->isa("FP::Lazy::Promise")) {
                 if (my $thunk = $$perhaps_promise[0]) {
-                    my $v = &$thunk();
+                    my $v = force(&$thunk(), $nocache);
+                    if ($$perhaps_promise[2]) {
+
+                        if (defined(my $got = blessed($v))) {
+
+                            $v->isa($$perhaps_promise[2])
+                                or die_type_error($$perhaps_promise[2],
+                                "a '$got'", $v);
+                        } else {
+                            die_type_error($$perhaps_promise[2],
+                                "a non-object", $v);
+                        }
+                    }
                     unless ($nocache) {
                         $$perhaps_promise[1] = $v;
                         $$perhaps_promise[0] = undef;
                     }
-                    $perhaps_promise = $v;
-                    redo LP;
+                    $v
                 } else {
-                    $perhaps_promise = $$perhaps_promise[1];
-                    redo LP;
+                    $$perhaps_promise[1]
                 }
             } else {
                 $perhaps_promise
@@ -301,7 +367,8 @@ LP: {
     }
 }
 
-# just remove promise wrapper, don't actually force its evaluation
+# just remove promise wrapper, don't actually force its evaluation. XX
+# does this need updating for the new type feature?
 sub force_noeval {
     @_ == 1 or fp_croak_arity 1;
     my ($s) = @_;
@@ -369,7 +436,7 @@ package FP::Lazy::AnyPromise {
     *force = \&FP::Lazy::force;
 
     sub FORCE {
-        $_[0] = force($_[0]);
+        $_[0] = FP::Lazy::force($_[0]);
     }
 
     sub DESTROY {
@@ -377,40 +444,115 @@ package FP::Lazy::AnyPromise {
         # nothing, catch this to prevent it from entering AUTOLOAD
     }
 
+    # XXX TODO: provide a `can` method, right?
+
+}
+
+use FP::Show qw(subprefix_to_show_coderef);
+
+my $lazy_thunk_show  = subprefix_to_show_coderef("lazy ");
+my $lazyT_thunk_show = subprefix_to_show_coderef("lazyT ");
+
+package FP::Lazy::Promise {
+    our @ISA = 'FP::Lazy::AnyPromise';
+
+    use overload FP::Lazy::overloads(1);
+
+    sub FP_Lazy_is_forced {
+        not defined $_[0][0]
+    }
+
+    sub FP_Show_show {
+        my ($s, $show) = @_;
+
+        # do not force unforced promises
+        if (defined $$s[0]) {
+            if (defined(my $cl = $$s[2])) {
+                &$lazyT_thunk_show($$s[0]) . " " . &$show($cl)
+            } else {
+                &$lazy_thunk_show($$s[0])
+            }
+        } else {
+            &$show($$s[1])
+        }
+    }
+
     our $AUTOLOAD;    # needs to be declared even though magical
 
     sub AUTOLOAD {
         my $methodname = $AUTOLOAD;
-        my $v          = force($_[0]);
         $methodname =~ s/.*:://;
+        my $maybe_expected_ref = $_[0][2];
+        my ($v, $ref);
+        if (defined $maybe_expected_ref) {
+            $ref = $maybe_expected_ref;
+        } else {
+            $v   = FP::Lazy::force($_[0]);
+            $ref = ref $v;
+        }
 
         # To be able to select special implementations for lazy
         # inputs, select a method with `stream_` prefix if present.
 
-        # $v can be either a class name or object; it's guaranteed to
-        # be either of those, thus we can use ->can
+        # This will give "Can't call method "can" without a package or
+        # object reference" exception for the empty string given as
+        # type, which is happening in a weird place but actually is
+        # appropriate enough, right? Leaving at that is cheaper than
+        # special-casing it.
 
         my $method
             = ($methodname =~ /^stream_/
-            ? $v->can($methodname)
-            : $v->can("stream_$methodname") // $v->can($methodname)
+            ? $ref->can($methodname)
+            : $ref->can("stream_$methodname") // $ref->can($methodname)
                 // "FP::Mixin::Utils"->can($methodname));
         if ($method) {
 
-            # can't change @_ or it would break 'env clearing' ability
+            # If we forced evaluation, pass on the evaluated value.
+            # Can't rebuild @_ or it would break 'env clearing' ability
             # of the method. Thus assign to $_[0], which will effect
-            # our env, too, but so what? XX still somewhat bad.
-            $_[0] = $v;
+            # our env, too, but so what? XX still somewhat bad. (Is
+            # like `FORCE`.)
+            $_[0] = $v unless defined $maybe_expected_ref;
             goto &$method;
         } else {
+
+            if (defined $maybe_expected_ref) {
+
+                # If the library is declaring a base class as the type
+                # of the lazyT (in the case of basically a sum type),
+                # then if the user calls a method on the promise that
+                # does not exist in that base class, then still force
+                # it: this is also correct since in that case, the
+                # method will surely *need* the forced value, since,
+                # if it doesn't, it would be independent of the
+                # subclass hence be in the base class. Thus: force
+                # (equivalent to downgrading the lazyT to a lazy), and
+                # try again.
+
+                # $v   = FP::Lazy::force($_[0]);
+                # $ref = ref $v;
+                # $maybe_expected_ref = undef; # so that the logic works
+                # redo ...
+
+                # or simply adapted copy-paste:
+
+                $v = FP::Lazy::force($_[0]);
+                my $method
+                    = ($methodname =~ /^stream_/
+                    ? $v->can($methodname)
+                    : $v->can("stream_$methodname") // $v->can($methodname)
+                        // "FP::Mixin::Utils"->can($methodname));
+                if ($method) {
+                    $_[0] = $v;
+                    goto &$method;
+                }
+            }
 
             # XX imitate perl's ~exact error message?
             Carp::croak "no method '$methodname' found for object: "
                 . FP::Lazy::strshow($v);
         }
     }
-
-    # XXX TODO: provide a `can` method, right?
 
     # should really have a maybe_ prefix, but since it's for debugging
     # purposes only (and in that case also likely always returns a
@@ -421,28 +563,6 @@ package FP::Lazy::AnyPromise {
         my $s = shift;
         $$s[2]
     }
-
-}
-
-use FP::Show qw(subprefix_to_show_coderef);
-
-my $lazy_thunk_show = subprefix_to_show_coderef("lazy ");
-
-package FP::Lazy::Promise {
-    our @ISA = 'FP::Lazy::AnyPromise';
-
-    use overload FP::Lazy::overloads(1);
-
-    sub FP_Show_show {
-        my ($s, $show) = @_;
-
-        # do not force unforced promises
-        if ($$s[0]) {
-            &$lazy_thunk_show($$s[0])
-        } else {
-            &$show($$s[1])
-        }
-    }
 }
 
 my $lazyLight_thunk_show = subprefix_to_show_coderef("lazyLight ");
@@ -452,11 +572,55 @@ package FP::Lazy::PromiseLight {
 
     use overload FP::Lazy::overloads(0);
 
+    sub FP_Lazy_is_forced {
+        0
+    }
+
     sub FP_Show_show {
         my ($s, $show) = @_;
 
         # do not force unforced promises
         &$lazyLight_thunk_show($s)
+    }
+
+    our $AUTOLOAD;    # needs to be declared even though magical
+
+    sub AUTOLOAD {
+        my $methodname = $AUTOLOAD;
+
+        my $v = $_[0]->();
+        $methodname =~ s/.*:://;
+
+        # To be able to select special implementations for lazy
+        # inputs, select a method with `stream_` prefix if present.
+
+        my $method
+            = ($methodname =~ /^stream_/
+            ? $v->can($methodname)
+            : $v->can("stream_$methodname") // $v->can($methodname)
+                // "FP::Mixin::Utils"->can($methodname));
+        if ($method) {
+
+            # Can't rebuild @_ or it would break 'env clearing' ability
+            # of the method. Thus assign to $_[0], which will effect
+            # our env, too, but so what? XX still somewhat bad. (Is
+            # like `FORCE`.)
+            $_[0] = $v;
+            goto &$method;
+        } else {
+
+            # XX imitate perl's ~exact error message?
+            Carp::croak "no method '$methodname' found for object: "
+                . FP::Lazy::strshow($v);
+        }
+    }
+
+    sub bt {
+        my $s = shift;
+        Carp::croak "lazyLight cannot store a backtrace"
+
+            # except if using a different implementation when $debug
+            # is on
     }
 }
 

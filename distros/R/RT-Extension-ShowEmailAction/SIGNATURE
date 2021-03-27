@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.80.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,41 +12,40 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 836f3f1a0731190d084ccd9897627a1120e93311 MANIFEST
-SHA1 b964c95f53df3e2e7b07ffe626117847cdd340c6 META.yml
-SHA1 7ea1f64dde14306b7dc1ef176e243a7f590a9dee Makefile.PL
-SHA1 567c06b445e4df5da6fca69cb7e6bae954ef0e5f README
-SHA1 5cc257a5bca14e841c633135a638226d484e84cf html/Callbacks/RT-Extension-ShowEmailAction/Elements/ShowTransaction/Default
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
-SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
-SHA1 9e886864978e9f9b9988e412a75a908070b54fbf inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
-SHA1 46da978061094e70edb7df04ed73664ec48a4498 lib/RT/Extension/ShowEmailAction.pm
+SHA256 2be63c07bd71eacfa886623c3c672034b9e74bbb2e0eef591f37cd77417ca5ef MANIFEST
+SHA256 2f0c6615583f1e8e01bab9ad06eaaff4a6b0a7fdcf402d9985333d83577a424b META.yml
+SHA256 017774c3bef8b0774fbc550c13ac60b012bbb8ef92466519f6b3bfa950e225db Makefile.PL
+SHA256 91363a1a52a42384e02cd5f037146a4eb7cd044745886f60303d13c8eb07181f README
+SHA256 3de8fd9c880674926c86e7fa095a253cab674214f25169abc970d8ab70e173e7 html/Callbacks/RT-Extension-ShowEmailAction/Elements/ShowTransaction/Default
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 2c89fa442659e76a8ee28643923c3a928c39ed013ad08fe67049d1df7d4c9fd6 inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 be23dc3446b971e3dae69379d61f472a0f14a639cb27340c5a09fac5ad9d5130 lib/RT/Extension/ShowEmailAction.pm
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQIcBAEBAgAGBQJXpY0XAAoJEL4ubLXcP9UZLKgP/jnTSrb2oTjVx9nHVgxnGlSb
-NdZWpDdhWUNnhrfQzTOzy9bskXQNl8M3un2D9bReDfNZIMDcy+XnNrWXZgOM3gqu
-dy0ErMCejQMNXlbyjvF9GffINBG+M0T02D/p9KofGH270s0qRbfXGKsYfwDxpd45
-ciCRXEXdZimHLfjcMvn0uxk/j0/AGMB295yZivOjRKXmGtlVhITyXX6kUoMH/RK3
-y8WIRI8Cbjlv0hFmiNumO/4bAmDw51HrMaw8GEz5SSStXrM0Xt5+/6Un0ov008/2
-Im/pyn1hQFk2bsXBPTpy15vZ4hXY/itv91UR9h6K+xhdW/u5jRfkIK3RSZrNxbk7
-nmLUuaj4vv04Iq74PpPpJb5WtIfZ76MXWVOXtlnhWz+fzNoYqpR/unAtzPj1zHTf
-dvhcvW4J12biYyLzr92mHe1YWItz9DdN2DN8T4o3otnHtYFFH/3i9Yj/fWXSDzXK
-hkDAjs+tBMUILK3zx3ChCyrxHITPjl0s9zS2JiVdvirm54vOpWXloeTxKaFzUEeW
-YG8Blw7BMZ+yuZWPMWsyP2op/+tUeosFxpbdYam906V+2JkXWDBD2Z4KWdYQX9d9
-9IGROl55hWM7pc4TT8FPlItVdCzDTd7L8aMw51f3wyFxFFcYfgETunqkYpxz0hiz
-mFU6uSqCiV14OZXmfIWP
-=xYBP
+iQIzBAEBCgAdFiEEfrTy0shBJ9d4IkRFvi5stdw/1RkFAmBdqwIACgkQvi5stdw/
+1RntXQ/9GcbjFOLLme43iumOcstT1vtS+q1LEzD6iyYPhuCuIDLIK3zEHj/VP+jq
+tZYeymfI0gAhzWs9Ig+ttigH9zhs2s9IzGM/kU8IlzKACzUqtqI5FoOnafNAg85x
+mpE7QovYO9B0bn6LC/HCwJccR3rICNfj0G2Nmryrh+xGa+7u6pFz4Y2YSuPZWKwO
+MNugNdiPiLiNidopjKRxgbNVMv17RlKgOGtHxCXAVqfMZlWZw9KvlHEaUdtlbMeP
+3yPYrdK7QI2ZJ6W4r7tD/UuGyUkTQ1tfNm/xNYPgqE7bvg03Pe/3OF1qFnw9QCe/
+6ZeB8JgHZH3vHgKlFiMGJ6v9aLTWkvq2+ncd7OKAnUDf72z1Fh+26aO0W98ibC3P
+xDkawB14CXlHgDd4naqKsFddpqMoNCqS8cAY0KozYIwfJbN8/D1gnjU/JO2CFQZT
+yDN0uGjpiHT3M4yVmC3Lggm+MB6WkjrxwielNENCiabVNnJ/lVXTbf+SaXd0tcCb
+ZSOzTKpHj95iUQ0vmZFDpUnNJzNx4uLakeWefc8XvrmTRN05SSel80PGKbVYttnW
+SzaTbaq/LL73TYkEzwL25iX0ssGRQQNHEjo31EY4A0atCS7sjDu+4coE080OiirR
+nX0Gt8iU8WXsIX5zE21ytFjtkE+kl+9eQJLhIUhvzgVCz3a5NYU=
+=Kp9N
 -----END PGP SIGNATURE-----

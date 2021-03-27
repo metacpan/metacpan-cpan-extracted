@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Create CSV from https://sites.rootsweb.com/~obituary/ and
+# Create SQLite3 from https://sites.rootsweb.com/~obituary/ and
 #	https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit
 
 use strict;
@@ -61,7 +61,7 @@ if($cachedir) {
 HTTP::Cache::Transparent::init({
 	BasePath => $cachedir,
 	Verbose => 0,
-	NoUpdate => 60 * 60 * 24,
+	NoUpdate => 60 * 60 * 24 * 7 * 31,	# The archive never changes
 	MaxAge => 30 * 24
 }) || die "$0: $cachedir: $!";
 
@@ -71,6 +71,7 @@ my $ua = LWP::UserAgent::WithCache->new(timeout => 10, keep_alive => 1);
 $ua->env_proxy(1);
 $ua->agent('Mozilla/5.0');
 $ua->conn_cache()->total_capacity(undef);
+$Lingua::EN::NameCase::POSTNOMINAL = 0;
 
 # print '"last","first","maiden","age","place","newspapername","newspaperdate","tag"', "\n";
 
@@ -87,18 +88,23 @@ while(freelists($ua, 'v25no' . sprintf('%03d', $issue))) {
 	$issue++;
 }
 
+$issue = 1;
+while(freelists($ua, 'v26no' . sprintf('%03d', $issue))) {
+	$issue++;
+}
+
 print "\n";
 
 if(my $dbh = DBI->connect("dbi:SQLite:dbname=$filename", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' })) {
-	$dbh->do('CREATE TABLE obituaries(first VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL, url VARCHAR NOT NULL)');
 	$dbh->do('PRAGMA cache_size = -65536');	# 64MB
 	$dbh->do('PRAGMA journal_mode = OFF');
+	$dbh->do('CREATE TABLE obituaries(first VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL, url VARCHAR NOT NULL)');
 
 	flush($dbh);
 	$dbh->commit();
 	$dbh->disconnect();
 } else {
-	die "obituaries.sql: $!";
+	die "$filename: $!";
 }
 
 sub mlarchives($$) {
@@ -298,26 +304,25 @@ sub queue($$$$$$$$)
 {
 	my ($first, $last, $maiden, $age, $place, $date, $newspaper, $url) = @_;
 
-	my %columns;
-	$columns{'first'} = $first;
-	$columns{'last'} = $last;
-	if($maiden) {
-		$columns{'maiden'} = $maiden;
-	}
-	if(defined($age) && ($age ne '')) {
-		$columns{'age'} = $age;
-	}
-	$columns{'place'} = $place;
+	my %columns = (
+		first => $first,
+		last => $last,
+		newspaper => $newspaper,
+		place => $place,
+		url => $url
+	);
+	# If we don't know the date of publication, it's not easy to find
 	if($date) {
 		return unless($date =~ /^\d/);
 		$columns{'date'} = $date;
-	} else {
-		return;	# If we don't know the date of publication, it's not easy to find
+		if(defined($age) && ($age ne '')) {
+			$columns{'age'} = $age;
+		}
+		if($maiden) {
+			$columns{'maiden'} = $maiden;
+		}
+		push @queue, \%columns;
 	}
-	$columns{'newspaper'} = $newspaper;
-	$columns{'url'} = $url;
-
-	push @queue, \%columns;
 }
 
 sub flush($)
@@ -371,7 +376,7 @@ sub flush($)
 	} catch {
 		my @call_details = caller(0);
 		die "\nError in insert ($query) called from line ",
-			$call_details[2], ': ', $dbh->errstr(), "\n";
+			$call_details[2], ': ', $dbh->errstr();
 	};
 }
 

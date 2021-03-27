@@ -3,7 +3,7 @@ use warnings;
 
 package RT::Extension::ShowEmailAction;
 
-our $VERSION = '1.00';
+our $VERSION = '1.10';
 
 
 1;

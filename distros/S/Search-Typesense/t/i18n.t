@@ -42,7 +42,8 @@ $response = $typesense->search(
     }
 );
 
-is $response->{found}, 1, 'We should have one response found from our search()';
+is $response->{found}, 1,
+  'We should have one response found from our search()';
 eq_or_diff $response->{hits}[0]{document},
   {
     company_name    => 'Stäçîa',

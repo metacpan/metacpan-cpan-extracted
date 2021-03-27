@@ -1,3 +1,8 @@
+0.26 2021-03-27
+        - Added formats explicitely to be compatible with
+          Mojo >= 9.11.
+        - Replaced sojolicio.us with sojolicious.example.
+
 0.25 2021-02-10
         - Remove deprecated route() in favor of any().
 

@@ -1,15 +1,344 @@
-pod2text Nice::Try.pm > README
+NAME
+    Nice::Try - A real Try Catch Block Implementation Using Perl Filter
 
-If this is still here it means the programmer was too lazy to create the readme file.
+SYNOPSIS
+        use Nice::Try;
 
-You can create it now by using the command shown above from this directory.
+        print( "Hello, I want to try\n" );
+        # Try out {
+        print( "this piece of code\n" );
+        try 
+        {
+            # Not so sure }
+            print( "I am trying!\n" );
+            die( "Bye cruel world..." );
+            # Never going to reach this
+            return( 1 );
+        }
+        # Some comment
+        catch( Exception $e ) {
+            return( "Caught an exception \$e" );
+        }
+        # More comment with space too
 
-At the very least you should be able to use this set of instructions
-to install the module...
+        catch( $e ) {
+            print( "Got an error: $e\n" );
+        }
+        finally
+        {
+            print( "Cleaning up\n" );
+        }
+        print( "Ok, then\n" );
 
-perl Makefile.PL
-make
-make test
-make install
+    When run, this would produce, as one would expect:
 
-If you are on a windows box you should use 'nmake' rather than 'make'.
+        Hello, I want to try
+        this piece of code
+        I am trying!
+        Got an error: Bye cruel world... at ./some/script.pl line 18.
+        Cleaning up
+        Ok, then
+
+VERSION
+        v0.1.11
+
+DESCRIPTION
+    Nice::Try is a lightweight implementation of Try-Catch exception
+    trapping block using perl filter. It behaves like you would expect.
+
+    Here is a list of its distinctive features:
+
+    *   No routine to import like "Nice::Try qw( try catch )". Just add "use
+        Nice::Try" in your script
+
+    *   Properly report the right line number for the original error message
+
+    *   Allows embedded try-catch block within try-catch block, such as:
+
+            use Nice::Try;
+
+            print( "Wow, something went awry: ", &gotcha, "\n" );
+
+            sub gotcha
+            {
+                print( "Hello, I want to try\n" );
+                # Try out {
+                CORE::say( 'this piece' );
+                try 
+                {
+                    # Not so sure }
+                    print( "I am trying!\n" );
+                    try
+                    {
+                        die( "Bye cruel world..." );
+                        return( 1 );
+                    }
+                    catch( $err )
+                    {
+                        die( "Dying again with embedded error: '$err'" );
+                    }
+                }
+                catch( Exception $e ) {
+                    return( "Caught an exception \$e" );
+                }
+                catch( $e ) {
+                    try
+                    {
+                        print( "Got an error: $e\n" );
+                        print( "Trying something else.\n" );
+                        die( "No really, dying out... with error: $e\n" );
+                    }
+                    catch( $err2 )
+                    {
+                        return( "Returning from catch L2 with error '$err2'" );
+                    }
+                }
+                CORE::say( "Ok, then" );
+            }
+
+    *   No need for semicolon on the last closing brace
+
+    *   It does not rely on perl regular expression, but instead uses PPI
+        (short for "Perl Parsing Interface").
+
+    *   Variable assignment in the catch block works. For example:
+
+            try
+            {
+                # Something or
+                die( "Oops\n" );
+            }
+            catch( $funky_variable_name )
+            {
+                return( "Oh no: $funky_variable_name" );
+            }
+
+    *   $@ is always available too
+
+    *   You can return a value from try-catch blocks, even with embedded
+        try-catch blocks
+
+    *   It recognises @_ inside try-catch blocks, so you can do something
+        like:
+
+            print( &gotme( 'Jacques' ), "\n" );
+
+            sub gotme
+            {
+                try
+                {
+                    print( "I am trying my best $_[0]!\n" );
+                    die( "But I failed\n" );
+                }
+                catch( $some_reason )
+                {
+                    return( "Failed: $some_reason" );
+                }
+            }
+
+        Would produce:
+
+            I am trying my best Jacques!
+            Failed: But I failed
+
+WHY USE IT?
+    There are quite a few implementations of try-catch blocks in perl, and
+    they can be grouped in 4 categories:
+
+    1 Try-Catch as subroutines
+        For example Try::Tiny
+
+    2 Using Perl Filter
+        For example Nice::Try, Try::Harder
+
+    3 Using Devel::Declare
+        For example TryCatch
+
+    4 Others
+        For example Syntax::Keyword::Try and now perl with version 5.33
+        using experimental feature
+        <https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling
+        >.
+
+    Group 1 requires the use of semi-colons like:
+
+        try
+        {
+            # Something
+        }
+        catch
+        {
+            # More code
+        };
+
+    It also imports the subroutines "try" and "catch" in your namespace.
+
+    And you cannot do exception variable assignment like "catch( $err )"
+
+    In group 2, Try::Harder does a very nice work, but relies on perl
+    regular expression with Text::Balanced and that makes it susceptible to
+    failure if the try-catch block is not written as it expects it to be.
+    For example if you put comments between try and catch, it would not work
+    anymore. This is because parsing perl is famously difficult. Also, it
+    does not do exception variable assignment, or catch filtered based on
+    exception class like:
+
+        try
+        {
+            # Something
+            die( Exception->new( "Failed!" ) );
+        }
+        catch( Exception $e )
+        {
+            # Do something if exception is an Exception class
+        }
+
+    See "die" in perlfunc for more information on dying with an object.
+
+    Also Try::Harder will die if you use only "try" with no catch, such as:
+
+        use Try::Harder;
+        try
+        {
+            die( "Oops\n" );
+        }
+        # Will never reach this
+        print( "Got here with $@\n" );
+
+    In this example, the print line will never get executed. With Nice::Try
+    you can use "try" alone as an equivalent of "eval" in perlfunc and the
+    $@ will be available too. So:
+
+        use Nice::Try;
+        try
+        {
+            die( "Oops\n" );
+        }
+        print( "Got here with $@\n" );
+
+    will produces:
+
+        Got here with Oops
+
+    In group 3, TryCatch was working wonderfully, but was relying on
+    Devel::Declare which was doing some esoteric stuff and eventually the
+    version 0.006020 broke TryCatch and there seems to be no intention of
+    correcting this breaking change.
+
+    In group 4, there is Syntax::Keyword::Try, which is a great alternative
+    if you do not care about exception variable assignment or exception
+    class filter. You can only use $@
+
+    Since perl version 5.33
+    <https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling>
+    you can use the try-catch block using an experimental feature which may
+    be removed in future versions, by writing:
+
+        use feature 'try'; # will emit a warning this is experimental
+
+    This new feature supports try-catch block and variable assignment, but
+    no exception class, nor support for "finally" block, so you can do:
+
+        try
+        {
+            # Oh no!
+            die( "Argh...\n" );
+        }
+        catch( $oh_well )
+        {
+            return( $self->error( "Something went awry: $oh_well" ) );
+        }
+
+    But you cannot do:
+
+        try
+        {
+            # Oh no!
+            die( MyException->new( "Argh..." ) );
+        }
+        catch( MyException $oh_well )
+        {
+            return( $self->error( "Something went awry with MyException: $oh_well" ) );
+        }
+        # No support for 'finally' yet in perl 5.34
+        finally
+        {
+            # do some cleanup here
+        }
+
+    It is probably a matter of time until this is fully implemented in perl
+    as a regular non-experimental feature.
+
+    So, Nice::Try is quite unique and fill the missing features, but because
+    it is purely in perl and not an XS module, it is slower than XS module
+    like Syntax::Keyword::Try. I am not sure the difference would be that
+    noticeable, since the parsing by PPI is now done using an XS module,
+    which makes things very fast.
+
+FINALLY
+    Like with other language such as Java or JavaScript, the "finally" block
+    will be executed even if the "try" or "catch" block contains a return
+    statement.
+
+    This is useful to do some clean-up. For example:
+
+        try
+        {
+            # Something worth dying
+        }
+        catch( $e )
+        {
+            return( "I failed: $e" );
+        }
+        finally
+        {
+            # Do some mop up
+            # This would be reached even if catch already returned
+            # Putting return statement here does not actually return anything.
+            # This is only for clean-up
+        }
+
+    However, because this is designed for clean-up, it is called in void
+    context, so any "return" statement there will not actually return
+    anything back to the caller.
+
+DEBUGGING
+    And to have Nice::Try save the filtered code to a file, pass it the
+    "debug_file" parameter like this:
+
+        use Nice::Try debug_file => './updated_script.pl';
+
+    You can also call your script using Filter::ExtractSource like this:
+
+        perl -MFilter::ExtractSource script.pl > updated_script.pl
+
+    or add "use Filter::ExtractSource" inside it.
+
+    In the updated script produced, you can add the line calling Nice::Try
+    to:
+
+        use Nice::Try no_filter => 1;
+
+    to avoid Nice::Try from filtering your script
+
+    If you want Nice::Try to produce human readable code, pass it the
+    "debug_code" parameter like this:
+
+        use Nice::Try debug_code => 1;
+
+CREDITS
+    Credits to Stephen R. Scaffidi for his implementation of Try::Harder
+    from which I borrowed some code.
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+SEE ALSO
+    PPI, Filter::Util::Call, Try::Harder, Syntax::Keyword::Try
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2020 DEGUEST Pte. Ltd.
+
+    You can use, copy, modify and redistribute this package and associated
+    files under the same terms as Perl itself.
+

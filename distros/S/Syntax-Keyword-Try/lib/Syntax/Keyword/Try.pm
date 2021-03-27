@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.21;
+package Syntax::Keyword::Try 0.22;
 
 use v5.14;
 use warnings;
@@ -437,28 +437,6 @@ C<return> from inside C<try>.
    }
 
 =head1 ISSUES
-
-=head2 Context propagation during C<return>
-
-A C<return> statement inside a C<try> block will currently always propagate
-a scalar context, even if the function it appears in itself is in list
-context.
-
-   sub inner
-   {
-      return wantarray ? (qw( a list of things )) : "a single scalar";
-   }
-
-   sub outer
-   {
-      try { return inner() }
-      catch {}
-   }
-
-   my @result = outer();
-   print for @result;  # prints "a single scalar"
-
-This is discussed at L<https://rt.cpan.org/Ticket/Display.html?id=124229>.
 
 =head2 Thread-safety at load time cannot be assured before perl 5.16
 

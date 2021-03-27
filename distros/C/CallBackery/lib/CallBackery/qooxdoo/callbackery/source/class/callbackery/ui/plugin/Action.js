@@ -38,7 +38,11 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 case 'dataSaved':
                 case 'showMessage':
                     if (data.title && data.message){
-                        callbackery.ui.MsgBox.getInstance().info(this.xtr(data.title),this.xtr(data.message));
+                        callbackery.ui.MsgBox.getInstance().info(
+                            this.xtr(data.title),
+                            this.xtr(data.message),
+                            data.html, data.icons, data.size
+                        );
                     }
                     break;
                 case 'print':
@@ -47,6 +51,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 case 'reloadStatus':
                 case 'reload':
                 case 'cancel':
+                case 'wait':
                 case undefined:
                     break;
                 default:
@@ -159,8 +164,8 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         this.addListener('appear',function(){
                             var key = btCfg.key;
                             var that = this;
-                            var formData = getFormData();
                             autoTimerId = autoTimer.start(function(){
+                                var formData = getFormData();
                                 callbackery.data.Server.getInstance().callAsyncSmartBusy(function(ret){
                                     that.fireDataEvent('actionResponse',ret || {});
                                 },'processPluginData',cfg.name,{ "key": key, "formData": formData });

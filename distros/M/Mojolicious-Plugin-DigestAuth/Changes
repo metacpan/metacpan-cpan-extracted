@@ -1,4 +1,8 @@
 -------------------------
+2021-03-26	v0.10
+* Fixed method name _route to _route to work with Mojolicious 9 (Bug #10, thanks Alejandro Imass)
+
+-------------------------
 2015-05-08	v0.09
 * Added call to routes->under() when routes->bridge() is not available (Bug #8)
 

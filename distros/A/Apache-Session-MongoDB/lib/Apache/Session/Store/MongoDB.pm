@@ -3,7 +3,7 @@ package Apache::Session::Store::MongoDB;
 use 5.010;
 use strict;
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 use MongoDB;
 
@@ -69,7 +69,7 @@ sub materialize {
         $session->{data}->{_session_id} = $session->{data}->{_id};
     }
     else {
-        $session->data = undef;
+        die "Object does not exist in data store";
     }
 }
 

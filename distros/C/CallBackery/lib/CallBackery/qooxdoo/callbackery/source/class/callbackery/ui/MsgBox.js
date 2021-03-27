@@ -2,30 +2,19 @@
 
    Copyrigtht: OETIKER+PARTNER AG
    License:    GPL V3 or later
-   Authors:    Tobias Oetiker
+   Authors:    Tobias Oetiker, Fritz Zaucker
    Utf8Check:  äöü
 
 ************************************************************************ */
 
 /**
-@asset(qx/icon/${qx.icontheme}/32/status/dialog-error.png)
-@asset(qx/icon/${qx.icontheme}/16/status/dialog-error.png)
-@asset(qx/icon/${qx.icontheme}/32/status/dialog-information.png)
-@asset(qx/icon/${qx.icontheme}/16/status/dialog-information.png)
-@asset(qx/icon/${qx.icontheme}/32/status/dialog-warning.png)
-@asset(qx/icon/${qx.icontheme}/16/status/dialog-warning.png)
-@asset(qx/icon/${qx.icontheme}/16/actions/dialog-ok.png)
-@asset(qx/icon/${qx.icontheme}/16/actions/dialog-apply.png)
-@asset(qx/icon/${qx.icontheme}/16/actions/dialog-cancel.png)
- */
- 
-/**
- * A status window singelton. There is only one instance, several calls to
+ * A status window singleton. There is only one instance, several calls to
  * open will just change the windows content on the fly.
  *
  * <pre code='javascript'>
  * var msg = callbackery.ui.MsgBox.getInstance();
- * msg.error('Title','Message');
+ * msg.error('Title','Message'); // htmlEncode tags
+ * msg.error('Title','Message', true); // active HTML content
  * </pre>
  */
 qx.Class.define("callbackery.ui.MsgBox", {
@@ -63,11 +52,11 @@ qx.Class.define("callbackery.ui.MsgBox", {
 
         this.__btn = {};
 
-        this.__mk_btn('cancel',this.tr("Cancel"), "actions/dialog-cancel.png");
-        this.__mk_btn('apply',this.tr("Apply"), "actions/dialog-apply.png");
-        this.__mk_btn('ok',this.tr("OK"), "actions/dialog-ok.png");
-        this.__mk_btn('yes',this.tr("Yes"), "actions/dialog-ok.png");
-        this.__mk_btn('no',this.tr("No"), "actions/dialog-cancel.png");
+        this.__mk_btn('cancel',this.tr("Cancel"));
+        this.__mk_btn('apply',this.tr("Apply"));
+        this.__mk_btn('ok',this.tr("OK"));
+        this.__mk_btn('yes',this.tr("Yes"));
+        this.__mk_btn('no',this.tr("No"));
 
         ['ok','cancel','no'].forEach(function(x){
             this.__btn[x].addListener('appear', function(e) {
@@ -91,25 +80,41 @@ qx.Class.define("callbackery.ui.MsgBox", {
         /**
          * Open the message box
          *
-         * @param titel {String} window title
+         * @param title {String} window title
          * @param text {String} contents
+         * @param html {Boolean} allow HTML if true
+         * @param size {Map} of width and height
          * @return {void} 
          */
-        __open : function(titel, text) {
-            this.setCaption(String(titel));
+        __open : function(title, text, html, size) {
+            this.setCaption(String(title));
 
+            let width  = 400;
+            let height = 100;
+            if (size) {
+                if (size.height) {
+                    height = size.height;
+                }
+                if (size.width) {
+                    width = size.width;
+                }
+            }
             this.set({
-                width  : 400,
-                height : 100
+                width  : width,
+                height : height
             });
-            /* we are rich to get line breaking and stuff, but we do NOT
-               allow any HTML tags to execute */
-            var map = {
-                '>': '&gt;',
-                '<': '&lt;',
-                '&': '&amp;'
-            };
-            var label = String(text).replace(/[<>&]/g,function(m){return map[m]});
+            let label = String(text);
+
+            if (!html) {
+                /* we are always rich to get line breaking, but we do NOT
+                   allow any HTML tags to execute unless requested */
+                var map = {
+                    '>': '&gt;',
+                    '<': '&lt;',
+                    '&': '&amp;'
+                };
+                label = label.replace(/[<>&]/g,function(m){return map[m]});
+            }
             this.__body.setLabel(label);
             this.open();
         },
@@ -122,8 +127,8 @@ qx.Class.define("callbackery.ui.MsgBox", {
          * @param ico {Icon} icon
          * @return {Button} button widget
          */
-        __mk_btn : function(key,lab,ico) {
-            var b = this.__btn[key] = new qx.ui.form.Button(lab, 'icon/16/'+ico).set({ minWidth : 60 });
+        __mk_btn : function(key, label) {
+            var b = this.__btn[key] = new qx.ui.form.Button(label).set({ minWidth : 60 });
             this.__btnBox.add(b);
             b.addListener('execute',function(){
                 this.fireDataEvent('choice',key);
@@ -131,28 +136,44 @@ qx.Class.define("callbackery.ui.MsgBox", {
             },this);
         },
 
-        __show_btn: function(btns){
+        __show_btn: function(btns, icons){
             for (var key in this.__btn){
                 this.__btn[key].setVisibility('excluded');
             }
             btns.forEach(function(key){
                 this.__btn[key].setVisibility('visible');
+                if (icons && icons.button && icons.button[key]) {
+                    this.__btn[key].setIcon(icons[key]);
+                }
+                else {
+                    this.__btn[key].setIcon(null);
+                }
             },this);
         },
 
+        __setIcons: function(icons) {
+            if (icons && icons.caption) {
+                this.setIcon(icons.caption);
+            }
+            if (icons && icons.body) {
+                this.__body.setIcon(icons);
+            }
+        },
 
         /**
          * Open the Error popup
          *
-         * @param titel {String} title
+         * @param title {String} title
          * @param text {String} body
+         * @param html {Boolean} allow HTML if true
+         * @param icons {Map} of body, button, and title icon strings
+         * @param size {Map} of width and height
          * @return {void} 
          */
-        error : function(titel, text) {
-            this.__body.setIcon("icon/32/status/dialog-error.png");
-            this.setIcon("icon/16/status/dialog-error.png");
-            this.__show_btn(['ok']);
-            this.__open(titel, text);
+        error : function(title, text, html, icons, size) {
+            this.__setIcons(icons);
+            this.__show_btn(['ok'], icons);
+            this.__open(title, text, html, size);
             return this;
         },
 
@@ -161,20 +182,23 @@ qx.Class.define("callbackery.ui.MsgBox", {
          * Show server error message
          *
          * @param exc {Map} callAsync exception
+         * @param icons {Map} of title and body icon strings
+         * @param icons {Map} of body, button, and title icon strings
+         * @param size {Map} of width and height
          * @return {void} 
          */
-        exc : function(exc) {
-            this.__body.setIcon("icon/32/status/dialog-error.png");
-            this.setIcon("icon/16/status/dialog-error.png");
-            this.__show_btn(['ok']);
+        exc : function(exc, icons, size) {
+            this.__setIcons(icons);
+            this.__show_btn(['ok'], icons);
             //var trace = '';
             //if (exc.code == 2 && console.log){
             //    qx.dev.StackTrace.getStackTrace().forEach(function(row){
             //        console.log('stack trace:' + row);
             //    },this);
             // }
-            
-            this.__open(this.tr('RPC Error %1', exc.code), this.xtr(exc.message));
+
+            // no HTML
+            this.__open(this.tr('RPC Error %1', exc.code), this.xtr(exc.message), false);
             return this;
         },
 
@@ -182,15 +206,16 @@ qx.Class.define("callbackery.ui.MsgBox", {
         /**
          * Open the Info popup
          *
-         * @param titel {String} title
+         * @param title {String} title
          * @param text {String} body
+         * @param html {Boolean} allow HTML if true
+         * @param icons {Map} of body, button, and title icon strings
          * @return {void} 
          */
-        info : function(titel, text) {
-            this.__body.setIcon("icon/32/status/dialog-information.png");
-            this.setIcon("icon/16/status/dialog-information.png");
-            this.__show_btn(['ok']);
-            this.__open(titel, text);
+        info : function(title, text, html, icons, size) {
+            this.__setIcons(icons);
+            this.__show_btn(['ok'], icons);
+            this.__open(title, text, html, size);
             return this;
         },
 
@@ -198,29 +223,33 @@ qx.Class.define("callbackery.ui.MsgBox", {
         /**
          * Open the Warning popup with optional callback
          *
-         * @param titel {String} window title
+         * @param title {String} window title
          * @param text {String} content
+         * @param html {Boolean} allow HTML if true
+         * @param icons {Map} of body, button, and title icon strings
+         * @param size {Map} of width and height
          * @return {void} 
          */
-        warn : function(titel, text) {
-            this.__body.setIcon("icon/32/status/dialog-warning.png");
-            this.setIcon("icon/16/status/dialog-warning.png");
-            this.__show_btn(['cancel','apply']);
-            this.__open(titel, text);
+        warn : function(title, text, html, icons, size) {
+            this.__setIcons(icons);
+            this.__show_btn(['cancel','apply'], icons.button);
+            this.__open(title, text, html, size);
             return this;
         },
         /**
          * Open the Warning popup with optional callback
          *
-         * @param titel {String} window title
+         * @param title {String} window title
          * @param text {String} content
+         * @param html {Boolean} allow HTML if true
+         * @param icons {Map} of body, button, and title icon strings
+         * @param size {Map} of width and height
          * @return {void} 
          */
-        yesno : function(titel, text) {
-            this.__body.setIcon("icon/32/status/dialog-warning.png");
-            this.setIcon("icon/16/status/dialog-warning.png");
-            this.__show_btn(['yes','no']);
-            this.__open(titel, text);
+        yesno : function(title, text, html, icons, size) {
+            this.__setIcons(icons);
+            this.__show_btn(['yes','no'], icons.button);
+            this.__open(title, text, html, size);
             return this;
         }
     }

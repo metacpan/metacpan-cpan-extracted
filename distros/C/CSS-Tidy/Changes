@@ -1,5 +1,18 @@
 Revision history for Perl module CSS::Tidy
 
+0.03 2021-03-27
+
+- Deal with strings (necessary because of // comments)
+- Better spacings
+- Add semicolon to final CSS entry
+
+0.02 2021-03-26
+
+- Support // ("C++") comments
+- Add copy_css method
+- Add decomment option
+- Remove defunct duplicate code in tidy_css
+
 0.01 2021-01-29
 
 - Initial version

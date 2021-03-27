@@ -312,7 +312,22 @@ package FP::List::Pair {
         my $s = shift;
         @_ == 1 or fp_croak_arity 1;
         my @p = ($_[0], $s);
-        bless \@p, ref($s);
+
+        # Now it gets ~ugly: for lazy code, $s can (now, since
+        # AUTOLOAD on them doesn't necessarily force them anymore) now
+        # be a promise with field 2 set.
+        # my $immediate_class = ref($s);
+        # bless \@p,
+        #     UNIVERSAL::isa($immediate_class, "FP::Lazy::AnyPromise")
+        #     ? $$s[2]
+        #     : $immediate_class;
+        # /ugly.
+
+        # OR, simply (since the above would void any chance of simply
+        # using `lazyT` in stream libraries since one couldn't know
+        # the type of cons cells statically)!:
+        bless \@p, "FP::List::Pair";
+
         if ($immutable) {
             Internals::SvREADONLY $p[0], 1;
             Internals::SvREADONLY $p[1], 1;
@@ -333,7 +348,10 @@ package FP::List::Pair {
     *first_update = \&FP::List::first_update;
 
     sub cdr {
-        $_[0][1]
+
+        # $_[0][1]
+        # nope, since lazyT, the argument can be a promise:
+        ref($_[0]) eq __PACKAGE__ ? $_[0][1] : goto \&FP::List::cdr
     }
     *rest         = \&cdr;
     *maybe_rest   = \&rest;
@@ -667,7 +685,7 @@ sub cdr {
     @_ == 1 or fp_croak_arity 1;
     my ($v) = @_;
     my $r = blessed($v) // die_not_a_pair($v);
-    if ($r eq "FP::List::Pair") {
+    if ($r->isa("FP::List::Pair")) {
         $v->[1]
     } elsif (is_promise $v) {
         @_ = force $v;

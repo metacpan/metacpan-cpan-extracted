@@ -1,6 +1,9 @@
 Changes
 =======
 
+0.03 - 2021 March 26
+    - Fix possible issues with compilation  under Perl with thread support
+
 0.02 - 2021 March 16
     - Fix dependencies
 

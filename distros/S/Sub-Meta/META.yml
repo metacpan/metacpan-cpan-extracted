@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,26 +29,26 @@ no_index:
 provides:
   Sub::Meta:
     file: lib/Sub/Meta.pm
-    version: '0.08'
+    version: '0.09'
   Sub::Meta::Creator:
     file: lib/Sub/Meta/Creator.pm
-    version: '0.08'
+    version: '0.09'
   Sub::Meta::Finder::FunctionParameters:
     file: lib/Sub/Meta/Finder/FunctionParameters.pm
   Sub::Meta::Finder::SubWrapInType:
     file: lib/Sub/Meta/Finder/SubWrapInType.pm
   Sub::Meta::Library:
     file: lib/Sub/Meta/Library.pm
-    version: '0.08'
+    version: '0.09'
   Sub::Meta::Param:
     file: lib/Sub/Meta/Param.pm
-    version: '0.08'
+    version: '0.09'
   Sub::Meta::Parameters:
     file: lib/Sub/Meta/Parameters.pm
-    version: '0.08'
+    version: '0.09'
   Sub::Meta::Returns:
     file: lib/Sub/Meta/Returns.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Carp: '0'
   Scalar::Util: '0'
@@ -59,7 +59,7 @@ resources:
   bugtracker: https://github.com/kfly8/p5-Sub-Meta/issues
   homepage: https://github.com/kfly8/p5-Sub-Meta
   repository: git://github.com/kfly8/p5-Sub-Meta.git
-version: '0.08'
+version: '0.09'
 x_authority: cpan:KFLY
 x_contributors:
   - 'Kenta Kobayashi <kentafly88@gmail.com>'

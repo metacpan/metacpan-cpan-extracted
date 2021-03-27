@@ -1,7 +1,7 @@
 package Tapper::API::Plugin::Integrationtest;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: API functions for integration tests
-$Tapper::API::Plugin::Integrationtest::VERSION = '5.0.1';
+$Tapper::API::Plugin::Integrationtest::VERSION = '5.0.2';
 use warnings;
 use strict;
 use 5.010;
@@ -15,6 +15,9 @@ use Tapper::Model 'model';
 use File::ShareDir;
 use File::Spec;
 use Storable;
+use File::Temp 'tempfile';
+
+plugin('RenderFile');
 
 my $cfg      = Tapper::Config->subconfig;
 my %tests = (
@@ -35,6 +38,24 @@ sub get_groups
         return \%groups;
 }
 
+sub _get_api_base {
+    my $base_url = '';
+
+    # package name full or just last part
+    my $plugin_name1 = __PACKAGE__;
+    my $plugin_name2 = $plugin_name1;
+    $plugin_name2    =~ s/^.*:://;
+
+    return unless $cfg->{api}{routes};
+
+    foreach (@{$cfg->{api}{routes}}) {
+        if ($_->{module} eq $plugin_name1 or $_->{module} eq $plugin_name2) {
+            $base_url = $_->{url};
+            last;
+        }
+    }
+    return $base_url;
+}
 
 put 'host-new/room/:room/ip/:ip' => sub {
         my $self = shift;
@@ -328,7 +349,7 @@ get 'query/test-list/' => sub {
 
 any 'query/report-filelist/id/:report_id' => sub {
         my $self = shift;
-        $self->app->renderer->default_format('html');
+        $self->app->renderer->default_format('json');
 
         my $report_id = $self->param('report_id');
         my $filter_filename = $self->param('filter_filename');
@@ -343,11 +364,33 @@ any 'query/report-filelist/id/:report_id' => sub {
                           json => sub { $self->render(json =>  {map {$_->id => $_->filename} $file_result->all} )},
                           html => sub {
                                   my $file_ids = [map {$_->id} $file_result->all];
-                                  $self->stash(file_ids => $file_ids);
+                                  $self->stash(file_ids => $file_ids, api_base => _get_api_base());
                                   $self->render(template => 'queryreportfilelistidreport_id')
                           }
                          );
 };
+
+any 'query/report-list/name/:report_name/limit/:limit' => sub {
+        my $self = shift;
+        $self->app->renderer->default_format('json');
+
+        my $report_name = $self->param('report_name') || '';
+        my $limit       = $self->param('limit') || 1;
+        my $file_result;
+        if ($report_name) {
+                $file_result = model->resultset('ReportFile')->search({filename => {'like' => $report_name}}, {limit => $limit});
+        }
+
+        $self->respond_to(
+                          json => sub { $self->render(json =>  {map {$_->id => $_->filename} $file_result->all} )},
+                          html => sub {
+                                  my $file_ids = [map {$_->id} $file_result->all];
+                                  $self->stash(file_ids => $file_ids, api_base => _get_api_base());
+                                  $self->render(template => 'queryreportfilelistidreport_id')
+                          }
+                         );
+};
+
 
 any 'query/testrun-filelist/id/:testrun_id' => sub {
         my $self = shift;
@@ -355,9 +398,9 @@ any 'query/testrun-filelist/id/:testrun_id' => sub {
 
         my $cmd_testrun = Tapper::Cmd::Testrun->new();
         my $testrun_id = $self->param('testrun_id');
-        my $reports_rs = model->resultset('ReportgroupTestrun')->search({testrun_id => $testrun_id, primaryreport => 1});
+        my $reports_rs = model->resultset('ReportgroupTestrun')->search({testrun_id => $testrun_id});
         my @report_ids = map {$_->report_id} $reports_rs->all;
-        $self->stash(report_ids => \@report_ids);
+        $self->stash(report_ids => \@report_ids, api_base => _get_api_base());
 };
 
 any 'query/testplan-filelist/id/:testplan_id' => sub {
@@ -370,7 +413,7 @@ any 'query/testplan-filelist/id/:testplan_id' => sub {
 
         my $cmd = Tapper::Cmd::Testplan->new();
         my $file_ids = $cmd->testplan_files($testplan_id, $filter);
-        $self->stash(file_ids => $file_ids);
+        $self->stash(file_ids => $file_ids, api_base => _get_api_base());
 };
 
 any 'query/reportfile/*filepath' => sub {
@@ -388,11 +431,20 @@ any 'query/reportfile/*filepath' => sub {
         }
 
         my $filename = $reportfile_result->filename;
-        my $contenttype = $reportfile_result->contenttype eq 'plain' ? 'text/plain' : $reportfile_result->contenttype;
-        my $disposition = $contenttype =~ /plain/ ? 'inline' : 'attachment';
-        $self->res->headers->content_type ($contenttype || 'application/octet-stream');
-        $self->res->headers->content_disposition("$disposition; filename=$filename;");
-        $self->render(text => $reportfile_result->filecontent, status => 202);
+        my ($FH, $tmpname) = tempfile (TEMPLATE => "tapper-api-reportfile-${file_id}-XXXX",
+                                       UNLINK => 0,
+                                       TMPDIR => 1);
+        binmode $FH;
+        print $FH $reportfile_result->filecontent;
+        $self->render_file(filepath => $tmpname, filename => $filename);
+        unlink $FH;
+
+        # my $contenttype = $reportfile_result->contenttype eq 'plain' ? 'text/plain' : $reportfile_result->contenttype;
+        # my $disposition = $contenttype =~ /plain/ ? 'inline' : 'attachment';
+
+        # $self->res->headers->content_type ($contenttype || 'application/octet-stream');
+        # $self->res->headers->content_disposition("$disposition; filename=$filename;");
+        # $self->render(text => $reportfile_result->filecontent, status => 202);
 };
 
 
@@ -418,7 +470,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Amazon.
+This software is Copyright (c) 2021 by Amazon.
 
 This is free software, licensed under:
 
@@ -436,7 +488,7 @@ __DATA__
  <body>
 <table>
 % foreach my $file_id (@$file_ids){
-    <tr><td valign="top"><a href="/api/integrationtestv1/query/reportfile/id/<%= $file_id %>"></a></td>
+    <tr><td valign="top"><a href="<%= $api_base %>/query/reportfile/id/<%= $file_id %>"></a></td>
 % }
 </table>
 </body></html>
@@ -450,7 +502,7 @@ __DATA__
  <body>
 <table>
 % foreach my $report_id (@$report_ids){
-    <tr><td valign="top"><a href="/api/integrationtestv1/query/report-filelist/id/<%= $report_id %>"></a></td>
+    <tr><td valign="top"><a href="<%= $api_base %>/query/report-filelist/id/<%= $report_id %>"></a></td>
 % }
 </table>
 </body></html>
@@ -464,7 +516,7 @@ __DATA__
  <body>
 <table>
 % foreach my $file_id (@$file_ids){
-    <tr><td valign="top"><a href="/api/integrationtestv1/query/reportfile/id/<%= $file_id %>"></a></td>
+    <tr><td valign="top"><a href="<%= $api_base %>/query/reportfile/id/<%= $file_id %>"></a></td>
 % }
 </table>
 </body></html>

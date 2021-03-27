@@ -14,11 +14,11 @@ Genealogy::ObituaryDailyTimes - Compare a Gedcom against the Obituary Daily Time
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -46,8 +46,7 @@ sub new {
 	my $directory = $param{'directory'} || Module::Info->new_from_loaded(__PACKAGE__)->file();
 	$directory =~ s/\.pm$//;
 
-	Genealogy::ObituaryDailyTimes::DB::init(directory => File::Spec->catfile($directory, 'database'));
-
+	Genealogy::ObituaryDailyTimes::DB::init(directory => File::Spec->catfile($directory, 'database'), %param);
 	return bless { }, $class;
 }
 
@@ -130,7 +129,7 @@ L<http://deps.cpantesters.org/?module=Genealogy::ObituaryDailyTimes>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Nigel Horne.
+Copyright 2020-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

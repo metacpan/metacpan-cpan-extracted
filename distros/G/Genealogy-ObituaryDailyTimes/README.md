@@ -4,7 +4,7 @@ Genealogy::ObituaryDailyTimes - Compare a Gedcom against the Obituary Daily Time
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -72,6 +72,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2020 Nigel Horne.
+Copyright 2020-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2

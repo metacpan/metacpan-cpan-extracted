@@ -1,0 +1,18 @@
+Revision history for Test-Exec
+
+After 0.12 FFI-Exec was merged with Test2-Tools-Processs
+
+0.04      2017-07-14 10:48:01 -0400
+  - Added never_exec_ok function
+
+0.03      2017-03-24 10:19:07 -0400
+  - largely the same as 0.02_01, except Test2 tests are no longer optional
+
+0.02_01   2016-04-29 11:42:24 -0400
+  - Added some optional Test2 tests
+
+0.02      2015-12-13 12:47:56 -0500
+  - Fixed uncaptured exec
+
+0.01      2015-12-13 04:38:55 -0500
+  - initial version

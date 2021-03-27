@@ -4,13 +4,13 @@
       "Skye Shaw <sshaw AT lucas.cis.temple.edu>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-DigestAuth",
    "no_index" : {
@@ -45,5 +45,6 @@
          "url" : "http://github.com/sshaw/Mojolicious-Plugin-DigestAuth"
       }
    },
-   "version" : "0.09"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

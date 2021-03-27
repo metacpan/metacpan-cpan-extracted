@@ -25,7 +25,7 @@ while (my $cl = <$fh>) {
         die "Invalid line $. in classifiers.txt, must be in /^FOO( :: BAR)+/ form: $cl";
     }
     my ($fname, $fval) = ($1, $2);
-    $fname =~ s/\W+/_/g;
+
     $FEATURES_DEF{features}{$fname} //= {
         schema => ['any*', {
             of=>[

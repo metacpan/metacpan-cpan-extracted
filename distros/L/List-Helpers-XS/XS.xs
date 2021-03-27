@@ -1,16 +1,47 @@
-#define PERL_NO_GET_CONTEXT
+//#define PERL_NO_GET_CONTEXT
+
+// PERL_NO_GET_CONTEXT is not used here, so it's OK to define it after inculding these files
 #include "EXTERN.h"
 #include "perl.h"
+
+// There are a lot of macro about threads: USE_ITHREADS, USE_5005THREADS, I_PTHREAD, I_MACH_CTHREADS, OLD_PTHREADS_API
+// This symbol, if defined, indicates that Perl should be built to use the interpreter-based threading implementation.
+#ifndef USE_ITHREADS
+#	define PERL_NO_GET_CONTEXT
+#endif
+
+//#ifdef USE_ITHREADS
+//#	warning USE_ITHREADS: THREADS ARE ON
+//#endif
+//#ifdef USE_5005THREADS
+//#	warning USE_5005THREADS: THREADS ARE ON
+//#endif
+//#ifdef I_PTHREAD
+//#	warning I_PTHREAD: THREADS ARE ON
+//#endif
+//#ifdef I_MACH_CTHREADS
+//#	warning I_MACH_CTHREADS: THREADS ARE ON
+//#endif
+//#ifdef OLD_PTHREADS_API
+//# warning OLD_PTHREADS_API: THREADS ARE ON
+//#endif
+
 #include "XSUB.h"
 
 #include <sys/types.h>
-//#include <unistd.h>
-//#include <stdlib.h>
+
+#ifdef I_PTHREAD
+#	include "pthread.h"
+#endif
+
+#ifdef I_MACH_CTHREADS
+#	include "mach/cthreads.h"
+#endif
+
 
 inline static void croak_sv_is_not_an_arrayref (short int pos) {
     static char* pattern = "The argument at position %i isn't an array reference";
-    SV* msg = sv_2mortal( newSVpvf(pattern, pos) );
-    Perl_croak(pTHX_ (char *) SvPV_nolen( msg ));
+    croak(pattern, pos);
 }
 
 inline static void shuffle_tied_av_last_num_elements (AV *av, SSize_t len, SSize_t num) {
@@ -23,9 +54,7 @@ inline static void shuffle_tied_av_last_num_elements (AV *av, SSize_t len, SSize
     SV** bp;
 
     while (cur_index > 1) {
-        rand_index = (cur_index + 1) * Drand01(); // rand() % cur_index;
-        if (rand_index == cur_index)
-            continue;
+		rand_index = rand() % cur_index; // (cur_index + 1) * Drand01();
 
         ap = av_fetch(av,  cur_index, 0);
         bp = av_fetch(av, rand_index, 0);
@@ -47,6 +76,7 @@ inline static void shuffle_tied_av_last_num_elements (AV *av, SSize_t len, SSize
     }
 }
 
+
 inline static void shuffle_av_last_num_elements (AV *av, SSize_t len, SSize_t num) {
 
     if (SvTIED_mg((SV *)av, PERL_MAGIC_tied)) {
@@ -57,11 +87,9 @@ inline static void shuffle_av_last_num_elements (AV *av, SSize_t len, SSize_t nu
         SV **pav = AvARRAY(av);
         SV* a;
 
-        while (cur_index > 1) {
-            rand_index = (cur_index + 1) * Drand01(); // rand() % cur_index;
-            //warn("cur_index = %i\trnd = %i\n", cur_index, rand_index);
-            if (rand_index == cur_index)
-                continue;
+        while (cur_index >= 0) {
+            rand_index = (cur_index + 1) * Drand01(); // rand() % (cur_index + 1);
+            //warn("cur_index = %i\trnd = %i\n", (int)cur_index, (int)rand_index);
             a = (SV*) pav[rand_index];
             pav[rand_index] = pav[cur_index];
             pav[cur_index] = a;
@@ -72,14 +100,6 @@ inline static void shuffle_av_last_num_elements (AV *av, SSize_t len, SSize_t nu
 
 inline static void shuffle_av_first_num_elements (AV *av, SSize_t len, SSize_t num) {
 
-    /*
-    static short int is_rand_initialized = 0;
-
-    if (is_rand_initialized == 0) {
-        srand( (unsigned int) getpid() );
-        is_rand_initialized = 1;
-    }
-    */
 
     static SSize_t rand_index = 0;
     static SSize_t cur_index  = 0;
@@ -93,9 +113,7 @@ inline static void shuffle_av_first_num_elements (AV *av, SSize_t len, SSize_t n
         SV** bp;
 
         while (cur_index <= num) {
-            rand_index = cur_index + (len - cur_index) * Drand01(); // rand() % cur_index;
-            if (rand_index == cur_index)
-                continue;
+            rand_index = cur_index + (len - cur_index) * Drand01(); // cur_index + rand() % (len - cur_index)
 
             // perlguts: Note the value so returned does not need to be deallocated, as it is already mortal.
             // SO, let's bump REFCNT then
@@ -123,10 +141,9 @@ inline static void shuffle_av_first_num_elements (AV *av, SSize_t len, SSize_t n
         SV **pav = AvARRAY(av);
 
         while (cur_index <= num) {
-            rand_index = cur_index + (len - cur_index) * Drand01(); // rand() % (len - cur_index);
-            //warn("cur_index = %i\trnd = %i\n", cur_index, rand_index);
-            if (rand_index == cur_index)
-                continue;
+            rand_index = cur_index + (len - cur_index) * Drand01(); // cur_index + rand() % (len - cur_index);
+            //warn("cur_index = %i\trnd = %i\n", (int)cur_index, (int)rand_index);
+
             a = (SV*) pav[rand_index];
             pav[rand_index] = pav[cur_index];
             pav[cur_index] = a;
@@ -134,7 +151,6 @@ inline static void shuffle_av_first_num_elements (AV *av, SSize_t len, SSize_t n
         }
     }
 }
-
 
 MODULE = List::Helpers::XS      PACKAGE = List::Helpers::XS
 
@@ -154,7 +170,7 @@ AV* random_slice (av, num)
 PPCODE:
 
     if (num < 0)
-        Perl_croak(pTHX_ "The slice's size can't be less than 0");
+        croak("The slice's size can't be less than 0");
 
     if (num != 0) {
 
@@ -198,7 +214,7 @@ void random_slice_void (av, num)
 PPCODE:
 
     if (num < 0)
-        Perl_croak(pTHX_ "The slice's size can't be less than 0");
+        croak("The slice's size can't be less than 0");
 
     if (num == 0) {
         av_fill(av, 0);
@@ -242,7 +258,7 @@ PPCODE:
     SV *ref;
 
     if (items == 0)
-        Perl_croak(pTHX_ "Wrong amount of arguments");
+        croak("Wrong amount of arguments");
 
     for (i = 0; i < items; i++) {
         sv = ST(i);
@@ -260,4 +276,5 @@ PPCODE:
             croak_sv_is_not_an_arrayref(i);
     }
     // if (items < X) EXTEND(SP, X);
+
     XSRETURN_EMPTY;

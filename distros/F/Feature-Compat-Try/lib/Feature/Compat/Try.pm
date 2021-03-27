@@ -3,10 +3,13 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Feature::Compat::Try 0.02;
+package Feature::Compat::Try 0.03;
 
 use v5.14;
 use warnings;
+use feature ();
+
+use constant HAVE_FEATURE_TRY => defined $feature::feature{try};
 
 =head1 NAME
 
@@ -30,19 +33,23 @@ C<Feature::Compat::Try> - make C<try/catch> syntax available
 
 =head1 DESCRIPTION
 
-This module is written in the aspiration that one day perl will gain true
-native syntax support for C<try/catch> control flow, and that it will be
-spelled using the syntax defined here. The intention here is that on such
-a version of perl that provides this syntax this module will simply enable it,
-equivalent to perhaps
+This module is written in preparation for when perl will gain true native
+syntax support for C<try/catch> control flow.
+
+Perl added such syntax in the development version 5.33.7, which is enabled
+by
 
    use feature 'try';
+
+On that version of perl or later, this module simply enables the core feature
+equivalent to using it directly. On such perls, this module will install with
+no non-core dependencies, and requires no C compiler.
 
 On older versions of perl before such syntax is available, it is currently
 provided instead using the L<Syntax::Keyword::Try> module, imported with a
 special set of options to configure it to recognise exactly and only the same
-syntax as this as-yet-aspirational core perl feature, thus ensuring that any
-code using it will still continue to function on that newer perl.
+syntax as the core perl feature, thus ensuring that any code using it will
+still continue to function on that newer perl.
 
 =cut
 
@@ -102,17 +109,14 @@ usual effect.
 
 sub import
 {
-   # Hopefully some future version of perl will add `use feature 'try';` so
-   # we can be conditional on the perl version here.
-
-   # ironic use of eval {}
-   if( eval { require feature; feature->import(qw( try )); 1 } ) {
+   if( HAVE_FEATURE_TRY ) {
+      feature->import(qw( try ));
       require warnings;
       warnings->unimport(qw( experimental::try ));
    }
    else {
       require Syntax::Keyword::Try;
-      Syntax::Keyword::Try->VERSION( '0.21' );
+      Syntax::Keyword::Try->VERSION( '0.22' );
       Syntax::Keyword::Try->import(qw( try -no_finally -require_var ));
    }
 }

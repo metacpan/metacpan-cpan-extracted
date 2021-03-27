@@ -15,7 +15,7 @@ sub startup
     $self->plugin('digest_auth');
     
     my $r = $self->digest_auth('/admin', allow => TestHelper::users());	
-    $r->route('/:id')->to('controller#show');	
+    $r->_route('/:id')->to('controller#show');	
 }
 
 package App::Controller;

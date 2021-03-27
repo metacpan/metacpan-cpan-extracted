@@ -1,3 +1,9 @@
+0.079		2021-03-26	T. R. Wyant
+    Get prerequisites up to snuff, and add xt/author/prereq.t to ensure
+    they stay that way.
+
+    Add rt.cpan.org back to bug reporting methods. Long live RT!
+
 0.078		2021-01-28	T. R. Wyant
     Allow CPAN to index Script_Run, Atomic_Script_Run, since they made
     it into a production release.

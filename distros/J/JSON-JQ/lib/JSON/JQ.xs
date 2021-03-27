@@ -172,6 +172,8 @@ void * my_jv_output(pTHX_ jv jval) {
 
 static void my_error_cb(void * errors, jv jerr) {
     dTHX;
+    // original jerr will be freed by jq engine
+    jerr = jv_copy(jerr);
     av_push((AV *)errors, newSVpvn_utf8(jv_string_value(jerr), jv_string_length_bytes(jerr), 1));
 }
 
@@ -282,7 +284,8 @@ _init(self)
             XSRETURN_YES;
         }
         else {
-            jv_free(args);
+            // args freed by jq engine
+            //jv_free(args);
             // jq_teardown(&_jq); // no need to call destructor here, DESTROY will do
             XSRETURN_NO;
         }

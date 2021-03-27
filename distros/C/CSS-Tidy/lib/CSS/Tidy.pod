@@ -14,8 +14,8 @@ CSS::Tidy - reformat CSS
 
 =head1 VERSION
 
-This documents version 0.01 of CSS-Tidy
-corresponding to L<git commit 50d0ef7baaf1754a2cd58fd02be293916c3270e6|https://github.com/benkasminbullock/css-tidy/commit/50d0ef7baaf1754a2cd58fd02be293916c3270e6> released on Fri Jan 29 22:55:52 2021 +0900.
+This documents version 0.03 of CSS-Tidy
+corresponding to L<git commit d5e498c8e56c332304999dec5f4f915a7c67a6cc|https://github.com/benkasminbullock/css-tidy/commit/d5e498c8e56c332304999dec5f4f915a7c67a6cc> released on Sat Mar 27 10:49:16 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -26,12 +26,47 @@ consistently format CSS.
 
 =head1 FUNCTIONS
 
+=head2 copy_css
+
+    copy_css (in => $infile, out => $outfile);
+
+Copy CSS from a file specified by L</in> to a file specified by
+L</out>.
+
+=over
+
+=item in
+
+Input file. The file is read in via the function C<read_text> in
+L</File::Slurper> so it must be in the UTF-8 encoding.
+
+=item out
+
+Output file. The file is written using C<write_text> from
+L</File::Slurper> so it must be in the UTF-8 encoding.
+
+=item decomment
+
+Remove comments from the output file.
+
+=back
+
 =head2 tidy_css
 
-    my $output = tidy_css ($input);
+    my $output = tidy_css ($input, %options);
 
 Given CSS in C<$input>, reformat it into a consistent format and
 return the value.
+
+Options are as follows:
+
+=over
+
+=item decomment
+
+Set to a true value to remove comments from the output
+
+=back
 
 =head1 TRANSFORMATIONS APPLIED
 
@@ -81,6 +116,20 @@ before and after itself.
 The script L<csstidy> runs L</tidy_css> on STDIN and prints the result
 to STDOUT. There is also F<css-tidy.el> in the distribution which
 enables one to run L<csstidy> on the current buffer.
+
+=head1 DEPENDENCIES
+
+=over 
+
+=item L<C::Tokenize>
+
+This is used for comment regex.
+
+=item L<File::Slurper>
+
+This is used to read and write files
+
+=back
 
 =head1 SEE ALSO
 

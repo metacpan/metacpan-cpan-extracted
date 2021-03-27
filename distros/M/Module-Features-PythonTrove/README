@@ -3,9 +3,9 @@ NAME
     module
 
 VERSION
-    This document describes version 0.001 of Module::Features::PythonTrove
+    This document describes version 0.002 of Module::Features::PythonTrove
     (from Perl distribution Module-Features-PythonTrove), released on
-    2021-03-25.
+    2021-03-26.
 
 SYNOPSIS
     To add Python trove classifiers in your module, just define %FEATURES
@@ -17,22 +17,18 @@ SYNOPSIS
      our %FEATURES = (
          features => {
              PythonTrove => {
-                 # we use underscore (Development_Status instead of "Development
-                 # Status") because feature names in Module::Features need to be
-                 # /^\w+$/. feature values need not be.
+                 "Development Status" => "3 - Alpha",
 
-                 "Development_Status" => "3 - Alpha",
-
-                 "Intended_Audience" => "Developers",
+                 "Intended Audience" => "Developers",
 
                  "License" => [
                      "OSI Approved :: Artistic License",
                      "OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
                  ],
 
-                 "Natural_Language" => "Indonesian",
+                 "Natural Language" => "Indonesian",
 
-                 "Programming_Language" => "Perl",
+                 "Programming Language" => "Perl",
 
                  "Environment" => "Console",
 
@@ -66,7 +62,7 @@ DESCRIPTION
 DEFINED FEATURES
     Features defined by this module:
 
-    *   Development_Status
+    *   Development Status
 
         Optional. Type: any.
 
@@ -78,7 +74,7 @@ DEFINED FEATURES
 
         Optional. Type: any.
 
-    *   Intended_Audience
+    *   Intended Audience
 
         Optional. Type: any.
 
@@ -86,15 +82,15 @@ DEFINED FEATURES
 
         Optional. Type: any.
 
-    *   Natural_Language
+    *   Natural Language
 
         Optional. Type: any.
 
-    *   Operating_System
+    *   Operating System
 
         Optional. Type: any.
 
-    *   Programming_Language
+    *   Programming Language
 
         Optional. Type: any.
 

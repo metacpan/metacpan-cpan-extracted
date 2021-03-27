@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
         'warnings'      => 0,
     	'Exporter'		=> '5.73',
     	'Filter::Util::Call' => '1.59',
+    	'IO::File'      => 0,
     	'List::Util'    => '1.33',
     	'PPI'           => '1.270',
     	'Scalar::Util'	=> '1.50',
@@ -42,7 +43,8 @@ my %WriteMakefileArgs = (
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Nice-Try',
+                ## web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Nice-Try',
+                web         => 'https://git.deguest.jp/jack/Nice-Try/issues',
             },
         },
     }) : ()),

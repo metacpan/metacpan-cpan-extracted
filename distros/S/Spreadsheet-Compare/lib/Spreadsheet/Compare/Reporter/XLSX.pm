@@ -26,7 +26,7 @@ my %format_defaults = (
 has $_, $format_defaults{$_} for keys %format_defaults;
 
 has report_filename => sub {
-    ( my $title = $_[0]->title ) =~ s/[^\w-]/_/g;
+    ( my $title = $_[0]->test_title ) =~ s/[^\w-]/_/g;
     return "$title.xlsx";
 };
 

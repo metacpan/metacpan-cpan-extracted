@@ -13,6 +13,7 @@ typedef SV PADNAME;
 #  define PadnamelistMAX(pnl)     AvFILLp(pnl)
 
 #  define PadARRAY(p)             AvARRAY(p)
+#  define PadMAX(pad)             AvFILLp(pad)
 #endif
 
 #ifndef av_top_index
@@ -33,6 +34,16 @@ typedef SV PADNAME;
 
 #ifndef intro_my
 #  define intro_my()             Perl_intro_my(aTHX)
+#endif
+
+#ifndef CX_CUR
+#  define CX_CUR() (&cxstack[cxstack_ix])
+#endif
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+#  define OLDSAVEIX(cx)  (cx->blk_oldsaveix)
+#else
+#  define OLDSAVEIX(cx)  (PL_scopestack[cx->blk_oldscopesp-1])
 #endif
 
 #ifndef OpSIBLING

@@ -1,3 +1,10 @@
+0.13 2021-03-26
+  - fix warning in DB reader
+  - add --version to spreadcomp
+  - fix limit_rel
+  - add test_title in Spreadsheet::Reporter
+  - fix failing skip in excel test
+
 0.12 2021-03-25
   - fix MANIFEST and bugtracker entry
 

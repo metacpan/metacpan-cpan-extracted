@@ -1,5 +1,8 @@
 Revision history for Perl module String::Interpolate
 
+0.33 2021-03-25 NEILB
+    - Fixed typos in doc and comments. Thanks to Gregor Herrmann, RT#129224
+
 0.32 2015-06-28 NEILB
     - Added SEE ALSO section. SWEETKID++
     - Got rid of indirect method notation in the doc. SWEETKID++

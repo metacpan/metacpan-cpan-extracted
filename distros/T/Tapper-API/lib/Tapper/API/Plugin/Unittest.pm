@@ -1,6 +1,6 @@
 package Tapper::API::Plugin::Unittest;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::API::Plugin::Unittest::VERSION = '5.0.1';
+$Tapper::API::Plugin::Unittest::VERSION = '5.0.2';
 use warnings;
 use strict;
 use 5.010;
@@ -56,7 +56,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Amazon.
+This software is Copyright (c) 2021 by Amazon.
 
 This is free software, licensed under:
 

@@ -1,8 +1,8 @@
 Build.PL
 Changes
-eg/README
-eg/game-life
 eg/glider
+eg/glider.life
+eg/README
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 lib/Game/Life/Faster.pm
@@ -13,6 +13,7 @@ MANIFEST
 META.json
 META.yml
 README
+script/game-life-faster
 t/basic.t
 t/game.t
 xt/author/changes.t
@@ -26,3 +27,4 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
+xt/author/prereq.t

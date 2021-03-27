@@ -1,4 +1,4 @@
-Linux-Sys-CPU-Affinity version 0.10
+Linux-Sys-CPU-Affinity
 =========================
 
 This module allows you to pin any process by its PID to some CPU's group on

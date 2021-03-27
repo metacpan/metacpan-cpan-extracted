@@ -7,14 +7,21 @@ my %REQUIRES_PERL = (
 );
 
 my %REQUIRES_SKT = (
-   'Syntax::Keyword::Try' => '0.21',
+   'Syntax::Keyword::Try' => '0.22',
 );
 
-my $HAVE_FEATURE_TRY = eval {
-   require feature;
-   feature->import( 'try' );
-   1;
+use feature ();
+my $HAVE_FEATURE_TRY = do {
+   # %feature::feature was only added on 5.16, but that's fine. If we're
+   # running on 5.14 this definitely won't be define()ed anyway. Looking at a
+   # package var is safe even under strict, we'll just get a "used once only"
+   # typo warning. We can quiet it.
+   no warnings 'once';
+   defined $feature::feature{try};
 };
+
+printf "Using %s\n",
+   $HAVE_FEATURE_TRY ? "core's feature 'try'" : "Syntax::Keyword::Try";
 
 my $build = Module::Build->new(
    module_name => 'Feature::Compat::Try',

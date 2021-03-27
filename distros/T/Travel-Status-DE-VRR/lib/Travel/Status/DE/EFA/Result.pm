@@ -8,11 +8,11 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
 use parent 'Class::Accessor';
 
-our $VERSION = '1.17';
+our $VERSION = '1.19';
 
 Travel::Status::DE::EFA::Result->mk_ro_accessors(
 	qw(countdown date delay destination is_cancelled info key line lineref
-	  mot platform platform_db platform_name sched_date sched_time time type)
+	  mot occupancy operator platform platform_db platform_name sched_date sched_time time train_no type)
 );
 
 my @mot_mapping = qw{
@@ -135,7 +135,7 @@ departure received by Travel::Status::DE::EFA
 
 =head1 VERSION
 
-version 1.17
+version 1.19
 
 =head1 DESCRIPTION
 
@@ -208,6 +208,14 @@ and 11.
 Returns the "mode of transport", for instance "zug", "s-bahn", "tram" or
 "sonstige".
 
+=item $departure->occupancy
+
+Returns expected occupancy, if available, undef otherwise.
+
+Occupancy values are passed from the backend as-is. Known values are
+"MANY_SEATS" (low occupation), "FEW_SEATS" (high occupation), and
+"STANDING_ONLY" (very high occupation).
+
 =item $departure->platform
 
 Departure platform number (may not be a number).
@@ -228,12 +236,12 @@ object.
 
 =item $departure->route_pre
 
-List of stations the train passed (or will have passed) befoe this stop.
+List of stations the vehicle passed (or will have passed) before this stop.
 Each station is a Travel::Status::DE::EFA::Stop(3pm) object.
 
 =item $departure->route_post
 
-List of stations the train will pass after this stop.
+List of stations the vehicle will pass after this stop.
 Each station is a Travel::Status::DE::EFA::Stop(3pm) object.
 
 =item $departure->sched_date
@@ -247,6 +255,10 @@ Scheduled departure time (HH:MM).
 =item $departure->time
 
 Actual departure time (HH:MM).
+
+=item $departure->train_no
+
+Train number. Only defined if departure is a train.
 
 =item $departure->type
 

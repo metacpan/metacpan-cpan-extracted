@@ -22,7 +22,7 @@ name: Test-Dirs
 provides:
   Test::Dirs:
     file: lib/Test/Dirs.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Carp: '0'
   File::Copy::Recursive: '0'
@@ -37,5 +37,5 @@ resources:
   bugtracker: http://github.com/jozef/Test-Dirs/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jozef/Test-Dirs/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

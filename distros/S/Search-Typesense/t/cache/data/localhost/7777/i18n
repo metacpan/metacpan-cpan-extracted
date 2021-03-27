@@ -1,0 +1,116 @@
+[
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/ HTTP/1.1\r\nHost: localhost:7777\r\nX-TYPESENSE-API-KEY: 777\r\nAccept-Encoding: gzip\r\nContent-Type: application/json\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nVary: accept-encoding\r\nDate: Thu, 25 Mar 2021 14:39:19 GMT\r\nAccept-Ranges: none\r\nContent-Length: 2\r\n\r\n[]",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 0
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "POST /collections HTTP/1.1\r\nUser-Agent: Mojolicious (Perl)\r\nAccept-Encoding: gzip\r\nContent-Type: application/json\r\nHost: localhost:7777\r\nContent-Length: 286\r\nX-TYPESENSE-API-KEY: 777\r\n\r\n{\"default_sorting_field\":\"num_employees\",\"fields\":[{\"facet\":false,\"name\":\"company_name\",\"type\":\"string\"},{\"facet\":false,\"name\":\"num_employees\",\"type\":\"int32\"},{\"facet\":true,\"name\":\"country\",\"type\":\"string\"}],\"name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"num_documents\":0}",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 201 Created\r\nConnection: keep-alive\r\nContent-Type: application/json; charset=utf-8\r\nDate: Thu, 25 Mar 2021 14:39:19 GMT\r\nContent-Length: 383\r\n\r\n{\"created_at\":1616683159,\"default_sorting_field\":\"num_employees\",\"fields\":[{\"facet\":false,\"name\":\"company_name\",\"optional\":false,\"type\":\"string\"},{\"facet\":false,\"name\":\"num_employees\",\"optional\":false,\"type\":\"int32\"},{\"facet\":true,\"name\":\"country\",\"optional\":false,\"type\":\"string\"}],\"name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"num_documents\":0,\"num_memory_shards\":4}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 1
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "POST /collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents HTTP/1.1\r\nUser-Agent: Mojolicious (Perl)\r\nAccept-Encoding: gzip\r\nContent-Type: application/json\r\nContent-Length: 76\r\nX-TYPESENSE-API-KEY: 777\r\nHost: localhost:7777\r\n\r\n{\"company_name\":\"StÃÂ¤ÃÂ§ÃÂ®a\",\"country\":\"USA\",\"id\":\"124\",\"num_employees\":5215}",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 201 Created\r\nContent-Length: 76\r\nDate: Thu, 25 Mar 2021 14:39:19 GMT\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\n\r\n{\"company_name\":\"StÃÂ¤ÃÂ§ÃÂ®a\",\"country\":\"USA\",\"id\":\"124\",\"num_employees\":5215}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 2
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/search?filter_by=num_employees%3A%3E100&q=stacia&query_by=company_name&sort_by=num_employees%3Adesc HTTP/1.1\r\nX-TYPESENSE-API-KEY: 777\r\nHost: localhost:7777\r\nUser-Agent: Mojolicious (Perl)\r\nContent-Type: application/json\r\nAccept-Encoding: gzip\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/search",
+            "port" : "7777",
+            "query" : "filter_by=num_employees%3A%3E100&q=stacia&query_by=company_name&sort_by=num_employees%3Adesc",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nVary: accept-encoding\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nAccept-Ranges: none\r\nContent-Length: 410\r\nDate: Thu, 25 Mar 2021 14:39:19 GMT\r\n\r\n{\"facet_counts\":[],\"found\":1,\"hits\":[{\"document\":{\"company_name\":\"StÃÂ¤ÃÂ§ÃÂ®a\",\"country\":\"USA\",\"id\":\"124\",\"num_employees\":5215},\"highlights\":[{\"field\":\"company_name\",\"matched_tokens\":[\"StÃÂ¤ÃÂ§ÃÂ®a\"],\"snippet\":\"<mark>StÃÂ¤ÃÂ§ÃÂ®a</mark>\"}],\"text_match\":130816}],\"out_of\":1,\"page\":1,\"request_params\":{\"collection_name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"per_page\":10,\"q\":\"stacia\"},\"search_time_ms\":0}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 3
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/ HTTP/1.1\r\nUser-Agent: Mojolicious (Perl)\r\nContent-Type: application/json\r\nAccept-Encoding: gzip\r\nHost: localhost:7777\r\nX-TYPESENSE-API-KEY: 777\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nAccept-Ranges: none\r\nContent-Length: 385\r\nDate: Thu, 25 Mar 2021 14:39:19 GMT\r\nVary: accept-encoding\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\n\r\n[{\"created_at\":1616683159,\"default_sorting_field\":\"num_employees\",\"fields\":[{\"facet\":false,\"name\":\"company_name\",\"optional\":false,\"type\":\"string\"},{\"facet\":false,\"name\":\"num_employees\",\"optional\":false,\"type\":\"int32\"},{\"facet\":true,\"name\":\"country\",\"optional\":false,\"type\":\"string\"}],\"name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"num_documents\":1,\"num_memory_shards\":4}]",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 4
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "DELETE /collections/company_XXX_this_will_be_deleted_after_testing_XXX HTTP/1.1\r\nHost: localhost:7777\r\nX-TYPESENSE-API-KEY: 777\r\nContent-Length: 0\r\nContent-Type: application/json\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nVary: accept-encoding\r\nDate: Thu, 25 Mar 2021 14:39:19 GMT\r\nAccept-Ranges: none\r\nContent-Length: 383\r\n\r\n{\"created_at\":1616683159,\"default_sorting_field\":\"num_employees\",\"fields\":[{\"facet\":false,\"name\":\"company_name\",\"optional\":false,\"type\":\"string\"},{\"facet\":false,\"name\":\"num_employees\",\"optional\":false,\"type\":\"int32\"},{\"facet\":true,\"name\":\"country\",\"optional\":false,\"type\":\"string\"}],\"name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"num_documents\":1,\"num_memory_shards\":4}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 5
+   }
+]

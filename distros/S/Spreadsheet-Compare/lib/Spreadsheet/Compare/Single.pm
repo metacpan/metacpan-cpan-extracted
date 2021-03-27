@@ -493,8 +493,8 @@ sub _compare_record ( $self, $l, $r ) {    ## no critic (ProhibitExcessComplexit
 
         my $rdiff =
             ( $rval == 0 or $lval == 0 )
-            ? 100
-            : ( $diff / abs($lval) * 100 );
+            ? 1
+            : ( $diff / abs($lval) );
 
         $diff_rec[$idx] = sprintf( '%.4f', $rdiff ) if $self->{diff_relative}{$key};
 

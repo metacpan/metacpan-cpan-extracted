@@ -51,26 +51,38 @@ EXPORTS
 
 FUNCTIONS
 
- temp_copy_ok($src_dir, [$message])
+ temp_copy_ok($src_dir, $message)
 
     Will recursively copy $src_dir to a "newdir" in File::Temp folder and
     returning File::Temp::Dir object. This object will stringify to a path
     and when destroyed (will leave the scope) folder is automatically
     deleted.
 
- is_dir($dir1, $dir2, [$message, \@ignore_files, $verbose])
+    $message is optional.
 
-    Compares $dir1 with $dir2. Files that has to be ignored (are not
-    important) can be specified as @ignore_files. The filenames are
+ is_dir($is_dir, $expected_dir, $message, \@ignore_files, $verbose)
+
+    Compares $is_dir with $expected_dir. Files that has to be ignored (are
+    not important) can be specified as @ignore_files. The filenames are
     relative to the $dir1(2) folders.
 
- dir_cleanup_ok($filename, [$message])
+    $verbose will output unified diff between $expected_dir and $is_dir.
+
+    Setting FIXIT env to true will make this function copy $is_dir folder
+    content into $expected_dir. Usefull for bootstraping test results or
+    for acnkowledging results after code update.
+
+    $message, \@ignore_files, $verbose are optional.
+
+ dir_cleanup_ok($filename, $message)
 
     If the $filename is a folder. Removes this folder and all empty folders
     upwards.
 
     If the $filename is a file. Removes parent folder of this file and all
     empty folders upwards.
+
+    $message is optional.
 
     PS: Just be careful :-)
 

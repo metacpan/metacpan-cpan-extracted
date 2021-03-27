@@ -1,17 +1,30 @@
 package Search::Typesense::Role::Request;
 
 use v5.16.0;
+use Carp 'croak';
 use Moo::Role;
 use Search::Typesense::Types qw(
   Enum
+  InstanceOf
   compile
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-requires qw(
-  _ua
-  _url_base
+has _ua => (
+    is       => 'lazy',
+    isa      => InstanceOf ['Mojo::UserAgent'],
+    weak_ref => 1,
+    init_arg => 'user_agent',
+    required => 1,
+);
+
+has _url_base => (
+    is       => 'lazy',
+    isa      => InstanceOf ['Mojo::URL'],
+    weak_ref => 1,
+    init_arg => 'url',
+    required => 1,
 );
 
 sub _url {
@@ -21,9 +34,7 @@ sub _url {
 
 sub _GET {
     my ( $self, %arg_for ) = @_;
-    my $request = $arg_for{request};
-    my @args    = $request ? ( form => $request ) : ();
-    return $self->_handle_request( \%arg_for, \@args );
+    return $self->_handle_request( \%arg_for );
 }
 
 sub _DELETE {
@@ -33,15 +44,15 @@ sub _DELETE {
 
 sub _POST {
     my ( $self, %arg_for ) = @_;
-    my $request = $arg_for{request};
-    my @args    = ref $request ? ( json => $request ) : $request;
+    my $body = $arg_for{body};
+    my @args = ref $body ? ( json => $body ) : $body;
     return $self->_handle_request( \%arg_for, \@args );
 }
 
 sub _PATCH {
     my ( $self, %arg_for ) = @_;
-    my $request = $arg_for{request};
-    my @args    = ref $request ? ( json => $request ) : $request;
+    my $body = $arg_for{body};
+    my @args = ref $body ? ( json => $body ) : $body;
     return $self->_handle_request( \%arg_for, \@args );
 }
 
@@ -62,7 +73,8 @@ sub _handle_request {
     # args, if any (those can become part of a query string for GET, or part
     # of the body for other HTTP verbs
     my @args = $args ? @$args : ();
-    my $url = $self->_url( $arg_for->{path} )->query( $arg_for->{query} || {} );
+    my $url
+      = $self->_url( $arg_for->{path} )->query( $arg_for->{query} || {} );
     my $tx  = $self->_ua->$method( $url, @args );
     my $res = $tx->res;
 
@@ -79,7 +91,7 @@ sub _handle_request {
     }
 
     return $arg_for->{return_transaction} ? $tx : $tx->res->json;
-} ## end sub _check_for_failure
+}
 
 1;
 

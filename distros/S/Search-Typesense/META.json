@@ -54,39 +54,39 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "Mojo::UserAgent::Mockable" : "1.58",
             "Test::More" : "0",
-            "Test::Most" : "0.37"
+            "Test::Most" : "0.37",
+            "Test::Perl::Critic" : "1.04",
+            "Test::PerlTidy" : "20200930",
+            "autodie" : "2.29"
          }
       }
    },
    "provides" : {
       "Search::Typesense" : {
          "file" : "lib/Search/Typesense.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Search::Typesense::Collection" : {
          "file" : "lib/Search/Typesense/Collection.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Search::Typesense::Document" : {
          "file" : "lib/Search/Typesense/Document.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Search::Typesense::Role::Request" : {
          "file" : "lib/Search/Typesense/Role/Request.pm",
-         "version" : "0.06"
-      },
-      "Search::Typesense::Role::UserAgentInterface" : {
-         "file" : "lib/Search/Typesense/Role/UserAgentInterface.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Search::Typesense::Types" : {
          "file" : "lib/Search/Typesense/Types.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Search::Typesense::Version" : {
          "file" : "lib/Search/Typesense/Version.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -101,7 +101,7 @@
          "web" : "https://github.com/Ovid/Search-Typesense"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }

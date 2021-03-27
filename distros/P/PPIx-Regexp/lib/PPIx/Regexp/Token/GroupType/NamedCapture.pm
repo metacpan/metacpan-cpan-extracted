@@ -43,7 +43,7 @@ use Carp qw{ confess };
 
 use PPIx::Regexp::Constant qw{ RE_CAPTURE_NAME @CARP_NOT };
 
-our $VERSION = '0.078';
+our $VERSION = '0.079';
 
 use constant TOKENIZER_ARGUMENT_REQUIRED => 1;
 
@@ -107,8 +107,9 @@ __END__
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in electronic
-mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-Regexp>,
+L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

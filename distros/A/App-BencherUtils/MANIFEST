@@ -14,6 +14,7 @@ script/bencher-module-startup-overhead
 script/chart-bencher-result
 script/cleanup-old-bencher-results
 script/format-bencher-result
+script/gen-bencher-scenario-from-cpanmodules
 script/list-bencher-results
 script/list-bencher-scenario-modules
 t/00-compile.t

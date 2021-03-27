@@ -1,32 +1,43 @@
-Changes on 2021-03-19 for repository at:
+Changes on 2021-03-25 for repository at:
   Fetch URL: git@github.com:abeltje/MooX-Params-CompiledValidators.git
   Push  URL: git@github.com:abeltje/MooX-Params-CompiledValidators.git
 
 Enjoy!
 
-0.02 2021-03-19T05:08:02+01:00 (c4a7206 => Abe Timmerman)
+0.04 2021-03-25T20:59:17+01:00 (1c0638e => Abe Timmerman)
  - (Abe Timmerman, 2 seconds ago) Autocommit for distribution
+   MooX::Params::CompiledValidators 0.04 (same)
+
+0.02 2021-03-19T05:08:02+01:00 (20fff4a => Abe Timmerman)
+ - (Abe Timmerman, 7 days ago) Autocommit for distribution
    MooX::Params::CompiledValidators 0.02 (same)
 
+ - (Abe Timmerman, 6 minutes ago) FIX: Makefile.PL
+ -     Add dependency on 'namespace::autoclean'
+ -     Fix some of the META_ADD information
+
+ - (Abe Timmerman, 2 minutes ago) Autocommit for distribution
+   MooX::Params::CompiledValidators 0.03 (same)
+
 0.01 2021-03-19T04:43:32+01:00 (2b8c415 => Abe Timmerman)
- - (Abe Timmerman, 25 minutes ago) Autocommit for distribution
+ - (Abe Timmerman, 7 days ago) Autocommit for distribution
    MooX::Params::CompiledValidators 0.01 (same)
 
- - (Abe Timmerman, 7 minutes ago) Clean up the MANIFEST* stuff
+ - (Abe Timmerman, 7 days ago) Clean up the MANIFEST* stuff
  -     We want Changes in the tarbal...
 
 0.00_00 2021-02-19T01:11:57+01:00 (58b6456 => Abe Timmerman)
- - (Abe Timmerman, 4 weeks ago) New repository
+ - (Abe Timmerman, 5 weeks ago) New repository
    MooX::Params::CompiledValidations
 
- - (Abe Timmerman, 7 days ago) Setup the new repository
+ - (Abe Timmerman, 2 weeks ago) Setup the new repository
  -     Basic perl-distribution files
  -     t::Test::abeltje (update_abeltje_testing)
  -     The actual code
  -     basic tests
 
- - (Abe Timmerman, 7 days ago) VERSION doesn't work with whitespace in it
+ - (Abe Timmerman, 2 weeks ago) VERSION doesn't work with whitespace in it
 
- - (Abe Timmerman, 3 hours ago) Small POD changes
+ - (Abe Timmerman, 7 days ago) Small POD changes
 
- - (Abe Timmerman, 33 minutes ago) Add a README.md
+ - (Abe Timmerman, 7 days ago) Add a README.md

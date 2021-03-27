@@ -40,7 +40,7 @@ use Log::Log4perl qw(:easy);
 use Log::Any qw($log);
 use Log::Any::Adapter;
 
-our $VERSION = '0.0.7';
+our $VERSION = '0.0.8';
 
 sub init {
     my $self = shift;

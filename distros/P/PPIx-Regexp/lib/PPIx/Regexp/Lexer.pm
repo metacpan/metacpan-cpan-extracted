@@ -69,7 +69,7 @@ use PPIx::Regexp::Token::Unmatched			();
 use PPIx::Regexp::Tokenizer				();
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.078';
+our $VERSION = '0.079';
 
 =head2 new
 
@@ -596,8 +596,9 @@ __END__
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in electronic
-mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-Regexp>,
+L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

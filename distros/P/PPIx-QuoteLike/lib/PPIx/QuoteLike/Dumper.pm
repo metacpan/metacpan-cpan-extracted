@@ -12,7 +12,7 @@ use PPIx::QuoteLike::Constant qw{ @CARP_NOT };
 use PPIx::QuoteLike::Utils qw{ __instance };
 use Scalar::Util ();
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use constant SCALAR_REF	=> ref \0;
 
@@ -506,6 +506,7 @@ concatenates the result into a single string, and returns that string.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-QuoteLike>,
 L<https://github.com/trwyant/perl-PPIx-QuoteLike/issues>, or in
 electronic mail to the author.
 

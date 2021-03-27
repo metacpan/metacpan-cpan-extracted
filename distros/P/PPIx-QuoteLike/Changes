@@ -1,3 +1,12 @@
+0.016		2021-03-26	T. R. Wyant
+    Add rt.cpan.org back to bug reporting methods. Long live RT!
+
+    Get prerequisites up to snuff, and add xt/author/prereq.t to ensure
+    they stay that way.
+
+    Refactor authortest into three, so I do not have to generate stub
+    files to test without optional modules.
+
 0.015		2021-02-05	T. R. Wyant
     Handle <<\EOD and <<~\EOD, which are equivalent to <<'EOD' and
     <<~'EOD', respectively.

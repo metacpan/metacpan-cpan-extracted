@@ -1,3 +1,9 @@
+0.002   2021-03-26  Released-By: PERLANCAR; Urgency: medium
+
+	- [backward incompatible change] Feature name is not required to be
+	  Words_With_Underscores.
+
+
 0.001   2021-03-25  Released-By: PERLANCAR
 
         - First release.

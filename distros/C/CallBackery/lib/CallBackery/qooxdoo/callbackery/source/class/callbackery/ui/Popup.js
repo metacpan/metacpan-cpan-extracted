@@ -69,9 +69,16 @@ qx.Class.define("callbackery.ui.Popup", {
                 var data = e.getData();
                 this.fireDataEvent('actionResponse',data);
                 switch (data.action){
+                case 'wait':
+                    break;
+                case 'showMessage':
                 case 'dataSaved':
                 case 'cancel':
                     this.close();
+                    break;
+                default:
+                    console.warn('Unknown actionResponse', data.action);
+                    break;
                 }
             },this);
             this.addListener('keydown',function(e){

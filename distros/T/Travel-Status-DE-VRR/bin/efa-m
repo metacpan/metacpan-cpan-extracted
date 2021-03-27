@@ -6,7 +6,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.17';
+our $VERSION = '1.19';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -56,7 +56,7 @@ if ($list_services) {
 	show_services();
 }
 
-if ( @ARGV != 2 ) {
+if ( @ARGV < 1 or @ARGV > 2 ) {
 	show_help(1);
 }
 
@@ -66,7 +66,14 @@ if ( @ARGV != 2 ) {
 @grep_mots      = split( qr{,}, join( q{,}, @grep_mots ) );
 @grep_platforms = split( qr{,}, join( q{,}, @grep_platforms ) );
 
-my ( $place, $input ) = @ARGV;
+my ( $place, $input );
+
+if ( @ARGV == 1 ) {
+	$input = $ARGV[0];
+}
+else {
+	( $place, $input ) = @ARGV;
+}
 
 if ( $input =~ s{ ^ (?<type> address|poi|stop) : }{}x ) {
 	$input_type = $+{type};
@@ -121,7 +128,7 @@ sub new_efa_by_url {
 sub show_help {
 	my ($code) = @_;
 
-	print "Usage: efa-m [-d <dd.mm.yyyy>] [-t <hh:mm>] <city> <station>\n"
+	print "Usage: efa-m [-d <dd.mm.yyyy>] [-t <hh:mm>] [place] <station>\n"
 	  . "See also: man efa-m\n";
 
 	exit $code;
@@ -296,6 +303,20 @@ sub show_results {
 			$output_line[3]
 			  = join( q{  }, map { $_->name_suf } $d->route_interesting );
 		}
+		elsif ( $d->occupancy ) {
+			if ( $d->occupancy eq 'MANY_SEATS' ) {
+				$output_line[3] = '_';
+			}
+			elsif ( $d->occupancy eq 'FEW_SEATS' ) {
+				$output_line[3] = '*';
+			}
+			elsif ( $d->occupancy eq 'STANDING_ONLY' ) {
+				$output_line[3] = '!';
+			}
+			else {
+				$output_line[3] = '?';
+			}
+		}
 
 		if ( $edata{fullroute} ) {
 			$output_line[6]
@@ -371,17 +392,38 @@ efa-m - Unofficial interface to the efa.vrr.de departure monitor
 
 B<efa-m> [B<-Lr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
 [B<-l> I<lines>] [B<-p> I<platforms>] [B<-u> I<url>]
-I<city> [I<type>B<:>]I<name>
+[I<city>] [I<type>B<:>]I<name>
 
 =head1 VERSION
 
-version 1.17
+version 1.19
 
 =head1 DESCRIPTION
 
-B<efa-m> lists scheduled tram, bus and train departures at the location I<name>
-in I<city>.  Realtime data (i.e. delays) is included if available, it's
-visible in the output as a "+x" remark (meaning a delay of x minutes).
+B<efa-m> lists scheduled tram, bus and train departures at the location I<name>.
+
+For each departure, it shows
+
+=over
+
+=item * scheduled departure time,
+
+=item * delay in minutes,
+
+=item * platform,
+
+=item * line,
+
+=item * expected occupation (from _ to !, if available), and
+
+=item * destination.
+
+=back
+
+If I<city> is specified, I<name> refers to a location within I<city>. Otherwise,
+I<name> must be self-contained. I.e., both C<< efa Essen Hbf >> and
+C<< efa "Essen Hbf" >> are valid. Note, however, than C<< efa E Hbf >> works,
+but C<< efa "E Hbf" >> does not.
 
 By default, I<name> refers to a stop, this can be changed by specifying
 I<type>.  Supported types are B<address> and B<poi> (point of interest).

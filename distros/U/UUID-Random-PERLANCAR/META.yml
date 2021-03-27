@@ -23,7 +23,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-UUID-Random-PERLANCAR/issues
   homepage: https://metacpan.org/release/UUID-Random-PERLANCAR
   repository: git://github.com/perlancar/perl-UUID-Random-PERLANCAR.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

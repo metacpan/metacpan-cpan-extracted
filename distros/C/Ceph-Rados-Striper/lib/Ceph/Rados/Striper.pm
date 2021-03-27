@@ -127,7 +127,7 @@ sub read_handle_perl {
 }
 
 sub read_handle {
-    my ($self, $soid, $handle) = @_;
+    my ($self, $soid, $handle, $offset, $length, $debug) = @_;
     Carp::confess "Called with not an open handle"
         unless openhandle $handle;
     &_read_to_fh
@@ -189,7 +189,7 @@ our @EXPORT = qw(
 	LIBRADOSSTRIPER_VER_MINOR
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

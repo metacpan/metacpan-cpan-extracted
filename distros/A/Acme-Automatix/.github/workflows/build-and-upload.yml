@@ -13,7 +13,7 @@ jobs:
     - name: Deliver locally
       run: make dist
     - name: Upload to CPAN
-      uses: thibaultduponchelle/upload-to-cpan@master
+      uses: thibaultduponchelle/action-upload-to-cpan@master
       with:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}

@@ -1,5 +1,8 @@
 Revision history for Perl module JSON::JQ
 
+v0.04:
+   - fix double free in XS code
+   - fix utf8 decode error when dealing with json_file parameter in process()
 v0.03:
    - avoid std c99 feature in xs code
    - fix a float number test case

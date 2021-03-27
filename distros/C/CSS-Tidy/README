@@ -6,7 +6,7 @@
                                           |___/ 
 
 
-This is the README for CSS::Tidy version 0.01.
+This is the README for CSS::Tidy version 0.03.
 
 CSS::Tidy is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -61,11 +61,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm CSS::Tidy
 
-To install the module from the source file, CSS-Tidy-0.01.tar.gz, follow
+To install the module from the source file, CSS-Tidy-0.03.tar.gz, follow
 this sequence of commands:
 
-    tar xfz CSS-Tidy-0.01.tar.gz
-    cd CSS-Tidy-0.01
+    tar xfz CSS-Tidy-0.03.tar.gz
+    cd CSS-Tidy-0.03
     perl Makefile.PL
     make
     make install
@@ -90,6 +90,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Fri Jan 29 22:56:28 2021.
+This README was written on Sat Mar 27 10:49:50 2021.
 
 -----------------------------------------------------------------------------

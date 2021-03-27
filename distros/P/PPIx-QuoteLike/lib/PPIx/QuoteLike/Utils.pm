@@ -39,7 +39,7 @@ our @EXPORT_OK = qw{
     __variables
 };
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 # Readonly::Scalar my $BRACED_RE	=> __match_enclosed( LEFT_CURLY );
 Readonly::Scalar my $BRACKETED_RE	=> __match_enclosed( '[' ); # ]
@@ -56,7 +56,6 @@ Readonly::Scalar my $SYMBOL_NAME_RE	=> qr/
 	[[:punct:]]
     )
 /smx;
-
 
 sub column_number {
     my ( $self ) = @_;
@@ -138,7 +137,6 @@ sub column_number {
 		}
 		return keys %var;
 	    };
-
 
 	$ppi->isa( 'PPI::Element' )
 	    or croak 'Argument must be a PPI::Element, ',
@@ -546,7 +544,6 @@ PPIx::QuoteLike::Utils - Utility subroutines for PPIx::QuoteLike;
  
  say for __variables( PPI::Document->new( \'$foo' );
 
-
 =head1 DESCRIPTION
 
 This Perl module holds code for L<PPIx::QuoteLike|PPIx::QuoteLike> that
@@ -679,6 +676,7 @@ module, because of the possibility of a circular dependency.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-QuoteLike>,
 L<https://github.com/trwyant/perl-PPIx-QuoteLike/issues>, or in
 electronic mail to the author.
 

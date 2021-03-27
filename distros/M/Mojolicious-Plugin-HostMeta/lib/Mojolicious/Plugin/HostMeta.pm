@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Headers;
 use Mojo::Util qw/quote/;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 our $WK_PATH = '/.well-known/host-meta';
 
@@ -77,13 +77,14 @@ sub register {
     });
 
   # Establish /.well-known/host-meta route
-  my $route = $app->routes->any( $WK_PATH );
+  my $route = $app->routes->any( $WK_PATH => [format => [qw!json xml jrd xrd!]] );
 
   # Define endpoint
   $route->endpoint('host-meta');
 
   # Set route callback
   $route->to(
+    format => 'xrd',
     cb => sub {
       my $c = shift;
 
@@ -353,8 +354,8 @@ file with the key C<HostMeta> or on registration
   # In Controller:
   my $xrd = $c->hostmeta;
   $xrd = $c->hostmeta('gmail.com');
-  $xrd = $c->hostmeta('sojolicio.us' => ['hub']);
-  $xrd = $c->hostmeta('sojolicio.us', { 'X-MyHeader' => 'Fun' } => ['hub']);
+  $xrd = $c->hostmeta('sojolicious.example' => ['hub']);
+  $xrd = $c->hostmeta('sojolicious.example', { 'X-MyHeader' => 'Fun' } => ['hub']);
   $xrd = $c->hostmeta('gmail.com', -secure);
 
   # Non blocking
@@ -514,7 +515,8 @@ L<Mojolicious::Plugin::XRD>.
 
   https://github.com/Akron/Mojolicious-Plugin-HostMeta
 
-This plugin is part of the L<Sojolicious|http://sojolicio.us> project.
+This plugin is part of the
+L<Sojolicious|https://www.nils-diewald.de/development/sojolicious> project.
 
 
 =head1 COPYRIGHT AND LICENSE

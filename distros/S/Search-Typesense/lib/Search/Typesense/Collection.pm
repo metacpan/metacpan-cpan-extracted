@@ -3,10 +3,7 @@ package Search::Typesense::Collection;
 use v5.16.0;
 
 use Moo;
-with qw(
-  Search::Typesense::Role::Request
-  Search::Typesense::Role::UserAgentInterface
-);
+with qw(Search::Typesense::Role::Request);
 
 use Carp 'croak';
 use Search::Typesense::Types qw(
@@ -45,7 +42,7 @@ Response shown at L<https://typesense.org/docs/0.19.0/api/#retrieve-collection>
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head2 C<search>
 
@@ -67,21 +64,12 @@ sub search {
     unless ( exists $query->{q} ) {
         croak("Query parameter 'q' is required for searching");
     }
-    unless ( exists $query->{query_by} ) {
-        $query->{query_by} = 'search';
-    }
     my $tx = $self->_GET(
-        path    => [ 'collections', $collection, 'documents', 'search' ],
-        request => $query,
+        path  => [ 'collections', $collection, 'documents', 'search' ],
+        query => $query,
         return_transaction => 1,
     ) or return;
-    my $response = $tx->res->json;
-    foreach my $hit ( @{ $response->{hits} } ) {
-        if ( exists $hit->{document}{json} ) {
-            $hit->{document}{json} = decode_json( $hit->{document}{json} );
-        }
-    }
-    return $response;
+    return $tx->res->json;
 }
 
 sub get {
@@ -108,14 +96,14 @@ sub create {
 
     foreach my $field (@$fields) {
         if ( exists $field->{facet} ) {
-            $field->{facet} =
-              $field->{facet} ? Mojo::JSON->true : Mojo::JSON->false;
+            $field->{facet}
+              = $field->{facet} ? Mojo::JSON->true : Mojo::JSON->false;
         }
     }
 
     return $self->_POST(
-        path    => ['collections'],
-        request => $collection_definition
+        path => ['collections'],
+        body => $collection_definition
     );
 }
 

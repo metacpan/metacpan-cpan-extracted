@@ -1,9 +1,9 @@
 package Module::Features::PerlTrove;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-25'; # DATE
+our $DATE = '2021-03-26'; # DATE
 our $DIST = 'Module-Features-PerlTrove'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,7 +14,7 @@ our %FEATURES_DEF;
 # BEGIN FRAGMENT id=def
 %FEATURES_DEF = %{ {
   features => {
-    Development_Status => {
+    "Development Status" => {
       schema => [
         "any*",
         {
@@ -299,7 +299,7 @@ our %FEATURES_DEF;
         },
       ],
     },
-    Intended_Audience => {
+    "Intended Audience" => {
       schema => [
         "any*",
         {
@@ -551,7 +551,7 @@ our %FEATURES_DEF;
         },
       ],
     },
-    Natural_Language => {
+    "Natural Language" => {
       schema => [
         "any*",
         {
@@ -698,7 +698,7 @@ our %FEATURES_DEF;
         },
       ],
     },
-    Operating_System => {
+    "Operating System" => {
       schema => [
         "any*",
         {
@@ -811,7 +811,7 @@ our %FEATURES_DEF;
         },
       ],
     },
-    Programming_Language => {
+    "Programming Language" => {
       schema => [
         "any*",
         {
@@ -1695,7 +1695,7 @@ Module::Features::PerlTrove - Put Perl trove classifiers in your module
 
 =head1 VERSION
 
-This document describes version 0.001 of Module::Features::PerlTrove (from Perl distribution Module-Features-PerlTrove), released on 2021-03-25.
+This document describes version 0.002 of Module::Features::PerlTrove (from Perl distribution Module-Features-PerlTrove), released on 2021-03-26.
 
 =head1 SYNOPSIS
 
@@ -1707,25 +1707,21 @@ variable:
 
  our %FEATURES = (
      features => {
-         Perl => {
-             # we use underscore (Development_Status instead of "Development
-             # Status") because feature names in Module::Features need to be
-             # /^\w+$/. feature values need not be.
-
-             "Development_Status" => "3 - Alpha",
+         PerlTrove => {
+             "Development Status" => "3 - Alpha",
 
              "Framework" => "App::Cmd",
 
-             "Intended_Audience" => "Developers",
+             "Intended Audience" => "Developers",
 
              "License" => [
                  "OSI Approved :: Artistic License",
                  "OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
              ],
 
-             "Natural_Language" => "Indonesian",
+             "Natural Language" => "Indonesian",
 
-             "Programming_Language" => "Perl",
+             "Programming Language" => "Perl",
 
              "Environment" => "Console",
 
@@ -1768,7 +1764,7 @@ Features defined by this module:
 
 =over
 
-=item * Development_Status
+=item * Development Status
 
 Optional. Type: any. 
 
@@ -1780,7 +1776,7 @@ Optional. Type: any.
 
 Optional. Type: any. 
 
-=item * Intended_Audience
+=item * Intended Audience
 
 Optional. Type: any. 
 
@@ -1788,15 +1784,15 @@ Optional. Type: any.
 
 Optional. Type: any. 
 
-=item * Natural_Language
+=item * Natural Language
 
 Optional. Type: any. 
 
-=item * Operating_System
+=item * Operating System
 
 Optional. Type: any. 
 
-=item * Programming_Language
+=item * Programming Language
 
 Optional. Type: any. 
 

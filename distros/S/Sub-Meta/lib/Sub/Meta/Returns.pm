@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 use Scalar::Util ();
 
@@ -102,6 +102,18 @@ sub _eq_inlined {
     return join "\n && ", @src;
 }
 
+sub display {
+    my $self = shift;
+
+    if (_eq($self->scalar, $self->list) && _eq($self->list, $self->void)) {
+        return $self->scalar . '';
+    }
+    else {
+        my @r = map { $self->$_ ? "$_ => @{[$self->$_]}" : () } qw(scalar list void);
+        return "(@{[join ', ', @r]})";
+    }
+}
+
 1;
 __END__
 
@@ -167,7 +179,7 @@ A boolean whether with coercions.
 
 Setter for C<coerce>.
 
-=head2 OTHERS
+=head2 METHODS
 
 =head3 is_same_interface($other_meta)
 
@@ -177,6 +189,15 @@ Specifically, check whether C<scalar>, C<list> and C<void> are equal.
 =head3 is_same_interface_inlined($other_meta_inlined)
 
 Returns inlined C<is_same_interface> string.
+
+=head3 display
+
+Returns the display of Sub::Meta::Returns:
+
+    use Sub::Meta::Returns;
+    use Types::Standard qw(Tuple Str);
+    my $meta = Sub::Meta::Returns->new(Tuple[Str,Str]);
+    $meta->display; # 'Tuple[Str,Str]'
 
 =head1 LICENSE
 

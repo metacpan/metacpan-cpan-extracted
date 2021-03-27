@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/BencherUtils.pm'
@@ -19,6 +19,7 @@ my @scripts = (
     'script/chart-bencher-result',
     'script/cleanup-old-bencher-results',
     'script/format-bencher-result',
+    'script/gen-bencher-scenario-from-cpanmodules',
     'script/list-bencher-results',
     'script/list-bencher-scenario-modules'
 );

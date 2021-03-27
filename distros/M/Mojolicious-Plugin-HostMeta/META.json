@@ -4,7 +4,7 @@
       "Nils Diewald"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -56,6 +56,6 @@
          "web" : "https://github.com/Akron/Mojolicious-Plugin-HostMeta"
       }
    },
-   "version" : "0.25",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.26",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

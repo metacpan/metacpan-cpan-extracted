@@ -6,6 +6,10 @@ build_requires:
   Test2::Plugin::BailOnFail: '0'
   Test2::Tools::LoadModule: '0'
   Test2::V0: '0'
+configure_requires:
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -21,16 +25,17 @@ no_index:
 provides:
   Game::Life::Faster:
     file: lib/Game/Life/Faster.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Carp: '0'
   List::Util: '0'
+  constant: '0'
   perl: '5.008001'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-Game-Life-Faster/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Game-Life-Faster
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Game-Life-Faster.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

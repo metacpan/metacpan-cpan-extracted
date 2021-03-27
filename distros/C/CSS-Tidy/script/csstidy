@@ -2,15 +2,24 @@
 use warnings;
 use strict;
 use utf8;
+use FindBin '$Bin';
+use lib "$Bin/../lib";
 use CSS::Tidy 'tidy_css';
+use Getopt::Long;
+
+my $ok = GetOptions (
+    verbose => \my $verbose,
+);
 
 my $text = '';
 
 while (<STDIN>) {
     $text .= $_;
 }
-
-my $out = tidy_css ($text);
+if ($verbose) {
+    print "Tidying ...\n";
+}
+my $out = tidy_css ($text, verbose => $verbose);
 print "$out\n";
 
 =head1 NAME

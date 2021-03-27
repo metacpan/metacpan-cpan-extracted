@@ -9,8 +9,7 @@ use base qw{ PPIx::QuoteLike::Token };
 
 use PPIx::QuoteLike::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.015';
-
+our $VERSION = '0.016';
 
 sub significant {
     return 0;
@@ -36,7 +35,6 @@ L<PPIx::QuoteLike::Token|PPIx::QuoteLike::Token>.
 
 C<PPIx::QuoteLike::Token::Whitespace> has no descendants.
 
-
 =head1 DESCRIPTION
 
 This Perl class represents insignificant white space.
@@ -50,7 +48,6 @@ superclass. However, the following methods have been overridden:
 
 This method returns a false value.
 
-
 =head1 SEE ALSO
 
 L<PPIx::QuoteLike::Token|PPIx::QuoteLike::Token>.
@@ -58,6 +55,7 @@ L<PPIx::QuoteLike::Token|PPIx::QuoteLike::Token>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-QuoteLike>,
 L<https://github.com/trwyant/perl-PPIx-QuoteLike/issues>, or in
 electronic mail to the author.
 

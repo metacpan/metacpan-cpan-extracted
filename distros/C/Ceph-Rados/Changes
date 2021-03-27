@@ -1,5 +1,10 @@
 Revision history for Perl extension Ceph::Rados.
 
+0.13  Mon 22 Mar 17:33:28 GMT 2021
+    - allow randed hadle reads (for e.g. serving Catalyst 'Range:' header requests)
+    - rados_ioctx_pool_required_alignment() is deprecated, replace with
+      rados_ioctx_pool_required_alignment2()
+
 0.12  Fri  1 Mar 16:16:40 GMT 2019
     - added test for SEGVs in IO.xs, and fixed those segfults by
       only calling destroy/shutdown in global destruction

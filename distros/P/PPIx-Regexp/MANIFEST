@@ -30,8 +30,8 @@ lib/PPIx/Regexp/Structure/Main.pm
 lib/PPIx/Regexp/Structure/Modifier.pm
 lib/PPIx/Regexp/Structure/NamedCapture.pm
 lib/PPIx/Regexp/Structure/Quantifier.pm
-lib/PPIx/Regexp/Structure/RegexSet.pm
 lib/PPIx/Regexp/Structure/Regexp.pm
+lib/PPIx/Regexp/Structure/RegexSet.pm
 lib/PPIx/Regexp/Structure/Replacement.pm
 lib/PPIx/Regexp/Structure/Script_Run.pm
 lib/PPIx/Regexp/Structure/Subexpression.pm
@@ -87,8 +87,8 @@ t/basic.t
 t/fuzz.t
 t/locations.t
 t/parse.t
-t/unit.t
 t/unit-adhoc.t
+t/unit.t
 t/version.t
 t/xplain.t
 xt/author/carp_not.t
@@ -103,5 +103,6 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
-xt/author/unit_left_curly.t
+xt/author/prereq.t
 xt/author/unicode_short_charclass.t
+xt/author/unit_left_curly.t

@@ -1,0 +1,306 @@
+[
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/ HTTP/1.1\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\nX-TYPESENSE-API-KEY: 777\r\nHost: localhost:7777\r\nContent-Type: application/json\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nVary: accept-encoding\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nAccept-Ranges: none\r\nConnection: keep-alive\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 2\r\n\r\n[]",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 0
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/ HTTP/1.1\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\nX-TYPESENSE-API-KEY: 777\r\nContent-Type: application/json\r\nHost: localhost:7777\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nConnection: keep-alive\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 2\r\nVary: accept-encoding\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nAccept-Ranges: none\r\n\r\n[]",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 1
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/ HTTP/1.1\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\nX-TYPESENSE-API-KEY: 777\r\nHost: localhost:7777\r\nContent-Type: application/json\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nContent-Length: 2\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nAccept-Ranges: none\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nVary: accept-encoding\r\n\r\n[]",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 2
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "POST /collections HTTP/1.1\r\nContent-Length: 286\r\nX-TYPESENSE-API-KEY: 777\r\nContent-Type: application/json\r\nHost: localhost:7777\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n{\"default_sorting_field\":\"num_employees\",\"fields\":[{\"facet\":false,\"name\":\"company_name\",\"type\":\"string\"},{\"facet\":false,\"name\":\"num_employees\",\"type\":\"int32\"},{\"facet\":true,\"name\":\"country\",\"type\":\"string\"}],\"name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"num_documents\":0}",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 201 Created\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nContent-Length: 383\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\n\r\n{\"created_at\":1616687808,\"default_sorting_field\":\"num_employees\",\"fields\":[{\"facet\":false,\"name\":\"company_name\",\"optional\":false,\"type\":\"string\"},{\"facet\":false,\"name\":\"num_employees\",\"optional\":false,\"type\":\"int32\"},{\"facet\":true,\"name\":\"country\",\"optional\":false,\"type\":\"string\"}],\"name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"num_documents\":0,\"num_memory_shards\":4}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 3
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/ HTTP/1.1\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\nX-TYPESENSE-API-KEY: 777\r\nContent-Type: application/json\r\nHost: localhost:7777\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nAccept-Ranges: none\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nVary: accept-encoding\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nContent-Length: 385\r\n\r\n[{\"created_at\":1616687808,\"default_sorting_field\":\"num_employees\",\"fields\":[{\"facet\":false,\"name\":\"company_name\",\"optional\":false,\"type\":\"string\"},{\"facet\":false,\"name\":\"num_employees\",\"optional\":false,\"type\":\"int32\"},{\"facet\":true,\"name\":\"country\",\"optional\":false,\"type\":\"string\"}],\"name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"num_documents\":0,\"num_memory_shards\":4}]",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 4
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "POST /collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents HTTP/1.1\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\nContent-Length: 83\r\nX-TYPESENSE-API-KEY: 777\r\nContent-Type: application/json\r\nHost: localhost:7777\r\n\r\n{\"company_name\":\"Stark Industries\",\"country\":\"USA\",\"id\":\"124\",\"num_employees\":5215}",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 201 Created\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nContent-Length: 83\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\n\r\n{\"company_name\":\"Stark Industries\",\"country\":\"USA\",\"id\":\"124\",\"num_employees\":5215}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 5
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "POST /collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents?action=upsert HTTP/1.1\r\nUser-Agent: Mojolicious (Perl)\r\nAccept-Encoding: gzip\r\nHost: localhost:7777\r\nContent-Type: application/json\r\nContent-Length: 88\r\nX-TYPESENSE-API-KEY: 777\r\n\r\n{\"company_name\":\"All Around the World\",\"country\":\"France\",\"id\":\"125\",\"num_employees\":20}",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents",
+            "port" : "7777",
+            "query" : "action=upsert",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 201 Created\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nConnection: keep-alive\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: 88\r\n\r\n{\"company_name\":\"All Around the World\",\"country\":\"France\",\"id\":\"125\",\"num_employees\":20}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 6
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "POST /collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents?action=upsert HTTP/1.1\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\nContent-Length: 88\r\nX-TYPESENSE-API-KEY: 777\r\nHost: localhost:7777\r\nContent-Type: application/json\r\n\r\n{\"company_name\":\"All Around the World\",\"country\":\"France\",\"id\":\"125\",\"num_employees\":10}",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents",
+            "port" : "7777",
+            "query" : "action=upsert",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 201 Created\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nContent-Length: 88\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\n\r\n{\"company_name\":\"All Around the World\",\"country\":\"France\",\"id\":\"125\",\"num_employees\":10}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 7
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "PATCH /collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/125 HTTP/1.1\r\nUser-Agent: Mojolicious (Perl)\r\nAccept-Encoding: gzip\r\nHost: localhost:7777\r\nContent-Type: application/json\r\nX-TYPESENSE-API-KEY: 777\r\nContent-Length: 20\r\n\r\n{\"num_employees\":15}",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/125",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 201 Created\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nContent-Length: 31\r\n\r\n{\"id\":\"125\",\"num_employees\":15}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 8
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "DELETE /collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/125 HTTP/1.1\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\nContent-Length: 0\r\nX-TYPESENSE-API-KEY: 777\r\nHost: localhost:7777\r\nContent-Type: application/json\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/125",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nAccept-Ranges: none\r\nVary: accept-encoding\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nContent-Length: 88\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\n\r\n{\"company_name\":\"All Around the World\",\"country\":\"France\",\"id\":\"125\",\"num_employees\":15}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 9
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/search?filter_by=num_employees%3A%3E100&q=stark&query_by=company_name&sort_by=num_employees%3Adesc HTTP/1.1\r\nX-TYPESENSE-API-KEY: 777\r\nContent-Type: application/json\r\nHost: localhost:7777\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/search",
+            "port" : "7777",
+            "query" : "filter_by=num_employees%3A%3E100&q=stark&query_by=company_name&sort_by=num_employees%3Adesc",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nContent-Length: 419\r\nAccept-Ranges: none\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nVary: accept-encoding\r\n\r\n{\"facet_counts\":[],\"found\":1,\"hits\":[{\"document\":{\"company_name\":\"Stark Industries\",\"country\":\"USA\",\"id\":\"124\",\"num_employees\":5215},\"highlights\":[{\"field\":\"company_name\",\"matched_tokens\":[\"Stark\"],\"snippet\":\"<mark>Stark</mark> Industries\"}],\"text_match\":130816}],\"out_of\":1,\"page\":1,\"request_params\":{\"collection_name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"per_page\":10,\"q\":\"stark\"},\"search_time_ms\":0}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 10
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "POST /collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/import?action=upsert HTTP/1.1\r\nContent-Type: application/json\r\nHost: localhost:7777\r\nContent-Length: 244\r\nX-TYPESENSE-API-KEY: 777\r\nUser-Agent: Mojolicious (Perl)\r\nAccept-Encoding: gzip\r\n\r\n{\"company_name\":\"Stark Industries\",\"country\":\"US\",\"id\":\"124\",\"num_employees\":5215}\n{\"company_name\":\"Future Technology\",\"country\":\"UK\",\"id\":\"125\",\"num_employees\":1232}\n{\"company_name\":\"Random Corp.\",\"country\":\"AU\",\"id\":\"126\",\"num_employees\":531}",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/import",
+            "port" : "7777",
+            "query" : "action=upsert",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nAccept-Ranges: none\r\nVary: accept-encoding\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nContent-Length: 50\r\nContent-Type: text/plain; charset=utf8\r\nConnection: keep-alive\r\n\r\n{\"success\":true}\n{\"success\":true}\n{\"success\":true}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 11
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/export HTTP/1.1\r\nX-TYPESENSE-API-KEY: 777\r\nHost: localhost:7777\r\nContent-Type: application/json\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX/documents/export",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nConnection: keep-alive\r\nContent-Length: 244\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\n\r\n{\"company_name\":\"Stark Industries\",\"country\":\"US\",\"id\":\"124\",\"num_employees\":5215}\n{\"company_name\":\"Future Technology\",\"country\":\"UK\",\"id\":\"125\",\"num_employees\":1232}\n{\"company_name\":\"Random Corp.\",\"country\":\"AU\",\"id\":\"126\",\"num_employees\":531}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 12
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/compani/documents/export HTTP/1.1\r\nX-TYPESENSE-API-KEY: 777\r\nHost: localhost:7777\r\nContent-Type: application/json\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/compani/documents/export",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 404 Not Found\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nContent-Length: 24\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\n\r\n{\"message\": \"Not Found\"}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 13
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "GET /collections/ HTTP/1.1\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\nX-TYPESENSE-API-KEY: 777\r\nHost: localhost:7777\r\nContent-Type: application/json\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\nContent-Length: 385\r\nAccept-Ranges: none\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nVary: accept-encoding\r\n\r\n[{\"created_at\":1616687808,\"default_sorting_field\":\"num_employees\",\"fields\":[{\"facet\":false,\"name\":\"company_name\",\"optional\":false,\"type\":\"string\"},{\"facet\":false,\"name\":\"num_employees\",\"optional\":false,\"type\":\"int32\"},{\"facet\":true,\"name\":\"country\",\"optional\":false,\"type\":\"string\"}],\"name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"num_documents\":3,\"num_memory_shards\":4}]",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 14
+   },
+   {
+      "class" : "Mojo::Transaction::HTTP",
+      "request" : {
+         "body" : "DELETE /collections/company_XXX_this_will_be_deleted_after_testing_XXX HTTP/1.1\r\nAccept-Encoding: gzip\r\nUser-Agent: Mojolicious (Perl)\r\nContent-Length: 0\r\nX-TYPESENSE-API-KEY: 777\r\nContent-Type: application/json\r\nHost: localhost:7777\r\n\r\n",
+         "class" : "Mojo::Message::Request",
+         "url" : {
+            "host" : "localhost",
+            "path" : "/collections/company_XXX_this_will_be_deleted_after_testing_XXX",
+            "port" : "7777",
+            "query" : "",
+            "scheme" : "http"
+         }
+      },
+      "response" : {
+         "body" : "HTTP/1.1 200 OK\r\nAccept-Ranges: none\r\nDate: Thu, 25 Mar 2021 15:56:48 GMT\r\nVary: accept-encoding\r\nContent-Length: 383\r\nContent-Type: application/json; charset=utf-8\r\nConnection: keep-alive\r\n\r\n{\"created_at\":1616687808,\"default_sorting_field\":\"num_employees\",\"fields\":[{\"facet\":false,\"name\":\"company_name\",\"optional\":false,\"type\":\"string\"},{\"facet\":false,\"name\":\"num_employees\",\"optional\":false,\"type\":\"int32\"},{\"facet\":true,\"name\":\"country\",\"optional\":false,\"type\":\"string\"}],\"name\":\"company_XXX_this_will_be_deleted_after_testing_XXX\",\"num_documents\":3,\"num_memory_shards\":4}",
+         "class" : "Mojo::Message::Response"
+      },
+      "txn_num" : 15
+   }
+]

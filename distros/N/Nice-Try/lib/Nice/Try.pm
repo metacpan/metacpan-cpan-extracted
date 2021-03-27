@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v0.1.10
+## Version v0.1.11
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2021/02/11
+## Modified 2021/03/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,15 +13,16 @@
 package Nice::Try;
 BEGIN
 {
+    require 5.16.0;
     use strict;
     use warnings;
     use warnings::register;
+    use IO::File;
     use PPI;
     use Filter::Util::Call;
     use Scalar::Util;
     use List::Util ();
-    # use Devel::Confess;
-    our $VERSION = 'v0.1.10';
+    our $VERSION = 'v0.1.11';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -752,8 +753,9 @@ EOT
                     if( $cdef->{class} )
                     {
                         my $ex_class = $cdef->{class};
+                        # Tilmann Haeberle (TH) 2021-03-25: Fix: properly test for exception class inheritance via ->isa
                         $catch_section = <<EOT;
-        ${cond}( CORE::ref( \$Nice::Try::EXCEPTION ) eq '$ex_class' )
+        ${cond}( Scalar::Util::blessed( \$Nice::Try::EXCEPTION ) && \$Nice::Try::EXCEPTION->isa( '$ex_class' ) )
         {
             CORE::local \$\@ = \$Nice::Try::EXCEPTION;
             my $ex_var = \$Nice::Try::EXCEPTION;
@@ -817,9 +819,24 @@ EOT
                 push( @$catch_repl, $catch_section );
             }
             ## End catch loop
-            my $if_end = <<EOT;
+            # Tilmann Haeberle (TH) 2021-03-25: Fix: put an else at the end to avoid 'fall_through' issue unless an else exists already
+            my $if_end;
+            if( $else )
+            {
+                $if_end = <<EOT;
     }
 EOT
+            }
+            else
+            {
+                $if_end = <<EOT;
+        else
+        {
+            die( \$Nice::Try::EXCEPTION );
+        }
+    }
+EOT
+            }
             $if_end =~ s/\n/ /g unless( $self->{debug_code} );
             push( @$catch_repl, $if_end );
         }
@@ -1126,7 +1143,7 @@ When run, this would produce, as one would expect:
 
 =head1 VERSION
 
-    v0.1.10
+    v0.1.11
 
 =head1 DESCRIPTION
 
@@ -1247,7 +1264,7 @@ For example L<TryCatch>
 
 =item 4 Others
 
-For example L<Syntax::Keyword::Try>
+For example L<Syntax::Keyword::Try> and now perl with L<version 5.33 using experimental feature|https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling>.
 
 =back
 
@@ -1307,7 +1324,42 @@ In group 3, L<TryCatch> was working wonderfully, but was relying on L<Devel::Dec
 
 In group 4, there is L<Syntax::Keyword::Try>, which is a great alternative if you do not care about exception variable assignment or exception class filter. You can only use C<$@>
 
-So, L<Nice::Try> is quite unique and fill the missing features, but because it is purely in perl and not an XS module, it is slower than XS module like L<Syntax::Keyword::Try>. I am not sure the difference would be noticeable for regular size script, but the parsing with L<PPI> would definitely take more time on larger piece of code like 10,000 lines or more. If you know of a perl parser that uses XS, please let me know.
+Since L<perl version 5.33|https://perldoc.perl.org/blead/perlsyn#Try-Catch-Exception-Handling> you can use the try-catch block using an experimental feature which may be removed in future versions, by writing:
+
+    use feature 'try'; # will emit a warning this is experimental
+
+This new feature supports try-catch block and variable assignment, but no exception class, nor support for C<finally> block, so you can do:
+
+    try
+    {
+        # Oh no!
+        die( "Argh...\n" );
+    }
+    catch( $oh_well )
+    {
+        return( $self->error( "Something went awry: $oh_well" ) );
+    }
+
+But B<you cannot do>:
+
+    try
+    {
+        # Oh no!
+        die( MyException->new( "Argh..." ) );
+    }
+    catch( MyException $oh_well )
+    {
+        return( $self->error( "Something went awry with MyException: $oh_well" ) );
+    }
+    # No support for 'finally' yet in perl 5.34
+    finally
+    {
+        # do some cleanup here
+    }
+
+It is probably a matter of time until this is fully implemented in perl as a regular non-experimental feature.
+
+So, L<Nice::Try> is quite unique and fill the missing features, but because it is purely in perl and not an XS module, it is slower than XS module like L<Syntax::Keyword::Try>. I am not sure the difference would be that noticeable, since the parsing by L<PPI> is now done using an XS module, which makes things very fast.
 
 =head1 FINALLY
 
@@ -1332,6 +1384,69 @@ This is useful to do some clean-up. For example:
     }
 
 However, because this is designed for clean-up, it is called in void context, so any C<return> statement there will not actually return anything back to the caller.
+
+=head1 CATCHING OR NOT CATCHING?
+
+L<Nice::Try> can be used with a single C<try> block which will, in effect, behaves like an eval and the special variable C<$@> will be available as always.
+
+However, if you decide to catch class exceptions, make sure to add a default C<catch( $e )>. For example:
+
+    try
+    {
+        die( MyException->new( "Oh no" ) );
+    }
+    print( "Got here with $@\n" );
+
+will work and C<print> will display "Got here with Oh no". However:
+
+    try
+    {
+        die( MyException->new( "Oh no" ) );
+    }
+    catch( Some::Exception $e )
+    {
+        # won't reach here
+    }
+
+will make your process die because of the exception not being caught, thus you might want to do instead:
+
+    try
+    {
+        die( MyException->new( "Oh no" ) );
+    }
+    catch( Some::Exception $e )
+    {
+        # won't reach here
+    }
+    catch( $default )
+    {
+        print( "Got you! Error was: $default\n" );
+    }
+
+And the last catch will catch the exception.
+
+Since, try-catch block can be nested, the following would work too:
+
+    try
+    {
+        try
+        {
+            die( MyException->new( "Oh no" ) );
+        }
+        catch( Some::Exception $e )
+        {
+            # won't reach here
+        }
+    }
+    catch( MyException $e )
+    {
+        print( "Got you! MyException was: $e\n" );
+    }
+    # to play it safe
+    catch( $e )
+    {
+        # do something about it
+    }
 
 =head1 DEBUGGING
 
@@ -1369,7 +1484,7 @@ L<PPI>, L<Filter::Util::Call>, L<Try::Harder>, L<Syntax::Keyword::Try>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2020 DEGUEST Pte. Ltd.
+Copyright (c) 2020-2021 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 

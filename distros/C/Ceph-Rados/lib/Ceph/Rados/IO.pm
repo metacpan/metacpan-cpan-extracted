@@ -10,6 +10,8 @@ use Ceph::Rados::List;
 
 our @ISA = qw();
 
+my $CHUNK_SIZE = 1024 * 1024;
+
 # Preloaded methods go here.
 
 # TODO should query cluster for this value
@@ -41,7 +43,7 @@ sub write {
     }
 }
 
-sub write_handle {
+sub write_handle_perl {
     my ($self, $oid, $handle) = @_;
     my ($retval, $data);
     my $offset = 0;
@@ -55,16 +57,25 @@ sub write_handle {
     return $retval;
 }
 
+sub write_handle {
+    my ($self, $oid, $handle) = @_;
+    Carp::confess "Called with not an open handle"
+        unless openhandle $handle;
+    my $length = -s $handle
+        or Carp::confess "Could not get size for filehandle $handle";
+    $self->_write_from_fh($oid, $handle, $length);
+}
+
 sub write_data {
     my ($self, $oid, $data) = @_;
     my $length = length($data);
     my $retval;
-    for (my $offset = 0; $offset <= $length; $offset += $DEFAULT_OSD_MAX_WRITE) {
+    for (my $offset = 0; $offset <= $length; $offset += $CHUNK_SIZE) {
         my $chunk;
-        if ($offset + $DEFAULT_OSD_MAX_WRITE > $length) {
-            $chunk = $length % $DEFAULT_OSD_MAX_WRITE;
+        if ($offset + $CHUNK_SIZE > $length) {
+            $chunk = $length % $CHUNK_SIZE;
         } else {
-            $chunk = $DEFAULT_OSD_MAX_WRITE;
+            $chunk = $CHUNK_SIZE;
         }
         #printf "Writing bytes %i to %i\n", $offset, $offset+$chunk;
         $retval = $self->_write($oid, substr($data, $offset, $chunk), $chunk, $offset)
@@ -78,7 +89,7 @@ sub append {
     $self->_append($oid, $data, length($data));
 }
 
-sub read_handle {
+sub read_handle_perl {
     my ($self, $oid, $handle) = @_;
     (my $length, undef) = $self->_stat($oid);
     #
@@ -93,6 +104,14 @@ sub read_handle {
         syswrite $handle, $data;
     }
 }
+
+sub read_handle {
+    my ($self, $oid, $handle) = @_;
+    Carp::confess "Called with not an open handle"
+        unless openhandle $handle;
+    &_read_to_fh
+}
+
 
 sub read {
     my ($self, $oid, $len, $off) = @_;
@@ -144,17 +163,17 @@ Wraps C<rados_objects_list_open()>.  Returns a list context for the pool, as a L
 
 =head2 write(oid, source)
 
-Wraps C<rados_write()>.  Write data from the source, to a ceph object with the supplied ID.  Source can either be a perl scalar, or a handle to read data from.  Returns 1 on success.  Croaks on failure.  
+Wraps C<rados_write()>.  Write data from the source, to a ceph object with the supplied ID.  Source can either be a perl scalar, or a handle to read data from.  Returns 1 on success.  Croaks on failure.
 
 =head2 write_data(oid, data)
 
 =head2 write_handle(oid, handle)
 
 As L<write_data()>, but explicitly declaring the source type.
- 
+
 =head2 append(oid, data)
 
-Wraps C<rados_append()>.  Appends data to the ceph object with the supplied ID.  Data must be a perl scalar, not a handle.  Returns 1 on success.  Croaks on failure.  
+Wraps C<rados_append()>.  Appends data to the ceph object with the supplied ID.  Data must be a perl scalar, not a handle.  Returns 1 on success.  Croaks on failure.
 
 =head2 stat(oid)
 

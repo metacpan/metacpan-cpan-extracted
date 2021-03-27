@@ -122,6 +122,7 @@ CREATE TABLE runs (
 
     -- User Input
     added           TIMESTAMP       NOT NULL DEFAULT now(),
+    duration        TEXT            DEFAULT NULL,
     log_file_id     CHAR(36)        DEFAULT NULL,
 
     mode ENUM('qvfd', 'qvf', 'summary', 'complete') NOT NULL,
@@ -131,6 +132,7 @@ CREATE TABLE runs (
     passed          INTEGER         DEFAULT NULL,
     failed          INTEGER         DEFAULT NULL,
     retried         INTEGER         DEFAULT NULL,
+    concurrency     INTEGER         DEFAULT NULL,
     fields          LONGTEXT        DEFAULT NULL,
     parameters      LONGTEXT        DEFAULT NULL,
 

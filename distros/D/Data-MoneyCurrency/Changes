@@ -1,5 +1,11 @@
 Revision history for Data-MoneyCurrency
 
+0.18    Fri Mar 26 17:10:36 CET 2021
+        Panama (PA) uses USD
+
+0.17    Fri Mar 26 16:26:32 CET 2021
+        El Salvador (SV) uses USD
+
 0.16    Sat Mar 20 13:14:27 CET 2021
         add Kosovo
 

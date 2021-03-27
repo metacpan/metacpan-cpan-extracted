@@ -138,6 +138,7 @@ CREATE TABLE runs (
 
     -- User Input
     added           TIMESTAMP       NOT NULL DEFAULT now(),
+    duration        TEXT            DEFAULT NULL,
     mode            run_modes       NOT NULL DEFAULT 'qvfd',
     buffer          run_buffering   NOT NULL DEFAULT 'job',
     log_file_id     UUID            DEFAULT NULL REFERENCES log_files(log_file_id),
@@ -146,6 +147,7 @@ CREATE TABLE runs (
     passed          INTEGER         DEFAULT NULL,
     failed          INTEGER         DEFAULT NULL,
     retried         INTEGER         DEFAULT NULL,
+    concurrency     INTEGER         DEFAULT NULL,
     fields          JSONB           DEFAULT NULL,
     parameters      JSONB           DEFAULT NULL,
 

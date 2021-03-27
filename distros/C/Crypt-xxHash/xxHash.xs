@@ -1,8 +1,24 @@
+// PERL_NO_GET_CONTEXT is not used here, so it's OK to define it after inculding these files
 #include "EXTERN.h"
 #include "perl.h"
-#include "XSUB.h"
 
+// There are a lot of macro about threads: USE_ITHREADS, USE_5005THREADS, I_PTHREAD, I_MACH_CTHREADS, OLD_PTHREADS_API
+// This symbol, if defined, indicates that Perl should be built to use the interpreter-based threading implementation.
+#ifndef USE_ITHREADS
+#   define PERL_NO_GET_CONTEXT
+#endif
+
+#include "XSUB.h"
 #include "ppport.h"
+
+#ifdef I_PTHREAD
+#   include "pthread.h"
+#endif
+
+#ifdef I_MACH_CTHREADS
+#   include "mach/cthreads.h"
+#endif
+
 
 /* define int64_t and uint64_t when using MinGW compiler */
 #ifdef __MINGW32__
@@ -19,6 +35,9 @@ typedef unsigned __int64 uint64_t;
 #include "xxhash.h"
 #include <inttypes.h>
 #include <stdio.h>
+
+#ifdef HAS_INT64_T
+#endif
 
 MODULE = Crypt::xxHash  PACKAGE = Crypt::xxHash 
 

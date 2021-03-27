@@ -13,8 +13,8 @@ lives_ok {
         'csv_mixid sorted'      => {qw/left   880 right   880 same   515 diff 365  limit 361 miss 0 add 0 dup 0/},
         'csv_mixid limit'       => {qw/left   200 right   200 same    67 diff 133  limit 133 miss 0 add 0 dup 0/},
         'csv_mixid chunked'     => {qw/left   880 right   880 same   515 diff 365  limit 361 miss 0 add 0 dup 0/},
-        'csv_desep_no_convert'  => {qw/left   789 right   789 same   438 diff 351  limit 298 miss 0 add 0 dup 0/},
-        'csv_desep_convert'     => {qw/left   789 right   789 same   438 diff 351  limit 298 miss 0 add 0 dup 0/},
+        'csv_desep_no_convert'  => {qw/left   789 right   789 same   438 diff 351  limit 310 miss 0 add 0 dup 0/},
+        'csv_desep_convert'     => {qw/left   789 right   789 same   438 diff 351  limit 310 miss 0 add 0 dup 0/},
     );
 
     my $stitle = path($Script)->basename('.t');

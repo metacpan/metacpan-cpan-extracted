@@ -7,6 +7,7 @@ $Actions
 <%INIT>
 
 if ($Transaction->ObjectType eq 'RT::Ticket'
+        and $Transaction->Type !~ /EmailRecord$/
         and $Transaction->HasContent
         and $EmailRecordPath) {
 
@@ -16,8 +17,16 @@ if ($Transaction->ObjectType eq 'RT::Ticket'
         $Attachment = $Attachment->ParentObj;
     }
 
+    my $title;
+    if ($RT::MAJOR_VERSION >= 5) {
+        my $alt = loc('Show email contents');
+        $title = qq[<span class="fas fa-envelope-open-text" alt="$alt" data-toggle="tooltip" data-placement="top" data-original-title="$alt"></span>];
+    } else {
+        $title = loc('Show');
+    }
+
     push( @$Actions, {
-        title  => loc('Show'),
+        title  => $title,
         target => '_blank',
         path => $EmailRecordPath
             . '?id=' . $Transaction->ObjectId

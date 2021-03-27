@@ -34,9 +34,6 @@ use Syntax::Keyword::Try qw( try try_value );
 
 # list context
 {
-   local $TODO = "list context";
-
-   no warnings 'void';
    my @v = try do { 1, 2, 3 } catch ($e) {};
    is_deeply( \@v, [ 1 .. 3 ],
       'try do can yield lists' );

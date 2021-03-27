@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use List::Util qw{ max min };
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use constant ARRAY_REF	=> ref [];
 
@@ -421,7 +421,6 @@ array. Order is not important.
 
 The default is C<[ 3 ]>.
 
-
 =item $live
 
 This specifies the number of neighbors a "living" cell needs to remain
@@ -754,6 +753,7 @@ L<Game::Life|Game::Life>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Game-Life-Faster>,
 L<https://github.com/trwyant/perl-Game-Life-Faster/issues>, or in
 electronic mail to the author.
 

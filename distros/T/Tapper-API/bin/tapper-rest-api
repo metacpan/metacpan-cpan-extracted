@@ -8,7 +8,7 @@ use warnings;
 
 BEGIN {
     use CGI::Carp qw(carpout);
-    open( my $fh_log, '>>', '/var/log/tapper/tapper-rest-api.log')
+    open( my $fh_log, '>>', '/tmp/tapper-rest-api.log')
         or die "Unable to open log for tapper-rest-api: $!\n"
     ;
     carpout( $fh_log );
@@ -34,7 +34,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Amazon.
+This software is Copyright (c) 2021 by Amazon.
 
 This is free software, licensed under:
 

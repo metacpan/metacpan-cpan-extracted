@@ -31,6 +31,7 @@
             "Carp" : "0",
             "Class::Accessor" : "0",
             "Getopt::Long" : "0",
+            "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "List::Util" : "0",
             "XML::LibXML" : "0",
@@ -41,23 +42,23 @@
    "provides" : {
       "Travel::Status::DE::EFA" : {
          "file" : "lib/Travel/Status/DE/EFA.pm",
-         "version" : "1.17"
+         "version" : "1.19"
       },
       "Travel::Status::DE::EFA::Line" : {
          "file" : "lib/Travel/Status/DE/EFA/Line.pm",
-         "version" : "1.17"
+         "version" : "1.19"
       },
       "Travel::Status::DE::EFA::Result" : {
          "file" : "lib/Travel/Status/DE/EFA/Result.pm",
-         "version" : "1.17"
+         "version" : "1.19"
       },
       "Travel::Status::DE::EFA::Stop" : {
          "file" : "lib/Travel/Status/DE/EFA/Stop.pm",
-         "version" : "1.17"
+         "version" : "1.19"
       },
       "Travel::Status::DE::VRR" : {
          "file" : "lib/Travel/Status/DE/VRR.pm",
-         "version" : "1.17"
+         "version" : "1.19"
       }
    },
    "release_status" : "stable",
@@ -69,6 +70,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-VRR"
       }
    },
-   "version" : "1.17",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.19",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

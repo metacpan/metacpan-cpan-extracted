@@ -41,6 +41,7 @@ lib/FASTX/PE.pm
 lib/FASTX/Reader.pm
 lib/FASTX/ScriptHelper.pm
 scripts/Benchmark.pl
+scripts/CountTwo.pl
 scripts/Counter.pl
 scripts/FastqReader.pl
 scripts/Loader.pl

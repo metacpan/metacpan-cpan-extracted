@@ -1,7 +1,9 @@
 package App::BencherUtils;
 
-our $DATE = '2019-08-08'; # DATE
-our $VERSION = '0.242'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-20'; # DATE
+our $DIST = 'App-BencherUtils'; # DIST
+our $VERSION = '0.243'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -730,7 +732,7 @@ App::BencherUtils - Utilities related to bencher
 
 =head1 VERSION
 
-This document describes version 0.242 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2019-08-08.
+This document describes version 0.243 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2021-01-20.
 
 =head1 SYNOPSIS
 
@@ -751,6 +753,8 @@ This distribution includes several utilities:
 =item * L<cleanup-old-bencher-results>
 
 =item * L<format-bencher-result>
+
+=item * L<gen-bencher-scenario-from-cpanmodules>
 
 =item * L<list-bencher-results>
 
@@ -798,6 +802,7 @@ Use code_startup mode instead of normal benchmark.
 
 =item * B<with_process_size> => I<bool>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -832,6 +837,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<modules>* => I<array[perl::modname]>
+
 
 =back
 
@@ -895,6 +901,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<with_process_size> => I<bool>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -927,6 +934,7 @@ Arguments ('*' denotes required arguments):
 =item * B<json>* => I<str>
 
 JSON data.
+
 
 =back
 
@@ -978,6 +986,7 @@ Number of old results to keep.
 
 Directory to store results files in.
 
+
 =back
 
 Special arguments:
@@ -986,7 +995,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -1009,7 +1018,7 @@ Usage:
 
  format_bencher_result(%args) -> [status, msg, payload, meta]
 
-Format bencher raw/JSON result.
+Format bencher rawE<sol>JSON result.
 
 This function is not exported.
 
@@ -1020,6 +1029,7 @@ Arguments ('*' denotes required arguments):
 =item * B<json>* => I<str>
 
 JSON data.
+
 
 =back
 
@@ -1070,6 +1080,7 @@ Display each result with bencher-fmt.
 
 Directory to store results files in.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1103,6 +1114,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<query> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1126,7 +1138,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-BencherUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BencherUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-BencherUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -1138,7 +1150,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

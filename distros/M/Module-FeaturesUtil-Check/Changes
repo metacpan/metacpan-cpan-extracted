@@ -1,0 +1,27 @@
+0.005   2021-03-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Degrade the severity of check to warning: feature name must be
+	  /^\w+$/.
+
+
+0.004   2021-02-25  Released-By: PERLANCAR; Urgency: medium
+
+	- Check version of feature set specification version vs features
+	  declaration's set_v.
+
+
+0.003   2021-02-23  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Remove inappropriate tags (copy mistake).
+
+
+0.002   2021-02-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Module::Features 0.1.3.
+
+
+0.001   2021-02-22  Released-By: PERLANCAR
+
+        - First release.

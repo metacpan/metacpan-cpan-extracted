@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
@@ -19,6 +19,7 @@ my @files = (
     'bin/tapper-rest-api-daemon',
     'lib/Mojolicious/Plugin/TapperConfig.pm',
     'lib/Tapper/API.pm',
+    'lib/Tapper/API/Plugin/API.pm',
     'lib/Tapper/API/Plugin/Integrationtest.pm',
     'lib/Tapper/API/Plugin/Unittest.pm',
     't/00-load.t',

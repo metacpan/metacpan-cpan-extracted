@@ -1,5 +1,5 @@
 use Test2::V0;
-use Test2::Require::Module 'Function::Parameters';
+use Test2::Require::Module 'Function::Parameters', '2.000003';
 
 use Function::Parameters;
 

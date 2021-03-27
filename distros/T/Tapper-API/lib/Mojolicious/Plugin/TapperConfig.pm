@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::TapperConfig;
 our $AUTHORITY = 'cpan:TAPPER';
-$Mojolicious::Plugin::TapperConfig::VERSION = '5.0.1';
+$Mojolicious::Plugin::TapperConfig::VERSION = '5.0.2';
 use Mojo::Base 'Mojolicious::Plugin';
 use Tapper::Config;
 # ABSTRACT: create config for Hypnotoad used in Tapper
@@ -57,7 +57,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Amazon.
+This software is Copyright (c) 2021 by Amazon.
 
 This is free software, licensed under:
 

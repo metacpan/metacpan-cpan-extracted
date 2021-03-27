@@ -17,9 +17,9 @@ if (! -e $seq_file) {
 
 my $data = FASTX::PE->new({ filename => "$seq_file", interleaved => 1, verbose => 1 });
 my $pe = $data->getReads();
- 
-ok(defined $pe->{seq1},  "[PE] sequence1 is defined");
-ok(defined $pe->{seq2},  "[PE] sequence2 is defined");
+
+ok(defined $pe->{seq1},  "[PE] sequence1 is defined: " . $pe->{name1});
+ok(defined $pe->{seq2},  "[PE] sequence2 is defined: " . $pe->{name2});
 ok(defined $pe->{qual1}, "[PE] quality1 is defined");
 ok(defined $pe->{qual2}, "[PE] quality2 is defined");
 

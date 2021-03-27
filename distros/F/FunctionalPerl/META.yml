@@ -36,7 +36,7 @@ recommends:
   Clone: '0'
   Encode: '0'
   Eval::WithLexicals: '0'
-  JSON::PP: '0'
+  JSON: '0'
   LWP::UserAgent: '0'
   Method::Signatures: '0'
   PadWalker: '0'
@@ -62,5 +62,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/pflanze/functional-perl.git
-version: v0.72.44
+version: v0.72.46
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

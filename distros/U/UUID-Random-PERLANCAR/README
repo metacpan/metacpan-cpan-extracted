@@ -2,7 +2,7 @@ NAME
     UUID::Random::PERLANCAR - Another implementation of UUID::Random
 
 VERSION
-    This document describes version 0.004 of UUID::Random::PERLANCAR (from
+    This document describes version 0.005 of UUID::Random::PERLANCAR (from
     Perl distribution UUID-Random-PERLANCAR), released on 2021-01-20.
 
 SYNOPSIS
@@ -12,11 +12,27 @@ SYNOPSIS
      say UUID::Random::PERLANCAR::generate();
 
 DESCRIPTION
-    Note that this module does not produce RFC 4122-compliant v4 (random)
-    UUIDs (no encoding of variant and version information into the UUID).
+    This is another implementation of UUID::Random with improved speed and
+    an extra function "generate_rfc".
 
 FUNCTIONS
   generate
+    Generate a single v4 UUID string in the formatted 32 hexadecimal digits:
+
+     xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+    Note that this module does not produce RFC 4122-compliant v4 (random)
+    UUIDs (no encoding of variant and version information into the UUID).
+    See "generate_rfc" for UUIDs that comply to RFC 4122.
+
+  generate_rfc
+    Generate RFC-compliant a single v4 UUID string in the form of:
+
+     xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
+
+    where "x" is any hexadecimal digits ([0-9a-f]), "M" is 4, and N is
+    either 8, 9, "a", or "b" (1000, 1001, 1010, or 1011 in binary).
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/UUID-Random-PERLANCAR>.

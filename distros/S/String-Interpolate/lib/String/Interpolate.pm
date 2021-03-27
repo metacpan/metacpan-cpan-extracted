@@ -1,6 +1,6 @@
 
 package String::Interpolate;
-$String::Interpolate::VERSION = '0.32';
+$String::Interpolate::VERSION = '0.33';
 use 5.006;
 use strict;
 use warnings;
@@ -34,7 +34,7 @@ String::Interpolate - Wrapper for builtin the Perl interpolation engine.
     my $replace = safe String::Interpolate '\u\L$1'; 
     my $search = qr/(\w+)/;
     $_ = "HELLO world\n";
-    s/$search/$replace/eg; # /e supresses optimisation
+    s/$search/$replace/eg; # /e suppresses optimisation
     print;
 
 =head1 DESCRIPTION
@@ -85,7 +85,7 @@ behaviour can be suppressed using the unsafe_underscore() method.
 Perl string interpolation can, of course, throw exceptions.  By
 default String::Interpolate objects do not catch (or rethrow) these
 exceptions when working in a simple namespace and do trap them when
-working in a Safe compartment.  This behaviour can be overriden by the
+working in a Safe compartment.  This behaviour can be overridden by the
 trap() or pragma() methods.  If an exception during interpolation is
 trapped then undef will be returned as the result of the
 interpolation and $@ will hold the exception in the usual way.
@@ -200,7 +200,7 @@ sub new {
 
 =item safe
 
-Alternative constuctor to create a String::Interpolate object that
+Alternative constructor to create a String::Interpolate object that
 uses an automatically allocated temporary Safe compartment.  The
 automatically allocated Safe compartment will have the default opcode
 mask but with the 'bless' opcode denied as this can be used to execute
@@ -795,7 +795,7 @@ sub lexicals {
 Instructs the String::Interpolate object to forget its current Safe
 compartment or namespace and use the specified one henceforth.  The
 package name can be specified as a string, a GLOB or a GLOB reference.
-The trailing '::' may be ommited.  With an undefined argument this
+The trailing '::' may be omitted.  With an undefined argument this
 method instructs the object to use a new automatically allocated
 temporary namespace.
 
@@ -918,7 +918,7 @@ sub pragma {
 	my ( $no, $method, $un) =
 	    $pragma =~ /^(NO[ _]?)?(LEXICALS|TRAP|SAFE[_ ]HOLE|(?:((?:UN)?)SAFE[_ ](?:SYMBOLS|UNDERSCORE)))$/;
 	if ( $method ) {
-	    # For methods that start 'un' but for which the 'un' has been ommited
+	    # For methods that start 'un' but for which the 'un' has been omitted
 	    # reinstate the un and invert the sense of the 'no' prefix.
 	    if ( defined $un && !$un ) {
 		$no = !$no;
@@ -972,7 +972,7 @@ sub ashash {
 }
  
 package String::Interpolate::AsArray;
-$String::Interpolate::AsArray::VERSION = '0.32';
+$String::Interpolate::AsArray::VERSION = '0.33';
 sub TIEARRAY { my ($class, $thing ) = @_; bless \$thing, $class }
 
 sub STORE { ${${$_[0]}}->{pos}[$_[1]-1]=$_[2] }
@@ -987,7 +987,7 @@ sub FETCH {
 # A private and very secretive class to give secure access to an object
 
 package String::Interpolate::Func;
-$String::Interpolate::Func::VERSION = '0.32';
+$String::Interpolate::Func::VERSION = '0.33';
 sub wrap_hash {
     my $class = shift;
     my ($k,$v) = @_;
@@ -1037,7 +1037,7 @@ L<String::Interpolate::Shell>, L<String::Interpolate::RE>, L<String::Expand>, L<
 
 =head1 REPOSITORY
 
-L<https://github.com/neilbowers/String-Interpolate>
+L<https://github.com/neilb/String-Interpolate>
 
 =head1 AUTHOR
 

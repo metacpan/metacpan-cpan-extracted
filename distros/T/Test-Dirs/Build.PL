@@ -31,6 +31,7 @@ my $builder = Module::Build->new(
     script_files => [
     ],
     add_to_cleanup => [ 'Test-Dirs-*' ],
+    create_readme  => 1,
     meta_merge => {
         resources => {
             repository => 'http://github.com/jozef/Test-Dirs/',

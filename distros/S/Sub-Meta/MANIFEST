@@ -28,6 +28,7 @@ t/06_library.t
 t/07_creator.t
 t/08_finders/function_parameters.t
 t/08_finders/sub_wrap_in_type.t
+t/09_display.t
 t/lib/MySubMeta.pm
 t/lib/MySubMeta/Param.pm
 t/lib/MySubMeta/Parameters.pm

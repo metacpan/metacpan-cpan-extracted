@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "C::Tokenize" : "0.18",
+            "File::Slurper" : "0.012",
             "perl" : "5.006001"
          }
       }
@@ -47,6 +49,6 @@
          "web" : "https://github.com/benkasminbullock/css-tidy"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

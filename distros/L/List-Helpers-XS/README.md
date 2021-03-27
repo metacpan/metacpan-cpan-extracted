@@ -92,9 +92,9 @@ random_slice_void                               107%           14%              
 Total amount of elements in initial array: 25_000
 
                          shuffle_array and splice  random_slice_void  random_slice
-shuffle_array and splice                      --                -45%          -49%
-random_slice_void                             81%                 --           -8%
-random_slice                                  96%                 8%            --
+shuffle_array and splice                      --                -51%          -56%
+random_slice_void                            106%                 --           -9%
+random_slice                                 126%                10%            --
 
 Total amount of elements in initial array: 250_000
 
@@ -133,16 +133,16 @@ The benchmark results for "shuffle"
 
 ```
                             shuffle_huge_array  List::Helpers::XS::shuffle
-shuffle_huge_array                          --                         -4%
-List::Helpers::XS::shuffle                  4%                          --
+shuffle_huge_array                          --                         -7%
+List::Helpers::XS::shuffle                  7%                          --
 
                             shuffle_array  List::Helpers::XS::shuffle
-shuffle_array                                      --             -3%
-List::Helpers::XS::shuffle                          4%             --
+shuffle_array                          --                         -8%
+List::Helpers::XS::shuffle             8%                          --
 
                             List::Util::shuffle  List::Helpers::XS::shuffle
-List::Util::shuffle                          --                        -46%
-List::Helpers::XS::shuffle                   86%                         --
+List::Util::shuffle                          --                        -63%
+List::Helpers::XS::shuffle                 170%                         --
 ```
 
 ### AUTHOR

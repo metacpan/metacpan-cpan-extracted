@@ -35,7 +35,6 @@ lib/Selenium/Firefox.pm
 lib/Selenium/Firefox/Binary.pm
 lib/Selenium/Firefox/Profile.pm
 lib/Selenium/Firefox/webdriver.xpi
-lib/Selenium/Firefox/webdriver_prefs.json
 lib/Selenium/InternetExplorer.pm
 lib/Selenium/PhantomJS.pm
 lib/Selenium/Remote/Commands.pm

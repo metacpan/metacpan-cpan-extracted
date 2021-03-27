@@ -1,7 +1,7 @@
 Build.PL
 Changes
-eg/README
 eg/pqldump
+eg/README
 eg/variables
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
@@ -23,6 +23,8 @@ LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
 MANIFEST
+META.json
+META.yml
 README
 t/basic.t
 t/dump.t
@@ -44,5 +46,4 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
-META.yml
-META.json
+xt/author/prereq.t
