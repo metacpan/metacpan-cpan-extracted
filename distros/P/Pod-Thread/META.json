@@ -1,0 +1,48 @@
+{
+   "abstract" : "Convert POD data to the HTML macro language thread",
+   "author" : [
+      "Russ Allbery <rra@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Pod-Thread",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pod::Simple" : "3.06",
+            "perl" : "5.024"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Perl6::Slurp" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::Thread" : {
+         "file" : "lib/Pod/Thread.pm",
+         "version" : "2.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "2.00",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

@@ -23,15 +23,10 @@ eval "use App::Followme::FIO";
 require App::Followme::FileData;
 
 my $test_dir = catdir(@path, 'test');
-rmtree($test_dir);
+rmtree($test_dir) if -e $test_dir;
 
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-
-my $archive = catfile(@path, 'test', 'archive');
-mkdir $archive or die $!;
-chmod 0755, $archive;
-
 chdir($test_dir) or die $!;
 
 #----------------------------------------------------------------------
@@ -79,11 +74,12 @@ EOQ
         my $kount = ucfirst($count[$i]);
         $output =~ s/%%/$kount/g;
 
-        my $filename = "$count[$i].txt";
+        my $filename = catfile($test_dir, "$count[$i].txt");
         fio_write_page($filename, $output);
     }
 
-    my %data = $obj->fetch_data('title', 'one.txt');
+    my $filename = catfile($test_dir, 'one.txt');
+    my %data = $obj->fetch_data('title', $filename);
 
     is($data{description}, 'This is the description.',
        'get description from content'); # test 3
@@ -102,9 +98,11 @@ EOQ
     is($sorted_data->{title}, 'page one', 'format sortable title'); # test 7
     is($sorted_data->{author}, 'simon bernie', 'format sortable author'); # test 8
 
-    %data = $obj->fetch_data('title', 'two.txt');
+    $filename = catfile($test_dir, 'two.txt');
+    %data = $obj->fetch_data('title', $filename);
     is($data{title}, 'Count Two', 'get title from content'); # test 9
 
-    %data = $obj->fetch_data('title', 'three.txt');
+    $filename = catfile($test_dir, 'three.txt');
+    %data = $obj->fetch_data('title', $filename);
     is($data{title}, 'Three', 'get title from filename'); # test 10
 };

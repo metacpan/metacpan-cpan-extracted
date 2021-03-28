@@ -1,7 +1,3 @@
-# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
-# This package is free software; you can distribute it and/or modify it
-# under the terms of the Artistic License 2.0 (see LICENSE file).
-
 package Math::ModInt;
 
 use 5.006;
@@ -40,7 +36,7 @@ BEGIN {
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(mod divmod qmod);
     our @CARP_NOT  = qw(Math::ModInt::ChineseRemainder);
-    our $VERSION   = '0.012';
+    our $VERSION   = '0.013';
 }
 
 sub _max_modulus_perl {
@@ -318,7 +314,7 @@ Math::ModInt - modular integer arithmetic
 
 =head1 VERSION
 
-This documentation refers to version 0.012 of Math::ModInt.
+This documentation refers to version 0.013 of Math::ModInt.
 
 =head1 SYNOPSIS
 
@@ -539,7 +535,7 @@ optimization strategy for the modulus of C<$x>.  It returns the
 object it was called with.  Defaults may depend on the modulus and
 may or may not be equivalent to one of the other strategy choices.
 They should, however, be reasonably secure to use on small systems,
-and thus lean more to space than time efficency.
+and thus lean more to space than time efficiency.
 
 =back
 
@@ -580,7 +576,7 @@ the given residue and modulus in the former case, or the given
 residue and the modulus of the invocant object in the latter case.
 
 Note that the constructors I<mod> and I<new> of the application
-interface should not be overriden, as they need to switch
+interface should not be overridden, as they need to switch
 implementations, depending on parameters rather than the package
 they are called from.
 
@@ -693,10 +689,16 @@ the main module, for the sake of simplicity.  Please contact the
 maintainer if you intend to use a backend not from this distribution,
 so that something clever can be done about it.
 
-Math::ModInt is still undergoing beta testing on a growing number
-of platforms.  Bug reports and suggestions are always welcome --
-please submit them through the CPAN RT,
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-ModInt> .
+Math::ModInt has settled down a bit after a decade of beta testing.
+The interface may now be considered stable and new features will
+not intentionally break or remove existing ones from this point.
+
+Bug reports and suggestions are always welcome.
+Please submit them through the github issue tracker,
+L<https://github.com/mhasch/perl-Math-ModInt/issues> .
+
+More information for potential contributors can be found in the file
+named F<CONTRIBUTING> in this distribution.
 
 =head1 SEE ALSO
 
@@ -735,7 +737,7 @@ L<http://en.wikipedia.org/wiki/Modular_arithmetic>
 
 =head1 AUTHOR
 
-Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -751,7 +753,7 @@ hall of fame.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2019 by Martin Becker, Blaubeuren.
+Copyright (c) 2009-2021 by Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see LICENSE file).

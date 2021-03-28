@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Encode" : "0",
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -37,6 +36,12 @@
             "Encode" : "0",
             "YAML::Tiny" : "0",
             "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
@@ -52,6 +57,6 @@
          "web" : "https://github.com/vitahall/Text-FrontMatter-YAML"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

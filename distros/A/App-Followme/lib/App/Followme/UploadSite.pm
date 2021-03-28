@@ -13,7 +13,7 @@ use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile catdir);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "2.01";
+our $VERSION = "2.02";
 
 use constant SEED => 96;
 
@@ -354,7 +354,7 @@ sub update_folder {
         my $file = abs2rel($filename, $self->{top_directory});
         delete $local->{$file} if exists $local->{$file};
 
-        my $value = ${$self->{data}->build('checksum', $file)};
+        my $value = ${$self->{data}->build('checksum', $filename)};
 
         # Add file if new or changed
 

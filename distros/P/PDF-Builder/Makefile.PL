@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker 6.5503;
 my $PERL_version = '5.020000';  # can't use in "use" statement above! eval?
                                 # could read from .perl-version file otherwise
 my $MakeMaker_version = '6.5503';
-my $version = '3.021';          # PDFbuild.pl updates from 'version' file
+my $version = '3.022';          # PDFbuild.pl updates from 'version' file
 
 # optional libraries... prompt user whether or not to install
 # nice to have but not vital for many users

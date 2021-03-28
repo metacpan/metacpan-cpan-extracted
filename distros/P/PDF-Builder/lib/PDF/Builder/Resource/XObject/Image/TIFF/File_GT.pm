@@ -3,8 +3,8 @@ package PDF::Builder::Resource::XObject::Image::TIFF::File_GT;
 use strict;
 use warnings;
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 use IO::File;
 use Graphics::TIFF 7 ':all';  # already confirmed to be installed
@@ -77,19 +77,23 @@ sub readTags {
     if      ($self->{'filter'} == COMPRESSION_NONE) { # 1
         delete $self->{'filter'};
     # 2 modified Huffman RLE (COMPRESSION_CCITTRLE)
-    } elsif ($self->{'filter'} == COMPRESSION_CCITTFAX3 || $self->{'filter'} == COMPRESSION_CCITT_T4) {  # 3
+    } elsif ($self->{'filter'} == COMPRESSION_CCITTFAX3 || 
+             $self->{'filter'} == COMPRESSION_CCITT_T4) {  # 3
         $self->{'ccitt'} = $self->{'filter'};
         $self->{'filter'} = 'CCITTFaxDecode';
-    } elsif ($self->{'filter'} == COMPRESSION_CCITTFAX4 || $self->{'filter'} == COMPRESSION_CCITT_T6) {  # 4
+    } elsif ($self->{'filter'} == COMPRESSION_CCITTFAX4 || 
+             $self->{'filter'} == COMPRESSION_CCITT_T6) {  # 4
         # G4 same code as G3
         $self->{'ccitt'} = $self->{'filter'};
         $self->{'filter'} = 'CCITTFaxDecode';
     } elsif ($self->{'filter'} == COMPRESSION_LZW) { # 5
         $self->{'filter'} = 'LZWDecode';
-    } elsif ($self->{'filter'} == COMPRESSION_OJPEG || $self->{'filter'} == COMPRESSION_JPEG) { # 6  JPEG is 'new' JPEG?
+    } elsif ($self->{'filter'} == COMPRESSION_OJPEG || 
+             $self->{'filter'} == COMPRESSION_JPEG) { # 6  JPEG is 'new' JPEG?
         $self->{'filter'} = 'DCTDecode';
     # 7 'new' JPEG
-    } elsif ($self->{'filter'} == COMPRESSION_ADOBE_DEFLATE || $self->{'filter'} == COMPRESSION_DEFLATE) { # 8  same? see 32946
+    } elsif ($self->{'filter'} == COMPRESSION_ADOBE_DEFLATE ||
+             $self->{'filter'} == COMPRESSION_DEFLATE) { # 8  same? see 32946
         $self->{'filter'} = 'FlateDecode';
     # 9  T.85 
     # 10 T.43

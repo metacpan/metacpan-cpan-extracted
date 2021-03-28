@@ -7,7 +7,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 use Carp qw(confess cluck);
 use Encode qw(encode);
@@ -34,8 +34,8 @@ sub new {
 	if ( not( $opt{name} ) ) {
 		confess('You must specify a name');
 	}
-	if ( $opt{type} and not( $opt{type} ~~ [qw[stop address poi]] ) ) {
-		confess('type must be stop, address or poi');
+	if ( $opt{type} and not( $opt{type} ~~ [qw[stop stopID address poi]] ) ) {
+		confess('type must be stop, stopID, address, or poi');
 	}
 
 	if ( not $opt{efa_url} ) {
@@ -100,7 +100,7 @@ sub new {
 			submitButton           => 'anfordern',
 			typeInfo_dm            => 'invalid',
 			type_dm                => $opt{type} // 'stop',
-			useProxFootSearch      => '0',
+			useProxFootSearch      => $opt{proximity_search} ? '1' : '0',
 			useRealtime            => '1',
 		},
 		developer_mode => $opt{developer_mode},
@@ -673,7 +673,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =head1 DESCRIPTION
 
@@ -706,7 +706,7 @@ E<lt>derf+efa@finalrewind.orgE<gt>.
 
 Name of the place/city
 
-=item B<type> => B<address>|B<poi>|B<stop>
+=item B<type> => B<address>|B<poi>|B<stop>|B<stopID>
 
 Type of the following I<name>.  B<poi> means "point of interest".  Defaults to
 B<stop> (stop/station name).
@@ -726,6 +726,11 @@ iso-8859-15.
 If true: Request full routes for all departures from the backend. This
 enables the B<route_pre>, B<route_post> and B<route_interesting> accessors in
 Travel::Status::DE::EFA::Result(3pm).
+
+=item B<proximity_search> => B<0>|B<1>
+
+If true: Show departures for stops in the proximity of the requested place
+as well.
 
 =item B<timeout> => I<seconds>
 

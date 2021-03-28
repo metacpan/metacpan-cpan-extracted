@@ -1,3 +1,8 @@
+Travel::Status::DE::VRR 1.20 - Sun Mar 28 2021
+
+    * efa-m, EFA: Accept "stopID" stop type
+    * EFA: Add proximity_search (useProxFootSearch) option
+
 Travel::Status::DE::VRR 1.19 - Sat Mar 27 2021
 
     * Result: Add ->train_no accessor

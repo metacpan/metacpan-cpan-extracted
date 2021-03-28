@@ -10,7 +10,7 @@ use base qw(App::Followme::Module);
 use File::Spec::Functions qw(abs2rel rel2abs catfile splitdir);
 use App::Followme::FIO;
 
-our $VERSION = "2.01";
+our $VERSION = "2.02";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -125,7 +125,6 @@ sub update_folder {
 sub write_file {
     my ($self, $filename, $page, $binmode) = @_;
 
-    $filename = rel2abs($filename);
     my $time = ${$self->{data}->build('mdate', $filename)};
     my $new_filename = $self->title_to_filename($filename);
 

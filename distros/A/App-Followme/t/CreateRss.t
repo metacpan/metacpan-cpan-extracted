@@ -5,7 +5,7 @@ use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 
 #----------------------------------------------------------------------
 # Change the modification date of a file
@@ -39,7 +39,7 @@ require App::Followme::CreateRss;
 
 my $test_dir = catdir(@path, 'test');
 
-rmtree($test_dir);
+rmtree($test_dir) if -e $test_dir;
 mkdir $test_dir  or die $!;
 chmod 0755, $test_dir;
 chdir $test_dir or die $!;
@@ -134,32 +134,35 @@ EOQ
     # Create and test rss file
 
     $idx->run($test_dir);
-    my %rss = nt_parse_almost_xml_file('test.rss');
+    my $rss_file = catfile($test_dir, 'test.rss');
+    ok(-e $rss_file, "rss file created"); # test 3
+
+    my %rss = nt_parse_almost_xml_file($rss_file);
     
     my $channel = $rss{rss}{channel};
-    ok(ref $channel eq 'HASH', "rss tag exists"); # test 3
+    ok(ref $channel eq 'HASH', "rss tag exists"); # test 4
 
     my @keys = sort keys %$channel;
     my @keywords = qw(author description item link pubDate title);
-    is_deeply(\@keys, \@keywords, "channel has keywords"); # test 4
+    is_deeply(\@keys, \@keywords, "channel has keywords"); # test 5
 
     for my $key (@keywords) {
-        ok(length $channel->{$key}, "channel $key has a value"); # test 5-9
+        ok(length $channel->{$key}, "channel $key has a value"); # test 6-11
     }
 
     my $items = $channel->{item};
-    is(@$items, 3, "rss has three items"); # test 10
+    is(@$items, 3, "rss has three items"); # test 12
 
     my @item_titles = map {$_->{title}} @$items;
     my @fourth = grep {/four/} @item_titles;
-    is(@fourth, 0, "no fourth post"); # test 11
+    is(@fourth, 0, "no fourth post"); # test 13
 
     my $item = $items->[0];
     my @keys = sort keys %$item;
     @keywords = qw(author description guid link pubDate title);
-    is_deeply(\@keys, \@keywords, "item has keywords"); # test 12
+    is_deeply(\@keys, \@keywords, "item has keywords"); # test 14
 
     for my $key (@keywords) {
-        ok(length $item->{$key}, "item $key has a value"); # test 13-17
+        ok(length $item->{$key}, "item $key has a value"); # test 15-20
     }    
 };

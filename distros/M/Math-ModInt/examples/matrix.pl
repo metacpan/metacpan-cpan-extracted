@@ -1,5 +1,5 @@
-#!/usr/bin/perl
-# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+#!/usr/bin/env perl
+# Copyright (c) 2009-2021 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 

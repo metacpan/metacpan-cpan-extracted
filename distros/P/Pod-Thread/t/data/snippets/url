@@ -1,0 +1,19 @@
+[name]
+URL formatting
+
+[input]
+=head1 URLs
+
+URL with L<anchor text|http://example.com/>.
+
+URL without anchor text: L<http://example.com/>.
+
+[output]
+\h2(#S1)[URLs]
+
+URL with \link[http://example.com/][anchor text].
+
+URL without anchor text:
+<\link[http://example.com/][http://example.com/]>.
+
+\signature

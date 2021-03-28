@@ -88,7 +88,7 @@ done during the install process, only copying of .pm Perl module files.
 
 ## Copyright
 
-This software is Copyright (c) 2017-2020 by Phil M. Perry.
+This software is Copyright (c) 2017-2021 by Phil M. Perry.
 
 Previous copyrights are held by others (Steve Simms, Alfred Reibenschuh, et al.).
 
@@ -98,10 +98,11 @@ This is free software, licensed under:
 
 `The GNU Lesser General Public License, Version 2.1, February 1999`
 
-EXCEPT for some files which are explicitly under other licenses. You are
-permitted (at your option) to redistribute and/or modify this software (those
-portions under LGPL) at an LGPL version greater than 2.1. See INFO/LICENSE for
-more information on the licenses and warranty statement.
+EXCEPT for some files which are explicitly under other, compatible, licenses
+(the Perl License and the MIT License). You are permitted (at your option) to
+redistribute and/or modify this software (those portions under LGPL) at an
+LGPL version greater than 2.1. See INFO/LICENSE for more information on the
+licenses and warranty statement.
 
 ## See Also
 

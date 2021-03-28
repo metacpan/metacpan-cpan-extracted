@@ -10,6 +10,9 @@
 #   anyone's safety, is implied in this software or documentation.
 #
 #   This specific module is licensed under the Perl Artistic License.
+#   Effective 28 January 2021, the original author and copyright holder, 
+#   Martin Hosken, has given permission to use and redistribute this module 
+#   under the MIT license.
 #
 #=======================================================================
 package PDF::Builder::Basic::PDF::File;
@@ -18,8 +21,8 @@ use strict;
 use warnings;
 #no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -985,7 +988,7 @@ sub ship_out {
         my ($objnum, $objgen) = @{$self->{' objects'}{$objind->uid()}}[0..1];
         $fh->printf('%d %d obj ', $objnum, $objgen);
         $objind->outobjdeep($fh, $self);
-        $fh->print(" endobj\n");
+        $fh->print("\nendobj\n");
 
         # Note that we've output this obj, not forgetting to update
         # the cache of what's printed.

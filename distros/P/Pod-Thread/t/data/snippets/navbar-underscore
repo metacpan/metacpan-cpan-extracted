@@ -1,0 +1,40 @@
+[name]
+Navbar with all-caps symbols in headings
+
+[options]
+navbar 1
+
+[input]
+=head1 NAME
+
+foo - Some description of foo
+
+=head1 DESCRIPTION
+
+Some description.
+
+=head1 DB_CONFIG
+
+Another section with an underscore.
+
+[output]
+\heading[foo][]
+
+\h1[foo]
+
+\class(subhead)[(Some description of foo)]
+
+\class(navbar)[
+  \link[#S1][Description]
+  | \link[#S2][DB_CONFIG]
+]
+
+\h2(#S1)[DESCRIPTION]
+
+Some description.
+
+\h2(#S2)[DB_CONFIG]
+
+Another section with an underscore.
+
+\signature

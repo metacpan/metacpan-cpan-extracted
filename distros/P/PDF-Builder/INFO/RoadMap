@@ -1,4 +1,4 @@
-Road Map for Future Development of PDF::Builder              22 November 2020
+Road Map for Future Development of PDF::Builder              16 February 2021
 
 In order to encourage others to contribute code and/or algorithms to the
 effort, I am publishing this road map of where I would like the product to go.
@@ -182,6 +182,13 @@ Q. ## DONE ## release 3.020
    Look at Basic/PDF/File.pm 'Q>' unpack (ref RT 133131). Supposedly will not
    run on a 32 bit platform -- will it work on such platform to check if high
    33 bits are all 0, and convert the low 32 bits to a fullword integer?
+
+R. TTF/OTF font embedding: consider -forceASCII and -forceLatin1 options to
+   make the entire ASCII alphabet (or the entire Latin-1 alphabet) embedded,
+   not just what subset of characters (and glyphs) were used in text. This 
+   might be useful in fillable forms and any other situation where an end user 
+   gets to type in text. There is already the ability to embed the entire 
+   font, but that's often overkill.
 
 =============================================================================
 II. Items to add to a separate area (new module or sub-module)

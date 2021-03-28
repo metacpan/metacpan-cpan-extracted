@@ -1,5 +1,25 @@
 Revision history for XML-Sig
 
+0.47 - 2021-03-28
+
+  [Significant features implemented since 0.45]
+  - Fixed issue with InclusiveNamespaces that have a namespace
+  - Allow Signatures without returning XML Declaration (Net::SAML2 support)
+  - CPAN Release is now signed with gpg
+
+  - TBD     Update Changes and Increment version
+
+0.46-TRIAL - 2021-03-27
+
+  - Bug fix and allow XML::Sig to be used in Net::SAML2 (#32)
+
+  [Full Change Log]
+
+  - 1bbefe5 Update Changes and Increment version
+  - 703ada0 Fixes #32 Allow Signatures without returning XML Declaration
+  - 43b5ae1 Support Signing Release
+  - fc03e7f Fixes #31 Issue verifying xml with namespace on InclusiveNamespaces
+
 0.45 - 2021-03-20
   [Significant features implemented since 0.43]
 
@@ -9,7 +29,7 @@ Revision history for XML-Sig
 
   [Full Change Log]
 
-  - TBD     Update Changes and Increment version
+  - fb99312 Update Changes and Increment version
 
 
 0.44-TRIAL - 2021-03-20

@@ -7,48 +7,41 @@ use lib 'inc';
 
 use Module::Build;
 use My::Module::Build;
-use My::Module::Meta qw{
-    build_required_module_versions
-    meta_merge
-    recommended_module_versions
-    required_module_versions
-    requires_perl
-};
+use My::Module::Meta;
+
+my $meta = My::Module::Meta->new();
 
 ( my $mbv = Module::Build->VERSION() ) =~ s/_//g;
 
 my %args = (
-    module_name         => 'Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter',
-    dist_author         => 'Thomas R. Wyant, III (wyant at cpan dot org)',
-    dist_abstract       => 'Critique unused variables in Perl source',
-    license             => 'perl',
-    create_packlist     => 1,
-    sign                => 0,
-
-    requires            => { required_module_versions(
-                                perl => requires_perl(),
-                            ) },
-    build_requires      => { build_required_module_versions() },
-    recommends          => { recommended_module_versions() },
-
-    add_to_cleanup      => [
-        qw<
-            Debian_CPANTS.txt
-        >,
-    ],
+    add_to_cleanup	=> $meta->add_to_cleanup(),
+    build_requires	=> $meta->build_requires(),
+    configure_requires	=> $meta->configure_requires(),
+    dist_abstract	=> $meta->abstract(),
+    dist_author	=> $meta->author(),
+    dist_name	=> $meta->dist_name(),
+    license	=> $meta->license(),
+    module_name	=> $meta->module_name(),
+    recommends	=> { $meta->recommended_module_versions() },
+    requires	=> $meta->requires(
+	perl	=> $meta->requires_perl(),
+    ),
+    script_files	=> $meta->script_files(),
 );
 
-$mbv >= 0.28
-    and $args{meta_merge} = meta_merge();
+if ( $mbv >= 0.28 ) {
+    $args{meta_merge} = $meta->meta_merge();
+    $args{meta_add} = {
+	no_index	=> $meta->no_index(),
+    };
+}
 
 $mbv >= 0.34
     and $args{auto_configure_requires} = 0;	# Don't require Module::Build
 
-my $builder = My::Module::Build->new(
-    %args,
-);
+my $bldr = My::Module::Build->new( %args );
 
-$builder->create_build_script();
+$bldr->create_build_script();
 
 ##############################################################################
 # Local Variables:

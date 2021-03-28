@@ -7,6 +7,7 @@ META.json
 META.yml
 Makefile.PL
 README
+SIGNATURE
 cpanfile
 dist.ini
 lib/XML/Sig.pm
@@ -30,6 +31,7 @@ t/018-DigestSignatureAlgorithms.t
 t/019_dsakeys.t
 t/020_dsakeys-2048.t
 t/021_dsakeys-3072.t
+t/022_sign_no_xml_declaration.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t
@@ -47,6 +49,7 @@ t/ecdsa.private.pem
 t/ecdsa.public.pem
 t/intermediate.pem
 t/issues/issue-20.xml
+t/issues/issue-31.xml
 t/pkcs8.private.key
 t/release-trailing-space.t
 t/rsa.cert.pem

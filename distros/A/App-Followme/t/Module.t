@@ -38,7 +38,7 @@ require App::Followme::Module;
 
 my $test_dir = catdir(@path, 'test');
 
-rmtree($test_dir);
+rmtree($test_dir) if -e $test_dir;
 mkdir $test_dir;
 chmod 0755, $test_dir;
 
@@ -47,7 +47,7 @@ mkdir ($subdir) or die $!;
 chmod 0755, $subdir;
 chdir $test_dir or die $!;
 
-my $template_file = 'template.htm';
+my $template_file = catfile($test_dir, 'template.htm');
 
 #----------------------------------------------------------------------
 # Create object
@@ -181,7 +181,7 @@ run_after:
 
 EOQ
 
-    my $filename = 'test.cfg';
+    my $filename = catfile($test_dir, 'test.cfg');
     my $fd = IO::File->new($filename, 'w');
     print $fd $source;
     close($fd);
@@ -214,7 +214,8 @@ do {
 # Test render file
 
 do {
-   my $page = $obj->render_file('one.html');
+    my $filename = catfile($test_dir, 'one.html');
+    my $page = $obj->render_file($filename);
 
-   like($page, qr(Page one), 'render file'); # test 8
+    like($page, qr(Page one), 'render file'); # test 8
 };

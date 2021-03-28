@@ -8,7 +8,7 @@ use warnings;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-$VERSION = '0.45';
+$VERSION = '0.47';
 
 use base qw(Class::Accessor);
 XML::Sig->mk_accessors(qw(key));
@@ -91,6 +91,13 @@ sub new {
             $self->{ sig_hash } = 'sha1';
         }
     }
+
+    if ( exists $params->{ no_xml_declaration } && $params->{ no_xml_declaration } == 1 ) {
+        $self->{ no_xml_declaration } = 1;
+    } else {
+        $self->{ no_xml_declaration } = 0;
+    }
+
     return $self;
 }
 
@@ -100,6 +107,8 @@ sub sign {
     my ($xml) = @_;
 
     die "You cannot sign XML without a private key." unless $self->key;
+
+    local $XML::LibXML::skipXMLDeclaration = $self->{ no_xml_declaration };
 
     my $dom = XML::LibXML->load_xml( string => $xml );
 
@@ -234,7 +243,7 @@ sub sign {
         print ("\n\n\n SignatureValue:\n" . $signature_value_node . "\n\n\n") if $DEBUG;
     }
 
-    return $dom;
+    return $dom->toString;
 }
 
 
@@ -559,7 +568,7 @@ sub _transform {
 sub _find_prefixlist {
     my $self = shift;
     my ($node) = @_;
-    my @children = $node->getChildrenByTagName('InclusiveNamespaces');
+    my @children = $node->getChildrenByLocalName('InclusiveNamespaces');
 
     my $prefixlist = '';
     foreach my $child (@children) {
@@ -1468,7 +1477,7 @@ XML::Sig
 
 =head1 VERSION
 
-version 0.45
+version 0.47
 
 =head1 SYNOPSIS
 
@@ -1606,6 +1615,13 @@ Passing digest_hash to new allows you to specify the DigestMethod
 hashing algorithm used when calculating the hash of the XML being
 signed.  Supported hashes can be specified sha1, sha224, sha256,
 sha384, and sha512
+
+=item B<no_xml_declaration>
+
+Some applications such as Net::SAML2 expect to sign a fragment of the
+full XML document so is this is true (1) it will not include the
+XML Declaration at the beginning of the signed XML.  False (0) or
+undefined returns an XML document starting with the XML Declaration.
 
 =back
 

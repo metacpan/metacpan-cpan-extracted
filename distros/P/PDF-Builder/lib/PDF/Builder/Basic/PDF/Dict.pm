@@ -8,6 +8,9 @@
 #   anyone's safety, is implied in this software or documentation.
 #
 #   This specific module is licensed under the Perl Artistic License.
+#   Effective 28 January 2021, the original author and copyright holder, 
+#   Martin Hosken, has given permission to use and redistribute this module 
+#   under the MIT license.
 #
 #=======================================================================
 package PDF::Builder::Basic::PDF::Dict;
@@ -18,8 +21,8 @@ use strict;
 use warnings;
 #no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 our $mincache = 16 * 1024 * 1024;
 
@@ -181,7 +184,7 @@ sub outobjdeep {
     }
 
     if      (defined $self->{' stream'}) {
-        $fh->print(" stream\n");
+        $fh->print("\nstream\n");
         $loc = $fh->tell();
         my $stream = $self->{' stream'};
         unless ($self->{' nofilt'}) {
@@ -196,7 +199,7 @@ sub outobjdeep {
         open(my $dictfh, "<", $self->{' streamfile'}) || die "Unable to open $self->{' streamfile'}";
         binmode($dictfh, ':raw');
 
-        $fh->print(" stream\n");
+        $fh->print("\nstream\n");
         $loc = $fh->tell();
         my $stream;
         while (read($dictfh, $stream, 4096)) {

@@ -33,7 +33,7 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.021'; # VERSION
+our $VERSION = '3.022'; # VERSION
 my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Math::Trig;

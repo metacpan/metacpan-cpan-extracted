@@ -609,8 +609,8 @@ like($pdf->stringify, qr/2 Tw/, q{wordspace(2)});
 $pdf = PDF::Builder->new('-compress' => 'none');
 $gfx = $pdf->page->gfx();
 
-$gfx->lead(14);
-like($pdf->stringify, qr/14 TL/, q{lead(14)});
+$gfx->leading(14);
+like($pdf->stringify, qr/14 TL/, q{leading(14)});
 
 # Text Rendering Mode
 

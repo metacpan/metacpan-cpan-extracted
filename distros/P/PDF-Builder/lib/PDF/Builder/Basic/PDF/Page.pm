@@ -8,6 +8,9 @@
 #   anyone's safety, is implied in this software or documentation.
 #
 #   This specific module is licensed under the Perl Artistic License.
+#   Effective 28 January 2021, the original author and copyright holder, 
+#   Martin Hosken, has given permission to use and redistribute this module 
+#   under the MIT license.
 #
 #=======================================================================
 package PDF::Builder::Basic::PDF::Page;
@@ -17,8 +20,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Dict;
 use PDF::Builder::Basic::PDF::Utils;

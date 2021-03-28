@@ -5,8 +5,8 @@ use base 'PDF::Builder::Content';
 use strict;
 use warnings;
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -639,8 +639,8 @@ B<Options:>
 
 =item -last_align => place
 
-where place is 'left' (default), 'center', or 'right' allows you to specify
-the alignment of the last line output.
+where place is 'left' (default), 'center', or 'right' (may be shortened to
+first letter) allows you to specify the alignment of the last line output.
 
 =back
 
@@ -714,7 +714,14 @@ for paragraph first lines). This setting is ignored for centered text.
 
 C<$choice> is 'justified', 'right', 'center', 'left'; the default is 'left'.
 See C<text_justified> call for options to control how a line is expanded or
-condensed if C<$choice> is 'justified'.
+condensed if C<$choice> is 'justified'. C<$choice> may be shortened to the
+first letter.
+
+=item -last_align => place
+
+where place is 'left' (default), 'center', or 'right' (may be shortened to
+first letter) allows you to specify the alignment of the last line output,
+but applies only when C<-align> is 'justified'.
 
 =item -underline => $distance
 
@@ -833,6 +840,9 @@ C<$continue> is 0 for the first call of section(), and then use the value
 returned from the previous call (1 if a paragraph was cut in the middle) to 
 prevent unwanted indenting or outdenting of the first line being printed.
 
+For compatibility with recent changes to PDF::API2, B<paragraphs> is accepted
+as an I<alias> for C<section>.
+
 B<Options:>
 
 =over
@@ -849,6 +859,11 @@ See C<paragraph> for other C<%opts> you can use, such as -align and -pndnt.
 =back
 
 =cut
+
+# alias for compatibility
+sub paragraphs {
+    return section(@_);
+}
 
 sub section {
     my ($self, $text, $width,$height, $continue, %opts) = @_;

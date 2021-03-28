@@ -7,8 +7,8 @@ use warnings;
 
 #no warnings 'uninitialized';
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -129,7 +129,7 @@ sub new {
     $tif->close();
 
     return $self;
-}
+} # end of new()
 
 =item  $mode = $tif->usesLib()
 
@@ -152,6 +152,7 @@ sub usesLib {
     return $self->{'usesGT'}->val();
 }
 
+# non-CCITT compression methods
 sub handle_generic {
     my ($self, $pdf, $tif, %opts) = @_;
     my ($stripcount, $buffer);
@@ -164,6 +165,10 @@ sub handle_generic {
     $dict->{'BitsPerComponent'} = PDFNum($tif->{'bitsPerSample'});
     $dict->{'Colors'} = PDFNum($tif->{'colorSpace'} eq 'DeviceGray'?1 :3);
 
+    # uncompressed bilevel needs to be flipped
+    if (!defined $tif->{'filter'} && $tif->{'bitsPerSample'} == 1) {
+        $self->{'Decode'} = PDFArray(PDFNum(1), PDFNum(0));
+    }
     $stripcount = $tif->{'object'}->NumberOfStrips();
     $buffer = '';
     for my $i (0 .. $stripcount - 1) {
@@ -586,9 +591,10 @@ sub handle_ccitt {
     $decode->{'K'} = (($tif->{'ccitt'} == 4 || (defined $tif->{'g3Options'} && $tif->{'g3Options'} & 0x1))? PDFNum(-1): PDFNum(0));
     $decode->{'Columns'} = PDFNum($tif->{'imageWidth'});
     $decode->{'Rows'} = PDFNum($tif->{'imageHeight'});
-    # not sure why whiteIsZero needs to be flipped around???
-    $decode->{'BlackIs1'} = PDFBool($tif->{'whiteIsZero'} == 0? 1: 0);
+    $decode->{'BlackIs1'} = PDFBool($tif->{'whiteIsZero'} == 1? 1: 0);
     $decode->{'DamagedRowsBeforeError'} = PDFNum(100);
+    # all CCITT Fax need to flip black/white
+    $self->{'Decode'} = PDFArray(PDFNum(1), PDFNum(0));
 
     # g3Options       bit 0 = 0 for 1-Dimensional, = 1 for 2-Dimensional MR
     #  aka T4Options  bit 1 = 0 (compressed data only)
@@ -640,12 +646,6 @@ sub handle_ccitt {
 sub read_tiff {
     my ($self, $pdf, $tif, %opts) = @_;
 
-    # not sure why blackIsZero needs to be flipped around???
-    if (defined $tif->{'blackIsZero'}) {
-        $tif->{'blackIsZero'} = $tif->{'blackIsZero'} == 1? 0: 1;
-        $tif->{'whiteIsZero'} = $tif->{'blackIsZero'} == 1? 0: 1;
-    }
-
     $self->width($tif->{'imageWidth'});
     $self->height($tif->{'imageHeight'});
 
@@ -669,19 +669,12 @@ sub read_tiff {
     $self->{'Interpolate'} = PDFBool(1);
     $self->bits_per_component($tif->{'bitsPerSample'});
 
+    # swaps 0 and 1 ([0 1] -> [1 0]) in certain cases
     if (($tif->{'whiteIsZero'}||0) == 1 &&
 	($tif->{'filter'}||'') ne 'CCITTFaxDecode') {
         $self->{'Decode'} = PDFArray(PDFNum(1), PDFNum(0));
     }
 
-## debug  dump $tif
-#foreach (sort keys %$tif) {
-# if (defined $tif->{$_}) {
-#  print "\$tif->{'$_'} = '$tif->{$_}'\n";
-# } else {
-#  print "\$tif->{'$_'} = ?\n";
-# }
-#}
     # check filters and handle separately
     if (defined $tif->{'filter'} and $tif->{'filter'} eq 'CCITTFaxDecode') {
         $self->handle_ccitt($pdf, $tif, %opts);

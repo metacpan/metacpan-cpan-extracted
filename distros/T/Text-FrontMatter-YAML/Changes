@@ -1,5 +1,11 @@
 Revision history for Text-FrontMatter-YAML
 
+0.11	2021-03-27
+  - Return better errors when croaking for bad input arguments
+  - Add tests for said croaking. Test::Fatal is now a test requirement.
+  - Test requirements were mistakenly listed as build requirements.
+  - Other minor changes to Makefile.PL
+
 0.10	2021-03-01
   - Properly check for existence of the input arguments (rather than
     a boolean test of the value)

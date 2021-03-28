@@ -3,7 +3,8 @@ abstract: 'read the "YAML front matter" format'
 author:
   - 'Aaron Hall <ahall@vitaphone.net>'
 build_requires:
-  Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::Fatal: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -26,5 +27,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Bug/Report.html?Queue=Text-FrontMatter-YAML
   repository: https://github.com/vitahall/Text-FrontMatter-YAML.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

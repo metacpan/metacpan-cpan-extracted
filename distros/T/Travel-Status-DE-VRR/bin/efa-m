@@ -6,7 +6,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -75,7 +75,7 @@ else {
 	( $place, $input ) = @ARGV;
 }
 
-if ( $input =~ s{ ^ (?<type> address|poi|stop) : }{}x ) {
+if ( $input =~ s{ ^ (?<type> address|poi|stop|stopID) : }{}x ) {
 	$input_type = $+{type};
 }
 
@@ -396,7 +396,7 @@ B<efa-m> [B<-Lr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =head1 DESCRIPTION
 

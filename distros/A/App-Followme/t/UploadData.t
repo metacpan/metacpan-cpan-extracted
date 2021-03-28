@@ -23,7 +23,7 @@ require App::Followme::UploadData;
 my $test_dir = catdir(@path, 'test');
 my $state_dir = catdir(@path, 'test', '_state');
 
-rmtree($test_dir);
+rmtree($test_dir)  if -e $test_dir;
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
 
@@ -33,6 +33,7 @@ chdir $test_dir or die $!;
 
 my %configuration = (
                      top_directory => $test_dir,
+                     base_directory => $test_dir,
                    );
 
 #----------------------------------------------------------------------
@@ -62,22 +63,23 @@ my @files_ok;
 
 foreach my $dir (@dirs) {
     if ($dir) {
+        $dir = catfile($test_dir, $dir);
         mkdir $dir or die $!;
         chmod 0755, $dir;
-        push(@folders_ok, catfile($test_dir, $dir));
+        push(@folders_ok, $dir);
+    } else {
+        $dir = $test_dir;
     }
+
 
     foreach my $count (qw(one two three)) {
         my $output = $page;
         $output =~ s/!!/$dir/g;
         $output =~ s/%%/$count/g;
 
-        my $filename = $dir ? catfile($dir, "$count.html") : "$count.html";
+        my $filename = catfile($dir, "$count.html");
         fio_write_page($filename, $output);
-
-        unless ($dir) {
-            push(@files_ok, catfile($test_dir, $filename));
-        }
+        push(@files_ok, $filename) if $dir eq $test_dir;
     }
 }
 

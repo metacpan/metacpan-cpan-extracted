@@ -4,7 +4,7 @@
       "Martin Becker <becker-cpan-mp (at) cozap.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -54,50 +54,55 @@
    "provides" : {
       "Math::ModInt" : {
          "file" : "lib/Math/ModInt.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Math::ModInt::BigInt" : {
          "file" : "lib/Math/ModInt/BigInt.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Math::ModInt::ChineseRemainder" : {
          "file" : "lib/Math/ModInt/ChineseRemainder.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Math::ModInt::Event" : {
          "file" : "lib/Math/ModInt/Event.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Math::ModInt::Event::Trap" : {
          "file" : "lib/Math/ModInt/Event/Trap.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Math::ModInt::GF2" : {
          "file" : "lib/Math/ModInt/GF2.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Math::ModInt::GF3" : {
          "file" : "lib/Math/ModInt/GF3.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Math::ModInt::Perl" : {
          "file" : "lib/Math/ModInt/Perl.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Math::ModInt::Trivial" : {
          "file" : "lib/Math/ModInt/Trivial.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Math-ModInt"
+         "web" : "https://github.com/mhasch/perl-Math-ModInt/issues"
       },
       "license" : [
          "https://www.perlfoundation.org/artistic-license-20.html"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mhasch/perl-Math-ModInt.git",
+         "web" : "https://github.com/mhasch/perl-Math-ModInt"
+      }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

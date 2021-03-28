@@ -54,18 +54,23 @@ sub configuration_file {
 sub set_directory {
     my ($filename) = @_;
 
+    my $directory;
     if (defined $filename) {
         if (-d $filename) {
-            chdir($filename);
+            $directory = $filename;
 
         } else {
             my @path = splitdir($filename);
             pop(@path);
-            chdir(catfile(@path)) if @path;
+            $directory = catfile(@path) if @path;
         }
     }
 
-    my $directory = getcwd();
+    $directory = getcwd();
+
+    die "Could not set directory: $!\n" unless $directory;
+    die "Could not change directory: $directory\n" unless chdir($directory);
+
     return $directory;
 }
 

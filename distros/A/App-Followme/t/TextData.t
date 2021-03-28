@@ -5,7 +5,7 @@ use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
 use Test::Requires 'Text::Markdown';
-use Test::More tests => 22;
+use Test::More tests => 26;
 
 use lib '../..';
 
@@ -24,7 +24,7 @@ require App::Followme::TextData;
 
 my $test_dir = catdir(@path, 'test');
 
-rmtree($test_dir);
+rmtree($test_dir) if -e $test_dir;
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
 
@@ -59,7 +59,7 @@ EOQ
         my $output = $text;
         $output =~ s/%%/$count/g;
 
-        my $filename = "$count.md";
+        my $filename = catfile($test_dir, "$count.md");
         fio_write_page($filename, $output);
     }
 };
@@ -84,24 +84,27 @@ do {
    my $index_file = $obj->dir_to_filename($test_dir);
     my $files = $obj->build('files', $index_file);
     foreach my $file (@$files) {
+        my $page = fio_read_page($file);
+        ok(length($page) > 0, "Read $file"); # test 3, 9, 15, 21
+
         my ($dir, $root) = fio_split_filename($file);
         my ($count, $suffix) = split(/\./, $root);
 
         my $body = $obj->build('body', $file);
         ok(index($$body, "<li>third $count</li>") > 0,
-           "Convert Text $count"); # test 3, 8, 13, 18
+           "Convert Text $count"); # test 4, 10, 16, 22
 
         my $title = $obj->build('title', $file,);
-        is($$title, "Page $count", "get title $count"); # test 4, 9. 14, 19
+        is($$title, "Page $count", "get title $count"); # test 5, 11, 17, 23
 
         my $description = $obj->build('description', $file);
         is($$description, 'This is a paragraph.',
-           "get description $count"); # test 5, 10, 15, 20
+           "get description $count"); # test 6, 12, 18, 24
 
         my $date = $obj->build('date', $file);
-        is($$date, 'Nov 22, 2015 20:23', "get date $count"); # test 6, 11, 16, 21
+        is($$date, 'Nov 22, 2015 20:23', "get date $count"); # test 7, 13, 19, 25
 
         my $author = $obj->build('author', $file);
-        is($$author, 'Bernie Simon', "get author $count"); # test 7, 12, 17, 22
+        is($$author, 'Bernie Simon', "get author $count"); # test 8, 14, 20, 26
     }
 };

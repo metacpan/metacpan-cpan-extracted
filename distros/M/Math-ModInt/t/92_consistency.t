@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2019 Martin Becker, Blaubeuren.
+# Copyright (c) 2008-2021 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -147,8 +147,8 @@ my %pattern = (
     'script_ref'       =>
         qr{
             ^\s*\#[^\n]*\b
-            After\s+\`make\s+install\'\s+it\s+should\s+work\s+as\s+
-            \`perl\s+t/
+            After\s+['`]make\s+install\'\s+it\s+should\s+work\s+as\s+
+            ['`]perl\s+(?:t/)?
             ([\-\w]+\.t)
             \'
         }mx,
@@ -159,7 +159,11 @@ my %pattern = (
     'changes_version_headlines' =>
         qr{^\s*\Q$modname\E\s+(?:[Vv]ersion\s+)?(\d\S*)\s*$},
     'authormail_code' =>
-        qr[\QE<lt>$ambox\E(?:\@|E<64>|\s*\(at\)\s*)\Q${amhost}E<gt>\E],
+        qr[
+            \QE<lt>$ambox\E
+            (?:\@|E<64>|\s*\(at\)\s*|\s*I<at>\s*)
+            \Q${amhost}E<gt>\E
+        ]x,
     'package_line' => qr/^\s*package\s+(\w+(?:\:\:\w+)*)\s*;/,
     'version_line' => qr/^\s*(?:our\s*)\$VERSION\s*=\s*(.*?)\s*\z/,
     'version' => qr/^'([\d._]+)';\z/,
@@ -191,14 +195,23 @@ else {
 if (open FILE, '<', $README) {
     my $readme = <FILE>;
     close FILE;
-    my $found = $readme =~ /^(\S+)\s+version\s+(\d+\.\d+)\n/i;
-    test $found, "$README contains distro name and version number";
+    my $found = $readme =~ /^(\S+)(?:\s+version\s+(\d+\.\d+))?\n/i;
+    test $found, "$README contains distro name and optional version number";
     if ($found) {
         my ($readme_distname, $readme_version) = ($1, $2);
-        print "# $README refers to $readme_distname version $readme_version\n";
+        my $qrv =
+            defined($readme_version)?
+                "version $readme_version":
+                'without version';
+        print "# $README refers to $readme_distname $qrv\n";
         test $readme_distname eq $distname || $readme_distname eq $modname,
             "distro name in $README matches";
-        test $readme_version eq $mod_version, "version in $README matches";
+        if (defined $readme_version) {
+            test $readme_version eq $mod_version, "version in $README matches";
+        }
+        else {
+            skip 1, "version number not specified in $README";
+        }
     }
     else {
         skip 2, "unknown $README version";

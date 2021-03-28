@@ -22,18 +22,19 @@ require App::Followme::CreateIndex;
 
 my $test_dir = catdir(@path, 'test');
 
-rmtree($test_dir);
+rmtree($test_dir) if -e $test_dir;
 mkdir $test_dir  or die $!;
 chmod 0755, $test_dir;
 chdir $test_dir or die $!;
 
 my $archive_dir = catfile(@path, 'test', 'archive');
-	
+mkdir($archive_dir) unless -e $archive_dir;
+chmod 0755, $archive_dir;
+
 #----------------------------------------------------------------------
 # Create object
 
 my $template_file = 'template.htm';
-my $prototype_file = 'index.html';
 
 my %configuration = (
         top_directory => $test_dir,
@@ -128,41 +129,41 @@ my $body_ok = <<'EOQ';
 <p>All about three.</p>
 EOQ
 
-    fio_write_page($template_file, $index_template);
+   $template_file = catfile($test_dir, $template_file);
+   fio_write_page($template_file, $index_template);
 
-    mkdir($archive_dir) unless -e $archive_dir;
-    chdir($archive_dir) or die $!;
+   chdir($archive_dir) or die $!;
 
-    my ($index_name) = fio_to_file($archive_dir, $configuration{web_extension});
-    fio_write_page($index_name, $index_page);
+   my ($index_name) = fio_to_file($archive_dir, $configuration{web_extension});
+   fio_write_page($index_name, $index_page);
 
-    foreach my $count (qw(four three two one)) {
-        my $output = $page;
-        $output =~ s/%%/$count/g;
+   foreach my $count (qw(four three two one)) {
+      my $output = $page;
+      $output =~ s/%%/$count/g;
 
-        my $filename = catfile($archive_dir, "$count.html");
-        fio_write_page($filename, $output);
-    }
+      my $filename = catfile($archive_dir, "$count.html");
+      fio_write_page($filename, $output);
+   }
 
-    chdir($archive_dir) or die $!;
+   chdir($archive_dir) or die $!;
 
-    $configuration{base_directory} = $archive_dir;
-    my $idx = App::Followme::CreateIndex->new(%configuration);
-    $idx->run($archive_dir);
+   $configuration{base_directory} = $archive_dir;
+   my $idx = App::Followme::CreateIndex->new(%configuration);
+   $idx->run($archive_dir);
 
-    $page = fio_read_page($index_name);
-    ok($page, 'Write index page'); # test 3
+   $page = fio_read_page($index_name);
+   ok($page, 'Write index page'); # test 3
 
-    my $filled = $idx->sections_are_filled($index_name);
-    ok($filled, 'Test if sections are filled'); # test 4
+   my $filled = $idx->sections_are_filled($index_name);
+   ok($filled, 'Test if sections are filled'); # test 4
 
-    like($page, qr/Post four/, 'Index first page title'); # test 5
-    like($page, qr/Post two/, 'Index last page title'); # test 6
+   like($page, qr/Post four/, 'Index first page title'); # test 5
+   like($page, qr/Post two/, 'Index last page title'); # test 6
 
-    like($page, qr/<title>Stuff<\/title>/, 'Write index title'); # test 7
-    like($page, qr/<li><a href="archive\/two.html">Post two<\/a><\/li>/,
-       'Write index link'); #test 8
+   like($page, qr/<title>Stuff<\/title>/, 'Write index title'); # test 7
+   like($page, qr/<li><a href="archive\/two.html">Post two<\/a><\/li>/,
+      'Write index link'); #test 8
 
-    my $pos = index($page, $index_name);
-    is($pos, -1, 'Exclude index file'); # test 9
+   my $pos = index($page, $index_name);
+   is($pos, -1, 'Exclude index file'); # test 9
 };

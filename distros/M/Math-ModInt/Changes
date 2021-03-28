@@ -1,5 +1,10 @@
 Revision history for Perl extension Math::ModInt.
 
+0.013   Sun, 28 Mar 2021 08:29:12 +0200
+        - migrate from subversion to git
+        - switch bug tracker to github
+        - minor stylistic corrections
+
 0.012   Sat, 30 Nov 2019 11:31:39 +0100
         Minor improvements:
         - performance for short-lived event traps

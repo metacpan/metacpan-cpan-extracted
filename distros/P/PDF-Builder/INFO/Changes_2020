@@ -1,0 +1,354 @@
+See also INFO/Changes-ver_2 for changes released for PDF::API2, and 
+incorporated into PDF::Builder.
+See also INFO/Changes_2019 for earlier version 3 release logs.
+
+3.021     2020-12-28
+
+    Makefile.PL, CONTRIBUTING, INFO/SUPPORT, INFO/old/dist.ini.old, README.md
+     Some cleanup of email addresses and obsolete support venues.
+
+    Makefile.PL, lib/PDF/Builder.pm, t/00-all-usable.t
+     New minimum version for Image::PNG::Libpng is now 0.56. There was a change
+      introduced in 0.53 that broke PDF::Builder, but has now been fixed. As
+      far as we know, versions 0.47 through 0.52 should still work, if you 
+      happen to have that installed, but for automated install/upgrade, the 
+      new minimum is now 0.56.
+
+    lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm
+     Added some support for TIFF with alpha channel display [CTS 33, with some
+      help from 'carygravel']. Limited testing due to lack of sample .tif 
+      files, and currently not doing anything about transparency mask type or
+      any higher-numbered PhotometricInterpretation types.
+
+    tools/1_pc.pl, lib/PDF/Builder/Resource/Glyphs.pm, 
+      t/gif-png-pnm-rt120397-tiff.t
+     Clean up a few things Perl Critic doesn't like, and exclude a few more
+      frivolous things (in the exclusion list).
+
+    lib/PDF/Builder.pm, t/00-all-usable.t
+     Consolidate "optional" library versions to make update easier.
+
+    lib/PDF/Builder/Basic/PDF/File.pm
+     Change grep from expression format to { }, per PDF::API2 change.
+
+    README.md (added), README (removed), MANIFEST
+     Replace the plain text README with a markdown-formatted README.md
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Content-Lite-NamedDestination-UniWrap-
+      Util.pm, lib/PDF/Builder/Basic/PDF/Dict-File-Literal.pm,
+      lib/PDF/Builder/Basic/PDF/Filter/LZWDecode.pm, 
+      lib/PDF/Builder/Resource/CIDFont-ColorSpace-ExtGState-Font.pm,
+      lib/PDF/Builder/Resource/CIDFont/CJKFont-TrueType.pm,
+      lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm,
+      lib/PDF/Builder/Resource/ColorSpace/DeviceN-Indexed-Separation.pm,
+      lib/PDF/Builder/Resource/ColorSpace/Indexed/ACTFile-Hue-WebColor.pm,
+      lib/PDF/Builder/Resource/Font/BDFont-CoreFont-Postscript-SynFont.pm,
+      lib/PDF/Builder/Resource/XObject/Image/GD-GIF-PNM-TIFF-TIFF_GT.pm,
+      examples/Windows/Win32.pm, examples/Content-ContentText.pl,
+      examples/021_synfonts-023_cjkfonts-025_unifonts, 
+      tools/1_pc.pl, tools/3_examples.pl, t/deprecations.t
+     Change any "no warnings" directive to "use warnings", and fix any
+      resulting issues. This makes perlcritic and CPAN kwalitee a bit happier.
+
+      For now, just commented out "no warnings". If no reports of problems,
+      will physically remove commented-out lines in 3.022 or later. If you 
+      encounter Perl warnings from specific routines, you can uncomment the
+      "no warnings" and comment out "use warnings", to get past the warnings,
+      but please also file a bug report!
+
+    t/00-all-usable.t, Makefile.PL, lib/PDF/Builder.pm,
+      lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm
+     Make both t-tests and runtime a bit more robust if an optional library
+      (Graphics::TIFF and/or Image::PNG::Libpng) is installed, but back-level.
+
+3.020     2020-11-29
+
+    lib/PDF/Builder/Content-Outline-NamedDestination.pm, INFO/DEPRECATED
+     Rename previously deprecated names "spline" (to "qbspline") and "pdfile"
+     (to "pdf_file").
+
+    examples/042_links
+     Add some examples showing non-default positioning (fit) on 
+      target PDF's page.
+
+    lib/PDF/Builder/Basic/PDF/File.pm
+     Extend cross-reference stream handling (read-in PDFs) to cover field
+      widths of 5, 6, or 7 bytes (40-, 48-, or 56-bit integers). Special case
+      of 8 byte (64-bit integer) where top 32 bits are all 0, is treated as
+      32-bit integer to avoid requiring a 64-bit Perl build just for unpacking
+      this field.
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Docs.pm
+     Per [RT 130722, RT 133131, et al.] get any /Version override (in /Catalog)
+      and update the read-in PDF version (beyond 1.4, even if the PDF header
+      still claims 1.4). This minimizes extraneous warnings about having to
+      bump up the PDF version from what is claimed in the header.
+
+      Cross-check parent/kids links, report orphaned objects, report objects
+      referenced but not defined, report missing Info and Root objects, etc.
+      The input PDF file or string is not changed, but at least it can give
+      you an idea of why an error occurs, or the resulting PDF does not work
+      correctly.
+
+    lib/PDF/Builder/Basic/PDF/File.pm, INFO/RoadMap
+     Per [RT 133131, Vadim Repin's fix], change Quad int unpack code from Q 
+      to Q> to indicate "Big-Endian" byte order (MSB at left) for incoming data 
+      field in a cross-reference stream. Apparently, with just Q, Perl will 
+      assume the doubleword int is native format (for instance, Little-Endian 
+      on an Intel chip).
+      Note: This is a PDF 1.5+ feature (cross-reference streams) and has
+            no business being in a PDF 1.4 file (the original bug report).
+      Also add warning if imported file declared to be PDF 1.4 (or lower), as 
+      cross-reference streams are a PDF 1.5 feature. Earlier fix had added 
+      cross-reference stream support, but it really doesn't belong in PDF 1.4.
+
+    lib/PDF/Builder/Outline.pm, lib/PDF/Builder/Basic/PDF/Objind.pm
+     Per [RT 131657, Vadim Repin's fix] add weaken statements to eliminate
+      "Deep Recursion" error messages.
+
+    lib/PDF/Builder/Matrix.pm
+     Per latest changes to PDF::API2, some code cleanup in Matrix.pm (no
+      functional change except for adding some diagnostic carps). 
+
+    lib/PDF/Builder.pm  
+     Per [PR 139, by ppisar], replace some hard-coded checks for 
+      Graphics::TIFF and Image::PNG::Libpng with calls to LA_GT() and LA_IPL().
+
+    docs/buildDoc.pl, lib/PDF/Builder/Basic/PDF.pm, MANIFEST
+     Add NAVIGATION LINKS section to go Up to parent(s), sideways to 
+      Siblings, and Down to children. This enables you to get from any place 
+      in the docs to any place else without (usually) having to go all the way 
+      back up to index.html. PDF.pm added just for a place to put links (no
+      code).
+    
+    lib/PDF/Builder.pm, INFO/RoadMap  minor updates
+
+    lib/PDF/Builder.pm, README, INFO/LICENSE
+     Make license-related text more consistent, and attempt to clarify the 
+      relationship between the LGPL 2.1 master license and the various other 
+      licenses that some files are under, as well as the ability to 
+      redistribute under a higher version of LGPL. ref [CTS 35]
+
+    Makefile.PL, t/author-critic.t, tools/1_pc.pl
+     Update to fix some perlcritic warnings, enable author-critic (not useful,
+      as tools/1_pc.pl does a better job of it). Suggested by 'carygravel',
+      but [PR 135] rejected, as 1_pc is a superset of author-critic function.
+      Can't change .perlcriticrc SEVERITY from 5 to 4, as the GitHub Actions
+      CI testing appears to be using it, leading to a lot of errors.
+
+    lib/PDF/Builder/Resource/XObject/Image/TIFF/File_GT.pm, t/tiff.t, 
+      lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm, Makefile.PL, 
+      lib/PDF/Builder.pm, lib/PDF/Builder/Resource/XObject/Image/TIFF.pm,
+     Fix problem with reading colormap from TIFF [GH 133], by 'carygravel'.
+      Note that this requires upgrade of Graphics::TIFF from 6 to 7.
+
+    t/tiff.t  upgrade so tests 10 and 11 are no longer always skipped. This 
+      works only on a Linux system (definitely not on Windows), and makes use
+      of ImageMagick and Linux utilities 'convert' and 'tiffcp'. Graphics::TIFF
+      is needed for test 10, and test 9 (alpha layer) is still skipped. Thanks
+      to GitHub user 'carygravel' for the upgrade.
+
+    INFO/DEPRECATED   add a couple long-deprecated items ("PDFStr" and 
+      "PDFUtf") that were missing from this file.
+
+    INFO/RoadMap, lib/PDF/Builder/Docs.pm  add discussion on why images
+      (especially JPEG) are sometimes rotated and/or flipped, and what can be
+      done about it.
+
+    t/fonts-synfont.t, t/fonts-ttf.t fix a couple paths to DejaVu fonts on
+      certain Linux boxes. From 'gregoa' at Debian Perl Group.
+
+    lib/PDF/Builder/Resource/XObject/Image/PNM.pm
+     Bi-level (1 bit per pixel) PNM/PBM image was not being handled 
+      correctly if the row length (width) was not a multiple of 8. Not enough 
+      data was copied over to the PDF. Continuation of [RT 132844].
+     Almost complete rewrite of PNM.pm to properly support all combinations
+      of comments in the header, and support "plain" (ASCII) image files
+      (P1..P3) and 16 bit samples for grayscale and RGB. Not yet supporting
+      multiple images per file, as I don't have any firm definition!
+
+    lib/PDF/Builder/Resource/XObject/Image/PNG_IPL.pm
+     Make use of the new 'split_alpha' call in new release 0.47 of 
+      Image::PNG::Libpng (this version specified as minimum, for optional
+      library installation). This brings the speed for RGB and Gray scale
+      with Alpha channels up to reasonable levels, as the 'vec' call is no
+      longer called (4 or 8 times per pixel). Note that in contrast to
+      PDF::API2, both 8 and 16bps samples are supported, and Gray scale is
+      supported, at high speed; not just 8bps RGBA.
+
+    lib/PDF/Builder/Docs.pm, Makefile.PL, README, t/00-all-usable.t
+     PDF::Builder will (again) attempt to install or upgrade OPTIONAL 
+      libraries (see README). Includes a warning in Makefile.PL not to be
+      unduly alarmed if an optional install should fail. The user is given
+      a choice of selecting none/all/specific optional libraries when 
+      running Makefile.PL (default "all").
+
+    README  add instructions for installing on pre-5.020 Perls, which may be
+      adaptable to other OS's and Perls. Note that there's no guarantee that
+      PDF::Builder will actually RUN on older Perls! (But you're welcome to
+      try.)
+
+    lib/PDF/Builder/Docs-Content.pm, lib/PDF/Builder/Content/Text.pm
+     Fix spelling errors/typos, per report by 'carygravel'.
+
+    lib/PDF/Builder/Resource/PaperSizes.pm
+     Fix a couple missized entries (B7 and jr-Legal), added a bunch more
+      sizes (mostly archaic American and British sizes): dbill, statement 
+      (= student), half-letter (= student), old-paper, b-plus 
+      (B+/Super-B/A3+/super-A3), arch-a, arch-b, arch-c, arch-d, arch-e, 
+      arch-e1, pott, post, large-post, crown, large-crown, demy, small-demy, 
+      medium, royal, small-royal, super-royal, imperial, a7, a8, a9, a10.
+
+      Note that some "standard" sizes, such as broadsheet and foolscap, seem
+      to have a different size specification depending on where you look. You
+      should check that the size used matches your actual paper supply, and to
+      either update PaperSizes.pm to match, or specify the MediaBox in points
+      instead of by name. This is probably a good idea with any unusual,
+      large, archaic, or special-order paper... you want to check what its
+      actual size is before going through a lot of expensive failed printing!
+
+    examples/HarfBuzz.pl, examples/resources/HarfBuzz_example.pdf
+     In the updated 3.019 example, note that the entire AdobeMingStd-Light.otf 
+      font (ttfont call) appears to be embedded, rather than just the subset. 
+      This resulted in 3.019 being about 8MB larger than 3.018's version! It may
+      be related to bug [RT 130041]. Use caution when embedding CJK fonts, even 
+      when not using the cjkfont call, as at least some apparently don't subset.
+      I replaced the font with AdobeGothicStd-Light.otf, which appears to embed 
+      just a subset of the font, greatly reducing the size of the PDF file.
+
+3.019     2020-07-27   
+
+    lib/PDF/Builder/Content/Text.pm  Per [CTS 31], expand documentation of
+      textlabel() call to emphasize that it is a standalone call, and doesn't
+      play nicely with other text-output calls (such as not leaving a current
+      position for the next write). It is intended for one-off labels, etc.
+
+    lib/PDF/Builder/Content.pm, examples/HarfBuzz.pl, 
+      examples/resources/HarfBuzz_example.pdf
+     Support TTB (top to bottom) and BTT (bottom to top) vertical text in 
+      textHS(), now that HarfBuzz::Shaper supports these modes. Requires 
+      HarfBuzz::Shaper 0.23 or higher for TTB and BTT support, 0.21 for just 
+      LTR and RTL support. The "example" PDF is provided in case you don't
+      yet have HarfBuzz::Shaper installed, and want to see what it does. TTB is
+      recommended for both normally RTL (bidirectional) and LTR languages. 
+      Vertical writing is most often used with East Asian languages.
+
+    .perl-version, Makefile.PL, README
+     New minimum Perl version 5.20, which is already 6 years old, so we don't
+      waste a lot of time chasing down bugs due to ancient Perl versions.
+      PDF::Builder will likely work with older Perl versions, but your installer
+      (e.g., cpan or cpanm) might refuse to install it.
+
+    examples/042_links, examples/README, examples/examples_output, 
+      tools/3_examples.pl, lib/PDF/Builder/Annotation.pm, MANIFEST
+     Per [CTS 29], improved documentation of annotation-based links: PDF links 
+      and targets.
+
+    lib/PDF/Builder/Content.pm, lib/PDF/Builder/Resource/XObject/Image/PNM.pm
+     image() and form_image() calls default x,y to 0,0, so can call without
+      lower left corner x,y. PNM processing [RT 132844] fix routine forgetting 
+      where it is in the PNM file and failing to read part of it. Note that
+      132844 is still open, as PNM handling has not yet been thoroughly checked.
+
+    lib/PDF/Builder/Resource/XObject/Image/PNG-PNG_IPL.pm ref PR #25 for 
+      PDF::API2. Some have reported that apparently there can be some cases 
+      where the deletion of some streams may cause errors in the vec() calls. 
+      This may be dependent on the Perl version, use of nonstandard flags 
+      (such as -e), or other unusual usage.
+
+    lib/PDF/Builder/Resource/Font/CoreFont/courier-courierbold-courieroblique-
+      courierboldoblique-helvetica-helveticabold-helveticaoblique-
+      helveticaboldoblique-timesroman-timesbold-timesitalic-timesbolditalic-
+      symbol-zapfdingbats.pm, t/text.t
+     In 3.018, the Core Font metrics (in particular, the 'wx' character widths) 
+      were changed to use the values in the TTF files actually used (at least, 
+      on Windows systems). Per [CTS 27] et al., I received complaints about 
+      3.018 not using the exact Adobe font metrics for Core Fonts as before. I 
+      have gone back to using the canonical Adobe metrics, even though (for 
+      core fonts) this is likely to result in a small mismatch between the 
+      indicated glyph width and the actual glyph displayed. In most cases it's 
+      just one glyph grid unit wider (e.g., 667 instead of 666), which should 
+      have no visible effect in any real document. However, there were a 
+      handful of (rather esoteric) glyphs where the difference was 
+      considerable. I compared the claimed widths for both Adobe metrics and 
+      the TTF metrics, and picked one or the other, or even devised a new 
+      width. These are documented in the .pm files under 'wx' (widths).
+
+      Note that these are only the base 14 core fonts. The 15 Windows fonts 
+      were not changed, as there is no Adobe AFM standard for them.
+
+    INFO/CONVERSION, MANIFEST, README add conversion info for going from
+      PDF::API2 to PDF::Builder.
+
+    INFO/RoadMap minor updates
+
+3.018     2020-04-24 
+
+    lib/PDF/Builder/Content.pm-Page.pm
+     [RT 132403] clarify documentation on the two different rotate() methods.
+
+    lib/PDF/Builder/Content/Hyphenate_basic.pm, lib/PDF/Builder/Content.pm-
+      Docs.pm, lib/PDF/Builder/Resource/BaseFont.pm, examples/HarfBuzz.pl, 
+      examples/resources/HarfBuzz_example.pdf, examples/examples.output, 
+      examples/README, tools/3_examples.pl, INFO/old/examples.bat, 
+      Makefile.PL, README, MANIFEST
+     Implement support for use of HarfBuzz::Shaper (to shape chunks of text).
+      [RT 113700] This is an optional installation (manually done). 
+      examples/HarfBuzz.pl will not run if you do not have HarfBuzz::Shaper 
+      installed.  HarfBuzz_example.pdf is provided in examples/resources/ in 
+      case you can't (yet) run HarfBuzz.pl. It demonstrates the use of 
+      HarfBuzz::Shaper for a variety of Western (ligatures and kerning), 
+      Middle Eastern (script and RTL), and South and Southeast Asian scripts.
+
+    lib/PDF/Builder/Content.pm  Add 'none' option to text underline and
+      strikethrough options. This was added to permit the option (underline or
+      strikethrough) to be given in the code, but allow a 'none' value in 
+      those cases where drawing an underline or strikethrough is not desired.
+      This is still the default.
+
+    examples/021_synfonts, examples/examples.output, examples/README
+     The synthetic font example only showed for regular BankGothic font.
+      Added bold, bold-italic, and italic cases. Note that there is something
+      a bit odd about Bank Gothic -- it looks like it may only have regular
+      weight (no bold) and the italic is questionable.
+
+    tools/TTFdump.pl, MANIFEST, lib/PDF/Builder/Resource/Font/CoreFont.pm,
+      lib/PDF/Builder/Resource/BaseFont.pm, examples/022_truefonts,
+      lib/PDF/Builder/Resource/Font/CoreFont/courier*.pm-
+      helvetica*.pm-times*.pm-georgia*.pm-trebuchet*.pm-verdana*.pm
+     Add full set of glyph widths to core font metrics files [RT 57248].
+      This is intended to allow correct rendering of non-Latin-1 single
+      byte fonts, by expanding the width listing beyond Latin-1. A utility
+      is provided to read a TTF/OTF font and return glyph lists in a format
+      that can be dropped into a [typeface].pm file. Only glyph widths table
+      was changed (no other metrics). Arial was used for Helvetica metrics,
+      BankGothic could not be found (not sure what's being substituted for
+      it), and various symbology fonts were not changed. Courier "missing
+      width" updated to reflect the character used to indicate a missing glyph.
+
+    INFO/RoadMap  Update some items. Mention other packages PDF::Table,
+      Text::Layout, and HarfBuzz::Shaper that may be useful.
+
+    lib/PDF/Builder/Resource/CIDFont.pm  For TTF (ttfont) fix improper 
+      ToUnicode cmap so that a PDF may be searched (was broken in 3.016).
+
+    lib/PDF/Builder/Content.pm  Add example of using add() function to
+      cancel Chrome browser scaling and Y-axis flip before new content is
+      added to an existing PDF.
+
+    lib/PDF/Builder/Content.pm, lib/PDF/Builder/Content/Text.pm
+      Remind users not to use charspace() when working with a connected (script)
+      font such as Arabic, Devanagari, cursive handwriting, etc. Add -nocs
+      option to text line fill (justified) routines to not use any charspace()
+      values when expanding or shrinking text content to fit.
+
+    lib/PDF/Builder/Basic/PDF/File.pm. The earlier fix for corrupted xref table
+      only ran under diagnostics. Now only the warning message is under the
+      diagnostics flag (-diags), and the fixup attempt is always run.
+
+    INFO/Changes_2019, Changes, MANIFEST, lib/PDF/Builder.pm, README,
+     Makefile.PL, INFO/KNOWN_INCOMP
+      3.017 build/release, 2020 copyright, archive 2019 changes.
+      
+(see INFO/Changes_2019 for earlier changes)
+(see INFO/Changes-ver_2 for changes to PDF::API2 up through 2.033)

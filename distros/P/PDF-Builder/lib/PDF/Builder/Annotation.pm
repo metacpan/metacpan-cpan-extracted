@@ -5,10 +5,11 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
+use List::Util qw(min max);
 
 =head1 NAME
 
@@ -198,6 +199,12 @@ Any I<AP> dictionary entry will override the -icon setting.
 
 A I<reference> to an icon may be passed instead of a name.
 
+=item -opacity => I<value>
+
+Define the opacity (non-transparency, opaqueness) of the icon. This value
+ranges from 0.0 (transparent) to 1.0 (fully opaque), and applies to both
+the outline and the fill color. The default is 1.0.
+
 =back
 
 =cut
@@ -215,7 +222,12 @@ sub text {
     $self->open($options{'-open'}) if defined $options{'-open'};
     $self->Color(@{$options{'-color'}}) if defined $options{'-color'};
     # popup label (title)
+    # have seen /T as (xFEFF UTF-16 chars)
     $self->{'T'} = PDFString($options{'-text'}, 'p') if exists $options{'-text'};
+    # icon opacity?
+    if (defined $options{'-opacity'}) {
+        $self->{'CA'} = PDFNum($options{'-opacity'});
+    }
 
     # Icon Name will be ignored if there is an AP.
     my $icon;  # perlcritic doesn't want 2 lines combined
@@ -223,6 +235,112 @@ sub text {
     $self->{'Name'} = PDFName($icon) if $icon && !ref($icon); # icon name
     # Set the icon appearance
     $self->icon_appearance($icon, %options) if $icon;
+
+    return $self;
+}
+
+=item $annotation->markup($text, $PointList, $highlight, %options)
+
+Defines the annotation as a text note with content string C<$text> and
+options %options (-rect, -color, -text, -open: see descriptions below). 
+The C<$text> may include newlines \n for multiple lines.
+
+C<-text> is the popup's label string, not to be confused with the main C<$text>.
+
+There is no icon. Instead, the annotated text marked by C<$PointList> is
+highlighted in one of four ways specified by C<$highlight>. 
+
+=over
+
+=item $PointList => [ 8n numbers ]
+
+One or more sets of numeric coordinates are given, defining the quadrilateral
+(usually a rectangle) around the text to be highlighted and selectable
+(clickable, to bring up the annotation text). These
+are four sets of C<x,y> coordinates, given (for Left-to-Right text) as the 
+upper bound Upper Left to Upper Right and then the lower bound Lower Left to 
+Lower Right. B<Note that this is different from what is (erroneously)
+documented in the PDF specification!> It is important that the coordinates be
+given in this order.
+
+Multiple sets of quadrilateral corners may be given, such as for highlighted
+text that wraps around to new line(s). The minimum is one set (8 numbers).
+Any I<AP> dictionary entry will override the C<$PointList> setting. Finally,
+the "Rect" selection rectangle is created I<just outside> the convex bounding
+box defined by C<$PointList>.
+
+=item $highlight => 'string'
+
+The following highlighting effects are permitted. The C<string> must be 
+spelled and capitalized I<exactly> as given:
+
+=over
+
+=item Highlight
+
+The effect of a translucent "highlighter" marker.
+
+=item Squiggly 
+
+The effect is an underline written in a "squiggly" manner.
+
+=item StrikeOut
+
+The text is struck-through with a straight line. 
+
+=item Underline 
+
+The text is marked by a straight underline.
+
+=back
+
+=item -color => I<array of values>
+
+If C<-color> is not given (an array of numbers in the range 0.0-1.0), a 
+medium gray should be used by default. 
+Named colors are not supported at this time.
+
+=item -opacity => I<value>
+
+Define the opacity (non-transparency, opaqueness) of the icon. This value
+ranges from 0.0 (transparent) to 1.0 (fully opaque), and applies to both
+the outline and the fill color. The default is 1.0.
+
+=back
+
+=cut
+
+sub markup {
+    my ($self, $text, $PointList, $highlight, %options) = @_;
+
+    my @pointList = @{ $PointList };
+    if ((scalar @pointList) == 0 || (scalar @pointList)%8) {
+	die "markup point list does not have 8*N entries!\n";
+    }
+    $self->{'Subtype'} = PDFName($highlight);
+    delete $self->{'Border'};
+    $self->{'QuadPoints'} = PDFArray(map {PDFNum($_)} @pointList);
+    $self->content($text);
+
+    my $minX = min($pointList[0], $pointList[2], $pointList[4], $pointList[6]);
+    my $maxX = max($pointList[0], $pointList[2], $pointList[4], $pointList[6]);
+    my $minY = min($pointList[1], $pointList[3], $pointList[5], $pointList[7]);
+    my $maxY = max($pointList[1], $pointList[3], $pointList[5], $pointList[7]);
+    $self->rect($minX-.5,$minY-.5, $maxX+.5,$maxY+.5);
+
+    $self->open($options{'-open'}) if defined $options{'-open'};
+    if (defined $options{'-color'}) {
+        $self->Color(@{$options{'-color'}});
+    } else {
+        $self->Color([]);
+    }
+    # popup label (title)
+    # have seen /T as (xFEFF UTF-16 chars)
+    $self->{'T'} = PDFString($options{'-text'}, 'p') if exists $options{'-text'};
+    # opacity?
+    if (defined $options{'-opacity'}) {
+        $self->{'CA'} = PDFNum($options{'-opacity'});
+    }
 
     return $self;
 }
@@ -313,6 +431,12 @@ Any I<AP> dictionary entry will override the -icon setting.
 
 A I<reference> to an icon may be passed instead of a name.
 
+=item -opacity => I<value>
+
+Define the opacity (non-transparency, opaqueness) of the icon. This value
+ranges from 0.0 (transparent) to 1.0 (fully opaque), and applies to both
+the outline and the fill color. The default is 1.0.
+
 =item -notrimpath => 1
 
 If given, show the entire path and file name on mouse rollover, rather than
@@ -323,6 +447,13 @@ just the file name.
 A text label for the popup (on mouseover) that contains the file name.
 
 =back
+
+Note that while PDF permits different specifications (paths) to DOS/Windows,
+Mac, and Unix (including Linux) versions of a file, and different format copies 
+to be embedded, at this time PDF::Builder only permits a single file (format of
+your choice) to be embedded. If there is user demand for multiple file formats
+to be referenced and/or embedded, we could look into providing this, I<although
+separate OS version paths B<may> be considered obsolescent!>.
 
 =cut
 
@@ -339,6 +470,10 @@ sub file_attachment {
     $self->rect(@{$options{'-rect'}}) if defined $options{'-rect'};
     # descriptive text on mouse rollover
     $self->{'T'} = PDFString($options{'-text'}, 'p') if exists $options{'-text'};
+    # icon opacity?
+    if (defined $options{'-opacity'}) {
+        $self->{'CA'} = PDFNum($options{'-opacity'});
+    }
 
     $self->{'Subtype'} = PDFName('FileAttachment');
 
@@ -380,7 +515,7 @@ sub file_attachment {
     # The File Specification.
     $self->{'FS'} = PDFDict();
     $self->{'FS'}->{'F'} = PDFString($file, 'f');
-    $self->{'FS'}->{'Type'} = PDFName('F');
+    $self->{'FS'}->{'Type'} = PDFName('Filespec');
     $self->{'FS'}->{'EF'} = PDFDict($file);
     $self->{'FS'}->{'EF'}->{'F'} = PDFDict($file);
     $self->{' apipdf'}->new_obj($self->{'FS'}->{'EF'}->{'F'});
@@ -671,6 +806,8 @@ value is used, without any message. If no color is given, the usual fill color
 is black.
 
 Defining option:
+
+Named colors are not supported at this time.
 
 =over
 

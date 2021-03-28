@@ -37,13 +37,14 @@ require App::Followme::EditSections;
 
 my $test_dir = catdir(@path, 'test');
 
-rmtree($test_dir);
+rmtree($test_dir) if -e $test_dir;
 mkdir $test_dir  or die $!;
 chmod 0755, $test_dir;
 
 my $sub_dir = catfile(@path, "test", "sub"); 
 mkdir $sub_dir or die $!;
 chmod 0755, $sub_dir;
+
 chdir $test_dir or die $!;
 
 my %configuration = (
@@ -81,21 +82,15 @@ EOQ
 
     my $es = App::Followme::EditSections->new(%configuration);
 
-    foreach my $dir (('sub', '')) {
+    foreach my $dir (($sub_dir, $test_dir)) {
         foreach my $count (qw(four three two one)) {
             my $output = $page;
             $output =~ s/%%/$count/g;
 
-            my $filename;
-            if ($dir) {
-                $filename = catfile($test_dir, $dir, $count);
-            } else {
-                $filename = catfile($test_dir, $count);
-            }
-            $filename .= '.html';
+            my $filename = catfile($dir, "$count.html");
 
 			my $sec;
-            if ($count eq 'one' && $dir eq '') {
+            if ($count eq 'one' && $dir eq $test_dir) {
                 $output =~ s/begin/section/g;
                 $output =~ s/end/endsection/g;
                 $sec = 0;
@@ -176,18 +171,11 @@ do {
 </html>
 EOQ
 
-    foreach my $dir (('sub', '')) {
+    foreach my $dir (($sub_dir, $test_dir)) {
         for my $count (qw(one two three four)) {
-            next if $count eq 'one' && $dir eq '';
+            next if $count eq 'one' && $dir eq $test_dir;
 
-            my $filename;
-            if ($dir) {
-                $filename = catfile($test_dir, $dir, $count);
-            } else {
-                $filename = catfile($test_dir, $count);
-            }
-            $filename .= '.html';
-
+            my $filename = catfile($dir, "$count.html");
             my $output = fio_read_page($filename);
 
             my $output_ok = $output_template;

@@ -6,8 +6,8 @@ use strict;
 use warnings;
 #no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 use Math::Trig;    # CAUTION: deg2rad(0) = deg2rad(360) = 0!
 use Unicode::UCD 'charinfo';
@@ -63,9 +63,6 @@ I<-condense>
 ... condense/expand factor (0.1-0.9 = condense, 1 = normal, 1.1+ = expand).
 It's the multiplier for character widths vs. normal.
 
-I<-slant>
-... B<DEPRECATED>, will be removed. Use C<-condense> instead.
-
 I<-oblique>
 ... italic angle (+/-) in degrees, where the character box is skewed. While 
 it's unlikely that anyone will want to slant characters at +/-360 degrees, they 
@@ -95,8 +92,7 @@ sub new
     my %opts = @opts;
     my $first = 1;
     my $last = 255;
-    # TBD after January 2021 remove -slant
-    my $cond = $opts{'-condense'} || $opts{'-slant'} || 1;
+    my $cond = $opts{'-condense'} || 1;
     my $oblique = $opts{'-oblique'} || 0;
     my $space = $opts{'-space'} || '0';
     my $bold = ($opts{'-bold'} || 0)*10; # convert to em
@@ -134,7 +130,7 @@ sub new
         'iscore' => '0',
         'isfixedpitch' => $font->isfixedpitch(),
         'italicangle' => $font->italicangle() + $oblique,
-        'missingwidth' => $font->missingwidth() * $cond,
+        'missingwidth' => ($font->missingwidth()||300) * $cond,
         'underlineposition' => $font->underlineposition(),
         'underlinethickness' => $font->underlinethickness(),
         'xheight' => $font->xheight(),
@@ -315,7 +311,7 @@ sub new
         }
 
 	# finale... all modifications to font have been done
-        $char->{' stream'} .= " Tj\nET\n";
+        $char->{' stream'} .= " Tj\nET ";
         push @widths, $wth;
         $self->data()->{'wx'}->{$font->glyphByEnc($w)} = $wth;
         $pdf->new_obj($char);

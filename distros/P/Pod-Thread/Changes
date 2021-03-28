@@ -1,0 +1,87 @@
+                     Revision history for Pod::Thread
+
+2.00 - 2021-03-28
+
+ - Table of contents and navbar generation is now handled internally in
+   the Pod::Thread module rather than with a pre-scanning pass.  The
+   contents and navbar module constructor options are now simple booleans.
+ - Don't title-case words in section titles in the navbar that contain an
+   underscore.
+ - CVS Id strings are now honored if found anywhere in the document.
+ - Change documentation references from Pod::Parser to Pod::Simple.
+ - Change the licensing to the Expat (MIT) license.
+ - Require Perl 5.24 or later.
+
+1.01 - 2013-06-30
+
+ - Remove single spaces at the start of lines in wrapped paragraphs.
+ - Encode output in UTF-8 if necessary.
+ - Strip formatting codes from headings that will go into the table of
+   contents or navbar, and fix the algorithm for adding anchors to account
+   for this transformation.
+ - Use Module::Build as the build system.
+
+1.00 - 2013-01-05
+
+ - Rewritten to use Pod::Simple as the underlying POD parser.
+ - Fix formatting of =item tags that look numeric but are meant as text.
+ - Only add angle brackets around URLs if there was no anchor text.
+ - Add dependency on Readonly.
+ - Require Perl 5.008 or later.
+
+0.12 - 2009-01-25
+
+ - Print saved whitespace to the thread output as intended.
+ - Do not treat =item 0 as a bullet.
+
+0.11 - 2008-11-12
+
+ - Require Perl 5.006 or later.
+
+0.10 - 2008-04-15
+
+ - Fix tracking of the special-cased NAME section.
+ - Interpolate headings before adding them to the table of contents or
+   navbar.
+
+0.09 - 2002-09-15
+
+ - Escape square brackets using \entity.
+
+0.08 - 2002-09-15
+
+ - Tag F<> sequences with the HTML class "file" for style sheet support.
+ - Fix handling of nested description lists.
+
+0.07 - 2002-09-15
+
+ - Only treat an =item tag as a bullet if it is a literal *, fixing *Z<>.
+ - Use \class instead of \p following changes in spin.
+ - Use \number instead of \packnumber following changes in spin.
+
+0.06 - 2002-09-11
+
+ - Add support for overriding the title of the output.
+ - Ensure verbatim blocks end with two newlines.
+ - Add support for a table of contents and navbar.
+ - Add proper internal links to headings in the table of contents or
+   navbar.
+ - Support multiple comma-separated page names in NAME.
+ - Improve handing of the CVS Id tag.
+
+0.05 - 2002-06-29
+
+ - Use special entities only when necessary in HTML 4.0.
+
+0.03 - 2002-06-28
+
+ - Do not forcibly break long lines.
+ - Fix reference to the CVS Id tag in the source.
+
+0.02 - 2002-06-28
+
+ - Be more conservative about recognizing Id tags in the input.
+
+0.01 - 2002-06-27
+
+ - Initial release.

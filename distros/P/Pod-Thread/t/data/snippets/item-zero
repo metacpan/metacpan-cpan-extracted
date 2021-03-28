@@ -1,0 +1,22 @@
+[name]
+=item with 0
+
+[input]
+=head1 ITEM 0
+
+=over 4
+
+=item 0
+
+Some 0 item.
+
+=back
+
+[output]
+\h2(#S1)[ITEM 0]
+
+\desc[0]
+[Some 0 item.
+]
+
+\signature

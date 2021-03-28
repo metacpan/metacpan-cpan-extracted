@@ -9,12 +9,6 @@ user in an emergency), but eventually they WILL be removed.
 
 In order of scheduled removal date:
 
--slant          option in Synfont.pm
-   This option was renamed to -condense, as it is the factor to condense
-   (multiply width by < 1) or expand (multiply width by > 1) text characters. 
-   Use "-condense" instead. -slant is scheduled to be removed on or after
-   January, 2021.
-
 elementsof()    method in a number of Basic/PDF/ routines
    This method was renamed to elements(). elementsof() is scheduled to be
    removed on or after August, 2021.
@@ -34,6 +28,12 @@ PDFStr()        method in Basic/PDF/Utils.pm
 
 PDFUtf()        method in Basic/PDF/Utils.pm
    Use PDFString() instead. May be removed on or after October, 2022.
+
+lead()          method in Content.pm
+   Use leading() instead. May be removed on or after March, 2023.
+
+textlead()      method in Lite.pm
+   Use textleading() instead. May be removed on or after March, 2023.
 
 *** If I have missed any deprecated interfaces, please let me know! ***
 
@@ -139,4 +139,10 @@ pdfile          method in Outline.pm, NamedDestination.pm
    This functionality was renamed to pdf_file(). Simply rename any call to
    "pdfile" to "pdf_file". pdfile is scheduled to be removed on or after
    October, 2020. [Removed November, 2020]
+
+-slant          option in Synfont.pm
+   This option was renamed to -condense, as it is the factor to condense
+   (multiply width by < 1) or expand (multiply width by > 1) text characters. 
+   Use "-condense" instead. -slant is scheduled to be removed on or after
+   January, 2021. [Removed February, 2021]
 

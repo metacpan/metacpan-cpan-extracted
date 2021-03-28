@@ -71529,3 +71529,14 @@ P/PE/PERLANCAR/Perinci-Sub-XCompletionBundle-Finance-SE-IDX-0.001.tar.gz
 M/MA/MATISSE/Perl-Metrics-Simple-v1.0.1.tar.gz
 P/PE/PEVANS/Syntax-Keyword-Try-0.23.tar.gz
 N/NE/NEILB/UNIVERSAL-require-0.19.tar.gz
+J/JI/JINZANG/App-Followme-2.02.tar.gz
+D/DO/DONGXU/JSON-JQ-0.05.tar.gz
+R/RA/RAJ/Lingua-IN-TGC-2.06.tar.gz
+M/MH/MHASCH/Math-ModInt-0.013.tar.gz
+P/PM/PMPERRY/PDF-Builder-3.022.tar.gz
+W/WY/WYANT/Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives-0.004.tar.gz
+W/WY/WYANT/Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter-0.110.tar.gz
+R/RR/RRA/Pod-Thread-2.00.tar.gz
+V/VI/VITAHALL/Text-FrontMatter-YAML-0.11.tar.gz
+D/DE/DERF/Travel-Status-DE-VRR-1.20.tar.gz
+T/TI/TIMLEGGE/XML-Sig-0.47.tar.gz

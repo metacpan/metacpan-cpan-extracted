@@ -38,10 +38,18 @@ eval "use App::Followme::Web";
 
 my $test_dir = catdir(@path, 'test');
 
-rmtree($test_dir);
+rmtree($test_dir) if -e $test_dir;
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
 chdir $test_dir or die $!;
+
+my $sub_one = catdir($test_dir, 'sub-one');
+mkdir $sub_one or die $!;
+chmod 0755, $sub_one;
+
+my $sub_two = catdir($test_dir, 'sub-two');
+mkdir $sub_two or die $!;
+chmod 0755, $sub_two;
 
 #----------------------------------------------------------------------
 # Test same file
@@ -121,29 +129,20 @@ EOQ
     my @ok_folders;
     my @ok_filenames;
 
-    foreach my $dir (('', 'sub-one', 'sub-two')) {
-        if ($dir ne '') {
-            my $subdir = catfile($test_dir, $dir);
-            mkdir $subdir or die $!;
-            chmod 0755, $subdir;
-            push(@ok_folders, $subdir);
-        }
+    foreach my $dir (($test_dir, $sub_one, $sub_two)) {
+        push(@ok_folders, $dir) if $dir ne $test_dir;
 
         foreach my $count (qw(first second third)) {
             my $output = $code;
             $output =~ s/%%/Page $count/g;
             $output =~ s/&&/$dir link/g;
 
-            my @dirs;
-            push(@dirs, $test_dir);
-            push(@dirs, $dir) if $dir;
-
-            my $filename = catfile(@dirs, "$count.html");
-            push(@ok_filenames, $filename) if $dir eq '';
+            my $filename = catfile($dir, "$count.html");
+            push(@ok_filenames, $filename) if $dir eq $test_dir;
 
             fio_write_page($filename, $output);
-
             my $input = fio_read_page($filename);
+            
             is($input, $output, "Read and write page $filename"); #tests 8-16
         }
     }

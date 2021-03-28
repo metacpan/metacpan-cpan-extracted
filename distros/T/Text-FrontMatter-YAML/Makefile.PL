@@ -8,18 +8,16 @@ my %MakefileOptions = (
     VERSION_FROM        => 'lib/Text/FrontMatter/YAML.pm',
     ABSTRACT_FROM       => 'lib/Text/FrontMatter/YAML.pm',
     MIN_PERL_VERSION    => '5.10.1',
-    ($ExtUtils::MakeMaker::VERSION >= 6.3002
-      ? ('LICENSE'=> 'perl')
-      : ()),
+    LICENSE             => 'perl_5',
     PL_FILES            => {},
     PREREQ_PM => {
         'Carp'          => 0,
         'Encode'        => 0,
         'YAML::Tiny'    => 0,
     },
-    BUILD_REQUIRES => {
+    TEST_REQUIRES => {
         'Test::More'    => '0.88',
-        'Encode'        => 0,
+        'Test::Fatal'   => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

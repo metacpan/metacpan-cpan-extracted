@@ -18,7 +18,7 @@ name: JSON-JQ
 provides:
   JSON::JQ:
     file: lib/JSON/JQ.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Alien::LibJQ: '0.04'
   JSON: '0'
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/dxma/perl5-json-jq/issues
   license: http://opensource.org/licenses/mit-license.php
   repository: https://github.com/dxma/perl5-json-jq
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

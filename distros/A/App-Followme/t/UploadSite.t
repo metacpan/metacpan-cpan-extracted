@@ -22,14 +22,17 @@ require App::Followme::UploadSite;
 
 my $test_dir = catdir(@path, 'test');
 my $local_dir = catdir(@path, 'test', 'local');
+my $sub_dir = catdir(@path, 'test', 'local', 'sub');
 my $remote_dir = catdir(@path, 'test', 'remote');
 my $state_dir = catdir(@path, 'test', 'local', '_state');
 
-rmtree($test_dir);
+rmtree($test_dir) if -e $test_dir;
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
 mkdir $local_dir or die $!;
 chmod 0755, $local_dir;
+mkdir $sub_dir or die $!;
+chmod 0755, $sub_dir;
 mkdir $remote_dir or die $!;
 chmod 0755, $remote_dir;
 mkdir $state_dir or die $!;
@@ -118,12 +121,10 @@ EOQ
 
     my $local = {};
     my $hash_ok = {};
-    foreach my $dir (('', 'sub')) {
-        if ($dir) {
-            my $directory = catdir($local_dir, $dir);
-            mkdir $directory;
-            chmod 0755, $directory;
+    my %info = ('' => $local_dir, 'sub' => $sub_dir);
 
+    while (my ($dir, $directory) = each %info) {
+        if ($dir) {
             $local->{$dir} = 1;
             $hash_ok->{$dir} = 'dir';
         }
@@ -134,7 +135,7 @@ EOQ
             $output =~ s/%%/$count/g;
 
             my $file = $dir ? catfile($dir, "$count.html") : "$count.html";
-            my $filename = catfile($local_dir, $file);
+            my $filename = catfile($directory, "$count.html");
             fio_write_page($filename, $output);
 
             $local->{$file} = 1;

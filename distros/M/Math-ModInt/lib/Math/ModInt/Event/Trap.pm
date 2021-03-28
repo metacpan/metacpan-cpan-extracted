@@ -1,7 +1,3 @@
-# Copyright (c) 2010-2019 Martin Becker, Blaubeuren.
-# This package is free software; you can distribute it and/or modify it
-# under the terms of the Artistic License 2.0 (see LICENSE file).
-
 package Math::ModInt::Event::Trap;
 
 use 5.006;
@@ -13,7 +9,7 @@ use Carp qw(carp croak);
 
 BEGIN {
     our @CARP_NOT = qw(Math::ModInt::Event);
-    our $VERSION  = '0.012';
+    our $VERSION  = '0.013';
 }
 
 # Math::ModInt::Event::Trap=ARRAY(...)
@@ -119,7 +115,7 @@ Math::ModInt::Event::Trap - catching events triggered by Math::ModInt
 
 =head1 VERSION
 
-This documentation refers to version 0.012 of Math::ModInt::Event::Trap.
+This documentation refers to version 0.013 of Math::ModInt::Event::Trap.
 
 =head1 SYNOPSIS
 
@@ -180,7 +176,7 @@ Math::ModInt::Event::Trap has no exports.
 =head1 DIAGNOSTICS
 
 Standard warning handlers print C<"warning: "> and the short
-description of the event (like C<"undefined result">) on stderr,
+description of the event (like C<"undefined result">) on STDERR,
 followed by a caller source code location.
 
 Standard error handlers die with C<"error: "> and the short description
@@ -202,11 +198,11 @@ L<Math::ModInt>
 
 =head1 AUTHOR
 
-Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2019 Martin Becker, Blaubeuren.
+Copyright (c) 2010-2021 Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see LICENSE file).

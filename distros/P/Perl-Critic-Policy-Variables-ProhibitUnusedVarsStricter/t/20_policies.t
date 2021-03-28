@@ -8,7 +8,7 @@ use Test::Perl::Critic::Policy qw< all_policies_ok >;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.109';
+our $VERSION = '0.110';
 
 #-----------------------------------------------------------------------------
 # Notice that you can pass arguments to this test, which limit the testing to

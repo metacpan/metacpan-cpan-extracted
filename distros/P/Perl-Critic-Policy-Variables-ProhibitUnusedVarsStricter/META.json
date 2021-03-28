@@ -29,9 +29,18 @@
       "build" : {
          "requires" : {
             "Carp" : "0",
-            "Test::More" : "0",
+            "PPI::Document" : "0",
+            "Perl::Critic::TestUtils" : "0",
+            "Test::More" : "0.88",
             "Test::Perl::Critic::Policy" : "0",
             "lib" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
@@ -39,10 +48,11 @@
             "File::Which" : "0"
          },
          "requires" : {
-            "PPI::Token::Symbol" : "0",
+            "English" : "0",
             "PPIx::QuoteLike" : "0.011",
+            "PPIx::QuoteLike::Constant" : "0.011",
             "PPIx::Regexp" : "0.071",
-            "Perl::Critic::Document" : "1.119",
+            "Perl::Critic::Exception::Fatal::PolicyDefinition" : "1.119",
             "Perl::Critic::Policy" : "1.119",
             "Perl::Critic::Utils" : "1.119",
             "Readonly" : "0",
@@ -57,13 +67,14 @@
    "provides" : {
       "Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter" : {
          "file" : "lib/Perl/Critic/Policy/Variables/ProhibitUnusedVarsStricter.pm",
-         "version" : "0.109"
+         "version" : "0.110"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter/issues"
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -74,6 +85,6 @@
          "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter"
       }
    },
-   "version" : "0.109",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.110",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

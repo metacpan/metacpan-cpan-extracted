@@ -16,7 +16,7 @@ use Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter;
 use Readonly;
 use Pod::Usage;
 
-our $VERSION = '0.109';
+our $VERSION = '0.110';
 
 Readonly::Scalar my $DEFAULT_SINGLE_FILE_FORMAT => 4;
 Readonly::Scalar my $DEFAULT_MULTI_FILE_FORMAT  => 5;

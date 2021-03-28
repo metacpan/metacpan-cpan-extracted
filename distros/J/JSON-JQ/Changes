@@ -1,5 +1,9 @@
 Revision history for Perl module JSON::JQ
 
+v0.05:
+   - not croak if no output available but no error raised
+   - bugfixes in XS code
+   - basic filters test case from official manual page
 v0.04:
    - fix double free in XS code
    - fix utf8 decode error when dealing with json_file parameter in process()

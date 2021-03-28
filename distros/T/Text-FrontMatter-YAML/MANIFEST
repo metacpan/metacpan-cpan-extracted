@@ -19,6 +19,7 @@ t/22-empty-null-data.t
 t/23-init-from-utf8-sections.t
 t/30-yaml-as-hash.t
 t/31-data-as-filehandle.t
+t/40-croaker.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

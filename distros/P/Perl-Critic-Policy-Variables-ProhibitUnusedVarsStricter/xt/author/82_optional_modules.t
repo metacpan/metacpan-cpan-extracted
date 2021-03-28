@@ -8,13 +8,13 @@ use File::Spec;
 
 use lib 'inc';
 
-use My::Module::Meta qw{ recommended_module_versions };
+use My::Module::Meta;
 
 use Test::More;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.109';
+our $VERSION = '0.110';
 
 #-----------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ our $VERSION = '0.109';
 # don't.  :]
 
 my %module_versions = (
-    recommended_module_versions(),
+    My::Module::Meta->recommended_module_versions(),
     'Test::Memory::Cycle'   => 0,
     'Test::Without::Module' => 0,
 );

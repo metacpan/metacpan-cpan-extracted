@@ -53,9 +53,9 @@ $api->mediabox(595,842);
 my $helv = $api->corefont('Helvetica-Bold', -encode=>'latin1');
 
 my $times = $api->corefont('Times-Roman', -encode=>'latin1');
-my $time2 = $api->synfont($times, -slant=>1.3);
+my $time2 = $api->synfont($times, -condense=>1.3);
 my $treb = $api->corefont('Trebuchet-Italic', -encode=>'latin1');
-my $tre2 = $api->synfont($treb, -slant=>1.1, -space=>60);
+my $tre2 = $api->synfont($treb, -condense=>1.1, -space=>60);
 my $georg = $api->corefont('Georgia-Italic', -encode=>'latin1');
 
 my $jfs = $api->cjkfont('KozMin', -encode=>'shiftjis');

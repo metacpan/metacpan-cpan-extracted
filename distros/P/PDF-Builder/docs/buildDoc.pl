@@ -2,7 +2,7 @@
 # buildDoc.pl builds documentation tree from Perl .pod and .pm files (POD)
 #   in case of duplicate names, .pod is used in preference to .pm
 # 
-# (c) copyright 2018-2020 Catskill Technology Services, LLC
+# (c) copyright 2018-2021 Catskill Technology Services, LLC
 # licensed under license used in PDF::Builder package (LGPL 2.1+)
 #
 # there is partial code to implement --all to build all PODs, or update an
@@ -16,8 +16,8 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 # =============
 # CONFIGURATION  these may be overridden by command-line flags. If reading from
@@ -692,6 +692,8 @@ sub update_HTML{
             }
         }
 
+	# bottom of page mark
+	$newstring .= "<p><center>###</center></p>\n";
         # write file back out
 	$string = substr($string, 0, $pos+1) . $newstring . substr($string, $pos+1);
 	spew($string, $fname);

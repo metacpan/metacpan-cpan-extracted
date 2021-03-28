@@ -6,8 +6,8 @@ use strict;
 use warnings;
 #no warnings qw( deprecated recursion uninitialized );
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 use Carp;
 use Compress::Zlib qw();
@@ -67,7 +67,7 @@ sub new {
     $self->{' charspace'}      = 0;
     $self->{' hscale'}         = 100;
     $self->{' wordspace'}      = 0;
-    $self->{' lead'}           = 0;
+    $self->{' leading'}        = 0;
     $self->{' rise'}           = 0;
     $self->{' render'}         = 0;
     $self->{' matrix'}         = [1,0,0,1,0,0];
@@ -97,7 +97,7 @@ sub outobjdeep {
 
     $self->textend();
 #   foreach my $k (qw[ api apipdf apiistext apipage font fontset fontsize
-#                      charspace hscale wordspace lead rise render matrix
+#                      charspace hscale wordspace leading rise render matrix
 #                      textmatrix textlinematrix fillcolor strokecolor
 #                      translate scale skew rotate ]) {
 #       $self->{" $k"} = undef;
@@ -2828,7 +2828,9 @@ sub hscale {
 # Note: hscale was originally named incorrectly as hspace, renamed
 # note that the private class data ' hspace' is no longer supported
 
-=item $leading = $content->lead($leading)
+=item $leading = $content->leading($leading)
+
+=item $leading = $content->leading()
 
 Sets the text leading, which is the distance between baselines. This
 is initially B<zero> (i.e., the lines will be printed on top of each
@@ -2837,24 +2839,44 @@ If C<$leading> is given, the current setting is replaced by that value and
 C<$self> is B<returned> (to permit chaining).
 If C<$leading> is not given, the current setting is B<returned>.
 
+Note that C<leading> here is defined as used in electronic typesetting and
+the PDF specification, which is the full interline spacing (text baseline to
+text baseline distance, in points). In cold metal typesetting, I<leading> was 
+usually the I<extra> spacing between lines beyond the font height itself, 
+created by inserting lead (type alloy) shims.
+
+=item $leading = $content->lead($leading)
+
+=item $leading = $content->lead()
+
+B<Deprecated,> to be removed after March 2023. Use C<leading()> now.
+
+Note that the C<$self->{' lead'}> internal variable is no longer available,
+having been replaced by C<$self->{' leading'}>.
+
 =cut
 
-sub _lead {
+# to be removed 3/2023 or later
+sub lead {
+    return $_[0]->leading($_[1]);
+}
+
+sub _leading {
     my ($leading) = @_;
 
     return float($leading) . ' TL';
 }
 
-sub lead {
+sub leading {
     my ($self, $leading) = @_;
 
     if (defined $leading) {
-        $self->{' lead'} = $leading;
-        $self->add(_lead($leading));
+        $self->{' leading'} = $leading;
+        $self->add(_leading($leading));
 
 	return $self;
     } else {
-        return $self->{' lead'};
+        return $self->{' leading'};
     }
 }
 
@@ -2958,7 +2980,7 @@ sub textstate {
     my %state;
     if (scalar @_) {
         %state = @_;
-        foreach my $k (qw( charspace hscale wordspace lead rise render )) {
+        foreach my $k (qw( charspace hscale wordspace leading rise render )) {
             next unless $state{$k};
             $self->can($k)->($self, $state{$k});
         }
@@ -2980,7 +3002,7 @@ sub textstate {
         }
         %state = ();
     } else {
-        foreach my $k (qw( font fontsize charspace hscale wordspace lead rise render )) {
+        foreach my $k (qw( font fontsize charspace hscale wordspace leading rise render )) {
             $state{$k}=$self->{" $k"};
         }
         $state{'matrix'}         = [@{$self->{" matrix"}}];
@@ -3087,9 +3109,9 @@ sub distance {
 =item $content->cr(0)
 
 If passed without an argument, moves (down) to the start of the I<next> line 
-(distance set by C<lead>). This is similar to C<nl()>.
+(distance set by C<leading>). This is similar to C<nl()>.
 
-If passed I<with> an argument, the C<lead> distance is ignored and the next 
+If passed I<with> an argument, the C<leading> distance is ignored and the next 
 line starts that far I<up> the page (positive value) or I<down> the page 
 (negative value) from the current line. "Y" increases upward, so a negative
 value would normally be used to get to the next line down.
@@ -3108,7 +3130,7 @@ sub cr {
         $self->matrix_update(0, $offset);
     } else {
         $self->add('T*');
-        $self->matrix_update(0, $self->lead() * -1);
+        $self->matrix_update(0, $self->leading() * -1);
     }
     $self->{' textlinematrix'}->[0] = 0;
 
@@ -3121,7 +3143,7 @@ sub cr {
 
 =item $content->nl(0)
 
-Moves to the start of the next line (see C<lead>). If C<$indent> is not given,
+Moves to the start of the next line (see C<leading>). If C<$indent> is not given,
 or is 0, there is no indentation. Otherwise, indent by that amount (I<out>dent
 if a negative value). The unit of measure is hundredths of a "unit of text
 space", or roughly 88 per em.
@@ -3134,7 +3156,7 @@ sub nl {
     # can't use Td, because it permanently changes the line start by $indent
     # same problem using the distance() call
     $self->add('T*');  # go to start of next line
-    $self->matrix_update(0, $self->lead() * -1);
+    $self->matrix_update(0, $self->leading() * -1);
     $self->{' textlinematrix'}->[0] = 0;
     if (defined($indent) && $indent != 0) {
 	# move right or left by $indent
@@ -3400,7 +3422,7 @@ sub _text_strikethru {
    # fonts define an underline position and thickness, but not strikethrough
    # ideally would be just under 1ex
    #my $strikethruposition = (-$self->{' font'}->strikethruposition()*$self->{' fontsize'}/1000||1);
-    my $strikethruposition = 4*($self->{'fontsize'}/1000||1);  # >0 is up
+    my $strikethruposition = 5*(($self->{' fontsize'}||20)/20);  # >0 is up
    # let's borrow the underline thickness for strikethrough purposes
     my $strikethruthickness = ($self->{' font'}->underlinethickness()*$self->{' fontsize'}/1000||1);
     my $pos = 1;
@@ -4300,7 +4322,7 @@ sub textstart {
         $self->{' charspace'}         = 0;
         $self->{' hscale'}            = 100;
         $self->{' wordspace'}         = 0;
-        $self->{' lead'}              = 0;
+        $self->{' leading'}           = 0;
         $self->{' rise'}              = 0;
         $self->{' render'}            = 0;
         @{$self->{' matrix'}}         = (1,0,0,1,0,0);

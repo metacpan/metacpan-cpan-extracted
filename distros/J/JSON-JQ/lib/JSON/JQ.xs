@@ -58,7 +58,8 @@ jv my_jv_input(pTHX_ void * arg) {
     else if (SvPOK(p_sv)) {
         // string
         STRLEN len;
-        char * p_pv = SvPVutf8(p_sv, len);
+        char * p_pv = SvUTF8(p_sv) ? SvPVutf8(p_sv, len) : SvPV(p_sv, len);
+        //fprintf(stderr, "my_jv_input() got string: %s\n", p_pv);
         return jv_string_sized(p_pv, len);
     }
     else if (SvROK(p_sv) && SvTYPE(SvRV(p_sv)) == SVt_PVAV) {
@@ -129,7 +130,10 @@ void * my_jv_output(pTHX_ jv jval) {
     }
     else if (kind == JV_KIND_STRING) {
         // string
-        return newSVpvn_utf8(jv_string_value(jval), jv_string_length_bytes(jval), 1);
+        //fprintf(stderr, "my_jv_output() got string: %s\n", jv_string_value(jval));
+        //return newSVpvn(jv_string_value(jval), jv_string_length_bytes(jval));
+        // NOTE: this might introduce unicode bug..
+        return newSVpvf("%s", jv_string_value(jval));
     }
     else if (kind == JV_KIND_ARRAY) {
         // array
@@ -174,7 +178,7 @@ static void my_error_cb(void * errors, jv jerr) {
     dTHX;
     // original jerr will be freed by jq engine
     jerr = jv_copy(jerr);
-    av_push((AV *)errors, newSVpvn_utf8(jv_string_value(jerr), jv_string_length_bytes(jerr), 1));
+    av_push((AV *)errors, newSVpvn(jv_string_value(jerr), jv_string_length_bytes(jerr)));
 }
 
 static void my_debug_cb(void * data, jv input) {
@@ -305,7 +309,7 @@ _process(self, sv_input, av_output)
         _jq = INT2PTR(jq_state *, SvIV(sv_jq));
         jv jv_input = my_jv_input(aTHX_ sv_input);
         int jq_flags = (int)SvIV(*hv_fetchs(self, "jq_flags", 0));
-        // logic from static int process(jq state *jq jv value, int flags, int dumpopts) in main.c
+        // logic from process() in main.c
         jq_start(_jq, jv_input, jq_flags);
         jv result;
         // clear previous call errors
@@ -354,16 +358,18 @@ _process(self, sv_input, av_output)
         else if (jv_invalid_has_msg(jv_copy(result))) {
             // uncaught jq exception
             jv msg = jv_invalid_get_msg(jv_copy(result));
-            jv input_pos = jq_util_input_get_position(_jq);
+            //jv input_pos = jq_util_input_get_position(_jq);
             if (jv_get_kind(msg) == JV_KIND_STRING) {
-                av_push(av_err, newSVpvf("jq: error (at %s): %s", jv_string_value(input_pos), jv_string_value(msg)));
+                //av_push(av_err, newSVpvf("jq: error (at %s): %s", jv_string_value(input_pos), jv_string_value(msg)));
+                av_push(av_err, newSVpvf("jq: error: %s", jv_string_value(msg)));
             }
             else {
                 msg = jv_dump_string(msg, 0);
-                av_push(av_err, newSVpvf("jq: error (at %s) (not a string): %s", jv_string_value(input_pos), jv_string_value(msg)));
+                //av_push(av_err, newSVpvf("jq: error (at %s) (not a string): %s", jv_string_value(input_pos), jv_string_value(msg)));
+                av_push(av_err, newSVpvf("jq: error (not a string): %s", jv_string_value(msg)));
             }
             ret = 5;
-            jv_free(input_pos);
+            //jv_free(input_pos);
             jv_free(msg);
         }
         jv_free(result);

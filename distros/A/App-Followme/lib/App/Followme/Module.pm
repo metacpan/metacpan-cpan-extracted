@@ -8,14 +8,14 @@ use lib '../..';
 
 use IO::File;
 use File::Spec::Functions qw(abs2rel catfile file_name_is_absolute
-                             no_upwards rel2abs splitdir updir);
+                             no_upwards splitdir updir);
 use App::Followme::FIO;
 use App::Followme::NestedText;
 use App::Followme::Web;
 
 use base qw(App::Followme::ConfiguredObject);
 
-our $VERSION = "2.01";
+our $VERSION = "2.02";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

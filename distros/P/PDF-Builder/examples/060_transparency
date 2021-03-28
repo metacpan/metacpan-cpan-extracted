@@ -10,8 +10,8 @@ use PDF::Builder;
 use PDF::Builder::Util;
 use POSIX;
 
-#my $compress = 'none'; # uncompressed streams
-my $compress = 'flate'; # compressed streams
+my $compress = 'none'; # uncompressed streams
+#my $compress = 'flate'; # compressed streams
 
 my $pdf = PDF::Builder->new(-compress => $compress);
 $pdf->mediabox(595,842);
@@ -28,24 +28,23 @@ my $text = $page->text();
 # both texts bleed off right side of page
 $text->textlabel(30,750, $fnt,100, '100% Opaque', -color=>'#F00');
 
-$text->save();
+#$text->save();
 $text->egstate($TRANSPARENT);
 $text->textlabel(30,720, $fnt,100, '40% Transparent', -color=>'#000');
-$text->restore();
+#$text->restore();
 
 # page 2: similar to page 1, but using different methods. bleed off left side.
 $page = $pdf->page();
 $text = $page->text();
 
-$text->save();
+#$text->save();
 $text->font($fnt, 100);
 $text->fillcolor('red');
 $text->translate(570,750);
 $text->text_right('Opaque 100%');
-$text->fill();
-$text->restore();
-
+#$text->restore();
 $text->textend();
+
 $text->save();
 $text->egstate($TRANSPARENT);
 $text->textstart();
@@ -53,10 +52,8 @@ $text->font($fnt, 100);
 $text->fillcolor('black');
 $text->translate(570,720);
 $text->text_right('Transparent 40%');
-$text->fill();
 $text->textend();
 $text->restore();
-$text->textstart();
 
 $pdf->saveas("$0.pdf");
 $pdf->end();

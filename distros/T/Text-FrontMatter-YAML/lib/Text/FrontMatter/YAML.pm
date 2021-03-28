@@ -15,7 +15,7 @@ use YAML::Tiny qw/Load/;
 Text::FrontMatter::YAML - read the "YAML front matter" format
 
 =cut
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 
 =head1 SYNOPSIS
@@ -136,14 +136,25 @@ sub new {
 
     my %args = @_;
 
+    # make sure we get something to init with
+    unless (
+        exists $args{'document_string'}
+        || exists $args{'frontmatter_hashref'}
+        || exists $args{'data_text'}
+    )
+    {
+        croak "must pass 'document_string', 'data_text', or 'frontmatter_hashref'";
+    }
+
     # disallow passing incompatible arguments
     unless (
         (exists $args{'document_string'})
           xor
         (exists $args{'frontmatter_hashref'} || exists $args{'data_text'})
-    ) {
-        croak "you must pass either 'document_string', "
-            . "or 'frontmatter_hashref' and/or 'data_text'";
+    )
+    {
+        croak "cannot pass 'document_string' with either "
+            . "'frontmatter_hashref' or 'data_text'";
     }
 
     # initialize from whatever we've got
@@ -340,10 +351,15 @@ sub document_string {
 
 =over 4
 
+=item must pass 'document_string', 'data_text', or 'frontmatter_hashref'
+
+When calling new(), you have to pass in something to initialize the object.
+You can't create the object and then set the contents.
+
 =item cannot pass 'document_string' with either 'frontmatter_hashref' or 'data_text'
 
 When calling new(), you can't both pass in a complete document string I<and>
-the individual hashref and data sections.
+the individual hashref and data sections. Do one or the other.
 
 =item you can't call <method> as a setter
 

@@ -9,12 +9,12 @@ use lib '../..';
 use base qw(App::Followme::FileData);
 
 use Pod::Simple::XHTML;
-use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
+use File::Spec::Functions qw(abs2rel catfile splitdir);
 
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "2.01";
+our $VERSION = "2.02";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

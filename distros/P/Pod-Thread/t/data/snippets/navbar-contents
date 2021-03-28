@@ -1,0 +1,77 @@
+[name]
+Automatic navbar and table of contents
+
+[options]
+navbar 1
+contents 1
+
+[input]
+=encoding utf-8
+
+=head1 NAME
+
+foo - Some description of foo
+
+=head1 DESCRIPTION
+
+Some scription.
+
+=head1 OTHER SECTION
+
+Another — section.
+
+=head1 YET ANOTHER SECTION
+
+More stuff.
+
+=head2 Subsection
+
+With some subsection.
+
+=head1 LONG SECTION NAME
+
+Yet more stuff.
+
+[output]
+\heading[foo][]
+
+\h1[foo]
+
+\class(subhead)[(Some description of foo)]
+
+\class(navbar)[
+  \link[#S1][Description]
+  | \link[#S2][Other Section]
+  | \link[#S3][Yet Another Section]
+\break
+  \link[#S4][Long Section Name]
+]
+
+\h2[Table of Contents]
+
+\number(packed)[\link[#S1][DESCRIPTION]]
+\number(packed)[\link[#S2][OTHER SECTION]]
+\number(packed)[\link[#S3][YET ANOTHER SECTION]]
+\number(packed)[\link[#S4][LONG SECTION NAME]]
+
+\h2(#S1)[DESCRIPTION]
+
+Some scription.
+
+\h2(#S2)[OTHER SECTION]
+
+Another — section.
+
+\h2(#S3)[YET ANOTHER SECTION]
+
+More stuff.
+
+\h3[Subsection]
+
+With some subsection.
+
+\h2(#S4)[LONG SECTION NAME]
+
+Yet more stuff.
+
+\signature

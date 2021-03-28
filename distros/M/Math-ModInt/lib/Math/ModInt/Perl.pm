@@ -1,7 +1,3 @@
-# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
-# This package is free software; you can distribute it and/or modify it
-# under the terms of the Artistic License 2.0 (see LICENSE file).
-
 package Math::ModInt::Perl;
 
 use 5.006;
@@ -26,7 +22,7 @@ use constant _OPT_LIMIT     => 32768;
 BEGIN {
     require Math::ModInt;
     our @ISA     = qw(Math::ModInt);
-    our $VERSION = '0.012';
+    our $VERSION = '0.013';
 }
 
 my %inverses = ();
@@ -198,7 +194,7 @@ Math::ModInt::Perl - modular integer arithmetic, powered by native Perl
 
 =head1 VERSION
 
-This documentation refers to version 0.012 of Math::ModInt::Perl.
+This documentation refers to version 0.013 of Math::ModInt::Perl.
 
 =head1 SYNOPSIS
 
@@ -244,11 +240,11 @@ L<Math::ModInt>
 
 =head1 AUTHOR
 
-Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+Copyright (c) 2009-2021 Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see LICENSE file).

@@ -1,7 +1,3 @@
-# Copyright (c) 2010-2019 Martin Becker, Blaubeuren.
-# This package is free software; you can distribute it and/or modify it
-# under the terms of the Artistic License 2.0 (see LICENSE file).
-
 package Math::ModInt::ChineseRemainder;
 
 use 5.006;
@@ -16,7 +12,7 @@ BEGIN {
     require Exporter;
     our @ISA        = qw(Exporter);
     our @EXPORT_OK  = qw(cr_combine cr_extract);
-    our $VERSION    = '0.012';
+    our $VERSION    = '0.013';
 }
 
 use constant _INITIAL_CACHE_SIZE => 1024;
@@ -150,7 +146,7 @@ Math::ModInt::ChineseRemainder - solving simultaneous integer congruences
 
 =head1 VERSION
 
-This documentation refers to version 0.012 of Math::ModInt::ChineseRemainder.
+This documentation refers to version 0.013 of Math::ModInt::ChineseRemainder.
 
 =head1 SYNOPSIS
 
@@ -281,11 +277,11 @@ and modify this caching behaviour should not be considered final.
 
 =head1 AUTHOR
 
-Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2010-2019 Martin Becker, Blaubeuren.
+Copyright (c) 2010-2021 Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see LICENSE file).

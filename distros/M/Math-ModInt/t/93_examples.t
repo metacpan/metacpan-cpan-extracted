@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# Copyright (c) 2009-2021 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -25,7 +25,7 @@ BEGIN {
 }
 
 my $examples_dir = 'examples';
-my $shebang_pat  = qr{^#!/usr/bin/perl\s};
+my $shebang_pat  = qr{^#!/usr/bin/(?:env )?perl\s};
 my $this_perl    = Test::MyUtils::this_perl();
 my $stdin_file   = File::Spec->devnull;
 my $stdout_file  = 't/example.out';

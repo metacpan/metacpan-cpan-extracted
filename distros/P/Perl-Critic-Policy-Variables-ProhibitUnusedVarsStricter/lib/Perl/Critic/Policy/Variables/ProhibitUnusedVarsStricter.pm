@@ -21,7 +21,7 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.109';
+our $VERSION = '0.110';
 
 #-----------------------------------------------------------------------------
 
@@ -447,7 +447,6 @@ sub _get_variable_declarations {    ## no critic (ProhibitExcessComplexity)
                 );
 
             }
-
 
         } continue {
             $elem
@@ -1192,12 +1191,10 @@ __END__
 
 Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter - Don't ask for storage you don't need.
 
-
 =head1 AFFILIATION
 
 This Policy is stand-alone, and is not part of the core
 L<Perl::Critic|Perl::Critic>.
-
 
 =head1 NOTE
 
@@ -1258,7 +1255,6 @@ not include the declarations. The list assignment is missed because PPI
 does not parse it as containing a
 L<PPI::Statement::Variable|PPI::Statement::Variable>. However, variables
 B<used> inside such constructions B<will> be detected.
-
 
 =head1 CONFIGURATION
 
@@ -1347,7 +1343,6 @@ by any operator. The latter means that something like
 
 will be accepted.
 
-
 =head1 AVOIDING UNUSED VARIABLES
 
 There are situations in Perl where eliminating unused variables is
@@ -1401,12 +1396,12 @@ or, if you prefer,
     #     3     4    5
     my ($mday,$mon,$year) = ( localtime() )[ 3, 4, 5 ];
 
-
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter/issues>,
-or in electronic mail to the author.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter>,
+L<https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

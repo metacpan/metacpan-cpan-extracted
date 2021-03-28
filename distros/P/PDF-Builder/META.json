@@ -4,7 +4,7 @@
       "Phil Perry"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -56,6 +56,6 @@
          "web" : "https://github.com/PhilterPaper/Perl-PDF-Builder"
       }
    },
-   "version" : "3.021",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "3.022",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 # internal flags
 our $DEBUG       = 0;
 our $DUMP_DISASM = 0;
@@ -77,6 +77,10 @@ sub process {
     if ($rc == 1) {
         # NOTE: treat this case as successful run
         warn "JSON::JQ::process(): returned null/false (undef output), perhaps the input is undef.\n";
+    }
+    elsif ($rc == 4 and @{ $self->{_errors} } == 0) {
+        # treat it as succeeded
+        push @$output, undef;
     }
     elsif ($rc != 0) {
         croak "JSON::JQ::process(): failed with return code = $rc and errors:\n  ". join("\n  ", @{ $self->{_errors} });

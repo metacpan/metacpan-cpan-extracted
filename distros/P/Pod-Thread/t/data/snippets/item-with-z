@@ -1,0 +1,30 @@
+[name]
+=item with Z<>
+
+[input]
+=head1 Non-numeric =item
+
+=over 2
+
+=item 1Z<>
+
+First item.
+
+=item 2Z<>
+
+Second item.
+
+=back
+
+[output]
+\h2(#S1)[Non-numeric =item]
+
+\desc[1]
+[First item.
+]
+
+\desc[2]
+[Second item.
+]
+
+\signature

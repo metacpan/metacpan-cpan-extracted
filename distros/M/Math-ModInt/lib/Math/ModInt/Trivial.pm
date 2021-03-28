@@ -1,7 +1,3 @@
-# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
-# This package is free software; you can distribute it and/or modify it
-# under the terms of the Artistic License 2.0 (see LICENSE file).
-
 package Math::ModInt::Trivial;
 
 use 5.006;
@@ -20,7 +16,7 @@ use constant NFIELDS   => 0;
 BEGIN {
     require Math::ModInt;
     our @ISA     = qw(Math::ModInt);
-    our $VERSION = '0.012';
+    our $VERSION = '0.013';
 }
 
 *signed_residue   =
@@ -38,7 +34,7 @@ sub _DIV { $singleton }
 sub _POW { $singleton }
 sub _INV { $singleton }
 sub _NEW { $singleton }
-sub _NEW2 { $_[1], $singleton }
+sub _NEW2 { ($_[1], $singleton) }
 
 sub modulus { 1 }
 sub residue { 0 }
@@ -53,7 +49,7 @@ Math::ModInt::Trivial - integer arithmetic modulo one
 
 =head1 VERSION
 
-This documentation refers to version 0.012 of Math::ModInt::Trivial.
+This documentation refers to version 0.013 of Math::ModInt::Trivial.
 
 =head1 SYNOPSIS
 
@@ -99,11 +95,11 @@ L<http://en.wikipedia.org/wiki/Trivial_ring>
 
 =head1 AUTHOR
 
-Martin Becker, E<lt>becker-cpan-mp@cozap.comE<gt>
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+Copyright (c) 2009-2021 Martin Becker, Blaubeuren.
 
 This library is free software; you can distribute it and/or modify it
 under the terms of the Artistic License 2.0 (see LICENSE file).

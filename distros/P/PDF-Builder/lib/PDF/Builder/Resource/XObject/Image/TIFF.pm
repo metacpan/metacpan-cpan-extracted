@@ -7,8 +7,8 @@ use warnings;
 
 #no warnings 'uninitialized';
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -43,6 +43,19 @@ sub new {
     my $self;
 
     my $tif = PDF::Builder::Resource::XObject::Image::TIFF::File->new($file);
+
+ # dump everything in tif except huge data streams
+# foreach (sort keys %{ $tif }) {
+# if ($_ eq ' stream') { next; }
+# if ($_ eq ' apipdf') { next; }
+# if ($_ eq ' realised') { next; }
+# if ($_ eq ' uid') { next; }
+#  if (defined $tif->{$_}) {
+#   print "\$tif->{'$_'} = '".($tif->{$_})."'\n";
+#  } else {
+#   print "\$tif->{'$_'} = ?\n";
+#  }
+# }
 
     # in case of problematic things
     #  proxy to other modules
@@ -223,10 +236,10 @@ sub handle_ccitt {
     $self->{' nofilt'} = 1;
     $self->{'Filter'} = PDFName('CCITTFaxDecode');
     $self->{'DecodeParms'} = PDFDict();
-    $self->{'DecodeParms'}->{'K'} = (($tif->{'ccitt'} == 4 || ($tif->{'g3Options'} & 0x1))? PDFNum(-1): PDFNum(0));
+    $self->{'DecodeParms'}->{'K'} = (($tif->{'ccitt'} == 4 || (($tif->{'g3Options'}||0) & 0x1))? PDFNum(-1): PDFNum(0));
     $self->{'DecodeParms'}->{'Columns'} = PDFNum($tif->{'imageWidth'});
     $self->{'DecodeParms'}->{'Rows'} = PDFNum($tif->{'imageHeight'});
-    $self->{'DecodeParms'}->{'BlackIs1'} = PDFBool($tif->{'whiteIsZero'} == 1? 1: 0);
+    $self->{'DecodeParms'}->{'BlackIs1'} = PDFBool($tif->{'whiteIsZero'} == 0? 1: 0);
     if (defined($tif->{'g3Options'}) && ($tif->{'g3Options'} & 0x4)) {
         $self->{'DecodeParms'}->{'EndOfLine'} = PDFBool(1);
         $self->{'DecodeParms'}->{'EncodedByteAlign'} = PDFBool(1);
@@ -272,6 +285,7 @@ sub read_tiff {
     $self->{'Interpolate'} = PDFBool(1);
     $self->bits_per_component($tif->{'bitsPerSample'});
 
+    # swaps 0 and 1 ([0 1] -> [1 0]) in certain cases
     if (($tif->{'whiteIsZero'}||0) == 1 &&
 	($tif->{'filter'}||'') ne 'CCITTFaxDecode') {
         $self->{'Decode'} = PDFArray(PDFNum(1), PDFNum(0));
@@ -287,6 +301,19 @@ sub read_tiff {
     } else {
         $self->handle_generic($pdf, $tif);
     }
+
+# # dump everything in self except huge data streams
+# foreach (sort keys %{ $self }) {
+#  if ($_ eq ' stream') { next; }
+#  if ($_ eq ' apipdf') { next; }
+#  if ($_ eq ' realised') { next; }
+#  if ($_ eq ' uid') { next; }
+#  if (defined $self->{$_}) {
+#   print "\$self->{'$_'} = '".($self->{$_}->val())."'\n";
+#  } else {
+#   print "\$self->{'$_'} = ?\n";
+#  }
+# }
 
     if ($tif->{'fillOrder'} == 2) {
         my @bl = ();
@@ -332,7 +359,6 @@ sub tiffTag {
 }
 
 =back
-
 =cut
 
 1;

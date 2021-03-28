@@ -23,7 +23,7 @@ our @EXPORT = qw(fio_filename_to_url fio_flatten
                  fio_split_filename fio_to_file 
                  fio_visit fio_write_page);
 
-our $VERSION = "2.01";
+our $VERSION = "2.02";
 
 #----------------------------------------------------------------------
 # Calculate the check sum for a file
@@ -363,6 +363,7 @@ sub fio_to_file {
 
 sub fio_visit {
     my ($directory) = @_;
+    $directory = rel2abs($directory);
 
     my @filenames;
     my @directories;
@@ -398,8 +399,7 @@ sub fio_write_page {
 	my ($dir, $base) = fio_split_filename($filename);
 
 	if (! -e $dir) {
-		$dir = rel2abs($dir);
-        die "Couldn't create directory $dir for $filename: $!" 
+        die "Couldn't create directory $dir for $filename: $!\n" 
             unless mkdir($dir);
     }
 	

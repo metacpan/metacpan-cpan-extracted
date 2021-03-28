@@ -11,7 +11,7 @@ use Digest::MD5 qw(md5_hex);
 use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 
-our $VERSION = "2.01";
+our $VERSION = "2.02";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -185,7 +185,7 @@ sub update_file {
     my ($self, $file, $prototype, $prototype_path) = @_;
 
     my $page = fio_read_page($file);
-    die "Couldn't read $file" unless defined $page;
+    return unless defined $page;
 
     # Check for changes before updating page
     return 0 if $self->unchanged_prototype($prototype, $page, $prototype_path);

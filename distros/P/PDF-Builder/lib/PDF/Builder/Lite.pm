@@ -4,8 +4,8 @@ use strict;
 use warnings;
 #no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.021'; # VERSION
-my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+our $VERSION = '3.022'; # VERSION
+my $LAST_UPDATE = '3.022'; # manually update whenever code is changed
 # NOTE that this sub-package has not been tested and is not well documented!
 #      It is possible that it will be deprecated and removed.
 
@@ -645,16 +645,27 @@ sub textfont {
     return $self;
 }
 
+=item $txt->textleading($leading)
+
+Set the baseline-to-baseline "leading" to be used for text lines.
+
 =item $txt->textlead($leading)
 
 Set the baseline-to-baseline "leading" to be used for text lines.
 
+B<Deprecated,> will be removed March 2023 or later. Use textleading().
+
 =cut
 
+# remove on or after March 2023
 sub textlead {
+    return $_[0]->textleading($_[1]);
+}
+
+sub textleading {
     my $self = shift();
 
-    $self->{'gfx'}->lead(@_);
+    $self->{'gfx'}->leading(@_);
     return $self;
 }
 

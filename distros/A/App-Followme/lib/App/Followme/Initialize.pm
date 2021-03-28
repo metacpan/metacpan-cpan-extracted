@@ -11,7 +11,7 @@ use File::Spec::Functions qw(splitdir catfile);
 use App::Followme::FIO;
 use App::Followme::NestedText;
 
-our $VERSION = "2.01";
+our $VERSION = "2.02";
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -129,9 +129,8 @@ sub create_dirs {
         push(@path, shift(@dirs));
         my $path = catfile(@path);
 
-        if (! -d $path) {
-            mkdir($path) or die "Couldn't create $path: $!\n";
-            chmod(0755, $path) or die "Couldn't set permissions: $!\n";
+        if ($path && ! -d $path) {
+            mkdir($path, 0755) or die "Couldn't create $path: $!\n";
         }
     }
 

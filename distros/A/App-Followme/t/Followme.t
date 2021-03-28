@@ -21,7 +21,7 @@ eval "use App::Followme::FIO";
 require App::Followme;
 
 my $test_dir = catdir(@path, 'test');
-rmtree($test_dir);
+rmtree($test_dir)  if -e $test_dir;
 
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
@@ -53,6 +53,7 @@ do {
     my $config = catfile($test_dir, 'followme.cfg');
     my @config_files_ok = ($config);
 
+    unlink $config if -e $config;
     fio_write_page($config, "remote_url: http://www.example.com\n");
 
     my $directory;
@@ -61,12 +62,15 @@ do {
         push(@directories, $dir);
 
         $directory = catfile(@directories);
-        mkdir($directory) or die $!;
-        chmod 0755, $directory;
+        unless (-e $directory) {
+            mkdir($directory) or die $!;
+            chmod 0755, $directory;
+        }
 
         $config = catfile($directory, 'followme.cfg');
         push(@config_files_ok, $config);
 
+        unlink $config if -e $config;
         fio_write_page($config, "run_after:\n  - App::Followme::CreateSitemap\n");
 
         foreach my $file (qw(first.html second.html third.html)) {

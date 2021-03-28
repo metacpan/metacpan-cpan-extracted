@@ -206,6 +206,7 @@ to see when the resulting PDFs are displayed.
   040_annotation.pdf 
    1 page two annotations, one initially open, one initially closed
    you will be prompted by Reader to save changes (if wrote to either)
+   1 page 4 "markup" annotations in some sample text.
 
 041_annot_fileattach
   041_annot_fileattach.pdf 

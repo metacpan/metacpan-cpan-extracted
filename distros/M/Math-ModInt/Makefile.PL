@@ -1,4 +1,4 @@
-# Copyright (c) 2009-2019 Martin Becker, Blaubeuren.
+# Copyright (c) 2009-2021 Martin Becker, Blaubeuren.
 # This package is free software; you can distribute it and/or modify it
 # under the terms of the Artistic License 2.0 (see LICENSE file).
 
@@ -65,11 +65,16 @@ WriteMakefile(
         },
         resources => {
             bugtracker => {
-                web => "https://rt.cpan.org/Public/Dist/Display.html?Name=$DN",
+                web => "https://github.com/mhasch/perl-$DN/issues",
             },
             license => [
                 'https://www.perlfoundation.org/artistic-license-20.html',
             ],
+            repository => {
+                url  => "git://github.com/mhasch/perl-$DN.git",
+                web  => "https://github.com/mhasch/perl-$DN",
+                type => 'git',
+            }
         },
     },
 );

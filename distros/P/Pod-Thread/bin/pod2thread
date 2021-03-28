@@ -1,0 +1,153 @@
+#!perl
+#
+# Convert POD data to the HTML macro language thread.
+#
+# SPDX-License-Identifier: MIT
+
+use 5.008;
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use Pod::Thread ();
+use Pod::Usage qw(pod2usage);
+
+# Insert -- into @ARGV before any single dash argument to hide it from
+# Getopt::Long; we want to interpret it as meaning stdin.
+my $stdin;
+local @ARGV = map { $_ eq q{-} && !$stdin++ ? (q{--}, $_) : $_ } @ARGV;
+
+# Parse our options.
+my @options = qw(contents|c help|h navbar|n style|s=s title|t=s);
+my %options;
+Getopt::Long::config('bundling');
+GetOptions(\%options, @options) or exit 1;
+if ($options{help}) {
+    pod2usage(1);
+}
+
+# Initialize and run the formatter.
+my $parser = Pod::Thread->new(%options);
+$parser->parse_from_file(@ARGV);
+
+__END__
+
+=for stopwords
+Allbery STDIN STDOUT -chn --navbar subclasses MERCHANTABILITY NONINFRINGEMENT
+sublicense
+
+=head1 NAME
+
+pod2thread - Convert POD data to the HTML macro language thread.
+
+=head1 SYNOPSIS
+
+B<pod2thread> [B<-chn>] [B<-s> I<style>] [B<-t> I<title>]
+    [I<input> [I<output>]]
+
+=head1 DESCRIPTION
+
+B<pod2thread> is a front-end for Pod::Thread and its subclasses.  It uses
+that module to generate thread source from POD source.
+
+I<input> is the file to read for POD source (the POD can be embedded in
+code).  If I<input> isn't given, it defaults to STDIN.  I<output>, if given,
+is the file to which to write the thread output.  If I<output> isn't given,
+the output is written to STDOUT.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c>, B<--contents>
+
+Generate a table of contents as the first section of the resulting thread
+file, with links to each top-level heading.
+
+=item B<-n>, B<--navbar>
+
+Generate a navigation bar at the top of the resulting thread file, with
+links to each top-level heading.
+
+=item B<-h>, B<--help>
+
+Print out usage information and exit.
+
+=item B<-s> I<style>, B<--style>=I<style>
+
+In the generated thread source, include a reference to the style sheet
+I<style>.  If this option is not given, no style sheet reference will be
+included.
+
+=item B<-t> I<title>, B<--title>=I<title>
+
+Use I<title> as the title of the page rather than looking for a NAME section
+in the POD document.
+
+=back
+
+=head1 DIAGNOSTICS
+
+If B<pod2thread> fails with errors, see L<Pod::Thread> and L<Pod::Parser>
+for information about what those errors might mean.  Internally, it can also
+produce the following diagnostic:
+
+=over 4
+
+=item Can't close %s: %s
+
+=item Can't open %s: %s
+
+(F) The specified file, given on the command line as the POD source, could
+not be opened or closed.
+
+=item Unknown option: %s
+
+(F) An unknown command line option was given.
+
+=back
+
+In addition, other L<Getopt::Long> error messages may result from invalid
+command-line options.
+
+=head1 AUTHOR
+
+Russ Allbery <rra@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2002, 2013, 2021 Russ Allbery <rra@cpan.org>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=head1 SEE ALSO
+
+L<Pod::Parser>, L<Pod::Thread>, L<spin(1)>
+
+This program is part of the Pod-Thread distribution.  The current version of
+Pod-Thread is available from CPAN, or directly from its web site at
+L<https://www.eyrie.org/~eagle/software/pod-thread/>.
+
+B<spin> is available from L<https://www.eyrie.org/~eagle/software/web/>.
+
+=cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

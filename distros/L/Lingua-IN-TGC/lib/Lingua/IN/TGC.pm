@@ -3,10 +3,10 @@ package Lingua::IN::TGC;
 
 use Mouse;
 use Regexp::Grammars;
-use Kavorka -all;
+use Kavorka;
 use utf8;
 
-our $VERSION = '2.04';
+our $VERSION = '2.06';
 
 my @result = ();
 
@@ -145,41 +145,7 @@ qr {
     <objtoken: IN::NT>         [^ଁ-୷]
 }xms;
 
-qr {
-    <grammar:  Lingua::IN::TGC::OR>
 
-    <objrule:  IN::Tgc>        <ws: (\s++)*> <S> | <Vm> | <CH> | <CHCvm> | <N> | <Other> | <NT>
-    <objrule:  IN::Vm>         <V><m_>
-    <objrule:  IN::CHCvm>      <CH__><C><v_><m_>
-    <objtoken: IN::CH>         ([କ-ହଡ଼-ୟ])(୍\b)
-    <objtoken: IN::V>          [ଅ-ଔୠୡ]
-    <objtoken: IN::m_>         [ଁ-ଃ଼ଽୖୗ]?
-    <objtoken: IN::CH__>       (([କ-ହଡ଼-ୟ])(୍))*
-    <objtoken: IN::C>          [କ-ହଡ଼-ୟ]
-    <objtoken: IN::v_>         [ା-ୈୋୌୢୣ]?
-    <objtoken: IN::N>          [ା-ୈୋୌୢୣଁ-ଃ଼ଽୖୗ]
-    <objtoken: IN::S>          [ ]
-    <objtoken: IN::Other>      [ଁ-୷]
-    <objtoken: IN::NT>         [^ଁ-୷]
-}xms;
-
-qr {
-    <grammar:  Lingua::IN::TGC::GU>
-
-    <objrule:  IN::Tgc>           <ws: (\s++)*> <S> | <Vm> | <CH> | <CHCvm> | <N> | <Other> | <NT>
-    <objrule:  IN::Vm>            <V><m_>
-    <objrule:  IN::CHCvm>         <CH__><C><v_><m_>
-    <objtoken: IN::CH>            ([క-హౘ-ౚ])(్\b)
-    <objtoken: IN::V>             [అ-ఔౠ-ౡ]
-    <objtoken: IN::m_>            [ఀ-ఄఽౕౖ]?
-    <objtoken: IN::CH__>          (([క-హౘ-ౚ])(్))*
-    <objtoken: IN::C>             [క-హౘ-ౚ]
-    <objtoken: IN::v_>            [ా-ౌౢౣ]?
-    <objtoken: IN::N>             [ా-ౌౢౣఀ-ఄఽౕౖ]
-    <objtoken: IN::S>             [ ]
-    <objtoken: IN::Other>         [ఀ-౿]
-    <objtoken: IN::NT>            [^ఀ-౿]
-}xms;
 
 method TGC( Str $lang, Str $string ) {
     my $lang_code = "Lingua::IN::TGC::" . $lang;

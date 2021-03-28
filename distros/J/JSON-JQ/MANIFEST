@@ -2,6 +2,7 @@ lib/JSON/JQ.pm
 lib/JSON/JQ.xs
 t/001_load.t
 t/002_basis.t
+t/003_basic_filters.t
 Build.PL
 Changes
 LICENSE

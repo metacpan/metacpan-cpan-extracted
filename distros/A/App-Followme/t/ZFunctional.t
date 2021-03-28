@@ -24,7 +24,7 @@ require App::Followme::Initialize;
 
 my $test_dir = catdir(@path, 'test');
 
-rmtree($test_dir);
+rmtree($test_dir) if -e $test_dir;
 mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
 chdir $test_dir or die $!;
@@ -48,17 +48,18 @@ do {
     my $followme = App::Followme->new();
 
     my $text = "This is the top page\n";
-    fio_write_page('index.md', $text);
+    my $filename = catfile($test_dir, 'index.md');
+    fio_write_page($filename, $text);
     $followme->run($test_dir);
 
-    ok(-e 'index.html', 'Index file created'); #test 5
-    ok(! -e 'index.md', 'Text file deleted'); #test 6
+    ok(! -e $filename, 'Text file deleted'); #test 5
+    $filename = catfile($test_dir, 'index.html');
+    ok(-e $filename, 'Index file created'); #test 6
 
     chomp($text);
-    my $page = fio_read_page('index.html');
+    my $page = fio_read_page($filename);
     ok(index($page, '<h2>Test</h2>') > 0, 'Generated title'); # test 7
     ok(index($page, "<p>$text</p>") > 0, 'Generated body'); # test 8
-
 };
 
 #----------------------------------------------------------------------

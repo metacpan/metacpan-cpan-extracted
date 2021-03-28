@@ -3,7 +3,7 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.021'; # VERSION
+our $VERSION = '3.022'; # VERSION
 my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
@@ -1607,11 +1607,6 @@ Valid %options are:
 
 Character width condense/expand factor (0.1-0.9 = condense, 1 = normal/default, 
 1.1+ = expand). It is the multiplier to apply to the width of each character.
-
-=item -slant
-
-B<DEPRECATED>. It is the old name for C<-condense>, and will eventually be
-removed. Use C<-condense> instead.
 
 =item -oblique
 

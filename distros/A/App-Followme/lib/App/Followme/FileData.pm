@@ -12,7 +12,7 @@ use App::Followme::FIO;
 use App::Followme::NestedText;
 use App::Followme::Web;
 
-our $VERSION = "2.01";
+our $VERSION = "2.02";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -119,14 +119,15 @@ sub fetch_data {
 sub fetch_from_file {
     my ($self, $filename) = @_;
 
+    my (%metadata, %content);
     my $text = fio_read_page($filename);
-    return () unless $text;
+    return () unless length $text;
 
     my $section = $self->fetch_sections($text);
 
     # First look in the metadata and then the content
-    my %metadata = $self->fetch_metadata($section->{metadata});
-    my %content = $self->fetch_content($section->{body});
+    %metadata = $self->fetch_metadata($section->{metadata});
+    %content = $self->fetch_content($section->{body});
 
     return (%content, %metadata);
 }
@@ -160,6 +161,7 @@ sub fetch_sections {
         $section{metadata} = '';
     }
 
+    die "Could not fetch body of text\n" unless $section{body};
     $section{body} = $self->fetch_as_html($section{body});
     return \%section;
 }

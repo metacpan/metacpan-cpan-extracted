@@ -121,6 +121,7 @@ BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
                  make a change to the open annotation, when you exit you will 
                  be prompted to save the changes (you don't have to, unless you
                  want to open the PDF again and see your entry still there).
+                 Also show some "markup" annotations on the second page.
 
  041_annot_fileattach  demonstrate file attachment annotations on a page. Two
                  small files are attached in six different ways (mostly a 
