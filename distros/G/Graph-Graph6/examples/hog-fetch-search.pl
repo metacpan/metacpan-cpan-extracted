@@ -36,15 +36,17 @@ use FindBin;
 use HTTP::Message;
 use WWW::Mechanize;
 
-our $VERSION = 8;
+our $VERSION = 9;
 
 my $output_filename = 'hog-fetch-search-output.g6';
 
 my $mech = WWW::Mechanize->new (keep_alive => 1);
 $mech->agent("$FindBin::Script/$VERSION ".$mech->agent);
 
-# ask for everything decoded_content() accepts
+# ask for all compressions decoded_content() knows
 $mech->add_header('Accept-Encoding' => scalar HTTP::Message::decodable());
+
+# diagnostic output
 $mech->add_handler (request_send => sub {
                       my ($req, $mech, $headers) = @_;
                       print "request:\n";

@@ -1,5 +1,9 @@
 Revision history for perl distribution Graph-ReadWrite
 
+2.10 2021-03-27 NEILB
+    - Fixed handling of undirected graphs in Dot writer.
+      Thanks to Ingrid Falk for bug report and fix: RT#22785
+
 2.09 2016-08-05 NEILB
     - Added the ability to cluster nodes in subgraphs when generating
       Dot format output. PR from Joenio Costa++.

@@ -4,25 +4,25 @@ NAME
 
 SYNOPSIS
 
-     use Event::Distributor;
+       use Event::Distributor;
     
-     my $dist = Event::Distributor->new;
+       my $dist = Event::Distributor->new;
     
-     $dist->declare_signal( "announce" );
-    
-    
-     $dist->subscribe_sync( announce => sub {
-        my ( $message ) = @_;
-        say $message;
-     });
-    
-     $dist->subscribe_async( announce => sub {
-        my ( $message ) = @_;
-        return $async_http->POST( "http://server/message", $message );
-     });
+       $dist->declare_signal( "announce" );
     
     
-     $dist->fire_sync( announce => "Hello, world!" );
+       $dist->subscribe_sync( announce => sub {
+          my ( $dist, $message ) = @_;
+          say $message;
+       });
+    
+       $dist->subscribe_async( announce => sub {
+          my ( $dist, $message ) = @_;
+          return $async_http->POST( "http://server/message", $message );
+       });
+    
+    
+       $dist->fire_sync( announce => "Hello, world!" );
 
 DESCRIPTION
 
@@ -143,7 +143,7 @@ METHODS
     When invoked the code will be passed the distributor object itself and
     the list of arguments.
 
-     $code->( $distributor, @args )
+       $code->( $distributor, @args )
 
  fire_async
 

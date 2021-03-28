@@ -2,7 +2,7 @@
 # Graph::Reader::XML - perl class for reading directed graphs from XML
 #
 package Graph::Reader::XML;
-$Graph::Reader::XML::VERSION = '2.09';
+$Graph::Reader::XML::VERSION = '2.10';
 use 5.006;
 use strict;
 use warnings;

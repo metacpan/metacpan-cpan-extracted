@@ -1,6 +1,7 @@
 use strict;
 use Test::More 'no_plan';
 use Graph;
+use Graph::Undirected;
 use Graph::Writer::Dot;
 use File::Temp qw(tempfile);
 
@@ -166,3 +167,36 @@ use File::Temp qw(tempfile);
 ',
     "do not cluster with invalid attribute");
 }
+
+{ # undirected graph
+  my $graph = Graph::Undirected->new();
+  $graph->add_edge('a' => 'b');
+  $graph->add_edge('a' => 'c');
+  my ($OUTPUT_FH, $OUTPUT_NAME) = tempfile();
+  my $writer = Graph::Writer::Dot->new();
+  $writer->write_graph($graph, $OUTPUT_FH);
+  open $OUTPUT_FH, '<', $OUTPUT_NAME;
+  $/ = undef;
+  my $OUTPUT = <$OUTPUT_FH>;
+  close $OUTPUT_FH;
+  unlink $OUTPUT_NAME;
+
+  is(
+    $OUTPUT,
+    'graph g
+{
+
+  /* list of nodes */
+  "a";
+  "b";
+  "c";
+
+  /* list of edges */
+  "a" -- "b";
+  "a" -- "c";
+}
+',
+    "do not cluster with invalid attribute");
+}
+
+done_testing;

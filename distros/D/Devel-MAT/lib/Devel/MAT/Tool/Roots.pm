@@ -3,13 +3,11 @@
 #
 #  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Roots;
+package Devel::MAT::Tool::Roots 0.44;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Devel::MAT::Tool );
-
-our $VERSION = '0.43';
 
 use List::Util qw( pairs );
 

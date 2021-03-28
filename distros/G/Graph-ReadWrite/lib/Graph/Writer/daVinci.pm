@@ -2,7 +2,7 @@
 # Graph::Writer::daVinci - write a directed graph out in daVinci format
 #
 package Graph::Writer::daVinci;
-$Graph::Writer::daVinci::VERSION = '2.09';
+$Graph::Writer::daVinci::VERSION = '2.10';
 use 5.006;
 use strict;
 use warnings;

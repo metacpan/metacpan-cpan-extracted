@@ -2,7 +2,7 @@
 # Graph::Reader - perl base class for Graph file format readers
 #
 package Graph::Reader;
-$Graph::Reader::VERSION = '2.09';
+$Graph::Reader::VERSION = '2.10';
 use 5.006;
 use strict;
 use warnings;

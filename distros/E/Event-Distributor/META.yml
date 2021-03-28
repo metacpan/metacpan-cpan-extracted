@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,21 +17,22 @@ name: Event-Distributor
 provides:
   Event::Distributor:
     file: lib/Event/Distributor.pm
-    version: '0.05'
+    version: '0.06'
   Event::Distributor::Action:
     file: lib/Event/Distributor/Action.pm
-    version: '0.05'
+    version: '0.06'
   Event::Distributor::Query:
     file: lib/Event/Distributor/Query.pm
-    version: '0.05'
+    version: '0.06'
   Event::Distributor::Signal:
     file: lib/Event/Distributor/Signal.pm
-    version: '0.05'
+    version: '0.06'
 requires:
+  Feature::Compat::Try: '0'
   Future: '0.15'
-  Syntax::Keyword::Try: '0'
+  perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,13 @@
 Revision history for Devel-MAT
 
+0.44    2021-03-27
+        [CHANGES]
+         * Rename `find lexical --all` to `--inactive`
+         * Have `find lexical` indicate if it was found in an inactive pad
+         * Paginate output of `outrefs` and `inrefs` commands
+         * Use Feature::Compat::Try
+         * Style modernisations for perl v5.14+
+
 0.43    2020-04-24
         [CHANGES]
          * Have `callers` print the actual CV identity of subs

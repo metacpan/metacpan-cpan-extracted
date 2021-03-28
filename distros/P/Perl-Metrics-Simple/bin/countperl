@@ -10,7 +10,7 @@ use Perl::Metrics::Simple::Output::JSON;
 use Perl::Metrics::Simple::Output::PlainText;
 use Pod::Usage qw(pod2usage);
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 exit main() if not caller;
 

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Feature::Compat::Try 0.03;
+package Feature::Compat::Try 0.04;
 
 use v5.14;
 use warnings;
@@ -83,6 +83,15 @@ associated C<catch>) are such that they are parsed as a self-contained
 statement. Because of this, there is no need to end with a terminating
 semicolon.
 
+Even though it parses as a statement and not an expression, a C<try> block can
+still yield a value if it appears as the final statement in its containing
+C<sub> or C<do> block. For example:
+
+   my $result = do {
+      try { attempt_func() }
+      catch ($e) { "Fallback Value" }
+   };
+
 =head2 catch
 
    ...
@@ -120,6 +129,34 @@ sub import
       Syntax::Keyword::Try->import(qw( try -no_finally -require_var ));
    }
 }
+
+=head1 COMPATIBILITY NOTES
+
+This module may use either L<Syntax::Keyword::Try> or the perl core C<try>
+feature to implement its syntax. While the two behave very similarly, and both
+conform to the description given above, the following differences should be
+noted.
+
+=over 4
+
+=item * Visibility to C<caller()>
+
+The C<Syntax::Keyword::Try> module implements C<try> blocks by using C<eval>
+frames. As a result, they are visible to the C<caller()> function and hence to
+things like C<Carp::longmess> when viewed as stack traces.
+
+By comparison, core's C<feature 'try'> creates a new kind of context stack
+entry that is ignored by C<caller()> and hence these blocks do not show up in
+stack traces.
+
+This should not matter to most use-cases - e.g. even C<Carp::croak> will be
+fine here. But if you are using C<caller()> with calculated indexes to inspect
+the state of callers to your code and there may be C<try> frames in the way,
+you will need to somehow account for the difference in stack height.
+
+=back
+
+=cut
 
 =head1 AUTHOR
 

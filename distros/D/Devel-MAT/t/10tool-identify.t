@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 use utf8;
 
@@ -38,7 +38,7 @@ local *Devel::MAT::Cmd::printf = sub {
    my ( $fmt, @args ) = @_;
    $got .= sprintf $fmt, @args;
 };
-Devel::MAT::Tool::Identify::walk_graph( $graph );
+Devel::MAT::Tool::Identify->walk_graph( $graph, "" );
 
 # Due to ordering within walk_graph this string should be relatively stable
 my $want = <<'EOR';

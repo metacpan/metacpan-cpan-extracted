@@ -3,6 +3,8 @@
 
 This module lets you require other modules where the module
 name is in a variable, something you can't do with the 'require' built-in.
+There are better alternatives now, so you should start by looking at
+the list in SEE ALSO.
 
 You can read a nicely formatted version of the documentation for
 this module online:

@@ -3,13 +3,11 @@
 #
 #  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Stack;
+package Devel::MAT::Tool::Stack 0.44;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Devel::MAT::Tool );
-
-our $VERSION = '0.43';
 
 use constant CMD => "stack";
 use constant CMD_DESC => "Display the value stack";
@@ -50,3 +48,5 @@ sub run
       );
    }
 }
+
+0x55AA;

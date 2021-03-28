@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.22;
+package Syntax::Keyword::Try 0.23;
 
 use v5.14;
 use warnings;
@@ -96,6 +96,15 @@ The parsing rules for the set of statements (the C<try> block and its
 associated C<catch> and C<finally>) are such that they are parsed as a self-
 contained statement. Because of this, there is no need to end with a
 terminating semicolon.
+
+Even though it parses as a statement and not an expression, a C<try> block can
+still yield a value if it appears as the final statement in its containing
+C<sub> or C<do> block. For example:
+
+   my $result = do {
+      try { attempt_func() }
+      catch ($e) { "Fallback Value" }
+   };
 
 Note (especially to users of L<Try::Tiny> and similar) that the C<try {}>
 block itself does not necessarily stop exceptions thrown inside it from
@@ -215,9 +224,11 @@ containing the original exception, if one existed.
 =over 4
 
 B<Warning:> the feature described in this section is experimental. This
-experiment may be stablised in a later version, or may be altered or removed
-without further notice. It is present here for testing and evaluation
-purposes.
+experiment has existed for a while, though given that since version 0.22
+the regular C<try> syntax already behaves fine inside a C<do> block, there is
+no longer any reason for this experimental feature to exist. It will start
+printing deprecation warnings in a later version, and eventually will be
+removed.
 
 Additionally, on I<perl> versions 5.18 and later, it will produce a warning
 in the C<experimental> category.
@@ -283,6 +294,10 @@ L<Syntax::Feature::Try>
 
 =back
 
+In addition, core perl itself gained a C<try/catch> syntax based on this
+module at developemnt version 5.33.7, and should become generally available
+when 5.34 is released. It will be available as C<use feature 'try'>.
+
 They are compared here, by feature:
 
 =head2 True syntax plugin
@@ -291,6 +306,9 @@ Like L<Try> and L<Syntax::Feature::Try>, this module is implemented as a true
 syntax plugin, allowing it to provide new parsing rules not available to
 simple functions. Most notably here it means that the resulting combination
 does not need to end in a semicolon.
+
+The core C<feature 'try'> is also implemented as true native syntax in the
+perl parser.
 
 In comparison, L<Try::Tiny> is plain perl and provides its functionality using
 regular perl functions; as such its syntax requires the trailing semicolon.
@@ -307,11 +325,15 @@ containing function's array as before.
 This feature is unique among these modules; none of the others listed have
 this ability.
 
+The core C<feature 'try'> also behaves in this manner.
+
 =head2 C<return> in a try or catch block
 
 Like L<TryCatch> and L<Syntax::Feature::Try>, the C<return> statement has its
 usual effect within a subroutine containing syntax provided by this module.
 Namely, it causes the containing C<sub> itself to return.
+
+It also behaves this way using the core C<feature 'try'>.
 
 In comparison, using L<Try> or L<Try::Tiny> mean that a C<return> statement
 will only exit from the C<try> block.
@@ -321,6 +343,8 @@ will only exit from the C<try> block.
 The loop control keywords of C<next>, C<last> and C<redo> have their usual
 effect on dynamically contained loops.
 
+These also work fine when using the core C<feature 'try'>.
+
 L<Syntax::Feature::Try> documents that these do not work there. The other
 modules make no statement either way.
 
@@ -329,15 +353,15 @@ modules make no statement either way.
 Like L<Try> and L<Syntax::Feature::Try>, the syntax provided by this module
 only works as a syntax-level statement and not an expression when the
 experimental C<try_value> feature described above has not been enabled. You
-cannot assign from the result of a C<try> block. Additionally,
-final-expression value semantics do not work, so it cannot be contained by a
-C<do> block to yield this value.
+cannot assign from the result of a C<try> block. A common workaround is to
+wrap the C<try/catch> statement inside a C<do> block, where its final
+expression can be captured and used as a value.
+
+The same C<do> block wrapping also works for the core C<feature 'try'>.
 
 In comparison, the behaviour implemented by L<Try::Tiny> can be used as a
 valued expression, such as assigned to a variable or returned to the caller of
-its containing function. Such ability is provided by this module if the
-experimental C<try_value> feature is enabled, though it must be spelled
-differently as C<try do { ... }>.
+its containing function.
 
 =head2 C<try> without C<catch>
 
@@ -352,10 +376,16 @@ exception propagation even without an actual C<catch> block.
 
 The L<TryCatch> module does not allow a C<try> block not followed by C<catch>.
 
+The core C<feature 'try'> does not implement C<finally> at all, and also
+requires that every C<try> block be followed by a C<catch>.
+
 =head2 Typed C<catch>
 
 L<Try> and L<Try::Tiny> make no attempt to perform any kind of typed dispatch
 to distinguish kinds of exception caught by C<catch> blocks.
+
+Likewise the core C<feature 'try'> currently does not provide this ability,
+though it remains an area of ongoing design work.
 
 L<TryCatch> and L<Syntax::Feature::Try> both attempt to provide a kind of
 typed dispatch where different classes of exception are caught by different

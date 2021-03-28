@@ -1,5 +1,7 @@
 Changes
+examples/iconify.pl
 lib/Mojolicious/Plugin/Iconify.pm
+lib/Mojolicious/Plugin/Iconify/API.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

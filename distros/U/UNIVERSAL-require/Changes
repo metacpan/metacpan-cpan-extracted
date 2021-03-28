@@ -1,5 +1,9 @@
 Revision history for Perl module UNIVERSAL::require
 
+0.19 2021-03-27 NEILB
+    - Noted that the module is now deprecated
+    - Added a list of alternatives to SEE ALSO
+
 0.18 2015-02-24
     - Skip the taint test if Perl was compiled without taint support.
       RAZ++

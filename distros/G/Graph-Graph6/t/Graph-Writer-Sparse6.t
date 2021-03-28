@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2021 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -66,7 +66,7 @@ my $filename = 'Graph-Writer-Sparse6-t.tmp';
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 8;
+  my $want_version = 9;
   ok ($Graph::Writer::Sparse6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Writer::Sparse6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Writer::Sparse6->VERSION($want_version); 1 }, 1,
@@ -104,7 +104,7 @@ sub try_write {
 }
 
 {
-  my $graph = Graph::Undirected->new;
+  my $graph = Graph->new (undirected => 1);
   $graph->add_vertices(0,1,2,3,4);
   $graph->add_edge(0,1);
   $graph->add_edge(0,2);
@@ -116,7 +116,7 @@ sub try_write {
 {
   # with header=>1
 
-  my $graph = Graph::Undirected->new;
+  my $graph = Graph->new (undirected => 1);
   $graph->add_vertices(0,1,2,3,4);
   $graph->add_edge(0,1);
   $graph->add_edge(0,2);
@@ -167,7 +167,8 @@ sub try_write {
 # countedged write
 
 {
-  my $graph = Graph::Undirected->new (countedged => 0);
+  my $graph = Graph->new (undirected => 1,
+                          countedged => 0);
   $graph->add_vertices(0,1);
   $graph->add_edge(0,1);
   $graph->add_edge(0,1);
@@ -175,7 +176,8 @@ sub try_write {
   # binary 101111, four pad bits
 }
 {
-  my $graph = Graph::Undirected->new (countedged => 1);
+  my $graph = Graph->new (undirected => 1,
+                          countedged => 1);
   $graph->add_vertices(0,1);
   $graph->add_edge(0,1);
   $graph->add_edge(0,1);
@@ -183,7 +185,8 @@ sub try_write {
   # binary 100011, two pad bits
 }
 {
-  my $graph = Graph::Undirected->new (countedged => 1);
+  my $graph = Graph->new (undirected => 1,
+                          countedged => 1);
   $graph->add_vertices(0,1);
   $graph->add_edge(0,1);
   $graph->add_edge(0,1);

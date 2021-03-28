@@ -1,7 +1,7 @@
 use Test2::V0 -no_srand => 1, -no_utf8 => 1;
 use Test2::Mock;
 use Test::Alien::Build;
-use Test::Exit;
+use Test2::Tools::Process qw( intercept_exit );
 use ExtUtils::MakeMaker;
 use Alien::Build::Plugin::Fetch::Prompt;
 use Capture::Tiny qw( capture_merged );
@@ -42,9 +42,9 @@ subtest 'user says yes' => sub {
 
   subtest 'default url' => sub {
   
-    never_exits_ok {
+    is intercept_exit {
       $build->fetch;
-    };
+    }, U();
     
     like $msg, qr{http://alienfile.org/foo/bar/baz};
     note "msg = $msg";
@@ -55,9 +55,9 @@ subtest 'user says yes' => sub {
   
   subtest 'non-default url' => sub {
   
-    never_exits_ok {
+    is intercept_exit {
       $build->fetch('http://alienfile.org/bar/baz/foo');
-    };
+    }, U();
     
     link $msg, qr{http://alienfile.org/bar/baz/foo};
     note "msg = $msg";
@@ -70,9 +70,9 @@ subtest 'user says yes' => sub {
 
     local $ENV{ALIEN_DOWNLOAD} = 'no';
   
-    never_exits_ok {
+    is intercept_exit {
       $build->fetch('http://alienfile.org/bar/baz/foo');
-    };
+    }, U();
     
     is $def, 'no';
   
@@ -84,7 +84,7 @@ subtest 'user says no' => sub {
 
   $mock->override(prompt => sub ($;$) { 'n' });
   
-  is exit_code { capture_merged { $build->fetch } }, 2;
+  is intercept_exit { capture_merged { $build->fetch } }, 2;
 
 };
 

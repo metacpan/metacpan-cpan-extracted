@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-package Event::Distributor::Query;
+package Event::Distributor::Query 0.06;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Event::Distributor::_Event );
-
-our $VERSION = '0.05';
 
 use Future;
 

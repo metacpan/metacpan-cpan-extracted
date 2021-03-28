@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2021 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -27,7 +27,7 @@ our @ISA = ('Exporter');
 our @EXPORT_OK = ('read_graph','write_graph',
                   'HEADER_GRAPH6','HEADER_SPARSE6','HEADER_DIGRAPH6');
 
-our $VERSION = 8;
+our $VERSION = 9;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -514,7 +514,7 @@ sub write_graph {
 
     # When doing a "set v" for a new to >= v+2, the b[i] bit can be either 0
     # or 1.  When 1 it means v++ increment, and the x[i]=to is still >v so
-    # set v.  The code here follows the nauty tools ntos6() and emits b[i]=1.
+    # set v.  The code here follows the Nauty tools ntos6() and emits b[i]=1.
 
     my $v = 0;
     while (my ($from, $to) = $edge_iterator->()) {
@@ -620,7 +620,7 @@ sub write_graph {
 1;
 __END__
 
-=for stopwords Ryde undirected multi-edges arrayref nauty tty
+=for stopwords Ryde undirected multi-edges arrayref Nauty tty
 
 =head1 NAME
 
@@ -641,8 +641,8 @@ Graph::Graph6 - read and write graph6, sparse6, digraph6 format graphs
 
 =head1 DESCRIPTION
 
-This module reads and writes graph6, sparse6 and digraph6 files.  These file
-formats are per
+This module reads and writes graph6, sparse6 and digraph6 files or strings
+as per
 
 =over 4
 
@@ -660,12 +660,12 @@ character so N vertices is a file size roughly N^2/12 bytes.
 
 sparse6 represents an undirected graph by a list of edges i,j.  This is good
 for graphs with relatively few edges.  It can have self-loops and
-multi-edges.  The file size is somewhere from B=E*(W+1)/6 to 2*B bytes for E
-edges and bit width W bits for the biggest vertex number N-1.
+multi-edges.  The file size ranges from B = E*(W+1)/6 bytes up to 2*B bytes,
+for E edges and bit width W bits for the biggest vertex number N-1.
 
-digraph6 represents a directed graph as an NxN adjacency matrix encoded 6
-bits per character so file size N^2/6 bytes.  It can include self-loops but
-no multi-edges.
+digraph6 represents a directed graph as an NxN adjacency matrix of bits
+encoded as 6 bits per character so file size N^2/6 bytes.  It can include
+self-loops but no multi-edges.
 
 =cut
 
@@ -712,12 +712,12 @@ Read graph6, sparse6 or digraph6.  The key/value options are
 The return value is
 
     1         if graph successfully read
-    0         if end of file (no graph)
+    0         if end of file (no graph read)
     croak()   if invalid content or file error
-    undef     if error_func returns instead of dying
+    undef     if error_func returns
 
 C<filename>, C<fh> or C<str> is the input.  The output is number of vertices
-and list of edges provided by calls or ref targets.
+and list of edges as callbacks or ref targets.
 
 The number of vertices n is stored to C<num_vertices_ref> or call to
 C<num_vertices_func>, or both.
@@ -729,7 +729,7 @@ Each edge is stored into C<edge_aref> or call to C<edge_func>, or both.  Any
 existing contents of C<edge_aref> array are deleted.  C<$from> and C<$to>
 are integers in the range 0 to n-1.  graph6 has C<$from E<lt> $to>.  sparse6
 has C<$from E<lt>= $to>.  digraph6 has any values.  For sparse6, multi-edges
-give multiple elements stored and multiple calls made.
+give multiple edges stored and multiple calls made.
 
     push @$edge_aref, [ $from, $to ];   # (and emptied first)
     $edge_func->($from, $to);
@@ -742,13 +742,13 @@ The default C<error_func> is C<croak()>.  If C<error_func> returns then the
 return from C<read_graph()> is C<undef>.
 
 An immediate end of file gives the end of file return 0.  It's common to
-have multiple graphs in a file, one per line and possibly an empty file if
+have multiple graphs in a file, one per line, and possibly an empty file if
 no graphs of some kind.  They can be read successively with C<read_graph()>
 until 0 at end of file.
 
 End of file is usually only of interest when reading an C<fh> handle.  But
-empty file or empty input string give the end of file return too.  This is
-designed to make the input sources equivalent (C<filename> is the same as
+an empty file or empty input string give the end of file return too.  This
+is designed to make the input sources equivalent (C<filename> is the same as
 open and C<fh>, and either the same as slurp and pass C<str>).
 
 For C<num_vertices_ref> and C<edge_aref>, a C<my> can be included in the
@@ -768,9 +768,9 @@ C<$from> to jump around.  digraph6 has edges ordered by increasing C<$from>
 and within that increasing C<$to>.  But the suggestion is not to rely on
 edge order (only on C<$from E<lt>= $to> for graph6 and sparse6 noted above).
 
-In C<perl -T> taint mode, C<$num_vertices> and edge C<$from,$to> outputs are
-tainted in the usual way for reading from file, from tainted C<str>, or from
-C<fh> handle of file or tie of something tainted.
+In C<perl -T> taint mode, C<$num_vertices> and edge C<$from, $to> outputs
+are tainted in the usual way for reading from file, from tainted C<str>, or
+from C<fh> handle of a file or a tie of something tainted.
 
 =back
 
@@ -812,13 +812,13 @@ C<format> defaults to C<"graph6">, or can be C<"sparse6"> or C<"digraph6">
 
 C<header> flag writes an initial C<"E<gt>E<gt>graph6E<lt>E<lt>">,
 C<"E<gt>E<gt>sparse6E<lt>E<lt>"> or C<"E<gt>E<gt>digraph6E<lt>E<lt>"> as
-appropriate.  This is optional for the nauty programs and for
+appropriate.  This is optional for the Nauty programs and for
 C<read_graph()> above, but may help a human reader distinguish a graph from
 tty line noise.
 
 C<num_vertices> is mandatory, except if C<edge_aref> is given then the
-default is from the maximum vertex number there (which is convenient as long
-as the maximum vertex has at least one edge).  Must have C<num_vertices <
+default is the maximum vertex number there.  (This is convenient, as long as
+the maximum vertex has at least one edge.)  Must have C<num_vertices <
 2**36>.
 
 C<edge_aref> is an arrayref of edges which are in turn arrayref pairs of
@@ -893,7 +893,7 @@ L<http://user42.tuxfamily.org/graph-graph6/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2021 Kevin Ryde
 
 Graph-Graph6 is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

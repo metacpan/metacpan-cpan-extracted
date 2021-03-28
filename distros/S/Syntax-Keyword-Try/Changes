@@ -1,5 +1,13 @@
 Revision history for Syntax-Keyword-Try
 
+0.23    2021-03-27
+        [CHANGES]
+         * Unit tests and documentation of the handling of the final-value
+           semantics of `do { try ... }`
+         * Also mention core's `feature 'try'` in documentation
+         * Gives notice that the experimental 'try_value' feature is now
+           discouraged and will eventually be removed
+
 0.22    2021-03-26
         [CHANGES]
          * Preserve wantarray context within the try {} block (RT133616)

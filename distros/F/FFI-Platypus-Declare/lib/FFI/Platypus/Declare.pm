@@ -7,7 +7,7 @@ use Carp ();
 use FFI::Platypus 1.33;
 
 # ABSTRACT: (discouraged) Declarative interface to FFI::Platypus
-our $VERSION = '1.33'; # VERSION
+our $VERSION = '1.34'; # VERSION
 
 
 our $ffi    = {};
@@ -175,7 +175,7 @@ FFI::Platypus::Declare - (discouraged) Declarative interface to FFI::Platypus
 
 =head1 VERSION
 
-version 1.33
+version 1.34
 
 =head1 SYNOPSIS
 
@@ -427,7 +427,11 @@ JIT compiler for FFI.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Carlos D. Álvaro (cdalvaro)
 
 =head1 COPYRIGHT AND LICENSE
 

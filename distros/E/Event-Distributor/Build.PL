@@ -6,8 +6,10 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Event::Distributor',
    requires => {
+      'perl' => '5.014',
+
+      'Feature::Compat::Try' => 0,
       'Future' => '0.15',
-      'Syntax::Keyword::Try' => 0,
    },
    test_requires => {
       'Test::Fatal' => 0,

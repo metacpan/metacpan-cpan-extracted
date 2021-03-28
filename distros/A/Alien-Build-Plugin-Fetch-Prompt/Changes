@@ -1,5 +1,10 @@
 Revision history for Alien-Build-Plugin-Fetch-Prompt
 
+0.60      2021-03-27 11:21:05 -0600
+  - Migrate test dep from Test::Exit to Test2::Tools::Process (gh#1)
+  - Drop support for Perls prior to 5.10
+  - Moved to new GitHub org PerlAlien
+
 0.59      2017-08-08 16:34:25 -0400
   - Workaround for test failure on Perl 5.10.0
 

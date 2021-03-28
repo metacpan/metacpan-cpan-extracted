@@ -1,13 +1,13 @@
 package Perl::Metrics::Simple::Output::PlainText;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 use strict;
 use warnings;
 
 use parent qw(Perl::Metrics::Simple::Output);
 
-use Readonly;
+use Readonly 1.03;
 
 Readonly my $MAX_PLAINTEXT_LABEL_LENGTH => 25;
 Readonly my $EMPTY_STRING               => q{};

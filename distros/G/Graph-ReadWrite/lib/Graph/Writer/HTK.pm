@@ -2,7 +2,7 @@
 # Graph::Writer::HTK - perl module for writing a Graph as an HTK lattice
 #
 package Graph::Writer::HTK;
-$Graph::Writer::HTK::VERSION = '2.09';
+$Graph::Writer::HTK::VERSION = '2.10';
 use 5.006;
 use strict;
 use warnings;

@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
-package Devel::MAT;
+package Devel::MAT 0.44;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.43';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -25,7 +23,7 @@ use Module::Pluggable
    require => 1;
 
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 =head1 NAME
 

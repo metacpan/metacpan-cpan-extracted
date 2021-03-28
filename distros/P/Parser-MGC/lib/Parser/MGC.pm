@@ -1,16 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
 
-package Parser::MGC;
+package Parser::MGC 0.18;
 
-use strict;
+use v5.14;
 use warnings;
 
-our $VERSION = '0.16';
-
 use Carp;
+use Feature::Compat::Try;
 
 use File::Slurp::Tiny qw( read_file );
 use Scalar::Util qw( blessed );
@@ -324,7 +323,7 @@ sub pos
 I<Since version 0.16.>
 
 Returns the next C<$len> characters directly from the input, prior to any
-whitespace or comment skipping. This does I<not> take account of any pending
+whitespace or comment skipping. This does I<not> take account of any
 end-of-scope marker that may be pending. It is intended for use by parsers of
 partially-binary protocols, or other situations in which it would be incorrect
 for the end-of-scope marker to take effect at this time.
@@ -514,14 +513,15 @@ sub maybe
    my $committed = 0;
    local $self->{committer} = sub { $committed++ };
 
-   my $ret;
-   eval { $ret = $self->$code; 1 } and return $ret;
-   my $e = $@;
+   try {
+      return $self->$code;
+   }
+   catch ( $e ) {
+      pos($self->{str}) = $pos;
 
-   pos($self->{str}) = $pos;
-
-   die $e if $committed or not _isa_failure( $e );
-   return undef;
+      die $e if $committed or not _isa_failure( $e );
+      return undef;
+   }
 }
 
 =head2 scope_of
@@ -656,13 +656,16 @@ sub list_of
       $committed = 0;
       my $pos = pos $self->{str};
 
-      eval { push @ret, $self->$code; 1 } and next;
-      my $e = $@;
+      try {
+         push @ret, $self->$code;
+         next;
+      }
+      catch ( $e ) {
+         pos($self->{str}) = $pos;
+         die $e if $committed or not _isa_failure( $e );
 
-      pos($self->{str}) = $pos;
-      die $e if $committed or not _isa_failure( $e );
-
-      last;
+         last;
+      }
    }
    continue {
       if( defined $sep ) {
@@ -752,13 +755,14 @@ sub any_of
       my $committed = 0;
       local $self->{committer} = sub { $committed++ };
 
-      my $ret;
-      eval { $ret = $self->$code; 1 } and return $ret;
-      my $e = $@;
+      try {
+         return $self->$code;
+      }
+      catch ( $e ) {
+         pos( $self->{str} ) = $pos;
 
-      pos( $self->{str} ) = $pos;
-
-      die $e if $committed or not _isa_failure( $e );
+         die $e if $committed or not _isa_failure( $e );
+      }
    }
 
    $self->fail( "Found nothing parseable" );

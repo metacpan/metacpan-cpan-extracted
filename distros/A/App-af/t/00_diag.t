@@ -23,7 +23,6 @@ $modules{$_} = $_ for qw(
   Test2::Mock
   Test2::Tools::Basic
   Test2::V0
-  Test::Exit
   Test::Script
   Text::Table
   YAML
@@ -72,7 +71,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

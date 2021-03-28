@@ -2,7 +2,6 @@ use Test2::V0 -no_srand => 1;
 use lib 'corpus/lib';
 use lib 't/lib';
 use MyTest;
-use Test::Exit;
 use File::chdir;
 use File::Temp qw( tempdir );
 use Path::Tiny qw( path );

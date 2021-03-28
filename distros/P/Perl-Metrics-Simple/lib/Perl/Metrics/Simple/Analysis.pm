@@ -4,12 +4,12 @@ use warnings;
 
 use Carp qw(confess);
 use English qw(-no_match_vars);
-use Readonly;
+use Readonly 1.03;
 use Statistics::Basic::StdDev;
 use Statistics::Basic::Mean;
 use Statistics::Basic::Median;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 my %_ANALYSIS_DATA = ();
 my %_FILES         = ();

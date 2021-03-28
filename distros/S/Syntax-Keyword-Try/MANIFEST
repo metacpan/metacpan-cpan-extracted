@@ -22,6 +22,7 @@ t/12return.t
 t/13die-in-finally.t
 t/14try-localises.t
 t/15context.t
+t/16final-expr.t
 t/20try-do.t
 t/21try-do-finally.t
 t/30compat.t

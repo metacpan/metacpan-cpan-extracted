@@ -1,5 +1,5 @@
 package Constant::FromGlobal;
-$Constant::FromGlobal::VERSION = '0.09';
+$Constant::FromGlobal::VERSION = '0.10';
 # ABSTRACT: declare constant(s) with value from global or environment variable
 
 use strict;
@@ -16,7 +16,7 @@ sub import {
 
     @_ = (
 		"constant",
-		$class->process_constants(
+		$class->_process_constants(
 			package => scalar(caller),
 			%$opt,
 			constants => \@args
@@ -26,7 +26,7 @@ sub import {
     goto &constant::import;
 }
 
-sub process_constants {
+sub _process_constants {
     my ( $class, %args ) = @_;
 
     my $options = Data::OptList::mkopt(delete $args{constants}, "constant", 1, [qw(HASH ARRAY)]);
@@ -38,7 +38,7 @@ sub process_constants {
     foreach my $constant ( @$options ) {
         my ( $name, $opt ) = @$constant;
 
-        $constants->{$name} = $class->get_value(
+        $constants->{$name} = $class->_get_value(
             %args,
             name => $name,
             %$opt,
@@ -48,13 +48,13 @@ sub process_constants {
     return $constants;
 }
 
-sub get_value {
+sub _get_value {
     my ( $class, %args ) = @_;
 
-    my $value = $class->get_var(%args);
+    my $value = $class->_get_var(%args);
 
     if ( not defined $value and $args{env} ) {
-        $value = $class->get_env_var(%args);
+        $value = $class->_get_env_var(%args);
     }
 
 	if ( not defined $value and defined $args{default} ) {
@@ -77,23 +77,23 @@ sub get_value {
 	return $value;
 }
 
-sub var_name {
+sub _var_name {
     my ( $class, %args ) = @_;
 
     join "::", @args{qw(package name)};
 }
 
-sub get_var {
+sub _get_var {
     my ( $class, %args ) = @_;
 
     no strict 'refs';
-    return ${ $class->var_name(%args) }
+    return ${ $class->_var_name(%args) }
 }
 
-sub get_env_var {
+sub _get_env_var {
     my ( $class, %args ) = @_;
 
-    my $name = uc $class->var_name(%args);
+    my $name = uc $class->_var_name(%args);
     $name =~ s/^MAIN:://;
     $name =~ s/::/_/g;
 
@@ -213,6 +213,9 @@ very similar to the C<constant> pragma, but defines lexically-scoped constants.
 
 L<Const::Fast> -
 CPAN module for defining immutable variables (scalars, hashes, and arrays).
+
+L<Config::Constants> is a module that will load a configuration
+file into a number of function-style constants.
 
 L<Adam Kennedy's original post|http://use.perl.org/use.perl.org/_Alias/journal/39845.html>
 that inspired this module.

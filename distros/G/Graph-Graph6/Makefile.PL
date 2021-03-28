@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2017 Kevin Ryde
+# Copyright 2015, 2017, 2021 Kevin Ryde
 
 # This file is part of Graph-Graph6.
 #
@@ -65,14 +65,14 @@ WriteMakefile
      prereqs =>
      { runtime =>
        { suggests =>
-         { 'Graph::Writer'       => 0,
-           'Graph::Reader'       => 0,
+         { 'Graph::Reader'       => 0,
+           'Graph::Writer'       => 0,
            'Graph::Easy::Parser' => 0,
            'GraphViz2'           => 0,
          },
        },
        test =>
-       { recommends =>
+       { suggests =>
          { 'Graph'               => 0,
            'Graph::Reader'       => 0,
            'Graph::Writer'       => 0,

@@ -1,17 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
 
-package Event::Distributor;
+package Event::Distributor 0.06;
 
-use strict;
+use v5.14;
 use warnings;
 
-our $VERSION = '0.05';
-
 use Carp;
-use Syntax::Keyword::Try;
+use Feature::Compat::Try;
 
 use Future;
 
@@ -25,25 +23,25 @@ C<Event::Distributor> - a simple in-process pub/sub mechanism
 
 =head1 SYNOPSIS
 
- use Event::Distributor;
+   use Event::Distributor;
 
- my $dist = Event::Distributor->new;
+   my $dist = Event::Distributor->new;
 
- $dist->declare_signal( "announce" );
-
-
- $dist->subscribe_sync( announce => sub {
-    my ( $message ) = @_;
-    say $message;
- });
-
- $dist->subscribe_async( announce => sub {
-    my ( $message ) = @_;
-    return $async_http->POST( "http://server/message", $message );
- });
+   $dist->declare_signal( "announce" );
 
 
- $dist->fire_sync( announce => "Hello, world!" );
+   $dist->subscribe_sync( announce => sub {
+      my ( $dist, $message ) = @_;
+      say $message;
+   });
+
+   $dist->subscribe_async( announce => sub {
+      my ( $dist, $message ) = @_;
+      return $async_http->POST( "http://server/message", $message );
+   });
+
+
+   $dist->fire_sync( announce => "Hello, world!" );
 
 =head1 DESCRIPTION
 
@@ -242,7 +240,7 @@ consider instead using the L</subscribe_async> method.
 When invoked the code will be passed the distributor object itself and the
 list of arguments.
 
- $code->( $distributor, @args )
+   $code->( $distributor, @args )
 
 =cut
 
@@ -256,8 +254,8 @@ sub subscribe_sync
       try {
          return Future->done( $code->( @args ) );
       }
-      catch {
-         return Future->fail( $@ );
+      catch ( $e ) {
+         return Future->fail( $e );
       }
    });
 }

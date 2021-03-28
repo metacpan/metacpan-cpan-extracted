@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use English qw(-no_match_vars);
 use FindBin qw($Bin);
-use Readonly;
+use Readonly 1.03;
 use Test::More tests => 6;
 
 Readonly::Scalar my $TEST_DIRECTORY => "$Bin/test_files";

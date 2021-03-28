@@ -3,17 +3,12 @@
 #
 #  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Identify;
+package Devel::MAT::Tool::Identify 0.44;
 
-use strict;
+use v5.14;
 use warnings;
-use base qw( Devel::MAT::Tool );
+use base qw( Devel::MAT::ToolBase::GraphWalker );
 use utf8;
-
-our $VERSION = '0.43';
-
-use List::Util qw( any pairs );
-use List::UtilsBy qw( nsort_by );
 
 use constant CMD => "identify";
 use constant CMD_DESC => "Identify an SV by its referrers";
@@ -31,117 +26,6 @@ tree of inrefs, printing useful information that helps to identify what it is
 by how it can be reached from well-known program roots.
 
 =cut
-
-my %STRENGTH_ORDER = (
-   strong   => 1,
-   weak     => 2,
-   indirect => 3,
-   inferred => 4,
-);
-
-sub _strength_label
-{
-   my ( $strength ) = @_;
-   $strength eq "strong" ? "" :
-      Devel::MAT::Cmd->format_note( "[$strength]", 1 ) . " ",
-}
-
-my $next_id;
-my %id_for;
-my %seen;
-
-sub walk_graph
-{
-   my ( $node, $indent ) = @_;
-   $indent //= "";
-
-   my $addr  = $node->addr;
-   my @roots = $node->roots;
-   my @edges = $node->edges_in;
-
-   if( !@roots and !@edges ) {
-      Devel::MAT::Cmd->printf( "$indent└─not found\n" );
-      return;
-   }
-
-   if( @roots == 1 and $roots[0] eq "EDEPTH" ) {
-      Devel::MAT::Cmd->printf( "$indent└─not found at this depth\n" );
-      return;
-   }
-
-   # Don't bother showing any non-root edges if we have a strong root
-   @edges = () if any { $_->strength eq "strong" } @roots;
-
-   if( @edges > 0 and $seen{$addr} ) {
-      Devel::MAT::Cmd->printf( "$indent└─already found " );
-
-      Devel::MAT::Cmd->printf( "%s ",
-         Devel::MAT::Cmd->format_note( "circularly" )
-      ) if $seen{$addr} == 1;
-
-      if( defined( my $id = $id_for{$addr} ) ) {
-         Devel::MAT::Cmd->printf( "as %s\n",
-            Devel::MAT::Cmd->format_note( "*$id" ),
-         );
-      }
-      else {
-         Devel::MAT::Cmd->printf( "%s\n",
-            Devel::MAT::Cmd->format_note( "circularly" ),
-         );
-      }
-      return;
-   }
-
-   $seen{$addr}++;
-
-   foreach my $idx ( 0 .. $#roots ) {
-      my $isfinal = $idx == $#roots && !@edges;
-
-      Devel::MAT::Cmd->printf( $indent . ( $isfinal ? "└─%s%s\n" : "├─%s%s\n" ),
-         _strength_label( $roots[$idx]->strength ),
-         $roots[$idx]->name,
-      );
-   }
-
-   my @refs = nsort_by { $STRENGTH_ORDER{$_->[0]->strength} } pairs @edges;
-   foreach my $idx ( 0 .. $#refs ) {
-      my ( $ref, $refnode ) = @{ $refs[$idx] };
-      my $is_final = $idx == $#refs;
-
-      Devel::MAT::Cmd->printf(
-         $indent . ( $is_final ? "└─" : "├─" ) );
-
-      my $ref_id;
-      if( $refnode->edges_out > 1 and not $refnode->roots and not $id_for{$refnode->addr} ) {
-         $ref_id = $id_for{$refnode->addr} = $next_id++;
-      }
-
-      Devel::MAT::Cmd->printf( "%s%s of %s, which is",
-         _strength_label( $ref->strength ),
-         $ref->name,
-         Devel::MAT::Cmd->format_sv( $refnode->sv ),
-      );
-
-      if( $ref_id ) {
-         Devel::MAT::Cmd->printf( " %s",
-            Devel::MAT::Cmd->format_note( "(*$ref_id)" ),
-         );
-      }
-
-      Devel::MAT::Cmd->printf( ":\n" );
-
-      my $subindent = $indent . ( $is_final ? "  " : "│ " );
-
-      if( $refnode->addr == $addr ) {
-         Devel::MAT::Cmd->printf( "${subindent}itself\n" );
-      }
-      else {
-         walk_graph( $refnode, $subindent );
-      }
-   }
-
-   $seen{$addr}++;
-}
 
 =head1 COMMANDS
 
@@ -212,10 +96,7 @@ sub run
    my %opts = %{ +shift };
    my ( $sv ) = @_;
 
-   # reset
-   $next_id = "A";
-   undef %id_for;
-   undef %seen;
+   $self->reset;
 
    my $STRONG = 1;
    my $DIRECT = 1;
@@ -230,12 +111,99 @@ sub run
       Devel::MAT::Cmd->format_sv( $sv ),
    );
 
-   walk_graph( $self->pmat->inref_graph( $sv,
+   $self->walk_graph( $self->pmat->inref_graph( $sv,
       depth => $opts{depth},
       strong => $STRONG,
       direct => $DIRECT,
       elide  => $ELIDE,
-   ) );
+   ), "" );
+}
+
+sub _strength_label
+{
+   my ( $strength ) = @_;
+   $strength eq "strong" ? "" :
+      Devel::MAT::Cmd->format_note( "[$strength]", 1 ) . " ",
+}
+
+sub on_walk_nothing
+{
+   shift;
+   my ( $node, $indent ) = @_;
+   Devel::MAT::Cmd->printf( "$indent└─not found\n" );
+}
+
+sub on_walk_EDEPTH
+{
+   shift;
+   my ( $node, $indent ) = @_;
+   Devel::MAT::Cmd->printf( "$indent└─not found at this depth\n" );
+}
+
+sub on_walk_again
+{
+   shift;
+   my ( $node, $cyclic, $id, $indent ) = @_;
+
+   Devel::MAT::Cmd->printf( "$indent└─already found " );
+
+   Devel::MAT::Cmd->printf( "%s ",
+      Devel::MAT::Cmd->format_note( "circularly" )
+   ) if $cyclic;
+
+   if( defined $id ) {
+      Devel::MAT::Cmd->printf( "as %s\n",
+         Devel::MAT::Cmd->format_note( "*$id" ),
+      );
+   }
+   else {
+      Devel::MAT::Cmd->printf( "%s\n",
+         Devel::MAT::Cmd->format_note( "circularly" ),
+      );
+   }
+}
+
+sub on_walk_root
+{
+   shift;
+   my ( $node, $root, $isfinal, $indent ) = @_;
+
+   Devel::MAT::Cmd->printf( $indent . ( $isfinal ? "└─%s%s\n" : "├─%s%s\n" ),
+      _strength_label( $root->strength ), $root->name,
+   );
+}
+
+sub on_walk_ref
+{
+   shift;
+   my ( $node, $ref, $sv, $ref_id, $is_final, $indent ) = @_;
+
+   Devel::MAT::Cmd->printf(
+      $indent . ( $is_final ? "└─" : "├─" ) );
+
+   Devel::MAT::Cmd->printf( "%s%s of %s, which is",
+      _strength_label( $ref->strength ),
+      $ref->name,
+      Devel::MAT::Cmd->format_sv( $sv ),
+   );
+
+   if( $ref_id ) {
+      Devel::MAT::Cmd->printf( " %s",
+         Devel::MAT::Cmd->format_note( "(*$ref_id)" ),
+      );
+   }
+
+   Devel::MAT::Cmd->printf( ":\n" );
+
+   # return recursion args:
+   return ( $indent . ( $is_final ? "  " : "│ " ) );
+}
+
+sub on_walk_itself
+{
+   shift;
+   my ( $node, $indent ) = @_;
+   Devel::MAT::Cmd->printf( "${indent}itself\n" );
 }
 
 =head1 AUTHOR

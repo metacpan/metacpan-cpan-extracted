@@ -2,10 +2,11 @@ package Alien::Build::Plugin::Fetch::PromptBeforeDownload;
 
 use strict;
 use warnings;
+use 5.010;
 use base qw( Alien::Build::Plugin::Fetch::Prompt );
 
 # ABSTRACT: Backwards compatible plugin name
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 
 1;
@@ -22,7 +23,7 @@ Alien::Build::Plugin::Fetch::PromptBeforeDownload - Backwards compatible plugin 
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 

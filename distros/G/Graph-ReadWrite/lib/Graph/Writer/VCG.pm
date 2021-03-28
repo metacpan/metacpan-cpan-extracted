@@ -2,7 +2,7 @@
 # Graph::Writer::VCG - write a directed graph out in VCG format
 #
 package Graph::Writer::VCG;
-$Graph::Writer::VCG::VERSION = '2.09';
+$Graph::Writer::VCG::VERSION = '2.10';
 use 5.006;
 use strict;
 use warnings;

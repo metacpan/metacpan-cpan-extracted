@@ -2,7 +2,7 @@
 # Graph::Reader::HTK - perl module for reading an HTK lattice into a Graph
 #
 package Graph::Reader::HTK;
-$Graph::Reader::HTK::VERSION = '2.09';
+$Graph::Reader::HTK::VERSION = '2.10';
 use 5.006;
 use strict;
 use warnings;

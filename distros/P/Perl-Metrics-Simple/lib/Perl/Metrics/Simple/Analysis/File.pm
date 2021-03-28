@@ -6,11 +6,11 @@ use Carp qw(cluck confess);
 use Data::Dumper;
 use English qw(-no_match_vars);
 use Perl::Metrics::Simple::Analysis;
-use PPI;
+use PPI 1.113;
 use PPI::Document;
 use Readonly;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 Readonly::Scalar my $ALL_NEWLINES_REGEX =>
     qr/ ( \Q$INPUT_RECORD_SEPARATOR\E ) /sxm;

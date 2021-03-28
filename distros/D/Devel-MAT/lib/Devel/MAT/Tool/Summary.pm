@@ -3,13 +3,11 @@
 #
 #  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Summary;
+package Devel::MAT::Tool::Summary 0.44;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Devel::MAT::Tool );
-
-our $VERSION = '0.43';
 
 use constant CMD => "summary";
 use constant CMD_DESC => "Print basic information about the loaded dumpfile";

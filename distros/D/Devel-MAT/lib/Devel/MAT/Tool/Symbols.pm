@@ -3,14 +3,11 @@
 #
 #  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Symbols;
+package Devel::MAT::Tool::Symbols 0.44;
 
-use strict;
+use v5.14;
 use warnings;
-use 5.014; # s///r
 use base qw( Devel::MAT::Tool );
-
-our $VERSION = '0.43';
 
 use constant CMD => "symbols";
 use constant CMD_DESC => "Display a list of the symbol table";

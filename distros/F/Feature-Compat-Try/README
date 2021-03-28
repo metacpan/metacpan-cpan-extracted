@@ -70,6 +70,15 @@ KEYWORDS
     statement. Because of this, there is no need to end with a terminating
     semicolon.
 
+    Even though it parses as a statement and not an expression, a try block
+    can still yield a value if it appears as the final statement in its
+    containing sub or do block. For example:
+
+       my $result = do {
+          try { attempt_func() }
+          catch ($e) { "Fallback Value" }
+       };
+
  catch
 
        ...
@@ -93,6 +102,29 @@ KEYWORDS
     containing function to return with the given value. The body may also
     contain loop control expressions (redo, next or last) which also have
     their usual effect.
+
+COMPATIBILITY NOTES
+
+    This module may use either Syntax::Keyword::Try or the perl core try
+    feature to implement its syntax. While the two behave very similarly,
+    and both conform to the description given above, the following
+    differences should be noted.
+
+      * Visibility to caller()
+
+      The Syntax::Keyword::Try module implements try blocks by using eval
+      frames. As a result, they are visible to the caller() function and
+      hence to things like Carp::longmess when viewed as stack traces.
+
+      By comparison, core's feature 'try' creates a new kind of context
+      stack entry that is ignored by caller() and hence these blocks do not
+      show up in stack traces.
+
+      This should not matter to most use-cases - e.g. even Carp::croak will
+      be fine here. But if you are using caller() with calculated indexes
+      to inspect the state of callers to your code and there may be try
+      frames in the way, you will need to somehow account for the
+      difference in stack height.
 
 AUTHOR
 

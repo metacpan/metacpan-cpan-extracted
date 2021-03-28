@@ -1,5 +1,11 @@
 Revision history for Feature-Compat-Try
 
+0.04    2021-03-27
+        [CHANGES]
+         * Unit tests and documentation of the handling of the final-value
+           semantics of `do { try ... }`
+         * Document the known differences between SKT and feature 'try'
+
 0.03    2021-03-26
         [CHANGES]
          * Better detection of whether the 'try' core feature is available

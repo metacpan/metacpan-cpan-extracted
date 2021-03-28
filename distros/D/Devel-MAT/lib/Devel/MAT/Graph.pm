@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2014-2016 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Graph;
+package Devel::MAT::Graph 0.44;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.43';
 
 use Struct::Dumb 0.07 'readonly_struct';
 
@@ -183,7 +181,7 @@ sub get_root_nodes
    } keys %{ $self->{roots_from} };
 }
 
-package Devel::MAT::Graph::Node;
+package Devel::MAT::Graph::Node 0.44;
 
 =head1 NODE OBJECTS
 

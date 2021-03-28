@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -22,7 +22,7 @@ use warnings;
 use Moo;
 use Graph::Graph6;
 
-our $VERSION = 8;
+our $VERSION = 9;
 
 
 has graph => (default  => sub {
@@ -214,7 +214,7 @@ L<http://user42.tuxfamily.org/graph-graph6/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 
 Graph-Graph6 is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

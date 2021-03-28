@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -85,7 +85,7 @@ sub easy_edges_str {
 #------------------------------------------------------------------------------
 
 {
-  my $want_version = 8;
+  my $want_version = 9;
   ok ($Graph::Easy::Parser::Graph6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Easy::Parser::Graph6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Easy::Parser::Graph6->VERSION($want_version); 1 }, 1,

@@ -4,9 +4,9 @@ use English qw(-no_match_vars);
 use Data::Dumper;
 use FindBin qw($Bin);
 use lib "$Bin/lib";
-use PPI;
+use PPI 1.113;
 use Perl::Metrics::Simple::Analysis::File;
-use Readonly;
+use Readonly 1.03;
 use Test::More tests => 20;
 
 Readonly::Scalar my $TEST_DIRECTORY => "$Bin/test_files";

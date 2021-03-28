@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::InternalTools;
+package Devel::MAT::InternalTools 0.44;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.43';
 
 package Devel::MAT::Tool::help;
 

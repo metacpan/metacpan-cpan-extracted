@@ -2,7 +2,7 @@
 # Graph::Writer - perl base class for Graph file format writers
 #
 package Graph::Writer;
-$Graph::Writer::VERSION = '2.09';
+$Graph::Writer::VERSION = '2.10';
 use 5.006;
 use strict;
 use warnings;

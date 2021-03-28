@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Outrefs;
+package Devel::MAT::Tool::Outrefs 0.44;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Devel::MAT::Tool );
-
-our $VERSION = '0.43';
 
 use List::UtilsBy qw( sort_by );
 
@@ -81,19 +79,24 @@ sub show_refs_by_method
    my $self = shift;
    my ( $method, $sv ) = @_;
 
-   my @table;
+   my @refs = grep { $_->sv } sort_by { $_->name } $sv->$method;
 
-   foreach my $ref ( sort_by { $_->name } $sv->$method ) {
-      my $refsv = $ref->sv or next;
+   Devel::MAT::Tool::more->paginate( sub {
+      my ( $count ) = @_;
 
-      push @table, [
-         $NOTES_BY_STRENGTH{ $ref->strength },
-         $ref->name,
-         Devel::MAT::Cmd->format_sv( $refsv ),
-      ];
-   }
+      my @table;
 
-   Devel::MAT::Cmd->print_table( \@table, sep => "  " );
+      my $ref;
+      $ref = shift @refs and
+         push @table, [
+            $NOTES_BY_STRENGTH{ $ref->strength },
+            $ref->name,
+            Devel::MAT::Cmd->format_sv( $ref->sv ),
+         ] while $count--;
+
+      Devel::MAT::Cmd->print_table( \@table, sep => "  " );
+      return scalar @refs;
+   } );
 }
 
 =head1 AUTHOR

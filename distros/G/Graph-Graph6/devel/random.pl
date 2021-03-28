@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2017 Kevin Ryde
+# Copyright 2015, 2017, 2021 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -39,7 +39,7 @@ for (;;) {
   }
   $count++;
 
-  my $graph = Graph::Undirected->new;
+  my $graph = Graph->new(undirected => 1);
   my $num_vertices = int(rand(32)) + 1;
   my @vertices;
   foreach my $i (1 .. $num_vertices) {

@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Dumpfile;
+package Devel::MAT::Dumpfile 0.44;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.43';
 
 use Carp;
 use IO::Handle;   # ->read

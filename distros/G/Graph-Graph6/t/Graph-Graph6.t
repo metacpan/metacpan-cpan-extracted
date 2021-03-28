@@ -34,7 +34,7 @@ my $filename = 'Graph-Graph6-t.tmp';
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 8;
+  my $want_version = 9;
   ok ($Graph::Graph6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Graph6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Graph6->VERSION($want_version); 1 }, 1,

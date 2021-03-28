@@ -84,6 +84,15 @@ KEYWORDS
     contained statement. Because of this, there is no need to end with a
     terminating semicolon.
 
+    Even though it parses as a statement and not an expression, a try block
+    can still yield a value if it appears as the final statement in its
+    containing sub or do block. For example:
+
+       my $result = do {
+          try { attempt_func() }
+          catch ($e) { "Fallback Value" }
+       };
+
     Note (especially to users of Try::Tiny and similar) that the try {}
     block itself does not necessarily stop exceptions thrown inside it from
     propagating outside. It is the presence of a later catch {} block which
@@ -199,9 +208,11 @@ KEYWORDS
 VALUE SEMANTICS
 
       Warning: the feature described in this section is experimental. This
-      experiment may be stablised in a later version, or may be altered or
-      removed without further notice. It is present here for testing and
-      evaluation purposes.
+      experiment has existed for a while, though given that since version
+      0.22 the regular try syntax already behaves fine inside a do block,
+      there is no longer any reason for this experimental feature to exist.
+      It will start printing deprecation warnings in a later version, and
+      eventually will be removed.
 
       Additionally, on perl versions 5.18 and later, it will produce a
       warning in the experimental category.
@@ -251,6 +262,11 @@ OTHER MODULES
 
       * Syntax::Feature::Try
 
+    In addition, core perl itself gained a try/catch syntax based on this
+    module at developemnt version 5.33.7, and should become generally
+    available when 5.34 is released. It will be available as use feature
+    'try'.
+
     They are compared here, by feature:
 
  True syntax plugin
@@ -259,6 +275,9 @@ OTHER MODULES
     syntax plugin, allowing it to provide new parsing rules not available
     to simple functions. Most notably here it means that the resulting
     combination does not need to end in a semicolon.
+
+    The core feature 'try' is also implemented as true native syntax in the
+    perl parser.
 
     In comparison, Try::Tiny is plain perl and provides its functionality
     using regular perl functions; as such its syntax requires the trailing
@@ -276,11 +295,15 @@ OTHER MODULES
     This feature is unique among these modules; none of the others listed
     have this ability.
 
+    The core feature 'try' also behaves in this manner.
+
  return in a try or catch block
 
     Like TryCatch and Syntax::Feature::Try, the return statement has its
     usual effect within a subroutine containing syntax provided by this
     module. Namely, it causes the containing sub itself to return.
+
+    It also behaves this way using the core feature 'try'.
 
     In comparison, using Try or Try::Tiny mean that a return statement will
     only exit from the try block.
@@ -290,6 +313,8 @@ OTHER MODULES
     The loop control keywords of next, last and redo have their usual
     effect on dynamically contained loops.
 
+    These also work fine when using the core feature 'try'.
+
     Syntax::Feature::Try documents that these do not work there. The other
     modules make no statement either way.
 
@@ -298,15 +323,15 @@ OTHER MODULES
     Like Try and Syntax::Feature::Try, the syntax provided by this module
     only works as a syntax-level statement and not an expression when the
     experimental try_value feature described above has not been enabled.
-    You cannot assign from the result of a try block. Additionally,
-    final-expression value semantics do not work, so it cannot be contained
-    by a do block to yield this value.
+    You cannot assign from the result of a try block. A common workaround
+    is to wrap the try/catch statement inside a do block, where its final
+    expression can be captured and used as a value.
+
+    The same do block wrapping also works for the core feature 'try'.
 
     In comparison, the behaviour implemented by Try::Tiny can be used as a
     valued expression, such as assigned to a variable or returned to the
-    caller of its containing function. Such ability is provided by this
-    module if the experimental try_value feature is enabled, though it must
-    be spelled differently as try do { ... }.
+    caller of its containing function.
 
  try without catch
 
@@ -321,10 +346,16 @@ OTHER MODULES
 
     The TryCatch module does not allow a try block not followed by catch.
 
+    The core feature 'try' does not implement finally at all, and also
+    requires that every try block be followed by a catch.
+
  Typed catch
 
     Try and Try::Tiny make no attempt to perform any kind of typed dispatch
     to distinguish kinds of exception caught by catch blocks.
+
+    Likewise the core feature 'try' currently does not provide this
+    ability, though it remains an area of ongoing design work.
 
     TryCatch and Syntax::Feature::Try both attempt to provide a kind of
     typed dispatch where different classes of exception are caught by

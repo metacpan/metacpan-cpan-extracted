@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -51,7 +51,7 @@ is_deeply( $parser->from_string( "  hello world  " ),
 
 # Perl 5.13.6 changed the regexp form
 # Accept both old and new-style stringification
-my $modifiers = (qr/foobar/ =~ /\Q(?^/) ? '^' : '-xism';
+my $modifiers = (qr/foobar/ =~ /\Q(?^/) ? '^u' : '-xism';
 
 ok( !eval { $parser->from_string( "goodbye world" ) }, '"goodbye world" fails' );
 is( $@,

@@ -189,10 +189,10 @@ METHODS
 
     Returns the next $len characters directly from the input, prior to any
     whitespace or comment skipping. This does not take account of any
-    pending end-of-scope marker that may be pending. It is intended for use
-    by parsers of partially-binary protocols, or other situations in which
-    it would be incorrect for the end-of-scope marker to take effect at
-    this time.
+    end-of-scope marker that may be pending. It is intended for use by
+    parsers of partially-binary protocols, or other situations in which it
+    would be incorrect for the end-of-scope marker to take effect at this
+    time.
 
  where
 

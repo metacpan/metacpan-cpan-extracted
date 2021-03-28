@@ -1,5 +1,12 @@
 Revision history for Perl module Perl::Metrics::Simple
 
+v1.0.1 - March 2021
+  Fix https://github.com/matisse/Perl-Metrics-Simple/issues/9
+    
+  - Add declaring required versions of modules wherever they are used
+    in addition to Build.PL and Makefile.PL
+  - Remove redundant compile testing of countperl.
+
 v1.0.0 - March 2021
   Declare dependency on Test::Compile v1.1.0 instead of 0, as v1.1.0
   is first version that documents the OO way of using Test::Compile.

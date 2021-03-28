@@ -22,25 +22,25 @@ name: Perl-Metrics-Simple
 provides:
   Perl::Metrics::Simple:
     file: lib/Perl/Metrics/Simple.pm
-    version: v1.0.0
+    version: v1.0.1
   Perl::Metrics::Simple::Analysis:
     file: lib/Perl/Metrics/Simple/Analysis.pm
-    version: v1.0.0
+    version: v1.0.1
   Perl::Metrics::Simple::Analysis::File:
     file: lib/Perl/Metrics/Simple/Analysis/File.pm
-    version: v1.0.0
+    version: v1.0.1
   Perl::Metrics::Simple::Output:
     file: lib/Perl/Metrics/Simple/Output.pm
-    version: v1.0.0
+    version: v1.0.1
   Perl::Metrics::Simple::Output::HTML:
     file: lib/Perl/Metrics/Simple/Output/HTML.pm
-    version: v1.0.0
+    version: v1.0.1
   Perl::Metrics::Simple::Output::JSON:
     file: lib/Perl/Metrics/Simple/Output/JSON.pm
-    version: v1.0.0
+    version: v1.0.1
   Perl::Metrics::Simple::Output::PlainText:
     file: lib/Perl/Metrics/Simple/Output/PlainText.pm
-    version: v1.0.0
+    version: v1.0.1
 recommends:
   Readonly::XS: '1.02'
 requires:
@@ -60,5 +60,5 @@ resources:
   bugtracker: https://github.com/matisse/Perl-Metrics-Simple/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/matisse/Perl-Metrics-Simple
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

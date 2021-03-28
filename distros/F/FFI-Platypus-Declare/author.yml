@@ -12,6 +12,8 @@ pod_spelling_system:
     - demangling
     - lang
     - xsub
+    - cdalvaro
+    - lvaro
 
 pod_coverage:
   skip: 0

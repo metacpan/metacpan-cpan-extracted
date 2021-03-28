@@ -25,7 +25,7 @@ Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5)
 Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
-Standards-Version: 4.1.5
+Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/graph-graph6/index.html
 Bugs: mailto:user42_kevin@yahoo.com.au
 

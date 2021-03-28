@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2017 Kevin Ryde
+# Copyright 2015, 2017, 2021 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -205,7 +205,8 @@ use Smart::Comments;
 
 {
   require Graph;
-  my $graph = Graph::Undirected->new(countedged => 1);
+  my $graph = Graph->new(undirected => 1,
+                         countedged => 1);
   $graph->add_edge(0,1);
   $graph->add_edge(0,1);
   $graph->add_edge(1,2);

@@ -8,7 +8,7 @@
 #
 ####################################################################
 package Graph::Reader::Dot;
-$Graph::Reader::Dot::VERSION = '2.09';
+$Graph::Reader::Dot::VERSION = '2.10';
 use strict;
 use warnings;
 

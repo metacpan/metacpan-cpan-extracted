@@ -3,14 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Count;
+package Devel::MAT::Tool::Count 0.44;
 
-use strict;
+use v5.14;
 use warnings;
-use 5.014; # s///r
 use base qw( Devel::MAT::Tool );
-
-our $VERSION = '0.43';
 
 use constant CMD => "count";
 use constant CMD_DESC => "Count the various kinds of SV";

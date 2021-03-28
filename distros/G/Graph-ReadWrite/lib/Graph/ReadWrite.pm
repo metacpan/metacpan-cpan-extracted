@@ -1,5 +1,5 @@
 package Graph::ReadWrite;
-$Graph::ReadWrite::VERSION = '2.09';
+$Graph::ReadWrite::VERSION = '2.10';
 use 5.006;
 use strict;
 use warnings;

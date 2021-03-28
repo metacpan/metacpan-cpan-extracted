@@ -2,7 +2,7 @@
 # Graph::Writer::Dot - write a directed graph out in Dot format
 #
 package Graph::Writer::Dot;
-$Graph::Writer::Dot::VERSION = '2.09';
+$Graph::Writer::Dot::VERSION = '2.10';
 use 5.006;
 use strict;
 use warnings;
@@ -89,7 +89,8 @@ sub _write_graph
     # name of the digraph instance. Else it's just 'g'.
     #-------------------------------------------------------------------
     $gn = $graph->has_graph_attribute('name') ? $graph->get_graph_attribute('name') : 'g';
-    print $FILE "digraph $gn\n{\n";
+    my $graphtype = $graph->is_directed ? "digraph" : "graph";
+    print $FILE "$graphtype $gn\n{\n";
 
     #-------------------------------------------------------------------
     # Dump out any overall attributes of the graph
@@ -149,10 +150,18 @@ sub _write_graph
     # Generate a list of edges, along with any attributes
     #-------------------------------------------------------------------
     print $FILE "\n  /* list of edges */\n";
+
+    #--------------------------------------------------------------------
+    # Handle directed and undirected graphs properly:
+    # - create a graph (not a digraph) instance for undirected graphs
+    # - the edge operator is '--' for undirected graphs, as opposed to '->'
+    #--------------------------------------------------------------------
+    my $edgeop = $graph->is_directed() ? '->' : '--';
+
     foreach my $edge (sort _by_vertex $graph->edges)
     {
         ($from, $to) = @$edge;
-        print $FILE "  \"$from\" -> \"$to\"";
+        print $FILE "  \"$from\" $edgeop \"$to\"";
         $attrref = $graph->get_edge_attributes($from, $to);
         @keys = grep(exists $attrref->{$_}, @{$valid_attributes{'edge'}});
         if (@keys > 0)

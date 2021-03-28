@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2021 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -45,6 +45,7 @@ if (! $have_graph) {
   }
   exit 0;
 }
+MyTestHelpers::diag ('Graph.pm version ', Graph->VERSION);
 
 {
   my $have_graph_writer = eval { require Graph::Writer; 1 };
@@ -65,7 +66,7 @@ my $filename = 'Graph-Writer-Graph6-t.tmp';
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 8;
+  my $want_version = 9;
   ok ($Graph::Writer::Graph6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Writer::Graph6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Writer::Graph6->VERSION($want_version); 1 }, 1,
@@ -102,7 +103,7 @@ sub try_write {
 }
 
 {
-  my $graph = Graph::Undirected->new;
+  my $graph = Graph->new (undirected => 1);
   $graph->add_vertices(0,1,2,3,4);
   $graph->add_edge(0,2);
   $graph->add_edge(0,4);
@@ -115,7 +116,7 @@ sub try_write {
 {
   # with header=>1
 
-  my $graph = Graph::Undirected->new;
+  my $graph = Graph->new (undirected => 1);
   $graph->add_vertices(0,1,2,3,4);
   $graph->add_edge(0,2);
   $graph->add_edge(0,4);

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2017 Kevin Ryde
+# Copyright 2015, 2017, 2021 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -181,7 +181,7 @@ use MyGraphs;
     print "\n";
   }
   {
-    my $graph = Graph::Undirected->new;
+    my $graph = Graph->new(undirected => 1);
     $graph->add_edge('from','to');
     print "neighbours ",$graph->neighbours('from'), "\n";
     print "neighbours ",$graph->neighbours('to'), "\n";
@@ -423,7 +423,7 @@ use MyGraphs;
     $graph = Graph::Maker->new('dragon', level=>2, undirected=>1);
   }
   if (0) {
-    $graph = Graph::Undirected->new;
+    $graph = Graph->new(undirected => 1);
     $graph->add_vertices(0,1,2,3);
     $graph->add_edge(0,1);
     # $graph->add_edge(0,2);
@@ -563,7 +563,7 @@ HERE
 
   print "code:\n";
   require Graph;
-  my $graph = Graph::Undirected->new;
+  my $graph = Graph->new(undirected => 1);
   my ($num_vertices) = ($str =~ /(\d+)/);
   foreach my $i (0 .. $num_vertices-1) { $graph->add_vertex($i); }
   $graph->add_edge(0,0);
@@ -580,7 +580,7 @@ HERE
   # Graph::Writer::Matrix samples
   {
     require Graph;
-    my $graph = Graph::Undirected->new;
+    my $graph = Graph->new(undirected => 1);
     $graph->add_edge('0','1');
     $graph->add_edge('1','2');
     $graph->add_edge('2','3');
@@ -624,7 +624,7 @@ HERE
 {
   # Graph::Writer::Matrix
   require Graph;
-  my $graph = Graph::Undirected->new;
+  my $graph = Graph->new(undirected => 1);
   ### $graph
   print $graph->get_graph_attribute('omniedged');
 
@@ -688,7 +688,7 @@ HERE
 {
   # Graph::Writer::Graph6 formats.txt example
   require Graph;
-  my $graph = Graph::Undirected->new;
+  my $graph = Graph->new(undirected => 1);
   $graph->add_vertices(0,1,2,3,4);
   $graph->add_edge(0,2);
   $graph->add_edge(0,4);

@@ -3,13 +3,11 @@
 #
 #  (C) Paul Evans, 2017-2019 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Callers;
+package Devel::MAT::Tool::Callers 0.44;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Devel::MAT::Tool );
-
-our $VERSION = '0.43';
 
 use constant CMD => "callers";
 use constant CMD_DESC => "Display the caller stack";

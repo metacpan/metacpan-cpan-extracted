@@ -14,8 +14,8 @@ $modules{$_} = $_ for qw(
   ExtUtils::MakeMaker
   Path::Tiny
   Test2::API
+  Test2::Tools::Process
   Test2::V0
-  Test::Exit
   Test::Script
   Wasm
   Wasm::Hook
@@ -65,7 +65,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $];
+diag sprintf $format, 'perl', "$] $^O $Config{archname}";
 
 foreach my $module (sort @modules)
 {

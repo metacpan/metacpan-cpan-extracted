@@ -6,15 +6,15 @@ build_requires:
   Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
   Test2::Mock: '0.000060'
+  Test2::Tools::Process: '0'
   Test2::V0: '0.000060'
   Test::Alien::Build: '0'
-  Test::Exit: '0.11'
-  perl: '5.006'
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,11 +23,14 @@ name: Alien-Build-Plugin-Fetch-Prompt
 requires:
   Alien::Build: '0.62'
   Alien::Build::Plugin: '0'
-  perl: '5.006'
+  perl: '5.010'
 resources:
   IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/plicease/Alien-Build-Plugin-Fetch-Prompt/issues
   homepage: https://metacpan.org/pod/Alien::Build::Plugin::Fetch::Prompt
   repository: git://github.com/plicease/Alien-Build-Plugin-Fetch-Prompt.git
-version: '0.59'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.60'
+x_generated_by_perl: v5.33.8
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

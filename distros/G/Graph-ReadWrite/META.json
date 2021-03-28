@@ -4,7 +4,7 @@
       "Neil Bowers <neilb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,6 +39,7 @@
          "requires" : {
             "File::Compare" : "0",
             "File::Temp" : "0",
+            "Graph::Undirected" : "0",
             "Test::More" : "0"
          }
       }
@@ -52,7 +53,8 @@
          "web" : "https://github.com/neilb/Graph-ReadWrite"
       }
    },
-   "version" : "2.09",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "2.10",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24"
 }
 

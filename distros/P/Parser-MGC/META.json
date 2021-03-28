@@ -4,13 +4,13 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Parser-MGC",
    "prereqs" : {
@@ -21,8 +21,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Feature::Compat::Try" : "0",
             "File::Slurp::Tiny" : "0",
-            "Scalar::Util" : "0"
+            "Scalar::Util" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -35,7 +37,7 @@
    "provides" : {
       "Parser::MGC" : {
          "file" : "lib/Parser/MGC.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       },
       "Parser::MGC::Examples::EvaluateExpression" : {
          "file" : "lib/Parser/MGC/Examples/EvaluateExpression.pm"
@@ -47,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

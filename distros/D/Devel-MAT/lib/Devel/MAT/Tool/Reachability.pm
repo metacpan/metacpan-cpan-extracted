@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Reachability;
+package Devel::MAT::Tool::Reachability 0.44;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.43';
 
 use constant FOR_UI => 1;
 

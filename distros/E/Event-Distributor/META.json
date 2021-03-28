@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -21,8 +21,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Feature::Compat::Try" : "0",
             "Future" : "0.15",
-            "Syntax::Keyword::Try" : "0"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -35,19 +36,19 @@
    "provides" : {
       "Event::Distributor" : {
          "file" : "lib/Event/Distributor.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Event::Distributor::Action" : {
          "file" : "lib/Event/Distributor/Action.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Event::Distributor::Query" : {
          "file" : "lib/Event/Distributor/Query.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Event::Distributor::Signal" : {
          "file" : "lib/Event/Distributor/Signal.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -57,6 +58,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

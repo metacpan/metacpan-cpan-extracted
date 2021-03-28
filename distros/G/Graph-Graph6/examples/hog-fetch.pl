@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017, 2018 Kevin Ryde
+# Copyright 2017, 2018, 2019, 2020 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -21,18 +21,23 @@
 # Usage: perl hog-fetch.pl NUM NUM ...
 #
 # Download graph6 format files of the given House of Graphs graph numbers.
-# For example number 74 at https://hog.grinvin.org/ViewGraphInfo.action?id=74
-# which is the complete-4.
+# For example graph number 74 is the complete-4.
 #
-# Output is to file ~/HOG/graph_NUM.g6 for each NUM number.  If that file
-# exists already then it's not re-downloaded or overwritten.  Delete a file
-# if for some reason you want to re-download.
+#      https://hog.grinvin.org/ViewGraphInfo.action?id=74
 #
-# Filenames of this form are hinted in the HOG server reply, so would match
-# a browser download.  But the server filename is ignored and the name here
-# is fixed.
+# Output is to file
 #
-# Note that not all numbers are graphs, so don't blindly download ranges.
+#      $HOME/HOG/graph_NUM.g6
+#
+# for each NUM number.  If the file exists already then it's not
+# re-downloaded or overwritten.  Delete a file if for any reason you want to
+# force a re-download.
+#
+# Filenames of this form are hinted in the HOG server reply, so should match
+# a browser download.  For security the server filename is ignored and the
+# name here is fixed.
+#
+# Note that not all ID numbers are graphs, so don't blindly download ranges.
 #
 # The graph download is a HTTP POST.  You can get much the same effect from
 # the command line by say
@@ -46,8 +51,9 @@
 #          --data "graphFormatName=Graph6&id=$id" \
 #          https://hog.grinvin.org/DownloadGraphs.action
 #
-# As of Feb 2017 the server doesn't compress graph downloads, but 255
-# vertices of graph6 is only 5kbytes anyway.
+# As of Feb 2017, the server doesn't compress graph downloads, but the HOG
+# limit of 255 vertices, downloaded in graph6 format, is at most 5 kbytes
+# anyway.
 
 use 5.006;
 use strict;
@@ -56,17 +62,23 @@ use FindBin;
 use File::Slurp;
 use HTTP::Message;
 use LWP::UserAgent;
+$|=1;
 
-our $VERSION = 8;
+our $VERSION = 9;
 my $option_verbose = 0;
 
-if (@ARGV && $ARGV[0] eq '-v') { shift @ARGV; $option_verbose = 1; }
+if (@ARGV && $ARGV[0] eq '-v') {
+  shift @ARGV;
+  $option_verbose = 1;
+}
 
 my $ua = LWP::UserAgent->new (keep_alive => 1);
 $ua->agent("$FindBin::Script/$VERSION ".$ua->agent);
 
-# ask for everything decoded_content() accepts
+# ask for all compressions decoded_content() knows
 $ua->default_header('Accept-Encoding' => scalar HTTP::Message::decodable());
+
+# diagnostic output
 $ua->add_handler (request_send => sub {
                     my ($req, $ua, $headers) = @_;
                     if ($option_verbose) {

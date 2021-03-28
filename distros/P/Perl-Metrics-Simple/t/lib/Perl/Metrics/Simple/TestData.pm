@@ -4,7 +4,7 @@ use warnings;
 
 use Carp qw(confess);
 use English qw(-no_match_vars);
-use Readonly;
+use Readonly 1.03;
 
 our $VERSION = '0.01';
 

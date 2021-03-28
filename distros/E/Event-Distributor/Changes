@@ -1,5 +1,11 @@
 Revision history for Event-Distributor
 
+0.06    2021-03-27
+        [CHANGES]
+         * Use Feature::Compat::Try instead of Syntax::Keyword::Try
+         * Fixed SYNOPSIS example for changes to subscriber arguments
+         * Style modernisations for perl v5.14+
+
 0.05    2018-07-23 16:11:07
         [CHANGES]
          * Ensure an empty query event doesn't fail

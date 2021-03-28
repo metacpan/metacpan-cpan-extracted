@@ -1,4 +1,4 @@
-Copyright 2015, 2016, 2017, 2018 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2021 Kevin Ryde
 
 This file is part of Graph-Graph6.
 
@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with Graph-Graph6.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 9, March 2021
+    - tests avoid Graph.pm incompatible change not loading Graph::Undirected
 
 Version 8, August 2018
     - HOG download example programs

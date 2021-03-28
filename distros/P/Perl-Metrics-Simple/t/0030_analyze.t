@@ -6,7 +6,7 @@ use File::Spec qw();
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 use Perl::Metrics::Simple::TestData;
-use Readonly;
+use Readonly 1.03;
 use Test::More tests => 37;
 
 Readonly::Scalar my $TEST_DIRECTORY => "$Bin/test_files";

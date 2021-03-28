@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Cmd::Terminal;
+package Devel::MAT::Cmd::Terminal 0.44;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.43';
 
 use String::Tagged 0.15;  # sprintf
 use String::Tagged::Terminal 0.03;  # ->print_to_terminal

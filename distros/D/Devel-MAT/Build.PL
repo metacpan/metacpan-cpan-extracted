@@ -1,4 +1,4 @@
-use strict;
+use v5.14;
 use warnings;
 
 use Module::Build;
@@ -8,6 +8,7 @@ my $build = Module::Build->new(
    requires => {
       'Commandable::Invocation' => '0.04', # ->peek_remaining
       'Devel::MAT::Dumper' => '0.35',
+      'Feature::Compat::Try' => '0',
       'File::ShareDir' => 0,
       'File::Spec' => 0,
       'Heap' => 0,
@@ -18,7 +19,6 @@ my $build = Module::Build->new(
       'String::Tagged' => '0.15', # sprintf
       'String::Tagged::Terminal' => '0.03',
       'Struct::Dumb' => '0.07',
-      'Syntax::Keyword::Try' => 0,
    },
    test_requires => {
       'Test::Identity' => 0,

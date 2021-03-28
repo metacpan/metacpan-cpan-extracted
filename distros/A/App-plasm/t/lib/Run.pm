@@ -2,7 +2,7 @@ package Run;
 
 use strict;
 use warnings;
-use Test::Exit ();
+use Test2::Tools::Process qw( intercept_exit );
 use App::plasm;
 use Capture::Tiny qw( capture );
 use Test2::API qw( context );
@@ -13,7 +13,7 @@ sub run
   my($out, $err, $exit) = capture {
     local $0 = 'bin/plasm';
     my $ret;
-    my $exit = Test::Exit::exit_code(sub { $ret = App::plasm->main(@cmd) });
+    my $exit = intercept_exit(sub { $ret = App::plasm->main(@cmd) });
     defined $exit
       ? $exit
       : $ret;

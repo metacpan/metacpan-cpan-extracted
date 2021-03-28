@@ -1,5 +1,9 @@
 Revision history for App-plasm},
 
+0.03      2021-03-27 11:31:55 -0600
+  - Migrate test dependency from Test::Exit to Test2::Tools::Process (gh#8)
+  - Drop support for Perls prior to Perl 5.10
+
 0.02      2020-06-19 13:21:13 -0600
   - Added `wat` subcommand for converting WebAssembly Text
     (.wat) to WebAssembly Binary (.wasm) (gh#3)

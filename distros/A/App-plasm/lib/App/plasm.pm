@@ -2,12 +2,12 @@ package App::plasm;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.010;
 use Pod::Usage qw( pod2usage );
 use Getopt::Long qw( GetOptions );
 
 # ABSTRACT: Perl WebAssembly command line tool
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub main
@@ -188,7 +188,7 @@ App::plasm - Perl WebAssembly command line tool
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

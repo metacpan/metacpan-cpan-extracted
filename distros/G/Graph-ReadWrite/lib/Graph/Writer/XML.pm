@@ -2,7 +2,7 @@
 # Graph::Writer::XML - write a directed graph out as XML
 #
 package Graph::Writer::XML;
-$Graph::Writer::XML::VERSION = '2.09';
+$Graph::Writer::XML::VERSION = '2.10';
 use 5.006;
 use strict;
 use warnings;

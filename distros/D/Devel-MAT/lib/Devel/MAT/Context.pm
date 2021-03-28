@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Context;
+package Devel::MAT::Context 0.44;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.43';
 
 use Carp;
 use Scalar::Util qw( weaken );
@@ -114,9 +112,8 @@ sub location
    return "$self->{file} line $self->{line}";
 }
 
-package Devel::MAT::Context::SUB;
+package Devel::MAT::Context::SUB 0.44;
 use base qw( Devel::MAT::Context );
-our $VERSION = '0.43';
 __PACKAGE__->register_type( 1 );
 
 =head1 Devel::MAT::Context::SUB
@@ -201,9 +198,8 @@ sub olddepth { return $_[0]->{olddepth} }
 sub _set_depth { $_[0]->{depth} = $_[1] }
 sub depth      { return $_[0]->{depth} }
 
-package Devel::MAT::Context::TRY;
+package Devel::MAT::Context::TRY 0.44;
 use base qw( Devel::MAT::Context );
-our $VERSION = '0.43';
 __PACKAGE__->register_type( 2 );
 
 =head1 Devel::MAT::Context::TRY
@@ -216,9 +212,8 @@ sub load {}
 
 sub _load_v0_1 {}
 
-package Devel::MAT::Context::EVAL;
+package Devel::MAT::Context::EVAL 0.44;
 use base qw( Devel::MAT::Context );
-our $VERSION = '0.43';
 __PACKAGE__->register_type( 3 );
 
 =head1 Devel::MAT::Context::EVAL

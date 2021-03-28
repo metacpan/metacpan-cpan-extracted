@@ -1,5 +1,16 @@
 Revision history for Parser-MGC
 
+0.18    2021-03-27
+        [CHANGES]
+         * Repack tarball without stale `Makefile.PL`
+         * No actual code changes
+
+0.17    2021-03-27
+        [CHANGES]
+         * Wording fix in docs - remove duplicate `pending` (thanks hobbs)
+         * Use Feature::Compat::Try instead of plain `eval {}` blocks
+         * Style modernisations for perl v5.14+
+
 0.16    2017/01/10 16:39:02
         [CHANGES]
          * Added ->take method

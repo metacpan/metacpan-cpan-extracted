@@ -3,13 +3,11 @@
 #
 #  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Find;
+package Devel::MAT::Tool::Find 0.44;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Devel::MAT::Tool );
-
-our $VERSION = '0.43';
 
 use Scalar::Util qw( blessed );
 
@@ -467,8 +465,8 @@ use constant FILTER_ARGS => (
 );
 
 use constant FILTER_OPTS => (
-   all => { help => "Include variables in non-live pads",
-            alias => "a" },
+   inactive => { help => "Include variables in non-live pads",
+                 alias => "I" },
 );
 
 sub build
@@ -496,13 +494,14 @@ sub build
          for 0 .. $#pads;
 
       # This isn't a real hit unless the pad is live
-      return unless $opts{all} || $depth <= $cv->depth;
+      my $is_live = $depth <= $cv->depth;
+      return unless $is_live || $opts{inactive};
 
       return {
          sv     => $sv,
-         output => String::Tagged->from_sprintf( "%s at depth %d of %s",
+         output => String::Tagged->from_sprintf( "%s at depth %d%s of %s",
             Devel::MAT::Cmd->format_note( $name, 1 ),
-            $depth,
+            $depth, $is_live ? "" : Devel::MAT::Cmd->format_note( " [inactive]", 2 ),
             Devel::MAT::Cmd->format_sv( $cv )
          ),
       };

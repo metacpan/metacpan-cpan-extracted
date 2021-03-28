@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
-use Syntax::Keyword::Try;
+use Feature::Compat::Try;
 
 use Devel::MAT;
 use Devel::MAT::Cmd::Terminal;
@@ -74,8 +74,8 @@ while( defined( my $line = $rl->readline(
          progress => $progress,
       );
    }
-   catch {
-      print STDERR "$@";
+   catch ($e) {
+      print STDERR "$e";
    }
 
    print "\n";
