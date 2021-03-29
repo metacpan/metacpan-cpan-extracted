@@ -3,33 +3,30 @@ package Text::Hunspell::FFI;
 use strict;
 use warnings;
 use 5.020;
-use FFI::Platypus;
-use Text::Hunspell::FFI::Lib;
+use FFI::Platypus 1.00;
+use FFI::CheckLib 0.27 ();
 use experimental qw( postderef );
 
 # ABSTRACT: Perl FFI interface to the Hunspell library
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
-sub _ffi
+sub _lib
 {
-  state $ffi;
-  
-  unless(defined $ffi)
-  {
-    my @libs = Text::Hunspell::FFI::Lib::_libs();
-
-    die "unable to find libs" unless @libs;
-    
-    $ffi = FFI::Platypus->new(
-      lib => \@libs,
-    );
-    $ffi->load_custom_type('::StringArray' => 'string_array');
-  }
-  
-  $ffi;
+  my @args = (lib => '*', verify => sub { $_[0] =~ /hunspell/ }, symbol => "Hunspell_create");
+  my @libs = FFI::CheckLib::find_lib @args;
+  my($first) = @libs
+    ? @libs
+    : FFI::CheckLib::find_lib @args, alien => 'Alien::Hunspell';
+  die "unable to find libs" unless $first;
+  $first;
 }
 
-_ffi->attach(['Hunspell_create'=>'new'] => ['string','string'] => 'opaque', sub
+my $ffi = FFI::Platypus->new(
+  api => 1,
+  lib => _lib(),
+);
+
+$ffi->attach(['Hunspell_create'=>'new'] => ['string','string'] => 'opaque', sub
 {
   my($xsub, $class, $aff, $dic) = @_;
   my $ptr = $xsub->($aff, $dic);
@@ -37,7 +34,7 @@ _ffi->attach(['Hunspell_create'=>'new'] => ['string','string'] => 'opaque', sub
 });
 
 
-_ffi->attach(['Hunspell_destroy'=>'DESTROY'] => ['opaque'] => 'void', sub
+$ffi->attach(['Hunspell_destroy'=>'DESTROY'] => ['opaque'] => 'void', sub
 {
   my($xsub, $self) = @_;
   $xsub->($$self);
@@ -46,7 +43,7 @@ _ffi->attach(['Hunspell_destroy'=>'DESTROY'] => ['opaque'] => 'void', sub
 foreach my $try (qw( Hunspell_add_dic _ZN8Hunspell7add_dicEPKcS1_ ))
 {
   eval {
-    _ffi->attach([$try=>'add_dic'] => ['opaque','string'] => 'void', sub
+    $ffi->attach([$try=>'add_dic'] => ['opaque','string'] => 'void', sub
     {
       my($xsub, $self, $dpath) = @_;
       $xsub->($$self, $dpath);
@@ -61,45 +58,45 @@ unless(__PACKAGE__->can('add_dic'))
   die "unable to find add_dic";
 }
 
-_ffi->attach(['Hunspell_spell'=>'check'] => ['opaque','string'] => 'int', sub
+$ffi->attach(['Hunspell_spell'=>'check'] => ['opaque','string'] => 'int', sub
 {
   my($xsub, $self, $word) = @_;
   $xsub->($$self, $word);
 });
 
-_ffi->attach(['Hunspell_free_list',=>'_free_list'] => ['opaque','opaque*','int'] => 'void');
+$ffi->attach(['Hunspell_free_list',=>'_free_list'] => ['opaque','opaque*','int'] => 'void');
 
 sub _string_array_and_word
 {
   my($xsub, $self, $word) = @_;
   my $ptr;
   my $count = $xsub->($$self, \$ptr, $word);
-  my @result = map { _ffi->cast('opaque','string',$_) } _ffi->cast('opaque',"opaque[$count]", $ptr)->@*;
+  my @result = map { $ffi->cast('opaque','string',$_) } $ffi->cast('opaque',"opaque[$count]", $ptr)->@*;
   _free_list($self, $ptr, $count);
-  wantarray ? @result : $result[0];
+  wantarray ? @result : $result[0];  ## no critic (Freenode::Wantarray)
 }
 
-_ffi->attach(['Hunspell_suggest'=>'suggest'] => ['opaque','opaque*','string'] => 'int', \&_string_array_and_word);
-_ffi->attach(['Hunspell_analyze'=>'analyze'] => ['opaque','opaque*','string'] => 'int', \&_string_array_and_word);
+$ffi->attach(['Hunspell_suggest'=>'suggest'] => ['opaque','opaque*','string'] => 'int', \&_string_array_and_word);
+$ffi->attach(['Hunspell_analyze'=>'analyze'] => ['opaque','opaque*','string'] => 'int', \&_string_array_and_word);
 
-_ffi->attach(['Hunspell_generate'=>'generate'] => ['opaque','opaque*','string','string'] => 'int', sub {
+$ffi->attach(['Hunspell_generate'=>'generate'] => ['opaque','opaque*','string','string'] => 'int', sub {
   my($xsub, $self, $word, $word2) = @_;
   my $ptr;
   my $count = $xsub->($$self, \$ptr, $word, $word2);
-  my @result = map { _ffi->cast('opaque','string',$_) } _ffi->cast('opaque',"opaque[$count]", $ptr)->@*;
+  my @result = map { $ffi->cast('opaque','string',$_) } $ffi->cast('opaque',"opaque[$count]", $ptr)->@*;
   _free_list($self, $ptr, $count);
-  wantarray ? @result : $result[0];
+  wantarray ? @result : $result[0];  ## no critic (Freenode::Wantarray)
 });
 
-_ffi->attach(['Hunspell_generate2'=>'generate2'] => ['opaque','opaque*','string','string_array','int'] => 'int', sub
+$ffi->attach(['Hunspell_generate2'=>'generate2'] => ['opaque','opaque*','string','string[]','int'] => 'int', sub
 {
   my($xsub, $self, $word, $suggestions) = @_;
   my $n = scalar @$suggestions;
   my $ptr;
   my $count = $xsub->($$self, \$ptr, $word, [@$suggestions], 1);
-  my @result = map { _ffi->cast('opaque','string',$_) } _ffi->cast('opaque',"opaque[$count]", $ptr)->@*;
+  my @result = map { $ffi->cast('opaque','string',$_) } $ffi->cast('opaque',"opaque[$count]", $ptr)->@*;
   _free_list($self, $ptr, $count);
-  wantarray ? @result : $result[0];  
+  wantarray ? @result : $result[0];  ## no critic (Freenode::Wantarray)
 });
 
 1;
@@ -116,26 +113,26 @@ Text::Hunspell::FFI - Perl FFI interface to the Hunspell library
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
     use Text::Hunspell::FFI;
-
+ 
     # You can use relative or absolute paths.
     my $speller = Text::Hunspell::FFI->new(
         "/usr/share/hunspell/en_US.aff",    # Hunspell affix file
         "/usr/share/hunspell/en_US.dic"     # Hunspell dictionary file
     );
-
+ 
     die unless $speller;
-
+ 
     # Check a word against the dictionary
     my $word = 'opera';
     print $speller->check($word)
           ? "'$word' found in the dictionary\n"
           : "'$word' not found in the dictionary!\n";
-
+ 
     # Spell check suggestions
     my $misspelled = 'programmng';
     my @suggestions = $speller->suggest($misspelled);
@@ -143,7 +140,7 @@ version 0.02
     for (@suggestions) {
         print "  - $_\n";
     }
-
+ 
     # Add dictionaries later
     $speller->add_dic('dictionary_file.dic');
 
@@ -301,7 +298,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Graham Ollis.
+This software is copyright (c) 2015-2021 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

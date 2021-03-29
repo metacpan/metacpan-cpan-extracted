@@ -3,8 +3,8 @@ NAME
     for random numbers
 
 VERSION
-    This document describes version 0.002 of UUID::Random::Secure (from Perl
-    distribution UUID-Random-Secure), released on 2021-01-18.
+    This document describes version 0.003 of UUID::Random::Secure (from Perl
+    distribution UUID-Random-Secure), released on 2021-01-20.
 
 SYNOPSIS
     Use like you would UUID::Random:
@@ -13,12 +13,24 @@ SYNOPSIS
      say UUID::Random::Secure::generate();
 
 DESCRIPTION
-    Note that this module currently does not produce RFC 4122-compliant v4
-    (random) UUIDs (no encoding of variant and version information into the
-    UUID).
-
 FUNCTIONS
   generate
+    Generate a single v4 UUID string in the formatted 32 hexadecimal digits:
+
+     xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+    Note that this module does not produce RFC 4122-compliant v4 (random)
+    UUIDs (no encoding of variant and version information into the UUID).
+    See "generate_rfc" for UUIDs that comply to RFC 4122.
+
+  generate_rfc
+    Generate RFC-compliant a single v4 UUID string in the form of:
+
+     xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx
+
+    where "x" is any hexadecimal digits ([0-9a-f]), "M" is 4, and N is
+    either 8, 9, "a", or "b" (1000, 1001, 1010, or 1011 in binary).
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/UUID-Random-Secure>.

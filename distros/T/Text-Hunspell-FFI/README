@@ -4,26 +4,26 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.03
 
 SYNOPSIS
 
         use Text::Hunspell::FFI;
-    
+     
         # You can use relative or absolute paths.
         my $speller = Text::Hunspell::FFI->new(
             "/usr/share/hunspell/en_US.aff",    # Hunspell affix file
             "/usr/share/hunspell/en_US.dic"     # Hunspell dictionary file
         );
-    
+     
         die unless $speller;
-    
+     
         # Check a word against the dictionary
         my $word = 'opera';
         print $speller->check($word)
               ? "'$word' found in the dictionary\n"
               : "'$word' not found in the dictionary!\n";
-    
+     
         # Spell check suggestions
         my $misspelled = 'programmng';
         my @suggestions = $speller->suggest($misspelled);
@@ -31,7 +31,7 @@ SYNOPSIS
         for (@suggestions) {
             print "  - $_\n";
         }
-    
+     
         # Add dictionaries later
         $speller->add_dic('dictionary_file.dic');
 
@@ -175,7 +175,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2015 by Graham Ollis.
+    This software is copyright (c) 2015-2021 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

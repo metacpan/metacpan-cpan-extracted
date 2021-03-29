@@ -29,7 +29,7 @@ The script is called over HTTP with a JSON Object payload.
    "options" : { "this" : "or", "that" : "and" }
   }
 
-There are many SMS::Send drivers available on CPAN.  I use L<VoIP::MS|SMS::Send::VoIP::MS> in examples since that is the provider that I use for my home automation notifications.  My other notiable drivers are L<SMS::Send::Kannel::SMSbox|Kannel::SMSbox> and L<SMS::Send::NANP::Twilio|NANP::Twilio>.
+There are many SMS::Send drivers available on CPAN.  I use L<VoIP::MS|SMS::Send::VoIP::MS> in examples since that is the provider that I use for my home automation notifications.  My other notiable drivers are L<Kannel::SMSbox|SMS::Send::Kannel::SMSbox> and L<NANP::Twilio|SMS::Send::NANP::Twilio>.
 
 Return is a JSON Object.
 

@@ -6,21 +6,38 @@ use JSON qw{decode_json encode_json};
 use SMS::Send;
 use CGI;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
+our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
 SMS::Send::Adapter::Node::Red - SMS::Send Adapter to Node-RED JSON HTTP request
 
 =head1 SYNOPSIS
-  
+
+CGI Application
+
   use SMS::Send::Adapter::Node::Red;
   my $service = SMS::Send::Adapter::Node::Red->new(content => join('', <>));
   $service->cgi_response;
 
+PSGI Application
+
+  use SMS::Send::Adapter::Node::Red;
+  SMS::Send::Adapter::Node::Red->psgi_app
+
+PSGI Plack Mount
+
+  use SMS::Send::Adapter::Node::Red;
+  use Plack::Builder qw{builder mount};
+  builder {
+    mount '/sms' => SMS::Send::Adapter::Node::Red->psgi_app;
+    mount '/'    => sub {[404=> [], []]};
+  }
+
 =head1 DESCRIPTION
 
-This Perl package provides an adapter from Node-RED HTTP request object with a JSON payload to the SMS::Send infrastructure using a CGI Apache script.  The architecture works easiest with SMS::Send drivers based on the L<SMS::Send::Driver::WebService> base object since common settings can be stored in the configuration file.
+This Perl package provides an adapter from Node-RED HTTP request object with a JSON payload to the SMS::Send infrastructure using either a PSGI or a CGI script.  The architecture works easiest with SMS::Send drivers based on the L<SMS::Send::Driver::WebService> base object since common settings can be stored in the configuration file.
 
 =head1 CONSTRUCTOR
 
@@ -39,11 +56,11 @@ Example Payload:
   {
     "to"      : "7035551212",
     "text"    : "My Text Message",
-    "driver"  : "VoIP::MS", 
+    "driver"  : "VoIP::MS",
     "options" : {}
   }
 
-The Perl logic is based on this with lots of error trapping
+The Perl logic is based on this one-liner with lots of error trapping
 
   my $sent = SMS::Send->new($driver, %$options)->send_sms(to=>$to, text=>$text);
 
@@ -76,16 +93,14 @@ JSON Object from input that is passed to output.
 
 sub input {
   my $self  = shift;
-  unless ($self->{'input'}) {
+  if (not defined $self->{'input'}) {
     local $@;
     my $input = eval{decode_json($self->content)};
     my $error = $@;
     if ($error) {
       $self->set_status_error(400=>'Error: JSON decode failed');
-      $self->{'input'} = {};
     } elsif (ref($input) ne 'HASH') {
       $self->set_status_error(400=>'Error: JSON Object required');
-      $self->{'input'} = {};
     } else {
       $self->{'input'} = $input;
     }
@@ -95,7 +110,7 @@ sub input {
 
 =head2 status
 
-HTTP Status Code returned to Node-RED is one of 200, 400, 500 or 502. Typically, a 200 means the SMS message was successfully sent to the provider, a 400 means a the input is misconfigured, a 500 means the server is misconfigured (verify installation), and a 502 means that the remote service is down or unauthorized. 
+HTTP Status Code returned to Node-RED is one of 200, 400, 500 or 502. Typically, a 200 means the SMS message was successfully sent to the provider, a 400 means the input is malformed, a 500 means the server is misconfigured (verify installation), and a 502 means that the remote service has issues or is unreachable.
 
 =cut
 
@@ -210,6 +225,35 @@ sub cgi_response {
         "\n";
 }
 
+=head2 psgi_app
+
+Returns a PSGI application
+
+=cut
+
+sub psgi_app {
+  return sub {
+    my $env            = shift;
+    my $length         = $env->{'CONTENT_LENGTH'} || 0;
+    my $content        = '';
+    if ($length > 0) {
+      my $fh           = $env->{'psgi.input'};
+      $fh->read($content, $length, 0);
+    }
+    my $service        = $PACKAGE->new(content => $content);
+    my $sent           = $service->send_sms ? \1 : \0; #sets object properties
+    my %response       = (sent  => $sent);
+    $response{'error'} = $service->error if $service->error;
+    $response{'input'} = $service->input if $service->input;
+
+    return [
+      $service->status,
+      [ 'Content-Type' => 'application/json' ],
+      [ encode_json(\%response), "\n" ],
+    ];
+  };
+}
+
 =head1 OBJECT ACCESSORS
 
 =head2 CGI
@@ -232,29 +276,32 @@ Returns a L<SMS::Send> object for use in this package.
 
 sub SMS {
   my $self   = shift;
-  my $driver = $self->input->{'driver'};
-  if ($driver) {
-    my $options = $self->input->{'options'} || {};
-    if (ref($options) eq 'HASH') {
-      local $@;
-      $self->{'SMS'} =  eval{SMS::Send->new($driver, %$options)};
-      my $error      = $@;
-      if ($error) {
-        my $text = qq{Failed to load Perl package SMS::Send with driver "$driver". Please ensure both SMS::Send and SMS::Send::$driver are installed. $error};
-        $self->set_status_error(500=>$text);
+  my $input  = $self->input; #undef on error
+  if (defined $input) {
+    my $driver = $input->{'driver'};
+    if ($driver) {
+      my $options = $input->{'options'} || {};
+      if (ref($options) eq 'HASH') {
+        local $@;
+        $self->{'SMS'} =  eval{SMS::Send->new($driver, %$options)};
+        my $error      = $@;
+        if ($error) {
+          my $text = qq{Failed to load Perl package SMS::Send with driver "$driver". Please ensure both SMS::Send and SMS::Send::$driver are installed. $error};
+          $self->set_status_error(500=>$text);
+        }
+      } else {
+        $self->set_status_error(400=>'Error: JSON input "options" not an object.');
       }
     } else {
-      $self->set_status_error(400=>'Error: JSON input "options" not an object.');
+      $self->set_status_error(400=>'Error: JSON input missing "driver".');
     }
-  } else {
-    $self->set_status_error(400=>'Error: JSON input missing "driver".');
   }
   return $self->{'SMS'};
 }
 
 =head1 SEE ALSO
 
-L<SMS::Send>
+L<SMS::Send>, L<CGI>, L<JSON>
 
 =head1 AUTHOR
 
@@ -263,19 +310,19 @@ Michael R. Davis
 =head1 COPYRIGHT AND LICENSE
 
 MIT License
- 
+
 Copyright (c) 2020 Michael R. Davis
- 
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
- 
+
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
- 
+
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE

@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.4224'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Data-Table-Text
 provides:
   Data::Table::Text:
     file: lib/Data/Table/Text.pm
-    version: '20210226'
+    version: '20210328'
 requires:
   B: '0'
   Carp: '0'
@@ -40,5 +40,5 @@ resources:
   bugtracker: https://github.com/philiprbrenan/DataTableText/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/philiprbrenan/DataTableText
-version: '20210226'
+version: '20210328'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

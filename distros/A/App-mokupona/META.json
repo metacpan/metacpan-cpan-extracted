@@ -4,7 +4,7 @@
       "Alex Schroeder"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "agpl_3"
    ],
@@ -32,8 +32,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Encode::Locale" : "0",
+            "IO::Socket::SSL" : "2.069",
             "Modern::Perl" : "1.20180701",
-            "Mojo::IOLoop" : "0",
+            "Mojolicious" : "9",
             "URI::Escape" : "0",
             "XML::LibXML" : "0",
             "perl" : "5.026000",
@@ -50,6 +52,6 @@
          "web" : "https://alexschroeder.ch/cgit/moku-pona/about/"
       }
    },
-   "version" : 2.09,
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : 2.11,
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

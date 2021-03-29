@@ -1,5 +1,8 @@
 Revision history for Text-Hunspell-FFI
 
+0.03      2021-03-28 16:25:01 -0600
+  - remove dependency on FFI::Platypus::Type::StringArray (gh#6)
+
 0.02      2016-04-25 07:02:20 -0400
   - remove spanish files in t folder in tarball to save space
   - remove dependency on Test::Stream

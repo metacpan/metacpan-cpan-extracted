@@ -30,4 +30,4 @@ $stmt = $sql->select( 'table',
                       { this => 'that' },
                       );
 
-like( $stmt, qr(^\QSELECT col1, col2 FROM table WHERE ( this = ? )\E$), 'SQL::Abstract - no limit' );
+like( $stmt, qr(^\QSELECT col1, col2 FROM table WHERE ( this = ? )\E$|^\QSELECT col1, col2 FROM table WHERE this = ?\E$), 'SQL::Abstract - no limit' );

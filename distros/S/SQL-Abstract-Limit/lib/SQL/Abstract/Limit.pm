@@ -15,7 +15,7 @@ SQL::Abstract::Limit - portable LIMIT emulation
 
 =cut    
 
-our $VERSION = '0.142';
+our $VERSION = '0.143';
 
 # additions / error reports welcome !
 our %SyntaxMap = (  mssql    => 'Top',
@@ -1124,7 +1124,7 @@ L<DBIx::RecordSet|DBIx::RecordSet>.
 =head1 BUGS
 
 Please report all bugs (patches welcome) via GitHub
-at Lhttps://github.com/asb-capfan/SQL-Abstract-Limit>
+at L<https://github.com/asb-capfan/SQL-Abstract-Limit>
 or via the CPAN Request Tracker at
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Abstract-Limit>.
 

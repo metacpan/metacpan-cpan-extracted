@@ -17,7 +17,7 @@ my @data = (
   [[qw( drink  eatables        )], [ 'drinkables'   ]],
   [[qw( drink  phenomena       )], [ 'drinks'       ]],
   [[qw( drinks  eat            )], [ 'drink'        ]],
-  [[qw( drinks  eats           )], [ 'drinks'       ]], 
+  [[qw( drinks  eats           )], [ 'drinks'       ]],
   [[qw( drinks  ate            )], [ 'drank'        ]],
   [[qw( drinks  eaten          )], [ 'drunk'        ]],
   [[qw( drinks  eatable        )], [ 'drinkable'    ]],

@@ -13,5 +13,9 @@ perl-SMS-Send-Adapter-Node-Red.spec
 scripts/make-pod-for-cpan-indexer.sh
 scripts/perl-SMS-Send-Adapter-Node-Red.cgi
 scripts/perl-SMS-Send-Adapter-Node-Red.cgi.pod
+scripts/perl-SMS-Send-Adapter-Node-Red.psgi
+scripts/perl-SMS-Send-Adapter-Node-Red.psgi.pod
+scripts/perl-SMS-Send-Adapter-Node-Red-plack-builder.psgi
+scripts/perl-SMS-Send-Adapter-Node-Red-plack-builder.psgi.pod
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

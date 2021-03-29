@@ -1,5 +1,16 @@
 Revision history for Perl extension SMS::Send::Adapter::Node::Red.
 
+0.07 2021-03-28
+  - Updated SMS::Send::Adapter::Node::Red to added PSGI capability
+    - Updated lib/SMS/Send/Adapter/Node/Red.pm added psgi_app class function
+    - Added scripts/perl-SMS-Send-Adapter-Node-Red.psgi example script
+    - Added scripts/perl-SMS-Send-Adapter-Node-Red-plack-builder.psgi example script
+  - Updated t/001_load.t added test coverage
+  - Updated perl-SMS-Send-Adapter-Node-Red.spec to install PSGI scripts
+  
+0.06 2020-12-30
+  - Updated Documentation
+
 0.05 2020-12-28
   - Updated Makefile.PL - Added JSON requirement (CPAN testers)
   - Updated Documentation

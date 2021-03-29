@@ -71540,3 +71540,11 @@ R/RR/RRA/Pod-Thread-2.00.tar.gz
 V/VI/VITAHALL/Text-FrontMatter-YAML-0.11.tar.gz
 D/DE/DERF/Travel-Status-DE-VRR-1.20.tar.gz
 T/TI/TIMLEGGE/XML-Sig-0.47.tar.gz
+S/SC/SCHROEDER/App-mokupona-2.11.tar.gz
+P/PR/PRBRENAN/Asm-C-20210329.tar.gz
+P/PR/PRBRENAN/Data-Table-Text-20210328.tar.gz
+L/LN/LNATION/MooX-Private-Attribute-1.00.tar.gz
+M/MR/MRDVT/SMS-Send-Adapter-Node-Red-0.07.tar.gz
+A/AS/ASB/SQL-Abstract-Limit-0.143.tar.gz
+P/PL/PLICEASE/Text-Hunspell-FFI-0.03.tar.gz
+P/PE/PERLANCAR/UUID-Random-Secure-0.003.tar.gz

@@ -2,7 +2,7 @@ package MooX::Private::Attribute;
 use strict;
 use warnings;
 use MooX::ReturnModifiers;
-our $VERSION = 0.01;
+our $VERSION = '1.00';
 
 sub import {
 	my $target    = caller;
@@ -37,7 +37,7 @@ MooX::Private::Attribute - private attributes
 
 =head1 VERSION
 
-Version 0.01
+Version 1.00
 
 =cut
 
@@ -126,7 +126,7 @@ L<https://metacpan.org/release/MooX-Private-Attribute>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020-2021 by LNATION.
 
 This is free software, licensed under:
 
