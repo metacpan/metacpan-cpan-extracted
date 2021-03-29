@@ -701,7 +701,6 @@ my @SPVM_RUNTIME_SRC_BASE_NAMES = qw(
   spvm_field_access.c
   spvm_field.c
   spvm_hash.c
-  spvm_hash_func.c
   spvm_list.c
   spvm_my.c
   spvm_op.c
@@ -821,7 +820,7 @@ sub link {
   
   my $object_files = [];
   my $package_name_rel_file = SPVM::Builder::Util::convert_package_name_to_rel_file($target_package_name);
-  push @$object_files, glob "$build_work_object_dir/$target_package_name.boot.o";
+  push @$object_files, glob "$build_work_object_dir/$package_name_rel_file.boot.o";
   
   my $bconf = SPVM::Builder::Config->new_c99;
   
