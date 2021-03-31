@@ -1,17 +1,12 @@
-##############################################
-
-##############################################
-
 package PDL::PP::PdlParObj;
 
+use strict;
+use warnings;
 use Carp;
-use PDL::Types;
-
-# check for bad value support
-#
+use PDL::Types ':All';
 use PDL::Config;
-my $usenan = $PDL::Config{BADVAL_USENAN} || 0;
 
+my $usenan = $PDL::Config{BADVAL_USENAN} || 0;
 our $macros = <<'EOF';
 #define PDL_REDODIMS(declini, cast, type, flag, name, pdlname) \
   declini name ## _datap = (cast(PDL_REPRP_TRANS(pdlname, flag))); \
@@ -23,18 +18,6 @@ our $macros = <<'EOF';
   PDL_Anyval name ## _anyval_badval = PDL->get_pdl_badvalue(pdlname); \
   ANYVAL_TO_CTYPE(name ## _badval, type, name ## _anyval_badval);
 EOF
-our %Typemap = ();
-use PDL::Types ':All';
-
-# build a typemap for our translation purposes
-# again from info in PDL::Types
-for my $typ (typesrtkeys) {
-  $Typemap{typefld($typ,'ppforcetype')} = {
-					  Ctype => typefld($typ,'ctype'),
-					  Cenum => typefld($typ,'sym'),
-					  Val =>   typefld($typ,'numval'),
-					 };
-}
 
 # Try to load Text::Balanced
 my $hasTB = 0;
@@ -90,9 +73,9 @@ sub splitprotected ($$) {
 # need for $badflag is due to hacked get_xsdatapdecl() 
 # - this should disappear when (if?) things are done sensibly
 #
-my $typeregex = join '|', map {typefld($_,'ppforcetype')} typesrtkeys;
+my $typeregex = join '|', map $_->ppforcetype, types;
 our $pars_re = qr/^
-	\s*((?:$typeregex)[+]*|)\s*	# $1: first option
+	\s*((?:real|$typeregex)[+]*|)\s*	# $1: first option
 	(?:
 	\[([^]]*)\]   	# $2: The initial [option] part
 	)?\s*
@@ -122,6 +105,7 @@ sub new {
 			and $this->{FlagCreateAlways}=1 or
 		/^t$/ and $this->{FlagTemp}=1 and $this->{FlagCreat}=1 and $this->{FlagW}=1 or
 		/^phys$/ and $this->{FlagPhys} = 1 or
+		/^real$/ and $this->{FlagReal} = 1 or
 		/^((?:$typeregex)[+]*)$/ and $this->{Type} = $1 and $this->{FlagTyped} = 1 or
 		confess("Invalid flag $_ given for $string\n");
 	}
@@ -130,7 +114,8 @@ sub new {
 #	}
 	if ($this->{FlagTyped} && $this->{Type} =~ s/[+]$// ) {
 	  $this->{FlagTplus} = 1;
-		}
+	}
+	$this->{Type} &&= PDL::Type->new($this->{Type});
 	if($this->{FlagNCreat}) {
 		delete $this->{FlagCreat};
 		delete $this->{FlagCreateAlways};
@@ -202,40 +187,14 @@ sub getcreatedims {
       $_->{Value} } @{$this->{IndObjs}};
 }
 
-
-# find the value for a given PDL type
-sub typeval {
-  my $ctype = shift;
-  my @match = grep {$Typemap{$_}->{Ctype} =~ /^$ctype$/} keys(%Typemap);
-  if ($#match < 0) {
-    use Data::Dumper;
-    print Dumper \%Typemap;
-    croak "unknown PDL type '$ctype'" ;
-  }
-  return $Typemap{$match[0]}->{Val};
-}
-
-# return the PDL type for this pdl
-sub ctype {
-  my ($this,$generic) = @_;
+sub adjusted_type {
+  my ($this, $generic) = @_;
+  return $generic->realversion if $this->{FlagReal};
   return $generic unless $this->{FlagTyped};
-  croak "ctype: unknownn type"
-    unless defined($Typemap{$this->{Type}});
-  my $type = $Typemap{$this->{Type}}->{Ctype};
-  if ($this->{FlagTplus}) {
-    $type = $Typemap{$this->{Type}}->{Val} >
-      PDL::PP::PdlParObj::typeval($generic) ?
-      $Typemap{$this->{Type}}->{Ctype} : $generic;
-  }
-  return $type;
-}
-
-# return the enum type for a parobj; it'd better be typed
-sub cenum {
-    my $this = shift;
-    croak "cenum: unknown type [" . $this->{Type} . "]"
-	unless defined($PDL::PP::PdlParObj::Typemap{$this->{Type}});
-    return $PDL::PP::PdlParObj::Typemap{$this->{Type}}->{Cenum};
+  return $this->{Type}->numval > $generic->numval
+    ? $this->{Type} : $generic
+    if $this->{FlagTplus};
+  $this->{Type};
 }
 
 sub get_nname{ my($this) = @_;
@@ -376,7 +335,7 @@ sub do_access {
 	if(scalar(keys %subst) != 0) {
 		confess("Substitutions left: ".(join ',',keys %subst)."\n");
 	}
-       return "$text PDL_COMMENT(\"ACCESS($access)\") ";
+       $text;
 }
 
 sub has_dim {
@@ -447,19 +406,19 @@ sub do_indterm { my($this,$pdl,$ind,$subst,$context) = @_;
 #
 sub get_xsdatapdecl { 
     my($this,$genlooptype,$asgnonly) = @_;
-    my $type; 
-    my $pdl = $this->get_nname; 
+    my $ptype = $this->adjusted_type($genlooptype);
+    my $type = $ptype->ctype;
+    my $pdl = $this->get_nname;
     my $flag = $this->get_nnflag;
     my $name = $this->{Name};
-    $type = $this->ctype($genlooptype) if defined $genlooptype;
     my $declini = ($asgnonly ? "" : "$type *");
     my $cast = ($type ? "($type *)" : "");
     my $macro = "PDL_REDODIMS";
-    # assuming we always need this 
+    # assuming we always need this
     # - may not be true - eg if $asgnonly ??
     # - not needed for floating point types when using NaN as bad values
-    $macro = "PDL_REDODIMS_BADVAL" if $this->{BadFlag} and $type and
-	( $usenan == 0 or $type !~ /^PDL_(Float|Double)$/ );
+    $macro = "PDL_REDODIMS_BADVAL" if $this->{BadFlag} and $ptype and
+	!($usenan * $ptype->usenan);
     PDL::PP::pp_line_numbers(__LINE__, "$macro($declini, $cast, $type, $flag, $name, $pdl)");
 }
 

@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Vocabulary::Format;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Format vocabulary
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -45,7 +45,7 @@ sub keywords {
   };
   my $is_ipv4 = sub {
     my @o = split(/\./, $_[0], 5);
-    @o == 4 && (grep /^[0-9]{1,3}$/, @o) == 4 && (grep $_ < 256, @o) == 4;
+    @o == 4 && (grep /^(0|[1-9][0-9]{0,2})$/, @o) == 4 && (grep $_ < 256, @o) == 4;
   };
   # https://tools.ietf.org/html/rfc3339#appendix-A with some additions for the 2000 version
   # as defined in https://en.wikipedia.org/wiki/ISO_8601#Durations
@@ -99,7 +99,10 @@ sub keywords {
     uuid => sub { $_[0] =~ /^[[:xdigit:]]{8}-(?:[[:xdigit:]]{4}-){3}[[:xdigit:]]{12}$/ },
     'json-pointer' => sub { (!length($_[0]) || $_[0] =~ m{^/}) && $_[0] !~ m{~(?![01])} },
     'relative-json-pointer' => sub { $_[0] =~ m{^(?:0|[1-9][0-9]*)(?:#$|$|/)} && $_[0] !~ m{~(?![01])} },
-    regex => sub { eval { qr/$_[0]/; 1 ? 1 : 0 } },
+    regex => sub {
+      local $SIG{__WARN__} = sub { die @_ };
+      eval { qr/$_[0]/; 1 ? 1 : 0 };
+    },
 
     # TODO: if the metaschema's $vocabulary entry is true, then we must die on
     # encountering these unimplemented formats.
@@ -155,7 +158,7 @@ JSON::Schema::Draft201909::Vocabulary::Format - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 

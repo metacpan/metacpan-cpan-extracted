@@ -1,11 +1,11 @@
 ## <https://perl.apache.org/docs/2.0/api/APR/Finfo.html>
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/Finfo.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/18
-## Modified 2021/01/13
+## Modified 2021/03/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,6 +18,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use Apache2::SSI::File::Type;
     use Exporter qw( import );
     use DateTime;
     use DateTime::Format::Strptime;
@@ -70,7 +71,7 @@ BEGIN
     use constant FILETYPE_UNKFILE => 127;
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 sub init
@@ -240,6 +241,7 @@ sub filetype
     else
     {
         my $file = $self->{filepath};
+        $self->message( 3, "Stating file '$file'" );
         CORE::stat( $file );
         if( !-e( _ ) )
         {
@@ -343,6 +345,14 @@ sub is_link { return( shift->filetype == FILETYPE_LNK ); }
 sub is_pipe { return( shift->filetype == FILETYPE_PIPE ); }
 
 sub is_socket { return( shift->filetype == FILETYPE_SOCK ); }
+
+sub mime_type
+{
+    my $self = shift( @_ );
+    my $file = $self->filepath;
+    my $m = Apache2::SSI::File::Type->new;
+    return( $m->file( $file ) );
+}
 
 sub mode
 {
@@ -657,7 +667,7 @@ Apache2::SSI::Finfo - Apache2 Server Side Include File Info Object Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -808,6 +818,10 @@ Returns true if this is a pipe, false otherwise.
 
 Returns true if this is a socket, false otherwise.
 
+=head2 mime_type
+
+Using L<Apache2::SSI::File::Type>, this guess the file mime type and returns it.
+
 =head2 mode
 
 Returns the file mode. This is equivalent to the mode & 07777, ie without the file type bit.
@@ -925,4 +939,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

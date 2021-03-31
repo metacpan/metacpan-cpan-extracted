@@ -2,7 +2,7 @@ package Net::DNS::RR::TSIG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: TSIG.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+our $VERSION = (qw$Id: TSIG.pm 1827 2020-12-14 10:49:27Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -668,7 +668,7 @@ The message ID from the header of the original packet.
      $rcode = $tsig->error;
 
 Returns the RCODE covering TSIG processing.  Common values are
-NOERROR, BADSIG, BADKEY, and BADTIME.  See RFC2845-bis for details.
+NOERROR, BADSIG, BADKEY, and BADTIME.  See RFC8945 for details.
 
 
 =head2 other
@@ -699,7 +699,7 @@ The default signing function is HMAC-MD5.
 
      $sigdata = $tsig->sig_data($packet);
 
-Returns the packet packed according to RFC2845-bis in a form for signing. This
+Returns the packet packed according to RFC8945 in a form for signing. This
 is only needed if you want to supply an external signing function, such as is
 needed for TSIG-GSS.
 
@@ -812,7 +812,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC2845-bis, RFC4635
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC8945
 
 L<TSIG Algorithm Names|http://www.iana.org/assignments/tsig-algorithm-names>
 

@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/env perl
 
 =head1 NAME
 
@@ -8,10 +8,9 @@ rectangle-coverage.pl - Find the dot maximally covered by (random) rectangles
 
 You might have to do 
 
-  prompt% sudo cpan Tk 
-  prompt% sudo cpan Algorithm::RectanglesContainingDot 
+  prompt% cpanm --installdeps . 
 
-specially this last one, first, since that module is not installed by default with L<Algorithm::Evolutionary>.
+first, since that module is not installed by default with L<Algorithm::Evolutionary>. Use C<sudo> if appropriate.
 
   prompt% ./rectangle-coverage.pl <number-of-rectangles> <arena-side> <bits-per-coordinate> <population> <number of generations> <selection rate>
 

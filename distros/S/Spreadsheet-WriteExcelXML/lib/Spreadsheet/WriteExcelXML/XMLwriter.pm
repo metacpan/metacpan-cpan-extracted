@@ -25,7 +25,7 @@ use strict;
 use vars qw($VERSION @ISA);
 @ISA = qw(Exporter);
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 ###############################################################################
 #

@@ -25,7 +25,7 @@ use Spreadsheet::WriteExcelXML::Utility qw(xl_cell_to_rowcol xl_rowcol_to_cell);
 use vars qw($VERSION @ISA);
 @ISA = qw(Spreadsheet::WriteExcelXML::XMLwriter);
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 ###############################################################################
 #

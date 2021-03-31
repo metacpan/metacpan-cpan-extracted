@@ -8,7 +8,7 @@ Sub::Meta - handle subroutine meta information
 ```perl
 use Sub::Meta;
 
-sub hello($) :mehtod { }
+sub hello($) :method { }
 my $meta = Sub::Meta->new(sub => \&hello);
 $meta->subname; # => hello
 
@@ -430,7 +430,7 @@ If that fails, or if the environment variable `PERL_SUB_META_PP` is defined to a
 
 # SEE ALSO
 
-[Sub::Identify](https://metacpan.org/pod/Sub%3A%3AIdentify), [Sub::Util](https://metacpan.org/pod/Sub%3A%3AUtil), [Sub::Info](https://metacpan.org/pod/Sub%3A%3AInfo), [Function::Paramters::Info](https://metacpan.org/pod/Function%3A%3AParamters%3A%3AInfo), [Function::Return::Info](https://metacpan.org/pod/Function%3A%3AReturn%3A%3AInfo)
+[Sub::Identify](https://metacpan.org/pod/Sub%3A%3AIdentify), [Sub::Util](https://metacpan.org/pod/Sub%3A%3AUtil), [Sub::Info](https://metacpan.org/pod/Sub%3A%3AInfo), [Function::Parameters::Info](https://metacpan.org/pod/Function%3A%3AParameters%3A%3AInfo), [Function::Return::Info](https://metacpan.org/pod/Function%3A%3AReturn%3A%3AInfo)
 
 # LICENSE
 

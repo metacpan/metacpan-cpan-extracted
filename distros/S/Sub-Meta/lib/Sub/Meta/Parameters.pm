@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 use Carp ();
 use Scalar::Util ();
@@ -17,11 +17,11 @@ use overload
 
 sub _croak { require Carp; goto &Carp::croak }
 
-sub param_class { 'Sub::Meta::Param' }
+sub param_class { return 'Sub::Meta::Param' }
 
 sub new {
-    my $class = shift;
-    my %args = @_ == 1 ? %{$_[0]} : @_;
+    my ($class, @args) = @_;
+    my %args = @args == 1 ? %{$args[0]} : @args;
 
     _croak 'parameters reqruires args' unless exists $args{args};
 
@@ -35,12 +35,12 @@ sub new {
     return $self;
 }
 
-sub nshift()    { $_[0]{nshift} // 0 }
-sub slurpy()    { $_[0]{slurpy} ? $_[0]{slurpy} : !!0 }
-sub args()      { $_[0]{args} }
-sub invocant()  { $_[0]{invocant} }
-sub invocants() { defined $_[0]{invocant} ? [ $_[0]{invocant} ] : [] }
-sub all_args()  { [ @{$_[0]->invocants}, @{$_[0]->args} ] }
+sub nshift()    { my $self = shift; return $self->{nshift} // 0 }
+sub slurpy()    { my $self = shift; return $self->{slurpy} ? $self->{slurpy} : !!0 }
+sub args()      { my $self = shift; return $self->{args} }
+sub invocant()  { my $self = shift; return $self->{invocant} }
+sub invocants() { my $self = shift; return defined $self->{invocant} ? [ $self->{invocant} ] : [] }
+sub all_args()  { my $self = shift; return [ @{$self->invocants}, @{$self->args} ] }
 
 sub set_slurpy {
     my ($self, $v) = @_;
@@ -51,8 +51,8 @@ sub set_slurpy {
 }
 
 sub set_args {
-    my $self = shift;
-    $self->{args} = $self->_normalize_args(@_);
+    my ($self, @args) = @_;
+    $self->{args} = $self->_normalize_args(@args);
     return $self;
 }
 
@@ -96,18 +96,19 @@ sub set_invocant {
 }
 
 sub _normalize_args {
-    my $self = shift;
-    _croak 'args must be a reference' unless @_ == 1 && ref $_[0];
+    my ($self, @args) = @_;
+    my $args = $args[0];
+    _croak 'args must be a reference' unless @args == 1 && ref $args;
 
-    my @args;
-    if (ref $_[0] eq 'ARRAY') {
-        @args = @{$_[0]};
+    my @normalized_args;
+    if (ref $args eq 'ARRAY') {
+        @normalized_args = @{$args};
     }
-    elsif (ref $_[0] eq 'HASH') {
-        for my $name (sort { $a cmp $b } keys %{$_[0]}) {
-            my $v = $_[0]->{$name};
+    elsif (ref $args eq 'HASH') {
+        for my $name (sort { $a cmp $b } keys %{$args}) {
+            my $v = $args->{$name};
             my $f = ref $v && ref $v eq 'HASH';
-            push @args => {
+            push @normalized_args => {
                 name  => $name,
                 named => 1,
                 ($f ? %$v : (type => $v) ),
@@ -115,7 +116,7 @@ sub _normalize_args {
         }
     }
     else {
-        @args = ($_[0]);
+        @normalized_args = ($args);
     }
 
     return [
@@ -123,39 +124,39 @@ sub _normalize_args {
             Scalar::Util::blessed($_) && $_->isa('Sub::Meta::Param')
             ? $_
             : $self->param_class->new($_)
-        } @args
+        } @normalized_args
     ]
 }
 
 sub _all_positional_required() {
     my $self = shift;
-    [ @{$self->invocants}, @{$self->positional_required} ];
+    return [ @{$self->invocants}, @{$self->positional_required} ];
 }
 
 
-sub positional()          { [ grep { $_->positional                 } @{$_[0]->args} ] }
-sub positional_required() { [ grep { $_->positional && $_->required } @{$_[0]->args} ] }
-sub positional_optional() { [ grep { $_->positional && $_->optional } @{$_[0]->args} ] }
+sub positional()          { my $self = shift; return [ grep { $_->positional                 } @{$self->args} ] }
+sub positional_required() { my $self = shift; return [ grep { $_->positional && $_->required } @{$self->args} ] }
+sub positional_optional() { my $self = shift; return [ grep { $_->positional && $_->optional } @{$self->args} ] }
 
-sub named()               { [ grep { $_->named                      } @{$_[0]->args} ] }
-sub named_required()      { [ grep { $_->named && $_->required      } @{$_[0]->args} ] }
-sub named_optional()      { [ grep { $_->named && $_->optional      } @{$_[0]->args} ] }
+sub named()               { my $self = shift; return [ grep { $_->named                      } @{$self->args} ] }
+sub named_required()      { my $self = shift; return [ grep { $_->named && $_->required      } @{$self->args} ] }
+sub named_optional()      { my $self = shift; return [ grep { $_->named && $_->optional      } @{$self->args} ] }
 
 sub args_min() {
     my $self = shift;
     my $r = 0;
     $r += @{$self->_all_positional_required};
     $r += @{$self->named_required} * 2;
-    $r
+    return $r
 }
 
 sub args_max() {
     my $self = shift;
-    return 0 + 'Inf' if $self->slurpy || @{$self->named};
+    return 0 + 'Inf' if $self->slurpy || @{$self->named}; ## no critic (ProhibitMismatchedOperators)
     my $r = 0;
     $r += @{$self->_all_positional_required};
     $r += @{$self->positional_optional};
-    $r
+    return $r
 }
 
 sub is_same_interface {

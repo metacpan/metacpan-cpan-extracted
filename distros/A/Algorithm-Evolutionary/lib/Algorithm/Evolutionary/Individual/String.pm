@@ -17,7 +17,7 @@ use lib qw(../../../lib);
                                    # Build random bitstring with length 10
 
     my $indi3 = new Algorithm::Evolutionary::Individual::String;
-    $indi3->set( { length => 20, 
+    $indi3->set( { length => 20,
 		   chars => ['A'..'Z'] } );   #Sets values, but does not build the string
     $indi3->randomize(); #Creates a random bitstring with length as above
     print $indi3->Atom( 7 );       #Returns the value of the 7th character
@@ -31,7 +31,7 @@ use lib qw(../../../lib);
 
     my @array = qw( a x q W z ñ); #Tie a String individual
     tie my @vector, 'Algorithm::Evolutionary::Individual::String', @array;
-    
+
     print $indi3->as_string(); #Prints the individual
 
 =head1 Base Class
@@ -57,14 +57,14 @@ use base 'Algorithm::Evolutionary::Individual::Base';
 
 =head2 MY_OPERATORS
 
-Known operators that act on this subroutine. Probably will be deprecated, so don't rely on it
+Known operators that act on this subroutine. Probably will be deprecated, so don't rely on its presence
 
 =cut
 
-use constant MY_OPERATORS => qw(Algorithm::Evolutionary::Op::Crossover 
+use constant MY_OPERATORS => qw(Algorithm::Evolutionary::Op::Crossover
 				Algorithm::Evolutionary::Op::QuadXOver
 				Algorithm::Evolutionary::Op::StringRand
-				Algorithm::Evolutionary::Op::Permutation	
+				Algorithm::Evolutionary::Op::Permutation
 				Algorithm::Evolutionary::Op::IncMutation
 				Algorithm::Evolutionary::Op::ChangeLengthMutation );
 
@@ -79,7 +79,7 @@ enforced unless the client class does it
 =cut
 
 sub new {
-  my $class = shift; 
+  my $class = shift;
   my $self = Algorithm::Evolutionary::Individual::Base::new( $class );
   $self->{'_chars'} = shift || ['a'..'z'];
   $self->{'_length'} = shift || 10;
@@ -88,7 +88,7 @@ sub new {
 }
 
 sub TIEARRAY {
-  my $class = shift; 
+  my $class = shift;
   my $self = { _str => join("",@_),
                _length => scalar( @_ ),
                _fitness => undef };
@@ -305,14 +305,14 @@ sub Chrom {
 
 =over 4
 
-=item * 
+=item *
 
 L<Algorithm::Evolutionary::Individual::BitString|Algorithm::Evolutionary::Individual::BitString>
 
 =back
 
 =head2 Copyright
-  
+
   This file is released under the GPL. See the LICENSE file included in this distribution,
   or go to http://www.fsf.org/licenses/gpl.txt
 

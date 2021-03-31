@@ -21,29 +21,29 @@ use Carp qw(verbose);
 
 MAIN: {
     # Note that _ in the addr gets replaced with a '#'
-    #  addr                       mask          base            newmask        bits mb proto todo
+    #  addr                       mask          base            newmask        bits mb proto shortnet todo
     my @rtests = qw(
-      209.157.68.22:255.255.224.0 u             209.157.64.0    255.255.224.0    19 18 IPv4     0
-      209.157.68.22               255.255.224.0 209.157.64.0    255.255.224.0    19 18 IPv4     0
-      209.157.70.33               0xffffe000    209.157.64.0    255.255.224.0    19 18 IPv4     0
-      209.157.70.33/19            u             209.157.64.0    255.255.224.0    19 18 IPv4     0
-      209.157.70.33               u             209.157.70.33   255.255.255.255  32 32 IPv4     0
-      140.174.82                  u             140.174.82.0    255.255.255.0    24 23 IPv4     0
-      140.174                     u             140.174.0.0     255.255.0.0      16 15 IPv4     0
-      10                          u             10.0.0.0        255.0.0.0        8  7  IPv4     0
-      10/8                        u             10.0.0.0        255.0.0.0        8  7  IPv4     0
-      209.157.64/19               u             209.157.64.0    255.255.224.0    19 18 IPv4     0
-      209.157.64.0-209.157.95.255 u             209.157.64.0    255.255.224.0    19 18 IPv4     0
-      216.140.48.16/32            u             216.140.48.16   255.255.255.255  32 28 IPv4     0
-      209.157/17                  u             209.157.0.0     255.255.128.0    17 16 IPv4     0
-      default                     u             0.0.0.0         0.0.0.0          0  0  IPv4     0
-      209.157.68.22_0.0.31.255    u             209.157.64.0    255.255.224.0    19 18 IPv4     0
-      2001:db8::/32               u             2001:db8::      ffff:ffff::      32 29 IPv6     0
-      2001:db8:100::/48           u             2001:db8:100::  ffff:ffff:ffff:: 48 40 IPv6     0
-      2001:db8:100::              u             2001:db8:100::  ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff 128  40 IPv6  0
-      2001:db8:100::1             u             2001:db8:100::1 ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff 128 128 IPv6  0
-      1:2:3:4:5:6:7:4/64          u             1:2:3:4::       ffff:ffff:ffff:ffff::                   64  62  IPv6  0
-      default6                    u             ::              ::               0  0  IPv6  0
+      209.157.68.22:255.255.224.0 u             209.157.64.0    255.255.224.0    19 18 IPv4  0        0
+      209.157.68.22               255.255.224.0 209.157.64.0    255.255.224.0    19 18 IPv4  0        0
+      209.157.70.33               0xffffe000    209.157.64.0    255.255.224.0    19 18 IPv4  0        0
+      209.157.70.33/19            u             209.157.64.0    255.255.224.0    19 18 IPv4  0        0
+      209.157.70.33               u             209.157.70.33   255.255.255.255  32 32 IPv4  0        0
+      140.174.82                  u             140.174.82.0    255.255.255.0    24 23 IPv4  1        0
+      140.174                     u             140.174.0.0     255.255.0.0      16 15 IPv4  1        0
+      10                          u             10.0.0.0        255.0.0.0        8  7  IPv4  1        0
+      10/8                        u             10.0.0.0        255.0.0.0        8  7  IPv4  1        0
+      209.157.64/19               u             209.157.64.0    255.255.224.0    19 18 IPv4  1        0
+      209.157.64.0-209.157.95.255 u             209.157.64.0    255.255.224.0    19 18 IPv4  0        0
+      216.140.48.16/32            u             216.140.48.16   255.255.255.255  32 28 IPv4  0        0
+      209.157/17                  u             209.157.0.0     255.255.128.0    17 16 IPv4  1        0
+      default                     u             0.0.0.0         0.0.0.0          0  0  IPv4  0        0
+      209.157.68.22_0.0.31.255    u             209.157.64.0    255.255.224.0    19 18 IPv4  0        0
+      2001:db8::/32               u             2001:db8::      ffff:ffff::      32 29 IPv6  0        0
+      2001:db8:100::/48           u             2001:db8:100::  ffff:ffff:ffff:: 48 40 IPv6  0        0
+      2001:db8:100::              u             2001:db8:100::  ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff 128  40 IPv6  0     0
+      2001:db8:100::1             u             2001:db8:100::1 ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff 128 128 IPv6  0     0
+      1:2:3:4:5:6:7:4/64          u             1:2:3:4::       ffff:ffff:ffff:ffff::                   64  62  IPv6  0     0
+      default6                    u             ::              ::               0  0  IPv6  0        0
     );
 
     my @store = qw(
@@ -85,21 +85,26 @@ MAIN: {
     my $debug = 0;
     my $x;
 
-    my ( $addr, $mask, $base, $newmask, $bits, $max, $proto, $todo );
-    while ( ( $addr, $mask, $base, $newmask, $bits, $max, $proto, $todo ) =
-        splice( @rtests, 0, 8 ) )
+    my ( $addr, $mask, $base, $newmask, $bits, $max, $proto, $shortnet, $todo );
+    while ( ( $addr, $mask, $base, $newmask, $bits, $max, $proto, $shortnet, $todo ) =
+        splice( @rtests, 0, 9 ) )
     {
 
         $addr =~ s/_/#/g;
 
-        diag "$addr $mask $base $newmask $bits $max $proto $todo";
+        diag "$addr $mask $base $newmask $bits $max $proto $shortnet $todo";
 
         $mask    = undef if $mask eq 'u';
         $newmask = undef if $newmask eq 'u';
 
         my $test = sub {
-            $x = Net::Netmask->new( $addr, $mask );
+            my $x = Net::Netmask->new( $addr, $mask, shortnet => $shortnet );
+
+            local($Net::Netmask::SHORTNET_DEFAULT) = 1;
+            my $y = Net::Netmask->new( $addr, $mask );
+
             ok( $x, "parsed $addr " );
+            is( $x cmp $y, 0, "Same with SHORTNET_DEFAULT enabled" );
 
             if ( defined($x) ) {
                 is( $x->base(),     $base,    "base of $addr" );
@@ -703,8 +708,19 @@ MAIN: {
     $block77->storeNetblock();
     is( findNetblock( "10.2.1.0", $table77 ), undef );
 
+    my $table77 = {};
+    my $block77 = Net::Netmask->safe_new("10.1.2.0/24");
+    $block77->storeNetblock();
+    is( findNetblock( "10.2.1.0", $table77 ), undef );
+
     $table77 = {};
     $block77 = Net::Netmask->new2("2001:db8:cccc:1111::/64");
+    is( $Net::Netmask::error, undef, 'No error' );
+    $block77->storeNetblock();
+    is( findNetblock( "2001:db8:cccc:2222::", $table77 ), undef );
+
+    $table77 = {};
+    $block77 = Net::Netmask->safe_new("2001:db8:cccc:1111::/64");
     is( $Net::Netmask::error, undef, 'No error' );
     $block77->storeNetblock();
     is( findNetblock( "2001:db8:cccc:2222::", $table77 ), undef );

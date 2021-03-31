@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 $VERSION = $VERSION;
 
 use strict;
@@ -159,7 +159,7 @@ sub UTF8::R2::chop (@) {
 #---------------------------------------------------------------------
 # chr() for UTF-8 codepoint string
 sub UTF8::R2::chr (;$) {
-    local $_ = @_ ? $_[0] : $_;
+    my $number = @_ ? $_[0] : $_;
 
 # Negative values give the Unicode replacement character (chr(0xfffd)),
 # except under the bytes pragma, where the low eight bits of the value
@@ -167,9 +167,9 @@ sub UTF8::R2::chr (;$) {
 
     my @octet = ();
     CORE::do {
-        unshift @octet, ($_ % 0x100);
-        $_ = int($_ / 0x100);
-    } while ($_ > 0);
+        unshift @octet, ($number % 0x100);
+        $number = int($number / 0x100);
+    } while ($number > 0);
     return pack 'C*', @octet;
 }
 
@@ -702,7 +702,7 @@ sub _list_all_ASCII_by_hyphen {
                 confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not "$hyphened[$i+0]" le "$hyphened[$i+2]"});
             }
             else {
-                push @list_all, ($hyphened[$i+0] .. $hyphened[$i+2]);
+                push @list_all, map { CORE::chr($_) } (CORE::ord($hyphened[$i+0]) .. CORE::ord($hyphened[$i+2]));
                 $i += 3;
             }
         }

@@ -23,7 +23,7 @@ no_index:
 provides:
   Test::Prereq::Meta:
     file: lib/Test/Prereq/Meta.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   CPAN::Meta: '0'
   Carp: '0'
@@ -41,8 +41,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-Test-Prereq-Meta/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Prereq-Meta
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Test-Prereq-Meta.git
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

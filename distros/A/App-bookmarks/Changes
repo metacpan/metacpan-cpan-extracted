@@ -1,37 +1,46 @@
 Revision history for App-bookmarks
 
-0.28    2021.02.17
-        fixed missing require DBD::SQLite (firefox)
+0.31    2021-03-30
+        - skip gemini.t if URI::Find not installed
 
-0.27    2021.02.16
-        added win32 Edge support
-        fixed win32 bug (find)
-        fixed Chrome bug (localappdata)
-        more tests (firefox)
+0.30    2021-03-29
+        - added great markdown regex by Michaël Perrin (thank you!)
+        - process files without extension as plain text
+        - fixed extra spaces printed after empty fields
+        - added gemini support
 
-0.26    2021.01.31
-        improved handling of optional dependencies
+0.28    2021-02-17
+        - fixed missing require DBD::SQLite (firefox)
 
-0.25    2021.01.31
-        skip bookmarks.t if URI::Find not installed
+0.27    2021-02-16
+        - added win32 Edge support
+        - fixed win32 bug (find)
+        - fixed Chrome bug (localappdata)
+        - more tests (firefox)
 
-0.24    2021.01.31
-        fixed missing prereq URI::Find in Makefile.PL
+0.26    2021-01-31
+        - improved handling of optional dependencies
 
-0.23    2021.01.23
-        added tests and fixed firefox default location
+0.25    2021-01-31
+        - skip bookmarks.t if URI::Find not installed
 
-0.22    2021.01.20
-        fixed firefox query
+0.24    2021-01-31
+        - fixed missing prereq URI::Find in Makefile.PL
 
-0.21    2020.06.29
-        added markdown and text files support
+0.23    2021-01-23
+        - added tests and fixed firefox default location
 
-0.20    2020.03.10
-        fixed EXCLUSIVE SQLite lock set by Firefox
+0.22    2021-01-20
+        - fixed firefox query
 
-0.19    2019.12.29
-        added chrome support, require, bugfixes
+0.21    2020-06-29
+        - added markdown and text files support
 
-0.17    2019.10.22
-        created module
+0.20    2020-03-10
+        - fixed EXCLUSIVE SQLite lock set by Firefox
+
+0.19    2019-12-29
+        - added chrome support, require, bugfixes
+
+0.17    2019-10-22
+        - created module

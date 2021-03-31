@@ -28,6 +28,13 @@
             "lib" : "0"
          }
       },
+      "configure" : {
+         "requires" : {
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -47,14 +54,14 @@
    "provides" : {
       "Test2::Tools::LoadModule" : {
          "file" : "lib/Test2/Tools/LoadModule.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-Test2-Tools-LoadModule/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Tools-LoadModule"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -65,6 +72,6 @@
          "web" : "https://github.com/trwyant/perl-Test2-Tools-LoadModule"
       }
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

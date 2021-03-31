@@ -15,11 +15,11 @@ my $ver = Date::Manip->VERSION();
 $ver =~ s/_//smx;
 
 if ( $ver >= 6.32 ) {
-    is $ENV{PATH}, $path, 'Date::Manip RT 89435 is fixed'
-	and diag 'RT 89435 is fixed. You can remove code that refers to it';
+    is $ENV{PATH}, $path, 'Date::Manip RT 80435 is fixed'
+	and diag 'RT 80435 is fixed. You can remove code that refers to it';
 } else {
     ok "Date::Manip @{[ Date::Manip->VERSION()
-	]} is not subject to RT 89435.";
+	]} is not subject to RT 80435.";
 }
 
 done_testing;

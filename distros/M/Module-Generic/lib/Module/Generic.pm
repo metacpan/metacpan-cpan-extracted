@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.13.6
+## Version v0.14.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2021/02/14
+## Modified 2021/03/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,6 +23,16 @@ BEGIN
     use Data::Dumper;
     use Data::Dump; 
     use Devel::StackTrace;
+    use Module::Generic::Array;
+    use Module::Generic::Boolean;
+    use Module::Generic::Datetime;
+    use Module::Generic::Dynamic;
+    use Module::Generic::Exception;
+    use Module::Generic::Hash;
+    use Module::Generic::Iterator;
+    use Module::Generic::Null;
+    use Module::Generic::Number;
+    use Module::Generic::Scalar;
     use Number::Format;
     use Nice::Try;
     use B;
@@ -53,7 +63,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.13.6';
+    $VERSION     = 'v0.14.0';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -96,18 +106,14 @@ sub import
     my $self = shift( @_ );
     my( $pkg, $file, $line ) = caller();
     local $Exporter::ExportLevel = 1;
-    ## local $Exporter::Verbose = $VERBOSE;
     Exporter::import( $self, @_ );
     
-    ##print( STDERR "Module::Generic::import(): called from package '$pkg' in file '$file' at line '$line'.\n" ) if( $DEBUG );
     ( my $dir = $pkg ) =~ s/::/\//g;
     my $path  = $INC{ $dir . '.pm' };
-    ##print( STDERR "Module::Generic::import(): using primary path of '$path'.\n" ) if( $DEBUG );
     if( defined( $path ) )
     {
         ## Try absolute path name
         $path =~ s/^(.*)$dir\.pm$/$1auto\/$dir\/autosplit.ix/;
-        ##print( STDERR "Module::Generic::import(): using treated path of '$path'.\n" ) if( $DEBUG );
         eval
         {
             local $SIG{ '__DIE__' }  = sub{ };
@@ -128,7 +134,6 @@ sub import
         {
             CORE::warn( $@ ) unless( $SILENT_AUTOLOAD );
         }
-        ##print( STDERR "Module::Generic::import(): '$path' ", $@ ? 'not ' : '', "loaded.\n" ) if( $DEBUG );
     }
 }
 
@@ -136,12 +141,10 @@ sub new
 {
     my $that  = shift( @_ );
     my $class = ref( $that ) || $that;
-    ## my $pkg   = ( caller() )[ 0 ];
-    ## print( STDERR __PACKAGE__ . "::new(): our calling package is '", ( caller() )[ 0 ], "', our class is '$class'.\n" );
     my $self  = {};
-    ## print( STDERR "${class}::OBJECT_READONLY: ", ${ "${class}\::OBJECT_READONLY" }, "\n" );
     if( defined( ${ "${class}\::OBJECT_PERMS" } ) )
     {
+        require Module::Generic::Tie;
         my %hash  = ();
         my $obj   = tie(
         %hash, 
@@ -1032,16 +1035,10 @@ sub error
         $args->{message} = substr( $args->{message}, 0, $this->{error_max_length} ) if( $max_len > 0 && length( $args->{message} ) > $max_len );
         # Reset it
         $this->{_msg_no_exec_sub} = 0;
-        ## my $n = 1;
-        # $n++ while( ( caller( $n ) )[0] eq 'Module::Generic' );
         ## XXX Taken from Carp to find the right point in the stack to start from
         no strict 'refs';
         my $caller_func;
         $caller_func = \&{"CORE::GLOBAL::caller"} if( defined( &{"CORE::GLOBAL::caller"} ) );
-#         my $call_pack = $caller_func ? $caller_func->() : caller();
-#         local $CALLER_LEVEL = $CALLER_INTERNAL->{ $call_pack } ? $CALLER_LEVEL : $CALLER_LEVEL + 1;
-        ## my( $p, $f, $l ) = caller( $n );
-        ## my( $sub ) = ( caller( $n + 1 ) )[3];
         if( defined( $o ) )
         {
             $this->{error} = ${ $class . '::ERROR' } = $o;
@@ -1050,7 +1047,6 @@ sub error
         {
             $o = $this->{error} = ${ $class . '::ERROR' } = Module::Generic::Exception->new( $args );
         }
-        ## printf( STDERR "%s::error() called from package %s ($p) in file %s ($f) at line %d ($l) from sub %s ($sub)\n", __PACKAGE__, $o->package, $o->file, $o->line, $o->subroutine );
         
         ## Get the warnings status of the caller. We use caller(1) to skip one frame further, ie our caller's caller
         ## This can be changed by using 'no warnings'
@@ -1082,21 +1078,17 @@ sub error
             my $call_offset = 0;
             while( my @call_data = $caller_func ? $caller_func->( $call_offset ) : caller( $call_offset ) )
             {
-                ## printf( STDERR "[$call_offset] In file $call_data[1] at line $call_data[2] from subroutine %s has bitmask $call_data[9]\n", (caller($call_offset+1))[3] );
                 my @prev_stack = $caller_func ? $caller_func->( $call_offset - 1 ) : caller( $call_offset - 1 );
                 unless( $call_offset > 0 && $call_data[0] ne $class && $prev_stack[0] eq $class )
                 {
-                    ## print( STDERR "Skipping package $call_data[0]\n" );
                     $call_offset++;
                     next;
                 }
                 last if( $call_data[9] || ( $call_offset > 0 && $prev_stack[0] ne $class ) );
                 $call_offset++;
             }
-            ## print( STDERR "Using offset $call_offset with bitmask ", ( caller( $call_offset ) )[9], "\n" );
             my $bitmask = $caller_func ? ($caller_func->( $call_offset ))[9] : ( caller( $call_offset ) )[9];
             my $offset = $warnings::Offsets{uninitialized};
-            ## $self->message( 3, "Caller (2)'s bitmask is '$bitmask', warnings offset is '$offset' and vector is '", vec( $bitmask, $offset, 1 ), "'." );
             $should_display_warning = vec( $bitmask, $offset, 1 );
         }
         
@@ -1106,7 +1098,6 @@ sub error
             try
             {
                 $r = Apache2::RequestUtil->request;
-                # $r->log->debug( "Called for error $o" ) if( $r );
                 $r->warn( $o->as_string ) if( $r );
             }
             catch( $e )
@@ -1118,44 +1109,34 @@ sub error
         my $err_handler = $self->error_handler;
         if( $err_handler && ref( $err_handler ) eq 'CODE' )
         {
-            # $r->log->debug( "Module::Generic::error(): called for object error hanler" ) if( $r );
             $err_handler->( $o );
         }
         elsif( $r )
         {
-            # $r->log->debug( "Module::Generic::error(): called for Apache mod_perl error hanler" ) if( $r );
             if( my $log_handler = $r->get_handlers( 'PerlPrivateErrorHandler' ) )
             {
                 $log_handler->( $o );
             }
             else
             {
-                # $r->log->debug( "Module::Generic::error(): No Apache mod_perl error handler set, reverting to log_error" ) if( $r );
-                # $r->log->debug( "$o" );
                 $r->warn( $o->as_string ) if( $should_display_warning );
             }
         }
         elsif( $this->{fatal} )
         {
-            ## die( sprintf( "Within package %s in file %s at line %d: %s\n", $o->package, $o->file, $o->line, $o->message ) );
-            # $r->log->debug( "Module::Generic::error(): called calling die" ) if( $r );
             my $enc_str = eval{ Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK ) };
             die( $@ ? $o : $enc_str );
         }
-        ## elsif( !exists( $this->{quiet} ) || !$this->{quiet} )
         elsif( $should_display_warning )
         {
-            # $r->log->debug( "Module::Generic::error(): calling warn" ) if( $r );
             if( $r )
             {
-                ## $r->warn( $o->as_string ) if( $should_display_warning );
                 $r->warn( $o->as_string );
             }
             else
             {
                 my $enc_str = eval{ Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK ) };
                 ## Display warnings if warnings for this class is registered and enabled or if not registered
-                ## warn( $@ ? $o : $enc_str ) if( $should_display_warning );
                 warn( $@ ? $o : $enc_str );
             }
         }
@@ -1169,9 +1150,6 @@ sub error
             ## my( $over_file, $over_line ) = Sub::Identify::get_code_location( $overload_meth_ref );
             # my( $over_call_pack, $over_call_file, $over_call_line ) = caller();
             my $call_sub = $caller_func ? ($caller_func->(1))[3] : (caller(1))[3];
-            # my $call_hash = (caller(0))[10];
-            # my @call_keys = CORE::keys( %$call_hash );
-            # print( STDERR "\$self is overloaded and stringification method is '$overload_meth', its sub name is '$overload_meth_name' from file '$over_file' at line '$over_line' and our caller subroutine is '$call_sub' from file '$over_call_file' at line '$over_call_line' with hint hash keys '@call_keys'.\n" );
             ## overloaded method name can be, for example: My::Package::as_string
             ## or, for anonymous sub: My::Package::__ANON__[lib/My/Package.pm:12]
             ## caller sub will reliably be the same, so we use it to check if we are called from an overloaded stringification and return undef right here.
@@ -1434,9 +1412,7 @@ sub message
 {
     my $self = shift( @_ );
     my $class = ref( $self ) || $self;
-    ## my( $pack, $file, $line ) = caller;
     my $this = $self->_obj2h;
-    ## print( STDERR __PACKAGE__ . "::message(): Called from package $pack in file $file at line $line with debug value '$hash->{debug}', package DEBUG value '", ${ $class . '::DEBUG' }, "' and params '", join( "', '", @_ ), "'\n" );
     if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
     {
         my $r;
@@ -1452,21 +1428,13 @@ sub message
             }
         }
     
-        # $r->log->debug( "Got here in Module::Generic::message before checking message." ) if( $r );
         my $ref;
         $ref = $self->message_check( @_ );
-        ## print( STDERR __PACKAGE__ . "::message(): message_check() returns '$ref' (", join( '', @$ref ), ")\n" );
-        ## return( 1 ) if( !( $ref = $self->message_check( @_ ) ) );
         return( 1 ) if( !$ref );
         
         my $opts = {};
         $opts = pop( @$ref ) if( ref( $ref->[-1] ) eq 'HASH' );
-        ## print( STDERR __PACKAGE__ . "::message(): \$opts contains: ", $self->dumper( $opts ), "\n" );
-        
-        ## By now, we should have a reference to @_ in $ref
-        ## my $class = ref( $self ) || $self;
-        ## print( STDERR __PACKAGE__ . "::message(): caller at 0 is ", (caller(0))[3], " and at 1 is ", (caller(1))[3], "\n" );
-        ## $r->log->debug( "Got here in Module::Generic::message checking frames stack." ) if( $r );
+
         my $stackFrame = $self->message_frame( (caller(1))[3] ) || 1;
         $stackFrame = 1 unless( $stackFrame =~ /^\d+$/ );
         $stackFrame-- if( $stackFrame );
@@ -1488,7 +1456,6 @@ sub message
                 }
             }
         }
-        ## $r->log->debug( "Called from package $pkg in file $file at line $line from sub $sub2 ($sub)" ) if( $r );
         if( $sub2 eq 'message' )
         {
             $stackFrame++;
@@ -1496,7 +1463,6 @@ sub message
             my $sub = ( caller( $stackFrame + 1 ) )[3] // '';
             $sub2 = substr( $sub, rindex( $sub, '::' ) + 2 );
         }
-        ## $r->log->debug( "Got here in Module::Generic::message building the message string." ) if( $r );
         my $txt;
         if( $opts->{message} )
         {
@@ -1515,7 +1481,6 @@ sub message
         }
         ## Reset it
         $this->{_msg_no_exec_sub} = 0;
-        ## $r->log->debug( "Got here in Module::Generic::message with message string '$txt'." ) if( $r );
         my $prefix = CORE::length( $opts->{prefix} ) ? $opts->{prefix} : '##';
         no overloading;
         $opts->{caller_info} = 1 if( !CORE::exists( $opts->{caller_info} ) || !CORE::length( $opts->{caller_info} ) );
@@ -1595,7 +1560,6 @@ sub message_check
     my $self  = shift( @_ );
     my $class = ref( $self ) || $self;
     my $this = $self->_obj2h;
-    ## printf( STDERR "Our class is $class and DEBUG_TARGET contains: '%s' and debug value is %s\n", join( ', ', @${ "${class}::DEBUG_TARGET" } ), $hash->{ 'debug' } );
     if( @_ )
     {
         if( $_[0] !~ /^\d/ )
@@ -1642,7 +1606,6 @@ sub message_check
                 int( $this->{debug} ) >= 100 || 
                 ( length( $target_re ) && $class =~ /^$target_re$/ && ${ $class . '::GLOBAL_DEBUG' } >= $message_level ) )
             {
-                ## print( STDERR ref( $self ) . "::message_check(): debug is '$hash->{debug}', verbose '$hash->{verbose}', DEBUG '", ${ $class . '::DEBUG' }, "', debug_level = $hash->{debug_level}\n" );
                 return( [ @_ ] );
             }
             else
@@ -1734,16 +1697,12 @@ sub message_log
 {
     my $self = shift( @_ );
     my $io   = $self->message_log_io;
-    #print( STDERR "Module::Generic::log: \$io now is '$io'\n" );
     return( undef() ) if( !$io );
-    #print( STDERR "Module::Generic::log: \$io is not an open handle\n" ) if( !openhandle( $io ) && $io );
     return( undef() ) if( !Scalar::Util::openhandle( $io ) && $io );
     ## 2019-06-14: I decided to remove this test, because if a log is provided it should print to it
     ## If we are on the command line, we can easily just do tail -f log_file.txt for example and get the same result as
     ## if it were printed directly on the console
-#   my $rc = CORE::print( $io @_ ) || return( $self->error( "Unable to print to log file: $!" ) );
     my $rc = $io->print( scalar( localtime( time() ) ), " [$$]: ", @_ ) || return( $self->error( "Unable to print to log file: $!" ) );
-    ## print( STDERR "Module::Generic::log (", ref( $self ), "): successfully printed to debug log file. \$rc is $rc, \$io is '$io' and message is: ", join( '', @_ ), "\n" );
     return( $rc );
 }
 
@@ -1777,7 +1736,6 @@ sub message_log_io
 sub messagef
 {
     my $self  = shift( @_ );
-    ## print( STDERR "got here: ", ref( $self ), "::messagef\n" );
     my $class = ref( $self ) || $self;
     my $this  = $self->_obj2h;
     if( $this->{verbose} || $this->{debug} || ${ $class . '::DEBUG' } )
@@ -1809,12 +1767,9 @@ sub messagef
             $fmt = shift( @$ref );
         }
         my $txt = sprintf( $fmt, map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @$ref ) );
-        ## $self->message( 3, "Option colour set? '$opts->{colour}'. Text is: '$txt'" );
         $txt = $self->colour_parse( $txt ) if( $opts->{colour} );
-        ## print( STDERR ref( $self ), "::messagef \$txt is '$txt'\n" );
         $opts->{message} = $txt;
         $opts->{level} = $level if( defined( $level ) );
-        # return( $self->message( defined( $level ) ? ( $level, $txt ) : $txt ) );
         return( $self->message( ( $level || 0 ), $opts ) );
     }
     return( 1 );
@@ -1976,7 +1931,6 @@ sub will
 {
     ( @_ >= 2 && @_ <= 3 ) || die( 'Usage: $obj->can( "method" ) or Module::Generic::will( $obj, "method" )' );
     my( $obj, $meth, $level );
-    ## $obj->will( $other_obj, 'method' );
     if( @_ == 3 && ref( $_[ 1 ] ) )
     {
         $obj  = $_[ 1 ];
@@ -2001,8 +1955,6 @@ sub will
         $meth  = substr( $meth, rindex( $meth, '::' ) + 2 );
     }
     $ref = \&{ "$class\::$meth" } if( defined( &{ "$class\::$meth" } ) );
-    ## print( $err "\t" x $level, "UNIVERSAL::can ", defined( $ref ) ? "succeeded" : "failed", " in finding the method \"$meth\" in object/class $obj.\n" );
-    ## print( $err "\t" x $level, defined( $ref ) ? "succeeded" : "failed", " in finding the method \"$meth\" in object/class $obj.\n" );
     return( $ref ) if( defined( $ref ) );
     ## We do not go further down the rabbit hole if level is greater or equal to 10
     $level ||= 0;
@@ -2013,10 +1965,8 @@ sub will
     ## possibly inherited
     if( @{ "$class\::ISA" } )
     {
-        ## print( STDERR "\t" x $level, "Checking ", scalar( @{ "$class\::ISA" } ), " entries in \"\@${class}\:\:ISA\".\n" );
         foreach my $pack ( @{ "$class\::ISA" } )
         {
-            ## print( STDERR "\t" x $level, "Looking up method \"$meth\" in inherited package \"$pack\".\n" );
             my $ref = &will( $pack, "$origi\::$meth", $level );
             return( $ref ) if( defined( $ref ) );
         }
@@ -2027,7 +1977,6 @@ sub will
     ## we are not going to call Module::Generic::AUTOLOAD for EXTRA_AUTOLOAD...
     if( $class ne 'Module::Generic' && $meth ne 'EXTRA_AUTOLOAD' && defined( &{ "$class\::AUTOLOAD" } ) )
     {
-        ## print( STDERR "\t" x ( $level - 1 ), "Found an AUTOLOAD in class \"$class\". Ok.\n" );
         my $sub = sub
         {
             $class::AUTOLOAD = "$origi\::$meth";
@@ -2073,6 +2022,22 @@ sub __instantiate_object
     return( $o );
 }
 
+sub _get_args_as_hash
+{
+    my $self = shift( @_ );
+    return( {} ) if( !scalar( @_ ) );
+    my $ref = {};
+    if( scalar( @_ ) == 1 && $self->_is_hash( $_[0] ) )
+    {
+        $ref = shift( @_ );
+    }
+    elsif( !( scalar( @_ ) % 2 ) )
+    {
+        $ref = { @_ };
+    }
+    return( $ref );
+}
+
 ## Call to the actual method doing the work
 ## The reason for doing so is because _instantiate_object() may be inherited, but
 ## _set_get_class or _set_get_hash_as_object created dynamic class which requires to call _instantiate_object
@@ -2094,14 +2059,34 @@ sub _is_class_loaded { shift( @_ ); return( Class::Load::is_class_loaded( @_ ) )
 
 ## UNIVERSAL::isa works for both array or array as objects
 ## sub _is_array { return( UNIVERSAL::isa( $_[1], 'ARRAY' ) ); }
-sub _is_array { return( Scalar::Util::reftype( $_[1] ) eq 'ARRAY' ); }
+sub _is_array
+{
+    return( 0 ) if( scalar( @_ < 2 ) );
+    return( 0 ) if( !defined( $_[1] ) );
+    return( Scalar::Util::reftype( $_[1] ) eq 'ARRAY' );
+}
 
 ## sub _is_hash { return( UNIVERSAL::isa( $_[1], 'HASH' ) ); }
-sub _is_hash { return( Scalar::Util::reftype( $_[1] ) eq 'HASH' ); }
+sub _is_hash
+{
+    return( 0 ) if( scalar( @_ < 2 ) );
+    return( 0 ) if( !defined( $_[1] ) );
+    return( Scalar::Util::reftype( $_[1] ) eq 'HASH' );
+}
 
-sub _is_object { return( Scalar::Util::blessed( $_[1] ) ); }
+sub _is_object
+{
+    return( 0 ) if( scalar( @_ < 2 ) );
+    return( 0 ) if( !defined( $_[1] ) );
+    return( Scalar::Util::blessed( $_[1] ) );
+}
 
-sub _is_scalar{ return( Scalar::Util::reftype( $_[1] ) eq 'SCALAR' ); }
+sub _is_scalar
+{
+    return( 0 ) if( scalar( @_ < 2 ) );
+    return( 0 ) if( !defined( $_[1] ) );
+    return( Scalar::Util::reftype( $_[1] ) eq 'SCALAR' );
+}
 
 sub _load_class
 {
@@ -2131,18 +2116,14 @@ sub _obj2h
         verbose => ${ "${class}\::VERBOSE" },
         error   => ${ "${class}\::ERROR" },
         };
-        ## XXX 
-        ## print( STDERR "Called with '$self' with debug value '$hash->{debug}' and verbose '$hash->{verbose}'\n" );
         return( bless( $hash => $class ) );
     }
-    ## print( STDERR "_obj2h(): Getting a hash refernece out of the object '$self'\n" );
     elsif( Scalar::Util::reftype( $self ) eq 'HASH' )
     {
         return( $self );
     }
     elsif( Scalar::Util::reftype( $self ) eq 'GLOB' )
     {
-        ## print( STDERR "Returning a reference to an hash for glob $self\n" );
         return( \%{*$self} );
     }
     ## Because object may be accessed as My::Package->method or My::Package::method
@@ -2158,7 +2139,6 @@ sub _parse_timestamp
 {
     my $self = shift( @_ );
     my $str  = shift( @_ );
-    ## $self->message( 3, "Called with string '$str'" );
     ## No value was actually provided
     return if( !length( $str ) );
     my $this = $self->_obj2h;
@@ -2171,7 +2151,6 @@ sub _parse_timestamp
     time_zone => $tz->name,
     on_error => sub{ $error++ },
     };
-    # $self->message( 3, "Checking timestamp string '$str' for appropriate pattern" );
     ## 2019-06-19 23:23:57.000000000+0900
     ## From PostgreSQL: 2019-06-20 11:02:36.306917+09
     ## ISO 8601: 2019-06-20T11:08:27
@@ -2188,11 +2167,9 @@ sub _parse_timestamp
             my $offset_min  = ( $offset_hour - CORE::int( $offset_hour ) ) * 60;
             $zone  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
         }
-        # $self->message( 3, "\tMatched pattern #1 with date '$date', time '$time' and time zone '$zone'." );
         $date =~ tr/\//-/;
         $zone .= '00' if( length( $zone ) == 3 );
         $str = "$date $time$zone";
-        ## $self->message( 3, "\tChanging string to '$str'" );
         $opt->{pattern} = '%Y-%m-%d %T%z';
     }
     ## From SQLite: 2019-06-20 02:03:14
@@ -2200,7 +2177,6 @@ sub _parse_timestamp
     elsif( $str =~ /(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})(?:[[:blank:]]+|T)(\d{1,2}:\d{1,2}:\d{1,2})/ )
     {
         my( $date, $time ) = ( "$1-$2-$3", $4 );
-        # $self->message( 3, "\tMatched pattern #2 with date '$date', time '$time' and without time zone." );
         my $dt = DateTime->now( time_zone => $tz );
         my $offset = $dt->offset;
         ## e.g. 9 or possibly 9.5
@@ -2210,18 +2186,15 @@ sub _parse_timestamp
         my $offset_str  = sprintf( '%+03d%02d', $offset_hour, $offset_min );
         $date =~ tr/\//-/;
         $str = "$date $time$offset_str";
-        ## $self->message( 3, "\tAdding time zone '", $tz->name, "' offset of $offset_str with result: '$str'." );
         $opt->{pattern} = '%Y-%m-%d %T%z';
     }
     elsif( $str =~ /^(\d{4})[-|\/](\d{1,2})[-|\/](\d{1,2})$/ )
     {
         $str = "$1-$2-$3";
-        # $self->message( 3, "\tMatched pattern #3 with date '$date' only." );
         $opt->{pattern} = '%Y-%m-%d';
     }
     elsif( $str =~ /^\d+$/ )
     {
-        ## $self->message( 3, "\tValue is actually a unix timestamp." );
         try
         {
             my $dt = DateTime->from_epoch( epoch => $str, time_zone => 'local' );
@@ -2234,7 +2207,6 @@ sub _parse_timestamp
     }
     elsif( $str =~ /^([\+\-]?\d+)([YMDhms])$/ )
     {
-        ## $self->message( 3, "\tValue is actually a variable time: '$str'" );
         my $interval =
         {
             's' => 1,
@@ -2370,7 +2342,6 @@ sub _set_get_boolean
         my $val = shift( @_ );
         $val //= '';
         no warnings 'uninitialized';
-        # $self->message( 3, "Value provided for field '$field' is '$val' of reference (", ref( $val ), ")." );
         if( Scalar::Util::blessed( $val ) && 
             ( $val->isa( 'JSON::PP::Boolean' ) || $val->isa( 'Module::Generic::Boolean' ) ) )
         {
@@ -2394,7 +2365,6 @@ sub _set_get_boolean
                 ? Module::Generic::Boolean->true
                 : Module::Generic::Boolean->false;
         }
-        # $self->message( 3, "Boolean field now has value $self->{$field} (", ref( $self->{ $field } ), ")." );
     }
     ## If there is a value set, like a default value and it is not an object or at least not one we recognise
     ## We transform it into a Module::Generic::Boolean object
@@ -2434,7 +2404,6 @@ sub __create_class
     }
     unless( Class::Load::is_class_loaded( $class ) )
     {
-        # $self->message( 3, "Class '$class' is not created yet, creating it." );
         my $type2func =
         {
         array       => '_set_get_array',
@@ -2534,10 +2503,7 @@ EOT
 1;
 
 EOT
-        ## $self->message( 7, "Evaluating code:\n$perl" );
-        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Evaluating\n$perl\n" );
         my $rc = eval( $perl );
-        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Returned $rc\n" );
         die( "Unable to dynamically create module $class: $@" ) if( $@ );
     }
     return( $class );
@@ -2833,19 +2799,14 @@ BEGIN
 1;
 
 EOT
-        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Evaluating\n$perl\n" );
         my $rc = eval( $perl );
-        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Returned $rc\n" );
         die( "Unable to dynamically create module \"$class\" for field \"$field\" based on our own class \"", ref( $self ), "\": $@" ) if( $@ );
     }
     
     if( @_ )
     {
         my $hash = shift( @_ );
-        # my $o = $class->new( $hash );
-        # print( STDERR ref( $self ), "::_set_get_hash_as_object instantiating hash with ref (", ref( $hash ), ") ", overload::StrVal( $hash ), "\n" );
         my $o = $self->__instantiate_object( $field, $class, $hash );
-        ## $self->message( 3, "Resulting object contains: ", sub{ $self->dumper( $o ) } );
         $data->{ $field } = $o;
     }
     
@@ -2882,19 +2843,6 @@ sub _set_get_lvalue : lvalue
     return;
 }
 
-# sub _set_get_number
-# {
-#     my $self  = shift( @_ );
-#     my $field = shift( @_ );
-#     my $this  = $self->_obj2h;
-#     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-#     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-#     if( @_ )
-#     {
-#         $data->{ $field } = Module::Generic::Number->new( shift( @_ ) );
-#     }
-#     return( $data->{ $field } );
-# }
 sub _set_get_number : lvalue
 {
     my $self  = shift( @_ );
@@ -2902,14 +2850,10 @@ sub _set_get_number : lvalue
     my $this  = $self->_obj2h;
     no overload;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    # print( STDERR ref( $self ), "::_set_get_number: Current value is '", overload::StrVal( $data->{ $field } ), "'\n" );
     if( want( qw( LVALUE ASSIGN ) ) )
     {
         my( $a ) = want( 'ASSIGN' );
-        # print( STDERR ref( $self ), "::_set_get_number: Setting Module::Generic::Number object for lvalue '$a'.\n" );
         $data->{ $field } = Module::Generic::Number->new( $a );
-        # print( STDERR ref( $self ), "::_set_get_number: Lvalue context, object now is '", overload::StrVal( $data->{ $field } ), "'\n" );
-        # print( STDERR ref( $self ), "::_set_get_number: Returning value '", overload::StrVal( $data->{ $field } ), "' in LVALUE context\n" );
         return( $data->{ $field } );
     }
     else
@@ -2917,17 +2861,13 @@ sub _set_get_number : lvalue
         @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
         if( @_ )
         {
-            # print( STDERR ref( $self ), "::_set_get_number: Setting Module::Generic::Number object for regular values '", join( "', '", @_ ), "'.\n" );
             $data->{ $field } = Module::Generic::Number->new( shift( @_ ) );
-            # print( STDERR ref( $self ), "::_set_get_number: Regular context, object now is '", overload::StrVal( $data->{ $field } ), "'\n" );
         }
         if( CORE::length( $data->{ $field } ) && !ref( $data->{ $field } ) )
         {
             $data->{ $field } = Module::Generic::Number->new( $data->{ $field } );
         }
-        # print( STDERR ref( $self ), "::_set_get_number: Returning value '", overload::StrVal( $data->{ $field } ), "' in regular context\n" );
         return( $data->{ $field } ) if( want( 'LVALUE' ) );
-        # print( STDERR ref( $self ), "::_set_get_number: RReturning value '", overload::StrVal( $data->{ $field } ), "' in rvalue context\n" );
         rreturn( $data->{ $field } );
     }
     return;
@@ -3021,10 +2961,6 @@ sub _set_get_object
     ## we set a dummy object that will just call itself to avoid perl complaining about undefined value calling a method
     if( !$data->{ $field } && want( 'OBJECT' ) )
     {
-        # print( STDERR __PACKAGE__, "::_set_get_object(): Called in a chain for field $field and class $class, but no object is set, reverting to dummy object\n" );
-        # $self->message( 3, "Called in a chain, but no object is set, reverting to dummy object." );
-        ## my $null = Module::Generic::Null->new( $o, { debug => $self->{debug}, has_error => 1 });
-        ## rreturn( $null );
         my $o = $self->_instantiate_object( $field, $class, @_ ) || do
         {
             if( $class->can( 'error' ) )
@@ -3218,11 +3154,8 @@ sub _set_get_object_array_object
     if( @_ )
     {
         my $that = ( scalar( @_ ) == 1 && UNIVERSAL::isa( $_[0], 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
-        ## $self->message( 3, "Received following data to store as array object: ", sub{ $self->dump( $that ) } );
         my $ref = $self->_set_get_object_array( $field, $class, $that ) || return;
-        ## $self->message( 3, "Object array returned is: ", sub{ $self->dump( $ref ) } );
         $data->{ $field } = Module::Generic::Array->new( $ref );
-        ## $self->message( 3, "Now value for field '$field' is: ", $data->{ $field }, " which contains: '", $data->{ $field }->join( "', '" ), "'." );
     }
     ## Default value so that call to the caller's method like my_sub->length will not produce something like "Can't call method "length" on an undefined value"
     ## Also, this will make i possible to set default value in caller's object and we would turn it into array object.
@@ -3478,7 +3411,6 @@ sub VERBOSE
 AUTOLOAD
 {
     my $self;
-    # $self = shift( @_ ) if( ref( $_[ 0 ] ) && index( ref( $_[ 0 ] ), 'Module::' ) != -1 );
     $self = shift( @_ ) if( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic' ) );
     my( $class, $meth );
     $class = ref( $self ) || $self;
@@ -3531,7 +3463,6 @@ AUTOLOAD
     {
         $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     }
-    ## CORE::print( STDERR "Storing '$meth' with value ", join( ', ', @_ ), "\n" );
     if( $data && CORE::exists( $data->{ $meth } ) )
     {
         if( @_ )
@@ -3597,7 +3528,6 @@ AUTOLOAD
         if( defined( $filename = $INC{ "$pkg.pm" } ) )
         {
             $filename =~ s/^(.*)$pkg\.pm\z/$1auto\/$pkg\/$func.al/s;
-            ## print( STDERR "Found possible autoloadable file '$filename'.\n" );
             if( -r( $filename ) )
             {
                 unless( $filename =~ m|^/|s )
@@ -3646,20 +3576,12 @@ AUTOLOAD
                 }
                 if( $@ )
                 {
-                    #$@ =~ s/ at .*\n//;
-                    #my $error = $@;
-                    #CORE::die( $error );
-                    ## die( "Method $meth() is not defined in class $class and not autoloadable.\n" );
-                    ## print( $err "EXTRA_AUTOLOAD is ", defined( &{ "${class}::EXTRA_AUTOLOAD" } ) ? "defined" : "not defined", " in package '$class'.\n" );
-                    ## if( $self && defined( &{ "${class}::EXTRA_AUTOLOAD" } ) )
                     ## Look up in our caller's @ISA to see if there is any package that has this special
                     ## EXTRA_AUTOLOAD() sub routine
                     my $sub_ref = '';
                     die( "EXTRA_AUTOLOAD: ", join( "', '", @_ ), "\n" ) if( $func eq 'EXTRA_AUTOLOAD' );
                     if( $self && $func ne 'EXTRA_AUTOLOAD' && ( $sub_ref = $self->will( 'EXTRA_AUTOLOAD' ) ) )
                     {
-                        ## return( &{ "${class}::EXTRA_AUTOLOAD" }( $self, $meth ) );
-                        ## return( $self->EXTRA_AUTOLOAD( $AUTOLOAD, @_ ) );
                         return( $sub_ref->( $self, $AUTOLOAD, @_ ) );
                     }
                     else
@@ -3694,11 +3616,7 @@ AUTOLOAD
             }
         }
         unshift( @_, $self ) if( $self );
-        #use overloading;
         goto &$sub;
-        ## die( "Method $meth() is not defined in class $class and not autoloadable.\n" );
-        ## my $mesg = "Method $meth() is not defined in class $class and not autoloadable.";
-        ## $self->{ 'fatal' } ? die( $mesg ) : return( $self->error( $mesg ) );
     }
 };
 
@@ -3706,3687 +3624,6 @@ DESTROY
 {
     ## Do nothing
 };
-
-package Module::Generic::Exception;
-BEGIN
-{
-    use strict;
-    use parent qw( Module::Generic );
-    use Scalar::Util;
-    use Devel::StackTrace;
-    use overload ('""'     => 'as_string',
-                  '=='     => sub { _obj_eq(@_) },
-                  '!='     => sub { !_obj_eq(@_) },
-                  fallback => 1,
-                 );
-    our( $VERSION ) = 'v0.1.1';
-    our( $CALLER_LEVEL, $CALLER_INTERNAL );
-    $CALLER_LEVEL = 0;
-    $CALLER_INTERNAL->{'Module::Generic'}++;
-    $CALLER_INTERNAL->{'Module::Generic::Exception'}++;
-};
-
-sub init
-{
-    my $self = shift( @_ );
-    # require Data::Dumper::Concise;
-    # print( STDERR __PACKAGE__, "::init() Got here with args: ", Data::Dumper::Concise::Dumper( \@_ ), "\n" );
-    $self->{code} = '';
-    $self->{type} = '';
-    $self->{file} = '';
-    $self->{line} = '';
-    $self->{message} = '';
-    $self->{package} = '';
-    $self->{retry_after} = '';
-    $self->{subroutine} = '';
-    my $args = {};
-    if( @_ )
-    {
-        if( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic::Exception' ) ) ||
-            Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic::Exception' ) )
-        {
-            $args->{object} = shift( @_ );
-        }
-        elsif( ref( $_[0] ) eq 'HASH' )
-        {
-            $args  = shift( @_ );
-        }
-        else
-        {
-            $args->{message} = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
-        }
-    }
-    # $self->SUPER::init( @_ );
-    
-    unless( length( $args->{skip_frames} ) )
-    {
-        ## XXX Taken from Carp to find the right point in the stack to start from
-        no strict 'refs';
-        my $caller_func;
-        $caller_func = \&{"CORE::GLOBAL::caller"} if( defined( &{"CORE::GLOBAL::caller"} ) );
-        my $call_pack = $caller_func ? $caller_func->() : caller();
-        ## Check if this is an internal package or a package inheriting from us
-        local $CALLER_LEVEL = ( $CALLER_INTERNAL->{ $call_pack } || bless( {} => $call_pack )->isa( 'Module::Generic::Exception' ) ) 
-            ? $CALLER_LEVEL 
-            : $CALLER_LEVEL + 1;
-        local $error_start_frame = sub 
-        {
-            my $i;
-            my $lvl = $CALLER_LEVEL;
-            {
-                ++$i;
-                my @caller = $caller_func ? $caller_func->( $i ) : caller( $i );
-                my $pkg = $caller[0];
-                unless( defined( $pkg ) ) 
-                {
-                    if( defined( $caller[2] ) ) 
-                    {
-                        # this can happen when the stash has been deleted
-                        # in that case, just assume that it's a reasonable place to
-                        # stop (the file and line data will still be intact in any
-                        # case) - the only issue is that we can't detect if the
-                        # deleted package was internal (so don't do that then)
-                        # -doy
-                        redo unless( 0 > --$lvl );
-                        last;
-                    }
-                    else 
-                    {
-                        return( 2 );
-                    }
-                }
-                redo if( $CALLER_INTERNAL->{ $pkg } );
-                redo unless( 0 > --$lvl );
-            }
-            return( $i - 1 );
-        };
-        
-        $args->{skip_frames} = $error_start_frame->();
-    }
-    
-    my $skip_frame = $args->{skip_frames} || 0;
-    ## Skip one frame to exclude us
-    $skip_frame++;
-    
-    my $trace = Devel::StackTrace->new( skip_frames => $skip_frame, indent => 1 );
-    my $frame = $trace->next_frame;
-    my $frame2 = $trace->next_frame;
-    $trace->reset_pointer;
-    if( ref( $args->{object} ) && Scalar::Util::blessed( $args->{object} ) && $args->{object}->isa( 'Module::Generic::Exception' ) )
-    {
-        my $o = $args->{object};
-        $self->{message} = $o->message;
-        $self->{code} = $o->code;
-        $self->{type} = $o->type;
-        $self->{retry_after} = $o->retry_after;
-    }
-    else
-    {
-        # print( STDERR __PACKAGE__, "::init() Got here with args: ", Data::Dumper::Concise::Dumper( $args ), "\n" );
-        $self->{message} = $args->{message} || '';
-        $self->{code} = $args->{code} if( exists( $args->{code} ) );
-        $self->{type} = $args->{type} if( exists( $args->{type} ) );
-        $self->{retry_after} = $args->{retry_after} if( exists( $args->{retry_after} ) );
-        ## I do not want to alter the original hash reference, which may adversely affect the calling code if they depend on its content for further execution for example.
-        my $copy = {};
-        %$copy = %$args;
-        CORE::delete( @$copy{ qw( message code type retry_after skip_frames ) } );
-        # print( STDERR __PACKAGE__, "::init() Following non-standard keys to set up: '", join( "', '", sort( keys( %$copy ) ) ), "'\n" );
-        ## Do we have some non-standard parameters?
-        foreach my $p ( keys( %$copy ) )
-        {
-            my $p2 = $p;
-            $p2 =~ tr/-/_/;
-            $p2 =~ s/[^a-zA-Z0-9\_]+//g;
-            $p2 =~ s/^\d+//g;
-            $self->$p2( $copy->{ $p } );
-        }
-    }
-    $self->{file} = $frame->filename;
-    $self->{line} = $frame->line;
-    ## The caller sub routine ( caller( n ) )[3] returns the sub called by our caller instead of the sub that called our caller, so we go one frame back to get it
-    $self->{subroutine} = $frame2->subroutine;
-    $self->{package} = $frame->package;
-    $self->{trace} = $trace;
-    return( $self );
-}
-
-#sub as_string { return( $_[0]->{message} ); }
-## This is important as stringification is called by die, so as per the manual page, we need to end with new line
-## And will add the stack trace
-sub as_string
-{
-    no overloading;
-    my $self = shift( @_ );
-    my $str = $self->message;
-    $str =~ s/\r?\n$//g;
-    $str .= sprintf( " within package %s at line %d in file %s\n%s", $self->package, $self->line, $self->file, $self->trace->as_string );
-    return( $str );
-}
-
-## if( Module::Generic::Exception->caught( $e ) ) { # do something, it's ours }
-sub caught 
-{
-    my( $class, $e ) = @_;
-    return if( ref( $class ) );
-    return unless( Scalar::Util::blessed( $e ) && $e->isa( $class ) );
-    return( $e );
-}
-
-sub code { return( shift->_set_get_scalar( 'code', @_ ) ); }
-
-sub file { return( shift->_set_get_scalar( 'file', @_ ) ); }
-
-sub line { return( shift->_set_get_scalar( 'line', @_ ) ); }
-
-sub message { return( shift->_set_get_scalar( 'message', @_ ) ); }
-
-sub package { return( shift->_set_get_scalar( 'package', @_ ) ); }
-
-sub rethrow 
-{
-    my $self = shift( @_ );
-    return if( !Scalar::Util::blessed( $self ) );
-    die( $self );
-}
-
-sub retry_after { return( shift->_set_get_scalar( 'retry_after', @_ ) ); }
-
-sub subroutine { return( shift->_set_get_scalar( 'subroutine', @_ ) ); }
-
-sub throw
-{
-    my $self = shift( @_ );
-    my $e;
-    if( @_ )
-    {
-        my $msg  = shift( @_ );
-        $e = $self->new({
-            skip_frames => 1,
-            message => $msg,
-        });
-    }
-    else
-    {
-        $e = $self;
-    }
-    die( $e );
-}
-
-## Devel::StackTrace has a stringification overloaded so users can use the object to get more information or simply use it as a string to get the stack trace equivalent of doing $trace->as_string
-sub trace { return( shift->_set_get_object( 'trace', 'Devel::StackTrace', @_ ) ); }
-
-sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
-
-sub _obj_eq
-{
-    ##return overload::StrVal( $_[0] ) eq overload::StrVal( $_[1] );
-    no overloading;
-    my $self = shift( @_ );
-    my $other = shift( @_ );
-    my $me;
-    if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Exception' ) )
-    {
-        if( $self->message eq $other->message &&
-            $self->file eq $other->file &&
-            $self->line == $other->line )
-        {
-            return( 1 );
-        }
-        else
-        {
-            return( 0 );
-        }
-    }
-    ## Compare error message
-    elsif( !ref( $other ) )
-    {
-        my $me = $self->message;
-        return( $me eq $other );
-    }
-    ## Otherwise some reference data to which we cannot compare
-    return( 0 ) ;
-}
-
-AUTOLOAD
-{
-    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
-    no overloading;
-    my $self = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $code;
-    if( $code = $self->can( $method ) )
-    {
-        return( $code->( @_ ) );
-    }
-    else
-    {
-        eval( "sub ${class}::${method} { return( shift->_set_get_scalar( '$method', \@_ ) ); }" );
-        die( $@ ) if( $@ );
-        return( $self->$method( @_ ) );
-    }
-};
-
-## Purpose of this package is to provide an object that will be invoked in chain without breaking and then return undef at the end
-## Normally if a method in the chain returns undef, perl will then complain that the following method in the chain was called on an undefined value. This Null package alleviate this problem.
-## This is an original idea from https://stackoverflow.com/users/2766176/brian-d-foy as document in this Stackoverflow thread here: https://stackoverflow.com/a/7068271/4814971
-## And also by user "particle" in this perl monks discussion here: https://www.perlmonks.org/?node_id=265214
-package Module::Generic::Null;
-BEGIN
-{
-    use strict;
-    use Want;
-    use overload ('""'     => sub{ '' },
-                  'eq'     => sub { _obj_eq(@_) },
-                  'ne'     => sub { !_obj_eq(@_) },
-                  fallback => 1,
-                 );
-    use Want;
-    our( $VERSION ) = '0.2.0';
-};
-
-sub new
-{
-    my $this = shift( @_ );
-    my $class = ref( $this ) || $this;
-    my $error_object = shift( @_ );
-    my $hash = ( @_ == 1 && ref( $_[0] ) ? shift( @_ ) : { @_ } );
-    $hash->{has_error} = $error_object;
-    return( bless( $hash => $class ) );
-}
-
-sub _obj_eq 
-{
-    ##return overload::StrVal( $_[0] ) eq overload::StrVal( $_[1] );
-    no overloading;
-    my $self = shift( @_ );
-    my $other = shift( @_ );
-    my $me;
-    if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Null' ) )
-    {
-        return( $self eq $other );
-    }
-    ## Compare error message
-    elsif( !ref( $other ) )
-    {
-        return( '' eq $other );
-    }
-    ## Otherwise some reference data to which we cannot compare
-    return( 0 ) ;
-}
-
-AUTOLOAD
-{
-    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
-    # my $debug = $_[0]->{debug};
-    # my( $pack, $file, $file ) = caller;
-    # my $sub = ( caller( 1 ) )[3];
-    # print( STDERR __PACKAGE__, ": Method $method called in package $pack in file $file at line $line from subroutine $sub (AUTOLOAD = $AUTOLOAD)\n" ) if( $debug );
-    ## If we are chained, return our null object, so the chain continues to work
-    if( want( 'OBJECT' ) )
-    {
-        ## No, this is NOT a typo. rreturn() is a function of module Want
-        rreturn( $_[0] );
-    }
-    ## Otherwise, we return undef; Empty return returns undef in scalar context and empty list in list context
-    return;
-};
-
-DESTROY {};
-
-package Module::Generic::Dynamic;
-BEGIN
-{
-    use strict;
-    use parent qw( Module::Generic );
-    use warnings::register;
-    use Scalar::Util ();
-    # use Class::ISA;
-    our( $VERSION ) = '0.1.0';
-};
-
-sub new
-{
-    my $this = shift( @_ );
-    my $class = ref( $this ) || $this;
-    my $self = bless( {} => $class );
-    my $data = $self->{_data} = {};
-    ## A Module::Generic object standard parameter
-    $self->{_data_repo} = '_data';
-    my $hash = {};
-    @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    if( scalar( @_ ) == 1 && Scalar::Util::reftype( $_[0] ) eq 'HASH' )
-    {
-        $hash = shift( @_ );
-    }
-    elsif( @_ )
-    {
-        CORE::warn( "Parameter provided is not an hash reference: '", join( "', '", @_ ), "'\n" ) if( $this->_warnings_is_enabled );
-    }
-    ## $self->message( 3, "Data provided are: ", sub{ $self->dumper( $hash ) } );
-    ## print( STDERR __PACKAGE__, "::new(): Got for hash: '", join( "', '", sort( keys( %$hash ) ) ), "'\n" );
-    local $make_class = sub
-    {
-        my $k = shift( @_ );
-        my $new_class = $k;
-        $new_class =~ tr/-/_/;
-        $new_class =~ s/\_{2,}/_/g;
-        $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
-        $new_class = "${class}\::${new_class}";
-        ## Sanitise the key which will serve as a method name
-        my $clean_field = $k;
-        $clean_field =~ tr/-/_/;
-        $clean_field =~ s/\_{2,}/_/g;
-        $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
-        $clean_field =~ s/^\d+//g;
-        ## print( STDERR __PACKAGE__, "::new(): \$clean_field now is '$clean_field'\n" );
-        my $perl = <<EOT;
-package $new_class;
-BEGIN
-{
-    use strict;
-    use Module::Generic;
-    use parent -norequire, qw( Module::Generic::Dynamic );
-};
-
-1;
-
-EOT
-        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Evaluating\n$perl\n" );
-        my $rc = eval( $perl );
-        # print( STDERR __PACKAGE__, "::_set_get_hash_as_object(): Returned $rc\n" );
-        die( "Unable to dynamically create module $new_class: $@" ) if( $@ );
-        return( $new_class, $clean_field );
-    };
-    
-    foreach my $k ( sort( keys( %$hash ) ) )
-    {
-        if( ref( $hash->{ $k } ) eq 'HASH' )
-        {
-            my $clean_field = $k;
-            $clean_field =~ tr/-/_/;
-            $clean_field =~ s/\_{2,}/_/g;
-            $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
-            $clean_field =~ s/^\d+//g;
-#             my( $new_class, $clean_field ) = $make_class->( $k );
-            # print( STDERR __PACKAGE__, "::new(): Is hash looping? ", ( $hash->{ $k }->{_looping} ? 'yes' : 'no' ), " (", ref( $hash->{ $k }->{_looping} ), ")\n" );
-#             my $o = $hash->{ $k }->{_looping} ? $hash->{ $k }->{_looping} : $new_class->new( $hash->{ $k } );
-#             $data->{ $clean_field } = $o;
-#             $hash->{ $k }->{_looping} = $o;
-            eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_object( $clean_field, '$new_class', \@_ ) ); }" );
-            die( $@ ) if( $@ );
-            $self->$clean_field( $hash->{ $k } );
-        }
-        elsif( ref( $hash->{ $k } ) eq 'ARRAY' )
-        {
-            my( $new_class, $clean_field ) = $make_class->( $k );
-            # print( STDERR __PACKAGE__, "::new() found an array for key $k, creating objects for class $new_class\n" );
-            ## We take a peek at what we have to determine how we will handle the data
-            my $mode = lc( scalar( @{$hash->{ $k }} ) ? ref( $hash->{ $k }->[0] ) : '' );
-            if( $mode eq 'hash' )
-            {
-                my $all = [];
-                foreach my $this ( @{$hash->{ $k }} )
-                {
-                    my $o = $this->{_looping} ? $this->{_looping} : $new_class->new( $this );
-                    $this->{_looping} = $o;
-                    CORE::push( @$all, $o );
-                }
-                # $data->{ $clean_field } = $all;
-                eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_object_array_object( '$clean_field', '$new_class', \@_ ) ); }" );
-            }
-            else
-            {
-                # $data->{ $clean_field } = $hash->{ $k };
-                eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_array_as_object( '$clean_field', \@_ ) ); }" );
-            }
-            die( $@ ) if( $@ );
-            $self->$clean_field( $hash->{ $k } );
-        }
-        elsif( !ref( $hash->{ $k } ) )
-        {
-            my $clean_field = $k;
-            $clean_field =~ tr/-/_/;
-            $clean_field =~ s/\_{2,}/_/g;
-            $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
-            $clean_field =~ s/^\d+//g;
-            eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_scalar_as_object( '$clean_field', \@_ ) ); }" );
-            $self->$clean_field( $hash->{ $k } );
-        }
-        else
-        {
-            $self->$k( $hash->{ $k } );
-        }
-    }
-    return( $self );
-}
-
-AUTOLOAD
-{
-    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
-    # my( $class, $method ) = our $AUTOLOAD =~ /^(.*?)::([^\:]+)$/;
-    no overloading;
-    my $self = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $code;
-    # print( STDERR __PACKAGE__, "::$method(): Called\n" );
-    if( $code = $self->can( $method ) )
-    {
-        return( $code->( @_ ) );
-    }
-    ## elsif( CORE::exists( $self->{ $method } ) )
-    else
-    {
-        my $ref = lc( ref( $_[0] ) );
-        my $handler = '_set_get_scalar_as_object';
-        # if( @_ && ( $ref eq 'hash' || $ref eq 'array' ) )
-        if( $ref eq 'hash' || $ref eq 'array' )
-        {
-            # print( STDERR __PACKAGE__, "::$method(): using handler $handler for type $ref\n" );
-            $handler = "_set_get_${ref}_as_object";
-        }
-        elsif( $ref eq 'json::pp::boolean' || 
-            $ref eq 'module::generic::boolean' ||
-            ( $ref eq 'scalar' && ( $$ref == 1 || $$ref == 0 ) ) )
-        {
-            $handler = '_set_get_boolean';
-        }
-        eval( "sub ${class}::${method} { return( shift->$handler( '$method', \@_ ) ); }" );
-        die( $@ ) if( $@ );
-        ## $self->message( 3, "Calling method '$method' with data: ", sub{ $self->printer( @_ ) } );
-        return( $self->$method( @_ ) );
-    }
-};
-
-package Module::Generic::Boolean;
-BEGIN
-{
-    use common::sense;
-    use overload
-      "0+"     => sub { ${$_[0]} },
-      "++"     => sub { $_[0] = ${$_[0]} + 1 },
-      "--"     => sub { $_[0] = ${$_[0]} - 1 },
-      fallback => 1;
-    # *Module::Generic::Boolean:: = *JSON::PP::Boolean::;
-    our( $VERSION ) = '0.1.0';
-};
-
-sub new { return( $_[1] ? $true : $false ); }
-
-sub defined { return( 1 ); }
-
-our $true  = do{ bless( \( my $dummy = 1 ) => Module::Generic::Boolean ) };
-our $false = do{ bless( \( my $dummy = 0 ) => Module::Generic::Boolean ) };
-
-sub true  () { $true  }
-sub false () { $false }
-
-sub is_bool  ($) {           UNIVERSAL::isa( $_[0], Module::Generic::Boolean ) }
-sub is_true  ($) {  $_[0] && UNIVERSAL::isa( $_[0], Module::Generic::Boolean ) }
-sub is_false ($) { !$_[0] && UNIVERSAL::isa( $_[0], Module::Generic::Boolean ) }
-
-sub TO_JSON
-{
-    ## JSON does not check that the value is a proper true or false. It stupidly assumes this is a string
-    ## The only way to make it understand is to return a scalar ref of 1 or 0
-    # return( $_[0] ? 'true' : 'false' );
-    return( $_[0] ? \1 : \0 );
-}
-
-package Module::Generic::Array;
-BEGIN
-{
-    use common::sense;
-    use warnings;
-    use warnings::register;
-    use Scalar::Util ();
-    use Want;
-    ## use Data::Dumper;
-    use overload (
-        # Turned out to be not such a good ide as it create unexpected results, especially when this is an array of overloaded objects
-        # '""'  => 'as_string',
-        '=='  => sub { _obj_eq(@_) },
-        '!='  => sub { !_obj_eq(@_) },
-        'eq'  => sub { _obj_eq(@_) },
-        'ne'  => sub { !_obj_eq(@_) },
-        '%{}' => 'as_hash',
-        fallback => 1,
-    );
-    our( $VERSION ) = 'v0.1.1';
-};
-
-sub new
-{
-    my $this = CORE::shift( @_ );
-    my $init = [];
-    $init = CORE::shift( @_ ) if( @_ && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) );
-    return( bless( $init => ( ref( $this ) || $this ) ) );
-}
-
-sub as_hash
-{
-    my $self = CORE::shift( @_ );
-    my $opts = {};
-    $opts = CORE::shift( @_ ) if( Scalar::Util::reftype( $opts ) eq 'HASH' );
-    ## print( STDERR ref( $self ), "::as_hash\n" );
-    my $ref = {};
-    my( @offsets ) = $self->keys;
-    if( $opts->{start_from} )
-    {
-        my $start = CORE::int( $opts->{start_from} );
-        for my $i ( 0..$#offsets )
-        {
-            $offsets[ $i ] += $start;
-        }
-    }
-    @$ref{ @$self } = @offsets;
-    ## print( ref( $self ), "::as_hash -> dump: ", Data::Dumper::Dumper( $ref ), "\n" );
-    return( Module::Generic::Hash->new( $ref ) );
-}
-
-sub as_string
-{
-    my $self = CORE::shift( @_ );
-    my $sort = 0;
-    $sort = CORE::shift( @_ ) if( @_ );
-    return( $self->sort->as_string ) if( $sort );
-    return( "@$self" );
-}
-
-sub clone { return( $_[0]->new( [ @{$_[0]} ] ) ); }
-
-sub delete
-{
-    my $self = CORE::shift( @_ );
-    my( $offset, $length ) = @_;
-    if( defined( $offset ) )
-    {
-        if( $offset !~ /^\-?\d+$/ )
-        {
-            warn( "Non integer offset \"$offset\" provided to delete array element\n" ) if( $self->_warnings_is_enabled );
-            return( $self );
-        }
-        if( CORE::defined( $length ) && $length !~ /^\-?\d+$/ )
-        {
-            warn( $self, "Non integer length \"$length\" provided to delete array element\n" ) if( $self->_warnings_is_enabled );
-            return( $self );
-        }
-        my @removed = CORE::splice( @$self, $offset, CORE::defined( $length ) ? CORE::int( $length ) : 1 );
-        if( Want::want( 'LIST' ) )
-        {
-            rreturn( @removed );
-        }
-        else
-        {
-            rreturn( $self->new( \@removed ) );
-        }
-        # Required to make the compiler happy, as per Want documentation
-        return;
-    }
-    return( $self );
-}
-
-sub each
-{
-    my $self = CORE::shift( @_ );
-    my $code = CORE::shift( @_ ) || do
-    {
-        warn( "No subroutine callback as provided for each\n" ) if( $self->_warnings_is_enabled );
-        return;
-    };
-    if( ref( $code ) ne 'CODE' )
-    {
-        warn( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead.\n" ) if( $self->_warnings_is_enabled );
-        return;
-    }
-    ## Index starts from 0
-    while( my( $i, $v ) = CORE::each( @$self ) )
-    {
-        local $_ = $v;
-        CORE::defined( $code->( $i, $v ) ) || CORE::last;
-    }
-    return( $self );
-}
-
-sub exists
-{
-    my $self = CORE::shift( @_ );
-    my $this = CORE::shift( @_ );
-    return( $self->_number( CORE::scalar( CORE::grep( /^$this$/, @$self ) ) ) );
-}
-
-sub first
-{
-    my $self = CORE::shift( @_ );
-    return( $self->[0] ) if( CORE::length( $self->[0] ) );
-    if( Want::want( 'OBJECT' ) )
-    {
-        rreturn( Module::Generic::Null->new );
-    }
-    return( $self->[0] );
-}
-
-sub for
-{
-    my $self = CORE::shift( @_ );
-    my $code = CORE::shift( @_ );
-    return if( ref( $code ) ne 'CODE' );
-    CORE::for( my $i = 0; $i < scalar( @$self ); $i++ )
-    {
-        local $_ = $self->[ $i ];
-        CORE::defined( $code->( $i, $self->[ $i ] ) ) || CORE::last;
-    }
-    return( $self );
-}
-
-sub foreach
-{
-    my $self = CORE::shift( @_ );
-    my $code = CORE::shift( @_ );
-    return if( ref( $code ) ne 'CODE' );
-    CORE::foreach my $v ( @$self )
-    {
-        local $_ = $v;
-        CORE::defined( $code->( $v ) ) || CORE::last;
-    }
-    return( $self );
-}
-
-sub get
-{
-    my $self = CORE::shift( @_ );
-    my $offset = CORE::shift( @_ );
-    return( $self->[ CORE::int( $offset ) ] );
-}
-
-sub grep
-{
-    my $self = CORE::shift( @_ );
-    my $expr = CORE::shift( @_ );
-    my $ref;
-    if( ref( $expr ) eq 'CODE' )
-    {
-        $ref = [CORE::grep( $expr->( $_ ), @$self )];
-    }
-    else
-    {
-        $expr = ref( $expr ) eq 'Regexp'
-            ? $expr
-            : qr/\Q$expr\E/;
-        $ref = [ CORE::grep( $_ =~ /$expr/, @$self ) ];
-    }
-    if( Want::want( 'LIST' ) )
-    {
-        return( @$ref );
-    }
-    else
-    {
-        return( $self->new( $ref ) );
-    }
-}
-
-sub has { return( CORE::shift->exists( @_ ) ); }
-
-sub index
-{
-    my $self = CORE::shift( @_ );
-    my $pos  = CORE::shift( @_ );
-    $pos = CORE::int( $pos );
-    return( $self->[ $pos ] );
-}
-
-sub iterator { return( Module::Generic::Iterator->new( $self ) ); }
-
-sub join
-{
-    my $self = CORE::shift( @_ );
-    return( $self->_scalar( CORE::join( $_[0], @$self ) ) );
-}
-
-sub keys
-{
-    my $self = CORE::shift( @_ );
-    return( $self->new( [ CORE::keys( @$self ) ] ) );
-}
-
-sub last
-{
-    my $self = CORE::shift( @_ );
-    return( $self->[-1] ) if( CORE::length( $self->[-1] ) );
-    if( Want::want( 'OBJECT' ) )
-    {
-        rreturn( Module::Generic::Null->new );
-    }
-    return( $self->[-1] );
-}
-
-sub length { return( $_[0]->_number( scalar( @{$_[0]} ) ) ); }
-
-sub list { return( @{$_[0]} ); }
-
-sub map
-{
-    my $self = CORE::shift( @_ );
-    my $code = CORE::shift( @_ );
-    return if( ref( $code ) ne 'CODE' );
-    my $ref = [ CORE::map( $code->( $_ ), @$self ) ];
-    if( Want::want( 'OBJECT' ) )
-    {
-        return( $self->new( $ref ) );
-    }
-    elsif( Want::want( 'LIST' ) )
-    {
-        return( @$ref );
-    }
-    else
-    {
-        return( $self->new( $ref ) );
-    }
-}
-
-sub pop
-{
-    my $self = CORE::shift( @_ );
-    return( CORE::pop( @$self ) );
-}
-
-sub pos
-{
-    my $self = CORE::shift( @_ );
-    my $this = CORE::shift( @_ );
-    return if( !CORE::length( $this ) );
-    my $is_ref = ref( $this );
-    my $ref = $is_ref ? Scalar::Util::refaddr( $this ) : $this;
-    foreach my $i ( 0 .. $#$self )
-    {
-        if( ( $is_ref && Scalar::Util::refaddr( $self->[$i] ) eq $ref ) ||
-            ( !$is_ref && $self->[$i] eq $this ) )
-        {
-            return( $i );
-        }
-    }
-    return;
-}
-
-sub push
-{
-    my $self = CORE::shift( @_ );
-    CORE::push( @$self, @_ );
-    return( $self );
-}
-
-sub push_arrayref
-{
-    my $self = CORE::shift( @_ );
-    my $ref = CORE::shift( @_ );
-    return( $self->error( "Data provided ($ref) is not an array reference." ) ) if( !UNIVERSAL::isa( $ref, 'ARRAY' ) );
-    CORE::push( @$self, @$ref );
-    return( $self );
-}
-
-sub reset
-{
-    my $self = CORE::shift( @_ );
-    @$self = ();
-    return( $self );
-}
-
-sub reverse
-{
-    my $self = CORE::shift( @_ );
-    my $ref = [ CORE::reverse( @$self ) ];
-    if( wantarray() )
-    {
-        return( @$ref );
-    }
-    else
-    {
-        return( $self->new( $ref ) );
-    }
-}
-
-sub scalar { return( CORE::shift->length ); }
-
-sub set
-{
-    my $self = CORE::shift( @_ );
-    my $ref = ( scalar( @_ ) == 1 && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) ) ? CORE::shift( @_ ) : [ @_ ];
-    @$self = @$ref;
-    return( $self );
-}
-
-sub shift
-{
-    my $self = CORE::shift( @_ );
-    return( CORE::shift( @$self ) );
-}
-
-sub size { return( $_[0]->_number( $#{$_[0]} ) ); }
-
-sub sort
-{
-    my $self = CORE::shift( @_ );
-    my $code = CORE::shift( @_ );
-    my $ref;
-    if( ref( $code ) eq 'CODE' )
-    {
-        $ref = [sort 
-        {
-            $code->( $a, $b );
-        } @$self];
-    }
-    else
-    {
-        $ref = [ CORE::sort( @$self ) ];
-    }
-    if( Want::want( 'LIST' ) )
-    {
-        return( @$ref );
-    }
-    else
-    {
-        return( $self->new( $ref ) );
-    }
-}
-
-sub splice
-{
-    my $self = CORE::shift( @_ );
-    my( $offset, $length, @list ) = @_;
-    if( defined( $offset ) && $offset !~ /^\-?\d+$/ )
-    {
-        warn( "Offset provided for splice \"$offset\" is not an integer.\n" ) if( $self->_warnings_is_enabled );
-        ## If a list was provided, the user is not looking to get an element removed, but add it, so we return out object
-        return( $self ) if( scalar( @list ) );
-        return;
-    }
-    if( defined( $length ) && $length !~ /^\-?\d+$/ )
-    {
-        warn( "Length provided for splice \"$length\" is not an integer.\n" ) if( $self->_warnings_is_enabled );
-        return( $self ) if( scalar( @list ) );
-        return;
-    }
-    ## Adding elements, so we return our object and allow chaining
-    ## @_ = offset, length, replacement list
-    if( scalar( @_ ) > 2 )
-    {
-        CORE::splice( @$self, $offset, $length, @list );
-        return( $self );
-    }
-    elsif( !scalar( @_ ) )
-    {
-        CORE::splice( @$self );
-        return( $self );
-    }
-    else
-    {
-        return( CORE::splice( @$self, $offset, $length ) ) if( CORE::defined( $offset ) && CORE::defined( $length ) );
-        return( CORE::splice( @$self, $offset ) ) if( CORE::defined( $offset ) );
-    }
-}
-
-sub undef
-{
-    my $self = CORE::shift( @_ );
-    @$self = ();
-    return( $self );
-}
-
-sub unshift
-{
-    my $self = CORE::shift( @_ );
-    CORE::unshift( @$self, @_ );
-    return( $self );
-}
-
-sub values
-{
-    my $self = CORE::shift( @_ );
-    my $ref = [ CORE::values( @$self ) ];
-    if( Want::want( 'LIST' ) )
-    {
-        return( @$ref );
-    }
-    else
-    {
-        return( $self->new( $ref ) );
-    }
-}
-
-sub _number
-{
-    my $self = CORE::shift( @_ );
-    my $num = CORE::shift( @_ );
-    return if( !defined( $num ) );
-    return( $num ) if( !CORE::length( $num ) );
-    return( Module::Generic::Number->new( $num ) );
-}
-
-sub _obj_eq
-{
-    no overloading;
-    my $self = CORE::shift( @_ );
-    my $other = CORE::shift( @_ );
-    ## Sorted
-    my $strA = $self->as_string(1);
-    my $strB;
-    if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Array' ) )
-    {
-        $strB = $other->as_string(1);
-    }
-    ## Compare error message
-    elsif( Scalar::Util::reftype( $other ) eq 'ARRAY' )
-    {
-        $strB = $self->new( $other )->as_string(1);
-    }
-    else
-    {
-        return( 0 );
-    }
-    ## print( STDERR ref( $self ), "::_obj_eq: Comparing array A (", CORE::scalar( @$self ), ") with '$strA' to array B (", CORE::scalar( @$other ), ") with '$strB'\n" );
-    return( $strA eq $strB ) ;
-}
-
-sub _scalar
-{
-    my $self = CORE::shift( @_ );
-    my $str  = CORE::shift( @_ );
-    return if( !defined( $str ) );
-    ## Whether empty or not, return an object
-    return( Module::Generic::Scalar->new( $str ) );
-}
-
-sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
-
-
-package Module::Generic::Iterator;
-BEGIN
-{
-    use common::sense;
-    use warnings;
-    use warnings::register;
-    use parent -norequire, qw( Module::Generic );
-    use Scalar::Util ();
-    use Want;
-    our( $VERSION ) = 'v0.1.0';
-};
-
-sub init
-{
-    my $self = CORE::shift( @_ );
-    my $init = [];
-    $init = CORE::shift( @_ ) if( @_ && ( ( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'ARRAY' ) ) || ref( $_[0] ) eq 'ARRAY' ) );
-    $self->{_init_strict_use_sub} = 1;
-    $self->SUPER::init( @_ );
-    my $elems = Module::Generic::Array->new;
-    ## Wrap each element in an Iterator element to enable next, prev, etc
-    foreach my $this ( @$init )
-    {
-        CORE::push( @$elems, Module::Generic::Iterator::Element->new( $this, { parent => $self, debug => $self->debug } ) );
-    }
-    $self->{elements} = $elems;
-    $self->{pos} = 0;
-    return( $self );
-}
-
-sub elements { return( shift->_set_get_array_as_object( 'elements', @_ ) ); }
-
-sub eof
-{
-    my $self = shift( @_ );
-    my $pos;
-    if( @_ )
-    {
-        $pos  = $self->_find_pos( @_ );
-        return if( !CORE::defined( $pos ) );
-    }
-    else
-    {
-        $pos = $self->pos;
-    }
-    return( $pos >= ( $self->elements->length - 1 ) );
-}
-
-sub find
-{
-    my $self = shift( @_ );
-    my $pos  = $self->_find_pos( @_ );
-    return if( !CORE::defined( $pos ) );
-    return( $self->elements->index( $pos ) );
-}
-
-sub first
-{
-    my $self = shift( @_ );
-    $self->pos = 0;
-    return( $self->elements->index( 0 ) );
-}
-
-sub has_next
-{
-    my $self = shift( @_ );
-    my $pos  = $self->pos;
-    return( $pos < ( $self->elements->length - 1 ) );
-}
-
-sub has_prev
-{
-    my $self = shift( @_ );
-    my $pos  = $self->pos;
-    return( $pos > 0 && $self->elements->length > 0 );
-}
-
-sub last
-{
-    my $self = shift( @_ );
-    my $pos = $self->elements->length - 1;
-    $self->pos = $pos;
-    return( $self->elements->index( $pos ) );
-}
-
-sub length { return( shift->elements->length ); }
-
-sub next
-{
-    my $self = shift( @_ );
-    my $pos;
-    if( @_ )
-    {
-        $pos = $self->_find_pos( @_ );
-        return if( !CORE::defined( $pos ) );
-        return if( $pos >= ( $self->elements->length - 1 ) );
-        $pos++;
-    }
-    else
-    {
-        $pos = $self->pos;
-        return if( $self->eof );
-        $self->pos++;
-    }
-    return( $self->elements->index( $pos ) );
-}
-
-sub pos : lvalue
-{
-    my $self = shift( @_ );
-    if( want( qw( LVALUE ASSIGN ) ) )
-    {
-        my( $a ) = want( 'ASSIGN' );
-        if( $a !~ /^\d+$/ )
-        {
-            CORE::warn( "Position provided \"$a\" is not an integer.\n" );
-            lnoreturn;
-        }
-        $self->{pos} = $a;
-        lnoreturn;
-    }
-    elsif( want( 'RVALUE' ) )
-    {
-        # $self->message( 3, "Returning rvalue" );
-        rreturn( $self->{pos} );
-    }
-    else
-    {
-        # $self->message( 3, "Else returning pos value" );
-        return( $self->{pos} );
-    }
-    return;
-}
-
-sub prev
-{
-    my $self = shift( @_ );
-    my $pos;
-    if( @_ )
-    {
-        $pos  = $self->_find_pos( @_ );
-        return if( !CORE::defined( $pos ) );
-        return if ( $pos <= 0 );
-        $pos--;
-    }
-    else
-    {
-        $pos = $self->pos;
-        $self->pos-- if( $pos > 0 );
-        ## Position of the given element is at the beginning of our array, there is nothing more
-        return if( $pos <= 0 );
-        $self->pos--;
-    }
-    return( $self->elements->index( $pos ) );
-}
-
-sub reset
-{
-    my $self = shift( @_ );
-    $self->pos = 0;
-    return( $self );
-}
-
-sub _find_pos
-{
-    my $self = shift( @_ );
-    my $this = shift( @_ );
-    # $self->message( 3, "Searching for \"$this\" (", ref( $this ) ? $this->value : $this, ")" );
-    return if( !CORE::length( $this ) );
-    my $is_ref = ref( $this );
-    my $ref = $is_ref ? Scalar::Util::refaddr( $this ) : $this;
-    # $self->message( 3, "\"$this\" reference address is \"$ref\"." );
-    my $elems = $self->elements;
-    # $self->messagef( 3, "Searching in a %d elements long stack.", $elems->length );
-    foreach my $i ( 0 .. $#$elems )
-    {
-        my $val = $elems->[$i]->value;
-        # $self->message( 3, "Checking ", ( ref( $this ) ? $this->value : $this ), " ($ref) with element No $i \"$val\" (", Scalar::Util::refaddr( $elems->[$i] ), ")." );
-        if( ( $is_ref && Scalar::Util::refaddr( $elems->[$i] ) eq $ref ) ||
-            ( !$is_ref && $val eq $this ) )
-        {
-            return( $i );
-        }
-    }
-    return;
-}
-
-package Module::Generic::Iterator::Element;
-BEGIN
-{
-    use common::sense;
-    use warnings;
-    use warnings::register;
-    use parent -norequire, qw( Module::Generic );
-    use Want;
-    our( $VERSION ) = 'v0.1.0';
-};
-
-sub init
-{
-    my $self = CORE::shift( @_ );
-    ## This could be anything
-    my $value = CORE::shift( @_ );
-    $self->{value}      = '';
-    $self->{parent}     = '';
-    $self->{_init_strict_use_sub} = 1;
-    $self->SUPER::init( @_ );
-    $self->{value} = $value;
-    return( $self );
-}
-
-sub has_next
-{
-    my $self = shift( @_ );
-    my $pos = $self->pos;
-    return( $pos < ( $self->parent->elements->length - 1 ) );
-}
-
-sub has_prev
-{
-    my $self = shift( @_ );
-    my $pos  = $self->pos;
-    return( $pos > 0 && $self->parent->elements->length > 0 );
-}
-
-sub next
-{
-    my $self = shift( @_ );
-    my $next = $self->parent->next( $self );
-    if( want( 'OBJECT' ) )
-    {
-        return( $next );
-    }
-    else
-    {
-        return( $next->value );
-    }
-}
-
-sub parent { return( shift->_set_get_object( 'parent', 'Module::Generic::Iterator', @_ ) ); }
-
-sub pos { return( $_[0]->parent->_find_pos( $_[0] ) ); }
-
-sub prev
-{
-    my $self = shift( @_ );
-    my $prev = $self->parent->prev( $self );
-    if( want( 'OBJECT' ) )
-    {
-        return( $prev );
-    }
-    else
-    {
-        return( $prev->value );
-    }
-}
-
-sub value { return( shift->{value} ); }
-
-
-package Module::Generic::Scalar;
-BEGIN
-{
-    use common::sense;
-    use warnings;
-    use warnings::register;
-    ## So that the user can say $obj->isa( 'Module::Generic::Scalar' ) and it would return true
-    ## use parent -norequire, qw( Module::Generic::Scalar );
-    use Scalar::Util ();
-    use Want;
-    use overload (
-        '""'    => 'as_string',
-        '.='    => sub
-        {
-            my( $self, $other, $swap ) = @_;
-            no warnings 'uninitialized';
-            if( !CORE::defined( $$self ) )
-            {
-                return( $other );
-            }
-            elsif( !CORE::defined( $other ) )
-            {
-                return( $$self );
-            }
-            ## print( STDERR ref( $self ), "::concatenate: Got here with other = '$other', and swap = '$swap'\n" );
-            ## print( STDERR "Module::Generic::Scalar::overload->.=: Received arguments '", join( "', '", @_ ), "'\n" );
-            my $expr;
-            if( $swap )
-            {
-                $expr = "\$other .= \$$self";
-                return( $other );
-            }
-            else
-            {
-                $$self .= $other;
-                return( $self );
-            }
-        },
-        'x'     => sub
-        {
-            my( $self, $other, $swap ) = @_;
-            no warnings 'uninitialized';
-            ## print( STDERR "Module::Generic::Scalar::overload->x: Received arguments '", join( "', '", @_ ), "'\n" );
-            my $expr = $swap ? "\"$other" x \"$$self\"" : "\"$$self\" x \"$other\"";
-            my $res  = eval( $expr );
-            if( $@ )
-            {
-                CORE::warn( $@ );
-                return;
-            }
-            return( $self->new( $res ) );
-        },
-        'eq'    => sub
-        {
-            my( $self, $other, $swap ) = @_;
-            no warnings 'uninitialized';
-            if( Scalar::Util::blessed( $other ) && ref( $other ) eq ref( $self ) )
-            {
-                return( $$self eq $$other );
-            }
-            else
-            {
-                return( $$self eq "$other" );
-            }
-        },
-        fallback => 1,
-    );
-    our( $VERSION ) = 'v0.2.3';
-};
-
-## sub new { return( shift->_new( @_ ) ); }
-sub new
-{
-    my $this = shift( @_ );
-    my $init = '';
-    if( ref( $_[0] ) eq 'SCALAR' || UNIVERSAL::isa( $_[0], 'SCALAR' ) )
-    {
-        $init = ${$_[0]};
-    }
-    elsif( ref( $_[0] ) eq 'ARRAY' || UNIVERSAL::isa( $_[0], 'ARRAY' ) )
-    {
-        $init = CORE::join( '', @{$_[0]} );
-    }
-    elsif( ref( $_[0] ) )
-    {
-        warn( "I do not know what to do with \"", $_[0], "\"\n" ) if( $this->_warnings_is_enabled );
-        return;
-    }
-    elsif( @_ )
-    {
-        $init = $_[0];
-    }
-    else
-    {
-        $init = undef();
-    }
-    ## print( STDERR __PACKAGE__, "::new: got here for value '$init' (defined? ", CORE::defined( $init ) ? 'yes' : 'no', ")\n" );
-    # CORE::tie( $self, 'Module::Generic::Scalar::Tie', $init );
-    return( bless( \$init => ( ref( $this ) || $this ) ) );
-}
-
-sub append { ${$_[0]} .= $_[1]; return( $_[0] ); }
-
-sub as_boolean { return( Module::Generic::Boolean->new( ${$_[0]} ? 1 : 0 ) ); }
-
-## sub as_string { CORE::defined( ${$_[0]} ) ? return( ${$_[0]} ) : return; }
-
-sub as_string { return( ${$_[0]} ); }
-
-## Credits: John Gruber, Aristotle Pagaltzis
-## https://gist.github.com/gruber/9f9e8650d68b13ce4d78
-sub capitalise
-{
-    my $self = CORE::shift( @_ );
-    my @small_words = qw( (?<!q&)a an and as at(?!&t) but by en for if in of on or the to v[.]? via vs[.]? );
-    my $small_re = CORE::join( '|', @small_words );
-
-    my $apos = qr/ (?: ['’] [[:lower:]]* )? /x;
-    
-    my $copy = $$self;
-    $copy =~ s{\A\s+}{}, s{\s+\z}{};
-    $copy = CORE::lc( $copy ) if( not /[[:lower:]]/ );
-    $copy =~ s{
-        \b (_*) (?:
-            ( (?<=[ ][/\\]) [[:alpha:]]+ [-_[:alpha:]/\\]+ |   # file path or
-              [-_[:alpha:]]+ [@.:] [-_[:alpha:]@.:/]+ $apos )  # URL, domain, or email
-            |
-            ( (?i: $small_re ) $apos )                         # or small word (case-insensitive)
-            |
-            ( [[:alpha:]] [[:lower:]'’()\[\]{}]* $apos )       # or word w/o internal caps
-            |
-            ( [[:alpha:]] [[:alpha:]'’()\[\]{}]* $apos )       # or some other word
-        ) (_*) \b
-    }{
-        $1 . (
-          defined $2 ? $2         # preserve URL, domain, or email
-        : defined $3 ? "\L$3"     # lowercase small word
-        : defined $4 ? "\u\L$4"   # capitalize word w/o internal caps
-        : $5                      # preserve other kinds of word
-        ) . $6
-    }xeg;
-
-
-    # Exceptions for small words: capitalize at start and end of title
-    $copy =~ s{
-        (  \A [[:punct:]]*         # start of title...
-        |  [:.;?!][ ]+             # or of subsentence...
-        |  [ ]['"“‘(\[][ ]*     )  # or of inserted subphrase...
-        ( $small_re ) \b           # ... followed by small word
-    }{$1\u\L$2}xig;
-
-    $copy =~ s{
-        \b ( $small_re )      # small word...
-        (?= [[:punct:]]* \Z   # ... at the end of the title...
-        |   ['"’”)\]] [ ] )   # ... or of an inserted subphrase?
-    }{\u\L$1}xig;
-
-    # Exceptions for small words in hyphenated compound words
-    ## e.g. "in-flight" -> In-Flight
-    $copy =~ s{
-        \b
-        (?<! -)                 # Negative lookbehind for a hyphen; we don't want to match man-in-the-middle but do want (in-flight)
-        ( $small_re )
-        (?= -[[:alpha:]]+)      # lookahead for "-someword"
-    }{\u\L$1}xig;
-
-    ## # e.g. "Stand-in" -> "Stand-In" (Stand is already capped at this point)
-    $copy =~ s{
-        \b
-        (?<!…)                  # Negative lookbehind for a hyphen; we don't want to match man-in-the-middle but do want (stand-in)
-        ( [[:alpha:]]+- )       # $1 = first word and hyphen, should already be properly capped
-        ( $small_re )           # ... followed by small word
-        (?! - )                 # Negative lookahead for another '-'
-    }{$1\u$2}xig;
-
-    return( $self->_new( $copy ) );
-}
-
-sub chomp { return( CORE::chomp( ${$_[0]} ) ); }
-
-sub chop { return( CORE::chop( ${$_[0]} ) ); }
-
-sub clone
-{
-    my $self = shift( @_ );
-    if( @_ )
-    {
-        return( $self->_new( @_ ) );
-    }
-    else
-    {
-        return( $self->_new( ${$self} ) );
-    }
-}
-
-sub crypt { return( __PACKAGE__->_new( CORE::crypt( ${$_[0]}, $_[1] ) ) ); }
-
-sub defined { return( CORE::defined( ${$_[0]} ) ); }
-
-sub fc { return( CORE::fc( ${$_[0]} ) eq CORE::fc( $_[1] ) ); }
-
-sub hex { return( $_[0]->_number( CORE::hex( ${$_[0]} ) ) ); }
-
-sub index
-{
-    my $self = shift( @_ );
-    my( $substr, $pos ) = @_;
-    return( $self->_number( CORE::index( ${$self}, $substr, $pos ) ) ) if( CORE::defined( $pos ) );
-    return( $self->_number( CORE::index( ${$self}, $substr ) ) );
-}
-
-sub is_alpha { return( ${$_[0]} =~ /^[[:alpha:]]+$/ ); }
-
-sub is_alpha_numeric { return( ${$_[0]} =~ /^[[:alnum:]]+$/ ); }
-
-sub is_empty { return( CORE::length( ${$_[0]} ) == 0 ); }
-
-sub is_lower { return( ${$_[0]} =~ /^[[:lower:]]+$/ ); }
-
-sub is_numeric { return( Scalar::Util::looks_like_number( ${$_[0]} ) ); }
-
-sub is_upper { return( ${$_[0]} =~ /^[[:upper:]]+$/ ); }
-
-sub lc { return( __PACKAGE__->_new( CORE::lc( ${$_[0]} ) ) ); }
-
-sub lcfirst { return( __PACKAGE__->_new( CORE::lcfirst( ${$_[0]} ) ) ); }
-
-sub left { return( $_[0]->_new( CORE::substr( ${$_[0]}, 0, CORE::int( $_[1] ) ) ) ); }
-
-sub length { return( $_[0]->_number( CORE::length( ${$_[0]} ) ) ); }
-
-sub like
-{
-    my $self = shift( @_ );
-    my $str = shift( @_ );
-    $str = CORE::defined( $str ) 
-        ? ref( $str ) eq 'Regexp'
-            ? $str
-            : qr/(?:\Q$str\E)+/
-        : qr/[[:blank:]\r\n]*/;
-    return( $$self =~ /$str/ );
-}
-
-sub ltrim
-{
-    my $self = shift( @_ );
-    my $str = shift( @_ );
-    $str = CORE::defined( $str ) 
-        ? ref( $str ) eq 'Regexp'
-            ? $str
-            : qr/(?:\Q$str\E)+/
-        : qr/[[:blank:]\r\n]*/;
-    $$self =~ s/^$str//g;
-    return( $self );
-}
-
-sub match
-{
-    my( $self, $re ) = @_;
-    $re = CORE::defined( $re ) 
-        ? ref( $re ) eq 'Regexp'
-            ? $re
-            : qr/(?:\Q$re\E)+/
-        : $re;
-    return( $$self =~ /$re/ );
-}
-
-sub ord { return( $_[0]->_number( CORE::ord( ${$_[0]} ) ) ); }
-
-sub pad
-{
-    my $self = shift( @_ );
-    my( $n, $str ) = @_;
-    $str //= ' ';
-    if( !CORE::length( $n ) )
-    {
-        warn( "No number provided to pad the string object.\n" ) if( $self->_warnings_is_enabled );
-    }
-    elsif( $n !~ /^\-?\d+$/ )
-    {
-        warn( "Number provided \"$n\" to pad string is not an integer.\n" ) if( $self->_warnings_is_enabled );
-    }
-    
-    if( $n < 0 )
-    {
-        $$self .= ( "$str" x CORE::abs( $n ) );
-    }
-    else
-    {
-        CORE::substr( $$self, 0, 0 ) = ( "$str" x $n );
-    }
-    return( $self );
-}
-
-sub pos { return( $_[0]->_number( @_ > 1 ? ( CORE::pos( ${$_[0]} ) = $_[1] ) : CORE::pos( ${$_[0]} ) ) ); }
-
-sub quotemeta { return( __PACKAGE__->_new( CORE::quotemeta( ${$_[0]} ) ) ); }
-
-sub right { return( $_[0]->_new( CORE::substr( ${$_[0]}, ( CORE::int( $_[1] ) * -1 ) ) ) ); }
-
-sub replace
-{
-    my( $self, $re, $replacement ) = @_;
-    $re = CORE::defined( $re ) 
-        ? ref( $re ) eq 'Regexp'
-            ? $re
-            : qr/(?:\Q$re\E)+/
-        : $re;
-    return( $$self =~ s/$re/$replacement/gs );
-}
-
-sub reset { ${$_[0]} = ''; return( $_[0] ); }
-
-sub reverse { return( __PACKAGE__->_new( CORE::scalar( CORE::reverse( ${$_[0]} ) ) ) ); }
-
-sub rindex
-{
-    my $self = shift( @_ );
-    my( $substr, $pos ) = @_;
-    return( $self->_number( CORE::rindex( ${$self}, $substr, $pos ) ) ) if( CORE::defined( $pos ) );
-    return( $self->_number( CORE::rindex( ${$self}, $substr ) ) );
-}
-
-sub rtrim
-{
-    my $self = shift( @_ );
-    my $str = shift( @_ );
-    $str = CORE::defined( $str ) 
-        ? ref( $str ) eq 'Regexp'
-            ? $str
-            : qr/(?:\Q$str\E)+/
-        : qr/[[:blank:]\r\n]*/;
-    $$self =~ s/${str}$//g;
-    return( $self );
-}
-
-sub scalar { return( shift->as_string ); }
-
-sub set
-{
-    my $self = CORE::shift( @_ );
-    my $init;
-    if( ref( $_[0] ) eq 'SCALAR' || UNIVERSAL::isa( $_[0], 'SCALAR' ) )
-    {
-        $init = ${$_[0]};
-    }
-    elsif( ref( $_[0] ) eq 'ARRAY' || UNIVERSAL::isa( $_[0], 'ARRAY' ) )
-    {
-        $init = CORE::join( '', @{$_[0]} );
-    }
-    elsif( ref( $_[0] ) )
-    {
-        warn( "I do not know what to do with \"", $_[0], "\"\n" ) if( $self->_warnings_is_enabled );
-        return;
-    }
-    else
-    {
-        $init = shift( @_ );
-    }
-    $$self = $init;
-    return( $self );
-}
-
-sub split
-{
-    my $self = CORE::shift( @_ );
-    my( $expr, $limit ) = @_;
-    CORE::warn( "No argument was provided to split string in Module::Generic::Scalar::split\n" ) if( !scalar( @_ ) );
-    my $ref;
-    $limit = "$limit";
-    if( CORE::defined( $limit ) && $limit =~ /^\d+$/ )
-    {
-        $ref = [ CORE::split( $expr, $$self, $limit ) ];
-    }
-    else
-    {
-        $ref = [ CORE::split( $expr, $$self ) ];
-    }
-    if( Want::want( 'OBJECT' ) ||
-        Want::want( 'SCALAR' ) )
-    {
-        rreturn( $self->_array( $ref ) );
-    }
-    elsif( Want::want( 'LIST' ) )
-    {
-        rreturn( @$ref );
-    }
-    return;
-}
-
-sub sprintf { return( __PACKAGE__->_new( CORE::sprintf( ${$_[0]}, @_[1..$#_] ) ) ); }
-
-sub substr
-{
-    my $self = CORE::shift( @_ );
-    my( $offset, $length, $replacement ) = @_;
-    return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset, $length, $replacement ) ) ) if( CORE::defined( $length ) && CORE::defined( $replacement ) );
-    return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset, $length ) ) ) if( CORE::defined( $length ) );
-    return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset ) ) );
-}
-
-## The 3 dash here are just so my editor does not get confused with colouring
-sub tr ###
-{
-    my $self = CORE::shift( @_ );
-    my( $search, $replace, $opts ) = @_;
-    eval( "\$\$self =~ CORE::tr/$search/$replace/$opts" );
-    return( $self );
-}
-
-sub trim
-{
-    my $self = shift( @_ );
-    my $str  = shift( @_ );
-    $str = CORE::defined( $str ) ? CORE::quotemeta( $str ) : qr/[[:blank:]\r\n]*/;
-    $$self =~ s/^$str|$str$//gs;
-    return( $self );
-}
-
-sub uc { return( __PACKAGE__->_new( CORE::uc( ${$_[0]} ) ) ); }
-
-sub ucfirst { return( __PACKAGE__->_new( CORE::ucfirst( ${$_[0]} ) ) ); }
-
-sub undef
-{
-    my $self = shift( @_ );
-    $$self = undef;
-    return( $self );
-}
-
-sub _array
-{
-    my $self = shift( @_ );
-    my $arr  = shift( @_ );
-    return if( !defined( $arr ) );
-    return( $arr ) if( Scalar::Util::reftype( $arr ) ne 'ARRAY' );
-    return( Module::Generic::Array->new( $arr ) );
-}
-
-sub _number
-{
-    my $self = shift( @_ );
-    my $num = shift( @_ );
-    return if( !defined( $num ) );
-    return( $num ) if( !CORE::length( $num ) );
-    return( Module::Generic::Number->new( $num ) );
-}
-
-sub _new { return( shift->Module::Generic::Scalar::new( @_ ) ); }
-
-sub _warnings_is_enabled { return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
-
-
-package Module::Generic::Number;
-BEGIN
-{
-    use strict;
-    use parent -norequire, qw( Module::Generic );
-    use warnings::register;
-    use Number::Format;
-    use Nice::Try;
-    use Regexp::Common qw( number );
-    use POSIX ();
-    our( $VERSION ) = 'v0.4.0';
-};
-
-use overload (
-    ## I know there is the nomethod feature, but I need to provide return_object set to true or false
-    ## And I do not necessarily want to catch all the operation.
-    '""' => sub { return( shift->{_number} ); },
-    '-' => sub { return( shift->compute( @_, { op => '-', return_object => 1 }) ); },
-    '+' => sub { return( shift->compute( @_, { op => '+', return_object => 1 }) ); },
-    '*' => sub { return( shift->compute( @_, { op => '*', return_object => 1 }) ); },
-    '/' => sub { return( shift->compute( @_, { op => '/', return_object => 1 }) ); },
-    '%' => sub { return( shift->compute( @_, { op => '%', return_object => 1 }) ); },
-    ## Exponent
-    '**' => sub { return( shift->compute( @_, { op => '**', return_object => 1 }) ); },
-    ## Bitwise AND
-    '&' => sub { return( shift->compute( @_, { op => '&', return_object => 1 }) ); },
-    ## Bitwise OR
-    '|' => sub { return( shift->compute( @_, { op => '|', return_object => 1 }) ); },
-    ## Bitwise XOR
-    '^' => sub { return( shift->compute( @_, { op => '^', return_object => 1 }) ); },
-    ## Bitwise shift left
-    '<<' => sub { return( shift->compute( @_, { op => '<<', return_object => 1 }) ); },
-    ## Bitwise shift right
-    '>>' => sub { return( shift->compute( @_, { op => '>>', return_object => 1 }) ); },
-    'x' => sub { return( shift->compute( @_, { op => 'x', return_object => 1, type => 'scalar' }) ); },
-    '+=' => sub { return( shift->compute( @_, { op => '+=', return_object => 1 }) ); },
-    '-=' => sub { return( shift->compute( @_, { op => '-=', return_object => 1 }) ); },
-    '*=' => sub { return( shift->compute( @_, { op => '*=', return_object => 1 }) ); },
-    '/=' => sub { return( shift->compute( @_, { op => '/=', return_object => 1 }) ); },
-    '%=' => sub { return( shift->compute( @_, { op => '%=', return_object => 1 }) ); },
-    '**=' => sub { return( shift->compute( @_, { op => '**=', return_object => 1 }) ); },
-    '<<=' => sub { return( shift->compute( @_, { op => '<<=', return_object => 1 }) ); },
-    '>>=' => sub { return( shift->compute( @_, { op => '>>=', return_object => 1 }) ); },
-    'x=' => sub { return( shift->compute( @_, { op => 'x=', return_object => 1 }) ); },
-    ## '.=' => sub { return( shift->compute( @_, { op => '.=', return_object => 1 }) ); },
-    '.=' => sub
-    {
-        my( $self, $other, $swap ) = @_;
-        my $op = '.=';
-        my $operation = $swap ? "${other} ${op} \$self->{_number}" : "\$self->{_number} ${op} ${other}";
-        my $res = eval( $operation );
-        warn( "Error with formula \"$operation\": $@" ) if( $@ && $self->_warnings_is_enabled );
-        return if( $@ );
-        ## Concatenated something. If it still look like a number, we return it as an object
-        if( $res =~ /^$RE{num}{real}$/ )
-        {
-            return( $self->clone( $res ) );
-        }
-        ## Otherwise we pass it to the scalar module
-        else
-        {
-            return( Module::Generic::Scalar->new( "$res" ) );
-        }
-    },
-    '<' => sub { return( shift->compute( @_, { op => '<', boolean => 1 }) ); },
-    '<=' => sub { return( shift->compute( @_, { op => '<=', boolean => 1 }) ); },
-    '>' => sub { return( shift->compute( @_, { op => '>', boolean => 1 }) ); },
-    '>=' => sub { return( shift->compute( @_, { op => '>=', boolean => 1 }) ); },
-    '<=>' => sub { return( shift->compute( @_, { op => '<=>', return_object => 0 }) ); },
-    '==' => sub { return( shift->compute( @_, { op => '==', boolean => 1 }) ); },
-    '!=' => sub { return( shift->compute( @_, { op => '!=', boolean => 1 }) ); },
-    'eq' => sub { return( shift->compute( @_, { op => 'eq', boolean => 1 }) ); },
-    'ne' => sub { return( shift->compute( @_, { op => 'ne', boolean => 1 }) ); },
-    '++' => sub
-    {
-        my( $self ) = @_;
-        return( ++$self->{_number} );
-    },
-    '--' => sub
-    {
-        my( $self ) = @_;
-        return( --$self->{_number} );
-    },
-    'fallback' => 1,
-);
-
-our $SUPPORTED_LOCALES =
-{
-aa_DJ   => [qw( aa_DJ.UTF-8 aa_DJ.ISO-8859-1 aa_DJ.ISO8859-1 )],
-aa_ER   => [qw( aa_ER.UTF-8 )],
-aa_ET   => [qw( aa_ET.UTF-8 )],
-af_ZA   => [qw( af_ZA.UTF-8 af_ZA.ISO-8859-1 af_ZA.ISO8859-1 )],
-ak_GH   => [qw( ak_GH.UTF-8 )],
-am_ET   => [qw( am_ET.UTF-8 )],
-an_ES   => [qw( an_ES.UTF-8 an_ES.ISO-8859-15 an_ES.ISO8859-15 )],
-anp_IN  => [qw( anp_IN.UTF-8 )],
-ar_AE   => [qw( ar_AE.UTF-8 ar_AE.ISO-8859-6 ar_AE.ISO8859-6 )],
-ar_BH   => [qw( ar_BH.UTF-8 ar_BH.ISO-8859-6 ar_BH.ISO8859-6 )],
-ar_DZ   => [qw( ar_DZ.UTF-8 ar_DZ.ISO-8859-6 ar_DZ.ISO8859-6 )],
-ar_EG   => [qw( ar_EG.UTF-8 ar_EG.ISO-8859-6 ar_EG.ISO8859-6 )],
-ar_IN   => [qw( ar_IN.UTF-8 )],
-ar_IQ   => [qw( ar_IQ.UTF-8 ar_IQ.ISO-8859-6 ar_IQ.ISO8859-6 )],
-ar_JO   => [qw( ar_JO.UTF-8 ar_JO.ISO-8859-6 ar_JO.ISO8859-6 )],
-ar_KW   => [qw( ar_KW.UTF-8 ar_KW.ISO-8859-6 ar_KW.ISO8859-6 )],
-ar_LB   => [qw( ar_LB.UTF-8 ar_LB.ISO-8859-6 ar_LB.ISO8859-6 )],
-ar_LY   => [qw( ar_LY.UTF-8 ar_LY.ISO-8859-6 ar_LY.ISO8859-6 )],
-ar_MA   => [qw( ar_MA.UTF-8 ar_MA.ISO-8859-6 ar_MA.ISO8859-6 )],
-ar_OM   => [qw( ar_OM.UTF-8 ar_OM.ISO-8859-6 ar_OM.ISO8859-6 )],
-ar_QA   => [qw( ar_QA.UTF-8 ar_QA.ISO-8859-6 ar_QA.ISO8859-6 )],
-ar_SA   => [qw( ar_SA.UTF-8 ar_SA.ISO-8859-6 ar_SA.ISO8859-6 )],
-ar_SD   => [qw( ar_SD.UTF-8 ar_SD.ISO-8859-6 ar_SD.ISO8859-6 )],
-ar_SS   => [qw( ar_SS.UTF-8 )],
-ar_SY   => [qw( ar_SY.UTF-8 ar_SY.ISO-8859-6 ar_SY.ISO8859-6 )],
-ar_TN   => [qw( ar_TN.UTF-8 ar_TN.ISO-8859-6 ar_TN.ISO8859-6 )],
-ar_YE   => [qw( ar_YE.UTF-8 ar_YE.ISO-8859-6 ar_YE.ISO8859-6 )],
-as_IN   => [qw( as_IN.UTF-8 )],
-ast_ES  => [qw( ast_ES.UTF-8 ast_ES.ISO-8859-15 ast_ES.ISO8859-15 )],
-ayc_PE  => [qw( ayc_PE.UTF-8 )],
-az_AZ   => [qw( az_AZ.UTF-8 )],
-be_BY   => [qw( be_BY.UTF-8 be_BY.CP1251 )],
-bem_ZM  => [qw( bem_ZM.UTF-8 )],
-ber_DZ  => [qw( ber_DZ.UTF-8 )],
-ber_MA  => [qw( ber_MA.UTF-8 )],
-bg_BG   => [qw( bg_BG.UTF-8 bg_BG.CP1251 )],
-bhb_IN  => [qw( bhb_IN.UTF-8 )],
-bho_IN  => [qw( bho_IN.UTF-8 )],
-bn_BD   => [qw( bn_BD.UTF-8 )],
-bn_IN   => [qw( bn_IN.UTF-8 )],
-bo_CN   => [qw( bo_CN.UTF-8 )],
-bo_IN   => [qw( bo_IN.UTF-8 )],
-br_FR   => [qw( br_FR.UTF-8 br_FR.ISO-8859-1 br_FR.ISO8859-1 br_FR.ISO-8859-15 br_FR.ISO8859-15 )],
-brx_IN  => [qw( brx_IN.UTF-8 )],
-bs_BA   => [qw( bs_BA.UTF-8 bs_BA.ISO-8859-2 bs_BA.ISO8859-2 )],
-byn_ER  => [qw( byn_ER.UTF-8 )],
-ca_AD   => [qw( ca_AD.UTF-8 ca_AD.ISO-8859-15 ca_AD.ISO8859-15 )],
-ca_ES   => [qw( ca_ES.UTF-8 ca_ES.ISO-8859-1 ca_ES.ISO8859-1 ca_ES.ISO-8859-15 ca_ES.ISO8859-15 )],
-ca_FR   => [qw( ca_FR.UTF-8 ca_FR.ISO-8859-15 ca_FR.ISO8859-15 )],
-ca_IT   => [qw( ca_IT.UTF-8 ca_IT.ISO-8859-15 ca_IT.ISO8859-15 )],
-ce_RU   => [qw( ce_RU.UTF-8 )],
-ckb_IQ  => [qw( ckb_IQ.UTF-8 )],
-cmn_TW  => [qw( cmn_TW.UTF-8 )],
-crh_UA  => [qw( crh_UA.UTF-8 )],
-cs_CZ   => [qw( cs_CZ.UTF-8 cs_CZ.ISO-8859-2 cs_CZ.ISO8859-2 )],
-csb_PL  => [qw( csb_PL.UTF-8 )],
-cv_RU   => [qw( cv_RU.UTF-8 )],
-cy_GB   => [qw( cy_GB.UTF-8 cy_GB.ISO-8859-14 cy_GB.ISO8859-14 )],
-da_DK   => [qw( da_DK.UTF-8 da_DK.ISO-8859-1 da_DK.ISO8859-1 )],
-de_AT   => [qw( de_AT.UTF-8 de_AT.ISO-8859-1 de_AT.ISO8859-1 de_AT.ISO-8859-15 de_AT.ISO8859-15 )],
-de_BE   => [qw( de_BE.UTF-8 de_BE.ISO-8859-1 de_BE.ISO8859-1 de_BE.ISO-8859-15 de_BE.ISO8859-15 )],
-de_CH   => [qw( de_CH.UTF-8 de_CH.ISO-8859-1 de_CH.ISO8859-1 )],
-de_DE   => [qw( de_DE.UTF-8 de_DE.ISO-8859-1 de_DE.ISO8859-1 de_DE.ISO-8859-15 de_DE.ISO8859-15 )],
-de_LI   => [qw( de_LI.UTF-8 )],
-de_LU   => [qw( de_LU.UTF-8 de_LU.ISO-8859-1 de_LU.ISO8859-1 de_LU.ISO-8859-15 de_LU.ISO8859-15 )],
-doi_IN  => [qw( doi_IN.UTF-8 )],
-dv_MV   => [qw( dv_MV.UTF-8 )],
-dz_BT   => [qw( dz_BT.UTF-8 )],
-el_CY   => [qw( el_CY.UTF-8 el_CY.ISO-8859-7 el_CY.ISO8859-7 )],
-el_GR   => [qw( el_GR.UTF-8 el_GR.ISO-8859-7 el_GR.ISO8859-7 )],
-en_AG   => [qw( en_AG.UTF-8 )],
-en_AU   => [qw( en_AU.UTF-8 en_AU.ISO-8859-1 en_AU.ISO8859-1 )],
-en_BW   => [qw( en_BW.UTF-8 en_BW.ISO-8859-1 en_BW.ISO8859-1 )],
-en_CA   => [qw( en_CA.UTF-8 en_CA.ISO-8859-1 en_CA.ISO8859-1 )],
-en_DK   => [qw( en_DK.UTF-8 en_DK.ISO-8859-15 en_DK.ISO8859-15 )],
-en_GB   => [qw( en_GB.UTF-8 en_GB.ISO-8859-1 en_GB.ISO8859-1 en_GB.ISO-8859-15 en_GB.ISO8859-15 )],
-en_HK   => [qw( en_HK.UTF-8 en_HK.ISO-8859-1 en_HK.ISO8859-1 )],
-en_IE   => [qw( en_IE.UTF-8 en_IE.ISO-8859-1 en_IE.ISO8859-1 en_IE.ISO-8859-15 en_IE.ISO8859-15 )],
-en_IN   => [qw( en_IN.UTF-8 )],
-en_NG   => [qw( en_NG.UTF-8 )],
-en_NZ   => [qw( en_NZ.UTF-8 en_NZ.ISO-8859-1 en_NZ.ISO8859-1 )],
-en_PH   => [qw( en_PH.UTF-8 en_PH.ISO-8859-1 en_PH.ISO8859-1 )],
-en_SG   => [qw( en_SG.UTF-8 en_SG.ISO-8859-1 en_SG.ISO8859-1 )],
-en_US   => [qw( en_US.UTF-8 en_US.ISO-8859-1 en_US.ISO8859-1 en_US.ISO-8859-15 en_US.ISO8859-15 )],
-en_ZA   => [qw( en_ZA.UTF-8 en_ZA.ISO-8859-1 en_ZA.ISO8859-1 )],
-en_ZM   => [qw( en_ZM.UTF-8 )],
-en_ZW   => [qw( en_ZW.UTF-8 en_ZW.ISO-8859-1 en_ZW.ISO8859-1 )],
-eo      => [qw( eo.UTF-8 eo.ISO-8859-3 eo.ISO8859-3 )],
-eo_US   => [qw( eo_US.UTF-8 )],
-es_AR   => [qw( es_AR.UTF-8 es_AR.ISO-8859-1 es_AR.ISO8859-1 )],
-es_BO   => [qw( es_BO.UTF-8 es_BO.ISO-8859-1 es_BO.ISO8859-1 )],
-es_CL   => [qw( es_CL.UTF-8 es_CL.ISO-8859-1 es_CL.ISO8859-1 )],
-es_CO   => [qw( es_CO.UTF-8 es_CO.ISO-8859-1 es_CO.ISO8859-1 )],
-es_CR   => [qw( es_CR.UTF-8 es_CR.ISO-8859-1 es_CR.ISO8859-1 )],
-es_CU   => [qw( es_CU.UTF-8 )],
-es_DO   => [qw( es_DO.UTF-8 es_DO.ISO-8859-1 es_DO.ISO8859-1 )],
-es_EC   => [qw( es_EC.UTF-8 es_EC.ISO-8859-1 es_EC.ISO8859-1 )],
-es_ES   => [qw( es_ES.UTF-8 es_ES.ISO-8859-1 es_ES.ISO8859-1 es_ES.ISO-8859-15 es_ES.ISO8859-15 )],
-es_GT   => [qw( es_GT.UTF-8 es_GT.ISO-8859-1 es_GT.ISO8859-1 )],
-es_HN   => [qw( es_HN.UTF-8 es_HN.ISO-8859-1 es_HN.ISO8859-1 )],
-es_MX   => [qw( es_MX.UTF-8 es_MX.ISO-8859-1 es_MX.ISO8859-1 )],
-es_NI   => [qw( es_NI.UTF-8 es_NI.ISO-8859-1 es_NI.ISO8859-1 )],
-es_PA   => [qw( es_PA.UTF-8 es_PA.ISO-8859-1 es_PA.ISO8859-1 )],
-es_PE   => [qw( es_PE.UTF-8 es_PE.ISO-8859-1 es_PE.ISO8859-1 )],
-es_PR   => [qw( es_PR.UTF-8 es_PR.ISO-8859-1 es_PR.ISO8859-1 )],
-es_PY   => [qw( es_PY.UTF-8 es_PY.ISO-8859-1 es_PY.ISO8859-1 )],
-es_SV   => [qw( es_SV.UTF-8 es_SV.ISO-8859-1 es_SV.ISO8859-1 )],
-es_US   => [qw( es_US.UTF-8 es_US.ISO-8859-1 es_US.ISO8859-1 )],
-es_UY   => [qw( es_UY.UTF-8 es_UY.ISO-8859-1 es_UY.ISO8859-1 )],
-es_VE   => [qw( es_VE.UTF-8 es_VE.ISO-8859-1 es_VE.ISO8859-1 )],
-et_EE   => [qw( et_EE.UTF-8 et_EE.ISO-8859-1 et_EE.ISO8859-1 et_EE.ISO-8859-15 et_EE.ISO8859-15 )],
-eu_ES   => [qw( eu_ES.UTF-8 eu_ES.ISO-8859-1 eu_ES.ISO8859-1 eu_ES.ISO-8859-15 eu_ES.ISO8859-15 )],
-eu_FR   => [qw( eu_FR.UTF-8 eu_FR.ISO-8859-1 eu_FR.ISO8859-1 eu_FR.ISO-8859-15 eu_FR.ISO8859-15 )],
-fa_IR   => [qw( fa_IR.UTF-8 )],
-ff_SN   => [qw( ff_SN.UTF-8 )],
-fi_FI   => [qw( fi_FI.UTF-8 fi_FI.ISO-8859-1 fi_FI.ISO8859-1 fi_FI.ISO-8859-15 fi_FI.ISO8859-15 )],
-fil_PH  => [qw( fil_PH.UTF-8 )],
-fo_FO   => [qw( fo_FO.UTF-8 fo_FO.ISO-8859-1 fo_FO.ISO8859-1 )],
-fr_BE   => [qw( fr_BE.UTF-8 fr_BE.ISO-8859-1 fr_BE.ISO8859-1 fr_BE.ISO-8859-15 fr_BE.ISO8859-15 )],
-fr_CA   => [qw( fr_CA.UTF-8 fr_CA.ISO-8859-1 fr_CA.ISO8859-1 )],
-fr_CH   => [qw( fr_CH.UTF-8 fr_CH.ISO-8859-1 fr_CH.ISO8859-1 )],
-fr_FR   => [qw( fr_FR.UTF-8 fr_FR.ISO-8859-1 fr_FR.ISO8859-1 fr_FR.ISO-8859-15 fr_FR.ISO8859-15 )],
-fr_LU   => [qw( fr_LU.UTF-8 fr_LU.ISO-8859-1 fr_LU.ISO8859-1 fr_LU.ISO-8859-15 fr_LU.ISO8859-15 )],
-fur_IT  => [qw( fur_IT.UTF-8 )],
-fy_DE   => [qw( fy_DE.UTF-8 )],
-fy_NL   => [qw( fy_NL.UTF-8 )],
-ga_IE   => [qw( ga_IE.UTF-8 ga_IE.ISO-8859-1 ga_IE.ISO8859-1 ga_IE.ISO-8859-15 ga_IE.ISO8859-15 )],
-gd_GB   => [qw( gd_GB.UTF-8 gd_GB.ISO-8859-15 gd_GB.ISO8859-15 )],
-gez_ER  => [qw( gez_ER.UTF-8 )],
-gez_ET  => [qw( gez_ET.UTF-8 )],
-gl_ES   => [qw( gl_ES.UTF-8 gl_ES.ISO-8859-1 gl_ES.ISO8859-1 gl_ES.ISO-8859-15 gl_ES.ISO8859-15 )],
-gu_IN   => [qw( gu_IN.UTF-8 )],
-gv_GB   => [qw( gv_GB.UTF-8 gv_GB.ISO-8859-1 gv_GB.ISO8859-1 )],
-ha_NG   => [qw( ha_NG.UTF-8 )],
-hak_TW  => [qw( hak_TW.UTF-8 )],
-he_IL   => [qw( he_IL.UTF-8 he_IL.ISO-8859-8 he_IL.ISO8859-8 )],
-hi_IN   => [qw( hi_IN.UTF-8 )],
-hne_IN  => [qw( hne_IN.UTF-8 )],
-hr_HR   => [qw( hr_HR.UTF-8 hr_HR.ISO-8859-2 hr_HR.ISO8859-2 )],
-hsb_DE  => [qw( hsb_DE.UTF-8 hsb_DE.ISO-8859-2 hsb_DE.ISO8859-2 )],
-ht_HT   => [qw( ht_HT.UTF-8 )],
-hu_HU   => [qw( hu_HU.UTF-8 hu_HU.ISO-8859-2 hu_HU.ISO8859-2 )],
-hy_AM   => [qw( hy_AM.UTF-8 hy_AM.ARMSCII-8 hy_AM.ARMSCII8 )],
-ia_FR   => [qw( ia_FR.UTF-8 )],
-id_ID   => [qw( id_ID.UTF-8 id_ID.ISO-8859-1 id_ID.ISO8859-1 )],
-ig_NG   => [qw( ig_NG.UTF-8 )],
-ik_CA   => [qw( ik_CA.UTF-8 )],
-is_IS   => [qw( is_IS.UTF-8 is_IS.ISO-8859-1 is_IS.ISO8859-1 )],
-it_CH   => [qw( it_CH.UTF-8 it_CH.ISO-8859-1 it_CH.ISO8859-1 )],
-it_IT   => [qw( it_IT.UTF-8 it_IT.ISO-8859-1 it_IT.ISO8859-1 it_IT.ISO-8859-15 it_IT.ISO8859-15 )],
-iu_CA   => [qw( iu_CA.UTF-8 )],
-iw_IL   => [qw( iw_IL.UTF-8 iw_IL.ISO-8859-8 iw_IL.ISO8859-8 )],
-ja_JP   => [qw( ja_JP.UTF-8 ja_JP.EUC-JP ja_JP.EUCJP )],
-ka_GE   => [qw( ka_GE.UTF-8 ka_GE.GEORGIAN-PS ka_GE.GEORGIANPS )],
-kk_KZ   => [qw( kk_KZ.UTF-8 kk_KZ.PT154 kk_KZ.RK1048 )],
-kl_GL   => [qw( kl_GL.UTF-8 kl_GL.ISO-8859-1 kl_GL.ISO8859-1 )],
-km_KH   => [qw( km_KH.UTF-8 )],
-kn_IN   => [qw( kn_IN.UTF-8 )],
-ko_KR   => [qw( ko_KR.UTF-8 ko_KR.EUC-KR ko_KR.EUCKR )],
-kok_IN  => [qw( kok_IN.UTF-8 )],
-ks_IN   => [qw( ks_IN.UTF-8 )],
-ku_TR   => [qw( ku_TR.UTF-8 ku_TR.ISO-8859-9 ku_TR.ISO8859-9 )],
-kw_GB   => [qw( kw_GB.UTF-8 kw_GB.ISO-8859-1 kw_GB.ISO8859-1 )],
-ky_KG   => [qw( ky_KG.UTF-8 )],
-lb_LU   => [qw( lb_LU.UTF-8 )],
-lg_UG   => [qw( lg_UG.UTF-8 lg_UG.ISO-8859-10 lg_UG.ISO8859-10 )],
-li_BE   => [qw( li_BE.UTF-8 )],
-li_NL   => [qw( li_NL.UTF-8 )],
-lij_IT  => [qw( lij_IT.UTF-8 )],
-ln_CD   => [qw( ln_CD.UTF-8 )],
-lo_LA   => [qw( lo_LA.UTF-8 )],
-lt_LT   => [qw( lt_LT.UTF-8 lt_LT.ISO-8859-13 lt_LT.ISO8859-13 )],
-lv_LV   => [qw( lv_LV.UTF-8 lv_LV.ISO-8859-13 lv_LV.ISO8859-13 )],
-lzh_TW  => [qw( lzh_TW.UTF-8 )],
-mag_IN  => [qw( mag_IN.UTF-8 )],
-mai_IN  => [qw( mai_IN.UTF-8 )],
-mg_MG   => [qw( mg_MG.UTF-8 mg_MG.ISO-8859-15 mg_MG.ISO8859-15 )],
-mhr_RU  => [qw( mhr_RU.UTF-8 )],
-mi_NZ   => [qw( mi_NZ.UTF-8 mi_NZ.ISO-8859-13 mi_NZ.ISO8859-13 )],
-mk_MK   => [qw( mk_MK.UTF-8 mk_MK.ISO-8859-5 mk_MK.ISO8859-5 )],
-ml_IN   => [qw( ml_IN.UTF-8 )],
-mn_MN   => [qw( mn_MN.UTF-8 )],
-mni_IN  => [qw( mni_IN.UTF-8 )],
-mr_IN   => [qw( mr_IN.UTF-8 )],
-ms_MY   => [qw( ms_MY.UTF-8 ms_MY.ISO-8859-1 ms_MY.ISO8859-1 )],
-mt_MT   => [qw( mt_MT.UTF-8 mt_MT.ISO-8859-3 mt_MT.ISO8859-3 )],
-my_MM   => [qw( my_MM.UTF-8 )],
-nan_TW  => [qw( nan_TW.UTF-8 )],
-nb_NO   => [qw( nb_NO.UTF-8 nb_NO.ISO-8859-1 nb_NO.ISO8859-1 )],
-nds_DE  => [qw( nds_DE.UTF-8 )],
-nds_NL  => [qw( nds_NL.UTF-8 )],
-ne_NP   => [qw( ne_NP.UTF-8 )],
-nhn_MX  => [qw( nhn_MX.UTF-8 )],
-niu_NU  => [qw( niu_NU.UTF-8 )],
-niu_NZ  => [qw( niu_NZ.UTF-8 )],
-nl_AW   => [qw( nl_AW.UTF-8 )],
-nl_BE   => [qw( nl_BE.UTF-8 nl_BE.ISO-8859-1 nl_BE.ISO8859-1 nl_BE.ISO-8859-15 nl_BE.ISO8859-15 )],
-nl_NL   => [qw( nl_NL.UTF-8 nl_NL.ISO-8859-1 nl_NL.ISO8859-1 nl_NL.ISO-8859-15 nl_NL.ISO8859-15 )],
-nn_NO   => [qw( nn_NO.UTF-8 nn_NO.ISO-8859-1 nn_NO.ISO8859-1 )],
-nr_ZA   => [qw( nr_ZA.UTF-8 )],
-nso_ZA  => [qw( nso_ZA.UTF-8 )],
-oc_FR   => [qw( oc_FR.UTF-8 oc_FR.ISO-8859-1 oc_FR.ISO8859-1 )],
-om_ET   => [qw( om_ET.UTF-8 )],
-om_KE   => [qw( om_KE.UTF-8 om_KE.ISO-8859-1 om_KE.ISO8859-1 )],
-or_IN   => [qw( or_IN.UTF-8 )],
-os_RU   => [qw( os_RU.UTF-8 )],
-pa_IN   => [qw( pa_IN.UTF-8 )],
-pa_PK   => [qw( pa_PK.UTF-8 )],
-pap_AN  => [qw( pap_AN.UTF-8 )],
-pap_AW  => [qw( pap_AW.UTF-8 )],
-pap_CW  => [qw( pap_CW.UTF-8 )],
-pl_PL   => [qw( pl_PL.UTF-8 pl_PL.ISO-8859-2 pl_PL.ISO8859-2 )],
-ps_AF   => [qw( ps_AF.UTF-8 )],
-pt_BR   => [qw( pt_BR.UTF-8 pt_BR.ISO-8859-1 pt_BR.ISO8859-1 )],
-pt_PT   => [qw( pt_PT.UTF-8 pt_PT.ISO-8859-1 pt_PT.ISO8859-1 pt_PT.ISO-8859-15 pt_PT.ISO8859-15 )],
-quz_PE  => [qw( quz_PE.UTF-8 )],
-raj_IN  => [qw( raj_IN.UTF-8 )],
-ro_RO   => [qw( ro_RO.UTF-8 ro_RO.ISO-8859-2 ro_RO.ISO8859-2 )],
-ru_RU   => [qw( ru_RU.UTF-8 ru_RU.KOI8-R ru_RU.KOI8R ru_RU.ISO-8859-5 ru_RU.ISO8859-5 ru_RU.CP1251 )],
-ru_UA   => [qw( ru_UA.UTF-8 ru_UA.KOI8-U ru_UA.KOI8U )],
-rw_RW   => [qw( rw_RW.UTF-8 )],
-sa_IN   => [qw( sa_IN.UTF-8 )],
-sat_IN  => [qw( sat_IN.UTF-8 )],
-sc_IT   => [qw( sc_IT.UTF-8 )],
-sd_IN   => [qw( sd_IN.UTF-8 )],
-sd_PK   => [qw( sd_PK.UTF-8 )],
-se_NO   => [qw( se_NO.UTF-8 )],
-shs_CA  => [qw( shs_CA.UTF-8 )],
-si_LK   => [qw( si_LK.UTF-8 )],
-sid_ET  => [qw( sid_ET.UTF-8 )],
-sk_SK   => [qw( sk_SK.UTF-8 sk_SK.ISO-8859-2 sk_SK.ISO8859-2 )],
-sl_SI   => [qw( sl_SI.UTF-8 sl_SI.ISO-8859-2 sl_SI.ISO8859-2 )],
-so_DJ   => [qw( so_DJ.UTF-8 so_DJ.ISO-8859-1 so_DJ.ISO8859-1 )],
-so_ET   => [qw( so_ET.UTF-8 )],
-so_KE   => [qw( so_KE.UTF-8 so_KE.ISO-8859-1 so_KE.ISO8859-1 )],
-so_SO   => [qw( so_SO.UTF-8 so_SO.ISO-8859-1 so_SO.ISO8859-1 )],
-sq_AL   => [qw( sq_AL.UTF-8 sq_AL.ISO-8859-1 sq_AL.ISO8859-1 )],
-sq_MK   => [qw( sq_MK.UTF-8 )],
-sr_ME   => [qw( sr_ME.UTF-8 )],
-sr_RS   => [qw( sr_RS.UTF-8 )],
-ss_ZA   => [qw( ss_ZA.UTF-8 )],
-st_ZA   => [qw( st_ZA.UTF-8 st_ZA.ISO-8859-1 st_ZA.ISO8859-1 )],
-sv_FI   => [qw( sv_FI.UTF-8 sv_FI.ISO-8859-1 sv_FI.ISO8859-1 sv_FI.ISO-8859-15 sv_FI.ISO8859-15 )],
-sv_SE   => [qw( sv_SE.UTF-8 sv_SE.ISO-8859-1 sv_SE.ISO8859-1 sv_SE.ISO-8859-15 sv_SE.ISO8859-15 )],
-sw_KE   => [qw( sw_KE.UTF-8 )],
-sw_TZ   => [qw( sw_TZ.UTF-8 )],
-szl_PL  => [qw( szl_PL.UTF-8 )],
-ta_IN   => [qw( ta_IN.UTF-8 )],
-ta_LK   => [qw( ta_LK.UTF-8 )],
-tcy_IN  => [qw( tcy_IN.UTF-8 )],
-te_IN   => [qw( te_IN.UTF-8 )],
-tg_TJ   => [qw( tg_TJ.UTF-8 tg_TJ.KOI8-T tg_TJ.KOI8T )],
-th_TH   => [qw( th_TH.UTF-8 th_TH.TIS-620 th_TH.TIS620 )],
-the_NP  => [qw( the_NP.UTF-8 )],
-ti_ER   => [qw( ti_ER.UTF-8 )],
-ti_ET   => [qw( ti_ET.UTF-8 )],
-tig_ER  => [qw( tig_ER.UTF-8 )],
-tk_TM   => [qw( tk_TM.UTF-8 )],
-tl_PH   => [qw( tl_PH.UTF-8 tl_PH.ISO-8859-1 tl_PH.ISO8859-1 )],
-tn_ZA   => [qw( tn_ZA.UTF-8 )],
-tr_CY   => [qw( tr_CY.UTF-8 tr_CY.ISO-8859-9 tr_CY.ISO8859-9 )],
-tr_TR   => [qw( tr_TR.UTF-8 tr_TR.ISO-8859-9 tr_TR.ISO8859-9 )],
-ts_ZA   => [qw( ts_ZA.UTF-8 )],
-tt_RU   => [qw( tt_RU.UTF-8 )],
-ug_CN   => [qw( ug_CN.UTF-8 )],
-uk_UA   => [qw( uk_UA.UTF-8 uk_UA.KOI8-U uk_UA.KOI8U )],
-unm_US  => [qw( unm_US.UTF-8 )],
-ur_IN   => [qw( ur_IN.UTF-8 )],
-ur_PK   => [qw( ur_PK.UTF-8 )],
-uz_UZ   => [qw( uz_UZ.UTF-8 uz_UZ.ISO-8859-1 uz_UZ.ISO8859-1 )],
-ve_ZA   => [qw( ve_ZA.UTF-8 )],
-vi_VN   => [qw( vi_VN.UTF-8 )],
-wa_BE   => [qw( wa_BE.UTF-8 wa_BE.ISO-8859-1 wa_BE.ISO8859-1 wa_BE.ISO-8859-15 wa_BE.ISO8859-15 )],
-wae_CH  => [qw( wae_CH.UTF-8 )],
-wal_ET  => [qw( wal_ET.UTF-8 )],
-wo_SN   => [qw( wo_SN.UTF-8 )],
-xh_ZA   => [qw( xh_ZA.UTF-8 xh_ZA.ISO-8859-1 xh_ZA.ISO8859-1 )],
-yi_US   => [qw( yi_US.UTF-8 yi_US.CP1255 )],
-yo_NG   => [qw( yo_NG.UTF-8 )],
-yue_HK  => [qw( yue_HK.UTF-8 )],
-zh_CN   => [qw( zh_CN.UTF-8 zh_CN.GB18030 zh_CN.GBK zh_CN.GB2312 )],
-zh_HK   => [qw( zh_HK.UTF-8 zh_HK.BIG5-HKSCS zh_HK.BIG5HKSCS )],
-zh_SG   => [qw( zh_SG.UTF-8 zh_SG.GBK zh_SG.GB2312 )],
-zh_TW   => [qw( zh_TW.UTF-8 zh_TW.EUC-TW zh_TW.EUCTW zh_TW.BIG5 )],
-zu_ZA   => [qw( zu_ZA.UTF-8 zu_ZA.ISO-8859-1 zu_ZA.ISO8859-1 )],
-};
-
-our $DEFAULT =
-{
-## The local currency symbol.
-currency_symbol     => '€',
-## The decimal point character, except for currency values, cannot be an empty string
-decimal_point       => '.',
-## The number of digits after the decimal point in the local style for currency values.
-frac_digits         => 2,
-## The sizes of the groups of digits, except for currency values. unpack( "C*", $grouping ) will give the number
-grouping            => (CORE::chr(3) x 2),
-## The standardized international currency symbol.
-int_curr_symbol     => '€',
-## The number of digits after the decimal point in an international-style currency value.
-int_frac_digits     => 2,
-## Same as n_cs_precedes, but for internationally formatted monetary quantities.
-int_n_cs_precedes   => '',
-## Same as n_sep_by_space, but for internationally formatted monetary quantities.
-int_n_sep_by_space  => '',
-## Same as n_sign_posn, but for internationally formatted monetary quantities.
-int_n_sign_posn     => 1,
-## Same as p_cs_precedes, but for internationally formatted monetary quantities.
-int_p_cs_precedes   => 1,
-## Same as p_sep_by_space, but for internationally formatted monetary quantities.
-int_p_sep_by_space  => 0,
-## Same as p_sign_posn, but for internationally formatted monetary quantities.
-int_p_sign_posn     => 1,
-## The decimal point character for currency values.
-mon_decimal_point   => '.',
-## Like grouping but for currency values.
-mon_grouping        => (CORE::chr(3) x 2),
-## The separator for digit groups in currency values.
-mon_thousands_sep   => ',',
-## Like p_cs_precedes but for negative values.
-n_cs_precedes       => 1,
-## Like p_sep_by_space but for negative values.
-n_sep_by_space      => 0,
-## Like p_sign_posn but for negative currency values.
-n_sign_posn         => 1,
-## The character used to denote negative currency values, usually a minus sign.
-negative_sign       => '-',
-## 1 if the currency symbol precedes the currency value for nonnegative values, 0 if it follows.
-p_cs_precedes       => 1,
-## 1 if a space is inserted between the currency symbol and the currency value for nonnegative values, 0 otherwise.
-p_sep_by_space      => 0,
-## The location of the positive_sign with respect to a nonnegative quantity and the currency_symbol, coded as follows:
-## 0    Parentheses around the entire string.
-## 1    Before the string.
-## 2    After the string.
-## 3    Just before currency_symbol.
-## 4    Just after currency_symbol.
-p_sign_posn         => 1,
-## The character used to denote nonnegative currency values, usually the empty string.
-positive_sign       => '',
-## The separator between groups of digits before the decimal point, except for currency values
-thousands_sep       => ',',
-};
-
-my $map =
-{
-decimal             => [qw( decimal_point mon_decimal_point )],
-grouping            => [qw( grouping mon_grouping )],
-position_neg        => [qw( n_sign_posn int_n_sign_posn )],
-position_pos        => [qw( n_sign_posn int_p_sign_posn )],
-precede             => [qw( p_cs_precedes int_p_cs_precedes )],
-precede_neg         => [qw( n_cs_precedes int_n_cs_precedes )],
-precision           => [qw( frac_digits int_frac_digits )],
-sign_neg            => [qw( negative_sign )],
-sign_pos            => [qw( positive_sign )],
-space_pos           => [qw( p_sep_by_space int_p_sep_by_space )],
-space_neg           => [qw( n_sep_by_space int_n_sep_by_space )],
-symbol              => [qw( currency_symbol int_curr_symbol )],
-thousand            => [qw( thousands_sep mon_thousands_sep )],
-};
-
-sub init
-{
-    my $self = shift( @_ );
-    my $num  = shift( @_ );
-    return( $self->error( "No number was provided." ) ) if( !CORE::length( $num ) );
-    return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
-    return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
-    use utf8;
-    my @k = keys( %$map );
-    @$self{ @k } = ( '' x scalar( @k ) );
-    $self->{lang} = '';
-    $self->{default} = $DEFAULT;
-    $self->{_init_strict_use_sub} = 1;
-    $self->SUPER::init( @_ );
-    my $default = $self->default;
-    # $self->message( 3, "Getting current locale" );
-    my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
-    ## $self->message( 3, "Current locale is '$curr_locale'" );
-    if( $self->{lang} )
-    {
-        # $self->message( 3, "Language requested '$self->{lang}'." );
-        try
-        {
-            # $self->message( 3, "Current locale found is '$curr_locale'" );
-            local $try_locale = sub
-            {
-                my $loc;
-                # $self->message( 3, "Checking language '$_[0]'" );
-                ## The user provided only a language code such as fr_FR. We try it, and also other known combination like fr_FR.UTF-8 and fr_FR.ISO-8859-1, fr_FR.ISO8859-1
-                ## Try several possibilities
-                ## RT https://rt.cpan.org/Public/Bug/Display.html?id=132664
-                if( index( $_[0], '.' ) == -1 )
-                {
-                    # $self->message( 3, "Language '$_[0]' is a bareword, check if it works as is." );
-                    $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
-                    # $self->message( 3, "Succeeded to set up locale for language '$_[0]'" ) if( $loc );
-                    $_[0] =~ s/^(?<locale>[a-z]{2,3})_(?<country>[a-z]{2})$/$+{locale}_\U$+{country}\E/;
-                    if( !$loc && CORE::exists( $SUPPORTED_LOCALES->{ $_[0] } ) )
-                    {
-                        # $self->message( 3, "Language '$_[0]' is supported, let's check for right variation" );
-                        foreach my $supported ( @{$SUPPORTED_LOCALES->{ $_[0] }} )
-                        {
-                            if( ( $loc = POSIX::setlocale( &POSIX::LC_ALL, $supported ) ) )
-                            {
-                                $_[0] = $supported;
-                                # $self->message( "-> Language variation '$supported' found." );
-                                last;
-                            }
-                        }
-                    }
-                }
-                ## We got something like fr_FR.ISO-8859
-                ## The user is specific, so we try as is
-                else
-                {
-                    # $self->message( 3, "Language '$_[0]' is specific enough, let's try it." );
-                    $loc = POSIX::setlocale( &POSIX::LC_ALL, $_[0] );
-                }
-                return( $loc );
-            };
-            
-            ## $self->message( 3, "Current locale is: '$curr_locale'" );
-            if( my $loc = $try_locale->( $self->{lang} ) )
-            {
-                # $self->message( 3, "Succeeded in setting locale for language '$self->{lang}'" );
-                ## $self->message( 3, "Succeeded in setting locale to '$self->{lang}'." );
-                my $lconv = POSIX::localeconv();
-                ## Set back the LC_ALL to what it was, because we do not want to disturb the user environment
-                POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
-                ## $self->messagef( 3, "POSIX::localeconv() returned %d items", scalar( keys( %$lconv ) ) );
-                $default = $lconv if( $lconv && scalar( keys( %$lconv ) ) );
-            }
-            else
-            {
-                return( $self->error( "Language \"$self->{lang}\" is not supported by your system." ) );
-            }
-        }
-        catch( $e )
-        {
-            return( $self->error( "An error occurred while getting the locale information for \"$self->{lang}\": $e" ) );
-        }
-    }
-    elsif( $curr_locale && ( my $lconv = POSIX::localeconv() ) )
-    {
-        $default = $lconv if( scalar( keys( %$lconv ) ) );
-        ## To simulate running on Windows
-#         my $fail = [qw(
-# frac_digits
-# int_frac_digits
-# n_cs_precedes
-# n_sep_by_space
-# n_sign_posn
-# p_cs_precedes
-# p_sep_by_space
-# p_sign_posn
-#         )];
-#         @$lconv{ @$fail } = ( -1 ) x scalar( @$fail );
-        ## $self->message( 3, "No language provided, but current locale '$curr_locale' found" );
-        $self->{lang} = $curr_locale;
-    }
-
-    ## This serves 2 purposes:
-    ## 1) to silence warnings issued from Number::Format when it uses an empty string when evaluating a number, e.g. '' == 1
-    ## 2) to ensure that blank numerical values are not interpreted to anything else than equivalent of empty
-    ##    For example, an empty frac_digits will default to 2 in Number::Format even if the user does not want any. Of course, said user could also have set it to 0
-    ## So here we use this hash reference of numeric properties to ensure the option parameters are set to a numeric value (0) when they are empty.
-    my $numerics = 
-    {
-    grouping => 0,
-    frac_digits => 0,
-    int_frac_digits => 0,
-    int_n_cs_precedes => 0,
-    int_p_cs_precedes => 0,
-    int_n_sep_by_space => 0,
-    int_p_sep_by_space => 0,
-    int_n_sign_posn => 1,
-    int_p_sign_posn => 1,
-    mon_grouping => 0,
-    n_cs_precedes => 0,
-    n_sep_by_space => 0,
-    n_sign_posn => 1,
-    p_cs_precedes => 0,
-    p_sep_by_space => 0,
-    ## Position of positive sign. 1 = before (0 = parentheses)
-    p_sign_posn => 1,
-    };
-    
-    no warnings 'uninitialized';
-    foreach my $prop ( keys( %$map ) )
-    {
-        my $ref = $map->{ $prop };
-        ## Already set by user
-        next if( CORE::length( $self->{ $prop } ) );
-        foreach my $lconv_prop ( @$ref )
-        {
-            if( CORE::defined( $default->{ $lconv_prop } ) )
-            {
-                ## Number::Format bug RT #71044 when running on Windows
-                ## https://rt.cpan.org/Ticket/Display.html?id=71044
-                ## This is a workaround when values are lower than 0 (i.e. -1)
-                if( CORE::exists( $numerics->{ $lconv_prop } ) && 
-                    CORE::length( $default->{ $lconv_prop } ) && 
-                    ## It may be a non-numeric value which would wreak the following condition
-                    $default->{ $lconv_prop } =~ /\d+/ &&
-                    $default->{ $lconv_prop } < 0 )
-                {
-                    $default->{ $lconv_prop } = $numerics->{ $lconv_prop };
-                }
-                $self->$prop( $default->{ $lconv_prop } );
-                last;
-            }
-            else
-            {
-                $self->$prop( $default->{ $lconv_prop } );
-            }
-        }
-    }
-    
-    # $Number::Format::DEFAULT_LOCALE->{int_curr_symbol} = 'EUR';
-    try
-    {
-        ## Those are unsupported by Number::Format
-        my $skip =
-        {
-        int_n_cs_precedes => 1,
-        int_p_cs_precedes => 1,
-        int_n_sep_by_space => 1,
-        int_p_sep_by_space => 1,
-        int_n_sign_posn => 1,
-        int_p_sign_posn => 1,
-        };
-        my $opts = {};
-        foreach my $prop ( CORE::keys( %$map ) )
-        {
-            ## $self->message( 3, "Checking property \"$prop\" value \"", overload::StrVal( $self->{ $prop } ), "\" (", $self->$prop->defined ? 'defined' : 'undefined', ")." );
-            my $prop_val;
-            if( $self->$prop->defined )
-            {
-                $prop_val = $self->$prop;
-            }
-            ## To prevent Number::Format from defaulting to property values not in sync with ours
-            ## Because it seems the POSIX::setlocale only affect one module
-            else
-            {
-                $prop_val = '';
-            }
-            ## $self->message( 3, "Using property \"$prop\" value \"$prop_val\" (", CORE::defined( $prop_val ) ? 'defined' : 'undefined', ") [ref=", ref( $prop_val ), "]." );
-            ## Need to set all the localeconv properties for Number::Format, because it uses mon_thousand_sep intsead of just thousand_sep
-            foreach my $lconv_prop ( @{$map->{ $prop }} )
-            {
-                CORE::next if( CORE::exists( $skip->{ $lconv_prop } ) );
-                ## Cannot be undefined, but can be empty string
-                $opts->{ $lconv_prop } = "$prop_val";
-                if( !CORE::length( $opts->{ $lconv_prop } ) && CORE::exists( $numerics->{ $lconv_prop } ) )
-                {
-                    $opts->{ $lconv_prop } = $numerics->{ $lconv_prop };
-                }
-            }
-        }
-        ## $self->message( 3, "Using following options for Number::Format: ", sub{ $self->dumper( $opts ) } );
-        no warnings qw( uninitialized );
-        $self->{_fmt} = Number::Format->new( %$opts );
-        use warnings;
-    }
-    catch( $e )
-    {
-        ## $self->message( 3, "Error trapped in creating a Number::Format object: '$e'" );
-        return( $self->error( "Unable to create a Number::Format object: $e" ) );
-    }
-    $self->{_original} = $num;
-    try
-    {
-        if( $num !~ /^$RE{num}{real}$/ )
-        {
-            $self->{_number} = $self->{_fmt}->unformat_number( $num );
-        }
-        else
-        {
-            $self->{_number} = $num;
-        }
-        ## $self->message( 3, "Unformatted number is: '$self->{_number}'" );
-        return( $self->error( "Invalid number: $num" ) ) if( !defined( $self->{_number} ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Invalid number: $num" ) );
-    }
-    return( $self );
-}
-
-sub abs { return( shift->_func( 'abs' ) ); }
-
-# sub asin { return( shift->_func( 'asin', { posix => 1 } ) ); }
-
-sub atan { return( shift->_func( 'atan', { posix => 1 } ) ); }
-
-sub atan2 { return( shift->_func( 'atan2', @_ ) ); }
-
-sub as_boolean { return( Module::Generic::Boolean->new( shift->{_number} ? 1 : 0 ) ); }
-
-sub as_string { return( shift->{_number} ) }
-
-sub cbrt { return( shift->_func( 'cbrt', { posix => 1 } ) ); }
-
-sub ceil { return( shift->_func( 'ceil', { posix => 1 } ) ); }
-
-sub chr { return( Module::Generic::Scalar->new( CORE::chr( $_[0]->{_number} ) ) ); }
-
-sub clone
-{
-    my $self = shift( @_ );
-    my $num  = @_ ? shift( @_ ) : $self->{_number};
-    return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
-    return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
-    my @keys = keys( %$map );
-    push( @keys, qw( lang debug ) );
-    my $hash = {};
-    @$hash{ @keys } = @$self{ @keys };
-    return( $self->new( $num, $hash ) );
-}
-
-sub compute
-{
-    my( $self, $other, $swap, $opts ) = @_;
-    my $other_val = Scalar::Util::blessed( $other ) ? $other : "\"$other\"";
-    my $operation = $swap ? "${other_val} $opts->{op} \$self->{_number}" : "\$self->{_number} $opts->{op} ${other_val}";
-    if( $opts->{return_object} )
-    {
-        my $res = eval( $operation );
-        no overloading;
-        warn( "Error with return formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled );
-        return if( $@ );
-        return( Module::Generic::Scalar->new( $res ) ) if( $opts->{type} eq 'scalar' );
-        return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
-        return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
-        ## undef may be returned for example on platform supporting NaN when using <=>
-        return( $self->clone( $res ) ) if( defined( $res ) );
-        return;
-    }
-    elsif( $opts->{boolean} )
-    {
-        my $res = eval( $operation );
-        no overloading;
-        warn( "Error with boolean formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled );
-        return if( $@ );
-        # return( $res ? $self->true : $self->false );
-        return( $res );
-    }
-    else
-    {
-        return( eval( $operation ) );
-    }
-}
-
-sub cos { return( shift->_func( 'cos' ) ); }
-
-sub currency { return( shift->_set_get_prop( 'symbol', @_ ) ); }
-
-sub decimal { return( shift->_set_get_prop( 'decimal', @_ ) ); }
-
-sub default { return( shift->_set_get_hash_as_mix_object( 'default', @_ ) ); }
-
-sub exp { return( shift->_func( 'exp' ) ); }
-
-sub floor { return( shift->_func( 'floor', { posix => 1 } ) ); }
-
-sub format
-{
-    my $self = shift( @_ );
-    my $precision = ( @_ && $_[0] =~ /^\d+$/ ) ? shift( @_ ) : $self->precision;
-    no overloading;
-    my $num  = $self->{_number};
-    ## If value provided was undefined, we leave it undefined, otherwise we would be at risk of returning 0, and 0 is very different from undefined
-    return( $num ) if( !defined( $num ) );
-    my $fmt = $self->{_fmt};
-    try
-    {
-        ## Amazingly enough, when a precision > 0 is provided, format_number will discard it if the number, before formatting, did not have decimals... Then, what is the point of formatting a number then?
-        ## To circumvent this, we provide the precision along with the "add trailing zeros" parameter expected by Number::Format
-        ## return( $fmt->format_number( $num, $precision, 1 ) );
-        my $res = $fmt->format_number( "$num", $precision, 1 );
-        return if( !defined( $res ) );
-        return( Module::Generic::Scalar->new( $res ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error formatting number \"$num\": $e" ) );
-    }
-}
-
-sub format_binary { return( Module::Generic::Scalar->new( CORE::sprintf( '%b', shift->{_number} ) ) ); }
-
-sub format_bytes
-{
-    my $self = shift( @_ );
-    # no overloading;
-    my $num  = $self->{_number};
-    ## See comment in format() method
-    return( $num ) if( !defined( $num ) );
-    my $fmt = $self->{_fmt};
-    try
-    {
-        ## return( $fmt->format_bytes( $num, @_ ) );
-        my $res = $fmt->format_bytes( "$num", @_ );
-        return if( !defined( $res ) );
-        return( Module::Generic::Scalar->new( $res ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error formatting number \"$num\": $e" ) );
-    }
-}
-
-sub format_hex { return( Module::Generic::Scalar->new( CORE::sprintf( '0x%X', shift->{_number} ) ) ); }
-
-sub format_money
-{
-    my $self = shift( @_ );
-    my $precision = ( @_ && $_[0] =~ /^\d+$/ ) ? shift( @_ ) : $self->precision;
-    my $currency_symbol = @_ ? shift( @_ ) : $self->currency;
-    # no overloading;
-    my $num  = $self->{_number};
-    ## See comment in format() method
-    return( $num ) if( !defined( $num ) );
-    my $fmt = $self->{_fmt};
-    try
-    {
-        ## Even though the Number::Format instantiated is set with a currency symbol, 
-        ## Number::Format will not respect it, and revert to USD if nothing was provided as argument
-        ## This highlights that Number::Format is designed to be used more for exporting function rather than object methods
-        ## $self->message( 3, "Passing Number = '$num', precision = '$precision', currency symbol = '$currency_symbol'." );
-        ## return( $fmt->format_price( $num, $precision, $currency_symbol ) );
-        my $res = $fmt->format_price( "$num", "$precision", "$currency_symbol" );
-        return if( !defined( $res ) );
-        return( Module::Generic::Scalar->new( $res ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error formatting number \"$num\": $e" ) );
-    }
-}
-
-sub format_negative
-{
-    my $self = shift( @_ );
-    # no overloading;
-    my $num  = $self->{_number};
-    ## See comment in format() method
-    return( $num ) if( !defined( $num ) );
-    my $fmt = $self->{_fmt};
-    try
-    {
-        my $new = $self->format;
-        ## $self->message( 3, "Formatted number '$self->{_number}' now is '$new'" );
-        ## return( $fmt->format_negative( $new, @_ ) );
-        my $res = $fmt->format_negative( "$new", @_ );
-        ## $self->message( 3, "Result is '$res'" );
-        return if( !defined( $res ) );
-        return( Module::Generic::Scalar->new( $res ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error formatting number \"$num\": $e" ) );
-    }
-}
-
-sub format_picture
-{
-    my $self = shift( @_ );
-    no overloading;
-    my $num  = $self->{_number};
-    ## See comment in format() method
-    return( $num ) if( !defined( $num ) );
-    my $fmt = $self->{_fmt};
-    try
-    {
-        ## return( $fmt->format_picture( $num, @_ ) );
-        my $res = $fmt->format_picture( "$num", @_ );
-        return if( !defined( $res ) );
-        return( Module::Generic::Scalar->new( $res ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error formatting number \"$num\": $e" ) );
-    }
-}
-
-sub formatter { return( shift->_set_get_object( 'formatter', 'Number::Format', @_ ) ); }
-
-## https://stackoverflow.com/a/483708/4814971
-sub from_binary
-{
-    my $self = shift( @_ );
-    my $binary = shift( @_ );
-    return if( !defined( $binary ) || !CORE::length( $binary ) );
-    try
-    {
-        ## Nice trick to convert from binary to decimal. See perlfunc -> oct
-        my $res = CORE::oct( "0b${binary}" );
-        return if( !defined( $res ) );
-        return( $self->clone( $res ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error while getting number from hexadecimal value \"$hex\": $e" ) );
-    }
-}
-
-sub from_hex
-{
-    my $self = shift( @_ );
-    my $hex = shift( @_ );
-    return if( !defined( $hex ) || !CORE::length( $hex ) );
-    try
-    {
-        my $res = CORE::hex( $hex );
-        return if( !defined( $res ) );
-        return( $self->clone( $res ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error while getting number from hexadecimal value \"$hex\": $e" ) );
-    }
-}
-
-sub grouping { return( shift->_set_get_prop( 'grouping', @_ ) ); }
-
-sub int { return( shift->_func( 'int' ) ); }
-
-*is_decimal = \&is_float;
-
-sub is_even { return( !( shift->{_number} % 2 ) ); }
-
-sub is_finite { return( shift->_func( 'isfinite', { posix => 1 }) ); }
-
-sub is_float { return( (POSIX::modf( shift->{_number} ))[0] != 0 ); }
-
-# sub is_infinite { return( !(shift->is_finite) ); }
-sub is_infinite { return( shift->_func( 'isinf', { posix => 1 }) ); }
-
-sub is_int { return( (POSIX::modf( shift->{_number} ))[0] == 0 ); }
-
-sub is_nan { return( shift->_func( 'isnan', { posix => 1}) ); }
-
-*is_neg = \&is_negative;
-
-sub is_negative { return( shift->_func( 'signbit', { posix => 1 }) != 0 ); }
-
-sub is_normal { return( shift->_func( 'isnormal', { posix => 1}) ); }
-
-sub is_odd { return( shift->{_number} % 2 ); }
-
-*is_pos = \&is_positive;
-
-sub is_positive { return( shift->_func( 'signbit', { posix => 1 }) == 0 ); }
-
-sub lang { return( shift->_set_get_scalar_as_object( 'lang', @_ ) ); }
-
-sub length { return( $_[0]->clone( CORE::length( $_[0]->{_number} ) ) ); }
-
-sub locale { return( shift->_set_get_scalar_as_object( 'lang', @_ ) ); }
-
-sub log { return( shift->_func( 'log' ) ); }
-
-sub log2 { return( shift->_func( 'log2', { posix => 1 } ) ); }
-
-sub log10 { return( shift->_func( 'log10', { posix => 1 } ) ); }
-
-sub max { return( shift->_func( 'fmax', @_, { posix => 1 } ) ); }
-
-sub min { return( shift->_func( 'fmin', @_, { posix => 1 } ) ); }
-
-sub mod { return( shift->_func( 'fmod', @_, { posix => 1 } ) ); }
-
-## This is used so that we can change formatter when the user changes thousand separator, decimal separator, precision or currency
-sub new_formatter
-{
-    my $self = shift( @_ );
-    my $hash = {};
-    if( @_ )
-    {
-        if( @_ == 1 && $self->_is_hash( $_[0] ) )
-        {
-            $hash = shift( @_ );
-        }
-        elsif( !( @_ % 2 ) )
-        {
-            $hash = { @_ };
-        }
-        else
-        {
-            return( $self->error( "Invalid parameters provided: '", join( "', '", @_ ), "'." ) );
-        }
-    }
-    else
-    {
-        my @keys = keys( %$map );
-        # @$hash{ @keys } = @$self{ @keys };
-        for( @keys )
-        {
-            $hash->{ $_ } = $self->$_();
-        }
-    }
-    try
-    {
-        my $opts = {};
-        foreach my $prop ( keys( %$map ) )
-        {
-            $opts->{ $map->{ $prop }->[0] } = $hash->{ $prop } if( CORE::defined( $hash->{ $prop } ) );
-        }
-        return( Number::Format->new( %$opts ) );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error while trying to get a Number::Format object: $e" ) );
-    }
-}
-
-sub oct { return( shift->_func( 'oct' ) ); }
-
-sub position_neg { return( shift->_set_get_prop( 'position_neg', @_ ) ); }
-
-sub position_pos { return( shift->_set_get_prop( 'position_pos', @_ ) ); }
-
-sub pow { return( shift->_func( 'pow', @_, { posix => 1 } ) ); }
-
-sub precede { return( shift->_set_get_prop( 'precede', @_ ) ); }
-
-sub precede_neg { return( shift->_set_get_prop( 'precede_neg', @_ ) ); }
-
-sub precede_pos { return( shift->_set_get_prop( 'precede', @_ ) ); }
-
-sub precision { return( shift->_set_get_prop( 'precision', @_ ) ); }
-
-sub rand { return( shift->_func( 'rand' ) ); }
-
-sub round { return( $_[0]->clone( CORE::sprintf( '%.*f', CORE::int( CORE::length( $_[1] ) ? $_[1] : 0 ), $_[0]->{_number} ) ) ); }
-
-sub round_zero { return( shift->_func( 'round', @_, { posix => 1 } ) ); }
-
-sub round2
-{
-    my $self = shift( @_ );
-    no overloading;
-    my $num  = $self->{_number};
-    ## See comment in format() method
-    return( $num ) if( !defined( $num ) );
-    my $fmt = $self->{_fmt};
-    try
-    {
-        ## return( $fmt->round( $num, @_ ) );
-        my $res = $fmt->round( $num, @_ );
-        return if( !defined( $res ) );
-        my $clone = $self->clone;
-        $clone->{_number} = $res;
-        return( $clone );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Error rounding number \"$num\": $e" ) );
-    }
-}
-
-sub scalar { return( shift->as_string ); }
-
-sub sign_neg { return( shift->_set_get_prop( 'sign_neg', @_ ) ); }
-
-sub sign_pos { return( shift->_set_get_prop( 'sign_pos', @_ ) ); }
-
-sub sin { return( shift->_func( 'sin' ) ); }
-
-*space = \&space_pos;
-
-sub space_neg { return( shift->_set_get_prop( 'space_neg', @_ ) ); }
-
-sub space_pos { return( shift->_set_get_prop( 'space_pos', @_ ) ); }
-
-sub sqrt { return( shift->_func( 'sqrt' ) ); }
-
-sub symbol { return( shift->_set_get_prop( 'symbol', @_ ) ); }
-
-sub tan { return( shift->_func( 'tan', { posix => 1 } ) ); }
-
-sub thousand { return( shift->_set_get_prop( 'thousand', @_ ) ); }
-
-sub unformat
-{
-    my $self = shift( @_ );
-    my $num = shift( @_ );
-    return if( !defined( $num ) );
-    try
-    {
-        my $num2 = $self->{_fmt}->unformat_number( $num );
-        my $clone = $self->clone;
-        $clone->{_original} = $num;
-        $clone->{_number} = $num2;
-        return( $clone );
-    }
-    catch( $e )
-    {
-        return( $self->error( "Unable to unformat the number \"$num\": $e" ) );
-    }
-}
-
-sub _func
-{
-    my $self = shift( @_ );
-    my $func = shift( @_ ) || return( $self->error( "No function was provided." ) );
-    ## $self->message( 3, "Arguments received are: '", join( "', '", @_ ), "'." );
-    my $opts = {};
-    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
-    my $namespace = $opts->{posix} ? 'POSIX' : 'CORE';
-    my $val  = @_ ? shift( @_ ) : undef;
-    my $expr = defined( $val ) ? "${namespace}::${func}( \$self->{_number}, $val )" : "${namespace}::${func}( \$self->{_number} )";
-    ## $self->message( 3, "Evaluating '$expr'" );
-    my $res = eval( $expr );
-    ## $self->message( 3, "Result for number '$self->{_number}' is '$res'" );
-    $self->message( 3, "Error: $@" ) if( $@ );
-    return( $self->pass_error( $@ ) ) if( $@ );
-    return if( !defined( $res ) );
-    return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
-    return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
-    return( $self->clone( $res ) );
-}
-
-sub _set_get_prop
-{
-    my $self = shift( @_ );
-    my $prop = shift( @_ );
-    if( @_ )
-    {
-        my $val = shift( @_ );
-        $val = $val->scalar if( $self->_is_object( $val ) && $val->isa( 'Module::Generic::Scalar' ) );
-        ## $self->message( 3, "Setting value \"$val\" (", defined( $val ) ? 'defined' : 'undefined', ") for property \"$prop\"." );
-        ## I do not want to set a default value of '' to $self->{ $prop } because if its value is undef, it should remain so
-        no warnings 'uninitialized';
-        if( !CORE::defined( $val ) || ( CORE::defined( $val ) && $val ne $self->{ $prop } ) )
-        {
-            $self->_set_get_scalar_as_object( $prop, $val );
-            ## If an error was set, we return nothing
-            $self->formatter( $self->new_formatter ) || return;
-        }
-    }
-    return( $self->_set_get_scalar_as_object( $prop ) );
-}
-
-AUTOLOAD
-{
-    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
-    my $self = shift( @_ ) || return;
-    my $fmt_obj = $self->{_fmt} || return;
-    my $code = $fmt_obj->can( $method );
-    if( $code )
-    {
-        try
-        {
-            return( $code->( $fmt_obj, @_ ) );
-        }
-        catch( $e )
-        {
-            CORE::warn( $e );
-            return;
-        }
-    }
-    return;
-};
-
-package Module::Generic::NumberSpecial;
-BEGIN
-{
-    use strict;
-    use warnings;
-    use parent -norequire, qw( Module::Generic::Number );
-    use overload ('""'      => sub{ $_[0]->{_number} },
-                  '+='      => sub{ &_catchall( @_[0..2], '+' ) },
-                  '-='      => sub{ &_catchall( @_[0..2], '-' ) },
-                  '*='      => sub{ &_catchall( @_[0..2], '*' ) },
-                  '/='      => sub{ &_catchall( @_[0..2], '/' ) },
-                  '%='      => sub{ &_catchall( @_[0..2], '%' ) },
-                  '**='      => sub{ &_catchall( @_[0..2], '**' ) },
-                  '<<='      => sub{ &_catchall( @_[0..2], '<<' ) },
-                  '>>='      => sub{ &_catchall( @_[0..2], '>>' ) },
-                  'x='      => sub{ &_catchall( @_[0..2], 'x' ) },
-                  '.='      => sub{ &_catchall( @_[0..2], '.' ) },
-                  nomethod  => \&_catchall,
-                  fallback  => 1,
-                 );
-    use Want;
-    use POSIX ();
-    our( $VERSION ) = '0.1.0';
-};
-
-sub new
-{
-    my $this = shift( @_ );
-    return( bless( { _number => CORE::shift( @_ ) } => ( ref( $this ) || $this ) ) );
-}
-
-sub clone { return( shift->new( @_ ) ); }
-
-sub is_finite { return( 0 ); }
-
-sub is_float { return( 0 ); }
-
-sub is_infinite { return( 0 ); }
-
-sub is_int { return( 0 ); }
-
-sub is_nan { return( 0 ); }
-
-sub is_normal { return( 0 ); }
-
-sub length { return( CORE::length( $self->{_number} ) ); }
-
-sub _catchall
-{
-    my( $self, $other, $swap, $op ) = @_;
-    my $expr = $swap ? "$other $op $self->{_number}" : "$self->{_number} $op $other";
-    my $res = eval( $expr );
-    ## print( ref( $self ), "::_catchall: evaluating $expr => $res\n" );
-    CORE::warn( "Error evaluating expression \"$expr\": $@" ) if( $@ );
-    return if( $@ );
-    return( Module::Generic::Number->new( $res ) ) if( POSIX::isnormal( $res ) );
-    return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
-    return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
-    return( $res );
-}
-
-sub _func
-{
-    my $self = shift( @_ );
-    my $func = shift( @_ ) || return( $self->error( "No function was provided." ) );
-    my $opts = {};
-    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
-    my $namespace = $opts->{posix} ? 'POSIX' : 'CORE';
-    my $val  = @_ ? shift( @_ ) : undef;
-    my $expr = defined( $val ) ? "${namespace}::${func}( $self->{_number}, $val )" : "${namespace}::${func}( $self->{_number} )";
-    my $res = eval( $expr );
-    ## $self->message( 3, "Error: $@" ) if( $@ );
-    ## print( STDERR ref( $self ), "::_func -> evaluating '$expr' -> '$res'\n" );
-    CORE::warn( $@ ) if( $@ );
-    return if( !defined( $res ) );
-    return( Module::Generic::Number->new( $res ) ) if( POSIX::isnormal( $res ) );
-    return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
-    return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
-    return( $res );
-}
-
-AUTOLOAD
-{
-    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
-    ## print( STDERR "$AUTOLOAD: called for method \"$method\"\n" );
-    ## If we are chained, return our null object, so the chain continues to work
-    if( want( 'OBJECT' ) )
-    {
-        ## No, this is NOT a typo. rreturn() is a function of module Want
-        print( STDERR "$AUTOLOAD: Returning the object itself (", ref( $_[0] ), ")\n" );
-        rreturn( $_[0] );
-    }
-    ## Otherwise, we return infinity, whether positive or negative or NaN depending on what was set
-    ## print( STDERR "$AUTOLOAD: returning '", $_[0]->{_number}, "'\n" );
-    return( $_[0]->{_number} );
-};
-
-DESTROY {};
-
-## Purpose is to allow chaining of methods when infinity is returned
-## At the end of the chain, Inf or -Inf is returned
-package Module::Generic::Infinity;
-BEGIN
-{
-    use strict;
-    use warnings;
-    use parent -norequire, qw( Module::Generic::NumberSpecial );
-    our( $VERSION ) = '0.1.0';
-};
-
-sub is_infinite { return( 1 ); }
-
-package Module::Generic::Nan;
-BEGIN
-{
-    use strict;
-    use warnings;
-    use parent -norequire, qw( Module::Generic::NumberSpecial );
-    our( $VERSION ) = '0.1.0';
-};
-
-sub is_nan { return( 1 ); }
-
-
-package Module::Generic::Hash;
-BEGIN
-{
-    use strict;
-    use warnings::register;
-    use parent -norequire, qw( Module::Generic );
-    use overload (
-        ## '""'    => 'as_string',
-        'eq'    => sub { _obj_eq(@_) },
-        'ne'    => sub { !_obj_eq(@_) },
-        '<'     => sub { _obj_comp( @_, '<') },
-        '>'     => sub { _obj_comp( @_, '>') },
-        '<='     => sub { _obj_comp( @_, '<=') },
-        '>='     => sub { _obj_comp( @_, '>=') },
-        '=='     => sub { _obj_comp( @_, '>=') },
-        '!='     => sub { _obj_comp( @_, '>=') },
-        'lt'     => sub { _obj_comp( @_, 'lt') },
-        'gt'     => sub { _obj_comp( @_, 'gt') },
-        'le'     => sub { _obj_comp( @_, 'le') },
-        'ge'     => sub { _obj_comp( @_, 'ge') },
-        fallback => 1,
-    );
-    use Data::Dumper;
-    use JSON;
-    use Clone ();
-    use Want;
-    use Regexp::Common;
-};
-
-sub new
-{
-    my $that = shift( @_ );
-    my $class = ref( $that ) || $that;
-    ## my $data = shift( @_ ) ||
-    ## return( $that->error( "No hash was provided to initiate a $class hash object." ) );
-    my $data = {};
-    $data = shift( @_ ) if( scalar( @_ ) );
-    return( $that->error( "I was expecting an hash, but instead got '$data'." ) ) if( Scalar::Util::reftype( $data ) ne 'HASH' );
-    my $tied = tied( %$data );
-    return( $that->error( "Hash provided is already tied to ", ref( $tied ), " and our package $class cannot use it, or it would disrupt the tie." ) ) if( $tied );
-    my %hash = ();
-    ## This enables access to the hash just like a real hash while still the user an call our object methods
-    my $obj = tie( %hash, 'Module::Generic::TieHash', {
-        disable => ['Module::Generic'],
-        debug => 0,
-    });
-    my $self = bless( \%hash => $class );
-    $obj->enable( 1 );
-    my @keys = CORE::keys( %$data );
-    @hash{ @keys } = @$data{ @keys };
-    $obj->enable( 0 );
-    $self->SUPER::init( @_ );
-    $obj->enable( 1 );
-    return( $self );
-}
-
-sub as_string { return( shift->dump ); }
-
-sub clone
-{
-    my $self = shift( @_ );
-    $self->_tie_object->enable( 0 );
-    my $data = $self->{data};
-    my $clone = Clone::clone( $data );
-    $self->_tie_object->enable( 1 );
-    return( $self->new( $clone ) );
-}
-
-sub debug { return( shift->_internal( 'debug', '_set_get_number', @_ ) ); }
-
-sub defined { CORE::defined( $_[0]->{ $_[1] } ); }
-
-sub delete { return( CORE::delete( shift->{ shift( @_ ) } ) ); }
-
-sub dump
-{
-    my $self = shift( @_ );
-    return( $self->_dumper( $self ) );
-}
-
-sub each
-{
-    my $self = shift( @_ );
-    my $code = shift( @_ ) || return( $self->error( "No subroutine callback as provided for each" ) );
-    return( $self->error( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead." ) ) if( ref( $code ) ne 'CODE' );
-    while( my( $k, $v ) = CORE::each( %$self ) )
-    {
-        CORE::defined( $code->( $k, $v ) ) || CORE::last;
-    }
-    return( $self );
-}
-
-sub exists { return( CORE::exists( shift->{ shift( @_ ) } ) ); }
-
-sub for { return( shift->foreach( @_ ) ); }
-
-sub foreach
-{
-    my $self = shift( @_ );
-    my $code = shift( @_ ) || return( $self->error( "No subroutine callback as provided for each" ) );
-    return( $self->error( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead." ) ) if( ref( $code ) ne 'CODE' );
-    CORE::foreach my $k ( CORE::keys( %$self ) )
-    {
-        local $_ = $self->{ $k };
-        CORE::defined( $code->( $k, $self->{ $k } ) ) || CORE::last;
-    }
-    return( $self );
-}
-
-sub get { return( $_[0]->{ $_[1] } ); }
-
-sub has { return( shift->exists( @_ ) ); }
-
-sub json
-{
-    my $self = shift( @_ );
-    my $opts = {};
-    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
-    $self->_tie_object->enable( 0 );
-    my $data = $self->{data};
-    my $json;
-    if( $opts->{pretty} )
-    {
-        $json = JSON->new->pretty->utf8->indent(1)->relaxed(1)->canonical(1)->allow_nonref->encode( $data );
-    }
-    else
-    {
-        $json = JSON->new->utf8->canonical(1)->allow_nonref->encode( $data );
-    }
-    $self->_tie_object->enable( 1 );
-    return( Module::Generic::Scalar->new( $json ) );
-}
-
-# $h->keys->sort
-sub keys
-{
-    my $self = shift( @_ );
-    $self->_tie_object->enable( 1 );
-    return( Module::Generic::Array->new( [ CORE::keys( %$self ) ] ) );
-}
-
-sub length { return( Module::Generic::Number->new( CORE::scalar( CORE::keys( %{$_[0]} ) ) ) ); }
-
-sub map
-{
-    my $self = shift( @_ );
-    my $code = CORE::shift( @_ );
-    return if( ref( $code ) ne 'CODE' );
-    return( CORE::map( $code->( $_, $self->{ $_ } ), CORE::keys( %$self ) ) );
-}
-
-sub map_array
-{
-    my $self = shift( @_ );
-    my $code = CORE::shift( @_ );
-    return if( ref( $code ) ne 'CODE' );
-    return( Module::Generic::Array->new( [CORE::map( $code->( $_, $self->{ $_ } ), CORE::keys( %$self ) )] ) );
-}
-
-sub map_hash
-{
-    my $self = shift( @_ );
-    my $code = CORE::shift( @_ );
-    return if( ref( $code ) ne 'CODE' );
-    return( $self->new( {CORE::map( $code->( $_, $self->{ $_ } ), CORE::keys( %$self ) )} ) );
-}
-
-sub merge
-{
-    my $self = shift( @_ );
-    my $hash = {};
-    $hash = shift( @_ );
-    return( $self->error( "No valid hash provided." ) ) if( !$hash || Scalar::Util::reftype( $hash ) ne 'HASH' );
-    ## $self->message( 3, "Hash provided is: ", sub{ $self->dumper( $hash ) } );
-    my $opts = {};
-    $opts = pop( @_ ) if( @_ && ref( $_[-1] ) eq 'HASH' );
-    $opts->{overwrite} = 1 unless( CORE::exists( $opts->{overwrite} ) );
-    $self->_tie_object->enable( 0 );
-    my $data = $self->{data};
-    my $seen = {};
-    local $copy = sub
-    {
-        my $this = shift( @_ );
-        my $to = shift( @_ );
-        my $p  = {};
-        $p = shift( @_ ) if( @_ && ref( $_[-1] ) eq 'HASH' );
-        ## $self->message( 3, "Merging hash ", sub{ $self->dumper( $this ) }, " to hash ", sub{ $self->dumper( $to ) }, " and with parameters ", sub{ $self->dumper( $p ) } );
-        CORE::foreach my $k ( CORE::keys( %$this ) )
-        {
-            # $self->message( 3, "Skipping existing property '$k'." ) if( CORE::exists( $to->{ $k } ) && !$p->{overwrite} );
-            next if( CORE::exists( $to->{ $k } ) && !$p->{overwrite} );
-            if( ref( $this->{ $k } ) eq 'HASH' || 
-                ( Scalar::Util::blessed( $this->{ $k } ) && $this->{ $k }->isa( 'Module::Generic::Hash' ) ) )
-            {
-                my $addr = Scalar::Util::refaddr( $this->{ $k } );
-                # $self->message( 3, "Checking if hash in property '$k' was already processed with address '$addr'." );
-                if( CORE::exists( $seen->{ $addr } ) )
-                {
-                    $to->{ $k } = $seen->{ $addr };
-                    next;
-                }
-                else
-                {
-                    $to->{ $k } = {} unless( Scalar::Util::reftype( $to->{ $k } ) eq 'HASH' );
-                    $copy->( $this->{ $k }, $to->{ $k } );
-                }
-                $seen->{ $addr } = $this->{ $k };
-            }
-            else
-            {
-                $to->{ $k } = $this->{ $k };
-            }
-        }
-    };
-    ## $self->message( 3, "Propagating hash ", sub{ $self->dumper( $hash ) }, " to hash ", sub{ $self->dumper( $data ) } );
-    $copy->( $hash, $data, $opts );
-    $self->_tie_object->enable( 1 );
-    return( $self );
-}
-
-sub reset { %{$_[0]} = () };
-
-sub set { $_[0]->{ $_[1] } = $_[2]; }
-
-sub undef { %{$_[0]} = () };
-
-sub values
-{
-    my $self = shift( @_ );
-    my $code;
-    $code = shift( @_ ) if( @_ && ref( $_[0] ) eq 'CODE' );
-    my $opts = {};
-    $opts = pop( @_ ) if( Scalar::Util::reftype( $_[-1] ) eq 'HASH' );
-    if( $code )
-    {
-        if( $opts->{sort} )
-        {
-            return( Module::Generic::Array->new( [ CORE::map( $code->( $_ ), CORE::sort( CORE::values( %$self ) ) ) ] ) );
-        }
-        else
-        {
-            return( Module::Generic::Array->new( [ CORE::map( $code->( $_ ), CORE::values( %$self ) ) ] ) );
-        }
-    }
-    else
-    {
-        if( $opts->{sort} )
-        {
-            return( Module::Generic::Array->new( [ CORE::sort( CORE::values( %$self ) ) ] ) );
-        }
-        else
-        {
-            return( Module::Generic::Array->new( [ CORE::values( %$self ) ] ) );
-        }
-    }
-}
-
-# sub _dumper
-# {
-#     my $self = shift( @_ );
-#     if( !$self->{_dumper} )
-#     {
-#         my $d = Data::Dumper->new;
-#         $d->Indent( 1 );
-#         $d->Useqq( 1 );
-#         $d->Terse( 1 );
-#         $d->Sortkeys( 1 );
-#         $self->{_dumper} = $d;
-#     }
-#     return( $self->{_dumper}->Dumper( @_ ) );
-# }
-# 
-sub _dumper
-{
-    my $self = shift( @_ );
-    $self->_tie_object->enable( 0 );
-    my $data = $self->{data};
-    my $d = Data::Dumper->new( [ $data ] );
-    $d->Indent( 1 );
-    $d->Useqq( 1 );
-    $d->Terse( 1 );
-    $d->Sortkeys( 1 );
-    # $d->Freezer( '' );
-    $d->Bless( '' );
-    # return( $d->Dump );
-    my $str = $d->Dump;
-    $self->_tie_object->enable( 1 );
-    return( $str );
-}
-
-sub _internal
-{
-    my $self = shift( @_ );
-    my $field = shift( @_ );
-    my $meth  = shift( @_ );
-    # print( STDERR ref( $self ), "::_internal -> Caling method '$meth' for field '$field' with value '", join( "', '", @_ ), "'\n" );
-    $self->_tie_object->enable( 0 );
-    my( @resA, $resB );
-    if( wantarray )
-    {
-        @resA = $self->$meth( $field, @_ );
-        # $self->message( "Resturn list value is: '@resA'" );
-    }
-    else
-    {
-        $resB = $self->$meth( $field, @_ );
-        # $self->message( "Resturn scalar value is: '$resB'" );
-    }
-    $self->_tie_object->enable( 1 );
-    return( wantarray ? @resA : $resB );
-}
-
-sub _obj_comp
-{
-    my( $self, $other, $swap, $op ) = @_;
-    my( $lA, $lB );
-    $lA = $self->length;
-    if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Hash' ) )
-    {
-        $lB = $other->length;
-    }
-    elsif( $other =~ /^$RE{num}{real}$/ )
-    {
-        $lB = $other;
-    }
-    else
-    {
-        return;
-    }
-    my $expr = $swap ? "$lB $op $lA" : "$lA $op $lB";
-    return( eval( $expr ) );
-}
-
-sub _printer { return( shift->printer( @_ ) ); }
-
-sub _obj_eq
-{
-    no overloading;
-    my $self = shift( @_ );
-    my $other = shift( @_ );
-    my $strA = $self->_dumper( $self );
-    my $strB;
-    if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Hash' ) )
-    {
-        $strB = $other->dump;
-    }
-    elsif( Scalar::Util::reftype( $other ) eq 'HASH' )
-    {
-        $strB = $self->_dumper( $other )
-    }
-    else
-    {
-        return( 0 );
-    }
-    return( $strA eq $strB );
-}
-
-sub _tie_object
-{
-    my $self = shift( @_ );
-    return( tied( %$self ) );
-}
-
-package Module::Generic::TieHash;
-BEGIN
-{
-    use strict;
-    use warnings::register;
-    use parent -norequire, qw( Module::Generic );
-    use Scalar::Util ();
-    our( $VERSION ) = '0.1.0';
-};
-
-sub TIEHASH
-{
-    my $self  = shift( @_ );
-    my $opts  = {};
-    $opts = shift( @_ ) if( @_ );
-    if( Scalar::Util::reftype( $opts ) ne 'HASH' )
-    {
-        warn( "Parameters provided ($opts) is not an hash reference.\n" ) if( $self->_warnings_is_enabled );
-        return;
-    }
-    my $disable = [];
-    $disable = $opts->{disable} if( Scalar::Util::reftype( $opts->{disable} ) );
-    my $list = {};
-    @$list{ @$disable } = ( 1 ) x scalar( @$disable );
-    my $hash =
-    {
-    ## The caller sets this to its class, so we can differentiate calls from inside and outside our caller's package
-    disable => $list,
-    debug => $opts->{debug},
-    ## When disabled, the Tie::Hash system will return hash key values directly under $self instead of $self->{data}
-    ## Disabled by default so the new() method can access its setup data directly under $self
-    ## Then new() can call enable to active it
-    enable => 0,
-    ## Where to store the actual hash data
-    data  => {},
-    };
-    my $class = ref( $self ) || $self;
-    return( bless( $hash => $class ) );
-}
-
-sub CLEAR
-{
-    my $self = shift( @_ );
-    my $data = $self->{data};
-    %$data = ();
-}
-
-sub DELETE
-{
-    my $self = shift( @_ );
-    my $data = $self->{data};
-    my $key  = shift( @_ );
-    my $caller = caller;
-    if( $self->_exclude( $caller ) || !$self->{enable} )
-    # if( !$self->{enable} )
-    {
-        CORE::delete( $self->{ $key } );
-    }
-    else
-    {
-        CORE::delete( $data->{ $key } );
-    }
-}
-
-sub EXISTS
-{
-    my $self = shift( @_ );
-    my $data = $self->{data};
-    my $key  = shift( @_ );
-    my $caller = caller;
-    if( $self->_exclude( $caller ) || !$self->{enable} )
-    # if( !$self->{enable} )
-    {
-        CORE::exists( $self->{ $key } );
-    }
-    else
-    {
-        CORE::exists( $data->{ $key } );
-    }
-}
-
-sub FETCH
-{
-    my $self = shift( @_ );
-    my $data = $self->{data};
-    my $key  = shift( @_ );
-    my $caller = caller;
-    ## print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key''\n" );
-    if( $self->_exclude( $caller ) || !$self->{enable} )
-    # if( !$self->{enable} )
-    {
-        #print( STDERR "FETCH($caller)[owner calling, enable=$self->{enable}] <- '$key' <- '$self->{$key}'\n" );
-        return( $self->{ $key } )
-    }
-    else
-    {
-        #print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key' <- '$data->{$key}'\n" );
-        return( $data->{ $key } );
-    }
-}
-
-sub FIRSTKEY
-{
-    my $self = shift( @_ );
-    my $data = $self->{data};
-    my @keys = ();
-    my $caller = caller;
-    if( $self->_exclude( $caller ) || !$self->{enable} )
-    # if( !$self->{enable} )
-    {
-        @keys = keys( %$self );
-    }
-    else
-    {
-        @keys = keys( %$data );
-    }
-    $self->{ITERATOR} = \@keys;
-    return( shift( @keys ) );
-}
-
-sub NEXTKEY
-{
-    my $self = shift( @_ );
-    my $data = $self->{data};
-    my $keys = ref( $self->{ITERATOR} ) ? $self->{ITERATOR} : [];
-    return( shift( @$keys ) );
-}
-
-sub SCALAR
-{
-    my $self  = shift( @_ );
-    my $data = $self->{data};
-    my $caller = caller;
-    if( $self->_exclude( $caller ) || !$self->{enable} )
-    # if( !$self->{enable} )
-    {
-        return( scalar( keys( %$self ) ) );
-    }
-    else
-    {
-        return( scalar( keys( %$data ) ) );
-    }
-}
-
-sub STORE
-{
-    my $self  = shift( @_ );
-    my $data = $self->{data};
-    my( $key, $val ) = @_;
-    my $caller = caller;
-    if( $self->_exclude( $caller ) || !$self->{enable} )
-    # if( !$self->{enable} )
-    {
-        #print( STDERR "STORE($caller)[owner calling] <- '$key' -> '$val'\n" );
-        $self->{ $key } = $val;
-    }
-    else
-    {
-        #print( STDERR "STORE($caller)[enable=$self->{enable}] <- '$key' -> '$val'\n" );
-        $data->{ $key } = $val;
-    }
-}
-
-sub enable { return( shift->_set_get_boolean( 'enable', @_ ) ); }
-
-sub _exclude
-{
-    my $self = shift( @_ );
-    my $caller = shift( @_ );
-    ## $self->message( 3, "Disable hash contains: ", sub{ $self->dump( $self->{disable} ) });
-    return( CORE::exists( $self->{disable}->{ $caller } ) );
-}
-
-package Module::Generic::Tie;
-BEGIN
-{
-    use Tie::Hash;
-    our( @ISA ) = qw( Tie::Hash );
-    our( $VERSION ) = '0.1.0';
-};
-
-sub TIEHASH
-{
-    my $self = shift( @_ );
-    my $pkg  = ( caller() )[ 0 ];
-    ## print( STDERR __PACKAGE__ . "::TIEHASH() called with following arguments: '", join( ', ', @_ ), "'.\n" );
-    my %arg  = ( @_ );
-    my $auth = [ $pkg, __PACKAGE__ ];
-    if( $arg{ 'pkg' } )
-    {
-        my $ok = delete( $arg{ 'pkg' } );
-        push( @$auth, ref( $ok ) eq 'ARRAY' ? @$ok : $ok );
-    }
-    my $priv = { 'pkg' => $auth };
-    my $data = { '__priv__' => $priv };
-    my @keys = keys( %arg );
-    @$priv{ @keys } = @arg{ @keys };
-    return( bless( $data, ref( $self ) || $self ) );
-}
-
-sub CLEAR
-{
-    my $self = shift( @_ );
-    my $pkg = ( caller() )[ 0 ];
-    ## print( $err __PACKAGE__ . "::CLEAR() called by package '$pkg'.\n" );
-    my $data = $self->{ '__priv__' };
-    return() if( $data->{ 'readonly' } && $pkg ne __PACKAGE__ );
-    ## if( $data->{ 'readonly' } || $data->{ 'protect' } )
-    if( !( $data->{ 'perms' } & 2 ) )
-    {
-        return if( !grep( /^$pkg$/, @{ $data->{ 'pkg' } } ) );
-    }
-    my $key  = $self->FIRSTKEY( @_ );
-    my @keys = ();
-    while( defined( $key ) )
-    {
-        push( @keys, $key );
-        $key = $self->NEXTKEY( @_, $key );
-    }
-    foreach $key ( @keys )
-    {
-        $self->DELETE( @_, $key );
-    }
-}
-
-sub DELETE
-{
-    my $self = shift( @_ );
-    my $pkg  = ( caller() )[ 0 ];
-    $pkg     = ( caller( 1 ) )[ 0 ] if( $pkg eq 'Module::Generic' );
-    ## print( STDERR __PACKAGE__ . "::DELETE() package '$pkg' tries to delete '$_[ 0 ]'\n" );
-    my $data = $self->{ '__priv__' };
-    return if( $_[ 0 ] eq '__priv__' && $pkg ne __PACKAGE__ );
-    ## if( $data->{ 'readonly' } || $data->{ 'protect' } )
-    if( !( $data->{ 'perms' } & 2 ) )
-    {
-        return() if( !grep( /^$pkg$/, @{ $data->{ 'pkg' } } ) );
-    }
-    return( delete( $self->{ shift( @_ ) } ) );
-}
-
-sub EXISTS
-{
-    my $self = shift( @_ );
-    ## print( STDERR __PACKAGE__ . "::EXISTS() called from package '", ( caller() )[ 0 ], "'.\n" );
-    return( 0 ) if( $_[ 0 ] eq '__priv__' && $pkg ne __PACKAGE__ );
-    my $data = $self->{ '__priv__' };
-    if( !( $data->{ 'perms' } & 4 ) )
-    {
-        my $pkg = ( caller() )[ 0 ];
-        return( 0 ) if( !grep( /^$pkg$/, @{$data->{ 'pkg' }} ) );
-    }
-    ## print( STDERR __PACKAGE__ . "::EXISTS() returns: '", exists( $self->{ $_[ 0 ] } ), "'.\n" );
-    return( exists( $self->{ shift( @_ ) } ) );
-}
-
-sub FETCH
-{
-    ## return( shift->{ shift( @_ ) } );
-    ## print( STDERR __PACKAGE__ . "::FETCH() called with arguments: '", join( ', ', @_ ), "'.\n" );
-    my $self = shift( @_ );
-    ## This is a hidden entry, we return nothing
-    return() if( $_[ 0 ] eq '__priv__' && $pkg ne __PACKAGE__ );
-    my $data = $self->{ '__priv__' };
-    ## If we have to protect our object, we hide its inner content if our caller is not our creator
-    ## if( $data->{ 'protect' } )
-    if( !( $data->{ 'perms' } & 4 ) )
-    {
-        my $pkg = ( caller() )[ 0 ];
-        ## print( STDERR __PACKAGE__ . "::FETCH() package '$pkg' wants to fetch the value of '$_[ 0 ]'\n" );
-        return if( !grep( /^$pkg$/, @{$data->{ 'pkg' }} ) );
-    }
-    return( $self->{ shift( @_ ) } );
-}
-
-sub FIRSTKEY
-{
-    my $self = shift( @_ );
-    ## my $a    = scalar( keys( %$hash ) );
-    ## return( each( %$hash ) );
-    my $data = $self->{ '__priv__' };
-    ## if( $data->{ 'protect' } )
-    if( !( $data->{ 'perms' } & 4 ) )
-    {
-        my $pkg = ( caller( 0 ) )[ 0 ];
-        ## print( STDERR __PACKAGE__ . "::FIRSTKEY() called by package '$pkg'\n" );
-        return if( !grep( /^$pkg$/, @{$data->{ 'pkg' }} ) );
-    }
-    ## print( STDERR __PACKAGE__ . "::FIRSTKEY(): gathering object's keys.\n" );
-    my( @keys ) = grep( !/^__priv__$/, keys( %$self ) );
-    $self->{ '__priv__' }->{ 'ITERATOR' } = \@keys;
-    ## print( STDERR __PACKAGE__ . "::FIRSTKEY(): keys are: '", join( ', ', @keys ), "'.\n" );
-    ## print( STDERR __PACKAGE__ . "::FIRSTKEY() returns '$keys[ 0 ]'.\n" );
-    return( shift( @keys ) );
-}
-
-sub NEXTKEY
-{
-    my $self = shift( @_ );
-    ## return( each( %$hash ) );
-    my $data = $self->{ '__priv__' };
-    ## if( $data->{ 'protect' } )
-    if( !( $data->{ 'perms' } & 4 ) )
-    {
-        my $pkg = ( caller( 0 ) )[ 0 ];
-        ## print( STDERR __PACKAGE__ . "::NEXTKEY() called by package '$pkg'\n" );
-        return if( !grep( /^$pkg$/, @{$data->{ 'pkg' }} ) );
-    }
-    my $keys = $self->{ '__priv__' }->{ 'ITERATOR' };
-    ## print( STDERR __PACKAGE__ . "::NEXTKEY() returns '$_[ 0 ]'.\n" );
-    return( shift( @$keys ) );
-}
-
-sub STORE
-{
-    my $self = shift( @_ );
-    return() if( $_[ 0 ] eq '__priv__' );
-    my $data = $self->{ '__priv__' };
-    #if( $data->{ 'readonly' } || 
-    #    $data->{ 'protect' } )
-    if( !( $data->{ 'perms' } & 2 ) )
-    {
-        my $pkg  = ( caller() )[ 0 ];
-        $pkg     = ( caller( 1 ) )[ 0 ] if( $pkg eq 'Module::Generic' );
-        ## print( STDERR __PACKAGE__ . "::STORE() package '$pkg' is trying to STORE the value '$_[ 1 ]' to key '$_[ 0 ]'\n" );
-        return if( !grep( /^$pkg$/, @{ $data->{ 'pkg' } } ) );
-    }
-    ## print( STDERR __PACKAGE__ . "::STORE() ", ( caller() )[ 0 ], " is storing value '$_[ 1 ]' for key '$_[ 0 ]'.\n" );
-    ## $self->{ shift( @_ ) } = shift( @_ );
-    $self->{ $_[ 0 ] } = $_[ 1 ];
-    ## print( STDERR __PACKAGE__ . "::STORE(): object '$self' now contains: '", join( ', ', map{ "$_, $self->{ $_ }" } keys( %$self ) ), "'.\n" );
-}
 
 1;
 
@@ -7410,7 +3647,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.13.6
+    v0.14.0
 
 =head1 DESCRIPTION
 
@@ -7676,7 +3913,7 @@ Uset to get an object data key value:
     print( $out "Verbose level is $vals[ 0 ] and debug level is $vals[ 1 ]\n" );
 
 This is no more needed, as it has been more conveniently bypassed by the AUTOLOAD
-generic routine with chich you may say:
+generic routine with which you may say:
 
     $obj->verbose( 1 );
     $obj->debug( 0 );
@@ -8016,6 +4253,25 @@ This is a support method used by L</"_instantiate_object">
 =head2 _instantiate_object
 
 This does the same thing as L</"__instantiate_object"> and the purpose is for this method to be potentially superseded in your own module. In your own module, you would call L</"__instantiate_object">
+
+=head2 _get_args_as_hash
+
+Provided with arguments and this support method will return the arguments provided as hash reference irrespective of whether they were initially provided as hash reference or a simple hash.
+
+For example:
+
+    my $ref = $self->_get_args_as_hash( first => 'John', last => 'Doe' );
+    # returns hash reference { first => 'John', last => 'Doe' }
+    my $ref = $self->_get_args_as_hash({ first => 'John', last => 'Doe' });
+    # same as above
+    my $res = $self->_get_args_as_hash(); # no args provided
+    # returns an empty hash reference
+
+However, this will return empty:
+
+    my $ref = $self->_get_args_as_hash( { age => 42, city => 'Tokyo' }, some_other => 'parameter' );
+
+This returns an empty hash reference, because although the first parameter is an hash reference, there is more than on parameter.
 
 =head2 _is_a
 

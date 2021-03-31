@@ -25,7 +25,7 @@ use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 #use Future::IO;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 our @CARP_NOT;
 
 # add Browser.setPermission , .grantPermission for
@@ -1082,6 +1082,9 @@ sub _connect( $self, %options ) {
             $s->set_download_directory_future($self->{download_directory}),
 
             keys %{$options{ extra_headers }} ? $s->_set_extra_headers_future( %{$options{ extra_headers }} ) : (),
+
+            # do a dummy search so no nodeId 0 gets used (?!)
+            # $s->_performSearch(query => '//'),
         );
 
         if( my $agent = delete $options{ user_agent }) {
@@ -1432,11 +1435,29 @@ callback will be invoked.
 =cut
 
 sub setRequestInterception_future( $self, @patterns ) {
-    $self->target->send_message('Network.setRequestInterception', patterns => @patterns)
+    $self->target->send_message('Network.setRequestInterception', patterns => \@patterns)
 }
 
 sub setRequestInterception( $self, @patterns ) {
     $self->setRequestInterception_future( @patterns )->get
+}
+
+=head2 C<< $mech->continueInterceptedRequest( %options ) >>
+
+    $mech->continueInterceptedRequest_future(
+        interceptionId => ...
+    );
+
+Continues an intercepted request
+
+=cut
+
+sub continueInterceptedRequest_future( $self, %options ) {
+    $self->target->send_message('Network.continueInterceptedRequest', %options)
+}
+
+sub continueInterceptedRequest( $self, %options ) {
+    $self->continueInterceptedRequest_future( %options )->get
 }
 
 =head2 C<< $mech->add_listener >>
@@ -1862,6 +1883,7 @@ sub close {
     #};
     if( $_[0]->{autoclose} and $_[0]->target and $_[0]->tab  ) {
         $_[0]->target->close->retain();
+        #$_[0]->target->close->get(); # just to see if there is an error
     };
 
     #if( $pid and $_[0]->{cached_version} > 65) {
@@ -2116,7 +2138,12 @@ sub _waitForNavigationEnd( $self, %options ) {
         $requestId ||= $self->_fetchRequestId($ev);
 
         my $stopped = (    $ev->{method} eq 'Page.frameStoppedLoading'
-                       && $ev->{params}->{frameId} eq $frameId);
+                       && $ev->{params}->{frameId} eq $frameId)
+                       ||
+                      (    $ev->{method} eq 'Network.loadingFinished'
+                       && (! $ev->{params}->{frameId}   || $ev->{params}->{frameId} eq ($frameId || ''))
+                       && (! $ev->{params}->{requestId} || $ev->{params}->{requestId} eq ($requestId || ''))
+                      );
         # This means basically no navigation events will follow:
         my $internal_navigation = (   $ev->{method} eq 'Page.navigatedWithinDocument'
                        && $requestId
@@ -3087,19 +3114,36 @@ sub document( $self ) {
 }
 
 sub decoded_content($self) {
-    $self->document_future->then(sub( $root ) {
-        # Join _all_ child nodes together to also fetch DOCTYPE nodes
-        # and the stuff that comes after them
-        my @content = map {
-            my $nodeId = $_->{nodeId};
-            $self->log('trace', "Fetching HTML for node " . $nodeId );
-            $self->target->send_message('DOM.getOuterHTML', nodeId => 0+$nodeId )
-        } @{ $root->{root}->{children} };
+    my $res;
+    my $ct = $self->ct || 'text/html';
+    if( $ct eq 'text/html' ) {
+        $res = $self->document_future->then(sub( $root ) {
+            # Join _all_ child nodes together to also fetch DOCTYPE nodes
+            # and the stuff that comes after them
 
-        Future->wait_all( @content )
-    })->then( sub( @outerHTML_f ) {
-        Future->done( join "", map { $_->get->{outerHTML} } @outerHTML_f )
-    })->get;
+            my @content = map {
+                my $nodeId = $_->{nodeId};
+                $self->log('trace', "Fetching HTML for node " . $nodeId );
+                $self->target->send_message('DOM.getOuterHTML', nodeId => 0+$nodeId )
+            } @{ $root->{root}->{children} };
+
+            return Future->wait_all( @content )
+            ->then( sub( @outerHTML_f ) {
+                Future->done( join "", map { $_->get->{outerHTML} } @outerHTML_f );
+            });
+        });
+    } else {
+        # Return the raw body
+        #use Data::Dumper;
+        #warn Dumper $self->response;
+        #warn $self->response->content;
+
+        # The content is already decoded (?!)
+        # I'm not sure how well this plays with encodings, and
+        # binary content
+        $res = Future->done($self->response->content);
+    };
+    return $res->get
 };
 
 =head2 C<< $mech->content( %options ) >>
@@ -3878,11 +3922,12 @@ sub _performSearch( $self, %args ) {
             my $searchId = $results->{searchId};
             my @childNodes;
             my $setChildNodes = $self->add_listener('DOM.setChildNodes', sub( $ev ) {
+                #use Data::Dumper; warn "setChildNodes: "; warn Dumper $ev;
                 push @childNodes, @{ $ev->{params}->{nodes} };
             });
 
             my $childNodes;
-            if( $subTreeId ) {
+            if( defined $subTreeId ) {
                 $childNodes =
                     $self->target->send_message( 'DOM.requestChildNodes',
                         nodeId => 0+$subTreeId,
@@ -3912,8 +3957,15 @@ sub _performSearch( $self, %args ) {
                 # the setChildNodes messages onto @childNodes
                 my @discard = $childNodes->get();
 
-                $search
+                return $search;
+
             })->then( sub( $response ) {
+                # you might get a node with nodeId 0. This one
+                # can't be retrieved. Bad luck.
+                if($response->{nodeIds}->[0] == 0) {
+                    warn "Bad luck: Node with nodeId 0 found. Info for this one cannot be retrieved.";
+                    # splice @{ $response->{nodeIds}}, 0, 1;
+                };
 
                 # Resolve the found nodes directly with the
                 # found node ids instead of returning the numbers and fetching
@@ -3942,7 +3994,15 @@ sub _performSearch( $self, %args ) {
 
                 for (@foundNodes) {
                     my $id = $_->nodeId;
-                    #warn "Found " . $_->nodeId;
+                    if( ! defined $id ) {
+                        #use Data::Dumper;
+                        #warn "Found node without nodeId: " . Dumper $_;
+                        # Sometimes we get a spurious, empty node, so we ignore that
+                        # Maybe that is because the node we searched for went
+                        # away, but we'd need to associate the information
+                        # before we get the response, so ...
+                        next;
+                    };
                     # Backfill here instead of overwriting!
                     if( my $n = $nodes->{$id} ) {
                         for my $key (qw( backendNodeId parentId )) {
@@ -4044,6 +4104,9 @@ sub xpath( $self, $query, %options) {
         my $id;
         if ($options{ node }) {
             $id = $options{ node }->backendNodeId;
+            #warn "Performing search (below '$id')";
+        } else {
+            #warn "Performing search across complete DOM";
         };
         Future->wait_all(
             map {
@@ -4052,6 +4115,10 @@ sub xpath( $self, $query, %options) {
         );
     })->then( sub {
         my @found = map { my @r = $_->get; @r ? map { $_->get } @r : () } @_;
+        #for( @found ) {
+        #    use Data::Dumper;
+        #    warn "Found " . Dumper $_;
+        #};
         push @res, @found;
         Future->done( 1 );
     })->get;
@@ -4207,11 +4274,12 @@ sub click {
     #warn Dumper $self->target->send_message('Runtime.getProperties', objectId => $id)->get;
     #warn Dumper $self->target->send_message('Runtime.callFunctionOn', objectId => $id, functionDeclaration => 'function() { this.focus(); }', arguments => [])->get;
 
-    my $response =
     $self->_mightNavigate( sub {
         $self->target->send_message('Runtime.callFunctionOn', objectId => $id, functionDeclaration => 'function() { this.click(); }', arguments => [])
     }, %options)
     ->get;
+
+    return $self->response;
 }
 
 # Internal method to run either an XPath, CSS or id query against the DOM
@@ -4735,6 +4803,129 @@ sub _field_by_name {
     @fields
 }
 
+=head2 C<< $mech->set_field( %options ) >>
+
+    $mech->set_field(
+        field => $field_node,
+        value => 'foo',
+    );
+
+Low level value setting method. Use this if you have an input element outside
+of a E<lt>formE<gt> tag.
+
+=cut
+
+sub set_field($self, %options ) {
+    my $value = delete $options{ value };
+    my $pre   = delete $options{pre};
+    $pre = [$pre]
+        if (defined $pre and ! ref $pre);
+    my $post  = delete $options{post};
+    $post = [$post]
+        if (defined $post and ! ref $post);
+    $pre  ||= ['focus']; # just to eliminate some checks downwards
+    $post ||= ['change']; # just to eliminate some checks downwards
+    my $obj = delete $options{ field }
+        or croak "Need a field to set";
+    my $tag = $obj->get_tag_name();
+
+    my %method = (
+        input    => 'value',
+        textarea => 'content',
+        select   => 'selected',
+    );
+    my $method = $method{ lc $tag };
+    if( lc $tag eq 'input' and $obj->get_attribute('type') eq 'radio' ) {
+        $method = 'checked';
+    };
+
+    my $id = $obj->{objectId};
+
+    # Send pre-change events:
+    for my $ev (@$pre) {
+        $self->target->send_message(
+                'Runtime.callFunctionOn',
+                objectId => $id,
+                functionDeclaration => <<'JS',
+function(ev) {
+    var event = new Event(ev, {
+        view : window,
+        bubbles: true,
+        cancelable: true
+    });
+    this.dispatchEvent(event);
+}
+JS
+                arguments => [{ value => $ev }],
+            );
+    };
+
+    if( 'value' eq $method ) {
+        $self->target->send_message('DOM.setAttributeValue', nodeId => 0+$obj->nodeId, name => 'value', value => "$value" )->get;
+
+    } elsif( 'selected' eq $method ) {
+        # ignoring undef; but [] would reset to no option
+        if (defined $value) {
+            $value = [ $value ] unless ref $value;
+            $self->target->send_message(
+                'Runtime.callFunctionOn',
+                objectId => $id,
+                functionDeclaration => <<'JS',
+function(newValue) {
+  var i, j;
+  if (this.multiple == true) {
+    for (i=0; i<this.options.length; i++) {
+      this.options[i].selected = false
+    }
+  }
+  for (j=0; j<newValue.length; j++) {
+    for (i=0; i<this.options.length; i++) {
+      if (this.options[i].value == newValue[j]) {
+        this.options[i].selected = true
+      }
+    }
+  }
+}
+JS
+                arguments => [{ value => $value }],
+            )->get;
+        }
+    } elsif( 'checked' eq $method ) {
+        if (defined $value) {
+            $value = [ $value ] unless ref $value;
+            $obj->set_attribute('checked' => JSON::true);
+        }
+    } elsif( 'content' eq $method ) {
+        $self->target->send_message('Runtime.callFunctionOn',
+            objectId => $id,
+            functionDeclaration => 'function(newValue) { this.innerHTML = newValue }',
+            arguments => [{ value => $value }]
+        )->get;
+    } else {
+        die "Don't know how to set the value for node '$tag', sorry";
+    };
+
+    # Send post-change events
+    # Send pre-change events:
+    for my $ev (@$post) {
+        $self->target->send_message(
+                'Runtime.callFunctionOn',
+                objectId => $id,
+                functionDeclaration => <<'JS',
+function(ev) {
+    var event = new Event(ev, {
+        view : window,
+        bubbles: true,
+        cancelable: true
+    });
+    this.dispatchEvent(event);
+}
+JS
+                arguments => [{ value => $ev }],
+            );
+    };
+}
+
 sub get_set_value($self,%options) {
     my $set_value = exists $options{ value };
     my $value = delete $options{ value };
@@ -4772,103 +4963,13 @@ sub get_set_value($self,%options) {
 
     if (my $obj = $fields[0]) {
 
-        my $tag = $obj->get_tag_name();
         if ($set_value) {
-            my %method = (
-                input    => 'value',
-                textarea => 'content',
-                select   => 'selected',
+            $self->set_field(
+                field => $obj,
+                value => $value,
+                pre => $pre,
+                post => $post,
             );
-            my $method = $method{ lc $tag };
-            if( lc $tag eq 'input' and $obj->get_attribute('type') eq 'radio' ) {
-                $method = 'checked';
-            };
-
-            my $id = $obj->{objectId};
-
-            # Send pre-change events:
-            for my $ev (@$pre) {
-                $self->target->send_message(
-                        'Runtime.callFunctionOn',
-                        objectId => $id,
-                        functionDeclaration => <<'JS',
-function(ev) {
-    var event = new Event(ev, {
-        view : window,
-        bubbles: true,
-        cancelable: true
-    });
-    this.dispatchEvent(event);
-}
-JS
-                        arguments => [{ value => $ev }],
-                    );
-            };
-
-            if( 'value' eq $method ) {
-                $self->target->send_message('DOM.setAttributeValue', nodeId => 0+$obj->nodeId, name => 'value', value => "$value" )->get;
-
-            } elsif( 'selected' eq $method ) {
-                # ignoring undef; but [] would reset to no option
-                if (defined $value) {
-                    $value = [ $value ] unless ref $value;
-                    $self->target->send_message(
-                        'Runtime.callFunctionOn',
-                        objectId => $id,
-                        functionDeclaration => <<'JS',
-function(newValue) {
-  var i, j;
-  if (this.multiple == true) {
-    for (i=0; i<this.options.length; i++) {
-      this.options[i].selected = false
-    }
-  }
-  for (j=0; j<newValue.length; j++) {
-    for (i=0; i<this.options.length; i++) {
-      if (this.options[i].value == newValue[j]) {
-        this.options[i].selected = true
-      }
-    }
-  }
-}
-JS
-                        arguments => [{ value => $value }],
-                    )->get;
-                }
-            } elsif( 'checked' eq $method ) {
-                if (defined $value) {
-                    $value = [ $value ] unless ref $value;
-                    $obj->set_attribute('checked' => JSON::true);
-                }
-            } elsif( 'content' eq $method ) {
-                $self->target->send_message('Runtime.callFunctionOn',
-                    objectId => $id,
-                    functionDeclaration => 'function(newValue) { this.innerHTML = newValue }',
-                    arguments => [{ value => $value }]
-                )->get;
-            } else {
-                die "Don't know how to set the value for node '$tag', sorry";
-            };
-
-            # Send post-change events
-            # Send pre-change events:
-            for my $ev (@$post) {
-                $self->target->send_message(
-                        'Runtime.callFunctionOn',
-                        objectId => $id,
-                        functionDeclaration => <<'JS',
-function(ev) {
-    var event = new Event(ev, {
-        view : window,
-        bubbles: true,
-        cancelable: true
-    });
-    this.dispatchEvent(event);
-}
-JS
-                        arguments => [{ value => $ev }],
-                    );
-            };
         };
 
         # Don't bother to fetch the field's value if it's not wanted
@@ -4876,6 +4977,7 @@ JS
 
         # We could save some work here for the simple case of single-select
         # dropdowns by not enumerating all options
+        my $tag = $obj->get_tag_name();
         if ('SELECT' eq uc $tag) {
             my $id = $obj->{objectId};
             my $arr = $self->target->send_message(
@@ -5375,6 +5477,15 @@ C<timeout> - the timeout after which the function will C<croak>. To catch
 the condition and handle it in your calling program, use an L<eval> block.
 A timeout of C<0> means to never time out.
 
+See also C<max_wait> if you want to wait a limited time for an element to
+appear.
+
+=item *
+
+C<max_wait> - the maximum time to wait until the function will return.
+A max_wait of C<0> means to never time out. If the element is still visible,
+the function will return a false value.
+
 =item *
 
 C<sleep> - the interval in seconds used to L<sleep>. Subsecond
@@ -5401,6 +5512,8 @@ sub wait_until_invisible( $self, %options ) {
     };
     my $sleep = delete $options{ sleep } || 0.3;
     my $timeout = delete $options{ timeout } || 0;
+    my $wait = delete $options{ max_wait } || 0;
+    $timeout ||= $wait;
 
     _default_limiter( 'maybe', \%options );
 
@@ -5424,8 +5537,13 @@ sub wait_until_invisible( $self, %options ) {
     } while ( $v
            and (!$timeout or time < $timeout_after ));
     if ($v and $timeout and time >= $timeout_after) {
-        croak "Timeout of $timeout seconds reached while waiting for element to become invisible";
+        if( $wait ) {
+            return()
+        } else {
+            croak "Timeout of $timeout seconds reached while waiting for element to become invisible";
+        };
     };
+    return 1;
 };
 
 =head2 C<< $mech->wait_until_visible( %options ) >>
@@ -6278,9 +6396,8 @@ L<here|https://corion.net/talks/WWW-Mechanize-Chrome/www-mechanize-chrome.en.htm
 
 =head1 BUG TRACKER
 
-Please report bugs in this module via the RT CPAN bug queue at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Chrome>
-or via mail to L<www-mechanize-Chrome-Bugs@rt.cpan.org|mailto:www-mechanize-Chrome-Bugs@rt.cpan.org>.
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/WWW-Mechanize-Chrome/issues>
 
 =head1 CONTRIBUTING
 
@@ -6302,7 +6419,7 @@ Steven Dondley C<s@dondley.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2021 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

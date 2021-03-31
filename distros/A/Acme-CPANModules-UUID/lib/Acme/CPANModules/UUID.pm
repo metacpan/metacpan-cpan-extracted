@@ -3,7 +3,7 @@ package Acme::CPANModules::UUID;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-20'; # DATE
 our $DIST = 'Acme-CPANModules-UUID'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use strict;
 use warnings;
@@ -36,6 +36,9 @@ from hashing a namespace using SHA-1.
 
 <pm:Data::UUID> should be your first choice, and when you cannot install XS
 modules you can use <pm:UUID::Tiny> instead.
+
+Aside from the modules listed as entries below, there are also:
+<pm:App::UUIDUtils> (containing CLIs to create/check UUID).
 
 _
     entry_features => {
@@ -207,6 +210,7 @@ _
                 create_v5 => 0,
             },
         },
+
     ],
 };
 
@@ -225,7 +229,7 @@ Acme::CPANModules::UUID - Modules that can generate immutable universally unique
 
 =head1 VERSION
 
-This document describes version 0.006 of Acme::CPANModules::UUID (from Perl distribution Acme-CPANModules-UUID), released on 2021-01-20.
+This document describes version 0.007 of Acme::CPANModules::UUID (from Perl distribution Acme-CPANModules-UUID), released on 2021-01-20.
 
 =head1 SYNOPSIS
 
@@ -265,6 +269,9 @@ from hashing a namespace using SHA-1.
 
 L<Data::UUID> should be your first choice, and when you cannot install XS
 modules you can use L<UUID::Tiny> instead.
+
+Aside from the modules listed as entries below, there are also:
+L<App::UUIDUtils> (containing CLIs to create/check UUID).
 
 =head1 BENCHMARKED MODULES
 
@@ -359,18 +366,18 @@ Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz 
 Benchmark with default options (C<< bencher --cpanmodules-module UUID >>):
 
  #table1#
- +---------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
- | participant                           | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
- +---------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
- | UUID::Random::Secure::generate        |        40 |     30    |                 0.00% |              5806.80% |   0.0004  |      20 |
- | UUID::Random::Secure::generate_rfc    |        42 |     24    |                16.35% |              4976.85% |   0.00014 |      20 |
- | UUID::Random                          |       100 |     10    |               169.05% |              2095.45% |   0.00013 |      20 |
- | UUID::Tiny                            |       140 |      7.2  |               286.30% |              1429.06% | 2.1e-05   |      20 |
- | Crypt::Misc                           |       300 |      4    |               624.98% |               714.75% | 6.6e-05   |      20 |
- | UUID::Random::PERLANCAR::generate_rfc |      1300 |      0.74 |              3667.94% |                56.76% | 6.1e-06   |      20 |
- | UUID::Random::PERLANCAR::generate     |      1000 |      0.7  |              3922.24% |                46.85% | 1.6e-05   |      20 |
- | Data::UUID                            |      2100 |      0.47 |              5806.80% |                 0.00% | 3.4e-06   |      20 |
- +---------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | participant                           | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+ | UUID::Random::Secure::generate_rfc    |        47 |    21     |                 0.00% |              5170.91% | 4.4e-05 |      20 |
+ | UUID::Random::Secure::generate        |        48 |    21     |                 1.57% |              5089.54% | 5.8e-05 |      20 |
+ | UUID::Random                          |       110 |     8.7   |               144.09% |              2059.42% | 3.3e-05 |      20 |
+ | UUID::Tiny                            |       150 |     6.9   |               209.41% |              1603.51% |   4e-05 |      20 |
+ | Crypt::Misc                           |       280 |     3.5   |               502.44% |               774.93% | 2.1e-05 |      21 |
+ | UUID::Random::PERLANCAR::generate_rfc |      1530 |     0.652 |              3171.61% |                61.11% | 1.6e-07 |      20 |
+ | UUID::Random::PERLANCAR::generate     |      1860 |     0.538 |              3866.37% |                32.89% | 3.6e-07 |      21 |
+ | Data::UUID                            |      2500 |     0.4   |              5170.91% |                 0.00% | 1.5e-06 |      20 |
+ +---------------------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher --cpanmodules-module UUID --module-startup >>):
@@ -379,13 +386,13 @@ Benchmark module startup overhead (C<< bencher --cpanmodules-module UUID --modul
  +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
  | participant             | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
  +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
- | UUID::Random::Secure    |        90 |                80 |                 0.00% |               898.13% |   0.00027 |      20 |
- | UUID::Tiny              |        30 |                20 |               200.97% |               231.64% |   0.0011  |      23 |
- | Data::UUID              |        20 |                10 |               345.26% |               124.17% |   0.00032 |      20 |
- | Crypt::Misc             |        19 |                 9 |               381.36% |               107.36% | 1.9e-05   |      22 |
- | perl -e1 (baseline)     |        10 |                 0 |               596.29% |                43.35% |   0.00029 |      20 |
- | UUID::Random::PERLANCAR |        10 |                 0 |               610.56% |                40.47% |   0.00017 |      20 |
- | UUID::Random            |         9 |                -1 |               898.13% |                 0.00% | 1.4e-05   |      20 |
+ | UUID::Random::Secure    |      90   |              83.3 |                 0.00% |              1241.53% |   0.00036 |      20 |
+ | UUID::Tiny              |      24   |              17.3 |               275.89% |               256.89% | 8.1e-05   |      20 |
+ | Crypt::Misc             |      18   |              11.3 |               393.94% |               171.60% | 8.1e-05   |      20 |
+ | Data::UUID              |      15   |               8.3 |               506.49% |               121.19% | 6.8e-05   |      20 |
+ | UUID::Random            |       8.9 |               2.2 |               917.54% |                31.84% | 5.4e-05   |      22 |
+ | UUID::Random::PERLANCAR |       8.8 |               2.1 |               925.85% |                30.77% |   6e-05   |      20 |
+ | perl -e1 (baseline)     |       6.7 |               0   |              1241.53% |                 0.00% | 3.8e-05   |      22 |
  +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
 
 

@@ -86,7 +86,7 @@ sub create {
 
 Applies mutation operator to a "Chromosome", a vector of stuff,
 really. Can be applied only to I<victims> with the C<_array> instance
-variable; but it checks before application (roughly) that both operands are of
+variable; but it checks before application (roughly) that the operand is of
 type L<Algorithm::Evolutionary::Individual::Vector>.
 
 =cut

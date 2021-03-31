@@ -9,6 +9,7 @@ with 'Net::SAML2::Role::ProtocolMessage';
 has 'issuer'      => (isa => 'Str', is => 'ro', required => 1);
 has 'destination' => (isa => 'Str', is => 'ro', required => 1);
 has 'artifact'    => (isa => 'Str', is => 'ro', required => 1);
+has 'provider'    => (isa => 'Str', is => 'ro', required => 0);
 
 
 sub as_xml {
@@ -24,7 +25,7 @@ sub as_xml {
             { ID => $self->id,
               IssueInstant => $self->issue_instant,
               Destination => $self->destination,
-              ProviderName => "My SP's human readable name.",
+              ProviderName => $self->provider || "My SP's human readable name.",
               Version => '2.0' },
             $x->Issuer(
                 $saml,
@@ -52,7 +53,7 @@ Net::SAML2::Protocol::ArtifactResolve
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -107,6 +108,7 @@ This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
             2012       Peter Marschall
             2017       Alessandro Ranellucci
             2020       Timothy Legge, Wesley Schwengle
+            2021       Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

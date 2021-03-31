@@ -18,6 +18,7 @@ BEGIN
     use parent qw( Apache2::SSI::Common );
     use Apache2::SSI::Finfo;
     use Cwd;
+    use File::Spec ();
     ## Used for debugging
     ## use Devel::Confess;
     use Nice::Try;
@@ -43,6 +44,7 @@ BEGIN
         fallback => 1,
     );
     our $VERSION = 'v0.1.1';
+    our $DIR_SEP = $Apache2::SSI::Common::DIR_SEP;
 };
 
 ## document_root = /home/joe/www
@@ -364,9 +366,10 @@ sub document_root
     {
         $new = shift( @_ );
         $self->message( 4, "New document root provided: '$new'." );
-        unless( substr( $new, 0, 1 ) eq '/' )
+        # unless( substr( $new, 0, 1 ) eq '/' )
+        unless( File::Spec->file_name_is_absolute( $new ) )
         {
-            $new = URI::file->new_abs( $new )->file;
+            $new = URI::file->new_abs( $new )->file( $^O );
         }
     }
     
@@ -463,7 +466,7 @@ sub document_uri
         $self->message( 4, "Returning nothing." ) if( !length( $self->{document_uri} ) && $self->{_path_info_processed} );
         return( '' ) if( !length( $self->{document_uri} ) && $self->{_path_info_processed} );
         my $v = $new || $self->{document_uri};
-        $self->message( 3, "New document uri provided is '$new' and document_uri value is: '$self->{document_uri}'" );
+        $self->message( 3, "New document uri provided is '$new' (possibly null) and document_uri value is: '$self->{document_uri}'" );
         if( !$self->{_path_info_processed} )
         {
             $self->message( 4, "Path info from document uri '$v' not processed yet, doing it now." );
@@ -594,7 +597,7 @@ sub filename
             else
             {
                 $self->message( 3, "File not found. Setting it to: '$newfile' nevertheless." );
-                $r->filename( $self->collapse_dots( $newfile ) );
+                $r->filename( $self->collapse_dots( $newfile, { separator => $DIR_SEP }) );
                 $self->message( 3, "File path is now '", $r->filename, "'." );
                 ## <https://perl.apache.org/docs/2.0/api/Apache2/RequestRec.html#toc_C_filename_>
                 $r->finfo( APR::Finfo::stat( $newfile, APR::Const::FINFO_NORM, $r->pool ) );
@@ -614,15 +617,39 @@ sub filename
     {
         if( defined( $newfile ) )
         {
-            $self->message( 4, "New file path provided is: '$newfile'" );
+            $self->message( 3, "New file path provided is: '$newfile'" );
             my $try = Cwd::realpath( $newfile );
-            $newfile = $try if( defined( $try ) );
+            ## Cwd::realpath would convert
+            ## Z:\perl\Apache2-SSI\t\htdocs\ssi\include.cgi
+            ## into 
+            ## Z:/perl/Apache2-SSI/t/htdocs/ssi/include.cgi
+            ## amazingly enough, so to make sure this keeps working on windows related platform, we need to call URI::file
+            $newfile = URI::file->new( $try )->file( $^O ) if( defined( $try ) );
             $self->message( 3, "Getting the new file real path: '$newfile'" );
+            unless( File::Spec->file_name_is_absolute( $newfile ) )
+            {
+                $newfile = URI::file->new_abs( $newfile )->file( $^O );
+                $self->message( 3, "Made file provided absolute => $newfile" );
+            }
             $self->env( SCRIPT_FILENAME => $newfile );
             $self->finfo( $newfile );
             ## Force to create new Apache2::SSI::URI object
-            $self->{filename} = $self->collapse_dots( $newfile );
-            $self->{document_path} = $self->new_uri( substr( $self->{filename}, length( $self->document_root ) ) );
+            ## Either a URI object or an URI::file object
+            $self->{filename} = $self->collapse_dots( $newfile, { separator => $DIR_SEP })->file( $^O );
+            $self->message( 3, "After collapsing dots, filename is '$self->{filename}'." );
+            ## Pass the file as new argument to URI::file which will create an object based on the value of the current OS
+            ## and transform it into a path à la linux, which is same as web, which is what we want
+            ## All this is unnecessary for linux type system or those who use / as directory separator,
+            ## but for windows type systems this is necessary
+            if( CORE::index( $self->{filename}, $self->document_root ) != -1 )
+            {
+                $self->{document_path} = $self->new_uri( URI::file->new( substr( $self->{filename}, length( $self->document_root ) ) )->file( 'linux' ) );
+            }
+            else
+            {
+                $self->{document_path} = $self->new_uri( URI::file->new( $self->{filename} )->file( 'linux' ) );
+            }
+            $self->message( 3, "Document path is set to '$self->{document_path}'" );
             $self->{_uri_reset} = 'filename' unless( $caller eq "${class}\::document_uri" );
         }
     }
@@ -895,47 +922,52 @@ sub uri { return( shift->document_uri( @_ ) ); }
 sub _find_path_info
 {
     my $self = shift( @_ );
-    my( $path, $doc_root ) = @_;
+    my( $uri_path, $doc_root ) = @_;
     $doc_root //= $self->document_root;
     my $qs = '';
-    if( Scalar::Util::blessed( $path ) && $path->isa( 'URI::file' ) )
+    my $sep = $DIR_SEP;
+    $sep = '/' if( !length( $sep ) );
+    if( Scalar::Util::blessed( $uri_path ) && $uri_path->isa( 'URI::file' ) )
     {
-        $path = $path->file;
+        $uri_path = $uri_path->file;
     }
-    my $u = $self->collapse_dots( $path );
+    my $u = $self->collapse_dots( $uri_path );
     $qs = $u->query;
-    $path = $u->path;
-    $doc_root = $doc_root->file if( Scalar::Util::blessed( $doc_root ) && $doc_root->isa( 'URI::file' ) );
-    $doc_root = substr( $doc_root, 0, length( $doc_root ) - 1 ) if( substr( $doc_root, -1, 1 ) eq '/' );
-    $self->message( 4, "Document root is '$doc_root' and path is '$path'" );
-    return( $self->error( "Path must be an absolute path starting with '/'. Path provided was \"$path\"." ) ) if( substr( $path, 0, 1 ) ne '/' );
+    $uri_path = $u->path;
+    ## Pass the OS to ensure we get ./ss/include.cgi becomes .\ssi\include.cgi
+    my $path = URI::file->new( $uri_path )->file( $^O );
+    $doc_root = $doc_root->file( $^O ) if( Scalar::Util::blessed( $doc_root ) && $doc_root->isa( 'URI::file' ) );
+    $doc_root = substr( $doc_root, 0, length( $doc_root ) - length( $sep ) ) if( substr( $doc_root, -length( $sep ), length( $sep ) ) eq $sep );
+    $self->message( 4, "Document root is '$doc_root', uri path '$uri_path' and file path is '$path'" );
+    return( $self->error( "URI path must be an absolute path starting with '/'. Path provided was \"$uri_path\"." ) ) if( substr( $uri_path, 0, 1 ) ne '/' );
     ## No need to go further
     if( -e( "${doc_root}${path}" ) )
     {
         return({
             filepath => "${doc_root}${path}",
-            path => $path,
+            path => $uri_path,
             query_string => $qs,
             code => 200,
         });
     }
-    elsif( $path eq '/' )
+    elsif( $uri_path eq '/' )
     {
         return({
             filepath => $doc_root,
-            path => $path,
+            path => $uri_path,
             path_info => undef(),
             query_string => $qs,
             code => ( -e( $doc_root ) ? 200 : 404 ),
         });
     }
-    my @parts = split( '/', substr( $path, 1 ) );
+    my @parts = split( '/', substr( $uri_path, 1 ) );
     $self->message( 4, "Document root is '$doc_root' and parts contains: ", sub{ $self->dump( \@parts ) } );
     my $trypath = '';
+    my $trypath_uri = '';
     my $pathinfo = '';
     foreach my $p ( @parts )
     {
-        $self->message( 4, "Checking path '$trypath/$p'" ) unless( $pathinfo );
+        $self->message( 4, "Checking path '${trypath_uri}/${p}'", ( $sep ne '/' ? " (${trypath}${sep}${p})" : '' ) ) unless( $pathinfo );
         ## The last path was a directory, and we cannot find the element within. So, the rest of the path is not path info, but rather a 404 missing document hierarchy
         ## We test the $pathinfo string, so we do not bother checking further if it is already set.
         if( !$pathinfo && -d( "${doc_root}${trypath}" ) && !-e( "${doc_root}${trypath}/${p}" ) )
@@ -944,7 +976,7 @@ sub _find_path_info
             ## We return the original path provided (minus any query string)
             return({
                 filepath => $doc_root . ( length( $trypath ) ? $trypath :  $path ),
-                path => $path,
+                path => $uri_path,
                 code => 404,
                 query_string => $qs,
             });
@@ -952,7 +984,8 @@ sub _find_path_info
         elsif( !$pathinfo && -e( "${doc_root}${trypath}/${p}" ) )
         {
             $self->message( 4, "ok, path ${trypath}/${p} exists." );
-            $trypath .= "/$p";
+            $trypath_uri .= "/${p}";
+            $trypath  .= "${sep}${p}";
         }
         else
         {
@@ -964,7 +997,7 @@ sub _find_path_info
     $self->message( 4, "Real path: $trypath, path info: $pathinfo" );
     return({
         filepath => "${doc_root}${trypath}",
-        path => $trypath,
+        path => $trypath_uri,
         path_info => $pathinfo,
         code => 200,
         query_string => $qs,

@@ -37,6 +37,8 @@
             "Clone" : "0.43",
             "Data::Dump" : "1.23",
             "Data::Dumper" : "0",
+            "DateTime" : "1.52",
+            "DateTime::Format::Strptime" : "1.77",
             "Devel::StackTrace" : "0",
             "Exporter" : "5.73",
             "JSON" : "4.02",
@@ -69,13 +71,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/NoAuth/Bugs.html?Dist=Module::Generic"
+         "web" : "https://git.deguest.jp/jack/Module-Generic/issues"
       },
       "repository" : {
          "type" : "git",
          "web" : "https://git.deguest.jp/jack/Module-Generic"
       }
    },
-   "version" : "v0.13.6",
+   "version" : "v0.14.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

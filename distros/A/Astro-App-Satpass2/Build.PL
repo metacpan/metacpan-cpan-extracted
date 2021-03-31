@@ -3,45 +3,52 @@ use 5.008;
 use strict;
 use warnings;
 
+use Module::Build;
+
 use lib qw{ inc };
 
 use My::Module::Build;
 use My::Module::Meta;
 use My::Module::Recommend;
-use Module::Build;
+
+( my $mbv = Module::Build->VERSION() ) =~ s/_//g;
 
 my $meta = My::Module::Meta->new();
 
-(my $mbv = Module::Build->VERSION) =~ s/_//g;
-
-my %attr = (
-    dist_author => 'Tom Wyant (wyant at cpan dot org)',
-    dist_abstract => 'Predict satellite visibility using Astro::Coord::ECI',
-    module_name => 'Astro::App::Satpass2',
-    license => 'perl',
-    requires => $meta->requires(
-        'perl'	=> $meta->requires_perl(),
+my %args = (
+    add_to_cleanup	=> $meta->add_to_cleanup(),
+    build_requires	=> $meta->build_requires(),
+    configure_requires	=> $meta->configure_requires(),
+    dist_abstract	=> $meta->abstract(),
+    dist_author	=> $meta->author(),
+    dist_name	=> $meta->dist_name(),
+    license	=> $meta->license(),
+    module_name	=> $meta->module_name(),
+    requires	=> $meta->requires(
+	perl	=> $meta->requires_perl(),
     ),
-    build_requires => $meta->build_requires(),
-    script_files => [ qw{ script/satpass2 } ],
-    add_to_cleanup => [ qw{ cover_db xt/author/optionals } ],
+    script_files	=> $meta->script_files(),
 );
 
-$mbv >= 0.28
-    and $attr{meta_merge} = $meta->meta_merge();
+if ( $mbv >= 0.28 ) {
+    $args{meta_merge} = $meta->meta_merge();
+    $args{meta_add} = {
+	no_index	=> $meta->no_index(),
+    };
+}
 
 # Don't require Module::Build if we're making a distribution, since the
 # the user may simply prefer ExtUtils::MakeMaker.
 
 $mbv >= 0.34
-    and $attr{auto_configure_requires} = !$meta->distribution();
+    and $args{auto_configure_requires} = !$meta->distribution();
 
 My::Module::Recommend->recommend();
 
 #	Generate a builder object.
 
-my $bldr = My::Module::Build->new (%attr);
+my $bldr = My::Module::Build->new ( %args );
 
-$bldr->create_build_script ();
+$bldr->create_build_script();
 
 # ex: set textwidth=72 :

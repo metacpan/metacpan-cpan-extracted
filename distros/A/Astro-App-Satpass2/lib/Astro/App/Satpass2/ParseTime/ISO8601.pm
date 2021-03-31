@@ -12,7 +12,7 @@ use Astro::Coord::ECI::Utils 0.112 qw{
 
 use parent qw{ Astro::App::Satpass2::ParseTime };
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 my $package = __PACKAGE__;
 
@@ -230,7 +230,6 @@ sub __back_end_default {
     return 'DateTime';
 }
 
-
 sub __back_end_validate {
     my ( undef, $cls, @arg ) = @_;	# Invocant ($self) unused
     $cls->now( @arg );
@@ -283,6 +282,7 @@ L<Astro::App::Satpass2::ParseTime|Astro::App::Satpass2::ParseTime>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

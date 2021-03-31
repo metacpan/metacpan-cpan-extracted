@@ -4,13 +4,13 @@ package JSON::Schema::Draft201909::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Core vocabulary
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
-use JSON::Schema::Draft201909::Utilities qw(is_type abort assert_keyword_type canonical_schema_uri E assert_uri_reference);
+use JSON::Schema::Draft201909::Utilities qw(is_type abort assert_keyword_type canonical_schema_uri E assert_uri_reference assert_uri);
 use Moo;
 use strictures 2;
 use namespace::clean;
@@ -69,6 +69,8 @@ sub _traverse_keyword_schema {
   my ($self, $schema, $state) = @_;
 
   return if not assert_keyword_type($state, $schema, 'string');
+
+  assert_uri($state, $schema);
 
   return E($state, '$schema can only appear at the schema resource root')
     if length($state->{schema_path});
@@ -140,7 +142,7 @@ sub _eval_keyword_ref {
 
   my $uri = Mojo::URL->new($schema->{'$ref'})->to_abs($state->{canonical_schema_uri});
   my ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
-  abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
+  abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
 
   return $self->eval($data, $subschema,
     +{
@@ -165,13 +167,13 @@ sub _eval_keyword_recursiveRef {
 
   my $target_uri = Mojo::URL->new($schema->{'$recursiveRef'})->to_abs($state->{canonical_schema_uri});
   my ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($target_uri);
-  abort($state, 'unable to find resource %s', $target_uri) if not defined $subschema;
+  abort($state, 'EXCEPTION: unable to find resource %s', $target_uri) if not defined $subschema;
 
   if (is_type('boolean', $subschema->{'$recursiveAnchor'}) and $subschema->{'$recursiveAnchor'}) {
     my $uri = Mojo::URL->new($schema->{'$recursiveRef'})
       ->to_abs($state->{recursive_anchor_uri} // $state->{canonical_schema_uri});
     ($subschema, $canonical_uri, $document, $document_path) = $state->{evaluator}->_fetch_schema_from_uri($uri);
-    abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
+    abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
   }
 
   return $self->eval($data, $subschema,
@@ -193,6 +195,8 @@ sub _traverse_keyword_vocabulary {
   foreach my $property (sort keys %{$schema->{'$vocabulary'}}) {
     E($state, '$vocabulary/%s value is not a boolean', $property)
       if not is_type('boolean', $schema->{'$vocabulary'}{$property});
+
+    assert_uri($state, $schema, $property);
   }
 
   return E($state, '$vocabulary can only appear at the schema resource root')
@@ -233,7 +237,7 @@ JSON::Schema::Draft201909::Vocabulary::Core - Implementation of the JSON Schema 
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 

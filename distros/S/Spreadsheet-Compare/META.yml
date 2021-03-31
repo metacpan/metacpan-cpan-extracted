@@ -24,7 +24,7 @@ requires:
   Class::Method::Modifiers: '0'
   Excel::Writer::XLSX: '1.00'
   Log::Log4perl: '0'
-  Mojolicious: '8.06'
+  Mojolicious: '8.43'
   Path::Tiny: '0.100'
   Pod::Find: '0'
   Pod::Usage: '0'
@@ -36,5 +36,5 @@ resources:
   bugtracker: https://github.com/tomk3003/spreadsheet-compare/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/tomk3003/spreadsheet-compare.git
-version: '0.13'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

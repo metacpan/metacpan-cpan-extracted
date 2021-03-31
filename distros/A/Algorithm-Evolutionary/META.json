@@ -4,7 +4,7 @@
       "JJ Merelo <jj /at/ merelo.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "open_source"
    ],
@@ -33,7 +33,6 @@
       "runtime" : {
          "requires" : {
             "Algorithm::Permute" : "0.01",
-            "B::Deparse" : "0.56",
             "Bit::Vector" : "0",
             "Clone" : "0.31",
             "GD" : "2.17",
@@ -57,5 +56,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.80"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JJ/Algorithm-Evolutionary.git",
+         "web" : "https://github.com/JJ/Algorithm-Evolutionary"
+      }
+   },
+   "version" : "v0.82.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

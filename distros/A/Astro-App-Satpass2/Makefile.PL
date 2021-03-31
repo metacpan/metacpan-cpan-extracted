@@ -10,62 +10,100 @@ use My::Module::Recommend;
 
 use ExtUtils::MakeMaker qw{WriteMakefile};
 
+( my $mmv = ExtUtils::MakeMaker->VERSION ) =~ s/_//g;
+
 my $meta = My::Module::Meta->new();
 
-(my $mmv = ExtUtils::MakeMaker->VERSION) =~ s/_//g;
-
-my %attr = (
-    NAME => 'Astro::App::Satpass2',
-    VERSION_FROM => 'lib/Astro/App/Satpass2.pm',
-    PREREQ_PM => $meta->requires(),
-    PL_FILES => {},	# Prevent old MakeMaker from running Build.PL
-    EXE_FILES => [ qw{ script/satpass2 } ],
-    'dist' => {COMPRESS => 'gzip', SUFFIX => 'gz'},
-    AUTHOR => 'Tom Wyant (wyant at cpan dot org)',
-    ABSTRACT => 'Predict satellite visibility using Astro::Coord::ECI',
-    realclean	=> { FILES => 'cover_db xt/author/optionals' },
+my %args = (
+    ABSTRACT	=> $meta->abstract(),
+    AUTHOR	=> $meta->author(),
+    DISTNAME	=> $meta->dist_name(),
+    EXE_FILES	=> $meta->script_files(),
+    NAME	=> $meta->module_name(),
+    PREREQ_PM	=> $meta->requires(),
+    PL_FILES	=> {},	# Prevent old MakeMaker from running Build.PL
+    realclean	=> {
+	FILES => join( ' ', @{ $meta->add_to_cleanup() } ),
+    },
+    VERSION_FROM	=> $meta->version_from(),
 );
 
-$mmv >= 6.31 and $attr{LICENSE} = 'perl';
+$mmv >= 6.31
+    and $args{LICENSE} = $meta->license();
 
 if ( $mmv >= 6.4501 ) {
-    $attr{META_MERGE} = $meta->meta_merge(
-	$meta->provides(),
-    );
-} else {
-    $attr{PREREQ_PM}{'Test::More'} = 0.40;
+    $args{META_ADD} = {
+	no_index => $meta->no_index(),
+    };
+    $args{META_MERGE} = $meta->meta_merge( $meta->provides() );
 }
 
-$mmv >= 6.4701 and $attr{MIN_PERL_VERSION} = $meta->requires_perl();
+$mmv >= 6.4701
+    and $args{MIN_PERL_VERSION} = $meta->requires_perl();
 
-$mmv >= 6.5501
-    and $attr{BUILD_REQUIRES} = $meta->build_requires()
-    or $mmv >= 6.4501
-    and $attr{META_MERGE}{build_requires} = $meta->build_requires();
+
+if ( $mmv >= 6.52 ) {
+    $args{BUILD_REQUIRES} = $meta->build_requires();
+    $args{CONFIGURE_REQUIRES} = $meta->configure_requires();
+} elsif ( $mmv >= 6.5501 ) {
+    $args{BUILD_REQUIRES} = $meta->build_requires();
+    $args{META_MERGE}{configure_requires} = $meta->configure_requires();
+} elsif ( $mmv >= 6.4501 ) {
+    $args{META_MERGE}{build_requires} = $meta->build_requires();
+    $args{META_MERGE}{configure_requires} = $meta->configure_requires();
+} else {
+    foreach my $method ( qw{ configure_requires build_requires } ) {
+	my $req = $meta->$method();
+	foreach my $key ( keys %{ $req } ) {
+	    exists $args{PREREQ_PM}{$key}
+		or $args{PREREQ_PM}{$key} = $req->{$key};
+	}
+    }
+}
 
 My::Module::Recommend->recommend();
 
-WriteMakefile (%attr);
+WriteMakefile( %args );
 
 sub MY::postamble {
     my ( $self, @args ) = @_;
 
-    my $authortest = $self->test_via_harness(
-	'$(FULLPERLRUN)', '$(AUTHORTEST_FILES)' );
-    $authortest =~ s/ \s+ \z //smx;
-    $authortest =~ s/ \A \s+ //smx;
-    chomp $authortest;
+    my $test = $self->test_via_harness(
+	'$(FULLPERLRUN)', '$(TEST_FILES)' );
+    my $structural_test = $self->test_via_harness(
+	'$(FULLPERLRUN)', '$(STRUCTURAL_TEST_FILES)' );
+    foreach ( $test, $structural_test ) {
+	s/ \s+ \z //smx;
+	s/ \A \s+ //smx;
+    }
+    my $optionals = join ',', My::Module::Recommend->optionals();
 
     return <<"EOD";
 
-AUTHORTEST_FILES = t/*.t xt/author/*.t xt/author/optionals/*.t
+STRUCTURAL_TEST_FILES = xt/author/*.t
 
-authortest :: pure_all
-	\$(FULLPERLRUN) "-Iinc" "-MMy::Module::Recommend" "-e" "My::Module::Recommend->make_optional_modules_tests()"
-	AUTHOR_TESTING=1 $authortest
+functional_test :: pure_all
+	\$(NOECHO) \$(ECHO)
+	\$(NOECHO) \$(ECHO) functional_test
+	AUTHOR_TESTING=1 $test
+
+optionals_test :: pure_all
+	\$(NOECHO) \$(ECHO)
+	\$(NOECHO) \$(ECHO) optionals_test
+	AUTHOR_TESTING=1 PERL5OPT=-MTest::Without::Module=$optionals $test
+
+structural_test :: pure_all
+	\$(NOECHO) \$(ECHO)
+	\$(NOECHO) \$(ECHO) structural_test
+	AUTHOR_TESTING=1 $structural_test
+
+authortest :: functional_test optionals_test structural_test
 
 testcover :: pure_all
 	cover -test -ignore_re=inc/ -ignore_re=eg/
+
+.PHONY: functional_test optionals_test structural_test authortest testcover
+
 EOD
 }
 

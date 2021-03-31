@@ -88,6 +88,7 @@ sub execute_tests
             my $u = Apache2::SSI::URI->new(
                 document_uri => $def->{uri},
                 document_root => $DOC_ROOT,
+                debug => $opts->{debug},
             ) || die( Apache2::SSI::URI->error );
             if( $u->code != 200 && !$def->{fail} )
             {

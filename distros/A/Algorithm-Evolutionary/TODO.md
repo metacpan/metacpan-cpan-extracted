@@ -11,6 +11,7 @@ Refactoring todo
 * [ ] Deprecate XML support. It's useless and it only creates problems in
    tests, as well as dependencies.
 * [ ] Eliminate tests with simple "Test" and change to Test::More. Why using more Test modules than needed... 
+* [ ] Deprecate `Test`, which has lots of bugs (and is not included in Makefile.PL).
 
 Functionality todo
 ---

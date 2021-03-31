@@ -1,7 +1,7 @@
 #!perl -T
 
 use Test::More tests => 2;
-use lib qw( lib ../lib ../../lib  ); #Just in case we are testing it in-place
+use lib qw( lib ../lib ../../lib ); #Just in case we are testing it in-place
 
 BEGIN {
 	use_ok( 'Algorithm::Evolutionary' );

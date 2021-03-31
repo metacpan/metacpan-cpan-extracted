@@ -7,16 +7,6 @@ use lib qw{ inc };
 
 use Test::More 0.88;
 
-BEGIN {
-    # We can't use load_or_skip here because My::Module::Test::App makes
-    # use of Astro::Coord::ECI::Utils, which contains an unneeded
-    # 'use Data::Dumper'.
-    eval {
-	require Data::Dumper;
-	1;
-    } or plan skip_all => 'Data::Dumper not available';
-}
-
 use My::Module::Test::App;
 
 use Astro::App::Satpass2::Format::Dump;

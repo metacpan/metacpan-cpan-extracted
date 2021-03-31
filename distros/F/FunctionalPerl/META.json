@@ -90,6 +90,6 @@
          "web" : "https://github.com/pflanze/functional-perl"
       }
    },
-   "version" : "v0.72.46",
+   "version" : "v0.72.47",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

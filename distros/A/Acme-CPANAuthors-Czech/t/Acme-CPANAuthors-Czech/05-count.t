@@ -8,4 +8,4 @@ use Test::NoWarnings;
 # Test.
 my $obj = Acme::CPANAuthors->new('Czech');
 my $ret = $obj->count;
-is($ret, 41, 'Count of Czech CPAN authors.');
+is($ret, 44, 'Count of Czech CPAN authors.');

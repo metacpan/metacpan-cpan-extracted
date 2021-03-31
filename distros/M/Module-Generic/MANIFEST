@@ -1,17 +1,30 @@
+CHANGES
 Changes
 CONTRIBUTING.md
 lib/Module/Generic.pm
+lib/Module/Generic/Array.pm
 lib/Module/Generic/Array.pod
+lib/Module/Generic/Boolean.pm
 lib/Module/Generic/Boolean.pod
+lib/Module/Generic/Datetime.pm
+lib/Module/Generic/Dynamic.pm
 lib/Module/Generic/Dynamic.pod
+lib/Module/Generic/Exception.pm
 lib/Module/Generic/Exception.pod
+lib/Module/Generic/Hash.pm
 lib/Module/Generic/Hash.pod
+lib/Module/Generic/Iterator.pm
 lib/Module/Generic/Iterator.pod
 lib/Module/Generic/Iterator/Element.pod
+lib/Module/Generic/Null.pm
 lib/Module/Generic/Null.pod
+lib/Module/Generic/Number.pm
 lib/Module/Generic/Number.pod
+lib/Module/Generic/Scalar.pm
 lib/Module/Generic/Scalar.pod
+lib/Module/Generic/Tie.pm
 lib/Module/Generic/Tie.pod
+lib/Module/Generic/TieHash.pm
 Makefile.PL
 MANIFEST
 META.yml
@@ -25,5 +38,6 @@ t/04.colour.t
 t/05.scalar.t
 t/06.array.t
 t/07.iterator.t
+t/08.datetime.t
 t/99.kwalitee.t
 META.json                                Module JSON meta-data (added by MakeMaker)

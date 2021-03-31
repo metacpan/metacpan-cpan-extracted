@@ -132,6 +132,149 @@ my @tests = (
         error => qr/^could not parse /,
         type  => 'bad mask',
     },
+    # These do weird things that users almost certainly don't expect,
+    # creating a potential security issue.  I.E. all of the below IP
+    # addresses would be valid to inet_aton().
+    {
+        input => [ '1.131844', '32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '0192.0.1.2', '32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '192.00.1.2', '32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '192.0.01.2', '32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '192.0.1.02', '32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '0xC0.0x1.0x3.0x4', '32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '1.131844/32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '0192.0.1.2/32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '192.00.1.2/32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '192.0.01.2/32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '192.0.1.02/32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '0xC0.0x1.0x3.0x4/32' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '1.131844' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '0192.0.1.2' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '192.00.1.2' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '0192.0.01.2' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '192.0.1.02' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '0xC0.0x1.0x3.0x4' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '10/8' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '10.0/8' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '10.0.0/8' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '10', '8' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '10.0', '8' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '10.0.0', '8' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '10', '8' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '10.0' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '10.0.0' ],
+        error => qr/^could not parse /,
+        type  => 'ambiguous',
+    },
+    {
+        input => [ '2001::/129' ],
+        error => qr/^illegal number of bits/,
+        type  => 'bad mask',
+    },
 );
 
 foreach my $test (@tests) {
@@ -140,15 +283,21 @@ foreach my $test (@tests) {
     my $name  = ( join ', ', @{ $test->{input} } );
     my $type  = $test->{type};
 
-    my $result = Net::Netmask->new2(@$input);
-
+    my $result = Net::Netmask->safe_new(@$input);
     is( $result, undef, "$name $type" );
     like( Net::Netmask->errstr, $err, "$name errstr mismatch" );
+
+    warns { $result = Net::Netmask->new(@$input) };
+    if ($result->{PROTOCOL} eq 'IPv4') {
+        is( "$result", "0.0.0.0/0", "result is 0.0.0.0/0" );
+    } else {
+        is( "$result", "::/0", "result is 0.0.0.0/0" );
+    }
 }
 
 # test whois numbers with space between dash (valid!)
-ok( Net::Netmask->new2('209.157.64.0 - 209.157.95.255'), "whois with single space around dash" );
-ok( Net::Netmask->new2('209.157.64.0   -   209.157.95.255'),
+ok( Net::Netmask->safe_new('209.157.64.0 - 209.157.95.255'), "whois with single space around dash" );
+ok( Net::Netmask->safe_new('209.157.64.0   -   209.157.95.255'),
     "whois with mulitple spaces around dash" );
 
 done_testing;

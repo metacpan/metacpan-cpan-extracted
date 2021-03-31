@@ -86,7 +86,7 @@ for my $o ({ name => "original", obj => $t }, { name => "thawed", obj => $thawed
 eval '$t->add_string("_")'; # invalid key
 like($@, qr/invalid/, 'adding "_"');
 
-ok($t->add_string("0/0"), "add 0/0");
+ok($t->add_string("0.0.0.0/0"), "add 0.0.0.0/0");
 
 $thawed = Storable::thaw(Storable::nfreeze($t));
 for my $o ({ name => "original", obj => $t }, { name => "thawed", obj => $thawed }) {

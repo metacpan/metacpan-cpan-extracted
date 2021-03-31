@@ -8,7 +8,7 @@ use warnings;
 use utf8;
 use lib './lib';
 
-BEGIN { use_ok( 'Module::Generic' ) || BAIL_OUT( "Unable to load Module::Generic" ); }
+BEGIN { use_ok( 'Module::Generic::Hash' ) || BAIL_OUT( "Unable to load Module::Generic::Hash" ); }
 
 my $hash =
 {

@@ -439,17 +439,6 @@ done_testing;
 
 {
 
-    my $dumper;
-    BEGIN {
-	$dumper = eval {
-	    require YAML;
-	    YAML->can( 'Dump' );
-	} || eval {
-	    require Data::Dumper;
-	    Data::Dumper->can( 'Dumper' );
-	};
-    }
-
     my @got;
     my @positional;
     my $tt;
@@ -472,7 +461,7 @@ done_testing;
     }
 
     sub dump_tokens {
-	$dumper and diag( $dumper->( \@got ) );
+	diag( explain( \@got ) );
 	return;
     }
 

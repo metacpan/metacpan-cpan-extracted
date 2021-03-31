@@ -1248,7 +1248,7 @@ See http://pdl.perl.org/PDLdocs/BadValues.html#dataflow_of_the_badflag for detai
 
 =for sig
 
-  Signature: (a(); [o]b())
+  Signature: (a(); real [o]b())
 
 =for ref
 
@@ -1277,7 +1277,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (a(); [o]b())
+  Signature: (a();  [o]b())
 
 =for ref
 
@@ -1306,7 +1306,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (a(); [o]b())
+  Signature: (a(); real [o]b())
 
 =for ref
 
@@ -1335,7 +1335,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (a(); [o]b())
+  Signature: (a(); real [o]b())
 
 =for ref
 
@@ -1364,7 +1364,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (a(); [o]b())
+  Signature: (a(); real [o]b())
 
 =for ref
 
@@ -1495,13 +1495,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 sub PDL::abs {
 	my $x=shift;
-	my $ret;
-	if ($x->type eq 'cdouble' or $x->type eq 'cfloat') {
-		$ret=PDL::_cabs($x);
-	} else {
-		$ret=PDL::_rabs($x);
-	}
-	$ret;
+	$x->type->real ? PDL::_rabs($x) : PDL::_cabs($x);
 }
 
 

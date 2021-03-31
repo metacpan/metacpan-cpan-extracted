@@ -22,7 +22,7 @@ use Scalar::Util ();		# Core since 5.7.3
 use Storable ();		# Core since 5.7.3
 use Test::Builder ();		# Core since 5.6.2
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 our @ISA = qw{ Exporter };
 
@@ -842,7 +842,6 @@ sub _get_module_index_cpan_meta_db {
 sub _handle_url {
     my ( $self, $link ) = @_;
 
-
     $self->check_url()
 	or return $self->_skip( $link, 'not checked; url checks disabled' );
 
@@ -1541,6 +1540,7 @@ Junior were particularly useful to me.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Pod-LinkCheck-Lite>,
 L<https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite/issues>, or in
 electronic mail to the author.
 

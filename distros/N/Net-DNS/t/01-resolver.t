@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 01-resolver.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1827 2020-12-14 10:49:27Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -9,25 +9,18 @@ use Test::More tests => 29;
 use Net::DNS::Resolver;
 use Net::DNS::Resolver::Recurse;
 
-BEGIN {					## sabotage socket code
-					## no critic ProhibitMultiplePackages
-
-	package LOCAL::Socket::STUB;
-	sub new {return}		## stub
-
-	package IO::Socket::INET;
-	our @ISA = qw(LOCAL::Socket::STUB);
-
-	package IO::Socket::IP;
-	our @ISA = qw(LOCAL::Socket::STUB);
-}
-
 
 my @NOIP = qw(:: 0.0.0.0);
 
 my $resolver = Net::DNS::Resolver->new( retrans => 0, retry => 0 );
 
 my $recursive = Net::DNS::Resolver::Recurse->new( retrans => 0, retry => 0 );
+
+
+foreach (@NOIP) {			## exercise IPv4/IPv6 LocalAddr selection
+	Net::DNS::Resolver::Base::_create_tcp_socket( $resolver, $_ );
+	Net::DNS::Resolver::Base::_create_udp_socket( $resolver, $_ );
+}
 
 
 $resolver->defnames(0);			## exercise query()
@@ -129,6 +122,12 @@ ok( !$warning7, "deprecated recursion_callback()\t[$warning7]" );
 
 
 exit;
+
+
+package Net::DNS::Resolver;		## off-line dry test
+sub _create_tcp_socket {return}		## stub
+sub _create_udp_socket {return}		## stub
+
 
 __END__
 

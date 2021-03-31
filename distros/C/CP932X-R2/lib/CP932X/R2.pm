@@ -5,13 +5,13 @@ package CP932X::R2;
 #
 # http://search.cpan.org/dist/CP932X-R2/
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-use 5.00503;    # Galapagos Consensus 1998 for primetools
+use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
 
 use strict;
@@ -56,7 +56,8 @@ CP932X::R2 - provides minimal CP932X I/O subroutines by short name
     $result = ioputf(FILEHANDLE, $utf8format, @utf8list)
     @result = iosort(@utf8str)
 
-    $result = $utf8str =~ $mb{qr/$utf8regex/imsxogc}
+    $result = $utf8str =~ $mb{qr/$utf8regex/imsxo}
+    $result = $utf8str =~ m<$mb{qr/$utf8regex/imsxo}>gc
     $result = $utf8str =~ s<$mb{qr/before/imsxo}><after>egr
 
 =head1 MBCS SUBROUTINES for SCRIPTING
@@ -68,8 +69,8 @@ Following subroutines and tied hash variable provide UTF-8 semantics for us.
   Acts as SBCS             Acts as MBCS
   Octet in Script          Octet in Script                             Note and Limitations
   ------------------------------------------------------------------------------------------------------------------------------------------
-  // or m// or qr//        $mb{qr/$utf8regex/imsxogc}                  not supports metasymbol \X that match grapheme
-                                                                       not support range of codepoint(like an "[A-Z]")
+  // or m// or qr//        $mb{qr/$utf8regex/imsxo}                    not supports metasymbol \X that match grapheme
+                           m<$mb{qr/$utf8regex/imsxo}>gc               not support range of codepoint(like an "[A-Z]")
                                                                        not supports POSIX character class (like an [:alpha:])
                                                                        (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
                                                                        not supports character properties (like \p{PROP} and \P{PROP})

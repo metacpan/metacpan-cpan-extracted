@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-	'JSON::Lines' => '0.03',
+	'JSON::Lines' => '1.00',
 	'POSIX' => '0',
 	'Time::HiRes' => '0',
 	'Fcntl' => '0',

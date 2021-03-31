@@ -1,5 +1,5 @@
 package Acme::MetaSyntactic;
-$Acme::MetaSyntactic::VERSION = '1.014';
+$Acme::MetaSyntactic::VERSION = '1.015';
 use strict;
 use warnings;
 use Carp;

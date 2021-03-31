@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cip sudo apt-get update
-cip sudo apt-get install libhunspell-dev
+cip sudo apt-get install libffi-dev libhunspell-dev

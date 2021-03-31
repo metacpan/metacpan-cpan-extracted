@@ -20,7 +20,7 @@ Module::Generic::Iterator - An Array Iterator Object Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

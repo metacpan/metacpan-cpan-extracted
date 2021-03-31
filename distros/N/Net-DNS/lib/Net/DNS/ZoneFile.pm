@@ -3,7 +3,7 @@ package Net::DNS::ZoneFile;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ZoneFile.pm 1813 2020-10-08 21:58:40Z willem $)[2];
+our $VERSION = (qw$Id: ZoneFile.pm 1832 2021-03-22 08:33:36Z willem $)[2];
 
 
 =head1 NAME
@@ -430,7 +430,7 @@ sub _generate {				## expand $GENERATE into input stream
 }
 
 
-my $LEX_REGEX = q/("[^"]*"|"[^"]*$)|;[^\n]*|([()])|(^\s)|[ \t\n\r\f]/;
+my $LEX_REGEX = q/("[^"]*"|"[^"]*$)|;.*$|([()])|[ \t\n\r\f]/;
 
 sub _getline {				## get line from current source
 	my $self = shift;
@@ -441,20 +441,23 @@ sub _getline {				## get line from current source
 		next unless /\S/;				# discard blank line
 
 		if (/[(]/) {					# concatenate multi-line RR
+			chomp;					# discard line terminator
 			s/\\\\/\\092/g;				# disguise escaped escape
 			s/\\"/\\034/g;				# disguise escaped quote
 			s/\\\(/\\040/g;				# disguise escaped bracket
 			s/\\\)/\\041/g;				# disguise escaped bracket
 			s/\\;/\\059/g;				# disguise escaped semicolon
-			my @token = grep { defined && length } split /$LEX_REGEX/o;
+			my @token = grep { defined && length } split /(^\s)|$LEX_REGEX/o;
 			if ( grep( { $_ eq '(' } @token ) && !grep( { $_ eq ')' } @token ) ) {
 				while (<$fh>) {
+					chomp;			# discard line terminator
+					tr[\t ][ ]s;		# squash white space
 					s/\\\\/\\092/g;		# disguise escaped escape
 					s/\\"/\\034/g;		# disguise escaped quote
 					s/\\\(/\\040/g;		# disguise escaped bracket
 					s/\\\)/\\041/g;		# disguise escaped bracket
 					s/\\;/\\059/g;		# disguise escaped semicolon
-					$_ = pop(@token) . $_;	# splice fragmented string
+					$_ = pop(@token) . $_;	# reparse fragmented string
 					my @part = grep { defined && length } split /$LEX_REGEX/o;
 					push @token, @part;
 					last if grep { $_ eq ')' } @part;

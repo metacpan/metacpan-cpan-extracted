@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -37,6 +37,7 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 
 use FP::Carp;
+use Carp;
 use FP::Optional qw(perhaps_to_maybe);
 use FP::Combinators qw (flip flip2of3 rot3right rot3left);
 use FP::Array ":all";
@@ -230,4 +231,37 @@ sub FP_Sequence_length {
 *perhaps_find      = flip \&array_perhaps_find;
 *find              = perhaps_to_maybe(\&array_perhaps_find);
 
-_END_    # Chj::NamespaceCleanAbove
+sub group {
+    @_ >= 2 and @_ <= 3 or fp_croak_arity "2-3";
+    my ($self, $equal, $maybe_tail) = @_;
+    croak("can't currently handle tail argument for array-likes")
+        if defined $maybe_tail;
+    require FP::PureArray;    # ugly?
+    my @res;
+    my $len = @$self;
+    if ($len >= 1) {
+        for (my $i = 0; $i < $len; $i++) {
+            my $cur = $self->[$i];
+            $i++;
+            my @group = $cur;
+        LP: {
+                if ($i >= $len) {
+                    push @res, FP::_::PureArray->new_from_array(\@group);
+                } else {
+                    my $a = $self->[$i];
+                    if ($equal->($cur, $a)) {
+                        push @group, $a;
+                        $i++;
+                        redo LP;
+                    } else {
+                        push @res, FP::_::PureArray->new_from_array(\@group);
+                        $i--;    # !
+                    }
+                }
+            }
+        }
+    }
+    FP::_::PureArray->new_from_array(\@res)
+}
+
+_END_                            # Chj::NamespaceCleanAbove

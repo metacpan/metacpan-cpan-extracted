@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 use Scalar::Util ();
 
@@ -13,24 +13,25 @@ use overload
     ;
 
 sub new {
-    my $class = shift;
-    my %args = @_ == 1 ? ref $_[0] && ref $_[0] eq 'HASH' ? %{$_[0]}
-                       : ( scalar => $_[0], list => $_[0], void => $_[0] )
-             : @_;
+    my ($class, @args) = @_;
+    my $v = $args[0];
+    my %args = @args == 1 ? ref $v && ref $v eq 'HASH' ? %{$v}
+                       : ( scalar => $v, list => $v, void => $v )
+             : @args;
 
-    bless \%args => $class;
+    return bless \%args => $class;
 }
 
-sub scalar() :method { $_[0]{scalar} }
-sub list()           { $_[0]{list} }
-sub void()           { $_[0]{void} }
+sub scalar() :method { my $self = shift; return $self->{scalar} } ## no critic (ProhibitBuiltinHomonyms)
+sub list()           { my $self = shift; return $self->{list} }
+sub void()           { my $self = shift; return $self->{void} }
 
-sub set_scalar($)    { $_[0]{scalar} = $_[1]; $_[0] }
-sub set_list($)      { $_[0]{list}   = $_[1]; $_[0] }
-sub set_void($)      { $_[0]{void}   = $_[1]; $_[0] }
+sub set_scalar    { my ($self, $v) = @_; $self->{scalar} = $v; return $self }
+sub set_list      { my ($self, $v) = @_; $self->{list}   = $v; return $self }
+sub set_void      { my ($self, $v) = @_; $self->{void}   = $v; return $self }
 
-sub coerce()      { !!$_[0]{coerce} }
-sub set_coerce($) { $_[0]{coerce} = defined $_[1] ? $_[1] : 1; $_[0] }
+sub coerce()   { my $self = shift; return !!$self->{coerce} }
+sub set_coerce { my ($self, $v) = @_; $self->{coerce} = defined $v ? $v : 1; return $self }
 
 sub is_same_interface {
     my ($self, $other) = @_;

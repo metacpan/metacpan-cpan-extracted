@@ -1840,7 +1840,7 @@ which I borrowed some code.
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x556f0d70c748)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x564839326528)"}\>
 
 CPAN ID: jdeguest
 

@@ -48,7 +48,7 @@ sub onemax {
     if ( defined $cache->{$string} ) {
 	return $cache->{$string};
     }
-    my $num_ones = ($string =~ tr/1/0/);
+    my $num_ones = ($string =~ tr/1/1/);
 #    my $num_ones = grep( $_, split(//, $string ));
 #     while ( $string ) {
 #       $num_ones += chop( $string );

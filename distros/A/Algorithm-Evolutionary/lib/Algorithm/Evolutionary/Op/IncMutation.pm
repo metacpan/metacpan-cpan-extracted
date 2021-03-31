@@ -10,14 +10,6 @@ Algorithm::Evolutionary::Op::IncMutation - Increments/decrements by one the valu
 
 =head1 SYNOPSIS
 
-  my $xmlStr2=<<EOC;
-  <op name='IncMutation' type='unary' rate='0.5' />
-  EOC
-  my $ref2 = XMLin($xmlStr2);
-
-  my $op2 = Algorithm::Evolutionary::Op::Base->fromXML( $ref2 );
-  print $op2->asXML(), "\n*Arity ", $op->arity(), "\n";
-
   my $op = new Algorithm::Evolutionary::Op::IncMutation; #Create from scratch
 
 =head1 Base Class
@@ -103,12 +95,6 @@ sub apply ($;$){
   
   This file is released under the GPL. See the LICENSE file included in this distribution,
   or go to http://www.fsf.org/licenses/gpl.txt
-
-  CVS Info: $Date: 2011/02/14 06:55:36 $ 
-  $Header: /media/Backup/Repos/opeal/opeal/Algorithm-Evolutionary/lib/Algorithm/Evolutionary/Op/IncMutation.pm,v 3.1 2011/02/14 06:55:36 jmerelo Exp $ 
-  $Author: jmerelo $ 
-  $Revision: 3.1 $
-  $Name $
 
 
 =cut

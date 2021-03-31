@@ -1,26 +1,33 @@
 Revision history for Perl module Spreadsheet::WriteExcelXML.
 
-See the DEPRECATED NOTICE in the main documention.
+This module is depreacated. Use Excel::Writer::XLSX instead. See the
+DEPRECATED NOTICE in the main documention.
 
 
-0.14 December 7 2012
+0.15 2021-03-29
+
+    ! Fix for failing test with perls compiled with usequadmath.
+      Reported by H.Merijn Brand
+
+
+0.14 2012-07-12
 
     ! Fix for hash randomisation bug under perl 5.17.6.
       Reported by Andreas Koenig RT#81766.
 
 
-0.13 February 26 2011
+0.13 2011-26-02
 
     ! This module is now deprecated in favour of Excel::Writer::XLSX.
 
 
-0.12 January 4 2011
+0.12 2011-04-01
 
     ! Minor fix for set_bold() without argument.
       Reported by Lukasz I.
 
 
-0.11 March 21 2010
+0.11 2010-21-03
 
     + Increased row and column limits to Excel 2007's limits of
       1,048,576 x 16,384. Older limits of 65536 x 256 can still
@@ -29,7 +36,7 @@ See the DEPRECATED NOTICE in the main documention.
       Thanks David Ashirov.
 
 
-0.10 April 29 2005
+0.10 2005-29-04
 
     + Added autofilter option via the autofilter() and filter_column()
       worksheet methods.
@@ -37,7 +44,7 @@ See the DEPRECATED NOTICE in the main documention.
     + Added autofilter.pl example program and tests.
 
 
-0.09 April 23 2005
+0.09 2005-23-04
 
     + Added write_html_string() method to allow multiple formats to
       be added to a cell via Html formatting.
@@ -54,7 +61,7 @@ See the DEPRECATED NOTICE in the main documention.
       Updated test 34_page_setup.t.
 
 
-0.08 December 1 2004
+0.08 2004-01-12
 
     + Enabled the Page Setup methods as per Spreadsheet::WriteExcel:
           set_landscape()
@@ -85,7 +92,7 @@ See the DEPRECATED NOTICE in the main documention.
       36_print_repeat.t.
 
 
-0.07 November 11 2004
+0.07 2004-11-11
 
     + Added automatic Unicode handling via utf8 in perl 5.8 and
       later.
@@ -104,7 +111,7 @@ See the DEPRECATED NOTICE in the main documention.
       examples.
 
 
-0.06 August 19 2004
+0.06 2004-19-08
 
     + Enabled merge_range() as per Spreadsheet::WriteExcel.
 
@@ -123,14 +130,14 @@ See the DEPRECATED NOTICE in the main documention.
     + Added array_formula.pl example.
 
 
-0.05 July 2 2004
+0.05 2004-02-07
 
     ! Fixed bug with implicit <Cell> ss:Index attribute.
 
     + Added index.t test for the above behaviour.
 
 
-0.04 July 1 2004
+0.04 2004-01-07
 
     ! Added XML escape for "\n" and test. Used in set_text_wrap().
       Thanks to Masaaki Hirose and Marc Rosenthal for reports.
@@ -142,7 +149,7 @@ See the DEPRECATED NOTICE in the main documention.
     + Added tests for set_row() and set_column().
 
 
-0.03 May 13 2004
+0.03 2004-13-05
 
     + Added write_date_time() to write dates in Excel XML's
       simplified ISO8601 format.
@@ -156,12 +163,12 @@ See the DEPRECATED NOTICE in the main documention.
     + Added tests for write_date_time().
 
 
-0.02 April 25 2004
+0.02 2004-25-04
 
     ! Fixed a Windows case insensitive bug.
 
 
-0.01 April 24 2004
+0.01 2004-24-04
 
     First CPAN release.
 

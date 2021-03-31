@@ -86,5 +86,74 @@
                 "valid": true
             }
         ]
+    },
+    {
+        "description": "invalid $ref: unencoded characters",
+        "comment": "when properly encoded, this would be http://foo%5Ebar/path",
+        "schema": {
+            "$defs": {
+                "foo": {
+                    "$ref": "http://foo^bar/path"
+                }
+            }
+        },
+        "tests": [
+            {
+                "description": "unencoded characters in $ref uri",
+                "data": 1,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "invalid $ref: non-ascii characters",
+        "schema": {
+            "$defs": {
+                "foo": {
+                    "$ref": "https://ಠ_ಠ.com"
+                }
+            }
+        },
+        "tests": [
+            {
+                "description": "non-ascii characters in $ref uri",
+                "data": 1,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "invalid $ref: invalid anchor fragment",
+        "schema": {
+            "$defs": {
+                "foo": {
+                    "$ref": "https://foo.com/bar.json#-not-an-anchor"
+                }
+            }
+        },
+        "tests": [
+            {
+                "description": "an invalid anchor fragment",
+                "data": 1,
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "invalid $ref: invalid json-pointer fragment",
+        "schema": {
+            "$defs": {
+                "foo": {
+                    "$ref": "https://foo.com/bar.json#/~2/not/json/pointer"
+                }
+            }
+        },
+        "tests": [
+            {
+                "description": "an invalid json-pointer fragment",
+                "data": 1,
+                "valid": false
+            }
+        ]
     }
 ]

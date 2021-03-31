@@ -8,8 +8,6 @@ lib/FB3/Convert/Epub.pm
 lib/FB3/Convert/FB2.pm
 lib/FB3/Euristica.pm
 MANIFEST			This list of files
-META.json
-META.yml
 README
 share/body.xsl
 share/body_rels.xsl
@@ -157,3 +155,5 @@ t/examples/fb3_to_fb2/table_title_189446.xml
 t/test1.t
 t/test2.t
 t/test3.t
+META.yml
+META.json

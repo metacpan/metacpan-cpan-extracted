@@ -107,7 +107,7 @@ my @TEST = (
 use JSON::PP;
 my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 {
-    no warnings qw/once/;
+    no warnings qw/once/; ## no critic (ProhibitNoWarnings)
     *{Sub::Meta::Parameters::TO_JSON} = sub {
         join ",", map { $_->type } @{$_[0]->args};
     };
@@ -120,7 +120,7 @@ my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 while (my ($args, $cases) = splice @TEST, 0, 2) {
     my $meta = Sub::Meta->new($args);
     my $inline = $meta->is_same_interface_inlined('$_[0]');
-    my $is_same_interface = eval sprintf('sub { %s }', $inline);
+    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic (ProhibitStringyEval)
 
     subtest "@{[$json->encode($args)]}" => sub {
 

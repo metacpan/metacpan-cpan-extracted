@@ -3,8 +3,10 @@ BEGIN
 {
     use strict;
     use warnings FATAL => 'all';
+    use lib './lib';
     use Test::More;
     use_ok( 'Apache2::SSI::Common' );
+    our $DEBUG => 0;
 };
 
 {
@@ -31,7 +33,7 @@ BEGIN
         '/path/page/../#anchor/page'                                => '/path/#anchor/page',
     ];
     
-    my $ssi = Apache2::SSI::Common->new( debug => 3 );
+    my $ssi = Apache2::SSI::Common->new( debug => $DEBUG );
     isa_ok( $ssi, 'Apache2::SSI::Common', 'instantiating object' );
     for( my $i = 0; $i < scalar( @$tests ); $i += 2 )
     {

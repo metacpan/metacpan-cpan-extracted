@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Validation vocabulary
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -183,7 +183,6 @@ sub _eval_keyword_maxItems {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not is_type('array', $data);
-
   return 1 if @$data <= $schema->{maxItems};
   return E($state, 'more than %d item%s', $schema->{maxItems}, $schema->{maxItems} > 1 ? 's' : '');
 }
@@ -310,7 +309,7 @@ JSON::Schema::Draft201909::Vocabulary::Validation - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 

@@ -6,7 +6,6 @@ Good beginner tasks:
  * Refactor tests in netmask.t to not use dlist() helper (just use "is")
  * Refactor tests in netmask.t to always have descriptions
 
-Advanced tests:
- * IPv6 Support
+Advanced tasks:
  * Speed improvements for IPv6
 

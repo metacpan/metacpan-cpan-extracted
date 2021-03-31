@@ -8,7 +8,7 @@ use URI;
 use Carp ();
 
 # ABSTRACT: Web client to download events from Daily Connect
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 has ua => (
@@ -56,7 +56,7 @@ around BUILDARGS => sub {
     require HTTP::AnyUA;
     HTTP::AnyUA->new(ua => $args{ua});
   }
-  
+
   return $class->$orig(%args);
 };
 
@@ -205,7 +205,7 @@ WebService::DailyConnect - Web client to download events from Daily Connect
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -237,10 +237,13 @@ version 0.02
 
 =head1 DESCRIPTION
 
+B<NOTE>: I no longer use DailyConnect, and happy to let someone who does need it
+maintain it.  This module is otherwise unsupported.
+
 Interface to DailyConnect, which is a service that can provide information about
 your kids at daycare.  This is more or less a port of a node API that I found here:
 
-https://github.com/Flet/dailyconnect
+L<https://github.com/Flet/dailyconnect>
 
 I wrote this module for more or less the same reasons as that author, although I
 wanted to be able to use it in perl.

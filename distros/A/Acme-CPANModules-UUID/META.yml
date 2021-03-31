@@ -23,7 +23,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Acme-CPANModules-UUID/issues
   homepage: https://metacpan.org/release/Acme-CPANModules-UUID
   repository: git://github.com/perlancar/perl-Acme-CPANModules-UUID.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

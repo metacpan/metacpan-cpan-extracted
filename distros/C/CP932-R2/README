@@ -25,7 +25,8 @@ SUBROUTINES
 
 TIED HASH VARIABLE
 
-  $result = $utf8str =~ $mb{qr/$utf8regex/imsxogc}
+  $result = $utf8str =~ $mb{qr/$utf8regex/imsxo}
+  $result = $utf8str =~ m<$mb{qr/$utf8regex/imsxo}>gc
   $result = $utf8str =~ s<$mb{qr/before/imsxo}><after>egr
 
 SUPPORTED PERL VERSIONS

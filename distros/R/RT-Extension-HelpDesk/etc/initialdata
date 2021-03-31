@@ -1,0 +1,212 @@
+use strict;
+use warnings;
+
+our @Queues = (
+    {
+        Name         => 'Support',
+        Description  => 'Queue for triaging support tickets.',
+        Lifecycle    => 'support',
+    }
+);
+
+our @Groups = (
+    {
+        Name        => 'Support',
+        Description => 'Group for support representatives.',
+    },
+);
+
+my @EveryoneRights = qw/CreateTicket ReplyToTicket SeeQueue/;
+our @ACL = map {
+    {
+        Right       => $_,
+        Queue       => 'Support',
+        GroupDomain => 'SystemInternal',
+        GroupType   => 'Everyone'
+    }
+} @EveryoneRights;
+
+push @ACL, map {
+    {
+        Right       => $_,
+        Queue       => 'Support',
+        GroupDomain => 'RT::System-Role',
+        GroupType   => 'Requestor'
+    }
+} qw/ShowTicket/;
+
+my @SupportRepresentativeRights = qw/CommentOnTicket Watch SeeCustomField
+  SeeQueue ShowTicket OwnTicket WatchAsAdminCC StealTicket TakeTicket
+  ShowTicketComments ModifyTicket ModifyCustomField ShowOutgoingEmail
+/;
+push @ACL, map {
+    {
+        Right       => $_,
+        Queue       => 'Support',
+        GroupDomain => 'UserDefined',
+        GroupId     => 'Support',
+    }
+} @SupportRepresentativeRights;
+
+our @CustomFields = (
+    {
+        Name        => 'Severity',
+        Type        => 'SelectSingle',
+        LookupType  => 'RT::Queue-RT::Ticket',
+        Description => 'Severity of finding',
+        ApplyTo     => 'Support',
+        RenderType  => 'Dropdown',
+        Values      => [
+            { Name => 'Low',    SortOrder => 1 },
+            { Name => 'Medium', SortOrder => 2 },
+            { Name => 'High',   SortOrder => 3 },
+        ],
+    },
+    {
+        Name        => 'Service Impacted',
+        Type        => 'AutocompleteSingle',
+        LookupType  => 'RT::Queue-RT::Ticket',
+        Description => 'Which service is impacted by this ticket',
+        ApplyTo     => 'Support',
+        Values      => [
+            { Name => 'Email', SortOrder => 1 },
+            { Name => 'Website', SortOrder => 2 },
+            { Name => 'Auth Services', SortOrder => 3 },
+            { Name => 'Document Sharing', SortOrder => 4 },
+            { Name => 'Chat', SortOrder => 5 },
+        ],
+    },
+);
+
+our @ScripActions = (
+    {
+      Name        => 'Set Status - waiting for customer',
+      Description => 'Set status of ticket to waiting for customer',
+      ExecModule  => 'SetStatus',
+      Argument    => 'waiting for customer',
+    },
+    {
+      Name        => 'Set Status - waiting for support',
+      Description => 'Set status of ticket to waiting for support',
+      ExecModule  => 'SetStatus',
+      Argument    => 'waiting for support',
+    },
+);
+
+our @ScripConditions = (
+    {
+        Name                 => 'On Requestor Reply',
+        Description          => 'When a requestor on a ticket replies.',
+        ApplicableTransTypes => 'Correspond',
+        ExecModule           => 'RequestorReply',
+    },
+    {
+        Name                 => 'On Non-Requestor Reply',
+        Description          => 'When any user who is not a requestor on a ticket replies.',
+        ApplicableTransTypes => 'Correspond',
+        ExecModule           => 'NonRequestorReply',
+    },
+);
+
+our @Scrips = (
+    {
+        Queue           => 'support',
+        Description     => 'On Requestor Correspond Update Status To "waiting for support"',
+        ScripCondition  => 'On Requestor Reply',
+        ScripAction     => 'Set Status - waiting for support',
+        Template        => 'Blank',
+        Stage           => 'TransactionCreate',
+    },
+    {
+        Queue           => 'support',
+        Description     => 'On Non-Requestor Correspond Update Status To "waiting for customer"',
+        ScripCondition  => 'On Non-Requestor Reply',
+        ScripAction     => 'Set Status - waiting for customer',
+        Template        => 'Blank',
+        Stage           => 'TransactionCreate',
+    },
+);
+
+
+our @Attributes = (
+    {
+        Name        => 'SavedSearch',
+        Description => 'Highest severity tickets waiting on support',
+        Object      => sub {
+            my $GroupName = 'Support';
+            my $group     = RT::Group->new( RT->SystemUser );
+
+            my( $ret, $msg ) = $group->LoadUserDefinedGroup( $GroupName );
+            die $msg unless $ret;
+
+            return $group;
+        },
+        Content     => {
+            Format => qq['<b><a href="__WebPath__/Ticket/Display.html?id=__id__">__id__</a></b>/TITLE:#',
+'<b><a href="__WebPath__/Ticket/Display.html?id=__id__">__Subject__</a></b>/TITLE:Subject',
+Status,
+'__CustomFieldView.{Severity}__',
+Priority,
+'__NEWLINE__',
+'__NBSP__',
+'<small>__Requestors__</small>',
+'<small>__CreatedRelative__</small>',
+Owner,
+'__CustomField.{Service Impacted}__'],
+            Query   => "Queue = 'Support' AND (  Status = 'waiting for support' OR Status = 'open' OR Status = 'new' )",
+            OrderBy => 'CustomFieldView.{Severity}',
+            Order   => 'DESC'
+        },
+    },
+);
+
+our @Final = (sub {
+    my $GroupName = 'Support';
+    my $group     = RT::Group->new( RT->SystemUser );
+
+    my ( $ret, $msg ) = $group->LoadUserDefinedGroup( $GroupName );
+    die $msg unless $ret;
+
+    my $root = RT::User->new( RT->SystemUser );
+    $root->Load( 'root' );
+
+    ($ret, $msg) =  $group->AddMember( $root->PrincipalObj->Id );
+    print "Could not load root user: $msg\n" unless $ret;
+
+    foreach my $right ( qw/SeeGroupDashboard ShowSavedSearches EditSavedSearches ModifyGroupDashboard/ ) {
+        ($ret, $msg) = $group->PrincipalObj->GrantRight( Right => $right, Object => $group );
+        print "Failed to grant right $right: $msg\n" unless $ret;
+    }
+
+    # Create our new dashboard
+    my $dashboard = RT::Dashboard->new( RT->SystemUser );
+    ($ret, $msg) = $dashboard->Save(
+        Name    => 'Support',
+        Privacy => 'RT::Group-'.$group->Id,
+    );
+    die "Could not create dashboard! $msg\n" unless $ret;
+
+    my $saved_search = RT::Attribute->new( RT->SystemUser );
+    ($ret, $msg) = $saved_search->LoadByCols(
+      Name        => 'SavedSearch',
+      Description => 'Highest severity tickets waiting on support',
+      ObjectType  => 'RT::Group',
+      ObjectId    => $group->Id,
+    );
+    die "Could not load highest severity saved search: $msg" unless $ret;
+
+    ($ret, $msg) = $dashboard->Update( Panes => {
+        body => [
+            {
+                description    => "Saved Search: Highest severity tickets waiting on support",
+                id             => $saved_search->Id,
+                pane           => "body",
+                portlet_type   => "search",
+                privacy        => "RT::Group-".$group->Id
+            }
+        ],
+        sidebar => [
+        ]
+    });
+    die "$msg" unless $ret;
+});

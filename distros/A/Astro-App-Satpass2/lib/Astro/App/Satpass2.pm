@@ -5,7 +5,6 @@ use 5.008;
 use strict;
 use warnings;
 
-
 use Astro::App::Satpass2::Locale qw{ __localize };
 use Astro::App::Satpass2::Macro::Command;
 use Astro::App::Satpass2::Macro::Code;
@@ -34,8 +33,18 @@ use Astro::Coord::ECI::Utils 0.112 qw{ :all };	# This needs at least 0.112.
 	Astro::Coord::ECI::TLE::Iridium->VERSION( 0.077 );
 	1;
     } || 0;
+    # Unfortunately the alias code creates the alias even if the version
+    # is unacceptable; so we may have to just delete the Iridium aliases
+    unless( HAVE_TLE_IRIDIUM ) {
+	my %type_map = Astro::Coord::ECI::TLE->alias();
+	foreach my $name ( keys %type_map ) {
+	    $type_map{$name} eq 'Astro::Coord::ECI::TLE::Iridium'
+		and Astro::Coord::ECI::TLE->alias( $name, undef );
+	}
+    }
 }
 
+use Attribute::Handlers;
 use Clone ();
 use Cwd ();
 use File::Glob qw{ :glob };
@@ -75,7 +84,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -174,69 +183,61 @@ my %twilight_abbr = abbrev (keys %twilight_def);
 #	-baz; the latter takes a string value.
 
 {
-    my (%attr, %want);
-    BEGIN {
-	my $hash = sub {
-	    my ( $name, $arg, @legal ) = @_;
-	    my $gol = Getopt::Long::Parser->new();
-	    my %opt;
-	    $gol->getoptionsfromarray(
-		[ split qr{ \s+ }smx, $arg ],
-		\%opt,
-		@legal,
-	    ) or do {
-		require Carp;
-		Carp::croak( "Bad $name option" );
-	    };
-	    return \%opt;
-	};
-	my $list = sub {
-	    return [ split qr{ \s+ }smx, $_[0] ];
-	};
-	%want = (
-	    Configure	=> $list,
-	    Tokenize	=> sub {
-		my ( $arg ) = @_;
-		my $opt = $hash->( Tokenize => $arg,
-		    qw{ expand_tilde! } );
-		exists $opt->{expand_tilde}
-		    or $opt->{expand_tilde} = 1;
-		return $opt;
-	    },
-	    Tweak	=> sub {
-		my ( $arg ) = @_;
-		return $hash->( Tweak => $arg,
-		    qw{ unsatisfied! } );
-	    },
-	    Verb	=> $list,
-	);
+    my %attr;
+
+    sub Configure : ATTR(CODE,RAWDATA) {
+	my ( undef, undef, $code, $name, $data ) = @_;
+	$attr{$code}{$name} = _attr_list( $data );
+	return;
     }
 
-    sub FETCH_CODE_ATTRIBUTES {
-	return $attr{$_[0]};
+    sub Tokenize : ATTR(CODE,RAWDATA) {
+	my ( undef, undef, $code, $name, $data ) = @_;
+	my $opt = _attr_hash( $name, $data, qw{ expand_tilde|expand-tilde! } );
+	exists $opt->{expand_tilde}
+	    or $opt->{expand_tilde} = 1;
+	$attr{$code}{$name} = $opt;
+	return;
     }
 
-    sub MODIFY_CODE_ATTRIBUTES {
-	my ( undef, $code, @args ) = @_;	# $pkg unused
-	my @rslt;
-	foreach (@args) {
-	    m{ ( [^(]* ) (?: [(] \s* (.*?) \s* [)] )? \z }smx or do {
-		push @rslt, $_;
-		next;
-	    };
-	    if ( my $hdlr = $want{$1} ) {
-		$attr{$code}{$1} = $hdlr->( defined $2 ? $2 : '' );
-	    } else {
-		push @rslt, $_;
-	    }
-	}
-	return @rslt;
+    sub Tweak : ATTR(CODE,RAWDATA) {
+	my ( undef, undef, $code, $name, $data ) = @_;
+	$attr{$code}{$name} = _attr_hash( $name, $data, qw{ unsatisfied! } );
+	return;
+    }
+
+    sub Verb : ATTR(CODE,RAWDATA) {
+	my ( undef, undef, $code, $name, $data ) = @_;
+	$attr{$code}{$name} = _attr_list( $data );
+	return;
+    }
+
+    sub _attr_hash {
+	my ( $name, $arg, @legal ) = @_;
+	my $gol = Getopt::Long::Parser->new();
+	my %opt;
+	$gol->getoptionsfromarray(
+	    _attr_list( $arg ),
+	    \%opt,
+	    @legal,
+	) or do {
+	    require Carp;
+	    Carp::croak( "Bad $name option" );
+	};
+	return \%opt;
+    }
+
+    sub _attr_list {
+	defined( local $_ = $_[0] )
+	    or return [];
+	s/ \A \s+ //smx;
+	return [ split qr< \s+ >smx ];
     }
 
     sub __get_attr {
 	my ( undef, $code, $name, $dflt ) = @_;	# $pkg unused
 	defined $code
-	    or return;
+	    or return \%attr;
 	defined $name
 	    or return $attr{$code};
 	exists $attr{$code}{$name}
@@ -516,7 +517,7 @@ sub almanac : Verb( choose=s@ dump! horizon|rise|set! transit! twilight! quarter
 #	appropriate.
 
     my @sky = $self->__choose( $opt->{choose}, $self->{sky} )
-	or $self->wail( 'No bodies selected' );
+	or return $self->__wail( 'No bodies selected' );
 
     foreach my $body ( @sky ) {
 	$body->can ('almanac') or do {
@@ -597,7 +598,7 @@ sub choose : Verb( epoch=s ) {
     }
     if ( @args ) {
 	my @bodies = @{ $self->__choose( \@args, $self->{bodies} ) }
-	    or $self->wail( 'No bodies chosen' );
+	    or return $self->__wail( 'No bodies chosen' );
 	@{ $self->{bodies} } = @bodies;
     }
     return;
@@ -608,7 +609,6 @@ sub clear : Verb() {
     @{$self->{bodies}} = ();
     return;
 }
-
 
 sub dispatch {
     my ($self, $verb, @args) = @_;
@@ -678,7 +678,7 @@ sub drop : Verb() {
 
     my @bodies = @{
 	$self->__choose( { invert => 1 }, \@args, $self->{bodies} ) }
-	or $self->wail( 'No bodies left' );
+	or return $self->__wail( 'No bodies left' );
 
     @{ $self->{bodies} } = @bodies;
 
@@ -867,7 +867,7 @@ sub export : Verb() {
 	@args and $self->set ($name, shift @args);
 	$self->{exported}{$name} = 1;
     } else {
-	@args or $self->wail( 'You must specify a value' );
+	@args or return $self->wail( 'You must specify a value' );
 	$self->{exported}{$name} = shift @args;
     }
     return;
@@ -927,7 +927,7 @@ sub flare : Verb( algorithm=s am! choose=s@ day! dump! pm! questionable|spare! q
 	);
 	push @active, $tle;
     }
-    @active or $self->wail( 'No bodies capable of flaring' );
+    @active or return $self->__wail( 'No bodies capable of flaring' );
 
     my @flares;
     foreach my $tle (@active) {
@@ -1372,7 +1372,6 @@ sub init {
     return;
 }
 
-
 sub initfile : Verb( create-directory! quiet! ) {
     my ( $self, $opt ) = __arguments( @_ );	# @args unused
 
@@ -1594,12 +1593,12 @@ sub _macro_define : Verb() {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ( $self, undef, $name, @args ) = __arguments( @_ );
     my $output;
     defined $name
-	or $self->wail( 'You must provide a name for the macro' );
+	or return $self->__wail( 'You must provide a name for the macro' );
     @args
-	or $self->wail( 'You must provide a definition for the macro' );
+	or return $self->__wail( 'You must provide a definition for the macro' );
     $name !~ m/ \W /smx
 	and $name !~ m/ \A _ /smx
-	or $self->wail("Invalid macro name '$name'");
+	or return $self->__wail("Invalid macro name '$name'");
 
     # NOTE the value of {def} used to be unescaped, but I do not now
     # know why, and the implementation of \U and friends is more natural
@@ -1934,7 +1933,6 @@ sub position : Verb( choose=s@ questionable|spare! quiet! ) {
     } else {
 	$time = time;
     }
-
 
 #	Define the observing station.
 
@@ -2715,7 +2713,6 @@ sub _show_unmodified {
     return ( 'set', $name, $val );
 }
 
-
 # For proper motion, we need to convert arc seconds per year to degrees
 # per second. Perl::Critic does not like 'use constant' because they do
 # not interpolate, but they really do: "@{[SPY2DPS]}".
@@ -3304,7 +3301,6 @@ sub __tle_options {
     return \@lgl;
 }
 
-
 sub unexport : Verb() {
     my ( $self, undef, @args ) = __arguments( @_ );	# $opt unused
 
@@ -3313,7 +3309,6 @@ sub unexport : Verb() {
     }
     return;
 }
-
 
 sub validate : Verb( quiet! ) {
     my ( $self, $opt, @args ) = __arguments( @_ );
@@ -3339,7 +3334,6 @@ sub validate : Verb( quiet! ) {
 
     return;
 }
-
 
 sub version : Verb() {
     return <<"EOD";
@@ -3585,8 +3579,6 @@ sub _apply_boolean_default {
     }
 
 }
-
-
 
 #	$self->_deprecation_notice( $type, $name );
 #
@@ -4037,7 +4029,6 @@ sub _get_browser_command {
 #	Gets the Astro::App::Satpass2::Format object. If $opt->{dump} is true,
 #	returns a dumper object; otherwise returns the currently-set
 #	formatter object.
-
 
 sub _get_formatter_object {
     my ( $self, $opt ) = @_;
@@ -4522,7 +4513,6 @@ sub __parse_time {
     $self->wail( "Invalid time '$time'" );
     return;
 }
-
 
 #	Reset the last time set. This is called from __arguments() in
 #	::Utils if the invocant is an Astro::App::Satpass2.
@@ -5345,7 +5335,6 @@ EOD
 		    pop @rslt;
 		}
 
-
 		# Here ends the variable expansion code.
 
 	    # If the character is an angle bracket or a pipe, we have a
@@ -5587,7 +5576,6 @@ sub _case_mod {
     return;
 }
 
-
 #	$self->wail(...)
 #
 #	Either die or croak with the arguments, depending on the value
@@ -5599,6 +5587,19 @@ sub wail {
     my ($self, @args) = @_;
     $self->{_warner}->wail( @args );
     return;	# We can't hit this, but Perl::Critic does not know that.
+}
+
+#	$self->__wail(...)
+#
+#	either wail() or whinge() depending on error_out.
+sub __wail {
+    my ($self, @args) = @_;
+    if ( $self->get( 'error_out' ) ) {
+	$self->{_warner}->wail( @args );
+    } else {
+	$self->{_warner}->whinge( @args );
+    }
+    return;
 }
 
 #	$self->weep(...)
@@ -5642,8 +5643,10 @@ Astro::App::Satpass2 - Forecast satellite visibility.
      longitude => -77.037684,  # degrees
      height => 16.68,          # meters
  );
- # Acquire ISS data from NASA
- $satpass2->spacetrack( qw{ spaceflight -all } );
+ # Acquire ISS data from Celestrak
+ $satpass2->spacetrack( qw{ celestrak stations } );
+ # Remove other bodies in the Celestrak 'stations' catalog
+ $satpass2->choose( 25544 );
  # Display our location
  $satpass2->location();
  # Display visible ISS passes over our location
@@ -5658,8 +5661,10 @@ this package,
  satpass2> set location '1600 Pennsylvania Ave, Washington DC'
  satpass2> set latitude 38.898748 longitude -77.037684
  satpass2> set height 16.68
- satpass2> # Acquire ISS data from NASA
- satpass2> spacetrack spaceflight -all
+ satpass2> # Acquire ISS data from Celestrak
+ satpass2> spacetrack celestrak stations
+ satpass2> # Remove other bodies in the Celestrak 'stations' catalog
+ satpass2> choose 25544
  satpass2> # Display our location
  satpass2> location
  satpass2> # Display visible ISS passes over our location
@@ -7260,9 +7265,9 @@ number of sources. See L</SPECIFYING INPUT DATA> for the details.
 
 This interactive method takes as its arguments the name of a method, and
 any arguments to be passed to that method. This method is called on the
-object which is stored in the L<spacetrack attribute|/spacetrack
-attribute>, and any results returned. Normally it will be used to
-configure the spacetrack object. See the
+object which is stored in the
+L<spacetrack attribute|/spacetrack attribute>, and any results returned.
+Normally it will be used to configure the spacetrack object. See the
 L<Astro::SpaceTrack|Astro::SpaceTrack> documentation for further
 details.
 
@@ -7340,7 +7345,6 @@ whatever the method returns.
 
 The following options are allowed on any retrieval:
 
- -all specifies the retrieval of all manned spaceflight elements;
  -descending specifies the return of data in descending order;
  -last5 specifies the return of the last 5 elements;
  -end specifies the end time for the data to be fetched;
@@ -9095,6 +9099,7 @@ in its default location.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

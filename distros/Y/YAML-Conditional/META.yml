@@ -22,12 +22,12 @@ no_index:
 provides:
   YAML::Conditional:
     file: lib/YAML/Conditional.pm
-    version: '0.03'
+    version: '1.00'
 requires:
-  Struct::Conditional: '0.02'
+  Struct::Conditional: '1.00'
   YAML::XS: '0.82'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/YAML-Conditional.git
-version: '0.03'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

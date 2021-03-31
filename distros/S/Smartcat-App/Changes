@@ -1,5 +1,8 @@
 Revision history for Smartcat-App
 
+0.0.9  2021-03-29 14:34:29 UTC
+        - Bugfixes for UTF-8 filename support
+
 0.0.8  2021-03-26 17:17:54 UTC
         - Fix availability to export translated files via `pull` command
           projects with folders

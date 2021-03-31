@@ -11,6 +11,7 @@
 
 use strict;
 
+use Config;
 use Spreadsheet::WriteExcelXML;
 use Test::More tests => 104;
 
@@ -85,6 +86,9 @@ $fail      = ! $worksheet->convert_date_time($date_time);
 ok($fail,  " Testing incorrect time: $date_time\tincorrect secs caught.");
 
 $date_time = '1899-12-31T00:00:59.9999999999999999999';
+if ($Config{usequadmath}) {
+    $date_time .= "9" x 19;
+}
 $fail      = ! $worksheet->convert_date_time($date_time);
 ok($fail,  " Testing incorrect time: $date_time\tincorrect secs caught.");
 
@@ -521,6 +525,3 @@ __DATA__
     <Cell ss:StyleID="s22"><Data ss:Type="DateTime">1899-12-31T23:59:59.999</Data></Cell>
     <Cell ss:StyleID="s23" ss:Formula="=RC[-1]"><Data ss:Type="Number">0.99999998842592586</Data></Cell>
    </Row>
-
-
-

@@ -90,15 +90,15 @@ Net::SAML2::Binding::Redirect
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 SYNOPSIS
 
   my $redirect = Net::SAML2::Binding::Redirect->new(
-    key => '/path/to/SPsign-nopw-key.pem',	# Service Provider (SP) private key
-    url => $sso_url,				# Service Provider Single Sign Out URL
-    param => 'SAMLRequest' OR 'SAMLResponse',	# Type of request
-    cert => '/path/to/IdP-cert.pem'		# Service Provider (SP) certificate
+    key     => '/path/to/SPsign-nopw-key.pem',		# Service Provider (SP) private key
+    url     => $sso_url,							# Service Provider Single Sign Out URL
+    param   => 'SAMLRequest' OR 'SAMLResponse',		# Type of request
+    cert    => $idp->cert('signing')				# Identity Provider (IdP) certificate
   );
 
   my $url = $redirect->sign($authnreq);
@@ -121,15 +121,19 @@ Arguments:
 
 =item B<key>
 
-signing key (for creating Redirect URLs)
+The SP's (Service Provider) also known as your application's signing key
+that your application uses to sign the AuthnRequest.  Some IdPs may not
+verify the signature.
 
 =item B<cert>
 
-IdP's signing cert (for verifying Redirect URLs)
+IdP's (Identity Provider's) certificate that is used to verify a signed
+Redirect from the IdP.  It is used to verify the signature of the Redirect
+response.
 
 =item B<url>
 
-IdP's SSO service url for the Redirect binding
+IdP's SSO (Single Sign Out) service url for the Redirect binding
 
 =item B<param>
 
@@ -164,6 +168,7 @@ This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
             2012       Peter Marschall
             2016       Jeff Fearn
             2020       Timothy Legge, Wesley Schwengle
+            2021       Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

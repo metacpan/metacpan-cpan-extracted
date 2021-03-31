@@ -65,7 +65,6 @@ sub write_row ( $self, $name, $robj ) {
     my($fnorm) = $self->_get_fmt( $name, $robj->side );
 
     my $rref = $self->{ws}{$name}{rows} //= [];
-    INFO "write_row called\n";
     push @$rref, {
         data    => $self->output_record($robj),
         row_fmt => $fnorm,

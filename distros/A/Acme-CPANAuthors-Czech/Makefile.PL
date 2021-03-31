@@ -23,7 +23,7 @@ resources 'repository' => 'git://github.com/michal-josef-spacek/Acme-CPANAuthors
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::More' => 0;
 tests_recursive;
-version '0.28';
+version '0.29';
 
 # Run.
 WriteAll();

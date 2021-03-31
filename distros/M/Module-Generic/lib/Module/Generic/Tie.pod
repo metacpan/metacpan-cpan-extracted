@@ -16,7 +16,7 @@ Module::Generic::Tie - Object Access Control Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

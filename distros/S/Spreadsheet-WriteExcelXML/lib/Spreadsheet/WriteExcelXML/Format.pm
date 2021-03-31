@@ -25,7 +25,7 @@ use Carp;
 use vars qw($AUTOLOAD $VERSION @ISA);
 @ISA = qw(Exporter);
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 ###############################################################################
 #

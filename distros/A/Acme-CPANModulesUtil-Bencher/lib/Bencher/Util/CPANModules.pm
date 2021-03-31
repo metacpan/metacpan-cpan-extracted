@@ -3,7 +3,7 @@ package Bencher::Util::CPANModules;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-20'; # DATE
 our $DIST = 'Acme-CPANModulesUtil-Bencher'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Alias for Acme::CPANModulesUtil::Bencher
@@ -20,7 +20,7 @@ Bencher::Util::CPANModules - Alias for Acme::CPANModulesUtil::Bencher
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Util::CPANModules (from Perl distribution Acme-CPANModulesUtil-Bencher), released on 2021-01-20.
+This document describes version 0.003 of Bencher::Util::CPANModules (from Perl distribution Acme-CPANModulesUtil-Bencher), released on 2021-01-20.
 
 =head1 DESCRIPTION
 

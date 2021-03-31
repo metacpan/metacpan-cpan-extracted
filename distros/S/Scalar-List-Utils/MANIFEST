@@ -21,6 +21,7 @@ t/isvstring.t
 t/lln.t
 t/max.t
 t/maxstr.t
+t/mesh.t
 t/min.t
 t/minstr.t
 t/openhan.t
@@ -44,5 +45,6 @@ t/tainted.t
 t/uniq.t
 t/uniqnum.t
 t/weak.t
+t/zip.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

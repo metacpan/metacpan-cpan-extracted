@@ -7,6 +7,7 @@ BEGIN
     use Encode ();
     use URI;
     use URI::file;
+    use File::Spec ();
     use constant HAS_APACHE_TEST => $ENV{HAS_APACHE_TEST};
     if( HAS_APACHE_TEST )
     {
@@ -20,7 +21,7 @@ BEGIN
 
 my $uri = './ssi/include.cgi';
 my $doc_root = './t/htdocs';
-my $doc_root_full_path = URI::file->new_abs( $doc_root )->file;
+my $doc_root_full_path = URI::file->new_abs( $doc_root )->file( $^O );
 my $f = Apache2::SSI::URI->new(
     document_uri => $uri,
     document_root => $doc_root,
@@ -39,6 +40,7 @@ my $failed;
 }
 ok( defined( $failed ), 'Non existing file object' );
 
+diag( "document_path found is '", $f->document_path, "'." ) if( $DEBUG );
 ok( $f->document_path eq '/ssi/include.cgi', 'document_path' );
 
 ok( $f->document_directory eq '/ssi', 'document_dir' );
@@ -49,7 +51,8 @@ ok( ( $f->path_info // '' ) eq '', 'empty path_info' );
 
 ok( ( $f->query_string // '' ) eq '', 'empty query_string' );
 
-ok( $f->document_filename eq "${doc_root_full_path}/ssi/include.cgi", 'document_filename' );
+diag( "document_filename returned '", $f->document_filename, "' using File::Spec (", File::Spec->catdir( $doc_root_full_path, URI::file->new( '/ssi/include.cgi' )->file( $^O ) ), ")." ) if( $DEBUG );
+ok( $f->document_filename eq File::Spec->catdir( $doc_root_full_path, URI::file->new( '/ssi/include.cgi' )->file( $^O ) ), 'document_filename' );
 
 ok( $f->document_root eq $doc_root_full_path, 'document_root' );
 
@@ -70,15 +73,15 @@ ok( $f2->document_uri eq "/ssi/include.cgi/some/pathinfo?q=something&l=ja_JP", "
     $f2->filename( "${doc_root}/ssi/../ssi/plop.pl" );
 }
 
-diag( "Document filename is: ", $f2->filename, " and I am expecting $doc_root_full_path/ssi/plop.pl" ) if( $DEBUG );
-ok( $f2->filename eq "${doc_root_full_path}/ssi/plop.pl", 'filename' );
+diag( "Document filename is: ", $f2->filename, " and I am expecting ", File::Spec->catdir( URI::file->new( $doc_root_full_path )->file( $^O ), URI::file->new( '/ssi/plop.pl' )->file( $^O ) ) ) if( $DEBUG );
+ok( $f2->filename eq File::Spec->catdir( URI::file->new( $doc_root_full_path )->file( $^O ), URI::file->new( '/ssi/plop.pl' )->file( $^O ) ), 'filename' );
 
 ok( $f2->document_uri eq "/ssi/plop.pl/some/pathinfo?q=something&l=ja_JP", "document_uri updated with filename" );
 
 # Access to finfo
 my $finfo = $f->finfo;
-diag( "File ${doc_root}/${uri} mode is: '", ( (CORE::stat( "${doc_root}/${uri}" ))[2] & 07777 ), "' vs finfo one: '", $f->finfo->mode, "'" ) if( $DEBUG );
-ok( ( (CORE::stat( "${doc_root}/${uri}" ))[2] & 07777 ) eq $f->finfo->mode, 'finfo' );
+diag( "File ${doc_root}/${uri} mode is: '", ( (CORE::stat( File::Spec->catdir( $doc_root_full_path, URI::file->new( $uri )->file( $^O ) ) ))[2] & 07777 ), "' vs finfo one: '", $f->finfo->mode, "'" ) if( $DEBUG );
+ok( ( (CORE::stat( File::Spec->catdir( $doc_root_full_path, URI::file->new( $uri )->file( $^O ) ) ))[2] & 07777 ) eq $f->finfo->mode, 'finfo' );
 
 ok( $f->finfo->is_file, 'finfo is_file' );
 

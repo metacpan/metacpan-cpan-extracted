@@ -44,6 +44,7 @@ t/additional-tests/anchor.json
 t/additional-tests/badRef.json
 t/additional-tests/faux-buggy-schemas.json
 t/additional-tests/format-duration.json
+t/additional-tests/format-ipv4.json
 t/additional-tests/format-relative-json-pointer.json
 t/additional-tests/future-keywords-draft2019-09.json
 t/additional-tests/id.json
@@ -58,6 +59,7 @@ t/additional-tests/ref-and-id.json
 t/additional-tests/ref.json
 t/additional-tests/short-circuit.json
 t/additional-tests/unicode.json
+t/additional-tests/vocabulary.json
 t/annotations.t
 t/booleans.t
 t/cached-metaschemas.t

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use lib './lib';
 
-BEGIN { use_ok( 'Module::Generic' ) || BAIL_OUT( "Unable to load Module::Generic" ); }
+BEGIN { use_ok( 'Module::Generic::Iterator' ) || BAIL_OUT( "Unable to load Module::Generic::Iterator" ); }
 
 my $a = Module::Generic::Iterator->new( [qw( John Jack Paul Peter Simon )], { debug => 0 } );
 

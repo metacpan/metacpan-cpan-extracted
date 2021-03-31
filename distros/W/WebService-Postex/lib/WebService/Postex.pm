@@ -1,6 +1,7 @@
 use utf8;
+
 package WebService::Postex;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moose;
 use namespace::autoclean;
 
@@ -13,9 +14,9 @@ use JSON::XS;
 # ABSTRACT: A Postex WebService implemenation in Perl
 
 has base_uri => (
-    is => 'ro',
-    isa => Uri,
-    coerce => 1,
+    is       => 'ro',
+    isa      => Uri,
+    coerce   => 1,
     required => 1,
 );
 
@@ -26,26 +27,26 @@ has generator_id => (
 );
 
 has secret => (
-    is => 'ro',
-    isa => 'Str',
+    is       => 'ro',
+    isa      => 'Str',
     required => 1,
 );
 
 has ua => (
-    is => 'ro',
-    isa => 'LWP::UserAgent',
-    lazy => 1,
+    is      => 'ro',
+    isa     => 'LWP::UserAgent',
+    lazy    => 1,
     builder => '_build_ua',
 );
 
 sub _build_ua {
     my $self = shift;
-    my $ua = LWP::UserAgent->new(
+    my $ua   = LWP::UserAgent->new(
         agent   => sprintf('%s/%s', __PACKAGE__, $VERSION),
         timeout => 30,
     );
-    $ua->default_header(Accept         => 'application/json');
-    $ua->default_header(Authorization  => "Bearer " . $self->secret);
+    $ua->default_header(Accept        => 'application/json');
+    $ua->default_header(Authorization => "Bearer " . $self->secret);
     return $ua;
 }
 
@@ -118,7 +119,8 @@ sub _build_uri {
     my ($self, $type, $call, $id) = @_;
 
     my $uri = $self->base_uri->clone;
-    $uri->path_segments(qw(rest data v1), $type, $call, $id);
+    my @segments = $uri->path_segments;
+    $uri->path_segments(@segments, qw(rest data v1), $type, $call, $id);
     return $uri;
 }
 
@@ -126,20 +128,22 @@ sub _prepare_request {
     my ($self, $uri, %payload) = @_;
 
     if (my $file = delete $payload{file}) {
-        $payload{file} = [ $file, delete $payload{filename} ];
+        $payload{file} = [$file, delete $payload{filename}];
         return (
             $uri,
-            Content        => [ %payload ],
+            Content        => [%payload],
             'Content-Type' => 'form-data',
         );
     }
 
     return (
         $uri,
-        %payload ? (
+        %payload
+        ? (
             Content        => encode_json(\%payload),
             'Content-Type' => 'application/json',
-        ) : (),
+            )
+        : (),
     );
 
 }
@@ -169,7 +173,7 @@ WebService::Postex - A Postex WebService implemenation in Perl
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

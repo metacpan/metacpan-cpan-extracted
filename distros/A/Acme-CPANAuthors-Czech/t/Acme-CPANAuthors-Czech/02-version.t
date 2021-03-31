@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Acme::CPANAuthors::Czech::VERSION, 0.28, 'Version.');
+is($Acme::CPANAuthors::Czech::VERSION, 0.29, 'Version.');

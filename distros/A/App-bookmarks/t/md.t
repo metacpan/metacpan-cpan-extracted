@@ -7,4 +7,7 @@ use Test::More;
 
 plan tests => 1;
 
-is(scalar(`"$^X" -Ilib script/bookmarks t/data/test.md`), "markdown example http://example.md #tag1 #tag2\n", "bookmarks - md");
+is(scalar(`"$^X" -Ilib script/bookmarks t/data/test.md`), <<'EOF'
+Link text with [brackets] inside http://www.example.com My \"title\"
+EOF
+, "bookmarks - md");

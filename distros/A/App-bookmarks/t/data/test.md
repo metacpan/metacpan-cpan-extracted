@@ -1,2 +1,2 @@
 test.md
-[markdown example](http://example.md) #tag1 #tag2
+[Link text with [brackets] inside](http://www.example.com "My \"title\"") bla bla bla

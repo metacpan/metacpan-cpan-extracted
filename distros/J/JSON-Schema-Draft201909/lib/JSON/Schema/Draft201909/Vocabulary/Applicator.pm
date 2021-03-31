@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Applicator vocabulary
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -47,7 +47,7 @@ sub _eval_keyword_allOf {
     }
   }
 
-  if (not @invalid) {
+  if (@invalid == 0) {
     push @{$state->{annotations}}, @new_annotations;
     return 1;
   }
@@ -113,7 +113,7 @@ sub _eval_keyword_not {
 
   return 1 if not $self->eval($data, $schema->{not},
     +{ %$state, schema_path => $state->{schema_path}.'/not',
-      short_circuit => (!$state->{short_circuit} || $state->{collect_annotations} ? 0 : 1),
+      short_circuit => $state->{short_circuit} || !$state->{collect_annotations},
       errors => [], annotations => [ @{$state->{annotations}} ] });
 
   return E($state, 'subschema is valid');
@@ -175,62 +175,77 @@ sub _eval_keyword_dependentSchemas {
 sub _traverse_keyword_items {
   my ($self, $schema, $state) = @_;
 
-  # Note: the metaschema says "items" has minItems:1 but the written spec omits this.
-  my $method = is_plain_arrayref($schema->{items}) ? 'traverse_array_schemas' : 'traverse_schema';
-  $self->$method($schema, $state);
+  # Note: this is valid for draft2019-09 only.
+  goto \&_traverse_keyword_prefixItems if is_plain_arrayref($schema->{items});
+  $self->traverse_schema($schema, $state);
 }
+
+# Note: the draft2019-09 metaschema says "items" has minItems:1 but the written spec omits this.
+# in draft2019-09, this is part of the 'items' keyword
+sub _traverse_keyword_prefixItems { shift->traverse_array_schemas(@_) }
 
 sub _traverse_keyword_additionalItems { shift->traverse_schema(@_) }
 
 sub _eval_keyword_items {
   my ($self, $data, $schema, $state) = @_;
 
+  # Note: this is valid for draft2019-09 only.
+  goto \&_eval_keyword_prefixItems if is_plain_arrayref($schema->{items});
+
   return 1 if not is_type('array', $data);
 
   my @orig_annotations = @{$state->{annotations}};
   my @new_annotations;
+  my $valid = 1;
 
-  if (not is_plain_arrayref($schema->{items})) {
-    my $valid = 1;
-    foreach my $idx (0 .. $#{$data}) {
-      my @annotations = @orig_annotations;
-      if (is_type('boolean', $schema->{items})) {
-        next if $schema->{items};
-        $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx }, 'item not permitted');
-      }
-      elsif ($self->eval($data->[$idx], $schema->{items},
-          +{ %$state, annotations => \@annotations,
-            data_path => $state->{data_path}.'/'.$idx,
-            schema_path => $state->{schema_path}.'/items' })) {
-        push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
-        next;
-      }
-
-      $valid = 0;
-      last if $state->{short_circuit};
+  foreach my $idx (0 .. $#{$data}) {
+    my @annotations = @orig_annotations;
+    if (is_type('boolean', $schema->{items})) {
+      next if $schema->{items};
+      $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx }, 'item not permitted');
+    }
+    elsif ($self->eval($data->[$idx], $schema->{items},
+        +{ %$state, annotations => \@annotations,
+          data_path => $state->{data_path}.'/'.$idx,
+          schema_path => $state->{schema_path}.'/items' })) {
+      push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
+      next;
     }
 
-    return E($state, 'subschema is not valid against all items') if not $valid;
-    push @{$state->{annotations}}, @new_annotations;
-    return A($state, true);
+    $valid = 0;
+    last if $state->{short_circuit};
   }
 
+  return E($state, 'subschema is not valid against all items') if not $valid;
+  push @{$state->{annotations}}, @new_annotations;
+  return A($state, true);
+}
+
+# in draft2019-09, this is part of the 'items' keyword
+sub _eval_keyword_prefixItems {
+  my ($self, $data, $schema, $state) = @_;
+
+  return 1 if not is_type('array', $data);
+
+  my @orig_annotations = @{$state->{annotations}};
+  my @new_annotations;
   my $last_index = -1;
   my $valid = 1;
+
   foreach my $idx (0 .. $#{$data}) {
-    last if $idx > $#{$schema->{items}};
+    last if $idx > $#{$schema->{$state->{keyword}}};
     $last_index = $idx;
 
     my @annotations = @orig_annotations;
-    if (is_type('boolean', $schema->{items}[$idx])) {
-      next if $schema->{items}[$idx];
+    if (is_type('boolean', $schema->{$state->{keyword}}[$idx])) {
+      next if $schema->{$state->{keyword}}[$idx];
       $valid = E({ %$state, data_path => $state->{data_path}.'/'.$idx,
         _schema_path_suffix => $idx }, 'item not permitted');
     }
-    elsif ($self->eval($data->[$idx], $schema->{items}[$idx],
+    elsif ($self->eval($data->[$idx], $schema->{$state->{keyword}}[$idx],
         +{ %$state, annotations => \@annotations,
           data_path => $state->{data_path}.'/'.$idx,
-          schema_path => $state->{schema_path}.'/items/'.$idx })) {
+          schema_path => $state->{schema_path}.'/'.$state->{keyword}.'/'.$idx })) {
       push @new_annotations, @annotations[$#orig_annotations+1 .. $#annotations];
       next;
     }
@@ -288,10 +303,10 @@ sub _traverse_keyword_unevaluatedItems {
 sub _eval_keyword_unevaluatedItems {
   my ($self, $data, $schema, $state) = @_;
 
-  abort($state, '"unevaluatedItems" keyword present, but annotation collection is disabled')
+  abort($state, 'EXCEPTION: "unevaluatedItems" keyword present, but annotation collection is disabled')
     if not $state->{collect_annotations};
 
-  abort($state, '"unevaluatedItems" keyword present, but short_circuit is enabled: results unreliable')
+  abort($state, 'EXCEPTION: "unevaluatedItems" keyword present, but short_circuit is enabled: results unreliable')
     if $state->{short_circuit};
 
   return 1 if not is_type('array', $data);
@@ -543,10 +558,10 @@ sub _traverse_keyword_unevaluatedProperties {
 sub _eval_keyword_unevaluatedProperties {
   my ($self, $data, $schema, $state) = @_;
 
-  abort($state, '"unevaluatedProperties" keyword present, but annotation collection is disabled')
+  abort($state, 'EXCEPTION: "unevaluatedProperties" keyword present, but annotation collection is disabled')
     if not $state->{collect_annotations};
 
-  abort($state, '"unevaluatedProperties" keyword present, but short_circuit is enabled: results unreliable')
+  abort($state, 'EXCEPTION: "unevaluatedProperties" keyword present, but short_circuit is enabled: results unreliable')
     if $state->{short_circuit};
 
   return 1 if not is_type('object', $data);
@@ -636,7 +651,7 @@ JSON::Schema::Draft201909::Vocabulary::Applicator - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 

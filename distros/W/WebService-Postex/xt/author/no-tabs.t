@@ -9,7 +9,8 @@ use Test::NoTabs;
 my @files = (
     'lib/WebService/Postex.pm',
     't/00-compile.t',
-    't/01-basic.t'
+    't/01-basic.t',
+    't/02-bug-baseuri-context.t'
 );
 
 notabs_ok($_) foreach @files;

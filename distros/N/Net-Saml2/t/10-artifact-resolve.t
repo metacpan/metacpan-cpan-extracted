@@ -7,6 +7,7 @@ my $ar = Net::SAML2::Protocol::ArtifactResolve->new(
     issuer      => 'http://some/sp',
     destination => 'http://some/idp',
     artifact    => 'some-artifact',
+    provider    => 'Net-SAML2 Test',
 );
 
 
@@ -35,4 +36,6 @@ test_xml_attribute_ok($xp, '/samlp:ArtifactResolve/@IssueInstant',
 test_xml_value_ok($xp, '/samlp:ArtifactResolve/samlp:Artifact',
     'some-artifact',);
 
+test_xml_attribute_ok($xp, '/samlp:ArtifactResolve/@ProviderName',
+    'Net-SAML2 Test',);
 done_testing;

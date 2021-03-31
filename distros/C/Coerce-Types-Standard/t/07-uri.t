@@ -25,7 +25,6 @@ BEGIN {
 		'queryString', [URI->by('query_string'), {coe}],
 		'queryForms', [URI->by('query_form'), {coe}],
 		'frag', [URI->by('fragment'), {coe}],
-		'query' => [URI->by('params'), {coe}],
 		'escape' => [URI->by('escape'), {coe}],
 		'unescape' => [URI->by('unescape'), {coe}],
 	);
@@ -52,7 +51,6 @@ is($thing->url->as_string, 'example.lnation.com');
 is(sprintf('https://%s', $thing->schema_url->as_string), 'https://example.lnation.com');
 is($thing->autoescape_url->as_string, 'https://example.lnation.com?one=%20a%20b%20c&two=1!2%C2%A33');
 is($thing->queryForm->as_string, 'https://example.lnation.com?a=b');
-
 is($thing->schema, 'https');
 is($thing->host, 'example.lnation.com');
 is($thing->path, '/okays');

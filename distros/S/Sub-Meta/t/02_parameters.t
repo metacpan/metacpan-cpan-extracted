@@ -97,7 +97,7 @@ my @TEST = (
         invocant                 => p(invocant => 1),
         invocants                => [p(invocant => 1)],
         args_min                 => 2,
-        args_max                 => 0 + 'Inf',
+        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
     ],
     { args => [p(type => 'Foo', named => 1)] } => [
         nshift                   => 0,
@@ -114,7 +114,7 @@ my @TEST = (
         invocant                 => undef,
         invocants                => [],
         args_min                 => 2,
-        args_max                 => 0 + 'Inf',
+        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
     ],
     { args => [p(type => 'Foo', optional => 1)] } => [
         nshift                   => 0,
@@ -148,7 +148,7 @@ my @TEST = (
         invocant                 => undef,
         invocants                => [],
         args_min                 => 0,
-        args_max                 => 0 + 'Inf',
+        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
     ],
     { args => [p(type => 'Foo', named => 1, optional => 1)], slurpy => 'Str' } => [
         nshift                   => 0,
@@ -165,7 +165,7 @@ my @TEST = (
         invocant                 => undef,
         invocants                => [],
         args_min                 => 0,
-        args_max                 => 0 + 'Inf',
+        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
     ],
     { args => [p(type => 'Foo'), p(type => 'Bar')] } => [
         nshift                   => 0,
@@ -216,7 +216,7 @@ my @TEST = (
         invocant                 => undef,
         invocants                => [],
         args_min                 => 3,
-        args_max                 => 0+'Inf',
+        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
     ],
     { args => [p(type => 'Foo'), p(type => 'Bar', named => 1, optional => 1)] } => [
         nshift                   => 0,
@@ -233,14 +233,14 @@ my @TEST = (
         invocant                 => undef,
         invocants                => [],
         args_min                 => 1,
-        args_max                 => 0+'Inf',
+        args_max                 => 0 + 'Inf', ## no critic (ProhibitMismatchedOperators)
     ],
 );
 
 use JSON::PP;
 my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 {
-    no warnings qw/once/;
+    no warnings qw/once/; ## no critic (ProhibitNoWarnings)
     *{Sub::Meta::Param::TO_JSON} = sub {
         my $s = $_[0]->type;
         $s .= ':named' if $_[0]->named;
@@ -249,7 +249,7 @@ my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
     }
 }
 
-sub p { Sub::Meta::Param->new(@_); }
+sub p { my @args = @_; return Sub::Meta::Param->new(@args); }
 
 while (my ($parameters, $expect) = splice @TEST, 0, 2) {
     my $meta = Sub::Meta::Parameters->new($parameters);
@@ -286,6 +286,7 @@ subtest 'setter' => sub {
 subtest '_normalize_args' => sub {
     my $some = bless {}, 'Some';
 
+## no critic (ProtectPrivateSubs)
     is(Sub::Meta::Parameters->_normalize_args([$some]), [p($some)], 'blessed arg list');
     is(Sub::Meta::Parameters->_normalize_args(['Foo', 'Bar']), [p('Foo'), p('Bar')], 'arrayref');
 
@@ -306,6 +307,7 @@ subtest '_normalize_args' => sub {
     is(Sub::Meta::Parameters->_normalize_args(
         { a => $foo }),
         [p(type => $foo, name => 'a', named => 1)], 'hashref');
+## use critic
 };
 
 subtest 'invocant' => sub {

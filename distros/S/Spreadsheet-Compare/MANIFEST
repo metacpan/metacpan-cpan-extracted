@@ -15,7 +15,6 @@ lib/Spreadsheet/Compare/Single.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.SKIP
 script/spreadcomp
 t/00_common.t
 t/01_simple_fix.t

@@ -150,7 +150,7 @@ sub as_string_with_fitness {
 
 =head2 Atom( $index [, $value )
 
-Sets or gets the value of an atom. Each individual is divided in atoms, which
+Sets or gets the value of an atom; each individual is divided in atoms, which
 can be accessed sequentially. If that does not apply, Atom can simply return the
 whole individual
 

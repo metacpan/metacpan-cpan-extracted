@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: CP932X-R2
-version: 0.05
+version: 0.06
 abstract: provides minimal CP932X I/O subroutines by short name
 author:
   - ina <ina@cpan.org>
@@ -15,9 +15,9 @@ requires:
   File::Copy: 2.02
   File::Path: 1.0401
   FindBin: 1.42
-  IOas::CP932X: 0.04
+  IOas::CP932X: 0.06
   Socket: 0
-  UTF8::R2: 0.03
+  UTF8::R2: 0.05
   lib: 0
   perl: 5.005_03
   strict: 1.01

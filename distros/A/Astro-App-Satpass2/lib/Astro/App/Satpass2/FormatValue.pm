@@ -23,7 +23,7 @@ use POSIX qw{ floor };
 use Scalar::Util 1.26 qw{ isdual reftype };
 use Text::Wrap ();
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 use constant NONE => undef;
 use constant RE_ALL_DIGITS	=> qr{ \A [0-9]+ \z }smx;
@@ -79,7 +79,6 @@ use constant TITLE_GRAVITY_TOP		=> 'top';
 		'Argument list_formatter must be a code reference ',
 		'or the name of a known coordinate system'
 	    );
-
 
 	$self->{title} = $args{title};
 
@@ -3731,7 +3730,6 @@ as a hash - for example
 Scalar arguments will be passed to all called methods, except for
 C<append>, which will be appended to the entire formatted value.
 
-
 =head3 longitude
 
  print $fmt->longitude();
@@ -3789,7 +3787,6 @@ value if you do not wish to enforce a specific width. The default is
 C<4>.
 
 =back
-
 
 =head3 maidenhead
 
@@ -4375,7 +4372,6 @@ other formatters, which produce a fixed-width string, this formatter
 produces a block of text, whatever is contained by the C<{body}>
 object's C<tle> attribute if any.
 
-
 =head3 type
 
  print $fmt->type();
@@ -4634,6 +4630,7 @@ The default is C<local>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

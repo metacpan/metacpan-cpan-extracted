@@ -1,4 +1,11 @@
-$Id: Changes 1826 2020-11-18 13:18:18Z willem $                       -*-text-*-
+$Id: Changes 1836 2021-03-30 07:55:46Z willem $                       -*-text-*-
+
+
+**** 1.30 Mar 30, 2021
+
+	Simplify parsing of multi-line RRs in zone file.
+	Improve robustness of "dry" resolver tests.
+	Avoid deep recursion in non-fatal test report.
 
 
 **** 1.29 Nov 18, 2020

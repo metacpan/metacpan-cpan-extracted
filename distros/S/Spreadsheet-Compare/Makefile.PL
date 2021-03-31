@@ -1,5 +1,5 @@
 #!perl
-use 5.010001;
+use 5.024;
 
 use strict;
 use warnings;
@@ -78,7 +78,7 @@ WriteMakefile(
         },
     },
     PREREQ_PM => { qw(
-        Mojolicious                8.06
+        Mojolicious                8.43
         Path::Tiny                 0.100
         YAML::Any                  0
         Log::Log4perl              0

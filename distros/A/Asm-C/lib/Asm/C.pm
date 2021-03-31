@@ -5,7 +5,7 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Asm::C;
-our $VERSION = "20210329";
+our $VERSION = "20210330";
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -25,7 +25,10 @@ sub extractCStructure($)                                                        
   return $extractCStructure{$input} if exists $extractCStructure{$input};       # Return cached value if it exists
   return undef unless confirmHasCommandLineCommand(q(gcc));                     # Check that we have gcc
 
-  my @e = qx(gcc -x c -gdwarf $input; readelf -w a.out; rm a.out);              # Structure details via dwarf debugging info
+  my $inputFile = -f $input ? $input : writeTempFile($input);                   # Make sure input is in a file
+
+  my $e = qq(gcc -c -x c -fno-eliminate-unused-debug-symbols -fno-eliminate-unused-debug-types -gdwarf $inputFile -o a.out; readelf -w a.out; rm a.out);
+  my @e = qx($e);                                                               # Structure details via dwarf debugging info
   my @s;                                                                        # Structure
 
   for my $e(@e)                                                                 # Each line of dwarf
@@ -40,12 +43,12 @@ sub extractCStructure($)                                                        
   my %s; my %b;                                                                 # Structure details, base details
   for my $i(keys @s)                                                            # Each dwarf
    {if             ($s[$i][0][3] =~ m(DW_TAG_structure_type))                   # Structure followed by fields
-     {my $name    = $s[$i][1][2];
+     {my $name    = $s[$i][1][2] =~ s/\(.*\):\s*//gsr;;
       my $size    = $s[$i][2][2];
       $s{$name}   = genHash('structure', size=>$size, fields=>{});
       for(my $j   = $i + 1; $j < @s; ++$j)                                      # Following tag fields
        {last unless  $s[$j][0][3] =~ m(DW_TAG_member);
-        my $field =  $s[$j][1][2];
+        my $field =  $s[$j][1][2] =~ s/\(.*\):\s*//gsr;
         my $type  =  $s[$j][5][2];
         my $loc   =  $s[$j][6][2];
         $type =~ s(<0x|>) ()gs;
@@ -70,7 +73,7 @@ sub extractCStructure($)                                                        
         $$fields{$f}->type = $b->type;
        }
       else
-       {say STDERR "No base for offset: $b";
+       {say STDERR "No base for offset: $type";
        }
      }
    }
@@ -567,6 +570,10 @@ END
   is_deeply extractCFieldType($input, q(S), q(a)), q(int);
   is_deeply extractCFieldType($input, q(S), q(b)), q(int);
   is_deeply extractCFieldType($input, q(S), q(c)), q(int);
+ }
+
+if (0)
+ {my $s = extractCStructure q(#include <time.h>);
  }
 
 if (1)                                                                          #TextractMacroDefinitionsFromCHeaderFile #TextractMacroDefinitionFromCHeaderFile

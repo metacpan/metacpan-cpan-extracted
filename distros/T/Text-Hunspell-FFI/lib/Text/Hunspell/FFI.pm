@@ -8,7 +8,7 @@ use FFI::CheckLib 0.27 ();
 use experimental qw( postderef );
 
 # ABSTRACT: Perl FFI interface to the Hunspell library
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 sub _lib
 {
@@ -71,8 +71,8 @@ sub _string_array_and_word
   my($xsub, $self, $word) = @_;
   my $ptr;
   my $count = $xsub->($$self, \$ptr, $word);
-  my @result = map { $ffi->cast('opaque','string',$_) } $ffi->cast('opaque',"opaque[$count]", $ptr)->@*;
-  _free_list($self, $ptr, $count);
+  my @result = defined $ptr ? map { $ffi->cast('opaque','string',$_) } $ffi->cast('opaque',"opaque[$count]", $ptr)->@* : ();
+  _free_list($self, $ptr, $count) if defined $ptr;
   wantarray ? @result : $result[0];  ## no critic (Freenode::Wantarray)
 }
 
@@ -83,8 +83,8 @@ $ffi->attach(['Hunspell_generate'=>'generate'] => ['opaque','opaque*','string','
   my($xsub, $self, $word, $word2) = @_;
   my $ptr;
   my $count = $xsub->($$self, \$ptr, $word, $word2);
-  my @result = map { $ffi->cast('opaque','string',$_) } $ffi->cast('opaque',"opaque[$count]", $ptr)->@*;
-  _free_list($self, $ptr, $count);
+  my @result = defined $ptr ? map { $ffi->cast('opaque','string',$_) } $ffi->cast('opaque',"opaque[$count]", $ptr)->@* : ();
+  _free_list($self, $ptr, $count) if $ptr;
   wantarray ? @result : $result[0];  ## no critic (Freenode::Wantarray)
 });
 
@@ -94,8 +94,8 @@ $ffi->attach(['Hunspell_generate2'=>'generate2'] => ['opaque','opaque*','string'
   my $n = scalar @$suggestions;
   my $ptr;
   my $count = $xsub->($$self, \$ptr, $word, [@$suggestions], 1);
-  my @result = map { $ffi->cast('opaque','string',$_) } $ffi->cast('opaque',"opaque[$count]", $ptr)->@*;
-  _free_list($self, $ptr, $count);
+  my @result = defined $ptr ? map { $ffi->cast('opaque','string',$_) } $ffi->cast('opaque',"opaque[$count]", $ptr)->@* : ();
+  _free_list($self, $ptr, $count) if defined $ptr;
   wantarray ? @result : $result[0];  ## no critic (Freenode::Wantarray)
 });
 
@@ -113,7 +113,7 @@ Text::Hunspell::FFI - Perl FFI interface to the Hunspell library
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

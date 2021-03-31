@@ -10,7 +10,7 @@ use Exporter qw{ import };
 use Test2::V0;
 use Test2::Util qw{ pkg_to_file };
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 our @EXPORT_OK = qw{
     build_skip_reason
@@ -114,6 +114,7 @@ L<Test2::V0|Test2::V0>
 
 This module is unsupported in the usual sense, but if you think it is
 causing test failures, please file a bug report at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test2-Tools-LoadModule>,
 L<https://github.com/trwyant/perl-Test2-Tools-LoadModule/issues>, or in
 electronic mail to the author.
 

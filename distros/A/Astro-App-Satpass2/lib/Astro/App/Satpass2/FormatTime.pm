@@ -11,7 +11,7 @@ use parent qw{ Astro::App::Satpass2::Copier };
 
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 use constant ROUND_TIME => 1;
 
@@ -152,7 +152,6 @@ sub __round_time_value {
 }
 
 __PACKAGE__->create_attribute_methods();
-
 
 1;
 
@@ -304,6 +303,7 @@ is returned.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

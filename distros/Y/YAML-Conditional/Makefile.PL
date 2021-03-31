@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'YAML::XS' => '0.82',
-	'Struct::Conditional' => '0.02'
+	'Struct::Conditional' => '1.00'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'YAML-Conditional-*' },

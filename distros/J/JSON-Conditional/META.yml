@@ -22,12 +22,12 @@ no_index:
 provides:
   JSON::Conditional:
     file: lib/JSON/Conditional.pm
-    version: '0.05'
+    version: '1.00'
 requires:
   JSON: '0'
-  Struct::Conditional: '0'
+  Struct::Conditional: '1.00'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/JSON-Conditional.git
-version: '0.05'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

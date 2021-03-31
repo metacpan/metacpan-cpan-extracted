@@ -12,7 +12,7 @@ BEGIN
 };
 
 diag( "Test include file is ./t/htdocs${BASE_URI}/include.01.txt" ) if( $DEBUG );
-my $inc = Apache2::SSI::File->new( "./t/htdocs${BASE_URI}/include.01.txt" );
+my $inc = Apache2::SSI::File->new( "./t/htdocs${BASE_URI}/include.01.txt", debug => $DEBUG );
 my $inc_size = Module::Generic::Number->new( $inc->finfo->size );
 my $size_formatted = $inc_size < 1024 ? $inc_size : $inc_size->format_bytes;
 

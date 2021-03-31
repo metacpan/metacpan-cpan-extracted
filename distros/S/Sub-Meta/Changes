@@ -1,8 +1,11 @@
 Revision history for Perl extension Sub-Meta
 
+0.10 2021-03-29T14:56:13Z
+    - use Perl::Critic & support severity 3 #29 #30 #31
+
 0.09 2021-03-26T14:42:12Z
     [IMPROVEMENTS]
-    - feat: diplay of Sub::Meta #26
+    - feat: display of Sub::Meta #26
     - improve Sub::Meta#new #26
     - improve test #24
 

@@ -15,7 +15,7 @@ use Astro::App::Satpass2::Utils qw{
 };
 use File::Spec;
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 sub init {
     my ( $self ) = @_;
@@ -67,7 +67,6 @@ sub init {
 	# Record the fact that the module defines this name.
 	$implements{$name} = *{$glob}{CODE};
     }
-
 
     # End of symbol table magic.
     $self->{implements} = \%implements;
@@ -177,7 +176,6 @@ This is really only here to make testing easier.
 
 =back
 
-
 =head1 SEE ALSO
 
 The superclass,
@@ -186,6 +184,7 @@ L<Astro::App::Satpass2::Macro|Astro::App::Satpass2::Macro>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

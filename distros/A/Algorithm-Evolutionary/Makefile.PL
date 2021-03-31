@@ -1,6 +1,20 @@
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker; #-*-cperl-*-
 
 my @scripts = grep {-f } glob("scripts/*.pl "); # Ripped from Text::PDF
+
+my %make;
+if ($ExtUtils::MakeMaker::VERSION > 6.64) {
+   $make{META_MERGE} = {
+    'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/JJ/Algorithm-Evolutionary.git',
+                web  => 'https://github.com/JJ/Algorithm-Evolutionary',
+            },
+        },
+    };
+}
 
 WriteMakefile(
     NAME                => 'Algorithm::Evolutionary',
@@ -11,16 +25,15 @@ WriteMakefile(
     LICENSE => 'gpl',
     PL_FILES            => {},
     PREREQ_PM => {'Algorithm::Permute' => 0.01,
-		  'B::Deparse' => 0.56,
 		  'Bit::Vector' => 0,
 		  'Clone' => 0.31,
 		  constant => 0,
-		  'GD' => 2.17,   
+		  'GD' => 2.17,
 		  'Math::Random' => 0.63,
-		  'Memoize' => 0, 
+		  'Memoize' => 0,
 		  'Object::Array' => 0,
-		  'Pod::Escapes'	=> '0', #Dependence from Test::Pod, but produces failure in 1 platform
-		  'Sort::Key' => 0,		  
+		  'Pod::Escapes' => '0', #Dependence from Test::Pod, but produces failure in 1 platform
+		  'Sort::Key' => 0,
 		  'Statistics::Basic' => 1.6,
 		  'String::Random' => 0,
 		  'Test::More' => 0,
@@ -33,7 +46,8 @@ WriteMakefile(
 		  YAML => 0
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
-    clean               => { FILES => 'Algorithm-Evolutionary-*' }
+    clean               => { FILES => 'Algorithm-Evolutionary-*' },
+    %make,
     );
 
 #Add new targets
@@ -46,7 +60,7 @@ docs:
 	for i in *.pod; do base=`basename $$i .pod`; echo $$base; pod2html --verbose --htmlroot ../..   --podpath=Individual:Op --outfile $$base.html $$i; done; \
 	cd Op; for i in *.pm; do base=`basename $$i .pm`; echo $$base; pod2html --verbose --htmlroot ../../.. --podroot ..  --outfile $$base.html $$i; done ; \
 	cd ../Individual; for i in *.pm; do base=`basename $$i .pm`; echo $$base; pod2html --verbose --htmlroot ../../.. --podroot .. --outfile $$base.html $$i; done
-	
+
 $(DISTVNAME)-examples.tar$(SUFFIX) : distdir
 	$(PREOP)
 	$(TO_UNIX)

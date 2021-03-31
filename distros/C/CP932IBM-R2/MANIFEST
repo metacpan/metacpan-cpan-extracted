@@ -7,6 +7,7 @@ Makefile.PL
 pmake.bat
 MANIFEST
 LICENSE
+CONTRIBUTING
 t/1002_mbeach.t
 t/1003_mbtr.t
 t/1004_iolen.t

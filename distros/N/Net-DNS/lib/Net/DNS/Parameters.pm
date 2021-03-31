@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2020-10-26)
+##	(last updated 2021-03-08)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1823 2020-11-16 16:29:45Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 1832 2021-03-22 08:33:36Z willem $)[2];
 
 use integer;
 use Carp;
@@ -111,7 +111,7 @@ my @typebyname = (
 	CDNSKEY	   => 60,					# RFC7344
 	OPENPGPKEY => 61,					# RFC7929
 	CSYNC	   => 62,					# RFC7477
-	ZONEMD	   => 63,					# draft-wessels-dns-zone-digest
+	ZONEMD	   => 63,					# RFC8976
 	SVCB	   => 64,					# draft-ietf-dnsop-svcb-https-00
 	HTTPS	   => 65,					# draft-ietf-dnsop-svcb-https-00
 	SPF	   => 99,					# RFC7208
@@ -126,7 +126,7 @@ my @typebyname = (
 	EUI48	   => 108,					# RFC7043
 	EUI64	   => 109,					# RFC7043
 	TKEY	   => 249,					# RFC2930
-	TSIG	   => 250,					# RFC-ietf-dnsop-rfc2845bis-09
+	TSIG	   => 250,					# RFC8945
 	IXFR	   => 251,					# RFC1995
 	AXFR	   => 252,					# RFC1035 RFC5936
 	MAILB	   => 253,					# RFC1035
@@ -171,17 +171,17 @@ my @rcodebyname = (
 	YXRRSET	  => 7,						# RFC2136
 	NXRRSET	  => 8,						# RFC2136
 	NOTAUTH	  => 9,						# RFC2136
-	NOTAUTH	  => 9,						# RFC-ietf-dnsop-rfc2845bis-09
+	NOTAUTH	  => 9,						# RFC8945
 	NOTZONE	  => 10,					# RFC2136
 	DSOTYPENI => 11,					# RFC8490
 	BADVERS	  => 16,					# RFC6891
-	BADSIG	  => 16,					# RFC-ietf-dnsop-rfc2845bis-09
-	BADKEY	  => 17,					# RFC-ietf-dnsop-rfc2845bis-09
-	BADTIME	  => 18,					# RFC-ietf-dnsop-rfc2845bis-09
+	BADSIG	  => 16,					# RFC8945
+	BADKEY	  => 17,					# RFC8945
+	BADTIME	  => 18,					# RFC8945
 	BADMODE	  => 19,					# RFC2930
 	BADNAME	  => 20,					# RFC2930
 	BADALG	  => 21,					# RFC2930
-	BADTRUNC  => 22,					# RFC-ietf-dnsop-rfc2845bis-09
+	BADTRUNC  => 22,					# RFC8945
 	BADCOOKIE => 23,					# RFC7873
 	);
 our %rcodebyval = reverse( BADSIG => 16, @rcodebyname );

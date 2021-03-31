@@ -33,7 +33,7 @@
    "provides" : {
       "Asm::C" : {
          "file" : "lib/Asm/C.pm",
-         "version" : "20210329"
+         "version" : "20210330"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "url" : "https://github.com/philiprbrenan/AsmC"
       }
    },
-   "version" : "20210329",
+   "version" : "20210330",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

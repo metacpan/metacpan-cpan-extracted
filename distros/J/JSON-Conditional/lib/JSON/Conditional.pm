@@ -1,5 +1,5 @@
 package JSON::Conditional;
-use 5.006; use strict; use warnings; our $VERSION = '0.05';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use JSON; use base 'Struct::Conditional';
 
 our $JSON;
@@ -57,7 +57,7 @@ JSON::Conditional - A conditional language within a JSON struct
 
 =head1 VERSION
 
-Version 0.05
+Version 1.00
 
 =cut
 
@@ -619,7 +619,7 @@ L<https://metacpan.org/release/JSON-Conditional>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2021 by LNATION.
 
 This is free software, licensed under:
 

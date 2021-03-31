@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 use Scalar::Util ();
 use Sub::Meta;
@@ -15,8 +15,7 @@ my %INDEX;
 sub _croak { require Carp; goto &Carp::croak }
 
 sub register {
-    my $class = shift;
-    my ($sub, $meta) = @_;
+    my ($class, $sub, $meta) = @_;
     unless ($sub && $meta) {
         _croak "arguments required coderef and submeta.";
     }
@@ -37,18 +36,16 @@ sub register {
 }
 
 sub register_list {
-    my $class = shift;
-    my @args = @_ == 1 && ref $_[0] && ref $_[0] eq 'ARRAY' ? @{$_[0]} : @_;
+    my ($class, @list) = @_;
 
-    for (@args) {
+    for (@list) {
         $class->register(@$_)
     }
     return;
 }
 
 sub get {
-    my $class = shift;
-    my ($sub) = @_;
+    my ($class, $sub) = @_;
 
     unless (ref $sub && ref $sub eq 'CODE') {
         _croak "required coderef: $sub";
@@ -59,8 +56,7 @@ sub get {
 }
 
 sub get_by_stash_subname {
-    my $class = shift;
-    my ($stash, $subname) = @_;
+    my ($class, $stash, $subname) = @_;
 
     my $id = $INDEX{$stash}{$subname};
     return $INFO{$id} if $id;
@@ -68,8 +64,7 @@ sub get_by_stash_subname {
 }
 
 sub get_all_subnames_by_stash {
-    my $class = shift;
-    my ($stash) = @_;
+    my ($class, $stash) = @_;
 
     my $data = $INDEX{$stash};
     return [ sort keys %$data ] if $data;
@@ -77,8 +72,7 @@ sub get_all_subnames_by_stash {
 }
 
 sub get_all_submeta_by_stash {
-    my $class = shift;
-    my ($stash) = @_;
+    my ($class, $stash) = @_;
 
     my $data = $INDEX{$stash};
     return [ map { $INFO{$data->{$_}} } sort keys %$data ] if $data;
@@ -86,8 +80,7 @@ sub get_all_submeta_by_stash {
 }
 
 sub remove {
-    my $class = shift;
-    my ($sub) = @_;
+    my ($class, $sub) = @_;
 
     unless (ref $sub && ref $sub eq 'CODE') {
         _croak "required coderef: $sub";

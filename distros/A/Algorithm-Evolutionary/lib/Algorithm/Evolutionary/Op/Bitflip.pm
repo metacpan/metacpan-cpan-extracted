@@ -9,16 +9,6 @@ Algorithm::Evolutionary::Op::Bitflip - Bit-flip mutation
 
 =head1 SYNOPSIS
 
-  my $xmlStr2=<<EOC; #howMany should be integer
-  <op name='Bitflip' type='unary' rate='0.5' >
-    <param name='howMany' value='2' /> 
-  </op>
-  EOC
-  my $ref2 = XMLin($xmlStr2);
-
-  my $op2 = Algorithm::Evolutionary::Op::Base->fromXML( $ref2 );
-  print $op2->asXML(), "\n*Arity ", $op->arity(), "\n";
-
   my $op = new Algorithm::Evolutionary::Op::Bitflip 2; #Create from scratch with default rate
 
 =head1 Base Class
@@ -36,7 +26,7 @@ does not need a rate
 
 package Algorithm::Evolutionary::Op::Bitflip;
 
-our ($VERSION) = ( '$Revision: 3.3 $ ' =~ /(\d+\.\d+)/ );
+our ($VERSION) = ( '$Revision: 3.4 $ ' =~ /(\d+\.\d+)/ );
 
 use Carp;
 use Clone qw(clone);
@@ -112,12 +102,6 @@ sub apply ($;$){
   
   This file is released under the GPL. See the LICENSE file included in this distribution,
   or go to http://www.fsf.org/licenses/gpl.txt
-
-  CVS Info: $Date: 2011/02/13 17:45:53 $ 
-  $Header: /media/Backup/Repos/opeal/opeal/Algorithm-Evolutionary/lib/Algorithm/Evolutionary/Op/Bitflip.pm,v 3.3 2011/02/13 17:45:53 jmerelo Exp $ 
-  $Author: jmerelo $ 
-  $Revision: 3.3 $
-  $Name $
 
 =cut
 

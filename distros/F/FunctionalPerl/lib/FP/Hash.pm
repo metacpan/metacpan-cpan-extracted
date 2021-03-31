@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -38,6 +38,19 @@ FP::Hash
     is_equal subhash({a => 10, b => 11, c => 12}, "a", "c"),
              +{a => 10, c => 12};
 
+    # Curried hash lookup:
+    is_equal hashkey("foo")->({foo=> 10, bar=> 20}), 10;
+    use FP::Array_sort qw(array_sort on);
+    use FP::Ops qw(number_cmp);
+    is_equal array_sort([ {a=> 3, b=> "a"}, {a=> 2, b=> "b"} ],
+                        on hashkey("a"), \&number_cmp),
+             [ {a=> 2, b=> "b"}, {a=> 3, b=> "a"} ];
+
+    # NOTE: `mesh` might be added to List::Util, too
+    is_equal +{ mesh [qw(a b c)], [2,3,4] },
+            { a=> 2, b=> 3, c=> 4 };
+    is_equal ziphash([qw(a b c)], [2,3,4]),
+            { a=> 2, b=> 3, c=> 4 };
 
 =head1 DESCRIPTION
 
@@ -61,14 +74,10 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 use Exporter "import";
 
-our @EXPORT
-    = qw(hash_set hash_perhaps_ref hash_maybe_ref hash_xref hash_ref_or hash_cache
-    hash_delete hash_update hash_diff
-    hash_length
-    subhash
-    hashes_keys $empty_hash
-    hash2_set
-);
+our @EXPORT = qw(hash_set hash_perhaps_ref hash_maybe_ref hash_xref
+    hash_ref_or hashkey mesh ziphash hash_cache hash_delete
+    hash_update hash_diff hash_length subhash hashes_keys $empty_hash
+    hash2_set );
 our @EXPORT_OK   = qw();
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
@@ -194,6 +203,29 @@ sub hash_ref_or {
     } else {
         $other
     }
+}
+
+# Curried hash lookup
+sub hashkey {
+    @_ == 1 or fp_croak_arity 1;
+    my ($key) = @_;
+    sub {
+        @_ == 1 or fp_croak_arity 1;
+        my ($h) = @_;
+        $h->{$key}
+    }
+}
+
+sub mesh {
+    @_ == 2 or fp_croak_arity 2;
+    my ($keys, $values) = @_;
+    map { $keys->[$_] => $values->[$_] } 0 .. $#$keys
+}
+
+sub ziphash {
+    @_ == 2 or fp_croak_arity 2;
+    my ($keys, $values) = @_;
+    +{ map { $keys->[$_] => $values->[$_] } 0 .. $#$keys }
 }
 
 sub hash_cache {

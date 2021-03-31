@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b15b6198d619dd74e648e2fdc6eaad65c9bdf6aa Changes
+SHA1 8635fbf61d99fdcfdea2c941d46d0f2d565fbf24 MANIFEST
+SHA1 d93f0b2a225f853f301388d1b4c6ee91e572c2a1 META.yml
+SHA1 34122614537a44c878a788c468626a939be9645c Makefile.PL
+SHA1 5217c32faccd3e7b91414276fc4a9eee1f17b6b2 README
+SHA1 7a8941ee705e547794233f9ce36b46acece91388 etc/Helpdesk_Config.pm
+SHA1 46593170a6bb0009251387889113fc9c496edbdd etc/Lifeycle_Config.pm
+SHA1 bc09324a72ddae3e0013f95632756afd2c9d1232 etc/initialdata
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 85254e101a40b265981d7165d2b8cf0277ebfed2 inc/Module/Install/Include.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
+SHA1 ad0193a17bb21562d27ac9a5f7a2fd782a3fafb5 inc/Module/Install/RTx.pm
+SHA1 a17d6d01c9da7a5bed6fcef0038727e63d9b932a inc/Module/Install/RTx/Runtime.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 61eb6159a86c81ec77f4a7ae9a177e187cad4634 inc/YAML/Tiny.pm
+SHA1 f2cc2e835d873ad167afa512906c4d67b5cd9edb lib/RT/Condition/NonRequestorReply.pm
+SHA1 5d031176b632690f613b42db07568ac4a2a61650 lib/RT/Condition/RequestorReply.pm
+SHA1 e11302916d610bd3e663948e2d90a872f67b52eb lib/RT/Extension/HelpDesk.pm
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJgY2MfAAoJEBXncVGnZqUURvYH/jdRqj/JCt0YmhEsDMHfoHKp
+X6X/ZZaHvnjorC/THV4rxbCgqZldbirU8XL6niunSBAFJvHn/xV1KEhYLregjhlS
+gYo+Hz/KnGNe9SJGV2+qRYSdRKubakwHkoDlF87iFExikU80DXsqbwjBuxkwG5qA
+5mBteJLRVY9ImtE4RvBcl3/9ZWnkJO6X6qSZh2P7G4QAaGZu4GF1GbFoiuKo7bkI
+ddSrY0ryGfjfCk+JGp9jCly9HF41QQ+aKaYcxE5ObWFDnfz/Cr9Mq5Bd09UYST3W
+EGmMJVvObjUgHbq245E799ZUetoGXXHZi7BkJziQIQjRDzSjj1DGFxG6I8YgdU8=
+=Ctqo
+-----END PGP SIGNATURE-----

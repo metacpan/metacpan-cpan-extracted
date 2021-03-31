@@ -24,6 +24,7 @@ sub handle_response {
     my $xml_opts = { x509 => 1 };
     $xml_opts->{ cert_text } = $self->cert_text if ($self->cert_text);
     $xml_opts->{ exclusive } = 1;
+    $xml_opts->{ no_xml_declaration } = 1;
     my $x = Net::SAML2::XML::Sig->new($xml_opts);
     my $ret = $x->verify($xml);
     die "signature check failed" unless $ret;
@@ -57,7 +58,7 @@ Net::SAML2::Binding::POST
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -108,6 +109,7 @@ This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
             2017       Alessandro Ranellucci
             2019       Timothy Legge
             2020       Timothy Legge, Wesley Schwengle
+            2021       Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

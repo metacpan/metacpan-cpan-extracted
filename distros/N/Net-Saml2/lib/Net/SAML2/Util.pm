@@ -32,7 +32,7 @@ Net::SAML2::Util - Utility functions for Net:SAML2
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 SYNOPSIS
 

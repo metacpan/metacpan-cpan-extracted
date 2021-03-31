@@ -2,7 +2,7 @@
 #
 # 1028_mb3.t
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # This file is encoded in UTF-8.
@@ -19,7 +19,9 @@ BEGIN {
     $SIG{__WARN__} = sub {
         local($_) = @_;
         /\A"\\c\)" is more clearly written simply as "i" at /   ? return :
+        /\A"\\c\)" is more clearly written simply as "i" in /   ? return :
         /\A"\\c\}" is more clearly written simply as "\\=" at / ? return :
+        /\A"\\c\}" is more clearly written simply as "\\=" in / ? return :
         /\AIllegal hex digit ignored at /                       ? return :
         /\AUnrecognized escape \\H passed through at /          ? return :
         /\AUnrecognized escape \\R passed through at /          ? return :

@@ -13,7 +13,7 @@ use Astro::App::Satpass2::Utils qw{
 use Astro::App::Satpass2::Warner;
 use Scalar::Util 1.26 qw{ weaken };
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 sub new {
     my ( $class, %arg ) = @_;
@@ -262,7 +262,6 @@ This optional attribute is an C<Astro::App::Satpass2::Warner> object
 used to report errors. If omitted, one will be generated. It is returned
 by the C<warner()> method.
 
-
 =head1 SEE ALSO
 
 <<< replace or remove boilerplate >>>
@@ -270,6 +269,7 @@ by the C<warner()> method.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

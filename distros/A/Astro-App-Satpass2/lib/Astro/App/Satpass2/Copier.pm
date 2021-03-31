@@ -9,7 +9,7 @@ use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 use Astro::App::Satpass2::Warner;
 use Scalar::Util 1.26 qw{ blessed };
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 sub attribute_names {
     return ( qw{ warner } );
@@ -257,6 +257,7 @@ This convenience method simply wraps C<< $self->warner()->whinge() >>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

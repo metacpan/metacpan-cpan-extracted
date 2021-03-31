@@ -4,7 +4,7 @@
 
 #########################
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use warnings;
 use strict;
@@ -22,7 +22,9 @@ my $indi = new Algorithm::Evolutionary::Individual::BitString $num_bits ; # Buil
 ok( $om->_apply( $indi ) > 0, "Works on indis" );
 ok( $om->onemax( $indi->{'_str'})  > 0, "Works on strings" );
 my $string = "11111111111";
+my $copy = $string;
 ok( $om->onemax( $string) == 11, "OK count 1" );
+ok( $string == $copy, "String not affected" );
 $string = "010111101111110";
 ok( $om->onemax( $string ) == 11, "OK count 2" );
 

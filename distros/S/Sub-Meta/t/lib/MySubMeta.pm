@@ -7,7 +7,7 @@ use MySubMeta::Parameters;
 use MySubMeta::Returns;
 
 # override
-sub parameters_class { 'MySubMeta::Parameters' }
-sub returns_class { 'MySubMeta::Returns' }
+sub parameters_class { return 'MySubMeta::Parameters' }
+sub returns_class { return 'MySubMeta::Returns' }
 
 1;

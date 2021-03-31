@@ -3,21 +3,12 @@ use warnings;
 
 =head1 NAME
 
-Algorithm::Evolutionary::Op::Mutation - BitFlip mutation, changes several bits in a bitstring, depending on the probability
+Algorithm::Evolutionary::Op::Mutation - Bitflip mutation, changes several bits in a bitstring, depending on the probability
 
 =head1 SYNOPSIS
 
   use Algorithm::Evolutionary::Op::Mutation;
 
-  my $xmlStr=<<EOC;
-  <op name='Mutation' type='unary' rate='2'>
-    <param name='probability' value='0.5' />
-  </op>
-  EOC
-  my $ref = XMLin($xmlStr);
-
-  my $op = Algorithm::Evolutionary::Op::->fromXML( $ref );
-  print $op->asXML(), "\n*Arity ->", $op->arity(), "\n";
 
   #Create from scratch
   my $op = new Algorithm::Evolutionary::Op::Mutation (0.5 ); 
@@ -38,7 +29,7 @@ Mutation operator for a GA
 
 package  Algorithm::Evolutionary::Op::Mutation;
 
-our ($VERSION) = ( '$Revision: 3.1 $ ' =~ /(\d+\.\d+)/ );
+our ($VERSION) = ( '$Revision: 3.2 $ ' =~ /(\d+\.\d+)/ );
 
 use Carp;
 
@@ -123,12 +114,6 @@ sub apply ($;$) {
   
   This file is released under the GPL. See the LICENSE file included in this distribution,
   or go to http://www.fsf.org/licenses/gpl.txt
-
-  CVS Info: $Date: 2009/09/13 12:49:04 $ 
-  $Header: /media/Backup/Repos/opeal/opeal/Algorithm-Evolutionary/lib/Algorithm/Evolutionary/Op/Mutation.pm,v 3.1 2009/09/13 12:49:04 jmerelo Exp $ 
-  $Author: jmerelo $ 
-  $Revision: 3.1 $
-  $Name $
 
 =cut
 

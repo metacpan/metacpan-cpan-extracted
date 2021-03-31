@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Struct::Conditional" : "0.02",
+            "Struct::Conditional" : "1.00",
             "YAML::XS" : "0.82",
             "perl" : "5.006"
          }
@@ -47,7 +47,7 @@
    "provides" : {
       "YAML::Conditional" : {
          "file" : "lib/YAML/Conditional.pm",
-         "version" : "0.03"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/YAML-Conditional"
       }
    },
-   "version" : "0.03",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

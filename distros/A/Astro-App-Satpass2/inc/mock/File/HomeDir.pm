@@ -9,7 +9,7 @@ use Carp;
 
 use constant HASH_REF	=> ref {};
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 our $MOCK_FILE_HOMEDIR_MY_DIST_CONFIG;
 our $MOCK_FILE_HOMEDIR_MY_HOME;
@@ -124,6 +124,7 @@ The real L<File::HomeDir|File::HomeDir>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

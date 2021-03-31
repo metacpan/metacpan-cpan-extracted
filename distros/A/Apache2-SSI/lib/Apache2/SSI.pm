@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI.pm
-## Version v0.2.3
+## Version v0.2.4
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/17
-## Modified 2021/03/19
+## Modified 2021/03/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -75,7 +75,7 @@ BEGIN
     use URL::Encode ();
     use URI::Escape::XS ();
     use version;
-    our $VERSION = 'v0.2.3';
+    our $VERSION = 'v0.2.4';
     use constant PERLIO_IS_ENABLED => $Config{useperlio};
     ## As of Apache 2.4.41 and mod perl 2.0.11 Apache2::SubProcess::spawn_proc_prog() is not working
     use constant MOD_PERL_SPAWN_PROC_PROG_WORKING => 0;
@@ -1925,11 +1925,14 @@ sub parse_exec
     }
     elsif( !$finfo->can_exec )
     {
-        $self->message( 3, "CGI file is not executable." );
-        ## return( $self->error( "Error including cgi \"$args->{cgi}\". File is not executable by Apache user." ) );
-        $self->error( "Error including cgi \"$args->{cgi}\". File is not executable by Apache user." );
-        $cgi->code( 401 );
-        return( $self->errmsg );
+        unless( $^O =~ /^(dos|mswin32|NetWare|symbian|win32)$/i && -T( "$finfo" ) )
+        {
+            $self->message( 3, "CGI file is not executable." );
+            ## return( $self->error( "Error including cgi \"$args->{cgi}\". File is not executable by Apache user." ) );
+            $self->error( "Error including cgi \"$args->{cgi}\". File is not executable by Apache user." );
+            $cgi->code( 401 );
+            return( $self->errmsg );
+        }
     }
     $self->message( 3, "Ok, file \"$cgi\" exists (code = '", $cgi->code, "')" );
         
@@ -1963,12 +1966,22 @@ sub parse_exec
             local $ENV{REQUEST_METHOD} = 'GET';
             local $ENV{REQUEST_URI} = $cgi->document_uri;
             my $file = $cgi->filename;
-            $buf = qx( "$file" );
+            my $mime = $finfo->mime_type;
+            $self->message( 3, "Mime type for file '$file' is '$mime', OS is '$^O' an is it a plain text file ? ", ( -T( "$cgi" ) ? 'Yes' : 'No' ), "." );
+            if( $^O =~ /^(dos|mswin32|NetWare|symbian|win32)$/i && $mime eq 'text/x-perl' )
+            {
+                $self->message( 3, "Calling $^X $file" );
+                $buf = `$^X $file`;
+            }
+            else
+            {
+                $buf = qx( "$file" );
+            }
         };
         ## Failed to execute
         if( $? == -1 )
         {
-            $self->message( 3, "CGI exite value was not 0 but '$?'." );
+            $self->message( 3, "CGI exit value was not 0 but '$?'." );
             $cgi->code( 500 );
             return( $self->errmsg );
         }
@@ -2646,42 +2659,6 @@ sub parse_expr_args
     return( join( ', ', @$buff ) );
 }
 
-sub _ipmatch
-{
-    my $self = shift( @_ );
-    my $subnet = shift( @_ ) || return( $self->error( "No subnet provided" ) );
-    my $ip   = shift( @_ ) || $self->remote_ip;
-    try
-    {
-        local $SIG{__WARN__} = sub{};
-        my $net = Net::Subnet::subnet_matcher( $subnet );
-        my $res = $net->( $ip );
-        return( $res ? 1 : 0 );
-    }
-    catch( $e )
-    {
-        $self->error( "Error while calling Net::Subnet: $e" );
-        return( 0 );
-    }
-}
-
-sub _is_ip
-{
-    my $self = shift( @_ );
-    my $ip   = shift( @_ );
-    return( 0 ) if( !length( $ip ) );
-    ## We need to return either 1 or 0. By default, perl return undef for false
-    return( $ip =~ /^(?:$RE{net}{IPv4}|$RE{net}{IPv6})$/ ? 1 : 0 );
-}
-
-sub _is_number
-{
-    my $self = shift( @_ );
-    my $word = shift( @_ );
-    return( 0 ) if( !length( $word ) );
-    return( $word =~ /^(?:$RE{num}{int}|$RE{num}{real})$/ ? 1 : 0 );
-}
-
 sub _format_time
 {
     my( $self, $time, $format, $tzone ) = @_;
@@ -2749,6 +2726,59 @@ sub _interp_vars
     $_[0] =~ s{ (^|[^\\]) (\\\\)* \$(\{)?(\w+)(\})? }
               { ($a,$b,$c) = ($1,$2,$4);
                 $a . ( length( $b ) ? substr( $b, length( $b ) / 2 ) : '' ) . $self->parse_echo({ var => $c }) }exg;
+}
+
+sub _ipmatch
+{
+    my $self = shift( @_ );
+    my $subnet = shift( @_ ) || return( $self->error( "No subnet provided" ) );
+    my $ip   = shift( @_ ) || $self->remote_ip;
+    try
+    {
+        local $SIG{__WARN__} = sub{};
+        my $net = Net::Subnet::subnet_matcher( $subnet );
+        my $res = $net->( $ip );
+        return( $res ? 1 : 0 );
+    }
+    catch( $e )
+    {
+        $self->error( "Error while calling Net::Subnet: $e" );
+        return( 0 );
+    }
+}
+
+sub _is_ip
+{
+    my $self = shift( @_ );
+    my $ip   = shift( @_ );
+    return( 0 ) if( !length( $ip ) );
+    ## We need to return either 1 or 0. By default, perl return undef for false
+    return( $ip =~ /^(?:$RE{net}{IPv4}|$RE{net}{IPv6})$/ ? 1 : 0 );
+}
+
+sub _is_number
+{
+    my $self = shift( @_ );
+    my $word = shift( @_ );
+    return( 0 ) if( !length( $word ) );
+    return( $word =~ /^(?:$RE{num}{int}|$RE{num}{real})$/ ? 1 : 0 );
+}
+
+sub _is_perl_script
+{
+    my $self = shift( @_ );
+    my $file = shift( @_ );
+    return( $self->error( "No file was provided to check if it looks like a perl script." ) ) if( !length( "$file" ) );
+    if( -T( "$finfo" ) )
+    {
+        my $io = IO::File->new( "<$file" ) || return( $self->error( "Unable to open file \"$file\" in read mode: $!" ) );
+        my $shebang = $io->getline;
+        chomp( $shebang );
+        $io->close;
+        ## We explicitly return 1 or 0, because otherwise upon failure perl would return undef which we reserve for errors
+        return( $shebang =~ /^\#\!(.*?)\bperl\b/i ? 1 : 0 );
+    }
+    return( 0 );
 }
 
 sub _lastmod                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            

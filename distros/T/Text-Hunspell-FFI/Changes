@@ -1,5 +1,8 @@
 Revision history for Text-Hunspell-FFI
 
+0.04      2021-03-30 17:48:10 -0600
+  - Fixed bug where empty suggestions could cause a crash (gh#8)
+
 0.03      2021-03-28 16:25:01 -0600
   - remove dependency on FFI::Platypus::Type::StringArray (gh#6)
 

@@ -1,3 +1,8 @@
+0.003   2021-01-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Extract per-function benchmark codes (Acme::CPANModules 0.1.7).
+
+
 0.002   2021-01-20  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

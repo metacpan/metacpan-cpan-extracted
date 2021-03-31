@@ -1,5 +1,10 @@
 Revision history for Perl module Apache2::SSI
 
+0.2.4 2021-03-29T23:15:37+0900
+    - Corrected bugs under Windows related OS
+    - Added Apache2::SSI::File::Type
+    - Added the mime_type method in Apache2::SSI::Finfo
+
 0.2.3 2021-03-19T12:09:54+0900
     - Removed use of Path::Tiny that was not declared as dependency in test unit 37.flastmod.t.
     - Adjusted Apache2::SSI::SharedMem for lack of support for threaded perl.

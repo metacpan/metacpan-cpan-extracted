@@ -12,6 +12,7 @@ cpanfile
 lib/WebService/Postex.pm
 t/00-compile.t
 t/01-basic.t
+t/02-bug-baseuri-context.t
 t/data/test.gz
 xt/author/distmeta.t
 xt/author/eol.t

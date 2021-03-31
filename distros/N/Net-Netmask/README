@@ -4,10 +4,12 @@ NAME
 SYNOPSIS
      use Net::Netmask;
 
-     $block = Net::Netmask->new(network block)
-     $block = Net::Netmask->new(network block, netmask)
+     $block = Net::Netmask->safe_new(network block)
+     $block = Net::Netmask->safe_new(network block, netmask)
      $block = Net::Netmask->new2(network block)
      $block = Net::Netmask->new2(network block, netmask)
+     $block = Net::Netmask->new(network block)   # Don't use in new code!
+     $block = Net::Netmask->new(network block, netmask)   # Don't use in new code!
 
      print $block;                      # a.b.c.d/bits or 1:2:3::4/bits
      print $block->base()
@@ -89,14 +91,6 @@ CONSTRUCTING
     '216.240.32.0 - 216.240.32.255'
     '216.240.32.4'                  A /32 block.
 
-    '216.240.32'                    Always a /24 block.
-
-    '216.240'                       Always a /16 block.
-
-    '140'                           Always a /8 block.
-
-    '216.240.32/24'
-    '216.240/16'
     'default' or 'any'              0.0.0.0/0 (the default route)
 
     '216.240.32.0#0.0.31.255'       A hostmask (as used by Cisco
@@ -109,14 +103,63 @@ CONSTRUCTING
 
     'default6' or 'any6'            ::/0 (the default route)
 
-    There are two constructor methods: "new" and "new2". "new2" differs from
-    "new" in that it will return undef for invalid netmasks, while "new"
-    will return a netmask object even if the constructor could not figure
-    out what the network block should be.
+    There are two constructor methods: "new" and "safe_new" (also known as
+    "new2").
+
+    "safe_new" differs from "new" in that it will return undef for invalid
+    netmasks, while "new" will return a netmask object even if the
+    constructor could not figure out what the network block should be.
 
     With "new", the error string can be found as $block->{'ERROR'}. With
-    "new2" the error can be found as Net::Netmask::errstr or
+    "safe_new" the error can be found as Net::Netmask::errstr or
     $Net::Netmask::error.
+
+    IMPORTANT: You want to use "safe_new" or "new2" ("new2" is a synonym for
+    "new") in new code!
+
+    As of version 2.000, the following abbreviated IPv4 netblocks are not
+    accepted by default, but can be accepted with options.
+
+    '216.240.32'                    Always a /24 block.
+
+    '216.240'                       Always a /16 block.
+
+    '140'                           Always a /8 block.
+
+    '216.240.32/24'
+    '216.240/16'
+
+    To accept these, you can call the constructor with a "shortnet" option
+    set to a true value. Example:
+
+      my $block = Net::Netmask->safe_new("216.240/16", shortnet => 1);
+
+    For compatibility with older codebases, it's also possible to change the
+    default to use the old behavior. To do this, you can set the
+    $Net::Netmask::SHORTNET_DEFAULT variable to a true value. It is
+    recommended that this be done by localizing the variable. Example:
+
+      local $Net::Netmask::SHORTNET_DEFAULT = 1
+      my $block = Net::Netmask->safe_new("216.240/16");
+
+    Please be aware that there are security implications to this as other
+    Perl modules, system libraries, or utilities may not parse these
+    addresses the same way. This is why the default was changed.
+
+    For instance:
+
+      perl -MNet::Netmask -E "say Net::Netmask->safe_new("10.20", shortnet => 1)"
+
+    Will print "10.2.0.0/16". However:
+
+      perl -MSocket -E "say inet_ntoa(inet_aton('10.20'))"
+
+    Will often print "10.0.0.20" which is obviously very different, and if
+    the Net::Netmask module was used to check an IP aggainst an ACL, and
+    then another program was executed (that uses inet_aton(), for instance),
+    the ACL processing might not match the connection.
+
+    Thus, it is advised to use this with caution.
 
 METHODS
     ->desc()                 Returns a description of the network block. Eg:
@@ -315,7 +358,7 @@ METHODS
 
                              For instance,
 
-                               Net::Netmask->new( '10.0.0.0/24' )->split(2)
+                               Net::Netmask->safe_new( '10.0.0.0/24' )->split(2)
 
                              is equivilent to
 
@@ -454,7 +497,7 @@ LICENSE
 
     Copyright (C) 2011-2013 Google, Inc.
 
-    Copyright (C) 2018 Joelle Maslak
+    Copyright (C) 2018-2021 Joelle Maslak
 
     This module may be used, modified and redistributed under the same terms
     as Perl itself.

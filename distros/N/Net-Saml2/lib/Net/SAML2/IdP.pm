@@ -220,7 +220,7 @@ Net::SAML2::IdP
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 SYNOPSIS
 

@@ -1,16 +1,12 @@
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
+# NAME
 
 Dist::Zilla::PluginBundle::Author::JMASLAK - JMASLAK's Plugin Bundle
 
-=head1 VERSION
+# VERSION
 
-version 1.202110
+version 1.210880
 
-=head1 DESCRIPTION
+# DESCRIPTION
 
 This is Joelle Maslak's plugin bundle, used for her modules.  If you're not
 her, you probably want to create your own plugin module because I may modify
@@ -47,8 +43,8 @@ It is somewhat equivilent to:
     [ShareDir]
 
     [ReadmeAnyFromPod]
-    type     = pod
-    filename = README.pod
+    type     = markdown
+    filename = README.md
 
     [Test::ChangesHasContent]
     [Test::EOL]
@@ -80,44 +76,42 @@ It is somewhat equivilent to:
 
 This automatically numbers releases.
 
-This creates a C<CODE_OF_CONDUCT.md> from the awesome Contributor Covenant
-project, a C<Changes> file, a C<CONTRIBUTING> file, a C<TODO> file,
-a C<MANIFEST_SKIP> file, an C<AUTHOR_PLEDGE> file that indicates CPAN admins
-can take ownership should the project become abandoned, and a C<.travis.yml>
+This creates a `CODE_OF_CONDUCT.md` from the awesome Contributor Covenant
+project, a `Changes` file, a `CONTRIBUTING` file, a `TODO` file,
+a `MANIFEST_SKIP` file, an `AUTHOR_PLEDGE` file that indicates CPAN admins
+can take ownership should the project become abandoned, and a `.travis.yml`
 file that will probably need to be edited.  If these files exist already, they
 will not get overwritten.
 
-It also generates a C<.mailmap> base file suitable for Joelle, if one does
+It also generates a `.mailmap` base file suitable for Joelle, if one does
 not already exists.
 
-=head1 USAGE
+# USAGE
 
-In your C<dist.ini> -
+In your `dist.ini` -
 
     [@Filter]
     -bundle  = @Author::JMASLAK
     -version = 0.003
 
-The C<-version> option should specify the latest version required and tested
+The `-version` option should specify the latest version required and tested
 with a given package.
 
-=head1 SEE ALSO
+# SEE ALSO
 
 Core Dist::Zilla plugins:
 
 Dist::Zilla roles:
-L<PluginBundle|Dist::Zilla::Role::PluginBundle>,
-L<PluginBundle::Easy|Dist::Zilla::Role::PluginBundle::Easy>.
+[PluginBundle](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APluginBundle),
+[PluginBundle::Easy](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APluginBundle%3A%3AEasy).
 
-=head1 AUTHOR
+# AUTHOR
 
 Joelle Maslak <jmaslak@antelope.net>
 
-=head1 COPYRIGHT AND LICENSE
+# COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018,2020 by Joelle Maslak.
+This software is copyright (c) 2018,2020-2021 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-=cut

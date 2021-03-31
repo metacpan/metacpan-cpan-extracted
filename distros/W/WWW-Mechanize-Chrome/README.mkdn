@@ -518,6 +518,14 @@ Allow or disallow execution of Javascript
 Sets the list of request patterns and resource types for which the interception
 callback will be invoked.
 
+## `$mech->continueInterceptedRequest( %options )`
+
+    $mech->continueInterceptedRequest_future(
+        interceptionId => ...
+    );
+
+Continues an intercepted request
+
 ## `$mech->add_listener`
 
     my $url_loaded = $mech->add_listener('Network.responseReceived', sub {
@@ -1464,6 +1472,16 @@ with a different API. Supported keys are:
 
 in addition to all keys that `$mech->xpath` supports.
 
+## `$mech->set_field( %options )`
+
+    $mech->set_field(
+        field => $field_node,
+        value => 'foo',
+    );
+
+Low level value setting method. Use this if you have an input element outside
+of a &lt;form> tag.
+
 ## `$mech->select( $name, $value )`
 
 ## `$mech->select( $name, \@values )`
@@ -1614,6 +1632,13 @@ In addition, the following options are accepted:
 - `timeout` - the timeout after which the function will `croak`. To catch
 the condition and handle it in your calling program, use an [eval](https://metacpan.org/pod/eval) block.
 A timeout of `0` means to never time out.
+
+    See also `max_wait` if you want to wait a limited time for an element to
+    appear.
+
+- `max_wait` - the maximum time to wait until the function will return.
+A max\_wait of `0` means to never time out. If the element is still visible,
+the function will return a false value.
 - `sleep` - the interval in seconds used to [sleep](https://metacpan.org/pod/sleep). Subsecond
 intervals are possible.
 
@@ -1891,9 +1916,8 @@ that talk are
 
 # BUG TRACKER
 
-Please report bugs in this module via the RT CPAN bug queue at
-[https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Chrome](https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Chrome)
-or via mail to [www-mechanize-Chrome-Bugs@rt.cpan.org](mailto:www-mechanize-Chrome-Bugs@rt.cpan.org).
+Please report bugs in this module via the Github bug queue at
+[https://github.com/Corion/WWW-Mechanize-Chrome/issues](https://github.com/Corion/WWW-Mechanize-Chrome/issues)
 
 # CONTRIBUTING
 
@@ -1915,7 +1939,7 @@ Steven Dondley `s@dondley.org`
 
 # COPYRIGHT (c)
 
-Copyright 2010-2020 by Max Maischein `corion@cpan.org`.
+Copyright 2010-2021 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

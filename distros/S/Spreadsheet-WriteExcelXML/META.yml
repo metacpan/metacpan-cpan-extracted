@@ -3,15 +3,15 @@ abstract: 'Write an Excel XML file.'
 author:
   - 'John McNamara (jmcnamara@cpan.org)'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Spreadsheet-WriteExcelXML
 no_index:
   directory:
@@ -19,6 +19,6 @@ no_index:
     - inc
 requires: {}
 resources:
+  MailingList: http://groups.google.com/group/spreadsheet-writeexcel
   repository: http://github.com/jmcnamara/spreadsheet-writeexcelxml
-  x_MailingList: http://groups.google.com/group/spreadsheet-writeexcel
-version: 0.14
+version: '0.15'

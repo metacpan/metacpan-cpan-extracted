@@ -16,55 +16,123 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use File::Spec ();
     use IO::File;
     use Nice::Try;
     use Scalar::Util ();
     use URI;
     our $VERSION = 'v0.1.0';
+    ## https://en.wikipedia.org/wiki/Path_(computing)
+    ## perlport
+    our $OS2SEP  =
+    {
+    amigaos     => '/',
+    android     => '/',
+    aix         => '/',
+    bsdos       => '/',
+    beos        => '/',
+    bitrig      => '/',
+    cygwin      => '/',
+    darwin      => '/',
+    dec_osf     => '/',
+    dgux        => '/',
+    dos         => "\\",
+    dragonfly   => '/',
+    dynixptx    => '/',
+    freebsd     => '/',
+    gnu         => '/',
+    gnukfreebsd => '/',
+    haiku       => '/',
+    hpux        => '/',
+    interix     => '/',
+    iphoneos    => '/',
+    irix        => '/',
+    linux       => '/',
+    machten     => '/',
+    macos       => ':',
+    midnightbsd => '/',
+    minix       => '/',
+    mirbsd      => '/',
+    mswin32     => "\\",
+    msys        => '/',
+    netbsd      => '/',
+    netware     => "\\",
+    next        => '/',
+    nto         => '/',
+    openbsd     => '/',
+    os2         => '/',
+    ## Extended Binary Coded Decimal Interchange Code
+    os390       => '/',
+    os400       => '/',
+    qnx         => '/',
+    riscos      => '.',
+    sco         => '/',
+    sco_sv      => '/',
+    solaris     => '/',
+    sunos       => '/',
+    svr4        => '/',
+    svr5        => '/',
+    symbian     => "\\",
+    unicos      => '/',
+    unicosmk    => '/',
+    vms         => '/',
+    vos         => '>',
+    win32       => "\\",
+    };
+    our $DIR_SEP = $OS2SEP->{ lc( $^O ) };
 };
 
 ## RFC 3986 section 5.2.4
+## This is aimed for web URI initially, but is also used for filesystems in a simple way
 sub collapse_dots
 {
     my $self = shift( @_ );
     my $path = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    ## To avoid warnings
+    $opts->{separator} //= '';
+    ## A path separator is provided when dealing with filesystem and not web URI
+    ## We use this to know what to return and how to behave
+    my $sep  = length( $opts->{separator} ) ? $opts->{separator} : '/';
     return( '' ) if( !length( $path ) );
-    my $u = URI->new( $path );
-    $path = $u->path;
+    my $u = $opts->{separator} ? URI::file->new( $path ) : URI->new( $path );
+    my( @callinfo ) = caller;
+    $self->message( 4, "URI based on '$path' is '$u' (", overload::StrVal( $u ), ") and separator to be used is '$sep' and uri path is '", $u->path, "' called from $callinfo[0] in file $callinfo[1] at line $callinfo[2]." );
+    $path = $opts->{separator} ? $u->file( $^O ) : $u->path;
     my @new = ();
     my $len = length( $path );
     
     ## "If the input buffer begins with a prefix of "../" or "./", then remove that prefix from the input buffer"
-    if( substr( $path, 0, 2 ) eq './' )
+    if( substr( $path, 0, 2 ) eq ".${sep}" )
     {
         substr( $path, 0, 2 ) = '';
         ## $self->message( 3, "Removed './'. Path is now '", substr( $path, 0 ), "'." );
     }
-    elsif( substr( $path, 0, 3 ) eq '../' )
+    elsif( substr( $path, 0, 3 ) eq "..${sep}" )
     {
         substr( $path, 0, 3 ) = '';
     }
     ## "if the input buffer begins with a prefix of "/./" or "/.", where "." is a complete path segment, then replace that prefix with "/" in the input buffer"
-    elsif( substr( $path, 0, 3 ) eq '/./' )
+    elsif( substr( $path, 0, 3 ) eq "${sep}.${sep}" )
     {
-        substr( $path, 0, 3 ) = '/';
+        substr( $path, 0, 3 ) = $sep;
     }
-    elsif( substr( $path, 0, 2 ) eq '/.' && 2 == $len )
+    elsif( substr( $path, 0, 2 ) eq "${sep}." && 2 == $len )
     {
-        substr( $path, 0, 2 ) = '/';
+        substr( $path, 0, 2 ) = $sep;
     }
     elsif( $path eq '..' || $path eq '.' )
     {
         $path = '';
     }
-    elsif( $path eq '/' )
+    elsif( $path eq $sep )
     {
         return( $u );
     }
     
     ## -1 is used to ensure trailing blank entries do not get removed
-    my @segments = split( '/', $path, -1 );
-    ## $self->messagef( 3, "Found %d segments.", scalar( @segments ) );
+    my @segments = split( "\Q$sep\E", $path, -1 );
+    $self->message( 3, "Found ", scalar( @segments ), " segments: ", sub{ $self->dump( \@segments ) } );
     for( my $i = 0; $i < scalar( @segments ); $i++ )
     {
         my $segment = $segments[$i];
@@ -83,9 +151,19 @@ sub collapse_dots
         }
     }
     ## Finally, the output buffer is returned as the result of remove_dot_segments.
-    my $new_path = join( '/', @new );
-    substr( $new_path, 0, 0 ) = '/' unless( substr( $new_path, 0, 1 ) eq '/' );
-    $u->path( $new_path );
+    my $new_path = join( $sep, @new );
+    # substr( $new_path, 0, 0 ) = $sep unless( substr( $new_path, 0, 1 ) eq '/' );
+    substr( $new_path, 0, 0 ) = $sep unless( File::Spec->file_name_is_absolute( $new_path ) );
+    $self->message( 4, "Adding back new path '$new_path' to uri '$u'." );
+    if( $opts->{separator} )
+    {
+        $u = URI::file->new( $new_path );
+    }
+    else
+    {
+        $u->path( $new_path );
+    }
+    $self->message( 4, "Returning uri '$u' (", ( $opts->{separator} ? $u->file( $^O ) : 'same' ), ")." );
     return( $u );
 }
 

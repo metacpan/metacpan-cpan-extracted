@@ -3,7 +3,7 @@ NAME
     information in an Acme::CPANModules::* list
 
 VERSION
-    This document describes version 0.002 of Acme::CPANModulesUtil::Bencher
+    This document describes version 0.003 of Acme::CPANModulesUtil::Bencher
     (from Perl distribution Acme-CPANModulesUtil-Bencher), released on
     2021-01-20.
 
@@ -20,11 +20,11 @@ FUNCTIONS
     example in Acme::CPANModules::TextTable, each entry has the following
     property:
 
-     # entries => [
-     #     ...
-     #     {
-     #         module => 'Text::ANSITable',
-     #         ...
+       entries => [
+           ...
+           {
+               module => 'Text::ANSITable',
+               ...
                bench_code => sub {
                    my ($table) = @_;
                    my $t = Text::ANSITable->new(
@@ -36,6 +36,14 @@ FUNCTIONS
                    );
                    $t->add_row($table->[$_]) for 1..@$table-1;
                    $t->draw;
+               },
+ 
+               # per-function participant
+               functions => {
+                   'func1' => {
+                       bench_code_template => 'Text::ANSITable::func1([])',
+                   },
+                   ...
                },
 
     The list also contains information about the benchmark datasets:

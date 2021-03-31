@@ -1,5 +1,5 @@
 package YAML::Conditional;
-use 5.006; use strict; use warnings; our $VERSION = '0.03';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use YAML::XS qw/Dump DumpFile Load LoadFile/; use base 'Struct::Conditional';
 
 sub encode {
@@ -43,7 +43,7 @@ YAML::Conditional - A conditional language within a YAML struct
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 
@@ -183,7 +183,7 @@ L<https://metacpan.org/release/YAML-Conditional>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2021 by LNATION.
 
 This is free software, licensed under:
 

@@ -2,8 +2,8 @@ use Test2::V0;
 
 use Sub::Meta::Returns;
 
-sub Int() { bless {}, 'Some::Type::Int' }
-sub Str() { bless {}, 'Some::Type::Str' }
+sub Int() { return bless {}, 'Some::Type::Int' }
+sub Str() { return bless {}, 'Some::Type::Str' }
 
 subtest 'empty' => sub {
     my $returns = Sub::Meta::Returns->new();

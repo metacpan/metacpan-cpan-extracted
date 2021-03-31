@@ -5,11 +5,13 @@ use warnings;
 use strict;
 use YAML qw(Load);
 
+local $YAML::LoadBlessed = 1;
+
 BEGIN { plan 'no_plan' };
 use lib qw( lib ../lib ../../lib  ); #Just in case we are testing it in-place
 
 my $size = 16;
-#Use: module name, args to ctor. 
+#Use: module name, args to ctor.
 my $primitives = { sum => [2, -1, 1],
 		   multiply => [2, -1, 1],
 		   substract => [2, -1, 1],
@@ -31,11 +33,11 @@ my %modulesToTest = ( String => [['a'..'z'],$size ],
 sub createAndTest ($$;$) {
   my $module = shift || die "No module name";
   my $newArgs = shift || die "No args";
-  
+
   my $class = "Algorithm::Evolutionary::Individual::$module";
   #require module
   eval " require  $class" || die "Can't load module $class: $@";
-  my $nct = new $class @$newArgs; 
+  my $nct = new $class @$newArgs;
   print "Testing $module\n";
   isa_ok( $nct, $class );
   if ( $module ne 'Tree' ) {
@@ -47,7 +49,7 @@ sub createAndTest ($$;$) {
   for (my $i = 0; $i < $nct->size(); $i ++ ) {
     is( defined( $nct->Atom($i)), 1, "Atom($i)");
   }
-  
+
   my $yaml = $nct->as_yaml();
   my $fromyaml = Load($yaml);
   ok( $yaml, $fromyaml->as_yaml());

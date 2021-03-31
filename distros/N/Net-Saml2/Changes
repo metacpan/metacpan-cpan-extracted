@@ -1,5 +1,63 @@
 Revision history for Perl extension Net::SAML2.
 
+0.34 - 2021-03-30
+
+  [Significant Changes since 0.32]
+
+  - Mostly an improvement in documentation
+  - Implement "full client" test that follows TUTORIAL.md
+  - TUTORIAL.md documents how to add Net::SAML2 to your web application
+  - Numerous small bug fixes/enhancements
+  - Improvements in SP Metadata support
+  - Add response_status to Assertion object
+  - XML::Sig version 0.47 (improvements in ECDSA and DSA and other fixes)
+
+  [Change Log]
+
+  - TBD     Update Changes and Increment version
+
+0.33-TRIAL - 2021-03-28
+
+  [Significant Changes]
+
+  - Mostly an improvement in documentation
+  - Implement "full client" test that follows TUTORIAL.md
+  - TUTORIAL.md documents how to add Net::SAML2 to your web application
+  - Numerous small bug fixes/enhancements
+  - Improvements in SP Metadata support
+  - Add response_status to Assertion object
+  - XML::Sig version 0.47 (improvements in ECDSA and DSA and other fixes)
+
+  [Change Log]
+
+  - 844d0be Update Changes and Increment version
+  - 7fabe59 Merge XML::Sig version 0.47
+  - d62059f Add Keycloak as a tested SAML provider
+  - f626fc5 Sign releases
+  - 86eabae Remove space at eol
+  - 64c8862 Test requires URI::URL
+  - 664a0da Merge pull request #27 from timlegge/full-client
+  - ab7e344 Add missing files
+  - 971a951 Add missing metadat file
+  - 171fd63 Merge pull request #26 from timlegge/full-client
+  - cdfe47e Initial full client test
+  - 1b07070 Add response_status to Assertion object
+  - bcee1ea Clarify Net::SAML2::Binding::Redirect cert parameter
+  - fb126f2 Merge pull request #25 from timlegge/tutorial
+  - db801af Update pod information
+  - 1887f90 Fix invalid newlines inserted
+  - 840585a Update TUTORIAL.MD
+  - 2987c08 TUTORIAL missing closing tag
+  - c34dead Merge pull request #23 from timlegge/tutorial
+  - cf1ac4b Fixes #22 New tutorial for integrating Net::SAML2 in your application
+  - 67b9ab1 Merge pull request #21 from timlegge/issue19
+  - 5377ecd Merge pull request #20 from timlegge/issue18
+  - 339d5f9 Fixes #19: SP Metadata AuthnRequestsSigned and WantAssertionsSigned should be configurable
+  - 9944c41 Fixes #18 - SP metatdata org_url
+  - 305c587 Fixes #13 - ProviderName should be a variable
+  - 68629bd Fixes #14 Improve clarity of documentaion for Redirect
+  - 8c14615 Fixes #15 Documentation IdP Cert
+
 0.32         16-Jan-2022
 
         Version 0.31-TRIAL with version incremented
@@ -8,7 +66,7 @@ Revision history for Perl extension Net::SAML2.
             1. Replace Crypt::OpenSSL::Verify509
             2. Merge latest XML::Sig
 
-        TBD     Update Changes and Increment version
+        780de03 Update Changes and Increment version
 
 0.31-TRIAL   15-Jan-2021
 

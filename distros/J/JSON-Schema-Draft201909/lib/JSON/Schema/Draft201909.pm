@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.023-11-g0d76ee9
+package JSON::Schema::Draft201909; # git description: v0.024-23-gfc4a281
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -250,7 +250,8 @@ sub evaluate {
       $document_path = '';
     }
 
-    abort($state, 'unable to find resource %s', $schema_reference) if not defined $schema;
+    abort($state, 'EXCEPTION: unable to find resource %s', $schema_reference)
+      if not defined $schema;
 
     $state = +{
       %{$document->evaluation_configs},
@@ -306,7 +307,7 @@ sub _traverse {
 
   delete $state->{keyword};
 
-  return E($state, 'maximum traversal depth exceeded')
+  return E($state, 'EXCEPTION: maximum traversal depth exceeded')
     if $state->{depth}++ > $self->max_traversal_depth;
 
   my $schema_type = get_type($schema);
@@ -337,14 +338,14 @@ sub _eval {
   my @parent_annotations = @{$state->{annotations}};
   delete $state->{keyword};
 
-  abort($state, 'maximum evaluation depth exceeded')
+  abort($state, 'EXCEPTION: maximum evaluation depth exceeded')
     if $state->{depth}++ > $self->max_traversal_depth;
 
   # find all schema locations in effect at this data path + canonical_uri combination
   # if any of them are absolute prefix of this schema location, we are in a loop.
   my $canonical_uri = canonical_schema_uri($state);
   my $schema_location = $state->{traversed_schema_path}.$state->{schema_path};
-  abort($state, 'infinite loop detected (same location evaluated twice)')
+  abort($state, 'EXCEPTION: infinite loop detected (same location evaluated twice)')
     if grep substr($schema_location, 0, length) eq $_,
       keys %{$state->{seen}{$state->{data_path}}{$canonical_uri}};
   $state->{seen}{$state->{data_path}}{$canonical_uri}{$schema_location}++;
@@ -547,7 +548,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -663,7 +664,7 @@ The result is a L<JSON::Schema::Draft201909::Result> object, which can also be u
 Evaluates the provided instance data against the known schema document.
 
 The data is in the form of an unblessed nested Perl data structure representing any type that JSON
-allows (null, boolean, string, number, object, array).
+allows: null, boolean, string, number, object, array. (See L</TYPES> below.)
 
 The schema must represent a JSON Schema that respects the Draft 2019-09 meta-schema at
 L<https://json-schema.org/draft/2019-09/schema>, in one of these forms:
@@ -866,7 +867,7 @@ C<idn-hostname> requires L<Net::IDN::Encode>
 
 Until version 1.000 is released, this implementation is not fully specification-compliant.
 
-To date, missing components (some of which are optional, but still quite useful) include:
+To date, missing features (some of which are optional, but still quite useful) include:
 
 =over 4
 

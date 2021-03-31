@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Moo
   license: https://dev.perl.org/licenses/
   repository: https://github.com/moose/Moo.git
-version: '2.005003'
+version: '2.005004'
 x_authority: cpan:MSTROUT
 x_breaks:
   App::Commando: '<= 0.012'

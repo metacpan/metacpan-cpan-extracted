@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 07-zonefile.t 1816 2020-10-16 09:44:21Z willem $	-*-perl-*-
+# $Id: 07-zonefile.t 1828 2020-12-24 15:33:41Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -355,18 +355,20 @@ hosta	A	192.0.2.1
 	TXT	( multiline	; interspersed ( mischievously )
 		resource	; with	( confusing )
 		record	)	; comments
+	TXT	(contig
+uous)
+	TXT	("quoted
+		string")
 	TXT	(string)
 	TXT	"(string)"
 EOF
-	is( $zonefile->read->name, 'hosta.example', 'name of simple RR as expected' );
-	is( $zonefile->read->name, 'hosta.example', 'name of simple RR propagated from previous RR' );
-	my $multilineRR = $zonefile->read;
-	is( $multilineRR->name,	   'hosta.example',		'name of multiline RR propagated from previous RR' );
-	is( $multilineRR->txtdata, 'multiline resource record', 'multiline RR correctly reassembled' );
-	my $following = $zonefile->read;
-	is( $following->name,	      'hosta.example', 'name of following RR as expected' );
-	is( $following->txtdata,      'string',	       'superfluous brackets ignored' );
-	is( $zonefile->read->txtdata, '(string)',      'quoted brackets protected' );
+	is( $zonefile->read->name,    'hosta.example',		   'name of simple RR as expected' );
+	is( $zonefile->read->name,    'hosta.example',		   'name propagated from previous RR' );
+	is( $zonefile->read->txtdata, 'multiline resource record', 'multiline RR parsed correctly' );
+	is( $zonefile->read->txtdata, 'contiguous',		   'contiguous string reassembled' );
+	is( $zonefile->read->txtdata, 'quoted string',		   'quoted string reassembled' );
+	is( $zonefile->read->txtdata, 'string',			   'superfluous brackets ignored' );
+	is( $zonefile->read->txtdata, '(string)',		   'quoted brackets protected' );
 }
 
 

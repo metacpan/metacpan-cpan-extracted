@@ -816,6 +816,11 @@ This attribute cannot be set from a config file.
 The readers have to be two objects of L<Spreadsheet::Compare::Reader> subclasses
 representing the left and the right side of the comparison.
 
+=head2 report_all_data
+
+Add an additional output stream containing all data from both sides of the comparison.
+This will slow down reporting on large datasets.
+
 =head2 right
 
     possible values: <string>

@@ -18,7 +18,7 @@ satpass2 - Script to wrap Astro::App::Satpass2 satellite prediction functionalit
 =head1 SYNOPSIS
 
  satpass2
- satpass2 'st spaceflight -all -eff' pass exit
+ satpass2 'spacetrack stations' 'choose 25544' pass exit
  satpass2 <canned_commands.txt
  satpass2 -help
  satpass2 -version

@@ -42,6 +42,7 @@ my @files = (
     't/09-authn-request.t',
     't/10-artifact-resolve.t',
     't/11-more-metadata.t',
+    't/12-full-client.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
@@ -56,6 +57,11 @@ my @files = (
     't/idp-metadata2.xml',
     't/lib/Test/Net/SAML2.pm',
     't/lib/Test/Net/SAML2/Util.pm',
+    't/net-saml2-cacert.pem',
+    't/net-saml2-cert.pem',
+    't/net-saml2-idp-metadata.xml',
+    't/net-saml2-key.pem',
+    't/net-saml2-metadata.xml',
     't/release-trailing-space.t',
     't/sign-nopw-cert.pem'
 );

@@ -29,7 +29,7 @@ BEGIN
 
 # diag( "Environment variables: ", Dumper( \%ENV ) );
 
-BEGIN { use_ok( 'Module::Generic' ) || BAIL_OUT( "Unable to load Module::Generic" ); }
+BEGIN { use_ok( 'Module::Generic::Number' ) || BAIL_OUT( "Unable to load Module::Generic::Number" ); }
 
 ## RT #132674
 ## Stupid me. I should compare the result to the locale variables unless they are explicitely set

@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 use Carp ();
 use Scalar::Util ();
@@ -16,7 +16,7 @@ use Sub::Meta::Returns;
 
 BEGIN {
     # for Pure Perl
-    $ENV{PERL_SUB_IDENTIFY_PP} = $ENV{PERL_SUB_META_PP};
+    $ENV{PERL_SUB_IDENTIFY_PP} = $ENV{PERL_SUB_META_PP}; ## no critic (RequireLocalizedPunctuationVars)
 }
 
 use overload
@@ -24,14 +24,14 @@ use overload
     eq => \&is_same_interface
     ;
 
-sub parameters_class { 'Sub::Meta::Parameters' }
-sub returns_class    { 'Sub::Meta::Returns' }
+sub parameters_class { return 'Sub::Meta::Parameters' }
+sub returns_class    { return 'Sub::Meta::Returns' }
 
 sub _croak { require Carp; goto &Carp::croak }
 
 sub new {
-    my $class = shift;
-    my %args = @_ == 1 ? %{$_[0]} : @_;
+    my ($class, @args) = @_;
+    my %args = @args == 1 ? %{$args[0]} : @args;
 
     my $self = bless \%args => $class;
 
@@ -40,40 +40,16 @@ sub new {
     $self->set_stashname(delete $args{stashname}) if exists $args{stashname};
     $self->set_fullname(delete $args{fullname})   if exists $args{fullname};
 
-    if (exists $args{parameters}) {
-        my $is_method = $args{is_method}
-                     || $args{parameters}{nshift}
-                     || $args{parameters}{invocant};
-
-        my $exists_is_method = exists $args{is_method}
-                            || exists $args{parameters}{nshift}
-                            || exists $args{parameters}{invocant};
-
-        $self->set_is_method($is_method) if $exists_is_method;
-        $self->set_parameters($args{parameters})
+    if (my $is_method = $self->_normalize_args_is_method(\%args)) {
+        $self->set_is_method($is_method);
     }
-    elsif(exists $args{args}) {
-        my $is_method = $args{is_method}
-                     || $args{nshift}
-                     || $args{invocant};
 
-        my $exists_is_method = exists $args{is_method}
-                            || exists $args{nshift}
-                            || exists $args{invocant};
+    if (my $parameters = $self->_normalize_args_parameters(\%args)) {
+        $self->set_parameters($parameters);
+    }
 
-        $self->set_is_method($is_method) if $exists_is_method;
-
-        my $nshift = exists $args{nshift} ? $args{nshift}
-                   : $is_method           ? 1
-                   : $exists_is_method    ? 0
-                   : undef;
-
-        $self->set_parameters(
-            args => $args{args},
-            exists $args{slurpy}   ? (slurpy   => $args{slurpy})   : (),
-            exists $args{invocant} ? (invocant => $args{invocant}) : (),
-            defined $nshift        ? (nshift   => $nshift)         : (),
-        );
+    if (exists $args{returns}) {
+        $self->set_returns($args{returns})
     }
 
     # cleaning
@@ -82,68 +58,118 @@ sub new {
     delete $args{invocant};
     delete $args{nshift};
 
-    if (exists $args{returns}) {
-        $self->set_returns($args{returns})
-    }
-
     return $self;
 }
 
-sub sub()         { $_[0]{sub} }
-sub subname()     { $_[0]->subinfo->[1] }
-sub stashname()   { $_[0]->subinfo->[0] }
-sub fullname()    { @{$_[0]->subinfo} ? sprintf('%s::%s', $_[0]->stashname || '', $_[0]->subname || '') : undef }
+sub _normalize_args_is_method {
+    my ($self, $args) = @_;
+
+    if (exists $args->{parameters}) {
+        my $is_method = $args->{is_method}
+                     || $args->{parameters}{nshift}
+                     || $args->{parameters}{invocant};
+
+        my $exists_is_method = exists $args->{is_method}
+                            || exists $args->{parameters}{nshift}
+                            || exists $args->{parameters}{invocant};
+
+        return $is_method if $exists_is_method
+    }
+    elsif(exists $args->{args}) {
+        my $is_method = $args->{is_method}
+                     || $args->{nshift}
+                     || $args->{invocant};
+
+        my $exists_is_method = exists $args->{is_method}
+                            || exists $args->{nshift}
+                            || exists $args->{invocant};
+
+        return $is_method if $exists_is_method;
+    }
+    return;
+}
+
+sub _normalize_args_parameters {
+    my ($self, $args) = @_;
+
+    if (exists $args->{parameters}) {
+        return $args->{parameters};
+    }
+    elsif(exists $args->{args}) {
+        my $nshift = exists $args->{nshift}    ? $args->{nshift}
+                   : $self->is_method          ? 1
+                   : exists $self->{is_method} ? 0
+                   : undef;
+
+        my $parameters = { args => $args->{args} };
+        $parameters->{slurpy}   = $args->{slurpy}   if exists $args->{slurpy};
+        $parameters->{invocant} = $args->{invocant} if exists $args->{invocant};
+        $parameters->{nshift}   = $nshift           if defined $nshift;
+        return $parameters;
+    }
+    return;
+}
+
+sub sub() :method { my $self = shift; return $self->{sub} } ## no critic (ProhibitBuiltinHomonyms)
+sub subname()     { my $self = shift; return $self->subinfo->[1] }
+sub stashname()   { my $self = shift; return $self->subinfo->[0] }
+sub fullname()    { my $self = shift; return @{$self->subinfo} ? sprintf('%s::%s', $self->stashname || '', $self->subname || '') : undef }
 
 sub subinfo()     {
-    return $_[0]{subinfo} if $_[0]{subinfo};
-    $_[0]{subinfo} = $_[0]->_build_subinfo
+    my $self = shift;
+    return $self->{subinfo} if $self->{subinfo};
+    $self->{subinfo} = $self->_build_subinfo;
+    return $self->{subinfo};
 }
 
-sub file()        { $_[0]{file}        ||= $_[0]->_build_file }
-sub line()        { $_[0]{line}        ||= $_[0]->_build_line }
-sub is_constant() { $_[0]{is_constant} ||= $_[0]->_build_is_constant }
-sub prototype()   { $_[0]{prototype}   ||= $_[0]->_build_prototype }
-sub attribute()   { $_[0]{attribute}   ||= $_[0]->_build_attribute }
-sub is_method()   { !!$_[0]{is_method} }
-sub parameters()  { $_[0]{parameters} }
-sub returns()     { $_[0]{returns} }
-sub args()        { $_[0]->parameters->args }
-sub all_args()    { $_[0]->parameters->all_args }
-sub slurpy()      { $_[0]->parameters->slurpy }
-sub nshift()      { $_[0]->parameters->nshift }
-sub invocant()    { $_[0]->parameters->invocant }
-sub invocants()   { $_[0]->parameters->invocants }
+sub file()        { my $self = shift; return $self->{file}        ||= $self->_build_file }
+sub line()        { my $self = shift; return $self->{line}        ||= $self->_build_line }
+sub is_constant() { my $self = shift; return $self->{is_constant} ||= $self->_build_is_constant }
+sub prototype() :method { my $self = shift; return $self->{prototype}   ||= $self->_build_prototype } ## no critic (ProhibitBuiltinHomonyms)
+sub attribute()   { my $self = shift; return $self->{attribute}   ||= $self->_build_attribute }
+sub is_method()   { my $self = shift; return !!$self->{is_method} }
+sub parameters()  { my $self = shift; return $self->{parameters} }
+sub returns()     { my $self = shift; return $self->{returns} }
+sub args()        { my $self = shift; return $self->parameters->args }
+sub all_args()    { my $self = shift; return $self->parameters->all_args }
+sub slurpy()      { my $self = shift; return $self->parameters->slurpy }
+sub nshift()      { my $self = shift; return $self->parameters->nshift }
+sub invocant()    { my $self = shift; return $self->parameters->invocant }
+sub invocants()   { my $self = shift; return $self->parameters->invocants }
 
-sub set_sub($)    {
-    $_[0]{sub} = $_[1];
+sub set_sub {
+    my ($self, $v) = @_;
+    $self->{sub} = $v;
 
     # rebuild subinfo
-    delete $_[0]{subinfo};
-    $_[0]->subinfo;
-    $_[0];
+    delete $self->{subinfo};
+    $self->subinfo;
+    return $self;
 }
 
-sub set_subname($)     { $_[0]{subinfo}[1]  = $_[1]; $_[0] }
-sub set_stashname($)   { $_[0]{subinfo}[0]  = $_[1]; $_[0] }
-sub set_fullname($)    {
-    $_[0]{subinfo} = $_[1] =~ m!^(.+)::([^:]+)$! ? [$1, $2] : [];
-    $_[0];
+sub set_subname   { my ($self, $v) = @_; $self->{subinfo}[1]  = $v; return $self }
+sub set_stashname { my ($self, $v) = @_; $self->{subinfo}[0]  = $v; return $self }
+sub set_fullname  {
+    my ($self, $v) = @_;
+    $self->{subinfo} = $v =~ m!^(.+)::([^:]+)$! ? [$1, $2] : [];
+    return $self;
 }
-sub set_subinfo($)     {
-    $_[0]{subinfo} = @_ > 2 ? [ $_[1], $_[2] ] : $_[1];
-    $_[0];
+sub set_subinfo {
+    my ($self, @args) = @_;
+    $self->{subinfo} = @args > 1 ? [ $args[0], $args[1] ] : $args[0];
+    return $self;
 }
 
-sub set_file($)        { $_[0]{file}        = $_[1]; $_[0] }
-sub set_line($)        { $_[0]{line}        = $_[1]; $_[0] }
-sub set_is_constant($) { $_[0]{is_constant} = $_[1]; $_[0] }
-sub set_prototype($)   { $_[0]{prototype}   = $_[1]; $_[0] }
-sub set_attribute($)   { $_[0]{attribute}   = $_[1]; $_[0] }
-sub set_is_method($)   { $_[0]{is_method}   = $_[1]; $_[0] }
+sub set_file        { my ($self, $v) = @_; $self->{file}        = $v; return $self }
+sub set_line        { my ($self, $v) = @_; $self->{line}        = $v; return $self }
+sub set_is_constant { my ($self, $v) = @_; $self->{is_constant} = $v; return $self }
+sub set_prototype   { my ($self, $v) = @_; $self->{prototype}   = $v; return $self }
+sub set_attribute   { my ($self, $v) = @_; $self->{attribute}   = $v; return $self }
+sub set_is_method   { my ($self, $v) = @_; $self->{is_method}   = $v; return $self }
 
 sub set_parameters {
-    my $self = shift;
-    my $v = $_[0];
+    my ($self, @args) = @_;
+    my $v = $args[0];
     if (Scalar::Util::blessed($v)) {
         if ($v->isa('Sub::Meta::Parameters')) {
             $self->{parameters} = $v
@@ -153,63 +179,63 @@ sub set_parameters {
         }
     }
     else {
-        $self->{parameters} = $self->parameters_class->new(@_);
+        $self->{parameters} = $self->parameters_class->new(@args);
     }
     return $self
 }
 
 sub set_args {
-    my $self = shift;
+    my ($self, @args) = @_;
     if ($self->parameters) {
-        $self->parameters->set_args(@_);
+        $self->parameters->set_args(@args);
     }
     else {
-        $self->set_parameters($self->parameters_class->new(args => @_));
+        $self->set_parameters($self->parameters_class->new(args => @args));
     }
     return $self;
 }
 
 sub set_slurpy {
-    my $self = shift;
-    $self->parameters->set_slurpy(@_);
+    my ($self, @args) = @_;
+    $self->parameters->set_slurpy(@args);
     return $self;
 }
 
 sub set_nshift {
-    my $self = shift;
-    if ($self->is_method && $_[0] == 0) {
+    my ($self, $v) = @_;
+    if ($self->is_method && $v == 0) {
         _croak 'nshift of method cannot be zero';
     }
-    $self->parameters->set_nshift(@_);
+    $self->parameters->set_nshift($v);
     return $self;
 }
 
 sub set_invocant {
-    my $self = shift;
-    $self->parameters->set_invocant(@_);
-    $self;
+    my ($self, $v) = @_;
+    $self->parameters->set_invocant($v);
+    return $self;
 }
 
 sub set_returns {
-    my $self = shift;
-    my $v = $_[0];
+    my ($self, @args) = @_;
+    my $v = $args[0];
     if (Scalar::Util::blessed($v) && $v->isa('Sub::Meta::Returns')) {
         $self->{returns} = $v
     }
     else {
-        $self->{returns} = $self->returns_class->new(@_);
+        $self->{returns} = $self->returns_class->new(@args);
     }
     return $self
 }
 
-sub _build_subinfo()     { $_[0]->sub ? [ Sub::Identify::get_code_info($_[0]->sub) ] : [] }
-sub _build_file()        { $_[0]->sub ? (Sub::Identify::get_code_location($_[0]->sub))[0] : '' }
-sub _build_line()        { $_[0]->sub ? (Sub::Identify::get_code_location($_[0]->sub))[1] : undef }
-sub _build_is_constant() { $_[0]->sub ? Sub::Identify::is_sub_constant($_[0]->sub) : undef }
-sub _build_prototype()   { $_[0]->sub ? Sub::Util::prototype($_[0]->sub) : '' }
-sub _build_attribute()   { $_[0]->sub ? [ attributes::get($_[0]->sub) ] : undef }
+sub _build_subinfo     { my $self = shift; return $self->sub ? [ Sub::Identify::get_code_info($self->sub) ] : [] }
+sub _build_file        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[0] : '' }
+sub _build_line        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[1] : undef }
+sub _build_is_constant { my $self = shift; return $self->sub ? Sub::Identify::is_sub_constant($self->sub) : undef }
+sub _build_prototype   { my $self = shift; return $self->sub ? Sub::Util::prototype($self->sub) : '' }
+sub _build_attribute   { my $self = shift; return $self->sub ? [ attributes::get($self->sub) ] : undef }
 
-sub apply_subname($) {
+sub apply_subname {
     my ($self, $subname) = @_;
     _croak 'apply_subname requires subroutine reference' unless $self->sub;
     $self->set_subname($subname);
@@ -217,7 +243,7 @@ sub apply_subname($) {
     return $self;
 }
 
-sub apply_prototype($) {
+sub apply_prototype {
     my ($self, $prototype) = @_;
     _croak 'apply_prototype requires subroutine reference' unless $self->sub;
     Sub::Util::set_prototype($prototype, $self->sub);
@@ -225,11 +251,11 @@ sub apply_prototype($) {
     return $self;
 }
 
-sub apply_attribute(@) {
+sub apply_attribute {
     my ($self, @attribute) = @_;
     _croak 'apply_attribute requires subroutine reference' unless $self->sub;
     {
-        no warnings qw(misc);
+        no warnings qw(misc); ## no critic (ProhibitNoWarnings)
         attributes->import($self->stashname, $self->sub, @attribute);
     }
     $self->set_attribute($self->_build_attribute);
@@ -314,7 +340,7 @@ Sub::Meta - handle subroutine meta information
 
     use Sub::Meta;
 
-    sub hello($) :mehtod { }
+    sub hello($) :method { }
     my $meta = Sub::Meta->new(sub => \&hello);
     $meta->subname; # => hello
 
@@ -709,7 +735,7 @@ If that fails, or if the environment variable C<PERL_SUB_META_PP> is defined to 
 
 =head1 SEE ALSO
 
-L<Sub::Identify>, L<Sub::Util>, L<Sub::Info>, L<Function::Paramters::Info>, L<Function::Return::Info>
+L<Sub::Identify>, L<Sub::Util>, L<Sub::Info>, L<Function::Parameters::Info>, L<Function::Return::Info>
 
 =head1 LICENSE
 

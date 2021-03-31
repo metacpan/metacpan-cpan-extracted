@@ -318,7 +318,6 @@ sub Astro::App::Satpass2::__TEST__raw_attr {
     return sprintf $format, $self->{$name};
 }
 
-
 1;
 
 __END__
@@ -337,7 +336,6 @@ My::Module::Test::App - Help test Astro::App::Satpass2;
  execute 'almanac 20100401T000000Z', <<'EOD', 'Test almanac'
  ... expected almanac output ...
  EOD
-
 
 =head1 DESCRIPTION
 
@@ -544,6 +542,7 @@ L<Astro::App::Satpass2|Astro::App::Satpass2>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

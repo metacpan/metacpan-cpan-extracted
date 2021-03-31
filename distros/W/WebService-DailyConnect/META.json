@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,6 +22,12 @@
       },
       "develop" : {
          "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
@@ -59,18 +65,19 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/WebService-DailyConnect/issues"
+         "web" : "https://github.com/uperl/WebService-DailyConnect/issues"
       },
       "homepage" : "https://metacpan.org/pod/WebService::DailyConnect",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/WebService-DailyConnect.git",
-         "web" : "https://github.com/plicease/WebService-DailyConnect"
+         "url" : "git://github.com/uperl/WebService-DailyConnect.git",
+         "web" : "https://github.com/uperl/WebService-DailyConnect"
       }
    },
-   "version" : "0.02",
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "version" : "0.03",
+   "x_generated_by_perl" : "v5.33.8",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }
 

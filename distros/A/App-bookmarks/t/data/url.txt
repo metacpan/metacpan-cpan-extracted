@@ -1,0 +1,2 @@
+gemini://msd.sdjf.net
+svn://test.net

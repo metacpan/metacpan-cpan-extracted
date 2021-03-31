@@ -8,7 +8,7 @@ Net::SAML2
  
 # VERSION
  
-version 0.26
+version 0.33
  
 # SYNOPSIS
 

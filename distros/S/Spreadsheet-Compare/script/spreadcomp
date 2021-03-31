@@ -86,6 +86,10 @@ exit $sc->exit_code;
 
 =pod
 
+=head1 NAME
+
+spreadcomp - compare spreadsheets or databases
+
 =head1 SYNOPSIS
 
     spreadcomp -c <YAML-config-file> [-d] [-j] [-q] [-h] [-m]
@@ -119,8 +123,6 @@ exit $sc->exit_code;
              Display version number and exit
 
 =head1 DESCRIPTION
-
-spreadcomp: compare spreadsheets or databases and create a report for the detected differences
 
 This is the command line frontend script for L<Spreadsheet::Compare> a suite of perl modules for comparing
 spreadsheet like data and generating detailed reports about the found differences. The comparisons can be

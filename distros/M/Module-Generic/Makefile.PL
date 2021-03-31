@@ -19,6 +19,8 @@ WriteMakefile(
         'Clone'         => '0.43',
         'Data::Dumper'  => 0,
         'Data::Dump'    => '1.23',
+        'DateTime'      => '1.52',
+        'DateTime::Format::Strptime' => '1.77',
         'Devel::StackTrace' => 0,
         'Class::Load'   => '0.25',
         'Exporter'      => '5.73',
@@ -54,7 +56,7 @@ WriteMakefile(
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Module::Generic',
+                web         => 'https://git.deguest.jp/jack/Module-Generic/issues',
             },
         },
     }) : ()),

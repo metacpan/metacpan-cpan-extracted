@@ -1,5 +1,5 @@
 package Log::JSON::Lines;
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use JSON::Lines; use POSIX; use Time::HiRes;
 use Fcntl qw/ :flock /; use Clone;
 
@@ -115,7 +115,7 @@ Log::JSON::Lines - Log in JSONLines format
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =cut
 
@@ -324,7 +324,7 @@ L<https://metacpan.org/release/Log-JSON-Lines>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2021 by LNATION.
 
 This is free software, licensed under:
 

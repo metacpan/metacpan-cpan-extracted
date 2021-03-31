@@ -1,7 +1,15 @@
-use strict; # -*- cperl -*-
-use warnings;
+package Algorithm::Evolutionary::Fitness::Trap; # -*- cperl -*-
 
-use lib qw( ../../../../lib );
+use strict; 
+use warnings;
+use Carp qw(croak);
+
+our $VERSION = '3.2';
+
+use lib qw(../../.. ../.. .. ../../../../lib);
+
+use base qw(Algorithm::Evolutionary::Fitness::String);
+
 
 =head1 NAME
 
@@ -15,33 +23,27 @@ Algorithm::Evolutionary::Fitness::Trap - 'Trap' fitness function for evolutionar
     my $z = $number_of_bits -1;
     my $trap = Algorithm::Evolutionary::Fitness::Trap->new( $number_of_bits, $a, $b, $z );
 
+# Equivalent to
+
+    $trap = Algorithm::Evolutionary::Fitness::Trap->new( $number_of_bits );
+
+    my $chromosome = "10101111110000";
+    my $fitness = $trap->apply( $chromosome );
+
 =head1 DESCRIPTION
 
-Trap function act as "yucky" or deceptive for evolutionary algorithms;
+Trap functions act as "yucky" or deceptive for evolutionary algorithms;
 they "trap" population into going to easier, but local, optima.
 
 =head1 METHODS
 
-=cut
-
-package Algorithm::Evolutionary::Fitness::Trap;
-
-our $VERSION = '3.2';
-
-use String::Random;
-use Carp qw(croak);
-
-use lib qw(../../.. ../.. ..);
-
-use base qw(Algorithm::Evolutionary::Fitness::String);
-use Algorithm::Evolutionary::Utils qw(hamming);
 
 =head2 new( $number_of_bits, [$a = $number_of_bits -1, $b = $number_of_bits, $z=$number_of_bits-1])
 
 Creates a new instance of the problem, with the said number of bits
 and traps. Uses default values from C<$number_of_bits> if needed
 
-=cut 
+=cut
 
 sub new {
   my $class = shift;

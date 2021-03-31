@@ -663,7 +663,11 @@ execute( 'macro define say \'echo ${1:?Nothing to say}\'', undef,
 
 execute( 'say cheese', 'cheese', 'Execute macro, no error' );
 
+execute( 'set error_out 1', undef, 'Set error_out true' );
+
 execute( 'say', 'Nothing to say', 'Execute macro, triggering error' );
+
+execute( 'set error_out 0', undef, 'Set error_out false' );
 
 execute( 'macro define say \'echo ${1:+something}\'', undef,
     'Redefine macro overriding argument' );

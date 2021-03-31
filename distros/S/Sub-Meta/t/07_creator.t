@@ -14,8 +14,10 @@ subtest 'new' => sub {
     like dies { Sub::Meta::Creator->new(finders => ['']) }, qr/^elements of finders have to be a code reference/;
     like dies { Sub::Meta::Creator->new(finders => [{}]) }, qr/^elements of finders have to be a code reference/;
 
-    my $creator = Sub::Meta::Creator->new(finders => [ \&finder ]);
-    isa_ok $creator, 'Sub::Meta::Creator';
+    subtest 'create' => sub {
+        my $creator = Sub::Meta::Creator->new(finders => [ \&finder ]);
+        isa_ok $creator, 'Sub::Meta::Creator';
+    };
 
     subtest 'create by hashref' => sub {
         my $creator = Sub::Meta::Creator->new({ finders => [ \&finder ] });

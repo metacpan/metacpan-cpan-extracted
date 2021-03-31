@@ -1,0 +1,9 @@
+Changes
+INI-Reader-Regexp-0.01.tar.gz
+lib/INI/Reader/Regexp.pm
+Makefile.PL
+MANIFEST
+README
+t/INI-Reader-Regexp.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

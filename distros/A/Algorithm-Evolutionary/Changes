@@ -1,3 +1,13 @@
+2018-03-13  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Algorithm/Evolutionary/Fitness/Skewed.pm (Algorithm): Adding this new way of adding noise to a function. This should probably go to Algorithm::Evolutionary::Fitness, but I'll sort it out later. 
+
+2017-10-29  Juan J. merelo  <jmerelo@penny>
+
+	* lib/Algorithm/Evolutionary/Fitness/Randomized.pm (Algorithm): We do need this kind of function to reflect the true nature of noisy optimization functions, which change skewness and lots of other things, including amplitude, on the fly. 
+
+	* lib/Algorithm/Evolutionary/Fitness/SkewTrap.pm (Algorithm): Adds a new "uncertain" function for uncertain optimization with EAs (uncertEAn). And I have really been a long time without writing anything there... 
+
 2013-01-06  Juan J. Merelo Guervós  <jjmerelo@gmail.com>
 
 	* lib/Algorithm/Evolutionary/Op/Base.pm: Tried to supress memorize

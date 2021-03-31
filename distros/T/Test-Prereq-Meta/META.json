@@ -56,14 +56,14 @@
    "provides" : {
       "Test::Prereq::Meta" : {
          "file" : "lib/Test/Prereq/Meta.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-Test-Prereq-Meta/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Prereq-Meta"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -74,6 +74,6 @@
          "web" : "https://github.com/trwyant/perl-Test-Prereq-Meta"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

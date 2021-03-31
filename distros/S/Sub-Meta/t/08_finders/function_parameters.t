@@ -7,12 +7,12 @@ use Sub::Meta::Creator;
 use Sub::Meta::Finder::FunctionParameters;
 
 sub find_materials { goto &Sub::Meta::Finder::FunctionParameters::find_materials }
-sub param { Sub::Meta::Param->new(@_) }
+sub param { my @args = @_; return Sub::Meta::Param->new(@args) }
 
-sub Str() { bless {}, 'SomeStr' }
-sub Int() { bless {}, 'SomeInt' }
+sub Str() { return bless {}, 'SomeStr' }
+sub Int() { return bless {}, 'SomeInt' }
 
-sub not_function_paramters {};
+sub not_function_parameters {};
 fun case_fun_positional(Str $a) {};
 fun case_fun_positional_optional(Str $a='aaa') {};
 fun case_fun_named(Str :$a) {};
@@ -25,7 +25,7 @@ method case_class_method($class: ) {}
 method case_class_method_with_type(Str $class: ) {}
 
 subtest 'find_materials' => sub {
-    is find_materials(\&not_function_paramters), undef, 'not_function_paramters';
+    is find_materials(\&not_function_parameters), undef, 'not_function_parameters';
     is find_materials(\&case_fun_positional), {
         sub       => \&case_fun_positional,
         is_method => !!0,
@@ -130,8 +130,8 @@ subtest 'create' => sub {
         finders => [ \&Sub::Meta::Finder::FunctionParameters::find_materials ],
     );
 
-    subtest 'not_function_paramters' => sub {
-        is $creator->create(\&not_function_paramters), undef, 'not_function_paramters';
+    subtest 'not_function_parameters' => sub {
+        is $creator->create(\&not_function_parameters), undef, 'not_function_parameters';
     };
 
     subtest 'case_fun_positional' => sub {

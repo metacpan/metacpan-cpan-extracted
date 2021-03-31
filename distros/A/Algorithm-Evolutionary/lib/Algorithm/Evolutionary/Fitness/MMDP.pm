@@ -9,9 +9,15 @@ Algorithm::Evolutionary::Fitness::MMDP - Massively Multimodal Deceptive Problem
 
 =head1 SYNOPSIS
 
+    use Algorithm::Evolutionary::Fitness::MMDP;
+
+    my @chromosome = "010101101010111111000000"
+
     my $fitness_func = Algorithm::Evolutionary::Fitness::MMDP::apply;
-    
     my $fitness = $fitness_func( $chromosome );
+
+    my $fitness_object = Algorithm::Evolutionary::Fitness::MMDP->new()
+    $fitness = $fitness_object->apply( $chromosome)
 
 =head1 DESCRIPTION
 

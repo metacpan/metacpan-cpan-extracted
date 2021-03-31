@@ -9,7 +9,7 @@ use parent qw{ Astro::App::Satpass2::Macro };
 
 use Astro::App::Satpass2::Utils qw{ quoter ARRAY_REF @CARP_NOT };
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 sub execute {
     my ( $self, $name ) = @_;
@@ -18,8 +18,13 @@ sub execute {
     my $satpass2 = $self->parent();
     my $output;
     foreach my $cmd ( @{ $self->{def} } ) {
-	if ( defined( my $buffer = $satpass2->execute( $cmd ) ) ) {
-	    $output .= $buffer;
+	eval {
+	    if ( defined( my $buffer = $satpass2->execute( $cmd ) ) ) {
+		$output .= $buffer;
+	    }
+	    1;
+	} or do {
+	    $satpass2->__wail( "$@" );
 	}
     }
     return $output;
@@ -104,6 +109,7 @@ L<Astro::App::Satpass2::Macro|Astro::App::Satpass2::Macro>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

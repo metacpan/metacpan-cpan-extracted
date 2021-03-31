@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 71-TSIG-create.t 1815 2020-10-14 21:55:18Z willem $	-*-perl-*-
+# $Id: 71-TSIG-create.t 1827 2020-12-14 10:49:27Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -8,17 +8,16 @@ use IO::File;
 use Test::More;
 use Net::DNS;
 
-my %prerequisite = (
-	'Digest::HMAC' => 1.03,
-	'Digest::MD5'  => 2.13,
-	'Digest::SHA'  => 5.23,
-	'MIME::Base64' => 2.13,
-	);
+my @prerequisite = qw(
+		Digest::HMAC
+		Digest::MD5
+		Digest::SHA
+		MIME::Base64
+		);
 
-foreach my $package ( sort keys %prerequisite ) {
-	my @revision = grep {$_} $prerequisite{$package};
-	next if eval "use $package @revision; 1;";		## no critic
-	plan skip_all => "missing prerequisite $package @revision";
+foreach my $package (@prerequisite) {
+	next if eval "require $package";## no critic
+	plan skip_all => "$package not installed";
 	exit;
 }
 

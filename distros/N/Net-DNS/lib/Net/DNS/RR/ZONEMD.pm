@@ -2,7 +2,7 @@ package Net::DNS::RR::ZONEMD;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: ZONEMD.pm 1814 2020-10-14 21:49:16Z willem $)[2];
+our $VERSION = (qw$Id: ZONEMD.pm 1832 2021-03-22 08:33:36Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -196,6 +196,6 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, draft-wessels-dns-zone-digest
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC8976
 
 =cut

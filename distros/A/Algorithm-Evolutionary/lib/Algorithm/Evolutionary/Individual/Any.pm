@@ -3,7 +3,7 @@ use warnings;
 
 =head1 NAME
 
-Algorithm::Evolutionary::Individual::Any - Wrapper around any Perl class, turns it into a I<Chromosome> 
+Algorithm::Evolutionary::Individual::Any - Wrapper around any Perl data structure, turns it into a I<Chromosome> 
 
 =head1 SYNOPSIS
 
@@ -62,9 +62,9 @@ sub new {
 
 =head2 Atom([$index]) 
 
-No matter what you write, it will return the object wrapped. You can
-subclass and overload, however, but then you win nothing to use this
-class; you're better off creating a new one altogether
+No matter what kind of underlying structure is there, it will return the wrapped object. You can
+subclass and overload, however, but then you earn nothing to use this
+class; you're better off creating a new one altogether.
 
 =cut 
 
@@ -90,11 +90,5 @@ sub size {
   
   This file is released under the GPL. See the LICENSE file included in this distribution,
   or go to http://www.fsf.org/licenses/gpl.txt
-
-  CVS Info: $Date: 2009/07/24 08:46:59 $ 
-  $Header: /media/Backup/Repos/opeal/opeal/Algorithm-Evolutionary/lib/Algorithm/Evolutionary/Individual/Any.pm,v 3.0 2009/07/24 08:46:59 jmerelo Exp $ 
-  $Author: jmerelo $ 
-  $Revision: 3.0 $
-  $Name $
 
 =cut

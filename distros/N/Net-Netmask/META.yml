@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: Net-Netmask
 provides:
   Net::Netmask:
     file: lib/Net/Netmask.pm
-    version: '1.9104'
+    version: '2.0001'
 recommends:
   AnyEvent: '7.14'
 requires:
@@ -36,12 +36,14 @@ resources:
   bugtracker: https://github.com/jmaslak/Net-Netmask/issues
   homepage: http://search.cpan.org/~jmaslak/Net-Netmask/
   repository: git://github.com/jmaslak/Net-Netmask.git
-version: '1.9104'
+version: '2.0001'
 x_contributors:
   - 'Joelle Maslak <jmaslak@antelope.net>'
   - 'David Muir Sharnoff <cpan@dave.sharnoff.org>'
   - 'Adam Herzog <adam@adamherzog.com>'
   - 'Ben Kolera <ben.kolera@gmail.com>'
-  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'bay-max1 <34803732+bay-max1@users.noreply.github.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

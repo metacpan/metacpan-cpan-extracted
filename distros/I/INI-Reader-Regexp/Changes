@@ -1,0 +1,6 @@
+Revision history for Perl extension INI::Reader::Regexp.
+
+0.01  Tue Mar 30 14:07:03 2021
+	- original version; created by h2xs 1.23 with options
+		-AXn INI::Reader::Regexp
+

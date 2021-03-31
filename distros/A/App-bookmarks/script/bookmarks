@@ -6,37 +6,42 @@
 # from browsers default locations (when called without arguments). The following
 # sources are supported :
 #
-# - Safari (Mac)
-# - Firefox (Mac/Linux/Windows)
-# - Chrome (Mac/Linux/Windows)
-# - Internet Explorer (Windows)
-# - Edge (Windows)
-# - Plain text (.txt)
+# - Safari (.plist)
+# - Firefox (.sqlite)
+# - Chrome and Edge (Bookmarks)
+# - Internet Explorer (Favorites)
 # - Markdown (.md)
+# - Gemini (.gmi)
+# - Surfraw (same as plain text)
+# - Plain text (any other extension)
 #
-# Files named *.plist, *.sqlite and *Bookmarks are processed as Safari, Firefox
-# and Chrome bookmarks, respectively. Directories named *Favorites are processed
-# as Internet Explorer favorites.
+# Default export format : <title> <url> <description>
 #
-# Fields <title>, <url> and <description> are retrieved (when existing) and
-# exported in the desired format, by default : <title> <url> <description>
+# - <title> is your bookmark's name, alias, or webpage title.
+# - <url> is your bookmark's address, URL or URI.
+# - <description> is empty for Chrome, Edge, Internet Explorer or Gemini. It 
+#   contains Safari 'Description', Firefox 'Tags' and what the Markdown spec
+#   calls the 'Title' (just the tooltip, actually).
+# 
+# Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
 #
-# That same format is used for plain text and markdown files :
-#
-#   plain text example http://example.txt with a description
-#   [markdown example](http://example.md) with a description
-#
-# The <description> field contains Safari 'Description' or Firefox 'Tags' but is
-# empty for Chrome, Internet Explorer and Edge.
+#   [markdown example](http://example.md/ "with description")
+#   => gemini://example.gmi gemini example
+#   plain text example http://example.txt with description
 #
 # Implementation Notes :
 #
 # - For Safari, this tool relies on dirty plist parsing using Apple's 'plutil'
 #   command. It should use Mac::PropertyList instead. For performance reasons
 #   when used interactively, I've decided to keep it like that (see README.md).
-#
 # - Since Firefox sets an EXCLUSIVE SQLite lock, a tmp DB file copy is used.
+# - sources are read as UTF-8.
 #
+# 2021.03.30 v0.31 jul : skip gemini.t if URI::Find not installed
+# 2021.03.29 v0.30 jul : added great markdown regex by Michaël Perrin
+#                        process files without extension as plain text
+#                        fixed extra spaces printed after empty fields
+#                        added gemini support
 # 2021.02.17 v0.28 jul : fixed missing require DBD::SQLite (firefox)
 # 2021.02.16 v0.27 jul : added win32 Edge support, fixed Chrome bug (localappdata), fixed win32 bug (find), more tests (firefox)
 # 2021.01.31 v0.26 jul : improved handling of optional dependencies
@@ -65,7 +70,7 @@ use File::Basename;
 use File::Temp qw(tempdir);
 use File::Copy qw(copy);
 
-our $VERSION = '0.28';
+our $VERSION = '0.30';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -75,7 +80,8 @@ Usage: $program [-hVdas] [-f format] [file ...]
     -V, --version   version
     -d              debug
     -a              all files : process arguments and default locations
-    -f format       any combination of letters t,u,d as title/url/description (default : tud)
+    -f format       any combination of letters t,u,d as title/url/description 
+                    (default : tud)
     -s              find schemeless URLs in text files (default : no)
 EOF
 
@@ -90,9 +96,6 @@ my $debug       = $options{d} // 0;
 my $all         = $options{a} // 0;
 my $format      = $options{f} // "tud";
 my $schemeless  = $options{s} // 0;
-my $quote       = " ";   # TODO ?
-my $fs          = " ";   # TODO ?
-my $rs          = "\n";  # TODO ?
 
 die $usage if $help;
 die $VERSION . "\n" if $version;
@@ -129,21 +132,21 @@ if (!@ARGV or $all)
 
 # option -f
 my %dispatch = (
-'t'     => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$rs";           },
-'tu'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$u$rs";      },
-'tud'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$u$fs$d$rs"; },
-'tdu'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$d$fs$u$rs"; },
-'td'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$t$fs$d$rs";      },
-'u'     => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$rs";           },
-'ud'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$fs$d$rs";      },
-'udt'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$fs$d$fs$t$rs"; },
-'utd'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$fs$t$fs$d$rs"; },
-'ut'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$u$fs$t$rs";      },
-'d'     => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$rs";           },
-'du'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$u$rs";      },
-'dut'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$u$fs$t$rs"; },
-'dtu'   => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$t$fs$u$rs"; },
-'dt'    => sub { my $t = shift // ""; my $u= shift // ""; my $d = shift // ""; print "$d$fs$t$rs";      },
+'t'     => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t);       },
+'tu'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$u);    },
+'tud'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$u,$d); },
+'tdu'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$d,$u); },
+'td'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($t,$d);    },
+'u'     => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u);       },
+'ud'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$d);    },
+'udt'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$d,$t); },
+'utd'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$t,$d); },
+'ut'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($u,$t);    },
+'d'     => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d);       },
+'du'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$u);    },
+'dut'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$u,$t); },
+'dtu'   => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$t,$u); },
+'dt'    => sub { my ($t,$u,$d) = @_; say join ' ', grep {defined $_ and length $_} ($d,$t);    },
 );
 
 # printer function
@@ -381,11 +384,51 @@ sub _txt {
  
     while (my $line = <$fh>)
     {
-        if ( $line =~ /(.*)\s+($regex)\s+(.*)/ )    # match title url desc
+        if ( $line =~ /(.*)\s+($regex)\s+(.*)/ )    # match <title> <url> <description>
         {
             my $title       = $1;
             my $url         = $2;
             my $description = $3;
+
+            $print_bookmark->($title, $url, $description);
+        }   
+    }
+}
+
+sub _gemini {
+
+    eval {
+        require URI::Find;
+        require URI::Find::Schemeless;
+    };
+    if ($@)
+    {
+        die "to process Gemini files, you need to install module URI::Find\n";
+    }
+
+    my $file = shift // "";
+    warn "\$file: $file\n" if $debug;
+
+    # get uri regex
+    my $class = $schemeless ? "URI::Find::Schemeless" : "URI::Find";    # copy-paste from urifind
+    my $finder = $class->new( sub {
+        my ($uri, $orig_uri) = @_;
+        return $orig_uri;
+    });
+
+    my $regex = $finder->uri_re;
+    $regex = $regex . '|' . $finder->schemeless_uri_re if $schemeless;
+
+    # read file as text
+    open(my $fh, '<:encoding(UTF-8)', $file) or die "unable to read file : $file";
+ 
+    while (my $line = <$fh>)
+    {
+        if ( $line =~ /^=>\s+($regex)\s+(.*)/ )    # match => <url> <title>
+        {
+            my $title       = $2;
+			my $url         = $1;
+            my $description = undef;
 
             $print_bookmark->($title, $url, $description);
         }   
@@ -402,12 +445,40 @@ sub _md {
 
     while (my $line = <$fh>)
     {
-        if ( $line =~ /\s*\[(.*)\]\((.*)\)\s*(.*)/ )    # match [title](url) desc
+		# regex by Michaël Perrin :
+		# http://blog.michaelperrin.fr/2019/02/04/advanced-regular-expressions/
+        if ( $line =~					
+		/								
+		(?<text_group>                  # Text group, including square brackets
+		  \[
+		    (?>                         # (?> defines an atomic group, this is a performance improvement when using recursion
+		      [^\[\]]+                  # Look for any char except closing square bracket
+		      |(?&text_group)           # OR: find recursively an other pattern with opening and closing square brackets
+		    )*
+		  \]
+		)
+		(?:
+		  \(
+		    (?<url>\S*?)                # URL: non-greedy non-whitespace characters
+		    (?:
+		      [ ]
+		      "
+		        (?<title>
+		          (?:[^"]|(?<=\\)")*?   # Title without double quotes around
+		        )
+		      "
+		    )?
+		  \)
+		)
+		/x
+		)    # match [<title>](<url> "<description>") OLD was [<title>](<url>) <description>
         {
             my $title       = $1;
             my $url         = $2;
             my $description = $3;
         
+			$title =~ s/^\[|\]$//g; # strip [...]
+		
             $print_bookmark->($title, $url, $description);
         }
     }
@@ -426,8 +497,9 @@ foreach my $file (@ARGV)
     elsif (-f $file and $name =~ /\.sqlite$/)  { _firefox($file);   }
     elsif (-f $file and $name =~ /Bookmarks$/) { _chrome($file);    }
     elsif (-d $file and $name =~ /Favorites$/) { _iexplorer($file); }
-    elsif (-f $file and $name =~ /\.txt$/)     { _txt($file);       }
     elsif (-f $file and $name =~ /\.md$/)      { _md($file);        }
+    elsif (-f $file and $name =~ /\.gmi$/)     { _gemini($file);    }
+    elsif (-f $file )                          { _txt($file);       }
     else  { die "unable to process file : $file"; }
 }
 
@@ -447,7 +519,8 @@ bookmarks - Export browser bookmarks as plain text.
     -V, --version   version
     -d              debug
     -a              all files : process arguments and default locations
-    -f format       any combination of letters t,u,d as title/url/description (default : tud)
+    -f format       any combination of letters t,u,d as title/url/description
+                    (default : tud)
     -s              find schemeless URLs in text files (default : no)
 
 =head1 DESCRIPTION
@@ -458,36 +531,43 @@ sources are supported :
 
 =over
 
-=item - Safari (Mac)
+=item - Safari (.plist)
 
-=item - Firefox (Mac/Linux/Windows)
+=item - Firefox (.sqlite)
 
-=item - Chrome (Mac/Linux/Windows)
+=item - Chrome and Edge (Bookmarks)
 
-=item - Internet Explorer (Windows)
-
-=item - Edge (Windows)
-
-=item - Plain text (.txt)
+=item - Internet Explorer (Favorites)
 
 =item - Markdown (.md)
 
+=item - Gemini (.gmi)
+
+=item - Surfraw (same as plain text)
+
+=item - Plain text (any other extension)
+
 =back
 
-Files named *.plist, *.sqlite and *Bookmarks are processed as Safari, Firefox
-and Chrome bookmarks, respectively. Directories named *Favorites are processed
-as Internet Explorer favorites.
+Default export format : <title> <url> <description>
 
-Fields <title>, <url> and <description> are retrieved (when existing) and
-exported in the desired format, by default : <title> <url> <description>
+=over
+ 
+=item - <title> is your bookmark's name, alias, or webpage title.
 
-That same format is used for plain text and markdown files :
+=item - <url> is your bookmark's address, URL or URI.
 
-    plain text example http://example.txt with a description
-    [markdown example](http://example.md) with a description
+=item - <description> is empty for Chrome, Edge, Internet Explorer or Gemini. It 
+        contains Safari 'Description', Firefox 'Tags' and what the Markdown spec
+        calls the 'Title' (just the tooltip, actually).
 
-The <description> field contains Safari 'Description' or Firefox 'Tags' but is
-empty for Chrome, Internet Explorer and Edge.
+=back
+
+Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
+
+    [markdown example](http://example.md/ "with description")
+    => gemini://example.gmi gemini example
+    plain text example http://example.txt with description
 
 =head1 BUGS
 
@@ -500,7 +580,7 @@ jul, C<kaldor@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2019 by jul.
+This software is Copyright (c) 2019-2021 by jul.
 
 This is free software, licensed under:
 

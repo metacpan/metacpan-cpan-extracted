@@ -2,7 +2,7 @@ package Crypt::PK::X25519;
 
 use strict;
 use warnings;
-our $VERSION = '0.070';
+our $VERSION = '0.071';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( )] );
@@ -64,19 +64,19 @@ sub import_key {
   croak "FATAL: invalid key data" unless $data;
 
   if ($data =~ /-----BEGIN PUBLIC KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password);
+    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
     return $self->_import($data);
   }
   elsif ($data =~ /-----BEGIN PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password);
+    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
     return $self->_import_pkcs8($data, $password);
   }
   elsif ($data =~ /-----BEGIN ENCRYPTED PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password);
+    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
     return $self->_import_pkcs8($data, $password);
   }
   elsif ($data =~ /-----BEGIN X25519 PRIVATE KEY-----(.*?)-----END/sg) {
-    $data = pem_to_der($data, $password);
+    $data = pem_to_der($data, $password) or croak "FATAL: PEM/key decode failed";
     return $self->_import_pkcs8($data, $password);
   }
   elsif ($data =~ /^\s*(\{.*?\})\s*$/s) { # JSON

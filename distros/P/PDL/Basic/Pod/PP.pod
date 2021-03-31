@@ -696,6 +696,11 @@ analogous to the C<indx> qualifier C<double> results in C<b> always being of
 type double regardless of the type of C<a> without leading to a
 type conversion of C<a> as a side effect.
 
+There is also a special type, C<real>. The others above are all actual
+PDL/C datatypes, but C<real> is a modifier; if the operation type is real,
+it has no effect; if it is complex, then the parameter will be the real
+version - so C<cdouble> becomes C<double>, etc.
+
 Finally, there are the C<type+> qualifiers where type is one of C<int>
 or C<float>. What shall that mean. Let's illustrate the C<int+>
 qualifier with the actual definition of sumover:
@@ -975,7 +980,7 @@ Since this is Perl, TMTOWTDI, so you could also write:
        $SETBAD(c());
     }',
 
-You can reduce code repition using the C C<PDL_BAD_CODE> macro,
+You can reduce code repetition using the C C<PDL_BAD_CODE> macro,
 using the same code for both of the C<Code> and C<BadCode> sections:
 
     #ifdef PDL_BAD_CODE
@@ -1105,7 +1110,7 @@ type of arguments. The general syntax is
 	$Ttypeletters(type_alternatives)
 
 where C<typeletters> is a permutation of a subset of the letters
-C<BSULFD> which stand for Byte, Short, Ushort, etc. and
+C<BSULNQFD> which stand for Byte, Short, Ushort, etc. and
 C<type_alternatives> are the expansions when the type of the PP
 operation is equal to that indicated by the respective letter. Let's
 illustrate this incomprehensible description by an example. Assuming
@@ -1121,21 +1126,12 @@ on the type of the transformation):
 
   pp_def('foofunc',
 	Pars => ' a(n); [o] b();',
-	Code => ' $TFD(float_func,double_func) ($P(a),$P(b));'
+	Code => ' $TFD(float,double)_func ($P(a),$P(b));'
 	GenericTypes => [qw(F D)],
   );
 
-Please note that you can't say
-
-       Code => ' $TFD(float,double)_func ($P(a),$P(b));'
-
-since the C<$T> macro expands with trailing spaces, analogously to
-C preprocessor macros.
-The slightly longer form illustrated above is correct.
-If you really want brevity, you can of course do
-
-	'$TBSULFD('.(join ',',map {"long_identifier_name_$_"}
-		qw/byt short unseigned lounge flotte dubble/).');'
+There is a limitation that the comma-separated values cannot have
+parentheses.
 
 =item C<$PP>
 
@@ -1924,7 +1920,6 @@ In most cases you can define your Makefile like
   %hash = pdlpp_stdargs($package);
   $hash{OBJECT} .= ' additional_Ccode$(OBJ_EXT) ';
   $hash{clean}->{FILES} .= ' todelete_Ccode$(OBJ_EXT) ';
-  $hash{'VERSION_FROM'} = 'mylib.pd';
   WriteMakefile(%hash);
 
   sub MY::postamble { pdlpp_postamble($package); }
@@ -2037,8 +2032,8 @@ Only used if C<HandleBad =E<gt> 1>.
 =item GenericTypes
 
 An array reference. The array may contain any subset of the one-character
-strings `B', `S', `U', `L', `Q', `F' and `D', which specify which types
-your operation will accept. The meaning of each type is:
+strings given below, which specify which types your operation will
+accept. The meaning of each type is:
 
  B - signed byte (i.e. signed char)
  S - signed short (two-byte integer)
@@ -2048,9 +2043,11 @@ your operation will accept. The meaning of each type is:
  Q - signed long long (eight byte integer)
  F - float
  D - double
+ G - complex float
+ C - complex double
 
 This is very useful (and important!) when interfacing an external library.
-Default: [qw/B S U L N Q F D/]
+Default: [qw/B S U L N Q F D C G/]
 
 =item Inplace
 

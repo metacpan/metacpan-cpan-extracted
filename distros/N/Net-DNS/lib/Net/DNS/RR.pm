@@ -3,7 +3,7 @@ package Net::DNS::RR;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RR.pm 1812 2020-10-07 18:09:53Z willem $)[2];
+our $VERSION = (qw$Id: RR.pm 1834 2021-03-28 09:34:49Z willem $)[2];
 
 
 =head1 NAME
@@ -133,10 +133,10 @@ sub _new_string {
 		my $rdata = pack 'H*', join( '', @token );
 		croak 'length and hexadecimal data inconsistent' unless $rdlen == length $rdata;
 		$self->rdata($rdata);				# unpack RDATA
-		return $self;
+	} else {
+		$self->_parse_rdata(@token);			# parse arguments
 	}
 
-	$self->_parse_rdata(@token);				# parse arguments
 	$self->_post_parse();
 	return $self;
 }

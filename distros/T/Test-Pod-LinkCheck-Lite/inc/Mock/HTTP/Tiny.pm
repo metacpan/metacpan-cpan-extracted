@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Storable ();
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use constant HASH_REF	=> ref {};
 
@@ -190,6 +190,7 @@ L<HTTP::Tiny|HTTP::Tiny> (the real one).
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Pod-LinkCheck-Lite>,
 L<https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite/issues>, or in
 electronic mail to the author.
 

@@ -4,7 +4,7 @@ use Sub::Meta::Parameters;
 
 my $p1 = Sub::Meta::Param->new("Str");
 my $p2 = Sub::Meta::Param->new("Int");
-sub param { Sub::Meta::Param->new(@_); }
+sub param { my @args = @_; return Sub::Meta::Param->new(@args); }
 
 my $obj = bless {} => 'Some';
 
@@ -114,7 +114,7 @@ my @TEST = (
 use JSON::PP;
 my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 {
-    no warnings qw/once/;
+    no warnings qw/once/; ## no critic (ProhibitNoWarnings)
     *{Sub::Meta::Param::TO_JSON} = sub {
         my $s = $_[0]->type;
         $s .= ':named' if $_[0]->named;
@@ -126,7 +126,7 @@ my $json = JSON::PP->new->allow_nonref->convert_blessed->canonical;
 while (my ($args, $cases) = splice @TEST, 0, 2) {
     my $meta = Sub::Meta::Parameters->new($args);
     my $inline = $meta->is_same_interface_inlined('$_[0]');
-    my $is_same_interface = eval sprintf('sub { %s }', $inline);
+    my $is_same_interface = eval sprintf('sub { %s }', $inline); ## no critic (ProhibitStringyEval)
 
     subtest "@{[$json->encode($args)]}" => sub {
 

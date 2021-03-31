@@ -7,19 +7,16 @@ use lib qw{ inc };
 
 use Test::More 0.88;
 
-my $test_mocktime;
+use constant TEST_MOCKTIME	=> do {
+    local $@ = undef;
 
-BEGIN {
-
-    local $@;
-
-    $test_mocktime = eval {
+    eval {
 	require Test::MockTime;
 	Test::MockTime->import( qw{ restore_time set_fixed_time } );
 	1;
-    };
+    } || 0;
 
-}
+};
 
 use My::Module::Test::App;
 
@@ -324,64 +321,69 @@ SKIP: {
 
     my $tests = 12;
 
-    $test_mocktime
-	or skip 'Unable to load Test::MockTime', $tests;
+    if ( TEST_MOCKTIME ) {
 
-    set_fixed_time('2009-07-01T06:00:00Z');
+	set_fixed_time('2009-07-01T06:00:00Z');
 
-    call_m( parse => 'yesterday Z',
-	greg_time_gm( 0, 0, 0, 30, 5, 2009 ),
-	q{Parse ISO-8601 'yesterday Z'} );
+	call_m( parse => 'yesterday Z',
+	    greg_time_gm( 0, 0, 0, 30, 5, 2009 ),
+	    q{Parse ISO-8601 'yesterday Z'} );
 
-    call_m( parse => 'yesterday 9:30Z',
-	greg_time_gm( 0, 30, 9, 30, 5, 2009 ),
-	q{Parse ISO-8601 'yesterday 9:30Z'} );
+	call_m( parse => 'yesterday 9:30Z',
+	    greg_time_gm( 0, 30, 9, 30, 5, 2009 ),
+	    q{Parse ISO-8601 'yesterday 9:30Z'} );
 
-    call_m( parse => 'today Z',
-	greg_time_gm( 0, 0, 0, 1, 6, 2009 ),
-	q{Parse ISO-8601 'today Z'} );
+	call_m( parse => 'today Z',
+	    greg_time_gm( 0, 0, 0, 1, 6, 2009 ),
+	    q{Parse ISO-8601 'today Z'} );
 
-    call_m( parse => 'today 9:30Z',
-	greg_time_gm( 0, 30, 9, 1, 6, 2009 ),
-	q{Parse ISO-8601 'today 9:30Z'} );
+	call_m( parse => 'today 9:30Z',
+	    greg_time_gm( 0, 30, 9, 1, 6, 2009 ),
+	    q{Parse ISO-8601 'today 9:30Z'} );
 
-    call_m( parse => 'tomorrow Z',
-	greg_time_gm( 0, 0, 0, 2, 6, 2009 ),
-	q{Parse ISO-8601 'tomorrow Z'} );
+	call_m( parse => 'tomorrow Z',
+	    greg_time_gm( 0, 0, 0, 2, 6, 2009 ),
+	    q{Parse ISO-8601 'tomorrow Z'} );
 
-    call_m( parse => 'tomorrow 9:30Z',
-	greg_time_gm( 0, 30, 9, 2, 6, 2009 ),
-	q{Parse ISO-8601 'tomorrow 9:30Z'} );
+	call_m( parse => 'tomorrow 9:30Z',
+	    greg_time_gm( 0, 30, 9, 2, 6, 2009 ),
+	    q{Parse ISO-8601 'tomorrow 9:30Z'} );
 
-    restore_time();
+	restore_time();
 
-    set_fixed_time( greg_time_local( 0, 0, 6, 1, 6, 2009 ) );
+	set_fixed_time( greg_time_local( 0, 0, 6, 1, 6, 2009 ) );
 
-    call_m( parse => 'yesterday',
-	greg_time_local( 0, 0, 0, 30, 5, 2009 ),
-	q{Parse ISO-8601 'yesterday'} );
+	call_m( parse => 'yesterday',
+	    greg_time_local( 0, 0, 0, 30, 5, 2009 ),
+	    q{Parse ISO-8601 'yesterday'} );
 
-    call_m( parse => 'yesterday 9:30',
-	greg_time_local( 0, 30, 9, 30, 5, 2009 ),
-	q{Parse ISO-8601 'yesterday 9:30'} );
+	call_m( parse => 'yesterday 9:30',
+	    greg_time_local( 0, 30, 9, 30, 5, 2009 ),
+	    q{Parse ISO-8601 'yesterday 9:30'} );
 
-    call_m( parse => 'today',
-	greg_time_local( 0, 0, 0, 1, 6, 2009 ),
-	q{Parse ISO-8601 'today'} );
+	call_m( parse => 'today',
+	    greg_time_local( 0, 0, 0, 1, 6, 2009 ),
+	    q{Parse ISO-8601 'today'} );
 
-    call_m( parse => 'today 9:30',
-	greg_time_local( 0, 30, 9, 1, 6, 2009 ),
-	q{Parse ISO-8601 'today 9:30'} );
+	call_m( parse => 'today 9:30',
+	    greg_time_local( 0, 30, 9, 1, 6, 2009 ),
+	    q{Parse ISO-8601 'today 9:30'} );
 
-    call_m( parse => 'tomorrow',
-	greg_time_local( 0, 0, 0, 2, 6, 2009 ),
-	q{Parse ISO-8601 'tomorrow'} );
+	call_m( parse => 'tomorrow',
+	    greg_time_local( 0, 0, 0, 2, 6, 2009 ),
+	    q{Parse ISO-8601 'tomorrow'} );
 
-    call_m( parse => 'tomorrow 9:30',
-	greg_time_local( 0, 30, 9, 2, 6, 2009 ),
-	q{Parse ISO-8601 'tomorrow 9:30'} );
+	call_m( parse => 'tomorrow 9:30',
+	    greg_time_local( 0, 30, 9, 2, 6, 2009 ),
+	    q{Parse ISO-8601 'tomorrow 9:30'} );
 
-    restore_time();
+	restore_time();
+
+    } else {
+
+	skip 'Unable to load Test::MockTime', $tests;
+
+    }
 
 }
 

@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.09";
+our $VERSION = "0.10";
 
 use Scalar::Util ();
 
@@ -15,10 +15,11 @@ use overload
 my %DEFAULT = ( named => 0, optional => 0, invocant => 0 );
 
 sub new {
-    my $class = shift;
-    my %args = @_ == 1 ? ref $_[0] && (ref $_[0] eq 'HASH') ? %{$_[0]}
-                       : ( type => $_[0] )
-             : @_;
+    my ($class, @args) = @_;
+    my $v = $args[0];
+    my %args = @args == 1 ? ref $v && (ref $v eq 'HASH') ? %{$v}
+                       : ( type => $v )
+             : @args;
 
     $args{optional} = !delete $args{required} if exists $args{required};
     $args{named}    = !delete $args{positional} if exists $args{positional};
@@ -29,31 +30,31 @@ sub new {
     return bless \%args => $class;
 }
 
-sub name()       { $_[0]{name} }
-sub type()       { $_[0]{type} }
-sub default()    { $_[0]{default} }
-sub coerce()     { $_[0]{coerce} }
-sub optional()   { !!$_[0]{optional} }
-sub required()   { !$_[0]{optional} }
-sub named()      { !!$_[0]{named} }
-sub positional() { !$_[0]{named} }
-sub invocant()   { !!$_[0]{invocant} }
+sub name()       { my $self = shift; return $self->{name} }
+sub type()       { my $self = shift; return $self->{type} }
+sub default()    { my $self = shift; return $self->{default} } ## no critic (ProhibitBuiltinHomonyms)
+sub coerce()     { my $self = shift; return $self->{coerce} }
+sub optional()   { my $self = shift; return !!$self->{optional} }
+sub required()   { my $self = shift; return !$self->{optional} }
+sub named()      { my $self = shift; return !!$self->{named} }
+sub positional() { my $self = shift; return !$self->{named} }
+sub invocant()   { my $self = shift; return !!$self->{invocant} }
 
-sub set_name($)      { $_[0]{name}     = $_[1];   $_[0] }
-sub set_type($)      { $_[0]{type}     = $_[1];   $_[0] }
-sub set_default($)   { $_[0]{default}  = $_[1];   $_[0] }
-sub set_coerce($)    { $_[0]{coerce}   = $_[1];   $_[0] }
-sub set_optional($;)   { $_[0]{optional} = !!(defined $_[1] ? $_[1] : 1); $_[0] }
-sub set_required($;)   { $_[0]{optional} =  !(defined $_[1] ? $_[1] : 1); $_[0] }
-sub set_named($;)      { $_[0]{named}    = !!(defined $_[1] ? $_[1] : 1); $_[0] }
-sub set_positional($;) { $_[0]{named}    =  !(defined $_[1] ? $_[1] : 1); $_[0] }
-sub set_invocant($;)   { $_[0]{invocant} = !!(defined $_[1] ? $_[1] : 1); $_[0] }
+sub set_name      { my ($self, $v) = @_; $self->{name}     = $v; return $self }
+sub set_type      { my ($self, $v) = @_; $self->{type}     = $v; return $self }
+sub set_default   { my ($self, $v) = @_; $self->{default}  = $v; return $self }
+sub set_coerce    { my ($self, $v) = @_; $self->{coerce}   = $v; return $self }
+sub set_optional   { my ($self, $v) = @_; $self->{optional} = !!(defined $v ? $v : 1); return $self }
+sub set_required   { my ($self, $v) = @_; $self->{optional} =  !(defined $v ? $v : 1); return $self }
+sub set_named      { my ($self, $v) = @_; $self->{named}    = !!(defined $v ? $v : 1); return $self }
+sub set_positional { my ($self, $v) = @_; $self->{named}    =  !(defined $v ? $v : 1); return $self }
+sub set_invocant   { my ($self, $v) = @_; $self->{invocant} = !!(defined $v ? $v : 1); return $self }
 
 # alias
 sub isa_() :method; # NOT isa
 *isa_ = \&type;
 
-sub set_isa($);
+sub set_isa;
 *set_isa = \&set_type;
 
 sub is_same_interface {

@@ -47,7 +47,14 @@ sub handle_response {
     my ($self, $response) = @_;
 
     # verify the response
-    my $x = Net::SAML2::XML::Sig->new({ x509 => 1, cert_text => $self->idp_cert, exclusive => 1, });
+    my $x = Net::SAML2::XML::Sig->new(
+    {
+        x509 => 1,
+        cert_text => $self->idp_cert,
+        exclusive => 1,
+        no_xml_declaration => 1,
+    });
+
     my $ret = $x->verify($response);
     die "bad SOAP response" unless $ret;
 
@@ -105,6 +112,7 @@ sub create_soap_envelope {
         key  => $self->key,
         cert => $self->cert,
         exclusive => 1,
+        no_xml_declaration => 1,
     });
     my $signed_message = $sig->sign($message);
 
@@ -153,7 +161,7 @@ Net::SAML2::Binding::SOAP
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -241,6 +249,7 @@ This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
             2012       Peter Marschall
             2019       Timothy Legge
             2020       Timothy Legge, Wesley Schwengle
+            2021       Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

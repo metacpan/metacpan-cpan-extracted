@@ -1,5 +1,11 @@
 Revision history for Perl extension JCM::Net::Patricia.
 
+1.05 - 2021-03-29  Various
+    - Security: No longer allow leading zeros in IPv4 octets
+    - Security: No longer allow "short" nets (I.E. 10/8 instead of
+      10.0.0.0/8)
+    - Merged documentation formatting change from Mohammad S Anwar
+
 1.04 - 2018-10-28  Joelle Maslak <jmaslak@antelope.net>
     - Merged documentation and metadata changes from Dylan Hardison
     - Additional author name updates

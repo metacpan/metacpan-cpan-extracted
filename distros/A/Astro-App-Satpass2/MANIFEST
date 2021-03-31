@@ -1,4 +1,3 @@
-script/satpass2
 Build.PL
 Changes
 eg/almanac
@@ -53,10 +52,11 @@ lib/Astro/App/Satpass2/Wrap/Array.pm
 LICENSES/Artistic
 LICENSES/Copying
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 META.json
 META.yml
 README
+script/satpass2
 t/basic.t
 t/data.tle
 t/format.t
@@ -100,4 +100,5 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
+xt/author/prereq.t
 xt/author/rt80435.t

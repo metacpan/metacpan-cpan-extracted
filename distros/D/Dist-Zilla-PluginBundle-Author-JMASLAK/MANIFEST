@@ -9,7 +9,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 Makefile.PL
-README.pod
+README.md
 TODO
 dist.ini
 lib/Dist/Zilla/PluginBundle/Author/JMASLAK.pm

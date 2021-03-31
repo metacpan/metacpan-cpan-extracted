@@ -4,7 +4,7 @@ Data::Validate::IP - IPv4 and IPv6 validation methods
 
 # VERSION
 
-version 0.27
+version 0.30
 
 # SYNOPSIS
 
@@ -33,6 +33,29 @@ and untaint their input. This includes both basic validation (`is_ipv4()` and
 `is_ipv6()`) and special cases like checking whether an address belongs to a
 specific network or whether an address is public or private (reserved).
 
+# USAGE AND SECURITY RECOMMENDATIONS
+
+It's important to understand that if `is_ipv4($ip)`, `is_ipv6($ip)`, or
+`is_ip($ip)` return false, then all other validation functions for that IP
+address family will _also_ return false. So for example, if `is_ipv4($ip)`
+returns false, then `is_private_ipv4($ip)` _and_ `is_public_ipv4($ip)` will
+both also return false.
+
+This means that simply calling `is_private_ipv4($ip)` by itself is not
+sufficient if you are dealing with untrusted input. You should always check
+`is_ipv4($ip)` as well. This applies as well when using IPv6 functions or
+generic functions like `is_private_ip($ip)`.
+
+There are security implications to this around certain oddly formed
+addresses. Notably, an address like "010.0.0.1" is technically valid, but the
+operating system will treat "010" as an octal number. That means that
+"010.0.0.1" is equivalent to "8.0.0.1", _not_ "10.0.0.1".
+
+However, this module's `is_ipv4($ip)` and `is_ip($ip)` functions will return
+false for addresses like "010.0.0.1" which have octal components. And of
+course that means that it also returns false for `is_private_ipv4($ip)`
+_and_ `is_public_ipv4($ip)`.
+
 # FUNCTIONS
 
 All of the functions below are exported by default.
@@ -53,10 +76,10 @@ These functions simply check whether the address is a valid IPv4 or IPv6 address
 
 This subroutine checks whether the address belongs to the given IPv4
 network. The `$network` argument can either be a string in CIDR notation like
-"15.0.15.0/24" or a [NetAddr::IP](https://metacpan.org/pod/NetAddr::IP) object.
+"15.0.15.0/24" or a [NetAddr::IP](https://metacpan.org/pod/NetAddr%3A%3AIP) object.
 
 This subroutine used to accept many more forms of network specifications
-(anything [Net::Netmask](https://metacpan.org/pod/Net::Netmask) accepts) but this has been deprecated.
+(anything [Net::Netmask](https://metacpan.org/pod/Net%3A%3ANetmask) accepts) but this has been deprecated.
 
 ## is\_unroutable\_ipv4($ip)
 
@@ -231,7 +254,11 @@ Please report any bugs or feature requests to
 [http://rt.cpan.org](http://rt.cpan.org). I will be notified, and then you'll automatically be
 notified of progress on your bug as I make changes.
 
-Bugs may be submitted through [https://github.com/houseabsolute/Data-Validate-IP/issues](https://github.com/houseabsolute/Data-Validate-IP/issues).
+Bugs may be submitted at [https://github.com/houseabsolute/Data-Validate-IP/issues](https://github.com/houseabsolute/Data-Validate-IP/issues).
+
+# SOURCE
+
+The source code repository for Data-Validate-IP can be found at [https://github.com/houseabsolute/Data-Validate-IP](https://github.com/houseabsolute/Data-Validate-IP).
 
 # AUTHORS
 
@@ -244,7 +271,10 @@ Gregory Oschwald <goschwald@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Neil Neely.
+This software is copyright (c) 2021 by Neil Neely.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+`LICENSE` file included with this distribution.

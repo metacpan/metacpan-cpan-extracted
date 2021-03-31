@@ -11,7 +11,7 @@ use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 use Scalar::Util ();
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 my @event_names;
 $event_names[PASS_EVENT_NONE]		= '';
@@ -144,7 +144,6 @@ EOD
     [%= data.latitude( arg ) %]
     [%= data.longitude( arg ) %] [% data.altitude( arg ) -%]
 EOD
-
 
 	location	=> <<'EOD',
 [% UNLESS data %]
@@ -640,6 +639,7 @@ L<Astro::App::Satpass2::Locale|Astro::App::Satpass2::Locale>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

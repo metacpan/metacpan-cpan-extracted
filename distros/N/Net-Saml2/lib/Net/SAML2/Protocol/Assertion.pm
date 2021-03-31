@@ -10,14 +10,15 @@ use XML::XPath;
 with 'Net::SAML2::Role::ProtocolMessage';
 
 
-has 'attributes' => (isa => 'HashRef[ArrayRef]', is => 'ro', required => 1);
-has 'session'    => (isa => 'Str',               is => 'ro', required => 1);
-has 'nameid'     => (isa => 'Str',               is => 'ro', required => 1);
-has 'not_before' => (isa => DateTime,          is => 'ro', required => 1);
-has 'not_after'  => (isa => DateTime,          is => 'ro', required => 1);
-has 'audience'   => (isa => NonEmptySimpleStr, is => 'ro', required => 1);
-has 'xpath'      => (isa => 'XML::XPath', is => 'ro', required => 1);
-has 'in_response_to' => (isa => 'Str',           is => 'ro', required => 1);
+has 'attributes'        => (isa => 'HashRef[ArrayRef]', is => 'ro', required => 1);
+has 'session'           => (isa => 'Str',               is => 'ro', required => 1);
+has 'nameid'            => (isa => 'Str',               is => 'ro', required => 1);
+has 'not_before'        => (isa => DateTime,            is => 'ro', required => 1);
+has 'not_after'         => (isa => DateTime,            is => 'ro', required => 1);
+has 'audience'          => (isa => NonEmptySimpleStr,   is => 'ro', required => 1);
+has 'xpath'             => (isa => 'XML::XPath',        is => 'ro', required => 1);
+has 'in_response_to'    => (isa => 'Str',               is => 'ro', required => 1);
+has 'response_status'   => (isa => 'Str',               is => 'ro', required => 1);
 
 
 
@@ -68,6 +69,7 @@ sub new_from_xml {
         not_after      => $not_after,
         xpath          => $xpath,
         in_response_to => $xpath->findvalue('//saml:Subject/saml:SubjectConfirmation/saml:SubjectConfirmationData/@InResponseTo')->value,
+        response_status => $xpath->findvalue('//saml2p:Response/saml2p:Status/saml2p:StatusCode/@Value')->value,
     );
 
     return $self;
@@ -113,7 +115,7 @@ Net::SAML2::Protocol::Assertion
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -172,6 +174,7 @@ This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
             2017       Alessandro Ranellucci
             2019       Timothy Legge
             2020       Timothy Legge, Wesley Schwengle
+            2021       Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -15,7 +15,7 @@ name: Asm-C
 provides:
   Asm::C:
     file: lib/Asm/C.pm
-    version: '20210329'
+    version: '20210330'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/philiprbrenan/AsmC/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/philiprbrenan/AsmC
-version: '20210329'
+version: '20210330'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

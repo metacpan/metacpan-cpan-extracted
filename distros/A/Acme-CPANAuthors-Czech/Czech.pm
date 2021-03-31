@@ -4,7 +4,7 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = 0.28;
+our $VERSION = 0.29;
 
 # Modules.
 use Acme::CPANAuthors::Register(
@@ -31,6 +31,8 @@ use Acme::CPANAuthors::Register(
 	'PASKY' => 'Petr Baudiš',
 	'PCIMPRICH' => 'Petr Cimprich',
 	'PEK' => 'Petr Kletečka',
+	'PETRIS' => 'Petr Malát',
+	'PKUBANEK' => 'Petr Kubánek',
 	'POPEL' => 'Martin Popel',
 	'PSME' => 'Petr Šmejkal',
 	'RUR' => 'Rudolf Rosa',
@@ -41,6 +43,7 @@ use Acme::CPANAuthors::Register(
 	'SMRZ' => 'Otakar Smrž',
 	'STRAKA' => 'Milan Straka',
 	'TKR' => 'Tomáš Kraut',
+	'TPODER' => 'Tomáš Podermański',
 	'TRIPIE' => 'Tomáš Stýblo',
 	'TYNOVSKY' => 'Miroslav Týnovský',
 	'VARISD' => 'Dušan Variš',
@@ -96,7 +99,7 @@ See documentation for L<Acme::CPANAuthors> for more details.
  print "Count of Czech CPAN authors: $count\n";
 
  # Output:
- # Count of Czech CPAN authors: 41
+ # Count of Czech CPAN authors: 44
 
 =head1 EXAMPLE2
 
@@ -140,24 +143,27 @@ See documentation for L<Acme::CPANAuthors> for more details.
  #     [20] "PASKY",
  #     [21] "PCIMPRICH",
  #     [22] "PEK",
- #     [23] "POPEL",
- #     [24] "PSME",
- #     [25] "RUR",
- #     [26] "RVASICEK",
- #     [27] "SARFY",
- #     [28] "SEIDLJAN",
- #     [29] "SKIM",
- #     [30] "SMRZ",
- #     [31] "STRAKA",
- #     [32] "TKR",
- #     [33] "TRIPIE",
- #     [34] "TYNOVSKY",
- #     [35] "VARISD",
- #     [36] "VASEKD",
- #     [37] "YENYA",
- #     [38] "ZABA",
- #     [39] "ZEMAN",
- #     [40] "ZOUL"
+ #     [23] "PETRIS",
+ #     [24] "PKUBANEK",
+ #     [25] "POPEL",
+ #     [26] "PSME",
+ #     [27] "RUR",
+ #     [28] "RVASICEK",
+ #     [29] "SARFY",
+ #     [30] "SEIDLJAN",
+ #     [31] "SKIM",
+ #     [32] "SMRZ",
+ #     [33] "STRAKA",
+ #     [34] "TKR",
+ #     [35] "TPODER",
+ #     [36] "TRIPIE",
+ #     [37] "TYNOVSKY",
+ #     [38] "VARISD",
+ #     [39] "VASEKD",
+ #     [40] "YENYA",
+ #     [41] "ZABA",
+ #     [42] "ZEMAN",
+ #     [43] "ZOUL"
  # ]
 
 =head1 DEPENDENCIES
@@ -182,6 +188,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.28
+0.29
 
 =cut

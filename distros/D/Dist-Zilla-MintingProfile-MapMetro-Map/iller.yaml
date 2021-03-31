@@ -1,0 +1,44 @@
+---
+doctype: global
+
+distribution_name: Dist-Zilla-MintingProfile-MapMetro-Map
+---
+doctype: dist
+
+header:
+  copyright_year: 2021
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.014000
+      - Moose
+      - Dist::Zilla: 6.017
+      - Dist::Zilla::Role::FileGatherer: 6.017
+      - Dist::Zilla::Plugin::InlineFiles: 6.017
+      - Dist::Zilla::Role::TextTemplate: 6.017
+      - Dist::Zilla::Role::MintingProfile::ShareDir: 6.017
+
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: ShareDir
+    dir: profiles
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    splint: 0
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+
+config: Author::CSSON
+onexist:
+  - script/

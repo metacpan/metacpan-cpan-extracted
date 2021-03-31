@@ -2539,11 +2539,13 @@ sub coerce_types {
 
 	my $dtype;
 	if ( $po->{FlagTyped} ) {
-	    $dtype = $po->cenum();
+	    $dtype = $po->{Type}->sym;
 	    $dtype = "PDLMAX($dtype,\$PRIV(__datatype))"
 		if $po->{FlagTplus};
+	} elsif ( $po->{FlagReal} ) {
+	    $dtype = '($PRIV(__datatype) < PDL_CF ? $PRIV(__datatype) : $PRIV(__datatype) - (PDL_CF - PDL_F))'
 	} else {
-	    $dtype = "\$PRIV(__datatype)";
+	    $dtype = '$PRIV(__datatype)';
 	}
 
 	if ( $po->{FlagCreateAlways} ) {
@@ -3122,23 +3124,18 @@ $PDL::PP::deftbl =
  #   for PDL-subclassed objects
  #
    PDL::PP::Rule->new("CallCopy", ["DimObjs", "USParNames", "USParObjs", "Name", "_P2Child"],
-		      sub {
-			  my ($dimObj, $USParNames, $USParObjs, $Name, $hasp2c) = @_;
-			  return 0 if $hasp2c;
-			  my $noDimmedArgs = scalar(keys %$dimObj);
-			  my $noArgs = scalar(@$USParNames);
-			  if( $noDimmedArgs == 0 and $noArgs == 2  ){
-			      # Check for 2-arg functgion with 0-dim signatures
-			      # Check to see if output arg is _not_ explicitly typed:
-			      my $arg2 = $USParNames->[1];
-			      my $ParObj = $USParObjs->{$arg2};
-			      if( $ParObj->ctype('generic') eq 'generic'){
-				  # print "Calling Copy for function '$Name'\n";
-				  return 1;
-			      }
-			  }
-			  return 0;
-		      }),
+      sub {
+	  my ($dimObj, $USParNames, $USParObjs, $Name, $hasp2c) = @_;
+	  return 0 if $hasp2c;
+	  my $noDimmedArgs = scalar(keys %$dimObj);
+	  my $noArgs = scalar(@$USParNames);
+	  return 0 if !($noDimmedArgs == 0 and $noArgs == 2);
+	  # Check for 2-arg function with 0-dim signatures
+	  # Check to see if output arg is _not_ explicitly typed:
+	  my $arg2 = $USParNames->[1];
+	  my $ParObj = $USParObjs->{$arg2};
+	  !$ParObj->{FlagTyped};
+      }),
 
 # "Other pars", the parameters which are usually not pdls.
 
@@ -3251,7 +3248,7 @@ $PDL::PP::deftbl =
    PDL::PP::Rule->new("ParsedBackCode",
 		      ["BackCode","_BadBackCode","ParNames","ParObjs","DimObjs","GenericTypes",
 		       "ExtraGenericLoops","HaveThreading","Name"],
-		      sub { return PDL::PP::Code->new(@_, undef, undef, 'BackCode2'); }),
+		      sub { return PDL::PP::Code->new(@_, undef, 'BackCode2'); }),
 
 # Compiled representations i.e. what the xsub function leaves
 # in the trans structure. By default, copies of the parameters

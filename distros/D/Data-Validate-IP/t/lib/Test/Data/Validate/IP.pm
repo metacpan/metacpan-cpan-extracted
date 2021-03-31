@@ -31,7 +31,7 @@ my %ipv4_types = (
             240.0.0.4
             255.255.255.254
             255.255.255.255
-            )
+        )
     ],
 );
 
@@ -42,7 +42,7 @@ my %ipv6_types = (
             fc01::1234
             fdef::
             fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
-            )
+        )
     ],
     public => [
         qw(
@@ -52,7 +52,7 @@ my %ipv6_types = (
             1:1:1:1::
             2001:abcd::
             abcd::
-            )
+        )
     ],
     loopback    => [qw(::1)],
     ipv4_mapped => [
@@ -61,21 +61,21 @@ my %ipv6_types = (
             ::ffff:0:1234
             ::ffff:1.2.3.4
             ::ffff:ffff:ffff
-            )
+        )
     ],
     discard => [
         qw(
             100::
             100::1234
             100:0000:0000:0000:ffff:ffff:ffff:ffff
-            )
+        )
     ],
     multicast => [
         qw(
             ff00::
             ffff::
             ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
-            )
+        )
     ],
     linklocal => [
         qw(
@@ -83,35 +83,35 @@ my %ipv6_types = (
             fe89::
             febf::
             febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff
-            )
+        )
     ],
     special => [
         [ '2001::'     => [qw( teredo )] ],
         [ '2001::1234' => [qw( teredo )] ],
         qw(
             2001:1ff:ffff:ffff:ffff:ffff:ffff:ffff
-            )
+        )
     ],
     teredo => [
         qw(
             2001::
             2001::1234
             2001:0:ffff:ffff:ffff:ffff:ffff:ffff
-            )
+        )
     ],
     orchid => [
         qw(
             2001:10::
             2001:10::1234
             2001:001F:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF
-            )
+        )
     ],
     documentation => [
         qw(
             2001:db8::
             2001:db8::1234
             2001:0db8:ffff:ffff:ffff:ffff:ffff:ffff
-            )
+        )
     ],
 );
 
@@ -155,7 +155,7 @@ sub _ipv4_basic_tests {
             256.17.184.1
             216.017.184.1
             016.17.184.1
-            ),
+        ),
         "1.1.1.1\0 exploit goes here",
     );
 
@@ -238,6 +238,8 @@ sub _ipv6_basic_tests {
     my @valid = qw(
         2067:fa88::0
         2067:FA88::1
+        2067:FA88::
+        2001:4888:205:7126:e0:120::
         2607:fa88::8a2e:370:7334
         2001:0db8:0000:0000:0000:0000:1428:57ab
         2001:0db8:0000:0000:0000::1428:57ab
@@ -270,7 +272,7 @@ sub _ipv6_basic_tests {
             :::
             g123::1234
             :abcd
-            ),
+        ),
         "::1\0 invalid",
     );
 
@@ -304,7 +306,7 @@ sub _ip_basic_tests {
             2067:fa88
             216.17.184
             :216.17.184
-            ),
+        ),
         "::1\0 invalid"
     );
     for my $ip (@invalid) {

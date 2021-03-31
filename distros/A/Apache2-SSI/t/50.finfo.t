@@ -18,9 +18,18 @@ BEGIN
 #     use constant FINFO_BLOCK_SIZE => 11;
 #     use constant FINFO_BLOCKS => 12;
     our $DEBUG = 0;
+    our $IS_WINDOWS_OS = ( $^O =~ /^(dos|mswin32|NetWare|symbian|win32)$/i );
 };
 
-my $file = './t/htdocs/ssi/include.cgi';
+my $file;
+if( $IS_WINDOWS_OS )
+{
+    $file = '.\t\htdocs\ssi\include.bat';
+}
+else
+{
+    $file = './t/htdocs/ssi/include.cgi';
+}
 my $f = Apache2::SSI::Finfo->new( $file );
 isa_ok( $f, 'Apache2::SSI::Finfo' );
 
@@ -51,7 +60,14 @@ ok( $f->inode == $finfo[ FINFO_INODE ], 'inode' );
 
 ok( $f->mode == ( $finfo[ FINFO_MODE ] & 07777 ), 'mode' );
 
-is( $f->name, 'include.cgi', 'file base name' );
+if( $IS_WINDOWS_OS )
+{
+    is( $f->name, 'include.bat', 'file base name' );
+}
+else
+{
+    is( $f->name, 'include.cgi', 'file base name' );
+}
 
 is( $f->nlink, $finfo[ FINFO_NLINK ], 'nlink' );
 

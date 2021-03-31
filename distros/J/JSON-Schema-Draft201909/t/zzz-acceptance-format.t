@@ -83,16 +83,11 @@ $accepter->acceptance(
     { file => [
         'iri-reference.json',                       # not yet implemented
         'uri-template.json',                        # not yet implemented
-        $ENV{AUTOMATED_TESTING} ? (                 # these all depend on optional prereqs
-        qw(
-          date-time.json
-          date.json
-          time.json
-          email.json
-          hostname.json
-          idn-hostname.json
-          idn-email.json
-        ) ) : (),
+        # these all depend on optional prereqs
+        $ENV{AUTOMATED_TESTING} && !eval { +require 'Time::Moment'; 1 } ? qw(date-time.json date.json time.json) : (),
+        $ENV{AUTOMATED_TESTING} && !eval { +require 'Email::Address::XS'; Email::Address::XS->VERSION(1.01); 1 } ? qw(email.json idn-email.json) : (),
+        $ENV{AUTOMATED_TESTING} && !eval { +require 'Data::Validate::Domain'; 1 } ? 'hostname.json' : (),
+        $ENV{AUTOMATED_TESTING} && !eval { +require 'Net::IDN::Encode'; 1 } ? 'idn-hostname.json' : (),
       ] },
     # various edge cases that are difficult to accomodate
     { file => 'date-time.json', group_description => 'validation of date-time strings',
@@ -114,11 +109,12 @@ memory_cycle_ok($js_short_circuit, 'no leaks in the short-circuiting evaluator o
 
 
 # date        Test::JSON::Schema::Acceptance version
-#                    result count of running *all* tests (with no TODOs)
-# ----        -----  --------------------------------------
-# 2020-12-04  1.003  Looks like you failed 40 tests of 1265.
-# 2021-03-17  1.004  Looks like you failed 23 tests of 242. <-- manually edited to only include optional/format
-# 2021-03-23  1.005  Looks like you failed 23 tests of 245.
+#                    JSON::Schema::Draft201909 version
+#                           result count of running *all* tests (with no TODOs)
+# ----        -----  -----  --------------------------------------
+# 2020-12-04  1.003  0.018  Looks like you failed 40 tests of 1265.
+# 2021-03-17  1.004  0.024  Looks like you failed 23 tests of 242. <-- manually edited to only include optional/format
+# 2021-03-23  1.005  0.024  Looks like you failed 23 tests of 245.
 
 
 END {

@@ -7,9 +7,12 @@ README.md
 script/bookmarks
 t/00-load.t
 t/data/places.sqlite
+t/data/test.gmi
 t/data/test.md
 t/data/test.txt
+t/data/url.txt
 t/firefox.t
+t/gemini.t
 t/manifest.t
 t/md.t
 t/pod-coverage.t

@@ -1,7 +1,7 @@
 package Acme::CPANModulesUtil::Bencher;
 
 our $DATE = '2021-01-20'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -21,11 +21,11 @@ An <pm:Acme::CPANModules>::* module can contain benchmark information, for
 example in <pm:Acme::CPANModules::TextTable>, each entry has the following
 property:
 
-    # entries => [
-    #     ...
-    #     {
-    #         module => 'Text::ANSITable',
-    #         ...
+      entries => [
+          ...
+          {
+              module => 'Text::ANSITable',
+              ...
               bench_code => sub {
                   my ($table) = @_;
                   my $t = Text::ANSITable->new(
@@ -37,6 +37,14 @@ property:
                   );
                   $t->add_row($table->[$_]) for 1..@$table-1;
                   $t->draw;
+              },
+
+              # per-function participant
+              functions => {
+                  'func1' => {
+                      bench_code_template => 'Text::ANSITable::func1([])',
+                  },
+                  ...
               },
 
 The list also contains information about the benchmark datasets:
@@ -89,15 +97,40 @@ sub gen_bencher_scenario {
         ($mod ? "<pm:$mod>" : "an <pm:Acme::CPANModules> list").".";
 
     for my $e (@{ $list->{entries} }) {
+        my @per_function_participants;
+
+        # we currently don't handle entries with 'modules'
+        next unless $e->{module};
+
+        # per-function participant
+        if ($e->{functions}) {
+            for my $fname (sort keys %{ $e->{functions} }) {
+                my $fspec = $e->{functions}{$fname};
+                my $p = {
+                    module => $e->{module},
+                    function => $fname,
+                };
+                for (qw/code code_template fcall_template/) {
+                    if ($fspec->{"bench_$_"}) {
+                        $p->{$_} = $fspec->{"bench_$_"};
+                    }
+                }
+                push @per_function_participants, $p;
+            }
+        }
+
         my $p = {
             module => $e->{module},
         };
+        my $has_bench_code;
         for (qw/code code_template fcall_template/) {
             if ($e->{"bench_$_"}) {
+                $has_bench_code++;
                 $p->{$_} = $e->{"bench_$_"};
             }
         }
-        push @{ $scenario->{participants} }, $p;
+        push @{ $scenario->{participants} }, $p if $has_bench_code || !@per_function_participants;
+        push @{ $scenario->{participants} }, @per_function_participants;
     }
 
     for (qw/datasets/) {
@@ -124,7 +157,7 @@ Acme::CPANModulesUtil::Bencher - Generate/extract Bencher scenario from informat
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModulesUtil::Bencher (from Perl distribution Acme-CPANModulesUtil-Bencher), released on 2021-01-20.
+This document describes version 0.003 of Acme::CPANModulesUtil::Bencher (from Perl distribution Acme-CPANModulesUtil-Bencher), released on 2021-01-20.
 
 =head1 FUNCTIONS
 
@@ -141,11 +174,11 @@ An L<Acme::CPANModules>::* module can contain benchmark information, for
 example in L<Acme::CPANModules::TextTable>, each entry has the following
 property:
 
- # entries => [
- #     ...
- #     {
- #         module => 'Text::ANSITable',
- #         ...
+   entries => [
+       ...
+       {
+           module => 'Text::ANSITable',
+           ...
            bench_code => sub {
                my ($table) = @_;
                my $t = Text::ANSITable->new(
@@ -157,6 +190,14 @@ property:
                );
                $t->add_row($table->[$_]) for 1..@$table-1;
                $t->draw;
+           },
+ 
+           # per-function participant
+           functions => {
+               'func1' => {
+                   bench_code_template => 'Text::ANSITable::func1([])',
+               },
+               ...
            },
 
 The list also contains information about the benchmark datasets:

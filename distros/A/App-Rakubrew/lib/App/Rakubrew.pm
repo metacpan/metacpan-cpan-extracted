@@ -2,7 +2,7 @@ package App::Rakubrew;
 use strict;
 use warnings;
 use 5.010;
-our $VERSION = '15';
+our $VERSION = '16';
 
 use Encode::Locale qw(env);
 if (-t) {
@@ -316,7 +316,7 @@ EOL
             say STDERR "$brew_name: No version set.";
             exit 1;
         }
-        say "Building zef ", $zef_version?$zef_version:"latest";
+        say("Building zef ", $zef_version || "latest");
         App::Rakubrew::Build::build_zef($version, $zef_version);
         # Might have new executables now -> rehash
         rehash();

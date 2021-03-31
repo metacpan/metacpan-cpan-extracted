@@ -32,12 +32,13 @@ requires:
   Digest::SHA: '0'
   Encode: '0'
   File::Basename: '0'
+  File::Spec: '3.26'
   File::Which: '0'
   HTML::Entities: '0'
   IO::File: '0'
   JSON: '0'
   MIME::Base64: '0'
-  Module::Generic: v0.13.3
+  Module::Generic: v0.14.0
   Net::Subnet: '1.03'
   Nice::Try: v0.1.7
   PPI: '1.270'
@@ -56,5 +57,5 @@ requires:
 resources:
   bugtracker: https://git.deguest.jp/jack/Apache2-SSI/issues
   repository: https://git.deguest.jp/jack/Apache2-SSI
-version: v0.2.3
+version: v0.2.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

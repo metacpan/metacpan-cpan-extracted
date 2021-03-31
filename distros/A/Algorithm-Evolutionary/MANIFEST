@@ -2,7 +2,7 @@ Changes
 LICENSE
 Makefile.PL
 MANIFEST
-README
+README.md
 TODO.md
 lib/Algorithm/Evolutionary.pm
 lib/Algorithm/Evolutionary/Experiment.pm

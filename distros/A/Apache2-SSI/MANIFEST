@@ -5,6 +5,8 @@ lib/Apache2/SSI.pm
 lib/Apache2/SSI/Common.pm
 lib/Apache2/SSI/Datetime.pod
 lib/Apache2/SSI/File.pm
+lib/Apache2/SSI/File/Type.pm
+lib/Apache2/SSI/File/Type.json
 lib/Apache2/SSI/Finfo.pm
 lib/Apache2/SSI/Notes.pm
 lib/Apache2/SSI/SemStat.pod
@@ -36,6 +38,7 @@ t/42.expression.t
 t/50.finfo.t
 t/60.uri.t
 t/70.file.t
+t/71.file_type.t
 t/80.notes.t
 t/80.sharedmem.pl
 t/90.manifest.t
@@ -100,7 +103,9 @@ t/htdocs/ssi/10.05.expr.html
 t/htdocs/ssi/10.06.expr.html
 t/htdocs/ssi/include.01.txt
 t/htdocs/ssi/include.02.txt
+t/htdocs/ssi/include.bat
 t/htdocs/ssi/include.cgi
+t/htdocs/ssi/include_win32.cgi
 t/htdocs/ssi/README
 t/SKIP
 t/SSITest.pm

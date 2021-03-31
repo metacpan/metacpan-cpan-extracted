@@ -7,6 +7,7 @@ BEGIN
     use lib './lib';
     require( "./t/functions.pl" ) || BAIL_OUT( "Unable to find library \"functions.pl\"." );
     our $BASE_URI;
+    our $DEBUG = 0;
 };
 
 $ENV{PATH_INFO}    = '/path';
@@ -46,7 +47,7 @@ my $tests =
 
 run_tests( $tests,
 {
-    debug => 0,
+    debug => $DEBUG,
     type => 'exec',
 });
 

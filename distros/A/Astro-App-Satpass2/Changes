@@ -1,3 +1,26 @@
+0.047		2021-03-30	T. R. Wyant
+    Remove references to NASA's Human Space Flight site.
+
+    Add rt.cpan.org back to bug reporting methods. Long live RT!
+
+    Use Attribute::Handlers, not low-level interface to assign custom
+    subroutine attributes.
+
+    Refactor authortest into three, so I don't have to generate stub
+    files for testing without optional modules.
+
+    Fixed typo in xt/author/rt80435.t in which the test title and
+    diagnostic referred to the wrong RT ticket number. For eight years
+    now. And I just noticed the discrepancy.
+
+    Fix test failure under Perl 5.8.
+
+    Make macros sensitive to error_out setting.  And a few other places
+    like choose().
+
+    Get prerequisites up to snuff and add xt/author/prereq.t to ensure
+    they stay that way.
+
 0.046		2021-01-08	T. R. Wyant
     Add Travis CI testing.
 

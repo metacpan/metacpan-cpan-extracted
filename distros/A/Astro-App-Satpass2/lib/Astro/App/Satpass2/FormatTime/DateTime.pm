@@ -19,7 +19,7 @@ use Astro::App::Satpass2::Locale qw{ __preferred };
 use DateTime;
 use DateTime::TimeZone;
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 sub attribute_names {
     my ( $self ) = @_;
@@ -247,7 +247,6 @@ L<Astro::App::Satpass2::FormatTime::DateTime::Cldr|Astro::App::Satpass2::FormatT
 L<Astro::App::Satpass2::FormatTime::DateTime::Strftime|Astro::App::Satpass2::FormatTime::DateTime::Strftime>, or
 L<Astro::App::Satpass2::FormatTime::POSIX::Strftime|Astro::App::Satpass2::FormatTime::POSIX::Strftime>
 
-
 =head1 METHODS
 
 This class provides the following methods over and above those provided
@@ -375,6 +374,7 @@ would therefore produce C<'0044BC-03-15'>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

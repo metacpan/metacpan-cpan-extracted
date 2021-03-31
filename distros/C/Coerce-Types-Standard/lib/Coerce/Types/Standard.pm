@@ -10,7 +10,7 @@ use parent 'Types::Standard';
 our @EXPORT_OK = ( Types::Standard->type_names );
 
 our $meta = __PACKAGE__->meta;
-our $VERSION = '0.000005';
+our $VERSION = '0.000007';
 
 our (%entity, %recurse, %compare, $esc, $unesc, $path);
 BEGIN {
@@ -386,8 +386,6 @@ sub uri_unescape {
 $meta->add_type({
 	name => 'Count',
 	parent => scalar $meta->Str,
-	abuse_constraint => \&_count_constraint,
-	abuse => \&_html,
 	coercion => sub {
 		my $ref = ref $_[0];
 		return $ref eq 'ARRAY' ? scalar @{$_[0]} : scalar keys %{$_[0]};
@@ -457,7 +455,7 @@ Coerce::Types::Standard - Coercing
 
 =head1 VERSION
 
-Version 0.000005
+Version 0.000007
 
 =cut
 
@@ -623,50 +621,196 @@ Should convert any struct into a single level Array.
 	HashToArray->by('flat')->coerce({ ux => ['ui'], analyst => [qw/document support meeting/] });	
 	*-*-*-*-*-*-*
 	[
-		qw/analyst document ux ui support meeting/
+		qw/analyst document support meeting ux ui/
 	]
 
 =back
 
 =head2 HTML
 
+Accepts a String and coerces it into entity encoded/decoded string, the default behaviour here is to entity encode the given string.
+
+	HTML->coerce('okay&'); 
+	*-*-*-*-*-*-*
+	okay&amp;
+
+You can also instantiate this object via *by* and passing in a *mode*, currently the following are your options.
+
 =over
 
 =item encode_entity
 
+Entity encode the given string.
+
+	HTML->by('encode_entity')->coerce('okay&');
+	*-*-*-*-*-*-*
+	okay&amp;
+
 =item decode_entity
+
+Entity decode the given string.
+
+	HTML->by('decode_entity')->coerce('okay&amp;');
+	*-*-*-*-*-*-*
+	okay&
 
 =back
 
 =head2 URI
 
+Accepts a String or Array reference and coerces it into a URI object.
+
+	my $uri = URI->coerce('example.lnation.org'); 
+	*-*-*-*-*-*-*
+	$uri->as_string; # example.lnation.org'
+
+	my $uri = URI->coerce(['example.lnation.org', 'https']); 
+	*-*-*-*-*-*-*
+	$uri->as_string; # https://example.lnation.org'
+
+	my $uri = URI->coerce(['https://example.lnation.org', { a => 'b' }]); 
+	*-*-*-*-*-*-*
+	$uri->as_string; # https://example.lnation.org?a=b'
+
+
+You can also instantiate this object via *by* and passing in a *mode*, currently the following are your options.
+
 =over
 
 =item schema
 
+Extract the schema from the given url.
+
+	URI->by('schema')->coerce('https://example.lnation.org');
+	*-*-*-*-*-*-*
+	https
+
 =item host
+
+Extract the host from the given url.
+
+	URI->by('schema')->coerce('https://example.lnation.org');
+	*-*-*-*-*-*-*
+	example.lnation.org	
 
 =item path
 
+Extract the path from the given url.
+
+	URI->by('path')->coerce('https://example.lnation.org/okays');
+	*-*-*-*-*-*-*
+	/okays
+
 =item query_string
+
+Extract the query string from the given url.
+
+	URI->by('path')->coerce('https://example.lnation.org?okay=s');
+	*-*-*-*-*-*-*
+	?okay=s
 
 =item query_form
 
+Extract the query form from the given url.
+
+	URI->by('path')->coerce('https://example.lnation.org?okay=s');
+	*-*-*-*-*-*-*
+	{
+		okay => s
+	}
+
 =item fragment
 
-=item params
+Extract the fragment from the given url.
+
+	URI->by('fragment')->coerce('https://example.lnation.org#okays');
+	*-*-*-*-*-*-*
+	# okays
 
 =item escape
 
+URI escape the given string.
+
+	URI->by('escape')->coerce('!$^@$%');
+	*-*-*-*-*-*-*
+	%21%24%5E%40%24%25
+
 =item unescape
 
-=item 
+URI unescape the given string.
+
+	URI->by('unescape')->coerce('%21%24%5E%40%24%25');
+	*-*-*-*-*-*-*
+	!$^@$%
 
 =back
 
 =head2 Count
 
+Accepts a Array or Hash reference and coerces it a count of items/keys.
+
+	my $count = Count->coerce([qw/a b c/]); 
+	*-*-*-*-*-*-*
+	3
+
+	my $count = Count->coerce({
+		a => 'b',
+		c => 'd'
+	}); 
+	*-*-*-*-*-*-*
+	2
+
 =head2 JSON
+
+Accepts a JSON encoded String and decodes it into a perl structure.
+
+	my $uri = JSON->coerce('{"a":"b"}'); 
+	*-*-*-*-*-*-*
+	{
+		a => "b"
+	}
+
+
+You can also instantiate this object via *by* and passing in a *mode*, currently the following are your options.
+
+=over
+
+=item encode
+
+JSON encode the passed reference.
+
+	JSON->by('encode')->coerce({
+		a => "b"
+	});
+	*-*-*-*-*-*-*
+	{"a":"b"}
+
+	JSON->by(['encode', ['utf8', 'pretty']])->coerce({
+		a => "b"
+	});
+	*-*-*-*-*-*-*
+	{
+		"a":"b"
+	}
+
+
+=item decode
+
+JSON decode the given string.
+
+	JSON->by('decode')->coerce('{"a":"b"}');
+	*-*-*-*-*-*-*
+	{
+		a => "b"
+	}
+
+	JSON->by(['HashRef', 'decode', ['utf8']])->coerce('{"a":"b"}');
+	*-*-*-*-*-*-*
+	{
+		"a":"b"
+	}
+
+=back
 
 =head1 AUTHOR
 

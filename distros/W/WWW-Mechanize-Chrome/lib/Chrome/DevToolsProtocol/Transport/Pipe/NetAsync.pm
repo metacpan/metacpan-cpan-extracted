@@ -9,7 +9,7 @@ use Scalar::Util 'weaken';
 use IO::Async::Loop;
 use IO::Async::Stream;
 
-our $VERSION = '0.65';
+our $VERSION = '0.66';
 
 =head1 NAME
 
@@ -133,9 +133,8 @@ The public support forum of this module is L<https://perlmonks.org/>.
 
 =head1 BUG TRACKER
 
-Please report bugs in this module via the RT CPAN bug queue at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-Mechanize-Chrome>
-or via mail to L<www-mechanize-Chrome-Bugs@rt.cpan.org|mailto:www-mechanize-Chrome-Bugs@rt.cpan.org>.
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/WWW-Mechanize-Chrome/issues>
 
 =head1 AUTHOR
 
@@ -143,7 +142,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2010-2020 by Max Maischein C<corion@cpan.org>.
+Copyright 2010-2021 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

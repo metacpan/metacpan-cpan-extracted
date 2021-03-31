@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2018,2020 Joelle Maslak
+# Copyright (C) 2018,2020-2021 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -11,7 +11,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::JMASLAK;
 # ABSTRACT: JMASLAK's Plugin Bundle
-$Dist::Zilla::PluginBundle::Author::JMASLAK::VERSION = '1.202110';
+$Dist::Zilla::PluginBundle::Author::JMASLAK::VERSION = '1.210880';
 
 use Moose;
 use Dist::Zilla;
@@ -265,7 +265,7 @@ Dist::Zilla::PluginBundle::Author::JMASLAK - JMASLAK's Plugin Bundle
 
 =head1 VERSION
 
-version 1.202110
+version 1.210880
 
 =head1 DESCRIPTION
 
@@ -304,8 +304,8 @@ It is somewhat equivilent to:
     [ShareDir]
 
     [ReadmeAnyFromPod]
-    type     = pod
-    filename = README.pod
+    type     = markdown
+    filename = README.md
 
     [Test::ChangesHasContent]
     [Test::EOL]
@@ -372,7 +372,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018,2020 by Joelle Maslak.
+This software is copyright (c) 2018,2020-2021 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

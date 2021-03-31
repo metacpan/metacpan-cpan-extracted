@@ -2,7 +2,7 @@
 #
 # 1022_mb1.t
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # This file is encoded in UTF-8.
@@ -446,50 +446,6 @@ BEGIN {
     sub { "\xE0\xBF\x9A"     =~ $mb{qr/\xE0\xBF\x9A/}     },
     sub { "\xF0\x90\x80\x80" =~ $mb{qr/\xF0\x90\x80\x80/} },
     sub { "\xF0\x90\xB9\xBE" =~ $mb{qr/\xF0\x90\xB9\xBE/} },
-    sub {1},
-    sub {1},
-# 381
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\x00"             =~ $mb{qr/\x{00}/}     }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\x7F"             =~ $mb{qr/\x{7F}/}     }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xC2\x80"         =~ $mb{qr/\x{80}/}     }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xC2\x80"         =~ $mb{qr/\x{0080}/}   }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xDF\xBA"         =~ $mb{qr/\x{7FA}/}    }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xDF\xBA"         =~ $mb{qr/\x{07FA}/}   }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xE0\xA0\x80"     =~ $mb{qr/\x{800}/}    }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xE0\xA0\x80"     =~ $mb{qr/\x{0800}/}   }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xE0\xBF\x9A"     =~ $mb{qr/\x{FDA}/}    }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xE0\xBF\x9A"     =~ $mb{qr/\x{0FDA}/}   }},
-# 391
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xF0\x90\x80\x80" =~ $mb{qr/\x{10000}/}  }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xF0\x90\x80\x80" =~ $mb{qr/\x{010000}/} }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xF0\x90\xB9\xBE" =~ $mb{qr/\x{10E7E}/}  }},
-    sub { ($] < 5.006) or (5.006 < $]) or eval q{ "\xF0\x90\xB9\xBE" =~ $mb{qr/\x{010E7E}/} }},
-    sub {1},
-    sub {1},
-    sub {1},
-    sub {1},
-    sub {1},
-    sub {1},
-# 401
-    sub { ($] < 5.006) or eval q{ "\x{00}"     =~ $mb{qr/\x{00}/}     }},
-    sub { ($] < 5.006) or eval q{ "\x{7F}"     =~ $mb{qr/\x{7F}/}     }},
-    sub { ($] < 5.006) or eval q{ "\x{80}"     =~ $mb{qr/\x{80}/}     }},
-    sub { ($] < 5.006) or eval q{ "\x{0080}"   =~ $mb{qr/\x{0080}/}   }},
-    sub { ($] < 5.006) or eval q{ "\x{7FA}"    =~ $mb{qr/\x{7FA}/}    }},
-    sub { ($] < 5.006) or eval q{ "\x{07FA}"   =~ $mb{qr/\x{07FA}/}   }},
-    sub { ($] < 5.006) or eval q{ "\x{800}"    =~ $mb{qr/\x{800}/}    }},
-    sub { ($] < 5.006) or eval q{ "\x{0800}"   =~ $mb{qr/\x{0800}/}   }},
-    sub { ($] < 5.006) or eval q{ "\x{FDA}"    =~ $mb{qr/\x{FDA}/}    }},
-    sub { ($] < 5.006) or eval q{ "\x{0FDA}"   =~ $mb{qr/\x{0FDA}/}   }},
-# 411
-    sub { ($] < 5.006) or eval q{ "\x{10000}"  =~ $mb{qr/\x{10000}/}  }},
-    sub { ($] < 5.006) or eval q{ "\x{010000}" =~ $mb{qr/\x{010000}/} }},
-    sub { ($] < 5.006) or eval q{ "\x{10E7E}"  =~ $mb{qr/\x{10E7E}/}  }},
-    sub { ($] < 5.006) or eval q{ "\x{010E7E}" =~ $mb{qr/\x{010E7E}/} }},
-    sub {1},
-    sub {1},
-    sub {1},
-    sub {1},
     sub {1},
     sub {1},
 #

@@ -22,8 +22,12 @@ has 'cacert' => (isa => 'Maybe[Str]', is => 'ro', required => 1);
 has 'org_name'         => (isa => 'Str', is => 'ro', required => 1);
 has 'org_display_name' => (isa => 'Str', is => 'ro', required => 1);
 has 'org_contact'      => (isa => 'Str', is => 'ro', required => 1);
+has 'org_url'          => (isa => 'Str', is => 'ro', required => 0);
 
 has '_cert_text' => (isa => 'Str', is => 'rw', required => 0);
+
+has 'authnreq_signed'         => (isa => 'Bool', is => 'ro', required => 0);
+has 'want_assertions_signed'  => (isa => 'Bool', is => 'ro', required => 0);
 
 
 sub BUILD {
@@ -164,8 +168,8 @@ sub metadata {
             entityID => $self->id },
         $x->SPSSODescriptor(
             $md,
-            { AuthnRequestsSigned => '1',
-              WantAssertionsSigned => '1',
+            { AuthnRequestsSigned => defined($self->authnreq_signed) ? $self->authnreq_signed : '1',
+              WantAssertionsSigned => defined($self->want_assertions_signed) ? $self->want_assertions_signed : '1',
               errorURL => $self->url . '/saml/error',
               protocolSupportEnumeration => 'urn:oasis:names:tc:SAML:2.0:protocol' },
             $x->KeyDescriptor(
@@ -226,7 +230,7 @@ sub metadata {
                 $md,
                 {
                     'xml:lang' => 'en' },
-                $self->url
+                defined($self->org_url) ? $self->org_url :$self->url
             )
         ),
         $x->ContactPerson(
@@ -259,7 +263,7 @@ Net::SAML2::SP
 
 =head1 VERSION
 
-version 0.32
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -315,6 +319,22 @@ SP organisation display name
 =item B<org_contact>
 
 SP contact email address
+
+=item B<org_url>
+
+SP organization url.  This is optional and url will be used as in
+previous versions if this is not provided.
+
+=item B<authnreq_signed>
+
+Specifies in the metadata whether the SP signs the AuthnRequest
+Optional (0 or 1) defaults to 1 (TRUE) if not specified.
+
+=item B<want_assertions_signed>
+
+Specifies in the metadata whether the SP wants the Assertion from
+the IdP to be signed
+Optional (0 or 1) defaults to 1 (TRUE) if not specified.
 
 =back
 
@@ -388,6 +408,7 @@ This software is copyright (c) 2021 by Chris Andrews and Others; in detail:
             2017       Alessandro Ranellucci
             2019       Timothy Legge
             2020       Timothy Legge, Wesley Schwengle
+            2021       Timothy Legge
 
 
 This is free software; you can redistribute it and/or modify it under

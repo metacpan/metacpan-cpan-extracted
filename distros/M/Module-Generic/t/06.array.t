@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use lib './lib';
 
-BEGIN { use_ok( 'Module::Generic' ) || BAIL_OUT( "Unable to load Module::Generic" ); }
+BEGIN { use_ok( 'Module::Generic::Array' ) || BAIL_OUT( "Unable to load Module::Generic::Array" ); }
 # use warnings 'Module::Generic::Array';
 # no warnings 'Module::Generic::Array';
 

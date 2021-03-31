@@ -19,31 +19,35 @@ DESCRIPTION
 
 `bookmarks` is a tool to export bookmarks from files supplied as arguments, or from browsers default locations (when called without arguments). The following sources are supported :
 
-- Safari (Mac)
-- Firefox (Mac/Linux/Windows)
-- Chrome (Mac/Linux/Windows)
-- Internet Explorer (Windows)
-- Edge (Windows)
-- Plain text (.txt)
-- Markdown (.md)
+- Safari (_.plist_)
+- Firefox (_.sqlite_)
+- Chrome and Edge (_Bookmarks_)
+- Internet Explorer (_Favorites_)
+- Markdown (_.md_)
+- Gemini (_.gmi_)
+- Surfraw (same as plain text)
+- Plain text (any other extension)
 
-Files named _*.plist_, _*.sqlite_ and _*Bookmarks_ are processed as Safari, Firefox and Chrome bookmarks, respectively. Directories named _*Favorites_ are processed as Internet Explorer favorites.
+Default export format : `<title> <url> <description>`
 
-Fields `<title>`, `<url>` and `<description>` are retrieved (when existing) and exported in the desired format, by default : `<title> <url> <description>`.
+- `<title>` is your bookmark's name, alias, or webpage title.
+- `<url>` is your bookmark's address, URL or URI.
+- `<description>` is empty for Chrome, Edge, Internet Explorer or Gemini. It 
+  contains Safari 'Description', Firefox 'Tags' and what the Markdown spec
+  calls the 'Title' (just the tooltip, actually).
 
-That same format is used for plain text and markdown files :
+Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
 ```
-plain text example http://example.txt with a description
-[markdown example](http://example.md) with a description
+  [markdown example](http://example.md/ "with description")
+  => gemini://example.gmi gemini example
+  plain text example http://example.txt with description
 ```
-
-The `<description>` field contains Safari's _Description_ or Firefox's _Tags_ but is empty for Chrome, Internet Explorer and Edge.
 
 
 SEARCH BOOKMARKS INTERACTIVELY FROM CLI
 ---------------------------------------
 
-This tool can be used to search and open bookmarks interactively from the CLI. The following instructions are for macOS, but it should be similar on any regular OS.
+This tool can be used to search, select and open bookmarks interactively from your terminal. The following instructions are for macOS.
 
 ![](tty.png)
 
@@ -54,16 +58,23 @@ Install the wonderful [fzf](https://github.com/junegunn/fzf) (available in [Home
 alias lk="bookmarks | uricolor | fzf --ansi --exact --multi | urifind | xargs open"
 ```
 
+- `uricolor` colorizes URIs to distinguish them from title and description.
+- `fzf` is a fuzzy finder : use TAB for multiple selection, press ENTER to confirm, or ESC to cancel.
+- `urifind` extracts all URIs. Try `uricolor -s` and `urifind --schemeless` to find schemeless URLs.
+- Selected URIs will open with your default browser or application.
+- Since `open` uses macOS _Launch Services_ to determine which program to run, most common schemes such as `ftp://` or `ssh://` are automatically recognized.
+
+N.B. On Windows, I use [busybox-w32](https://frippery.org/busybox/) and a file `lk.bat` containing : 
+```
+@echo off
+
+bookmarks | uricolor | fzf --ansi --exact --multi | urifind | busybox xargs -n1 cmd /c start ""
+````
+
 **Copy link(s) to clipboard :**
 ```
 alias lkc="bookmarks | uricolor | fzf --ansi --exact --multi | urifind | pbcopy"
 ```
-
-- `uricolor` colorizes URIs to distinguish them from title and description.
-- `fzf` is a fuzzy finder (with many options) : use TAB for multiple selection, press ENTER to confirm, or ESC to cancel.
-- `urifind` extracts all URIs. Try `uricolor -s` and `urifind --schemeless` to find schemeless URLs.
-- Selected URIs will open with your default browser or application.
-- Since `open` uses macOS _Launch Services_ to determine which program to run, most common schemes such as `ftp://` or `ssh://` are automatically recognized.
 
 
 CHECK LINKS STATUS
@@ -136,7 +147,7 @@ You can also look for information at :
 LICENSE AND COPYRIGHT
 ---------------------
 
-This software is Copyright (c) 2019 by jul.
+This software is Copyright (c) 2019-2021 by jul.
 
 This is free software, licensed under:
 

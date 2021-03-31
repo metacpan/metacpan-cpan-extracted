@@ -2,6 +2,7 @@
 #  Copyright (C) 2000-2005  Dave Plonka
 #  Copyright (C) 2009       Dave Plonka & Philip Prindeville
 #  Parts Copyright(C) 2016  Joelle Maslak
+#  Parts Copyright(C) 2021  Joelle Maslak
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -42,7 +43,7 @@ BEGIN {
   @EXPORT = qw(AF_INET AF_INET6);
 }
 
-'$Revision: 1.04 $' =~ m/(\d+)\.(\d+)((_\d+)|)/ && ( $VERSION = "$1.$2$3");
+'$Revision: 1.05 $' =~ m/(\d+)\.(\d+)((_\d+)|)/ && ( $VERSION = "$1.$2$3");
 
 bootstrap JCM::Net::Patricia $VERSION;
 
@@ -171,6 +172,8 @@ BEGIN {
 sub add {
   croak "add: wrong number of args" if (@_ < 2 || @_ > 4);
   my ($self, $ip, $bits, $data) = @_;
+  croak("invalid key") if ( scalar(split( /[\/.]/, $ip )) != 4);
+  croak("invalid key") if ( grep { /^0[0-9]/ } split( /[\/.]/, $ip ) );
   $data = (defined $bits ? "$ip/$bits" : $ip) if (@_ < 4);
   my $packed = inet_aton($ip);
   croak("invalid key") unless (defined $packed);
@@ -213,6 +216,8 @@ sub exact_integer {
 sub match {
   croak "match: wrong number of args" if (@_ < 2 || @_ > 3);
   my ($self, $ip, $bits) = @_;
+  croak("invalid key") if ( scalar(split( /[\/.]/, $ip )) != 4);
+  croak("invalid key") if ( grep { /^0[0-9]/ } split( /[\/.]/, $ip ) );
   my $packed = inet_aton($ip);
   croak("invalid key") unless (defined $packed);
   $bits = 32 if (@_ < 3);
@@ -222,6 +227,8 @@ sub match {
 sub matching_prefix {
   croak "matching_prefix: wrong number of args" if (@_ < 2 || @_ > 3);
   my ($self, $ip, $bits) = @_;
+  croak("invalid key") if ( scalar(split( /[\/.]/, $ip )) != 4);
+  croak("invalid key") if ( grep { /^0[0-9]/ } split( /[\/.]/, $ip ) );
   my $packed = inet_aton($ip);
   croak("invalid key") unless (defined $packed);
   $bits = 32 if (@_ < 3);
@@ -231,6 +238,8 @@ sub matching_prefix {
 sub exact {
   croak "exact: wrong number of args" if (@_ < 2 || @_ > 3);
   my ($self, $ip, $bits) = @_;
+  croak("invalid key") if ( scalar(split( /[\/.]/, $ip )) != 4);
+  croak("invalid key") if ( grep { /^0[0-9]/ } split( /[\/.]/, $ip ) );
   my $packed = inet_aton($ip);
   croak("invalid key") unless (defined $packed);
   $bits = 32 if (@_ < 3);
@@ -240,6 +249,8 @@ sub exact {
 sub remove {
   croak "remove: wrong number of args" if (@_ < 2 || @_ > 3);
   my ($self, $ip, $bits) = @_;
+  croak("invalid key") if ( scalar(split( /[\/.]/, $ip )) != 4);
+  croak("invalid key") if ( grep { /^0[0-9]/ } split( /[\/.]/, $ip ) );
   my $packed = inet_aton($ip);
   croak("invalid key") unless (defined $packed);
   $bits = 32 if (@_ < 3);
@@ -671,7 +682,7 @@ in turn owes something to the BSD kernel.
 
 =head1 SEE ALSO
 
-perl(1), Socket, Net::Netmask, Net::Patricia Text::Trie, Tree::Trie.
+L<perl(1)>, L<Socket>, L<Net::Netmask>, L<Net::Patricia>, L<Text::Trie>, L<Tree::Trie>.
 
 Tree::Radix and Net::RoutingTable are modules by Daniel Hagerty
 <hag@linnaean.org> written entirely in perl, unlike this module.  At

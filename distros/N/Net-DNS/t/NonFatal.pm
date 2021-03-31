@@ -1,22 +1,23 @@
-# $Id: NonFatal.pm 1823 2020-11-16 16:29:45Z willem $	-*-perl-*-
+# $Id: NonFatal.pm 1832 2021-03-22 08:33:36Z willem $	-*-perl-*-
 
-# Test::More calls functions from Test::Builder. Those functions all eventually
-# call Test::Builder::ok (on a builder instance) for reporting the status.
-# Here we define a new builder inherited from Test::Builder, with a redefined
-# ok method that always reports the test to have completed successfully.
+# Test::More calls functions from Test::Builder which all eventually call
+# Test::Builder::ok (on the (singular) builder instance) to report the
+# status. Here we define a builder subclass derived from Test::Builder,
+# with a redefined ok method that overrides the completion status seen by
+# the test harness.
 #
-# The functions NonFatalBegin and NonFatalEnd re-bless the builder in use by
-# Test::More (Test::More->builder) to be of type NonFatal and Test::Builder
-# respectively. Tests that are between those functions will thus always appear
-# to succeed. The failure report itself is not suppressed.
+# Note: The reported completion status is only modified if the file
+# 't/online.nonfatal' exists.
 #
-# Note that the builder is only re-blessed when the file 't/online.nonfatal'
-# exists.
+# The functions NonFatalBegin and NonFatalEnd re-bless the builder
+# instance to be of type NonFatal and Test::Builder respectively.
+# Tests that are between those functions will thus appear to succeed.
+# The failure report itself is not suppressed.
 #
 # This is just a quick hack to allow for non-fatal unit tests. It has many
 # problems such as for example that blocks marked by the NonFatalBegin and
 # NonFatalEnd subroutines may not be nested.
-#
+
 
 package NonFatal;
 
@@ -24,48 +25,39 @@ use strict;
 use warnings;
 use base qw(Test::Builder);
 
+use constant NONFATAL => eval { -e 't/online.nonfatal' };
+
 my @failed;
 
 sub ok {
 	my ( $self, $test, @name ) = @_;
 
-	return $self->SUPER::ok( 1, @name ) if $test;
-
-	$self->SUPER::ok( 1, "NOT OK (tolerating failure)  @name" );
+	return $self->SUPER::ok( $test, @name ) unless NONFATAL;
+	return $self->SUPER::ok( $test, @name ) if $test;
 
 	push @failed, join( "\t", $self->current_test, @name );
+
+	$self->SUPER::ok( 1, "NOT OK (tolerating failure)  @name" );
 	return $test;
 }
 
 
-sub diag {
-	my @annotation = @_;
-	return Test::More->builder->diag(@annotation);
-}
-
-
 END {
-	my $n = scalar(@failed);
-	my $s = $n > 1 ? 's' : '';
-	bless Test::More->builder, qw(Test::Builder);
-	diag( join "\n\t", "\tDisregarding $n failed sub-test$s", @failed ) if $n;
-	return;
+	my $n = scalar(@failed) || return;
+	my $s = ( $n == 1 ) ? '' : 's';
+	Test::Builder->new->diag( join "\n\t", "\tDisregarding $n failed sub-test$s", @failed );
 }
 
 
 package main;				## no critic ProhibitMultiplePackages
 
-require Test::More;
-
-use constant NONFATAL => eval { -e 't/online.nonfatal' };
-
 sub NonFatalBegin {
-	bless Test::More->builder, qw(NonFatal) if NONFATAL;
+	bless Test::Builder->new, qw(NonFatal);
 	return;
 }
 
 sub NonFatalEnd {
-	bless Test::More->builder, qw(Test::Builder) if NONFATAL;
+	bless Test::Builder->new, qw(Test::Builder);
 	return;
 }
 

@@ -5,7 +5,7 @@ use warnings;
 
 use 5.008;
 
-our $VERSION = '0.27';
+our $VERSION = '0.30';
 
 use NetAddr::IP 4;
 use Scalar::Util qw( blessed );
@@ -200,12 +200,16 @@ sub is_innet_ipv4 {
             # This is a hack to avoid a deprecation warning (Use of implicit
             # split to @_ is deprecated) that shows up on 5.10.1 but not on
             # newer Perls.
+            #
+            ## no critic(Variables::ProhibitUnusedVarsStricter)
             my $octets = scalar(my @tmp = split /\./, $net);
             $network = $net;
             $network .= '.0' x (4 - $octets);
             $network .= "/$bits";
         }
         elsif ($network =~ /^$partial_ip_re$/) {
+
+            ## no critic(Variables::ProhibitUnusedVarsStricter)
             my $octets = scalar(my @tmp = split /\./, $network);
             if ($octets < 4) {
                 $network .= '.0' x (4 - $octets);
@@ -337,7 +341,7 @@ sub is_innet_ipv4 {
                     10.0.0.0/8
                     172.16.0.0/12
                     192.168.0.0/16
-                    )
+                )
             ],
         },
         testnet => {
@@ -346,7 +350,7 @@ sub is_innet_ipv4 {
                     192.0.2.0/24
                     198.51.100.0/24
                     203.0.113.0/24
-                    )
+                )
             ],
         },
         anycast    => { networks => '192.88.99.0/24' },
@@ -360,7 +364,7 @@ sub is_innet_ipv4 {
                     192.0.0.0/29
                     198.18.0.0/15
                     240.0.0.0/4
-                    )
+                )
             ],
         },
     );
@@ -487,8 +491,7 @@ sub _build_fast_is_X_ip_subs {
     my $networks  = shift;
     my $ip_number = shift;
 
-    my $is_ip_sub = $ip_number == 4 ? 'is_ipv4'         : 'is_ipv6';
-    my $family    = $ip_number == 4 ? Socket::AF_INET() : Socket::AF_INET6();
+    my $family = $ip_number == 4 ? Socket::AF_INET() : Socket::AF_INET6();
 
     my @all_nets;
 
@@ -618,7 +621,7 @@ Data::Validate::IP - IPv4 and IPv6 validation methods
 
 =head1 VERSION
 
-version 0.27
+version 0.30
 
 =head1 SYNOPSIS
 
@@ -646,6 +649,29 @@ This module provides a number IP address validation subs that both validate
 and untaint their input. This includes both basic validation (C<is_ipv4()> and
 C<is_ipv6()>) and special cases like checking whether an address belongs to a
 specific network or whether an address is public or private (reserved).
+
+=head1 USAGE AND SECURITY RECOMMENDATIONS
+
+It's important to understand that if C<is_ipv4($ip)>, C<is_ipv6($ip)>, or
+C<is_ip($ip)> return false, then all other validation functions for that IP
+address family will I<also> return false. So for example, if C<is_ipv4($ip)>
+returns false, then C<is_private_ipv4($ip)> I<and> C<is_public_ipv4($ip)> will
+both also return false.
+
+This means that simply calling C<is_private_ipv4($ip)> by itself is not
+sufficient if you are dealing with untrusted input. You should always check
+C<is_ipv4($ip)> as well. This applies as well when using IPv6 functions or
+generic functions like C<is_private_ip($ip)>.
+
+There are security implications to this around certain oddly formed
+addresses. Notably, an address like "010.0.0.1" is technically valid, but the
+operating system will treat "010" as an octal number. That means that
+"010.0.0.1" is equivalent to "8.0.0.1", I<not> "10.0.0.1".
+
+However, this module's C<is_ipv4($ip)> and C<is_ip($ip)> functions will return
+false for addresses like "010.0.0.1" which have octal components. And of
+course that means that it also returns false for C<is_private_ipv4($ip)>
+I<and> C<is_public_ipv4($ip)>.
 
 =head1 FUNCTIONS
 
@@ -848,7 +874,11 @@ C<bug-data-validate-ip@rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org>. I will be notified, and then you'll automatically be
 notified of progress on your bug as I make changes.
 
-Bugs may be submitted through L<https://github.com/houseabsolute/Data-Validate-IP/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Data-Validate-IP/issues>.
+
+=head1 SOURCE
+
+The source code repository for Data-Validate-IP can be found at L<https://github.com/houseabsolute/Data-Validate-IP>.
 
 =head1 AUTHORS
 
@@ -872,9 +902,12 @@ Gregory Oschwald <goschwald@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Neil Neely.
+This software is copyright (c) 2021 by Neil Neely.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

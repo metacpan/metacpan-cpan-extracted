@@ -5,6 +5,7 @@ BEGIN
     use lib './lib';
     use_ok( 'Apache2::SSI::File' ) || BAIL_OUT( "Unable to load Apache2::SSI::File" );
     use_ok( 'URI::file' ) || BAIL_OUT( 'Unable to load URI::file' );
+    use File::Spec ();
     use constant HAS_APACHE_TEST => $ENV{HAS_APACHE_TEST};
     if( HAS_APACHE_TEST )
     {
@@ -17,16 +18,16 @@ BEGIN
 };
 
 my $file = './ssi/include.cgi';
-my $dir  = URI::file->new_abs( './t/htdocs' )->file;
+my $dir  = URI::file->new_abs( './t/htdocs' )->file( $^O );
 diag( "Base directory is '$dir'" ) if( $DEBUG );
-my $f = Apache2::SSI::File->new( $file, base_dir => './t/htdocs', debug => 0 );
+my $f = Apache2::SSI::File->new( $file, base_dir => './t/htdocs', debug => $DEBUG );
 
 isa_ok( $f, 'Apache2::SSI::File' );
 
 my $failed;
 {
     no warnings 'Apache2::SSI::Finfo';
-    $failed = Apache2::SSI::File->new( './not-existing.txt', debug => 0 );
+    $failed = Apache2::SSI::File->new( './not-existing.txt', debug => $DEBUG );
 }
 
 ok( defined( $failed ), 'Non-existing file object' );
@@ -35,8 +36,8 @@ ok( $failed->finfo->filetype == Apache2::SSI::Finfo::FILETYPE_NOFILE, 'Non-exist
 
 isa_ok( $failed, 'Apache2::SSI::File' );
 
-diag( "Expecting ${dir}/ssi/include.cgi" ) if( $DEBUG );
-ok( $f->filename eq "${dir}/ssi/include.cgi", 'filename' );
+diag( "Expecting ", File::Spec->catdir( $dir, URI::file->new( '/ssi/include.cgi' )->file( $^O ) ) ) if( $DEBUG );
+ok( $f->filename eq File::Spec->catdir( $dir, URI::file->new( '/ssi/include.cgi' )->file( $^O ) ), 'filename' );
 
 ok( $f->code == 200, 'code' );
 
@@ -47,19 +48,19 @@ my $f2 = $f->clone;
     $f2->filename( "${dir}/ssi/../ssi/plop.pl" );
 }
 
-diag( "Filename is: ", $f2->filename, " and I am expecting $dir/ssi/plop.pl" ) if( $DEBUG );
-ok( $f2->filename eq "${dir}/ssi/plop.pl", 'filename' );
+diag( "Filename is: ", $f2->filename, " and I am expecting ", File::Spec->catdir( $dir, URI::file->new( '/ssi/plop.pl' )->file( $^O ) ) ) if( $DEBUG );
+ok( $f2->filename eq File::Spec->catdir( $dir, URI::file->new( '/ssi/plop.pl' )->file( $^O ) ), 'filename' );
 
 ok( $f2->code == 404, 'code failed' );
 
 # Access to finfo
 my $finfo = $f->finfo;
-diag( "File ${dir}/${file} mode is: '", ( (CORE::stat( "${dir}/${file}" ))[2] & 07777 ), "' vs finfo one: '", $f->finfo->mode, "'" ) if( $DEBUG );
-ok( ( (CORE::stat( "${dir}/${file}" ))[2] & 07777 ) eq $f->finfo->mode, 'finfo' );
+diag( "File ", File::Spec->catdir( $dir, URI::file->new( "/${file}" )->file( $^O ) ), " mode is: '", ( (CORE::stat( File::Spec->catpath( $dir, URI::file->new( "/${file}" )->file( $^O ) ) ))[2] & 07777 ), "' vs finfo one: '", $f->finfo->mode, "'" ) if( $DEBUG );
+ok( ( (CORE::stat( File::Spec->catdir( $dir, URI::file->new( "/${file}" )->file( $^O ) ) ))[2] & 07777 ) eq $f->finfo->mode, 'finfo' );
 
 ok( $f->finfo->is_file, 'finfo is_file' );
 
-ok( $f->parent->filename eq "${dir}/ssi", 'parent' );
+ok( $f->parent->filename eq File::Spec->catdir( $dir, URI::file->new( '/ssi' )->file( $^O ) ), 'parent' );
 
 SKIP:
 {

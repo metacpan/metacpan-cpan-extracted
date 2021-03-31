@@ -2,7 +2,7 @@ use Test2::V0;
 
 use Sub::Meta;
 
-sub display { Sub::Meta->new(@_)->display }
+sub display { my @args = @_; return Sub::Meta->new(@args)->display }
 
 is display(), 'sub';
 is display(is_method => 1), 'method';

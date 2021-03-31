@@ -4,6 +4,10 @@ author:
   - 'Thomas R. Wyant, III F<wyant at cpan dot org>'
 build_requires:
   Test::More: '0.88'
+configure_requires:
+  lib: '0'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,7 +23,7 @@ no_index:
 provides:
   Test::Pod::LinkCheck::Lite:
     file: lib/Test/Pod/LinkCheck/Lite.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   B::Keywords: '0'
   Carp: '0'
@@ -36,13 +40,14 @@ requires:
   Scalar::Util: '0'
   Storable: '0'
   Test::Builder: '0'
+  constant: '0'
   perl: '5.008'
   strict: '0'
   utf8: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Pod-LinkCheck-Lite
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite.git
-version: '0.006'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

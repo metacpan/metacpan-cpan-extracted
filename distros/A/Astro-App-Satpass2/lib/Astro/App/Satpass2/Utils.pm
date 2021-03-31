@@ -14,7 +14,7 @@ use Getopt::Long 2.33;
 use Scalar::Util 1.26 qw{ blessed looks_like_number };
 use Text::ParseWords ();
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 our @CARP_NOT = qw{
     Astro::App::Satpass2
@@ -335,7 +335,6 @@ sub _get_my_lib {
     return $my_lib;
 }
 
-
 {
     my %loaded;
 
@@ -414,7 +413,6 @@ sub _get_my_lib {
 	return;
     }
 }
-
 
 # The Perl::Critic annotation on the following line should not (strictly
 # speaking) be necessary - but Subroutines::RequireArgUnpacking does not
@@ -819,6 +817,7 @@ This global contains all modules in this package.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 

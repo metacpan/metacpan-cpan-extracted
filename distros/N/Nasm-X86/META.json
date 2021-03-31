@@ -1,0 +1,54 @@
+{
+   "abstract" : "Generate Nasm X86 code from Perl.",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Nasm-X86",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Asm::C" : "0",
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "Data::Table::Text" : "0",
+            "Test2::API" : "0",
+            "Test::More" : "0",
+            "feature" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Nasm::X86" : {
+         "file" : "lib/Nasm/X86.pm",
+         "version" : "20210330"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/philiprbrenan/NasmX86/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/philiprbrenan/NasmX86"
+      }
+   },
+   "version" : "20210330",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

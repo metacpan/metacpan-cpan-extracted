@@ -26,6 +26,13 @@
             "Test::More" : "0.88"
          }
       },
+      "configure" : {
+         "requires" : {
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "B::Keywords" : "0",
@@ -43,6 +50,7 @@
             "Scalar::Util" : "0",
             "Storable" : "0",
             "Test::Builder" : "0",
+            "constant" : "0",
             "perl" : "5.008",
             "strict" : "0",
             "utf8" : "0",
@@ -53,14 +61,14 @@
    "provides" : {
       "Test::Pod::LinkCheck::Lite" : {
          "file" : "lib/Test/Pod/LinkCheck/Lite.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Pod-LinkCheck-Lite"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -71,6 +79,6 @@
          "web" : "https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite"
       }
    },
-   "version" : "0.006",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.007",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

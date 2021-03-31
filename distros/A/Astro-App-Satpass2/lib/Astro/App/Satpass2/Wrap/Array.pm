@@ -7,7 +7,7 @@ use warnings;
 
 use Astro::App::Satpass2::Utils qw{ ARRAY_REF @CARP_NOT };
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 sub new {
     my ( $class, $array ) = @_;
@@ -77,6 +77,7 @@ This method returns the elements in the original array.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
 L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
 electronic mail to the author.
 
