@@ -6,7 +6,7 @@ use warnings;
 
 use DNS::LDNS;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # Note: This class does not have a constructor. Thus, it can not be created
 # as an individual object. The data structure of the object will always be 

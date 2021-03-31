@@ -1,4 +1,4 @@
-use 5.014;
+use 5.026;
 use Test2::V0 -no_srand => 1;
 use Dist::Zilla::Plugin::CommentOut;
 use Test::DZil;
@@ -17,9 +17,9 @@ subtest defaults => sub {
       }
     }
   );
-  
+
   $tzil->build;
-  
+
   my($script) = grep { $_->name =~ /^bin/ } @{ $tzil->files };
   my($pm)     = grep { $_->name =~ /^lib/ } @{ $tzil->files };
 
@@ -44,7 +44,7 @@ use warnings;
 
 1;
 EOF
-  
+
 };
 
 subtest remove => sub {
@@ -61,9 +61,9 @@ subtest remove => sub {
       }
     }
   );
-  
+
   $tzil->build;
-  
+
   my($script) = grep { $_->name =~ /^bin/ } @{ $tzil->files };
   my($pm)     = grep { $_->name =~ /^lib/ } @{ $tzil->files };
 
@@ -88,7 +88,7 @@ use warnings;
 
 1;
 EOF
-  
+
 };
 
 subtest 'begin and end' => sub {
@@ -105,9 +105,9 @@ subtest 'begin and end' => sub {
       }
     }
   );
-  
+
   $tzil->build;
-  
+
   my($pm)     = grep { $_->name =~ /^lib/ } @{ $tzil->files };
 
   is($pm->content, <<'EOF', 'pm content');
@@ -122,7 +122,42 @@ package Foo::Bar::Baz1;
 
 1;
 EOF
-  
+
+};
+
+
+subtest 'begin and end and remove' => sub {
+
+  my $tzil = Builder->from_config(
+    { dist_root => 'corpus/Foo-Bar-Baz1' },
+    {
+      add_files => {
+        'source/dist.ini' => simple_ini({},
+          [ 'GatherDir'  => {} ],
+          [ 'ExecDir'    => {} ],
+          [ 'CommentOut' => { begin => 'dev-only-begin', end => 'dev-only-end', remove => 1 } ],
+        )
+      }
+    }
+  );
+
+  $tzil->build;
+
+  my($pm)     = grep { $_->name =~ /^lib/ } @{ $tzil->files };
+
+  is($pm->content, <<'EOF', 'pm content');
+package Foo::Bar::Baz1;
+
+
+
+
+
+
+
+
+1;
+EOF
+
 };
 
 done_testing

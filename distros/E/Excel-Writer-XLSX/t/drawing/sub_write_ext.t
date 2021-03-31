@@ -2,7 +2,7 @@
 #
 # Tests for Excel::Writer::XLSX::Drawing methods.
 #
-# Copyright 2000-2020, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2021, John McNamara, jmcnamara@cpan.org
 #
 
 use lib 't/lib';
@@ -33,7 +33,7 @@ $expected = '<xdr:ext cx="9308969" cy="6078325"/>';
 
 $drawing = _new_object( \$got, 'Excel::Writer::XLSX::Drawing' );
 
-$drawing->_write_ext( 9308969, 6078325 );
+$drawing->_write_xdr_ext( 9308969, 6078325 );
 
 is( $got, $expected, $caption );
 

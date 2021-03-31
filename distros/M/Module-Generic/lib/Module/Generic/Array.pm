@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v0.1.2
+## Version v1.0.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
@@ -33,7 +33,7 @@ BEGIN
         '%{}' => 'as_hash',
         fallback => 1,
     );
-    our( $VERSION ) = 'v0.1.2';
+    our( $VERSION ) = 'v1.0.0';
 };
 
 sub new

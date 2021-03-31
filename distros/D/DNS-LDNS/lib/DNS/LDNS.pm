@@ -101,6 +101,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	LDNS_RDF_TYPE_INT8
 	LDNS_RDF_TYPE_IPSECKEY
 	LDNS_RDF_TYPE_LOC
+	LDNS_RDF_TYPE_LONG
 	LDNS_RDF_TYPE_NONE
 	LDNS_RDF_TYPE_NSAP
 	LDNS_RDF_TYPE_NSEC
@@ -651,7 +652,7 @@ our @EXPORT = qw(
 	read_anchor_file
 );
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

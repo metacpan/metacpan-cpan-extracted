@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v0.1.0
+## Version v1.0.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2021/03/20
+## Modified 2021/03/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -41,6 +41,7 @@ BEGIN
     use Module::Generic::TieHash;
     use Regexp::Common;
     use Want;
+    our( $VERSION ) = 'v1.0.0';
 };
 
 sub new

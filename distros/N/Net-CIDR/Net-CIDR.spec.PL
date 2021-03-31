@@ -35,13 +35,13 @@ The Net::CIDR perl module manipulates IPv4/IPv6 netblocks in CIDR notation
 
 %prep
 %setup -q -n Net-CIDR-%{version}
-%{__perl} Makefile.PL PREFIX=$RPM_BUILD_ROOT%{_prefix}
+%{__perl} Makefile.PL INSTALLDIRS=vendor
 %build
-%{__make}
+%{make_build}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__make} pure_install
+%{__make} pure_install DESTDIR=$RPM_BUILD_ROOT INSTALLDIRS=vendor
 find $RPM_BUILD_ROOT \( -name .packlist -o -name perllocal.pod \) -exec rm -f {} \;
 %{_fixperms} %{buildroot}/*
 
@@ -50,7 +50,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%{perl_privlib}/Net
+%{perl_privlib}/vendor_perl/Net
 %{_mandir}/man3/*
 
 %changelog

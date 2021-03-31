@@ -1,5 +1,9 @@
 Revision history for Perl module Net::IPv6Addr
 
+1.02 2021-03-31
+        * Remove Net::IPv4Addr dependence
+        * Disable base85 unless user installed Math::Base85
+
 1.01 2020-06-20
         * Documentation revisions
 

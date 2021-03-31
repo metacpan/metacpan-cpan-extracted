@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+0.14.1 2021-03-31T14:50:43+0900
+    - Correcting a test unit in datetime and upgrading version numbers for sub modules
+
 0.14.0 2021-03-20T21:43:18+0900
     - Added Module::Generic::Datetime and split inline modules to their own files
     - Added method _get_args_as_hash to get methods parameters as hash reference whether they were provided initially as such or not

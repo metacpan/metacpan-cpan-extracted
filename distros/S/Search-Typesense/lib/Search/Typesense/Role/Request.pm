@@ -1,5 +1,7 @@
 package Search::Typesense::Role::Request;
 
+# ABSTRACT: No user-serviceable parts inside.
+
 use v5.16.0;
 use Carp 'croak';
 use Moo::Role;
@@ -9,7 +11,7 @@ use Search::Typesense::Types qw(
   compile
 );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 has _ua => (
     is       => 'lazy',
@@ -97,6 +99,27 @@ sub _handle_request {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Search::Typesense::Role::Request - No user-serviceable parts inside.
+
+=head1 VERSION
+
+version 0.08
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe <ovid@allaroundtheworld.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Curtis "Ovid" Poe.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

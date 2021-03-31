@@ -1,6 +1,6 @@
 use Test::Most;
 use Test::Time;
-use Date::Holidays::GB qw/ next_holiday /;
+use Date::Holidays::GB qw( next_holiday );
 
 $Test::Time::time = 1581526134;
 

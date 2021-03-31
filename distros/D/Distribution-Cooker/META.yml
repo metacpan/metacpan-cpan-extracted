@@ -1,14 +1,14 @@
 ---
-abstract: 'Create a module directory from your own templates'
+abstract: 'Create a Perl module directory from your own templates'
 author:
   - 'brian d foy <bdfoy@cpan.org>'
 build_requires:
-  Test::More: '0.98'
+  Test::More: '1'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,8 +23,9 @@ requires:
   Config::IniFiles: '0'
   Cwd: '0'
   File::Spec::Functions: '0'
-  Template: '0'
-  perl: '5.008'
+  IO::Interactive: '0'
+  Mojo::Template: '0'
+  perl: '5.026'
   strict: '0'
   subs: '0'
   vars: '0'
@@ -33,5 +34,5 @@ resources:
   bugtracker: https://github.com/briandfoy/distribution-cooker/issues
   homepage: https://github.com/briandfoy/distribution-cooker
   repository: https://github.com/briandfoy/distribution-cooker.git
-version: '1.023'
+version: '2.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

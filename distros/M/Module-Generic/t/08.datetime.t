@@ -20,7 +20,7 @@ my $hash =
     hour => 9,
     minute => 12,
     second => 10,
-    time_zone => 'local',
+    time_zone => 'Asia/Tokyo',
 };
 my $dt = DateTime->new( %$hash );
 my $fmt = DateTime::Format::Strptime->new(

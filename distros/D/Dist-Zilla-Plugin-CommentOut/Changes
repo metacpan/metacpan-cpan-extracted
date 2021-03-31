@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-CommentOut
 
+0.04      2021-03-31 09:04:46 -0600
+  - support begin, end and remove at the same time
+  - Drop support for Perls prior to 5.26
+
 0.03      2017-08-02 11:00:55 -0400
   - Quote id string in regex
   - Add begin and end optional properties

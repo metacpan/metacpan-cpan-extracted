@@ -335,6 +335,8 @@ by the application.
 sub postProcessCfg {
     my $self = shift;
     my $cfg = $self->cfgHash;
+    # only postprocess once
+    return $cfg if $cfg->{PLUGIN}{list};        
     my %plugin;
     my @pluginOrder;
     for my $section (sort keys %$cfg){

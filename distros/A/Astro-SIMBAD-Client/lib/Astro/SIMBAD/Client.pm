@@ -21,25 +21,27 @@ VO-format queries) as of June 4 2014, I have revised the transition plan
 announced with the release of 0.027_01 on October 28 2014.
 
 What I have done as of version 0.031_01 is to add attribute
-C<emulate_soap_queries>. This is false by default. If this attribute is
+C<emulate_soap_queries>. This was false by default. If this attribute is
 true, the C<query()> method and friends, instead of issuing a SOAP
 request to the SIMBAD server, will instead construct an equivalent
 script query, and issue that. The deprecation warning will not be issued
 if C<emulate_soap_queries> is true, since the SOAP interface is not
 being used.
 
-I intend to make the default value of C<emulate_soap_queries> true in
-the first release on or after October 1 2014, assuming SOAP queries work
-for that long.
+As of March 22 2021, SOAP queries started returning 404. Because of
+this, I have made the default of C<emulate_soap_queries> true. Well,
+actually I have made it the Boolean inverse of environment variable
+L<ASTRO_SIMBAD_CLIENT_USE_SOAP|/ASTRO_SIMBAD_CLIENT_USE_SOAP>. This is
+mostly for my benefit, so I can see if SOAP has come back.
 
-When the SOAP servers go out of service (and I notice) SOAP queries will
-become fatal, and the default value of C<emulate_soap_queries> will
-become true if it is not already.
+If SOAP still has not come back after six months, SOAP queries will
+become fatal, as will setting C<emulate_soap_queries> to a false value.
 
 Eventually the SOAP code will be removed. In the meantime all tests are
-marked TODO, and support of SOAP by this module will be on a best-effort
-basis; that is, if I can make it work without a huge amount of work I
-will -- otherwise SOAP will become unsupported.
+skipped unless C<ASTRO_SIMBAD_CLIENT_USE_SOAP> is true, and are marked
+TODO. Support of SOAP by this module will be on a best-effort basis;
+that is, if I can make it work without a huge amount of work I will --
+otherwise SOAP will become unsupported.
 
 =head1 DESCRIPTION
 
@@ -116,7 +118,7 @@ BEGIN {
 	|| sub { return $_[0] };
 }
 
-our $VERSION = '0.044';
+our $VERSION = '0.045';
 
 our @CARP_NOT = qw{Astro::SIMBAD::Client::WSQueryInterfaceService};
 
@@ -185,7 +187,7 @@ my %static = (
     autoload => 1,
     debug => 0,
     delay => 3,
-    emulate_soap_queries	=> 0,
+    emulate_soap_queries	=> ! $ENV{ASTRO_SIMBAD_CLIENT_USE_SOAP},
     format => {
 	txt => FORMAT_TXT_YAML_BASIC,
 	vo => FORMAT_VO_BASIC,
@@ -1655,6 +1657,13 @@ loaded, make a static call to C<set()>.
 If assigned a true value, this environment variable specifies the
 default for the C<'server'> attribute. It is read when the module is
 loaded. If you want to change the default after the module has been
+loaded, make a static call to C<set()>.
+
+=head2 ASTRO_SIMBAD_CLIENT_USE_SOAP
+
+The Boolean inverse of this environment variable specifies the default
+for the C<'emulate_soap_queries'> attribute. It is read when the module
+is loaded. If you want to change the default after the module has been
 loaded, make a static call to C<set()>.
 
 =head2 L<LWP::UserAgent|LWP::UserAgent>

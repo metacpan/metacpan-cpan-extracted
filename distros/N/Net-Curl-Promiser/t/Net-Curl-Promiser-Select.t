@@ -17,7 +17,7 @@ use lib "$FindBin::Bin/lib";
 use MyServer;
 use ClientTest;
 
-plan tests => $ClientTest::TEST_COUNT;
+plan tests => 2 + $ClientTest::TEST_COUNT;
 
 {
     my $server = MyServer->new();
@@ -30,11 +30,29 @@ plan tests => $ClientTest::TEST_COUNT;
 
     $_ = q<> for my ($rout, $wout, $eout);
 
+    my $checked_get_fds;
+
     while ($promiser->handles()) {
         my $timeout = $promiser->get_timeout();
 
         if ($timeout && $timeout != -1) {
             ($rout, $wout, $eout) = $promiser->get_vecs();
+
+            if (!$checked_get_fds) {
+                if (grep { tr<\0><>c } $rout, $wout) {
+                    $checked_get_fds++;
+
+                    my @fds = $promiser->get_fds();
+
+                    ok( 0 + @fds, 'get_fds() returns something when get_vecs() does' );
+
+                    is(
+                        0 + @fds,
+                        0 + $promiser->get_fds(),
+                        'get_fds() in scalar',
+                    );
+                }
+            }
 
             my $got = select $rout, $wout, $eout, $timeout;
 

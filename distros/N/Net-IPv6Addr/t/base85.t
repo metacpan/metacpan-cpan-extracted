@@ -3,6 +3,10 @@ use Test::More;
 
 use Net::IPv6Addr;
 
+if (! Net::IPv6Addr::base85ok ()) {
+    plan skip_all => 'Math::Base85 is not installed',
+};
+
 # Test ipv6_parse_base85 with garbage.
 
 eval { Net::IPv6Addr::ipv6_parse_base85("\n"); };

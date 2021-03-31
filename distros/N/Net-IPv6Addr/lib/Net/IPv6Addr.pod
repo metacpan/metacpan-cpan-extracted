@@ -7,8 +7,8 @@ Net::IPv6Addr - Check and manipulate IPv6 addresses
 
 =head1 VERSION
 
-This documents version 1.01 of Net::IPv6Addr corresponding to
-L<git commit 9002d5c714a91a7dc53c157af7f9a86e06c8616d|https://github.com/benkasminbullock/net-ipv6addr/commit/9002d5c714a91a7dc53c157af7f9a86e06c8616d> released on Sat Jun 20 13:23:08 2020 +0900.
+This documents version 1.02 of Net::IPv6Addr corresponding to
+L<git commit f9065cb7b044da442df16443d65593a5a3fc6baa|https://github.com/benkasminbullock/net-ipv6addr/commit/f9065cb7b044da442df16443d65593a5a3fc6baa> released on Wed Mar 31 11:11:47 2021 +0900.
 
 =head1 SYNOPSIS
 
@@ -25,7 +25,7 @@ produces output
     dead:beef:cafe:babe:0:0:0:f0ad
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/synopsis.pl> in the distribution.)
 
 
 =head1 DESCRIPTION
@@ -112,7 +112,7 @@ produces output
 
     ::ab54:a98c:eb1f:ad2
 
-(This example is included as L<F<from-bigint.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/from-bigint.pl> in the distribution.)
+(This example is included as L<F<from-bigint.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/from-bigint.pl> in the distribution.)
 
 
 Given a string or a L<Math::BigInt> object containing a number, this
@@ -150,7 +150,7 @@ produces output
     dead:beef:cafe:babe:dead:beef:cafe:babe is in network.
 
 
-(This example is included as L<F<inet.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/inet.pl> in the distribution.)
+(This example is included as L<F<inet.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/inet.pl> in the distribution.)
 
 
 =head3 Parameters
@@ -194,7 +194,7 @@ produces output
 
     dead:beef:cac0::
 
-(This example is included as L<F<inos.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/inos.pl> in the distribution.)
+(This example is included as L<F<inos.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/inos.pl> in the distribution.)
 
 
 Given an input IPv6 address $x, this returns the C<$n>
@@ -315,7 +315,7 @@ produces output
     dead 0000 0000 0000 0000 0000 0000 beef
 
 
-(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/array.pl> in the distribution.)
+(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/array.pl> in the distribution.)
 
 
 Convert an IPv6 address into an array of eight hexadecimal numbers.
@@ -351,7 +351,7 @@ produces output
     295986882420777848964380943247191621359
 
 
-(This example is included as L<F<bigint.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/bigint.pl> in the distribution.)
+(This example is included as L<F<bigint.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/bigint.pl> in the distribution.)
 
 
 Convert an IPv6 address into a L<Math::BigInt> object containing the
@@ -388,7 +388,7 @@ produces output
     dead 0000 0000 0000 0000 0000 0000 beef
 
 
-(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/array.pl> in the distribution.)
+(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/array.pl> in the distribution.)
 
 
 Convert an IPv6 address into an array of eight integer numbers.
@@ -437,7 +437,7 @@ produces output
 
     dead:beef::cafe:babe
 
-(This example is included as L<F<compressed.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/compressed.pl> in the distribution.)
+(This example is included as L<F<compressed.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/compressed.pl> in the distribution.)
 
 
 This provides the "canonical text representation format" of
@@ -455,7 +455,7 @@ The IPv6 address in the "compressed" (L</RFC1884> et al.) or
 lower case, consecutive zero elements are reduced to double colons,
 and leading zeros are removed from strings of hexadecimal digits. All
 treatment of ambiguities is as per RFC5952. (See
-L<F<t/rfc5952.t>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/t/rfc5952.t> for tests.)
+L<F<t/rfc5952.t>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/t/rfc5952.t> for tests.)
 
 =head3 Notes
 
@@ -477,7 +477,7 @@ produces output
     f.e.e.b.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.d.a.e.d.IP6.INT.
 
 
-(This example is included as L<F<string-ip6-int.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/string-ip6-int.pl> in the distribution.)
+(This example is included as L<F<string-ip6-int.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/string-ip6-int.pl> in the distribution.)
 
 
 =head3 Parameters
@@ -507,7 +507,7 @@ produces output
 
     dead:beef::3:2:1:202.254.186.190
 
-(This example is included as L<F<to-string-ipv4.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/to-string-ipv4.pl> in the distribution.)
+(This example is included as L<F<to-string-ipv4.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/to-string-ipv4.pl> in the distribution.)
 
 
 =head3 Parameters
@@ -537,7 +537,7 @@ produces output
 
     dead:beef::3:2:1:202.254.186.190
 
-(This example is included as L<F<to-string-ipv4-comp.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/to-string-ipv4-comp.pl> in the distribution.)
+(This example is included as L<F<to-string-ipv4-comp.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/to-string-ipv4-comp.pl> in the distribution.)
 
 
 =head3 Parameters
@@ -568,7 +568,7 @@ produces output
 
     dead:beef:cafe:babe:0:0:0:f0ad
 
-(This example is included as L<F<preferred.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/examples/preferred.pl> in the distribution.)
+(This example is included as L<F<preferred.pl>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/examples/preferred.pl> in the distribution.)
 
 
 =head3 Parameters
@@ -587,7 +587,7 @@ Invalid input will generate an exception.
 
 =head1 EXPORTS
 
-As of version 1.01, L</from_bigint>, L</in_network>, L</in_network_of_size>, L</ipv6_chkip>, L</ipv6_parse>, L</is_ipv6>, L</to_array>, L</to_bigint>, L</to_intarray>, L</to_string_base85>, L</to_string_compressed>, L</to_string_ip6_int>, L</to_string_ipv4>, L</to_string_ipv4_compressed>, L</to_string_preferred> may
+As of version 1.02, L</from_bigint>, L</in_network>, L</in_network_of_size>, L</ipv6_chkip>, L</ipv6_parse>, L</is_ipv6>, L</to_array>, L</to_bigint>, L</to_intarray>, L</to_string_base85>, L</to_string_compressed>, L</to_string_ip6_int>, L</to_string_ipv4>, L</to_string_ipv4_compressed>, L</to_string_preferred> may
 be exported on demand. All the exported functions may be exported
 using
 
@@ -597,18 +597,9 @@ using
 
 =over
 
-=item L<Net::IPv4Addr>
-
-This is used to parse IPv4 addresses.
-
-=item L<Math::Base85>
-
-This is used to parse L</RFC1924> (April Fool's) addresses.
-
 =item L<Math::BigInt>
 
-This is used by the L</RFC1924> (April Fool's) address routines and by
-L</to_bigint> and L</from_bigint>.
+This is used by L</to_bigint> and L</from_bigint>.
 
 =back
 
@@ -733,7 +724,7 @@ on metacpan.
 This module consists of a regex for validating IPv6s. Because this
 module had a lot more and better tests than Net::IPv6Addr, I included
 the tests and one regex from C<Regexp::IPv6> in this module. (See
-L<F<t/Regexp-IPv6.t>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.01/t/Regexp-IPv6.t>) Unlike C<Net::IPv6Addr>,
+L<F<t/Regexp-IPv6.t>|https://fastapi.metacpan.org/source/BKB/Net-IPv6Addr-1.02/t/Regexp-IPv6.t>) Unlike C<Net::IPv6Addr>,
 C<Regexp::IPv6> disallows C<::>, "the unspecified addresses". See the
 module's documentation for details.
 
@@ -760,6 +751,17 @@ Bowers as part of "CPAN day". Significant changes to the module since
 then include the following:
 
 =over
+
+=item 1.02
+
+L<Net::IPv4Addr> dependence removed. This module suffered from the
+"octal bug". This module had only been used to validate ipv4 addresses
+and was easy to remove.
+
+Math::Base85 dependence removed. This module is only needed to support
+the April Fool's joke method of IPv6 addresses, so if the user doesn't
+already have Math::Base85, the module now disables support for the
+April Fool addresses.
 
 =item 1.0
 

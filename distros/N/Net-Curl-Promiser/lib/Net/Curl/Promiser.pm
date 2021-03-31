@@ -3,7 +3,7 @@ package Net::Curl::Promiser;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 =encoding utf-8
 
@@ -12,6 +12,12 @@ our $VERSION = '0.14';
 Net::Curl::Promiser - Asynchronous L<libcurl|https://curl.haxx.se/libcurl/>, the easy way!
 
 =head1 DESCRIPTION
+
+=begin html
+
+<a href='https://coveralls.io/github/FGasper/p5-Net-Curl-Promiser?branch=master'><img src='https://coveralls.io/repos/github/FGasper/p5-Net-Curl-Promiser/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=end html
 
 L<Net::Curl::Multi> is powerful but tricky to use: polling, callbacks,
 timers, etc. This module does all of that for you and puts a Promise
@@ -76,6 +82,9 @@ each event interface.) These are kept separate to avoid circular references.
 #----------------------------------------------------------------------
 
 use parent 'Net::Curl::Promiser::LeakDetector';
+
+# So that Net::Curl::Easy::Code’s overloading gets set up:
+use Net::Curl::Easy ();
 
 use Net::Curl::Multi ();
 
@@ -162,7 +171,9 @@ Returns I<OBJ>.
 sub cancel_handle {
     my ($self, $easy) = @_;
 
-    return $self->{'backend'}->cancel_handle($easy);
+    $self->{'backend'}->cancel_handle($easy, $self->{'multi'});
+
+    return $self;
 }
 
 =head2 $obj = I<OBJ>->fail_handle( $EASY, $REASON )
@@ -182,7 +193,9 @@ sub fail_handle {
         Carp::carp("fail_handle(): no reason given");
     }
 
-    return $self->{'backend'}->fail_handle($easy, $reason);
+    $self->{'backend'}->fail_handle($easy, $reason, $self->{'multi'});
+
+    return $self;
 }
 
 #----------------------------------------------------------------------
@@ -268,6 +281,8 @@ sub _socket_fn {
 See the distribution’s F</examples> directory.
 
 =head1 SEE ALSO
+
+Try L<Net::Curl::Easier> for a more polished variant of Net::Curl::Easy.
 
 L<Net::Curl::Simple> implements a similar idea to this module but
 doesn’t return promises. It has a more extensive interface that provides

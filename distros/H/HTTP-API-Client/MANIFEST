@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 lib/HTTP/API/Client.pm
+t/00_kvp.t
 t/00_use.t
 t/01_api_call.t
 t/02_basic_auth.t

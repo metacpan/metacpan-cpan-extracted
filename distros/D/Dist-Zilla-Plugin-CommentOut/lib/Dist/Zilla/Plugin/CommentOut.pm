@@ -1,13 +1,15 @@
 use strict;
 use warnings;
-use 5.014;
+use 5.026;
 
-package Dist::Zilla::Plugin::CommentOut 0.03 {
+package Dist::Zilla::Plugin::CommentOut 0.04 {
 
   # ABSTRACT: Comment out code in your scripts and modules
 
 
   use Moose;
+  use experimental qw( signatures );
+
   with (
     'Dist::Zilla::Role::FileMunger',
     'Dist::Zilla::Role::FileFinderUser' => {
@@ -16,19 +18,19 @@ package Dist::Zilla::Plugin::CommentOut 0.03 {
   );
 
   use namespace::autoclean;
-  
+
   has id => (
     is      => 'rw',
     isa     => 'Str',
     default => 'dev-only',
   );
-  
+
   has remove => (
     is      => 'rw',
     isa     => 'Int',
     default => 0,
   );
-  
+
   has begin => (
     is      => 'rw',
     isa     => 'Str',
@@ -38,42 +40,38 @@ package Dist::Zilla::Plugin::CommentOut 0.03 {
     is      => 'rw',
     isa     => 'Str',
   );
-  
-  sub munge_files
+
+  sub munge_files ($self)
   {
-    my($self) = @_;
-    $DB::single = 1;
-    $self->munge_file($_) for @{ $self->found_files };
+    $self->munge_file($_) for $self->found_files->@*;
     return;
   }
-  
-  sub munge_file
+
+  sub munge_file ($self, $file)
   {
-    my ($self, $file) = @_;
-    
     return if $file->is_bytes;
-    
+
     $self->log("commenting out @{[ $self->id ]} in @{[ $file->name ]}");
-    
+
     my $content = $file->content;
-    
+
     my $id = $self->id;
 
     if($id)
-    {    
+    {
       if($self->remove)
       { $content =~ s/^(.*?#\s*\Q$id\E\s*)$/\n/mg }
       else
       { $content =~ s/^(.*?#\s*\Q$id\E\s*)$/#$1/mg }
     }
-    
+
     if($self->begin && $self->end)
     {
       my $begin = $self->begin;
       my $end   = $self->end;
       $begin = qr{^\s*#\s*\Q$begin\E\s*$};
       $end   = qr{^\s*#\s*\Q$end\E\s*$};
-      
+
       my @lines = split /\n/, $content;
       my $in = 0;
       for(@lines)
@@ -83,6 +81,7 @@ package Dist::Zilla::Plugin::CommentOut 0.03 {
           if($_ =~ $begin)
           {
             $in = 1;
+            $_ = '' if $self->remove;
           }
         }
         else
@@ -90,20 +89,24 @@ package Dist::Zilla::Plugin::CommentOut 0.03 {
           if($_ =~ $end)
           {
             $in = 0;
+            $_ = '' if $self->remove;
           }
           else
           {
-            $_ =~ s/^/#/;
+            if($self->remove)
+            { $_ = '' }
+            else
+            { s/^/#/ }
           }
         }
       }
       $content = join "\n", @lines, '';
     }
-    
+
     $file->content($content);
     return;
   }
-  
+
   __PACKAGE__->meta->make_immutable;
 
 }
@@ -122,7 +125,7 @@ Dist::Zilla::Plugin::CommentOut - Comment out code in your scripts and modules
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -152,7 +155,7 @@ every call.  To that end I write something like this:
 That is lovely, except that the main toolchain installers EUMM and MB will
 convert C</usr/bin/perl> but not C</usr/bin/env perl> to the correct perl
 when the distribution is installed.  There
-is a handy plugin C<[SetScriptShebang]> that solves that problem but the 
+is a handy plugin C<[SetScriptShebang]> that solves that problem but the
 C<use lib::findbin '../lib';> is problematic because C<../lib> relative to
 the install location might not be right!  With both C<[SetScriptShebang]>
 and this plugin, I can fix both problems:
@@ -191,6 +194,18 @@ Block comments are off unless both C<begin> and C<end> are specified.
 
 For block comments, the id to use for the beginning of the block.
 Block comments are off unless both C<begin> and C<end> are specified.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Dist::Zilla::Plugin::Comment>
+
+Does something very similar.  I did actually do a survay of Dist::Zilla
+plugins before writing this one, but apparently I missed this one.  Anyway
+I prefer C<[CommentOut]> as it is configurable.
+
+=back
 
 =head1 AUTHOR
 

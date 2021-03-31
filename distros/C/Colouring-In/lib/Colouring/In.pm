@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use smallnum;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 our (%TOOL, $ANOBJECT);
 
@@ -88,9 +88,9 @@ BEGIN {
 			$m2 = $l <= 0.5 ? $l * ( $s + 1 ) : $l + $s - $l * $s;
 			$m1 = $l * 2 - $m2;
 			return (
-				($TOOL{hue}( $h + 1 / 3, $m1, $m2 ) * 255),
-				($TOOL{hue}( $h,			$m1, $m2 ) * 255),
-				($TOOL{hue}( $h - 1 / 3, $m1, $m2 ) * 255),
+				($TOOL{clamp}($TOOL{hue}( $h + 1 / 3, $m1, $m2 ), 1) * 255),
+				($TOOL{clamp}($TOOL{hue}( $h,			$m1, $m2 ), 1) * 255),
+				($TOOL{clamp}($TOOL{hue}( $h - 1 / 3, $m1, $m2 ), 1) * 255),
 				( defined $a ? $a : () ),
 			);
 		},
@@ -412,7 +412,7 @@ Colouring::In - color or colour.
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 

@@ -1,5 +1,5 @@
 package Moose::Object;
-our $VERSION = '2.2014';
+our $VERSION = '2.2015';
 
 use strict;
 use warnings;
@@ -148,7 +148,7 @@ Moose::Object - The base object for Moose
 
 =head1 VERSION
 
-version 2.2014
+version 2.2015
 
 =head1 DESCRIPTION
 

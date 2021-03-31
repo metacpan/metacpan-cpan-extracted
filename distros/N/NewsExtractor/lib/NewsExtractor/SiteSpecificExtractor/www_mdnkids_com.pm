@@ -3,28 +3,39 @@ use utf8;
 use Moo;
 extends 'NewsExtractor::GenericExtractor';
 
-use Importer 'NewsExtractor::TextUtil' => qw(reformat_dateline);
+use Importer 'NewsExtractor::TextUtil' => qw(reformat_dateline normalize_whitespace);
 
 sub dateline {
     my ($self) = @_;
-    return reformat_dateline( $self->dom->at('td.newsbox_content_txt')->all_text(), '+08:00' );
+    my $el = $self->dom->at('h2 ~ div.col span');
+    if ($el) {
+        my ($ymd) = $el->all_text() =~ m<\(([0-9]{4}/[0-9]{1,2}/[0-9]{1,2})\)\z>;
+        return reformat_dateline( $ymd, '+08:00' );
+    }
+    return undef;
 }
 
 sub journalist {
     my ($self) = @_;
-    my $txt = $self->content_text;
+    my ($x, $el);
+    if ($el = $self->dom->at('h2 ~ div.col span')) {
+        $x = $el->all_text() =~ s<\([0-9]{4}/[0-9]{1,2}/[0-9]{1,2}\)\z><>r;
+        $x = normalize_whitespace($x);
+    }
+    unless ($x) {
+        my $t = $self->content_text;
 
-    my @regexps = (
-        qr{\A(\S+)／\S+報導\n},
-        qr{\A\S*(報導／\S+\s+攝影／\S+)\n},
-        qr{\A\S*(文／\S+\s+圖／\S+)\n},
-        qr{ \A\S*(\S{3})\n }x,
-    );
+        my @regexps = (
+            qr{\A(\S+)／\S+報導\n},
+            qr{\A\S*(報導／\S+\s+攝影／\S+)\n},
+            qr{\A\S*(文／\S+\s+圖／\S+)\n},
+            qr{\A\S*(\S{3})\n},
+        );
 
-    my ($x);
-    for my $re (@regexps) {
-        ($x) = $txt =~ $re;
-        last if $x;
+        for my $re (@regexps) {
+            ($x) = $t =~ /$re/;
+            last if $x;
+        }
     }
 
     return $x;

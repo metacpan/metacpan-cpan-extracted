@@ -52,10 +52,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 case 'reload':
                 case 'cancel':
                 case 'wait':
-                case undefined:
                     break;
                 default:
-                    console.error('Unknown action', data.action);
+                    console.error('Unknown action:', data.action);
                     break;
             }
         },this);

@@ -31,6 +31,7 @@ my @files = (
     't/release-kwalitee.t',
     't/role.t',
     't/role_attrs.t',
+    't/role_chain_attrs.t',
     't/sub_attrs.t'
 );
 

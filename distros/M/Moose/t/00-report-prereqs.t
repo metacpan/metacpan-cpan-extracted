@@ -70,7 +70,6 @@ my @include = qw(
   DynaLoader
   HTTP::Headers
   IO::File
-  IO::String
   Locale::US
   Module::Refresh
   MooseX::NonMoose

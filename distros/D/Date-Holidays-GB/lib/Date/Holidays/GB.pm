@@ -1,8 +1,8 @@
 package Date::Holidays::GB;
 
-our $VERSION = '0.017';
+our $VERSION = '0.019';
 
-# ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2021
+# ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2022
 
 use strict;
 use warnings;
@@ -118,7 +118,7 @@ sub is_holiday {
         ( $y, $m, $d ) = $args{date} =~ m{^([0-9]{4})-([0-9]{2})-([0-9]{2})$};
     }
     else {
-        ( $y, $m, $d ) = @args{qw/ year month day /};
+        ( $y, $m, $d ) = @args{qw( year month day )};
     }
 
     die "Must specify either 'date' or 'year', 'month' and 'day'"
@@ -196,7 +196,7 @@ sub _holiday {
     return join( ', ', @strings );
 }
 
-sub date_generated { '2020-06-04' }
+sub date_generated { '2021-01-19' }
 
 1;
 
@@ -474,3 +474,33 @@ __DATA__
 2021-12-28	EAW	Boxing Day
 2021-12-28	NIR	Boxing Day
 2021-12-28	SCT	Boxing Day
+2022-01-03	EAW	New Year’s Day
+2022-01-03	NIR	New Year’s Day
+2022-01-03	SCT	New Year’s Day
+2022-01-04	SCT	2nd January
+2022-03-17	NIR	St Patrick’s Day
+2022-04-15	EAW	Good Friday
+2022-04-15	NIR	Good Friday
+2022-04-15	SCT	Good Friday
+2022-04-18	EAW	Easter Monday
+2022-04-18	NIR	Easter Monday
+2022-05-02	EAW	Early May bank holiday
+2022-05-02	NIR	Early May bank holiday
+2022-05-02	SCT	Early May bank holiday
+2022-06-02	EAW	Spring bank holiday
+2022-06-02	NIR	Spring bank holiday
+2022-06-02	SCT	Spring bank holiday
+2022-06-03	EAW	Platinum Jubilee bank holiday
+2022-06-03	NIR	Platinum Jubilee bank holiday
+2022-06-03	SCT	Platinum Jubilee bank holiday
+2022-07-12	NIR	Battle of the Boyne (Orangemen’s Day)
+2022-08-01	SCT	Summer bank holiday
+2022-08-29	EAW	Summer bank holiday
+2022-08-29	NIR	Summer bank holiday
+2022-11-30	SCT	St Andrew’s Day
+2022-12-26	EAW	Boxing Day
+2022-12-26	NIR	Boxing Day
+2022-12-26	SCT	Boxing Day
+2022-12-27	EAW	Christmas Day
+2022-12-27	NIR	Christmas Day
+2022-12-27	SCT	Christmas Day

@@ -1,6 +1,6 @@
 # Net::CIDR
 #
-# Copyright 2001-2019 Sam Varshavchik.
+# Copyright 2001-2021 Sam Varshavchik.
 #
 # with contributions from David Cantrell.
 #
@@ -50,7 +50,7 @@ use Carp;
 
 );
 
-$VERSION = "0.20";
+$VERSION = "0.21";
 
 1;
 
@@ -66,6 +66,13 @@ Net::CIDR - Manipulate IPv4/IPv6 netblocks in CIDR notation
     use Net::CIDR;
 
     use Net::CIDR ':all';
+
+    my $var;
+
+    if ($var = Net::CIDR::cidrvalidate($var))
+    {
+         // ... do something
+    }
 
     print join("\n",
           Net::CIDR::range2cidr("192.168.0.0-192.168.255.255",
@@ -170,6 +177,12 @@ Net::CIDR - Manipulate IPv4/IPv6 netblocks in CIDR notation
 The Net::CIDR package contains functions that manipulate lists of IP
 netblocks expressed in CIDR notation.
 The Net::CIDR functions handle both IPv4 and IPv6 addresses.
+
+The cidrvalidate() function, described below, checks that its argument
+is a single, valid IP address or a CIDR. The remaining functions
+expect that
+their parameters consist of validated IPs or CIDRs. See cidrvalidate()
+and BUGS, below, for more information.
 
 =head2 @cidr_list=Net::CIDR::range2cidr(@range_list);
 

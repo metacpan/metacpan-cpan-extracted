@@ -67,5 +67,5 @@ LDNS_GENERIC_STRUCT_OPT
 
 OUTPUT
 Mortal_PV
-        sv_setsv($arg, sv_2mortal(newSVpv($var, 0)));
+	sv_setsv($arg, sv_2mortal(newSVpv($var, 0))); 
         free((void *)$var);

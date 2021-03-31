@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl interface to Typesense search engine.",
+   "abstract" : "Perl interface to the Typesense search engine",
    "author" : [
       "Curtis \"Ovid\" Poe <ovid@allaroundtheworld.fr>"
    ],
@@ -66,27 +66,27 @@
    "provides" : {
       "Search::Typesense" : {
          "file" : "lib/Search/Typesense.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Search::Typesense::Collection" : {
          "file" : "lib/Search/Typesense/Collection.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Search::Typesense::Document" : {
          "file" : "lib/Search/Typesense/Document.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Search::Typesense::Role::Request" : {
          "file" : "lib/Search/Typesense/Role/Request.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Search::Typesense::Types" : {
          "file" : "lib/Search/Typesense/Types.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Search::Typesense::Version" : {
          "file" : "lib/Search/Typesense/Version.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -101,7 +101,7 @@
          "web" : "https://github.com/Ovid/Search-Typesense"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }

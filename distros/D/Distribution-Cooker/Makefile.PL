@@ -44,7 +44,7 @@ my $github    = 'https://github.com/briandfoy/distribution-cooker';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.008',
+	'MIN_PERL_VERSION' => '5.026',
 
 	'NAME'	        => $module,
 	'ABSTRACT_FROM' => $main_file,
@@ -63,15 +63,16 @@ my %WriteMakefile = (
 		},
 
 	'TEST_REQUIRES' => {
-		'Test::More' => '0.98',
+		'Test::More' => '1',
 		},
 
 	'PREREQ_PM'     => {
 		'Config::IniFiles'      => '0',
-		'Template'              => '0',
+		'Mojo::Template'        => '0',
 		'Carp'                  => '0',
 		'Cwd'                   => '0',
 		'File::Spec::Functions' => '0',
+		'IO::Interactive'       => '0',
 		'strict'                => '0',
 		'subs'                  => '0',
 		'vars'                  => '0',

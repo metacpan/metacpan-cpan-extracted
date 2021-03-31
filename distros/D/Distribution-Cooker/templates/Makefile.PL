@@ -5,15 +5,15 @@ require 5.008;
 eval "use Test::Manifest 1.21";
 
 WriteMakefile(
-	'NAME'	        => '[% module %]',
-	'ABSTRACT_FROM' => 'lib/[% module_path %]',
-	'VERSION_FROM'  => 'lib/[% module_path %]',
+	'NAME'	        => '« $module »',
+	'ABSTRACT_FROM' => 'lib/« $module_path »',
+	'VERSION_FROM'  => 'lib/« $module_path »',
 	'LICENSE'       => 'perl',
 	'AUTHOR'        => 'brian d foy <bdfoy@cpan.org>',
-	
-	'PREREQ_PM'    => { 
+
+	'PREREQ_PM'    => {
 		'Test::More' => '0.95',
 		},
 
-	clean  => { FILES    => q|[% module_dist %]-*| },
+	clean  => { FILES    => q|« $module_dist »-*| },
 	);

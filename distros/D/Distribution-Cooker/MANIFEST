@@ -18,17 +18,12 @@ t/pod_coverage.t
 t/run.t
 t/test_manifest
 templates/Changes
-templates/examples/placeholder.pl
 templates/lib/Foo.pm
 templates/LICENSE
 templates/Makefile.PL
 templates/MANIFEST.SKIP
 templates/README
-templates/t/load.t
-templates/t/pod.t
-templates/t/pod_coverage.t
-templates/t/prereq.t
-templates/t/test_manifest
 xt/changes.t
+xt/version_check.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

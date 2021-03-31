@@ -6,7 +6,7 @@
                                                                        
 
 
-This is the README for Net::IPv6Addr version 1.01.
+This is the README for Net::IPv6Addr version 1.02.
 
 Net::IPv6Addr is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -113,11 +113,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Net::IPv6Addr
 
-To install the module from the source file, Net-IPv6Addr-1.01.tar.gz,
+To install the module from the source file, Net-IPv6Addr-1.02.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Net-IPv6Addr-1.01.tar.gz
-    cd Net-IPv6Addr-1.01
+    tar xfz Net-IPv6Addr-1.02.tar.gz
+    cd Net-IPv6Addr-1.02
     perl Makefile.PL
     make
     make install
@@ -142,6 +142,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Sat Jun 20 13:23:37 2020.
+This README was written on Wed Mar 31 11:14:40 2021.
 
 -----------------------------------------------------------------------------

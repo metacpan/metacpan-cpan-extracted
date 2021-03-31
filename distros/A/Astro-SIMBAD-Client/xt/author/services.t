@@ -7,6 +7,10 @@ use lib qw{ inc };
 
 use My::Module::Test;
 
+use constant TEST_SOAP	=> $ENV{ASTRO_SIMBAD_CLIENT_USE_SOAP};
+
+TEST_SOAP
+    or plan skip_all => 'SOAP tests disabled.';
 
 access();
 

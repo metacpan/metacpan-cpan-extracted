@@ -49,8 +49,4 @@ sub _SETOPT_FORBIDDEN {
     );
 }
 
-sub _GET_FD_ACTION {
-    return +{ @{ $_[1] } };
-}
-
 1;

@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Perl interface to Typesense search engine.",
+  "ABSTRACT" => "Perl interface to the Typesense search engine",
   "AUTHOR" => "Curtis \"Ovid\" Poe <ovid\@allaroundtheworld.fr>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::PerlTidy" => 20200930,
     "autodie" => "2.29"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }

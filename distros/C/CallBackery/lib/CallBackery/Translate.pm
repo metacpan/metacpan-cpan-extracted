@@ -124,6 +124,9 @@ use overload
         my $ret = $self->[0];
         $ret =~ s{%(\d+)}{$self->[$1]//''}eg;
         return $ret;
+    },
+    'eq' => sub ($self,$other,$swap) {
+        return "$self" eq "$other";
     };
 
 sub trm ($str,@args) {

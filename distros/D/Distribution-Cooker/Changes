@@ -1,5 +1,10 @@
 Revision history for Perl module Distribution::Cooker
 
+2.001 2021-03-31T10:58:27Z
+	* Change to using Mojo::Templates, but with special characters to
+	mark the code.
+	* Convert to GitHub actions and dump Travis.
+
 1.023 2018-09-08T17:20:05Z
 	* Support the TTREE environment variable
 

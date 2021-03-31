@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -74,6 +74,14 @@ PROPERTIES
 
     For block comments, the id to use for the beginning of the block. Block
     comments are off unless both begin and end are specified.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::Comment
+
+      Does something very similar. I did actually do a survay of
+      Dist::Zilla plugins before writing this one, but apparently I missed
+      this one. Anyway I prefer [CommentOut] as it is configurable.
 
 AUTHOR
 

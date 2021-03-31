@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v0.4.1
+## Version v1.0.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
@@ -22,7 +22,7 @@ BEGIN
     use Nice::Try;
     use Regexp::Common qw( number );
     use POSIX ();
-    our( $VERSION ) = 'v0.4.1';
+    our( $VERSION ) = 'v1.0.0';
 };
 
 use overload (

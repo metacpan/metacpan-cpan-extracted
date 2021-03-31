@@ -1,6 +1,6 @@
 package Date::Holidays::GB::EAW;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; our $VERSION = '0.019'; # VERSION
 
 use strict;
 use warnings;
@@ -41,7 +41,7 @@ Date::Holidays::GB::EAW - Date::Holidays class for GB-EAW (England & Wales)
 
 =head1 SYNOPSIS
 
-    use Date::Holidays::GB::EAW qw/ holidays is_holiday /;
+    use Date::Holidays::GB::EAW qw( holidays is_holiday );
 
     # All holidays for England & Wales
     my $holidays = holidays( year => 2013 );

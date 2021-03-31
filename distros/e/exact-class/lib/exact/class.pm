@@ -7,9 +7,9 @@ use Role::Tiny ();
 use Scalar::Util ();
 use Class::Method::Modifiers ();
 
-our $VERSION = '1.13'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
-my ( $store, $roles );
+my $store;
 
 sub import {
     my ( $self, $caller ) = @_;
@@ -22,7 +22,7 @@ sub import {
         exact->add_isa( $self, $caller ) if ( $self eq 'exact::class');
     }
 
-    $store->{$caller} = {};
+    $store->{struc}{$caller} = {};
 
     eval qq{
         package $caller {
@@ -30,9 +30,7 @@ sub import {
         };
     };
 
-    for ( qw( has class_has with ) ) {
-        exact->monkey_patch( $caller, $_, \&$_ ) unless ( defined &{ $caller . '::' . $_ } );
-    }
+    exact->monkey_patch( $caller, $_, \&$_ ) for ( qw( has class_has with ) );
 }
 
 sub DESTROY {}
@@ -46,16 +44,28 @@ sub ____parents {
 
 sub ____install {
     my ( $self, $namespace, $input ) = @_;
-    if ( ref $store->{$namespace} eq 'HASH' ) {
-        for my $name ( keys %{ $store->{$namespace}->{has} } ) {
-            if ( exists $input->{$name} ) {
-                $self->attr( $name, $input->{$name} );
+
+    if ( ref $store->{struc}{$namespace} eq 'HASH' ) {
+        my @has_names = keys %{ $store->{struc}{$namespace}->{has} };
+
+        for my $class_has_name (
+            grep {
+                my $name = $_;
+                not grep { $_ eq $name } @has_names;
+            } keys %{ $store->{struc}{$namespace}->{name} }
+        ) {
+            $self->$class_has_name( $input->{$class_has_name} ) if ( exists $input->{$class_has_name} );
+        }
+
+        for my $has_name (@has_names) {
+            if ( exists $input->{$has_name} ) {
+                $self->attr( $has_name, $input->{$has_name} );
             }
-            elsif ( exists $store->{$namespace}->{value}{$name} ) {
-                $self->attr( $name, $store->{$namespace}->{value}{$name} );
+            elsif ( exists $store->{struc}{$namespace}->{value}{$has_name} ) {
+                $self->attr( $has_name, $store->{struc}{$namespace}->{value}{$has_name} );
             }
             else {
-                $self->attr($name);
+                $self->attr($has_name);
             }
         }
     }
@@ -67,8 +77,8 @@ sub new {
     my $self  = bless( { %$input }, ref $class || $class );
 
     for my $namespace ( reverse ( ref $self, ____parents( ref $self ) ) ) {
-        if ( ref $roles->{$namespace} eq 'ARRAY' ) {
-            for my $role ( @{ $roles->{$namespace} } ) {
+        if ( ref $store->{roles}{$namespace} eq 'ARRAY' ) {
+            for my $role ( @{ $store->{roles}->{$namespace} } ) {
                 ____install( $self, $role, $input );
             }
         }
@@ -152,19 +162,19 @@ sub ____attrs {
                     my ( $self, $value ) = @_;
 
                     if ( @_ > 1 ) {
-                        $store->{ $set->{caller} }->{value}{$name} = $value;
+                        $store->{struc}{ $set->{caller} }->{value}{$name} = $value;
                         return $self;
                     }
                     else {
-                        return ${ $store->{ $set->{caller} }->{value}{$name} } if (
-                            ref $store->{ $set->{caller} }->{value}{$name} eq 'REF' and
-                            ref ${ $store->{ $set->{caller} }->{value}{$name} } eq 'CODE'
+                        return ${ $store->{struc}{ $set->{caller} }->{value}{$name} } if (
+                            ref $store->{struc}{ $set->{caller} }->{value}{$name} eq 'REF' and
+                            ref ${ $store->{struc}{ $set->{caller} }->{value}{$name} } eq 'CODE'
                         );
 
-                        $store->{ $set->{caller} }->{value}{$name} =
-                            $store->{ $set->{caller} }->{value}{$name}->($self)
-                            if ( ref $store->{ $set->{caller} }->{value}{$name} eq 'CODE' );
-                        return $store->{ $set->{caller} }->{value}{$name};
+                        $store->{struc}{ $set->{caller} }->{value}{$name} =
+                            $store->{struc}{ $set->{caller} }->{value}{$name}->($self)
+                            if ( ref $store->{struc}{ $set->{caller} }->{value}{$name} eq 'CODE' );
+                        return $store->{struc}{ $set->{caller} }->{value}{$name};
                     }
                 };
 
@@ -178,9 +188,9 @@ sub ____attrs {
                 $set->{self}->$name( $set->{value} ) if ( exists $set->{value} );
             }
             else {
-                $store->{ $set->{caller} }->{has}{$name}   = 1 if ( $set->{set_has} );
-                $store->{ $set->{caller} }->{name}{$name}  = 1;
-                $store->{ $set->{caller} }->{value}{$name} = $set->{value} if ( exists $set->{value} );
+                $store->{struc}{ $set->{caller} }->{has}{$name}   = 1 if ( $set->{set_has} );
+                $store->{struc}{ $set->{caller} }->{name}{$name}  = 1;
+                $store->{struc}{ $set->{caller} }->{value}{$name} = $set->{value} if ( exists $set->{value} );
             }
         }
     }
@@ -193,19 +203,21 @@ sub ____role_attrs {
 
     for my $role (@$roles) {
         for my $name (
-            keys %{ $store->{$role}{name} }
+            keys %{ $store->{struc}{$role}{name} }
         ) {
             my $set = {
                 attrs  => $name,
                 caller => $caller,
             };
 
-            if ( $store->{$role}{has}{$name} ) {
+            if ( $store->{struc}{$role}{has}{$name} ) {
                 $set->{self}         = $object;
                 $set->{obj_accessor} = 1;
+                $set->{set_has}      = 1;
             }
 
-            $set->{value} = $store->{$role}{value}{$name} if ( exists $store->{$role}{value}{$name} );
+            $set->{value} = $store->{struc}{$role}{value}{$name}
+                if ( exists $store->{struc}{$role}{value}{$name} );
 
             ____attrs($set);
         }
@@ -216,10 +228,18 @@ sub ____role_attrs {
 
 sub with {
     my $caller = scalar(caller);
-    push( @{ $roles->{$caller} }, @_ );
-    my $result = Role::Tiny->apply_roles_to_package( $caller, @_ );
+    push( @{ $store->{roles}->{$caller} }, @_ );
+
+    try {
+        Role::Tiny->apply_roles_to_package( $caller, $_ ) for @_;
+    }
+    catch ($e) {
+        $e =~ s/\s+at\s.+\sline\s\d+\.\s*$//g;
+        croak $e;
+    }
+
     ____role_attrs( $caller, [@_] );
-    return $result;
+    return;
 }
 
 sub with_roles {
@@ -257,7 +277,7 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.13
+version 1.15
 
 =for markdown [![test](https://github.com/gryphonshafer/exact-class/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact-class/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact-class/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact-class)

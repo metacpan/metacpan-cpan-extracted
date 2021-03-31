@@ -17,23 +17,25 @@ sub new {
 }
 
 sub cancel_handle {
-    my ($self, $easy) = @_;
+    my ($self, $easy, $multi) = @_;
 
-    return $self->_fail_or_cancel($easy);
+    return $self->_fail_or_cancel($easy, undef, $multi);
 }
 
 sub fail_handle {
-    my ($self, $easy, $reason) = @_;
+    my ($self, $easy, $reason, $multi) = @_;
 
-    return $self->_fail_or_cancel($easy, \$reason);
+    return $self->_fail_or_cancel($easy, \$reason, $multi);
 }
 
 sub _fail_or_cancel {
-    my ($self, $easy, $reason_sr) = @_;
+    my ($self, $easy, $reason_sr, $multi) = @_;
 
     $self->_is_pending($easy) or die "Cannot fail non-pending request!";
 
     $self->{'to_fail'}{$easy} = [ $easy, $reason_sr ];
+
+    $self->_clear_failed($multi);
 
     return $self;
 }

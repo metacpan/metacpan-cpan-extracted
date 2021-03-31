@@ -5,7 +5,7 @@
       "Tom Wyant (wyant at cpan dot org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,8 +16,6 @@
    "name" : "HTML-TableContentParser",
    "no_index" : {
       "directory" : [
-         "t",
-         "inc",
          "inc",
          "t",
          "xt"
@@ -26,12 +24,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::More" : "0.88"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
@@ -43,24 +43,19 @@
             "strict" : "0",
             "warnings" : "0"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0.88"
-         }
       }
    },
    "provides" : {
       "HTML::TableContentParser" : {
          "file" : "lib/HTML/TableContentParser.pm",
-         "version" : "0.303"
+         "version" : "0.304"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-HTML-TableContentParser/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-TableContentParser"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -71,6 +66,6 @@
          "web" : "https://github.com/trwyant/perl-HTML-TableContentParser"
       }
    },
-   "version" : "0.303",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.304",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

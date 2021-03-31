@@ -1,3 +1,7 @@
+0.045		2021-03-31	T. R. Wyant
+    Default emulate_soap_queries to true and skip SOAP tests. This is
+    because SOAP queries started failing with a 404 on March 22 2021.
+
 0.044		2021-03-17	T. R. Wyant
     Add rt.cpan.org back to bug reporting methods. Long live RT!
 

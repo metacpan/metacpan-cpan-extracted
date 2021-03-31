@@ -1,15 +1,26 @@
 use Test::More 0.98;
 
-my $class  = 'Distribution::Cooker';
+my $class;
+BEGIN { $class  = 'Distribution::Cooker' };
+my $local_class = 'Local::Cooker';
 my $module = 'Foo::Bar';
 my $dist   = 'Foo-Bar';
 my $cooker;
 
-subtest setup => sub {
-	use_ok( $class );
-	can_ok( $class, qw(pre_run run post_run) );
+package Local::Cooker {
+	use parent ( $class );
 
-	$cooker = $class->new;
+	sub template_dir { 'templates' }
+
+	sub cook { 'Buster' }
+	sub prompt { return }
+	}
+
+subtest setup => sub {
+	can_ok( $local_class, qw(pre_run run post_run) );
+
+	$cooker = $local_class->new;
+	isa_ok( $cooker, $local_class );
 	isa_ok( $cooker, $class );
 	can_ok( $cooker, qw(pre_run run post_run) );
 
@@ -22,14 +33,13 @@ subtest setup => sub {
 {
 no strict 'refs';
 no warnings 'redefine';
-local *{"${class}::cook"} = sub { 'Buster' };
-is( $class->cook, 'Buster', "cook has been mocked" );
+is( $local_class->cook, 'Buster', "cook has been overridden" );
 
 # try it with a module name
 subtest module_name => sub {
-	ok( my $cooker = $class->run( $module, 'description' ),
+	ok( my $cooker = $local_class->run( $module, 'description', $module ),
 		"run returns something that is true" );
-	isa_ok( $cooker, $class );
+	isa_ok( $cooker, $local_class );
 
 	is( $cooker->module, $module, "Set module to $module" );
 	is( $cooker->dist, $dist, "Set module to $dist" );
@@ -41,11 +51,9 @@ subtest prompting => sub {
 	my $dist   = 'Baz-Quux';
 
 	local *{"${class}::prompt"} = sub { $module };
-	is( $class->prompt, $module, "prompt has been mocked" );
 
-	ok( my $cooker = $class->run,
-		"run returns something that is true" );
-	isa_ok( $cooker, $class );
+	ok( my $cooker = $local_class->run( $module ), "run returns something that is true" );
+	isa_ok( $cooker, $local_class );
 
 	is( $cooker->module, $module, "Set module to $module" );
 	is( $cooker->dist, $dist, "Set module to $dist" );
@@ -56,10 +64,10 @@ subtest no_module_name => sub {
 	my $module = 'Baz::Quux';
 	my $dist   = 'Baz-Quux';
 
-	local *{"${class}::prompt"} = sub { return };
-	is( $class->prompt, undef, "prompt has been mocked as undef" );
+	local *{"${local_class}::prompt"} = sub { return };
+	is( $local_class->prompt, undef, "prompt has been mocked as undef" );
 
-	my $rc = eval { $class->run };
+	my $rc = eval { $local_class->run };
 	my $at = $@;
 	ok( defined $at, "eval failed for run() with no module name" );
 	};

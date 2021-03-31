@@ -6,7 +6,7 @@ use warnings;
 
 use DNS::LDNS;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 sub new {
     my ($class, $type, $str) = @_;
@@ -50,6 +50,9 @@ DNS::LDNS::RData - Rdata field or a dname in an rr
 
   rd->print(\*FILE)
   str = rd->to_string
+
+  binstr = rd->data
+  rd->set_data(binstr)
 
   count = rd->label_count
   rd2 = rd->label(pos)

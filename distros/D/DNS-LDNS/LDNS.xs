@@ -753,7 +753,7 @@ ldns_rr_new_frm_type(t)
 
 DNS__LDNS__RR
 _new_from_str(str, default_ttl, origin, prev, s)
-	const char* str;
+	SV* str;
 	uint32_t default_ttl;
 	DNS__LDNS__RData__Opt origin;
 	DNS__LDNS__RData__Opt prev;
@@ -767,10 +767,14 @@ _new_from_str(str, default_ttl, origin, prev, s)
 	    pclone = ldns_rdf_clone(prev);
         }
 
-	s = ldns_rr_new_frm_str(&rr, str, default_ttl, origin, &prev);
+	const char* strstr = SvPVbyte_nolen(str);
+
+	s = ldns_rr_new_frm_str(&rr, strstr, default_ttl, origin, (prev == NULL) ? NULL : &pclone);
 	if (prev != NULL) {
 	    prev = pclone;
 	}
+
+	RETVAL = NULL;
 
 	if (s == LDNS_STATUS_OK) {
 	    RETVAL = rr;
@@ -794,8 +798,8 @@ _new_from_file(fp, default_ttl, origin, prev, s, line_nr)
 	    ldns_rdf *pclone = NULL;
         CODE:
 
-	/* Must clone origin and prev because new_frm_fp_l may change 
- 	   them and may not (we do not know for certain). The perl layer 
+	/* Must clone origin and prev because new_frm_fp_l may change
+	   them and may not (we do not know for certain). The perl layer
 	   will take care of freeing the old structs. */
 	if (origin != NULL) {
 	    oclone = ldns_rdf_clone(origin);
@@ -805,8 +809,9 @@ _new_from_file(fp, default_ttl, origin, prev, s, line_nr)
         }
 
 	RETVAL = NULL;
-	s = ldns_rr_new_frm_fp_l(&rr, fp, &default_ttl, &oclone, &pclone, 
-	    &line_nr);
+	s = ldns_rr_new_frm_fp_l(&rr, fp, &default_ttl,
+            (origin == NULL) ? NULL : &oclone,
+            (prev == NULL) ? NULL: &pclone, &line_nr);
 
 	/* Replace the input origin with our new clone. The perl layer will
 	   take care of freeing it later. */
@@ -844,6 +849,7 @@ ldns_rr_set_owner(rr, owner)
 
 void
 ldns_rr_set_ttl(rr, ttl)
+
 	DNS__LDNS__RR rr;
 	uint32_t ttl;
 	ALIAS:
@@ -1300,6 +1306,23 @@ ldns_rdf2str(rdf)
 	ALIAS:
 	to_string = 1
 
+SV*
+data(rdf)
+       DNS__LDNS__RData rdf;
+       CODE:
+       RETVAL = newSVpvn( ldns_rdf_data(rdf), ldns_rdf_size(rdf) );
+       OUTPUT:
+       RETVAL
+
+void
+set_data(rdf, binstr)
+	DNS__LDNS__RData rdf;
+        SV* binstr;
+	CODE:
+        const char* downgrd = SvPVbyte_nolen(binstr);
+        ldns_rdf_set_data(rdf, downgrd);
+        ldns_rdf_set_size(rdf, SvCUR(binstr));
+
 void
 print(rdf, fp)
 	DNS__LDNS__RData rdf;
@@ -1384,7 +1407,7 @@ ldns_dname_compare(dname, otherdname)
 	DNS__LDNS__RData dname;
 	DNS__LDNS__RData otherdname;
 	ALIAS:
-	compare = 1
+	dname_compare = 1
 
 LDNS_RR_Type
 ldns_rdf2rr_type(rdf)
@@ -2453,6 +2476,7 @@ _send(resolver, name, type, class, flags, s)
 	    DNS__LDNS__Packet packet;
 	CODE:
 	s = ldns_resolver_send(&packet, resolver, name, type, class, flags);
+	RETVAL = NULL;
 	if (s == LDNS_STATUS_OK) {
 	    RETVAL = packet;
 	}
@@ -2469,6 +2493,7 @@ _send_pkt(resolver, packet, s)
 	    DNS__LDNS__Packet answer;
 	CODE:
 	s = ldns_resolver_send_pkt(&answer, resolver, packet);
+	RETVAL = NULL;
 	if (s == LDNS_STATUS_OK) {
 	    RETVAL = answer;
 	}
@@ -2488,6 +2513,7 @@ _prepare_query_pkt(resolver, name, type, class, flags, s)
 	    DNS__LDNS__Packet packet;
 	CODE:
 	s = ldns_resolver_prepare_query_pkt(&packet, resolver, name, type, class, flags);
+	RETVAL = NULL;
 	if (s == LDNS_STATUS_OK) {
 	    RETVAL = packet;
 	}

@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Iterator.pm
-## Version v0.1.1
+## Version v1.0.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
@@ -20,7 +20,7 @@ BEGIN
     use Module::Generic::Array;
     use Scalar::Util ();
     use Want;
-    our( $VERSION ) = 'v0.1.1';
+    our( $VERSION ) = 'v1.0.0';
 };
 
 sub init

@@ -1,6 +1,6 @@
 package Date::Holidays::GB::NIR;
 
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; our $VERSION = '0.019'; # VERSION
 
 use strict;
 use warnings;
@@ -41,7 +41,7 @@ Date::Holidays::GB::NIR - Date::Holidays class for GB-NIR (Northern Ireland)
 
 =head1 SYNOPSIS
 
-    use Date::Holidays::GB::NIR qw/ holidays is_holiday /;
+    use Date::Holidays::GB::NIR qw( holidays is_holiday );
 
     # All holidays for Northern Ireland
     my $holidays = holidays( year => 2013 );

@@ -51,3 +51,16 @@ Revision history for Perl extension DNS::LDNS.
 0.61  Fri Dec 30 14:32:00 2016
         - Bugfixes for ldns 1.7 compatibility
         - Compatibility with perl 5.25
+
+0.62  Wed Mar 31 14:44:00 2021
+        - Added methods DNS::LDNS::RData::data and DNS::LDNS::RData::set_data
+          for working with raw binary resource record data.
+        - Corrected encoding leakage problem with the DNS::LDNS::RR constructor.
+        - Renamed the method RData::compare to RData::dname_compare, avoiding
+          conflict with the other (real) RData::compare method.
+        - Fixed memory leak in DNS::LDNS::RR::_new_from_str and
+          DNS::LDNS::RR::_new_from_file.
+        - Fixed segfaults related to undefined return values from methods
+          DNS::LDNS::RR::_new_from_str, DNS::LDNS::Packet::_send,
+          DNS::LDNS::Packet::_send_pkt and
+          DNS::LDNS::Packet::_prepare_query_pkt.

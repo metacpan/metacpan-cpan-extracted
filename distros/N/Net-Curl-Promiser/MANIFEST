@@ -1,4 +1,6 @@
 .appveyor.yml
+.github/workflows/linux.yml
+.github/workflows/macos.yml
 .gitignore
 .travis.yml
 Changes
@@ -29,6 +31,7 @@ lib/Net/Curl/Promiser/Select.pm
 t/Net-Curl-Promiser-AnyEvent.t
 t/Net-Curl-Promiser-AnyEvent_reuse.t
 t/Net-Curl-Promiser-IOAsync.t
+t/Net-Curl-Promiser-IOAsync_net_curl_easy_overload.t
 t/Net-Curl-Promiser-Mojo.t
 t/Net-Curl-Promiser-Select.t
 t/Net-Curl-Promiser-Select_setopt_fail.t

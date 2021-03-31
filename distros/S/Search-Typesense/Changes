@@ -1,3 +1,9 @@
+0.08      2021-03-31 09:07:28 CEST
+
+          - Bugfix in tests: if Typesense is not running, don't SKIP tests
+            just because we don't have a server. We currently cache test
+            results.
+
 0.07      2021-03-26 13:39:29 CET
 
           - Tests can now cache their output and be rerun without a Typesense

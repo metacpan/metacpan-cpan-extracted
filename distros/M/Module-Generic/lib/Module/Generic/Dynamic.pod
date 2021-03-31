@@ -23,7 +23,7 @@ Module::Generic::Dynamic - Dynamic Object Class
 
 =head1 VERSION
 
-    v0.1.1
+    v1.0.0
 
 =head1 DESCRIPTION
 

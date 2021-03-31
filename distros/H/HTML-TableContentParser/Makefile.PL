@@ -10,62 +10,92 @@ use ExtUtils::MakeMaker;
 
 ( my $mmv = ExtUtils::MakeMaker->VERSION ) =~ s/ _ //smxg;
 
-my %arg = (
-    'AUTHOR'		=> [
+my %args = (
+    AUTHOR		=> [
 	'Simon Drabble (sdrabble@cpan.org)',
 	'Tom Wyant (wyant at cpan dot org)',
     ],
-    'ABSTRACT'		=> 'Extract tables from HTML',
-    'NAME'		=> 'HTML::TableContentParser',
-    'VERSION_FROM'	=> 'lib/HTML/TableContentParser.pm', # finds $VERSION
-    'PREREQ_PM'		=> {
+    ABSTRACT		=> 'Extract tables from HTML',
+    NAME		=> 'HTML::TableContentParser',
+    PL_FILES	=> {},	# Prevent old MakeMaker from running Build.PL
+    PREREQ_PM		=> {
 	'Carp'		=> 0,
 	'HTML::Parser'	=> 0,
 	'parent'	=> 0,
 	'strict'	=> 0,
 	'warnings'	=> 0,
     }, # e.g., Module::Name => 1.1
+    realclean	=> {
+	FILES	=> 'cover_db',
+    },
+    VERSION_FROM	=> 'lib/HTML/TableContentParser.pm', # finds $VERSION
 );
 
 $mmv >= 6.31
-    and $arg{LICENSE} = 'perl_5';
+    and $args{LICENSE} = 'perl_5';
 
-$mmv >= 6.4501 and $arg{META_MERGE} = {
-    'meta-spec'	=> {
-	version	=> 2,
-    },
-    no_index	=> {
-	directory	=> [ qw{ inc t xt } ],
-    },
-    resources => {
-	bugtracker => {
-	    web	=> 'https://github.com/trwyant/perl-HTML-TableContentParser/issues',
-	    mailto	=> 'wyant@cpan.org',
+if ( $mmv >= 6.4501 ) {
+    $args{META_ADD} = {
+	no_index	=> {
+	    directory	=> [ qw{ inc t xt } ],
 	},
-	license => 'http://dev.perl.org/licenses/',
-	repository	=> {
-	    type	=> 'git',
-	    url	=> 'git://github.com/trwyant/perl-HTML-TableContentParser.git',
-	    web	=> 'https://github.com/trwyant/perl-HTML-TableContentParser',
+    };
+    $args{META_MERGE} = {
+	'meta-spec'	=> {
+	    version	=> 2,
 	},
-    },
-    provides(),
-};
+	resources => {
+	    bugtracker => {
+		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-TableContentParser',
+		# web	=> 'https://github.com/trwyant/perl-HTML-TableContentParser/issues',
+		mailto	=> 'wyant@cpan.org',
+	    },
+	    license => 'http://dev.perl.org/licenses/',
+	    repository	=> {
+		type	=> 'git',
+		url	=> 'git://github.com/trwyant/perl-HTML-TableContentParser.git',
+		web	=> 'https://github.com/trwyant/perl-HTML-TableContentParser',
+	    },
+	},
+	provides(),
+    };
+}
+
+my %build_requires = (
+    'Test::More'	=> 0.88,
+);
+
+my %config_requires = (
+    'ExtUtils::MakeMaker'	=> 0,
+    strict	=> 0,
+    warnings	=> 0,
+);
 
 $mmv >= 6.4701
-    and $arg{MIN_PERL_VERSION} = 5.006002;
+    and $args{MIN_PERL_VERSION} = 5.006002;
 
 $mmv >= 6.5702
-    or $arg{AUTHOR} = join ', ', @{ $arg{AUTHOR} };
+    or $args{AUTHOR} = join ', ', @{ $args{AUTHOR} };
 
-$arg{ $mmv >= 6.52 ? 'CONFIGURE_REQUIRES' : 'PREREQ_PM' }
-    { 'ExtUtils::MakeMaker' } = 0;
+if ( $mmv >= 6.52 ) {
+    $args{BUILD_REQUIRES} = \%build_requires;
+    $args{CONFIGURE_REQUIRES} = \%config_requires;
+} elsif ( $mmv >= 6.5501 ) {
+    $args{BUILD_REQUIRES} = \%build_requires;
+    $args{META_MERGE}{configure_requires} = \%config_requires;
+} elsif ( $mmv >= 6.4501 ) {
+    $args{META_MERGE}{build_requires} = \%build_requires;
+    $args{META_MERGE}{configure_requires} = \%config_requires;
+} else {
+    foreach my $req ( \%build_requires, \%config_requires ) {
+	foreach my $key ( keys %{ $req } ) {
+	    exists $args{PREREQ_PM}{$key}
+		or $args{PREREQ_PM}{$key} = $req->{$key};
+	}
+    }
+}
 
-$arg{ $mmv >= 6.64 ? 'TEST_REQUIRES' :
-    $mmv >= 6.5503 ? 'BUILD_REQUIRES' : 'PREREQ_PM' }
-    { 'Test::More' } = 0.88;
-
-WriteMakefile( %arg );
+WriteMakefile( %args );
 
 sub MY::postamble {
     my ( $self, @args ) = @_;

@@ -1,4 +1,4 @@
-DNS::LDNS version 0.61
+DNS::LDNS version 0.62
 ======================
 
 DESCRIPTION
@@ -29,7 +29,7 @@ Erik Pihl Ostlyngen, erik.ostlyngen@uninett.no
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2013 by UNINETT Norid AS
+Copyright (C) 2019 by Norid AS
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.142060'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,4 +26,4 @@ resources:
   bugtracker: http://github.com/jmcnamara/excel-writer-xlsx/issues
   homepage: http://jmcnamara.github.com/excel-writer-xlsx/
   repository: http://github.com/jmcnamara/excel-writer-xlsx
-version: '1.07'
+version: '1.08'

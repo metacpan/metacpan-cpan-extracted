@@ -8,6 +8,8 @@ use lib qw{ inc };
 use My::Module::Test;
 use Data::Dumper;
 
+use constant TEST_SOAP	=> $ENV{ASTRO_SIMBAD_CLIENT_USE_SOAP};
+
 local $Data::Dumper::Terse = 1;
 local $Data::Dumper::Sortkeys = 1;
 
@@ -34,50 +36,56 @@ foreach my $scheme ( qw{ http https } ) {
 
 	call( set => scheme => $scheme );
 
-	TODO: {
-	    local $TODO = 'SOAP vo queries are deprecated';
-	    local $SIG{__WARN__} = sub {};	# Ignore warnings.
+	if ( TEST_SOAP ) {
 
-	    echo( <<'EOD' );
+	    call( set => emulate_soap_queries => 0 );
+
+	    TODO: {
+		local $TODO = 'SOAP vo queries are deprecated';
+		local $SIG{__WARN__} = sub {};	# Ignore warnings.
+
+		echo( <<'EOD' );
 
 The following tests use the query (SOAP) interface
 
 EOD
 
-	    silent( hidden( 'SOAP::Lite' ) );
-	    call( query => id => 'Arcturus' );
-	    silent( 0 );
+		silent( hidden( 'SOAP::Lite' ) );
+		call( query => id => 'Arcturus' );
+		silent( 0 );
 
-	    count();
-	    test( 1, 'query id Arcturus (vo) - count of tables' );
+		count();
+		test( 1, 'query id Arcturus (vo) - count of tables' );
 
-	    deref( 0, 'data' );
-	    count();
-	    test( 1, 'query id arcturus (vo) - count of rows' );
+		deref( 0, 'data' );
+		count();
+		test( 1, 'query id arcturus (vo) - count of rows' );
 
-	    deref( 0, data => 0, 0, 'value' );
-	    test( canned( arcturus => 'name' ), 'query id Arcturus (vo) - name' );
+		deref( 0, data => 0, 0, 'value' );
+		test( canned( arcturus => 'name' ), 'query id Arcturus (vo) - name' );
 
-	    deref( 0, data => 0, 2, 'value' );
-	    test( canned( arcturus => 'ra' ), 'query id Arcturus (vo) - right ascension' );
+		deref( 0, data => 0, 2, 'value' );
+		test( canned( arcturus => 'ra' ), 'query id Arcturus (vo) - right ascension' );
 
-	    deref( 0, data => 0, 3, 'value' );
-	    test( canned( arcturus => 'dec' ), 'query id Arcturus (vo) - declination' );
+		deref( 0, data => 0, 3, 'value' );
+		test( canned( arcturus => 'dec' ), 'query id Arcturus (vo) - declination' );
 
-	    deref( 0, data => 0, 4, 'value' );
-	    test( canned( arcturus => 'plx' ), 'query id Arcturus (vo) - parallax' );
+		deref( 0, data => 0, 4, 'value' );
+		test( canned( arcturus => 'plx' ), 'query id Arcturus (vo) - parallax' );
 
-	    deref( 0, data => 0, 5, 'value' );
-	    test( canned( arcturus => 'pmra' ),
-		'query id Arcturus (vo) - proper motion in right ascension' );
+		deref( 0, data => 0, 5, 'value' );
+		test( canned( arcturus => 'pmra' ),
+		    'query id Arcturus (vo) - proper motion in right ascension' );
 
-	    deref( 0, data => 0, 6, 'value' );
-	    test( canned( arcturus => 'pmdec' ),
-		'query id Arcturus (vo) - proper motion in declination' );
+		deref( 0, data => 0, 6, 'value' );
+		test( canned( arcturus => 'pmdec' ),
+		    'query id Arcturus (vo) - proper motion in declination' );
 
-	    deref( 0, data => 0, 7, 'value' );
-	    test( canned( arcturus => 'radial' ),
-		'query id Arcturus (vo) - radial velocity' );
+		deref( 0, data => 0, 7, 'value' );
+		test( canned( arcturus => 'radial' ),
+		    'query id Arcturus (vo) - radial velocity' );
+
+	    }
 
 	}
 

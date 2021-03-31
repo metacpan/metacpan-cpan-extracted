@@ -1,4 +1,4 @@
-use Test::More tests => 18;
+use Test::More tests => 20;
 
 use DNS::LDNS ':all';
 
@@ -32,6 +32,11 @@ ok($dn3->is_subdomain($dn2), 'sub.other.org is subdomain of other.org');
 ok(!$dn2->is_subdomain($dn3), 'other.org is not subdomain of sub.other.org');
 is($dn3->label_count, 3, 'sub.other.org has 3 labels');
 is($dn3->label(1)->to_string, 'other.', 'label 1 of sub.other.org is other.');
+
+is($dn1->data(), "\5azone\3org\5other\3org\0", 'data()');
+
+$dn1->set_data("\5foo\3com\5bar\3net\0");
+is($dn1->data(), "\5foo\3com\5bar\3net\0", 'set_data()');
 
 my $dni = new DNS::LDNS::RData(
     LDNS_RDF_TYPE_DNAME, 'not..valid.org');

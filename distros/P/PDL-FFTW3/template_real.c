@@ -33,7 +33,9 @@
     unsigned long nelem = 1;
     for( int i=0; i<=RANK; i++ )
       nelem *= $PDL(complexv)->dims[i];
-    $GENERIC()* input_copy = $TFD(fftwf_,fftw_)alloc_real( nelem );
+    unsigned long elem_scale = sizeof($GENERIC()) / sizeof( $TFD(float,double) ); /* native complex */
+    /* explicit C types here means when changed to $TGC will still be right */
+    $TFD(float,double)* input_copy = $TFD(fftwf_,fftw_)alloc_real( nelem * elem_scale );
     memcpy( input_copy, $P(complexv), sizeof($GENERIC()) * nelem );
 
     $TFD(fftwf_,fftw_)execute_dft_c2r( plan,

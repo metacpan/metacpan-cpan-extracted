@@ -6,7 +6,7 @@ use warnings;
 
 use DNS::LDNS;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 sub rrset {
     my $self = shift;

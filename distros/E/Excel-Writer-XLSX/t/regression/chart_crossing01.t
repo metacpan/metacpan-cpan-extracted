@@ -2,7 +2,7 @@
 #
 # Tests the output of Excel::Writer::XLSX against Excel generated files.
 #
-# Copyright 2000-2020, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2021, John McNamara, jmcnamara@cpan.org
 #
 
 use lib 't/lib';
@@ -54,7 +54,7 @@ $chart->add_series( values => '=Sheet1!$C$1:$C$5' );
 
 $chart->set_y_axis( crossing => 'max');
 
-# Not stictly required. Just to match reference file.
+# Not strictly required. Just to match reference file.
 $chart->set_x_axis( position => 't' );
 
 $worksheet->insert_chart( 'E9', $chart );

@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Exception.pm
-## Version v0.1.2
+## Version v1.0.0
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
@@ -22,7 +22,7 @@ BEGIN
                   '!='     => sub { !_obj_eq(@_) },
                   fallback => 1,
                  );
-    our( $VERSION ) = 'v0.1.2';
+    our( $VERSION ) = 'v1.0.0';
     our( $CALLER_LEVEL, $CALLER_INTERNAL );
     $CALLER_LEVEL = 0;
     $CALLER_INTERNAL->{'Module::Generic'}++;

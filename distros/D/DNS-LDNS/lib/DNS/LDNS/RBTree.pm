@@ -6,7 +6,7 @@ use warnings;
 
 use DNS::LDNS;
 
-our $VERSION = '0.61';
+our $VERSION = '0.62';
 
 # Note: Since this class does not have a constructor, we can let its child
 # objects be owned by the parent. This reduces the recursion depth on

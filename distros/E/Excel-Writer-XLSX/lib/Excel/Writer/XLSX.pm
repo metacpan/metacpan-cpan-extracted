@@ -4,7 +4,7 @@ package Excel::Writer::XLSX;
 #
 # Excel::Writer::XLSX - Create a new file in the Excel 2007+ XLSX format.
 #
-# Copyright 2000-2020, John McNamara, jmcnamara@cpan.org
+# Copyright 2000-2021, John McNamara, jmcnamara@cpan.org
 #
 # Documentation after __END__
 #
@@ -17,7 +17,7 @@ use Exporter;
 use Excel::Writer::XLSX::Workbook;
 
 our @ISA     = qw(Excel::Writer::XLSX::Workbook Exporter);
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 
 ###############################################################################
@@ -155,6 +155,7 @@ The Excel::Writer::XLSX module provides an object oriented interface to a new Ex
     set_optimization()
     set_calc_mode()
     get_default_url_format()
+    read_only_recommended()
 
 If you are unfamiliar with object oriented interfaces or the way that they are implemented in Perl have a look at C<perlobj> and C<perltoot> in the main Perl documentation.
 
@@ -692,6 +693,15 @@ The C<get_default_url_format()> method gets a copy of the default url format use
 
 
 
+=head2 read_only_recommended()
+
+The C<read_only_recommended()> method can be used to set the Excel "Read-only Recommended" option that is available when saving a file. This presents the user of the file with an option to open it in "read-only" mode. This means that any changes to the file can't be saved back to the same file and must be saved to a new file. It can be set as follows:
+
+    $workbook->read_only_recommended();
+
+
+
+
 =head1 WORKSHEET METHODS
 
 A new worksheet is created by calling the C<add_worksheet()> method from a workbook object:
@@ -732,6 +742,7 @@ The following methods are available through a new worksheet:
     hide()
     set_first_sheet()
     protect()
+    unprotect_range()
     set_selection()
     set_row()
     set_default_row()
@@ -749,7 +760,7 @@ The following methods are available through a new worksheet:
     filter_column()
     filter_column_list()
     set_vba_name()
-
+    ignore_errors()
 
 
 =head2 Cell notation
@@ -1712,6 +1723,8 @@ The optional C<options> hash/hashref parameter can be used to set various option
         object_position => 2,
         url             => undef,
         tip             => undef,
+        description     => $filename,
+        decorative      => 0,
     );
 
 The parameters C<x_offset> and C<y_offset> can be used to specify an offset from the top left hand corner of the cell specified by C<$row> and C<$col>. The offset values are in pixels.
@@ -1724,7 +1737,6 @@ The parameters C<x_scale> and C<y_scale> can be used to scale the inserted image
 
     # Scale the inserted image: width x 2.0, height x 0.8
     $worksheet->insert_image( 'A1', 'perl.bmp', { y_scale => 2, y_scale => 0.8 } );
-
 
 The positioning of the image when cells are resized can be set with the C<object_position> parameter:
 
@@ -1754,6 +1766,15 @@ The C<tip> option can be use to used to add a mouseover tip to the hyperlink:
             tip => 'GitHub'
         }
     );
+
+The C<description> parameter can be used to specify a description or "alt text" string for the image. In general this would be used to provide a text description of the image to help accessibility. It is an optional parameter and defaults to the filename of the image. It can be used as follows:
+
+    $worksheet->insert_image( 'E9', 'logo.png',
+                              {description => "This is some alternative text"} );
+
+The optional C<decorative> parameter is also used to help accessibility. It is used to mark the image as decorative, and thus uninformative, for automated screen readers. As in Excel, if this parameter is in use the C<description> field isn't written. It is used as follows:
+
+    $worksheet->insert_image( 'E9', 'logo.png', {decorative => 1} );
 
 Note: you must call C<set_row()> or C<set_column()> before C<insert_image()> if you wish to change the default dimensions of any of the rows or columns that the image occupies. The height of a row can also change if you use a font that is larger than the default. This in turn will affect the scaling of your image. To avoid this you should explicitly set the height of the row using C<set_row()> if it contains a font size that will change the row height.
 
@@ -2134,6 +2155,23 @@ For chartsheets the allowable options and default values are:
         objects               => 1,
         content               => 1,
     );
+
+
+
+
+=head2 unprotect_range( $cell_range, $range_name )
+
+
+The C<unprotect_range()> method is used to unprotect ranges in a protected worksheet. It can be used to set a single range or multiple ranges:
+
+    $worksheet->unprotect_range( 'A1' );
+    $worksheet->unprotect_range( 'C1' );
+    $worksheet->unprotect_range( 'E1:E3' );
+    $worksheet->unprotect_range( 'G1:K100' );
+
+As in Excel the ranges are given sequential names like C<Range1> and C<Range2> but a user defined name can also be specified:
+
+    $worksheet->unprotect_range( 'G4:I6', 'MyRange' );
 
 
 
@@ -2563,7 +2601,6 @@ B<NOTE:> It isn't sufficient to just specify the filter condition. You must also
 
 
 
-
 =head2 convert_date_time( $date_string )
 
 The C<convert_date_time()> method is used internally by the C<write_date_time()> method to convert date strings to a number that represents an Excel date and time.
@@ -2572,13 +2609,76 @@ It is exposed as a public method for utility purposes.
 
 The C<$date_string> format is detailed in the C<write_date_time()> method.
 
-=head2 Worksheet set_vba_name()
 
-The Worksheet C<set_vba_name()> method can be used to set the VBA codename for the
-worksheet (there is a similar method for the workbook VBA name). This is sometimes required when a C<vbaProject> macro included via C<add_vba_project()> refers to the worksheet. The default Excel VBA name of C<Sheet1>, etc., is used if a user defined name isn't specified.
+
+=head2 set_vba_name()
+
+The Worksheet C<set_vba_name()> method can be used to set the VBA codename for the worksheet (there is a similar method for the workbook VBA name). This is sometimes required when a C<vbaProject> macro included via C<add_vba_project()> refers to the worksheet. The default Excel VBA name of C<Sheet1>, etc., is used if a user defined name isn't specified.
 
 See also L<WORKING WITH VBA MACROS>.
 
+
+
+=head2 ignore_errors()
+
+The C<ignore_errors()> method can be used to ignore various worksheet cell errors/warnings. For example the following code writes a string that looks like a number:
+
+    $worksheet->write_string('D2', '123');
+
+This causes Excel to display a small green triangle in the top left hand corner of the cell to indicate an error/warning.
+
+Sometimes these warnings are useful indicators that there is an issue in the spreadsheet but sometimes it is preferable to turn them off. Warnings can be turned off at the Excel level for all workbooks and worksheets by using the using "Excel options -> Formulas -> Error checking rules". Alternatively you can turn them off for individual cells in a worksheet, or ranges of cells, using the C<ignore_errors()> method with a hashref of options and ranges like this:
+
+    $worksheet->ignore_errors({number_stored_as_text => 'A1:H50'});
+
+    # Or for more than one option:
+    $worksheet->ignore_errors({number_stored_as_text => 'A1:H50',
+                               eval_error =>            'A1:H50'});
+
+The range can be a single cell, a range of cells, or multiple cells and ranges separated by spaces:
+
+    # Single cell.
+    $worksheet->ignore_errors({eval_error => 'C6'});
+
+    # Or a single range:
+    $worksheet->ignore_errors({eval_error => 'C6:G8'});
+
+    # Or multiple cells and ranges:
+    $worksheet->ignore_errors({eval_error => 'C6 E6 G1:G20 J2:J6'});
+
+Note: calling C<ignore_errors> multiple times will overwrite the previous settings.
+
+You can turn off warnings for an entire column by specifying the range from the first cell in the column to the last cell in the column:
+
+    $worksheet->ignore_errors({number_stored_as_text => 'A1:A1048576'});
+
+Or for the entire worksheet by specifying the range from the first cell in the worksheet to the last cell in the worksheet:
+
+    $worksheet->ignore_errors({number_stored_as_text => 'A1:XFD1048576'});
+
+The worksheet errors/warnings that can be ignored are:
+
+=over
+
+=item * C<number_stored_as_text>: Turn off errors/warnings for numbers stores as text.
+
+=item * C<eval_error>: Turn off errors/warnings for formula errors (such as divide by zero).
+
+=item * C<formula_differs>: Turn off errors/warnings for formulas that differ from surrounding formulas.
+
+=item * C<formula_range>: Turn off errors/warnings for formulas that omit cells in a range.
+
+=item * C<formula_unlocked>: Turn off errors/warnings for unlocked cells that contain formulas.
+
+=item * C<empty_cell_reference>: Turn off errors/warnings for formulas that refer to empty cells.
+
+=item * C<list_data_validation>: Turn off errors/warnings for cells in a table that do not comply with applicable data validation rules.
+
+=item * C<calculated_column>: Turn off errors/warnings for cell formulas that differ from the column formula.
+
+=item * C<two_digit_text_year>: Turn off errors/warnings for formulas that contain a two digit text representation of a year.
+
+=back
 
 
 =head1 PAGE SET-UP METHODS
@@ -7077,6 +7177,7 @@ different features and options of the module. See L<Excel::Writer::XLSX::Example
     hyperlink1.pl           Shows how to create web hyperlinks.
     hyperlink2.pl           Examples of internal and external hyperlinks.
     indent.pl               An example of cell indentation.
+    ignore_errors.pl        An example of turning off worksheet cells errors/warnings.
     macros.pl               An example of adding macros from an existing file.
     merge1.pl               A simple example of cell merging.
     merge2.pl               A simple example of cell merging with formatting.
@@ -7623,6 +7724,6 @@ John McNamara jmcnamara@cpan.org
 
 =head1 COPYRIGHT
 
-Copyright MM-MMXX, John McNamara.
+Copyright MM-MMXXI, John McNamara.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as Perl itself.

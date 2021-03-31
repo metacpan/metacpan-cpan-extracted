@@ -24,7 +24,7 @@ Module::Generic::Exception - Generic Module Exception Class
 
 =head1 VERSION
 
-    v0.1.2
+    v1.0.0
 
 =head1 DESCRIPTION
 

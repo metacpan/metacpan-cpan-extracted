@@ -20,10 +20,11 @@ my %WriteMakefileArgs = (
     "JSON::XS" => 0,
     "LWP::Protocol::https" => 0,
     "LWP::UserAgent" => 0,
-    "Mouse" => 0,
+    "Moo" => 0,
     "Net::Curl::Simple" => 0,
     "Try::Tiny" => 0,
-    "URI" => 0
+    "URI" => 0,
+    "URI::Escape" => 0
   },
   "TEST_REQUIRES" => {
     "Dancer" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::TCP" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "1.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,12 +50,13 @@ my %FallbackPrereqs = (
   "JSON::XS" => 0,
   "LWP::Protocol::https" => 0,
   "LWP::UserAgent" => 0,
-  "Mouse" => 0,
+  "Moo" => 0,
   "Net::Curl::Simple" => 0,
   "Test::More" => 0,
   "Test::TCP" => 0,
   "Try::Tiny" => 0,
-  "URI" => 0
+  "URI" => 0,
+  "URI::Escape" => 0
 );
 
 

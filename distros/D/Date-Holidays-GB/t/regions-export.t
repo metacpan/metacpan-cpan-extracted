@@ -9,7 +9,7 @@ binmode $builder->failure_output, ":utf8";
 binmode $builder->todo_output,    ":utf8";
 
 use Date::Holidays::GB;
-use Date::Holidays::GB::EAW qw/ is_holiday holidays /;
+use Date::Holidays::GB::EAW qw( is_holiday holidays );
 
 open( my $fh, '<:encoding(utf-8)', 't/samples/2013-holidays' )
     or die "Can't open 2013-holidays: $!";

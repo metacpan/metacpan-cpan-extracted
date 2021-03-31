@@ -1,5 +1,7 @@
 package Search::Typesense::Document;
 
+# ABSTRACT: CRUD for Typesense documents
+
 use v5.16.0;
 
 use Moo;
@@ -16,32 +18,9 @@ use Search::Typesense::Types qw(
   compile
 );
 
-=head1 NAME
 
-Search::Typesense::Document - CRUD for Typesense documents
+our $VERSION = '0.08';
 
-=head1 SYNOPSIS
-
-    my $typesense = Search::Typesense->new(
-        host    => $host,
-        api_key => $key,
-    );
-    my $documents = $typesense->documents;
-
-The instantiation of this module is for internal use only. The methods are
-public.
-
-=cut
-
-our $VERSION = '0.07';
-
-=head2 C<create>
-
-    my $document = $typesense->documents->create($collection, \%data);
-
-Arguments and response as shown at L<https://typesense.org/docs/0.19.0/api/#index-document>
-
-=cut
 
 sub create {
     my ( $self, $collection, $document ) = @_;
@@ -53,13 +32,6 @@ sub create {
     );
 }
 
-=head2 C<upsert>
-
-    my $document = $typesense->documents->upsert($collection, \%data);
-
-Arguments and response as shown at L<https://typesense.org/docs/0.19.0/api/#upsert>
-
-=cut
 
 sub upsert {
     my ( $self, $collection, $document ) = @_;
@@ -73,13 +45,6 @@ sub upsert {
     );
 }
 
-=head2 C<update>
-
-    my $document = $typesense->documents->update($collection, $document_id, \%data);
-
-Arguments and response as shown at L<https://typesense.org/docs/0.19.0/api/#update-document>
-
-=cut
 
 sub update {
     my ( $self, $collection, $document_id, $updates ) = @_;
@@ -92,13 +57,6 @@ sub update {
     );
 }
 
-=head2 C<delete>
-
-    my $document = $typesense->documents->delete($collection_name, $document_id);
-
-Arguments and response as shown at L<https://typesense.org/docs/0.19.0/api/#delete-document>
-
-=cut
 
 sub delete {
     my ( $self, $collection, $document_id ) = @_;
@@ -108,15 +66,6 @@ sub delete {
         path => [ 'collections', $collection, 'documents', $document_id ] );
 }
 
-=head2 C<export>
-
-    my $export = $typesense->documents->export($collection_name);
-
-Response as shown at L<https://typesense.org/docs/0.19.0/api/#export-documents>
-
-(An arrayref of hashrefs)
-
-=cut
 
 sub export {
     my ( $self, $collection ) = @_;
@@ -129,19 +78,6 @@ sub export {
     return [ map { decode_json($_) } split /\n/ => $tx->res->body ];
 }
 
-=head2 C<import>
-
-    my $response = $typesense->documents->import(
-      $collection_name,
-      $action,
-      \@documents,
-   );
-
-Response as shown at L<https://typesense.org/docs/0.19.0/api/#import-documents>
-
-C<$action> must be one of C<create>, C<update>, or C<upsert>.
-
-=cut
 
 sub import {
     my $self = shift;
@@ -168,3 +104,84 @@ sub import {
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Search::Typesense::Document - CRUD for Typesense documents
+
+=head1 VERSION
+
+version 0.08
+
+=head1 SYNOPSIS
+
+    my $typesense = Search::Typesense->new(
+        host    => $host,
+        api_key => $key,
+    );
+    my $documents = $typesense->documents;
+
+The instantiation of this module is for internal use only. The methods are
+public.
+
+=head2 C<create>
+
+    my $document = $typesense->documents->create($collection, \%data);
+
+Arguments and response as shown at L<https://typesense.org/docs/0.19.0/api/#index-document>
+
+=head2 C<upsert>
+
+    my $document = $typesense->documents->upsert($collection, \%data);
+
+Arguments and response as shown at L<https://typesense.org/docs/0.19.0/api/#upsert>
+
+=head2 C<update>
+
+    my $document = $typesense->documents->update($collection, $document_id, \%data);
+
+Arguments and response as shown at L<https://typesense.org/docs/0.19.0/api/#update-document>
+
+=head2 C<delete>
+
+    my $document = $typesense->documents->delete($collection_name, $document_id);
+
+Arguments and response as shown at L<https://typesense.org/docs/0.19.0/api/#delete-document>
+
+=head2 C<export>
+
+    my $export = $typesense->documents->export($collection_name);
+
+Response as shown at L<https://typesense.org/docs/0.19.0/api/#export-documents>
+
+(An arrayref of hashrefs)
+
+=head2 C<import>
+
+    my $response = $typesense->documents->import(
+      $collection_name,
+      $action,
+      \@documents,
+   );
+
+Response as shown at L<https://typesense.org/docs/0.19.0/api/#import-documents>
+
+C<$action> must be one of C<create>, C<update>, or C<upsert>.
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe <ovid@allaroundtheworld.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Curtis "Ovid" Poe.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

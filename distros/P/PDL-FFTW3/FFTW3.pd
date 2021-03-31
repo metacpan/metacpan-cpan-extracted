@@ -19,7 +19,7 @@ use warnings;
 # I generate code for up to 10-dimensional FFTs
 my $maxrank = 10;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 pp_setversion($VERSION);
 
 pp_addpm( {At => 'Top'}, slurp('README.pod') . <<'EOF' );
@@ -208,6 +208,32 @@ EOF
   $pp_def{Code} =~ s/\*2//g; # the sizeof-doubling
   $pp_def{GenericTypes} = [qw(G C)];
   pp_def( "__Nfft$rank", %pp_def );
+
+  ##################################################################################
+  ####### native complex-real
+  @dims_real    = @dims;
+  @dims_complex = @dims;
+  $dims_complex[0] = 'nhalf'; # first complex dim is real->dim(0)/2+1
+  $dims_real_string    = join(',', @dims_real);
+  $dims_complex_string = join(',', @dims_complex);
+  $code_real          =  slurp('template_real.c');
+  $code_real             =~ s/RANK/$rank-1/ge;
+  $code_real_forward  =  $code_real;
+  $code_real_backward =  $code_real;
+  $code_real_forward  =~ s/INVERSE/0/g;
+  $code_real_backward =~ s/INVERSE/1/g;
+
+  # backward
+  $pp_def{RedoDimsCode} = <<'EOF';
+if( $PDL(real)->dims[0] <= 0 )
+  $SIZE(n1) = 2*$PDL(complexv)->dims[0] - 2;
+EOF
+  $pp_def{Pars} = "complexv($dims_complex_string); real [o]real($dims_real_string);";
+  $code_real_backward =~ s/TFD/TGC/g;
+  $code_real_backward =~ s/\*2//g; # the sizeof-doubling
+  $pp_def{Code} = $code_real_backward;
+  $pp_def{GenericTypes} = [qw(G C)];
+  pp_def( "__irNfft$rank", %pp_def );
 }
 
 sub slurp

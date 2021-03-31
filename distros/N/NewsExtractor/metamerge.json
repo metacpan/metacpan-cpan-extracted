@@ -1,5 +1,8 @@
 {
     "name": "NewsExtractor",
+    "license" : [
+        "unrestricted"
+    ],
     "x_static_install": true,
     "resources": {
         "bugtracker": {

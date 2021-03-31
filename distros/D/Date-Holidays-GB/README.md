@@ -1,10 +1,10 @@
 # NAME
 
-Date::Holidays::GB - Determine British holidays - Current UK public and bank holiday dates up to 2021
+Date::Holidays::GB - Determine British holidays - Current UK public and bank holiday dates up to 2022
 
 # SYNOPSIS
 
-    use Date::Holidays::GB qw/ holidays is_holiday next_holiday /;
+    use Date::Holidays::GB qw( holidays is_holiday next_holiday );
 
     # All UK holidays
     my $holidays = holidays( year => 2013 );
@@ -69,12 +69,12 @@ module - Bank Holidays are not the same throughout the UK!
 ## holidays
 
     # year, month, day, [regions]
-    my $holidays = Date::Holidays::GB->holidays( @args );
+    my $holidays = holidays( @args );
 
 or
 
     # ( year => ..., month => ..., day => ..., [ regions => \@. .. ] )
-    my $holidays = Date::Holidays::GB->holidays( %args );
+    my $holidays = holidays( %args );
 
 Returns hashref of holiday dates, values are a string listing the holiday(s)
 taking place on that date, with the region name(s) in parenthesis.
@@ -87,18 +87,18 @@ Date keys are in the format MMDD, as per the behaviour of [Date::Holidays](https
 ## is\_holiday
 
     # year, month, day, [regions]
-    my $holiday = Date::Holidays::GB->is_holiday( @args );
+    my $holiday = is_holiday( @args );
 
 or
 
     # date in YYYY-MM-DD format
     # ( date => ..., [ regions => \@. .. ] )
-    my $holiday = Date::Holidays::GB->is_holiday( %args );
+    my $holiday = is_holiday( %args );
 
 or
 
     # ( year => ..., month => ..., day => ..., [ regions => \@. .. ] )
-    my $holiday = Date::Holidays::GB->is_holiday( %args );
+    my $holiday = is_holiday( %args );
 
 Returns the holiday details (as per `holidays`) but for a single date.
 Returns false if the specified date is not a holiday in the appropriate
@@ -106,7 +106,7 @@ region(s).
 
 ## next\_holiday
 
-    my $next_holiday = Date::Holidays::GB->next_holiday( @regions );
+    my $next_holiday = next_holiday( @regions );
 
 Returns the holiday details for the next holiday in the specified regions.
 If no regions are specified, returns the next holiday dates for all regions.
@@ -115,7 +115,7 @@ The `all` key in the results is the next holiday observed by all regions.
 
 ## date\_generated
 
-    print Date::Holidays::GB->date_generated;
+    print Date::Holidays::GB::date_generated;
 
 Prints the date that the data was downloaded, in YYYY-MM-DD format.
 
@@ -168,7 +168,7 @@ Michael Jemmeson <mjemmeson@cpan.org>
 
 # COPYRIGHT
 
-This software is copyright (c) 2013-2020 by Michael Jemmeson.
+This software is copyright (c) 2013-2021 by Michael Jemmeson.
 
 # LICENSE
 

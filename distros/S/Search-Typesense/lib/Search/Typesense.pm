@@ -1,5 +1,7 @@
 package Search::Typesense;
 
+# ABSTRACT: Perl interface to the Typesense search engine
+
 use v5.16.0;
 
 use Moo;
@@ -24,51 +26,8 @@ use Search::Typesense::Types qw(
   compile
 );
 
-=head1 NAME
 
-Search::Typesense - Perl interface to Typesense search engine.
-
-=head1 SYNOPSIS
-
-    my $typesense = Search::Typesense->new(
-        host      => $host,    # required
-        api_key   => $key,     # required
-        port      => $port,    # defaults to 8108
-        use_https => $bool,    # defaults to true
-    );
-    
-    my $results = $typesense->search(
-        $collection_name,
-        { q => 'Search String' },
-    );
-    if ( $results->{found} ) {
-        foreach my $hit ( @{ $results->{hits} } ) {
-            ...;
-        }
-    }
-
-L<Check here for a comparison to ElasticSearch and similar technologies|https://typesense.org/typesense-vs-algolia-vs-elasticsearch-vs-meilisearch/>.
-
-=head1 DESCRIPTION
-
-B<ALPHA CODE>. The interface can and will change without warning.
-
-This is an interface to the L<Typesense|https://typesense.org/> search
-engine. Most methods will do one of three things:
-
-=over 4
-
-=item * Return results as defined in the Typesense documentation (listed per section)
-
-=item * Return nothing if Typesense returns a 404.
-
-=item * C<croak> if Typesense returns an error.
-
-=back
-
-=cut
-
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 has collections => (
     is       => 'lazy',
@@ -169,6 +128,74 @@ sub BUILD {
     $self->assert_is_running;
 }
 
+
+sub assert_is_running {
+    my $self = shift;
+    $self->_GET( path => ['health'] );
+}
+
+
+sub typesense_version {
+    my $self   = shift;
+    my $result = $self->_GET( path => ['debug'] ) or return;
+    return Search::Typesense::Version->new(
+        version_string => $result->{version} );
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Search::Typesense - Perl interface to the Typesense search engine
+
+=head1 VERSION
+
+version 0.08
+
+=head1 SYNOPSIS
+
+    my $typesense = Search::Typesense->new(
+        host      => $host,    # required
+        api_key   => $key,     # required
+        port      => $port,    # defaults to 8108
+        use_https => $bool,    # defaults to true
+    );
+    
+    my $results = $typesense->search(
+        $collection_name,
+        { q => 'Search String' },
+    );
+    if ( $results->{found} ) {
+        foreach my $hit ( @{ $results->{hits} } ) {
+            ...;
+        }
+    }
+
+L<Check here for a comparison to ElasticSearch and similar technologies|https://typesense.org/typesense-vs-algolia-vs-elasticsearch-vs-meilisearch/>.
+
+=head1 DESCRIPTION
+
+B<ALPHA CODE>. The interface can and will change without warning.
+
+This is an interface to the L<Typesense|https://typesense.org/> search
+engine. Most methods will do one of three things:
+
+=over 4
+
+=item * Return results as defined in the Typesense documentation (listed per section)
+
+=item * Return nothing if Typesense returns a 404.
+
+=item * C<croak> if Typesense returns an error.
+
+=back
+
 =head1 CONSTRUCTOR
 
 The constructor takes a list (or hashref) of key/value pairs.
@@ -233,13 +260,6 @@ Returns an instance of L<Search::Typesense::Document> for managing Typesense doc
 This does nothing if we can connect to Typesense. Otherwise, this method will
 C<croak> with a message explaining the error.
 
-=cut
-
-sub assert_is_running {
-    my $self = shift;
-    $self->_GET( path => ['health'] );
-}
-
 =head2 C<typesense_version>
 
     my $version = $typesense->typesense_version;
@@ -248,19 +268,6 @@ Returns an instance of L<Search::Typesense::Version>.
 
 If your version of Typesense is older than C<0.8.0>, this method will return
 nothing.
-
-=cut
-
-sub typesense_version {
-    my $self   = shift;
-    my $result = $self->_GET( path => ['debug'] ) or return;
-    return Search::Typesense::Version->new(
-        version_string => $result->{version} );
-}
-
-1;
-
-__END__
 
 =head1 INTERNATIONALIZATION (I18N)
 
@@ -314,3 +321,16 @@ This software is Copyright (c) 2021 by Curtis "Ovid" Poe.
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe <ovid@allaroundtheworld.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Curtis "Ovid" Poe.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

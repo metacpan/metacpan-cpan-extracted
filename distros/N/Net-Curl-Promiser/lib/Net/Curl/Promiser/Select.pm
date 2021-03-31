@@ -63,7 +63,7 @@ sub get_fds {
 
 #----------------------------------------------------------------------
 
-=head1 C<process( $READ_MASK, $WRITE_MASK )>
+=head2 $obj = I<OBJ>->process( $READ_MASK, $WRITE_MASK )
 
 Tell the underlying L<Net::Curl::Multi> object which socket events have
 happened. $READ_MASK and $WRITE_MASK are as “left” by Perl’s
@@ -119,7 +119,7 @@ sub time_out {
 Like libcurl’s L<curl_multi_timeout(3)>, but sometimes returns different
 values depending on the needs of I<OBJ>.
 
-(NB: This value is in I<milliseconds>.)
+(NB: This value is in I<seconds>, not milliseconds.)
 
 This should only be called (if it’s called at all) from event loop logic.
 

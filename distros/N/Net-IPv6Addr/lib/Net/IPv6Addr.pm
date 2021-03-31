@@ -6,31 +6,42 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT = qw();
 our @EXPORT_OK = qw(
-		       from_bigint
-		       in_network
-		       in_network_of_size
-		       ipv6_chkip
-		       ipv6_parse
-		       is_ipv6
-		       to_array
-		       to_bigint
-		       to_intarray
-		       to_string_base85
-		       to_string_compressed
-		       to_string_ip6_int
-		       to_string_ipv4
-		       to_string_ipv4_compressed
-		       to_string_preferred
-	       );
+    from_bigint
+    in_network
+    in_network_of_size
+    ipv6_chkip
+    ipv6_parse
+    is_ipv6
+    to_array
+    to_bigint
+    to_intarray
+    to_string_base85
+    to_string_compressed
+    to_string_ip6_int
+    to_string_ipv4
+    to_string_ipv4_compressed
+    to_string_preferred
+);
 
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Carp;
-use Net::IPv4Addr;
 use Math::BigInt '1.999813';
-use Math::Base85;
+
+my $base85ok;
+eval {
+    require Math::Base85;
+};
+if (! $@) {
+    $base85ok = 1;
+}
+
+sub base85ok
+{
+    return $base85ok
+}
 
 #  ____       _   _                      
 # |  _ \ __ _| |_| |_ ___ _ __ _ __  ___ 
@@ -43,14 +54,38 @@ use Math::Base85;
 
 my $h = qr/[a-f0-9]{1,4}/i;
 
-my $ipv4 = "((25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))";
+my $ipn = qr!
+    (
+	25[0-5]
+    |
+	2[0-4][0-9]
+    |
+	1[0-9]{2}
+    |
+	[1-9][0-9]
+    |
+	[0-9]
+    )
+!x;
+
+my $ipv4 = qr!($ipn\.){3}$ipn!;
+
+sub ipv4_validate
+{
+    my ($ip) = @_;
+    if ($ip !~ /$ipv4/) {
+	croak "Holy macaroni batman";
+    }
+}
 
 # base-85
 
-my $digits = $Math::Base85::base85_digits;
-$digits =~ s/-//;
-my $x = "[" . $digits . "-]";
-my $n = "{20}";
+my $base85_re;
+if ($base85ok) {
+    my $digits = $Math::Base85::base85_digits;
+    $digits =~ s/-//;
+    $base85_re = qr![$digits-]{20}!;
+}
 
 my %ipv6_patterns = (
     'preferred' => [
@@ -92,11 +127,14 @@ my %ipv6_patterns = (
 	qr/^(?:$h:){6}$ipv4$/i,
 	\&parse_mixed_ipv6v4_compressed,
     ],
-    'base85' => [
-	qr/^$x$n$/,
+);
+
+if ($base85ok) {
+    $ipv6_patterns{'base85'} = [
+	$base85_re,
 	\&ipv6_parse_base85,
     ],
-);
+}
 
 #  ____       _            _       
 # |  _ \ _ __(_)_   ____ _| |_ ___ 
@@ -212,7 +250,7 @@ sub parse_mixed_ipv6v4_compressed
     $v4addr = $v6pcs[-1];
     splice(@v6pcs, 6);
     push @result, map { hex } @v6pcs;
-    Net::IPv4Addr::ipv4_parse($v4addr);
+    ipv4_validate($v4addr);
     my @v4pcs = split(/\./, $v4addr);
     splice(@v4pcs, 4);
     push @result, unpack("n", pack("CC", @v4pcs[0,1]));
@@ -232,7 +270,7 @@ sub ipv6_parse_ipv4
     $v4addr = $v6pcs[-1];
     splice(@v6pcs, 6);
     push @result, map { hex } @v6pcs;
-    Net::IPv4Addr::ipv4_parse($v4addr);
+    ipv4_validate($v4addr);
     my @v4pcs = split(/\./, $v4addr);
     push @result, unpack("n", pack("CC", @v4pcs[0,1]));
     push @result, unpack("n", pack("CC", @v4pcs[2,3]));
@@ -255,7 +293,7 @@ sub ipv6_parse_ipv4_compressed
     $v4addr = $v6pcs[-1];
     splice(@v6pcs, 6);
     push @result, map { hex } @v6pcs;
-    Net::IPv4Addr::ipv4_parse($v4addr);
+    ipv4_validate($v4addr);
     my @v4pcs = split(/\./, $v4addr);
     splice(@v4pcs, 4);
     push @result, unpack("n", pack("CC", @v4pcs[0,1]));
@@ -267,6 +305,10 @@ sub ipv6_parse_ipv4_compressed
 
 sub ipv6_parse_base85
 {
+    if (! $base85ok) {
+	carp "Math::Base85 is not installed";
+	return ();
+    }
     my $ip = shift;
     match_or_die ($ip, 'base85');
     my $r;
@@ -469,6 +511,10 @@ sub to_string_ipv4_compressed
 
 sub to_string_base85
 {
+    if (! $base85ok) {
+	carp "Math::Base85 is not installed";
+	return undef;
+    }
     my $self = shift;
     if (ref $self ne __PACKAGE__) {
 	$self = Net::IPv6Addr->new ($self);

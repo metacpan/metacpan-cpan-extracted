@@ -10,8 +10,8 @@ use Cwd qw( realpath );
 use DateTime;
 use File::Spec::Functions qw( catfile splitpath updir );
 use JSON qw(decode_json);
-use List::Util qw( uniq );
-use LWP::Simple qw/ get /;
+use List::MoreUtils qw( uniq );
+use LWP::Simple qw( get );
 use Time::Local ();
 
 my $URL = 'http://www.gov.uk/bank-holidays.json';

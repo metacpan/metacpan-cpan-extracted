@@ -7,6 +7,7 @@ use Digest::MD5 qw(md5_hex);
 use Mojo::UserAgent::Mockable;
 use FindBin;
 use Search::Typesense::Types qw(
+  Bool
   InstanceOf
 );
 
@@ -16,6 +17,22 @@ has '+_ua' => (
     is  => 'rw',
     isa => InstanceOf ['Mojo::UserAgent'],
 );
+
+has _force_cache => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
+);
+
+sub assert_is_running {
+    my $self       = shift;
+    my $is_running = eval { $self->next::method; 1 };
+    unless ($is_running) {
+        Test::Most::diag(
+            "Typesense is not running. Falling back to cache, if possible.");
+        $self->_force_cache(1);
+    }
+}
 
 sub BUILD {
     my $self = shift;
@@ -82,6 +99,7 @@ sub _get_user_agent {
 
     # if we have PERL_TEST_TYPESENSE_MODE, assume that's the correct behavior
     # for Mojo::UserAgent, regardless of cache existence.
+    local $ENV{PERL_TEST_TYPESENSE_MODE} if $self->_force_cache;
 
     my $mode = 'record';
     if ( defined( my $override_mode = $ENV{PERL_TEST_TYPESENSE_MODE} ) ) {
@@ -110,6 +128,16 @@ sub _get_user_agent {
             if ( $current_checksum eq $cached_checksum ) {
                 $mode = 'playback';
             }
+            elsif ( $self->_force_cache ) {
+                Test::Most::diag(
+                    "Could not playback because cached checksum of $cached_checksum did not match new checksum of $current_checksum"
+                );
+            }
+        }
+        elsif ( $self->_force_cache ) {
+            Test::Most::diag(
+                "Could not playback because cached checksum file $checksum does not exist"
+            );
         }
     }
 

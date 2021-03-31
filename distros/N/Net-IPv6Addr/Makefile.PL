@@ -5,17 +5,11 @@ my $pod = 'lib/Net/IPv6Addr.pod';
 my $github = 'github.com/benkasminbullock/net-ipv6addr';
 my $repo = "https://$github";
 WriteMakefile(
-#    'AUTHOR' => 'Tony Monroe',
-    
-    # This is set for documentation generation. Tony Monroe is the
-    # author of the module.
     'AUTHOR' => 'Ben Bullock <bkb@cpan.org>',
     'NAME'	=> 'Net::IPv6Addr',
     'VERSION_FROM' => $pm,
     'ABSTRACT_FROM' => $pod,
     'PREREQ_PM' => { 
-	'Net::IPv4Addr' => '0.10', 
-	'Math::Base85' => '0.2',
 	'Carp' => '0',
 	'Math::BigInt' => '1.999813',
     },
@@ -40,6 +34,7 @@ WriteMakefile(
 	    'Ben Bullock <bkb@cpan.org>',
 	    'Neil Bowers <neilb@cpan.org>',
 	    'Salvador Fandiño García <salva@cpan.org>',
+	    'Tony Monroe',
 	],
     },
     # http://matrix.cpantesters.org/?dist=Net-IPv6Addr%200.8 gives

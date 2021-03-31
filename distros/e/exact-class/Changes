@@ -1,5 +1,12 @@
 Revision history for exact::class
 
+1.15      2021-03-30 19:57:04-07:00 America/Los_Angeles
+        - Re-allow role composition to override role-provided methods
+
+1.14      2021-03-30 18:44:34-07:00 America/Los_Angeles
+        - Role chain attrs are set-able and don't bleed
+        - Role chain class attrs are set-able and do bleed
+
 1.13      2021-03-11 08:58:31-08:00 America/Los_Angeles
         - Role class_has attributes don't cross-contaminate beyond the class
 

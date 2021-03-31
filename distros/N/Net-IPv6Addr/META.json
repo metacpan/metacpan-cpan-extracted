@@ -4,7 +4,7 @@
       "Ben Bullock <bkb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,9 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Math::Base85" : "0.2",
             "Math::BigInt" : "1.999813",
-            "Net::IPv4Addr" : "0.10",
             "perl" : "5.006000"
          }
       }
@@ -51,13 +49,14 @@
          "web" : "https://github.com/benkasminbullock/net-ipv6addr"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_contributors" : [
       "Jyrki Soini",
       "Joacim Haggmark",
       "Ben Bullock <bkb@cpan.org>",
       "Neil Bowers <neilb@cpan.org>",
-      "Salvador Fandiño García <salva@cpan.org>"
+      "Salvador Fandiño García <salva@cpan.org>",
+      "Tony Monroe"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

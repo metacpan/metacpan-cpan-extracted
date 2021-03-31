@@ -7,6 +7,7 @@ use lib qw{ inc };
 
 use My::Module::Test;
 
+use constant TEST_SOAP	=> $ENV{ASTRO_SIMBAD_CLIENT_USE_SOAP};
 
 access();
 
@@ -40,46 +41,52 @@ foreach my $scheme ( qw{ http https } ) {
 
 	call( set => scheme => $scheme );
 
-	TODO: {
-	    local $TODO = 'SOAP vo queries are deprecated';
-	    local $SIG{__WARN__} = sub {};	# Ignore warnings.
+	if ( TEST_SOAP ) {
 
-	    echo( <<'EOD' );
+	    call( set => emulate_soap_queries => 0 );
+
+	    TODO: {
+		local $TODO = 'SOAP vo queries are deprecated';
+		local $SIG{__WARN__} = sub {};	# Ignore warnings.
+
+		echo( <<'EOD' );
 
 The following tests use the query (SOAP) interface
 
 EOD
 
-	    silent( hidden( 'SOAP::Lite' ) );
-	    call( query => id => 'Arcturus' );
-	    silent( 0 );
+		silent( hidden( 'SOAP::Lite' ) );
+		call( query => id => 'Arcturus' );
+		silent( 0 );
 
-	    count();
-	    test( 1, 'query id Arcturus (txt) - number of objects returned' );
+		count();
+		test( 1, 'query id Arcturus (txt) - number of objects returned' );
 
-	    deref( 0, 'name' );
-	    test( canned( arcturus => 'name' ), 'query id Arcturus (txt) - name' );
+		deref( 0, 'name' );
+		test( canned( arcturus => 'name' ), 'query id Arcturus (txt) - name' );
 
-	    deref( 0, 'ra' );
-	    test( canned( arcturus => 'ra' ), 'query id Arcturus (txt) - right ascension' );
+		deref( 0, 'ra' );
+		test( canned( arcturus => 'ra' ), 'query id Arcturus (txt) - right ascension' );
 
-	    deref( 0, 'dec' );
-	    test( canned( arcturus => 'dec' ), 'query id Arcturus (txt) - declination' );
+		deref( 0, 'dec' );
+		test( canned( arcturus => 'dec' ), 'query id Arcturus (txt) - declination' );
 
-	    deref( 0, 'plx' );
-	    test( canned( arcturus => 'plx' ), 'query id Arcturus (txt) - parallax' );
+		deref( 0, 'plx' );
+		test( canned( arcturus => 'plx' ), 'query id Arcturus (txt) - parallax' );
 
-	    deref( 0, 'pm', 0 );
-	    test( canned( arcturus => 'pmra' ),
-		'query id Arcturus (txt) - proper motion in right ascension' );
+		deref( 0, 'pm', 0 );
+		test( canned( arcturus => 'pmra' ),
+		    'query id Arcturus (txt) - proper motion in right ascension' );
 
-	    deref( 0, 'pm', 1 );
-	    test( canned( arcturus => 'pmdec' ),
-		'query id Arcturus (txt) - proper motion in declination' );
+		deref( 0, 'pm', 1 );
+		test( canned( arcturus => 'pmdec' ),
+		    'query id Arcturus (txt) - proper motion in declination' );
 
-	    deref( 0, 'radial' );
-	    test( canned( arcturus => 'radial' ),
-		'query id Arcturus (txt) - radial velocity in recession' );
+		deref( 0, 'radial' );
+		test( canned( arcturus => 'radial' ),
+		    'query id Arcturus (txt) - radial velocity in recession' );
+	    }
+
 	}
 
 	# Maybe we're skipping because of a problem with SOAP; so we

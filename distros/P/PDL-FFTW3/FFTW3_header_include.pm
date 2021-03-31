@@ -77,8 +77,9 @@ EOF
   # I now have the arguments and the plan. Go!
   my $internal_function = 'PDL::__';
   $internal_function .=
-    $is_native ? 'N' :
+    ($is_native && !$is_real_fft) ? 'N' :
     !$is_real_fft ? '' :
+    ($is_native && $do_inverse_fft) ? 'irN' :
     $do_inverse_fft ? 'ir' :
     'r';
   $internal_function .= "fft$rank";
@@ -93,6 +94,8 @@ sub getOutArgs {
   my ($in, $is_real_fft, $do_inverse_fft) = @_;
 
   my @dims = $in->dims;
+  my $is_native = !$in->type->real;
+  my $out_type = $in->type;
 
   if ( !$is_real_fft ) {
     # complex fft. Output is the same size as the input.
@@ -112,10 +115,14 @@ sub getOutArgs {
     #
     # WITHOUT ANY OTHER INFORMATION, I ASSUME EVEN INPUT SIZES, SO I ASSUME
     #  $out->dim(0) = 2*$in->dim(1) - 2
-    shift @dims;
+    if ($is_native) {
+      $out_type = ($out_type == cfloat) ? float : double;
+    } else {
+      shift @dims;
+    }
     $dims[0] = 2*($dims[0])-2;
   }
-  ($in->type, @dims);
+  ($out_type, @dims);
 }
 
 sub validateArguments
@@ -184,10 +191,11 @@ EOF
 
 sub validateArgumentDimensions_real {
   my ( $rank, $do_inverse_fft, $thisfunction, $iarg, $arg ) = @_;
+  my $is_native = !$arg->type->real; # native complex
 
   # real FFT. Forward transform takes in real and spits out complex;
   # backward transform does the reverse
-  if ( $arg->dim(0) != 2 ) {
+  if ( !$is_native && $arg->dim(0) != 2 ) {
     my ($verb, $var);
     if ( !$do_inverse_fft && $iarg == 1 ) {
       ($verb, $var) = qw(produces output);
@@ -195,8 +203,8 @@ sub validateArgumentDimensions_real {
       ($verb, $var) = qw(takes input);
     }
     barf <<EOF if $verb;
-$thisfunction $verb complex output, so \$$var->dim(0) == 2 should be true,
-but it's not. This is the (real,imag) dimension. Giving up.
+$thisfunction $verb complex $var, so \$$var->dim(0) == 2 should be true,
+but it's not (in @{[$arg->info]}: $arg). This is the (real,imag) dimension. Giving up.
 EOF
   }
 
@@ -204,12 +212,12 @@ EOF
   if( $iarg == 0 ) {
     # The input needs at least $rank dimensions. If this is a backward
     # transform, the input is complex, so it needs an extra dimension
-    $min_dimensionality++ if $do_inverse_fft;
+    $min_dimensionality++ if $do_inverse_fft && !$is_native;
     $var = 'input';
   } else {
     # The output needs at least $rank dimensions. If this is a forward
     # transform, the output is complex, so it needs an extra dimension
-    $min_dimensionality++ if !$do_inverse_fft;
+    $min_dimensionality++ if !$do_inverse_fft && !$is_native;
     $var = 'output';
   }
   if ( $arg->ndims < $min_dimensionality ) {
@@ -245,13 +253,14 @@ sub matchDimensions_real {
     # Backward FFT. The input is complex, the output is real.
     ($varname1, $varname2, $var1, $var2) = (qw(output input), $out, $in);
   }
-  barf <<EOF if int($var1->dim(0)/2) + 1 != $var2->dim(1);
+  my $is_native = !$var2->type->real; # native complex
+  barf <<EOF if int($var1->dim(0)/2) + 1 != $var2->dim($is_native ? 0 : 1);
 $thisfunction: mismatched first dimension:
 \$$varname2->dim(1) == int(\$$varname1->dim(0)/2) + 1 wasn't true.
 Giving up.
 EOF
   for my $idim (1..$rank-1) {
-    if ( $var1->dim($idim) != $var2->dim($idim + 1) ) {
+    if ( $var1->dim($idim) != $var2->dim($idim + ($is_native ? 0 : 1)) ) {
       barf <<EOF;
 $thisfunction was given input/output matrices of non-matching sizes.
 Giving up.
@@ -281,10 +290,25 @@ sub processTypes
 $thisfunction can only generate 'float' or 'double' output. You gave an output
 of type '$out_type'. I can't change this so I give up
 EOF
-    my $targetType = ( $out_type < float ) ? (float) : $out_type;
-    forceType( $in,  $targetType );
-    forceType( $out, $targetType );
+    my $in_type = $$in->type;
+    my $in_precision = getPrecision($in_type);
+    my $out_precision = getPrecision($out_type);
+    return if $in_precision == $out_precision;
+    forceType( $in, typeWithComplexity($out_precision, !$in_type->real) );
+    forceType( $out, typeWithComplexity($out_precision, !$out_type->real) );
   }
+}
+
+sub typeWithComplexity {
+  my ($precision, $complex) = @_;
+  $complex ? ($precision == 1 ? cfloat : cdouble) :
+    $precision == 1 ? float : double;
+}
+
+sub getPrecision {
+  my ($type) = @_;
+  ($type <= float || $type == cfloat) ? 1 : # float
+  2; # double
 }
 
 sub forceType
@@ -322,7 +346,8 @@ sub getPlan
   my $Nslices = reduce {$a*$b} splice(@dims, $rank);
   $Nslices = 1 unless defined $Nslices;
 
-  my $do_double_precision = $in->get_datatype == $PDL_F ? 0 : 1;
+  my $do_double_precision = ($in->get_datatype == $PDL_F || $in->get_datatype == $PDL_CF)
+    ? 0 : 1;
   $_last_do_double_precision = $do_double_precision;
 
   my $do_inplace = is_same_data( $in, $out );
