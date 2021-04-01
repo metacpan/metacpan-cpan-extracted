@@ -123,7 +123,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -359,7 +359,6 @@ sub add_magnitudes {
     return -2.5 * log( $sum ) / log( 10 );
 }
 
-
 =item $angle = asin ($value)
 
 This subroutine calculates the arc in radians whose sine is the given
@@ -368,7 +367,6 @@ value.
 =cut
 
 sub asin {return atan2 ($_[0], sqrt (1 - $_[0] * $_[0]))}
-
 
 =item $magnitude = atmospheric_extinction ($elevation, $height);
 
@@ -396,7 +394,6 @@ values given even in the absence of cloud cover.
 #	same equation (a.k.a. the scale height) can be up to twice
 #	that.
 
-
 sub atmospheric_extinction {
     my ($elevation, $height) = @_;
     my $cosZ = cos (PIOVER2 - $elevation);
@@ -405,7 +402,6 @@ sub atmospheric_extinction {
     my $Aaer = 0.120 * exp (-$height / 1.5);	# Green 4
     return ($Aray + $Aaer + 0.016) * $X;	# Green 5, 6
 }
-
 
 =item $jd = date2jd ($sec, $min, $hr, $day, $mon, $yr)
 
@@ -464,7 +460,6 @@ sub date2jd {
 
 use constant JD_OF_EPOCH => date2jd (gmtime (0));
 
-
 =item $epoch = date2epoch ($sec, $min, $hr, $day, $mon, $yr)
 
 This is a convenience routine that converts the given date to seconds
@@ -515,7 +510,6 @@ sub decode_space_track_json_time {
     return $rslt;
 }
 
-
 # my ( $self, $station, @args ) = __default_station( @_ )
 #
 # This exportable subroutine checks whether the second argument embodies
@@ -534,7 +528,6 @@ sub __default_station {
     return ( $self, @args );
 }
 
-
 =item $rad = deg2rad ($degr)
 
 This subroutine converts degrees to radians. If the argument is
@@ -543,7 +536,6 @@ C<undef>, C<undef> will be returned.
 =cut
 
 sub deg2rad { return defined $_[0] ? $_[0] * PI / 180 : undef }
-
 
 =item $value = distsq (\@coord1, \@coord2)
 
@@ -576,7 +568,6 @@ EOD
     }
     return $sum
 }
-
 
 =item $seconds = dynamical_delta ($time);
 
@@ -620,7 +611,6 @@ sub embodies {
     my $code = eval {$thingy->can('represents')};
     return $code ? $code->($thingy, $class) : undef;
 }
-
 
 =item ($sec, $min, $hr, $day, $mon, $yr, $wday, $yday, 0) = epoch2datetime ($epoch)
 
@@ -671,7 +661,6 @@ sub epoch2datetime {
     return strftime ($DATETIMEFORMAT, $sec, $min, $hr, $day, $mon, $yr,
 	$wday, $yd, 0);
 }
-
 
 =item $time = find_first_true ($start, $end, \&test, $limit);
 
@@ -821,7 +810,6 @@ ratio greater than 1.
     }
 }
 
-
 =item ($day, $mon, $yr, $greg, $leap) = jd2date ($jd)
 
 This subroutine converts the given Julian day to the corresponding date.
@@ -865,7 +853,6 @@ sub jd2date {
 ##	% 400 ? 1 : $yr % 100 ? 0 : !($yr % 4))));
 }
 
-
 =item ($sec, $min, $hr, $day, $mon, $yr, $wday, $yday, 0) = jd2datetime ($jd)
 
 This convenience subroutine converts the given Julian day to the
@@ -882,7 +869,6 @@ sub jd2datetime {
     return epoch2datetime(($time - JD_OF_EPOCH) * SECSPERDAY);
 }
 
-
 =item $century = jcent2000 ($time);
 
 Several of the algorithms in Jean Meeus' "Astronomical Algorithms"
@@ -893,7 +879,6 @@ that calculation.
 =cut
 
 sub jcent2000 {return jday2000 ($_[0]) / 36525}
-
 
 =item $jd = jday2000 ($time);
 
@@ -908,7 +893,6 @@ Algorithms", 2nd Edition, Chapter 7, page 62.
 =cut
 
 sub jday2000 {return ($_[0] - PERL2000) / SECSPERDAY}
-
 
 =item $jd = julianday ($time);
 
@@ -983,7 +967,6 @@ to load the same module simply give the cached results.
     }
 }	# End local symbol block.
 
-
 =item $boolean = looks_like_number ($string);
 
 This subroutine returns true if the input looks like a number. It uses
@@ -1010,7 +993,6 @@ unless (eval {require Scalar::Util; Scalar::Util->import
     };
 }
 
-
 =item $maximum = max (...);
 
 This subroutine returns the maximum of its arguments.  If List::Util can
@@ -1032,7 +1014,6 @@ unless (eval {require List::Util; List::Util->import ('max'); 1}) {
 	$rslt;
     };
 }
-
 
 =item $minimum = min (...);
 
@@ -1056,7 +1037,6 @@ unless (eval {require List::Util; List::Util->import ('min'); 1}) {
     };
 }
 
-
 =item $theta = mod2pi ($theta)
 
 This subroutine reduces the given angle in radians to the range 0 <=
@@ -1065,7 +1045,6 @@ $theta < TWOPI.
 =cut
 
 sub mod2pi {return $_[0] - floor ($_[0] / TWOPI) * TWOPI}
-
 
 =item $radians = omega ($time);
 
@@ -1114,7 +1093,6 @@ sub position_angle {
 	cos( $delta1 ) * tan( $delta2 ) -
 	sin( $delta1 ) * cos( $delta_alpha ) );
 }
-
 
 =item $degrees = rad2deg ($radians)
 
@@ -1208,7 +1186,6 @@ This subroutine computes the tangent of the given angle in radians.
 
 sub tan {return sin ($_[0]) / cos ($_[0])}
 
-
 =item $value = theta0 ($time);
 
 This subroutine returns the Greenwich hour angle of the mean equinox at
@@ -1224,7 +1201,6 @@ sub theta0 {
     return thetag( greg_time_gm( 0, 0, 0, @t[3 .. 5] ) );
 }
 
-
 =item $value = thetag ($time);
 
 This subroutine returns the Greenwich hour angle of the mean equinox at
@@ -1234,7 +1210,6 @@ The algorithm comes from Jean Meeus' "Astronomical Algorithms", 2nd
 Edition, equation 12.4, page 88.
 
 =cut
-
 
 #	Meeus, pg 88, equation 12.4, converted to radians and Perl dates.
 
@@ -1449,7 +1424,6 @@ sub __instance {
 
 	}
 
-
 	my $offset = pop @date || 0;
 	if ( @zone && !$zone[0] ) {
 	    my ( undef, $sign, $hr, $min ) = @zone;
@@ -1550,8 +1524,10 @@ implemented herein.
 
 =head1 BUGS
 
-Bugs can be reported to the author by mail, or through
-L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues/>.
+Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
+L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

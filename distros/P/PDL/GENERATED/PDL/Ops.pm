@@ -4,7 +4,7 @@
 #
 package PDL::Ops;
 
-our @EXPORT_OK = qw( PDL::PP log10 PDL::PP assgn PDL::PP carg PDL::PP conj PDL::PP creal PDL::PP cimag PDL::PP _cabs PDL::PP ci PDL::PP ipow PDL::PP _rabs );
+our @EXPORT_OK = qw( PDL::PP log10 PDL::PP assgn PDL::PP carg PDL::PP conj PDL::PP creal PDL::PP cimag PDL::PP _cabs PDL::PP ci PDL::PP ipow PDL::PP _rabs PDL::PP r2C );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -1248,7 +1248,7 @@ See http://pdl.perl.org/PDLdocs/BadValues.html#dataflow_of_the_badflag for detai
 
 =for sig
 
-  Signature: (a(); real [o]b())
+  Signature: (complexv(); real [o]b())
 
 =for ref
 
@@ -1277,7 +1277,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (a();  [o]b())
+  Signature: (complexv();  [o]b())
 
 =for ref
 
@@ -1306,7 +1306,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (a(); real [o]b())
+  Signature: (complexv(); real [o]b())
 
 =for ref
 
@@ -1335,7 +1335,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (a(); real [o]b())
+  Signature: (complexv(); real [o]b())
 
 =for ref
 
@@ -1364,7 +1364,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for sig
 
-  Signature: (a(); real [o]b())
+  Signature: (complexv(); real [o]b())
 
 =for ref
 
@@ -1492,11 +1492,44 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-
 sub PDL::abs {
 	my $x=shift;
 	$x->type->real ? PDL::_rabs($x) : PDL::_cabs($x);
 }
+
+
+
+
+=head2 r2C
+
+=for sig
+
+  Signature: (r(); complex [o]c())
+
+=for ref
+
+convert real to native complex, with an imaginary part of zero
+
+=for bad
+
+r2C does not process bad values.
+It will set the bad-value flag of all output piddles if the flag is set for any of the input piddles.
+
+
+=cut
+
+
+
+
+sub PDL::r2C ($) {
+  return $_[0] if !$_[0]->type->real;
+  my $r = $_[1] // PDL->nullcreate($_[0]);
+  PDL::_r2C_int($_[0], $r);
+  $r;
+}
+
+
+*r2C = \&PDL::r2C;
 
 
 

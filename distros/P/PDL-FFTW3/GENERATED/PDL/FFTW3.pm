@@ -4,7 +4,7 @@
 #
 package PDL::FFTW3;
 
-our @EXPORT_OK = qw( fft1 ifft1 rfft1 irfft1 fft2 ifft2 rfft2 irfft2 fft3 ifft3 rfft3 irfft3 fft4 ifft4 rfft4 irfft4 fft5 ifft5 rfft5 irfft5 fft6 ifft6 rfft6 irfft6 fft7 ifft7 rfft7 irfft7 fft8 ifft8 rfft8 irfft8 fft9 ifft9 rfft9 irfft9 fft10 ifft10 rfft10 irfft10 fftn ifftn rfftn irfftn );
+our @EXPORT_OK = qw( fft1 ifft1 rfft1 rNfft1 irfft1 fft2 ifft2 rfft2 rNfft2 irfft2 fft3 ifft3 rfft3 rNfft3 irfft3 fft4 ifft4 rfft4 rNfft4 irfft4 fft5 ifft5 rfft5 rNfft5 irfft5 fft6 ifft6 rfft6 rNfft6 irfft6 fft7 ifft7 rfft7 rNfft7 irfft7 fft8 ifft8 rfft8 rNfft8 irfft8 fft9 ifft9 rfft9 rNfft9 irfft9 fft10 ifft10 rfft10 rNfft10 irfft10 fftn ifftn rfftn irfftn );
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
@@ -13,7 +13,7 @@ use DynaLoader;
 
 
 
-   our $VERSION = '0.13';
+   our $VERSION = '0.14';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::FFTW3 $VERSION;
@@ -278,6 +278,10 @@ The following are equivalent:
  $X = rfftn( $x, 1 );
  $X = rfft1( $x );
  rfft1( $x, my $X = $x->zeroes );
+
+=head2 rNfftX (rNfft1, rNfft2, rNfft3, ..., rNfftn)
+
+Similar to the above, but returns native-complex piddles.
 
 =head2 irfftX (irfft1, irfft2, irfft3, ..., irfftn)
 
@@ -561,6 +565,56 @@ use warnings;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #line 0 "FFTW3_header_include.pm"
 
 # This file is included by FFTW3.pd
@@ -585,7 +639,7 @@ our $_last_do_double_precision;
 sub __fft_internal {
   my $thisfunction = shift;
 
-  my ($do_inverse_fft, $is_real_fft, $rank) = $thisfunction =~ /^(i?)((?:r)?).*fft([0-9]+)/;
+  my ($do_inverse_fft, $is_real_fft, $is_native_output, $rank) = $thisfunction =~ /^(i?)(r?)(N?).*fft([0-9]+)/;
 
   # first I parse the variables. This is a very direct translation of what PP
   # does normally. Plan-creation has to be outside of PP, so I must re-do this
@@ -618,17 +672,17 @@ EOF
   # make sure the in/out types match. Convert $in if needed. This needs to
   # happen before we instantiate $out (if it's null) to make sure we know the
   # type
-  processTypes( $thisfunction, \$in, \$out );
+  processTypes( $thisfunction, $is_native_output, \$in, \$out );
 
   # I now create a piddle for the null output. Normally PP does this, but I need
   # to have the piddle made to create plans. If I don't, the alignment may
   # differ between plan-time and run-time
   if ( $out->isnull ) {
-    my @args = getOutArgs($in, $is_real_fft, $do_inverse_fft);
+    my @args = getOutArgs($in, $is_real_fft, $do_inverse_fft, $is_native_output);
     $out .= zeros(@args);
   }
 
-  validateArguments( $rank, $is_real_fft, $do_inverse_fft, $thisfunction, $in, $out );
+  validateArguments( $rank, $is_real_fft, $do_inverse_fft, $is_native_output, $thisfunction, $in, $out );
 
   # I need to physical-ize the piddles before I make a plan. Again, normally PP
   # does this, but to make sure alignments match, I need to do this myself, now
@@ -639,6 +693,7 @@ EOF
   barf "$thisfunction couldn't make a plan. Giving up\n" unless defined $plan;
 
   my $is_native = !$in->type->real; # native complex
+  $is_native_output ||= !$out->type->real;
   # I now have the arguments and the plan. Go!
   my $internal_function = 'PDL::__';
   $internal_function .=
@@ -646,6 +701,7 @@ EOF
     !$is_real_fft ? '' :
     ($is_native && $do_inverse_fft) ? 'irN' :
     $do_inverse_fft ? 'ir' :
+    ($is_native_output) ? 'rN' :
     'r';
   $internal_function .= "fft$rank";
   eval { no strict 'refs'; $internal_function->( $in, $out, $plan ) };
@@ -656,7 +712,7 @@ EOF
 }
 
 sub getOutArgs {
-  my ($in, $is_real_fft, $do_inverse_fft) = @_;
+  my ($in, $is_real_fft, $do_inverse_fft, $is_native_output) = @_;
 
   my @dims = $in->dims;
   my $is_native = !$in->type->real;
@@ -666,9 +722,12 @@ sub getOutArgs {
     # complex fft. Output is the same size as the input.
   } elsif ( !$do_inverse_fft ) {
     # forward real fft
-    my $d0 = shift @dims;
-    unshift @dims, 1+int($d0/2);
-    unshift @dims, 2;
+    $dims[0] = int($dims[0]/2)+1;
+    if ($is_native_output) {
+      $out_type = typeWithComplexity(getPrecision($out_type), $is_native_output);
+    } else {
+      unshift @dims, 2;
+    }
   } else {
     # backward real fft
     #
@@ -685,14 +744,14 @@ sub getOutArgs {
     } else {
       shift @dims;
     }
-    $dims[0] = 2*($dims[0])-2;
+    $dims[0] = 2*($dims[0]-1);
   }
   ($out_type, @dims);
 }
 
 sub validateArguments
 {
-  my ($rank, $is_real_fft, $do_inverse_fft, $thisfunction, $in, $out) = @_;
+  my ($rank, $is_real_fft, $do_inverse_fft, $is_native_output, $thisfunction, $in, $out) = @_;
 
   for my $arg ( $in, $out )
   {
@@ -725,7 +784,7 @@ EOF
     if( !$is_real_fft )
     { validateArgumentDimensions_complex( $rank, $thisfunction, $arg); }
     else
-    { validateArgumentDimensions_real( $rank, $do_inverse_fft, $thisfunction, $iarg, $arg); }
+    { validateArgumentDimensions_real( $rank, $do_inverse_fft, $is_native_output, $thisfunction, $iarg, $arg); }
   }
 
   # we have an explicit output piddle we're filling in. Make sure the
@@ -733,7 +792,7 @@ EOF
   if ( !$is_real_fft )
   { matchDimensions_complex($thisfunction, $rank, $in, $out); }
   else
-  { matchDimensions_real($thisfunction, $rank, $do_inverse_fft, $in, $out); }
+  { matchDimensions_real($thisfunction, $rank, $do_inverse_fft, $is_native_output, $in, $out); }
 }
 
 sub validateArgumentDimensions_complex
@@ -755,14 +814,15 @@ EOF
 }
 
 sub validateArgumentDimensions_real {
-  my ( $rank, $do_inverse_fft, $thisfunction, $iarg, $arg ) = @_;
+  my ( $rank, $do_inverse_fft, $is_native_output, $thisfunction, $iarg, $arg ) = @_;
   my $is_native = !$arg->type->real; # native complex
+#use Carp; use Test::More; diag "vAD_r ($arg)($is_native) ", $arg->info;
 
   # real FFT. Forward transform takes in real and spits out complex;
   # backward transform does the reverse
   if ( !$is_native && $arg->dim(0) != 2 ) {
     my ($verb, $var);
-    if ( !$do_inverse_fft && $iarg == 1 ) {
+    if ( !$is_native_output && !$do_inverse_fft && $iarg == 1 ) {
       ($verb, $var) = qw(produces output);
     } elsif ( $do_inverse_fft && $iarg == 0 ) {
       ($verb, $var) = qw(takes input);
@@ -782,7 +842,7 @@ EOF
   } else {
     # The output needs at least $rank dimensions. If this is a forward
     # transform, the output is complex, so it needs an extra dimension
-    $min_dimensionality++ if !$do_inverse_fft && !$is_native;
+    $min_dimensionality++ if !$do_inverse_fft && !$is_native_output;
     $var = 'output';
   }
   if ( $arg->ndims < $min_dimensionality ) {
@@ -806,7 +866,7 @@ EOF
 }
 
 sub matchDimensions_real {
-  my ($thisfunction, $rank, $do_inverse_fft, $in, $out) = @_;
+  my ($thisfunction, $rank, $do_inverse_fft, $is_native_output, $in, $out) = @_;
   my ($varname1, $varname2, $var1, $var2);
   if ( !$do_inverse_fft ) {
     # Forward FFT. The input is real, the output is complex. $output->dim(0)
@@ -818,10 +878,12 @@ sub matchDimensions_real {
     # Backward FFT. The input is complex, the output is real.
     ($varname1, $varname2, $var1, $var2) = (qw(output input), $out, $in);
   }
-  my $is_native = !$var2->type->real; # native complex
+  my $is_native = !$var2->type->real || $is_native_output; # native complex
   barf <<EOF if int($var1->dim(0)/2) + 1 != $var2->dim($is_native ? 0 : 1);
 $thisfunction: mismatched first dimension:
 \$$varname2->dim(1) == int(\$$varname1->dim(0)/2) + 1 wasn't true.
+$varname1: @{[$var1->info]}
+$varname2: @{[$var2->info]}
 Giving up.
 EOF
   for my $idim (1..$rank-1) {
@@ -836,7 +898,7 @@ EOF
 
 sub processTypes
 {
-  my ($thisfunction, $in, $out) = @_;
+  my ($thisfunction, $is_native_output, $in, $out) = @_;
 
   # types:
   #
@@ -967,6 +1029,9 @@ sub ifft1 {
 sub rfft1 { __fft_internal( "rfft1", @_ ); }
 *PDL::rfft1 = \&rfft1;
 
+sub rNfft1 { __fft_internal( "rNfft1", @_ ); }
+*PDL::rNfft1 = \&rNfft1;
+
 sub irfft1 { my $a = __fft_internal( "irfft1", @_ ); $a /= $a->shape->slice('0:0')->prodover; $a; }
 *PDL::irfft1 = \&irfft1;
 
@@ -985,6 +1050,9 @@ sub ifft2 {
 
 sub rfft2 { __fft_internal( "rfft2", @_ ); }
 *PDL::rfft2 = \&rfft2;
+
+sub rNfft2 { __fft_internal( "rNfft2", @_ ); }
+*PDL::rNfft2 = \&rNfft2;
 
 sub irfft2 { my $a = __fft_internal( "irfft2", @_ ); $a /= $a->shape->slice('0:1')->prodover; $a; }
 *PDL::irfft2 = \&irfft2;
@@ -1005,6 +1073,9 @@ sub ifft3 {
 sub rfft3 { __fft_internal( "rfft3", @_ ); }
 *PDL::rfft3 = \&rfft3;
 
+sub rNfft3 { __fft_internal( "rNfft3", @_ ); }
+*PDL::rNfft3 = \&rNfft3;
+
 sub irfft3 { my $a = __fft_internal( "irfft3", @_ ); $a /= $a->shape->slice('0:2')->prodover; $a; }
 *PDL::irfft3 = \&irfft3;
 
@@ -1023,6 +1094,9 @@ sub ifft4 {
 
 sub rfft4 { __fft_internal( "rfft4", @_ ); }
 *PDL::rfft4 = \&rfft4;
+
+sub rNfft4 { __fft_internal( "rNfft4", @_ ); }
+*PDL::rNfft4 = \&rNfft4;
 
 sub irfft4 { my $a = __fft_internal( "irfft4", @_ ); $a /= $a->shape->slice('0:3')->prodover; $a; }
 *PDL::irfft4 = \&irfft4;
@@ -1043,6 +1117,9 @@ sub ifft5 {
 sub rfft5 { __fft_internal( "rfft5", @_ ); }
 *PDL::rfft5 = \&rfft5;
 
+sub rNfft5 { __fft_internal( "rNfft5", @_ ); }
+*PDL::rNfft5 = \&rNfft5;
+
 sub irfft5 { my $a = __fft_internal( "irfft5", @_ ); $a /= $a->shape->slice('0:4')->prodover; $a; }
 *PDL::irfft5 = \&irfft5;
 
@@ -1061,6 +1138,9 @@ sub ifft6 {
 
 sub rfft6 { __fft_internal( "rfft6", @_ ); }
 *PDL::rfft6 = \&rfft6;
+
+sub rNfft6 { __fft_internal( "rNfft6", @_ ); }
+*PDL::rNfft6 = \&rNfft6;
 
 sub irfft6 { my $a = __fft_internal( "irfft6", @_ ); $a /= $a->shape->slice('0:5')->prodover; $a; }
 *PDL::irfft6 = \&irfft6;
@@ -1081,6 +1161,9 @@ sub ifft7 {
 sub rfft7 { __fft_internal( "rfft7", @_ ); }
 *PDL::rfft7 = \&rfft7;
 
+sub rNfft7 { __fft_internal( "rNfft7", @_ ); }
+*PDL::rNfft7 = \&rNfft7;
+
 sub irfft7 { my $a = __fft_internal( "irfft7", @_ ); $a /= $a->shape->slice('0:6')->prodover; $a; }
 *PDL::irfft7 = \&irfft7;
 
@@ -1099,6 +1182,9 @@ sub ifft8 {
 
 sub rfft8 { __fft_internal( "rfft8", @_ ); }
 *PDL::rfft8 = \&rfft8;
+
+sub rNfft8 { __fft_internal( "rNfft8", @_ ); }
+*PDL::rNfft8 = \&rNfft8;
 
 sub irfft8 { my $a = __fft_internal( "irfft8", @_ ); $a /= $a->shape->slice('0:7')->prodover; $a; }
 *PDL::irfft8 = \&irfft8;
@@ -1119,6 +1205,9 @@ sub ifft9 {
 sub rfft9 { __fft_internal( "rfft9", @_ ); }
 *PDL::rfft9 = \&rfft9;
 
+sub rNfft9 { __fft_internal( "rNfft9", @_ ); }
+*PDL::rNfft9 = \&rNfft9;
+
 sub irfft9 { my $a = __fft_internal( "irfft9", @_ ); $a /= $a->shape->slice('0:8')->prodover; $a; }
 *PDL::irfft9 = \&irfft9;
 
@@ -1138,12 +1227,15 @@ sub ifft10 {
 sub rfft10 { __fft_internal( "rfft10", @_ ); }
 *PDL::rfft10 = \&rfft10;
 
+sub rNfft10 { __fft_internal( "rNfft10", @_ ); }
+*PDL::rNfft10 = \&rNfft10;
+
 sub irfft10 { my $a = __fft_internal( "irfft10", @_ ); $a /= $a->shape->slice('0:9')->prodover; $a; }
 *PDL::irfft10 = \&irfft10;
 
 
 
-#line 86 "FFTW3.pd"
+#line 89 "FFTW3.pd"
 sub _rank_springboard {
   my ($name, $source, $rank, @rest) = @_;
   my $inverse = ($name =~ m/^i/);

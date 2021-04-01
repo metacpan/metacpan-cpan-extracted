@@ -7,9 +7,9 @@ use PDL::Complex;
 use PDL::NiceSlice;
 use PDL::LinearAlgebra::Complex;
 use constant N=>10;
-use Test::More tests => 2*N;
+use Test::More;
 
-for my $D (3..N+2) { #first differencess
+for my $D (3..N+2) { #first differences
     #solve (1+i)(b_{n+1}-b_n)=1-i with homogeneous BCs
     my $c=zeroes($D)+0*i;
     my $d=-ones($D)*(1+i);
@@ -19,6 +19,16 @@ for my $D (3..N+2) { #first differencess
     cgtsv($c, $d, $e, $b, $info);
     my $r=sequence($D)*(1-i)/(1+i);
     ok($b->complex->approx($r)->all, "1st diff. cgtsv in D=$D")
+      or diag "info: ", $info, "\nGot: ", $b, "\nExpected: ", $r;
+
+    $c=zeroes(cdouble, $D);
+    $d=-ones($D)*(1+ci);
+    $e=ones($D)*(1+ci); $e->((-1)).=0+0*ci;
+    $b=ones($D)*(1-ci); $b->((-1)).=(1-$D)*(1-ci);
+    $info=pdl(short,0);
+    cgtsv($c, $d, $e, $b, $info);
+    $r=sequence($D)*(1-ci)/(1+ci);
+    ok($b->approx($r)->all, "1st diff. native cgtsv in D=$D")
       or diag "info: ", $info, "\nGot: ", $b, "\nExpected: ", $r;
 }
 
@@ -35,3 +45,5 @@ for my $D (3..N+2){ #second differences
     ok($b->complex->approx($r)->all, "2nd diff. cgtsv in D=$D")
       or diag "info: ", $info, "\nGot: ", $b, "\nExpected: ", $r;
 }
+
+done_testing;

@@ -20,7 +20,7 @@ use constant{
 
 use strict;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 $VERSION = eval $VERSION;
 
 @PDL::LinearAlgebra::ISA = qw/PDL::Exporter/;
@@ -970,8 +970,6 @@ sub PDL::mrcond {
 		$m->gecon($anorm,$norm,$rcond,$info);
 	}
 	return wantarray ? ($rcond, $info) : $rcond;
-
-	
 }
 
 sub PDL::Complex::mrcond {

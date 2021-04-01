@@ -50,7 +50,7 @@ package Astro::Coord::ECI::Star;
 use strict;
 use warnings;
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 use base qw{Astro::Coord::ECI};
 
@@ -81,7 +81,6 @@ sub new {
     return $class->SUPER::new (angularvelocity => 0,
 	@args);
 }
-
 
 =item @almanac = $star->almanac($station, $start, $end);
 
@@ -159,7 +158,6 @@ elements 0 through 3 of the list returned by almanac().
 =cut
 
 use Astro::Coord::ECI::Mixin qw{ almanac_hash };
-
 
 use constant NEVER_PASS_ELEV => 2 * __PACKAGE__->SECSPERDAY;
 
@@ -272,7 +270,6 @@ eod
     my ( $delta_psi ) = $self->nutation();
     $lambda += $delta_psi;
 
-
 #	Calculate and add in the aberration terms (Meeus 23.2);
 
     my $T = jcent2000 ($time);			# Meeus (22.1)
@@ -304,7 +301,6 @@ eod
     return $self;
 }
 
-
 1;
 
 =back
@@ -333,6 +329,7 @@ SLALIB library.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
 L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
 electronic mail to the author.
 

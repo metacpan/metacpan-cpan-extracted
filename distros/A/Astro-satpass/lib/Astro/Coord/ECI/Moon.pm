@@ -44,14 +44,13 @@ package Astro::Coord::ECI::Moon;
 use strict;
 use warnings;
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 use base qw{Astro::Coord::ECI};
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
 use POSIX qw{floor strftime};
-
 
 #	Load the periodic terms from the table.
 
@@ -88,7 +87,6 @@ my $weaken = eval {
 our $Singleton = $weaken;
 
 my %object;	# By class
-
 
 =item $moon = Astro::Coord::ECI::Moon->new ();
 
@@ -132,7 +130,6 @@ sub new {
 	return $class->SUPER::new (%static, @args);
     }
 }
-
 
 =item @almanac = $moon->almanac ($station, $start, $end);
 
@@ -251,7 +248,6 @@ sub correct_for_refraction {
     return $elevation;
 }
 
-
 =item ($time, $quarter, $desc) = $moon->next_quarter ($want);
 
 This method calculates the time of the next quarter-phase of the Moon
@@ -320,7 +316,6 @@ sub __quarter_name {
     return $self->__event_name( $event, $tplt );
 }
 
-
 =item ($phase, $illum) = $moon->phase ($time);
 
 This method calculates the current phase of the moon and its illuminated
@@ -372,7 +367,6 @@ eod
     my $phase = mod2pi ($longm - $longs);
     return wantarray ? ($phase, (1 + cos ($self->PI - $phase)) / 2) : $phase;
 }
-
 
 =item $moon->time_set ()
 
@@ -547,6 +541,7 @@ the Sun.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
 L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
 electronic mail to the author.
 

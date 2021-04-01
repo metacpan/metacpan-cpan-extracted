@@ -1,0 +1,29 @@
+---
+abstract: 'Trim various things by removing leading and trailing whitespace.'
+author:
+  - philiprbrenan@gmail.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Trim
+provides:
+  Trim:
+    file: lib/Trim.pm
+    version: '20210401'
+requires:
+  Carp: '0'
+  Test2::API: '0'
+  Test::More: '0'
+  feature: '0'
+resources:
+  bugtracker: https://github.com/philiprbrenan/Trim/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/philiprbrenan/Trim
+version: '20210401'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

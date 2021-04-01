@@ -11,14 +11,17 @@ Astro::Coord::ECI::TLE::Set - Represent a set of data for the same ID.
 
  # Get orbital data on the International Space Station and
  # related NASA stuff. 
- my $st = Astro::SpaceTrack->new();
- my $rslt = $st->spaceflight('-all');
+ my $st = Astro::SpaceTrack->new(
+     username => $me,
+     password => $secret,
+ );
+ my $rslt = $st->retrieve( qw{ -last5 25544 } );
  $rslt->is_success
      or die "Unable to get data: ", $rslt->status_line;
  
- # We aggregate the data because NASA provides multiple sets
- # of orbital elements for each body. The Set object will
- # select the correct one for the given time.
+ # We aggregate the data because we retrieved the last five orbital
+ # elements for the body. The Set object will select the correct one for
+ # the given time.
  my @sats = Astro::Coord::ECI::TLE::Set->aggregate (
      Astro::Coord::ECI::TLE->parse ($rslt->content));
  my $now = time ();
@@ -140,13 +143,12 @@ our @CARP_NOT = qw{
     Astro::Coord::ECI
 };
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 use constant ERR_NOCURRENT => <<eod;
 Error - Can not call %s because there is no current member. Be
         sure you called add() after instantiating or calling clear().
 eod
-
 
 =item $set = Astro::Coord::ECI::TLE::Set->new ()
 
@@ -166,7 +168,6 @@ sub new {
     $self->add (@args) if @args;
     return $self;
 }
-
 
 =item $set->add ($member ...);
 
@@ -227,7 +228,6 @@ eod
     return $self;
 }
 
-
 =item @sets = Astro::Coord::ECI::TLE::Set->aggregate ($tle ...);
 
 This method aggregates the given Astro::Coord::ECI::TLE objects into
@@ -286,7 +286,6 @@ sub aggregate {
     return @rslt;
 }
 
-
 =item $set->can ($method);
 
 This method checks to see if the object can execute the given method.
@@ -309,7 +308,6 @@ sub can {
 	$self->{current}->can($method)
     };
 }
-
 
 =item $set->clear ();
 
@@ -416,7 +414,6 @@ sub represents {
     return $self->{current}->represents($class);
 }
 
-
 =item $set->select ($time);
 
 This method selects the member object that best represents the given
@@ -453,7 +450,6 @@ eod
     return $self->{current};
 }
 
-
 =item $set->set ($name => $value ...);
 
 This method iterates over the individual name-value pairs. If the name
@@ -477,7 +473,6 @@ sub set {
     }
     return $self;
 }
-
 
 =item $set->set_all ($name => $value ...);
 
@@ -576,7 +571,6 @@ sub validate {
     return $self->validate($opt, @args);
 }
 
-
 #	The AUTOLOAD routine does not define methods, it simply
 #	simulates them. This is because there is no good way to
 #	get rid of the routines if we end up representing a
@@ -623,8 +617,10 @@ __END__
 
 =head1 BUGS
 
-Bugs can be reported to the author by mail, or through
-L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues/>.
+Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
+L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

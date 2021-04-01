@@ -503,13 +503,18 @@ sub other2native {
                      [-5.90820611352046,-50.87477421602225] );
 
   my $fx6 = rfft1($x6);
-  ok_should_make_plan( all( approx( $fx6, $fx6_ref->slice(':,0:3'), approx_eps_double) ),
+  my $fx6_ref_input = $fx6_ref->slice(':,0:3');
+  ok_should_make_plan( all( approx( $fx6, $fx6_ref_input, approx_eps_double) ),
                        "rfft basic test - forward - 6long" );
+  my $fx6_nat = rNfft1($x6);
+  my $fx6_ref_input_nat = other2native($fx6_ref_input);
+  ok_should_reuse_plan( all( approx( $fx6_nat, $fx6_ref_input_nat, approx_eps_double) ),
+                       "rfft basic test - native forward - 6long" );
+
   my $fx7 = rfft1($x7);
   ok_should_make_plan( all( approx( $fx7, $fx7_ref->slice(':,0:3'), approx_eps_double) ),
                        "rfft basic test - forward - 7long" );
 
-  my $fx6_ref_input = $fx6_ref->slice(':,0:3');
   my $x6_back = irfft1($fx6_ref_input, zeros(6) );
   ok_should_make_plan( all( approx( $x6, $x6_back, approx_eps_double) ),
                        "rfft basic test - backward - 6long - output in arglist" );
@@ -522,7 +527,6 @@ sub other2native {
   ok_should_make_plan( all( approx( $x7, $x7_back, approx_eps_double) ),
                        "rfft basic test - backward - 7long" );
 
-  my $fx6_ref_input_nat = other2native($fx6_ref_input);
   my $x6_nat_back = irfft1($fx6_ref_input_nat, zeros(6));
   ok_should_reuse_plan( all( approx( $x6_nat_back, $x6, approx_eps_double) ),
                        "rfft basic test - native backward - 6long - output in arglist" )

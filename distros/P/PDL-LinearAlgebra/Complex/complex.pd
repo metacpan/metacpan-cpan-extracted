@@ -63,16 +63,40 @@ sub generate_code($){
 	}
 }
 
-sub pp_defc{
-	my $function = shift;
-	pp_def(('c'.$function), Doc=>"
+my %float2native = (F => 'G', D => 'C');
+sub pp_defc {
+  my ($function, %hash) = @_;
+  $hash{GenericTypes} ||= [qw(F D)];
+  my $doc = $hash{Doc} || "\n=for ref\n\nComplex version of $function\n\n";
+  $hash{Doc} = undef;
+  my $decl = delete $hash{_decl};
+  $decl =~ s/\$GENERIC\(\)\s*\*/void */g; # dodge float vs float complex ptr problem
+  $hash{Code} = "$decl\n$hash{Code}";
+  pp_def("__Cc$function", %hash);
+  my %hash2 = %hash;
+  $hash2{Pars} =~ s/\(2,/(/g;
+  $hash2{GenericTypes} = [map $float2native{$_} || $_, @{$hash{GenericTypes}}];
+  $hash2{Code} =~ s/\$GENERIC\(\)/\$TFD(float,double)/g;
+  $hash2{Code} =~ s/\$TFD\(/\$TGC(/g;
+  pp_def("__Nc$function", %hash2);
+  pp_add_exported("c$function");
+  pp_addpm(<<EOF);
+=head2 c$function
 
-=for ref
+=for sig
 
-Complex version of $function
+  Signature: ($hash{Pars})
 
-", @_);
+$doc
 
+=cut
+
+sub PDL::c$function {
+  \$_[0]->type->real ? goto &PDL::__Cc$function : goto &PDL::__Nc$function;
+}
+*c$function = \\&PDL::c$function;
+
+EOF
 }
 
 #pp_bless('PDL::Complex');
@@ -130,6 +154,17 @@ PDL::LinearAlgebra::Complex - PDL interface to the lapack linear algebra program
  $job = 0;
  cgesdd($a, $job, $info, $s , $u, $v);
 
+ # or, using native complex numbers:
+ use PDL;
+ use PDL::LinearAlgebra::Complex;
+ $a = random(cdouble, 100, 100);
+ $s = zeroes(cdouble, 100);
+ $u = zeroes(cdouble, 100, 100);
+ $v = zeroes(cdouble, 100, 100);
+ $info = 0;
+ $job = 0;
+ cgesdd($a, $job, $info, $s , $u, $v);
+
 =head1 DESCRIPTION
 
 This module provides an interface to parts of the lapack library (complex numbers).
@@ -138,21 +173,15 @@ These routines accept either float or double piddles.
 EOD
 
 pp_defc("gtsv",
+	_decl => <<'EOF',
+		extern int $TFD(c,z)gtsv_(integer *n, integer *nrhs,
+		$GENERIC() *dl, $GENERIC() *d, $GENERIC() *du, $GENERIC() *b,
+                integer *ldb, integer *info);
+EOF
 	HandleBad => 0,
 	Pars => '[phys]DL(2,n); [phys]D(2,n); [phys]DU(2,n); [io,phys]B(2,n,nrhs); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
-	     types(F) %{
-		extern int cgtsv_(integer *n, integer *nrhs,
-		float *dl, float *d, float *du, float *b,
-                integer *ldb, integer *info);
-             %}
-             types(D) %{
-		extern int zgtsv_(integer *n, integer *nrhs,
-		double *dl, double *d, double *du, double *b,
-                integer *ldb, integer *info);
-             %}
-		$TFD(cgtsv_,zgtsv_)(
+		$TFD(c,z)gtsv_(
 		&(integer){$PRIV(__n_size)},
 		&(integer){$PRIV(__nrhs_size)},
 		$P(DL),
@@ -220,36 +249,22 @@ its second element.
 ');
 
 pp_defc("gesvd",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gesvd_(char *jobu, char *jobvt, integer *m, integer *n, $GENERIC() *a,
+		integer *lda, $GENERIC() *s, $GENERIC() *u, int *ldu,
+		$GENERIC() *vt, integer *ldvt, $GENERIC() *work, integer *lwork, $GENERIC() *rwork,
+		integer *info);
+EOF
        HandleBad => 0,
 	RedoDimsCode => '$SIZE(r) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
 	Pars => '[io,phys]A(2,m,n); int jobu(); int jobvt(); [o,phys]s(r); [o,phys]U(2,p,q); [o,phys]VT(2,s,t); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork;
 		char trau, travt;
-             types(F) %{
-		extern int cgesvd_(char *jobu, char *jobvt, integer *m, integer *n, float *a,
-		integer *lda, float *s, float *u, int *ldu,
-		float *vt, integer *ldvt, float *work, integer *lwork, float *rwork,
-		integer *info);
-		float *rwork;
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zgesvd_(char *jobz,char *jobvt, integer *m, integer *n,
-		double *a, integer *lda, double *s, double *u, int *ldu,
-		double *vt, integer *ldvt, double *work, integer *lwork, double *rwork,
-		integer *info);
-		double *rwork;
-		double tmp_work[2];
-             %}
+		$GENERIC() *rwork;
+		$GENERIC() tmp_work[2];
 		lwork = ($PRIV(__m_size) < $PRIV(__n_size)) ? 5*$PRIV(__m_size) : 5*$PRIV(__n_size);
-             types(F) %{		
-		rwork = (float *)malloc(lwork *  sizeof(float));
-             %}
-             types(D) %{		
-		rwork = (double *)malloc(lwork *  sizeof(double));
-             %}
+		rwork = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
 		lwork = -1;
 
 
@@ -274,7 +289,7 @@ pp_defc("gesvd",
 			default: travt = \'N\';
 		}
 
-		$TFD(cgesvd_,zgesvd_)(
+		$TFD(c,z)gesvd_(
 		&trau,
 		&travt,
 		&(integer){$PRIV(__m_size)},
@@ -293,14 +308,7 @@ pp_defc("gesvd",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-
-		float *work = (float *)malloc(2*lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc(2*lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(cgesvd_,zgesvd_)(
 		&trau,
 		&travt,
@@ -334,74 +342,43 @@ The SVD is written
 ');
 
 pp_defc("gesdd",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gesdd_(char *jobz, integer *m, integer *n, $GENERIC() *
+		a, integer *lda, $GENERIC() *s, $GENERIC() *u, int *ldu,
+		$GENERIC() *vt, integer *ldvt, $GENERIC() *work, integer *lwork,
+		$GENERIC() *rwork, integer *iwork, integer *info);
+EOF
        HandleBad => 0,
        RedoDimsCode => '$SIZE(r) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
 	Pars => '[io,phys]A(2,m,n); int job(); [o,phys]s(r); [o,phys]U(2,p,q); [o,phys]VT(2,s,t); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork;
 		integer *iwork;
 		char tra;
-             types(F) %{
 
-		extern int cgesdd_(char *jobz, integer *m, integer *n, float *
-		a, integer *lda, float *s, float *u, int *ldu,
-		float *vt, integer *ldvt, float *work, integer *lwork,
-		float *rwork, integer *iwork, integer *info);
-		float *rwork;
-		float tmp_work[2];
-             %}
-             types(D) %{
-
-		extern int zgesdd_(char *jobz, integer *m, integer *n, double *
-		a, integer *lda, double *s, double *u, int *ldu,
-		double *vt, integer *ldvt, double *work, integer *lwork,
-		double *rwork, integer *iwork, integer *info);
-		double *rwork;
-		double tmp_work[2];
-             %}
+		$GENERIC() *rwork;
+		$GENERIC() tmp_work[2];
 		
 		lwork = ($PRIV(__m_size) < $PRIV(__n_size)) ? $PRIV(__m_size) : $PRIV(__n_size);
 		iwork = (integer *)malloc(lwork * 8 * sizeof(integer));
 
-		types(F) %{
 		switch ($job())
 		{
 
 			case 1: tra = \'A\';
-				rwork = (float *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(float));
+				rwork = ($GENERIC() *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof($GENERIC()));
 				break;
 			case 2: tra = \'S\';
-				rwork = (float *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(float));
+				rwork = ($GENERIC() *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof($GENERIC()));
 				break;
 			case 3: tra = \'O\';
-				rwork = (float *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(float));
+				rwork = ($GENERIC() *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof($GENERIC()));
 				break;
 			default: tra = \'N\';
-				rwork = (float *)malloc( 7 * lwork  *  sizeof(float));
+				rwork = ($GENERIC() *)malloc( 7 * lwork  *  sizeof($GENERIC()));
 				break;
 
 		}		
-		%}
-		types(D) %{
-		switch ($job())
-		{
-
-			case 1: tra = \'A\';
-				rwork = (double *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(double));
-				break;
-			case 2: tra = \'S\';
-				rwork = (double *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(double));
-				break;
-			case 3: tra = \'O\';
-				rwork = (double *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(double));
-				break;
-			default: tra = \'N\';
-				rwork = (double *)malloc( 7 * lwork  *  sizeof(double));
-				break;
-
-		}
-		%}
 		lwork = -1;
 		$TFD(cgesdd_,zgesdd_)(
 		&tra,
@@ -422,14 +399,8 @@ pp_defc("gesdd",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
 
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgesdd_,zgesdd_)(
 		&tra,
 		&(integer){$PRIV(__m_size)},
@@ -464,34 +435,22 @@ The SVD is written
 ');
 
 pp_defc("ggsvd",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)ggsvd3_(char *jobu, char *jobv, char *jobq, integer *m,
+		integer *n, integer *p, integer *k, integer *l, $GENERIC() *a, 
+		integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *alpha, 
+		$GENERIC() *beta, $GENERIC() *u, integer *ldu, $GENERIC() *v, integer 
+		*ldv, $GENERIC() *q, integer *ldq, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *iwork,
+		integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); int jobu(); int jobv(); int jobq(); [io,phys]B(2,p,n); int [o,phys]k(); int [o,phys]l();[o,phys]alpha(n);[o,phys]beta(n); [o,phys]U(2,q,r); [o,phys]V(2,s,t); [o,phys]Q(2,u,v); int [o,phys]iwork(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char pjobu = \'N\';
 		char pjobv = \'N\';		
 		char pjobq = \'N\';
 
-             types(F) %{
-
-		extern int cggsvd3_(char *jobu, char *jobv, char *jobq, integer *m,
-		integer *n, integer *p, integer *k, integer *l, float *a, 
-		integer *lda, float *b, integer *ldb, float *alpha, 
-		float *beta, float *u, integer *ldu, float *v, integer 
-		*ldv, float *q, integer *ldq, float *work, integer *lwork, float *rwork, integer *iwork,
-		integer *info);
-		float *work, *rwork, twork[1];
-             %}
-             types(D) %{
-
-		extern int zggsvd3_(char *jobu, char *jobv, char *jobq, integer *m,
-		integer *n, integer *p, integer *k, integer *l, double *a, 
-		integer *lda, double *b, integer *ldb, double *alpha, 
-		double *beta, double *u, integer *ldu, double *v, integer 
-		*ldv, double *q, integer *ldq, double *work, integer *lwork, double *rwork, integer *iwork,
-		integer *info);
-		double *work, *rwork, twork[1];
-             %}
+		$GENERIC() *work, *rwork, twork[1];
 		//integer lwork = ($SIZE (m) < $SIZE (n)) ? $SIZE (n): $SIZE (m);
 		integer lwork = -1;
 
@@ -533,15 +492,8 @@ pp_defc("ggsvd",
 
 		lwork = (integer) twork[0];
 
-		
-		types(F) %{
-			work = (float *)malloc(2*(lwork * sizeof(float)));
-			rwork = (float *)malloc(2 * $SIZE (n) *  sizeof(float));
-		%}
-		types(D) %{
-			work = (double *)malloc(2*(lwork * sizeof(double)));
-			rwork = (double *)malloc(2 * $SIZE (n) *  sizeof(double));
-		%}		
+			work = ($GENERIC() *)malloc(2*(lwork * sizeof($GENERIC())));
+			rwork = ($GENERIC() *)malloc(2 * $SIZE (n) *  sizeof($GENERIC()));
 		
 		$TFD(cggsvd3_,zggsvd3_)(
 		&pjobu,
@@ -574,37 +526,24 @@ pp_defc("ggsvd",
 ');
 
 pp_defc("geev",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)geev_(char *jobvl, char *jobvr, integer *n, $GENERIC() *a,
+		integer *lda, $GENERIC() *w, $GENERIC() *vl, integer *ldvl, $GENERIC() *vr,
+		integer *ldvr, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int jobvl(); int jobvr(); [o,phys]w(2,n); [o,phys]vl(2,m,m); [o,phys]vr(2,p,p); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jvl = \'N\';
 		char jvr = \'N\';
-             types(F) %{
-		extern int cgeev_(char *jobvl, char *jobvr, integer *n, float *a,
-		integer *lda, float *w, float *vl, integer *ldvl, float *vr,
-		integer *ldvr, float *work, integer *lwork, float *rwork, integer *info);
-		float tmp_work[2], *rwork;
-             %}
-             types(D) %{
-		extern int zgeev_(char *jobvl, char *jobvr, integer *n, double *
-		a, integer *lda, double *w, double *vl,
-		integer *ldvl, double *vr, integer *ldvr, double *work,
-		integer *lwork, double *rwork, integer *info);
-		double tmp_work[2], *rwork;
-             %}
+		$GENERIC() tmp_work[2], *rwork;
 		integer lwork = -1;
 
 		if ($jobvl())
 			jvl = \'V\';
 		if ($jobvr())
 			jvr = \'V\';
-             types(F) %{
-			rwork = (float *)malloc( 2 * $PRIV(__n_size) *  sizeof(float));
-             %}
-             types(D) %{
-			rwork = (double *)malloc(2 * $PRIV(__n_size) *  sizeof(double));             
-             %}
+			rwork = ($GENERIC() *)malloc( 2 * $PRIV(__n_size) *  sizeof($GENERIC()));
 		$TFD(cgeev_,zgeev_)(
 		&jvl,
 		&jvr,
@@ -623,12 +562,7 @@ pp_defc("geev",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2*lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2*lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(cgeev_,zgeev_)(
 		&jvl,
 		&jvr,
@@ -651,32 +585,22 @@ pp_defc("geev",
 
 
 pp_defc("geevx",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)geevx_(char *balanc, char *jobvl, char *jobvr, char *
+		sense, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *w,
+		$GENERIC() *vl, integer *ldvl, $GENERIC() *vr,
+		integer *ldvr, integer *ilo, integer *ihi, $GENERIC() *scale,
+		$GENERIC() *abnrm, $GENERIC() *rconde, $GENERIC() *rcondv, $GENERIC()
+		*work, integer *lwork, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o,phys]w(2,n); [o,phys]vl(2,m,m); [o,phys]vr(2,p,p); int [o,phys]ilo(); int [o,phys]ihi(); [o,phys]scale(n); [o,phys]abnrm(); [o,phys]rconde(q); [o,phys]rcondv(r); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jvl = \'N\';
 		char jvr = \'N\';
 		char balanc, sens;
 		integer lwork = -1;
-             types(F) %{
-		extern int cgeevx_(char *balanc, char *jobvl, char *jobvr, char *
-		sense, integer *n, float *a, integer *lda, float *w,
-		float *vl, integer *ldvl, float *vr,
-		integer *ldvr, integer *ilo, integer *ihi, float *scale,
-		float *abnrm, float *rconde, float *rcondv, float
-		*work, integer *lwork, float *rwork, integer *info);
-		float tmp_work[2], *rwork;
-             %}
-             types(D) %{
-		extern int zgeevx_(char *balanc, char *jobvl, char *jobvr, char *
-		sense, integer *n, double *a, integer *lda, double *w,
-		double *vl, integer *ldvl, double *vr,
-		integer *ldvr, integer *ilo, integer *ihi, double *scale,
-		double *abnrm, double *rconde, double *rcondv, double
-		*work, integer *lwork, double *rwork, integer *info);
-		double tmp_work[2], *rwork;
-             %}
+		$GENERIC() tmp_work[2], *rwork;
 
 		if ($jobvl())
 			jvl = \'V\';
@@ -703,12 +627,7 @@ pp_defc("geevx",
 				break;
 			default: sens = \'N\';
 		}
-             types(F) %{
-			rwork = (float *)malloc( 2 * $PRIV(__n_size) *  sizeof(float));
-             %}
-             types(D) %{
-			rwork = (double *)malloc(2 * $PRIV(__n_size) *  sizeof(double));             
-             %}
+			rwork = ($GENERIC() *)malloc( 2 * $PRIV(__n_size) *  sizeof($GENERIC()));
 		$TFD(cgeevx_,zgeevx_)(
 		&balanc,
 		&jvl,
@@ -735,14 +654,7 @@ pp_defc("geevx",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgeevx_,zgeevx_)(
 		&balanc,
 		&jvl,
@@ -772,40 +684,25 @@ pp_defc("geevx",
 ');
 
 pp_defc("ggev",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)ggev_(char *jobvl, char *jobvr, integer *n, $GENERIC() *
+		a, integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *alpha,
+		$GENERIC() *beta, $GENERIC() *vl, integer *ldvl,
+		$GENERIC() *vr, integer *ldvr, $GENERIC() *work, integer *lwork,
+		$GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int jobvl();int jobvr();[phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VL(2,m,m);[o,phys]VR(2,p,p);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
 		char pjobvl = \'N\', pjobvr = \'N\';
-
-             types(F) %{
-		extern int cggev_(char *jobvl, char *jobvr, integer *n, float *
-		a, integer *lda, float *b, integer *ldb, float *alpha,
-		float *beta, float *vl, integer *ldvl,
-		float *vr, integer *ldvr, float *work, integer *lwork,
-		float *rwork, integer *info);
-		float tmp_work[2], *rwork;
-             %}
-             types(D) %{
-		extern int zggev_(char *jobvl, char *jobvr, integer *n, double *
-		a, integer *lda, double *b, integer *ldb, double *alpha,
-		double *beta, double *vl, integer *ldvl,
-		double *vr, integer *ldvr, double *work, integer *lwork,
-		double *rwork, integer *info);
-		double tmp_work[2], *rwork;
-             %}
+		$GENERIC() tmp_work[2], *rwork;
 		if ($jobvl())
 			pjobvl = \'V\';
 		if ($jobvr())
 			pjobvr = \'V\';
 
-		types(F) %{
-			rwork = (float *)malloc(8 * $SIZE(n) *  sizeof(float));
-             	%}
-             	types(D) %{
-			rwork = (double *)malloc(8 * $SIZE(n) *  sizeof(double));
-             	%}
+			rwork = ($GENERIC() *)malloc(8 * $SIZE(n) *  sizeof($GENERIC()));
 		$TFD(cggev_,zggev_)(
 		&pjobvl,
 		&pjobvr,
@@ -827,12 +724,7 @@ pp_defc("ggev",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             	%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 
 		$TFD(cggev_,zggev_)(
 		&pjobvl,
@@ -859,38 +751,25 @@ pp_defc("ggev",
 ');
 
 pp_defc("ggevx",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)ggevx_(char *balanc, char *jobvl, char *jobvr, char *
+		sense, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,
+		integer *ldb, $GENERIC() *alpha, $GENERIC() *
+		beta, $GENERIC() *vl, integer *ldvl, $GENERIC() *vr, integer *ldvr,
+		integer *ilo, integer *ihi, $GENERIC() *lscale, $GENERIC() *rscale,
+		$GENERIC() *abnrm, $GENERIC() *bbnrm, $GENERIC() *rconde, $GENERIC() *
+		rcondv, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *iwork, logical *
+		bwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VL(2,m,m);[o,phys]VR(2,p,p);int [o,phys]ilo();int [o,phys]ihi();[o,phys]lscale(n);[o,phys]rscale(n);[o,phys]abnrm();[o,phys]bbnrm();[o,phys]rconde(r);[o,phys]rcondv(s);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1, *iwork, *bwork;
 		char pjobvl = \'N\', pjobvr = \'N\';
 		char pbalanc, psens;
 
-             types(F) %{
-		int cggevx_(char *balanc, char *jobvl, char *jobvr, char *
-		sense, integer *n, float *a, integer *lda, float *b,
-		integer *ldb, float *alpha, float *
-		beta, float *vl, integer *ldvl, float *vr, integer *ldvr,
-		integer *ilo, integer *ihi, float *lscale, float *rscale,
-		float *abnrm, float *bbnrm, float *rconde, float *
-		rcondv, float *work, integer *lwork, float *rwork, integer *iwork, logical *
-		bwork, integer *info);
-		float tmp_work[2], *rwork;
-		rwork = (float *)malloc(6 * $SIZE(n) *  sizeof(float));
-             %}
-             types(D) %{
-		extern int zggevx_(char *balanc, char *jobvl, char *jobvr, char *
-		sense, integer *n, double *a, integer *lda, double *b,
-		integer *ldb, double *alpha, double *
-		beta, double *vl, integer *ldvl, double *vr, integer *ldvr,
-		integer *ilo, integer *ihi, double *lscale, double *rscale,
-		double *abnrm, double *bbnrm, double *rconde, double *
-		rcondv, double *work, integer *lwork, double *rwork, integer *iwork, logical *
-		bwork, integer *info);
-		double tmp_work[2], *rwork;
-		rwork = (double *)malloc(6 * $SIZE(n) *  sizeof(double));
-             %}
+		$GENERIC() tmp_work[2], *rwork;
+		rwork = ($GENERIC() *)malloc(6 * $SIZE(n) *  sizeof($GENERIC()));
 		if ($jobvl())
 			pjobvl = \'V\';
 		if ($jobvr())
@@ -956,12 +835,7 @@ pp_defc("ggevx",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             	%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 
 		$TFD(cggevx_,zggevx_)(
 		&pbalanc,
@@ -1105,38 +979,25 @@ PDL_Long dselect_wrapper(double *p)
 ');
 
 pp_defc("gees",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gees_(char *jobvs, char *sort, L_fp select, integer *n,
+		$GENERIC() *a, integer *lda, integer *sdim, $GENERIC() *w,
+		$GENERIC() *vs, integer *ldvs, $GENERIC() *work,
+		integer *lwork, $GENERIC() *rwork, integer *bwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);  int jobvs(); int sort(); [o,phys]w(2,n); [o,phys]vs(2,p,p); int [o,phys]sdim(); int [o,phys]info()',
 	OtherPars => "SV* select_func" ,
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jvs = \'N\';
 		char psort = \'N\';
 		integer *bwork;
 		integer lwork = -1;
 
-             types(F) %{
-		extern int cgees_(char *jobvs, char *sort, L_fp select, integer *n,
-		float *a, integer *lda, integer *sdim, float *w,
-		float *vs, integer *ldvs, float *work,
-		integer *lwork, float *rwork, integer *bwork, integer *info);
-		float tmp_work[2];
-		float *rwork, *work;
-		rwork = (float *) malloc ($PRIV(__n_size) * sizeof (float));
-		fselect_func    = $PRIV(select_func);
-             %}
-             types(D) %{
-		extern int zgees_(char *jobvs, char *sort, L_fp select, integer *n,
-		double *a, integer *lda, integer *sdim, double *w,
-		double *vs, integer *ldvs, double *work,
-		integer *lwork, double *rwork, integer *bwork, integer *info);
-		double *rwork, *work;
-		double tmp_work[2];
-		dselect_func    = $PRIV(select_func);
-		rwork = (double *) malloc ($PRIV(__n_size) * sizeof (double));
-             %}
-
-
+		$GENERIC() tmp_work[2];
+		$GENERIC() *rwork, *work;
+		rwork = ($GENERIC() *) malloc ($PRIV(__n_size) * sizeof ($GENERIC()));
+		$TFD(f,d)select_func    = $PRIV(select_func);
 
 		if ($jobvs())
 			jvs = \'V\';
@@ -1144,11 +1005,10 @@ pp_defc("gees",
 			psort = \'S\';
 			bwork  = (integer * ) malloc ($PRIV(__n_size) * sizeof (integer));
 		}
-             types(F) %{
-             cgees_(
+             $TFD(c,z)gees_(
 		&jvs,
 		&psort,
-		fselect_wrapper,
+		$TFD(f,d)select_wrapper,
 		&(integer){$PRIV(__n_size)},
 		$P(A),
 		&(integer){$PRIV(__n_size)},
@@ -1161,34 +1021,14 @@ pp_defc("gees",
 		rwork,
 		bwork,
 		$P(info));             
-             %}
-             types(D) %{
-		zgees_(
-		&jvs,
-		&psort,
-		dselect_wrapper,
-		&(integer){$PRIV(__n_size)},
-		$P(A),
-		&(integer){$PRIV(__n_size)},
-		$P(sdim),
-		$P(w),
-		$P(vs),
-		&(integer){$PRIV(__p_size)},
-		&tmp_work[0],
-		&lwork,
-		rwork,
-		bwork,
-		$P(info));
-             %}
 
 		lwork = (integer )tmp_work[0];
 
-		types(F) %{
-		work = (float *) malloc(2 * lwork *  sizeof(float));
-		cgees_(
+		work = ($GENERIC() *) malloc(2 * lwork *  sizeof($GENERIC()));
+		$TFD(c,z)gees_(
 		&jvs,
 		&psort,
-		fselect_wrapper,
+		$TFD(f,d)select_wrapper,
 		&(integer){$PRIV(__n_size)},
 		$P(A),
 		&(integer){$PRIV(__n_size)},
@@ -1202,28 +1042,7 @@ pp_defc("gees",
 		bwork,
 		$P(info));
 		free(work);
-             %}
 
-             types(D) %{
-		work = (double *) malloc(2*lwork *  sizeof(double));
-		zgees_(
-		&jvs,
-		&psort,
-		dselect_wrapper,
-		&(integer){$PRIV(__n_size)},
-		$P(A),
-		&(integer){$PRIV(__n_size)},
-		$P(sdim),
-		$P(w),
-		$P(vs),
-		&(integer){$PRIV(__p_size)},
-		work,
-		&lwork,
-		rwork,
-		bwork,
-		$P(info));
-		free(work);
-             %}
 		if ($sort())
 			free(bwork);
 		free(rwork);
@@ -1251,10 +1070,16 @@ Complex version of gees
 
 
 pp_defc("geesx",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)geesx_(char *jobvs, char *sort, L_fp select, char * sense,
+		integer *n, $GENERIC() *a, integer *lda, integer *sdim, $GENERIC() *w,
+		$GENERIC() *vs, integer *ldvs, $GENERIC() *rconde, $GENERIC() *rcondv,
+		$GENERIC() *work, integer *lwork, $GENERIC() *rwork,
+		integer *bwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);  int jobvs(); int sort(); int sense(); [o,phys]w(2,n);[o,phys]vs(2,p,p); int [o,phys]sdim(); [o,phys]rconde();[o,phys]rcondv(); int [o,phys]info()',
 	OtherPars => "SV* select_func" ,
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jvs = \'N\';
 		char psort = \'N\';
@@ -1262,26 +1087,9 @@ pp_defc("geesx",
 		integer lwork = 0;
 		char sens;
 
-             types(F) %{
-		extern int cgeesx_(char *jobvs, char *sort, L_fp select, char * sense,
-		integer *n, float *a, integer *lda, integer *sdim, float *w,
-		float *vs, integer *ldvs, float *rconde, float *rcondv,
-		float *work, integer *lwork, float *rwork,
-		integer *bwork, integer *info);
-		float *work, *rwork;
-		rwork = (float *) malloc ($PRIV(__n_size) * sizeof (float));
-		fselect_func    = $PRIV(select_func);
-             %}
-             types(D) %{
-		extern int zgeesx_(char *jobvs, char *sort, L_fp select, char * sense,
-		integer *n, double *a, integer *lda, integer *sdim, double *w,
-		double *vs, integer *ldvs, double *rconde, double *rcondv,
-		double *work, integer *lwork, double *rwork,
-		integer *bwork, integer *info);
-		double *work, *rwork;
-		dselect_func    = $PRIV(select_func);
-		rwork = (double *) malloc ($PRIV(__n_size) * sizeof (double));
-             %}
+		$GENERIC() *work, *rwork;
+		rwork = ($GENERIC() *) malloc ($PRIV(__n_size) * sizeof ($GENERIC()));
+		$TFD(f,d)select_func    = $PRIV(select_func);
 
 
 		if ($jobvs())
@@ -1305,18 +1113,12 @@ pp_defc("geesx",
 			default: sens = \'N\';
 				 lwork = (integer ) ($PRIV(__n_size) * 2);
 		}
-		types(D) %{
-			work  = (double * )malloc(2*lwork * sizeof (double));
-		%}
-		types(F) %{
-			work  = (float * )malloc(2*lwork * sizeof (float));
-		%}
+		work  = ($GENERIC() * )malloc(2*lwork * sizeof ($GENERIC()));
 
-		types(F) %{
-		cgeesx_(
+		$TFD(c,z)geesx_(
 		&jvs,
 		&psort,
-		fselect_wrapper,
+		$TFD(f,d)select_wrapper,
 		&sens,
 		&(integer){$PRIV(__n_size)},
 		$P(A),
@@ -1332,29 +1134,6 @@ pp_defc("geesx",
 		rwork,
 		bwork,
 		$P(info));
-		%}
-
-		types(D) %{
-		zgeesx_(
-		&jvs,
-		&psort,
-		dselect_wrapper,
-		&sens,
-		&(integer){$PRIV(__n_size)},
-		$P(A),
-		&(integer){$PRIV(__n_size)},
-		$P(sdim),
-		$P(w),
-		$P(vs),
-		&(integer){$PRIV(__p_size)},
-		$P(rconde),
-		$P(rcondv),
-		work,
-		&lwork,
-		rwork,
-		bwork,
-		$P(info));
-		%}
 
 		free(work);
 		if ($sort())
@@ -1522,37 +1301,25 @@ PDL_Long dgselect_wrapper(double *p, double *q)
 
 
 pp_defc("gges",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gges_(char *jobvsl, char *jobvsr, char *sort, L_fp
+		delctg, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,
+		integer *ldb, integer *sdim, $GENERIC() *alpha,
+		$GENERIC() *beta, $GENERIC() *vsl, integer *ldvsl, $GENERIC() *vsr,
+		integer *ldvsr, $GENERIC() *work, integer *lwork, $GENERIC() *rwork,
+		logical *bwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int jobvsl();int jobvsr();int sort();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VSL(2,m,m);[o,phys]VSR(2,p,p);int [o,phys]sdim();int [o,phys]info()',
 	OtherPars => "SV* select_func" ,
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
 		char pjobvsl = \'N\', pjobvsr = \'N\', psort = \'N\';
 		integer *bwork;
 
-             types(F) %{
-		extern int cgges_(char *jobvsl, char *jobvsr, char *sort, L_fp
-		delctg, integer *n, float *a, integer *lda, float *b,
-		integer *ldb, integer *sdim, float *alpha,
-		float *beta, float *vsl, integer *ldvsl, float *vsr,
-		integer *ldvsr, float *work, integer *lwork, float *rwork,
-		logical *bwork, integer *info);
-		float tmp_work[2], *rwork;
-		fgselect_func    = $PRIV(select_func);
-		rwork = (float *)malloc(8 * $SIZE(n) *  sizeof(float));	
-             %}
-             types(D) %{
-		extern int zgges_(char *jobvsl, char *jobvsr, char *sort, L_fp
-		delctg, integer *n, double *a, integer *lda, double *b,
-		integer *ldb, integer *sdim, double *alpha,
-		double *beta, double *vsl, integer *ldvsl, double *vsr,
-		integer *ldvsr, double *work, integer *lwork, double *rwork,
-		logical *bwork,	integer *info);
-		double tmp_work[2], *rwork;
-		dgselect_func    = $PRIV(select_func);
-		rwork = (double *)malloc(8 * $SIZE(n) *  sizeof(double));	
-             %}
+		$GENERIC() tmp_work[2], *rwork;
+		$TFD(f,d)gselect_func    = $PRIV(select_func);
+		rwork = ($GENERIC() *)malloc(8 * $SIZE(n) *  sizeof($GENERIC()));	
 		if ($jobvsl())
 			pjobvsl = \'V\';
 		if ($jobvsr())
@@ -1561,12 +1328,11 @@ pp_defc("gges",
 			psort = \'S\';
 			bwork = (integer *)malloc($PRIV(__n_size) *  sizeof(integer));
 		}
-		types(F) %{
-		cgges_(
+		$TFD(c,z)gges_(
 		&pjobvsl,
 		&pjobvsr,
 		&psort,
-		fgselect_wrapper,
+		$TFD(f,d)gselect_wrapper,
 		&(integer){$PRIV(__n_size)},
 		$P(A),
 		&(integer){$PRIV(__n_size)},
@@ -1584,49 +1350,16 @@ pp_defc("gges",
 		rwork,
 		bwork,
 		$P(info));
-		%}
-
-		types(D) %{
-		zgges_(
-		&pjobvsl,
-		&pjobvsr,
-		&psort,
-		dgselect_wrapper,
-		&(integer){$PRIV(__n_size)},
-		$P(A),
-		&(integer){$PRIV(__n_size)},
-		$P(B),
-		&(integer){$PRIV(__n_size)},
-		$P(sdim),
-		$P(alpha),
-		$P(beta),
-		$P(VSL),
-		&(integer){$PRIV(__m_size)},
-		$P(VSR),
-		&(integer){$PRIV(__p_size)},
-		&tmp_work[0],
-		&lwork,
-		rwork,
-		bwork,
-		$P(info));
-		%}
-
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             	%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 
-		types(F) %{
-		cgges_(
+		$TFD(c,z)gges_(
 		&pjobvsl,
 		&pjobvsr,
 		&psort,
-		fgselect_wrapper,
+		$TFD(f,d)gselect_wrapper,
 		&(integer){$PRIV(__n_size)},
 		$P(A),
 		&(integer){$PRIV(__n_size)},
@@ -1644,32 +1377,6 @@ pp_defc("gges",
 		rwork,
 		bwork,
 		$P(info));
-		%}
-
-		types(D) %{
-		zgges_(
-		&pjobvsl,
-		&pjobvsr,
-		&psort,
-		dgselect_wrapper,
-		&(integer){$PRIV(__n_size)},
-		$P(A),
-		&(integer){$PRIV(__n_size)},
-		$P(B),
-		&(integer){$PRIV(__n_size)},
-		$P(sdim),
-		$P(alpha),
-		$P(beta),
-		$P(VSL),
-		&(integer){$PRIV(__m_size)},
-		$P(VSR),
-		&(integer){$PRIV(__p_size)},
-		work,
-		&lwork,
-		rwork,
-		bwork,
-		$P(info));
-		%}		
 		free(work);
 		}
 		if ($sort())
@@ -1699,10 +1406,18 @@ Complex version of ggees
 ');
 
 pp_defc("ggesx",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)ggesx_(char *jobvsl, char *jobvsr, char *sort, L_fp
+		delctg, char *sense, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,
+		integer *ldb, integer *sdim, $GENERIC() *alpha,
+		$GENERIC() *beta, $GENERIC() *vsl, integer *ldvsl, $GENERIC() *vsr,
+		integer *ldvsr, $GENERIC() *rconde, $GENERIC() *rcondv,  $GENERIC() *work,
+		integer *lwork, $GENERIC() *rwork, integer *iwork, integer *liwork, logical *bwork,
+		integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int jobvsl();int jobvsr();int sort();int sense();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VSL(2,m,m);[o,phys]VSR(2,p,p);int [o,phys]sdim();[o,phys]rconde(q);[o,phys]rcondv(r);int [o,phys]info()',
 	OtherPars => "SV* select_func" ,
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork, maxwrk;
 		integer liwork = 1;
@@ -1716,28 +1431,8 @@ pp_defc("ggesx",
 		char psens = \'N\';
 		integer *bwork;
 		integer *iwork;
-             types(F) %{
-		extern int cggesx_(char *jobvsl, char *jobvsr, char *sort, L_fp
-		delctg, char *sense, integer *n, float *a, integer *lda, float *b,
-		integer *ldb, integer *sdim, float *alpha,
-		float *beta, float *vsl, integer *ldvsl, float *vsr,
-		integer *ldvsr, float *rconde, float *rcondv,  float *work,
-		integer *lwork, float *rwork, integer *iwork, integer *liwork, logical *bwork,
-		integer *info);
-		float *rwork = (float *)malloc(8 * $SIZE(n) *  sizeof(float));	
-		fgselect_func    = $PRIV(select_func);
-             %}
-             types(D) %{
-		extern int zggesx_(char *jobvsl, char *jobvsr, char *sort, L_fp
-		delctg, char *sense, integer *n, double *a, integer *lda, double *b,
-		integer *ldb, integer *sdim, double *alpha,
-		double *beta, double *vsl, integer *ldvsl, double *vsr,
-		integer *ldvsr,  double *rconde, double *rcondv, double *work,
-		integer *lwork, double *rwork, integer *iwork, integer *liwork, logical *bwork,
-		integer *info);
-		double *rwork = (double *)malloc(8 * $SIZE(n) *  sizeof(double));	
-		dgselect_func    = $PRIV(select_func);
-             %}
+		$GENERIC() *rwork = ($GENERIC() *)malloc(8 * $SIZE(n) *  sizeof($GENERIC()));	
+		$TFD(f,d)gselect_func    = $PRIV(select_func);
 		if ($jobvsr())
 			pjobvsr = \'V\';
 
@@ -1786,20 +1481,13 @@ pp_defc("ggesx",
 		lwork = max(maxwrk,minwrk);
 
 		{
-		types(F) %{
-			float *work = (float *)malloc( 2 * lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             	%}
+			$GENERIC() *work = ($GENERIC() *)malloc( 2 * lwork *  sizeof($GENERIC()));
 
-		
-		types(F) %{	
-		cggesx_(
+		$TFD(c,z)ggesx_(
 		&pjobvsl,
 		&pjobvsr,
 		&psort,
-		fgselect_wrapper,
+		$TFD(f,d)gselect_wrapper,
 		&psens,
 		&(integer){$PRIV(__n_size)},
 		$P(A),
@@ -1822,38 +1510,6 @@ pp_defc("ggesx",
 		&liwork,
 		bwork,
 		$P(info));
-		%}
-		
-		types(D) %{
-		zggesx_(
-		&pjobvsl,
-		&pjobvsr,
-		&psort,
-		dgselect_wrapper,
-		&psens,
-		&(integer){$PRIV(__n_size)},
-		$P(A),
-		&(integer){$PRIV(__n_size)},
-		$P(B),
-		&(integer){$PRIV(__n_size)},
-		$P(sdim),
-		$P(alpha),
-		$P(beta),
-		$P(VSL),
-		&(integer){$PRIV(__m_size)},
-		$P(VSR),
-		&(integer){$PRIV(__p_size)},
-		$P(rconde),
-		$P(rcondv),
-		work,
-		&lwork,
-		rwork,
-		iwork,
-		&liwork,
-		bwork,
-		$P(info));
-		%}
-
 		free(work);
 		}
 		if ($sort())
@@ -1885,35 +1541,24 @@ Complex version of ggeesx
 
 
 pp_defc("heev",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)heev_(char *jobz, char *uplo, integer *n, $GENERIC() *a,
+	 	integer *lda, $GENERIC() *w, $GENERIC() *work, integer *lwork, $GENERIC() *rwork,
+		integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
 		integer lwork = -1;
-             types(F) %{
-		extern int cheev_(char *jobz, char *uplo, integer *n, float *a,
-	 	integer *lda, float *w, float *work, integer *lwork, float *rwork,
-		integer *info);
-		float *rwork;
-		float tmp_work[2];
-		rwork = (float *) malloc ((3*$PRIV(__n_size)-2) * sizeof(float));
-             %}
-             types(D) %{
-		extern int zheev_(char *jobz, char *uplo, integer *n, double *a,
-	 	integer *lda, double *w, double *work, integer *lwork, double *rwork,
-		integer *info);
-		double *rwork;
-		double tmp_work[2];
-		rwork = (double *) malloc ((3*$PRIV(__n_size)-2) * sizeof(double));
-             %}
-
+		$GENERIC() *rwork;
+		$GENERIC() tmp_work[2];
+		rwork = ($GENERIC() *) malloc ((3*$PRIV(__n_size)-2) * sizeof($GENERIC()));
 		if ($jobz())
 			jz = \'V\';
 		if ($uplo())
 			puplo = \'L\';
-
 
 		$TFD(cheev_,zheev_)(
 		&jz,
@@ -1929,12 +1574,7 @@ pp_defc("heev",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2*lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2*lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(cheev_,zheev_)(
 		&jz,
 		&puplo,
@@ -1959,9 +1599,13 @@ Complex version of syev for Hermitian matrix
 ');
 
 pp_defc("heevd",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)heevd_(char *jobz, char *uplo, integer *n, $GENERIC() *a,
+	 	integer *lda, $GENERIC() *w, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *lrwork,
+		integer *iwork, integer *liwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -1969,21 +1613,8 @@ pp_defc("heevd",
 		integer lrwork, liwork;
 		integer tmpi_work;
 		integer *iwork;
-
-             types(F) %{
-		extern int cheevd_(char *jobz, char *uplo, integer *n, float *a,
-	 	integer *lda, float *w, float *work, integer *lwork, float *rwork, integer *lrwork,
-		integer *iwork, integer *liwork, integer *info);
-		float tmp_work[2];
-		float tmpr_work;
-             %}
-             types(D) %{
-		extern int zheevd_(char *jobz, char *uplo, integer *n, double *a,
-	 	integer *lda, double *w, double *work, integer *lwork, double *rwork, integer *lrwork,
-		integer *iwork, integer *liwork, integer *info);
-		double tmp_work[2];
-		double tmpr_work;
-             %}
+		$GENERIC() tmp_work[2];
+		$GENERIC() tmpr_work;
 
 		if ($jobz())
 			jz = \'V\';
@@ -2013,14 +1644,8 @@ pp_defc("heevd",
 		iwork = (integer *)malloc(liwork *  sizeof(integer));
 
 		{
-		types(F) %{
-		float *work = (float *)malloc(2*lwork *  sizeof(float));
-		float *rwork = (float *)malloc(lrwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2*lwork *  sizeof(double));
-		double *rwork = (double *)malloc(lrwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() *)malloc(lrwork *  sizeof($GENERIC()));
 		$TFD(cheevd_,zheevd_)(
 		&jz,
 		&puplo,
@@ -2051,9 +1676,15 @@ Complex version of syevd for Hermitian matrix
 
 
 pp_defc("heevx",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)heevx_(char *jobz, char *range, char *uplo, integer *n,
+		$GENERIC() *a, integer *lda, $GENERIC() *vl, $GENERIC() *vu, integer *
+		il, integer *iu, $GENERIC() *abstol, integer *m, $GENERIC() *w,
+		$GENERIC() *z__, integer *ldz, $GENERIC() *work, integer *lwork,
+		$GENERIC() *rwork, integer *iwork, integer *ifail, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n); [o,phys]z(2,p,q);int [o,phys]ifail(r); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -2061,26 +1692,9 @@ pp_defc("heevx",
 		integer lwork = -1;
 		integer *iwork;
 
-             types(F) %{
-		extern int cheevx_(char *jobz, char *range, char *uplo, integer *n,
-		float *a, integer *lda, float *vl, float *vu, integer *
-		il, integer *iu, float *abstol, integer *m, float *w,
-		float *z__, integer *ldz, float *work, integer *lwork,
-		float *rwork, integer *iwork, integer *ifail, integer *info);
-		float *rwork;
-		float tmp_work[2];
-		rwork = (float *)malloc(7 * $SIZE(n) * sizeof(float));
-             %}
-             types(D) %{
-		extern int zheevx_(char *jobz, char *range, char *uplo, integer *n,
-		double *a, integer *lda, double *vl, double *vu, integer *
-		il, integer *iu, double *abstol, integer *m, double *w,
-		double *z__, integer *ldz, double *work, integer *lwork,
-		double *rwork, integer *iwork, integer *ifail, integer *info);
-		double *rwork;
-		double tmp_work[2];
-		rwork = (double *)malloc(7 * $SIZE(n) * sizeof(double));
-             %}
+		$GENERIC() *rwork;
+		$GENERIC() tmp_work[2];
+		rwork = ($GENERIC() *)malloc(7 * $SIZE(n) * sizeof($GENERIC()));
 
 		if ($jobz())
 			jz = \'V\';
@@ -2123,12 +1737,7 @@ pp_defc("heevx",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2* lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2* lwork *  sizeof($GENERIC()));
 		$TFD(cheevx_,zheevx_)(
 		&jz,
 		&prange,
@@ -2165,9 +1774,15 @@ Complex version of syevx for Hermitian matrix
 ');
 
 pp_defc("heevr",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)heevr_(char *jobz, char *range, char *uplo, integer *n,
+		$GENERIC() *a, integer *lda, $GENERIC() *vl, $GENERIC() *vu, integer *
+		il, integer *iu, $GENERIC() *abstol, integer *m, $GENERIC() *w,
+		$GENERIC() *z__, integer *ldz, integer *isuppz, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *lrwork,
+		integer *iwork, integer *liwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n); [o,phys]z(2,p,q);int [o,phys]isuppz(r); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -2176,24 +1791,8 @@ pp_defc("heevr",
 		integer liwork,lrwork;
 		integer tmpi_work;
 
-             types(F) %{
-		extern int cheevr_(char *jobz, char *range, char *uplo, integer *n,
-		float *a, integer *lda, float *vl, float *vu, integer *
-		il, integer *iu, float *abstol, integer *m, float *w,
-		float *z__, integer *ldz, integer *isuppz, float *work, integer *lwork, float *rwork, integer *lrwork,
-		integer *iwork, integer *liwork, integer *info);
-		float tmp_work[2];
-		float tmpr_work;
-             %}
-             types(D) %{
-		extern int zheevr_(char *jobz, char *range, char *uplo, integer *n,
-		double *a, integer *lda, double *vl, double *vu, integer *
-		il, integer *iu, double *abstol, integer *m, double *w,
-		double *z__, integer *ldz, integer *isuppz, double *work, integer *lwork, double *rwork, integer *lrwork,
-		integer *iwork, integer *liwork, integer *info);
-		double tmp_work[2];
-		double tmpr_work;
-             %}
+		$GENERIC() tmp_work[2];
+		$GENERIC() tmpr_work;
 
 		if ($jobz())
 			jz = \'V\';
@@ -2238,16 +1837,9 @@ pp_defc("heevr",
 		lrwork = (integer )tmpr_work;
 		liwork = (integer )tmpi_work;
 		{
-		types(F) %{
-		float *work = (float *)malloc(2* lwork *  sizeof(float));
-		float *rwork = (float *)malloc(lrwork *  sizeof(float));
+		$GENERIC() *work = ($GENERIC() *)malloc(2* lwork *  sizeof($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() *)malloc(lrwork *  sizeof($GENERIC()));
 		integer *iwork = (integer *)malloc(liwork *  sizeof(integer));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-		double *rwork = (double *)malloc(lrwork *  sizeof(double));
-		integer *iwork = (integer *)malloc(liwork *  sizeof(integer));
-             %}
 		$TFD(cheevr_,zheevr_)(
 		&jz,
 		&prange,
@@ -2287,28 +1879,20 @@ Complex version of syevr for Hermitian matrix
 ');
 
 pp_defc("hegv",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hegv_(integer *itype, char *jobz, char *uplo, integer *
+		n, $GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb,
+		$GENERIC() *w, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(2,n,n);[o,phys]w(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
 		integer lwork = -1;
 
-             types(F) %{
-		extern int chegv_(integer *itype, char *jobz, char *uplo, integer *
-		n, float *a, integer *lda, float *b, integer *ldb,
-		float *w, float *work, integer *lwork, float *rwork, integer *info);
-		float tmp_work[2], *rwork;
-		rwork = (float *) malloc( (3 * $SIZE(n) - 2 ) *  sizeof(float));
-             %}
-             types(D) %{
-		extern int zhegv_(integer *itype, char *jobz, char *uplo, integer *
-		n, double *a, integer *lda, double *b, integer *ldb,
-		double *w, double *work, integer *lwork, double *rwork, integer *info);
-		double tmp_work[2], *rwork;
-		rwork = (double *) malloc( (3 * $SIZE(n) - 2 ) *  sizeof(double));
-             %}
+		$GENERIC() tmp_work[2], *rwork;
+		rwork = ($GENERIC() *) malloc( (3 * $SIZE(n) - 2 ) *  sizeof($GENERIC()));
 
 		if ($jobz())
 			jz = \'V\';
@@ -2333,12 +1917,7 @@ pp_defc("hegv",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(chegv_,zhegv_)(
 		$P(itype),
 		&jz,
@@ -2367,9 +1946,14 @@ Complex version of sygv for Hermitian matrix
 
 
 pp_defc("hegvd",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hegvd_(integer *itype, char *jobz, char *uplo, integer *
+		n, $GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb,
+		$GENERIC() *w, $GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *lrwork,
+		integer *iwork,	integer *liwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(2,n,n);[o,phys]w(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -2379,20 +1963,7 @@ pp_defc("hegvd",
 		integer *iwork;
 		integer tmp_iwork;
 
-             types(F) %{
-		extern int chegvd_(integer *itype, char *jobz, char *uplo, integer *
-		n, float *a, integer *lda, float *b, integer *ldb,
-		float *w, float *work, integer *lwork, float *rwork, integer *lrwork,
-		integer *iwork,	integer *liwork, integer *info);
-		float tmp_work[2], tmp_rwork;
-             %}
-             types(D) %{
-		extern int zhegvd_(integer *itype, char *jobz, char *uplo, integer *
-		n, double *a, integer *lda, double *b, integer *ldb,
-		double *w, double *work, integer *lwork, double *rwork, integer *lrwork,
-		integer *iwork, integer *liwork, integer *info);
-		double tmp_work[2], tmp_rwork;
-             %}
+		$GENERIC() tmp_work[2], tmp_rwork;
 
 		if ($jobz())
 			jz = \'V\';
@@ -2424,14 +1995,8 @@ pp_defc("hegvd",
 		iwork = (integer *)malloc(liwork *  sizeof(integer));
 
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-			float *rwork = (float *)malloc(lrwork *  sizeof(float));
-             %}
-             types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-			double *rwork = (double *)malloc(lrwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() *)malloc(lrwork *  sizeof($GENERIC()));
 		$TFD(chegvd_,zhegvd_)(
 		$P(itype),
 		&jz,
@@ -2464,9 +2029,16 @@ Complex version of sygvd for Hermitian matrix
 
 
 pp_defc("hegvx",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hegvx_(integer *itype, char *jobz, char *range, char *
+		uplo, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b, integer
+		*ldb, $GENERIC() *vl, $GENERIC() *vu, integer *il, integer *iu,
+		$GENERIC() *abstol, integer *m, $GENERIC() *w, $GENERIC() *z__,
+		integer *ldz, $GENERIC() *work, integer *lwork, $GENERIC() *rwork,
+		integer *iwork, integer *ifail, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);int [phys]itype();int jobz();int range(); int uplo();[io,phys]B(2,n,n);[phys]vl();[phys]vu();int [phys]il();int [phys]iu();[phys]abstol();int [o,phys]m();[o,phys]w(n); [o,phys]Z(2,p,q);int [o,phys]ifail(r);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char jz = \'N\';
 		char puplo = \'U\';
@@ -2474,26 +2046,8 @@ pp_defc("hegvx",
 		integer lwork = -1;
 		integer *iwork;
 
-             types(F) %{
-		extern int chegvx_(integer *itype, char *jobz, char *range, char *
-		uplo, integer *n, float *a, integer *lda, float *b, integer
-		*ldb, float *vl, float *vu, integer *il, integer *iu,
-		float *abstol, integer *m, float *w, float *z__,
-		integer *ldz, float *work, integer *lwork, float *rwork,
-		integer *iwork, integer *ifail, integer *info);
-		float tmp_work[2], *rwork;
-		rwork = (float *)malloc(7 * $SIZE(n) *  sizeof(float));
-             %}
-             types(D) %{
-		extern int zhegvx_(integer *itype, char *jobz, char *range, char *
-		uplo, integer *n, double *a, integer *lda, double *b, integer
-		*ldb, double *vl, double *vu, integer *il, integer *iu,
-		double *abstol, integer *m, double *w, double *z__,
-		integer *ldz, double *work, integer *lwork, double *rwork,
-		integer *iwork, integer *ifail, integer *info);
-		double tmp_work[2], *rwork;
-		rwork = (double *)malloc(7 * $SIZE(n) * sizeof(double));	
-             %}
+		$GENERIC() tmp_work[2], *rwork;
+		rwork = ($GENERIC() *)malloc(7 * $SIZE(n) *  sizeof($GENERIC()));
 
 		if ($jobz())
 			jz = \'V\';
@@ -2539,14 +2093,7 @@ pp_defc("hegvx",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-
-		float *work = (float *)malloc( 2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc( 2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc( 2 * lwork *  sizeof($GENERIC()));
 		$TFD(chegvx_,zhegvx_)(
 		$P(itype),
 		&jz,
@@ -2587,19 +2134,13 @@ Complex version of sygvx for Hermitian matrix
 
 
 pp_defc("gesv",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gesv_(integer *n, integer *nrhs, $GENERIC() *a, integer
+		*lda, integer *ipiv, $GENERIC() *b, integer *ldb, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);  [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
-             types(F) %{
-		extern int cgesv_(integer *n, integer *nrhs, float *a, integer
-		*lda, integer *ipiv, float *b, integer *ldb, integer *info);
-             %}
-             types(D) %{
-		extern int zgesv_(integer *n, integer *nrhs, double *a, integer
-		*lda, integer *ipiv, double *b, integer *ldb, integer *info);
-             %}
-
 		$TFD(cgesv_,zgesv_)(
 		&(integer){$PRIV(__n_size)},
 		&(integer){$PRIV(__m_size)},
@@ -2611,32 +2152,21 @@ pp_defc("gesv",
 		$P(info));
 ');
 pp_defc("gesvx",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gesvx_(char *fact, char *trans, integer *n, integer *
+		nrhs, $GENERIC() *a, integer *lda, $GENERIC() *af, integer *ldaf,
+		integer *ipiv, char *equed, $GENERIC() *r__, $GENERIC() *c__,
+		$GENERIC() *b, integer *ldb, $GENERIC() *x, integer *ldx, $GENERIC() *
+		rcond, $GENERIC() *ferr, $GENERIC() *berr, $GENERIC() *work, $GENERIC() *
+		rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int trans(); int fact(); [io,phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); int [io]equed(); [io,phys]r(n); [io,phys]c(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); [o,phys]rpvgrw(); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans, pfact, pequed;
 
-             types(F) %{
-		extern int cgesvx_(char *fact, char *trans, integer *n, integer *
-		nrhs, float *a, integer *lda, float *af, integer *ldaf,
-		integer *ipiv, char *equed, float *r__, float *c__,
-		float *b, integer *ldb, float *x, integer *ldx, float *
-		rcond, float *ferr, float *berr, float *work, float *
-		rwork, integer *info);
-		float *work = (float *) malloc(4 * $PRIV(__n_size) *  sizeof(float));
-		float *rwork  = (float *) malloc(4 * $PRIV(__n_size) *  sizeof(float));
-             %}
-             types(D) %{
-		extern int zgesvx_(char *fact, char *trans, integer *n, integer *
-		nrhs, double *a, integer *lda, double *af, integer *ldaf,
-		integer *ipiv, char *equed, double *r__, double *c__,
-		double *b, integer *ldb, double *x, integer *ldx, double *
-		rcond, double *ferr, double *berr, double *work, double *
-		rwork, integer *info);
-		double *work = (double *) malloc(4 * $PRIV(__n_size) *  sizeof(double));
-		double *rwork  = (double *) malloc(4 * $PRIV(__n_size) *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *) malloc(4 * $PRIV(__n_size) *  sizeof($GENERIC()));
+		$GENERIC() *rwork  = ($GENERIC() *) malloc(4 * $PRIV(__n_size) *  sizeof($GENERIC()));
 
 		switch ($trans())
 		{
@@ -2719,24 +2249,17 @@ Complex version of gesvx.
 ');
 
 pp_defc("sysv",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)sysv_(char *uplo, integer *n, integer *nrhs, $GENERIC()
+		*a, integer *lda, integer *ipiv, $GENERIC() *b, integer *ldb,
+		$GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char puplo = \'U\';
 		integer lwork = -1;
-             types(F) %{
-		extern int csysv_(char *uplo, integer *n, integer *nrhs, float
-		*a, integer *lda, integer *ipiv, float *b, integer *ldb,
-		float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zsysv_(char *uplo, integer *n, integer *nrhs, double
-		*a, integer *lda, integer *ipiv, double *b, integer *ldb,
-		double *work, integer *lwork, integer *info);
-		double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 		if ($uplo())
 			puplo = \'L\';
 
@@ -2756,14 +2279,7 @@ pp_defc("sysv",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-
-		float *work = (float *)malloc(2*lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc(2*lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(csysv_,zsysv_)(
 		&puplo,
 		&(integer){$PRIV(__n_size)},
@@ -2782,32 +2298,22 @@ pp_defc("sysv",
 ');
 
 pp_defc("sysvx",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)sysvx_(char *fact, char *uplo, integer *n, integer *
+		nrhs, $GENERIC() *a, integer *lda, $GENERIC() *af, integer *ldaf,
+		integer *ipiv, $GENERIC() *b, integer *ldb, $GENERIC() *x, integer *
+		ldx, $GENERIC() *rcond, $GENERIC() *ferr, $GENERIC() *berr,
+		$GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int uplo(); int fact(); [phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char pfact = \'N\';
 		char puplo = \'U\';
 		integer lwork = -1;
 
-             types(F) %{
-		extern int csysvx_(char *fact, char *uplo, integer *n, integer *
-		nrhs, float *a, integer *lda, float *af, integer *ldaf,
-		integer *ipiv, float *b, integer *ldb, float *x, integer *
-		ldx, float *rcond, float *ferr, float *berr,
-		float *work, integer *lwork, float *rwork, integer *info);
-		float *rwork = (float * )malloc ($PRIV(__n_size)* sizeof (float));
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zsysvx_(char *fact, char *uplo, integer *n, integer *
-		nrhs, double *a, integer *lda, double *af, integer *ldaf,
-		integer *ipiv, double *b, integer *ldb, double *x, integer *
-		ldx, double *rcond, double *ferr, double *berr,
-		double *work, integer *lwork, double *rwork, integer *info);
-		double *rwork = (double * )malloc ($PRIV(__n_size)* sizeof (double));
-		double tmp_work[2];
-             %}
+		$GENERIC() *rwork = ($GENERIC() * )malloc ($PRIV(__n_size)* sizeof ($GENERIC()));
+		$GENERIC() tmp_work[2];
 
 		if($fact())
 			pfact = \'F\';
@@ -2840,12 +2346,7 @@ pp_defc("sysvx",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2*lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2*lwork *  sizeof(double));
-             	%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 
 		$TFD(csysvx_,zsysvx_)(
 		&pfact,
@@ -2875,24 +2376,17 @@ pp_defc("sysvx",
 ');
 
 pp_defc("hesv",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hesv_(char *uplo, integer *n, integer *nrhs, $GENERIC()
+		*a, integer *lda, integer *ipiv, $GENERIC() *b, integer *ldb,
+		$GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char puplo = \'U\';
 		integer lwork = -1;
-             types(F) %{
-		extern int chesv_(char *uplo, integer *n, integer *nrhs, float
-		*a, integer *lda, integer *ipiv, float *b, integer *ldb,
-		float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zhesv_(char *uplo, integer *n, integer *nrhs, double
-		*a, integer *lda, integer *ipiv, double *b, integer *ldb,
-		double *work, integer *lwork, integer *info);
-		double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 		if ($uplo())
 			puplo = \'L\';
 
@@ -2912,14 +2406,7 @@ pp_defc("hesv",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-
-		float *work = (float *)malloc(2*lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc(2*lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(chesv_,zhesv_)(
 		&puplo,
 		&(integer){$PRIV(__n_size)},
@@ -2945,32 +2432,22 @@ Complex version of sysv for Hermitian matrix
 ');
 
 pp_defc("hesvx",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hesvx_(char *fact, char *uplo, integer *n, integer *
+		nrhs, $GENERIC() *a, integer *lda, $GENERIC() *af, integer *ldaf,
+		integer *ipiv, $GENERIC() *b, integer *ldb, $GENERIC() *x, integer *
+		ldx, $GENERIC() *rcond, $GENERIC() *ferr, $GENERIC() *berr,
+		$GENERIC() *work, integer *lwork, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int uplo(); int fact(); [phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char pfact = \'N\';
 		char puplo = \'U\';
 		integer lwork = -1;
 
-             types(F) %{
-		extern int chesvx_(char *fact, char *uplo, integer *n, integer *
-		nrhs, float *a, integer *lda, float *af, integer *ldaf,
-		integer *ipiv, float *b, integer *ldb, float *x, integer *
-		ldx, float *rcond, float *ferr, float *berr,
-		float *work, integer *lwork, float *rwork, integer *info);
-		float *rwork = (float * )malloc ($PRIV(__n_size)* sizeof (float));
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zhesvx_(char *fact, char *uplo, integer *n, integer *
-		nrhs, double *a, integer *lda, double *af, integer *ldaf,
-		integer *ipiv, double *b, integer *ldb, double *x, integer *
-		ldx, double *rcond, double *ferr, double *berr,
-		double *work, integer *lwork, double *rwork, integer *info);
-		double *rwork = (double * )malloc ($PRIV(__n_size)* sizeof (double));
-		double tmp_work[2];
-             %}
+		$GENERIC() *rwork = ($GENERIC() * )malloc ($PRIV(__n_size)* sizeof ($GENERIC()));
+		$GENERIC() tmp_work[2];
 
 		if($fact())
 			pfact = \'F\';
@@ -3003,12 +2480,7 @@ pp_defc("hesvx",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2*lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2*lwork *  sizeof(double));
-             	%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 
 		$TFD(chesvx_,zhesvx_)(
 		&pfact,
@@ -3046,21 +2518,14 @@ Complex version of sysvx for Hermitian matrix
 
 
 pp_defc("posv",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)posv_(char *uplo, integer *n, integer *nrhs, $GENERIC()
+		*a, integer *lda, $GENERIC() *b, integer *ldb, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-
-             types(F) %{
-		extern int cposv_(char *uplo, integer *n, integer *nrhs, float
-		*a, integer *lda, float *b, integer *ldb, integer *info);
-             %}
-             types(D) %{
-		extern int zposv_(char *uplo, integer *n, integer *nrhs, double
-		*a, integer *lda, double *b, integer *ldb, integer *info);
-             %}
-
 		if ($uplo())
 			puplo = \'L\';
 
@@ -3082,30 +2547,21 @@ Complex version of posv for Hermitian positive definite matrix
 
 ');
 pp_defc("posvx",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)posvx_(char *fact, char *uplo, integer *n, integer *
+		nrhs, $GENERIC() *a, integer *lda, $GENERIC() *af, integer *ldaf,
+		char *equed, $GENERIC() *s, $GENERIC() *b, integer *ldb, $GENERIC() *
+		x, integer *ldx, $GENERIC() *rcond, $GENERIC() *ferr, $GENERIC() *
+		berr, $GENERIC() *work, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int fact(); [io,phys]B(2,n,m); [io,phys]af(2,n,n); int [io]equed(); [io,phys]s(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char pfact;
 		char pequed = \'N\';
 		char puplo = \'U\';
 
-             types(F) %{
-		extern int cposvx_(char *fact, char *uplo, integer *n, integer *
-		nrhs, float *a, integer *lda, float *af, integer *ldaf,
-		char *equed, float *s, float *b, integer *ldb, float *
-		x, integer *ldx, float *rcond, float *ferr, float *
-		berr, float *work, float *rwork, integer *info);
-		float *work, *rwork;
-             %}
-             types(D) %{
-		extern int zposvx_(char *fact, char *uplo, integer *n, integer *
-		nrhs, double *a, integer *lda, double *af, integer *ldaf,
-		char *equed, double *s, double *b, integer *ldb, double *
-		x, integer *ldx, double *rcond, double *ferr, double *
-		berr, double *work, double *rwork, integer *info);
-		double *work, *rwork;
-             %}
+		$GENERIC() *work, *rwork;
 
 		switch ($fact())
 		{
@@ -3120,17 +2576,8 @@ pp_defc("posvx",
 		if ($uplo())
 			puplo = \'L\';
 
-		types(F) %{
-
-		work = (float *) malloc(4 * $PRIV(__n_size) *  sizeof(float));
-		rwork = (float *) malloc(2 * $PRIV(__n_size) *  sizeof(float));
-             %}
-             types(D) %{
-
-		work = (double *) malloc(4 * $PRIV(__n_size) *  sizeof(double));
-		rwork = (double *) malloc(2 * $PRIV(__n_size) *  sizeof(double));
-             %}
-
+		work = ($GENERIC() *) malloc(4 * $PRIV(__n_size) *  sizeof($GENERIC()));
+		rwork = ($GENERIC() *) malloc(2 * $PRIV(__n_size) *  sizeof($GENERIC()));
 
 		$TFD(cposvx_,zposvx_)(
 		&pfact,
@@ -3174,30 +2621,21 @@ Complex version of posvx for Hermitian positive definite matrix
 ');
 
 pp_defc("gels",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gels_(char *trans, integer *m, integer *n, integer *
+		nrhs, $GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb,
+		$GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); int trans(); [io,phys]B(2,p,q);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\';
 		integer lwork = -1;
 
-             types(F) %{
-		extern int cgels_(char *trans, integer *m, integer *n, integer *
-		nrhs, float *a, integer *lda, float *b, integer *ldb,
-		float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zgels_(char *trans, integer *m, integer *n, integer *
-		nrhs, double *a, integer *lda, double *b, integer *ldb,
-		double *work, integer *lwork, integer *info);
-		double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 
 		if($trans())
 			ptrans = \'C\';
-
-
 
 		$TFD(cgels_,zgels_)(
 		&ptrans,
@@ -3214,12 +2652,7 @@ pp_defc("gels",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2*lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2*lwork *  sizeof(double));
-             	%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 
 		$TFD(cgels_,zgels_)(
 		&ptrans,
@@ -3251,35 +2684,21 @@ Complex version of gels.
 ');
 
 pp_defc("gelsy",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gelsy_(integer *m, integer *n, integer *nrhs,
+		$GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb, integer *
+		jpvt, $GENERIC() *rcond, integer *rank, $GENERIC() *work, integer *
+		lwork, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [io,phys]B(2,p,q); [phys]rcond(); int [io,phys]jpvt(n); int [o,phys]rank();int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
 
-             types(F) %{
-		extern int cgelsy_(integer *m, integer *n, integer *nrhs,
-		float *a, integer *lda, float *b, integer *ldb, integer *
-		jpvt, float *rcond, integer *rank, float *work, integer *
-		lwork, float *rwork, integer *info);
-		float tmp_work[2];
-		float *rwork;
-             %}
-             types(D) %{
-		extern int zgelsy_(integer *m, integer *n, integer *nrhs,
-		double *a, integer *lda, double *b, integer *ldb, integer *
-		jpvt, double *rcond, integer *rank, double *work, integer *
-		lwork, double *rwork, integer *info);
-		double tmp_work[2];
-		double *rwork;
-             %}
+		$GENERIC() tmp_work[2];
+		$GENERIC() *rwork;
 
-		types(F) %{
-			rwork = (float *)malloc( 2 * $PRIV(__m_size) *  sizeof(float));
-             	%}
-             	types(D) %{
-			rwork = (double *)malloc(2 * $PRIV(__m_size) *  sizeof(double));
-		%}
+		rwork = ($GENERIC() *)malloc(2 * $PRIV(__m_size) * sizeof($GENERIC()));
 
 		$TFD(cgelsy_,zgelsy_)(
 		&(integer){$PRIV(__m_size)},
@@ -3299,12 +2718,7 @@ pp_defc("gelsy",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             	%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 
 		$TFD(cgelsy_,zgelsy_)(
 		&(integer){$PRIV(__m_size)},
@@ -3329,38 +2743,24 @@ pp_defc("gelsy",
 
 
 pp_defc("gelss",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gelss_(integer *m, integer *n, integer *nrhs,
+		$GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *s,
+		$GENERIC() *rcond, integer *rank, $GENERIC() *work, integer *
+		lwork, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [io,phys]B(2,p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
 		integer lrwork;
 
-             types(F) %{
-		extern int cgelss_(integer *m, integer *n, integer *nrhs,
-		float *a, integer *lda, float *b, integer *ldb, float *s,
-		float *rcond, integer *rank, float *work, integer *
-		lwork, float *rwork, integer *info);
-		float tmp_work[2];
-		float *rwork;
-             %}
-             types(D) %{
-		extern int zgelss_(integer *m, integer *n, integer *nrhs,
-		double *a, integer *lda, double *b, integer *ldb,
-		double *s,double *rcond, integer *rank, double *work, integer *
-		lwork, double *rwork, integer *info);
-		double tmp_work[2];
-		double *rwork;
-             %}
+		$GENERIC() tmp_work[2];
+		$GENERIC() *rwork;
 
 		lrwork = min($PRIV(__m_size), $PRIV(__n_size));
 
-		types(F) %{
-			rwork = (float *)malloc(5 * lrwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			rwork = (double *)malloc(5 * lrwork *  sizeof(double));
-             	%}
+			rwork = ($GENERIC() *)malloc(5 * lrwork *  sizeof($GENERIC()));
 
 		$TFD(cgelss_,zgelss_)(
 		&(integer){$PRIV(__m_size)},
@@ -3380,12 +2780,7 @@ pp_defc("gelss",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             	%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 
 		$TFD(cgelss_,zgelss_)(
 		&(integer){$PRIV(__m_size)},
@@ -3409,55 +2804,32 @@ pp_defc("gelss",
 ');
 
 pp_defc("gelsd",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gelsd_(integer *m, integer *n, integer *nrhs,
+		$GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *s,
+		$GENERIC() *rcond, integer *rank, $GENERIC() *work, integer *
+		lwork,  $GENERIC() *rwork, integer *iwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [io,phys]B(2,p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
 		integer smlsiz, size_i, nlvl, *iwork;
 		integer minmn = min( $SIZE(m), $SIZE(n) );
 
-
-             types(F) %{
-		extern int cgelsd_(integer *m, integer *n, integer *nrhs,
-		float *a, integer *lda, float *b, integer *ldb, float *s,
-		float *rcond, integer *rank, float *work, integer *
-		lwork,  float *rwork, integer *iwork, integer *info);
-		float *rwork;
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zgelsd_(integer *m, integer *n, integer *nrhs,
-		double *a, integer *lda, double *b, integer *ldb,
-		double *s,double *rcond, integer *rank, double *work, integer *
-		lwork, double *rwork, integer *iwork,integer *info);
-		double *rwork;
-		double tmp_work[2];
-             %}
+		$GENERIC() *rwork;
+		$GENERIC() tmp_work[2];
 
 		minmn = max(1,minmn);
 
-
-             types(F) %{
 		smlsiz = ilaenv_(&c_nine, "CGELSD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
-		size_i = (integer) (log((float) minmn / (float) (smlsiz + 1)) /log(2.)) + 1;
+		size_i = (integer) (log(($GENERIC()) minmn / ($GENERIC()) (smlsiz + 1)) /log(2.)) + 1;
 		if ($PRIV(__m_size) >=  $PRIV(__n_size)){
-			rwork = (float *) malloc ((10*$PRIV(__n_size) + 2 * $PRIV(__n_size) * smlsiz + 8 * $PRIV(__n_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof(float));
+			rwork = ($GENERIC() *) malloc ((10*$PRIV(__n_size) + 2 * $PRIV(__n_size) * smlsiz + 8 * $PRIV(__n_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof($GENERIC()));
 		}
 		else{
-			rwork = (float *) malloc ((10*$PRIV(__m_size) + 2 * $PRIV(__m_size) * smlsiz + 8 * $PRIV(__m_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof(float));
+			rwork = ($GENERIC() *) malloc ((10*$PRIV(__m_size) + 2 * $PRIV(__m_size) * smlsiz + 8 * $PRIV(__m_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof($GENERIC()));
 		}
-             %}
-             types(D) %{
-		smlsiz = ilaenv_(&c_nine, "ZGELSD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
-		size_i = (integer) (log((double) minmn / (double) (smlsiz + 1)) /log(2.)) + 1;
-		if ($PRIV(__m_size) >=  $PRIV(__n_size)){
-			rwork = (double *) malloc ((10*$PRIV(__n_size) + 2 * $PRIV(__n_size) * smlsiz + 8 * $PRIV(__n_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof(double));
-		}
-		else{
-			rwork = (double *) malloc ((10*$PRIV(__m_size) + 2 * $PRIV(__m_size) * smlsiz + 8 * $PRIV(__m_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof(double));
-		}
-             %}
 		nlvl = max(size_i, 0);
 		iwork = (integer *)malloc((3 * minmn * nlvl + 11 * minmn) *  sizeof(integer));
 
@@ -3481,12 +2853,7 @@ pp_defc("gelsd",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             	%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 
 		$TFD(cgelsd_,zgelsd_)(
 		&(integer){$PRIV(__m_size)},
@@ -3512,27 +2879,18 @@ pp_defc("gelsd",
 
 
 pp_defc("gglse",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gglse_(integer *m, integer *n, integer *p, $GENERIC() *
+		a, integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *c__,
+		$GENERIC() *d__, $GENERIC() *x, $GENERIC() *work, integer *lwork,
+		integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,m,n); [phys]B(2,p,n);[io,phys]c(2,m);[phys]d(2,p);[o,phys]x(2,n);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
 
-             types(F) %{
-		extern int cgglse_(integer *m, integer *n, integer *p, float *
-		a, integer *lda, float *b, integer *ldb, float *c__,
-		float *d__, float *x, float *work, integer *lwork,
-		integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zgglse_(integer *m, integer *n, integer *p, double *
-		a, integer *lda, double *b, integer *ldb, double *c__,
-		double *d__, double *x, double *work, integer *lwork,
-		integer *info);
-		double tmp_work[2];
-             %}
-
+		$GENERIC() tmp_work[2];
 
 		$TFD(cgglse_,zgglse_)(
 		&(integer){$PRIV(__m_size)},
@@ -3551,13 +2909,7 @@ pp_defc("gglse",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             	%}
-
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgglse_,zgglse_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -3578,27 +2930,18 @@ pp_defc("gglse",
 ');
 
 pp_defc("ggglm",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)ggglm_(integer *n, integer *m, integer *p, $GENERIC() *
+		a, integer *lda, $GENERIC() *b, integer *ldb, $GENERIC() *d__,
+		$GENERIC() *x, $GENERIC() *y, $GENERIC() *work, integer *lwork,
+		integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,m); [phys]B(2,n,p);[phys]d(2,n);[o,phys]x(2,m);[o,phys]y(2,p);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
 
-             types(F) %{
-		extern int cggglm_(integer *n, integer *m, integer *p, float *
-		a, integer *lda, float *b, integer *ldb, float *d__,
-		float *x, float *y, float *work, integer *lwork,
-		integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zggglm_(integer *n, integer *m, integer *p, double *
-		a, integer *lda, double *b, integer *ldb, double *d__,
-		double *x, double *y, double *work, integer *lwork,
-		integer *info);
-		double tmp_work[2];
-             %}
-
+		$GENERIC() tmp_work[2];
 
 		$TFD(cggglm_,zggglm_)(
 		&(integer){$PRIV(__n_size)},
@@ -3617,13 +2960,7 @@ pp_defc("ggglm",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             	%}
-
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cggglm_,zggglm_)(
 		&(integer){$PRIV(__n_size)},
 		&(integer){$PRIV(__m_size)},
@@ -3650,21 +2987,14 @@ pp_defc("ggglm",
 ################################################################################
 # TODO IPIV = min(m,n)
 pp_defc("getrf",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)getrf_(integer *m, integer *n, $GENERIC() *a, integer *
+		lda, integer *ipiv, integer *info);
+EOF
        HandleBad => 0,
 	RedoDimsCode => '$SIZE(p) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
 	Pars => '[io,phys]A(2,m,n); int [o,phys]ipiv(p); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
-             types(F) %{
-
-		extern int cgetrf_(integer *m, integer *n, float *a, integer *
-		lda, integer *ipiv, integer *info);
-             %}
-             types(D) %{
-
-		extern int zgetrf_(integer *m, integer *n, double *a, integer *
-		lda, integer *ipiv, integer *info);
-             %}
 		$TFD(cgetrf_,zgetrf_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -3675,21 +3005,14 @@ pp_defc("getrf",
 ');
 
 pp_defc("getf2",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)getf2_(integer *m, integer *n, $GENERIC() *a, integer *
+		lda, integer *ipiv, integer *info);
+EOF
        HandleBad => 0,
 	RedoDimsCode => '$SIZE(p) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
 	Pars => '[io,phys]A(2,m,n); int [o,phys]ipiv(p); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
-             types(F) %{
-
-		extern int cgetf2_(integer *m, integer *n, float *a, integer *
-		lda, integer *ipiv, integer *info);
-             %}
-             types(D) %{
-
-		extern int zgetf2_(integer *m, integer *n, double *a, integer *
-		lda, integer *ipiv, integer *info);
-             %}
 		$TFD(cgetf2_,zgetf2_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -3700,26 +3023,16 @@ pp_defc("getf2",
 ');
 
 pp_defc("sytrf",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)sytrf_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *ipiv, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
 	     integer lwork = -1;
-
-	     types(F) %{
-		extern int csytrf_(char *uplo, integer *n, float *a, integer *
-		lda, integer *ipiv, float *work, integer *lwork, integer *info);
-
-		float tmp_work[2];
-             %}
-
-             types(D) %{
-		extern int zsytrf_(char *uplo, integer *n, double *a, integer *
-		lda, integer *ipiv, double *work, integer *lwork, integer *info);
-
-		double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 		if ($uplo())
 			puplo = \'L\';
 
@@ -3735,12 +3048,7 @@ pp_defc("sytrf",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2*lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			double *work = (double *)malloc(2*lwork *  sizeof(double));
-             	%}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(csytrf_,zsytrf_)(
 		&puplo,
 		&(integer){$PRIV(__n_size)},
@@ -3755,21 +3063,14 @@ pp_defc("sytrf",
 ');
 
 pp_defc("sytf2",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)sytf2_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *ipiv, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-
-	     types(F) %{
-		extern int csytf2_(char *uplo, integer *n, float *a, integer *
-		lda, integer *ipiv, integer *info);
-             %}
-
-             types(D) %{
-		extern int zsytf2_(char *uplo, integer *n, double *a, integer *
-		lda, integer *ipiv, integer *info);
-             %}
 		if ($uplo())
 			puplo = \'L\';
 
@@ -3783,41 +3084,24 @@ pp_defc("sytf2",
 ');
 
 pp_defc("chetrf",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hetrf_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *ipiv, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
 	     integer lwork = -1;
 	     integer blocksiz;
-
-
-	     types(F) %{
-		extern int chetrf_(char *uplo, integer *n, float *a, integer *
-		lda, integer *ipiv, float *work, integer *lwork, integer *info);
-		float *work;
+		$GENERIC() *work;
 		blocksiz = ilaenv_(&c_nine, "CHETRF", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
-             %}
-
-             types(D) %{
-		extern int zhetrf_(char *uplo, integer *n, double *a, integer *
-		lda, integer *ipiv, double *work, integer *lwork, integer *info);
-		double *work;
-		blocksiz = ilaenv_(&c_nine, "ZHETRF", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
-             %}
 
 		if ($uplo())
 			puplo = \'L\';
 
-
 		lwork = (integer ) $PRIV(__n_size) * blocksiz;
-
-		types(F) %{
-			work = (float *)malloc(2*lwork *  sizeof(float));
-             	%}
-             	types(D) %{
-			work = (double *)malloc(2*lwork *  sizeof(double));
-             	%}
+		work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(chetrf_,zhetrf_)(
 		&puplo,
 		&(integer){$PRIV(__n_size)},
@@ -3838,21 +3122,14 @@ Complex version of sytrf for Hermitian matrix
 ');
 
 pp_defc("hetf2",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hetf2_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *ipiv, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-
-	     types(F) %{
-		extern int chetf2_(char *uplo, integer *n, float *a, integer *
-		lda, integer *ipiv, integer *info);
-             %}
-
-             types(D) %{
-		extern int zhetf2_(char *uplo, integer *n, double *a, integer *
-		lda, integer *ipiv, integer *info);
-             %}
 		if ($uplo())
 			puplo = \'L\';
 
@@ -3873,22 +3150,14 @@ Complex version of sytf2 for Hermitian matrix
 ');
 
 pp_defc("potrf",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)potrf_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-
-	     types(F) %{
-
-		extern int cpotrf_(char *uplo, integer *n, float *a, integer *
-		lda, integer *info);
-             %}
-             types(D) %{
-
-		extern int zpotrf_(char *uplo, integer *n, double *a, integer *
-		lda, integer *info);
-             %}
 		if ($uplo())
 			puplo = \'L\';
 
@@ -3908,22 +3177,14 @@ Complex version of potrf for Hermitian positive definite matrix
 ');
 
 pp_defc("potf2",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)potf2_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-
-	     types(F) %{
-
-		extern int cpotf2_(char *uplo, integer *n, float *a, integer *
-		lda, integer *info);
-             %}
-             types(D) %{
-
-		extern int zpotf2_(char *uplo, integer *n, double *a, integer *
-		lda, integer *info);
-             %}
 		if ($uplo())
 			puplo = \'L\';
 
@@ -3943,26 +3204,15 @@ Complex version of potf2 for Hermitian positive definite matrix
 ');
 
 pp_defc("getri",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)getri_(integer *n, $GENERIC() *a, integer *lda, integer
+		*ipiv, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int [phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             types(F) %{
-
-		extern int cgetri_(integer *n, float *a, integer *lda, integer
-		*ipiv, float *work, integer *lwork, integer *info);
-
-		float tmp_work[2];
-             %}
-             types(D) %{
-
-		extern int zgetri_(integer *n, double *a, integer *lda, integer
-		*ipiv, double *work, integer *lwork, integer *info);
-
-		double tmp_work[2];
-             %}
-
+		$GENERIC() tmp_work[2];
 
 		$TFD(cgetri_,zgetri_)(
 		&(integer){$PRIV(__n_size)},
@@ -3975,12 +3225,7 @@ pp_defc("getri",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2*lwork *  sizeof(float));
-		%}
-		types(D) %{
-			double *work = (double *)malloc(2*lwork *  sizeof(double));
-		%}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(cgetri_,zgetri_)(
 		&(integer){$PRIV(__n_size)},
 		$P(A),
@@ -3995,25 +3240,15 @@ pp_defc("getri",
 
 
 pp_defc("sytri",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)sytri_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *ipiv, $GENERIC() *work, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-             types(F) %{
-
-		extern int csytri_(char *uplo, integer *n, float *a, integer *
-		lda, integer *ipiv, float *work, integer *info);
-
-		float *work = (float *)malloc(2*$PRIV(__n_size) *  sizeof(float));
-             %}
-             types(D) %{
-
-		extern int zsytri_(char *uplo, integer *n, double *a, integer *
-		lda, integer *ipiv, double *work, integer *info);
-
-		double *work = (double *)malloc(2*$PRIV(__n_size) *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*$PRIV(__n_size) *  sizeof($GENERIC()));
 		if ($uplo())
 			puplo = \'L\';
 
@@ -4029,25 +3264,15 @@ pp_defc("sytri",
 ');
 
 pp_defc("hetri",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hetri_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *ipiv, $GENERIC() *work, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-             types(F) %{
-
-		extern int chetri_(char *uplo, integer *n, float *a, integer *
-		lda, integer *ipiv, float *work, integer *info);
-
-		float *work = (float *)malloc(2*$PRIV(__n_size) *  sizeof(float));
-             %}
-             types(D) %{
-
-		extern int zhetri_(char *uplo, integer *n, double *a, integer *
-		lda, integer *ipiv, double *work, integer *info);
-
-		double *work = (double *)malloc(2*$PRIV(__n_size) *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*$PRIV(__n_size) *  sizeof($GENERIC()));
 		if ($uplo())
 			puplo = \'L\';
 
@@ -4070,19 +3295,14 @@ Complex version of sytri for Hermitian matrix
 ');
 
 pp_defc("potri",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)potri_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-	     types(F) %{
-		extern int cpotri_(char *uplo, integer *n, float *a, integer *
-		lda, integer *info);
-             %}
-             types(D) %{
-		extern int zpotri_(char *uplo, integer *n, double *a, integer *
-		lda, integer *info);
-             %}
 		if ($uplo())
 			puplo = \'L\';
 
@@ -4095,22 +3315,15 @@ pp_defc("potri",
 ');
 
 pp_defc("trtri",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)trtri_(char *uplo, char *diag, integer *n, $GENERIC() *a, integer *
+		lda, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int diag(); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
              char pdiag = \'N\';
-             types(F) %{
-
-		extern int ctrtri_(char *uplo, char *diag, integer *n, float *a, integer *
-		lda, integer *info);
-             %}
-             types(D) %{
-
-		extern int ztrtri_(char *uplo, char *diag, integer *n, double *a, integer *
-		lda, integer *info);
-             %}
 		if ($uplo())
 			puplo = \'L\';
 		if ($diag())
@@ -4126,22 +3339,15 @@ pp_defc("trtri",
 ');
 
 pp_defc("trti2",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)trti2_(char *uplo, char *diag, integer *n, $GENERIC() *a, integer *
+		lda, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int uplo(); int diag(); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
              char pdiag = \'N\';
-             types(F) %{
-
-		extern int ctrti2_(char *uplo, char *diag, integer *n, float *a, integer *
-		lda, integer *info);
-             %}
-             types(D) %{
-
-		extern int ztrti2_(char *uplo, char *diag, integer *n, double *a, integer *
-		lda, integer *info);
-             %}
 		if ($uplo())
 			puplo = \'L\';
 		if ($diag())
@@ -4157,21 +3363,15 @@ pp_defc("trti2",
 ');
 
 pp_defc("getrs",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)getrs_(char *trans, integer *n, integer *nrhs,
+		$GENERIC() *a, integer *lda, integer *ipiv, $GENERIC() *b, integer *
+		ldb, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int trans(); [io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char transp = \'N\';
-	     types(F) %{
-		extern int cgetrs_(char *trans, integer *n, integer *nrhs,
-		float *a, integer *lda, integer *ipiv, float *b, integer *
-		ldb, integer *info);
-             %}
-             types(D) %{
-		extern int zgetrs_(char *trans, integer *n, integer *nrhs,
-		double *a, integer *lda, integer *ipiv, double *b, integer *
-		ldb, integer *info);
-             %}
 		if($trans() == 1)
 			transp = \'T\';
 		else if($trans() == 2)
@@ -4203,21 +3403,15 @@ Complex version of getrs
 ');
 
 pp_defc("sytrs",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)sytrs_(char *uplo, integer *n, integer *nrhs,
+		$GENERIC() *a, integer *lda, integer *ipiv, $GENERIC() *b, integer *
+		ldb, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int uplo();[io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-	     types(F) %{
-		extern int csytrs_(char *uplo, integer *n, integer *nrhs,
-		float *a, integer *lda, integer *ipiv, float *b, integer *
-		ldb, integer *info);
-             %}
-             types(D) %{
-		extern int zsytrs_(char *uplo, integer *n, integer *nrhs,
-		double *a, integer *lda, integer *ipiv, double *b, integer *
-		ldb, integer *info);
-             %}
 		if($uplo())
 			puplo = \'L\';
 
@@ -4235,21 +3429,15 @@ pp_defc("sytrs",
 
 
 pp_defc("hetrs",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hetrs_(char *uplo, integer *n, integer *nrhs,
+		$GENERIC() *a, integer *lda, integer *ipiv, $GENERIC() *b, integer *
+		ldb, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int uplo();[io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-	     types(F) %{
-		extern int chetrs_(char *uplo, integer *n, integer *nrhs,
-		float *a, integer *lda, integer *ipiv, float *b, integer *
-		ldb, integer *info);
-             %}
-             types(D) %{
-		extern int zhetrs_(char *uplo, integer *n, integer *nrhs,
-		double *a, integer *lda, integer *ipiv, double *b, integer *
-		ldb, integer *info);
-             %}
 		if($uplo())
 			puplo = \'L\';
 
@@ -4273,21 +3461,15 @@ Complex version of sytrs for Hermitian matrix
 ');
 
 pp_defc("potrs",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)potrs_(char *uplo, integer *n, integer *nrhs,
+		$GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb, integer *
+		info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int uplo(); [io,phys]B(2,n,m); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-	     types(F) %{
-		extern int cpotrs_(char *uplo, integer *n, integer *nrhs,
-		float *a, integer *lda, float *b, integer *ldb, integer *
-		info);
-             %}
-             types(D) %{
-		extern int zpotrs_(char *uplo, integer *n, integer *nrhs,
-		double *a, integer *lda, double *b, integer *ldb, integer *
-		info);
-             %}
 		if($uplo())
 			puplo = \'L\';
 
@@ -4311,25 +3493,18 @@ Complex version of potrs for Hermitian positive definite matrix
 ');
 
 pp_defc("trtrs",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)trtrs_(char *uplo, char *trans, char *diag, 
+		integer *n, integer *nrhs,
+		$GENERIC() *a, integer *lda, $GENERIC() *b, integer *
+		ldb, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int uplo(); int trans(); int diag();[io,phys]B(2,n,m); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
              char ptrans = \'N\';
              char pdiag = \'N\';
-	     types(F) %{
-		extern int ctrtrs_(char *uplo, char *trans, char *diag, 
-		integer *n, integer *nrhs,
-		float *a, integer *lda, float *b, integer *
-		ldb, integer *info);
-             %}
-             types(D) %{
-		extern int ztrtrs_(char *uplo, char *trans, char *diag,
-		integer *n, integer *nrhs,
-		double *a, integer *lda, double *b, integer *
-		ldb, integer *info);
-             %}
 		if($uplo())
 			puplo = \'L\';
 		if($trans() == 1)
@@ -4367,25 +3542,19 @@ Complex version of trtrs
 
 
 pp_defc("latrs",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)latrs_(char *uplo, char *trans, char *diag, char *
+		normin, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *x, 
+		$GENERIC() *scale, $GENERIC() *cnorm, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int uplo(); int trans(); int diag(); int normin();[io,phys]x(2,n); [o,phys]scale();[io,phys]cnorm(n);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
              char ptrans = \'N\';
              char pdiag = \'N\';
              char pnormin = \'N\';
 
-	     types(F) %{
-		extern int clatrs_(char *uplo, char *trans, char *diag, char *
-		normin, integer *n, float *a, integer *lda, float *x, 
-		float *scale, float *cnorm, integer *info);
-             %}
-             types(D) %{
-		extern int zlatrs_(char *uplo, char *trans, char *diag, char *
-		normin, integer *n, double *a, integer *lda, double *x, 
-		double *scale, double *cnorm, integer *info);
-             %}
 		if($uplo())
 			puplo = \'L\';
 		if($trans())
@@ -4427,32 +3596,22 @@ Complex version of latrs
 
 
 pp_defc("gecon",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gecon_(char *norm, integer *n, $GENERIC() *a, integer *
+		lda, $GENERIC() *anorm, $GENERIC() *rcond, $GENERIC() *work, $GENERIC() *
+		rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int norm(); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char pnorm = \'I\';
-
-	     types(F) %{
-		extern int sgecon_(char *norm, integer *n, float *a, integer *
-		lda, float *anorm, float *rcond, float *work, float *
-		rwork, integer *info);
-		float *work = (float *) malloc(($PRIV(__n_size) * 4) *  sizeof(float));
-		float *rwork = (float *) malloc(($PRIV(__n_size) * 2)*  sizeof(integer));
-             %}
-             types(D) %{
-		extern int dgecon_(char *norm, integer *n, double *a, integer *
-		lda, double *anorm, double *rcond, double *work, double *
-		rwork, integer *info);
-		double *work = (double *) malloc(($PRIV(__n_size)*4) *  sizeof(double));
-		double *rwork = (double *) malloc(($PRIV(__n_size)*2 )*  sizeof(integer));
-             %}
-
+		$GENERIC() *work = ($GENERIC() *) malloc(($PRIV(__n_size) * 4) *  sizeof($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() *) malloc(($PRIV(__n_size) * 2)*  sizeof(integer));
 
 		if($norm())
 			pnorm = \'O\';
 
-		$TFD(sgecon_,dgecon_)(
+		$TFD(cgecon_,zgecon_)(
 		&pnorm,
 		&(integer){$PRIV(__n_size)},
 		$P(A),
@@ -4468,25 +3627,17 @@ pp_defc("gecon",
 ');
 
 pp_defc("sycon",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)sycon_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *ipiv, $GENERIC() *anorm, $GENERIC() *rcond, $GENERIC() *
+		work, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
 
-	     types(F) %{
-		extern int csycon_(char *uplo, integer *n, float *a, integer *
-		lda, integer *ipiv, float *anorm, float *rcond, float *
-		work, integer *info);
-		float *work = (float *) malloc(($PRIV(__n_size) * 4) *  sizeof(float));
-             %}
-             types(D) %{
-		extern int zsycon_(char *uplo, integer *n, double *a, integer *
-		lda, integer *ipiv, double *anorm, double *rcond, double *
-		work, integer *info);
-		double *work = (double *) malloc(($PRIV(__n_size)*4) *  sizeof(double));
-             %}
-
+		$GENERIC() *work = ($GENERIC() *) malloc(($PRIV(__n_size) * 4) *  sizeof($GENERIC()));
 		if($uplo())
 			puplo = \'L\';
 
@@ -4505,24 +3656,17 @@ pp_defc("sycon",
 ');
 
 pp_defc("hecon",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hecon_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, integer *ipiv, $GENERIC() *anorm, $GENERIC() *rcond, $GENERIC() *
+		work, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
 
-	     types(F) %{
-		extern int checon_(char *uplo, integer *n, float *a, integer *
-		lda, integer *ipiv, float *anorm, float *rcond, float *
-		work, integer *info);
-		float *work = (float *) malloc(($PRIV(__n_size) * 4) *  sizeof(float));
-             %}
-             types(D) %{
-		extern int zhecon_(char *uplo, integer *n, double *a, integer *
-		lda, integer *ipiv, double *anorm, double *rcond, double *
-		work, integer *info);
-		double *work = (double *) malloc(($PRIV(__n_size)*4) *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *) malloc(($PRIV(__n_size) * 4) *  sizeof($GENERIC()));
 
 		if($uplo())
 			puplo = \'L\';
@@ -4549,27 +3693,17 @@ Complex version of sycon for Hermitian matrix
 ');
 
 pp_defc("pocon",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)pocon_(char *uplo, integer *n, $GENERIC() *a, integer *
+		lda, $GENERIC() *anorm, $GENERIC() *rcond, $GENERIC() *work, $GENERIC() *
+		rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int uplo(); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
-
-	     types(F) %{
-		extern int cpocon_(char *uplo, integer *n, float *a, integer *
-		lda, float *anorm, float *rcond, float *work, float *
-		rwork, integer *info);
-		float *work = (float *) malloc(($PRIV(__n_size) * 4) *  sizeof(float));
-		float *rwork = (float *) malloc($PRIV(__n_size) *  sizeof(integer));
-             %}
-             types(D) %{
-		extern int zpocon_(char *uplo, integer *n, double *a, integer *
-		lda, double *anorm, double *rcond, double *work, double *
-		rwork, integer *info);
-		double *work = (double *) malloc(($PRIV(__n_size)* 4) *  sizeof(double));
-		double *rwork = (double *) malloc($PRIV(__n_size) *  sizeof(integer));
-             %}
-
+		$GENERIC() *work = ($GENERIC() *) malloc(($PRIV(__n_size) * 4) *  sizeof($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() *) malloc($PRIV(__n_size) *  sizeof(integer));
 
 		if($uplo())
 			puplo = \'L\';
@@ -4597,25 +3731,18 @@ Complex version of pocon for Hermitian positive definite matrix
 ');
 
 pp_defc("trcon",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)trcon_(char *norm, char *uplo, char *diag,integer *n, $GENERIC() *a, integer *
+		lda, $GENERIC() *rcond, $GENERIC() *work, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,n); int norm();int uplo();int diag(); [o,phys]rcond();int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
              char puplo = \'U\';
              char pdiag = \'N\';
              char pnorm = \'I\';
-	     types(F) %{
-		extern int strcon_(char *norm, char *uplo, char *diag,integer *n, float *a, integer *
-		lda, float *rcond, float *work, float *rwork, integer *info);
-		float *work = (float *) malloc(($PRIV(__n_size) * 4) *  sizeof(float));
-		float *rwork = (float *) malloc($PRIV(__n_size) *  sizeof(integer));
-             %}
-             types(D) %{
-		extern int dtrcon_(char *norm, char *uplo, char *diag, integer *n, double *a, integer *
-		lda, double *rcond, double * work, double *rwork, integer *info);
-		double *work = (double *) malloc(($PRIV(__n_size)* 4) *  sizeof(double));
-		double *rwork = (double *) malloc($PRIV(__n_size) *  sizeof(integer));
-             %}
+		$GENERIC() *work = ($GENERIC() *) malloc(($PRIV(__n_size) * 4) *  sizeof($GENERIC()));
+		$GENERIC() *rwork = ($GENERIC() *) malloc($PRIV(__n_size) *  sizeof(integer));
 
 		if($uplo())
 			puplo = \'L\';
@@ -4624,7 +3751,7 @@ pp_defc("trcon",
 		if($norm())
 			pnorm = \'O\';
 
-		$TFD(strcon_,dtrcon_)(
+		$TFD(ctrcon_,ztrcon_)(
 		&pnorm,
 		&puplo,
 		&pdiag,
@@ -4641,26 +3768,17 @@ pp_defc("trcon",
 ');
 
 pp_defc("geqp3",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)geqp3_(integer *m, integer *n, $GENERIC() *a, integer *
+		lda, integer *jpvt, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
+		$GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); int [io,phys]jpvt(n); [o,phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-
-	     types(F) %{
-		extern int cgeqp3_(integer *m, integer *n, float *a, integer *
-		lda, integer *jpvt, float *tau, float *work, integer *lwork,
-		float *rwork, integer *info);
-		float tmp_work[2], *rwork;
-		rwork = (float *) malloc ($PRIV(__n_size) * 2  * sizeof(float));
-             %}
-             types(D) %{
-		extern int zgeqp3_(integer *m, integer *n, double *a, integer *
-		lda, integer *jpvt, double *tau, double *work, integer *lwork,
-		double *rwork, integer *info);
-		double tmp_work[2], *rwork;
-		rwork = (double *) malloc ($PRIV(__n_size) * 2 * sizeof(double));
-             %}
+		$GENERIC() tmp_work[2], *rwork;
+		rwork = ($GENERIC() *) malloc ($PRIV(__n_size) * 2  * sizeof($GENERIC()));
 
 		$TFD(cgeqp3_,zgeqp3_)(
 		&(integer){$PRIV(__m_size)},
@@ -4676,12 +3794,7 @@ pp_defc("geqp3",
 
 		lwork = (integer )tmp_work[0];
 		{
-			types(F) %{
-				float *work = (float *)malloc(2 * lwork *  sizeof(float));
-			%}
-			types(D) %{
-				double *work = (double *)malloc(2 * lwork *  sizeof(double));
-			%}
+				$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 			$TFD(cgeqp3_,zgeqp3_)(
 			&(integer){$PRIV(__m_size)},
 			&(integer){$PRIV(__n_size)},
@@ -4701,24 +3814,16 @@ pp_defc("geqp3",
 
 
 pp_defc("geqrf",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)geqrf_(integer *m, integer *n, $GENERIC() *a, integer *
+		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork,
+		integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cgeqrf_(integer *m, integer *n, float *a, integer *
-		lda, float *tau, float *work, integer *lwork,
-		integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zgeqrf_(integer *m, integer *n, double *a, integer *
-		lda, double *tau, double *work, integer *lwork,
-		 integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 
 		$TFD(cgeqrf_,zgeqrf_)(
 		&(integer){$PRIV(__m_size)},
@@ -4732,12 +3837,7 @@ pp_defc("geqrf",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgeqrf_,zgeqrf_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -4753,25 +3853,16 @@ pp_defc("geqrf",
 ');
 
 pp_defc("ungqr",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)ungqr_(integer *m, integer *n, integer *k, $GENERIC() *
+		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, 
+		integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cungqr_(integer *m, integer *n, integer *k, float *
-		a, integer *lda, float *tau, float *work, integer *lwork, 
-		integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zungqr_(integer *m, integer *n, integer *k, double *
-		a, integer *lda, double *tau, double *work, integer *lwork, 
-		integer *info);
-		 double tmp_work[2];
-             %}
-
+		$GENERIC() tmp_work[2];
 		$TFD(cungqr_, zungqr_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -4785,12 +3876,7 @@ pp_defc("ungqr",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-		%}
-		types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-		%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cungqr_,zungqr_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -4815,25 +3901,17 @@ Complex version of orgqr
 
 
 pp_defc("unmqr",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)unmqr_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, $GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *
+		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,p,k); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cunmqr_(char *side, char *trans, integer *m, integer *n, 
-		integer *k, float *a, integer *lda, float *tau, float *
-		c__, integer *ldc, float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zunmqr_(char *side, char *trans, integer *m, integer *n, 
-		integer *k, double *a, integer *lda, double *tau, double *
-		c__, integer *ldc, double *work, integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 		if($trans())
 			ptrans = \'C\';
 		if($side())
@@ -4856,12 +3934,7 @@ pp_defc("unmqr",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-		%}
-		types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-		%}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cunmqr_,zunmqr_)(
 		&pside,
 		&ptrans,
@@ -4889,22 +3962,15 @@ Complex version of ormqr. Here trans = 1 means conjugate transpose.
 ');
 
 pp_defc("gelqf",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gelqf_(integer *m, integer *n, $GENERIC() *a, integer *
+		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cgelqf_(integer *m, integer *n, float *a, integer *
-		lda, float *tau, float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zgelqf_(integer *m, integer *n, double *a, integer *
-		lda, double *tau, double *work, integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 
 		$TFD(cgelqf_,zgelqf_)(
 		&(integer){$PRIV(__m_size)},
@@ -4918,12 +3984,7 @@ pp_defc("gelqf",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgelqf_,zgelqf_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -4939,25 +4000,16 @@ pp_defc("gelqf",
 ');
 
 pp_defc("unglq",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)unglq_(integer *m, integer *n, integer *k, $GENERIC() *
+		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, 
+		integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cunglq_(integer *m, integer *n, integer *k, float *
-		a, integer *lda, float *tau, float *work, integer *lwork, 
-		integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zunglq_(integer *m, integer *n, integer *k, double *
-		a, integer *lda, double *tau, double *work, integer *lwork, 
-		integer *info);
-		 double tmp_work[2];
-             %}
-
+		$GENERIC() tmp_work[2];
 		$TFD(cunglq_,zunglq_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -4971,12 +4023,7 @@ pp_defc("unglq",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cunglq_,zunglq_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -5000,25 +4047,17 @@ Complex version of orglq
 ');
 
 pp_defc("unmlq",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)unmlq_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, $GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *
+		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cunmlq_(char *side, char *trans, integer *m, integer *n, 
-		integer *k, float *a, integer *lda, float *tau, float *
-		c__, integer *ldc, float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zunmlq_(char *side, char *trans, integer *m, integer *n, 
-		integer *k, double *a, integer *lda, double *tau, double *
-		c__, integer *ldc, double *work, integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 		if($trans())
 			ptrans = \'C\';
 		if($side())
@@ -5041,12 +4080,7 @@ pp_defc("unmlq",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cunmlq_,zunmlq_)(
 		&pside,
 		&ptrans,
@@ -5075,22 +4109,15 @@ Complex version of ormlq. Here trans = 1 means conjugate transpose.
 
 
 pp_defc("geqlf",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)geqlf_(integer *m, integer *n, $GENERIC() *a, integer *
+		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cgeqlf_(integer *m, integer *n, float *a, integer *
-		lda, float *tau, float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zgeqlf_(integer *m, integer *n, double *a, integer *
-		lda, double *tau, double *work, integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 
 		$TFD(cgeqlf_,zgeqlf_)(
 		&(integer){$PRIV(__m_size)},
@@ -5104,12 +4131,7 @@ pp_defc("geqlf",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-		%}
-		types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-		%}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgeqlf_,zgeqlf_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -5125,24 +4147,16 @@ pp_defc("geqlf",
 ');
 
 pp_defc("ungql",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)ungql_(integer *m, integer *n, integer *k, $GENERIC() *
+		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, 
+		integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cungql_(integer *m, integer *n, integer *k, float *
-		a, integer *lda, float *tau, float *work, integer *lwork, 
-		integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zungql_(integer *m, integer *n, integer *k, double *
-		a, integer *lda, double *tau, double *work, integer *lwork, 
-		integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 
 		$TFD(cungql_,zungql_)(
 		&(integer){$PRIV(__m_size)},
@@ -5157,12 +4171,7 @@ pp_defc("ungql",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cungql_,zungql_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -5186,25 +4195,17 @@ Complex version of orgql.
 ');
 
 pp_defc("unmql",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)unmql_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, $GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *
+		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,p,k); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cunmql_(char *side, char *trans, integer *m, integer *n, 
-		integer *k, float *a, integer *lda, float *tau, float *
-		c__, integer *ldc, float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zunmql_(char *side, char *trans, integer *m, integer *n, 
-		integer *k, double *a, integer *lda, double *tau, double *
-		c__, integer *ldc, double *work, integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 		if($trans())
 			ptrans = \'C\';
 		if($side())
@@ -5227,12 +4228,7 @@ pp_defc("unmql",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cunmql_,zunmql_)(
 		&pside,
 		&ptrans,
@@ -5260,23 +4256,15 @@ Complex version of ormql. Here trans = 1 means conjugate transpose.
 ');
 
 pp_defc("gerqf",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gerqf_(integer *m, integer *n, $GENERIC() *a, integer *
+		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cgerqf_(integer *m, integer *n, float *a, integer *
-		lda, float *tau, float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zgerqf_(integer *m, integer *n, double *a, integer *
-		lda, double *tau, double *work, integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
-
+		$GENERIC() tmp_work[2];
 		$TFD(cgerqf_,zgerqf_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -5289,12 +4277,7 @@ pp_defc("gerqf",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cgerqf_,zgerqf_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -5310,24 +4293,16 @@ pp_defc("gerqf",
 ');
 
 pp_defc("ungrq",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)ungrq_(integer *m, integer *n, integer *k, $GENERIC() *
+		a, integer *lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, 
+		integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cungrq_(integer *m, integer *n, integer *k, float *
-		a, integer *lda, float *tau, float *work, integer *lwork, 
-		integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zungrq_(integer *m, integer *n, integer *k, double *
-		a, integer *lda, double *tau, double *work, integer *lwork, 
-		integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 
 		$TFD(cungrq_,zungrq_)(
 		&(integer){$PRIV(__m_size)},
@@ -5342,14 +4317,7 @@ pp_defc("ungrq",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cungrq_,zungrq_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -5373,25 +4341,17 @@ Complex version of orgrq.
 ');
 
 pp_defc("unmrq",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)unmrq_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, $GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *
+		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cunmrq_(char *side, char *trans, integer *m, integer *n, 
-		integer *k, float *a, integer *lda, float *tau, float *
-		c__, integer *ldc, float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zunmrq_(char *side, char *trans, integer *m, integer *n, 
-		integer *k, double *a, integer *lda, double *tau, double *
-		c__, integer *ldc, double *work, integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 		if($trans())
 			ptrans = \'C\';
 		if($side())
@@ -5414,14 +4374,7 @@ pp_defc("unmrq",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cunmrq_,zunmrq_)(
 		&pside,
 		&ptrans,
@@ -5449,22 +4402,15 @@ Complex version of ormrq. Here trans = 1 means conjugate transpose.
 ');
 
 pp_defc("tzrzf",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)tzrzf_(integer *m, integer *n, $GENERIC() *a, integer *
+		lda, $GENERIC() *tau, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int ctzrzf_(integer *m, integer *n, float *a, integer *
-		lda, float *tau, float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int ztzrzf_(integer *m, integer *n, double *a, integer *
-		lda, double *tau, double *work, integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 
 		$TFD(ctzrzf_,ztzrzf_)(
 		&(integer){$PRIV(__m_size)},
@@ -5478,12 +4424,7 @@ pp_defc("tzrzf",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-			float *work = (float *)malloc(2 * lwork *  sizeof(float));
-		%}
-		types(D) %{
-			double *work = (double *)malloc(2 * lwork *  sizeof(double));
-		%}
+			$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(ctzrzf_,ztzrzf_)(
 		&(integer){$PRIV(__m_size)},
 		&(integer){$PRIV(__n_size)},
@@ -5499,26 +4440,18 @@ pp_defc("tzrzf",
 ');
 
 pp_defc("unmrz",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)unmrz_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, integer *l, $GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *
+		c__, integer *ldc, $GENERIC() *work, integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char ptrans = \'N\', pside = \'L\';
 		integer lwork = -1;
 		integer kk =  $SIZE(p) - $SIZE(k);
-             
-	     types(F) %{
-		extern int cunmrz_(char *side, char *trans, integer *m, integer *n, 
-		integer *k, integer *l, float *a, integer *lda, float *tau, float *
-		c__, integer *ldc, float *work, integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zunmrz_(char *side, char *trans, integer *m, integer *n, 
-		integer *k, integer *l, double *a, integer *lda, double *tau, double *
-		c__, integer *ldc, double *work, integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 		if($trans())
 			ptrans = \'C\';
 		if($side())
@@ -5542,12 +4475,7 @@ pp_defc("unmrz",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(cunmrz_,zunmrz_)(
 		&pside,
 		&ptrans,
@@ -5577,24 +4505,16 @@ Complex version of ormrz. Here trans = 1 means conjugate transpose.
 
 
 pp_defc("gehrd",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gehrd_(integer *n, integer *ilo, integer *ihi, 
+		$GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *work, 
+		integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int [phys]ilo();int [phys]ihi();[o,phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cgehrd_(integer *n, integer *ilo, integer *ihi, 
-		float *a, integer *lda, float *tau, float *work, 
-		integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zgehrd_(integer *n, integer *ilo, integer *ihi, 
-		double *a, integer *lda, double *tau, double *work, 
-		integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 
 		$TFD(cgehrd_,zgehrd_)(
 		&(integer){$PRIV(__n_size)},
@@ -5609,14 +4529,7 @@ pp_defc("gehrd",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-
-		float *work = (float *)malloc(2*lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc(2*lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(cgehrd_,zgehrd_)(
 		&(integer){$PRIV(__n_size)},
 		$P(ilo),
@@ -5633,24 +4546,16 @@ pp_defc("gehrd",
 ');
 
 pp_defc("unghr",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)unghr_(integer *n, integer *ilo, integer *ihi, 
+		$GENERIC() *a, integer *lda, $GENERIC() *tau, $GENERIC() *work, 
+		integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int [phys]ilo();int [phys]ihi();[phys]tau(2,k); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		integer lwork = -1;
-             
-	     types(F) %{
-		extern int cunghr_(integer *n, integer *ilo, integer *ihi, 
-		float *a, integer *lda, float *tau, float *work, 
-		integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zunghr_(integer *n, integer *ilo, integer *ihi, 
-		double *a, integer *lda, double *tau, double *work, 
-		integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 
 		$TFD(cunghr_,zunghr_)(
 		&(integer){$PRIV(__n_size)},
@@ -5665,14 +4570,7 @@ pp_defc("unghr",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-
-		float *work = (float *)malloc(2*lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc(2*lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2*lwork *  sizeof($GENERIC()));
 		$TFD(cunghr_,zunghr_)(
 		&(integer){$PRIV(__n_size)},
 		$P(ilo),
@@ -5697,28 +4595,19 @@ Complex version of orghr
 
 
 pp_defc("hseqr",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)hseqr_(char *job, char *compz, integer *n, integer *ilo,
+	 	integer *ihi, $GENERIC() *h__, integer *ldh, $GENERIC() *w, 
+		$GENERIC() *z__, integer *ldz, $GENERIC() *work, 
+		integer *lwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]H(2,n,n); int job();int compz();int [phys]ilo();int [phys]ihi();[o,phys]w(2,n); [o,phys]Z(2,m,m); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char pcompz;
 		char pjob = \'E\';
 		integer lwork = -1;
-
-	     types(F) %{
-		extern int chseqr_(char *job, char *compz, integer *n, integer *ilo,
-	 	integer *ihi, float *h__, integer *ldh, float *w, 
-		float *z__, integer *ldz, float *work, 
-		integer *lwork, integer *info);
-		float tmp_work[2];
-             %}
-             types(D) %{
-		extern int zhseqr_(char *job, char *compz, integer *n, integer *ilo,
-		integer *ihi, double *h__, integer *ldh, double *w, 
-		double *z__, integer *ldz, double *work, 
-		integer *lwork, integer *info);
-		 double tmp_work[2];
-             %}
+		$GENERIC() tmp_work[2];
 
 		if($job())
 			pjob = \'S\';
@@ -5749,14 +4638,7 @@ pp_defc("hseqr",
 
 		lwork = (integer )tmp_work[0];
 		{
-		types(F) %{
-
-		float *work = (float *)malloc(2 * lwork *  sizeof(float));
-             %}
-             types(D) %{
-
-		double *work = (double *)malloc(2 * lwork *  sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *)malloc(2 * lwork *  sizeof($GENERIC()));
 		$TFD(chseqr_,zhseqr_)(
 		&pjob,
 		&pcompz,
@@ -5777,27 +4659,18 @@ pp_defc("hseqr",
 ');
 
 pp_defc("trevc",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)trevc_(char *side, char *howmny, logical *select, 
+		integer *n, $GENERIC() *t, integer *ldt, $GENERIC() *vl, integer *
+		ldvl, $GENERIC() *vr, integer *ldvr, integer *mm, integer *m, 
+		$GENERIC() *work, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]T(2,n,n); int side();int howmny();int [phys]select(q);[io,phys]VL(2,m,r); [io,phys]VR(2,p,s);int [o,phys]m(); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char pside,phowmny;
 		integer mm = 0;
-
-	     types(F) %{
-		extern int ctrevc_(char *side, char *howmny, logical *select, 
-		integer *n, float *t, integer *ldt, float *vl, integer *
-		ldvl, float *vr, integer *ldvr, integer *mm, integer *m, 
-		float *work, float *rwork, integer *info);
-		float *work = (float *) malloc(5 * $SIZE(n) *sizeof(float));
-             %}
-             types(D) %{
-		extern int ztrevc_(char *side, char *howmny, logical *select, 
-		integer *n, double *t, integer *ldt, double *vl, integer *
-		ldvl, double *vr, integer *ldvr, integer *mm, integer *m, 
-		double *work, double *rwork, integer *info);
-		double *work = (double *) malloc (5 * $SIZE(n) * sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *) malloc(5 * $SIZE(n) *sizeof($GENERIC()));
 
 		switch ($howmny())
 		{
@@ -5841,27 +4714,18 @@ pp_defc("trevc",
 ');
 
 pp_defc("tgevc",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)tgevc_(char *side, char *howmny, logical *select, 
+		integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b, integer *ldb,
+		$GENERIC() *vl, integer *ldvl, $GENERIC() *vr, integer *ldvr, 
+		integer *mm, integer *m, $GENERIC() *work, $GENERIC() *rwork, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int side();int howmny(); [io,phys]B(2,n,n);int [phys]select(q);[io,phys]VL(2,m,r); [io,phys]VR(2,p,s);int [o,phys]m(); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char pside,phowmny;
 		integer mm = 0;
-
-	     types(F) %{
-		extern int ctgevc_(char *side, char *howmny, logical *select, 
-		integer *n, float *a, integer *lda, float *b, integer *ldb,
-		float *vl, integer *ldvl, float *vr, integer *ldvr, 
-		integer *mm, integer *m, float *work, float *rwork, integer *info);
-		float *work = (float *) malloc(6 * $SIZE(n) *sizeof(float));
-             %}
-             types(D) %{
-		extern int ztgevc_(char *side, char *howmny, logical *select, 
-		integer *n, double *a, integer *lda, double *b, integer *ldb,
-		double *vl, integer *ldvl, double *vr, integer *ldvr, 
-		integer *mm, integer *m, double *work, double *rwork, integer *info);
-		double *work = (double *) malloc (6 * $SIZE(n) * sizeof(double));
-             %}
+		$GENERIC() *work = ($GENERIC() *) malloc(6 * $SIZE(n) *sizeof($GENERIC()));
 
 		switch ($howmny())
 		{
@@ -5908,21 +4772,14 @@ pp_defc("tgevc",
 
 
 pp_defc("gebal",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gebal_(char *job, integer *n, $GENERIC() *a, integer *
+		lda, integer *ilo, integer *ihi, $GENERIC() *scale, integer *info);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,n,n); int job(); int [o,phys]ilo();int [o,phys]ihi();[o,phys]scale(n); int [o,phys]info()',
-	GenericTypes => [F,D],
 	Code => generate_code '
 		char pjob;
-             
-	     types(F) %{
-		extern int cgebal_(char *job, integer *n, float *a, integer *
-		lda, integer *ilo, integer *ihi, float *scale, integer *info);
-             %}
-             types(D) %{
-		extern int zgebal_(char *job, integer *n, double *a, integer *
-		lda, integer *ilo, integer *ihi, double *scale, integer *info);
-             %}
-
 	        switch ($job())
 		{
 			case 1:   pjob = \'P\';
@@ -5933,7 +4790,6 @@ pp_defc("gebal",
 				  break;
 			default:  pjob = \'N\';
 		}
-		
 		$TFD(cgebal_,zgebal_)(
 		&pjob,
 		&(integer){$PRIV(__n_size)},
@@ -5943,39 +4799,26 @@ pp_defc("gebal",
 		$P(ihi),
 		$P(scale),
 		$P(info));
-
 ');
 
 
 #################################################################################
 pp_defc("lange",
+       _decl => <<'EOF',
+		extern $GENERIC() $TFD(c,z)lange_(char *norm, integer *m, integer *n, $GENERIC() *a, integer
+		*lda, $GENERIC() *work);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,m); int norm(); [o]b()',
-	GenericTypes => [F,D],
 	Code =>  '
              char pnorm;
-
-	     types(F) %{
-		extern float clange_(char *norm, integer *m, integer *n, float *a, integer
-		*lda, float *work);
-		float *work;
-             %}
-             types(D) %{
-		extern double zlange_(char *norm, integer *m, integer *n, double *a, integer
-		*lda, double *work);
-		double *work;
-             %}
+		$GENERIC() *work;
 		switch ($norm())
 		{
 			case 1: pnorm = \'O\';
 				break;
 			case 2: pnorm = \'I\';
-			types(F) %{
-				work = (float *)malloc($PRIV(__n_size) *  sizeof(float));
-             		%}
-             		types(D) %{
-				work = (double *)malloc($PRIV(__n_size) *  sizeof(double));
-             		%}
+				work = ($GENERIC() *)malloc($PRIV(__n_size) *  sizeof($GENERIC()));
 				break;
 			case 3: pnorm = \'F\';
 				break;
@@ -5996,40 +4839,23 @@ pp_defc("lange",
 
 
 pp_defc("lansy",
+       _decl => <<'EOF',
+		extern $GENERIC() $TFD(c,z)lansy_(char *norm, char *uplo, integer *n, $GENERIC() *a, integer 
+		*lda, $GENERIC() *work);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2, n,n); int uplo(); int norm(); [o]b()',
-	GenericTypes => [F,D],
 	Code =>  '
 
              char pnorm, puplo = \'U\';
-
-	     types(F) %{
-		extern float clansy_(char *norm, char *uplo, integer *n, float *a, integer 
-		*lda, float *work);
-		float *work;
-             %}
-             types(D) %{
-		extern double zlansy_(char *norm, char *uplo, integer *n, double *a, integer 
-		*lda, double *work);
-		double *work;
-             %}
+		$GENERIC() *work;
 		switch ($norm())
 		{
 			case 1: pnorm = \'O\';
-			types(F) %{
-				work = (float *)malloc($PRIV(__n_size) *  sizeof(float));
-             		%}
-             		types(D) %{
-				work = (double *)malloc($PRIV(__n_size) *  sizeof(double));
-             		%}
+				work = ($GENERIC() *)malloc($PRIV(__n_size) *  sizeof($GENERIC()));
 				break;
 			case 2: pnorm = \'I\';
-			types(F) %{
-				work = (float *)malloc($PRIV(__n_size) *  sizeof(float));
-             		%}
-             		types(D) %{
-				work = (double *)malloc($PRIV(__n_size) *  sizeof(double));
-             		%}
+				work = ($GENERIC() *)malloc($PRIV(__n_size) *  sizeof($GENERIC()));
 				break;
 			case 3: pnorm = \'F\';
 				break;
@@ -6051,35 +4877,22 @@ pp_defc("lansy",
 ');
 
 pp_defc("lantr",
+       _decl => <<'EOF',
+		extern $GENERIC() $TFD(c,z)lantr_(char *norm, char *uplo, char *diag, integer *m, integer *n, $GENERIC() *a, integer 
+		*lda, $GENERIC() *work);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,m,n);int uplo();int norm();int diag();[o]b()',
-	GenericTypes => [F,D],
 	Code =>  '
-
              char pnorm, puplo = \'U\';
              char pdiag = \'N\';
-
-	     types(F) %{
-		extern float clantr_(char *norm, char *uplo, char *diag, integer *m, integer *n, float *a, integer 
-		*lda, float *work);
-		float *work;
-             %}
-             types(D) %{
-		extern double zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n, double *a, integer 
-		*lda, double *work);
-		double *work;
-             %}
+		$GENERIC() *work;
 		switch ($norm())
 		{
 			case 1: pnorm = \'O\';
 				break;
 			case 2: pnorm = \'I\';
-			types(F) %{
-				work = (float *)malloc($PRIV(__m_size) *  sizeof(float));
-             		%}
-             		types(D) %{
-				work = (double *)malloc($PRIV(__m_size) *  sizeof(double));
-             		%}
+				work = ($GENERIC() *)malloc($PRIV(__m_size) *  sizeof($GENERIC()));
 				break;
 			case 3: pnorm = \'F\';
 				break;
@@ -6111,25 +4924,17 @@ pp_defc("lantr",
 ################################################################################
 
 pp_defc("gemm",
+       _decl => <<'EOF',
+			extern int $TFD(c,z)gemm_(char *transa, char *transb, integer *m, integer *
+			n, integer *k, $GENERIC() *alpha, $GENERIC() *a, integer *lda,
+			$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
+			integer *ldc);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,m,n); int transa(); int transb(); [phys]B(2,p,q);[phys]alpha(2); [phys]beta(2); [io,phys]C(2,r,s)',
-	GenericTypes => [F,D],
 	Code => '
 		char ptransa = \'N\';
 		char ptransb = \'N\';
-
-		types(F) %{
-			extern int cgemm_(char *transa, char *transb, integer *m, integer *
-			n, integer *k, float *alpha, float *a, integer *lda,
-			float *b, integer *ldb, float *beta, float *c__,
-			integer *ldc);
-		%}
-		types(D) %{
-			extern int zgemm_(char *transa, char *transb, integer *m, integer *
-			n, integer *k, double *alpha, double *a, integer *lda,
-			double *b, integer *ldb, double *beta, double *c__,
-			integer *ldc);
-		%}
 		integer kk = $transa() ? $SIZE(m) : $SIZE(n);
 
 		if ($transa() == 1)
@@ -6178,23 +4983,13 @@ if ($config{CBLAS}){
 pp_def("rmcgemm",
        HandleBad => 0,
 	Pars => '[phys]A(2,m,n); int transa(); int transb(); [phys]B(2,p,q);[phys]alpha(2); [phys]beta(2); [io,phys]C(2,r,s)',
-	GenericTypes => [F,D],
 	Code => '
 		int ptransa, ptransb;
-		types(F) %{
-			extern void cblas_cgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
+			extern void $TFD(cblas_cgemm,cblas_zgemm)(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
 				const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
 				const int K, const void *alpha, const void *A,
 				const int lda, const void *B, const int ldb,
 				const void *beta, void *C, const int ldc);
-		%}
-		types(D) %{
-			extern void cblas_zgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
-		                 const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
-	        	         const int K, const void *alpha, const void *A,
-	                	 const int lda, const void *B, const int ldb,
-		                 const void *beta, void *C, const int ldc);
-		%}
 		integer kk = $transa() ? $SIZE(n) : $SIZE(m);
 
 		switch($transa()){
@@ -6248,27 +5043,18 @@ Complex version of rmgemm.
 }
 
 pp_defc("mmult",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gemm_(char *transa, char *transb, integer *m, integer *
+		n, integer *k, $GENERIC() *alpha, $GENERIC() *a, integer *lda,
+		$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
+		integer *ldc);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,m,n); [phys]B(2,p,m); [o,phys]C(2,p,n)',
-	GenericTypes => [F,D],
 	Code =>  '
 		char ptrans = \'N\';
-		types(F) %{
-			extern int cgemm_(char *transa, char *transb, integer *m, integer *
-			n, integer *k, float *alpha, float *a, integer *lda,
-			float *b, integer *ldb, float *beta, float *c__,
-			integer *ldc);
-			float alpha[2] = {1,0};
-			float beta[2] = {0,0};
-		%}
-		types(D) %{
-			extern int zgemm_(char *transa, char *transb, integer *m, integer *
-			n, integer *k, double *alpha, double *a, integer *lda,
-			double *b, integer *ldb, double *beta, double *c__,
-			integer *ldc);
-			double alpha[2] = {1,0};
-			double beta[2] = {0,0};
-		%}
+			$GENERIC() alpha[2] = {1,0};
+			$GENERIC() beta[2] = {0,0};
 
 		$TFD(cgemm_,zgemm_)(
 		&ptrans,
@@ -6287,28 +5073,18 @@ pp_defc("mmult",
 ');
 if ($config{STRASSEN}){
 pp_defc("smmult",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gemmb_(char *transa, char *transb, integer *m, integer *
+		n, integer *k, $GENERIC() *alpha, $GENERIC() *a, integer *lda,
+		$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
+		integer *ldc);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,m,n); [phys]B(2,p,m); [o,phys]C(2,p,n)',
-	GenericTypes => [F,D],
 	Code =>  '
 		char ptrans = \'N\';
-		types(F) %{
-			extern int cgemmb_(char *transa, char *transb, integer *m, integer *
-			n, integer *k, float *alpha, float *a, integer *lda,
-			float *b, integer *ldb, float *beta, float *c__,
-			integer *ldc);
-			float alpha[2] = {1,0};
-			float beta[2] = {0,0};
-		%}
-		types(D) %{
-			extern int zgemmb_(char *transa, char *transb, integer *m, integer *
-			n, integer *k, double *alpha, double *a, integer *lda,
-			double *b, integer *ldb, double *beta, double *c__,
-			integer *ldc);
-			double alpha[2] = {1,0};
-			double beta[2] = {0,0};
-		%}
-
+		$GENERIC() alpha[2] = {1,0};
+		$GENERIC() beta[2] = {0,0};
 		$TFD(cgemmb_,zgemmb_)(
 		&ptrans,
 		&ptrans,
@@ -6327,29 +5103,19 @@ pp_defc("smmult",
 }
 
 pp_defc("crossprod",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)gemm_(char *transa, char *transb, integer *m, integer *
+		n, integer *k, $GENERIC() *alpha, $GENERIC() *a, integer *lda,
+		$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
+		integer *ldc);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,n,m); [phys]B(2,p,m); [o,phys]C(2,p,n)',
-	GenericTypes => [F,D],
 	Code =>  '
 		char btrans = \'N\';
 		char atrans = \'C\';
-		types(F) %{
-			extern int cgemm_(char *transa, char *transb, integer *m, integer *
-			n, integer *k, float *alpha, float *a, integer *lda,
-			float *b, integer *ldb, float *beta, float *c__,
-			integer *ldc);
-			float alpha[2] = {1,0};
-			float beta[2] = {0,0};
-		%}
-		types(D) %{
-			extern int zgemm_(char *transa, char *transb, integer *m, integer *
-			n, integer *k, double *alpha, double *a, integer *lda,
-			double *b, integer *ldb, double *beta, double *c__,
-			integer *ldc);
-			double alpha[2] = {1,0};
-			double beta[2] = {0,0};
-		%}
-
+		$GENERIC() alpha[2] = {1,0};
+		$GENERIC() beta[2] = {0,0};
 		$TFD(cgemm_,zgemm_)(
 		&btrans,
 		&atrans,
@@ -6367,25 +5133,18 @@ pp_defc("crossprod",
 ');
 
 pp_defc("syrk",
+       _decl => <<'EOF',
+			extern int $TFD(c,z)syrk_(char *uplo, char *trans, integer *n, integer *k,
+			$GENERIC() *alpha, $GENERIC() *a, integer *lda, $GENERIC() *beta,
+			$GENERIC() *c__, integer *ldc);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,m,n); int uplo(); int trans(); [phys]alpha(2); [phys]beta(2); [io,phys]C(2,p,p)',
 	RedoDimsCode => '$SIZE(p) = $trans() ? $SIZE(n) : $SIZE(m);',
-	GenericTypes => [F,D],
 	Code =>  '
 
 		char puplo = \'U\';
 		char ptrans = \'N\';
-
-		types(F) %{
-			extern int csyrk_(char *uplo, char *trans, integer *n, integer *k,
-			float *alpha, float *a, integer *lda, float *beta,
-			float *c__, integer *ldc);
-		%}
-		types(D) %{
-			extern int zsyrk_(char *uplo, char *trans, integer *n, integer *k,
-			double *alpha, double *a, integer *lda, double *beta,
-			double *c__, integer *ldc);
-		%}
 		integer kk = $trans() ? $SIZE(m) : $SIZE(n);
 
 		if ($uplo())
@@ -6412,23 +5171,13 @@ if ($config{CBLAS}){
 pp_def("rmcsyrk",
        HandleBad => 0,
 	Pars => '[phys]A(2,m,n); int uplo(); int trans(); [phys]alpha(2); [phys]beta(2); [io,phys]C(2,p,p)',
-	GenericTypes => [F,D],
 	Code =>  '
 		int puplo = CblasUpper;
 		int ptrans;
-
-		types(F) %{
 			extern void cblas_csyrk(const enum CBLAS_ORDER Order, const enum CBLAS_UPLO Uplo,
 		                 const enum CBLAS_TRANSPOSE Trans, const int N, const int K,
 		                 const void *alpha, const void *A, const int lda,
 		                 const void *beta, void *C, const int ldc);
-		%}
-		types(D) %{
-			extern void cblas_zsyrk(const enum CBLAS_ORDER Order, const enum CBLAS_UPLO Uplo,
-		                 const enum CBLAS_TRANSPOSE Trans, const int N, const int K,
-	        	         const void *alpha, const void *A, const int lda,
-	                	 const void *beta, void *C, const int ldc);
-		%}
 		integer kk = $trans() ? $SIZE(n) : $SIZE(m);
 
 		if ($uplo())
@@ -6465,20 +5214,14 @@ Complex version of rmsyrk
 ');
 }
 pp_defc("dot",
+       _decl => <<'EOF',
+			extern $GENERIC() $TFD(c,z)dotu_($GENERIC() *ret, integer *n, $GENERIC() *dx, integer *incx, $GENERIC() *dy,
+			integer *incy);
+EOF
        HandleBad => 0,
 	Pars => '[phys]a(2,n);int [phys]inca();[phys]b(2,n);int [phys]incb();[o,phys]c(2)',
-	GenericTypes => [F,D],
 	Code =>  '
-		types(F) %{
-			extern float cdotu_(float *ret, integer *n, float *dx, integer *incx, float *dy,
-			integer *incy);
-		%}
-		types(D) %{
-			extern double zdotu_(double *ret, integer *n, double *dx, integer *incx, double *dy,
-			integer *incy);
-		%}
 		integer n = (integer ) $PRIV(__n_size)/$inca();
-
 		$TFD(cdotu_,zdotu_)(
 		$P(c),
 		&n,
@@ -6488,21 +5231,15 @@ pp_defc("dot",
 		$P(incb));
 ');
 
-pp_def("cdotc",
+pp_defc("dotc",
+       _decl => <<'EOF',
+			extern $GENERIC() $TFD(c,z)dotc_($GENERIC() *ret, integer *n, $GENERIC() *dx, integer *incx, $GENERIC() *dy,
+			integer *incy);
+EOF
        HandleBad => 0,
 	Pars => '[phys]a(2,n);int [phys]inca();[phys]b(2,n);int [phys]incb();[o,phys]c(2)',
-	GenericTypes => [F,D],
 	Code =>  '
-		types(F) %{
-			extern float cdotc_(float *ret, integer *n, float *dx, integer *incx, float *dy,
-			integer *incy);
-		%}
-		types(D) %{
-			extern double zdotc_(double *ret, integer *n, double *dx, integer *incx, double *dy,
-			integer *incy);
-		%}
 		integer n = (integer ) $PRIV(__n_size)/$inca();
-
 		$TFD(cdotc_,zdotc_)(
 		$P(c),
 		&n,
@@ -6521,21 +5258,14 @@ vector.
 ');
 
 pp_defc("axpy",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)axpy_(integer *n, $GENERIC() *da, $GENERIC() *dx,
+		integer *incx, $GENERIC() *dy, integer *incy);
+EOF
        HandleBad => 0,
 	Pars => '[phys]a(2,n);int [phys]inca();[phys] alpha(2);[io,phys]b(2,n);int [phys]incb()',
-	GenericTypes => [F,D],
 	Code =>  '
-
-		types(F) %{
-			extern int caxpy_(integer *n, float *da, float *dx,
-			integer *incx, float *dy, integer *incy);
-		%}
-		types(D) %{
-			extern int zaxpy_(integer *n, double *da, double *dx,
-			integer *incx, double *dy, integer *incy);
-		%}
 		integer n = (integer ) $PRIV(__n_size)/$inca();
-
 		$TFD(caxpy_,zaxpy_)(
 		&n,
 		$P(alpha),
@@ -6546,65 +5276,44 @@ pp_defc("axpy",
 ');
 
 pp_defc("nrm2",
+       _decl => <<'EOF',
+			extern $GENERIC() $TFD(sc,dz)nrm2_(integer *n, $GENERIC() *dx,
+			integer *incx);
+EOF
        HandleBad => 0,
 	Pars => '[phys]a(2,n);int [phys]inca();[o,phys]b()',
-	GenericTypes => [F,D],
 	Code =>  '
-
-		types(F) %{
-			extern float scnrm2_(integer *n, float *dx,
-			integer *incx);
-		%}
-		types(D) %{
-			extern double dznrm2_(integer *n, double *dx,
-			integer *incx);
-		%}
 		integer n = (integer ) $PRIV(__n_size)/$inca();
-
-		$b() = $TFD(scnrm2_,dznrm2_)(
+		$b() = $TFD(sc,dz)nrm2_(
 		&n,
 		$P(a),
 		$P(inca));
 ');
 
 pp_defc("asum",
+       _decl => <<'EOF',
+		extern $GENERIC() $TFD(sc,dz)asum_(integer *n, $GENERIC() *dx,
+		integer *incx);
+EOF
        HandleBad => 0,
 	Pars => '[phys]a(2,n);int [phys]inca();[o,phys]b()',
-	GenericTypes => [F,D],
 	Code =>  '
-
-		types(F) %{
-			extern float scasum_(integer *n, float *dx,
-			integer *incx);
-		%}
-		types(D) %{
-			extern double dzasum_(integer *n, double *dx,
-			integer *incx);
-		%}
 		integer n = (integer ) $PRIV(__n_size)/$inca();
-
-		$b() = $TFD(scasum_,dzasum_)(
+		$b() = $TFD(sc,dz)asum_(
 		&n,
 		$P(a),
 		$P(inca));
 ');
 
 pp_defc("scal",
+	_decl => <<'EOF',
+		extern int $TFD(c,z)scal_(integer *n, $GENERIC() *sa,
+		$GENERIC() *dx, integer *incx);
+EOF
         HandleBad => 0,
 	Pars => '[io,phys]a(2,n);int [phys]inca();[phys]scale(2)',
-	GenericTypes => [F,D],
 	Code =>  '
-
-		types(F) %{
-			extern int cscal_(integer *n, float *sa,
-			float *dx, integer *incx);
-		%}
-		types(D) %{
-			extern int zscal_(integer *n, double *sa,
-			double *dx,integer *incx);
-		%}
 		integer n = (integer ) $PRIV(__n_size)/$inca();
-
 		$TFD(cscal_,zscal_)(
 		&n,
 		$P(scale),
@@ -6617,11 +5326,9 @@ pp_def("sscal",
 	Pars => '[io,phys]a(2,n);int [phys]inca();[phys]scale()',
 	GenericTypes => [F],
 	Code =>  '
-
-		extern int csscal_(integer *n, float *sa,
-		float *dx, integer *incx);
+		extern int csscal_(integer *n, $GENERIC() *sa,
+		$GENERIC() *dx, integer *incx);
 		integer n = (integer ) $PRIV(__n_size)/$inca();
-
 		csscal_( &n, $P(scale), $P(a), $P(inca));
 ',
 Doc=>'
@@ -6634,20 +5341,13 @@ Scales a complex vector by a real constant.
 
 
 pp_defc("rotg",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)rotg_($GENERIC() *dx,
+		$GENERIC() *dy, $GENERIC() *c, $GENERIC() *s);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]a(2);[phys]b(2);[o,phys]c(); [o,phys]s(2)',
-	GenericTypes => [F,D],
 	Code =>  '
-
-		types(F) %{
-			extern int crotg_(float *dx,
-			float *dy, float *c, float *s);
-		%}
-		types(D) %{
-			extern int zrotg_(double *dx,
-			double *dy, double *c, double *s);
-		%}
-
 		$TFD(crotg_,zrotg_)(
 		$P(a),
 		$P(b),
@@ -6662,22 +5362,14 @@ pp_defc("rotg",
 #
 ################################################################################
 pp_defc("lacpy",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)lacpy_(char *uplo, integer *m, integer *n, $GENERIC() *
+		a, integer *lda, $GENERIC() *b, integer *ldb);
+EOF
        HandleBad => 0,
 	Pars => '[phys]A(2,m,n); int uplo(); [o,phys]B(2,p,n)',
-	GenericTypes => [F,D],
 	Code => '
 		char puplo;
-
-		types(F) %{
-			extern int clacpy_(char *uplo, integer *m, integer *n, float *
-			a, integer *lda, float *b, integer *ldb);
-		%}
-		types(D) %{
-			extern int zlacpy_(char *uplo, integer *m, integer *n, double *
-			a, integer *lda, double *b, integer *ldb);
-		%}
-
-
 		switch ($uplo())
 		{
 			case 0: puplo = \'U\';
@@ -6698,20 +5390,13 @@ pp_defc("lacpy",
 ');
 
 pp_defc("laswp",
+       _decl => <<'EOF',
+		extern int $TFD(c,z)laswp_(integer *n, $GENERIC() *a, integer *lda, integer 
+		*k1, integer *k2, integer *ipiv, integer *incx);
+EOF
        HandleBad => 0,
 	Pars => '[io,phys]A(2,m,n); int [phys]k1(); int [phys]k2(); int [phys]ipiv(p);int [phys]inc()',
-	GenericTypes => [F,D],
 	Code => '
-		types(F) %{
-			extern int claswp_(integer *n, float *a, integer *lda, integer 
-			*k1, integer *k2, integer *ipiv, integer *incx);
-		%}
-		types(D) %{
-			extern int zlaswp_(integer *n, double *a, integer *lda, integer 
-			*k1, integer *k2, integer *ipiv, integer *incx);
-		%}
-
-
 		$TFD(claswp_,zlaswp_)(
 		&(integer){$PRIV(__n_size)},
 		$P(A),
@@ -6833,8 +5518,9 @@ EOT
 );
 
 pp_addhdr('
-void cftrace(int n, float *mat, float *res)
+void cftrace(int n, void *a1, void *a2)
 {
+  float *mat = a1, *res = a2;
   int i;
   res[0] = mat[0];
   res[1] = mat[1];
@@ -6844,8 +5530,9 @@ void cftrace(int n, float *mat, float *res)
    	res[1] += mat[(i*(n+1))*2+1];
   }
 }
-void cdtrace(int n, double *mat, double *res)
+void cdtrace(int n, void *a1, void *a2)
 {
+  double *mat = a1, *res = a2;
   int i;
   res[0] = mat[0];
   res[1] = mat[1];
@@ -6857,33 +5544,22 @@ void cdtrace(int n, double *mat, double *res)
 }
 ');
 
-pp_defc(
-	'charpol',
+pp_defc('charpol',
+	_decl => <<'EOF',
+	extern int $TFD(c,z)gemm_(char *transa, char *transb, integer *m, integer *
+	n, integer *k, $GENERIC() *alpha, $GENERIC() *a, integer *lda,
+	$GENERIC() *b, integer *ldb, $GENERIC() *beta, $GENERIC() *c__,
+	integer *ldc);
+EOF
 	RedoDimsCode => '$SIZE(p) = $PDL(A)->dims[1] + 1;',
 	Pars => '[phys]A(c=2,n,n);[phys,o]Y(c=2,n,n);[phys,o]out(c=2,p);',
-	GenericTypes => [F,D],
 	Code => '
 	int i,j,k;
 	$GENERIC() *p, tr[2], b[2];
 	//$GENERIC() *tmp;	
 	char ptrans = \'N\';	
-	types(F) %{
-		extern int cgemm_(char *transa, char *transb, integer *m, integer *
-		n, integer *k, float *alpha, float *a, integer *lda,
-		float *b, integer *ldb, float *beta, float *c__,
-		integer *ldc);
-		float alpha[2] = {1,0};
-		float beta[2] = {0,0};
-	%}
-	types(D) %{
-		extern int zgemm_(char *transa, char *transb, integer *m, integer *
-		n, integer *k, double *alpha, double *a, integer *lda,
-		double *b, integer *ldb, double *beta, double *c__,
-		integer *ldc);
-		double alpha[2] = {1,0};
-		double beta[2] = {0,0};
-	%}
-
+	$GENERIC() alpha[2] = {1,0};
+	$GENERIC() beta[2] = {0,0};
 	p = ($GENERIC() * ) malloc (2* $SIZE(n) * $SIZE(n) * sizeof($GENERIC()));
 	loop(n0)%{
 		loop(n1)%{

@@ -218,15 +218,6 @@ In practice, TLE data have an effective date, and a shelf life measured
 from that effective date. Unfortunately, the TLE data do not contain
 either of these.
 
-NASA's Human Space Flight data, available from
-L<https://spaceflight.nasa.gov/realdata/elements/>, specify an effective
-date (see the C<Vector Time> information on that web page), but this is
-not part of the TLE. The L<Astro::SpaceTrack|Astro::SpaceTrack> package
-is capable of returning this data by jamming it onto the first line of a
-NASA TLE, and this package's C<parse()> method is
-capable of populating the object from this information. If an effective
-date is needed but not available, the L<epoch|/Epoch> is used.
-
 For casual use, the 'shelf life' of a set of TLE data is a week or so.
 But this can vary based on circumstances. For example, if the data
 represent a coasting arc for a shuttle launch, the shelf life may be a
@@ -389,12 +380,9 @@ of a Space Shuttle launch) use of the data by as little as a day or so
 before its epoch can cause the model computations to fail. For cases
 like this there is a 'backdate' attribute, which tells the
 L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> C<pass()> method
-whether it should consider
-times before the L<epoch|/Epoch> of the data. It defaults to true
-because that represents the general case. But you may wish to set it
-false (e.g. by something like C<< $tle->set(backdate => 0); >>) if
-you are using the predicted data downloaded from the
-L<NASA Human Space Flight> web site. You may also wish to call the
+whether it should consider times before the L<epoch|/Epoch> of the data.
+It defaults to true because that represents the general case. but you
+may wish to set it false. You may wish to call the
 L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE> C<validate()> method
 before making pass calculations if you suspect that your TLE data may
 not all be valid.
@@ -522,15 +510,6 @@ then retrieves the data from Space Track, so you will need a username
 and password. If you don't have them, you can configure
 L<Astro::SpaceTrack|Astro::SpaceTrack> to work for this site
 without them.
-
-=head2 NASA Human Space Flight
-
-NASA makes International Space Station data available at
-L<https://spaceflight.nasa.gov/realdata/elements/>, but the L<TLEs|/TLE>
-have to be dug out of the data.  L<Astro::SpaceTrack|Astro::SpaceTrack>
-will dig out the data for you, and you do not need a username or
-password.  Unlike the other sources, these data include predictions of
-future TLEs.
 
 =head2 Amateur Radio Satellite Corporation
 

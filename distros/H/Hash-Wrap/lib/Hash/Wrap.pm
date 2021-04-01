@@ -9,7 +9,7 @@ use warnings;
 
 use Scalar::Util qw[ blessed reftype ];
 use Digest::MD5;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -19,17 +19,14 @@ our $DEBUG    = 0;
 my %REGISTRY;
 
 sub _croak {
-
     require Carp;
     Carp::croak( @_ );
 }
 
 sub _find_symbol {
-
     my ( $package, $symbol, $reftype ) = @_;
 
     no strict 'refs';    ## no critic (ProhibitNoStrict)
-
     my $candidate = *{"$package\::$symbol"}{SCALAR};
 
     return $$candidate
@@ -44,7 +41,6 @@ sub _find_symbol {
 
 # this is called only if the method doesn't exist.
 sub _generate_accessor {
-
     my ( $hash_class, $class, $key ) = @_;
 
     my %dict = (
@@ -53,9 +49,7 @@ sub _generate_accessor {
     );
 
     my $code = $REGISTRY{$hash_class}{accessor_template};
-
     my $coderef = _compile_from_tpl( \$code, \%dict );
-
     _croak_about_code( \$code, 'accessor' )
       if $@;
 
@@ -63,7 +57,6 @@ sub _generate_accessor {
 }
 
 sub _autoload {
-
     my ( $hash_class, $method, $object ) = @_;
 
     my ( $class, $key ) = $method =~ /(.*)::(.*)/;
@@ -80,17 +73,13 @@ sub _autoload {
 
 
 sub import {
-
     shift;
-
     my $caller = caller;
 
     my @imports = @_;
-
     push @imports, @EXPORT unless @imports;
 
     for my $args ( @imports ) {
-
         if ( !ref $args ) {
             _croak( "$args is not exported by ", __PACKAGE__ )
               unless grep { /$args/ } @EXPORT;
@@ -122,11 +111,11 @@ sub import {
 
             $args->{-class} = $caller;
             $args->{-new} = 1 unless !!$args->{-new};
-            _build_class( $args );
+            _build_class( $caller, $name, $args );
         }
 
         else {
-            _build_class( $args );
+            _build_class( $caller, $name, $args );
             _build_constructor( $caller, $name, $args )
               if defined $name;
         }
@@ -147,8 +136,7 @@ sub import {
 use constant PerlIdentifier => qr/([^\W\d]\w*+)/;
 
 sub _build_class {
-
-    my $attr = shift;
+    my ( $caller, $name, $attr ) = @_;
 
     if ( !defined $attr->{-class} ) {
 
@@ -158,6 +146,10 @@ sub _build_class {
             } sort keys %$attr;
 
         $attr->{-class} = join '::', 'Hash::Wrap::Class', Digest::MD5::md5_hex( @class );
+    }
+
+    elsif ( $attr->{-class} eq '-caller' ) {
+      $attr->{-class} = $caller . '::' . $name;
     }
 
     my $class = $attr->{-class};
@@ -176,7 +168,6 @@ sub _build_class {
     );
 
     if ( $attr->{-lvalue} ) {
-
         if ( $] lt '5.016000' ) {
             _croak( "lvalue accessors require Perl 5.16 or later" )
               if $attr->{-lvalue} < 0;
@@ -254,7 +245,6 @@ sub AUTOLOAD <<AUTOLOAD_ATTR>> {
 sub DESTROY { }
 
 sub can {
-
     my ( $self, $key ) = @_;
 
     my $class = Scalar::Util::blessed( $self );
@@ -294,7 +284,6 @@ END
 }
 
 sub _build_constructor {
-
     my ( $package, $name, $args ) = @_;
 
     # closure for user provided clone sub
@@ -310,7 +299,6 @@ sub _build_constructor {
     );
 
     $dict{class} = do {
-
         if ( $args->{-method} ) {
             'shift;';
         }
@@ -321,14 +309,11 @@ sub _build_constructor {
     };
 
     $dict{copy} = do {
-
         if ( $args->{-copy} ) {
             '$hash = { %{ $hash } };';
         }
 
         elsif ( exists $args->{-clone} ) {
-
-
             if ( 'CODE' eq ref $args->{-clone} ) {
                 $clone = $args->{-clone};
                 '$hash = $clone->($hash);';
@@ -394,20 +379,14 @@ sub _build_constructor {
 }
 
 sub _croak_about_code {
-
     my ( $code, $what ) = @_;
-
     my $error = $@;
-
     _line_number_code( $code );
-
     _croak( qq[error compiling $what: $error\n$$code] );
 }
 
 sub _line_number_code {
-
     my ( $code ) = @_;
-
     my $space = length( $$code =~ tr/\n// );
     my $line  = 0;
     $$code =~ s/^/sprintf "%${space}d: ", ++$line/emg;
@@ -430,9 +409,7 @@ sub _compile_from_tpl {
 }
 
 sub _interpolate {
-
     my ( $tpl, $dict, $work ) = @_;
-
     $work = { loop => {} } unless defined $work;
 
     $$tpl =~ s{(\\)?\<\<(\w+)\>\>
@@ -444,7 +421,6 @@ sub _interpolate {
                     my $key = lc $2;
                     my $v = $dict->{$key};
                     if ( defined $v ) {
-
                         $v = join( "\n", @$v )
                           if 'ARRAY' eq ref $v;
 
@@ -461,7 +437,6 @@ sub _interpolate {
               }gex;
     return;
 }
-
 
 1;
 
@@ -483,7 +458,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -591,8 +566,16 @@ except via the imported constructor subroutine:
   print $h->a, "\n";             # prints 1
   $h->isa( 'My::Class' );        # returns true
 
+or, if you want it to reflect the current package, try this:
+
+  package Foo;
+  use Hash::Wrap { -class => '-caller', -as => 'wrapit' };
+
+  my $h = wrapit { a => 1 };
+  $h->isa( 'Foo::wrapit' );  # returns true
+
 Again, the wrapper class has no constructor method, so the only way to create
-an object is via the C<wrap_hash> subroutine.
+an object is via the generated subroutine.
 
 =head3 The Wrapper Class needs its own class constructor method
 
@@ -740,6 +723,14 @@ A class with the given name will be created and new objects will be
 blessed into the specified class by the constructor subroutine.  The
 new class will not have a constructor method.
 
+If I<class name> is the string C<-caller>, then the class name is
+set to the fully qualified name of the constructor, e.g.
+
+  package Foo;
+  use Hash::Wrap { -class => '-caller', -as => 'wrap_it' };
+
+results in a class name of C<Foo::wrap_it>.
+
 If not specified, the class name will be constructed based upon the
 options.  Do not rely upon this name to determine if an object is
 wrapped by B<Hash::Wrap>.
@@ -847,6 +838,18 @@ Lvalue accessors are available only on Perl 5.16 and later.
 Accessors for deleted elements are not removed.  The class's C<can>
 method will return C<undef> for them, but they are still available in
 the class's stash.
+
+=head1 EXAMPLES
+
+=head1 Existing keys are not compatible with method names
+
+If a hash key contains characters that aren't legal in method names,
+there's no way to access that hash entry.  One way around this is to
+use a custom clone subroutine which modifies the keys so they are
+legal method names.  The user can directly insert a non-method-name
+key into the C<Hash::Wrap> object after it is created, and those still
+have a key that's not available via a method, but there's no cure for
+that.
 
 =head1 SEE ALSO
 
@@ -1017,7 +1020,7 @@ is done globally, so all objects are affected.
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -1191,8 +1194,16 @@ __END__
 #pod   print $h->a, "\n";             # prints 1
 #pod   $h->isa( 'My::Class' );        # returns true
 #pod
+#pod or, if you want it to reflect the current package, try this:
+#pod
+#pod   package Foo;
+#pod   use Hash::Wrap { -class => '-caller', -as => 'wrapit' };
+#pod
+#pod   my $h = wrapit { a => 1 };
+#pod   $h->isa( 'Foo::wrapit' );  # returns true
+#pod
 #pod Again, the wrapper class has no constructor method, so the only way to create
-#pod an object is via the C<wrap_hash> subroutine.
+#pod an object is via the generated subroutine.
 #pod
 #pod =head3 The Wrapper Class needs its own class constructor method
 #pod
@@ -1340,6 +1351,14 @@ __END__
 #pod blessed into the specified class by the constructor subroutine.  The
 #pod new class will not have a constructor method.
 #pod
+#pod If I<class name> is the string C<-caller>, then the class name is
+#pod set to the fully qualified name of the constructor, e.g.
+#pod
+#pod   package Foo;
+#pod   use Hash::Wrap { -class => '-caller', -as => 'wrap_it' };
+#pod
+#pod results in a class name of C<Foo::wrap_it>.
+#pod
 #pod If not specified, the class name will be constructed based upon the
 #pod options.  Do not rely upon this name to determine if an object is
 #pod wrapped by B<Hash::Wrap>.
@@ -1448,6 +1467,19 @@ __END__
 #pod Accessors for deleted elements are not removed.  The class's C<can>
 #pod method will return C<undef> for them, but they are still available in
 #pod the class's stash.
+#pod
+#pod =head1 EXAMPLES
+#pod
+#pod =head1 Existing keys are not compatible with method names
+#pod
+#pod If a hash key contains characters that aren't legal in method names,
+#pod there's no way to access that hash entry.  One way around this is to
+#pod use a custom clone subroutine which modifies the keys so they are
+#pod legal method names.  The user can directly insert a non-method-name
+#pod key into the C<Hash::Wrap> object after it is created, and those still
+#pod have a key that's not available via a method, but there's no cure for
+#pod that.
+#pod
 #pod
 #pod
 #pod =head1 SEE ALSO

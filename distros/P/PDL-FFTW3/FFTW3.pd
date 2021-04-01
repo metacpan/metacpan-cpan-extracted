@@ -19,7 +19,7 @@ use warnings;
 # I generate code for up to 10-dimensional FFTs
 my $maxrank = 10;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 pp_setversion($VERSION);
 
 pp_addpm( {At => 'Top'}, slurp('README.pod') . <<'EOF' );
@@ -71,11 +71,14 @@ sub ifft$rank {
 sub rfft$rank { __fft_internal( "rfft$rank", \@_ ); }
 *PDL::rfft$rank = \\&rfft$rank;
 
+sub rNfft$rank { __fft_internal( "rNfft$rank", \@_ ); }
+*PDL::rNfft$rank = \\&rNfft$rank;
+
 sub irfft$rank { my \$a = __fft_internal( "irfft$rank", \@_ ); \$a /= $rshapestr; \$a; }
 *PDL::irfft$rank = \\&irfft$rank;
 EOF
 
-  pp_add_exported( "fft$rank", "ifft$rank", "rfft$rank", "irfft$rank" );
+  pp_add_exported( map "${_}fft$rank", '', 'i', 'r', 'rN', 'ir' );
 }
 
 
@@ -210,7 +213,7 @@ EOF
   pp_def( "__Nfft$rank", %pp_def );
 
   ##################################################################################
-  ####### native complex-real
+  ####### real-native complex and native complex-real
   @dims_real    = @dims;
   @dims_complex = @dims;
   $dims_complex[0] = 'nhalf'; # first complex dim is real->dim(0)/2+1
@@ -222,6 +225,16 @@ EOF
   $code_real_backward =  $code_real;
   $code_real_forward  =~ s/INVERSE/0/g;
   $code_real_backward =~ s/INVERSE/1/g;
+
+  # forward
+  $pp_def{RedoDimsCode} = <<'EOF';
+if( $PDL(complexv)->ndims <= 1 || $PDL(complexv)->dims[1] <= 0 )
+  $SIZE(nhalf) = (int)( $PDL(real)->dims[0]/2 ) + 1;
+EOF
+  $pp_def{Pars} = "real($dims_real_string); complex [o]complexv($dims_complex_string);";
+  $pp_def{Code} = $code_real_forward;
+  $pp_def{GenericTypes} = [qw(F D)];
+  pp_def( "__rNfft$rank", %pp_def );
 
   # backward
   $pp_def{RedoDimsCode} = <<'EOF';

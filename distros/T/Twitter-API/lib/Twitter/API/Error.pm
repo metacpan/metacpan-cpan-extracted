@@ -1,6 +1,6 @@
 package Twitter::API::Error;
 # ABSTRACT: Twitter API exception
-$Twitter::API::Error::VERSION = '1.0005';
+$Twitter::API::Error::VERSION = '1.0006';
 use Moo;
 use Ref::Util qw/is_arrayref is_hashref/;
 use Try::Tiny;
@@ -224,7 +224,7 @@ Twitter::API::Error - Twitter API exception
 
 =head1 VERSION
 
-version 1.0005
+version 1.0006
 
 =head1 SYNOPSIS
 
@@ -385,7 +385,7 @@ Marc Mims <marc@questright.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2018 by Marc Mims.
+This software is copyright (c) 2015-2021 by Marc Mims.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

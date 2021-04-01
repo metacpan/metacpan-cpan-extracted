@@ -1,5 +1,12 @@
 Revision history for Selenium-Client
 
+1.03 2021-04-01 TEODESIAN
+    [BUG FIXES]
+    - Fix issue where child elements found with FindElementFromElement() (and FindElementsFromElement) would use the parent element ID rather than their own
+    - Expose the elementid parameter in Selenium::Element objects immediately after instantiation
+    [DOCUMENTATION]
+    - Note that SwitchToFrame does not actually work with element IDs as suggested by WC3 standard
+
 1.02 2021-02-10 TEODESIAN
     [BUG FIXES]
     - Declare minimum version of perl 5.28

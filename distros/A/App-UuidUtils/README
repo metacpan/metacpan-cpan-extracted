@@ -1,6 +1,72 @@
-DESCRIPTION
+NAME
+    App::UuidUtils - Command-line utilities related to UUIDs
 
+VERSION
+    This document describes version 0.030 of App::UuidUtils (from Perl
+    distribution App-UuidUtils), released on 2021-01-20.
+
+DESCRIPTION
     This distribution contains command-line utilities related to UUIDs:
 
-    #INSERT_EXECS_LIST
+    *   gen-uuid
+
+FUNCTIONS
+  gen_uuid
+    Usage:
+
+     gen_uuid(%args) -> [status, msg, payload, meta]
+
+    Generate UUID, with several options.
+
+    This utility is meant to generate one or several UUIDs with several
+    options, like "version", backend, etc.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backend => *str*
+
+        Choose a specific backend, if unspecified one will be chosen.
+
+        Note that not all backends support every version of UUID.
+
+    *   num => *int* (default: 1)
+
+    *   uuid_version => *str* (default: "random")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-UuidUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-UuidUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-App-UuidUtils/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

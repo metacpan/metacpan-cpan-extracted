@@ -23,6 +23,7 @@ my @files = (
     'lib/Selenium/Driver/Gecko.pm',
     'lib/Selenium/Driver/Safari.pm',
     'lib/Selenium/Driver/SeleniumHQ/Jar.pm',
+    'lib/Selenium/Driver/WinApp.pm',
     'lib/Selenium/Specification.pm',
     'lib/Selenium/Subclass.pm',
     't/00-compile.t',

@@ -5,7 +5,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 use Exporter qw{ import };
 
@@ -221,7 +221,6 @@ sub tolerance_frac {
 	    $grade = \&fail;
 	    $title .= <<"EOD";
 
-
            $dim( t + 1 ): $rslt[1][$inx]
                $dim( t ): $rslt[0][$inx]
           $dim dot ( t ): @{[ _dor( $rslt[0][$v_inx], '<undef>' ) ]}
@@ -257,7 +256,6 @@ reserves the right to change or revoke it without notice.
 
 This module is a repository for subroutines used in testing
 L<My::Module|My::Module>.
-
 
 =head1 SUBROUTINES
 
@@ -325,6 +323,7 @@ C<< abs( $want * $tolerance ) >> and then does a C<goto &tolerance>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
 L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
 electronic mail to the author.
 

@@ -1,7 +1,7 @@
 package Twitter::API;
 # ABSTRACT: A Twitter REST API library for Perl
 
-our $VERSION = '1.0005';
+our $VERSION = '1.0006';
 use 5.14.1;
 use Moo;
 use Carp;
@@ -22,6 +22,16 @@ use namespace::clean;
 
 with qw/MooX::Traits/;
 sub _trait_namespace { 'Twitter::API::Trait' }
+
+has api_version => (
+    is      => 'ro',
+    default => sub { '1.1' },
+);
+
+has api_ext => (
+    is      => 'ro',
+    default => sub { '.json' },
+);
 
 has [ qw/consumer_key consumer_secret/ ] => (
     is       => 'ro',
@@ -47,11 +57,6 @@ has api_url => (
 has upload_url => (
     is      => 'ro',
     default => sub { 'https://upload.twitter.com' },
-);
-
-has api_version => (
-    is      => 'ro',
-    default => sub { '1.1' },
 );
 
 has agent => (
@@ -365,13 +370,13 @@ sub process_error_response {
 sub api_url_for {
     my $self = shift;
 
-    $self->_url_for('.json', $self->api_url, $self->api_version, @_);
+    $self->_url_for($self->api_ext, $self->api_url, $self->api_version, @_);
 }
 
 sub upload_url_for {
     my $self = shift;
 
-    $self->_url_for('.json', $self->upload_url, $self->api_version, @_);
+    $self->_url_for($self->api_ext, $self->upload_url, $self->api_version, @_);
 }
 
 sub oauth_url_for {
@@ -386,7 +391,10 @@ sub _url_for {
     # If we already have a fully qualified URL, just return it
     return $_[-1] if $_[-1] =~ m(^https?://);
 
-    join('/', @parts) . $ext;
+    my $url = join('/', @parts);
+    $url .= $ext if $ext;
+
+    return $url;
 }
 
 # OAuth handshake
@@ -460,7 +468,7 @@ Twitter::API - A Twitter REST API library for Perl
 
 =head1 VERSION
 
-version 1.0005
+version 1.0006
 
 =head1 SYNOPSIS
 
@@ -627,6 +635,26 @@ structures decoded from the JSON responses. Refer to the L<Twitter API
 Documentation|https://dev.twitter.com/rest/public> for available endpoints,
 parameters, and responses.
 
+=head2 Twitter API V2 Beta Support
+
+Twitter intends to replace the current public API, version 1.1, with version 2.
+
+See L<https://developer.twitter.com/en/docs/twitter-api/early-access>.
+
+You can use Twitter::API for the V2 beta with the minimalist usage described
+just above by passing values in the constructor for C<api_version> and
+C<api_ext>.
+
+    my $client = Twitter::API->new_with_traits(
+        api_version => '2',
+        api_ext     => '',
+        %oauth_credentials,
+    );
+
+    my $user = $client->get("users/by/username/$username");
+
+More complete V2 support is anticipated in a future release.
+
 =head1 ATTRIBUTES
 
 =head2 consumer_key, consumer_secret
@@ -651,6 +679,10 @@ Optional. Defaults to C<https://upload.twitter.com>.
 =head2 api_version
 
 Optional. Defaults to C<1.1>.
+
+=head2 api_ext
+
+Optional. Defaults to C<.json>.
 
 =head2 agent
 
@@ -752,7 +784,7 @@ Marc Mims <marc@questright.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2018 by Marc Mims.
+This software is copyright (c) 2015-2021 by Marc Mims.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

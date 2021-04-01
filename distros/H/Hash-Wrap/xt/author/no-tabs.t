@@ -8,7 +8,6 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Hash/Wrap.pm',
-    't/#api.t#',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
@@ -16,7 +15,6 @@ my @files = (
     't/basic.t',
     't/croak.t',
     't/defined.t',
-    't/defined.t.orig',
     't/exists.t',
     't/immutable.t',
     't/import.t',
@@ -24,7 +22,6 @@ my @files = (
     't/lvalue.t',
     't/lvalue_undef.t',
     't/subclass.t',
-    't/t',
     't/undef.t'
 );
 

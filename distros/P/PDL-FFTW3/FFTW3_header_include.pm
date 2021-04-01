@@ -20,7 +20,7 @@ our $_last_do_double_precision;
 sub __fft_internal {
   my $thisfunction = shift;
 
-  my ($do_inverse_fft, $is_real_fft, $rank) = $thisfunction =~ /^(i?)((?:r)?).*fft([0-9]+)/;
+  my ($do_inverse_fft, $is_real_fft, $is_native_output, $rank) = $thisfunction =~ /^(i?)(r?)(N?).*fft([0-9]+)/;
 
   # first I parse the variables. This is a very direct translation of what PP
   # does normally. Plan-creation has to be outside of PP, so I must re-do this
@@ -53,17 +53,17 @@ EOF
   # make sure the in/out types match. Convert $in if needed. This needs to
   # happen before we instantiate $out (if it's null) to make sure we know the
   # type
-  processTypes( $thisfunction, \$in, \$out );
+  processTypes( $thisfunction, $is_native_output, \$in, \$out );
 
   # I now create a piddle for the null output. Normally PP does this, but I need
   # to have the piddle made to create plans. If I don't, the alignment may
   # differ between plan-time and run-time
   if ( $out->isnull ) {
-    my @args = getOutArgs($in, $is_real_fft, $do_inverse_fft);
+    my @args = getOutArgs($in, $is_real_fft, $do_inverse_fft, $is_native_output);
     $out .= zeros(@args);
   }
 
-  validateArguments( $rank, $is_real_fft, $do_inverse_fft, $thisfunction, $in, $out );
+  validateArguments( $rank, $is_real_fft, $do_inverse_fft, $is_native_output, $thisfunction, $in, $out );
 
   # I need to physical-ize the piddles before I make a plan. Again, normally PP
   # does this, but to make sure alignments match, I need to do this myself, now
@@ -74,6 +74,7 @@ EOF
   barf "$thisfunction couldn't make a plan. Giving up\n" unless defined $plan;
 
   my $is_native = !$in->type->real; # native complex
+  $is_native_output ||= !$out->type->real;
   # I now have the arguments and the plan. Go!
   my $internal_function = 'PDL::__';
   $internal_function .=
@@ -81,6 +82,7 @@ EOF
     !$is_real_fft ? '' :
     ($is_native && $do_inverse_fft) ? 'irN' :
     $do_inverse_fft ? 'ir' :
+    ($is_native_output) ? 'rN' :
     'r';
   $internal_function .= "fft$rank";
   eval { no strict 'refs'; $internal_function->( $in, $out, $plan ) };
@@ -91,7 +93,7 @@ EOF
 }
 
 sub getOutArgs {
-  my ($in, $is_real_fft, $do_inverse_fft) = @_;
+  my ($in, $is_real_fft, $do_inverse_fft, $is_native_output) = @_;
 
   my @dims = $in->dims;
   my $is_native = !$in->type->real;
@@ -101,9 +103,12 @@ sub getOutArgs {
     # complex fft. Output is the same size as the input.
   } elsif ( !$do_inverse_fft ) {
     # forward real fft
-    my $d0 = shift @dims;
-    unshift @dims, 1+int($d0/2);
-    unshift @dims, 2;
+    $dims[0] = int($dims[0]/2)+1;
+    if ($is_native_output) {
+      $out_type = typeWithComplexity(getPrecision($out_type), $is_native_output);
+    } else {
+      unshift @dims, 2;
+    }
   } else {
     # backward real fft
     #
@@ -120,14 +125,14 @@ sub getOutArgs {
     } else {
       shift @dims;
     }
-    $dims[0] = 2*($dims[0])-2;
+    $dims[0] = 2*($dims[0]-1);
   }
   ($out_type, @dims);
 }
 
 sub validateArguments
 {
-  my ($rank, $is_real_fft, $do_inverse_fft, $thisfunction, $in, $out) = @_;
+  my ($rank, $is_real_fft, $do_inverse_fft, $is_native_output, $thisfunction, $in, $out) = @_;
 
   for my $arg ( $in, $out )
   {
@@ -160,7 +165,7 @@ EOF
     if( !$is_real_fft )
     { validateArgumentDimensions_complex( $rank, $thisfunction, $arg); }
     else
-    { validateArgumentDimensions_real( $rank, $do_inverse_fft, $thisfunction, $iarg, $arg); }
+    { validateArgumentDimensions_real( $rank, $do_inverse_fft, $is_native_output, $thisfunction, $iarg, $arg); }
   }
 
   # we have an explicit output piddle we're filling in. Make sure the
@@ -168,7 +173,7 @@ EOF
   if ( !$is_real_fft )
   { matchDimensions_complex($thisfunction, $rank, $in, $out); }
   else
-  { matchDimensions_real($thisfunction, $rank, $do_inverse_fft, $in, $out); }
+  { matchDimensions_real($thisfunction, $rank, $do_inverse_fft, $is_native_output, $in, $out); }
 }
 
 sub validateArgumentDimensions_complex
@@ -190,14 +195,15 @@ EOF
 }
 
 sub validateArgumentDimensions_real {
-  my ( $rank, $do_inverse_fft, $thisfunction, $iarg, $arg ) = @_;
+  my ( $rank, $do_inverse_fft, $is_native_output, $thisfunction, $iarg, $arg ) = @_;
   my $is_native = !$arg->type->real; # native complex
+#use Carp; use Test::More; diag "vAD_r ($arg)($is_native) ", $arg->info;
 
   # real FFT. Forward transform takes in real and spits out complex;
   # backward transform does the reverse
   if ( !$is_native && $arg->dim(0) != 2 ) {
     my ($verb, $var);
-    if ( !$do_inverse_fft && $iarg == 1 ) {
+    if ( !$is_native_output && !$do_inverse_fft && $iarg == 1 ) {
       ($verb, $var) = qw(produces output);
     } elsif ( $do_inverse_fft && $iarg == 0 ) {
       ($verb, $var) = qw(takes input);
@@ -217,7 +223,7 @@ EOF
   } else {
     # The output needs at least $rank dimensions. If this is a forward
     # transform, the output is complex, so it needs an extra dimension
-    $min_dimensionality++ if !$do_inverse_fft && !$is_native;
+    $min_dimensionality++ if !$do_inverse_fft && !$is_native_output;
     $var = 'output';
   }
   if ( $arg->ndims < $min_dimensionality ) {
@@ -241,7 +247,7 @@ EOF
 }
 
 sub matchDimensions_real {
-  my ($thisfunction, $rank, $do_inverse_fft, $in, $out) = @_;
+  my ($thisfunction, $rank, $do_inverse_fft, $is_native_output, $in, $out) = @_;
   my ($varname1, $varname2, $var1, $var2);
   if ( !$do_inverse_fft ) {
     # Forward FFT. The input is real, the output is complex. $output->dim(0)
@@ -253,10 +259,12 @@ sub matchDimensions_real {
     # Backward FFT. The input is complex, the output is real.
     ($varname1, $varname2, $var1, $var2) = (qw(output input), $out, $in);
   }
-  my $is_native = !$var2->type->real; # native complex
+  my $is_native = !$var2->type->real || $is_native_output; # native complex
   barf <<EOF if int($var1->dim(0)/2) + 1 != $var2->dim($is_native ? 0 : 1);
 $thisfunction: mismatched first dimension:
 \$$varname2->dim(1) == int(\$$varname1->dim(0)/2) + 1 wasn't true.
+$varname1: @{[$var1->info]}
+$varname2: @{[$var2->info]}
 Giving up.
 EOF
   for my $idim (1..$rank-1) {
@@ -271,7 +279,7 @@ EOF
 
 sub processTypes
 {
-  my ($thisfunction, $in, $out) = @_;
+  my ($thisfunction, $is_native_output, $in, $out) = @_;
 
   # types:
   #

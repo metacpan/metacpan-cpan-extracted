@@ -1,5 +1,5 @@
 package HTTP::API::Client;
-$HTTP::API::Client::VERSION = '1.01';
+$HTTP::API::Client::VERSION = '1.02';
 use strict;
 use warnings;
 
@@ -78,6 +78,17 @@ use Moo;
 use Try::Tiny;
 use URI;
 use URI::Escape qw( uri_escape uri_unescape );
+use Scalar::Util qw( looks_like_number );
+use HTTP::API::DataTypeMarker;
+
+extends 'Exporter';
+
+our @EXPORT = qw( xCSV xBOOLEAN
+    xTRUE xFALSE
+    xTrue xFalse
+    xtrue xfalse
+    xt__e xf___e
+);
 
 has username => (
     is      => "rw",
@@ -583,7 +594,7 @@ sub convert_data {
     my $content_type = $self->get_content_type(%o);
 
     if ($content_type =~ m/json/) {
-        return $self->json->encode($data);
+        return $self->kvp2json(%o);
     }
     elsif ($content_type eq 'application/x-www-form-urlencoded') {
         return $self->kvp2str(%o);
@@ -591,6 +602,67 @@ sub convert_data {
     else {
         return $data;
     }
+}
+
+sub kvp2json {
+    my ($self, %o) = @_;
+
+    my ($data, $events) = @o{qw(data events)};
+
+    my @keys;
+
+    if (my $do = $events->{keys}) {
+        @keys = $self->$do(%o);
+    }
+    else {
+        @keys = keys %$data;
+    }
+
+    my %data = ();
+
+    foreach my $key(@keys) {
+        next if $o{skip_key}{$key};
+        $data{$key} = $self->kvp2json_each(%o, value => $data->{$key});
+    }
+
+    return $self->json->encode(\%data);
+}
+
+sub kvp2json_each {
+    my ($self, %o) = @_;
+
+    my ($v) = map { _defor($_, '') } @o{qw( value )};
+
+    if (UNIVERSAL::isa($v, 'CODE')) {
+        $v = $self->$v(%o);
+    }
+
+    if (!ref $v) {
+        return looks_like_number($v) ? $v+0 : $v;
+    }
+    elsif (ref $v eq 'BOOL') {
+        return $v->[0];
+    }
+    elsif (UNIVERSAL::isa($v, 'ARRAY')) {
+        my @parts;
+
+        foreach my $val(@$v) {
+            push @parts, $self->kvp2json_each(%o, value => $val);
+        }
+
+        return \@parts;
+    }
+    elsif (UNIVERSAL::isa($v, 'HASH')) {
+        my %parts;
+
+        foreach my $key(keys %$v) {
+            $parts{$key} = $self->kvp2json_each(%o, value => $v->{$key});
+        }
+
+        return \%parts;
+    }
+
+    return $v;
 }
 
 sub kvp2str {
@@ -601,18 +673,18 @@ sub kvp2str {
     my @keys;
 
     if (my $do = $events->{before_sorting_keys}) {
-        $self->$do($data, \@keys);
+        $self->$do(%o, keys => \@keys);
     }
 
     if (my $do = $events->{keys}) {
-        @keys = $self->$do($data);
+        @keys = $self->$do(%o);
     }
     else {
         @keys = sort keys %$data;
     }
 
     if (my $do = $events->{after_sorting_keys}) {
-        $self->$do($data, \@keys);
+        $self->$do(%o, keys => \@keys);
     }
 
     my @parts;
@@ -628,7 +700,9 @@ sub kvp2str {
 sub kvp2str_each {
     my ($self, %o) = @_;
 
-    my ($k, $v) = @o{qw( key value )};
+    my ($k, $v) = map { _defor($_, '') } @o{qw( key value )};
+
+    $k = uri_escape($k);
 
     if (UNIVERSAL::isa($v, 'CODE')) {
         $v = $self->$v(%o, key => $k);
@@ -637,16 +711,22 @@ sub kvp2str_each {
     if (!ref $v) {
         $v = uri_escape($v);
 
+        $v = $v + 0 if looks_like_number($v);
+
         if ($o{no_key}) {
             return $v;
         }
         else {
-            $k = uri_escape($k);
             return "$k=$v";
         }
     }
+    elsif (ref $v eq 'BOOL') {
+        return ref $v->[0] eq 'SCALAR'
+            ? "$k=${$v->[0]}"
+            : "$k=$v->[0]";
 
-    if (ref $v eq 'ARRAY') {
+    }
+    elsif (ref $v eq 'ARRAY') {
         my @parts;
 
         foreach my $val(@$v) {
@@ -655,8 +735,7 @@ sub kvp2str_each {
 
         return ($o{no_key} ? '&' : '') . join '&', @parts;
     }
-
-    if (ref $v eq 'CSV') {
+    elsif (ref $v eq 'CSV') {
         my @csv;
         my @parts;
 
@@ -679,6 +758,8 @@ sub kvp2str_each {
 
         return $csv;
     }
+
+    return $v;
 }
 
 sub basic_authenticator {

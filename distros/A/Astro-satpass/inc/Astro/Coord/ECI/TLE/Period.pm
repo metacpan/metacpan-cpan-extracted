@@ -9,7 +9,7 @@ use Astro::Coord::ECI::TLE;
 use Carp;
 
 our @ISA = qw{ Astro::Coord::ECI::TLE };
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 my $pkg = __PACKAGE__;
 
@@ -25,7 +25,6 @@ sub period {
     my ( $self ) = @_;
     return $self->{$pkg}{period};
 }
-
 
 1;
 
@@ -74,6 +73,7 @@ L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
 L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
 electronic mail to the author.
 

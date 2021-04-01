@@ -254,6 +254,10 @@ The following are equivalent:
  $X = rfft1( $x );
  rfft1( $x, my $X = $x->zeroes );
 
+=head2 rNfftX (rNfft1, rNfft2, rNfft3, ..., rNfftn)
+
+Similar to the above, but returns native-complex piddles.
+
 =head2 irfftX (irfft1, irfft2, irfft3, ..., irfftn)
 
 The complex -> real inverse FFT. You can pass in the rank with the

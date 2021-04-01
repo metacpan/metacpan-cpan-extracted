@@ -9,7 +9,7 @@
 # COPYRIGHT NOTICE                                                           #
 # Copyright 2003 Bernard Nauwelaerts  All Rights Reserved.                   #
 #                                                                            #
-# THIS SOFTWARE IS RELEASED UNDER THE GNU Public Licence                     #
+# THIS SOFTWARE IS RELEASED UNDER THE GNU Public Licence version 3           #
 # See COPYING for details                                                    #
 #                                                                            #
 #  This software is provided as is, WITHOUT ANY WARRANTY, without even the   #

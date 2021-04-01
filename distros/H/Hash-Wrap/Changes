@@ -1,5 +1,13 @@
 Revision history for Hash-Wrap
 
+0.13      2021-04-01 15:45:07-04:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * the -class option can take the value '-caller', which
+      causes the class name to be determined from the calling
+      package name and the constructor name.
+
 0.12      2019-11-07 09:50:32-05:00 America/New_York
 
   [BUG FIX]

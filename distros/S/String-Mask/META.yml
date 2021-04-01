@@ -21,11 +21,11 @@ no_index:
 provides:
   String::Mask:
     file: lib/String/Mask.pm
-    version: '0.03'
+    version: '1.00'
 requires:
   Import::Export: '1.00'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/String-Mask.git
-version: '0.03'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -8,9 +8,11 @@ Makefile.PL
 README
 README.md
 lib/HTTP/API/Client.pm
-t/00_kvp.t
+lib/HTTP/API/DataTypeMarker.pm
 t/00_use.t
 t/01_api_call.t
 t/02_basic_auth.t
 t/03_diff_type.t
 t/04_callbacks.t
+t/05_kvp.t
+t/06_json.t

@@ -9,7 +9,7 @@ package Business::Tax::VAT::Validation;
 # Original author:                                                           #
 # IT Development software                                                    #
 # European VAT number validator Version 1.0.2                                #
-# Created 06/08/2003            Last Modified 30/11/2012                     #
+# Created 06/08/2003                                                         #
 #                                                                            #
 # Maintainership kindly handed over to David Precious (BIGPRESH) in 2015     #
  ############################################################################
@@ -17,7 +17,7 @@ package Business::Tax::VAT::Validation;
 # Copyright 2003 Bernard Nauwelaerts  All Rights Reserved.                   #
 # Copyright 2015 David Precious       All Rights Reserved.                   #
 #                                                                            #
-# THIS SOFTWARE IS RELEASED UNDER THE GNU Public Licence                     #
+# THIS SOFTWARE IS RELEASED UNDER THE GNU Public Licence version 3           #
 # Please see COPYING for details                                             #
 #                                                                            #
 # DISCLAIMER                                                                 #
@@ -27,16 +27,17 @@ package Business::Tax::VAT::Validation;
 #                                                                            #
 ############################################################################
 use strict;
+use warnings;
 
-BEGIN {
-    $Business::Tax::VAT::Validation::VERSION = '1.12';
-    use HTTP::Request::Common qw(POST);
-    use LWP::UserAgent;
-}
+our $VERSION = '1.20';
+
+use HTTP::Request::Common qw(POST);
+use LWP::UserAgent;
+use JSON qw/ decode_json /;
 
 =head1 NAME
 
-Business::Tax::VAT::Validation - Validate EU VAT numbers against VIES
+Business::Tax::VAT::Validation - Validate EU VAT numbers against VIES/HMRC
 
 =head1 SYNOPSIS
 
@@ -61,6 +62,8 @@ the supplied VAT number fit the expected format for the specified EU member
 state are performed first, to avoid unnecessarily sending queries to VIES for
 input that could never be valid.
 
+It also supports looking up VAT codes from the United Kingdom by using the
+REST API provided by their HMRC.
 
 =head1 CONSTRUCTOR
 
@@ -83,6 +86,7 @@ sub new {
     my ( $class, %arg ) = @_;
     my $self = {
         baseurl      => $arg{baseurl} || 'https://ec.europa.eu/taxation_customs/vies/services/checkVatService',
+        hmrc_baseurl => $arg{hmrc_baseurl} || 'https://api.service.hmrc.gov.uk/organisations/vat/check-vat-number/lookup/',
         error        => '',
         error_code   => 0,
         response     => '',
@@ -116,9 +120,10 @@ sub new {
             SE => '[0-9]{12}',
             SI => '[0-9]{8}',
             SK => '[0-9]{10}',
+            XI => '([0-9]{3} ?[0-9]{4} ?[0-9]{2}|[0-9]{3} ?[0-9]{4} ?[0-9]{2} ?[0-9]{3}|GD[0-9]{3}|HA[0-9]{3})',
         },
         proxy        => $arg{-proxy},
-        informations => {}
+        information => {}
     };
     $self = bless $self, $class;
     $self->{members} = join( '|', keys %{ $self->{re} } );
@@ -131,7 +136,23 @@ sub new {
 
 =over 4
 
-=item B<member_states> Returns all member states 2-digit codes as array
+=item B<member_states> Returns all supported country codes.
+
+These are ISO 3166-1 alpha-2 country codes with two exceptions. This module
+supports VAT codes from all current European Union member states and The United
+Kingdom of Great Britain and Northern Ireland.
+
+=over 4
+
+=item C<EL> Greece
+
+Must be used in place of Greece's proper code.
+
+=item C<XI> Northern Ireland
+
+May be used rather than C<GB> for checking a Northern Irish company.
+
+=back
 
     @ms=$hvatn->member_states;
     
@@ -179,33 +200,22 @@ or specify the VAT and MSC (vatNumber and countryCode) individually.
 Valid MS values are :
 
  AT, BE, BG, CY, CZ, DE, DK, EE, EL, ES,
- FI, FR, GB, HU, IE, IT, LU, LT, LV, MT,
- NL, PL, PT, RO, SE, SI, SK
+ FI, FR, GB, HR, HU, IE, IT, LU, LT, LV,
+ MT, NL, PL, PT, RO, SE, SI, SK, XI
 
 =cut
 
 sub check {
     my ($self, $vatNumber, $countryCode, @other) = @_;    # @other is here for backward compatibility purposes
+    $self->{information} = {};
     return $self->_set_error('You must provide a VAT number') unless $vatNumber;
     $countryCode ||= '';
     ( $vatNumber, $countryCode ) = $self->_format_vatn( $vatNumber, $countryCode );
     if ($vatNumber) {
-        my $ua = LWP::UserAgent->new;
-        if ( ref $self->{proxy} eq 'ARRAY' ) {
-            $ua->proxy( @{ $self->{proxy} } );
-        } else {
-            $ua->env_proxy;
+        if ($countryCode eq 'GB') {
+            return $self->_check_hmrc($vatNumber, $countryCode);
         }
-        $ua->agent( 'Business::Tax::VAT::Validation/'. $Business::Tax::VAT::Validation::VERSION );
-        
-        my $request = HTTP::Request->new(POST => $self->{baseurl});
-        $request->header(SOAPAction => 'http://www.w3.org/2003/05/soap-envelope');
-        $request->content(_in_soap_envelope($vatNumber, $countryCode));
-        $request->content_type("Content-Type: application/soap+xml; charset=utf-8");
-        
-        my $response = $ua->request($request);
-        
-        return $countryCode . '-' . $vatNumber if $self->_is_res_ok( $response->code, $response->decoded_content );
+        return $self->_check_vies($vatNumber, $countryCode);
     }
     0;
 }
@@ -220,6 +230,7 @@ sub check {
 
 sub local_check {
     my ( $self, $vatn, $mscc, @other ) = @_;    # @other is here for backward compatibility purposes
+    $self->{information} = {};
     return $self->_set_error('You must provide a VAT number') unless $vatn;
     $mscc ||= '';
     ( $vatn, $mscc ) = $self->_format_vatn( $vatn, $mscc );
@@ -231,19 +242,28 @@ sub local_check {
     }
 }
 
-=item B<informations> - Returns informations related to the last validated VAT number
-    
-    %infos=$hvatn->informations();
-    
+=item B<information> - Returns information related to the last checked VAT number
+
+    # Get all available information as a hashref:
+    my $info = $hvatn->information();
+
+    # Get a particular key:
+    my $address = $hvatn->information('address');
+
+Which information is offered depends on the checker used - for UK VAT numbers,
+checked via the HMRC API, C<address> is the only key which will be set.
+
+For EU VAT numbers checked via VIES, you can expect C<name> and C<address>.
+This hashref will be reset every time you call check() or local_check()
 
 =cut
 
-sub informations {
+sub information {
     my ( $self, $key, @other ) = @_; 
     if ($key) {
-        return $self->{informations}{$key} 
+        return $self->{information}{$key} 
     } else {
-        return ($self->{informations})    
+        return ($self->{information})    
     }
 }
 
@@ -320,6 +340,67 @@ sub get_last_response {
 }
 
 ### PRIVATE FUNCTIONS ==========================================================
+sub _get_ua {
+    my ($self) = @_;
+    my $ua = LWP::UserAgent->new;
+    if ( ref $self->{proxy} eq 'ARRAY' ) {
+        $ua->proxy( @{ $self->{proxy} } );
+    } else {
+        $ua->env_proxy;
+    }
+    $ua->agent( 'Business::Tax::VAT::Validation/'. $Business::Tax::VAT::Validation::VERSION );
+    return $ua;
+}
+
+sub _check_vies {
+  my ($self, $vatNumber, $countryCode) = @_;
+  my $ua = $self->_get_ua();
+  my $request = HTTP::Request->new(POST => $self->{baseurl});
+  $request->header(SOAPAction => 'http://www.w3.org/2003/05/soap-envelope');
+  $request->content(_in_soap_envelope($vatNumber, $countryCode));
+  $request->content_type("Content-Type: application/soap+xml; charset=utf-8");
+
+  my $response = $ua->request($request);
+
+  return $countryCode . '-' . $vatNumber if $self->_is_res_ok( $response->code, $response->decoded_content );
+}
+
+sub _check_hmrc {
+    my ($self, $vatNumber, $countryCode) = @_;
+    my $ua = $self->_get_ua();
+
+    my $request = HTTP::Request->new(GET => $self->{hmrc_baseurl}.$vatNumber);
+    $request->header(Accept => 'application/vnd.hmrc.1.0+json');
+    my $response = $ua->request($request);
+
+    $self->{res} = $response->decoded_content;
+    if ($response->code == 200) {
+        my $data = decode_json($self->{res});
+        $self->{information}->{name} = $data->{target}->{name};
+        my $line = 1;
+        my $address = "";
+        while (defined $data->{target}->{address}->{"line$line"}) {
+            $address .= $data->{target}->{address}->{"line$line"}."\n";
+            $line++;
+        }
+        $address .= $data->{target}->{address}->{postcode};
+        $address .= "\n".$data->{target}->{address}->{countryCode};
+        $self->{information}->{address} = $address;
+        $self->_set_error( -1, 'Valid VAT Number');
+    }
+    elsif ($response->code == 404) {
+        return $self->_set_error( 2, 'Invalid VAT Number ('.$vatNumber.')');
+    }
+    elsif ($response->code == 400) {
+        return $self->_set_error( 3, 'VAT number badly formed ('.$vatNumber.')');
+    }
+    else {
+        return $self->_set_error( 500, 'Could not contact HMRC: '.$response->status_line);
+    }
+
+    return $countryCode . '-' . $vatNumber;
+}
+
 sub _format_vatn {
     my ( $self, $vatn, $mscc ) = @_;
     my $null = '';
@@ -357,7 +438,7 @@ sub _in_soap_envelope {
 
 sub _is_res_ok {
     my ( $self, $code, $res ) = @_;
-    $self->{informations}={};
+    $self->{information}={};
     $res=~s/[\r\n]/ /g;
     $self->{response} = $res;
     if ($code == 200) {
@@ -365,10 +446,10 @@ sub _is_res_ok {
             my $v = $1;
             if ($v eq 'true' || $v eq '1') {
                 if ($res=~m/<name> *(.*?) *<\/name>/) {
-                    $self->{informations}{name} = $1
+                    $self->{information}{name} = $1
                 }
                 if ($res=~m/<address> *(.*?) *<\/address>/) {
-                    $self->{informations}{address} = $1
+                    $self->{information}{address} = $1
                 }
                 $self->_set_error( -1, 'Valid VAT Number');
                 return 1;
@@ -412,8 +493,10 @@ sub _set_error {
 
 LWP::UserAgent
 
-I<http://ec.europa.eu/taxation_customs/vies/faqvies.do> for the FAQs related to the VIES service.
+L<http://ec.europa.eu/taxation_customs/vies/faqvies.do> for the FAQs related to the VIES service.
 
+L<https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/vat-registered-companies-api/1.0>
+for details of the service provided by the UK's HMRC.
 
 =head1 FEEDBACK
 
@@ -446,7 +529,13 @@ Bart Heupers, Netherlands.
 Martin H. Sluka, noris network AG, Germany.
 
 =item *
-Simon Williams, UK2 Limited, United Kingdom & Benoît Galy, Greenacres, France & Raluca Boboia, Evozon, Romania
+Simon Williams, UK2 Limited, United Kingdom
+
+=item *
+Benoît Galy, Greenacres, France
+
+=item *
+Raluca Boboia, Evozon, Romania
 
 =item *
 Dave O., POBox, U.S.A.
@@ -466,16 +555,19 @@ Robert Alloway, Service Centre, United Kingdom.
 =item *
 Torsten Mueller, Archesoft, Germany
 
+=item *
+Dave Lambley (davel), GoDaddy, United Kingdom
+
 =back
 
 =head1 LICENSE
 
-GPL. Enjoy! See COPYING for further information on the GPL.
+GPL3. Enjoy! See COPYING for further information on the GPL.
 
 
 =head1 DISCLAIMER
 
-See I<http://ec.europa.eu/taxation_customs/vies/viesdisc.do> to known the limitations of the EU validation service.
+See L<http://ec.europa.eu/taxation_customs/vies/viesdisc.do> to known the limitations of the EU validation service.
 
   This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
   without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

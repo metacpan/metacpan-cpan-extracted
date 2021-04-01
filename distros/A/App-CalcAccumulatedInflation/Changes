@@ -1,3 +1,8 @@
+0.050   2021-04-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add options: --base-index, --base-year.
+
+
 0.04    2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update coerce rule names in Sah schemas (Data::Sah::Coerce

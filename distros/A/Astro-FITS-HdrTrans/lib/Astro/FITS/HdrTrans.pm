@@ -36,7 +36,7 @@ use vars qw/ $VERSION $DEBUG @ISA /;
 use Exporter 'import';
 our @EXPORT_OK = qw( translate_from_FITS translate_to_FITS );
 
-$VERSION = '1.62';
+$VERSION = '1.63';
 $DEBUG   = 0;
 
 # The reference list of classes we can try This list should be

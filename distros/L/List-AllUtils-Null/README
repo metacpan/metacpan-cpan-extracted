@@ -1,0 +1,60 @@
+NAME
+    List::AllUtils::Null - List subroutines that treat undef as contagious
+    unknown, like null in SQL
+
+VERSION
+    This document describes version 0.001 of List::AllUtils::Null (from Perl
+    distribution List-AllUtils-Null), released on 2021-04-01.
+
+SYNOPSIS
+     use List::AllUtils::Null qw(
+         max maxstr min minstr
+         sum
+     );
+
+     say max(1,2,3,4,5);     # => 5
+     say max(1,2,undef,4,5); # => undef
+
+     say min(1,2,3,4,5);     # => 1
+     say min(1,2,undef,4,5); # => undef
+
+     say sum(1,2,3,4,5);     # => 15
+     say sum(1,2,undef,4,5); # => undef
+
+DESCRIPTION
+FUNCTIONS
+  max
+  maxstr
+  min
+  minstr
+  sum
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/List-AllUtils-Null>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-List-AllUtils-Null>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-List-AllUtils-Null/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Your favorite SQL reference.
+
+    List::Util and friends (List::SomeUtils, List::UtilsBy, List::MoreUtils,
+    List::AllUtils).
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

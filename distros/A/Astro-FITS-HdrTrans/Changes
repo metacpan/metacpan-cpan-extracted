@@ -1,5 +1,12 @@
 Revision history for Astro::FITS::HdrTrans
 
+1.63 2021-04-01
+
+    - Added support for older RxH3 data and a constant
+      DR_RECIPE value.
+    - translatehdr opens FITS files read-only.
+    - translatehdr can now display array values.
+
 1.62 2019-07-30
 
     - Use Astro::PAL instead of Astro::SLA.

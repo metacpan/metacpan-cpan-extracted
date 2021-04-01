@@ -15,7 +15,7 @@ use Pod::Usage;
 use POSIX qw{ strftime };
 use Time::Local;
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 # Map -want-events values to TLE event codes.
 my %wanted_event_map = (
@@ -702,8 +702,10 @@ F<$HOME/.risesetrc>.
 
 =head1 BUGS
 
-Bugs can be reported to the author by mail, or through
-L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues/>.
+Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
+L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
+electronic mail to the author.
 
 =head1 AUTHOR
 

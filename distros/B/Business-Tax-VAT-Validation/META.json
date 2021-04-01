@@ -1,5 +1,5 @@
 {
-   "abstract" : "Validate EU VAT numbers against VIES",
+   "abstract" : "Validate EU VAT numbers against VIES/HMRC",
    "author" : [
       "David Precious <davidp@preshweb.co.uk>"
    ],
@@ -33,7 +33,9 @@
       "runtime" : {
          "requires" : {
             "HTTP::Request::Common" : "1",
-            "LWP::UserAgent" : "1"
+            "JSON" : "0",
+            "LWP::UserAgent" : "1",
+            "perl" : "v5.8.9"
          }
       }
    },
@@ -47,6 +49,6 @@
          "url" : "https://github.com/bigpresh/Business-Tax-VAT-Validation"
       }
    },
-   "version" : "1.12",
+   "version" : "1.20",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

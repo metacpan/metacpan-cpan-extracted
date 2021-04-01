@@ -45,7 +45,7 @@
    "provides" : {
       "String::Mask" : {
          "file" : "lib/String/Mask.pm",
-         "version" : "0.03"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/String-Mask"
       }
    },
-   "version" : "0.03",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

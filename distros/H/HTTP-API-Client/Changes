@@ -1,3 +1,19 @@
+2021-03-31 - v1.02
+    + convert number in the request
+    + added data type markers
+        + json true  = xTRUE()
+        + json false = xFALSE()
+        + cgi param true  = xTRUE()  => "1"
+        + cgi param false = xFALSE() => "0"
+        + cgi param true  = xTrue()  => "True" 
+        + cgi param false = xFalse() => "False"
+        + cgi param true  = xtrue()  => "true" 
+        + cgi param false = xfalse() => "false"
+        + cgi param true  = xt__e()  => "t"    
+        + cgi param false = xf___e() => "f"    
+        + cgi param csv list = %a = (a => xCSV(1,2,3,4)) => "a=1,2,3,4"
+                   otherwise = %b = (b => [1,2,3,4])     => "b=1&b=2&b=3&b=4"
+
 2021-03-31 - v1.01
     + Enchance key value pairs representing on the cgi params
 

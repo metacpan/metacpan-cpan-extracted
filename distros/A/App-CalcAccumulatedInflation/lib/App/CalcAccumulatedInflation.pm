@@ -1,9 +1,9 @@
 package App::CalcAccumulatedInflation;
 
-# AUTHOR
-our $DATE = '2019-11-29'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-04-01'; # DATE
 our $DIST = 'App-CalcAccumulatedInflation'; # DIST
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.050'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,6 +35,14 @@ _
             schema => 'float*',
             cmdline_aliases => {y=>{}},
         },
+        base_index => {
+            schema => 'float*',
+            default => 1,
+        },
+        base_year => {
+            schema => 'float*',
+            default => 0,
+        },
     },
     args_rels => {
         req_one => ['rates', 'yearly_rate'],
@@ -57,12 +65,13 @@ _
 sub calc_accumulated_inflation {
     my %args = @_;
 
-    my $index = 1;
-    my $year = 0;
+    my $index = $args{base_index} // 1;
+    my $year = $args{base_year} // 0;
     my @res = ({year=>$year, index=>$index});
 
+    my $i = 0;
     if (defined $args{yearly_rate}) {
-        while ($year < $args{years}) {
+        while ($i++ < $args{years}) {
             $year++;
             $index *= 1 + $args{yearly_rate}/100;
             push @res, {
@@ -72,7 +81,7 @@ sub calc_accumulated_inflation {
         }
     } else {
         my $rates = $args{rates};
-        while ($year <= $#{$rates}) {
+        while ($i++ <= $#{$rates}) {
             my $rate = $rates->[$year];
             $index *= 1 + $rate/100;
             $year++;
@@ -102,7 +111,7 @@ App::CalcAccumulatedInflation - Calculate accumulated inflation over the years
 
 =head1 VERSION
 
-This document describes version 0.04 of App::CalcAccumulatedInflation (from Perl distribution App-CalcAccumulatedInflation), released on 2019-11-29.
+This document describes version 0.050 of App::CalcAccumulatedInflation (from Perl distribution App-CalcAccumulatedInflation), released on 2021-04-01.
 
 =head1 SYNOPSIS
 
@@ -123,28 +132,24 @@ Examples:
 
 =over
 
-=item * See accumulated 6%/year inflation for 10 years:
+=item * See accumulated 6%E<sol>year inflation for 10 years:
 
  calc_accumulated_inflation(yearly_rate => 6);
 
 Result:
 
  [
-   200,
-   "OK",
-   [
-     { index => 1, year => 0 },
-     { index => "1.0600", year => 1 },
-     { index => 1.1236, year => 2 },
-     { index => "1.1910", year => 3 },
-     { index => 1.2625, year => 4 },
-     { index => 1.3382, year => 5 },
-     { index => 1.4185, year => 6 },
-     { index => 1.5036, year => 7 },
-     { index => 1.5938, year => 8 },
-     { index => 1.6895, year => 9 },
-     { index => 1.7908, year => 10 },
-   ],
+   { index => 1, year => 0 },
+   { index => "1.0600", year => 1 },
+   { index => 1.1236, year => 2 },
+   { index => "1.1910", year => 3 },
+   { index => 1.2625, year => 4 },
+   { index => 1.3382, year => 5 },
+   { index => 1.4185, year => 6 },
+   { index => 1.5036, year => 7 },
+   { index => 1.5938, year => 8 },
+   { index => 1.6895, year => 9 },
+   { index => 1.7908, year => 10 },
  ]
 
 =item * Indonesia's inflation rate for 2003-2014:
@@ -154,23 +159,19 @@ Result:
 Result:
 
  [
-   200,
-   "OK",
-   [
-     { index => 1, year => 0 },
-     { index => 1.0516, rate => "5.16%", year => 1 },
-     { index => 1.1189, rate => "6.40%", year => 2 },
-     { index => 1.3103, rate => "17.11%", year => 3 },
-     { index => 1.3968, rate => "6.60%", year => 4 },
-     { index => 1.4889, rate => "6.59%", year => 5 },
-     { index => 1.6536, rate => "11.06%", year => 6 },
-     { index => 1.6995, rate => "2.78%", year => 7 },
-     { index => 1.8178, rate => "6.96%", year => 8 },
-     { index => 1.8867, rate => "3.79%", year => 9 },
-     { index => 1.9678, rate => "4.30%", year => 10 },
-     { index => 2.1327, rate => "8.38%", year => 11 },
-     { index => "2.3110", rate => "8.36%", year => 12 },
-   ],
+   { index => 1, year => 0 },
+   { index => 1.0516, rate => "5.16%", year => 1 },
+   { index => 1.1189, rate => "6.40%", year => 2 },
+   { index => 1.3103, rate => "17.11%", year => 3 },
+   { index => 1.3968, rate => "6.60%", year => 4 },
+   { index => 1.4889, rate => "6.59%", year => 5 },
+   { index => 1.6536, rate => "11.06%", year => 6 },
+   { index => 1.6995, rate => "2.78%", year => 7 },
+   { index => 1.8178, rate => "6.96%", year => 8 },
+   { index => 1.8867, rate => "3.79%", year => 9 },
+   { index => 1.9678, rate => "4.30%", year => 10 },
+   { index => 2.1327, rate => "8.38%", year => 11 },
+   { index => "2.3110", rate => "8.36%", year => 12 },
  ]
 
 =back
@@ -185,6 +186,10 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<base_index> => I<float> (default: 1)
+
+=item * B<base_year> => I<float> (default: 0)
+
 =item * B<rates> => I<array[float]>
 
 Different rates for each year, in percent.
@@ -194,6 +199,7 @@ Different rates for each year, in percent.
 A single rate for every year, in percent.
 
 =item * B<years> => I<int> (default: 10)
+
 
 =back
 
@@ -209,7 +215,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CalcAccumulatedI
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CalcAccumulatedInflation>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CalcAccumulatedInflation/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -221,7 +227,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

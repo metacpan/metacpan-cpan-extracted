@@ -1,5 +1,6 @@
-#!/usr/bin/env perl -w
+#!/usr/bin/env perl
 use strict;
+use warnings;
 use Test;
 
 my %distant_checks = (
@@ -16,6 +17,7 @@ my %distant_checks = (
     FI      =>  ['12345678'],
     FR      =>  ['12345678901', '12 456789012', 'A2 456789012', '1B 456789012', 'AB 456789012'],
     GB      =>  ['123456789', '123456789012', '123 5678 01', '123 5678 12 234','GD345', 'HA123'],
+    XI      =>  ['123456789', '123456789012', '123 5678 01', '123 5678 12 234','GD345', 'HA123'],
     HU      =>  ['12345678'],
     IE      =>  ['1234567A', '1B34567C', '1+34567C', '1*34567C'],
     IT      =>  ['12345678901'],
@@ -57,6 +59,12 @@ for my $ms (keys %distant_checks) {
             } elsif ($err > 257) {
                 warn("skipping $ms$t : ".$hvat->get_last_error."\n");
                 skip(1);
+            } elsif ($err == 3 && $ms eq 'GB' && ($t eq 'GD345' || $t eq 'HA123')) {
+                # These two codes are only successfully looked up in VIES, HMRC
+                # throws a 400 error indicating that the code is malformed.
+                # This does not seem correct, but is observed behaviour.
+                warn("skipping $ms$t : ".$hvat->get_last_error."\n");
+                skip(1);
             } else {
                 warn("Distant check for $ms$t failed: ".$err.' '.$hvat->get_last_error."\n");
                 ok(0);
@@ -66,5 +74,5 @@ for my $ms (keys %distant_checks) {
         sleep(1);
     }
 }
-exit;
+exit 0;
 __END__

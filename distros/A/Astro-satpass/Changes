@@ -1,3 +1,20 @@
+0.118		2021-04-01	T. R. Wyant
+    Add rt.cpan.org back to bug reporting methods. Long live RT!
+
+    Refactor authortest into three, to eliminate the need for stub files
+    to test without optional modules.
+
+    Remove references to the NASA Human Space Flight web site, since it
+    has been taken down.
+
+    Fix broken POD links. Most were in script/satpass, but the "Ask Dr.
+    Math" link on haversines is also gone, because the teachers'
+    association that took it over from Drexel has decided that their
+    function is to restrict knowledge, not disiseminate it.
+
+    Get prerequisites up to snuff, and add xt/author/prereq.t to ensure
+    they stay that way.
+
 0.117		2021-01-01	T. R. Wyant
     Fix bug in Astro::Coord::ECI::Sun next_quarter(). This bug was
     introduced in version 0.089 (released 2018-02-02) when I replaced an

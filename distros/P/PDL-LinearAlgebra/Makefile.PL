@@ -33,7 +33,9 @@ WriteMakefile(
   CONFIGURE_REQUIRES =>  {
     "PDL" => 0,
   },
-  PREREQ_PM => { "PDL" => 0 },
+  PREREQ_PM => {
+    "PDL" => '2.034', # native complex
+  },
   dist => { PREOP=>'$(PERL) -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)' }, # GENERATED subdir in dist tarball
   clean => { FILES => '*~' },
 );

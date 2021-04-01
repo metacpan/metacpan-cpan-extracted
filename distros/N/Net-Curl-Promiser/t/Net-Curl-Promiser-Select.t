@@ -35,25 +35,25 @@ plan tests => 2 + $ClientTest::TEST_COUNT;
     while ($promiser->handles()) {
         my $timeout = $promiser->get_timeout();
 
-        if ($timeout && $timeout != -1) {
-            ($rout, $wout, $eout) = $promiser->get_vecs();
+        ($rout, $wout, $eout) = $promiser->get_vecs();
 
-            if (!$checked_get_fds) {
-                if (grep { tr<\0><>c } $rout, $wout) {
-                    $checked_get_fds++;
+        if (!$checked_get_fds) {
+            if (grep { tr<\0><>c } $rout, $wout) {
+                $checked_get_fds++;
 
-                    my @fds = $promiser->get_fds();
+                my @fds = $promiser->get_fds();
 
-                    ok( 0 + @fds, 'get_fds() returns something when get_vecs() does' );
+                ok( 0 + @fds, 'get_fds() returns something when get_vecs() does' );
 
-                    is(
-                        0 + @fds,
-                        0 + $promiser->get_fds(),
-                        'get_fds() in scalar',
-                    );
-                }
+                is(
+                    0 + @fds,
+                    0 + $promiser->get_fds(),
+                    'get_fds() in scalar',
+                );
             }
+        }
 
+        if ($timeout && $timeout != -1) {
             my $got = select $rout, $wout, $eout, $timeout;
 
             die "select(): $!" if $got < 0;

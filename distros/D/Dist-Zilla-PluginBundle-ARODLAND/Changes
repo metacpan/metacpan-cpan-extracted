@@ -1,3 +1,6 @@
+Version 0.15: 2021-04-01
+  * Auto-commit Build.PL or Makefile.PL
+
 Version 0.14: 2017-12-09
   * Auto-commit META and README
 

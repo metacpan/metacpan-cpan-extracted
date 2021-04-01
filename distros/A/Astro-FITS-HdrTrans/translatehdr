@@ -82,7 +82,7 @@ if ($file =~ /\.sdf$/) {
     $hdr = Astro::FITS::Header::GSD->new( File => $file );
 } else {
     require Astro::FITS::Header::CFITSIO;
-    $hdr = Astro::FITS::Header::CFITSIO->new( File => $file);
+    $hdr = Astro::FITS::Header::CFITSIO->new( File => $file, ReadOnly => 1 );
 }
 
 # tie to a hash
@@ -95,6 +95,7 @@ for my $k (sort keys %translation) {
     next if $k =~ /^_/;
     my $v = $translation{$k};
     $v = "undef" if !defined $v; # should be trapped by HdrTrans
+    $v = join ",\n    ", @$v if 'ARRAY' eq ref $v;
     print "$k => $v\n";
 }
 

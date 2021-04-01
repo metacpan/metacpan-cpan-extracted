@@ -1,6 +1,6 @@
 package Twitter::API::Role::RequestArgs;
 # ABSTRACT: API request method helpers
-$Twitter::API::Role::RequestArgs::VERSION = '1.0005';
+$Twitter::API::Role::RequestArgs::VERSION = '1.0006';
 use 5.14.1;
 use warnings;
 use Carp;
@@ -197,7 +197,7 @@ Twitter::API::Role::RequestArgs - API request method helpers
 
 =head1 VERSION
 
-version 1.0005
+version 1.0006
 
 =head1 SYNOPSIS
 
@@ -334,7 +334,7 @@ Marc Mims <marc@questright.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2018 by Marc Mims.
+This software is copyright (c) 2015-2021 by Marc Mims.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

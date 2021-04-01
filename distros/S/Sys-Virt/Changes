@@ -1,5 +1,12 @@
 Revision history for perl module Sys::Virt
 
+7.2.0 2021-04-01
+
+ - Add virDomainStartDirtyRateCalc API
+ - Add VIR_DOMAIN_DIRTYRATE_* constants
+ - Add VIR_DOMAIN_STATS_DIRTYRATE constant
+ - Fix inverted descriptions for s390 AP device constants
+
 7.1.0 2021-03-01
 
  - Add VIR_ERR_MULTIPLE_DOMAINS constant

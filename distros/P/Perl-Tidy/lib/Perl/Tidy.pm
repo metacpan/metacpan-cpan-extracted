@@ -3,7 +3,7 @@
 #
 #    perltidy - a perl script indenter and formatter
 #
-#    Copyright (c) 2000-2020 by Steve Hancock
+#    Copyright (c) 2000-2021 by Steve Hancock
 #    Distributed under the GPL license agreement; see file COPYING
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -110,7 +110,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20210111';
+    $VERSION = '20210402';
 }
 
 sub DESTROY {
@@ -418,6 +418,9 @@ sub perltidy {
         prefilter             => undef,
         postfilter            => undef,
     );
+
+    # Fix for issue git #57
+    $Warn_count = 0;
 
     # don't overwrite callers ARGV
     local @ARGV   = @ARGV;
@@ -1486,9 +1489,12 @@ EOM
                         my $iterm = $iter - 1;
                         if ( $saw_md5{$digest} != $iterm ) {
 
-                            # Blinking (oscillating) between two stable
-                            # end states.  This has happened in the past
-                            # but at present there are no known instances.
+                            # Blinking (oscillating) between two or more stable
+                            # end states.  This is unlikely to occur with normal
+                            # parameters, but it can occur in stress testing
+                            # with extreme parameter values, such as very short
+                            # maximum line lengths.  We want to catch and fix
+                            # them when they happen.
                             $convergence_log_message = <<EOM;
 BLINKER. Output for iteration $iter same as for $saw_md5{$digest}. 
 EOM
@@ -2245,6 +2251,7 @@ sub generate_options {
     $add_option->( 'continuation-indentation',           'ci',   '=i' );
     $add_option->( 'extended-continuation-indentation',  'xci',  '!' );
     $add_option->( 'line-up-parentheses',                'lp',   '!' );
+    $add_option->( 'line-up-parentheses-exclusion-list', 'lpxl', '=s' );
     $add_option->( 'outdent-keyword-list',               'okwl', '=s' );
     $add_option->( 'outdent-keywords',                   'okw',  '!' );
     $add_option->( 'outdent-labels',                     'ola',  '!' );
@@ -2266,6 +2273,7 @@ sub generate_options {
     $add_option->( 'brace-tightness',                           'bt',    '=i' );
     $add_option->( 'delete-old-whitespace',                     'dws',   '!' );
     $add_option->( 'delete-semicolons',                         'dsm',   '!' );
+    $add_option->( 'function-paren-vertical-alignment',         'fpva',  '!' );
     $add_option->( 'keyword-paren-inner-tightness',             'kpit',  '=i' );
     $add_option->( 'keyword-paren-inner-tightness-list',        'kpitl', '=s' );
     $add_option->( 'logical-padding',                           'lop',   '!' );
@@ -2577,6 +2585,7 @@ sub generate_options {
       delete-old-newlines
       delete-semicolons
       extended-syntax
+      function-paren-vertical-alignment
       fuzzy-line-length
       hanging-side-comments
       indent-block-comments
@@ -2774,6 +2783,11 @@ sub generate_options {
         'noconverge' => [qw(it=1)],
         'conv'       => [qw(it=4)],
         'nconv'      => [qw(it=1)],
+
+        # FIXME: possible future shortcut.  This will remain deactivated until
+        # the -lpxl flag is no longer experimental.
+        # 'line-up-function-parentheses' => [ qw(lp), q#lpxl=[ { F(2# ],
+        # 'lfp'                          => [qw(line-up-function-parentheses)],
 
         # 'mangle' originally deleted pod and comments, but to keep it
         # reversible, it no longer does.  But if you really want to
@@ -3298,19 +3312,28 @@ sub check_options {
         $rOpts->{'indent-block-comments'} = 1;
     }
 
+    # -bar cannot be used with -bl or -bli; arbitrarily keep -bar
+    if ( $rOpts->{'opening-brace-always-on-right'} ) {
+
+        if ( $rOpts->{'opening-brace-on-new-line'} ) {
+            Warn(<<EOM);
+ Conflict: you specified both 'opening-brace-always-on-right' (-bar) and 
+  'opening-brace-on-new-line' (-bl).  Ignoring -bl.
+EOM
+            $rOpts->{'opening-brace-on-new-line'} = 0;
+        }
+        if ( $rOpts->{'brace-left-and-indent'} ) {
+            Warn(<<EOM);
+ Conflict: you specified both 'opening-brace-always-on-right' (-bar) and 
+  '--brace-left-and-indent' (-bli).  Ignoring -bli. 
+EOM
+            $rOpts->{'brace-left-and-indent'} = 0;
+        }
+    }
+
     # -bli flag implies -bl
     if ( $rOpts->{'brace-left-and-indent'} ) {
         $rOpts->{'opening-brace-on-new-line'} = 1;
-    }
-
-    if (   $rOpts->{'opening-brace-always-on-right'}
-        && $rOpts->{'opening-brace-on-new-line'} )
-    {
-        Warn(<<EOM);
- Conflict: you specified both 'opening-brace-always-on-right' (-bar) and 
-  'opening-brace-on-new-line' (-bl).  Ignoring -bl. 
-EOM
-        $rOpts->{'opening-brace-on-new-line'} = 0;
     }
 
     # it simplifies things if -bl is 0 rather than undefined
@@ -3376,6 +3399,27 @@ EOM
         }
         my $joined_words = join ' ', @filtered_word_list;
         $rOpts->{'sub-alias-list'} = join ' ', @filtered_word_list;
+    }
+
+    # Turn on fuzzy-line-length unless this is an extrude run, as determined
+    # by the -i and -ci settings. Otherwise blinkers can form (case b935)
+    if ( !$rOpts->{'fuzzy-line-length'} ) {
+        if (   $rOpts->{'maximum-line-length'} != 1
+            || $rOpts->{'continuation-indentation'} != 0 )
+        {
+            $rOpts->{'fuzzy-line-length'} = 1;
+        }
+    }
+
+    # The freeze-whitespace option is currently a derived option which has its
+    # own key
+    $rOpts->{'freeze-whitespace'} = !$rOpts->{'add-whitespace'}
+      && !$rOpts->{'delete-old-whitespace'};
+
+    # Turn off certain options if whitespace is frozen
+    # Note: vertical alignment will be automatically shut off
+    if ( $rOpts->{'freeze-whitespace'} ) {
+        $rOpts->{'logical-padding'} = 0;
     }
 
     # Define $tabsize, the number of spaces per tab for use in
@@ -4173,7 +4217,7 @@ sub show_version {
     print STDOUT <<"EOM";
 This is perltidy, v$VERSION 
 
-Copyright 2000-2020, Steve Hancock
+Copyright 2000-2021, Steve Hancock
 
 Perltidy is free software and may be copied under the terms of the GNU
 General Public License, which is included in the distribution files.

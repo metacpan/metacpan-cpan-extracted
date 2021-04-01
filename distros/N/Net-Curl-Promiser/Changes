@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Curl::Promiser
 
+0.16 Wed 31 Mar 2021
+- Fix t/Net-Curl-Promiser-Select.t with CentOS 6’s default libcurl.
+
 0.15 Wed 31 Mar 2021
 - BUG FIX: cancel_handle() and fail_handle() now immediately release
 event-loop interactions. Previously memory leak warnings happened if the

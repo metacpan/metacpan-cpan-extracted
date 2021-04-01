@@ -49,7 +49,7 @@ package Astro::Coord::ECI::Sun;
 use strict;
 use warnings;
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 use base qw{Astro::Coord::ECI};
 
@@ -249,7 +249,6 @@ sub correct_for_refraction {
     return $elevation;
 }
 
-
 =item $long = $sun->geometric_longitude ()
 
 This method returns the geometric longitude of the Sun in radians at
@@ -285,7 +284,6 @@ sub get {
     }
     return wantarray ? @rslt : $rslt[0];
 }
-
 
 =item ($point, $intens, $central) = $sun->magnitude ($theta, $omega);
 
@@ -659,7 +657,6 @@ sub set {
     return $self;
 }
 
-
 =item $sun->time_set ()
 
 This method sets coordinates of the object to the coordinates of the
@@ -681,7 +678,6 @@ Edition, Chapter 25, pages 163ff.
 #	because Meeus' equations are in degrees, I was too lazy
 #	to hand-convert them to radians, but I didn't want to
 #	penalize the user for the conversion every time.
-
 
 use constant SUN_C1_0 => deg2rad (1.914602);
 use constant SUN_C1_1 => deg2rad (-0.004817);
@@ -818,6 +814,7 @@ functionality similar to B<Astro-Sunrise>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
 L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
 electronic mail to the author.
 

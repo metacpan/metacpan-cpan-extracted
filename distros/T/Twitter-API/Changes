@@ -1,5 +1,8 @@
 Revision history for Twitter::API
 
+1.0006  2021-04-01 10:23:58 PDT
+  - rudimentary support for Twitter API V2 early access / beta
+
 1.0005  2018-10-02 10:45:08 PDT
   - force fallback to WWW::Form::UrlEncoded::PP for tests
   - recommend appropriate XS modules

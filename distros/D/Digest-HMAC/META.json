@@ -1,0 +1,55 @@
+{
+   "abstract" : "Keyed-Hashing for Message Authentication",
+   "author" : [
+      "Andrew Rodland <arodland@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Digest-HMAC",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "2",
+            "Digest::SHA" : "1",
+            "perl" : "5.004"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Digest-HMAC@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Digest-HMAC"
+      },
+      "homepage" : "http://metacpan.org/release/Digest-HMAC",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/arodland/Digest-HMAC.git",
+         "web" : "http://github.com/arodland/Digest-HMAC"
+      }
+   },
+   "version" : "1.04",
+   "x_authority" : "cpan:ARODLAND",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

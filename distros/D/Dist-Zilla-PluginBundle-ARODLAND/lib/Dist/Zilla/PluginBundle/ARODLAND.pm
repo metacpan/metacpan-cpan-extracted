@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::ARODLAND;
 # ABSTRACT: Use L<Dist::Zilla> like ARODLAND does
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 use 5.10.0;
 use Moose;
@@ -224,7 +224,7 @@ sub bundle_config {
           ? (tag_message => $tag_message)
           : ()
         ),
-        allow_dirty => ['dist.ini', 'README', 'README.pod', 'META.json', 'Changes'],
+        allow_dirty => ['dist.ini', 'README', 'README.pod', 'META.json', 'Changes', 'Build.PL', 'Makefile.PL'],
         changelog => 'Changes',
         add_files_in => ['README', 'README.pod', 'META.json'],
         commit_msg => 'Release v%v%n%n%c',
@@ -249,7 +249,7 @@ Dist::Zilla::PluginBundle::ARODLAND - Use L<Dist::Zilla> like ARODLAND does
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -335,7 +335,7 @@ Andrew Rodland <arodland@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Andrew Rodland.
+This software is copyright (c) 2021 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -195,11 +195,11 @@ Include s390 AP card devices
 
 =item Sys::Virt::NodeDevice::LIST_CAP_AP_MATRIX
 
-Include s390 AP queue devices
+Include s390 AP matrix devices
 
 =item Sys::Virt::NodeDevice::LIST_CAP_AP_QUEUE
 
-Include s390 AP matrix devices
+Include s390 AP queue devices
 
 =back
 

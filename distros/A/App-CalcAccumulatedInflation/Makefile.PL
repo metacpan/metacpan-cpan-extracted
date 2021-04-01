@@ -21,11 +21,12 @@ my %WriteMakefileArgs = (
   "NAME" => "App::CalcAccumulatedInflation",
   "PREREQ_PM" => {
     "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
+    "Data::Sah::Coerce::perl::To_float::From_str::percent" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::float" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Lite" => "1.820",
+    "Perinci::CmdLine::Lite" => "1.827",
     "strict" => 0,
     "warnings" => 0
   },
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.050",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
+  "Data::Sah::Coerce::perl::To_float::From_str::percent" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::float" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
@@ -51,7 +53,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Lite" => "1.820",
+  "Perinci::CmdLine::Lite" => "1.827",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

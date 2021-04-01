@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.0005
+    version 1.0006
 
 SYNOPSIS
 
@@ -137,6 +137,27 @@ OVERVIEW
     Documentation <https://dev.twitter.com/rest/public> for available
     endpoints, parameters, and responses.
 
+ Twitter API V2 Beta Support
+
+    Twitter intends to replace the current public API, version 1.1, with
+    version 2.
+
+    See https://developer.twitter.com/en/docs/twitter-api/early-access.
+
+    You can use Twitter::API for the V2 beta with the minimalist usage
+    described just above by passing values in the constructor for
+    api_version and api_ext.
+
+        my $client = Twitter::API->new_with_traits(
+            api_version => '2',
+            api_ext     => '',
+            %oauth_credentials,
+        );
+    
+        my $user = $client->get("users/by/username/$username");
+
+    More complete V2 support is anticipated in a future release.
+
 ATTRIBUTES
 
  consumer_key, consumer_secret
@@ -161,6 +182,10 @@ ATTRIBUTES
  api_version
 
     Optional. Defaults to 1.1.
+
+ api_ext
+
+    Optional. Defaults to .json.
 
  agent
 
@@ -254,7 +279,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2015-2018 by Marc Mims.
+    This software is copyright (c) 2015-2021 by Marc Mims.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

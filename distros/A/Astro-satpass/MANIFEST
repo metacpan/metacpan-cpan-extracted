@@ -78,6 +78,7 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_links.t
 xt/author/pod_spelling.t
+xt/author/prereq.t
 xt/author/satpass.t
 xt/author/satpass_geocode.t
 xt/author/tle_support.t

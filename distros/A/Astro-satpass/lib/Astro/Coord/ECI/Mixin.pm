@@ -14,7 +14,7 @@ use Astro::Coord::ECI::Utils qw{ __default_station
 use Exporter ();
 use POSIX qw{ floor };
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 our @EXPORT_OK = qw{
     almanac almanac_hash
@@ -301,6 +301,7 @@ distribution go together and how to use them.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
 L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
 electronic mail to the author.
 

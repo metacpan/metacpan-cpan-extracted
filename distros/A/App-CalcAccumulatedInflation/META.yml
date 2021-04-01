@@ -18,19 +18,20 @@ meta-spec:
 name: App-CalcAccumulatedInflation
 requires:
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
+  Data::Sah::Coerce::perl::To_float::From_str::percent: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::float: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Lite: '1.820'
+  Perinci::CmdLine::Lite: '1.827'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CalcAccumulatedInflation
+  bugtracker: https://github.com/perlancar/perl-App-CalcAccumulatedInflation/issues
   homepage: https://metacpan.org/release/App-CalcAccumulatedInflation
   repository: git://github.com/perlancar/perl-App-CalcAccumulatedInflation.git
-version: '0.04'
+version: '0.050'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -38,7 +39,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: GenPericmdScript::calc_accumulated_inflation
-      version: '0.421'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
+      name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -104,17 +109,13 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::FileFinder::ByName
-      name: '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.599'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -130,7 +131,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -153,11 +154,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyrightYearFromGit
       name: '@Author::PERLANCAR/CopyrightYearFromGit'
-      version: '0.003'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
@@ -167,9 +168,9 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/MetaConfig'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@Author::PERLANCAR/Authority'
-      version: '1.009'
+      class: Dist::Zilla::Plugin::PERLANCAR::Authority
+      name: '@Author::PERLANCAR/PERLANCAR::Authority'
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
@@ -293,7 +294,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.06'
+              version: '0.082'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -307,7 +308,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.142'
+      version: '0.144'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
@@ -315,7 +316,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -343,9 +344,11 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Test::Perl::Critic::Subset:
           finder:
-            - '@Author::PERLANCAR/FileFinder::ByName PERLANCAR'
+            - ':ExecFiles'
+            - ':InstallModules'
+            - ':TestFiles'
       name: '@Author::PERLANCAR/Test::Perl::Critic::Subset'
-      version: 3.001.003
+      version: 3.001.005
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'

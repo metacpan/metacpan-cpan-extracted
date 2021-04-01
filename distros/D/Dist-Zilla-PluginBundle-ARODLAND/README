@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Dist-Zilla-PluginBundle-ARODLAND,
-version 0.14:
+version 0.15:
 
   Use L<Dist::Zilla> like ARODLAND does
 
-This software is copyright (c) 2017 by Andrew Rodland.
+This software is copyright (c) 2021 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

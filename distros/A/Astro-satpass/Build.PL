@@ -16,35 +16,44 @@ use FileHandle;
 
 my $meta = My::Module::Meta->new();
 
-my %attr = (
-    dist_author => 'Tom Wyant (wyant at cpan dot org)',
-    dist_abstract => 'Classes and app to compute satellite visibility',
-    module_name => 'Astro::Coord::ECI',
-    dist_name => 'Astro-satpass',
-    dist_version_from => 'lib/Astro/Coord/ECI.pm',
-    requires => $meta->requires(
-	perl => $meta->requires_perl(),
+my %args = (
+    add_to_cleanup	=> [],
+    build_requires	=> $meta->build_requires(),
+    configure_requires	=> $meta->configure_requires(),
+    dist_abstract	=> $meta->abstract(),
+    dist_author	=> $meta->author(),
+    dist_name	=> $meta->dist_name(),
+    license	=> $meta->license(),
+    module_name	=> $meta->module_name(),
+    requires	=> $meta->requires(
+	perl	=> $meta->requires_perl(),
     ),
-    build_requires => $meta->build_requires(),
-    get_options => {y => {}, n => {}},
-    dynamic_config => 1,
-    license => 'perl',
-    add_to_cleanup => [ qw{ cover_db xt/author/optionals } ],
+    script_files	=> [],
 );
 
-$mbv >= 0.28
-    and $attr{meta_merge} = $meta->meta_merge();
+$mbv >= 0.26
+    and $args{get_options} = {
+	n	=> { type => '!' },
+	y	=> { type => '!' },
+    };
+
+if ( $mbv >= 0.28 ) {
+    $args{meta_merge} = $meta->meta_merge();
+    $args{meta_add} = {
+	no_index	=> $meta->no_index(),
+    };
+}
 
 # Don't require Module::Build if we are making a distribution, since the
 # user may choose to use ExtUtils::MakeMaker.
 $mbv >= 0.34
-    and $attr{auto_configure_requires} = !$meta->distribution();
+    and $args{auto_configure_requires} = !$meta->distribution();
 
 My::Module::Recommend->recommend();
 
-my $bldr = My::Module::Build->new (%attr);
+my $bldr = My::Module::Build->new( %args );
 
-my %opt = $bldr->args ();
+my %opt = $bldr->args();
 
 my @exe_files;
 my @clean_files;
@@ -104,8 +113,8 @@ eod
     }
 }
 
-$bldr->add_to_cleanup (@clean_files);
-$bldr->script_files (\@exe_files);
+$bldr->add_to_cleanup( @{ $meta->add_to_cleanup() }, @clean_files );
+$bldr->script_files( \@exe_files );
 
 $bldr->create_build_script ();
 

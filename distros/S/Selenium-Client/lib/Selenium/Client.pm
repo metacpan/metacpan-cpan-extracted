@@ -1,11 +1,12 @@
 package Selenium::Client;
-$Selenium::Client::VERSION = '1.02';
+$Selenium::Client::VERSION = '1.03';
 # ABSTRACT: Module for communicating with WC3 standard selenium servers
 
 use strict;
 use warnings;
 
-use v5.28;
+use 5.006;
+use v5.28.0;    # Before 5.006, v5.10.0 would not be understood.
 
 no warnings 'experimental';
 use feature qw/signatures/;
@@ -344,15 +345,15 @@ sub _objectify($self,$result,$inject) {
 
 
 package Selenium::Capabilities;
-$Selenium::Capabilities::VERSION = '1.02';
+$Selenium::Capabilities::VERSION = '1.03';
 use parent qw{Selenium::Subclass};
 1;
 package Selenium::Session;
-$Selenium::Session::VERSION = '1.02';
+$Selenium::Session::VERSION = '1.03';
 use parent qw{Selenium::Subclass};
 1;
 package Selenium::Element;
-$Selenium::Element::VERSION = '1.02';
+$Selenium::Element::VERSION = '1.03';
 use parent qw{Selenium::Subclass};
 1;
 
@@ -368,7 +369,7 @@ Selenium::Client - Module for communicating with WC3 standard selenium servers
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 CONSTRUCTOR
 
@@ -549,6 +550,8 @@ You can call Selenium methods on this object which require a sessionid and eleme
 =head1 STUPID SELENIUM TRICKS
 
 There are a variety of quirks with Selenium drivers that you just have to put up with, don't log bugs on these behaviors.
+Most of this will probably change in the future,
+as these are firmly in the "undefined/undocumented behavior" stack of the browser vendors.
 
 =head3 alerts
 
@@ -598,6 +601,23 @@ Different browser drivers also handle window handles differently.
 Chrome in particular demands you stringify handles returned from the driver.
 It also seems to be a lot less cooperative than firefox when setting the WindowRect.
 
+=head3 frames
+
+In the SwitchToFrame documentation, the claim is made that passing the element ID of a <frame> or <iframe> will switch the browsing context of the session to that frame.
+This is quite obviously false in every driver known.  Example:
+
+    # This does not ever work
+    $session->SwitchToFrame( id => $session->FindElement( using => 'css selector', value => '#frame' )->{elementid} );
+
+The only thing that actually works is switching by array index as you would get from window.frames in javascript:
+
+    # Supposing #frame is the first frame encountered in the DOM, this works
+    $session->SwitchToFrame( id => 0 );
+
+As you might imagine this is a significant barrier to reliable automation as not every JS interperter will necessarily index in the same order.
+Nor is there, say, a GetFrames() method from which you could sensibly pick which one you want and move from there.
+The only workaround here would be to always execute a script to interrogate window.frames and guess which one you want based on the output of that.
+
 =head3 arguments
 
 If you make a request of the server with arguments it does not understand it will hang for 30s, so set a SIGALRM handler if you insist on doing so.
@@ -613,6 +633,9 @@ Kind of like how you'll die if you use a perl without signatures with this modul
 Also, due to perl pseudo-forks hanging forever if anything is ever waiting on read() in windows, we don't fork to spawn binaries.
 Instead we use C<start> to open a new cmd.exe window, which will show up in your task tray.
 Don't close this or your test will fail for obvious reasons.
+
+This also means that if you have to send ^C (SIGTERM) to your script or exit() prematurely, said window may be left dangling,
+as these behave a lot more like POSIX::_exit() does on unix systems.
 
 =head1 AUTHOR
 

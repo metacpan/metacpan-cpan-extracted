@@ -1,6 +1,11 @@
-Revision history for App-UuidUtils
+0.030   2021-01-20  Released-By: PERLANCAR
 
-0.02    2015-09-27 (PERLANCAR)
+        - [incompatible change] Rename CLI gen-uuids to gen-uuid.
+
+        - [CLI genuuid] Add options --uuid-version, --backend.
+
+
+0.02    2015-09-27  Released-By: PERLANCAR
 
 	- [ux] Give positional argument for 'num', for convenience.
 
@@ -8,6 +13,6 @@ Revision history for App-UuidUtils
           coderefs more compatibly with older perls [CT].
 
 
-0.01    2015-08-31 (PERLANCAR)
+0.01    2015-08-31  Released-By: PERLANCAR
 
         - First release.

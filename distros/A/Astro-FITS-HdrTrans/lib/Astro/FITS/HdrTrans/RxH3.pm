@@ -9,11 +9,12 @@ package Astro::FITS::HdrTrans::RxH3;
 use warnings;
 use strict;
 
-our $VERSION = '1.62';
+our $VERSION = '1.63';
 
 use base qw/Astro::FITS::HdrTrans::JCMT/;
 
 my %CONST_MAP = (
+    DR_RECIPE => 'REDUCE_HOLOGRAPHY',
 );
 
 my %UNIT_MAP = (
@@ -36,6 +37,54 @@ Returns "RxH3".
 
 sub this_instrument {
     return 'RxH3';
+}
+
+=item B<can_translate>
+
+Older RxH3 data files lack an INSTRUME header, so look for other
+headers also.
+
+=cut
+
+sub can_translate {
+    my $self = shift;
+    my $headers = shift;
+
+    return 1 if $self->SUPER::can_translate($headers);
+
+    my $freqfile = undef;
+
+    if (exists $headers->{'FREQFILE'}) {
+        $freqfile = $headers->{'FREQFILE'};
+    }
+    elsif (exists $headers->{'SUBHEADERS'} &&
+            exists $headers->{'SUBHEADERS'}->[0]->{'FREQFILE'}) {
+        $freqfile = $headers->{'SUBHEADERS'}->[0]->{'FREQFILE'};
+    }
+
+    return (defined $freqfile and $freqfile =~ /\/rxh3/) ? 1 : 0;
+}
+
+=item B<to_UTSTART>
+
+Older RxH3 data only has a "DATE" header (the date the FITS file was created),
+so fall back to this if we don't get a value from the standard header ("DATE-OBS").
+
+=cut
+
+sub to_UTSTART {
+    my $self = shift;
+    my $headers = shift;
+
+    my $utstart = $self->SUPER::to_UTSTART($headers);
+
+    unless (defined $utstart) {
+        if ((exists $headers->{'DATE'}) and (defined $headers->{'DATE'})) {
+            $utstart = $self->_parse_iso_date($headers->{'DATE'});
+        }
+    }
+
+    return $utstart;
 }
 
 1;

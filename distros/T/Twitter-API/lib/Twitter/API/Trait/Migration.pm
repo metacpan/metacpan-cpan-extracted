@@ -1,6 +1,6 @@
 package Twitter::API::Trait::Migration;
 # ABSTRACT: Migration support Net::Twitter/::Lite users
-$Twitter::API::Trait::Migration::VERSION = '1.0005';
+$Twitter::API::Trait::Migration::VERSION = '1.0006';
 use 5.14.1;
 use Carp;
 use Moo::Role;
@@ -117,7 +117,7 @@ Twitter::API::Trait::Migration - Migration support Net::Twitter/::Lite users
 
 =head1 VERSION
 
-version 1.0005
+version 1.0006
 
 =head1 DESCRIPTION
 
@@ -307,7 +307,7 @@ replace with L<oauth_authentication_url|Twitter::API/oauth_athentication_url>
 
 =item *
 
-B<get_autorization_url>
+B<get_authorization_url>
 
 replace with L<oauth_authorization_url|Twitter::API/oauth_authorization_url> or
   L<oauth_request_token|Twitter::API/oauth_request_token> and
@@ -353,7 +353,7 @@ Marc Mims <marc@questright.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2018 by Marc Mims.
+This software is copyright (c) 2015-2021 by Marc Mims.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -9,8 +9,7 @@ use base qw{ Astro::Coord::ECI::Sun };
 
 use Carp;
 
-our $VERSION = '0.117';
-
+our $VERSION = '0.118';
 
 1;
 
@@ -47,7 +46,6 @@ This class adds no methods.
 
 This class adds no attributes.
 
-
 =head1 SEE ALSO
 
 L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun>
@@ -55,6 +53,7 @@ L<Astro::Coord::ECI::Sun|Astro::Coord::ECI::Sun>
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass>,
 L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
 electronic mail to the author.
 

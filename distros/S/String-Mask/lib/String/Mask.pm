@@ -2,7 +2,7 @@ package String::Mask;
 use 5.006; use strict; use warnings;
 use base 'Import::Export';
 
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 our %EX = (
 	mask => [qw/all/]
 );
@@ -10,7 +10,7 @@ our %EX = (
 sub mask {
 	my ($string, $pos, $length, $mask_char) = @_;
 	$pos ||= 'start';
-	$length ||= int(length($string) / 2);
+	$length = int(length($string) / 2) unless $length;
 	if ($pos eq 'end') {
 		$string =~ s/(.*)(.{$length})$/_mask($1, $mask_char).$2/es;
 	} elsif ($pos eq 'middle') {
@@ -41,7 +41,7 @@ String::Mask - mask sensitive data
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 
@@ -143,7 +143,7 @@ L<https://metacpan.org/release/String-Mask>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2021 by LNATION.
 
 This is free software, licensed under:
 

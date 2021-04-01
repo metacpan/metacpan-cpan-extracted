@@ -21,7 +21,7 @@
 package Perl::Tidy::Tokenizer;
 use strict;
 use warnings;
-our $VERSION = '20210111';
+our $VERSION = '20210402';
 
 use Perl::Tidy::LineBuffer;
 use Carp;
@@ -5017,7 +5017,9 @@ sub operator_expected {
             # For example, from RT#130344:
             #   use lib $FindBin::Bin . '/lib';
             if ( $statement_type ne 'use' ) {
-                complain("operator in print statement not recommended\n");
+                complain(
+"operator in possible indirect object location not recommended\n"
+                );
             }
             $op_expected = OPERATOR;
         }
@@ -5194,6 +5196,11 @@ sub code_block_type {
 
     # check bareword
     elsif ( $last_nonblank_type eq 'w' ) {
+
+        # check for syntax 'use MODULE LIST'
+        # This fixes b1022 b1025 b1027 b1028 b1029 b1030 b1031
+        return "" if ( $statement_type eq 'use' );
+
         return decide_if_code_block( $i, $rtokens, $rtoken_type,
             $max_token_index );
     }
@@ -5797,6 +5804,20 @@ sub guess_if_pattern_or_conditional {
     return ( $is_pattern, $msg );
 }
 
+my %is_known_constant;
+my %is_known_function;
+
+BEGIN {
+
+    # Constants like 'pi' in Trig.pm are common
+    my @q = qw(pi pi2 pi4 pip2 pip4);
+    @{is_known_constant}{@q} = (1) x scalar(@q);
+
+    # parenless calls of 'ok' are common
+    @q = qw( ok );
+    @{is_known_function}{@q} = (1) x scalar(@q);
+}
+
 sub guess_if_pattern_or_division {
 
     # this routine is called when we have encountered a / following an
@@ -5881,15 +5902,20 @@ sub guess_if_pattern_or_division {
 
                     # Both pattern and divide can work here...
 
-                    # A very common bare word in math expressions is 'pi'
-                    if ( $last_nonblank_token eq 'pi' ) {
-                        $msg .= "division (pattern works too but saw 'pi')\n";
+                    # Increase weight of divide if a pure number follows
+                    $divide_expected += $next_token =~ /^\d+$/;
+
+                    # Check for known constants in the numerator, like 'pi'
+                    if ( $is_known_constant{$last_nonblank_token} ) {
+                        $msg .=
+"division (pattern works too but saw known constant '$last_nonblank_token')\n";
                         $is_pattern = 0;
                     }
 
                     # A very common bare word in pattern expressions is 'ok'
-                    elsif ( $last_nonblank_token eq 'ok' ) {
-                        $msg .= "pattern (division works too but saw 'ok')\n";
+                    elsif ( $is_known_function{$last_nonblank_token} ) {
+                        $msg .=
+"pattern (division works too but saw '$last_nonblank_token')\n";
                         $is_pattern = 1;
                     }
 
@@ -6146,8 +6172,12 @@ sub scan_bare_identifier_do {
               )
             {
 
-                # may not be indirect object unless followed by a space
-                if ( $input_line =~ m/\G\s+/gc ) {
+                # may not be indirect object unless followed by a space;
+                # updated 2021-01-16 to consider newline to be a space.
+                # updated for case b990 to look for either ';' or space
+                if ( pos($input_line) == length($input_line)
+                    || $input_line =~ m/\G[;\s]/gc )
+                {
                     $type = 'Y';
 
                     # Abandon Hope ...

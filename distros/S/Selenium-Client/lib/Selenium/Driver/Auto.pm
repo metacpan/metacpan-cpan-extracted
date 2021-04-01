@@ -1,5 +1,5 @@
 package Selenium::Driver::Auto;
-$Selenium::Driver::Auto::VERSION = '1.02';
+$Selenium::Driver::Auto::VERSION = '1.03';
 #ABSTRACT: Automatically choose the best driver available for your browser choice
 
 use strict;
@@ -46,7 +46,7 @@ Selenium::Driver::Auto - Automatically choose the best driver available for your
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SUBROUTINES
 

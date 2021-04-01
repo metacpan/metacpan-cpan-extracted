@@ -12,7 +12,7 @@ use Astro::Coord::ECI;
 use Astro::Coord::ECI::Sun;
 use Astro::Coord::ECI::Utils qw{ deg2rad rad2deg };
 
-our $VERSION = '0.117';
+our $VERSION = '0.118';
 
 my $time = time;
 

@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => 0,
     "Moo" => 0,
     "Net::Curl::Simple" => 0,
+    "Scalar::Util" => 0,
     "Try::Tiny" => 0,
     "URI" => 0,
     "URI::Escape" => 0
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::TCP" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "LWP::UserAgent" => 0,
   "Moo" => 0,
   "Net::Curl::Simple" => 0,
+  "Scalar::Util" => 0,
   "Test::More" => 0,
   "Test::TCP" => 0,
   "Try::Tiny" => 0,

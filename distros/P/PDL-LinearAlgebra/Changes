@@ -1,3 +1,6 @@
+0.17 2021-04-01
+- handle native complex data
+
 0.16 2021-03-23
 - fix pp_setversion calls now that preserves string
 
