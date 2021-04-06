@@ -1,10 +1,9 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
+
 BEGIN {
-  if ($] ge '5.012') {
-    use strict;
-    use warnings;
-  }
   if ($] ge '5.026') {
     use lib '.';
   }
@@ -40,7 +39,7 @@ SKIP: {
     ($old_hn, $old_dn) = Net::IPAddress::fqdn($std_fqdn);
   }
 
-  diag('Some deprecation warnings here are normal') if $^W;
+diag('Some deprecation warnings here are normal') if $^W;
 
   {
     eval "require Net::IPAddress::Util";

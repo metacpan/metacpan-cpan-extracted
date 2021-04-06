@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.131   2021-04-06
+        - Single table row output: skip separator lines.
+
 0.130   2021-03-04
         - Option to filter table rows.
 

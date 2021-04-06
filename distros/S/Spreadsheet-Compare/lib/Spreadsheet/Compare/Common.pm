@@ -6,7 +6,7 @@ use Module::Load qw(load_remote autoload_remote);
 use Class::Method::Modifiers qw(install_modifier);
 use Log::Log4perl qw(:easy);
 use Carp;
-use YAML qw(Dump);
+use YAML::Any qw(Dump);
 use Path::Tiny qw(path tempdir);
 
 sub attr {
@@ -21,7 +21,7 @@ sub attr {
         my $ro_attr = '__ro__' . $attr;
         Mojo::Base::attr( $self, $ro_attr, $value, %kv );
         my $sub = sub {
-            croak qq(attribute "$attr" is readonly) if @_ > 1;
+            croak qq(attribute "$attr" is readonly)                if @_ > 1;
             carp qq(found rw value for readonly attribute "$attr") if exists $_[0]->{$attr};
             return $_[0]->$ro_attr;
         };
@@ -55,11 +55,12 @@ sub import ( $class, %args ) {
         autoload_remote $pkg, 'Test::More';
         autoload_remote $pkg, 'Test::Exception';
 
-        if ( $args{temp} and path('t')->is_dir ) {
-            my $fn = path($0)->basename('.t');
+        my $pt = path('t');
+        if ( $args{temp} and $pt->is_dir ) {
+            my $fn   = path($0)->basename('.t');
             my $tmpd = tempdir(
-                DIR => 't',
-                CLEANUP=> $ENV{SPREADSHEET_COMPARE_CLEANUP} // 1,
+                DIR      => 't',
+                CLEANUP  => $ENV{SPREADSHEET_COMPARE_CLEANUP} // $pt->sibling('.idea')->is_dir,
                 TEMPLATE => "${fn}_XXXX",
             );
             monkey_patch( $pkg, 'tmpd', sub { $tmpd } );

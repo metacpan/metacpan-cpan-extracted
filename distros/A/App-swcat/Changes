@@ -1,3 +1,8 @@
+0.015   2021-04-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to Software::Catalog 1.0.7: Add subcommand available-archs.
+
+
 0.014   2019-10-26  Released-By: PERLANCAR; Urgency: high
 
 	- Adjust to Software::Catalog 1.0.6 (incompatible change, renamed

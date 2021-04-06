@@ -1,3 +1,9 @@
+** 0.12 / 2021-04-05
+   - Properly fix JSONWIRE compatibility with FF by letting
+     get_attribute try to separate attributes and properties on browsers
+     which allows it and fallback on attributes only on failure.
+   - Move Continuous Integration tests to Github Actions
+
 ** 0.11 / 2020-06-17
    - Fix a bug with scrolling an element into the viewport on Chrome & Opera
 

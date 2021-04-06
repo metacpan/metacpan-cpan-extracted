@@ -4,7 +4,7 @@ JSON::Schema::ToJSON - Generate example JSON structures from JSON Schema definit
 
 # VERSION
 
-0.17
+0.19
 
 # SYNOPSIS
 
@@ -22,7 +22,7 @@ JSON::Schema::ToJSON - Generate example JSON structures from JSON Schema definit
 
 # DESCRIPTION
 
-[JSON::Schema::ToJSON](https://metacpan.org/pod/JSON::Schema::ToJSON) is a class for generating "fake" or "example" JSON data
+[JSON::Schema::ToJSON](https://metacpan.org/pod/JSON%3A%3ASchema%3A%3AToJSON) is a class for generating "fake" or "example" JSON data
 structures from JSON Schema structures.
 
 # CONSTRUCTOR ARGUMENTS
@@ -56,6 +56,9 @@ key as the content would not be sensible or valid).
 To prevent deep recursion due to circular references in JSON schemas the module has
 a default max depth set to a very conservative level of 10. If you need to go deeper
 than this then pass a larger value at object construction.
+
+Note that the underlying JSON schema parser, [JSON::Validator](https://metacpan.org/pod/JSON%3A%3AValidator) now handles recursion
+so you shouldn't have to worry too much about this - see its documentation for details.
 
 # METHODS
 
@@ -110,10 +113,26 @@ combination.
 Note that the data generated is completely random, don't expect it to be the same
 across runs or calls. The data is also meaningless in terms of what it represents
 such that an object property of "name" that is a string will be generated as, for
-example, "kj02@#fjs01je#$42wfjs" - The JSON generated is so you have a representative
+example, "est sed asperiores" - The JSON generated is so you have a representative
 **structure**, not representative **data**. Set example keys in your schema and then
 set the `example_key` in the constructor if you want this to be repeatable and/or
 more representative.
+
+[Data::Fake](https://metacpan.org/pod/Data%3A%3AFake) is used for some of the generated data, through use of fake\_name,
+fake\_past\_datetime, fake\_int, and fake\_words
+
+To generate subsections of data, or for those schema that are large only generating
+small sections, you can combine with [JSON::Validator](https://metacpan.org/pod/JSON%3A%3AValidator) like so:
+
+        use JSON::Validator;
+        my $jv = JSON::Validator->new;
+        $jv->schema( 'petstore.json' );
+
+        my $generator = JSON::Schema::ToJSON->new;
+
+        my $response = $generator->json_schema_to_json(
+                schema => $jv->get( '/definitions/Pet' )
+        );
 
 # LICENSE
 

@@ -14,4 +14,5 @@ t/01-basic.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/release-module-features.t
 weaver.ini

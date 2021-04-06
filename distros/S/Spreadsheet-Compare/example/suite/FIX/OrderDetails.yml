@@ -1,0 +1,8 @@
+---
+- title: fix_order detail
+  type: FIX
+  files :
+    - FIX/ref/simple01.fix
+    - FIX/cur/simple01.fix
+  record_format: 'A2A3A3A3A3'
+  identity: [0]

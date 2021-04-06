@@ -1,4 +1,5 @@
-package RandomLine;
+package
+    RandomLine;
 use base qw/Test::Class/;
 
 use strict;

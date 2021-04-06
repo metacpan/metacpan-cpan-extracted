@@ -30,7 +30,7 @@ foreach my $LEVEL (0 .. $size) {
         $debug->debug($method, $LogLevel[$count]  . ' Single Line Message Test');
         $debug->debug($method, $LogLevel[$count]  . " Multi-Line Scalar\nMessage Test");
         $debug->debug($method, [$LogLevel[$count] . ' Multi-Line', 'Array', 'Message Test']);
-        $debug->DEBUGMAX(['DEBUGMAX - Data Dumper -',\@LogLevel,\@CodeLevel,\%SomeHash,\&subroutine]);
+        $debug->DEBUGMAX(['DEBUGMAX - Data Dumper -',\@LogLevel,\@CodeLevel,\%SomeHash]);
         print STDERR "\n";
     }
 }

@@ -3,7 +3,10 @@ abstract: 'Create a DateTime object from a Genealogy Date'
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
+  Data::Dumper: '0'
+  English: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Test::Carp: '0'
   Test::CleanNamespaces: '0'
   Test::Deep: '0'
@@ -16,7 +19,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +36,7 @@ requires:
   namespace::clean: '0'
   perl: '5.006002'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Genealogy
+  bugtracker: https://github.com/nigelhorne/DateTime-Format-Genealogy/issues
   repository: git://github.com/nigelhorne/DateTime-Format-Genealogy.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

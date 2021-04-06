@@ -4,6 +4,9 @@ use Mojo::Base 'Spreadsheet::Compare::Reporter', -signatures;
 use Spreadsheet::Compare::Common;
 
 use Excel::Writer::XLSX;
+use Encode;
+
+my $enc_chk = Encode::FB_WARN | Encode::LEAVE_SRC;
 
 my %format_defaults = (
     fmt_head       => 'bold 1 align left',
@@ -45,7 +48,9 @@ sub add_stream ( $self, $name ) {
 
 sub write_header ( $self, $name ) {
 
-    $self->{ws}{$name}->write_row( $self->{row}{$name}++, 0, $self->header, $self->fmt_head );
+    state $head = [ map { decode_utf8( $_, $enc_chk ) } $self->header->@* ];
+
+    $self->{ws}{$name}->write_row( $self->{row}{$name}++, 0, $head, $self->fmt_head );
     $self->{ws}{$name}->freeze_panes( 1, 0 );
 
     return $self;
@@ -67,8 +72,9 @@ sub mark_header ( $self, $name, $mask ) {
 
 
 sub write_row ( $self, $name, $robj ) {
+    my @data = map { decode_utf8( $_, $enc_chk ) } $self->output_record($robj)->@*;
     my($fnorm) = $self->_get_fmt( $name, $robj->side );
-    $self->{ws}{$name}->write_row( $self->{row}{$name}++, 0, $self->output_record($robj), $fnorm );
+    $self->{ws}{$name}->write_row( $self->{row}{$name}++, 0, \@data, $fnorm );
     return $self;
 }
 
@@ -91,18 +97,20 @@ sub _get_fmt ( $self, $name, $side ) {
 
 sub write_fmt_row ( $self, $name, $robj ) {
 
-    my $data = $self->output_record($robj);
+    my @data = map { decode_utf8( $_, $enc_chk ) } $self->output_record($robj)->@*;
     my $mask = $self->strip_ignore( $robj->limit_mask );
     my $off  = $self->head_offset;
     my $row  = $self->{row}{$name}++;
 
     my( $fnorm, $fhigh, $flow ) = $self->_get_fmt( $name, $robj->side );
 
-    for my $col ( 0 .. $#$data ) {
+    for my $col ( 0 .. $#data ) {
         my $idx  = $col - $off;
         my $flag = $idx < 0 ? 0 : $mask->[$idx];
         $self->{ws}{$name}->write(
-            $row, $col, $data->[$col], $flag
+            $row, $col,
+            $data[$col],
+            $flag
             ? ( $flag == 1 ? $fhigh : $flow )
             : $fnorm,
         );
@@ -195,7 +203,7 @@ $/x;
 
 sub _write_with_infinity {
     my $ws = shift;
-    return $ws->write_string(@_) if $_[2] =~ /$qr_num/ and $_[2]+0 =~ /Inf/;
+    return $ws->write_string(@_) if $_[2] =~ /$qr_num/ and $_[2] + 0 =~ /Inf/;
     return;
 }
 

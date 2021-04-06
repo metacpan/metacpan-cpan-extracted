@@ -11,6 +11,7 @@ sub do_test {
     my %test = %{shift()};
     my $output = get_scroller_output($test{in}, @_);
     my $expect = $test{out} =~ s/\n$//sr; # chop off final newline
+    #print $output;
     is( $output, $expect );
 }
 

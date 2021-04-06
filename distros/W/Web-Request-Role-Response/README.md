@@ -4,7 +4,7 @@ Web::Request::Role::Response - Generate various HTTP responses from a Web::Reque
 
 # VERSION
 
-version 1.006
+version 1.008
 
 # SYNOPSIS
 
@@ -92,6 +92,7 @@ tracking URL.
 Thanks to
 
 - [validad.com](https://www.validad.com/) for supporting Open Source.
+- [choroba](https://github.com/choroba) for improvements to the test suite.
 
 # AUTHOR
 

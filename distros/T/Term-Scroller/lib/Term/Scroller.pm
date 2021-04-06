@@ -6,7 +6,7 @@ use warnings;
 
 use feature 'unicode_strings';
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 =head1 NAME
 
@@ -50,6 +50,8 @@ use List::Util qw(any);
 
 use IO::Pty;
 use Term::ReadKey qw(GetTerminalSize);
+
+use Term::Scroller::Linefeed qw(linefeed);
 
 our @ISA = qw(IO::Pty);
 
@@ -141,12 +143,12 @@ sub new {
     my $class = shift;
 
     my %params = @_;
+    my $outfh       = $params{out}          // qualify_to_ref(select);
     my $buf_height  = $params{height}       // 10;
-    my $buf_width   = $params{width}        // (GetTerminalSize)[0]    // 80;
+    my $buf_width   = $params{width}        // (GetTerminalSize $outfh)[0] // 80;
     my $tab_width   = $params{tabwidth}     // 4;
     my $style       = $params{style};
     my $windowspec  = $params{window};
-    my $outfh       = $params{out}          // qualify_to_ref(select);
     my $hide        = $params{hide}         // 0;
     my $passthru    = $params{passthrough};
 
@@ -169,7 +171,6 @@ sub new {
     select $outfh;
 
     my @buf;
-    my $slave = $pty->slave;
 
     my $tab = " "x$tab_width;
 
@@ -201,10 +202,10 @@ sub new {
         $buf_width -= ( length($line_start) + length($line_end) );
     }
 
-    while(my $line = <$slave>) {
-        print $passthru $line if openhandle($passthru);
+    my $firstline = 1;
 
-        state $firstline = 1;
+    while (my $line = linefeed($pty)) {
+
         if ($firstline) {
             print "$window_top\n" if defined $window_top;
             print "$window_bot\n" if defined $window_bot;
@@ -246,8 +247,8 @@ sub new {
         print "$_\033[K\n"  for (@buf);     
         print "\033[0m";
         print "$window_bot\n" if defined $window_bot;
-
     }
+
     close $passthru if openhandle($passthru);
 
     if ($hide) {
@@ -280,7 +281,8 @@ Returns the exit status of the instance's child process.
 =cut
 sub end {
     my $self = shift;
-    print $self "\04";
+    print $self "\04\n\04";
+    $self->flush;
     waitpid($self->pid, 0);
     return $?;
 }

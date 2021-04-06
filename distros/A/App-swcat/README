@@ -2,8 +2,8 @@ NAME
     App::swcat - Software catalog
 
 VERSION
-    This document describes version 0.014 of App::swcat (from Perl
-    distribution App-swcat), released on 2019-10-26.
+    This document describes version 0.015 of App::swcat (from Perl
+    distribution App-swcat), released on 2021-04-04.
 
 SYNOPSIS
     See swcat script.
@@ -24,6 +24,37 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   arch => *software::arch*
+
+    *   cache_period => *int*
+
+    *   db_path => *filename*
+
+        Location of SQLite database (for caching), defaults to
+        ~/.cache/swcat.db.
+
+    *   software* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  available_archs
+    Usage:
+
+     available_archs(%args) -> [status, msg, payload, meta]
+
+    Get list of available architectures of a software.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
 
     *   cache_period => *int*
 
@@ -300,7 +331,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-swcat>
+    <https://github.com/perlancar/perl-App-swcat/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -312,7 +343,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

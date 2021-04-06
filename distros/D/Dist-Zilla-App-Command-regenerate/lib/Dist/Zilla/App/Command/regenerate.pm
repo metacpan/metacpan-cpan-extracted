@@ -4,11 +4,11 @@ use warnings;
 
 package Dist::Zilla::App::Command::regenerate;
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001002';
 
 # ABSTRACT: Write content into your source tree from your release staging
 
-our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
+our $AUTHORITY = 'cpan:DBOOK'; # AUTHORITY
 
 use Dist::Zilla::App '-command';
 use Carp qw( croak );
@@ -53,7 +53,7 @@ Dist::Zilla::App::Command::regenerate - Write content into your source tree from
 
 =head1 VERSION
 
-version 0.001001
+version 0.001002
 
 =head1 SYNOPSIS
 
@@ -116,7 +116,7 @@ Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Kent Fredric <kentfredric@gmail.com>.
+This software is copyright (c) 2016-2017 by Kent Fredric <kentfredric@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

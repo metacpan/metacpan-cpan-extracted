@@ -8,7 +8,8 @@ do { my $x = {
                       'requires' => {
                                       'Encode' => '0',
                                       'Test::More' => '0',
-                                      'Test::Pod' => '1.41'
+                                      'Test::Pod' => '1.41',
+                                      'strict' => '0'
                                     }
                     },
        'runtime' => {
@@ -37,7 +38,8 @@ do { my $x = {
                                       'Pod::Weaver' => '4',
                                       'Pod::Weaver::Config::Assembler' => '0',
                                       'Pod::Weaver::Section::Contributors' => '0.008',
-                                      'strict' => '0',
+                                      'Pod::Weaver::Section::GenerateSection' => '0.000',
+                                      'perl' => 'v5.20.0',
                                       'warnings' => '0'
                                     }
                     },
@@ -48,7 +50,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0.96'
+                                   'Test::More' => '0.96',
+                                   'strict' => '0'
                                  }
                  }
      };

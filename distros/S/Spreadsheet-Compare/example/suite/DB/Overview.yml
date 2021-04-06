@@ -1,0 +1,15 @@
+---
+- title     : db_order
+  type: DB
+  dsns :
+    - dsn: 'dbi:SQLite:dbname=%{rootdir}/../Northwind_small.sqlite'
+  sql :
+    - select * from [Order]
+    - select * from [NewOrder]
+  identity:
+    - Id
+  limit_rel:
+    __default__: .1
+    Freight: 0.08
+  limit_abs:
+    __default__: none

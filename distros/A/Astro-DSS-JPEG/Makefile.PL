@@ -20,7 +20,18 @@ my %WriteMakefileArgs = (
         'Test::MockObject' => '0',
     },
     PREREQ_PM => {
-        'LWP::UserAgent' => '0'
+        'LWP::UserAgent'           => '0',
+        'Astro::Coord::Precession' => '0'
+    },
+    META_MERGE => {
+        "meta-spec" => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url => 'git://github.com/dkechag/Astro-DSS-JPEG.git',
+                web => 'https://github.com/dkechag/Astro-DSS-JPEG',
+            }
+        }
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Astro-DSS-JPEG-*' },

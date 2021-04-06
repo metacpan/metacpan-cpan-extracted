@@ -27,7 +27,7 @@ name: Dancer2-Plugin-DBIx-Class
 provides:
   Dancer2::Plugin::DBIx::Class:
     file: lib/Dancer2/Plugin/DBIx/Class.pm
-    version: '1.02'
+    version: '1.03'
 requires:
   Carp: '0'
   Class::C3::Componentised: '0'
@@ -37,7 +37,7 @@ requires:
 resources:
   bugtracker: https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class/-/issues
   repository: https://gitlab.com/GeekRuthie/Dancer2-Plugin-DBIx-Class.git
-version: '1.02'
+version: '1.03'
 x_contributors:
   - 'D Ruth Holloway <ruthh@clearbuilt.com>'
 x_generated_by_perl: v5.32.0

@@ -4,7 +4,7 @@ CtrlO::Crypt::XkcdPassword - Yet another xkcd style password generator
 
 # VERSION
 
-version 1.009
+version 1.010
 
 # SYNOPSIS
 
@@ -39,7 +39,7 @@ version 1.009
 algorithm suggested in [https://xkcd.com/936/](https://xkcd.com/936/): It selects 4 words
 from a curated list of words and combines them into a hopefully easy
 to remember password (actually a passphrase, but we're all trying to
-getting things done, so who cares..).
+get things done, so who cares..).
 
 See [this
 explaination](https://www.explainxkcd.com/wiki/index.php/936:_Password_Strength)
@@ -92,7 +92,7 @@ Or in a module:
         wordlist => 'My::Wordlist'
     );
 
-See ["DEFINING CUSTOM WORD LISTS"](#defining-custom-word-lists) for more info
+See ["DEFINING CUSTOM WORD LISTS"](#defining-custom-word-lists) for more info.
 
 ## xkcd
 
@@ -191,12 +191,12 @@ prior to a proper installation.
 
 # SEE ALSO
 
-Inspired by [https://xkcd.com/936/](https://xkcd.com/936/) and [https://xkcd.com/927/](https://xkcd.com/927/)
+Inspired by [https://xkcd.com/936/](https://xkcd.com/936/) and [https://xkcd.com/927/](https://xkcd.com/927/).
 
 There are a lot of similar modules on CPAN, so we just point you to
-[Neil Bower's comparison of CPAN modules for generating passwords](http://neilb.org/reviews/passwords.html)
+[Neil Bower's comparison of CPAN modules for generating passwords](http://neilb.org/reviews/passwords.html).
 
-## But we did we write yet another module?
+## But why did we write yet another module?
 
 - Good entropy
 
@@ -209,14 +209,15 @@ There are a lot of similar modules on CPAN, so we just point you to
 
     While [Crypt::Diceware](https://metacpan.org/pod/Crypt%3A%3ADiceware) has good entropy, we did not like its word
     lists. Of course we could have just provided a word list better suited
-    to our needs, but we wanted it to be very easy to generate xkcd-Style
-    passwords
+    to our needs, but we wanted it to be very easy to generate xkcd-style
+    passwords.
 
 - Easy API
 
     `my $pwd = CtrlO::Crypt::XkcdPassword->new->xkcd` returns 4 words
     starting with an uppercase letter as a string, which is our main use
-    case. But the API also allows for more or less words, or even some digits.
+    case. Nevertheless, the API also allows for more or fewer words, or
+    even some digits.
 
 - Fork save
 - [https://xkcd.com/927/](https://xkcd.com/927/)

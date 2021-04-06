@@ -1,3 +1,6 @@
+0.2.3 - 2021-04-05
+    - fix test, it used deprected features RT#134647
+
 0.2.2 - 2019-02-19
     - add YAML::PP
 

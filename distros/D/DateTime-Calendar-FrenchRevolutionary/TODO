@@ -1,9 +1,5 @@
-Implement durations, addition and subtraction
-
 Check test coverage for other cases (which cases?)
 
 printf specifiers C<%V>, C<%w>
 
 Install the other F<DateTime::Calendar> modules and use them in the F<today> example
-
-Add more locales, such as Italian or Spanish

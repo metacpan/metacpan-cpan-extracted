@@ -18,5 +18,6 @@ t/image-similar.t
 t/Technical_college-nosurf.png
 t/Technical_college.png
 t/Technical_college.svg
+TODO.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+Revision history for File-Codeowners.
+
+0.53      2021-04-02 19:47:45-06:00 America/Denver
+  * Test::File::Codeowners now looks for CODEOWNERS files and repos
+    relative to the executing test script (not cwd).
+
+0.52      2021-04-02 19:07:53-06:00 America/Denver
+  * Handle no-git and no-repo edge cases in Test::File::Codeowners.
+
+0.51      2021-04-02 14:59:55-06:00 America/Denver
+  * Add Test::File::Codeowners from App-Codeowners.
+
+0.50      2021-04-02 14:06:24-06:00 America/Denver
+  * Split from App-Codeowners.

@@ -1,4 +1,5 @@
-package TestConstants;
+package
+    TestConstants;
 
 use strict;
 use warnings;

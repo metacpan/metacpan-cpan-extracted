@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 # version
-$OOB::VERSION = '0.13';
+$OOB::VERSION = '0.14';
 
 # modules that we need
 use Scalar::Util qw( blessed refaddr reftype );
@@ -77,7 +77,7 @@ BEGIN {
     # make sure reblessing OOB objects does the right thing
     *CORE::GLOBAL::bless = sub {
         my $blessed = blessed $_[0];
-        my $class   = $_[1] || caller();
+        my $class   = $_[1] ? $_[1] : caller();
 
         # make sure we can DESTROY if a new class
         _register_DESTROY($class) if $blessed and $stolen{$blessed};
@@ -384,7 +384,8 @@ sub _register_DESTROY {
         $stolen{$blessed} = $destroy;
         my $fullname = sub_fullname($destroy);
         no strict 'refs';
-        *$fullname = sub { $destroy->( $_[0] ); &OOB::DESTROY( $_[0] ) };
+        no warnings 'redefine';
+       *$fullname = sub { $destroy->( $_[0] ); &OOB::DESTROY( $_[0] ) };
     }
 
     # no DESTROY method yet, to set one
@@ -403,7 +404,6 @@ sub _register_DESTROY {
 # OUT: 1 id to be used in internal hash
 
 sub _unique_id {
-
     # no ref, make it!
     my $reftype = reftype $_[0];
     if ( !$reftype ) {
@@ -432,7 +432,7 @@ OOB - out of band data for any data structure in Perl
 
 =head1 VERSION
 
-This documentation describes version 0.13.
+This documentation describes version 0.14.
 
 =head1 SYNOPSIS
 

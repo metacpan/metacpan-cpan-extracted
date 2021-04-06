@@ -1,4 +1,5 @@
-package RandomFileCheckOption;
+package
+    RandomFileCheckOption;
 use base qw/RandomFileMethodBase/;
 use TestConstants;
 

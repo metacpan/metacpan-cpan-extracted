@@ -1,0 +1,26 @@
+Revision history for Perl module Data::HexDump
+
+0.04 2021-04-03 NEILB
+    * Added Data::Peek to SEE ALSO, for DHexDump().
+    * SYNOPSIS wasn't a working example.
+    * Fixed RT#61974 - couldn't dump "0", for example.
+
+0.03 2021-04-02 NEILB
+    * Developer release all green on CPAN Testers, so doing
+      a stable release.
+
+0.02_01 2021-03-27 NEILB
+    * Fixed the warnings from pack that the testsuite was generating.
+      Posthumous thanks to KENTNL for RT#123226, which included the fix.
+    * Moved hexdump script to eg/, so it won't be installed.
+      Addresses RT#123224 from KENTNL.
+    * Added "use warnings" and refactored to drop "use vars"
+    * Refactored the documentation.
+    * Added SEE ALSO, with links to all the other hex dumpers I could find.
+    * Removed indirect method use
+
+0.02   1999-09-05   FTASSIN
+    * Unknown contents
+
+0.01   1999-07-15   FTASSIN
+    * First release to CPAN

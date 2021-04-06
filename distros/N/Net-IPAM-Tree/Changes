@@ -1,5 +1,12 @@
 Revision history for Net-IPAM-Tree
 
+3.00    Sat, 03 Apr 2021 18:14:49 +0200
+        - ATTENTION: incompatible change, simplified API
+        - new algo
+
+2.12    Sun, 14 Feb 2021 18:55:46 +0100
+        - remove hint to RT in Net::IPAM::Tree::Node
+
 2.11    Sun, 14 Feb 2021 18:43:03 +0100
         - more checks against possible index panics in corner cases
 

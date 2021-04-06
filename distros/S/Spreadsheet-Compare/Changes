@@ -1,3 +1,12 @@
+0.16 2021-04-03
+  - add version check to skip for excel test
+  - avoid Mojo::IOLoop::Thread reload
+  - fix CSV error handling
+  - add option to clear defaults for csv_options
+  - better message on config file open errors
+  - add example directory
+  - fix UTF-8 characters in XLSX
+
 0.15 2021-03-29
   - fix NAME section for spreadcomp
 

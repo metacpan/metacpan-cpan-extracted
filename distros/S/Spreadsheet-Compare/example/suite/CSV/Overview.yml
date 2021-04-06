@@ -1,0 +1,16 @@
+---
+- title: csv_order
+  type: CSV
+  files :
+    - CSV/ref/Order.csv
+    - CSV/cur/NewOrder.csv
+  identity:
+    - Id
+  limit_rel:
+    __default__: .1
+    Freight: 0.08
+  limit_abs:
+    __default__: none
+  csv_options:
+    binary: 1
+    allow_whitespace: 1

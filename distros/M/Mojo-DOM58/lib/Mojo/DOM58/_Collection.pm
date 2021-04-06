@@ -9,14 +9,16 @@ use warnings;
 use Carp 'croak';
 use List::Util;
 use Scalar::Util 'blessed';
+use re ();
 
 use constant REDUCE => ($] >= 5.008009 ? \&List::Util::reduce : \&_reduce);
+use constant HAS_IS_REGEXP => !!($] >= 5.010000);
 
 # Role support requires Role::Tiny 2.000001+
 use constant ROLES =>
   !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
-our $VERSION = '2.000';
+our $VERSION = '3.000';
 
 sub new {
   my $class = shift;
@@ -41,7 +43,7 @@ sub each {
 sub first {
   my ($self, $cb) = (shift, shift);
   return $self->[0] unless $cb;
-  return List::Util::first { $_ =~ $cb } @$self if ref $cb eq 'Regexp';
+  return List::Util::first { $_ =~ $cb } @$self if HAS_IS_REGEXP ? re::is_regexp($cb) : ref $cb eq 'Regexp';
   return List::Util::first { $_->$cb(@_) } @$self;
 }
 
@@ -49,8 +51,15 @@ sub flatten { $_[0]->new(_flatten(@{$_[0]})) }
 
 sub grep {
   my ($self, $cb) = (shift, shift);
-  return $self->new(grep { $_ =~ $cb } @$self) if ref $cb eq 'Regexp';
+  return $self->new(grep { $_ =~ $cb } @$self) if HAS_IS_REGEXP ? re::is_regexp($cb) : ref $cb eq 'Regexp';
   return $self->new(grep { $_->$cb(@_) } @$self);
+}
+
+sub head {
+  my ($self, $size) = @_;
+  return $self->new(@$self) if $size > @$self;
+  return $self->new(@$self[0 .. ($size - 1)]) if $size >= 0;
+  return $self->new(@$self[0 .. ($#$self + $size)]);
 }
 
 sub join {
@@ -93,6 +102,13 @@ sub sort {
     $a->$cb($b);
   } @$self;
   return $self->new(@sorted);
+}
+
+sub tail {
+  my ($self, $size) = @_;
+  return $self->new(@$self) if $size > @$self;
+  return $self->new(@$self[($#$self - ($size - 1)) .. $#$self]) if $size >= 0;
+  return $self->new(@$self[(0 - $size) .. $#$self]);
 }
 
 sub tap {

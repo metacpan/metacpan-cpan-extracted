@@ -1,0 +1,83 @@
+NAME
+    File::Edit - A naive, probably buggy, file editor.
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use File::Edit;
+
+        # Replace string in file
+        File::Edit->new('build.gradle')
+                  ->replace('minSdkVersion 16', 'minSdkVersion 21')
+                  ->save()
+                  ;
+
+        # Edit text, save to file
+        File::Edit->new()
+                  ->text("  minSdkVersion 16\n  targetSdkVersion 29")
+                  ->replace('minSdkVersion 16', 'minSdkVersion 21')
+                  ->save('build.gradle')
+                  ;
+
+EXPORT
+    A list of functions that can be exported. You can delete this section if
+    you don't export anything, such as for a purely object-oriented module.
+
+METHODS
+  new
+        my $fe = File::Edit->new("some_file.txt");
+
+        Reads in a file for editing.
+
+  text
+        my $fe = File::Edit->new()->text(some_text);
+
+        Reads in some text for editing.
+
+  replace
+        $fe->replace($old, $new);
+
+        Replace the $old portion of a single line with $new.
+
+  save
+        my $fe = File::Edit->new("some_file.txt");
+        $fe->save();                # Saves to "some_file.txt"
+        $fe->save("other.txt")      # Saves to "other.txt"
+
+AUTHOR
+    Hoe Kit CHEW, "<hoekit at gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-file-edit at
+    rt.cpan.org", or through the web interface at
+    <https://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-Edit>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc File::Edit
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <https://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Edit>
+
+    *   CPAN Ratings
+
+        <https://cpanratings.perl.org/d/File-Edit>
+
+    *   Search CPAN
+
+        <https://metacpan.org/release/File-Edit>
+
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2021 by Hoe Kit CHEW.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

@@ -4,13 +4,13 @@
       "Tim Bunce <timb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Devel-NYTProf",
    "no_index" : {
@@ -39,9 +39,13 @@
             "Getopt::Long" : "0",
             "JSON::MaybeXS" : "0",
             "List::Util" : "0",
-            "Test::Differences" : "0.60",
-            "Test::More" : "0.84",
             "XSLoader" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0.60",
+            "Test::More" : "0.84"
          }
       }
    },
@@ -57,11 +61,11 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/timbunce/devel-nytprof.git",
+         "url" : "https://github.com/timbunce/devel-nytprof.git",
          "web" : "https://github.com/timbunce/devel-nytprof"
       },
       "x_MailingList" : "http://groups.google.com/group/develnytprof-dev"
    },
-   "version" : "6.06",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "6.07",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

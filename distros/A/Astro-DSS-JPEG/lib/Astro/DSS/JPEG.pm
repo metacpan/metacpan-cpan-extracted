@@ -7,6 +7,7 @@ use utf8;
 
 use LWP::UserAgent;
 use List::Util 'min';
+use Astro::Coord::Precession qw/precess read_coordinates/;
 
 =encoding utf8
 
@@ -16,12 +17,11 @@ Astro::DSS::JPEG - Download color JPEG images from the Digitized Sky Survey
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
-
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,7 @@ interface can be redefined (e.g. if they change in the future) from the above sh
         target       => $target,            # Not used if RA, Dec provided
         ra           => $ra,                # Right Ascension (in hours of angle)
         dec          => $dec,               # Declination (in degrees of angle)
+        epoch        => $epoch,             # Optional. Epoch for coordinates (otherwise J2000 assumed)
         angular_size => 30,                 # Optional. Frame angular size in arcmin
         pixel_size   => 1000,               # Optional. Frame size in pixels
         filename     => $filename           # Optional. Filename to save image to
@@ -100,6 +101,7 @@ Right ascension, from 0-24h of angle. The option is flexible, it will accept a s
 decimal number - e.g. C<2.5> or a string with hours, minutes, secs like C<'2 30 00'> or
 C<'2h30m30s'> etc. Single/double quotes and single/double prime symbols are accepted
 for denoting minute, second in place of a single space which also works.
+Uses C<Astro::Coord::Precession::read_coordinates>.
 
 =item * C<dec>
 
@@ -107,6 +109,12 @@ Declination, from -90 to 90 degrees of angle. The option is flexible, it will ac
 a single decimal number - e.g. C<54.5> or a string with degrees, minutes, secs like
 C<'+54 30 00'> or C<'54°30m30s'> etc. Single/double quotes and single/double prime symbols
 are accepted for denoting minute, second in place of a single space which also works.
+Uses C<Astro::Coord::Precession::read_coordinates>.
+
+=item * C<epoch>
+
+DSS uses J2000.0 coordinates, but you can enter custom epoch coordinates by specifying
+it and it will be converted with L<Astro::Coord::Precession>.
 
 =item * C<target>
 
@@ -209,18 +217,17 @@ sub _get_dss {
 
 sub _convert_coordinates {
     my %opts = @_;
-    if (defined $opts{ra} && $opts{ra} =~ /([+-]?[0-9.]+)[ h]+([0-9.]+)[ m′']+([0-9.]+)/) {
-        $opts{ra} = $1+$2/60+$3/3600;
-    }
-    if (defined $opts{dec} && $opts{dec} =~ /([+-]?[0-9.]+)[ d°]+([0-9.]+)[ m′']+([0-9.]+)/) {
-        my $sign = $1 < 0 ? -1 : 1;
-        $opts{dec} = (abs($1)+$2/60+$3/3600)*$sign;
-    }
+    ($opts{ra}, $opts{dec}) = @{read_coordinates([@opts{'ra','dec'}])}
+        if defined $opts{ra} && defined $opts{dec};
     return %opts;
 }
 
 sub _process_options {
     my %opts = _convert_coordinates(@_);
+
+    ($opts{ra}, $opts{dec}) = @{precess([@opts{'ra','dec'}], $opts{epoch},2000)}
+        if $opts{epoch} && $opts{epoch} != 2000;
+
     $opts{angular_size} ||= 30; # 30' Default angular size
     $opts{pixel_size}   ||= 1000;
 

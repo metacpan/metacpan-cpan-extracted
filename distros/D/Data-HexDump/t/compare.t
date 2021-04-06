@@ -11,7 +11,7 @@ print "1..2\n";
 # data
 my $org = "";
 for (my $i = 0; $i <= 255; $i++) {
-  $org .= pack 'c', $i;
+  $org .= pack 'C', $i;
 }
 $org = $org x 17 . "more data";
 

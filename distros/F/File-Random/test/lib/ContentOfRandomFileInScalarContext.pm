@@ -1,4 +1,5 @@
-package ContentOfRandomFileInScalarContext;
+package
+    ContentOfRandomFileInScalarContext;
 use base qw/RandomFileMethodBase/;
 use TestConstants;
 

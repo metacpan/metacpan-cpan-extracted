@@ -1,0 +1,25 @@
+---
+- title: __GLOBAL__
+  type: CSV
+  report_diff_row: 1
+  identity:
+    - Id
+  limit_rel:
+    __default__: .1
+    Freight: 0.08
+  limit_abs:
+    __default__: none
+  csv_options:
+    __clear__: 1
+    binary: 1
+#    allow_whitespace: 1
+    decode_utf8: 0
+#=============================================
+- title: csv_order details
+  files:
+    - CSV/ref/OrderDetails_V.csv
+    - CSV/cur/NewOrderDetails_V.csv
+  diff_relative:
+    - UnitPriceProduct
+  ignore:
+    - OrderDate

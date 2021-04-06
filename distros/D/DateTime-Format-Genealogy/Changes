@@ -1,5 +1,9 @@
 Revision history for DateTime::Format::Genealogy
 
+0.04	Sat Apr  3 20:53:13 EDT 2021
+	Warn rather than die on unparseable date
+	Trap unparsable dates
+
 0.03	Fri Jun 12 20:25:09 EDT 2020
 	Added the quiet flag
 	Added the strict flag and allow long month names if not given

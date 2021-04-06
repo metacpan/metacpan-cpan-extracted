@@ -2,7 +2,7 @@ Changes
 LICENSE
 Makefile.PL
 MANIFEST
-README.pod
+README
 lib/GnuCash/SQLite.pm
 t/GnuCash-SQLite.t
 t/sample.db

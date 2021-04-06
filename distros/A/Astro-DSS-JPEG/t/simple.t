@@ -39,16 +39,71 @@ subtest '_convert_coordinates' => sub {
         },
     );
 
-    is({Astro::DSS::JPEG::_convert_coordinates(%$_)}, {ra => 6.501, dec => 15.76}, 'Converted coords')
-        for @test;
-    is(warnings {Astro::DSS::JPEG::_convert_coordinates()}, [], 'No warnings on undef');
-    is({Astro::DSS::JPEG::_convert_coordinates(dec => '-15 45 36')}, {dec => -15.76}, 'Converted negative dec');
+    is(
+        {Astro::DSS::JPEG::_convert_coordinates(%$_)},
+        {
+            ra  => 6.501,
+            dec => 15.76
+        },
+        'Converted coords'
+    ) for @test;
+    is(warnings {Astro::DSS::JPEG::_convert_coordinates()},
+        [], 'No warnings on undef');
+    is(
+        warnings {Astro::DSS::JPEG::_convert_coordinates(ra => 1)},
+        [],
+        'No warnings on undef dec'
+    );
+    is(
+        warnings {Astro::DSS::JPEG::_convert_coordinates(dec => 1)},
+        [],
+        'No warnings on undef RA'
+    );
+    is(
+        {Astro::DSS::JPEG::_convert_coordinates(ra => '-0 45 36', dec => '-15 45 36')},
+        {ra => -0.76, dec => -15.76},
+        'Converted negative coord'
+    );
 };
 
 subtest '_process_options' => sub {
-    my $default = {angular_size => 30, angular_size_y => 30, pixel_size => 1000, pixel_size_y => 1000};
+    my $default = {
+        angular_size   => 30,
+        angular_size_y => 30,
+        pixel_size     => 1000,
+        pixel_size_y   => 1000
+    };
     is({Astro::DSS::JPEG::_process_options()}, $default, 'Default options');
-    is({Astro::DSS::JPEG::_process_options(angular_size => '0x0', pixel_size => '0x0')}, $default, 'Default options');
+    is({
+            Astro::DSS::JPEG::_process_options(
+                ra    => 0,
+                dec   => 0,
+                epoch => 2000
+            )
+        },
+        {%$default, ra => 0, dec => 0, epoch => 2000},
+        'Epoch 2000 coord'
+    );
+    my %processed = Astro::DSS::JPEG::_process_options(
+        ra    => 0,
+        dec   => 0,
+        epoch => 2021
+    );
+    $processed{$_} = sprintf("%.4f",$processed{$_}) foreach qw/ra dec/;
+    is(
+        [@processed{qw/ra dec/}],
+        [23.9821, -0.1169],
+        'Correctly precessed to 2021'
+    );
+    is({
+            Astro::DSS::JPEG::_process_options(
+                angular_size => '0x0',
+                pixel_size   => '0x0'
+            )
+        },
+        $default,
+        'Default options'
+    );
     is(
         { Astro::DSS::JPEG::_process_options(angular_size => '30x60', %$_) },
         { %$default, angular_size_y => 60, pixel_size_y => 2000 },

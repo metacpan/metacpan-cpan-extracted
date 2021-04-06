@@ -2,7 +2,7 @@ package Web::Request::Role::JSON;
 
 # ABSTRACT: Make handling JSON easier in Web::Request
 
-our $VERSION = '1.007'; # VERSION
+our $VERSION = '1.008'; # VERSION
 
 use 5.010;
 use MooseX::Role::Parameterized;
@@ -93,7 +93,7 @@ Web::Request::Role::JSON - Make handling JSON easier in Web::Request
 
 =head1 VERSION
 
-version 1.007
+version 1.008
 
 =head1 SYNOPSIS
 

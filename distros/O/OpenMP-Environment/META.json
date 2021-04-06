@@ -1,0 +1,37 @@
+{
+   "abstract" : "Perl extension managing OpenMP variables in C<%ENV> within a script.",
+   "author" : [
+      "oodler577 <oodler@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.048, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OpenMP-Environment",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Validate::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.0.1"
+}
+

@@ -7,120 +7,15 @@
 
 #include <Python.h>
 #include "PerlPyErr.h"
+#include "../pycompat.h"
 #include "../lang_lock.h"
 #include "../lang_map.h"
 #include "../thrd_ctx.h"
+#include "../pyo.h"
 
 /* so we can use different typemaps for borrowed/owned obj refs */
 typedef PyObject NewPyObject;
 typedef PyObject NewPyObjectX;
-
-static int
-magic_free_pyo(pTHX_ SV *sv, MAGIC *mg)
-{
-    dCTX;
-    PyObject *pyo = INT2PTR(PyObject *, SvIV(sv));
-#ifdef REF_TRACE
-    printf("Unbind pyo %p\n", pyo);
-#endif
-    ENTER_PYTHON;
-    Py_DECREF(pyo);
-    ENTER_PERL;
-    return 0;
-}
-
-MGVTBL vtbl_free_pyo = {0, 0, 0, 0, magic_free_pyo};
-
-SV*
-newPerlPyObject_noinc(PyObject *pyo)
-{
-    SV* rv;
-    SV* sv;
-    MAGIC *mg;
-
-    ASSERT_LOCK_PERL;
-
-    if (!pyo)
-        croak("Missing pyo reference argument");
-
-    rv = newSV(0);
-
-    sv = newSVrv(rv, "Python::Object");
-    sv_setiv(sv, (IV)pyo);
-    sv_magic(sv, 0, '~', 0, 0);
-    mg = mg_find(sv, '~');
-    if (!mg) {
-        SvREFCNT_dec(rv);
-	croak("Can't assign magic to Python::Object");
-    }
-    mg->mg_virtual = &vtbl_free_pyo;
-    SvREADONLY(sv);
-#ifdef REF_TRACE
-    printf("Bind pyo %p\n", pyo);
-#endif
-
-    ASSERT_LOCK_PERL;
-
-    return rv;
-}
-
-SV*
-newPerlPyObject_inc(PyObject *pyo)
-{
-    SV* sv;
-    dCTX;
-    ASSERT_LOCK_BOTH;
-    Py_XINCREF(pyo);
-    PYTHON_UNLOCK;
-    sv = newPerlPyObject_noinc(pyo);
-    ENTER_PYTHON;
-    PERL_LOCK;
-    return sv;
-}
-
-
-static PyObject*
-PerlPyObject_pyo_or_null(SV* sv)
-{
-    MAGIC *mg;
-    ASSERT_LOCK_PERL;
-
-    if (SvROK(sv) && sv_derived_from(sv, "Python::Object")) {
-        sv = SvRV(sv);
-        mg = mg_find(sv, '~');
-        if (SvIOK(sv) && mg && mg->mg_virtual == &vtbl_free_pyo) {
-	    IV ival = SvIV(sv);
-	    return INT2PTR(PyObject *, ival);
-        }
-    }
-    return INT2PTR(PyObject *, 0);
-}
-
-
-static PyObject*
-PerlPyObject_pyo(SV* sv)
-{
-    MAGIC *mg;
-    ASSERT_LOCK_PERL;
-
-    if (SvROK(sv) && sv_derived_from(sv, "Python::Object")) {
-        sv = SvRV(sv);
-        mg = mg_find(sv, '~');
-        if (SvIOK(sv) && mg && mg->mg_virtual == &vtbl_free_pyo) {
-	    IV ival = SvIV(sv);
-	    if (!ival)
-		croak("Null Python::Object content");
-	    return INT2PTR(PyObject *, ival);
-        }
-        else
-            croak("Bad Python::Object content");
-    }
-    else
-	croak("Not a Python::Object");
-
-    /* NOT REACHED */
-    return NULL;
-}
 
 static SV*
 newPerlPyErr()
@@ -140,18 +35,18 @@ PerlPyErr_err(SV* sv)
 {
     ASSERT_LOCK_PERL;
     if (SvROK(sv) && sv_derived_from(sv, "Python::Err")) {
-	IV tmp = SvIV((SV*)SvRV(sv));
-	return INT2PTR(PerlPyErr *,tmp);
+        IV tmp = SvIV((SV*)SvRV(sv));
+        return INT2PTR(PerlPyErr *,tmp);
     }
     else
-	croak("Not a Python::Err");
+        croak("Not a Python::Err");
 
     /* NOT REACHED */
     return NULL;
 }
 
 
-void
+static void
 croak_on_py_exception()
 {
     /* Enter with python lock.
@@ -171,20 +66,20 @@ croak_on_py_exception()
 
     ENTER_PERL;
     if (py_err->type) {
-	sv_setsv(ERRSV, py_err_sv);
-	SvREFCNT_dec(py_err_sv);
-	ASSERT_LOCK_PERL;
-	croak(Nullch);
+        sv_setsv(ERRSV, py_err_sv);
+        SvREFCNT_dec(py_err_sv);
+        ASSERT_LOCK_PERL;
+        croak(Nullch);
     }
     else {
-	SvREFCNT_dec(py_err_sv);
-	ASSERT_LOCK_PERL;
-	croak("No python exception");
+        SvREFCNT_dec(py_err_sv);
+        ASSERT_LOCK_PERL;
+        croak("No python exception");
     }
 }
 
 
-MODULE = Python::Object		PACKAGE = Python
+MODULE = Python::Object        PACKAGE = Python
 
 PROTOTYPES: DISABLE
 
@@ -278,7 +173,7 @@ list(...)
          croak_on_py_exception();
      PERL_LOCK;
      for (i = 0; i < items; i++) {
-	PyList_SetItem(RETVAL, i, sv2pyo(ST(i)));
+    PyList_SetItem(RETVAL, i, sv2pyo(ST(i)));
      }
      PYTHON_UNLOCK;
      ASSERT_LOCK_PERL;
@@ -298,7 +193,7 @@ tuple(...)
          croak_on_py_exception();
      PERL_LOCK;
      for (i = 0; i < items; i++) {
-	PyTuple_SetItem(RETVAL, i, sv2pyo(ST(i)));
+    PyTuple_SetItem(RETVAL, i, sv2pyo(ST(i)));
      }
      PYTHON_UNLOCK;
      ASSERT_LOCK_PERL;
@@ -321,14 +216,14 @@ dict(...)
         PyObject *key = sv2pyo(ST(i));
         PyObject *val;
         if (i < (items-1))
-	    val = sv2pyo(ST(i+1));
-	else {
-	    if (PL_dowarn)
-		warn("Odd number of elements in dict initializer");
+        val = sv2pyo(ST(i+1));
+    else {
+        if (PL_dowarn)
+        warn("Odd number of elements in dict initializer");
             Py_INCREF(Py_None);
-	    val = Py_None;
+        val = Py_None;
         }
-	if (PyDict_SetItem(RETVAL, key, val) == -1) {
+    if (PyDict_SetItem(RETVAL, key, val) == -1) {
             Py_DECREF(RETVAL);
             PERL_UNLOCK;
             croak_on_py_exception();
@@ -353,25 +248,25 @@ PyO_transplant(self, donor)
         MAGIC *mg;
         donor = SvRV(donor);
         mg = mg_find(donor, '~');
-	if (SvIOK(donor) && mg && mg->mg_virtual == &vtbl_free_pyo) {
-	   SV* self_sv = SvRV(self);
-	   sv_setiv(self_sv, SvIV(donor));
+    if (SvIOK(donor) && mg && mg->mg_virtual == &vtbl_free_pyo) {
+       SV* self_sv = SvRV(self);
+       sv_setiv(self_sv, SvIV(donor));
            mg->mg_virtual = 0;  /* since sv_unmagic() would call it */
-	   sv_unmagic(donor, '~');
-	   SvOK_off(donor);
+       sv_unmagic(donor, '~');
+       SvOK_off(donor);
 
-	   sv_magic(self_sv, 0, '~', 0, 0);
-    	   mg = mg_find(self_sv, '~');
-	   if (!mg)
-		croak("Can't assign magic to Python::Object");
-	    mg->mg_virtual = &vtbl_free_pyo;
+       sv_magic(self_sv, 0, '~', 0, 0);
+           mg = mg_find(self_sv, '~');
+       if (!mg)
+        croak("Can't assign magic to Python::Object");
+        mg->mg_virtual = &vtbl_free_pyo;
             SvREADONLY(self_sv);
         }
         else
-	   croak("Bad donor content");
+       croak("Bad donor content");
      }
      else
-	croak("Bad donor");
+    croak("Bad donor");
 
 
 NewPyObjectX *
@@ -414,7 +309,7 @@ PyObject_SetAttr(o, attrname, v)
      Py_DECREF(py_attrname);
      Py_DECREF(py_v);
      if (RETVAL == -1)
-     	croak_on_py_exception();
+         croak_on_py_exception();
      ENTER_PERL;
    OUTPUT:
      RETVAL
@@ -435,7 +330,7 @@ PyObject_DelAttr(o, attrname)
      RETVAL = PyObject_DelAttr(o, py_attrname);
      Py_DECREF(py_attrname);
      if (RETVAL == -1)
-     	croak_on_py_exception();
+         croak_on_py_exception();
      ENTER_PERL;
    OUTPUT:
      RETVAL
@@ -470,21 +365,21 @@ PyObject_GetItem(o, key)
      ASSERT_LOCK_PERL;
      ENTER_PYTHON;
      if (PyList_Check(o) || PyTuple_Check(o)) {
-	  int index;
-	  ENTER_PERL;
-	  index = SvIV(key);
-	  ENTER_PYTHON;
-	  RETVAL = PySequence_GetItem(o, index);
+        int index;
+        ENTER_PERL;
+        index = SvIV(key);
+        ENTER_PYTHON;
+        RETVAL = PySequence_GetItem(o, index);
      }
      else {
-	  PERL_LOCK;
+      PERL_LOCK;
           py_key = sv2pyo(key);
           PERL_UNLOCK;
           RETVAL = PyObject_GetItem(o, py_key);
           Py_DECREF(py_key);
      }
      if (!RETVAL)
-     	croak_on_py_exception();
+         croak_on_py_exception();
    OUTPUT:
      RETVAL
 
@@ -504,11 +399,11 @@ PyObject_SetItem(o, key, v)
      py_v   = sv2pyo(v);
      PERL_UNLOCK;
      if (PyList_Check(o) || PyTuple_Check(o)) {
-	  int index;
-	  ENTER_PERL;
-	  index = SvIV(key);
-	  ENTER_PYTHON;
-	  RETVAL = PySequence_SetItem(o, index, py_v);
+      int index;
+      ENTER_PERL;
+      index = SvIV(key);
+      ENTER_PYTHON;
+      RETVAL = PySequence_SetItem(o, index, py_v);
      }
      else {
           PERL_LOCK;
@@ -519,7 +414,7 @@ PyObject_SetItem(o, key, v)
      }
      Py_DECREF(py_v);
      if (RETVAL == -1)
-     	croak_on_py_exception();
+         croak_on_py_exception();
      ENTER_PERL;
    OUTPUT:
      RETVAL
@@ -535,11 +430,11 @@ PyObject_DelItem(o, key)
      ASSERT_LOCK_PERL;
      ENTER_PYTHON;
      if (PyList_Check(o) || PyTuple_Check(o)) {
-	  int index;
-	  ENTER_PERL;
-	  index = SvIV(key);
-	  ENTER_PYTHON;
-	  RETVAL = PySequence_DelItem(o, index);
+        int index;
+        ENTER_PERL;
+        index = SvIV(key);
+        ENTER_PYTHON;
+        RETVAL = PySequence_DelItem(o, index);
      }
      else {
           PERL_LOCK;
@@ -549,23 +444,24 @@ PyObject_DelItem(o, key)
           Py_DECREF(py_key);
      }
      if (RETVAL == -1)
-     	croak_on_py_exception();
+         croak_on_py_exception();
      ENTER_PERL;
    OUTPUT:
      RETVAL
 
 int
-PyObject_Compare(o1, o2)
+PyObject_RichCompareBool(o1, o2, opid)
      PyObject *o1
      PyObject *o2
+     int opid
    PREINIT:
      dCTX;
    CODE:
      ASSERT_LOCK_PERL;
      ENTER_PYTHON;
-     RETVAL = PyObject_Compare(o1, o2);
+     RETVAL = PyObject_RichCompareBool(o1, o2, opid);
      if (RETVAL == -1 && PyErr_Occurred())
-	croak_on_py_exception();
+    croak_on_py_exception();
      ENTER_PERL;
    OUTPUT:
      RETVAL
@@ -580,7 +476,7 @@ PyObject_Hash(o)
      ENTER_PYTHON;
      RETVAL = PyObject_Hash(o);
      if (RETVAL == -1)
-	croak_on_py_exception();
+    croak_on_py_exception();
      ENTER_PERL;
    OUTPUT:
      RETVAL
@@ -604,7 +500,7 @@ PyObject_Length(o)
      ENTER_PYTHON;
      RETVAL = PyObject_Length(o);
      if (RETVAL == -1)
-	croak_on_py_exception();
+    croak_on_py_exception();
      ENTER_PERL;
    OUTPUT:
      RETVAL
@@ -652,12 +548,12 @@ PyObject_Str(o,...)
      ENTER_PYTHON;
      str_o = (ix == 1) ? PyObject_Str(o) : PyObject_Repr(o);
      PERL_LOCK;
-     if (str_o && PyString_Check(str_o)) {
-	RETVAL = newSVpvn(PyString_AsString(str_o),
-			  PyString_Size(str_o));	
+     if (str_o && PyUnicode_Check(str_o)) {
+    RETVAL = newSVpvn(PyUnicode_AsUTF8(str_o),
+              PyUnicode_GetLength(str_o));
      }
      else {
-	RETVAL = newSV(0);
+    RETVAL = newSV(0);
      }
      Py_XDECREF(str_o);
      PYTHON_UNLOCK;
@@ -674,11 +570,11 @@ PyRun_SimpleString(str)
      ASSERT_LOCK_PERL;
      ENTER_PYTHON;
      if (PyRun_SimpleString(str) == -1) {
-	/* There is no way to get at the python exception when using
-	 * this entry point to the API
-	 */
-	ENTER_PERL;
-	croak("PyRun_SimpleString failed");
+    /* There is no way to get at the python exception when using
+     * this entry point to the API
+     */
+    ENTER_PERL;
+    croak("PyRun_SimpleString failed");
      }
      ENTER_PERL;
 
@@ -693,42 +589,43 @@ eval(str,...)
      PyObject *globals = 0;
      PyObject *locals = 0;
    CODE:
+     fflush(stdout);
      ENTER_PYTHON;
      if (items > 1) {
-	globals = PerlPyObject_pyo(ST(1));
+        globals = PerlPyObject_pyo(ST(1));
         if (items > 2) {
-	    locals = PerlPyObject_pyo(ST(2));
-	    if (items > 3) {
+            locals = PerlPyObject_pyo(ST(2));
+            if (items > 3) {
                 ENTER_PERL;
-		croak("Too many arguments");
+                croak("Too many arguments");
             }
         }
      }
      if (!globals) {
-	PyObject *m = PyImport_AddModule("__main__");
-	if (m == NULL)
-	    croak_on_py_exception();
-	globals = PyModule_GetDict(m);
+        PyObject *m = PyImport_AddModule("__main__");
+        if (m == NULL)
+            croak_on_py_exception();
+        globals = PyModule_GetDict(m);
      }
      if (!locals)
         locals = globals;
 
      if (!PyDict_Check(locals) || !PyDict_Check(globals))
      {
-	ENTER_PERL;
-	croak("The 2nd and 3rd argument must be dictionaries");
+        ENTER_PERL;
+        croak("The 2nd and 3rd argument must be dictionaries");
      }
 
      if (PyDict_GetItemString(globals, "__builtins__") == NULL) {
-	   if (PyDict_SetItemString(globals, "__builtins__",
-			            PyEval_GetBuiltins()) != 0)
-	       croak_on_py_exception();
+       if (PyDict_SetItemString(globals, "__builtins__",
+                        PyEval_GetBuiltins()) != 0)
+           croak_on_py_exception();
      }
 
      RETVAL = PyRun_String(str, (ix == 1) ? Py_eval_input : Py_file_input,
-	                   globals, locals);
+                       globals, locals);
      if (!RETVAL)
-	croak_on_py_exception();
+    croak_on_py_exception();
    OUTPUT:
      RETVAL
      
@@ -744,8 +641,8 @@ PyObject_CallObject(o, ...)
      ASSERT_LOCK_PERL;
      ENTER_PYTHON;
      if (!PyCallable_Check(o)) {
-	ENTER_PERL;
-	croak("Can't call a non-callable object");
+        ENTER_PERL;
+        croak("Can't call a non-callable object");
      }
 
      if (items > 1) {
@@ -759,164 +656,162 @@ PyObject_CallObject(o, ...)
      RETVAL = PyObject_CallObject(o, args);
      Py_XDECREF(args);
      if (!RETVAL)
-     	croak_on_py_exception();
+         croak_on_py_exception();
    OUTPUT:
      RETVAL
 
 NewPyObjectX *
 PyEval_CallObjectWithKeywords(o,...)
-     PyObject *o
-   PREINIT:
-     dCTX;
-     PyObject *alist = NULL;
-     PyObject *kwdict = NULL;
+    PyObject *o
+    PREINIT:
+        dCTX;
+        PyObject *alist = NULL;
+        PyObject *kwdict = NULL;
 
-     PyObject *t1 = NULL;
-     PyObject *t2 = NULL;
-   CODE:
-     ASSERT_LOCK_PERL;
-     if (items > 3) {
-	croak("Too many arguments");
-     }
+        PyObject *t1 = NULL;
+        PyObject *t2 = NULL;
+    CODE:
+        ASSERT_LOCK_PERL;
+        if (items > 3) {
+            croak("Too many arguments");
+        }
 
-     RETVAL = NULL;
+        RETVAL = NULL;
 
-     if (items >= 2) {
-         /* make a tuple out of ST(1) */
-	 alist = PerlPyObject_pyo_or_null(ST(1));
-	 if (alist) {
-	    ENTER_PYTHON;
-	    if (!PyTuple_Check(alist)) {
-		if (!PySequence_Check(alist)) {
-		    PyErr_SetString(PyExc_TypeError,
-				    "2nd argument must be a sequence");
-	            goto done;
-                }
-		t1 = PySequence_Tuple(alist);
-		if (t1 == NULL)
-                    goto done;
-		alist = t1;
-	    }
-	    ENTER_PERL;
-         }
-	 else {
-            SV* sv = ST(1);
-            if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
-		AV* av = (AV*)SvRV(sv);
-		int alen = av_len(av) + 1;
-		int i;
-
-		ENTER_PYTHON;
-		t1 = PyTuple_New(alen);
-		if (t1 == NULL)
-		    goto done;
-
-                ENTER_PERL;
-		for (i = 0; i < items; i++) {
-		    SV** svp;
-                    ASSERT_LOCK_PERL;
-		    svp = av_fetch(av, i, 0);
-		    if (svp) {
-		        PyObject *item;
-
-                        PYTHON_LOCK;
-                        item = sv2pyo(*svp);
-
-                        PERL_UNLOCK;
-     			PyTuple_SetItem(t1, i, item);
-
-			ENTER_PERL;
+        if (items >= 2) {
+            /* make a tuple out of ST(1) */
+            alist = PerlPyObject_pyo_or_null(ST(1));
+            if (alist) {
+                ENTER_PYTHON;
+                if (!PyTuple_Check(alist)) {
+                    if (!PySequence_Check(alist)) {
+                        PyErr_SetString(PyExc_TypeError, "2nd argument must be a sequence");
+                        goto done;
                     }
-		}
-		alist = t1;
-	    }
-	    else if (SvOK(sv)) {  /* not an array */
-		croak("2nd argument must be an array reference");
-            }
-         }
-     }
-     if (items == 3) {
-        /* make a dict out of ST(2) */
-	 kwdict = PerlPyObject_pyo_or_null(ST(2));
-	 if (kwdict) {
-	    ENTER_PYTHON;
-	    if (!PyDict_Check(alist)) { 
-            }
-	    ENTER_PERL;
-         }
-	 else {
-            SV* sv = ST(2);
-            if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVHV) {
-		HV* hv = (HV*)SvRV(sv);
-		HE* entry;
-
-		ENTER_PYTHON;
-                t2 =  PyDict_New();
-		if (t2 == NULL)
-		    goto done;
-
+                    t1 = PySequence_Tuple(alist);
+                    if (t1 == NULL)
+                        goto done;
+                    alist = t1;
+                }
                 ENTER_PERL;
-		hv_iterinit(hv);
-		while( (entry = hv_iternext(hv))) {
-		    PyObject *key;
-		    PyObject *val;
-
-                    I32 klen;
-                    char *kstr;
-                    SV* val_sv;
-
-                    ASSERT_LOCK_PERL;
-                    kstr = hv_iterkey(entry, &klen);
-                    val_sv = hv_iterval(hv, entry);
+            }
+            else {
+                SV* sv = ST(1);
+                if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV) {
+                    AV* av = (AV*)SvRV(sv);
+                    int alen = av_len(av) + 1;
+                    int i;
 
                     ENTER_PYTHON;
-                    key = PyString_FromStringAndSize(kstr, klen);
-                    if (key == NULL)
-			goto done;
+                    t1 = PyTuple_New(alen);
+                    if (t1 == NULL)
+                        goto done;
 
-                    PERL_LOCK;
-                    val = sv2pyo(val_sv);
-                    PERL_UNLOCK;
-
-		    if (PyDict_SetItem(t2, key, val) == -1)
-			goto done;
                     ENTER_PERL;
-                }
-		kwdict = t2;
-	    }
-	    else if (SvOK(sv)) {  /* not a hash */
-                ENTER_PYTHON;
-		PyErr_SetString(PyExc_TypeError,
-				"3rd argument must be a hash reference");
-	        goto done;
-            }
-         }
-     }
+                    for (i = 0; i < items; i++) {
+                        SV** svp;
+                        ASSERT_LOCK_PERL;
+                        svp = av_fetch(av, i, 0);
+                        if (svp) {
+                            PyObject *item;
 
-     ENTER_PYTHON;
-     RETVAL = PyEval_CallObjectWithKeywords(o, alist, kwdict);
-   done:
-     Py_XDECREF(t1);
-     Py_XDECREF(t2);
-     if (!RETVAL)
-	croak_on_py_exception();
-   OUTPUT:
-     RETVAL
+                            PYTHON_LOCK;
+                            item = sv2pyo(*svp);
+
+                            PERL_UNLOCK;
+                            PyTuple_SetItem(t1, i, item);
+
+                            ENTER_PERL;
+                        }
+                    }
+                    alist = t1;
+                }
+                else if (SvOK(sv)) {  /* not an array */
+                    croak("2nd argument must be an array reference");
+                }
+            }
+        }
+        if (items == 3) {
+            /* make a dict out of ST(2) */
+            kwdict = PerlPyObject_pyo_or_null(ST(2));
+            if (kwdict) {
+                ENTER_PYTHON;
+                if (!PyDict_Check(alist)) { 
+                }
+                ENTER_PERL;
+            }
+            else {
+                SV* sv = ST(2);
+                if (SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVHV) {
+                    HV* hv = (HV*)SvRV(sv);
+                    HE* entry;
+
+                    ENTER_PYTHON;
+                    t2 =  PyDict_New();
+                    if (t2 == NULL)
+                        goto done;
+
+                    ENTER_PERL;
+                    hv_iterinit(hv);
+                    while( (entry = hv_iternext(hv))) {
+                        PyObject *key;
+                        PyObject *val;
+
+                        I32 klen;
+                        char *kstr;
+                        SV* val_sv;
+
+                        ASSERT_LOCK_PERL;
+                        kstr = hv_iterkey(entry, &klen);
+                        val_sv = hv_iterval(hv, entry);
+
+                        ENTER_PYTHON;
+                        key = PyUnicode_FromStringAndSize(kstr, klen);
+                        if (key == NULL)
+                            goto done;
+
+                        PERL_LOCK;
+                        val = sv2pyo(val_sv);
+                        PERL_UNLOCK;
+
+                        if (PyDict_SetItem(t2, key, val) == -1)
+                            goto done;
+                        ENTER_PERL;
+                    }
+                    kwdict = t2;
+                }
+                else if (SvOK(sv)) {  /* not a hash */
+                    ENTER_PYTHON;
+                    PyErr_SetString(PyExc_TypeError, "3rd argument must be a hash reference");
+                    goto done;
+                }
+            }
+        }
+
+        ENTER_PYTHON;
+        RETVAL = PyEval_CallObjectWithKeywords(o, alist, kwdict);
+        done:
+            Py_XDECREF(t1);
+            Py_XDECREF(t2);
+            if (!RETVAL)
+        croak_on_py_exception();
+    OUTPUT:
+        RETVAL
 
 NewPyObject *
 PyImport_ImportModule(name)
-     char* name
-   PREINIT:
-     dCTX;
-   CODE:
-     ASSERT_LOCK_PERL;
-     ENTER_PYTHON;
-     RETVAL = PyImport_ImportModule(name);
-     if (!RETVAL)
-	croak_on_py_exception();
-     ENTER_PERL;
-   OUTPUT:
-     RETVAL
+    char* name
+    PREINIT:
+        dCTX;
+    CODE:
+        ASSERT_LOCK_PERL;
+        ENTER_PYTHON;
+        RETVAL = PyImport_ImportModule(name);
+        if (!RETVAL)
+            croak_on_py_exception();
+        ENTER_PERL;
+    OUTPUT:
+        RETVAL
 
 int
 PyNumber_Check(o)
@@ -977,73 +872,73 @@ PyCallable_Check(o)
 
 void
 raise(type, value)
-	SV* type
-	SV* value
+    SV* type
+    SV* value
       PREINIT:
         dCTX;
-	PyObject *type_pyo;
-	PyObject *value_pyo;
+    PyObject *type_pyo;
+    PyObject *value_pyo;
       CODE:
         ASSERT_LOCK_PERL;
-	PYTHON_LOCK;
-	type_pyo = sv2pyo(type);
-	value_pyo = sv2pyo(value);
-	PERL_UNLOCK;
-	PyErr_SetObject(type_pyo, value_pyo);
-	croak_on_py_exception();
+    PYTHON_LOCK;
+    type_pyo = sv2pyo(type);
+    value_pyo = sv2pyo(value);
+    PERL_UNLOCK;
+    PyErr_SetObject(type_pyo, value_pyo);
+    croak_on_py_exception();
 
 BOOT:
 #ifdef BOOT_FROM_PERL
-	Py_Initialize();
-	initperl();
-	{
-	    dCTX;
-	    PYTHON_UNLOCK;
-	}
+    Py_Initialize();
+    PyInit_perl();
+    {
+        dCTX;
+        PYTHON_UNLOCK;
+    }
 #endif
 
 
-MODULE = Python::Object		PACKAGE = Python::Err
+MODULE = Python::Object        PACKAGE = Python::Err
 
 NewPyObject*
 type(self)
-	PerlPyErr *self
+    PerlPyErr *self
       ALIAS:
-	Python::Err::type      = 1
-	Python::Err::value     = 2
-	Python::Err::traceback = 3
+    Python::Err::type      = 1
+    Python::Err::value     = 2
+    Python::Err::traceback = 3
       PREINIT:
         dCTX;
       CODE:
         ASSERT_LOCK_PERL;
-	switch (ix) {
-	case 1:	RETVAL = self->type;      break;
-	case 2:	RETVAL = self->value;     break;
-	case 3:	RETVAL = self->traceback; break;
-	default: croak("Unknown attribute (%d)", ix);
+    switch (ix) {
+    case 1:    RETVAL = self->type;      break;
+    case 2:    RETVAL = self->value;     break;
+    case 3:    RETVAL = self->traceback; break;
+    default: croak("Unknown attribute (%d)", (int)ix);
         }
         ENTER_PYTHON;
         Py_XINCREF(RETVAL);
         ENTER_PERL;
       OUTPUT:
-	RETVAL
+    RETVAL
 
 SV*
 as_string(self,...)
-	PerlPyErr *self
+    PerlPyErr *self
         # ... because stringify overloading provide additional arguments
       PREINIT:
         dCTX;
-	PyObject *str;
+    PyObject *str;
       CODE:
         ASSERT_LOCK_PERL;
         ENTER_PYTHON;
-	str = PyObject_Str(self->type);
+    str = PyObject_Str(self->type);
         PERL_LOCK;
-	RETVAL = newSVpv("", 0);
-        if (str && PyString_Check(str)) {
-	    sv_catpv(RETVAL, "python.");
-            sv_catpv(RETVAL, PyString_AsString(str));
+    RETVAL = newSVpv("", 0);
+        if (str && PyUnicode_Check(str)) {
+        sv_catpv(RETVAL, "python.");
+            sv_catpv(RETVAL, PyUnicode_AsUTF8(str));
         }
         else
             sv_catpv(RETVAL, "python");
@@ -1053,137 +948,135 @@ as_string(self,...)
 
         if (self->value &&
             (str = PyObject_Str(self->value)) &&
-            PyString_Check(str))
+            PyUnicode_Check(str))
         {
-	    PERL_LOCK;
+        PERL_LOCK;
             sv_catpv(RETVAL, ": ");
-            sv_catpv(RETVAL, PyString_AsString(str));
+            sv_catpv(RETVAL, PyUnicode_AsUTF8(str));
             PERL_UNLOCK;
         }
         Py_XDECREF(str);
         ENTER_PERL;
-	if (*SvEND(RETVAL) != '\n')
-	    sv_catpvn(RETVAL, "\n", 1);
+    if (*SvEND(RETVAL) != '\n')
+        sv_catpvn(RETVAL, "\n", 1);
       OUTPUT:
-	RETVAL
+    RETVAL
 
 int
 as_bool(self,...)
-	PerlPyErr *self
+    PerlPyErr *self
         # ... because bool overloading provide additional arguments
       CODE:
         ASSERT_LOCK_PERL;
-	RETVAL = 1;
+    RETVAL = 1;
       OUTPUT:
         RETVAL
 
 void
 DESTROY(self)
-	PerlPyErr *self
+    PerlPyErr *self
       PREINIT:
         dCTX;
       CODE:
-	/* printf("Destructing Python::Err %p\n", self); */
-	ASSERT_LOCK_PERL;
-	ENTER_PYTHON;
-	Py_XDECREF(self->type);
-	Py_XDECREF(self->value);
-	Py_XDECREF(self->traceback);
-	ENTER_PERL;
-	Safefree(self);
-	ASSERT_LOCK_PERL;
+    /* printf("Destructing Python::Err %p\n", self); */
+    ASSERT_LOCK_PERL;
+    ENTER_PYTHON;
+    Py_XDECREF(self->type);
+    Py_XDECREF(self->value);
+    Py_XDECREF(self->traceback);
+    ENTER_PERL;
+    Safefree(self);
+    ASSERT_LOCK_PERL;
 
 SV*
 Exception(...)
       ALIAS:
-	Python::Err::Exception = 1
-	Python::Err::StandardError = 2
-	Python::Err::ArithmeticError = 3
-	Python::Err::LookupError = 4
-	Python::Err::AssertionError = 5
-	Python::Err::AttributeError = 6
-	Python::Err::EOFError = 7
-	Python::Err::FloatingPointError = 8
-	Python::Err::EnvironmentError = 9
-	Python::Err::IOError = 10
-	Python::Err::OSError = 11
-	Python::Err::ImportError = 12
-	Python::Err::IndexError = 13
-	Python::Err::KeyError = 14
-	Python::Err::KeyboardInterrupt = 15
-	Python::Err::MemoryError = 16
-	Python::Err::NameError = 17
-	Python::Err::OverflowError = 18
-	Python::Err::RuntimeError = 19
-	Python::Err::NotImplementedError = 20
-	Python::Err::SyntaxError = 21
-	Python::Err::SystemError = 22
-	Python::Err::SystemExit = 23
-	Python::Err::TypeError = 24
-	Python::Err::UnboundLocalError = 25
-	Python::Err::UnicodeError = 26
-	Python::Err::ValueError = 27
-	Python::Err::ZeroDivisionError = 28
+    Python::Err::Exception = 1
+    Python::Err::ArithmeticError = 2
+    Python::Err::LookupError = 3
+    Python::Err::AssertionError = 4
+    Python::Err::AttributeError = 5
+    Python::Err::EOFError = 6
+    Python::Err::FloatingPointError = 7
+    Python::Err::EnvironmentError = 8
+    Python::Err::IOError = 9
+    Python::Err::OSError = 10
+    Python::Err::ImportError = 11
+    Python::Err::IndexError = 12
+    Python::Err::KeyError = 13
+    Python::Err::KeyboardInterrupt = 14
+    Python::Err::MemoryError = 15
+    Python::Err::NameError = 16
+    Python::Err::OverflowError = 17
+    Python::Err::RuntimeError = 18
+    Python::Err::NotImplementedError = 19
+    Python::Err::SyntaxError = 20
+    Python::Err::SystemError = 21
+    Python::Err::SystemExit = 22
+    Python::Err::TypeError = 23
+    Python::Err::UnboundLocalError = 24
+    Python::Err::UnicodeError = 25
+    Python::Err::ValueError = 26
+    Python::Err::ZeroDivisionError = 27
       PREINIT:
         dCTX;
-	PyObject* e;
+    PyObject* e;
       CODE:
         ASSERT_LOCK_PERL;
         if (items > 1)
-	    croak("Usage: Python::Err:Exception( [ OBJ ] )");
-	switch (ix) {
-	case  1: e = PyExc_Exception; break;
-	case  2: e = PyExc_StandardError; break;
-	case  3: e = PyExc_ArithmeticError; break;
-	case  4: e = PyExc_LookupError; break;
-	case  5: e = PyExc_AssertionError; break;
-	case  6: e = PyExc_AttributeError; break;
-	case  7: e = PyExc_EOFError; break;
-	case  8: e = PyExc_FloatingPointError; break;
-	case  9: e = PyExc_EnvironmentError; break;
-	case 10: e = PyExc_IOError; break;
-	case 11: e = PyExc_OSError; break;
-	case 12: e = PyExc_ImportError; break;
-	case 13: e = PyExc_IndexError; break;
-	case 14: e = PyExc_KeyError; break;
-	case 15: e = PyExc_KeyboardInterrupt; break;
-	case 16: e = PyExc_MemoryError; break;
-	case 17: e = PyExc_NameError; break;
-	case 18: e = PyExc_OverflowError; break;
-	case 19: e = PyExc_RuntimeError; break;
-	case 20: e = PyExc_NotImplementedError; break;
-	case 21: e = PyExc_SyntaxError; break;
-	case 22: e = PyExc_SystemError; break;
-	case 23: e = PyExc_SystemExit; break;
-	case 24: e = PyExc_TypeError; break;
+        croak("Usage: Python::Err:Exception( [ OBJ ] )");
+    switch (ix) {
+    case  1: e = PyExc_Exception; break;
+    case  2: e = PyExc_ArithmeticError; break;
+    case  3: e = PyExc_LookupError; break;
+    case  4: e = PyExc_AssertionError; break;
+    case  5: e = PyExc_AttributeError; break;
+    case  6: e = PyExc_EOFError; break;
+    case  7: e = PyExc_FloatingPointError; break;
+    case  8: e = PyExc_EnvironmentError; break;
+    case  9: e = PyExc_IOError; break;
+    case 10: e = PyExc_OSError; break;
+    case 11: e = PyExc_ImportError; break;
+    case 12: e = PyExc_IndexError; break;
+    case 13: e = PyExc_KeyError; break;
+    case 14: e = PyExc_KeyboardInterrupt; break;
+    case 15: e = PyExc_MemoryError; break;
+    case 16: e = PyExc_NameError; break;
+    case 17: e = PyExc_OverflowError; break;
+    case 18: e = PyExc_RuntimeError; break;
+    case 19: e = PyExc_NotImplementedError; break;
+    case 20: e = PyExc_SyntaxError; break;
+    case 21: e = PyExc_SystemError; break;
+    case 22: e = PyExc_SystemExit; break;
+    case 23: e = PyExc_TypeError; break;
 #if PY_MAJOR_VERSION >= 1 && PY_MINOR_VERSION >= 6
-	case 25: e = PyExc_UnboundLocalError; break;
-	case 26: e = PyExc_UnicodeError; break;
+    case 24: e = PyExc_UnboundLocalError; break;
+    case 25: e = PyExc_UnicodeError; break;
 #endif
-	case 27: e = PyExc_ValueError; break;
-	case 28: e = PyExc_ZeroDivisionError; break;
-	default: croak("Bad exception selector (%d)", ix); break;
-	}
-	if (items) {
+    case 26: e = PyExc_ValueError; break;
+    case 27: e = PyExc_ZeroDivisionError; break;
+    default: croak("Bad exception selector (%d)", (int)ix); break;
+    }
+    if (items) {
             SV* argsv = ST(0);
-	    PyObject* arg;
+        PyObject* arg;
             if (SvROK(argsv) && sv_derived_from(argsv, "Python::Err")) {
-	        arg = PerlPyErr_err(argsv)->type;
+            arg = PerlPyErr_err(argsv)->type;
              }
              else {
-		arg = PerlPyObject_pyo_or_null(argsv);
+        arg = PerlPyObject_pyo_or_null(argsv);
              }
             /* XXX should actually do a ISA test here */
-	    RETVAL = boolSV(arg == e);
-	}
-	else {
-	    PYTHON_LOCK;
-	    RETVAL = newPerlPyObject_inc(e);
-	    PYTHON_UNLOCK;
+        RETVAL = boolSV(arg == e);
+    }
+    else {
+        PYTHON_LOCK;
+        RETVAL = newPerlPyObject_inc(e);
+        PYTHON_UNLOCK;
         }
-	ASSERT_LOCK_PERL;
+    ASSERT_LOCK_PERL;
       OUTPUT:
-	RETVAL
+    RETVAL
 
 
-MODULE = Python::Object		PACKAGE = Python::Object
+MODULE = Python::Object        PACKAGE = Python::Object

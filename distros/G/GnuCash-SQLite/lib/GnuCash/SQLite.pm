@@ -19,7 +19,7 @@ use Path::Tiny;
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
     my $class = shift;
@@ -133,7 +133,7 @@ sub _node_bal {
     my $self = shift;
     my $guid = shift;
 
-    my $sql = "SELECT SUM(value_num/(value_denom*1.0)) FROM splits "
+    my $sql = "SELECT printf('%.2f',SUM(value_num/(value_denom*1.0))) FROM splits "
             . "WHERE account_guid = ?";
     return $self->_runsql($sql,$guid)->[0][0] || 0;
 }
@@ -390,6 +390,10 @@ review and contribution under the terms of the license.
     <https://github.com/hoekit/GnuCash-SQLite>
 
     git clone git@github.com:hoekit/GnuCash-SQLite.git
+
+=head1 CREDITS
+
+Credit goes to L<Sawyer X|https://metacpan.org/author/XSAWYERX> for bug fixes.
 
 =head1 AUTHOR
 

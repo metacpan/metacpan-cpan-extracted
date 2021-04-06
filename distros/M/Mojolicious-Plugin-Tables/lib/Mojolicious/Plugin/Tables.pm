@@ -6,7 +6,7 @@ use File::Spec::Functions 'catdir';
 
 use Mojolicious::Plugin::Tables::Model;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -90,21 +90,23 @@ sub register {
     my $r = $app->routes;
     $r->get('/' => sub{shift->redirect_to('tables')}) unless $conf->{nohome};
 
-    my $crud_gets  = [qw/view edit del nuke navigate/];
-    my $crud_posts = [qw/save/];
+    my @crud_gets  = (qw/view edit del nuke navigate/);
+    my @crud_posts = (qw/save/);
+    my $fmts       = [format=>[qw/html json/]];
 
-    for ($r->under('tables')                   ->to('auth#ok'   )) {
-        for ($_->under()                       ->to('tables#ok' )) {
-            $_->get                            ->to('#page'     );
-            for ($_->under(':table')           ->to('#table_ok' )) {
-                $_->any                        ->to('#table'    );
-                $_->get('add')                 ->to('#add'      );
-                $_->post('save')               ->to('#save'     );
-                for ($_->under(':id')          ->to('#id_ok'    )) {
-                    $_->get(':action'=>[action=>$crud_gets]     );
-                    $_->post(':action'=>[action=>$crud_posts]   );
-                    $_->get('add_child/:child')->to('#view'     );
-                    $_->any(':children')       ->to('#children' );
+    for ($r->under('tables')                          ->to('auth#ok'   )) {
+        for ($_->under()                              ->to('tables#ok' )) {
+            $_->get                                   ->to('#page'     );
+            for ($_->under(':table')                  ->to('#table_ok' )) {
+                $_->any('/'=>$fmts)                   ->to('#table', format=>'html' );
+                $_->get('add')                        ->to('#add'      );
+                $_->post('save')                      ->to('#save'     );
+                for ($_->under(':id')                 ->to('#id_ok'    )) {
+                    my $r = $_;
+                    $r->get( $_=>$fmts)               ->to("#$_", format=>'html') for @crud_gets;
+                    $r->post($_=>$fmts)               ->to("#$_", format=>'html') for @crud_posts;
+                    $r->get('add_child/:child'=>$fmts)->to('#view', format=>'html'     );
+                    $r->any(':children'=>$fmts)       ->to('#children', format=>'html' );
                 }
             }
         }

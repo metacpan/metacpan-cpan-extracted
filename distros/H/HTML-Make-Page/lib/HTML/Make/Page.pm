@@ -9,7 +9,7 @@ our @EXPORT_OK = qw/make_page/;
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use HTML::Make '0.15';
 
 sub add_meta
@@ -99,27 +99,7 @@ sub make_page
 	delete $options{css};
     }
     if ($options{js}) {
-	my $i = -1;
-	for my $js (@{$options{js}}) {
-	    $i++;
-	    if (ref $js eq 'HASH') {
-		if (! $js->{src}) {
-		    if (! $quiet) {
-			carp "No src specified for js element $i";
-		    }
-		    next;
-		}
-		$head->push ('script', attr => $js);
-	    }
-	    else {
-		$head->push (
-		    'script',
-		    attr => {
-			src => $js,
-		    },
-		)
-	    }
-	}
+	add_js ($head, $options{js}, $quiet);
 	delete $options{js};
     }
     if ($options{title}) {
@@ -151,6 +131,35 @@ sub make_page
     }
     my $body = $html->push ('body');
     return ($html, $body);
+}
+
+sub add_js
+{
+    my ($head, $jss, $quiet) = @_;
+    my $i = -1;
+    for my $js (@$jss) {
+	$i++;
+	if (ref $js eq 'HASH') {
+	    if ($js->{src}) {
+		$head->push ('script', attr => $js);
+		next;
+	    }
+	    if ($js->{text}) {
+		$head->push ('script', text => $js->{text});
+		next;
+	    }
+	    if (! $quiet) {
+		carp "No src or text specified for js element $i";
+	    }
+	    next;
+	}
+	$head->push (
+	    'script',
+	    attr => {
+		src => $js,
+	    },
+	);
+    }
 }
 
 1;

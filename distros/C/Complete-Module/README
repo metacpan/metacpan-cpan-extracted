@@ -2,8 +2,8 @@ NAME
     Complete::Module - Complete with installed Perl module names
 
 VERSION
-    This document describes version 0.260 of Complete::Module (from Perl
-    distribution Complete-Module), released on 2017-09-08.
+    This document describes version 0.262 of Complete::Module (from Perl
+    distribution Complete-Module), released on 2021-02-06.
 
 SYNOPSIS
      use Complete::Module qw(complete_module);
@@ -60,6 +60,10 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   exclude_dir => *bool*
+
+    *   exclude_leaf => *bool*
+
     *   find_pm => *bool* (default: 1)
 
         Whether to find .pm files.
@@ -76,7 +80,7 @@ FUNCTIONS
 
         Whether to find module prefixes.
 
-    *   ns_prefix => *str*
+    *   ns_prefix => *perl::modname*
 
         Namespace prefix.
 
@@ -85,6 +89,13 @@ FUNCTIONS
         to "Dist::Zilla::Plugin" (or "Dist::Zilla::Plugin::") and word is
         "F", you can get "['FakeRelease', 'FileFinder::', 'FinderCode']"
         (those are modules under the "Dist::Zilla::Plugin::" namespace).
+
+    *   ns_prefixes => *array[perl::modname]*
+
+        Namespace prefixes.
+
+        If you specify this instead of "ns_prefix", then the routine will
+        search from all the prefixes instead of just one.
 
     *   path_sep => *str*
 
@@ -95,6 +106,10 @@ FUNCTIONS
         "::" then will default to "/". This is because "::" (contains colon)
         is rather problematic as it is by default a word-break character in
         bash and the word needs to be quoted to avoid word-breaking by bash.
+
+    *   recurse => *bool*
+
+    *   recurse_matching => *str* (default: "level-by-level")
 
     *   word* => *str* (default: "")
 
@@ -123,7 +138,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Module>
+    <https://github.com/perlancar/perl-Complete-Module/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -135,7 +150,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2017, 2015, 2014 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

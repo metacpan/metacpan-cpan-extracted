@@ -32,14 +32,14 @@ requires:
   Filename::Archive: '0'
   Filename::Executable: '0'
   HTTP::Request: '0'
-  IPC::System::Options: '0.335'
+  IPC::System::Options: '0.339'
   LWP::UserAgent: '0'
-  Log::ger: '0.037'
+  Log::ger: '0.038'
   Module::List::Tiny: '0'
   PERLANCAR::File::HomeDir: '0'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLineX::CommonOptions::SelfUpgrade: '0.003'
-  Perinci::Object: '0.310'
+  Perinci::Object: '0.311'
   PerlX::Maybe: '0'
   Sah::Schema::dirname: '0'
   Sah::Schema::software::arch: '0'
@@ -51,10 +51,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-instopt
+  bugtracker: https://github.com/perlancar/perl-App-instopt/issues
   homepage: https://metacpan.org/release/App-instopt
   repository: git://github.com/perlancar/perl-App-instopt.git
-version: '0.016'
+version: '0.017'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -134,7 +134,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.602'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -150,7 +150,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.040'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'

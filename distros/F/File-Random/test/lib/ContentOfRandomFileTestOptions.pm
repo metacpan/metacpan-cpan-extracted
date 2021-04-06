@@ -1,4 +1,5 @@
-package ContentOfRandomFileTestOptions;
+package
+    ContentOfRandomFileTestOptions;
 use base qw/RandomFileMethodAllTests/;
 
 use strict;

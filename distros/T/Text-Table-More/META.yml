@@ -36,11 +36,15 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Text-Table-More/issues
   homepage: https://metacpan.org/release/Text-Table-More
   repository: git://github.com/perlancar/perl-Text-Table-More.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::Module::Features
+      name: Module::Features
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::InsertExample
       name: InsertExample
@@ -304,6 +308,10 @@ x_Dist_Zilla:
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
               version: '0.082'
+            -
+              class: Pod::Weaver::Plugin::Module::Features
+              name: -Module::Features
+              version: '0.001'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -413,6 +421,14 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: x_spec
+      name: DevelopX_spec
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode

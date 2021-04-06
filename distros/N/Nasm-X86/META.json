@@ -34,7 +34,7 @@
    "provides" : {
       "Nasm::X86" : {
          "file" : "lib/Nasm/X86.pm",
-         "version" : "20210330"
+         "version" : "20210404"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "url" : "https://github.com/philiprbrenan/NasmX86"
       }
    },
-   "version" : "20210330",
+   "version" : "20210404",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

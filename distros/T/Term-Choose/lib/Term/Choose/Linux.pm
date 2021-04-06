@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.720';
+our $VERSION = '1.730';
 
 use Term::Choose::Constants qw( :linux :keys TERM_READKEY );
 use Term::Choose::Screen    qw( hide_cursor show_cursor normal );

@@ -38,7 +38,7 @@ use constant _NFIELDS  => 4;
 
 # ----- static data -----
 
-our $VERSION      = '1.019';
+our $VERSION      = '1.021';
 our $max_degree   = 10_000;    # limit for power operator
 
 # default values for as_string options
@@ -962,7 +962,7 @@ Math::Polynomial - Perl class for polynomials in one variable
 
 =head1 VERSION
 
-This documentation refers to version 1.019 of Math::Polynomial.
+This documentation refers to version 1.021 of Math::Polynomial.
 
 =head1 SYNOPSIS
 
@@ -2430,9 +2430,12 @@ Hermite, Laguerre polynomials etc.) may be provided by modules
 adding not much more than a bunch of funnily named constructors to
 the base class.
 
+Some polynomial operators not yet implemented, like resultants and
+discriminants, may be added as well.
+
 Other modules may implement algorithms employing polynomials (such
 as approximation techniques) or analyzing them (such as root-finding
-techniques).
+and factoring techniques).
 
 Yet another set of modules may provide alternative implementations
 optimized for special cases such as sparse polynomials, or taking
@@ -2441,7 +2444,8 @@ benefit from specialized external math libraries.
 Multivariate polynomials, finally, are now implemented in an
 independent package, Math-Polynomial-Multivariate.
 
-This list is not necessarily complete.
+This list is not necessarily complete.  Please also read the
+F<CONTRIBUTING> file if you intend to get involved.
 
 =head1 DEPENDENCIES
 
@@ -2500,13 +2504,16 @@ Math::ModInt (available on CPAN)
 
 At the time of release, there were no known unresolved issues with
 this module.  Bug reports and suggestions are welcome -- please
-submit them through the CPAN RT,
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Math-Polynomial>.
+submit them through the github issue tracker,
+L<https://github.com/mhasch/perl-Math-Polynomial/issues>.
 
 Our test suite checks for compatibility with several alien modules that
 might be useful as coefficient spaces.  Issues with these modules are
 reported only in skip messages, but not as hard failures, as in the past
 usually the alien module was to blame.
+
+More information for potential contributors can be found in the file
+named F<CONTRIBUTING> in this distribution.
 
 =head1 SEE ALSO
 
@@ -2523,12 +2530,6 @@ interpolation, rational coefficients, pretty-printing, and more.
 
 Scripts in the test suite are less wordily documented, but should have at
 least one usage example for each of even the most exotic features.
-
-=item *
-
-I<Math::Polynomial::Generic> (deprecated) -
-an experimental interface extension with some syntactical sugar
-coating Math::Polynomial.  It is no longer supported.
 
 =back
 
@@ -2567,32 +2568,41 @@ Other Modules:
 
 =item *
 
-I<Math::Polynomial::Multivariate> -
+L<Math::Polynomial::Multivariate> -
 a module dealing with polynomials in more than one variable.
 
 =item *
 
-I<PDL> -
+L<Math::Polynomial::Cyclotomic> - cyclotomic polynomials generator.
+
+=item *
+
+L<Math::Polynomial::ModInt> - a subclass for polynomials over modular
+integers.
+
+=item *
+
+L<PDL> -
 the Perl Data Language.
 
 =item *
 
-Math::GMPz, Math::GMPq, Math::GMPf -
+L<Math::GMPz>, L<Math::GMPq>, L<Math::GMPf> -
 interfaces to the GMP arbitrary precision integer math library.
 
 =item *
 
-Math::BigInt, Math::BigFloat, and Math::BigRat -
+L<Math::BigInt>, L<Math::BigFloat>, and L<Math::BigRat> -
 arbitrary precision math libraries.
 
 =item *
 
-Math::AnyNum -
+L<Math::AnyNum> -
 another arbitrary precision library (using GMP).
 
 =item *
 
-Math::Pari -
+L<Math::Pari> -
 interface to the Pari math library.
 
 =back

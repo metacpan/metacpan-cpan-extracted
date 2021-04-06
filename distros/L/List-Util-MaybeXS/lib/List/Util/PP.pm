@@ -3,15 +3,29 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = '1.500004';
+our $VERSION = '1.500006';
 $VERSION =~ tr/_//d;
 
-our @EXPORT_OK = qw(
-  first min max minstr maxstr reduce sum shuffle
-  all any none notall product sum0 uniq uniqnum uniqstr
-  pairs unpairs pairkeys pairvalues pairmap pairgrep pairfirst
-  head tail
-);
+our @EXPORT_OK;
+BEGIN {
+  @EXPORT_OK = qw(
+    all any first none notall
+    min max minstr maxstr
+    product reductions reduce sum sum0
+    sample shuffle
+    uniq uniqnum uniqint uniqstr
+    pairs unpairs pairkeys pairvalues pairmap pairgrep pairfirst
+    head tail
+    zip zip_longest zip_shortest
+    mesh mesh_longest mesh_shortest
+  );
+}
+
+my $rand = do { our $RAND };
+*RAND = *List::Util::RAND;
+our $RAND;
+$RAND = $rand
+  if !defined $RAND;
 
 sub import {
   my $pkg = caller;
@@ -21,6 +35,14 @@ sub import {
   no strict 'refs';
   ${"${pkg}::a"} = ${"${pkg}::a"};
   ${"${pkg}::b"} = ${"${pkg}::b"};
+
+  # May be imported by List::Util if very old version is installed, which
+  # expects default exports
+  if ($pkg eq 'List::Util' && @_ < 2) {
+    package #hide from PAUSE
+      List::Util;
+    return __PACKAGE__->import(qw(first min max minstr maxstr reduce sum shuffle));
+  }
 
   goto &Exporter::import;
 }
@@ -47,6 +69,34 @@ sub reduce (&@) {
   }
 
   $a;
+}
+
+sub reductions (&@) {
+  my $f = shift;
+  unless ( length ref $f && eval { $f = \&$f; 1 } ) {
+    require Carp;
+    Carp::croak("Not a subroutine reference");
+  }
+
+  return unless @_;
+  return shift unless @_ > 1;
+
+  my $pkg = caller;
+  my $a = shift;
+
+  no strict 'refs';
+  local *{"${pkg}::a"} = \$a;
+  my $glob_b = \*{"${pkg}::b"};
+
+  my @o = $a;
+
+  foreach my $b (@_) {
+    local *$glob_b = \$b;
+    $a = $f->();
+    push @o, $a;
+  }
+
+  @o;
 }
 
 sub first (&@) {
@@ -102,13 +152,16 @@ sub maxstr (@) {
 }
 
 sub shuffle (@) {
-  my @a=\(@_);
-  my $n;
-  my $i=@_;
-  map {
-    $n = rand($i--);
-    (${$a[$n]}, $a[$n] = $a[$i])[0];
-  } @_;
+  sample(scalar @_, @_);
+}
+
+sub sample ($@) {
+  my $num = shift;
+  my @i = (0 .. $#_);
+  $num = @_ if $num > @_;
+  my @o = defined $RAND ? (map +(splice @i, $RAND->($#i), 1), 1 .. $num)
+                        : (map +(splice @i,    rand($#i), 1), 1 .. $num);
+  @_[@o];
 }
 
 sub all (&@) {
@@ -299,11 +352,30 @@ sub uniqnum (@) {
       my ($NV) = unpack 'F', pack 'F', $_;
       !$seen{
         $NV == 0 ? 0 : (
-          (!($NV != $NV)
+          ($NV == $NV
             ? do { local $@; eval { pack 'JF', $_, $_ } }
             : 0
           ) || sprintf('%f', $_)
         )
+      }++;
+    }
+    map +(defined($_) ? $_
+      : do { warnings::warnif('uninitialized', 'Use of uninitialized value in subroutine entry'); 0 }),
+    @_;
+  @uniq;
+}
+
+sub uniqint (@) {
+  my %seen;
+  my @uniq =
+    map +(
+      ref $_ ? $_ : int($_)
+    ),
+    grep {
+      !$seen{
+        /\A[0-9]+\z/  ? $_
+        : $_ > 0      ? sprintf '%u', $_
+                      : sprintf '%d', $_
       }++;
     }
     map +(defined($_) ? $_
@@ -336,6 +408,38 @@ sub tail ($@) {
   @_[ ( $size >= 0 ? ($#_ - ($size-1) ) : 0 - $size ) .. $#_ ];
 }
 
+sub zip_longest {
+  map {
+    my $idx = $_;
+    [ map $_->[$idx], @_ ];
+  } ( 0 .. max(map $#$_, @_) || -1 )
+}
+
+sub zip_shortest {
+  map {
+    my $idx = $_;
+    [ map $_->[$idx], @_ ];
+  } ( 0 .. min(map $#$_, @_) || -1 )
+}
+
+*zip = \&zip_longest;
+
+sub mesh_longest {
+  map {
+    my $idx = $_;
+    map $_->[$idx], @_;
+  } ( 0 .. max(map $#$_, @_) || -1 )
+}
+
+sub mesh_shortest {
+  map {
+    my $idx = $_;
+    map $_->[$idx], @_;
+  } ( 0 .. min(map $#$_, @_) || -1 )
+}
+
+*mesh = \&mesh_longest;
+
 1;
 
 __END__
@@ -346,17 +450,15 @@ List::Util::PP - Pure-perl implementations of List::Util subroutines
 
 =head1 SYNOPSIS
 
-    use List::Util::PP qw(
-      reduce any all none notall first
+  use List::Util::PP qw(
+    reduce any all none notall first reductions
 
-      max maxstr min minstr product sum sum0
+    max maxstr min minstr product sum sum0
 
-      pairs pairkeys pairvalues pairfirst pairgrep pairmap
+    pairs unpairs pairkeys pairvalues pairfirst pairgrep pairmap
 
-      shuffle
-
-      head tail
-    );
+    shuffle uniq uniqint uniqnum uniqstr zip mesh
+  );
 
 =head1 DESCRIPTION
 
@@ -394,15 +496,21 @@ this module otherwise.
 
 =item L<reduce|List::Util/reduce>
 
+=item L<reductions|List::Util/reductions>
+
 =item L<sum|List::Util/sum>
 
 =item L<sum0|List::Util/sum0>
 
 =item L<shuffle|List::Util/shuffle>
 
+=item L<sample|List::Util/sample>
+
 =item L<uniq|List::Util/uniq>
 
 =item L<uniqnum|List::Util/uniqnum>
+
+=item L<uniqint|List::Util/uniqint>
 
 =item L<uniqstr|List::Util/uniqstr>
 
@@ -423,6 +531,30 @@ this module otherwise.
 =item L<head|List::Util/head>
 
 =item L<tail|List::Util/tail>
+
+=item L<zip|List::Util/zip>
+
+=item L<zip_longest|List::Util/zip>
+
+=item L<zip_shortest|List::Util/zip>
+
+=item L<mesh|List::Util/mesh>
+
+=item L<mesh_longest|List::Util/mesh>
+
+=item L<mesh_shortest|List::Util/mesh>
+
+=back
+
+=head1 CONFIGURATION VARIABLES
+
+=over 4
+
+=item L<$RAND|List::Util/$RAND>
+
+The variables C<$List::Util::RAND>, C<$List::Util::PP::RAND>, and
+C<$List::Util::MaybeXS::RAND> are all aliased to each other.  Any of them will
+impact both List::Util::PP and L<List::Util> functions.
 
 =back
 

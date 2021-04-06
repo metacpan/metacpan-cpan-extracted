@@ -1,6 +1,6 @@
 package Mac::OSA::Notification::Tiny;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.01';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 
 use base 'Import::Export';
 
@@ -26,7 +26,7 @@ Mac::OSA::Notification::Tiny - native mac notifications
 
 =head1 VERSION
 
-Version 0.01
+Version 1.00
 
 =cut
 
@@ -131,7 +131,7 @@ L<https://metacpan.org/release/Mac-OSA-Notification-Tiny>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2021 by LNATION.
 
 This is free software, licensed under:
 

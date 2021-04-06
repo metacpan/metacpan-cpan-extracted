@@ -17,6 +17,7 @@ my $ENABLE_JMPENV = $^O ne "MSWin32";
 print C <<EOT;
 
 #include <EXTERN.h>
+#define PERL_EXT 1
 #include <perl.h>
 #include <Python.h>
 
@@ -30,7 +31,8 @@ print C <<EOT if $ENABLE_JMPENV;
 
 static LOGOP dummy_op;
 
-void fake_inittry()
+void
+fake_inittry(void)
 {
     Zero(&dummy_op, 1, LOGOP);
     dummy_op.op_flags |= OPf_WANT_SCALAR;
@@ -38,7 +40,7 @@ void fake_inittry()
 }
 
 static void
-fake_entertry()
+fake_entertry(void)
 {
     PERL_CONTEXT *cx;
     I32 gimme;
@@ -50,9 +52,9 @@ fake_entertry()
     ENTER;
     SAVETMPS;
 
-    push_return(Nullop);
+//    Perl_push_return(aTHX_ Nullop);
     PUSHBLOCK(cx, (CXt_EVAL|CXp_TRYBLOCK), PL_stack_sp);
-    PUSHEVAL(cx, 0, 0);
+    PUSHEVAL(cx, 0);
     PL_eval_root = PL_op;
     PL_in_eval = EVAL_INEVAL;
     sv_setpvn(ERRSV, "", 0);
@@ -71,7 +73,7 @@ fake_leavetry(I32 oldscope)
 
         POPBLOCK(cx,newpm);
         POPEVAL(cx);
-        pop_return();
+//        Perl_pop_return(aTHX);
         PL_curpm = newpm;
     }
 
@@ -80,6 +82,8 @@ fake_leavetry(I32 oldscope)
 }
 
 EOT
+
+print H "void \tfake_inittry(void);\n";
 
 while (<DATA>) {
     if (/^(\w.*?)(\w+)\(([^)]*)\)\s*$/) {

@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.262    2021-04-06
+        - Single table row output: skip separator lines.
+
 2.261    2021-03-21
         - Update saved search_and_replace.
 

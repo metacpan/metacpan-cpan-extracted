@@ -3,9 +3,12 @@ native:
   debian:
     packages:
       - libzmq3-dev
+      - cmake
   macos-homebrew:
     packages:
       - zmq
+      - cmake
   msys2-mingw64:
     packages:
       - mingw-w64-x86_64-zeromq
+      - mingw-w64-x86_64-cmake

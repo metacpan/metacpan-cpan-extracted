@@ -1,7 +1,7 @@
 package Algorithm::AM;
 use strict;
 use warnings;
-our $VERSION = '3.11';
+our $VERSION = '3.12';
 # ABSTRACT: Classify data with Analogical Modeling
 use feature 'state';
 use Carp;
@@ -327,7 +327,7 @@ Algorithm::AM - Classify data with Analogical Modeling
 
 =head1 VERSION
 
-version 3.11
+version 3.12
 
 =head1 SYNOPSIS
 
@@ -519,7 +519,7 @@ sample data sets.
 The L<Wikipedia article|http://en.wikipedia.org/wiki/Analogical_modeling>
 has details and even illustrations on analogical modeling.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -560,7 +560,7 @@ Nick Logan <nlogan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Royal Skousen.
+This software is copyright (c) 2021 by Royal Skousen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

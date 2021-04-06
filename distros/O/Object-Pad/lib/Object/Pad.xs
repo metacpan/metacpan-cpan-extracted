@@ -460,6 +460,49 @@ static void S_pad_add_self_slots(pTHX)
     croak("ARGH: Expected that padix[@slots] = 2");
 }
 
+#define find_padix_for_slot(slotmeta)  S_find_padix_for_slot(aTHX_ slotmeta)
+static PADOFFSET S_find_padix_for_slot(pTHX_ SlotMeta *slotmeta)
+{
+  const char *slotname = SvPVX(slotmeta->name);
+#if HAVE_PERL_VERSION(5, 20, 0)
+  const PADNAMELIST *nl = PadlistNAMES(CvPADLIST(PL_compcv));
+  PADNAME **names = PadnamelistARRAY(nl);
+  PADOFFSET padix;
+
+  for(padix = 1; padix <= PadnamelistMAXNAMED(nl); padix++) {
+    PADNAME *name = names[padix];
+
+    if(!name || !PadnameLEN(name))
+      continue;
+
+    const char *pv = PadnamePV(name);
+    if(!pv)
+      continue;
+
+    /* slot names are all OUTER vars. This is necessary so we don't get
+     * confused by signatures params of the same name
+     *   https://rt.cpan.org/Ticket/Display.html?id=134456
+     */
+    if(!PadnameOUTER(name))
+      continue;
+    if(!strEQ(pv, slotname))
+      continue;
+
+    /* TODO: for extra robustness we could compare the SV * in the pad itself */
+
+    return padix;
+  }
+
+  return NOT_IN_PAD;
+#else
+  /* Before the new pad API, the best we can do is call pad_findmy_pv()
+   * It won't get confused about signatures params because these perls are too
+   * old for signatures anyway
+   */
+  return pad_findmy_pv(slotname, 0);
+#endif
+}
+
 static XOP xop_methstart;
 static OP *pp_methstart(pTHX)
 {
@@ -1495,6 +1538,23 @@ static XS(xsub_mop_class_seal)
   mop_class_seal(meta);
 }
 
+static bool is_valid_ident_utf8(const U8 *s)
+{
+  const U8 *e = s + strlen((char *)s);
+
+  if(!isIDFIRST_utf8_safe(s, e))
+    return false;
+
+  s += UTF8SKIP(s);
+  while(*s) {
+    if(!isIDCONT_utf8_safe(s, e))
+      return false;
+    s += UTF8SKIP(s);
+  }
+
+  return true;
+}
+
 enum {
   ACCESSOR,
   ACCESSOR_READER,
@@ -1508,6 +1568,13 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
   if(SvPVX(slotmeta->name)[0] != '$')
     /* TODO: A reader for an array or hash slot should also be fine */
     croak("Can only generate accessors for scalar slots");
+
+  if(mname && !mname[0])
+    /* empty string */
+    mname = NULL;
+
+  if(mname && !is_valid_ident_utf8((U8 *)mname))
+    croak("Invalid accessor method name");
 
   ENTER;
 
@@ -1636,6 +1703,8 @@ static int keyword_classlike(pTHX_ enum MetaType type, OP **op_ptr)
 
     lex_read_space(0);
     superclassname = lex_scan_packagename();
+    if(!superclassname)
+      croak("Expected a superclass name after 'extends'");
 
     lex_read_space(0);
     SV *superclassver = lex_scan_version(PARSE_OPTIONAL);
@@ -1664,6 +1733,8 @@ static int keyword_classlike(pTHX_ enum MetaType type, OP **op_ptr)
       while(1) {
         lex_read_space(0);
         SV *rolename = lex_scan_packagename();
+        if(!rolename)
+          croak("Expected a role name after 'implements'");
 
         lex_read_space(0);
         SV *rolever = lex_scan_version(PARSE_OPTIONAL);
@@ -2094,7 +2165,10 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *ho
 
     const char *pv = SvPVX(slotmeta->name);
     SLOTOFFSET slotix = slotmeta->slotix;
-    PADOFFSET padix = pv ? pad_findmy_pv(pv, 0) : 0;
+    PADOFFSET padix = find_padix_for_slot(slotmeta);
+
+    if(padix == NOT_IN_PAD)
+      continue;
 
     U8 private = 0;
     switch(pv[0]) {

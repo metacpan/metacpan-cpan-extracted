@@ -3,7 +3,7 @@ use warnings;
 
 use List::Util::PP qw(first);
 use Test::More;
-plan tests => 22;
+plan tests => 24;
 my $v;
 
 ok(defined &first, 'defined');
@@ -87,6 +87,22 @@ SKIP: {
     is(&Internals::SvREFCNT(\&huge), $refcnt, "Refcount unchanged");
 }
 
+# These tests are only relevant for the real multicall implementation. The
+# psuedo-multicall implementation behaves differently.
+SKIP: {
+    $List::Util::PP::REAL_MULTICALL ||= 0; # Avoid use only once
+    skip("Poor man's MULTICALL can't cope", 2)
+      if !$List::Util::PP::REAL_MULTICALL;
+
+    # Can we goto a label from the 'first' sub?
+    eval {()=first{goto foo} 1,2; foo: 1};
+    like($@, qr/^Can't "goto" out of a pseudo block/, "goto label");
+
+    # Can we goto a subroutine?
+    eval {()=first{goto sub{}} 1,2;};
+    like($@, qr/^Can't goto subroutine from a sort sub/, "goto sub");
+}
+
 use constant XSUBC_TRUE  => 1;
 use constant XSUBC_FALSE => 0;
 
@@ -104,4 +120,3 @@ eval { &first([],1,2,3) };
 ok($@ =~ /^Not a subroutine reference/, 'check for code reference');
 eval { &first(+{},1,2,3) };
 ok($@ =~ /^Not a subroutine reference/, 'check for code reference');
-

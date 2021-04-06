@@ -71,8 +71,8 @@ sub _load ($src) {
         }
     }
     else {
-        my $p = path($src);
-        $cfg = $p->is_file ? LoadFile($src) : Load($src);
+        INFO "loading configuration from '$src'";
+        $cfg = $src =~ /\n/ ? Load($src) : LoadFile($src);
     }
 
     my $rcfg = ref($cfg);
@@ -88,11 +88,13 @@ sub _make_plan ( $self, $cfg_main ) {
 
     my $globals = $self->_extract_globals($cfg_main);
     $globals->{title} = _get_title_from_filename( $self->from );
+    $self->_expand_test($globals, $globals->{rootdir});
 
     my $plan = [];
     my %suite_globals;
     for my $cfg (@$cfg_main) {
         my $nbr = 1;
+        $self->_expand_test($cfg);
         if ( $cfg->{suite} ) {
             croak "'suite' parameter in config has to be an array of filenames\n"
                 unless ref( $cfg->{suite} ) eq 'ARRAY';
@@ -104,11 +106,12 @@ sub _make_plan ( $self, $cfg_main ) {
 
                 my $suite_title = _get_title_from_filename($fn);
                 $debug and DEBUG "suite title: $suite_title";
-                $suite_globals{$suite_title} = $self->_extract_globals($sub_cfg);
+                $suite_globals{$fn} = $self->_extract_globals($sub_cfg);
 
                 my $snbr = 1;
                 for my $sub_entry (@$sub_cfg) {
                     $sub_entry->{$_} //= $cfg->{$_} for keys %$cfg;
+                    $sub_entry->{_filename} = $fn;
                     $sub_entry->{suite_title} = $suite_title;
                     $sub_entry->{title} //= $suite_title . '_' . $snbr++;
                     push @$plan, $sub_entry;
@@ -123,6 +126,7 @@ sub _make_plan ( $self, $cfg_main ) {
     }
 
     $self->_expand_plan( $plan, $globals, \%suite_globals );
+    INFO Dump(\%suite_globals);
 
     $self->plan($plan);
     $self->{__ro__globals} = $globals;
@@ -146,14 +150,14 @@ sub _expand_plan ( $self, $plan, $globals, $sglobals ) {
     local $ENV{SC_DATE}     = strftime( '%Y%m%d',       @t0 );
     local $ENV{SC_DATETIME} = strftime( '%Y%m%d%H%M%S', @t0 );
     for my $test (@$plan) {
-        if ( $test->{suite_title} and my $sg = $sglobals->{ $test->{suite_title} } ) {
+        if ( $test->{_filename} and my $sg = $sglobals->{ $test->{_filename} } ) {
             delete $sg->{title};
             $test->{$_} //= $sg->{$_} for keys %$sg;
         }
         $test->{$_} //= $globals->{$_} for keys %$globals;
         $self->_expand_test($test);
     }
-    $self->_expand_test($globals);
+    $self->_expand_test($globals, $globals->{summary_filename} //= '');
     return $self;
 }
 

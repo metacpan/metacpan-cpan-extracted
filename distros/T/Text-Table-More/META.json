@@ -23,9 +23,13 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::Module::Features" : "0.001",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
+         },
+         "x_spec" : {
+            "Module::Features" : "v0.1.5"
          }
       },
       "runtime" : {
@@ -68,12 +72,17 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-More"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Module::Features",
+            "name" : "Module::Features",
+            "version" : "0.002"
+         },
          {
             "class" : "Dist::Zilla::Plugin::InsertExample",
             "name" : "InsertExample",
@@ -404,6 +413,11 @@
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
                         "version" : "0.082"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Module::Features",
+                        "name" : "-Module::Features",
+                        "version" : "0.001"
                      }
                   ]
                }
@@ -550,6 +564,17 @@
                }
             },
             "name" : "TestRequires",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "x_spec"
+               }
+            },
+            "name" : "DevelopX_spec",
             "version" : "6.012"
          },
          {

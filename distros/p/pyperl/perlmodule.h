@@ -1,3 +1,6 @@
+#ifndef __PERLMODULE_H
+#define __PERLMODULE_H
+
 /* Copyright 2000-2001 ActiveState
  */
 
@@ -26,3 +29,5 @@ PyObject *call_perl(char *method, SV* obj, I32 gimme,
 #else /* USE_ITHREADS */
    #define SET_CUR_PERL /* empty */
 #endif /* USE_ITHREADS */
+
+#endif

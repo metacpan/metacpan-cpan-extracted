@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Test script for DateTime::Calendar::FrenchRevolutionary
-#     Copyright (C) 2010, 2011, 2012, 2014, 2016, 2019 Jean Forget. All rights reserved.
+#     Copyright (C) 2010, 2011, 2012, 2014, 2016, 2019, 2021 Jean Forget. All rights reserved.
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
@@ -27,7 +27,9 @@
 #     Inc., <https://www.fsf.org/>.
 #
 use DateTime::Calendar::FrenchRevolutionary::Locale::en;
+use DateTime::Calendar::FrenchRevolutionary::Locale::es;
 use DateTime::Calendar::FrenchRevolutionary::Locale::fr;
+use DateTime::Calendar::FrenchRevolutionary::Locale::it;
 use utf8;
 use strict;
 use warnings;
@@ -41,6 +43,14 @@ package Altfr;
 use base 'DateTime::Calendar::FrenchRevolutionary::Locale::fr';
 sub date_before_time { "0"; }
 
+package Altit;
+use base 'DateTime::Calendar::FrenchRevolutionary::Locale::it';
+sub date_before_time { "0"; }
+
+package Altes;
+use base 'DateTime::Calendar::FrenchRevolutionary::Locale::es';
+sub date_before_time { "0"; }
+
 package main;
 my $n = 0;
 
@@ -50,10 +60,19 @@ sub check {
   $altfr_result = $fr_result unless defined $altfr_result;
   $alten_result = $en_result unless defined $alten_result;
 
+  my $es_result    = $fr_result;
+  my $it_result    = $fr_result;
+  my $altes_result = $altfr_result;
+  my $altit_result = $altfr_result;
+
   my $fr_test = DateTime::Calendar::FrenchRevolutionary::Locale::fr->$method;
   my $en_test = DateTime::Calendar::FrenchRevolutionary::Locale::en->$method;
+  my $es_test = DateTime::Calendar::FrenchRevolutionary::Locale::es->$method;
+  my $it_test = DateTime::Calendar::FrenchRevolutionary::Locale::it->$method;
   my $altfr_test = Altfr->$method;
   my $alten_test = Alten->$method;
+  my $altes_test = Altes->$method;
+  my $altit_test = Altit->$method;
 
   ++ $n;
   if ($fr_test eq $fr_result) {
@@ -72,6 +91,22 @@ sub check {
   }
 
   ++ $n;
+  if ($es_test eq $es_result) {
+    print "ok $n\n";
+  }
+  else {
+    print "not ok $n : expected '$es_result', got '$es_test'\n";
+  }
+
+  ++ $n;
+  if ($it_test eq $it_result) {
+    print "ok $n\n";
+  }
+  else {
+    print "not ok $n : expected '$it_result', got '$it_test'\n";
+  }
+
+  ++ $n;
   if ($altfr_test eq $altfr_result) {
     print "ok $n\n";
   }
@@ -85,6 +120,22 @@ sub check {
   }
   else {
     print "not ok $n : expected '$alten_result', got '$alten_test'\n";
+  }
+
+  ++ $n;
+  if ($altes_test eq $altes_result) {
+    print "ok $n\n";
+  }
+  else {
+    print "not ok $n : expected '$altes_result', got '$altes_test'\n";
+  }
+
+  ++ $n;
+  if ($altit_test eq $altit_result) {
+    print "ok $n\n";
+  }
+  else {
+    print "not ok $n : expected '$altit_result', got '$altit_test'\n";
   }
 
 }
@@ -114,7 +165,7 @@ my @tests = (
        [ "date_parts_order",         "dmy",                                         "dmy",                        ],
 );
 
-printf "1..%d\n", 4 * @tests;
+printf "1..%d\n", 8 * @tests;
 
 foreach (@tests) { check @$_ }
 

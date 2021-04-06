@@ -1,3 +1,6 @@
+0.08 - 2021-04-03
+  * Added "temperature" option.
+
 0.07 - 2020-10-05
   * Fixed broken link in documentation (thanks, Dave Smith)
   * Fixed bin/aqi documentation

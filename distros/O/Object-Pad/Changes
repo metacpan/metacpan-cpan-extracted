@@ -1,5 +1,14 @@
 Revision history for Object-Pad
 
+0.37    2021-04-01
+        [BUGFIXES]
+         * Don't get confused by sub signature parameters of the same name as
+           slot variables (RT134456)
+         * Don't crash if extends/implements package names are missing or
+           malformed (RT134827)
+         * Reject requests to make accessors with invalid identifier names
+           (RT134795)
+
 0.36    2021-02-19
         [CHANGES]
          * Added $classmeta->compose_role() (RT134261)

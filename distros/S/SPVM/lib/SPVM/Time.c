@@ -16,53 +16,57 @@ int32_t SPNATIVE__SPVM__Time__time(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   stack[0].lval = timer_value;
   
-  return SPVM_SUCCESS;
+  return 0;
 }
 
 int32_t SPNATIVE__SPVM__Time__localtime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
+  int32_t e;
+  
   time_t time = (time_t)stack[0].lval;
   struct tm* resultp = localtime(&time);
 
-  void* obj_time_info;
-  SPVM_NEW_OBJECT(env, "SPVM::Time::Info", &obj_time_info, MFILE, __LINE__);
+  void* obj_time_info = env->new_object_by_name(env, "SPVM::Time::Info", &e, MFILE, __LINE__);
+  if (e) { return e; }
 
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "sec", resultp->tm_sec, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "min", resultp->tm_min, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "hour", resultp->tm_hour, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "mday", resultp->tm_mday, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "mon", resultp->tm_mon, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "year", resultp->tm_year, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "wday", resultp->tm_wday, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "yday", resultp->tm_yday, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "isdst", resultp->tm_isdst, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "sec", resultp->tm_sec, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "min", resultp->tm_min, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "hour", resultp->tm_hour, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "mday", resultp->tm_mday, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "mon", resultp->tm_mon, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "year", resultp->tm_year, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "wday", resultp->tm_wday, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "yday", resultp->tm_yday, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "isdst", resultp->tm_isdst, &e, MFILE, __LINE__);
   
   stack[0].oval = obj_time_info;
   
-  return SPVM_SUCCESS;
+  return 0;
 }
 
 int32_t SPNATIVE__SPVM__Time__gmtime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
+  int32_t e;
+
   time_t time = (time_t)stack[0].lval;
   struct tm* resultp = gmtime(&time);
 
-  void* obj_time_info;
-  SPVM_NEW_OBJECT(env, "SPVM::Time::Info", &obj_time_info, MFILE, __LINE__);
+  void* obj_time_info = env->new_object_by_name(env, "SPVM::Time::Info", &e, MFILE, __LINE__);
+  if (e) { return e; }
 
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "sec", resultp->tm_sec, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "min", resultp->tm_min, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "hour", resultp->tm_hour, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "mday", resultp->tm_mday, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "mon", resultp->tm_mon, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "year", resultp->tm_year, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "wday", resultp->tm_wday, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "yday", resultp->tm_yday, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "isdst", resultp->tm_isdst, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "sec", resultp->tm_sec, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "min", resultp->tm_min, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "hour", resultp->tm_hour, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "mday", resultp->tm_mday, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "mon", resultp->tm_mon, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "year", resultp->tm_year, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "wday", resultp->tm_wday, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "yday", resultp->tm_yday, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "isdst", resultp->tm_isdst, &e, MFILE, __LINE__);
   
   stack[0].oval = obj_time_info;
   
-  return SPVM_SUCCESS;
+  return 0;
 }
 
 // https://code.woboq.org/userspace/glibc/timezone/private.h.html
@@ -372,12 +376,14 @@ static const unsigned char *find_string(const unsigned char *bp, int *tgt, const
 }
 int32_t SPNATIVE__SPVM__Time__strptime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
+  int32_t e;
+  
   void* obj_str = stack[0].oval;
-  if (!obj_str) { SPVM_DIE("String must be defined", MFILE, __LINE__); }
+  if (!obj_str) { return env->die(env, "String must be defined", MFILE, __LINE__); }
   const char* str = env->get_chars(env, obj_str);
   
   void* obj_format = stack[1].oval;
-  if (!obj_format) { SPVM_DIE("Format must be defined", MFILE, __LINE__); }
+  if (!obj_format) { return env->die(env, "Format must be defined", MFILE, __LINE__); }
   const char* format = env->get_chars(env, obj_format);
 
   struct tm resultp = {0};
@@ -385,85 +391,88 @@ int32_t SPNATIVE__SPVM__Time__strptime(SPVM_ENV* env, SPVM_VALUE* stack) {
   const char* end_ptr = SPVM_strptime(str, format, &resultp);
   
   if (end_ptr && *end_ptr != '\0') {
-    SPVM_DIE("Format parsing failed \"%s\"", end_ptr, MFILE, __LINE__);
+    return env->die(env, "Format parsing failed \"%s\"", end_ptr, MFILE, __LINE__);
   }
   else if (!end_ptr) {
-    SPVM_DIE("Format parsing failed", MFILE, __LINE__);
+    return env->die(env, "Format parsing failed", MFILE, __LINE__);
   }
 
-  void* obj_time_info;
-  SPVM_NEW_OBJECT(env, "SPVM::Time::Info", &obj_time_info, MFILE, __LINE__);
+  void* obj_time_info = env->new_object_by_name(env, "SPVM::Time::Info", &e, MFILE, __LINE__);
+  if (e) { return e; }
 
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "sec", resultp.tm_sec, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "min", resultp.tm_min, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "hour", resultp.tm_hour, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "mday", resultp.tm_mday, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "mon", resultp.tm_mon, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "year", resultp.tm_year, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "wday", resultp.tm_wday, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "yday", resultp.tm_yday, MFILE, __LINE__);
-  SPVM_SET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "isdst", resultp.tm_isdst, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "sec", resultp.tm_sec, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "min", resultp.tm_min, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "hour", resultp.tm_hour, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "mday", resultp.tm_mday, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "mon", resultp.tm_mon, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "year", resultp.tm_year, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "wday", resultp.tm_wday, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "yday", resultp.tm_yday, &e, MFILE, __LINE__);
+  env->set_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "isdst", resultp.tm_isdst, &e, MFILE, __LINE__);
   
   stack[0].oval = obj_time_info;
   
-  return SPVM_SUCCESS;
+  return 0;
 }
 
 int32_t SPNATIVE__SPVM__Time__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
+
+  int32_t e;
+
   void* obj_format = stack[0].oval;
-  if (!obj_format) { SPVM_DIE("Format must be defined", MFILE, __LINE__); }
+  if (!obj_format) { return env->die(env, "Format must be defined", MFILE, __LINE__); }
   const char* format = env->get_chars(env, obj_format);
   
   void* obj_time_info = stack[1].oval;
-  if (!obj_time_info) { SPVM_DIE("SPVM::Time::Info object must be defined", MFILE, __LINE__); }
+  if (!obj_time_info) { return env->die(env, "SPVM::Time::Info object must be defined", MFILE, __LINE__); }
 
   struct tm resultp;
 
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "sec", &resultp.tm_sec, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "min", &resultp.tm_min, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "hour", &resultp.tm_hour, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "mday", &resultp.tm_mday, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "mon", &resultp.tm_mon, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "year", &resultp.tm_year, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "wday", &resultp.tm_wday, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "yday", &resultp.tm_yday, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "isdst", &resultp.tm_isdst, MFILE, __LINE__);
+  resultp.tm_sec = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "sec", &e, MFILE, __LINE__);
+  resultp.tm_min = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "min", &e, MFILE, __LINE__);
+  resultp.tm_hour = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "hour", &e, MFILE, __LINE__);
+  resultp.tm_mday = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "mday", &e, MFILE, __LINE__);
+  resultp.tm_mon = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "mon", &e, MFILE, __LINE__);
+  resultp.tm_year = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "year", &e, MFILE, __LINE__);
+  resultp.tm_wday = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "wday", &e, MFILE, __LINE__);
+  resultp.tm_yday = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "yday", &e, MFILE, __LINE__);
+  resultp.tm_isdst = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "isdst", &e, MFILE, __LINE__);
   
   char str[256] = {0};
   int32_t count = strftime(str, 256, format, &resultp);
   
   if (count == 0) {
-    SPVM_DIE("strftime fail", MFILE, __LINE__);
+    return env->die(env, "strftime fail", MFILE, __LINE__);
   }
 
   void* obj_str = env->new_string(env, str, strlen(str));
   
   stack[0].oval = obj_str;
   
-  return SPVM_SUCCESS;
+  return 0;
 }
 
 int32_t SPNATIVE__SPVM__Time__timelocal(SPVM_ENV* env, SPVM_VALUE* stack) {
+  int32_t e;
   
   void* obj_time_info = stack[0].oval;
-  if (!obj_time_info) { SPVM_DIE("SPVM::Time::Info object must be defined", MFILE, __LINE__); }
+  if (!obj_time_info) { return env->die(env, "SPVM::Time::Info object must be defined", MFILE, __LINE__); }
 
   struct tm resultp;
 
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "sec", &resultp.tm_sec, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "min", &resultp.tm_min, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "hour", &resultp.tm_hour, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "mday", &resultp.tm_mday, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "mon", &resultp.tm_mon, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "year", &resultp.tm_year, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "wday", &resultp.tm_wday, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "yday", &resultp.tm_yday, MFILE, __LINE__);
-  SPVM_GET_FIELD_INT(env, obj_time_info, "SPVM::Time::Info", "isdst", &resultp.tm_isdst, MFILE, __LINE__);
+  resultp.tm_sec = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "sec", &e, MFILE, __LINE__);
+  resultp.tm_min = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "min", &e, MFILE, __LINE__);
+  resultp.tm_hour = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "hour", &e, MFILE, __LINE__);
+  resultp.tm_mday = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "mday", &e, MFILE, __LINE__);
+  resultp.tm_mon = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "mon", &e, MFILE, __LINE__);
+  resultp.tm_year = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "year", &e, MFILE, __LINE__);
+  resultp.tm_wday = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "wday", &e, MFILE, __LINE__);
+  resultp.tm_yday = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "yday", &e, MFILE, __LINE__);
+  resultp.tm_isdst = env->get_field_int_by_name(env, obj_time_info, "SPVM::Time::Info", "isdst", &e, MFILE, __LINE__);
   
   int64_t ltime = (int64_t)mktime(&resultp);
   
   stack[0].lval = ltime;
   
-  return SPVM_SUCCESS;
+  return 0;
 }

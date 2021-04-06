@@ -2,13 +2,15 @@ NAME
     App::BorderStyleUtils - CLI utilities related to border styles
 
 VERSION
-    This document describes version 0.002 of App::BorderStyleUtils (from
-    Perl distribution App-BorderStyleUtils), released on 2020-06-19.
+    This document describes version 0.004 of App::BorderStyleUtils (from
+    Perl distribution App-BorderStyleUtils), released on 2021-01-23.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
 
     *   list-border-style-modules
+
+    *   show-border-style
 
 FUNCTIONS
   list_border_style_modules
@@ -35,6 +37,30 @@ FUNCTIONS
 
     Return value: (any)
 
+  show_border_style
+    Usage:
+
+     show_border_style(%args) -> [status, msg, payload, meta]
+
+    Show example table with specified border style.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   style* => *perl::borderstyle::modname_with_optional_args*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/App-BorderStyleUtils>.
@@ -45,7 +71,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-BorderStyleUtils>
+    <https://github.com/perlancar/perl-App-BorderStyleUtils/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -57,7 +83,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

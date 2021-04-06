@@ -1,0 +1,20 @@
+---
+- title: __GLOBAL__
+  reporter: HTML
+  type: DB
+  dsns :
+    - dsn: 'dbi:SQLite:dbname=example/Northwind_small.sqlite'
+#=============================================
+- title     : order
+  sql :
+    - select * from [Order]
+    - select * from [NewOrder]
+  identity:
+    - Id
+#=============================================
+- title     : order details
+  sql :
+    - select * from [OrderDetails_V]
+    - select * from [NewOrderDetails_V]
+  identity:
+    - Id

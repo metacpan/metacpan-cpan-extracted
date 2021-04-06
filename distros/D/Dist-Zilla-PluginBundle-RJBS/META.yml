@@ -6,10 +6,11 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Test::More: '0.96'
+  strict: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.78'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.018, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,13 +41,14 @@ requires:
   Pod::Weaver: '4'
   Pod::Weaver::Config::Assembler: '0'
   Pod::Weaver::Section::Contributors: '0.008'
-  strict: '0'
+  Pod::Weaver::Section::GenerateSection: '0.000'
+  perl: v5.20.0
   warnings: '0'
 resources:
   bugtracker: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS/issues
   homepage: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS
   repository: https://github.com/rjbs/Dist-Zilla-PluginBundle-RJBS.git
-version: '5.013'
+version: '5.015'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -102,58 +104,58 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@RJBS/@Filter/PruneCruft'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@RJBS/@Filter/ManifestSkip'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@RJBS/@Filter/MetaYAML'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::License
       name: '@RJBS/@Filter/License'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@RJBS/@Filter/Readme'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@RJBS/@Filter/ExecDir'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@RJBS/@Filter/ShareDir'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@RJBS/@Filter/Manifest'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@RJBS/@Filter/TestRelease'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@RJBS/@Filter/ConfirmRelease'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@RJBS/@Filter/UploadToCPAN'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 9
       name: '@RJBS/MakeMaker'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@RJBS/AutoPrereqs'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -169,19 +171,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@RJBS/PkgVersion'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@RJBS/MetaConfig'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@RJBS/MetaJSON'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@RJBS/NextRelease'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@RJBS/Test::ChangesHasContent'
@@ -189,7 +191,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@RJBS/PodSyntaxTests'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@RJBS/Test::ReportPrereqs'
@@ -201,7 +203,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@RJBS/TestMoreWithSubtests'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -215,67 +217,71 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@RJBS/SingleEncoding'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Name
               name: '@RJBS/Name'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Version
               name: '@RJBS/Version'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Region
               name: '@RJBS/Prelude'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Generic
               name: '@RJBS/Synopsis'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Generic
               name: '@RJBS/Description'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Generic
               name: '@RJBS/Overview'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Generic
               name: '@RJBS/Stability'
-              version: '4.015'
+              version: '4.016'
+            -
+              class: Pod::Weaver::Section::GenerateSection
+              name: '@RJBS/PerlSupport'
+              version: '1.06'
             -
               class: Pod::Weaver::Section::Collect
               name: Attributes
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Collect
               name: Methods
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Collect
               name: Functions
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@RJBS/Leftovers'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Region
               name: '@RJBS/postlude'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Authors
               name: '@RJBS/Authors'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@RJBS/Contributors'
@@ -283,11 +289,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Legal
               name: '@RJBS/Legal'
-              version: '4.015'
+              version: '4.016'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@RJBS/List'
-              version: '4.015'
+              version: '4.016'
       name: '@RJBS/PodWeaver'
       version: '4.008'
     -
@@ -337,7 +343,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '5.013'
+          tag: '5.015'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -377,52 +383,52 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.017'
+      version: '6.018'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.017'
+      version: '6.018'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.017'
+    version: '6.018'
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
 x_generated_by_perl: v5.32.0

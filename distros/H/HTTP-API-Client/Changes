@@ -1,3 +1,6 @@
+2021-03-31 - v1.03
+    + use lazy builder, so the sub classes can just overwrite the _build_ sub instead of using default => sub {}
+
 2021-03-31 - v1.02
     + convert number in the request
     + added data type markers

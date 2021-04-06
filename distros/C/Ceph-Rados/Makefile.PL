@@ -20,6 +20,7 @@ WriteMakefile(
     TEST_REQUIRES     => {
         'Test::More'        => 0,
         'Test::Exception'   => 0,
+        'Test::SharedFork'  => 0,
         'Data::Dump'        => 0,
     },
     ABSTRACT_FROM     => 'lib/Ceph/Rados.pm', # retrieve abstract from module

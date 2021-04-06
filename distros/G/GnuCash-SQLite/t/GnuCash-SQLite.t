@@ -81,7 +81,7 @@ tt('child_guid() returns empty list for leaf accounts.',
 
 $guid = $reader->account_guid('Assets:Cash');
 tt('_node_bal() returns correct balance.',
-    got => $reader->_node_bal($guid),
+    got => $reader->_node_bal($guid)+0,
     exp => 10000);
 
 $guid = $reader->account_guid('Assets:Cash');

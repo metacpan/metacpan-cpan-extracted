@@ -2,14 +2,19 @@ package Image::CairoSVG;
 use warnings;
 use strict;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
+# Core modules
 use Carp qw/carp croak/;
+use ExtUtils::ParseXS::Utilities 'trim_whitespace';
+use Math::Trig;
+use Scalar::Util 'looks_like_number';
 use XML::Parser;
-use Cairo;
-use Image::SVG::Path qw/extract_path_info create_path_string/;
 
-use constant M_PI => 3.14159265358979;
+# Installed modules
+use Cairo;
+use Graphics::ColorNames::WWW;
+use Image::SVG::Path qw/extract_path_info create_path_string/;
 
 our $default_surface_type = 'argb32';
 our $default_surface_size = 100;
@@ -125,9 +130,11 @@ sub svg
     my $height;
     if ($attr{width}) {
 	$width = $attr{width};
+	$width = svg_units ($width);
     }
     if ($attr{height}) {
 	$height = $attr{height};
+	$height = svg_units ($height);
     }
 
     # Use viewBox attribute
@@ -206,7 +213,7 @@ sub handle_start
 	if ($self->{verbose}) {
 	    print "Unhandled tag '$tag'.\n";
 	}
-#	warn "Unknown tag '$tag' in $self->{file}";
+	#	warn "Unknown tag '$tag' in $self->{file}";
     }
 
     # http://www.princexml.com/doc/7.1/svg/
@@ -217,10 +224,10 @@ sub rect
 {
     my ($self, %attr) = @_;
 
-    my $x = $self->convert_svg_units ($attr{x});
-    my $y = $self->convert_svg_units ($attr{y});
-    my $width = $self->convert_svg_units ($attr{width});
-    my $height = $self->convert_svg_units ($attr{height});
+    my $x = svg_units ($attr{x});
+    my $y = svg_units ($attr{y});
+    my $width = svg_units ($attr{width});
+    my $height = svg_units ($attr{height});
 
     my $cr = $self->{cr};
 
@@ -233,10 +240,10 @@ sub ellipse
 {
     my ($self, %attr) = @_;
 
-    my $cx = $self->convert_svg_units ($attr{cx});
-    my $cy = $self->convert_svg_units ($attr{cy});
-    my $rx = $self->convert_svg_units ($attr{rx});
-    my $ry = $self->convert_svg_units ($attr{ry});
+    my $cx = svg_units ($attr{cx});
+    my $cy = svg_units ($attr{cy});
+    my $rx = svg_units ($attr{rx});
+    my $ry = svg_units ($attr{ry});
 
     my $cr = $self->{cr};
 
@@ -248,7 +255,7 @@ sub ellipse
 
     # Render it.
 
-    $cr->arc (0, 0, 1, 0, 2*M_PI);
+    $cr->arc (0, 0, 1, 0, 2*pi);
 
     $cr->restore ();
 
@@ -259,15 +266,15 @@ sub circle
 {
     my ($self, %attr) = @_;
 
-    my $cx = $self->convert_svg_units ($attr{cx});
-    my $cy = $self->convert_svg_units ($attr{cy});
-    my $r = $self->convert_svg_units ($attr{r});
+    my $cx = svg_units ($attr{cx});
+    my $cy = svg_units ($attr{cy});
+    my $r = svg_units ($attr{r});
 
     my $cr = $self->{cr};
 
     # Render it.
 
-    $cr->arc ($cx, $cy, $r, 0, 2*M_PI);
+    $cr->arc ($cx, $cy, $r, 0, 2*pi);
 
     $self->do_svg_attr (%attr);
 }
@@ -360,7 +367,6 @@ sub path
 	    # to C keys.
 	    die "Path parse conversion to no shortcuts failed";
 	}
-
 	if ($key eq 'M') {
 	    # Move to
 	    $cr->new_sub_path ();
@@ -426,7 +432,7 @@ sub svg_arc
 
     # Calculations
 
-    my $x_axis_rotation = (M_PI * $element->{x_axis_rotation})/180;
+    my $x_axis_rotation = (pi * $element->{x_axis_rotation})/180;
     my $large_arc_flag = $element->{large_arc_flag};
     my $sweep_flag = $element->{sweep_flag};
 
@@ -516,27 +522,39 @@ sub line
     $self->do_svg_attr (%attr);
 }
 
-sub convert_svg_units
+my %units = (
+    # Arbitrary hack
+    mm => 4,
+    px => 1,
+);
+
+sub svg_units
 {
-    my ($self, $thing) = @_;
+    my ($thing) = @_;
     if (! defined $thing) {
 	return 0;
     }
     if ($thing eq '') {
 	return 0;
     }
-    if ($thing =~ /^(\d|\.)+$/) {
+    if (looks_like_number ($thing)) {
 	return $thing;
     }
-    if ($thing =~ /(\d+)px/) {
-	$thing =~ s/px$//;
-	return $thing;
+    if ($thing =~ /([0-9\.]+)(\w+)/) {
+	my $number = $1;
+	my $unit = $2;
+	my $u = $units{$unit};
+	if ($u) {
+	    return $number * $u;
+	}
     }
-    carp "Could not convert SVG units '$thing'";
+
+    carp "Failed to convert SVG units '$thing'";
+    return undef;
 }
 
 # We have a path in the cairo surface and now we have to do the SVG
-# crap specified by "%attr".
+# instructions specified by "%attr".
 
 sub do_svg_attr
 {
@@ -559,22 +577,21 @@ sub do_svg_attr
 	my @styles = split /;/, $attr{style};
 	for (@styles) {
 	    my ($key, $value) = split /:/, $_, 2;
-	    # Is this the way to do it?
 	    $attr{$key} = $value;
 	}
     }
     my $fill = $attr{fill};
     if ($fill) {
-	$fill =~ s/^\s+|\s+$//g;
+	trim_whitespace ($fill);
     }
     my $stroke = $attr{stroke};
     if ($stroke) {
-	$stroke =~ s/^\s+|\s+$//g;
+	trim_whitespace ($stroke);
     }
     my $cr = $self->{cr};
     my $stroke_width = $attr{"stroke-width"};
     if ($stroke_width) {
-	$stroke_width = $self->convert_svg_units ($stroke_width);
+	$stroke_width = svg_units ($stroke_width);
 	$cr->set_line_width ($stroke_width);
     }
     if ($fill && $fill ne 'none') {
@@ -600,6 +617,37 @@ sub do_svg_attr
     }
 }
 
+my $gcwtable;
+# Only warn once if the module fails.
+my $gcwtablefailed;
+my @defaultrgb = (0, 0, 0);
+
+sub name2colour
+{
+    my ($colour) = @_;
+    if (! $colour) {
+	warn "Empty input colour";
+	return @defaultrgb;
+    }
+    if (! $gcwtable) {
+	if ($gcwtablefailed) {
+	    return @defaultrgb;
+	}
+	$gcwtable = Graphics::ColorNames::WWW->NamesRgbTable ();
+	if (! $gcwtable) {
+	    warn "Graphics::ColorNames::WWW->NamesRgbTable failed";
+	    $gcwtablefailed = 1;
+	    return @defaultrgb;
+	}
+    }
+    my $rgb = $gcwtable->{$colour};
+    if (! $rgb) {
+	carp "Unknown colour $colour";
+	return @defaultrgb;
+    }
+    return @$rgb;
+}
+
 sub set_colour
 {
     my ($self, $colour) = @_;
@@ -607,21 +655,23 @@ sub set_colour
     # Hex digit
     my $h = qr/[0-9a-f]/i;
     my $hh = qr/$h$h/;
+    my @c = @defaultrgb;
     if ($colour eq 'black') {
-	$cr->set_source_rgb (0, 0, 0);
+	@c = (0, 0, 0);
     }
     elsif ($colour eq 'white') {
-	$cr->set_source_rgb (1, 1, 1);
+	@c = (1, 1, 1);
     }
     elsif ($colour =~ /^#($h)($h)($h)$/) {
-	$cr->set_source_rgb (hex ($1)/15, hex ($2)/15, hex ($3)/15);
+	@c = (hex ($1)/15, hex ($2)/15, hex ($3)/15);
     }
     elsif ($colour =~ /^#($hh)($hh)($hh)$/) {
-	$cr->set_source_rgb (hex ($1)/255, hex ($2)/255, hex ($3)/255);
+	@c = (hex ($1)/255, hex ($2)/255, hex ($3)/255);
     }
     else {
-	warn "Unknown colour '$colour'";
+	@c = name2colour ($colour);
     }
+    $cr->set_source_rgb (@c);
 }
 
 sub surface

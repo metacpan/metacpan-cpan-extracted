@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker 6.31;
 
 WriteMakefile(
   'ABSTRACT' => 'YAML Configuration Plugin for Mojolicious',
-  'AUTHOR' => 'Danijel Tasov <data@cpan.org>',
+  'AUTHOR' => 'Danijel Tasov <cpan@rbfh.de>',
   'BUILD_REQUIRES' => {},
   'CONFIGURE_REQUIRES' => {
     'ExtUtils::MakeMaker' => '6.31'

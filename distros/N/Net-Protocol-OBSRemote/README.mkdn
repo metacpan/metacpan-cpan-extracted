@@ -1,0 +1,61 @@
+
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Net-Protocol-OBSRemote?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Net-Protocol-OBSRemote)
+[![Windows](https://github.com/Corion/Net-Protocol-OBSRemote/workflows/windows/badge.svg)](https://github.com/Corion/Net-Protocol-OBSRemote/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Net-Protocol-OBSRemote/workflows/macos/badge.svg)](https://github.com/Corion/Net-Protocol-OBSRemote/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Net-Protocol-OBSRemote/workflows/linux/badge.svg)](https://github.com/Corion/Net-Protocol-OBSRemote/actions?query=workflow%3Alinux)
+
+# NAME
+
+Net::Protocol::OBSRemote - event-loop agnostic protocol to control OBS via the WebSocket plugin
+
+# SYNOPSIS
+
+    my $protocol = Net::Protocol::OBSRemote->new();
+    my $message = $protocol->GetVersion();
+
+    my $result = $obs_connection->send_message( $message );
+
+See [Mojo::OBS::Client](https://metacpan.org/pod/Mojo::OBS::Client) for a Mojolicious implementation. This module merely
+abstracts constructing the messages.
+
+# SEE ALSO
+
+[https://github.com/Palakis/obs-websocket/blob/4.x-current/docs/generated/protocol.md](https://github.com/Palakis/obs-websocket/blob/4.x-current/docs/generated/protocol.md)
+
+## `->SetCurrentScene $sceneName`
+
+Sets the current broadcast scene
+
+## `->GetPreviewScene`
+
+Gets the current preview scene
+
+## `->SetPreviewScene $sceneName`
+
+Sets the current preview scene
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/Net-Protocol-OBSRemote](https://github.com/Corion/Net-Protocol-OBSRemote).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+[https://github.com/Corion/Net-Protocol-OBSRemote/issues](https://github.com/Corion/Net-Protocol-OBSRemote/issues)
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2021-2021 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

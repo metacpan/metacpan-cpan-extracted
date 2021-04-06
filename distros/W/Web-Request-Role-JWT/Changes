@@ -1,6 +1,8 @@
 Revision history for Web::Request::Role::JWT
 
-1.002     2021-01-03 18:07:00+01:00
+1.003     2021-04-04 13:26:52+02:00
+   - Adds missing author, license, and copyright_holder to dist.ini. (Håkon Hægland)
+
 
 1.002     2021-01-03 18:05:49+01:00
     - dist housekeeping: github issues,

@@ -1,18 +1,36 @@
 Changelog for AnyEvent-Net-Curl-Queued
 
-0.047 2014-02-26T16:11:07
+0.048 2021-04-05T11:27:15
+ - Fixed no-clobbering behavior (Stanislaw Pusep)
+ - Bump copyright year (Stanislaw Pusep)
+ - Fix for Test::Synopsis (Stanislaw Pusep)
+ - Improvements for the bin/yada utility (Stanislaw Pusep)
+ - Fix for issue #5 (Stanislaw Pusep)
+ - Fixed Changes generation behavior (Stanislaw Pusep)
+
+0.047 2014-02-26T16:10:35
  - cleanup (Stanislaw Pusep)
  - No checks for IPv6 localhost for now :( (Stanislaw Pusep)
  - Updated Dist::Zilla (Stanislaw Pusep)
+
+0.046 2013-10-17T12:32:49
  - saner YADA defaults (Stanislaw Pusep)
  - YADA optimization for plain URL queues (Stanislaw Pusep)
  - remove ram comment about Parallel::Downloader (Christian Walde)
  - Fixed yet another test failing behind the proxy (Stanislaw Pusep)
+
+0.045 2013-04-27T14:16:02
  - reverting #871313f1ed (Stanislaw Pusep)
+
+0.044 2013-04-22T18:12:36
  - AnyEvent timers are now weak_ref (Stanislaw Pusep)
  - Perl v5.17.10 compatibility (Stanislaw Pusep)
+
+0.043 2013-03-19T20:59:04
  - "AnyOf" usage requires MooX::Types::MooseLike >= 0.18 (Stanislaw Pusep)
  - fixed timers for AnyEvent::Impl::Perl (Stanislaw Pusep)
+
+0.042 2013-03-18T14:35:07
  - typo fix (Stanislaw Pusep)
  - BROKEN COMPATIBILITY: added the "WARNING: GONE MOO!" POD section
    *everywhere* (Stanislaw Pusep)
@@ -25,13 +43,20 @@ Changelog for AnyEvent-Net-Curl-Queued
  - more Any::Moose removal (Stanislaw Pusep)
  - Fixed FIXMEs (Stanislaw Pusep)
  - Moo-sification: take two (Stanislaw Pusep)
+
+0.041 2013-02-18T21:48:46
  - removed dead reload code (Stanislaw Pusep)
  - t/70-timeout.t seems OK now (Stanislaw Pusep)
  - "use base" was broken (Stanislaw Pusep)
+
+0.040 2013-02-03T16:20:20
  - recommend EV 4.11 as a prerequisite (Stanislaw Pusep)
  - eg/yada-crawler.pl cleanup (Stanislaw Pusep)
  - AE::N::C::Q::E header attribute readonly (Stanislaw Pusep)
  - cleaned dependencies (Stanislaw Pusep)
+
+0.039 2013-01-29T02:36:38
+ - eg/yada-crawler.pl cleanup (Stanislaw Pusep)
  - YADA cleanup (Stanislaw Pusep)
  - minor ::Multi accessor cleanup (Stanislaw Pusep)
  - http_message handling revamped (Stanislaw Pusep)
@@ -41,6 +66,10 @@ Changelog for AnyEvent-Net-Curl-Queued
  - disable compression in Mojo::UA benchmark (Stanislaw Pusep)
  - Mojo::UserAgent benchmark fixed (mea culpa) (Stanislaw Pusep)
  - t/73-cycle.t is an author test (Stanislaw Pusep)
+ - eg/yada-crawler.pl: simplified parser initialization (Stanislaw Pusep)
+ - fixed taskset(1) link (Stanislaw Pusep)
+
+0.038 2013-01-24T22:11:02
  - ooops, Mojo can't start/stop several times anymore? (Stanislaw Pusep)
  - Mojo::UserAgent benchmark overhaul (Stanislaw Pusep)
  - setting CURLOPT_POSTFIELDS to a HashRef converts to JSON automatically
@@ -54,11 +83,15 @@ Changelog for AnyEvent-Net-Curl-Queued
  - fragment supression tested (Stanislaw Pusep)
  - disabling Net::Curl::* prototypes (Stanislaw Pusep)
  - messing around (Stanislaw Pusep)
+
+0.037 2012-11-25T18:55:34
  - fixed encoding issues revealed by upgrading to Digest::SHA v5.74
    (Stanislaw Pusep)
  - postponing $cv->send to properly destroy ::Multi instance (Stanislaw
    Pusep)
  - followlocation-caused header propagation fix (Stanislaw Pusep)
+
+0.036 2012-11-06T15:00:02
  - curly brackets cleanup (Stanislaw Pusep)
  - initialization exception testing (Stanislaw Pusep)
  - proper usage of BUILDARGS/FOREIGNBUILDARGS (Stanislaw Pusep)
@@ -71,23 +104,35 @@ Changelog for AnyEvent-Net-Curl-Queued
  - major breakthrough in Net::Curl::*  "unreferenced scalar" fixing!
    (Stanislaw Pusep)
  - attempt to fight 1-millisecond timeout (again) (Stanislaw Pusep)
+
+0.035 2012-10-22T18:49:04
  - Net::Curl::Share instance destruction code is FUBAR; storing it inside a
    Mo[ou]se attribute was a really bad idea :~( (Stanislaw Pusep)
+
+0.034 2012-10-22T12:46:49
  - weak_ref unnecessary, after all (Stanislaw Pusep)
  - removed unnecessary & broken weak_ref declarations (Stanislaw Pusep)
  - replaced time() from Time::HiRes by AE::tie (Stanislaw Pusep)
  - a bit less deterministic t/61-nest.t (Stanislaw Pusep)
+
+0.033 2012-10-18T18:31:27
  - better compliance with libcurl docs (Stanislaw Pusep)
  - a bit cleaner Net::Curl::Share handling (Stanislaw Pusep)
  - very bad fix for Net::Curl::Share instance "weakness" (Stanislaw Pusep)
  - getting rid of "Attempt to free unreferenced scalar: SV 0xdeadbeef
    during global destruction." (Stanislaw Pusep)
+
+0.032 2012-10-16T15:14:13
  - version bump (Stanislaw Pusep)
  - fix release: dependencies were stripped accidentally (Stanislaw Pusep)
+
+0.031 2012-10-16T14:20:54
  - split Test::HTTP::AnyEvent::Server into a separate module (Stanislaw
    Pusep)
  - finally Test::HTTP::AnyEvent::Server can detach & run as separate
    process (Stanislaw Pusep)
+
+0.030 2012-10-11T22:31:11
  - YADA DWIM: documented & tested (Stanislaw Pusep)
  - updated test for nasty empty HTTP::Message condition (Stanislaw Pusep)
  - minor edge case condition adjustments (Stanislaw Pusep)
@@ -95,10 +140,14 @@ Changelog for AnyEvent-Net-Curl-Queued
  - better type constraints (Stanislaw Pusep)
  - added common_opts to AE::N::C::Q and fixed CURLOPT_(SHARE|TIMEOUT)
    propagation for YADA (Stanislaw Pusep)
+
+0.029 2012-10-03T19:44:25
  - test fixes (no need to rely on cpan.org) (Stanislaw Pusep)
  - eg/simple.pl updated to show the new sugar syntax (Stanislaw Pusep)
  - do *NOT* return HTTP::Response if scheme is not HTTP/HTTPS (Stanislaw
    Pusep)
+
+0.028 2012-09-26T19:52:31
  - attempt to fix FreeBSD test errors (Stanislaw Pusep)
  - YADA append()/prepend() are now chainable (updated example in SYNOPSIS)
    (Stanislaw Pusep)
@@ -111,6 +160,8 @@ Changelog for AnyEvent-Net-Curl-Queued
  - benchmark results updated (Stanislaw Pusep)
  - update process name in eg/benchmark.pl (Stanislaw Pusep)
  - refactored eg/benchmark.pl (Stanislaw Pusep)
+
+0.027 2012-09-11T04:54:09
  - test cloning (Stanislaw Pusep)
  - AE::N::C::Q::Easy->clone($param) fixed (Stanislaw Pusep)
  - benchmark updated (Stanislaw Pusep)
@@ -141,6 +192,8 @@ Changelog for AnyEvent-Net-Curl-Queued
  - implemented Test::HTTP::AnyEvent::Server, as fork() breaks Net::Curl :(
    (Stanislaw Pusep)
  - use AE::postpone instead of "instant timer" hack (Stanislaw Pusep)
+
+0.026 2012-09-05T21:24:33
  - updated t/42-loopback-retry.t to use internal POST retry mechanism
    (Stanislaw Pusep)
  - attempt double GET at t/30-queued-single.t (to verify queue
@@ -150,26 +203,50 @@ Changelog for AnyEvent-Net-Curl-Queued
  - split queue accessors POD (Stanislaw Pusep)
  - correctly reenqueue POST requests (Stanislaw Pusep)
  - Mojo::UserAgent benchmark (Stanislaw Pusep)
+
+0.025 2012-07-27T18:08:19
  - benchmark fixed (Stanislaw Pusep)
  - removed Memoize dependency (Stanislaw Pusep)
+
+0.024 2012-07-23T19:22:24
  - squash setopt calls during init into one (Stanislaw Pusep)
  - Trait::Array is too slow to handle huge queues (Stanislaw Pusep)
+
+0.023 2012-07-20T19:35:04
  - automatically POST as JSON (Stanislaw Pusep)
+
+0.022 2012-07-04T18:54:54
  - raise CURLMOPT_MAXCONNECTS (Stanislaw Pusep)
  - example fixes (Stanislaw Pusep)
  - eg/CrawlApache.pm using Web::Scraper (Stanislaw Pusep)
+
+0.021 2012-05-21T17:18:08
  - removed common::sense (Stanislaw Pusep)
  - using ChangelogFromGit::CPAN::Changes for changelog (Stanislaw Pusep)
  - Changes (Stanislaw Pusep)
+
+0.020 2012-05-12T21:18:51
  - documentation updated with alternatives; prereq common::sense 3.5
    (Stanislaw Pusep)
  - Changelog (Stanislaw Pusep)
+
+0.019 2012-04-05T20:26:29
+ - version bump (Stanislaw Pusep)
  - fix for perl-5.15.9 (Stanislaw Pusep)
+ - Changelog (Stanislaw Pusep)
+
+0.018 2012-03-31T19:04:45
  - minor fixes (Stanislaw Pusep)
+ - Changelog (Stanislaw Pusep)
+
+0.017 2012-03-27T13:54:30
  - ++yada options (Stanislaw Pusep)
  - yada: stupid typo fix (Stanislaw Pusep)
  - benchmark is flawed as YADA also can't tell initialization from fetching
    apart :( (Stanislaw Pusep)
+ - Changelog (Stanislaw Pusep)
+
+0.016 2012-03-25T21:46:55
  - yada: filename from content-disposition/location tags (Stanislaw Pusep)
  - better socket watcher recycling (Stanislaw Pusep)
  - benchmark now separates initialization from the download; using remote
@@ -178,16 +255,26 @@ Changelog for AnyEvent-Net-Curl-Queued
  - yada timeout parameter (Stanislaw Pusep)
  - --MooseX::NonMoose from dist.ini (Stanislaw Pusep)
  - verbose yada help (Stanislaw Pusep)
+
+0.015 2012-03-23T15:34:09
  - ++yada CLI tool (Stanislaw Pusep)
  - all tests under Any::Moose (Stanislaw Pusep)
  - meta->class_precedence_list => meta->name (Stanislaw Pusep)
  - ++MooseX::NonMoose to dist.ini (Stanislaw Pusep)
  - eg/benchmark.pl: unsure about the way to use AnyEvent::Curl::Multi;
    copied from Template::Parser::RemoteInclude (Stanislaw Pusep)
+ - Changelog (Stanislaw Pusep)
+
+0.014 2012-03-22T19:38:15
  - README version bump (Stanislaw Pusep)
  - ++CURL_LOCK_DATA_SSL_SESSION (Stanislaw Pusep)
  - MouseX::NativeTraits dependency (Stanislaw Pusep)
+ - Changelog (Stanislaw Pusep)
+
+0.013 2012-03-21T20:23:37
  - Replaced Moose by Any::Moose (Stanislaw Pusep)
+ - benchmark update (Stanislaw Pusep)
+ - documentation update (Stanislaw Pusep)
  - fixes (Stanislaw Pusep)
  - benchmark fix (Stanislaw Pusep)
  - cleanup test (Stanislaw Pusep)
@@ -195,47 +282,85 @@ Changelog for AnyEvent-Net-Curl-Queued
  - Mouse prereqs (Stanislaw Pusep)
  - BUILDARGS hack (Stanislaw Pusep)
  - Moose => Any::Moose (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.012 2012-02-01T16:33:34
  - AENCQ object now reusable (Stanislaw Pusep)
  - fixed kwalitee test due to new Parse::RecDescent release (Stanislaw
    Pusep)
  - "Attempt to free unreferenced scalar: SV 0xdeadbeef." warning was not
    Test::HTTP::Server's fault in 01-net-curl-compatibility.t, at all.
    (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.011 2011-11-06T19:58:44
  - watchdog executes $self->multi->perform (Stanislaw Pusep)
  - watchdog (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.010 2011-10-26T13:33:09
  - YADA alias (Stanislaw Pusep)
  - default timeout/retry update (Stanislaw Pusep)
  - Fixed 'Attempt to free unreferenced scalar: SV 0xdeadbeef during global
    destruction.' in t/01-net-curl-compatibility.t (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.009 2011-10-23T12:50:02
  - max connections editable on-fly (Stanislaw Pusep)
  - retry CodeRef fix (Stanislaw Pusep)
  - eg/ fix (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.008 2011-10-23T00:47:12
  - re-enqueued requests are forced to bypass de-duplication filter
    (Stanislaw Pusep)
  - allow_dups configurable (Stanislaw Pusep)
  - URI coerce typo fix (Stanislaw Pusep)
  - better cloning (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.007 2011-10-21T19:23:14
  - update README.pod (Stanislaw Pusep)
  - reorganize tests (Stanislaw Pusep)
  - optionally use_stats (Stanislaw Pusep)
+ - benchmark update (Stanislaw Pusep)
  - Const POD (Stanislaw Pusep)
  - Net::Curl::* constants accessor/cache (Stanislaw Pusep)
+ - benchmark fix (Stanislaw Pusep)
  - ++curl benchmark (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.006 2011-10-20T14:02:20
  - added nice comparison chart (Stanislaw Pusep)
  - callback tests (Stanislaw Pusep)
  - Easy: constants cache; on_init/on_finish callbacks (Stanislaw Pusep)
  - Stats: precompute constants (Stanislaw Pusep)
  - benchmark example (Stanislaw Pusep)
+
+0.005 2011-10-19T19:49:29
  - new release (Stanislaw Pusep)
  - recursively update queue test (Stanislaw Pusep)
  - single request in queue test (Stanislaw Pusep)
  - fixed HTTP::Response encapsulation warning when response is empty
    (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.004 2011-10-15T16:40:51
  - stupid termination condition bug (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.003 2011-10-15T15:31:32
  - no CURLINFO_PRIMARY_PORT in older libcurl (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.002 2011-10-14T14:34:05
  - now passes tests on perl-5.10.1 (Stanislaw Pusep)
  - getinfo()/setopt() improvements (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.001 2011-10-13T20:44:06
  - documentation (Stanislaw Pusep)
+ - cleanup (Stanislaw Pusep)
  - HTTP::Response encapsulation (Stanislaw Pusep)
  - Easy getinfo() wrapper (Stanislaw Pusep)
  - Easy setopt() wrapper (Stanislaw Pusep)
@@ -262,6 +387,3 @@ Changelog for AnyEvent-Net-Curl-Queued
  - retries (Stanislaw Pusep)
  - split (Stanislaw Pusep)
  -  (Stanislaw Pusep)
- - fixed taskset(1) link (Stanislaw Pusep)
- - eg/yada-crawler.pl: simplified parser initialization (Stanislaw Pusep)
-

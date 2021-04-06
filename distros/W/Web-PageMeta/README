@@ -50,6 +50,14 @@ ACCESSORS
     User-Agent header to use for http requests. Default is one from Chrome
     89.0.4389.90.
 
+  extra_headers
+    HashRef with extra http request headers.
+
+  cookie_jar
+    Accepts optional HTTP::Cookies compatible object that must provide
+    "get_cookies()" method. If set will send http cookie headers with each
+    request.
+
   title
     Returns title of the page.
 
@@ -62,14 +70,16 @@ ACCESSORS
   image_data
     Returns image binary data of "image" link.
 
+    Will throw 404 exception if there is not "image" link.
+
   page_meta
     Returns hash ref with all open-graph data.
 
   extra_scraper
-    Web::Scrape object to fetch image, title or description from different
+    Web::Scraper object to fetch image, title or description from different
     than default location.
 
-        use Web::Scrape;
+        use Web::Scraper;
         use Web::PageMeta;
         my $escraper = scraper {
             process_first '.slider .camera_wrap div', 'image' => '@data-src';
@@ -79,6 +89,10 @@ ACCESSORS
             extra_scraper => $escraper,
         );
 
+  page_body_hdr
+    Returns array ref with page [$body,$headers]. Can be useful for
+    post-processing or special/additional data extractions.
+
   fetch_page_meta_ft
     Returns future object for fetching paga meta data. See "ASYNC USE". On
     done "page_meta" hash is returned.
@@ -86,6 +100,10 @@ ACCESSORS
   fetch_image_data_ft
     Returns future object for fetching image data. See "ASYNC USE" On done
     "image_data" scalar is returned.
+
+  fetch_page_body_hdr_ft
+    Returns future object for fetching page content and headers. See "ASYNC
+    USE" On done "page_body_hdr" array ref is returned.
 
 ASYNC USE
     To run multiple page meta data or image http requests in parallel or to

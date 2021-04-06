@@ -1,5 +1,5 @@
 This archive contains the distribution Dancer2-Plugin-DBIx-Class,
-version 1.02:
+version 1.03:
 
   syntactic sugar for DBIx::Class in Dancer2, optionally with DBIx::Class::Schema::ResultSetNames
 

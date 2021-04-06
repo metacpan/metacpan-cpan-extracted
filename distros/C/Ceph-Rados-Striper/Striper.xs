@@ -192,8 +192,8 @@ _read_to_fh(striper, soid, fh, len = 0, off = 0, debug=false)
     if (debug)
         printf("preparing to write from %s to FH, %" PRIu64 " bytes\n", soid, psize);
     for (bufpos=off; bufpos<len+off; bufpos+=chk_sz) {
-        // logic is 'will bufpos move past ien+offnext cycle'
-        buflen = len+off < bufpos+chk_sz ? len+off % chk_sz : chk_sz;
+        // logic is 'will bufpos move past ien+off next cycle'
+        buflen = len+off < bufpos+chk_sz ? len % chk_sz : chk_sz;
         if (debug)
             printf("Reading %u bytes, offset %" PRIu64 ", of %" PRIu64 "-%" PRIu64 "/%" PRIu64 " from striper\n", buflen, bufpos, off, len+off, psize);
         err = rados_striper_read(striper, soid, buf, buflen, bufpos);

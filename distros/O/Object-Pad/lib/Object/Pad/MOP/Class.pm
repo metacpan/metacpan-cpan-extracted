@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
 
-package Object::Pad::MOP::Class;
+package Object::Pad::MOP::Class 0.37;
 
 use v5.14;
 use warnings;
-
-our $VERSION = '0.36';
 
 # This is an XS-implemented object type provided by Object::Pad itself
 require Object::Pad;

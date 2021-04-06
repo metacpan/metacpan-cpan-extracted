@@ -1,3 +1,8 @@
+0.017   2021-04-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Didn't access the correct data structure element.
+
+
 0.016   2020-10-08  Released-By: PERLANCAR; Urgency: medium
 
 	[Bug fixes]

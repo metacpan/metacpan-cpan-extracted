@@ -1,7 +1,6 @@
 package HTTP::API::Client;
-$HTTP::API::Client::VERSION = '1.02';
-use strict;
-use warnings;
+$HTTP::API::Client::VERSION = '1.03';
+use Moo;
 
 =head1 NAME
 
@@ -74,7 +73,6 @@ use HTTP::Request;
 use JSON::XS;
 use LWP::UserAgent;
 use Net::Curl::Simple;
-use Moo;
 use Try::Tiny;
 use URI;
 use URI::Escape qw( uri_escape uri_unescape );
@@ -115,12 +113,20 @@ has auth_token => (
 sub _build_auth_token { _defor($ENV{HTTP_AUTH_TOKEN}, '') }
 
 has base_url => (
-    is  => "rw",
+    is      => "rw",
+    lazy    => 1,
+    builder => 1,
 );
 
+sub _build_base_url {}
+
 has last_response => (
-    is  => "rw",
+    is      => "rw",
+    lazy    => 1,
+    builder => 1,
 );
+
+sub _build_last_response {}
 
 has charset => (
     is      => "rw",
@@ -142,8 +148,12 @@ sub _build_browser_id {
 }
 
 has content_type => (
-    is => "rw",
+    is      => "rw",
+    lazy    => 1,
+    builder => 1,
 );
+
+sub _build_content_type {}
 
 sub get_content_type {
     my ($self, %o) = @_;
@@ -165,6 +175,7 @@ sub get_content_type {
 
 has engine => (
     is      => "ro",
+    lazy    => 1,
     builder => 1,
 );
 
@@ -280,16 +291,28 @@ sub _build_debug_flags {
 }
 
 has pre_defined_data => (
-    is  => "rw",
+    is      => "rw",
+    lazy    => 1,
+    builder => 1,
 );
+
+sub _build_pre_defined_data {{}}
 
 has pre_defined_headers => (
-    is  => "rw",
+    is      => "rw",
+    lazy    => 1,
+    builder => 1,
 );
 
+sub _build_pre_defined_headers {{}}
+
 has pre_defined_events => (
-    is  => "rw",
+    is      => "rw",
+    lazy    => 1,
+    builder => 1,
 );
+
+sub _build_pre_defined_events {{}}
 
 sub get {
     my ($self, @args) = @_;

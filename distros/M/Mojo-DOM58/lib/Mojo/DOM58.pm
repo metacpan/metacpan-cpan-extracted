@@ -17,7 +17,7 @@ use Mojo::DOM58::_HTML 'tag_to_html';
 use Scalar::Util qw(blessed weaken);
 use Storable 'dclone';
 
-our $VERSION = '2.000';
+our $VERSION = '3.000';
 
 our @EXPORT_OK = 'tag_to_html';
 
@@ -37,7 +37,7 @@ sub new_tag {
 
 sub TO_JSON { ${shift()}->render }
 
-sub all_text { _text(_nodes(shift->tree), 1) }
+sub all_text { _text(_nodes($_[0]->tree), $_[0]->xml, 1) }
 
 sub ancestors { _select($_[0]->_collect([_ancestors($_[0]->tree)]), $_[1]) }
 
@@ -176,7 +176,7 @@ sub tag {
 
 sub tap { Mojo::DOM58::_Collection::tap(@_) }
 
-sub text { _text(_nodes(shift->tree), 0) }
+sub text { _text(_nodes(shift->tree), 0, 0) }
 
 sub to_string { ${shift()}->render }
 
@@ -334,7 +334,7 @@ sub _siblings {
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }
 
 sub _text {
-  my ($nodes, $all) = @_;
+  my ($nodes, $xml, $all) = @_;
 
   my $text = '';
   while (my $node = shift @$nodes) {
@@ -346,7 +346,9 @@ sub _text {
     }
 
     # Nested tag
-    elsif ($type eq 'tag' && $all) { unshift @$nodes, @{_nodes($node)} }
+    elsif ($type eq 'tag' && $all) {
+      unshift @$nodes, @{_nodes($node)} if $xml || ($node->[1] ne 'script' && $node->[1] ne 'style');
+    }
   }
 
   return $text;
@@ -417,8 +419,8 @@ Mojo::DOM58 - Minimalistic HTML/XML DOM parser with CSS selectors
 
 L<Mojo::DOM58> is a minimalistic and relaxed pure-perl HTML/XML DOM parser based
 on L<Mojo::DOM>. It supports the L<HTML Living Standard|https://html.spec.whatwg.org/>
-and L<Extensible Markup Language (XML) 1.0|http://www.w3.org/TR/xml/>, and
-matching based on L<CSS3 selectors|http://www.w3.org/TR/selectors/>. It will
+and L<Extensible Markup Language (XML) 1.0|https://www.w3.org/TR/xml/>, and
+matching based on L<CSS3 selectors|https://www.w3.org/TR/selectors/>. It will
 even try to interpret broken HTML and XML, so you should not use it for
 validation.
 
@@ -429,7 +431,7 @@ closely compatible with upstream. It differs only in the standalone format and
 compatibility with Perl 5.8. Any bugs or patches not related to these changes
 should be reported directly to the L<Mojolicious> issue tracker.
 
-This release of L<Mojo::DOM58> is up to date with version C<8.09> of
+This release of L<Mojo::DOM58> is up to date with version C<9.0> of
 L<Mojolicious>.
 
 =head1 NODES AND ELEMENTS
@@ -520,14 +522,26 @@ An C<E> element whose C<foo> attribute value is exactly equal to C<bar>.
 
 An C<E> element whose C<foo> attribute value is exactly equal to any
 (ASCII-range) case-permutation of C<bar>. Note that this selector is
-EXPERIMENTAL and might change without warning!
+B<EXPERIMENTAL> and might change without warning!
 
   my $case_insensitive = $dom->find('input[type="hidden" i]');
   my $case_insensitive = $dom->find('input[type=hidden i]');
   my $case_insensitive = $dom->find('input[class~="foo" i]');
 
 This selector is part of
-L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
+L<Selectors Level 4|https://dev.w3.org/csswg/selectors-4>, which is still a work
+in progress.
+
+=item E[foo="bar" s]
+
+An C<E> element whose C<foo> attribute value is exactly and case-sensitively
+equal to C<bar>. Note that this selector is B<EXPERIMENTAL> and might change
+without warning!
+
+  my $case_sensitive = $dom->find('input[type="hidden" s]');
+
+This selector is part of
+L<Selectors Level 4|https://dev.w3.org/csswg/selectors-4>, which is still a work
 in progress.
 
 =item E[foo~="bar"]
@@ -652,19 +666,38 @@ An C<E> element that has no children (including text nodes).
 
   my $empty = $dom->find(':empty');
 
+=item E:any-link
+
+Alias for L</"E:link">. Note that this selector is B<EXPERIMENTAL> and might
+change without warning! This selector is part of
+L<Selectors Level 4|https://dev.w3.org/csswg/selectors-4>, which is still a
+work in progress.
+
 =item E:link
 
 An C<E> element being the source anchor of a hyperlink of which the target is
 not yet visited (C<:link>) or already visited (C<:visited>). Note that
-L<Mojo::DOM58> is not stateful, therefore C<:link> and C<:visited> yield
-exactly the same results.
+L<Mojo::DOM58> is not stateful, therefore C<:any-link>, C<:link> and
+C<:visited> yield exactly the same results.
 
+  my $links = $dom->find(':any-link');
   my $links = $dom->find(':link');
   my $links = $dom->find(':visited');
 
 =item E:visited
 
 Alias for L</"E:link">.
+
+=item E:scope
+
+An C<E> element being a designated reference element. Note that this selector is B<EXPERIMENTAL> and might change
+without warning!
+
+  my $scoped = $dom->find('a:not(:scope > a)');
+  my $scoped = $dom->find('div :scope p');
+  my $scoped = $dom->find('~ p');
+
+This selector is part of L<Selectors Level 4|https://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
 
 =item E:checked
 
@@ -688,25 +721,36 @@ An C<E> element with C<ID> equal to "myid".
 =item E:not(s1, s2)
 
 An C<E> element that does not match either compound selector C<s1> or compound
-selector C<s2>. Note that support for compound selectors is EXPERIMENTAL and
+selector C<s2>. Note that support for compound selectors is B<EXPERIMENTAL> and
 might change without warning!
 
   my $others = $dom->find('div p:not(:first-child, :last-child)');
 
 Support for compound selectors was added as part of
-L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
+L<Selectors Level 4|https://dev.w3.org/csswg/selectors-4>, which is still a work
 in progress.
 
-=item E:matches(s1, s2)
+=item E:is(s1, s2)
 
 An C<E> element that matches compound selector C<s1> and/or compound selector
-C<s2>. Note that this selector is EXPERIMENTAL and might change without warning!
+C<s2>. Note that this selector is B<EXPERIMENTAL> and might change without warning!
 
-  my $headers = $dom->find(':matches(section, article, aside, nav) h1');
+  my $headers = $dom->find(':is(section, article, aside, nav) h1');
 
 This selector is part of
-L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
+L<Selectors Level 4|https://dev.w3.org/csswg/selectors-4>, which is still a work
 in progress.
+
+=item E:has(rs1, rs2)
+
+An C<E> element, if either of the relative selectors C<rs1> or C<rs2>, when evaluated with C<E> as the :scope elements,
+match an element. Note that this selector is B<EXPERIMENTAL> and might change without warning!
+
+  my $link = $dom->find('a:has(> img)');
+
+This selector is part of L<Selectors Level 4|https://dev.w3.org/csswg/selectors-4>, which is still a work in progress.
+Also be aware that this feature is currently marked C<at-risk>, so there is a high chance that it will get removed
+completely.
 
 =item A|E
 
@@ -861,7 +905,8 @@ key/value pairs to generate attributes from.
 
   my $text = $dom->all_text;
 
-Extract text content from all descendant nodes of this element.
+Extract text content from all descendant nodes of this element. For HTML documents C<script> and C<style> elements are
+excluded.
 
   # "foo\nbarbaz\n"
   $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->at('div')->all_text;
@@ -1098,6 +1143,9 @@ Trailing key/value pairs can be used to declare xml namespace aliases.
 
 Find this element's namespace, or return C<undef> if none could be found.
 
+  # "http://www.w3.org/2000/svg"
+  Mojo::DOM58->new('<svg xmlns:svg="http://www.w3.org/2000/svg"><svg:circle>3.14</svg:circle></svg>')->at('svg\:circle')->namespace;
+
   # Find namespace for an element with namespace prefix
   my $namespace = $dom->at('svg > svg\:circle')->namespace;
 
@@ -1321,6 +1369,8 @@ Render this node and its content to HTML/XML.
   # "<b>Test</b>"
   $dom->parse('<div><b>Test</b></div>')->at('div b')->to_string;
 
+To extract text content from all descendant nodes, see L</"all_text">.
+
 =head2 tree
 
   my $tree = $dom->tree;
@@ -1536,6 +1586,19 @@ and is also available as C<$_>.
   # Find all values that are greater than 5
   my $greater = $collection->grep(sub { $_ > 5 });
 
+=head2 head
+
+  my $new = $collection->head(4);
+  my $new = $collection->head(-2);
+
+Create a new L<collection|/"COLLECTION METHODS"> with up to the specified
+number of elements from the beginning of the collection. A negative number will
+count from the end.
+
+  # $collection contains ('A', 'B', 'C', 'D', 'E')
+  $collection->head(3)->join(' '); # "A B C"
+  $collection->head(-3)->join(' '); # "A B"
+
 =head2 join
 
   my $stream = $collection->join;
@@ -1622,6 +1685,19 @@ L<collection|/"COLLECTION METHODS"> from the results.
   # Sort values case-insensitive
   my $case_insensitive = $collection->sort(sub { uc($a) cmp uc($b) });
 
+=head2 tail
+
+  my $new = $collection->tail(4);
+  my $new = $collection->tail(-2);
+
+Create a new L<collection|/"COLLECTION METHODS"> with up to the specified
+number of elements from the end of the collection. A negative number will count
+from the beginning.
+
+  # $collection contains ('A', 'B', 'C', 'D', 'E')
+  $collection->tail(3)->join(' '); # "C D E"
+  $collection->tail(-3)->join(' '); # "D E"
+
 =head2 tap
 
   $collection = $collection->tap(sub {...});
@@ -1661,6 +1737,13 @@ are treated the same.
 
 Equivalent to L<Mojo::Base/"with_roles">. Note that role support depends on
 L<Role::Tiny> (2.000001+).
+
+=head1 DEBUGGING
+
+You can set the C<MOJO_DOM58_CSS_DEBUG> environment variable to get some advanced diagnostics information printed to
+C<STDERR>.
+
+  MOJO_DOM58_CSS_DEBUG=1
 
 =head1 BUGS
 

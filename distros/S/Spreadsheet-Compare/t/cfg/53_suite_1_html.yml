@@ -1,5 +1,6 @@
 ---
 - title:     __GLOBAL__
+  type: CSV
   files:
     - left/csv_med_dup.csv
     - right/csv_med_dup.csv

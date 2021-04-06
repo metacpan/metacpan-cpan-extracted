@@ -64,7 +64,7 @@ if ( $opt{man} ) {
     };
     my $pager = $ENV{PAGER} || $Config{pager} || 'more';
     my $tmp   = tempfile("spreadcomp-XXXX");
-    $tmp->spew($out);
+    $tmp->append({truncate => 1}, $out);
     system("$pager $tmp");
     exit;
 }

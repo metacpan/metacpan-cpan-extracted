@@ -6,14 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/BorderStyleUtils.pm'
 );
 
 my @scripts = (
-    'script/list-border-style-modules'
+    'script/list-border-style-modules',
+    'script/show-border-style'
 );
 
 # no fake home requested

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Test script for DateTime::Calendar::FrenchRevolutionary
-#     Copyright (C) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019 Jean Forget. All rights reserved.
+#     Copyright (C) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019, 2021 Jean Forget. All rights reserved.
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License

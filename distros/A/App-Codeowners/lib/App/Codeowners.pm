@@ -13,7 +13,7 @@ use Color::ANSI::Util 0.03 qw(ansifg);
 use File::Codeowners;
 use Path::Tiny;
 
-our $VERSION = '0.49'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 
 sub main {
@@ -219,7 +219,7 @@ App::Codeowners - A tool for managing CODEOWNERS files
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 DESCRIPTION
 
@@ -250,7 +250,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Charles McGarvey.
+This software is copyright (c) 2021 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

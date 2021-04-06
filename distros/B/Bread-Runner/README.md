@@ -4,7 +4,7 @@ Bread::Runner - run ALL the apps via Bread::Board
 
 # VERSION
 
-version 0.904
+version 0.905
 
 # SYNOPSIS
 
@@ -19,16 +19,16 @@ version 0.904
             )
         };
     };
-    
+
     # Write one generic wrapper script to run all your services
     # bin/generic_runner.pl
     use Bread::Runner;
     Bread::Runner->run('YourProduct');
-    
+
     # Symlink this generic runner to filenames matchin your services
     ln -s bin/generic_runner.pl bin/api.psgi
     ln -s bin/generic_runner.pl bin/some_script
-    
+
     # Never write a wrapper script again!
 
 # DESCRIPTION
@@ -86,7 +86,7 @@ Default: `$0` modulo some cleanup magic, see ["Guessing the service name from $0
 
 The name of the service to use.
 
-If you do not want to use this magic, pass in the explizit service
+If you do not want to use this magic, pass in the explicit service
 name you want to use. This could be hardcoded, or you could come up
 with an alternative implementation to get the service name from the
 environment available to a generic wrapper script.
@@ -120,10 +120,10 @@ A subref to be called just before `run` is called.
 Gets the following things as a list in this order
 
 - the `Bread::Board` container
-- the initated service
+- the initiated service
 - the opts hashref (so you can pass on more stuff from your wrapper)
 
-You could use this hook to do some further initalistion, setup etc
+You could use this hook to do some further initialisation, setup etc
 that might not be doable in `Bread::Board` itself.
 
 ### post\_run
@@ -143,7 +143,7 @@ Set this to a true value to prevent the startup log message.
 Thanks to
 
 - [validad.com](http://www.validad.com/) for supporting Open Source.
-- [Klaus Ita](https://metacpan.org/author/KOKI) for feedback & input during inital in-house development
+- [Klaus Ita](https://metacpan.org/author/KOKI) for feedback & input during initial in-house development
 
 # AUTHOR
 

@@ -1,7 +1,9 @@
 package App::swcat;
 
-our $DATE = '2019-10-26'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-04-04'; # DATE
+our $DIST = 'App-swcat'; # DIST
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -49,7 +51,7 @@ our $db_schema_spec = {
 
 our $re_software = qr/\A[A-Za-z0-9_]+(?:-[A-Za-z0-9_]+)*\z/;
 
-our %args_common = (
+our %args_common0 = (
     db_path => {
         summary => 'Location of SQLite database (for caching), '.
             'defaults to ~/.cache/swcat.db',
@@ -63,6 +65,10 @@ our %args_common = (
             no_cache => {summary => 'Alias for --cache-period=-1', is_flag=>1, code=>sub { $_[0]{cache_period} = -1 }},
         },
     },
+);
+
+our %args_common = (
+    %args_common0,
     arch => {
         schema => 'software::arch*',
         tags => ['common'],
@@ -162,23 +168,6 @@ sub _connect_db {
     $dbh;
 }
 
-sub _detect_arch {
-    require Config; Config->import;
-    my $archname = $Config{archname};
-    if ($archname =~ /\Ax86-linux/) {
-        return "linux-x86"; # linux i386
-    } elsif ($archname =~ /\Ax86-linux/) {
-    } elsif ($archname =~ /\Ax86_64-linux/) {
-        return "linux-x86_64";
-    } elsif ($archname =~ /\AMSWin32-x86(-|\z)/) {
-        return "win32";
-    } elsif ($archname =~ /\AMSWin32-x64(-|\z)/) {
-        return "win64";
-    } else {
-        die "Unsupported arch '$archname'";
-    }
-}
-
 sub _set_args_default {
     my $args = shift;
     if (!$args->{db_path}) {
@@ -187,7 +176,8 @@ sub _set_args_default {
             '/.cache/swcat.db';
     }
     if (!$args->{arch}) {
-        $args->{arch} = _detect_arch;
+        require Software::Catalog::Util;
+        $args->{arch} = Software::Catalog::Util::detect_arch();
     }
     if (!defined $args->{cache_period}) {
         $args->{cache_period} = 86400;
@@ -477,6 +467,74 @@ sub available_versions {
     $mod->available_versions(arch => $args{arch});
 }
 
+$SPEC{available_archs} = {
+    v => 1.1,
+    summary => 'Get list of available architectures of a software',
+    description => <<'_',
+
+
+_
+    args => {
+        %args_common0,
+        %arg0_software,
+    },
+};
+sub available_archs {
+    my %args = @_;
+    my $state = _init(\%args, 'rw');
+
+    my $sw = $args{software};
+
+    my $mod = _load_swcat_mod($sw);
+    [200, "OK", [$mod->available_archs]];
+}
+
+$SPEC{release_note} = {
+    v => 1.1,
+    summary => 'Get release note of (a version of) a software',
+    description => <<'_',
+
+
+_
+    args => {
+        %args_common,
+        %arg0_software,
+        %argopt_arch,
+        %argopt1_version,
+    },
+};
+sub release_note {
+    my %args = @_;
+    my $state = _init(\%args, 'ro');
+
+    my $sw = delete $args{software};
+    my $mod = _load_swcat_mod($sw);
+    $mod->release_note(%args);
+}
+
+$SPEC{archive_info} = {
+    v => 1.1,
+    summary => 'Get info of a software archive',
+    args => {
+        %args_common,
+        %arg0_software,
+        #%arg_version,
+        %argopt_arch,
+    },
+};
+sub archive_info {
+    my %args = @_;
+    my $state = _init(\%args, 'ro');
+
+    my $sw = $args{software};
+
+    my $mod = _load_swcat_mod($sw);
+    my $res = $mod->archive_info(
+        maybe arch => $args{arch},
+    );
+    $res;
+}
+
 $SPEC{download_url} = {
     v => 1.1,
     summary => 'Get download URL(s) of a software',
@@ -522,53 +580,6 @@ sub download_url {
     $res;
 }
 
-$SPEC{release_note} = {
-    v => 1.1,
-    summary => 'Get release note of (a version of) a software',
-    description => <<'_',
-
-
-_
-    args => {
-        %args_common,
-        %arg0_software,
-        %argopt_arch,
-        %argopt1_version,
-    },
-};
-sub release_note {
-    my %args = @_;
-    my $state = _init(\%args, 'ro');
-
-    my $sw = delete $args{software};
-    my $mod = _load_swcat_mod($sw);
-    return [501, "Not implemented"] unless $mod->can("release_note");
-    $mod->release_note(%args);
-}
-
-$SPEC{archive_info} = {
-    v => 1.1,
-    summary => 'Get info of a software archive',
-    args => {
-        %args_common,
-        %arg0_software,
-        #%arg_version,
-        %argopt_arch,
-    },
-};
-sub archive_info {
-    my %args = @_;
-    my $state = _init(\%args, 'ro');
-
-    my $sw = $args{software};
-
-    my $mod = _load_swcat_mod($sw);
-    my $res = $mod->archive_info(
-        maybe arch => $args{arch},
-    );
-    $res;
-}
-
 1;
 # ABSTRACT: Software catalog
 
@@ -584,7 +595,7 @@ App::swcat - Software catalog
 
 =head1 VERSION
 
-This document describes version 0.014 of App::swcat (from Perl distribution App-swcat), released on 2019-10-26.
+This document describes version 0.015 of App::swcat (from Perl distribution App-swcat), released on 2021-04-04.
 
 =head1 SYNOPSIS
 
@@ -617,9 +628,48 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_path> => I<filename>
 
-Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+Location of SQLite database (for caching), defaults to ~E<sol>.cacheE<sol>swcat.db.
 
 =item * B<software>* => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 available_archs
+
+Usage:
+
+ available_archs(%args) -> [status, msg, payload, meta]
+
+Get list of available architectures of a software.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<cache_period> => I<int>
+
+=item * B<db_path> => I<filename>
+
+Location of SQLite database (for caching), defaults to ~E<sol>.cacheE<sol>swcat.db.
+
+=item * B<software>* => I<str>
+
 
 =back
 
@@ -656,9 +706,10 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_path> => I<filename>
 
-Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+Location of SQLite database (for caching), defaults to ~E<sol>.cacheE<sol>swcat.db.
 
 =item * B<software>* => I<str>
+
 
 =back
 
@@ -699,9 +750,10 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_path> => I<filename>
 
-Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+Location of SQLite database (for caching), defaults to ~E<sol>.cacheE<sol>swcat.db.
 
 =item * B<softwares_or_patterns> => I<array[str]>
+
 
 =back
 
@@ -742,9 +794,10 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_path> => I<filename>
 
-Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+Location of SQLite database (for caching), defaults to ~E<sol>.cacheE<sol>swcat.db.
 
 =item * B<softwares_or_patterns> => I<array[str]>
+
 
 =back
 
@@ -781,9 +834,10 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_path> => I<filename>
 
-Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+Location of SQLite database (for caching), defaults to ~E<sol>.cacheE<sol>swcat.db.
 
 =item * B<detail> => I<bool>
+
 
 =back
 
@@ -820,11 +874,12 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_path> => I<filename>
 
-Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+Location of SQLite database (for caching), defaults to ~E<sol>.cacheE<sol>swcat.db.
 
 =item * B<detail> => I<bool>
 
 =item * B<lcpan> => I<bool>
+
 
 =back
 
@@ -861,9 +916,10 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_path> => I<filename>
 
-Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+Location of SQLite database (for caching), defaults to ~E<sol>.cacheE<sol>swcat.db.
 
 =item * B<detail> => I<bool>
+
 
 =back
 
@@ -900,11 +956,12 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_path> => I<filename>
 
-Location of SQLite database (for caching), defaults to ~/.cache/swcat.db.
+Location of SQLite database (for caching), defaults to ~E<sol>.cacheE<sol>swcat.db.
 
 =item * B<software>* => I<str>
 
 =item * B<version> => I<str>
+
 
 =back
 
@@ -929,7 +986,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-swcat>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-swcat>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-swcat/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -945,7 +1002,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

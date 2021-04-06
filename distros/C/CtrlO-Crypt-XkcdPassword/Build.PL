@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "CtrlO-Crypt-XkcdPassword",
-  "dist_version" => "1.009",
+  "dist_version" => "1.010",
   "license" => "perl",
   "module_name" => "CtrlO::Crypt::XkcdPassword",
   "recursive_test_files" => 1,

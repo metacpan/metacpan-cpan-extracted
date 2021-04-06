@@ -4,9 +4,9 @@ use warnings;
 
 package Dist::Zilla::Role::Regenerator;
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001002';
 
-our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
+our $AUTHORITY = 'cpan:DBOOK'; # AUTHORITY
 
 # ABSTRACT: A package which can regenerate source files
 
@@ -40,11 +40,11 @@ Dist::Zilla::Role::Regenerator - A package which can regenerate source files
 
 =head1 VERSION
 
-version 0.001001
+version 0.001002
 
 =head1 SYNOPSIS
 
-  pacakge Dist::Zilla::Plugin::Regenerate::SomeThing;
+  package Dist::Zilla::Plugin::Regenerate::SomeThing;
   use Moose;
   use Path::Tiny qw( path );
   with "Dist::Zilla::Role::Plugin","Dist::Zilla::Role::Regenerator";
@@ -139,7 +139,7 @@ Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Kent Fredric <kentfredric@gmail.com>.
+This software is copyright (c) 2016-2017 by Kent Fredric <kentfredric@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

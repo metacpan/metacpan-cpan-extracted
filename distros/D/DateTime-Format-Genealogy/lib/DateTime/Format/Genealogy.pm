@@ -1,7 +1,7 @@
 package DateTime::Format::Genealogy;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2018-2020, Nigel Horne
+# Copyright (C) 2018-2021, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -42,11 +42,11 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -62,9 +62,9 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	return unless(defined($class));
-
-	return bless {}, $class;
+	if(defined($class)) {
+		return bless {}, $class;
+	}
 }
 
 =head2 parse_datetime($string)
@@ -103,11 +103,10 @@ sub parse_datetime {
 		$params{'date'} = shift;
 	}
 	my $quiet = $params{'quiet'};
-	my $strict = $params{'strict'};
 
 	if(my $date = $params{'date'}) {
 		# TODO: Needs much more sanity checking
-		if(($date =~ /^bef\s/i) || ($date =~ /^aft\s/i)) {
+		if(($date =~ /^bef\s/i) || ($date =~ /^aft\s/i) || ($date =~ /^abt\s/i)) {
 			Carp::carp("$date is invalid, need an exact date to create a DateTime")
 				unless($quiet);
 			return;
@@ -130,28 +129,37 @@ sub parse_datetime {
 			}
 			return;
 		}
+
 		if($date !~ /^\d{3,4}$/) {
 			if($date =~ /^(\d{1,2})\s+([A-Z]{4,}+)\s+(\d{3,4})$/i) {
+				my $strict = $params{'strict'};
+
 				if((!$strict) && (my $abbrev = $months{$2})) {
 					$date = "$1 $abbrev $3";
 				} else {
-					Carp::croak("Unparseable date $date - often because the month name isn't 3 letters") unless($quiet);
+					Carp::carp("Unparseable date $date - often because the month name isn't 3 letters") unless($quiet);
+					return;
 				}
 			}
 			if(($date =~ /^\d/) && (my $d = $self->_date_parser_cached($date))) {
 				return $dfn->parse_datetime($d->{'canonical'});
 			}
-			if(($date !~ /^(Abt|ca?)/i) && ($date =~ /^[\w\s]+$/)) {
+			if(($date !~ /^(Abt|ca?)/i) && ($date =~ /^[\w\s,]+$/)) {
 				# ACOM exports full month names and non-standard format dates e.g. U.S. format MMM, DD YYYY
-				# TODO: allow that when mot in strict mode
+				# TODO: allow that when not in strict mode
 				if(my $rc = $dfn->parse_datetime($date)) {
-					return $rc;
+					if($dfn->success()) {
+						return $rc;
+					}
+					Carp::carp($dfn->error()) unless($quiet);
+				} else {
+					Carp::carp("Can't parse date '$date'") unless($quiet);
 				}
-				Carp::croak("Can't parse date '$date'");
+				return;
 			}
 		}
 	} else {
-		Carp::croak('Usage: parse_datetime(date => $date)');
+		Carp::croak('Usage: ', __PACKAGE__, '::parse_datetime(date => $date)');
 	}
 }
 
@@ -160,19 +168,11 @@ sub parse_datetime {
 sub _date_parser_cached
 {
 	my $self = shift;
-	my %params;
+	my $date = shift;
 
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(ref($_[0])) {
+	if(!defined($date)) {
 		Carp::croak('Usage: _date_parser_cached(date => $date)');
-	} elsif(scalar(@_) % 2 == 0) {
-		%params = @_;
-	} else {
-		$params{'date'} = shift;
 	}
-
-	my $date = $params{'date'};
 
 	if($self->{'all_dates'}{$date}) {
 		return $self->{'all_dates'}{$date};
@@ -232,7 +232,7 @@ L<http://cpanratings.perl.org/d/DateTime-Format-Gedcom>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018-2020 Nigel Horne.
+Copyright 2018-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

@@ -1,4 +1,4 @@
-package Spreadsheet::Compare 0.15;
+package Spreadsheet::Compare 0.16;
 
 # TODO: (issue) allow list for reporters
 
@@ -56,9 +56,7 @@ sub _setup_readers ( $self, $test ) {
     my @readers;
     for my $index ( 0, 1 ) {
         $debug and DEBUG "creating $modname instance $index";
-        my $reader = $modname->new(
-            %args,
-        ) or LOGDIE "could not create $modname object";
+        my $reader = $modname->new( %args, ) or LOGDIE "could not create $modname object";
 
         $reader->{__ro__index} = $index;
 
@@ -89,8 +87,8 @@ sub _setup_reporter ( $self, $test, $single ) {
 
     $args{report_filename} =~ s/\s+/_/g if $args{report_filename};
 
-    INFO "Reporter Args: ", Dump( \%args );
-    $self->{_current_reporter} = my $rep_obj = $modname->new( \%args );
+    $debug and DEBUG "Reporter Args: ", Dump( \%args );
+    $self->{_current_reporter}   = my $rep_obj = $modname->new( \%args );
     $rep_obj->{__ro__test_title} = $test->{title};
     $rep_obj->setup();
     for my $ev ( $self->_reporter_events->@* ) {
@@ -129,9 +127,9 @@ sub run ($self) {
 
     local $| = 1 if $self->stdout;
 
-    unless ($self->_cfo->plan->@*) {
+    unless ( $self->_cfo->plan->@* ) {
         croak "no configuration given!" unless $self->config;
-        $self->_cfo->load($self->config);
+        $self->_cfo->load( $self->config );
     }
     my $cfg = $self->_cfo;
 
@@ -197,7 +195,7 @@ sub run ($self) {
         my $modname = "Spreadsheet::Compare::Reporter::$stype";
         load($modname);
         my $reporter = $modname->new( rootdir => $globals->{rootdir} // '.' );
-        $reporter->write_summary( $summary{$stype}, $globals->{summary_filename} // $globals->{title} );
+        $reporter->write_summary( $summary{$stype}, $globals->{summary_filename} || $globals->{title} );
     }
 
     my $ec = $self->{failed} // 0;
@@ -210,8 +208,9 @@ sub run ($self) {
 
 sub _mod_check ( $self, $cfg ) {
 
-    if ( $self->jobs > 1 and $^O eq 'MSWin32' ) {
+    if ( $self->jobs > 1 and $^O eq 'MSWin32' and not $Mojo::IOLoop::Thread::VERSION ) {
         try {
+            no warnings 'redefine';    ## no critic (ProhibitNoWarnings)
             load('Mojo::IOLoop::Thread');
             my $ver = $Mojo::IOLoop::Thread::VERSION;
             croak "$ver" if $ver < 0.10;

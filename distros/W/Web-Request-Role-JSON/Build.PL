@@ -19,7 +19,7 @@ my %module_build_args = (
     "Klaus Ita <koki\@itascraft.com>"
   ],
   "dist_name" => "Web-Request-Role-JSON",
-  "dist_version" => "1.007",
+  "dist_version" => "1.008",
   "license" => "perl",
   "module_name" => "Web::Request::Role::JSON",
   "recursive_test_files" => 1,

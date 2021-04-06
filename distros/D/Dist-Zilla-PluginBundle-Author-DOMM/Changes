@@ -1,5 +1,10 @@
 Revision history for Dist::Zilla::PluginBundle::Author::DOMM
 
+0.909     2021-04-04 16:18:34+02:00
+    - move data from global dist.ini into dist (Thomas Klausner)
+    - add UploadToCPAN and Clean (Thomas Klausner)
+
+
 0.908     2021-01-07 16:18:00+01:00
     - switch to CheckChangesHasContent
     - use all used Plugins explicitly

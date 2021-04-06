@@ -35,9 +35,9 @@ DESCRIPTION
     Mojo::DOM58 is a minimalistic and relaxed pure-perl HTML/XML DOM parser
     based on Mojo::DOM. It supports the HTML Living Standard
     <https://html.spec.whatwg.org/> and Extensible Markup Language (XML)
-    1.0 <http://www.w3.org/TR/xml/>, and matching based on CSS3 selectors
-    <http://www.w3.org/TR/selectors/>. It will even try to interpret broken
-    HTML and XML, so you should not use it for validation.
+    1.0 <https://www.w3.org/TR/xml/>, and matching based on CSS3 selectors
+    <https://www.w3.org/TR/selectors/>. It will even try to interpret
+    broken HTML and XML, so you should not use it for validation.
 
 FORK INFO
 
@@ -47,7 +47,7 @@ FORK INFO
     not related to these changes should be reported directly to the
     Mojolicious issue tracker.
 
-    This release of Mojo::DOM58 is up to date with version 8.09 of
+    This release of Mojo::DOM58 is up to date with version 9.0 of
     Mojolicious.
 
 NODES AND ELEMENTS
@@ -145,7 +145,19 @@ SELECTORS
         my $case_insensitive = $dom->find('input[class~="foo" i]');
 
       This selector is part of Selectors Level 4
-      <http://dev.w3.org/csswg/selectors-4>, which is still a work in
+      <https://dev.w3.org/csswg/selectors-4>, which is still a work in
+      progress.
+
+    E[foo="bar" s]
+
+      An E element whose foo attribute value is exactly and
+      case-sensitively equal to bar. Note that this selector is
+      EXPERIMENTAL and might change without warning!
+
+        my $case_sensitive = $dom->find('input[type="hidden" s]');
+
+      This selector is part of Selectors Level 4
+      <https://dev.w3.org/csswg/selectors-4>, which is still a work in
       progress.
 
     E[foo~="bar"]
@@ -272,19 +284,40 @@ SELECTORS
 
         my $empty = $dom->find(':empty');
 
+    E:any-link
+
+      Alias for "E:link". Note that this selector is EXPERIMENTAL and might
+      change without warning! This selector is part of Selectors Level 4
+      <https://dev.w3.org/csswg/selectors-4>, which is still a work in
+      progress.
+
     E:link
 
       An E element being the source anchor of a hyperlink of which the
       target is not yet visited (:link) or already visited (:visited). Note
-      that Mojo::DOM58 is not stateful, therefore :link and :visited yield
-      exactly the same results.
+      that Mojo::DOM58 is not stateful, therefore :any-link, :link and
+      :visited yield exactly the same results.
 
+        my $links = $dom->find(':any-link');
         my $links = $dom->find(':link');
         my $links = $dom->find(':visited');
 
     E:visited
 
       Alias for "E:link".
+
+    E:scope
+
+      An E element being a designated reference element. Note that this
+      selector is EXPERIMENTAL and might change without warning!
+
+        my $scoped = $dom->find('a:not(:scope > a)');
+        my $scoped = $dom->find('div :scope p');
+        my $scoped = $dom->find('~ p');
+
+      This selector is part of Selectors Level 4
+      <https://dev.w3.org/csswg/selectors-4>, which is still a work in
+      progress.
 
     E:checked
 
@@ -314,20 +347,34 @@ SELECTORS
         my $others = $dom->find('div p:not(:first-child, :last-child)');
 
       Support for compound selectors was added as part of Selectors Level 4
-      <http://dev.w3.org/csswg/selectors-4>, which is still a work in
+      <https://dev.w3.org/csswg/selectors-4>, which is still a work in
       progress.
 
-    E:matches(s1, s2)
+    E:is(s1, s2)
 
       An E element that matches compound selector s1 and/or compound
       selector s2. Note that this selector is EXPERIMENTAL and might change
       without warning!
 
-        my $headers = $dom->find(':matches(section, article, aside, nav) h1');
+        my $headers = $dom->find(':is(section, article, aside, nav) h1');
 
       This selector is part of Selectors Level 4
-      <http://dev.w3.org/csswg/selectors-4>, which is still a work in
+      <https://dev.w3.org/csswg/selectors-4>, which is still a work in
       progress.
+
+    E:has(rs1, rs2)
+
+      An E element, if either of the relative selectors rs1 or rs2, when
+      evaluated with E as the :scope elements, match an element. Note that
+      this selector is EXPERIMENTAL and might change without warning!
+
+        my $link = $dom->find('a:has(> img)');
+
+      This selector is part of Selectors Level 4
+      <https://dev.w3.org/csswg/selectors-4>, which is still a work in
+      progress. Also be aware that this feature is currently marked
+      at-risk, so there is a high chance that it will get removed
+      completely.
 
     A|E
 
@@ -482,7 +529,8 @@ METHODS
 
       my $text = $dom->all_text;
 
-    Extract text content from all descendant nodes of this element.
+    Extract text content from all descendant nodes of this element. For
+    HTML documents script and style elements are excluded.
 
       # "foo\nbarbaz\n"
       $dom->parse("<div>foo\n<p>bar</p>baz\n</div>")->at('div')->all_text;
@@ -720,6 +768,9 @@ METHODS
 
     Find this element's namespace, or return undef if none could be found.
 
+      # "http://www.w3.org/2000/svg"
+      Mojo::DOM58->new('<svg xmlns:svg="http://www.w3.org/2000/svg"><svg:circle>3.14</svg:circle></svg>')->at('svg\:circle')->namespace;
+    
       # Find namespace for an element with namespace prefix
       my $namespace = $dom->at('svg > svg\:circle')->namespace;
     
@@ -945,6 +996,8 @@ METHODS
       # "<b>Test</b>"
       $dom->parse('<div><b>Test</b></div>')->at('div b')->to_string;
 
+    To extract text content from all descendant nodes, see "all_text".
+
  tree
 
       my $tree = $dom->tree;
@@ -1161,6 +1214,19 @@ COLLECTION METHODS
       # Find all values that are greater than 5
       my $greater = $collection->grep(sub { $_ > 5 });
 
+ head
+
+      my $new = $collection->head(4);
+      my $new = $collection->head(-2);
+
+    Create a new collection with up to the specified number of elements
+    from the beginning of the collection. A negative number will count from
+    the end.
+
+      # $collection contains ('A', 'B', 'C', 'D', 'E')
+      $collection->head(3)->join(' '); # "A B C"
+      $collection->head(-3)->join(' '); # "A B"
+
  join
 
       my $stream = $collection->join;
@@ -1245,6 +1311,19 @@ COLLECTION METHODS
       # Sort values case-insensitive
       my $case_insensitive = $collection->sort(sub { uc($a) cmp uc($b) });
 
+ tail
+
+      my $new = $collection->tail(4);
+      my $new = $collection->tail(-2);
+
+    Create a new collection with up to the specified number of elements
+    from the end of the collection. A negative number will count from the
+    beginning.
+
+      # $collection contains ('A', 'B', 'C', 'D', 'E')
+      $collection->tail(3)->join(' '); # "C D E"
+      $collection->tail(-3)->join(' '); # "D E"
+
  tap
 
       $collection = $collection->tap(sub {...});
@@ -1284,6 +1363,13 @@ COLLECTION METHODS
 
     Equivalent to "with_roles" in Mojo::Base. Note that role support
     depends on Role::Tiny (2.000001+).
+
+DEBUGGING
+
+    You can set the MOJO_DOM58_CSS_DEBUG environment variable to get some
+    advanced diagnostics information printed to STDERR.
+
+      MOJO_DOM58_CSS_DEBUG=1
 
 BUGS
 

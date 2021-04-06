@@ -3,7 +3,7 @@ import perl
 #	print "1..0"
 #	raise SystemExit
 
-print "1..11"
+print("1..11")
 
 
 perl.eval("""
@@ -29,9 +29,9 @@ testno = 1
 def expect(res, expect):
     global testno
     if res != expect:
-	print "Expected", repr(expect), "got", repr(res)
-	print "not",
-    print "ok", testno
+	print("Expected", repr(expect), "got", repr(res))
+	print("not", end=' ')
+    print("ok", testno)
     testno = testno + 1
 
 void   = None

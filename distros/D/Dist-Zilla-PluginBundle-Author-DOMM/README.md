@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::DOMM - Dist::Zilla config suiting my needs
 
 # VERSION
 
-version 0.908
+version 0.909
 
 # DESCRIPTION
 

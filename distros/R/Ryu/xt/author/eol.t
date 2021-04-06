@@ -38,6 +38,7 @@ my @files = (
     't/source/count.t',
     't/source/distinct.t',
     't/source/distinct_until_changed.t',
+    't/source/emit_from.t',
     't/source/encode.t',
     't/source/every.t',
     't/source/exception.t',

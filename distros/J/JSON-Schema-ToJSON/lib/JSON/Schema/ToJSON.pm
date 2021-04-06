@@ -11,7 +11,7 @@ use Hash::Merge qw/ merge /;
 use Data::Fake qw/ Core Names Text Dates /;
 use JSON::Validator::Util qw/ schema_type /;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 has _validator  => sub {
 	$ENV{JSON_VALIDATOR_RECURSION_LIMIT} = shift->max_depth;
@@ -419,7 +419,7 @@ JSON::Schema::ToJSON - Generate example JSON structures from JSON Schema definit
 
 =head1 VERSION
 
-0.18
+0.19
 
 =head1 SYNOPSIS
 
@@ -471,6 +471,9 @@ key as the content would not be sensible or valid).
 To prevent deep recursion due to circular references in JSON schemas the module has
 a default max depth set to a very conservative level of 10. If you need to go deeper
 than this then pass a larger value at object construction.
+
+Note that the underlying JSON schema parser, L<JSON::Validator> now handles recursion
+so you shouldn't have to worry too much about this - see its documentation for details.
 
 =head1 METHODS
 

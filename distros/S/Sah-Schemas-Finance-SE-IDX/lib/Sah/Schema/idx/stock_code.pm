@@ -1,0 +1,152 @@
+package Sah::Schema::idx::stock_code;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-18'; # DATE
+our $DIST = 'Sah-Schemas-Finance-SE-IDX'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+our $schema = [str => {
+    summary => 'Stock code in the Indonesian Stock Exchange',
+    description => <<'_',
+
+Code will not be checked whether it exists or listed.
+
+Will be normalized to code in uppercase.
+
+_
+    len => 4,
+    'x.perl.coerce_rules' => ['From_str::to_upper'],
+    'x.completion' => 'idx_listed_stock_code',
+    examples => [
+        {value=>'', valid=>0},
+        {value=>'BBRI', valid=>1, validated_value=>'BBRI'},
+        {value=>'bbri', valid=>1, validated_value=>'BBRI'},
+        {value=>'BANKBRI', valid=>0, summary=>'Too long'},
+        {value=>'KARK', valid=>1, summary=>'Not currently listed, but still accepted'},
+    ],
+}, {}];
+
+1;
+# ABSTRACT: Stock code in the Indonesian Stock Exchange
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Sah::Schema::idx::stock_code - Stock code in the Indonesian Stock Exchange
+
+=head1 VERSION
+
+This document describes version 0.001 of Sah::Schema::idx::stock_code (from Perl distribution Sah-Schemas-Finance-SE-IDX), released on 2021-01-18.
+
+=head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("idx::stock_code*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("idx::stock_code*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['idx::stock_code*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ ""  # INVALID
+
+ "BBRI"  # valid, becomes "BBRI"
+
+ "bbri"  # valid, becomes "BBRI"
+
+ "BANKBRI"  # INVALID (Too long)
+
+ "KARK"  # valid
+
+=head1 DESCRIPTION
+
+Code will not be checked whether it exists or listed.
+
+Will be normalized to code in uppercase.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schemas-Finance-SE-IDX>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Finance-SE-IDX>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-Finance-SE-IDX/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

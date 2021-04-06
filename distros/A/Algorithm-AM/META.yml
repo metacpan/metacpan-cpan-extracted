@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,22 +33,22 @@ no_index:
 provides:
   Algorithm::AM:
     file: lib/Algorithm/AM.pm
-    version: '3.11'
+    version: '3.12'
   Algorithm::AM::Batch:
     file: lib/Algorithm/AM/Batch.pm
-    version: '3.11'
+    version: '3.12'
   Algorithm::AM::BigInt:
     file: lib/Algorithm/AM/BigInt.pm
-    version: '3.11'
+    version: '3.12'
   Algorithm::AM::DataSet:
     file: lib/Algorithm/AM/DataSet.pm
-    version: '3.11'
+    version: '3.12'
   Algorithm::AM::DataSet::Item:
     file: lib/Algorithm/AM/DataSet/Item.pm
-    version: '3.11'
+    version: '3.12'
   Algorithm::AM::Result:
     file: lib/Algorithm/AM/Result.pm
-    version: '3.11'
+    version: '3.12'
 requires:
   Carp: '0'
   Class::Tiny: '0'
@@ -70,9 +70,11 @@ resources:
   bugtracker: https://github.com/garfieldnate/Algorithm-AM/issues
   homepage: https://github.com/garfieldnate/Algorithm-AM
   repository: https://github.com/garfieldnate/Algorithm-AM.git
-version: '3.11'
+version: '3.12'
 x_authority: cpan:NGLENN
 x_contributors:
   - 'Nathan Glenn <nathan-gary.glenn@trivago.com>'
   - 'Nick Logan <nlogan@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

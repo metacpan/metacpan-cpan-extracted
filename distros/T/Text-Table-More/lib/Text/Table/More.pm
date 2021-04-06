@@ -1,14 +1,51 @@
 package Text::Table::More;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-21'; # DATE
+our $DATE = '2021-02-26'; # DATE
 our $DIST = 'Text-Table-More'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 #use utf8;
+
+our %FEATURES = (
+    features => {
+        TextTable => {
+            can_align_cell_containing_wide_character => 1,
+            can_align_cell_containing_color_code     => 1,
+            can_align_cell_containing_newline        => 1,
+            can_use_box_character                    => 1,
+            can_customize_border                     => 1,
+            can_halign                               => 1,
+            can_halign_individual_row                => 1,
+            can_halign_individual_column             => 1,
+            can_halign_individual_cell               => 1,
+            can_valign                               => 1,
+            can_valign_individual_row                => 1,
+            can_valign_individual_column             => 1,
+            can_valign_individual_cell               => 1,
+            can_rowspan                              => 1,
+            can_colspan                              => 1,
+            can_color                                => 0,
+            can_color_theme                          => 0,
+            can_set_cell_height                      => 0,
+            can_set_cell_height_of_individual_row    => 0,
+            can_set_cell_width                       => 0,
+            can_set_cell_width_of_individual_column  => 0,
+            speed                                    => 'slow',
+            can_hpad                                 => 0,
+            can_hpad_individual_row                  => 0,
+            can_hpad_individual_column               => 0,
+            can_hpad_individual_cell                 => 0,
+            can_vpad                                 => 0,
+            can_vpad_individual_row                  => 0,
+            can_vpad_individual_column               => 0,
+            can_vpad_individual_cell                 => 0,
+        },
+    },
+);
 
 use List::AllUtils qw(first firstidx max);
 
@@ -559,7 +596,7 @@ Text::Table::More - Generate text table with simple interface and many options
 
 =head1 VERSION
 
-This document describes version 0.011 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-02-21.
+This document describes version 0.012 of Text::Table::More (from Perl distribution Text-Table-More), released on 2021-02-26.
 
 =head1 SYNOPSIS
 
@@ -704,6 +741,140 @@ per-row/column/cell align/valign.
 Keywords: rowspan, colspan.
 
 =for Pod::Coverage ^(.+)$
+
+=head1 DECLARED FEATURES
+
+Features declared by this module:
+
+=head2 From feature set TextTable
+
+Features from feature set L<TextTable|Module::Features::TextTable> declared by this module:
+
+=over
+
+=item * can_align_cell_containing_color_code
+
+Value: yes.
+
+=item * can_align_cell_containing_newline
+
+Value: yes.
+
+=item * can_align_cell_containing_wide_character
+
+Value: yes.
+
+=item * can_color
+
+Value: yes.
+
+=item * can_color_theme
+
+Value: yes.
+
+=item * can_colspan
+
+Value: yes.
+
+=item * can_customize_border
+
+Value: yes.
+
+=item * can_halign
+
+Value: yes.
+
+=item * can_halign_individual_cell
+
+Value: yes.
+
+=item * can_halign_individual_column
+
+Value: yes.
+
+=item * can_halign_individual_row
+
+Value: yes.
+
+=item * can_hpad
+
+Value: yes.
+
+=item * can_hpad_individual_cell
+
+Value: yes.
+
+=item * can_hpad_individual_column
+
+Value: yes.
+
+=item * can_hpad_individual_row
+
+Value: yes.
+
+=item * can_rowspan
+
+Value: yes.
+
+=item * can_set_cell_height
+
+Value: yes.
+
+=item * can_set_cell_height_of_individual_row
+
+Value: yes.
+
+=item * can_set_cell_width
+
+Value: yes.
+
+=item * can_set_cell_width_of_individual_column
+
+Value: yes.
+
+=item * can_use_box_character
+
+Value: yes.
+
+=item * can_valign
+
+Value: yes.
+
+=item * can_valign_individual_cell
+
+Value: yes.
+
+=item * can_valign_individual_column
+
+Value: yes.
+
+=item * can_valign_individual_row
+
+Value: yes.
+
+=item * can_vpad
+
+Value: yes.
+
+=item * can_vpad_individual_cell
+
+Value: yes.
+
+=item * can_vpad_individual_column
+
+Value: yes.
+
+=item * can_vpad_individual_row
+
+Value: yes.
+
+=item * speed
+
+Value: "slow".
+
+=back
+
+For more details on module features, see L<Module::Features>.
 
 =head1 PER-ROW ATTRIBUTES
 

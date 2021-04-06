@@ -1,3 +1,13 @@
+0.004   2021-01-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Avoid perl undef warning.
+
+
+0.003   2021-01-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: show-border-style.
+
+
 0.002   2020-06-19  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli list-border-style-modules] Now only show BorderStyle::*

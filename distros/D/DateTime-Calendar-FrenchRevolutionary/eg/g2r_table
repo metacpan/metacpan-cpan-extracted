@@ -2,7 +2,7 @@
 #
 #     Example script for DateTime::Calendar::FrenchRevolutionary:
 #     print a few tables for an easy conversion of dates from Gregorian to French Revolutionary
-#     Copyright (C) 2003, 2004, 2010, 2011, 2014, 2016, 2019 Jean Forget. All rights reserved.
+#     Copyright (C) 2003, 2004, 2010, 2011, 2014, 2016, 2019, 2021 Jean Forget. All rights reserved.
 #
 #     See the license in the embedded documentation below.
 #
@@ -177,11 +177,10 @@ sub build_intervals {
       substr($new_line, $year % 100 % $columns * 3, 3) = word_for_year($year);
       my $intersection = $old_line & $new_line;
       $intersection =~ tr / /./;
-      unless ($old_line =~ m{$intersection} && $new_line =~ m{$intersection})
-        {
-	  $current_start = $year;
-	  $line_for_interval{$year} = $new_line;
-	}
+      unless ($old_line =~ m{$intersection} && $new_line =~ m{$intersection}) {
+        $current_start = $year;
+        $line_for_interval{$year} = $new_line;
+      }
       $line_for_interval{$current_start} |= $new_line;
       $end_of_interval{$current_start} = $year;
   }
@@ -272,30 +271,26 @@ sub html_2 {
   print "<p><table border><tr><th align='center' colspan='$colspan'>$labels{title2}{$part}</th></tr>\n";
   html_2header($part eq 'e' ? 1791 : 1792, $part);
   # the part of September in the end of the year
-  if ($part eq 'e')
-    {
-      print "<tr align='center'><td>$labels{month}[8]</td>";
-      foreach (@days)
-        {
-          my $year = $year_of_partday{$part}{$_};
-          my @formulas = formulas($year, 9);
-	  print "<td>$formulas[2]</td>\n";
-	}
-      print "</tr>\n";
+  if ($part eq 'e') {
+    print "<tr align='center'><td>$labels{month}[8]</td>";
+    foreach (@days) {
+      my $year = $year_of_partday{$part}{$_};
+      my @formulas = formulas($year, 9);
+      print "<td>$formulas[2]</td>\n";
     }
+    print "</tr>\n";
+  }
   # The regular months of the part of the year
   my @month_list = $part eq 'b' ? (1..2) : $part eq 'm' ? (3..9) : (10..12);
-  foreach my $month (@month_list)
-    {
-      print "<tr align='center'><td>$labels{month}[$month - 1]</td>";
-      foreach (@days)
-        {
-          my $year = $year_of_partday{$part}{$_};
-          my @formulas = formulas($year, $month);
-	  print "<td>$formulas[0]<br>$formulas[1]</td>\n";
-	}
-      print "</tr>\n";
+  foreach my $month (@month_list) {
+    print "<tr align='center'><td>$labels{month}[$month - 1]</td>";
+    foreach (@days) {
+      my $year = $year_of_partday{$part}{$_};
+      my @formulas = formulas($year, $month);
+      print "<td>$formulas[0]<br>$formulas[1]</td>\n";
     }
+    print "</tr>\n";
+  }
 
   print "</table>\n";
 }
@@ -495,8 +490,8 @@ Jean Forget <JFORGET@cpan.org>
 
 =head1 LICENSE STUFF
 
-Copyright (c)  2003, 2004, 2010,  2012, 2014, 2016, 2019  Jean Forget.
-All  rights  reserved.   This  program  is  free   software.  You  can
+Copyright  (c) 2003,  2004, 2010,  2012, 2014,  2016, 2019,  2021 Jean
+Forget. All  rights reserved. This  program is free software.  You can
 distribute,      adapt,     modify,      and     otherwise      mangle
 DateTime::Calendar::FrenchRevolutionary under  the same terms  as perl
 5.16.3.
@@ -520,9 +515,9 @@ WITHOUT   ANY  WARRANTY;   without  even   the  implied   warranty  of
 MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
 General Public License for more details.
 
-You  should have received  a copy  of the  GNU General  Public License
-along with  this program; if not,  see <https://www.gnu.org/licenses/>
-or write to the Free Software Foundation, Inc., L<https://www.fsf.org>.
+You should  have received  a copy  of the  GNU General  Public License
+along with this program;  if not, see L<https://www.gnu.org/licenses/>
+or contact the Free Software Foundation, Inc., L<https://www.fsf.org>.
 
 =cut
 

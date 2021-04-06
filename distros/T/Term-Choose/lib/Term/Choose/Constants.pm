@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.720';
+our $VERSION = '1.730';
 
 use Exporter qw( import );
 
@@ -21,6 +21,8 @@ our @EXPORT_OK = qw(
         CONTROL_I CONTROL_K CONTROL_Q CONTROL_U CONTROL_X
         KEY_BTAB KEY_TAB KEY_ESC KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_q KEY_Tilde KEY_BSPACE
         VK_PAGE_UP VK_PAGE_DOWN VK_END VK_HOME VK_LEFT VK_UP VK_RIGHT VK_DOWN VK_INSERT VK_DELETE VK_F1 VK_F2 VK_F3 VK_F4
+
+        ROW COL
 
         WIDTH_CURSOR
 
@@ -43,12 +45,20 @@ our %EXPORT_TAGS = (
         CONTROL_I CONTROL_K CONTROL_Q CONTROL_U CONTROL_X
         KEY_BTAB KEY_TAB KEY_ESC KEY_SPACE KEY_h KEY_j KEY_k KEY_l KEY_q KEY_Tilde KEY_BSPACE
         VK_PAGE_UP VK_PAGE_DOWN VK_END VK_HOME VK_LEFT VK_UP VK_RIGHT VK_DOWN VK_INSERT VK_DELETE VK_F1 VK_F2 VK_F3 VK_F4
-    ) ]
+    ) ],
+    index => [ qw(
+        ROW COL
+    )]
 );
 
 use constant TERM_READKEY => eval { require Term::ReadKey; 1 };
 
 use constant WIDTH_CURSOR => 1;
+
+use constant {
+    ROW => 0,
+    COL => 1,
+};
 
 use constant {
     SET_ANY_EVENT_MOUSE_1003      => "\e[?1003h",

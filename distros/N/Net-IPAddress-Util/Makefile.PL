@@ -18,8 +18,8 @@ WriteMakefile(
     'Math::BigInt' => '0',
     'overload' => '0',
   },
-  TEST_REQUIRES => { 'Test::More' => 0, 'Time::HiRes' => '0', },
-  MIN_PERL_VERSION => '5.010000',
+  TEST_REQUIRES => { 'Test::More' => '0', 'Time::HiRes' => '0', },
+  MIN_PERL_VERSION => '5.012000',
   dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
   clean => { FILES => 'Net-IPAddress-Util-*' },
 );

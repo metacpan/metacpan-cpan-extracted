@@ -8,7 +8,6 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Dist::Zilla' => '5',
-                                      'Dist::Zilla::Plugin::InstallGuide' => '0',
                                       'Dist::Zilla::PluginBundle::NGLENN' => '0',
                                       'File::Spec' => '0',
                                       'File::Temp' => '0',
@@ -25,8 +24,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
-                                      'Test::Version' => '1',
-                                      'blib' => '1.01'
+                                      'Test::Version' => '1'
                                     }
                     },
        'runtime' => {

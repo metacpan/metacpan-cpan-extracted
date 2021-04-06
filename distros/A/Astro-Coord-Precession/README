@@ -1,0 +1,43 @@
+Astro-Coord-Precession
+
+A very simple, pure Perl module to precess equatorial coordinates from one epoch
+to another, based on the algorithm P. Herget used in the Publications of the
+Cincinnati Observatory.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Astro::Coord::Precession
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Astro-Coord-Precession
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Astro-Coord-Precession
+
+    Search CPAN
+        https://metacpan.org/release/Astro-Coord-Precession
+
+    GitHub
+        https://github.com/dkechag/Astro-Coord-Precession
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2021 by Dimitrios Kechagias.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

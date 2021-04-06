@@ -90,3 +90,8 @@ PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, HV *typ
   return Perl_pad_add_name(aTHX_ SvPV_nolen(namesv), SvCUR(namesv), flags, typestash, ourstash);
 }
 #endif
+
+#if !HAVE_PERL_VERSION(5, 26, 0)
+#  define isIDFIRST_utf8_safe(s, e)  (PERL_UNUSED_ARG(e), isIDFIRST_utf8(s))
+#  define isIDCONT_utf8_safe(s, e)   (PERL_UNUSED_ARG(e), isIDCONT_utf8(s))
+#endif

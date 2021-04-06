@@ -72,9 +72,9 @@ if ($@) {
 ok ($warnings !~ /Unknown option/, "Option quiet recognised");
 eval {
     my $style = <<EOF;
-h1 => {
-   color => 'white';
-   background-color => '#FFF';
+h1 {
+   color: white;
+   background-color: #FFF;
 }
 EOF
     my ($h, $b) = make_page (style => $style);

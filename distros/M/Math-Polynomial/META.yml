@@ -6,10 +6,10 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
   File::Spec: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,10 +22,7 @@ no_index:
 provides:
   Math::Polynomial:
     file: lib/Math/Polynomial.pm
-    version: '1.019'
-  Math::Polynomial::Generic:
-    file: lib/Math/Polynomial/Generic.pm
-    version: '1.019'
+    version: '1.021'
 recommends:
   Math::AnyNum: '0'
   Math::Complex: '0'
@@ -34,5 +31,9 @@ requires:
   Carp: '0'
   overload: '0'
   perl: '5.006'
-version: '1.019'
+resources:
+  bugtracker: https://github.com/mhasch/perl-Math-Polynomial/issues
+  license: https://www.perlfoundation.org/artistic-license-20.html
+  repository: git://github.com/mhasch/perl-Math-Polynomial.git
+version: '1.021'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

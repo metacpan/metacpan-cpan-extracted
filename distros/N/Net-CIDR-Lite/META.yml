@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Net-CIDR-Lite
-version:            0.21
+version:            0.22
 abstract:           Perl extension for merging IPv4 or IPv6 CIDR addresses
 author:
     - Douglas Wilson <dougw@cpan.org>

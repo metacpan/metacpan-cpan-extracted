@@ -1,0 +1,8 @@
+0.002     2021-04-06 17:46:56 CEST
+  - Switch from Mojo::Redis2 to Mojo::Redis
+  - Add shim for history to get a sorta-working Minion admin console
+  - Fully implement list_locks
+  - minion->stats now contains the active_locks field
+
+0.001
+  - Initial code by DBOOK

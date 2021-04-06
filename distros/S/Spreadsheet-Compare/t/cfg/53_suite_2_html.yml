@@ -1,5 +1,6 @@
 ---
 - title:      __GLOBAL__
+  type: CSV
   files:
     - left/csv_mixid.csv
     - right/csv_mixid.csv

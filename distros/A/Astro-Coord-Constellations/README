@@ -1,0 +1,43 @@
+Astro-Coord-Constellations
+
+A module to identify the constellation to which a celestial position (as defined by
+equatorial coordinates for any epoch) belongs to, according to the IAU constellation
+boundaries.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Astro::Coord::Constellations
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Astro-Coord-Constellations
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Astro-Coord-Constellations
+
+    Search CPAN
+        https://metacpan.org/release/Astro-Coord-Constellations
+
+    GitHub
+        https://github.com/dkechag/Astro-Coord-Constellations
+
+LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2021 by Dimitrios Kechagias.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

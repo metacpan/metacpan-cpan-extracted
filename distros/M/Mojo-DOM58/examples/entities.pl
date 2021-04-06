@@ -11,6 +11,8 @@ my $rows = $dom->find('#named-character-references-table tbody > tr');
 for my $row ($rows->each) {
   my $entity     = $row->at('td > code')->text;
   my $codepoints = $row->children('td')->[1]->text;
+  $codepoints =~ s/^\s*//;
+  $codepoints =~ s/\s*$//;
   print "$entity $codepoints\n";
 }
 

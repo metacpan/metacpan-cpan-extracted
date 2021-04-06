@@ -7,9 +7,9 @@ build_requires:
   Test::More: '0.75'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
-license: perl
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -20,5 +20,9 @@ no_index:
     - inc
 requires:
   perl: '5.006'
-version: '0.004'
+resources:
+  bugtracker: https://github.com/mhasch/perl-Bundle-ExCore/issues
+  license: https://www.perlfoundation.org/artistic-license-20.html
+  repository: git://github.com/mhasch/perl-Bundle-ExCore.git
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

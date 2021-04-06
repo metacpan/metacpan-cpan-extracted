@@ -1,6 +1,11 @@
 Revision history for Term::Choose
 
 
+1.730   2021-04-06
+    - Removed deprecated option name 'footer_string'.
+    - New experimental option 'skip_items'.
+    - Code refactoring.
+
 1.720   2021-03-04
     - Filter choices.
     - Bugfix in list_idx2rc.

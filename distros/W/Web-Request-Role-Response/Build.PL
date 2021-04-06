@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "Web-Request-Role-Response",
-  "dist_version" => "1.006",
+  "dist_version" => "1.008",
   "license" => "perl",
   "module_name" => "Web::Request::Role::Response",
   "recursive_test_files" => 1,

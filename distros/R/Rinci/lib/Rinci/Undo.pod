@@ -21,12 +21,12 @@ Rinci::Undo - (DEPRECATED) Protocol for undo operations in functions
 
 =head1 VERSION
 
-This document describes version 1.1.96 of Rinci::Undo (from Perl distribution Rinci), released on 2021-01-22.
+This document describes version 1.1.98 of Rinci::Undo (from Perl distribution Rinci), released on 2021-01-22.
 
 =head1 STATUS
 
-This protocol (riundo for short) is now deprecated in favor of
-L<Rinci::Transaction> (ritx for short) for several reasons:
+This protocol (I<riundo> for short) is now deprecated in favor of
+L<Rinci::Transaction> (I<ritx> for short) for several reasons:
 
 =over 4
 
@@ -41,9 +41,10 @@ perform its action.
 =item * ritx does not limit using the same function for undo
 
 In riundo, we must call the same function (passing the previously obtained undo
-data from the that function) to undo the information. This is sometimes slightly
-cumbersome. The undo action might be provided by other functions, but we still
-have to go through the same function first.
+data from the that function) to perform the undo. This is sometimes slightly
+cumbersome. The undo action might be better provided by other functions
+(example: a C<delete_user()> function to undo the C<create_user()>), but we
+still have to go through the same function first.
 
 =item * ritx can also implement undo/redo
 

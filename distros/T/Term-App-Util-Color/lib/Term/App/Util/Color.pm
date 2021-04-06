@@ -1,9 +1,9 @@
 package Term::App::Util::Color;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-13'; # DATE
+our $DATE = '2021-03-14'; # DATE
 our $DIST = 'Term-App-Util-Color'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -98,7 +98,7 @@ sub term_app_color_depth {
 
     my $val;
     if (defined $ENV{COLORTERM} &&
-            $ENV{COLOR_TERM} eq 'truecolor') {
+            $ENV{COLORTERM} eq 'truecolor') {
         $res->[2] = 2**24;
         $res->[3]{'func.debug_info'}{color_depth_from} = 'COLORTERM env';
     } elsif (defined($ENV{COLOR_DEPTH}) &&
@@ -142,7 +142,7 @@ Term::App::Util::Color - Determine color depth and whether to use color or not
 
 =head1 VERSION
 
-This document describes version 0.002 of Term::App::Util::Color (from Perl distribution Term-App-Util-Color), released on 2021-03-13.
+This document describes version 0.003 of Term::App::Util::Color (from Perl distribution Term-App-Util-Color), released on 2021-03-14.
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@ package Net::IPAddress::Util::Range;
 
 use strict;
 use warnings;
-use 5.010;
+use 5.012;
 
 use overload (
   '""' => 'as_string',
@@ -13,7 +13,7 @@ use overload (
 use Net::IPAddress::Util qw( :constr :manip );
 require Net::IPAddress::Util::Collection;
 
-our $VERSION = '4.004';
+our $VERSION = '5.000';
 
 sub new {
   my $class = shift;

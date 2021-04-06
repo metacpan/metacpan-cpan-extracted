@@ -10,7 +10,7 @@ use Exporter 'import';
 use Mojo::DOM58::Entities qw(html_attr_unescape html_escape html_unescape);
 use Scalar::Util 'weaken';
 
-our $VERSION = '2.000';
+our $VERSION = '3.000';
 
 our @EXPORT_OK = 'tag_to_html';
 
@@ -73,6 +73,9 @@ $CLOSE{$_} = [\%TABLE, {table => 1}] for qw(colgroup tbody tfoot thead);
 $CLOSE{$_} = [{dd => 1, dt => 1}, {dl    => 1}] for qw(dd dt);
 $CLOSE{$_} = [{rp => 1, rt => 1}, {ruby  => 1}] for qw(rp rt);
 $CLOSE{$_} = [{th => 1, td => 1}, {table => 1}] for qw(td th);
+
+# HTML parent elements that signal no more content when closed, but that are also phrasing content
+my %NO_MORE_CONTENT = (ruby => [qw(rt rp)], select => [qw(option optgroup)]);
 
 # HTML elements without end tags
 my %EMPTY = map { $_ => 1 } (
@@ -142,7 +145,14 @@ sub parse {
     if (defined $tag) {
 
       # End
-      if ($tag =~ /^\/\s*(\S+)/) { _end($xml ? $1 : lc $1, $xml, \$current) }
+      if ($tag =~ /^\/\s*(\S+)/) {
+        my $end = $xml ? $1 : lc $1;
+
+        # No more content
+        if (!$xml && (my $tags = $NO_MORE_CONTENT{$end})) { _end($_, $xml, \$current) for @$tags }
+
+        _end($xml ? $1 : lc $1, $xml, \$current);
+      }
 
       # Start
       elsif ($tag =~ m!^([^\s/]+)([\s\S]*)!) {

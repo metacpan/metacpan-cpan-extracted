@@ -1,0 +1,68 @@
+{
+   "abstract" : "Mojolicious client for the OBS WebSocket remote plugin",
+   "author" : [
+      "Max Maischein <corion@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojo-OBS-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Filter::signatures" : "0.09",
+            "Future::Mojo" : "0",
+            "Mojo::JSON" : "0",
+            "Mojo::UserAgent" : "0",
+            "Net::Protocol::OBSRemote" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Corion/Mojo-OBS-Client/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Corion/Mojo-OBS-Client.git",
+         "web" : "https://github.com/Corion/Mojo-OBS-Client"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

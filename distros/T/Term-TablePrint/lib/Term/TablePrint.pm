@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -240,7 +240,7 @@ sub __write_table {
     if ( ! defined $w_cols ) {
         return;
     }
-    my $list = $self->__cols_to_string( $progress, $orig_table, $table_copy, $w_cols ); # $self->{table_copy} is now $list
+    my $list = $self->__cols_to_string( $progress, $orig_table, $table_copy, $w_cols );
     my $table_w = sum( @$w_cols, $self->{tab_w} * $#{$w_cols} );
     my @header;
     #$self->{info} = 'INFO'; # info info_tabs prompt_tabs
@@ -711,10 +711,11 @@ sub __print_single_row {
     my $separator = ' : ';
     my $len_sep = length( $separator );
     my $col_max = $term_w - ( $len_key + $len_sep + 1 );
+    my $separator_row = ' ';
     my $row_data = [ ' Close with ENTER' ];
 
     for my $col ( @$chosen_cols ) {
-        push @$row_data, ' ';
+        push @$row_data, $separator_row;
         my $key = $orig_tbl->[0][$col];
         if ( ! defined $key ) {
             $key = $self->{undef};
@@ -743,9 +744,11 @@ sub __print_single_row {
             $copy_sep = '' if $copy_sep;
         }
     }
+    my $regex = qr/^\Q$separator_row\E\z/;
     choose(
         $row_data,
-        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, f3 => $self->{f3} }
+        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse},
+          hide_cursor => 0, f3 => $self->{f3}, skip_items => "$regex" }
     );
 }
 
@@ -810,7 +813,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.130
+Version 0.131
 
 =cut
 

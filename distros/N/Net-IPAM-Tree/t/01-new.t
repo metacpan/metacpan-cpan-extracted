@@ -10,16 +10,12 @@ BEGIN {
   use_ok('Net::IPAM::Block') || print "Bail out!\n";
 }
 
-my ( $t, $dup );
-my @blocks = qw(0.0.0.0/0 ::ffff:1.2.3.5 1.2.3.6 1.2.3.7/31 ::/0 fe80::1/10 ::cafe:affe);
+my ( $t, @blocks, $str, $dups );
+@blocks = map { Net::IPAM::Block->new($_) } qw(0.0.0.0/0 ::ffff:1.2.3.5 1.2.3.6 1.2.3.7/31 ::/0 fe80::1/10 ::cafe:affe);
 
-my @items;
-foreach my $b (@blocks) {
-  push @items, Net::IPAM::Block->new($b);
-}
-$t = Net::IPAM::Tree->new->insert(@items);
+ok($t = Net::IPAM::Tree->new(@blocks), "new");
 
-my $str = <<EOT;
+$str = <<EOT;
 ▼
 ├─ 0.0.0.0/0
 │  ├─ 1.2.3.5/32
@@ -30,17 +26,29 @@ my $str = <<EOT;
    └─ fe80::/10
 EOT
 
-ok( $t->to_string eq $str, 'insert and stringify' );
+is( $t->to_string, $str, 'stringify' );
+ok( $t->len == 7, 'len' );
 
-# shut up warnings
-$t   = Net::IPAM::Tree->new( sub { } )->insert(@items);
-$dup = Net::IPAM::Block->new('1.2.3.6');
-ok( !$t->insert($dup), 'insert dup block' );
+### dups
 
-# die on dups
-$t   = Net::IPAM::Tree->new( sub { die shift } )->insert(@items);
-$dup = Net::IPAM::Block->new('1.2.3.6');
-eval { $t->insert($dup) };
-like( $@, qr/\Q1.2.3.6\E/i, 'dies on dup' );
+@blocks = map { Net::IPAM::Block->new($_) } qw(::/0 1.2.3.4 ::/0);
+ok( ($t, $dups) = Net::IPAM::Tree->new(@blocks) , 'new with dups');
+
+$str = <<EOT;
+▼
+├─ 1.2.3.4/32
+└─ ::/0
+EOT
+
+is( $t->to_string, $str, 'stringify with dups' );
+is($dups->[0], "::/0", 'found the duplicate block');
+
+### dups with warn
+{
+    my $msg;
+    local $SIG{__WARN__} = sub { $msg = shift };
+    $t = Net::IPAM::Tree->new(@blocks);
+    like( $msg, qr/duplicate/, 'new with dups, check warnings');
+}
 
 done_testing();

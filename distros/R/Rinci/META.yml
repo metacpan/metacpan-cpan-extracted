@@ -20,7 +20,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-Rinci/issues
   homepage: https://metacpan.org/release/Rinci
   repository: git://github.com/perlancar/perl-Rinci.git
-version: 1.1.96
+version: 1.1.98
 x_Dist_Zilla:
   perl:
     version: '5.030000'

@@ -5,7 +5,7 @@ package Mojolicious::Plugin::YamlConfig;
 
 use base 'Mojolicious::Plugin::JSONConfig';
 
-our $VERSION = '0.2.2';
+our $VERSION = '0.2.4';
 
 sub register {
     my ( $self, $app, $conf ) = @_;
@@ -69,13 +69,9 @@ Mojolicious::Plugin::YamlConfig - YAML Configuration Plugin
     # Mojolicious::Lite
     plugin 'yaml_config';
 
-    # Reads myapp.yaml by default and puts the parsed version into the stash
-    my $config = $self->stash('config');
-
     # Everything can be customized with options
     plugin yaml_config => {
         file      => '/etc/myapp.conf',
-        stash_key => 'conf',
         class     => 'YAML::XS'
     };
 
@@ -92,7 +88,7 @@ L<YAML> via the C<class> option to parse the data with a more advanced YAML pars
 
 =head2 AUTHOR
 
-Danijel Tasov <data@cpan.org>
+Danijel Tasov <cpan@rbfh.de>
 
 =head2 SEE ALSO
 

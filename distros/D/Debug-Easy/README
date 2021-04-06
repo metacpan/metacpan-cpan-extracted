@@ -19,7 +19,9 @@ OR you can use the older ExtUtils::MakeMaker method:
 SAMPLE CODE
 
 The "examples" directory in the tar package has two code examples on
-how to use this module.
+how to use this module.  Note, older versions did not have the
+"use lib '.';" and may break on newer Perls.  These new examples have
+that issue fixed.
 
 SUPPORT AND DOCUMENTATION
 
@@ -29,9 +31,6 @@ perldoc command.
     perldoc Debug::Easy
 
 You can also look for information at:
-
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-Easy
 
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/Debug-Easy

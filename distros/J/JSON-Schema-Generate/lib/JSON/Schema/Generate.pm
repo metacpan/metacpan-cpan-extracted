@@ -1,5 +1,5 @@
 package JSON::Schema::Generate;
-use 5.006; use strict; use warnings; our $VERSION = '0.06';
+use 5.006; use strict; use warnings; our $VERSION = '0.07';
 use Tie::IxHash; use Types::Standard qw/Str HashRef Bool/;
 use Compiled::Params::OO qw/cpo/; use JSON; use Blessed::Merge;
 
@@ -205,7 +205,7 @@ JSON::Schema::Generate - Generate JSON Schemas from data!
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -787,7 +787,7 @@ L<https://metacpan.org/release/JSON-Schema-Generate>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2021 by LNATION.
 
 This is free software, licensed under:
 

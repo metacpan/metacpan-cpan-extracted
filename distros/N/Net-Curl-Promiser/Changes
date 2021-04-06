@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Curl::Promiser
 
+0.17 Thu 1 Apr 2021
+- Fix Select’s get_fds() to include write-polling FDs.
+
 0.16 Wed 31 Mar 2021
 - Fix t/Net-Curl-Promiser-Select.t with CentOS 6’s default libcurl.
 

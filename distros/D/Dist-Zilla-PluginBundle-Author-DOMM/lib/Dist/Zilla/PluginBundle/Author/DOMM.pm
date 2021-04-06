@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::Author::DOMM;
 
 # ABSTRACT: Dist::Zilla config suiting my needs
 
-our $VERSION = '0.908'; # VERSION
+our $VERSION = '0.909'; # VERSION
 
 use Moose;
 use namespace::autoclean;
@@ -12,7 +12,6 @@ with qw(
   Dist::Zilla::Role::PluginBundle::Config::Slicer
 );
 
-use Dist::Zilla::Plugin::OurPkgVersion;
 use Dist::Zilla::Plugin::Git::GatherDir;
 use Dist::Zilla::Plugin::PruneCruft;
 use Dist::Zilla::Plugin::ManifestSkip;
@@ -39,11 +38,12 @@ use Dist::Zilla::Plugin::CopyFilesFromBuild;
 use Dist::Zilla::Plugin::GithubMeta;
 use Dist::Zilla::Plugin::Git::Check;
 use Dist::Zilla::Plugin::ConfirmRelease;
-use Dist::Zilla::Plugin::FakeRelease;
+use Dist::Zilla::Plugin::UploadToCPAN;
 use Dist::Zilla::Plugin::Git::Commit;
 use Dist::Zilla::Plugin::Git::NextVersion;
 use Dist::Zilla::Plugin::Git::Tag;
 use Dist::Zilla::Plugin::Git::Push;
+use Dist::Zilla::Plugin::Clean;
 
 has homepage => (
   is      => 'ro' ,
@@ -73,7 +73,7 @@ sub configure {
         'ExecDir',
         'ShareDir',
         'ExtraTests',
-        'CheckChangesHasContent' ,
+        'CheckChangesHasContent',
         ['NextRelease' => {
             format=>'%-9v %{yyyy-MM-dd HH:mm:ssZZZZZ}d%{ (TRIAL RELEASE)}T',
         }],
@@ -99,7 +99,7 @@ sub configure {
             allow_dirty => [qw/dist.ini Changes README.md cpanfile/]
         }],
         'ConfirmRelease',
-        'FakeRelease',
+        'UploadToCPAN',
         [ 'Git::Commit' => 'Commit_Dirty_Files' => {
             allow_dirty => [qw/dist.ini Changes README.md/],
             commit_msg => 'Release %V'
@@ -113,6 +113,7 @@ sub configure {
             tag_message => 'release %v',
         }],
         [ 'Git::Push' => { push_to => ['origin'] } ],
+        'Clean',
     );
 }
 
@@ -130,7 +131,7 @@ Dist::Zilla::PluginBundle::Author::DOMM - Dist::Zilla config suiting my needs
 
 =head1 VERSION
 
-version 0.908
+version 0.909
 
 =head1 DESCRIPTION
 

@@ -2,12 +2,12 @@
 
 import perl
 if not perl.MULTI_PERL:
-        print "1..0"
+        print("1..0")
         raise SystemExit
 
-print "1..10"
+print("1..10")
 
-import thread
+import _thread
 import time
 
 def t(start, step, stop):
@@ -23,11 +23,11 @@ def t(start, step, stop):
     
     """ % (start, step, stop))
 
-thread.start_new_thread(t, (1, 2, 9))
+_thread.start_new_thread(t, (1, 2, 9))
 time.sleep(0.5)
-thread.start_new_thread(t, (2, 2, 10))
+_thread.start_new_thread(t, (2, 2, 10))
 
 perl.eval("sleep 3")
-print "perl sleep done"
+#print "perl sleep done"
 time.sleep(4)
-print "done"
+#print "done"

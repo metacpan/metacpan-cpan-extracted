@@ -57,17 +57,13 @@ describe 'Use default name generator' => sub {
 
   describe 'Use instance of Sub::Meta directly' => sub {
 
-    it q{Name generator returns instance's address} => sub {
+    it q{Name generator returns instance's display} => sub {
       my $meta = Sub::Meta->new(
-        parameters => Sub::Meta::Parameters->new(
-          args   => [],
-          slurpy => 1,
-        ),
-        returns => Sub::Meta::Returns->new(),
+        args => [Int, Int],
+        returns => Int,
       );
-      is $factory->name_generator->($factory->name, $meta), $factory->name . "[$meta]";
+      is $factory->name_generator->($factory->name, $meta), $factory->name . "[Sub::Meta=sub(Int, Int) => Int]";
     };
-
   };
 
   describe 'Empty parameters' => sub {

@@ -37,6 +37,8 @@ modules = Carp::Always Data::Dumper Data::Printer
 [-RegularExpressions::RequireBracesForMultiline]
 [-RegularExpressions::RequireDotMatchAnything]
 [-RegularExpressions::RequireLineBoundaryMatching]
+[-Subroutines::ProhibitCallsToUndeclaredSubs]
+[-Subroutines::ProhibitCallsToUnexportedSubs]
 
 [Subroutines::RequireArgUnpacking]
 allow_delegation_to = execute_script

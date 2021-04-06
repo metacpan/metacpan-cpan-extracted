@@ -31,6 +31,7 @@ if (WriteMakefile(
     BUILD_REQUIRES => {
         'Test::More' => 0.44,
     },
+    PREREQ_FATAL   => 1,
     PREREQ_PM      => {
         'Time::HiRes'     => 1.9715,
         'Term::ANSIColor' => 4.00,

@@ -1,4 +1,5 @@
-package RandomFilePassesPathsToCheckRoutine;
+package
+    RandomFilePassesPathsToCheckRoutine;
 use base qw/RandomFileMethodBase/;
 use TestConstants;
 

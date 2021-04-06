@@ -1,3 +1,4 @@
+CONTRIBUTING
 Changes
 LICENSE
 MANIFEST
@@ -10,7 +11,7 @@ examples/runge.pl
 examples/runge_plot.png
 examples/symbolic.pl
 lib/Math/Polynomial.pm
-lib/Math/Polynomial/Generic.pm
+lib/Math/Polynomial/Generic.pod
 t/01_load.t
 t/02_basics.t
 t/03_expressions.t

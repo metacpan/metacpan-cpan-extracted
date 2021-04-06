@@ -1,5 +1,10 @@
 Revision history for Perl bundle Bundle::ExCore.
 
+0.005   Fri, 02 Apr 2021 11:00:30 +0200
+        - added modules removed from core in perl-5.32.0
+        - switched to artistic license
+        - moved repository and issue tracker to github
+
 0.004   Tue, 11 Jun 2019 07:23:37 +0200
         - added modules removed from core in perl-5.30.0
 

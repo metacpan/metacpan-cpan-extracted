@@ -7,18 +7,16 @@
 #include <perl.h>
 #include <Python.h>
 
+#include "pycompat.h"
 #include "thrd_ctx.h"
 #include "perlmodule.h"
 #include "svrv_object.h"
 #include "lang_lock.h"
 #include "lang_map.h"
+#include "try_perlapi.h"
 
 static PyObject *PerlError;
 extern void xs_init (pTHXo);
-
-#ifdef WIN32
-SV* (*pnewPerlPyObject_inc)(PyObject *py);
-#endif
 
 #ifdef MULTI_PERL
 
@@ -26,7 +24,7 @@ PerlInterpreter *
 new_perl(void)
 {
     PerlInterpreter *p;
-    char *embedding[] = { "", "-mPython::Object", "-e", "0", NULL };
+    char *embedding[] = { "", "-mPython::Object", "-e", "$| = 1;", NULL };
 
     p = perl_alloc();
 #if 0
@@ -39,22 +37,6 @@ new_perl(void)
     perl_parse(p, xs_init, 4, embedding, NULL);
 #endif
     perl_run(p);
-
-#ifdef WIN32
-    /* Object.dll will have been loaded by Perl now, so resolve its exported
-     * functions explicitly.  This is needed so that we don't load two
-     * independent copies of Object.dll, once via perl56.dll and another
-     * time via perl.pyd.
-     * XXX Other platforms probably need similar treatment. */
-    {
-	HMODULE m = GetModuleHandle("Object.dll");
-	if (m) {
-	    pnewPerlPyObject_inc = (SV* (*)(PyObject *py))GetProcAddress(m, "newPerlPyObject_inc");
-	}
-	else
-	    return NULL;
-    }
-#endif
 
     return p;
 }
@@ -90,25 +72,25 @@ propagate_errsv()
     ASSERT_LOCK_BOTH;
 
     if (SvROK(ERRSV) && sv_derived_from(ERRSV, "Python::Err")) {
-	IV tmp = SvIV((SV*)SvRV(ERRSV));
-	PerlPyErr *py_err = INT2PTR(PerlPyErr *,tmp);
+    IV tmp = SvIV((SV*)SvRV(ERRSV));
+    PerlPyErr *py_err = INT2PTR(PerlPyErr *,tmp);
     
-	/* We want to keep the Exception object valid also after restore,
-	 * so increment reference counts first.
-	 */
-	Py_XINCREF(py_err->type);
-	Py_XINCREF(py_err->value);
-	Py_XINCREF(py_err->traceback);
+    /* We want to keep the Exception object valid also after restore,
+     * so increment reference counts first.
+     */
+    Py_XINCREF(py_err->type);
+    Py_XINCREF(py_err->value);
+    Py_XINCREF(py_err->traceback);
 
-	PyErr_Restore(py_err->type, py_err->value, py_err->traceback);
+    PyErr_Restore(py_err->type, py_err->value, py_err->traceback);
     }
     else {
-	char *s;
-	PYTHON_UNLOCK;
-	s = SvPV(ERRSV, n_a);
-	ENTER_PYTHON;
-	PyErr_SetString(PerlError, s);
-	PERL_LOCK;
+    char *s;
+    PYTHON_UNLOCK;
+    s = SvPV(ERRSV, n_a);
+    ENTER_PYTHON;
+    PyErr_SetString(PerlError, s);
+    PERL_LOCK;
     }
 
     ASSERT_LOCK_BOTH;
@@ -117,8 +99,8 @@ propagate_errsv()
 
 PyObject *
 call_perl(char *method, SV* obj, I32 gimme,
-	  PyObject *args,
-	  PyObject *keywds)
+      PyObject *args,
+      PyObject *keywds)
 {
     PyObject *m_obj = 0;
     SV* func = 0;
@@ -137,49 +119,49 @@ call_perl(char *method, SV* obj, I32 gimme,
     arglen = PyTuple_Size(args);
 
     if (method) {
-	if (!*method) {
-	    if (arglen < (obj ? 1 : 2)) {
-		PyErr_SetString(PerlError, "Need both a method name and a object/class");
-		ASSERT_LOCK_PYTHON;
-		return NULL;
-	    }
-	    m_obj = PyTuple_GetItem(args, 0);
-	    m_obj = PyObject_Str(m_obj); /* need decrement refcount after call */
-	    assert(PyString_Check(m_obj));
-	    method = PyString_AsString(m_obj);
-	    argfirst = 1;
-	}
-	else if (!obj && !arglen) {
-	    PyErr_SetString(PerlError, "Missing object/class");
-	    ASSERT_LOCK_PYTHON;
-	    return NULL;
-	}
+    if (!*method) {
+        if (arglen < (obj ? 1 : 2)) {
+        PyErr_SetString(PerlError, "Need both a method name and a object/class");
+        ASSERT_LOCK_PYTHON;
+        return NULL;
+        }
+        m_obj = PyTuple_GetItem(args, 0);
+        m_obj = PyObject_Str(m_obj); /* need decrement refcount after call */
+        assert(PyString_Check(m_obj));
+        method = PyUnicode_AsUTF8(m_obj);
+        argfirst = 1;
+    }
+    else if (!obj && !arglen) {
+        PyErr_SetString(PerlError, "Missing object/class");
+        ASSERT_LOCK_PYTHON;
+        return NULL;
+    }
     }
     else if (obj) {
-	func = obj;
-	obj = 0;
+    func = obj;
+    obj = 0;
     }
     else {
-	if (arglen < 1) {
-	    PyErr_SetString(PerlError, "Missing function argument");
-	    ASSERT_LOCK_PYTHON;
-	    return NULL;
-	}
-	PERL_LOCK;
-	func = pyo2sv(PyTuple_GetItem(args, 0));
-	argfirst = 1;
-	PERL_UNLOCK;
+    if (arglen < 1) {
+        PyErr_SetString(PerlError, "Missing function argument");
+        ASSERT_LOCK_PYTHON;
+        return NULL;
+    }
+    PERL_LOCK;
+    func = pyo2sv(PyTuple_GetItem(args, 0));
+    argfirst = 1;
+    PERL_UNLOCK;
     }
 
     if (keywds) {
-	PyObject *o;
-	assert(PyDict_Check(keywds));
+    PyObject *o;
+    assert(PyDict_Check(keywds));
 
-	if ( (o = PyDict_GetItemString(keywds, "__wantarray__"))) {
-	    gimme = (o == Py_None)     ? G_VOID :
-		    PyObject_IsTrue(o) ? G_ARRAY :
-		                         G_SCALAR;
-	}
+    if ( (o = PyDict_GetItemString(keywds, "__wantarray__"))) {
+        gimme = (o == Py_None)     ? G_VOID :
+            PyObject_IsTrue(o) ? G_ARRAY :
+                                 G_SCALAR;
+    }
     }
 
     /* At this point we should know we have enough arguments to actually
@@ -194,28 +176,28 @@ call_perl(char *method, SV* obj, I32 gimme,
     PUSHMARK(SP);
 
     if (obj)
-	XPUSHs(obj);
+    XPUSHs(obj);
 
     for (i = argfirst; i < arglen; i++) {
-	XPUSHs(sv_2mortal(pyo2sv(PyTuple_GET_ITEM(args, i))));
+    XPUSHs(sv_2mortal(pyo2sv(PyTuple_GET_ITEM(args, i))));
     }
 
     /* push keyword arguments too if there are any */
     if (keywds) {
-	int pos = 0;
-	PyObject *key;
-	char *key_str;
-	PyObject *val;
-	while (PyDict_Next(keywds, &pos, &key, &val)) {
-	    assert(PyString_Check(key));
-	    key_str = PyString_AsString(key);
+    Py_ssize_t pos = 0;
+    PyObject *key;
+    char *key_str;
+    PyObject *val;
+    while (PyDict_Next(keywds, &pos, &key, &val)) {
+        assert(PyString_Check(key));
+        key_str = PyUnicode_AsUTF8(key);
       
-	    if (key_str[0] == '_' && key_str[1] == '_')
-		continue;
+        if (key_str[0] == '_' && key_str[1] == '_')
+        continue;
 
-	    XPUSHs(sv_2mortal(newSVpv(key_str, 0)));
-	    XPUSHs(sv_2mortal(pyo2sv(val)));
-	}
+        XPUSHs(sv_2mortal(newSVpv(key_str, 0)));
+        XPUSHs(sv_2mortal(pyo2sv(val)));
+    }
     }
 
     PUTBACK;
@@ -223,11 +205,11 @@ call_perl(char *method, SV* obj, I32 gimme,
     PYTHON_UNLOCK;
 
     if (method)
-	ret_count = perl_call_method(method, gimme | G_EVAL);
+    ret_count = call_method(method, gimme | G_EVAL);
     else {
-	ret_count = perl_call_sv(func, gimme | G_EVAL);
-	if (argfirst == 1)
-	    SvREFCNT_dec(func);
+    ret_count = call_sv(func, gimme | G_EVAL);
+    if (argfirst == 1)
+        SvREFCNT_dec(func);
     }
     errsv = SvTRUE(ERRSV);
 
@@ -237,23 +219,23 @@ call_perl(char *method, SV* obj, I32 gimme,
     PERL_LOCK;
 
     if (errsv) {
-	while (ret_count--)
-	    POPs;
-	propagate_errsv();
-	ret_val = NULL;
+    while (ret_count--)
+        POPs;
+    propagate_errsv();
+    ret_val = NULL;
     }
     else {
-	if (gimme == G_ARRAY || ret_count > 1) {
-	    ret_val = PyTuple_New(ret_count);
-	    for (i = 0; i < ret_count; i++)
-		PyTuple_SET_ITEM(ret_val, ret_count - 1 - i, sv2pyo(POPs));
-	}
-	else if (ret_count == 1) {
-	    ret_val = sv2pyo(POPs);
-	}
-	else {
-	    ret_val = Py_BuildValue("");  /* None */
-	}
+    if (gimme == G_ARRAY || ret_count > 1) {
+        ret_val = PyTuple_New(ret_count);
+        for (i = 0; i < ret_count; i++)
+        PyTuple_SET_ITEM(ret_val, ret_count - 1 - i, sv2pyo(POPs));
+    }
+    else if (ret_count == 1) {
+        ret_val = sv2pyo(POPs);
+    }
+    else {
+        ret_val = Py_BuildValue("");  /* None */
+    }
     }
 
     PYTHON_UNLOCK;
@@ -290,9 +272,9 @@ safecall(self, args, keywds)
     dCTXP;
 
     if (!PyArg_ParseTuple(args, "ss#O!:safecall",
-			  &root, &op_mask, &op_mask_len,
-			  &PyTuple_Type, &realargs))
-	return NULL;
+              &root, &op_mask, &op_mask_len,
+              &PyTuple_Type, &realargs))
+    return NULL;
 
     ENTER_PERL;
     SET_CUR_PERL;
@@ -304,24 +286,24 @@ safecall(self, args, keywds)
     save_aptr(&PL_endav);
     PL_endav = (AV*)sv_2mortal((SV*)newAV()); /* ignore END blocks for now */
 
-    save_hptr(&PL_defstash);		/* save current default stash	*/
+    save_hptr(&PL_defstash);        /* save current default stash    */
     save_hptr(&PL_curstash);
-    /* the assignment to global defstash changes our sense of 'main'	*/
+    /* the assignment to global defstash changes our sense of 'main'    */
 
     if (ctx->root_stash) {
-	PL_defstash = PL_curstash = ctx->root_stash;
+    PL_defstash = PL_curstash = ctx->root_stash;
     }
     else {
-	save_hptr(&ctx->root_stash);
-	ctx->root_stash = PL_defstash;
+    save_hptr(&ctx->root_stash);
+    ctx->root_stash = PL_defstash;
     }
 
-    PL_defstash = gv_stashpv(root, GV_ADDWARN); /* should exist already	*/
+    PL_defstash = gv_stashpv(root, GV_ADDWARN); /* should exist already    */
     PL_curstash = PL_defstash;
 
-    /* defstash must itself contain a main:: so we'll add that now	*/
-    /* take care with the ref counts (was cause of long standing bug)	*/
-    /* XXX I'm still not sure if this is right, GV_ADDWARN should warn!	*/
+    /* defstash must itself contain a main:: so we'll add that now    */
+    /* take care with the ref counts (was cause of long standing bug)    */
+    /* XXX I'm still not sure if this is right, GV_ADDWARN should warn!    */
     gv = gv_fetchpv("main::", GV_ADDWARN, SVt_PVHV);
     sv_free((SV*)GvHV(gv));
     GvHV(gv) = (HV*)SvREFCNT_inc(PL_defstash);
@@ -359,21 +341,21 @@ restore_unsafe_env(thread_ctx *ctx)
 
 static PyObject *
 unsafe_call_perl(char *method, SV* obj, I32 gimme,
-		 PyObject *args,
-		 PyObject *keywds)
+         PyObject *args,
+         PyObject *keywds)
 {
     dCTXP;
     PyObject *res;
     int leave_needed = 0;
     if (ctx->root_stash) {
-	/* reenter from safe, set back root */
-	ENTER;
-	leave_needed++;
-	restore_unsafe_env(ctx);
+    /* reenter from safe, set back root */
+    ENTER;
+    leave_needed++;
+    restore_unsafe_env(ctx);
     }
     res = call_perl(method, obj, gimme, args, keywds);
     if (leave_needed)
-	LEAVE;  /* restore safe env */
+    LEAVE;  /* restore safe env */
     return res;
 }
 
@@ -441,7 +423,7 @@ eval(self, args)
     ASSERT_LOCK_PYTHON;
   
     if (!PyArg_ParseTuple(args, "s:perl.eval", &code))
-	return NULL;
+    return NULL;
 
     ENTER_PERL;
     SET_CUR_PERL;
@@ -450,18 +432,19 @@ eval(self, args)
     SAVETMPS;
     RESTORE_UNSAFE_ENV;
 
-    res_sv = perl_eval_pv(code, FALSE);
+    fflush(stdout);
+    res_sv = eval_pv(code, FALSE);
     errsv = SvTRUE(ERRSV);
   
     ENTER_PYTHON;
     PERL_LOCK;
 
     if (errsv) {
-	propagate_errsv();
-	res_pyo = NULL;
+    propagate_errsv();
+    res_pyo = NULL;
     }
     else {
-	res_pyo = sv2pyo(res_sv);
+    res_pyo = sv2pyo(res_sv);
     }
 
     PYTHON_UNLOCK;
@@ -490,7 +473,7 @@ require(self, args)
     ASSERT_LOCK_PYTHON;
   
     if (!PyArg_ParseTuple(args, "s:perl.require", &module))
-	return NULL;
+    return NULL;
 
     ENTER_PERL;
     SET_CUR_PERL;
@@ -502,7 +485,7 @@ require(self, args)
     code = newSVpv("require ", 0);
     sv_catpv(code, module);
 
-    res_sv = perl_eval_pv(SvPVx(code, n_a), FALSE);
+    res_sv = eval_pv(SvPVx(code, n_a), FALSE);
     SvREFCNT_dec(code);
     errsv = SvTRUE(ERRSV);
 
@@ -510,11 +493,11 @@ require(self, args)
     PERL_LOCK;
 
     if (errsv) {
-	propagate_errsv();
-	res_pyo = NULL;
+    propagate_errsv();
+    res_pyo = NULL;
     }
     else {
-	res_pyo = sv2pyo(res_sv);
+    res_pyo = sv2pyo(res_sv);
     }
 
     PYTHON_UNLOCK;
@@ -539,7 +522,7 @@ defined(self, args)
 
     ASSERT_LOCK_PYTHON;
     if (!PyArg_ParseTuple(args, "s:perl.defined", &name))
-	return NULL;
+    return NULL;
     ENTER_PERL;
     SET_CUR_PERL;
 
@@ -547,31 +530,31 @@ defined(self, args)
     RESTORE_UNSAFE_ENV;
 
     if (isIDFIRST(*name)) {
-	type = '&';
+    type = '&';
     }
     else {
-	type = *name;
-	name++;
+    type = *name;
+    name++;
     }
 
     if (*name) {
-	switch (type) {
-	case '$': sv =      perl_get_sv(name, 0); break;
-	case '@': sv = (SV*)perl_get_av(name, 0); break;
-	case '%': sv = (SV*)perl_get_hv(name, 0); break;
-	case '&': sv = (SV*)perl_get_cv(name, 0); break;
-	default:
-	    LEAVE;
-	    ENTER_PYTHON;
-	    PyErr_Format(PerlError, "Bad type spec '%c'", type);
-	    return NULL;
-	}
+    switch (type) {
+    case '$': sv =      get_sv(name, 0); break;
+    case '@': sv = (SV*)get_av(name, 0); break;
+    case '%': sv = (SV*)get_hv(name, 0); break;
+    case '&': sv = (SV*)get_cv(name, 0); break;
+    default:
+        LEAVE;
+        ENTER_PYTHON;
+        PyErr_Format(PerlError, "Bad type spec '%c'", type);
+        return NULL;
+    }
     }
     else {
-	LEAVE;
-	ENTER_PYTHON;
-	PyErr_Format(PerlError, "Missing identifier name");
-	return NULL;
+    LEAVE;
+    ENTER_PYTHON;
+    PyErr_Format(PerlError, "Missing identifier name");
+    return NULL;
     }
     LEAVE;
     ENTER_PYTHON;
@@ -597,8 +580,8 @@ get_ref(self, args, keywds)
 
     /* Establish 'name' and 'create' */
     if (!PyArg_ParseTupleAndKeywords(args, keywds, "s|i:perl.get_ref", kwlist,
-				     &name, &create))
-	return NULL;
+                     &name, &create))
+    return NULL;
 
     PERL_LOCK;
     SET_CUR_PERL;
@@ -611,44 +594,44 @@ get_ref(self, args, keywds)
      */
 
     if (isIDFIRST(*name)) {
-	type = '&';
+    type = '&';
     }
     else {
-	type = *name;
-	name++;
+    type = *name;
+    name++;
     }
 
     if (*name) {
-	switch (type) {
-	case '$': sv =      perl_get_sv(name, create); break;
-	case '@': sv = (SV*)perl_get_av(name, create); break;
-	case '%': sv = (SV*)perl_get_hv(name, create); break;
-	case '&': sv = (SV*)perl_get_cv(name, create); break;
-	default:
-	    LEAVE;
-	    PERL_UNLOCK;
-	    PyErr_Format(PerlError, "Bad type spec '%c'", type);
-	    return NULL;
-	}
-	if (!sv) {
-	    LEAVE;
-	    PERL_UNLOCK;
-	    PyErr_Format(PerlError, "No perl object named %s", name);
-	    return NULL;
-	}
-	SvREFCNT_inc(sv);
+    switch (type) {
+    case '$': sv =      get_sv(name, create); break;
+    case '@': sv = (SV*)get_av(name, create); break;
+    case '%': sv = (SV*)get_hv(name, create); break;
+    case '&': sv = (SV*)get_cv(name, create); break;
+    default:
+        LEAVE;
+        PERL_UNLOCK;
+        PyErr_Format(PerlError, "Bad type spec '%c'", type);
+        return NULL;
+    }
+    if (!sv) {
+        LEAVE;
+        PERL_UNLOCK;
+        PyErr_Format(PerlError, "No perl object named %s", name);
+        return NULL;
+    }
+    SvREFCNT_inc(sv);
     }
     else {
-	switch (type) {
-	case '$': sv =      newSV(0); break;
-	case '@': sv = (SV*)newAV();  break;
-	case '%': sv = (SV*)newHV();  break;
-	default:
-	    LEAVE;
-	    PERL_UNLOCK;
-	    PyErr_Format(PerlError, "Bad type spec '%c'", type);
-	    return NULL;
-	}
+    switch (type) {
+    case '$': sv =      newSV(0); break;
+    case '@': sv = (SV*)newAV();  break;
+    case '%': sv = (SV*)newHV();  break;
+    default:
+        LEAVE;
+        PERL_UNLOCK;
+        PyErr_Format(PerlError, "Bad type spec '%c'", type);
+        return NULL;
+    }
     }
 
     sv = newRV_noinc(sv);
@@ -680,55 +663,55 @@ array(self, args, keywds)
 
     /* Takes any sequence object and turn it into an perl array */
     if (!PyArg_ParseTuple(args, "O:perl.array", &o))
-	return NULL;
+    return NULL;
 
     if (!PySequence_Check(o)) {
-	PyErr_SetString(PyExc_TypeError, "perl.array() argument must be a sequence");
-	return NULL;
+    PyErr_SetString(PyExc_TypeError, "perl.array() argument must be a sequence");
+    return NULL;
     }
 
     n = PySequence_Length(o);
     if (n < 0)
-	return NULL;
+    return NULL;
 
     PERL_LOCK;
     SET_CUR_PERL;
 
     av = newAV();
     if (n) {
-	av_extend(av, n-1);
-	i = 0;
+    av_extend(av, n-1);
+    i = 0;
 
-	for (i = 0;; i++) {
-	    PyObject *item;
+    for (i = 0;; i++) {
+        PyObject *item;
 
-	    PERL_UNLOCK;
-	    item = PySequence_GetItem(o, i);
-	    PERL_LOCK;
+        PERL_UNLOCK;
+        item = PySequence_GetItem(o, i);
+        PERL_LOCK;
 
-	    if (item) {
-		SV* item_sv = pyo2sv(item);
-		if (!av_store(av, i, item_sv)) {
-		    SvREFCNT_dec(item_sv);
-		    SvREFCNT_dec(av);
-		    PERL_UNLOCK;
-		    PyErr_SetString(PyExc_RuntimeError, "av_store failed");
-		    ASSERT_LOCK_PYTHON;
-		    return NULL;
-		}
-	    }
-	    else {
-		if (PyErr_ExceptionMatches(PyExc_IndexError)) {
-		    PyErr_Clear();
-		    break;
-		}
-		/* Something else bad happened */
-		SvREFCNT_dec(av);
-		PERL_UNLOCK;
-		ASSERT_LOCK_PYTHON;
-		return NULL;
-	    }
-	}
+        if (item) {
+        SV* item_sv = pyo2sv(item);
+        if (!av_store(av, i, item_sv)) {
+            SvREFCNT_dec(item_sv);
+            SvREFCNT_dec(av);
+            PERL_UNLOCK;
+            PyErr_SetString(PyExc_RuntimeError, "av_store failed");
+            ASSERT_LOCK_PYTHON;
+            return NULL;
+        }
+        }
+        else {
+        if (PyErr_ExceptionMatches(PyExc_IndexError)) {
+            PyErr_Clear();
+            break;
+        }
+        /* Something else bad happened */
+        SvREFCNT_dec(av);
+        PERL_UNLOCK;
+        ASSERT_LOCK_PYTHON;
+        return NULL;
+        }
+    }
     }
 
     sv = newRV_inc((SV*)av);
@@ -758,16 +741,43 @@ static PyMethodDef PerlMethods[] = {
 };
 
 
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef ModuleDef = {
+        PyModuleDef_HEAD_INIT,
+        "perl",
+        NULL,
+        -1,
+        PerlMethods,
+        NULL,
+        NULL,
+        NULL,
+        NULL
+};
+#endif
+
+
+#if PY_MAJOR_VERSION < 3
 void
 #ifdef DL_HACK
 initperl2()
 #else
 initperl()
 #endif
+
+#else
+
+PyMODINIT_FUNC
+#ifdef DL_HACK
+PyInit_perl2()
+#else
+PyInit_perl()
+#endif
+
+#endif
 {
     PyObject *m, *d;
 #ifndef MULTI_PERL
-    char *embedding[] = { "", "-mPython::Object", "-e", "0" };
+    char *embedding[] = { "", "-mPython::Object", "-e", "$| = 1;" };
 #if !defined(USE_ITHREADS)
     PerlInterpreter *main_perl;
 #endif
@@ -791,13 +801,22 @@ initperl()
      * python itself was embedded before we imported perl.
      */
 
+#if PY_MAJOR_VERSION >= 3
+    m = PyModule_Create(&ModuleDef);
+#else
     m = Py_InitModule("perl", PerlMethods);
+#endif
+
     d = PyModule_GetDict(m);
     PerlError = PyErr_NewException("perl.PerlError", NULL, NULL);
     PyDict_SetItemString(d, "PerlError", PerlError);
 #ifdef MULTI_PERL
-    PyDict_SetItemString(d, "MULTI_PERL", PyInt_FromLong(1));
+    PyDict_SetItemString(d, "MULTI_PERL", PyLong_FromLong(1));
 #else
-    PyDict_SetItemString(d, "MULTI_PERL", PyInt_FromLong(0));
+    PyDict_SetItemString(d, "MULTI_PERL", PyLong_FromLong(0));
+#endif
+
+#if PY_MAJOR_VERSION >= 3
+    return m;
 #endif
 }

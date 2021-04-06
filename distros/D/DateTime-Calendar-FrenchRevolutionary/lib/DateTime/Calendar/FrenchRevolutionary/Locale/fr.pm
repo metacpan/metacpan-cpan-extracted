@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 # Perl DateTime extension for providing French strings for the French Revolutionary calendar
-# Copyright (c) 2003, 2004, 2010, 2011, 2014, 2016, 2019 Jean Forget. All rights reserved.
+# Copyright (c) 2003, 2004, 2010, 2011, 2014, 2016, 2019, 2021 Jean Forget. All rights reserved.
 #
 # See the license in the embedded documentation below.
 #
@@ -13,7 +13,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-$VERSION = '0.15'; # same as parent module DT::C::FR
+$VERSION = '0.17'; # same as parent module DT::C::FR
 
 my @months_short  = qw (Vnd Bru Fri Niv Plu Vnt Ger Flo Pra Mes The Fru S-C);
 #my @add_days_short= qw (Vertu Génie Trav Raison Récomp Révol);
@@ -195,7 +195,7 @@ sub day_abbreviation {
     return $decade_days_short[$date->day_of_decade_0];
 }
 
-sub am_pm                    { $_[0]->am_pms->             [ $_[1]->hour < 5 ? 0 : 1 ] }
+sub am_pm { $_[0]->am_pms->[ $_[1]->hour < 5 ? 0 : 1 ] }
 
 sub _raw_feast {
   my ($self, $date) = @_;
@@ -239,10 +239,10 @@ sub default_time_format      { $_[0]->time_formats->{ $_[0]->default_time_format
 
 sub _datetime_format_pattern_order { $_[0]->date_before_time ? (0, 1) : (1, 0) }
 
-sub    full_datetime_format { join ' ', ( $_[0]->full_date_format,    $_[0]->full_time_format    )[ $_[0]->_datetime_format_pattern_order ] }
-sub    long_datetime_format { join ' ', ( $_[0]->long_date_format,    $_[0]->long_time_format    )[ $_[0]->_datetime_format_pattern_order ] }
-sub  medium_datetime_format { join ' ', ( $_[0]->medium_date_format,  $_[0]->medium_time_format  )[ $_[0]->_datetime_format_pattern_order ] }
-sub   short_datetime_format { join ' ', ( $_[0]->short_date_format,   $_[0]->short_time_format   )[ $_[0]->_datetime_format_pattern_order ] }
+sub    full_datetime_format { join ' ', ( $_[0]->   full_date_format, $_[0]->   full_time_format )[ $_[0]->_datetime_format_pattern_order ] }
+sub    long_datetime_format { join ' ', ( $_[0]->   long_date_format, $_[0]->   long_time_format )[ $_[0]->_datetime_format_pattern_order ] }
+sub  medium_datetime_format { join ' ', ( $_[0]-> medium_date_format, $_[0]-> medium_time_format )[ $_[0]->_datetime_format_pattern_order ] }
+sub   short_datetime_format { join ' ', ( $_[0]->  short_date_format, $_[0]->  short_time_format )[ $_[0]->_datetime_format_pattern_order ] }
 sub default_datetime_format { join ' ', ( $_[0]->default_date_format, $_[0]->default_time_format )[ $_[0]->_datetime_format_pattern_order ] }
 
 sub default_date_format_length { $default_date_format_length }
@@ -865,7 +865,7 @@ lignes du Greb, passage de la Lech.
 29 Nivôse II Armée du Rhin. Evacuation totale du département du
 Bas-Rhin par les coalisés ; reprise du fort Vauban.
 
-29 Nivôse III Armée du Nord. Prise de Gertuydemberg.
+29 Nivôse III Armée du Nord. Prise de Gertruydemberg.
 
 0430
 30 Nivôse VI Naissance d'Auguste Comte, philosophe français.
@@ -2257,6 +2257,12 @@ Returns the French day name.
 
 Returns a 3-letter abbreviation for the French day name.
 
+=item * am_pm ($date)
+
+Returns a code (typically C<AM> or C<PM>) showing whether the datetime
+is in the morning or the  afternoon. Outside the sexagesimal time with
+a 1..12 hour range, this is not very useful.
+
 =item * feast_short ($date)
 
 Returns  the name for  the plant,  animal or  tool that  correspond to
@@ -2280,12 +2286,82 @@ Most of these events come  from an anonymous propaganda book published
 in year  VIII (1799--1800). The others are  common knowledge available
 in any French History book or any encyclopedia.
 
+=item * full_date_format, long_date_format, medium_date_format, short_date_format
+
+Class  methods,  giving four  C<strftime>  canned  formats for  dates,
+without the need to remember all the C<%> specifiers.
+
+=item * full_time_format, long_time_format, medium_time_format, short_time_format
+
+Same thing, C<strftime> canned formats for decimal time.
+
+=item * full_datetime_format, long_datetime_format, medium_datetime_format, short_datetime_format
+
+Same thing, for formats including both the date and the decimal time.
+
+=item * default_date_format, default_time_format, default_datetime_format
+
+Class methods  suggesting one each  of the  date formats, of  the time
+formats and of the datetime formats.
+
+=item * full_time_format, long_time_format, medium_time_format, short_time_format
+
+Same thing, C<strftime> canned formats for decimal time.
+
+=item * full_datetime_format, long_datetime_format, medium_datetime_format, short_datetime_format
+
+Same thing, for formats including both the date and the decimal time.
+
+=item * default_date_format, default_time_format, default_datetime_format
+
+Class methods  suggesting one each  of the  date formats, of  the time
+formats and of the datetime formats.
+
+=item * default_date_format_length, default_time_format_length
+
+While  C<default_date_format>  and   C<default_time_format>  give  the
+actual default formats, with C<%> and  all, these class methods give a
+one-word  description of  the  default  formats: C<short>,  C<medium>,
+C<long> or C<full>.
+
+=item * date_formats, time_formats
+
+These  class methods  give a  hashtable where  the key  is the  length
+(C<short>,  C<medium>,  C<long> and  C<full>)  and  the value  is  the
+corresponding format, complete with C<%> and specifiers.
+
+=item * month_names, month_abbreviations, day_names, day_abbreviations
+
+Class methods giving the whole array of month or day names or abbrevs,
+not limited to the date implemented by the invocant.
+
 =back
 
 =head1 SUPPORT
 
 Support for this module is provided via the datetime@perl.org email
 list. See L<https://lists.perl.org/> for more details.
+
+Please   report  any   bugs   or  feature   requests   to  Github   at
+L<https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary>,
+and create an issue or submit a pull request.
+
+If you have no  feedback after a week or so, try to  reach me by email
+at JFORGET  at cpan  dot org.  The notification  from Github  may have
+failed to reach  me. In your message, please  mention the distribution
+name in the subject, so my spam  filter and I will easily dispatch the
+email to the proper folder.
+
+On the other  hand, I may be  on vacation or away from  Internet for a
+good  reason. Do  not be  upset if  I do  not answer  immediately. You
+should write  me at a leisurely  rythm, about once per  month, until I
+react.
+
+If after about six  months or a year, there is  still no reaction from
+me, you can worry and start the CPAN procedure for module adoption.
+See L<https://groups.google.com/g/perl.module-authors/c/IPWjASwuLNs>
+L<https://www.cpan.org/misc/cpan-faq.html#How_maintain_module>
+and L<https://www.cpan.org/misc/cpan-faq.html#How_adopt_module>.
 
 =head1 AUTHOR
 
@@ -2362,8 +2438,8 @@ method.
 
 =head1 LICENSE STUFF
 
-Copyright (c)  2003, 2004, 2010,  2012, 2014, 2016, 2019  Jean Forget.
-All  rights  reserved.   This  program  is  free   software.  You  can
+Copyright  (c) 2003,  2004, 2010,  2012, 2014,  2016, 2019,  2021 Jean
+Forget. All  rights reserved. This  program is free software.  You can
 distribute,         modify,        and         otherwise        mangle
 DateTime::Calendar::FrenchRevolutionary under  the same terms  as perl
 5.16.3.
@@ -2388,7 +2464,7 @@ MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
 General Public License for more details.
 
 You should  have received  a copy  of the  GNU General  Public License
-along with  this program; if not,  see <https://www.gnu.org/licenses/>
-or write to the Free Software Foundation, Inc., L<https://www.fsf.org>.
+along with this program;  if not, see L<https://www.gnu.org/licenses/>
+or contact the Free Software Foundation, Inc., L<https://www.fsf.org>.
 
 =cut

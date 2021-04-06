@@ -1,4 +1,5 @@
-package RandomFileMethodBase;
+package
+    RandomFileMethodBase;
 use base qw/Test::Class/;
 use TestConstants;
 

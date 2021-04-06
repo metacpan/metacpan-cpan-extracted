@@ -1,0 +1,87 @@
+
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/Mojo-OBS-Client?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/Mojo-OBS-Client)
+[![Windows](https://github.com/Corion/Mojo-OBS-Client/workflows/windows/badge.svg)](https://github.com/Corion/Mojo-OBS-Client/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/Mojo-OBS-Client/workflows/macos/badge.svg)](https://github.com/Corion/Mojo-OBS-Client/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/Mojo-OBS-Client/workflows/linux/badge.svg)](https://github.com/Corion/Mojo-OBS-Client/actions?query=workflow%3Alinux)
+
+# NAME
+
+Mojo::OBS::Client - Mojolicious client for the OBS WebSocket remote plugin
+
+# SYNOPSIS
+
+    use feature 'signatures';
+
+    my $obs = Mojo::OBS::Client->new;
+    $obs->login('ws://localhost:4444', 'secret')->then(sub {
+        $obs->SetTextFreetype2Properties( source => 'Text.NextTalk',text => 'Hello World')
+    })->then(sub {
+        $obs->GetSourceSettings( sourceName => 'VLC.Vortrag', sourceType => 'vlc_source')
+    });
+
+# ACCESSORS
+
+## `->ioloop`
+
+Access the underlying [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop)
+
+## `->ua`
+
+Access the [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent) object used to talk to OBS.
+
+## `->tx`
+
+The websocket connection to OBS.
+
+## `->protocol`
+
+The [Net::Protocol::OBSRemote](https://metacpan.org/pod/Net::Protocol::OBSRemote) instance used to generate the OBS messages.
+
+## `->debug`
+
+Switch on debug messages to STDERR. Also enabled if
+`$ENV{PERL_MOJO_OBS_CLIENT_DEBUG}` is set to a true value.
+
+# METHODS
+
+# METHODS
+
+For the OBS methods, see [Net::Protocl::OBSRemote](https://metacpan.org/pod/Net::Protocl::OBSRemote).
+
+## `->login $url, $password`
+
+    $obs->login('ws://localhost:4444', 'secret')
+    ->then(sub( $res ){
+        if( $res->{error} ) {
+            warn $res->{error};
+            return
+        };
+    })
+
+Performs the login authentication with the OBS websocket
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/Mojo-OBS-Client](https://github.com/Corion/Mojo-OBS-Client).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+[https://github.com/Corion/Mojo-OBS-Client/issues](https://github.com/Corion/Mojo-OBS-Client/issues)
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2021-2021 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

@@ -1,6 +1,12 @@
+6.1.1 - 2021-04-07
+- Supported HTTP requests retry mechanism on error responses.
+- Improved code examples: create_customer, add_dynamic_page_feed, etc.
+- Updated all code examples to link to Google Ads API documentation instead of
+  AdWords API documentation.
+
 6.1.0 - 2021-02-15
 - Added support for Google Ads API v6_1.
-- Removed support for Google Ads API v3_0.
+- Removed support for Google Ads API v3.
 - Added support for authenticating with service accounts.
 - Added code examples: get_pending_invitations, invite_user_with_access_role,
   add_image_extension, etc.
@@ -12,7 +18,7 @@
 
 6.0.0 - 2020-11-11
 - Added support for Google Ads API v6_0.
-- Removed support for Google Ads API v2_0.
+- Removed support for Google Ads API v2.
 - Added support of client configuration from environment variables.
 - Refactored GoogleAdsLogger to redact email addresses present in the requests
   and responses.

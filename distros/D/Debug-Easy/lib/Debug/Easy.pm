@@ -1,6 +1,6 @@
 #############################################################################
 #################         Easy Debugging Module        ######################
-################# Copyright 2013 - 2018 Richard Kelsch ######################
+################# Copyright 2013 - 2021 Richard Kelsch ######################
 #################          All Rights Reserved         ######################
 #############################################################################
 ####### Licensing information available near the end of this file. ##########
@@ -19,7 +19,7 @@ use Term::ANSIColor;
 use Time::HiRes qw(time);
 use File::Basename;
 
-use Data::Dumper;
+use Data::Dumper; $Data::Dumper::Sortkeys = TRUE; $Data::Dumper::Purity = TRUE; $Data::Dumper::Deparse = TRUE;
 
 use Config;
 use threads;
@@ -28,7 +28,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.03';
+    our $VERSION = '2.05';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -39,9 +39,6 @@ BEGIN {
     # Functions and variables which can be optionally exported
     our @EXPORT_OK = qw(@Levels);
 } ## end BEGIN
-
-$Data::Dumper::Sortkeys = TRUE;
-$Data::Dumper::Purity   = TRUE;
 
 # This can be optionally exported for whatever
 our @Levels = qw( ERR WARN NOTICE INFO VERBOSE DEBUG DEBUGMAX );
@@ -754,13 +751,11 @@ OR you can use the old ExtUtils::MakeMaker method:
 
 Richard Kelsch <rich@rk-internet.com>
 
-Copyright 2013-2018 Richard Kelsch, All Rights Reserved.
-
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 B<VERSION>
 
-Version 2.00    (June 13, 2018)
+Version 2.05    (April 5, 2021)
 
 =head1 B<BUGS>
 
@@ -772,6 +767,9 @@ You can find documentation for this module with the perldoc command.
 
 C<perldoc Debug::Easy>
 
+or if you have "man" installed, then
+
+C<man Debug::Easy>
 
 You can also look for information at:
 
@@ -803,17 +801,13 @@ L<http://search.cpan.org/dist/Debug-Easy/>
 
 =head1 B<AUTHOR COMMENTS>
 
-Earlier versions of this module (pre version 1.0), were difficult to code with, and not "Easy" as the name implied.  Version 1.x+ has addressed the issues brought forward by some users (and reviewers), and has made the module truely easy to use.
-
-Version 2.0 promises to be even simpler, with fewer prerequisites on installation.  Specifically the requirement for "Log::Fast" will be removed, and this module will exclusively handle logging, as I believe it should.
-
 I coded this module because it filled a gap when I was working for a major chip manufacturing company.  It gave the necessary output the other coders asked for, and fulfilled a need.  It has grown far beyond those days, and I use it every day in my coding work.
 
 If you have any features you wish added, or functionality improved or changed, then I welcome them, and will very likely incorporate them sooner than you think.
 
 =head1 B<LICENSE AND COPYRIGHT>
 
-Copyright 2013-2018 Richard Kelsch.
+Copyright 2013-2021 Richard Kelsch.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 

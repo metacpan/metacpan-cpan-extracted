@@ -15,9 +15,11 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Carp' => '0',
+                                      'Data::Dumper' => '0',
                                       'Exporter' => '5.57',
                                       'List::Util' => '0',
                                       'Scalar::Util' => '0',
+                                      'constant' => '0',
                                       'perl' => '5.008001'
                                     },
                       'suggests' => {
@@ -33,7 +35,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'JSON::PP' => '0',
-                                   'Test::More' => '0.88'
+                                   'Test::More' => '0.96'
                                  }
                  }
      };

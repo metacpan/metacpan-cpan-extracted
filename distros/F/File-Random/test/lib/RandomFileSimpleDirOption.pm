@@ -1,4 +1,5 @@
-package RandomFileSimpleDirOption;
+package
+    RandomFileSimpleDirOption;
 use base qw/RandomFileMethodBase/;
 use TestConstants;
 

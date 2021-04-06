@@ -47,27 +47,6 @@ like(
 	'die on bad $ref',
 );
 
-eval {
-   	$ToJSON->json_schema_to_json(
-		schema => {
-			"type" => "array",
-			"items" => { '$ref' => "../definitions/foo.json" },
-			"definitions" => {
-				"positiveInteger" => {
-					"type" => "integer",
-					"minimum" => 1,
-				}
-			}
-		}
-	);
-};
-
-like(
-	$@,
-	qr!Unable to load schema!,
-	'die on bad file $ref'
-);
-
 done_testing();
 
 # vim:noet:sw=4:ts=4

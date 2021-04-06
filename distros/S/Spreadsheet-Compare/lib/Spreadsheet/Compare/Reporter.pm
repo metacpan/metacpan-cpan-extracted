@@ -35,7 +35,7 @@ use Spreadsheet::Compare::Config {
 
 #<<<
 # attributes set by after_reader_setup
-has [qw(ign record_header header test_title)] => undef,                                                                ro => 1;
+has [qw(ign record_header header test_title)] => undef,                                                     ro => 1;
 has stat_head   => sub { [qw/title left right same diff miss add dup limit link/] },                        ro => 1;
 has max_hdr     => sub { $_[0]->report_max_columns ? [qw/ABS_FIELD ABS_VALUE REL_FIELD REL_VALUE/] : []; }, ro => 1;
 has sln_hdr     => sub { $_[0]->report_line_numbers ? [qw/__SLN__/] : []; },                                ro => 1;

@@ -39,7 +39,7 @@ use AnyEvent::Net::Curl::Queued::Stats;
 
 no if ($] >= 5.017010), warnings => q(experimental);
 
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 has json        => (
     is          => 'ro',
@@ -421,7 +421,7 @@ AnyEvent::Net::Curl::Queued::Easy - Net::Curl::Easy wrapped by Moo
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 
@@ -712,7 +712,7 @@ Stanislaw Pusep <stas@sysd.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Stanislaw Pusep.
+This software is copyright (c) 2021 by Stanislaw Pusep.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

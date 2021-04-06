@@ -1,4 +1,4 @@
-print "1..2"
+print("1..2")
 import perl
 
 perl.eval("""

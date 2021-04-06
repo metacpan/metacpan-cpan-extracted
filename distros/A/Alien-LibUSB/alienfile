@@ -1,7 +1,6 @@
 use alienfile;
 use Config;
 use Carp;
-use File::Copy qw(copy);
 
 sub isAtLeastFreeBSDv8 {
     # FreeBSD 8+ ships with a native libusb-1.0 compatible library
@@ -38,16 +37,9 @@ share {
     requires 'Alien::m4'       => '0.11';
 
     if ($^O eq 'linux') {
-        requires 'Alien::libudev' => '0.1';
-        eval "use Alien::libudev"; die $@ if $@;
-        $cppflags  = Alien::libudev->cflags // '';
-        $ldflags   = Alien::libudev->libs // '';
-
-        meta->after_hook(gather_share => sub {
-            my($build) = @_;
-            $build->runtime_prop->{$_} .= ' ' . $ldflags for qw( libs libs_static );
-            $build->runtime_prop->{cflags} .= ' ' . $cppflags;
-        });
+        plugin 'Build::SearchDep' => (
+          aliens => { 'Alien::libudev' => '0.1' },
+        );
     }
 
     plugin Download => (
@@ -60,17 +52,9 @@ share {
 
     plugin Extract => 'zip';
 
-    patch sub {
-        # README is a symlink and would make autotools fail on filesystems not supporting them
-        unlink 'README';
-        copy qw(README.md README);
-    };
-
     plugin 'Build::Autoconf' => ();
 
     $ENV{NOCONFIGURE}  = 1;
-    $ENV{CPPFLAGS}    .= " $cppflags";
-    $ENV{LDFLAGS}     .= " $ldflags";
 
     build [
         './autogen.sh',

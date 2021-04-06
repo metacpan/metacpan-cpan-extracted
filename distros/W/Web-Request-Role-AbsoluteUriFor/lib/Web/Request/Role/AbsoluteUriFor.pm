@@ -2,7 +2,7 @@ package Web::Request::Role::AbsoluteUriFor;
 
 # ABSTRACT: Construct an absolute URI honoring script_name
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 use 5.010;
 use Moose::Role;
@@ -46,7 +46,7 @@ Web::Request::Role::AbsoluteUriFor - Construct an absolute URI honoring script_n
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 

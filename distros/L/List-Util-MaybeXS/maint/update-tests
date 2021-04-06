@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use File::Basename qw(dirname basename);
+use File::Spec::Functions qw(updir catdir catfile);
+use Cwd qw(realpath);
+
+my $slu_loc;
+
+for my $loc (@ARGV, catdir(dirname(__FILE__), updir, updir, 'Scalar-List-Utils')) {
+  if (-d $loc && -f catfile($loc, 'lib', 'List', 'Util.pm')) {
+    $slu_loc = realpath($loc);
+  }
+}
+
+die "Unable to find Scalar-List-Utils directory!\n"
+  if !$slu_loc;
+
+my @tests = glob("$slu_loc/t/*.t");
+
+print "Updating tests from $slu_loc...\n";
+for my $test (@tests) {
+  open my $fh, '<', $test
+    or die "Can't read $test: $!";
+  my $content = do { local $/; <$fh> };
+  close $fh;
+  if ($content =~ s/(?<![\w:])List::Util\b(?!::PP|::XS)/List::Util::PP/g) {
+    if ($content =~ /\b(?:List::Util::XS|Sub::Util)\b/) {
+      next;
+    }
+    $content =~ s/\A#![^\n]+\n//;
+    $content =~ s/\A\s*//;
+    $content =~ s/\s*\z/\n/;
+
+    my $out = 't/'.basename($test);
+    my $fh;
+    my $old_content;
+    if (open $fh, '+<', $out) {
+      $old_content = do { local $/; <$fh> };
+    }
+    elsif (open $fh, '>', $out) {
+      $old_content = '';
+    }
+    else {
+      die "Can't write $out: $!";
+    }
+    if ($content eq $old_content) {
+      next;
+    }
+    print "    $out\n";
+    seek $fh, 0, 0;
+    truncate $fh, 0;
+    print $fh $content;
+    close $fh;
+  }
+}
+print "Done.\n";

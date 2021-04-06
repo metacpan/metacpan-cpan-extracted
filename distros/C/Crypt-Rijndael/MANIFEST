@@ -5,11 +5,8 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.json			Module JSON meta-data (added by MakeMaker)
-META.yml			Module YAML meta-data (added by MakeMaker)
 NEWS
 ppport.h
-README
 rijndael.h
 Rijndael.pm
 Rijndael.xs
@@ -17,3 +14,5 @@ t/00_load.t
 t/modes.t
 t/rt/27632.t
 typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

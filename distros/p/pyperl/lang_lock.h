@@ -1,8 +1,8 @@
 /* Copyright 2000-2001 ActiveState
  */
 
-/* #define NO_PERL_LOCK /**/
-/* #define LOCK_DEBUG /**/
+/* #define NO_PERL_LOCK */
+/* #define LOCK_DEBUG */
 
 #if !defined(NO_PERL_LOCK) && defined(WITH_THREAD)
  #define DO_THREAD /* a simpler macro to test for in files that include this */

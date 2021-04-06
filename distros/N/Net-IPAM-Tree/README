@@ -4,11 +4,14 @@ Net::IPAM::Tree - A CIDR/Block tree library for fast IP lookup with longest-pref
 
 A module for fast IP-routing-table lookups and IP-ACLs (Access Control Lists).
 
-It is NOT a standard patricia-trie implementation. This isn't possible for general blocks not represented by bitmasks, every tree item is a Net::IPAM::Block.
+It is NOT a standard patricia-trie implementation.
+This isn't possible for general blocks not represented by bitmasks.
+Every tree item is a Net::IPAM::Block or a subclass of it.
 
 SEE ALSO
 
-Net::IPAM::IP is the basic respresentation for Net::IPAM::Block and Net::IPAM::Tree.
+Net::IPAM::IP
+Net::IPAM::Block
 
 INSTALLATION
 
@@ -30,7 +33,7 @@ You can also look for information at github (TODO)
 
 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020 by Karl Gaissmaier.
+This software is copyright (c) 2020-2021 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

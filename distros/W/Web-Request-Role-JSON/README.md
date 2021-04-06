@@ -4,7 +4,7 @@ Web::Request::Role::JSON - Make handling JSON easier in Web::Request
 
 # VERSION
 
-version 1.007
+version 1.008
 
 # SYNOPSIS
 

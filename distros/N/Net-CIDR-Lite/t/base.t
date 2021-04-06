@@ -8,7 +8,7 @@
 use Test;
 use strict;
 $|++;
-BEGIN { plan tests => 39 };
+BEGIN { plan tests => 42 };
 use Net::CIDR::Lite;
 ok(1); # If we made it this far, we are ok.
 
@@ -133,3 +133,14 @@ ok(join(', ', @list_short_range), '10.0.0.1-2, 10.0.0.5');
 })->list_short_range;
 ok(join(', ', @list_short_range), '10.0.0.250-255, 10.0.1.0-20, 10.0.1.22, 10.0.2.250-255, 10.0.3.0-255, 10.0.4.0-255, 10.0.5.0-8');
 
+
+# Tests for vulnerability: https://blog.urth.org/2021/03/29/security-issues-in-perl-ip-address-distros/
+eval { Net::CIDR::Lite->new("010.0.0.0/8") };
+ok($@=~/Can't determine ip format/);
+
+my $err_octal = Net::CIDR::Lite->new;
+eval { $err_octal->add("010.0.0.0/8") };
+ok($@=~/Can't determine ip format/);
+
+eval { $err_octal->add("10.01.0.0/8") };
+ok($@=~/Can't determine ip format/);

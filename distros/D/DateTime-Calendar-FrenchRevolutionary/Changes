@@ -1,8 +1,15 @@
 Revision history for Perl extension DateTime::Calendar::FrenchRevolutionary.
 
+0.17  Septidi 17 Germinal CCXXIX, jour du mélèze, 227th anniversary of the beheading of Fabre d'Églantine, Danton and Desmoulins (or Tuesday 2021-04-06)
+        - fix the kwalitee errors of version 0.16.
+
+0.16  Septidi 17 Germinal CCXXIX, jour du mélèze, 227th anniversary of the execution of Fabre d'Églantine (or Tuesday 2021-04-06)
+        - add an Italian and a Spanish locales (thank you again Gérald)
+        - a few documentation fixes.
+
 0.15  Quintidi 25 Prairial CCXXVII, jour de la tanche,  219th anniversary of the Marengo victory and of Kléber's assassination (or Thusday, 2019-06-13)
         - fix a few typos in the feasts names (thank you Gérald)
-	- add a few entries in the "SEE ALSO" chapter (thank you Gérald)
+        - add a few entries in the "SEE ALSO" chapter (thank you Gérald)
         - tidying up the documentation, for example replacing http:// by https:// whenever possible
 
 0.14  Primidi 11 Frimaire CCXXV, jour de la cire, 212th anniversary of Napoleon's crowning, 211th anniversary of the Battle of Austerlitz (or Thursday 2016-12-01)
@@ -85,33 +92,33 @@ Revision history for Perl extension DateTime::Calendar::FrenchRevolutionary.
         week method. And by the way, the decade method is aliased to week.
 
 0.06  Septidi 27 Frimaire CCXII, jour du liège (Wednesday 2003-12-17)
-	- add test for nanoseconds... and fixed nanosecond related bug
-	- add basic support for Locale, with two languages: French and English
-	- add much more shameless propaganda for the French Revolutionary armies
+        - add test for nanoseconds... and fixed nanosecond related bug
+        - add basic support for Locale, with two languages: French and English
+        - add much more shameless propaganda for the French Revolutionary armies
 
 0.05  Décadi 30 Fructidor CCXI, jour du panier (Tuesday 2003-09-16)
-	- removed the reference to Makefile.PL in README
-	- pod fixes thanks to Iain Truskett
-	- add minimal support for nanoseconds (so conversion Greg->FR->Greg will not
-	lose the precision)
-	- add much stuff for the events that occurred in Vendémiaire
-	- replace the CCXI calendars by CCXII calendars in the eg/result directory.
+        - removed the reference to Makefile.PL in README
+        - pod fixes thanks to Iain Truskett
+        - add minimal support for nanoseconds (so conversion Greg → FR → Greg will not
+        lose the precision)
+        - add much stuff for the events that occurred in Vendémiaire
+        - replace the CCXI calendars by CCXII calendars in the eg/result directory.
 
 0.04  Primidi 11 Thermidor CCXI, jour du panis (Tuesday 2003-07-29)
-	- the _offset_from_local_time was unduly commented out. Fixed.
-	- removed Makefile.PL. Or rather, replaced by a file suggesting that
-	the user adopts Module::Build instead of ExtUtils::MakeMaker.
+        - the _offset_from_local_time was unduly commented out. Fixed.
+        - removed Makefile.PL. Or rather, replaced by a file suggesting that
+        the user adopts Module::Build instead of ExtUtils::MakeMaker.
 
 0.03  Primidi 11 Floréal CCXI, jour de la rhubarbe (Wednesday 2003-04-30)
-	- I had forgotten the Roman.pm prerequisite in Makefile.PL. Fixed.
-	- A few words about Roman.pm in README, too.
+        - I had forgotten the Roman.pm prerequisite in Makefile.PL. Fixed.
+        - A few words about Roman.pm in README, too.
 
 0.02  Décadi 10 Floréal CCXI, jour du rateau (Tuesday 2003-04-29)
         - altered Makefile.PL so the existence of Build.PL will not cause problems.
-	- negative dates (prior to 22 September 1792): I do not know whether
-	they give proper results (year 0? leap year?) but at least you can
-	convert back to Gregorian and get the same result.
-	- added a few tests and examples
+        - negative dates (prior to 22 September 1792): I do not know whether
+        they give proper results (year 0? leap year?) but at least you can
+        convert back to Gregorian and get the same result.
+        - added a few tests and examples
 
 0.01  Nonidi 9 Floréal CCXI, jour de la jacinthe (Monday 2003-04-28)
         - initial version.
@@ -126,27 +133,27 @@ Revision history for Perl extension Date::Convert::French_Rev.
         called Primidi etc. The bug in the module is fixed.
 
 0.04  Tridi 13 Fructidor CCX, jour de l'épine-vinette (2002-08-30, Friday)
-	- reorganise the directory structure along Matt Sergeant's tips
+        - reorganise the directory structure along Matt Sergeant's tips
         - include the 4000-modulus rule for leap years (according to emacs-21.2)
-        - reorganise the absolute -> FR conversion
-	- rephrase the README file
-	- add the  prerequisite for Date::Convert  in Makefile.PL (the
-	use statement and the @ISA array are not sufficient)
+        - reorganise the absolute → FR conversion
+        - rephrase the README file
+        - add the  prerequisite for Date::Convert  in Makefile.PL (the
+        use statement and the @ISA array are not sufficient)
         - add a few examples in the eg/ subdirectory
-	- fix a few bugs: $_ was squashed by date_string, the month value
-	was not controlled
-	- compatibility with diagnostics-1.2
+        - fix a few bugs: $_ was squashed by date_string, the month value
+        was not checked
+        - compatibility with diagnostics-1.2
 
 0.03  20 Thermidor CCIX (2001-08-07, Tuesday)
         - rewrite the Changes file, with proper dates
         - it seems that the 4th additional day should rather be "jour
-	de l'opinion"
-	- reformat the code
+        de l'opinion"
+        - reformat the code
 
 0.02  19 Prairial CCIX (2001-06-07, Thursday)
         - add the prerequisite for Roman.pm in Makefile.PL
         - extend the "SEE ALSO" section
 
 0.01  4 Prairial CCIX (2001-05-23, Wednesday)
-	- original version; created by h2xs 1.19
+        - original version; created by h2xs 1.19
 

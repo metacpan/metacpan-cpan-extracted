@@ -1,6 +1,6 @@
 #
 #     Configuration script for DateTime::Calendar::FrenchRevolutionary
-#     Copyright (c) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019 Jean Forget. All rights reserved.
+#     Copyright (c) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019, 2021 Jean Forget. All rights reserved.
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
@@ -22,7 +22,7 @@
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with this program; if not, write to the Free Software Foundation,
+#     along with this program; if not, contact the Free Software Foundation,
 #     Inc., <https://www.fsf.org/>.
 #
 use strict;
@@ -77,7 +77,7 @@ WriteMakefile
        provides       => {
            'DateTime::Calendar::FrenchRevolutionary' => {
                 file => 'lib/DateTime/Calendar/FrenchRevolutionary.pm',
-                version => '0.15',
+                version => '0.17',
            },
        },
        'meta-spec' => { version => 2 },
@@ -86,6 +86,9 @@ WriteMakefile
                type => 'git',
                url  => 'https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary.git',
                web  => 'https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary',
+           },
+           bugtracker => {
+               web  => 'https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary/issues',
            },
        },
     },

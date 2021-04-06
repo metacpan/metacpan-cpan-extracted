@@ -1,5 +1,12 @@
 Revision history for Perl extension Math::Polynomial.
 
+1.021   2021-04-03
+        - migrate from subversion to git
+        - switch bugtracker to github
+        - clean up Makefile.PL
+        - finally remove Math::Polynomial::Generic stub
+        - add CONTRIBUTING file
+
 1.019   2021-01-07
         - Added deflate and unnest.
 

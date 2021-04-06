@@ -1,13 +1,20 @@
-MANIFEST
 CHANGELOG
-README
-Makefile.PL
 lib/OOB.pm
+Makefile.PL
+MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
+README
 t/001basic.t
 t/010cloak.t
 t/020object.t
 t/030function.t
 t/040blessed.t
 t/050cleanup.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+t/060begin.t
+t/061begin.t
+t/062begin.t
+t/063begin.t
+t/070-reset.t
+t/080-destroy.t
+t/090-autoload.t

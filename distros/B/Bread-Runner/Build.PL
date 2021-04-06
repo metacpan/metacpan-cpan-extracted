@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@plix.at>"
   ],
   "dist_name" => "Bread-Runner",
-  "dist_version" => "0.904",
+  "dist_version" => "0.905",
   "license" => "perl",
   "module_name" => "Bread::Runner",
   "recursive_test_files" => 1,

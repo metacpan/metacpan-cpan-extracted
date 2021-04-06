@@ -3,19 +3,30 @@ use strict;
 use warnings;
 use Exporter (); BEGIN { *import = \&Exporter::import }
 
-our $VERSION = '1.500004';
+our $VERSION = '1.500006';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK;
 BEGIN {
   @EXPORT_OK = qw(
-    all any first min max minstr maxstr none notall
-    product reduce sum sum0
-    shuffle uniq uniqnum uniqstr
+    all any first none notall
+    min max minstr maxstr
+    product reductions reduce sum sum0
+    sample shuffle
+    uniq uniqnum uniqint uniqstr
     pairs unpairs pairkeys pairvalues pairmap pairgrep pairfirst
     head tail
+    zip zip_longest zip_shortest
+    mesh mesh_longest mesh_shortest
   );
 }
+
+my $rand = do { our $RAND };
+*RAND                 = *List::Util::RAND;
+*List::Util::PP::RAND = *List::Util::RAND;
+our $RAND;
+$RAND = $rand
+  if !defined $RAND;
 
 BEGIN {
   my %need;
@@ -45,7 +56,13 @@ List::Util::MaybeXS - L<List::Util> but with Pure Perl fallback
 =head1 SYNOPSIS
 
   use List::Util::MaybeXS qw(
-    any all
+    reduce any all none notall first reductions
+
+    max maxstr min minstr product sum sum0
+
+    pairs unpairs pairkeys pairvalues pairfirst pairgrep pairmap
+
+    shuffle uniq uniqint uniqnum uniqstr zip mesh
   );
 
 =head1 DESCRIPTION
@@ -84,15 +101,21 @@ over using L<List::Util> directly.
 
 =item L<reduce|List::Util/reduce>
 
+=item L<reductions|List::Util/reductions>
+
 =item L<sum|List::Util/sum>
 
 =item L<sum0|List::Util/sum0>
+
+=item L<sample|List::Util/sample>
 
 =item L<shuffle|List::Util/shuffle>
 
 =item L<uniq|List::Util/uniq>
 
 =item L<uniqnum|List::Util/uniqnum>
+
+=item L<uniqint|List::Util/uniqint>
 
 =item L<uniqstr|List::Util/uniqstr>
 
@@ -113,6 +136,30 @@ over using L<List::Util> directly.
 =item L<head|List::Util/head>
 
 =item L<tail|List::Util/tail>
+
+=item L<zip|List::Util/zip>
+
+=item L<zip_longest|List::Util/zip>
+
+=item L<zip_shortest|List::Util/zip>
+
+=item L<mesh|List::Util/mesh>
+
+=item L<mesh_longest|List::Util/mesh>
+
+=item L<mesh_shortest|List::Util/mesh>
+
+=back
+
+=head1 CONFIGURATION VARIABLES
+
+=over 4
+
+=item L<$RAND|List::Util/$RAND>
+
+The variables C<$List::Util::RAND>, C<$List::Util::PP::RAND>, and
+C<$List::Util::MaybeXS::RAND> are all aliased to each other.  Any of them will
+impact both L<List::Util::PP> and L<List::Util> functions.
 
 =back
 

@@ -102,3 +102,22 @@ thrd_ctx_init()
 
 }
 
+#if defined(WIN32) && defined(MULTI_PERL)
+
+BOOL WINAPI
+DllMain(HINSTANCE hInstance, DWORD dwReason, DWORD lpReserved)
+{
+    BOOL ret = TRUE;
+    switch (dwReason) {
+    case DLL_THREAD_DETACH:
+	{
+	    thread_ctx* ctx = (thread_ctx*)TlsGetValue(thrd_ctx_key);
+	    if (ctx)
+		free_thread_ctx(ctx);
+	}
+	break;
+    }
+    return ret;
+}
+
+#endif

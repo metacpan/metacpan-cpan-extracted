@@ -60,4 +60,3 @@ is($v, $v1, 'bigint and normal int');
 
 $v = max(1, 2, $v1, 3);
 is($v, $v1, 'bigint and normal int');
-

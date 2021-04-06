@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Test script for DateTime::Calendar::FrenchRevolutionary
-#     Copyright (C) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019 Jean Forget. All rights reserved.
+#     Copyright (C) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019, 2021 Jean Forget. All rights reserved.
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
@@ -34,7 +34,7 @@ use warnings;
 
 #my $nb_tests = @tests;
 my $n = 1;
-my $nb_tests = 26;
+my $nb_tests = 28;
 
 print "1..$nb_tests\n";
 
@@ -307,4 +307,26 @@ if ($d1->year == $d->year && $d1->month == $d->month && $d1->day == $d->day) {
 }
 else {
   print "not ok 26, clone failed\n";
+}
+
+# Checking the on_date method for the new locales
+$d = DateTime::Calendar::FrenchRevolutionary->new( year   => 8,
+                                                   month  =>  2,
+                                                   day    => 18,
+                                                   locale => 'es');
+if ($d->on_date eq '') {
+  print "ok 27\n";
+}
+else {
+  print "not ok 27, wrong Spanish event\n";
+}
+$d = DateTime::Calendar::FrenchRevolutionary->new( year   => 8,
+                                                   month  =>  2,
+                                                   day    => 18,
+                                                   locale => 'it');
+if ($d->on_date eq '') {
+  print "ok 28\n";
+}
+else {
+  print "not ok 28, wrong Spanish event\n";
 }

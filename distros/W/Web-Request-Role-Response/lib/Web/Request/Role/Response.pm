@@ -2,7 +2,7 @@ package Web::Request::Role::Response;
 
 # ABSTRACT: Generate various HTTP responses from a Web::Request
 
-our $VERSION = '1.006'; # VERSION
+our $VERSION = '1.008'; # VERSION
 
 use 5.010;
 use Moose::Role;
@@ -80,7 +80,7 @@ Web::Request::Role::Response - Generate various HTTP responses from a Web::Reque
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 SYNOPSIS
 
@@ -172,6 +172,8 @@ Thanks to
 =item *
 
 L<validad.com|https://www.validad.com/> for supporting Open Source.
+
+=item * L<choroba|https://github.com/choroba> for improvements to the test suite.
 
 =back
 

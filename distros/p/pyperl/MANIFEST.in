@@ -1,0 +1,10 @@
+recursive-include . *.py
+recursive-include . *.pm
+include *.h
+include *.c
+include Changes
+include README
+include TODO
+include opts.pl
+include try_perlapi.pl
+recursive-include Python-Object *

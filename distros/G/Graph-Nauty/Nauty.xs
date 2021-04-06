@@ -25,7 +25,14 @@ sparsenauty(sg, lab, ptn, options)
             SG_ALLOC( sg2, sg.nv, sg.nde, "malloc" );
         }
         orbits = malloc( sizeof(int) * sg.nv );
-        sparsenauty(&sg, lab, ptn, orbits, &options, &stats, &sg2);
+
+        /* Increasing workspace to handle larger or more intricate
+           graphs */
+        size_t worksize = 2000;
+        setword workspace[worksize];
+        nauty( (graph*)&sg, lab, ptn, NULL, orbits, &options, &stats,
+               workspace, worksize, SETWORDSNEEDED(sg.nv), sg.nv, (graph*)&sg2 );
+
         HV *statsblk = newHV();
         hv_store( statsblk, "errstatus",      9, newSViv( stats.errstatus ),     0 );
         hv_store( statsblk, "grpsize1",       8, newSViv( stats.grpsize1 ),      0 );

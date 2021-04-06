@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/BorderStyleUtils.pm','script/list-border-style-modules'];
+my $filenames = ['lib/App/BorderStyleUtils.pm','script/list-border-style-modules','script/show-border-style'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

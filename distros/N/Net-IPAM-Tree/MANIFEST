@@ -1,7 +1,7 @@
 Build.PL
 Changes
 lib/Net/IPAM/Tree.pm
-lib/Net/IPAM/Tree/Node.pm
+lib/Net/IPAM/Tree/Private.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -9,11 +9,10 @@ META.yml
 README
 t/00-load.t
 t/01-new.t
-t/02-lookup-contains.t
-t/03-remove.t
+t/02-lookup-superset.t
+t/03-walk.t
 t/04-to_string.t
 t/05-errors.t
-t/06-walk.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

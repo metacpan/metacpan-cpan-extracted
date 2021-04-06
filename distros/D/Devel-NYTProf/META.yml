@@ -4,10 +4,12 @@ author:
   - 'Tim Bunce <timb@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Differences: '0.60'
+  Test::More: '0.84'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,14 +26,12 @@ requires:
   Getopt::Long: '0'
   JSON::MaybeXS: '0'
   List::Util: '0'
-  Test::Differences: '0.60'
-  Test::More: '0.84'
   XSLoader: '0'
 resources:
   MailingList: http://groups.google.com/group/develnytprof-dev
   bugtracker: https://github.com/timbunce/devel-nytprof/issues
   homepage: https://code.google.com/p/perl-devel-nytprof/
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/timbunce/devel-nytprof.git
-version: '6.06'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  repository: https://github.com/timbunce/devel-nytprof.git
+version: '6.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

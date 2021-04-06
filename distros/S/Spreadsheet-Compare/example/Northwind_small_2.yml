@@ -1,0 +1,27 @@
+---
+- title: __GLOBAL__
+  reporter: HTML
+  type: DB
+  dsns :
+    - dsn: 'dbi:SQLite:dbname=Northwind_small.sqlite'
+  summary: HTML
+  report_diff_row: 1
+  diff_relative:
+    - UnitPriceProduct
+  identity:
+    - Id
+  limit_rel:
+    __default__: .1
+    Freight: 0.08
+  limit_abs:
+    __default__: none
+#=============================================
+- title     : order
+  sql :
+    - select * from [Order]
+    - select * from [NewOrder]
+#=============================================
+- title     : order details
+  sql :
+    - select * from [OrderDetails_V]
+    - select * from [NewOrderDetails_V]

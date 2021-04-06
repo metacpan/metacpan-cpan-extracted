@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use List::Util::PP qw(shuffle);
 
@@ -22,3 +22,14 @@ isnt( "@r", "@in", 'result different to args');
 
 my @s = sort { $a <=> $b } @r;
 is( "@in", "@s", 'values');
+
+{
+  local $List::Util::PP::RAND = sub { 4/10 }; # chosen by a fair die
+
+  @r = shuffle(1..10);
+  is_deeply(
+    [ shuffle(1..10) ],
+    [ shuffle(1..10) ],
+    'rigged rand() yields predictable output'
+  );
+}

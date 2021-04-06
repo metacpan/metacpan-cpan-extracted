@@ -1,0 +1,23 @@
+---
+- title:              __GLOBAL__
+  reporter:           HTML
+  summary:            HTML
+  rootdir:            ${TESTDIR}/suite
+  left:               Reference Data
+  right:              Current Data
+  report_filename:    reports/%{title}.html
+  summary_filename:   reports/suite_summary
+  report_diff_row:    1
+  report_line_source: 1
+#=============================================
+- suite:
+    - DB/Overview.yml
+    - DB/OrderDetails.yml
+#=============================================
+- suite:
+    - CSV/Overview.yml
+    - CSV/OrderDetails.yml
+#=============================================
+- suite:
+    - FIX/Overview.yml
+    - FIX/OrderDetails.yml

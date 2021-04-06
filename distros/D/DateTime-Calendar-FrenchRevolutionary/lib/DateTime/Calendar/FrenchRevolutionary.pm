@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 # Perl DateTime extension for converting to/from the French Revolutionary calendar
-# Copyright (c) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019 Jean Forget. All rights reserved.
+# Copyright (c) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019, 2021 Jean Forget. All rights reserved.
 #
 # See the license in the embedded documentation below.
 #
@@ -13,7 +13,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.15';
+$VERSION = '0.17';
 
 use Params::Validate qw(validate SCALAR BOOLEAN OBJECT);
 use Roman;
@@ -78,8 +78,11 @@ my $BasicValidate =
                     },
       locale    => { type => SCALAR | OBJECT,
                       callbacks =>
-                      { "only 'fr' and 'en' possible" =>
-                        sub { ($_[0] eq 'fr') or ($_[0] eq 'en') or ref($_[0]) =~ /(?:en|fr)$/ },
+                      { "only 'fr', 'en', 'es' and 'it' possible" =>
+                        sub { ($_[0] eq 'fr') or ($_[0] eq 'en')
+                                              or ($_[0] eq 'es')
+                                              or ($_[0] eq 'it')
+                                              or ref($_[0]) =~ /(?:en|es|fr|it)$/ },
                       },
                      default => DefaultLocale() },
     };
@@ -209,7 +212,7 @@ sub set
 sub set_time_zone { } # do nothing, only 'floating' allowed
 
 # Internal functions
-use constant REV_BEGINNING => 654415; # RD value for 1 Vendémiaire I in the Revolutionary calendar
+use constant REV_BEGINNING  => 654415; # RD value for 1 Vendémiaire I in the Revolutionary calendar
 use constant NORMAL_YEAR    => 365;
 use constant LEAP_YEAR      => 366;
 use constant FOUR_YEARS     =>  4 * NORMAL_YEAR + 1; # one leap year every four years
@@ -220,7 +223,7 @@ use constant FOUR_MILLENIA  => 10 * FOUR_CENTURIES - 1; # ...except every four m
 # number of days between the start of the revolutionary calendar, and the
 # beginning of year n - 1 as long as the equinox rule is in effect
 my @YEARS_BEGINS=    (0, 365, 730, 1096, 1461, 1826, 2191, 2557, 2922, 3287, 3652,
-		   4018, 4383, 4748, 5113, 5479, 5844);
+                   4018, 4383, 4748, 5113, 5479, 5844);
 sub _is_leap_year {
     my ($self, $year) = @_;
 
@@ -310,22 +313,24 @@ sub _ymd2rd {
     my $rd = REV_BEGINNING - 1; # minus 1 for the zeroth Vendémiaire
     $y --;  #get years *before* this year.  Makes math easier.  :)
     # first, convert year into days. . .
-    if ($y < 0 || $y >= 16) # Romme rule in effect, or nearly so
-      {
-        my $x = int($y/4000);
-        --$x if $y <= 0;
-	$rd += $x * FOUR_MILLENIA;
-	$y  %= 4000;
-	$rd += int($y/400)* FOUR_CENTURIES;
-	$y  %= 400;
-	$rd += int($y/100)* CENTURY;
-	$y  %= 100;
-	$rd += int($y/4)* FOUR_YEARS;
-	$y  %= 4;
-	$rd += $y * NORMAL_YEAR;
-      }
-    else # table look-up for the programmer-hostile equinox rule
-      {	$rd += $YEARS_BEGINS[$y] }
+    if ($y < 0 || $y >= 16) {
+      # Romme rule in effect, or nearly so
+      my $x = int($y/4000);
+      --$x if $y <= 0;
+      $rd += $x * FOUR_MILLENIA;
+      $y  %= 4000;
+      $rd += int($y/400)* FOUR_CENTURIES;
+      $y  %= 400;
+      $rd += int($y/100)* CENTURY;
+      $y  %= 100;
+      $rd += int($y/4)* FOUR_YEARS;
+      $y  %= 4;
+      $rd += $y * NORMAL_YEAR;
+    }
+    else {
+      # table look-up for the programmer-hostile equinox rule
+      $rd += $YEARS_BEGINS[$y];
+    }
 
     # now, month into days.
     $rd += 30 * ($m - 1) + $d;
@@ -340,46 +345,44 @@ sub _rd2ymd {
     # note:  years and days are initially days *before* today, rather than
     # today's date.  This is because of fenceposts.  :)
     $doy =  $rd - REV_BEGINNING;
-    if ($doy >= 0 && $doy < $YEARS_BEGINS[16])
-      {
-       	$y = scalar grep { $_ <= $doy } @YEARS_BEGINS;
-	$doy -= $YEARS_BEGINS[$y - 1];
-	$doy++;
-      }
-    else
-      {
-	#$doy --;
-	my $x;
-	$x    = int ($doy / FOUR_MILLENIA);
-        --$x  if $doy < 0; # So pre-1792 dates will give something that look about right
-        $y   += $x * 4000;
-	$doy -= $x * FOUR_MILLENIA;
+    if ($doy >= 0 && $doy < $YEARS_BEGINS[16]) {
+      $y = scalar grep { $_ <= $doy } @YEARS_BEGINS;
+      $doy -= $YEARS_BEGINS[$y - 1];
+      $doy++;
+    }
+    else {
+      #$doy --;
+      my $x;
+      $x    = int ($doy / FOUR_MILLENIA);
+      --$x  if $doy < 0; # So pre-1792 dates will give something that look about right
+      $y   += $x * 4000;
+      $doy -= $x * FOUR_MILLENIA;
 
-	$x    = int ($doy / FOUR_CENTURIES);
-        $y   += $x * 400;
-	$doy -= $x * FOUR_CENTURIES;
+      $x    = int ($doy / FOUR_CENTURIES);
+      $y   += $x * 400;
+      $doy -= $x * FOUR_CENTURIES;
 
-	$x    = int ($doy / CENTURY);
-        $x    = 3 if $x == 4; # last day of the 400-year period; see comment below
-        $y   += $x * 100;
-	$doy -= $x * CENTURY;
+      $x    = int ($doy / CENTURY);
+      $x    = 3 if $x == 4; # last day of the 400-year period; see comment below
+      $y   += $x * 100;
+      $doy -= $x * CENTURY;
 
-	$x    = int ($doy / FOUR_YEARS);
-        $y   += $x * 4;
-	$doy -= $x * FOUR_YEARS;
+      $x    = int ($doy / FOUR_YEARS);
+      $y   += $x * 4;
+      $doy -= $x * FOUR_YEARS;
 
-	$x    = int ($doy / NORMAL_YEAR);
-        # The integer division above divides the 4-year period, 1461 days,
-        # into 5 parts: 365, 365, 365, 365 and 1. This mathematically sound operation
-        # is wrong with respect to the calendar, which needs to divide
-        # into 4 parts: 365, 365, 365 and 366. Therefore the adjustment below.
-        $x    = 3 if $x == 4; # last day of the 4-year period
-        $y   += $x;
-	$doy -= $x * NORMAL_YEAR;
+      $x    = int ($doy / NORMAL_YEAR);
+      # The integer division above divides the 4-year period, 1461 days,
+      # into 5 parts: 365, 365, 365, 365 and 1. This mathematically sound operation
+      # is wrong with respect to the calendar, which needs to divide
+      # into 4 parts: 365, 365, 365 and 366. Therefore the adjustment below.
+      $x    = 3 if $x == 4; # last day of the 4-year period
+      $y   += $x;
+      $doy -= $x * NORMAL_YEAR;
 
-        ++$y; # because of 0-based mathematics vs 1-based chronology
-        ++$doy;
-      }
+      ++$y; # because of 0-based mathematics vs 1-based chronology
+      ++$doy;
+    }
     my $d  = $doy % 30 || 30;
     my $m = ($doy - $d) / 30 + 1;
     if ($extra)
@@ -661,7 +664,7 @@ sub strftime {
       # And if the user asks for %E!,
       # it defaults to E! because neither %E! nor %! exist.
       $f =~ s/
-	        \%([EO]?([*%a-zA-Z]))
+                \%([EO]?([*%a-zA-Z]))
               | \%\{(\w+)\}
              /
               $3 ? ($self->can($3) ? $self->$3() : "\%{$3}")
@@ -715,9 +718,9 @@ DateTime::Calendar::FrenchRevolutionary - Dates in the French Revolutionary Cale
   use DateTime::Calendar::FrenchRevolutionary;
 
   # Use the date "18 Brumaire VIII" (Brumaire being the second month)
-  $dt = DateTime::Calendar::FrenchRevolutionary->new( year  => 8,
-                                         month =>  2,
-                                         day   => 18,
+  $dt = DateTime::Calendar::FrenchRevolutionary->new( year  =>  8,
+                                                      month =>  2,
+                                                      day   => 18,
                                        );
 
   # convert from French Revolutionary to Gregorian...
@@ -750,7 +753,7 @@ The Revolutionary calendar was in  use in France from 24 November 1793
 (4 Frimaire  II) to 31  December 1805 (10  Nivôse XIV). An  attempt to
 apply  the  decimal rule  (the  basis of  the  metric  system) to  the
 calendar. Therefore, the week  disappeared, replaced by the décade. In
-addition, all months have exactly 3 decades, no more, no less.
+addition, all months have exactly 3 décades, no more, no less.
 
 At first,  the year was  beginning on the  equinox of autumn,  for two
 reasons.  First, the  republic had  been established  on  22 September
@@ -863,9 +866,9 @@ decimal time parameters (see above).
 
 =item * C<locale>
 
-Only   the   values   C<fr>   (French)   and   C<en>   (English)   are
-allowed.  Default  is  French.  No  other values  are  possible,  even
-territory variants such as C<fr_BE> or C<en_US>.
+Only the values  C<fr> (French), C<en> (English),  C<es> (Spanish) and
+C<it> (Italian)  are allowed. Default  is French. No other  values are
+possible, even territory variants such as C<fr_BE> or C<en_US>.
 
 =back
 
@@ -912,13 +915,13 @@ C<new()> method.
 
 =item * year
 
-Returns the year. C<%G> in C<strftime>.
+Returns the year. C<%Y> or C<%G> in C<strftime>.
 
 =item * month
 
 Returns the month in the 1..12 range. If the date is an additional day
 at  the end  of the  year, returns  13, which  is not  really  a month
-number. C<%f> in C<strftime>.
+number. C<%m> or C<%f> in C<strftime>.
 
 =item * month_0
 
@@ -948,9 +951,10 @@ Returns the day of the month, from 1..30. C<%d> or C<%e> in C<strftime>.
 
 =item * day_of_decade, dod, day_of_week, dow, wday
 
-Returns the  day of  the decade, from  1..10. The C<dow>,  C<wday> and
-C<day_of_week>   names  are  there   for  compatibility's   sake  with
-C<DateTime>, even if the word "week" is improper.
+Returns the day of the I<décade>,  from 1..10. The C<dow>, C<wday> and
+C<day_of_week>  names   are  there   for  compatibility's   sake  with
+C<DateTime>,  even   if  the  word   "week"  is  improper.   C<%u>  in
+C<strftime>, but not C<%w> (because the value differs on I<décadi>).
 
 =item * day_name
 
@@ -992,7 +996,7 @@ elements. C<%F> in C<strftime>.
 =item * abt_hour, abt_minute, abt_min, abt_second, abt_sec
 
 Return  the corresponding  time elements,  using a  sexagesimal scale.
-This is also known as the I<Anglo-Babylonian Time>.
+This is also sometimes known as the I<Anglo-Babylonian Time>.
 
 =item * hour, minute, min, second, sec
 
@@ -1027,7 +1031,7 @@ Returns the I<décade> number. C<%U>, C<%V> or C<%W> in C<strftime>.
 
 =item * decade, week
 
-Returns a 2-element list, with  the year number and the decade number.
+Returns a 2-element list, with  the year number and the décade number.
 Since the  I<décade> is always  aligned with a  month and then  with a
 year, the year element is always the same as the date's year.  Anyhow,
 this is done for compatibility with DateTime's C<week> method.
@@ -1110,11 +1114,11 @@ C<strftime()> method:
 
 =item * %a
 
-The abbreviated day of decade name.
+The abbreviated day of I<décade> name.
 
 =item * %A
 
-The full day of decade name.
+The full day of I<décade> name.
 
 =item * %b
 
@@ -1278,9 +1282,9 @@ to 37.
 
 =item * %V
 
-The  decade  number  (French   Revolutionary  equivalent  to  the  ISO
-8601:1988 week number) of the  current year as a decimal number, range
-01  to  37.  Identical to  %U,  since  décades  are aligned  with  the
+The  I<décade>  number (French  Revolutionary  equivalent  to the  ISO
+8601:1988 week number) of the current  year as a decimal number, range
+01 to  37. Identical to C<%U>,  since I<décades> are aligned  with the
 beginning of the year.
 
 =item * %w
@@ -1350,11 +1354,11 @@ They are not supported.
 
 =head2 I18N
 
-For the moment, only French and English are available. For the English
-translation, I have  used Thomas Carlyle's book and  Alan Taylor's web
-site  at   kokogiak.com  (see  below).  Then,  I   have  checked  some
-translations with Wikipedia and Jonathan Badger's French Revolutionary
-Calendar module written in Ruby.
+For  the  moment,  only  French,  English,  Spanish  and  Italian  are
+available. For the  English translation, I have  used Thomas Carlyle's
+book and Alan  Taylor's web site at kokogiak.com (see  below). Then, I
+have checked  some translations  with Wikipedia and  Jonathan Badger's
+French Revolutionary Calendar module written in Ruby.
 
 Some feast names are not translated, other's translations are doubtful
 (they are flagged with a question mark).  Remarks are welcome.
@@ -1387,7 +1391,27 @@ The bracket  references refer  to entries in  the "SEE  ALSO" section,
 Support for this module is provided via the datetime@perl.org email
 list. See L<https://lists.perl.org/> for more details.
 
-Please enter bug reports at L<https://rt.cpan.org/>
+Please   report  any   bugs   or  feature   requests   to  Github   at
+L<https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary>,
+and create an issue or submit a pull request.
+
+If you have no  feedback after a week or so, try to  reach me by email
+at JFORGET  at cpan  dot org.  The notification  from Github  may have
+failed to reach  me. In your message, please  mention the distribution
+name in the subject, so my spam  filter and I will easily dispatch the
+email to the proper folder.
+
+On the other  hand, I may be  on vacation or away from  Internet for a
+good  reason. Do  not be  upset if  I do  not answer  immediately. You
+should write  me at a leisurely  rythm, about once per  month, until I
+react.
+
+If after about six  months or a year, there is  still no reaction from
+me, you can worry and start the CPAN procedure for module adoption.
+See L<https://groups.google.com/g/perl.module-authors/c/IPWjASwuLNs>
+L<https://www.cpan.org/misc/cpan-faq.html#How_maintain_module>
+and L<https://www.cpan.org/misc/cpan-faq.html#How_adopt_module>.
+
 
 =head1 AUTHOR
 
@@ -1412,8 +1436,9 @@ Many thanks to those who sent me a RT ticket or a pull request:
 
 =item * Slaven Rezić
 
-=item * and especially Gérald Sédrati-Dinet (GIBUS at cpan dot org),
-for his thorough documentation research.
+=item * and  especially Gérald Sédrati-Dinet (GIBUS at  cpan dot org),
+for  his thorough  documentation  research  and for  his  work on  the
+Spanish and Italian locales.
 
 =back
 
@@ -1525,8 +1550,8 @@ method.
 
 =head1 LICENSE STUFF
 
-Copyright (c)  2003, 2004, 2010,  2012, 2014, 2016, 2019  Jean Forget.
-All  rights  reserved.   This  program  is  free   software.  You  can
+Copyright  (c) 2003,  2004, 2010,  2012, 2014,  2016, 2019,  2021 Jean
+Forget. All  rights reserved. This  program is free software.  You can
 distribute,    adapt,    modify,     and    otherwise    mangle    the
 DateTime::Calendar::FrenchRevolutionary module under the same terms as
 perl 5.16.3.
@@ -1550,8 +1575,8 @@ WITHOUT   ANY  WARRANTY;   without  even   the  implied   warranty  of
 MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
 General Public License for more details.
 
-You  should have received  a copy  of the  GNU General  Public License
-along with  this program; if not,  see <https://www.gnu.org/licenses/>
-or write to the Free Software Foundation, Inc., L<https://www.fsf.org>.
+You should  have received  a copy  of the  GNU General  Public License
+along with this program;  if not, see L<https://www.gnu.org/licenses/>
+or contact the Free Software Foundation, Inc., L<https://www.fsf.org>.
 
 =cut

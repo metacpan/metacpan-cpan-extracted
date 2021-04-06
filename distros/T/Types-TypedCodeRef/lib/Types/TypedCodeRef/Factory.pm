@@ -67,7 +67,8 @@ sub name_generator {
         "[ $params_types_name => $return_types_name ]";
       }
       elsif (@type_parameters == 1) {
-        "[$type_parameters[0]]";
+        my $submeta = $type_parameters[0];
+        sprintf('[%s=%s]', ref $submeta, $submeta->display);
       }
       else {
         '[]';

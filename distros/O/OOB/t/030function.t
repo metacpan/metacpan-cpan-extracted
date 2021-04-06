@@ -15,16 +15,18 @@ BEGIN {				# Magic Perl CORE pragma
 use strict;
 use warnings;
 
-use Test::More tests => 2 * 8 * 5;
+use Test::More tests => 1 + 2 * 8 * 5;
 
 use OOB qw( OOB_get OOB_set );
+
+is(OOB_get( [] => 'Attribute' ), undef);
 
 # test unblessed and blessed
 foreach my $class ( '', 'Foo' ) {
     my $scalar = ''; # prevent undefined warnings
     my @array;
     my %hash;
-
+    my $i = 0;
     # given types
     no warnings 'once';
     foreach my $ref (

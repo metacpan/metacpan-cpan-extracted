@@ -3,6 +3,7 @@ inc/ExtUtils/HasCompiler.pm
 lib/List/Util/MaybeXS.pm
 lib/List/Util/PP.pm
 maint/Makefile.PL.include
+maint/update-tests
 Makefile.PL
 MANIFEST			This list of files
 t/any-all.t
@@ -11,19 +12,23 @@ t/head-tail.t
 t/matching-exports.t
 t/max.t
 t/maxstr.t
+t/mesh.t
 t/min.t
 t/minstr.t
 t/overload-count.t
 t/pair.t
 t/product.t
 t/reduce.t
+t/reductions.t
 t/rt-96343.t
+t/sample.t
 t/shuffle.t
 t/stack-corruption.t
 t/sum.t
 t/sum0.t
 t/uniq.t
-t/uniqnum.t
+t/uniqnum-more.t
+t/zip.t
 xt/all-supported.t
 xt/pod-coverage.t
 xt/pod.t

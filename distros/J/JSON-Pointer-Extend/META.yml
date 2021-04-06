@@ -1,0 +1,29 @@
+---
+abstract: 'L<JSON::Pointer> extension module'
+author:
+  - 'Pavel Andryushin <vrag867@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-Pointer-Extend
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  JSON::Pointer: '0.07'
+  perl: v5.12.1
+resources:
+  bugtracker: https://github.com/vrag86/json-pointer-extend/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/vrag86/json-pointer-extend
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

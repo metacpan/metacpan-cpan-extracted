@@ -1,5 +1,5 @@
 package HTTP::API::DataTypeMarker;
-$HTTP::API::DataTypeMarker::VERSION = '1.02';
+$HTTP::API::DataTypeMarker::VERSION = '1.03';
 use strict;
 use warnings;
 use base 'Exporter';

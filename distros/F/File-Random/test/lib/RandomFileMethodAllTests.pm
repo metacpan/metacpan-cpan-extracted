@@ -1,4 +1,5 @@
-package RandomFileMethodAllTests;
+package
+    RandomFileMethodAllTests;
 use base qw/RandomFileSimpleDirOption
             RandomFileCheckOption
 			RandomFileRecursiveOption

@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
     orbits_are_same
 );
 
-our $VERSION = '0.3.4'; # VERSION
+our $VERSION = '0.3.5'; # VERSION
 
 require XSLoader;
 XSLoader::load('Graph::Nauty', $VERSION);

@@ -3,7 +3,13 @@ NAME
 
 SYNOPSIS
       use List::Util::MaybeXS qw(
-        any all
+        reduce any all none notall first reductions
+
+        max maxstr min minstr product sum sum0
+
+        pairs unpairs pairkeys pairvalues pairfirst pairgrep pairmap
+
+        shuffle uniq uniqint uniqnum uniqstr zip mesh
       );
 
 DESCRIPTION
@@ -27,11 +33,14 @@ FUNCTIONS
     notall
     product
     reduce
+    reductions
     sum
     sum0
+    sample
     shuffle
     uniq
     uniqnum
+    uniqint
     uniqstr
     pairs
     unpairs
@@ -42,6 +51,18 @@ FUNCTIONS
     pairfirst
     head
     tail
+    zip
+    zip_longest
+    zip_shortest
+    mesh
+    mesh_longest
+    mesh_shortest
+
+CONFIGURATION VARIABLES
+    $RAND
+        The variables $List::Util::RAND, $List::Util::PP::RAND, and
+        $List::Util::MaybeXS::RAND are all aliased to each other. Any of
+        them will impact both List::Util::PP and List::Util functions.
 
 DIFFERENCES FROM List::Util
     As the subs provided are implemented in perl, there are some minor

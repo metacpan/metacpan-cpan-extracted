@@ -132,7 +132,7 @@ sub write_summary ( $self, $summary, $filename ) {
     LOGDIE "Failed to render HTML template: $res" if ref($res) eq 'Mojo::Exception';
 
     $pout->parent->mkpath;
-    $pout->spew($res);
+    $pout->append( { truncate => 1 }, $res );
 
     return $self;
 }
@@ -161,7 +161,7 @@ sub save_and_close ($self) {
     ( $self->{title} = $pout->basename ) =~ s/\.[^\.]*$//;
 
     $pout->parent->mkpath;
-    $pout->spew( $self->_fill_html_template );
+    $pout->append( { truncate => 1 }, $self->_fill_html_template );
 
     return $self;
 }

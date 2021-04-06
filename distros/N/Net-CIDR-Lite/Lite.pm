@@ -4,7 +4,7 @@ use strict;
 use vars qw($VERSION);
 use Carp qw(confess);
 
-$VERSION = '0.21';
+$VERSION = '0.22';
 
 my %masks;
 my @fields = qw(PACK UNPACK NBITS MASKS);
@@ -181,7 +181,7 @@ sub _pack_ipv4 {
     my @nums = split /\./, shift(), -1;
     return unless @nums == 4;
     for (@nums) {
-        return unless /^\d{1,3}$/ and $_ <= 255;
+        return unless /^\d{1,3}$/ and !/^0\d{1,2}$/ and $_ <= 255;
     }
     pack("CC*", 0, @nums);
 }
@@ -672,6 +672,10 @@ not enough to suit your needs.
 
 Douglas Wilson, E<lt>dougw@cpan.orgE<gt>
 w/numerous hints and ideas borrowed from Tye McQueen.
+
+=head1 MAINTAINER
+
+Stig Palmquist E<lt>stig@stig.ioE<gt>
 
 =head1 COPYRIGHT
 

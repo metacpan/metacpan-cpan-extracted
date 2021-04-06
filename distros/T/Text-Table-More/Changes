@@ -1,3 +1,10 @@
+0.012   2021-02-26  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Declare features according to Module::Features::TextTable.
+
+
 0.011   2021-02-21  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

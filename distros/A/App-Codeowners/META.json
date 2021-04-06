@@ -49,6 +49,7 @@
             "Dist::Zilla::Plugin::Run::Release" : "0",
             "Dist::Zilla::PluginBundle::Author::CCM" : "0",
             "Dist::Zilla::PluginBundle::Filter" : "0",
+            "Pod::Coverage::TrustPod" : "0",
             "Software::License::Perl_5" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
@@ -59,6 +60,7 @@
             "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
             "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0"
          }
@@ -70,17 +72,14 @@
             "Unicode::GCString" : "0"
          },
          "requires" : {
-            "Carp" : "0",
             "Color::ANSI::Util" : "0.03",
             "Encode" : "0",
             "Exporter" : "0",
+            "File::Codeowners" : "0",
+            "File::Codeowners::Util" : "0",
             "Getopt::Long" : "2.39",
-            "IPC::Open2" : "0",
             "Module::Load" : "0",
             "Path::Tiny" : "0.089",
-            "Scalar::Util" : "0",
-            "Test::Builder" : "0",
-            "Text::Gitignore" : "0",
             "parent" : "0",
             "perl" : "v5.10.1",
             "strict" : "0",
@@ -106,6 +105,7 @@
             "FindBin" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Path::Tiny" : "0.089",
             "Test::Exit" : "0",
             "Test::More" : "0"
          }
@@ -114,55 +114,43 @@
    "provides" : {
       "App::Codeowners" : {
          "file" : "lib/App/Codeowners.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "App::Codeowners::Formatter" : {
          "file" : "lib/App/Codeowners/Formatter.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "App::Codeowners::Formatter::CSV" : {
          "file" : "lib/App/Codeowners/Formatter/CSV.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "App::Codeowners::Formatter::JSON" : {
          "file" : "lib/App/Codeowners/Formatter/JSON.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "App::Codeowners::Formatter::String" : {
          "file" : "lib/App/Codeowners/Formatter/String.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "App::Codeowners::Formatter::TSV" : {
          "file" : "lib/App/Codeowners/Formatter/TSV.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "App::Codeowners::Formatter::Table" : {
          "file" : "lib/App/Codeowners/Formatter/Table.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "App::Codeowners::Formatter::YAML" : {
          "file" : "lib/App/Codeowners/Formatter/YAML.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "App::Codeowners::Options" : {
          "file" : "lib/App/Codeowners/Options.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "App::Codeowners::Util" : {
          "file" : "lib/App/Codeowners/Util.pm",
-         "version" : "0.49"
-      },
-      "App::Codeowners::Util::Process" : {
-         "file" : "lib/App/Codeowners/Util.pm",
-         "version" : "0.49"
-      },
-      "File::Codeowners" : {
-         "file" : "lib/File/Codeowners.pm",
-         "version" : "0.49"
-      },
-      "Test::File::Codeowners" : {
-         "file" : "lib/Test/File/Codeowners.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       }
    },
    "release_status" : "stable",
@@ -177,10 +165,10 @@
          "web" : "https://github.com/chazmcgarvey/git-codeowners"
       }
    },
-   "version" : "0.49",
+   "version" : "0.50",
    "x_authority" : "cpan:CCM",
    "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.15",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

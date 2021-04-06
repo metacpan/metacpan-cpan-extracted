@@ -1,4 +1,5 @@
-package RandomFileRecursiveOption;
+package
+    RandomFileRecursiveOption;
 use base qw/RandomFileMethodBase/;
 use TestConstants;
 

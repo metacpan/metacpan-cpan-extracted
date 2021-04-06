@@ -39,7 +39,7 @@ subtest 'wait_all' => sub {
         );
     } @pms;
 
-    Future->wait_all(@fts_images)->get;
+    AnyEvent::Future->wait_all(@fts_images)->get;
 
     eq_or_diff(
         [map {$_->state} @fts, @fts_images],
@@ -80,6 +80,7 @@ subtest 'fmap_void' => sub {
 };
 
 subtest 'fail on non-200' => sub {
+
     # this test will try real http request
     # http request will fail with or without functioning internet connection
     my $ok_http_fail;
@@ -127,8 +128,8 @@ sub http_get {
     $w = AnyEvent->timer(
         after => ($delay / 1000),
         cb    => sub {
-            $ft->done($body, {Status => 200});
             $w = undef;
+            $ft->done($body, {Status => 200});
         }
     );
     return $ft;

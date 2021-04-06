@@ -1,5 +1,9 @@
 Revision history for Perl module HTML::Make::Page
 
+0.02 2021-04-06
+
+- Add ability for inline JavaScript in <head>
+
 0.01 2021-03-08
 
 - Initial version

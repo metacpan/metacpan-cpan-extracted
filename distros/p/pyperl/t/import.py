@@ -1,11 +1,10 @@
-print "1..5"
+print("1..5")
 import perl
 import sys;
 
 perl.eval("""
 
 my $sys = Python::Import("sys");
-print $sys->version, "\n";
 print "not " unless $sys->version eq "%s";
 print "ok 1\n";
 
@@ -28,5 +27,5 @@ print "ok 4\n";
 """ % (sys.version))
 
 if sys.modules['string']:
-    print "ok 5"
+    print("ok 5")
 

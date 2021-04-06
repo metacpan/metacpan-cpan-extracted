@@ -1,0 +1,57 @@
+=head1 NAME
+
+Math::Polynomial::Generic - history of a discontinued module
+
+=head1 REMOVAL NOTICE
+
+Math::Polynomial::Generic was an extension of Math::Polynomial that did
+not make it into a permanent release.
+
+It had been declared experimental and its interface as not to be taken
+for granted.  The intention was to give users more expressive flexibility
+through a kind of polynomial object that was not bound to a particular
+coefficient space.
+
+This experiment turned out as a failure.  Coefficient spaces need to be
+specified at one point, and delaying this part of proper initialization
+did more harm than good in terms of clarity.
+
+Therefore, Math::Polynomial::Generic was removed from the Math-Polynomial
+distribution after a two-stage deprecation period.
+
+Technically, before its actual removal it was replaced by an empty module
+in order to neutralize incompatible code in older versions.
+
+=head2 MIGRATION
+
+Old code still using this module can easily be fixed.
+
+Instead of the symbol C<X>, a variable C<$X> that is initialized as
+C<Math::Polynomial-E<gt>new($zero, $one)> with appropriate coefficient
+values C<$zero> and C<$one> can be used.
+
+C<C($coeff)> can be replaced by C<Math::Polynomial-E<gt>new($coeff)>
+or it can be defined locally as a small wrapper for the same.
+
+=head1 SEE ALSO
+
+L<Math::Polynomial>
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp (at) cozap.comE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009-2021 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This module is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

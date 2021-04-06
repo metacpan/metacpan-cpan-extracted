@@ -1,5 +1,5 @@
 package Crayon;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 use 5.006;
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use Blessed::Merge;
 
 our ($LINES, $GLOBAL, $NESTED_GLOBAL, $NESTED_VARIABLE, $VARIABLE, $COMMENT, $CI);
 BEGIN {
-	$LINES = qr{ (([^\{]+)[\{]( (?: (?> [^\{\}]+ ) | (??{ $LINES }) )*) [\}]) }x;
+	$LINES = qr{ ([\{]( (?: (?> [^\{\}]+ ) | (??{ $LINES }) )*) [\}]) }x;
 	$GLOBAL = qr{ (\$([^:\n]+)\:([^;\n]+);) }x;
 	$VARIABLE = qr{ (\$(.*)) }x;
 	$COMMENT = qr{ (\/\*[^*]*\*+([^/*][^*]*\*+)*\/) }x;
@@ -90,13 +90,15 @@ sub _parse_globals {
 
 sub _parse_content {
 	my ($self, $string, $css) = @_;
-	
+
 	my $globals = {};
-	while ($string =~ m/$LINES/g) {
-		my ($match, $class, $props) = ($1, $2, $3);
+	while ( $string =~ m/(([^{]+)$LINES)/g ) {
+		my ($match, $class, $props) = ($1, $2, $4);
+		
 		my $nested = {};
 		($nested, $props) = $self->_parse_content($props, {})
 			if ($props =~ m/$LINES/);
+
 		my $ri = rindex($class, ';');
 		if ($ri > 0) {
 			my $p = substr $class, 0, $ri + 1, '';
@@ -325,7 +327,7 @@ Crayon - dedupe, minify and extend CSS
 
 =head1 VERSION
 
-Version 0.05 
+Version 0.06 
 
 =cut
 

@@ -6,6 +6,8 @@
 
 #include "ppport.h"
 
+#include <assert.h>
+
 #define NUM_LATTICES 4
 
 /*
@@ -39,7 +41,7 @@ typedef AM_LONG AM_BIG_INT[8];
   var[ind + 1] += high_bits(var[ind]); \
   var[ind] = low_bits(var[ind])
 
-/* carry macro for AM_BIG_INT pointers */
+/* carry macros for math using AM_BIG_INT */
 #define carry_pointer(p) \
   *(p + 1) += high_bits(*(p)); \
   *(p) = low_bits(*(p))
@@ -48,9 +50,24 @@ typedef AM_LONG AM_BIG_INT[8];
   var[ind + 1] = high_bits(var[ind]); \
   var[ind] = low_bits(var[ind])
 
+#define hash_pointer_from_stack(ind) \
+  (HV *) SvRV(ST(ind))
+
+#define array_pointer_from_stack(ind) \
+  AvARRAY((AV *)SvRV(ST(ind)))
+
+#define unsigned_int_from_stack(ind) \
+  SvUVX(ST(ind))
+
+/* AM_SUPRAs form a linked list; using for(iter_supra(x, supra)) loops over the list members using the temp variable x */
+#define iter_supras(loop_var, supra_ptr) \
+  loop_var = supra_ptr + supra_ptr->next; loop_var != supra_ptr; loop_var = supra_ptr + loop_var->next
+
+#define sublist_top(supra) \
+  supra->data + supra->data[0] + 1
+
 /*
  * structure for the supracontexts
- *
  */
 
 typedef struct AM_supra {
@@ -176,9 +193,9 @@ typedef struct AM_guts {
    * array index is data item index in data set.
    */
   SV **classes;
-  /* ??? */
+  /* TODO: ??? */
   SV **itemcontextchain;
-  /* ??? */
+  /* TODO: ??? */
   HV *itemcontextchainhead;
   /* Maps subcontext binary labels to class indices */
   HV *context_to_class;
@@ -193,7 +210,7 @@ typedef struct AM_guts {
   HV *pointers;
   /* Maps binary context labels to the size of the gang effect of
    * that context. A gang effect is the number of pointers in
-   * the given context multiplied by the number training items
+   * the given context multiplied by the number of training items
    * contained in the context.
    */
   HV *gang;
@@ -211,6 +228,7 @@ typedef struct AM_guts {
 
 /*
  * A function and a vtable necessary for the use of Perl magic
+ * TODO: explain the necessity
  */
 
 static int AMguts_mgFree(pTHX_ SV *sv, MAGIC *mg) {
@@ -235,7 +253,6 @@ MGVTBL AMguts_vtab = {
 /*
  * arrays used in the change-of-base portion of normalize(SV *s)
  * they are initialized in BOOT
- *
  */
 
 AM_LONG tens[16]; /* 10, 10*2, 10*4, ... */
@@ -244,7 +261,7 @@ AM_LONG ones[16]; /*  1,  1*2,  1*4, ... */
 /*
  * function: normalize(SV *s)
  *
- * s is an SvPV whose PV* is a unsigned long array representing a very
+ * s is an SvPV whose PV* is an unsigned long array representing a very
  * large integer
  *
  * this function modifies s so that its NV is the floating point
@@ -259,38 +276,48 @@ AM_LONG ones[16]; /*  1,  1*2,  1*4, ... */
  * ASCII digits from least to most significant
  *
  */
+const unsigned int ASCII_0 = 0x30;
+const unsigned int DIVIDE_SPACE = 10;
+const int OUTSPACE_SIZE = 55;
+void normalize(pTHX_ SV *s) {
+  AM_LONG *p = (AM_LONG *)SvPVX(s);
 
-normalize(pTHX_ SV *s) {
-  AM_LONG dspace[10];
-  AM_LONG qspace[10];
-  char outspace[55];
+  AM_LONG dspace[DIVIDE_SPACE];
+  AM_LONG qspace[DIVIDE_SPACE];
   AM_LONG *dividend, *quotient, *dptr, *qptr;
-  char *outptr;
-  unsigned int outlength = 0;
-  AM_LONG *p = (AM_LONG *) SvPVX(s);
+
   STRLEN length = SvCUR(s) / sizeof(AM_LONG);
-  /* TODO: is this required to be a certain number of bits?*/
+  /* length indexes into dspace and qspace */
+  assert(length <= DIVIDE_SPACE);
+
+  /*
+   * outptr iterates outspace from end to beginning, and an ASCII digit is inserted at each location.
+   * No need to 0-terminate since we track the final string length in outlength and pass it to sv_setpvn.
+   */
+  char outspace[OUTSPACE_SIZE];
+  char *outptr;
+  outptr = outspace + (OUTSPACE_SIZE - 1);
+  unsigned int outlength = 0;
+
+  /* TODO: is this required to be a certain number of bits? */
   long double nn = 0;
   int j;
 
-  /* you can't put the for block in {}, or it doesn't work
-   * ask me for details some time
-   * TODO: is this still necessary? (Nate)
-   */
-  for (j = 8; j; --j){
+  /* nn will be assigned to the NV */
+  for (j = 8; j; --j) {
     /*   2^16    * nn +           p[j-1] */
     nn = 65536.0 * nn + (double) *(p + j - 1);
   }
 
   dividend = &dspace[0];
   quotient = &qspace[0];
-  Copy(p, dividend, length, sizeof(AM_LONG));
-  /* Magic number here... */
-  outptr = outspace + 54;
+  Copy(p, dividend, length, AM_LONG);
 
   while (1) {
     AM_LONG *temp, carry = 0;
-    while (length && (*(dividend + length - 1) == 0)) --length;
+    while (length && (*(dividend + length - 1) == 0)) {
+      --length;
+    }
     if (length == 0) {
       sv_setpvn(s, outptr, outlength);
       break;
@@ -313,7 +340,7 @@ normalize(pTHX_ SV *s) {
       --qptr;
     }
     --outptr;
-    *outptr = (char) (0x30 + *dividend) & 0x00ff;
+    *outptr = (char)(ASCII_0 + *dividend) & 0x00ff;
     ++outlength;
     temp = dividend;
     dividend = quotient;
@@ -333,21 +360,24 @@ normalize(pTHX_ SV *s) {
   * just the same as the third input.
   */
 unsigned short *intersect_supras(
-    AM_SHORT *i, AM_SHORT *j, AM_SHORT *k){
+    AM_SHORT *intersection_list_top, AM_SHORT *subcontext_list_top, AM_SHORT *k){
   AM_SHORT *temp;
   while (1) {
-    while (*i > *j)
-      --i;
-    if (*i == 0) break;
-    if (*i < *j) {
-      temp = i;
-      i = j;
-      j = temp;
+    while (*intersection_list_top > *subcontext_list_top) {
+      --intersection_list_top;
+    }
+    if (*intersection_list_top == 0) {
+      break;
+    }
+    if (*intersection_list_top < *subcontext_list_top) {
+      temp = intersection_list_top;
+      intersection_list_top = subcontext_list_top;
+      subcontext_list_top = temp;
       continue;
     }
-    *k = *i;
-    --i;
-    --j;
+    *k = *intersection_list_top;
+    --intersection_list_top;
+    --subcontext_list_top;
     --k;
   }
   return k;
@@ -362,23 +392,25 @@ unsigned short *intersect_supras(
   * list.
   */
 AM_SHORT intersect_supras_final(
-    AM_SHORT *i, AM_SHORT *j,
+    AM_SHORT *intersection_list_top, AM_SHORT *subcontext_list_top,
     AM_SHORT *intersect, AM_SHORT *subcontext_class){
   AM_SHORT class = 0;
   AM_SHORT length = 0;
   AM_SHORT *temp;
   while (1) {
-    while (*i > *j)
-      --i;
-    if (*i == 0)
+    while (*intersection_list_top > *subcontext_list_top) {
+      --intersection_list_top;
+    }
+    if (*intersection_list_top == 0) {
       break;
-    if (*i < *j) {
-      temp = i;
-      i = j;
-      j = temp;
+    }
+    if (*intersection_list_top < *subcontext_list_top) {
+      temp = intersection_list_top;
+      intersection_list_top = subcontext_list_top;
+      subcontext_list_top = temp;
       continue;
     }
-    *intersect = *i;
+    *intersect = *intersection_list_top;
     ++intersect;
     ++length;
 
@@ -389,22 +421,24 @@ AM_SHORT intersect_supras_final(
         length = 0;
         break;
       } else {
-        class = subcontext_class[*i];
+        class = subcontext_class[*intersection_list_top];
       }
     } else {
       /* Do the classes not match? */
-      if (class != subcontext_class[*i]) {
+      if (class != subcontext_class[*intersection_list_top]) {
         length = 0;
         break;
       }
     }
-    --i;
-    --j;
+    --intersection_list_top;
+    --subcontext_list_top;
   }
   return length;
 }
 
-MODULE = Algorithm::AM		PACKAGE = Algorithm::AM
+MODULE = Algorithm::AM PACKAGE = Algorithm::AM
+
+PROTOTYPES: DISABLE
 
 BOOT:
   {
@@ -427,7 +461,7 @@ BOOT:
   * This function is called by from AM.pm right after creating
   * a blessed reference to Algorithm::AM. It stores the necessary
   * pointers in the AM_GUTS structure and attaches it to the magic
-  * part of thre reference.
+  * part of the reference.
   *
   */
 
@@ -443,17 +477,18 @@ _xs_initialize(...)
  PPCODE:
   /* 9 arguments are passed to the _xs_initialize method: */
   /* $self, the AM object */
-  project = (HV *) SvRV(ST(0));
+  project = hash_pointer_from_stack(0);
   /* For explanations on these, see the comments on AM_guts */
-  lattice_sizes = AvARRAY((AV *) SvRV(ST(1)));
-  guts.classes = AvARRAY((AV *) SvRV(ST(2)));
-  guts.itemcontextchain = AvARRAY((AV *) SvRV(ST(3)));
-  guts.itemcontextchainhead = (HV *) SvRV(ST(4));
-  guts.context_to_class = (HV *) SvRV(ST(5));
-  guts.contextsize = (HV *) SvRV(ST(6));
-  guts.pointers = (HV *) SvRV(ST(7));
-  guts.gang = (HV *) SvRV(ST(8));
-  guts.sum = AvARRAY((AV *) SvRV(ST(9)));
+  lattice_sizes = array_pointer_from_stack(1);
+  guts.classes = array_pointer_from_stack(2);
+  guts.itemcontextchain = array_pointer_from_stack(3);
+  guts.itemcontextchainhead = hash_pointer_from_stack(4);
+  guts.context_to_class = hash_pointer_from_stack(5);
+  guts.contextsize = hash_pointer_from_stack(6);
+  guts.pointers = hash_pointer_from_stack(7);
+  guts.gang = hash_pointer_from_stack(8);
+  guts.sum = array_pointer_from_stack(9);
+  /* Length of guts.sum */
   guts.num_classes = av_len((AV *) SvRV(ST(9)));
 
   /*
@@ -466,9 +501,9 @@ _xs_initialize(...)
 
   for (i = 0; i < NUM_LATTICES; ++i) {
     UV v = SvUVX(lattice_sizes[i]);
-    Newz(0, guts.lptr[i], 1 << v, AM_SHORT);
-    Newz(0, guts.sptr[i], 1 << (v + 1), AM_SUPRA); /* CHANGED */
-    Newz(0, guts.sptr[i][0].data, 2, AM_SHORT);
+    Newxz(guts.lptr[i], 1 << v, AM_SHORT);
+    Newxz(guts.sptr[i], 1 << (v + 1), AM_SUPRA); /* CHANGED */ /* TODO: what changed? */
+    Newxz(guts.sptr[i][0].data, 2, AM_SHORT);
   }
 
   /* Perl magic invoked here */
@@ -510,9 +545,9 @@ _fillandcount(...)
    * perl lattice, and a flag to indicate whether to count occurrences
    * (true) or pointers (false), also known as linear/quadratic.
    */
-  project = (HV *) SvRV(ST(0));
-  lattice_sizes_input = AvARRAY((AV *) SvRV(ST(1)));
-  linear_flag = SvUVX(ST(2));
+  project = hash_pointer_from_stack(0);
+  lattice_sizes_input = array_pointer_from_stack(1);
+  linear_flag = unsigned_int_from_stack(2);
   mg = mg_find((SV *) project, PERL_MAGIC_ext);
   guts = (AM_GUTS *) SvPVX(mg->mg_obj);
 
@@ -531,8 +566,9 @@ _fillandcount(...)
     Zero(lptr[chunk], 1 << lattice_sizes[chunk], AM_SHORT);
     sptr[chunk][0].next = 0;
     nptr[chunk] = 1;
-    for (i = 1; i < 1 << (lattice_sizes[chunk] + 1); ++i) /* CHANGED */
+    for (i = 1; i < 1 << (lattice_sizes[chunk] + 1); ++i) {/* CHANGED (TODO: changed what?) */
       sptr[chunk][i].next = (AM_SHORT) i + 1;
+    }
   }
 
   /*
@@ -551,18 +587,18 @@ _fillandcount(...)
 
   context_to_class = guts->context_to_class;
   subcontextnumber = (AM_SHORT) HvUSEDKEYS(context_to_class);
-  Newz(0, subcontext, NUM_LATTICES * (subcontextnumber + 1), AM_SHORT);
+  Newxz(subcontext, NUM_LATTICES * (subcontextnumber + 1), AM_SHORT);
   subcontext += NUM_LATTICES * subcontextnumber;
-  Newz(0, subcontext_class, subcontextnumber + 1, AM_SHORT);
+  Newxz(subcontext_class, subcontextnumber + 1, AM_SHORT);
   subcontext_class += subcontextnumber;
-  Newz(0, intersectlist, subcontextnumber + 1, AM_SHORT);
-  Newz(0, intersectlist2, subcontextnumber + 1, AM_SHORT);
+  Newxz(intersectlist, subcontextnumber + 1, AM_SHORT);
+  Newxz(intersectlist2, subcontextnumber + 1, AM_SHORT);
   ilist2top = intersectlist2 + subcontextnumber;
-  Newz(0, intersectlist3, subcontextnumber + 1, AM_SHORT);
+  Newxz(intersectlist3, subcontextnumber + 1, AM_SHORT);
   ilist3top = intersectlist3 + subcontextnumber;
 
   hv_iterinit(context_to_class);
-  while (he = hv_iternext(context_to_class)) {
+  while ((he = hv_iternext(context_to_class))) {
     AM_SHORT *contextptr = (AM_SHORT *) HeKEY(he);
     AM_SHORT class = (AM_SHORT) SvUVX(HeVAL(he));
     for (chunk = 0; chunk < NUM_LATTICES; ++chunk, ++contextptr) {
@@ -643,17 +679,16 @@ _fillandcount(...)
       subcontext[chunk] = context;
 
       if (context == 0) {
-      	for (p = supralist + supralist->next;
-      	     p != supralist; p = supralist + p->next) {
-      	  AM_SHORT *data;
-      	  Newz(0, data, p->data[0] + 3, AM_SHORT);
-      	  Copy(p->data + 2, data + 3, p->data[0], AM_SHORT);
-      	  data[2] = subcontextnumber;
-      	  data[0] = p->data[0] + 1;
-      	  Safefree(p->data);
-      	  p->data = data;
-      	}
-	      if (lattice[context] == 0) {
+        for (iter_supras(p, supralist)) {
+          AM_SHORT *data;
+          Newxz(data, p->data[0] + 3, AM_SHORT);
+          Copy(p->data + 2, data + 3, p->data[0], AM_SHORT);
+          data[2] = subcontextnumber;
+          data[0] = p->data[0] + 1;
+          Safefree(p->data);
+          p->data = data;
+        }
+        if (lattice[context] == 0) {
 
           /* in this case, the subcontext will be
            * added to all supracontexts, so there's
@@ -661,36 +696,39 @@ _fillandcount(...)
            * move pointers
            */
 
-       	  AM_SHORT count = 0;
-      	  ci = nptr[chunk];
-      	  nptr[chunk] = supralist[ci].next;
-      	  c = supralist + ci;
-      	  c->next = supralist->next;
-      	  supralist->next = ci;
-      	  Newz(0, c->data, 3, AM_SHORT);
-      	  c->data[2] = subcontextnumber;
-      	  c->data[0] = 1;
-      	  for (i = 0; i < (1 << active); ++i) {
-      	    if (lattice[i] == 0) {
-      	      lattice[i] = ci;
-      	      ++count;
-      	    }
-      	  }
-      	  c->count = count;
-	      }
-	      continue;
+          AM_SHORT count = 0;
+          ci = nptr[chunk];
+          nptr[chunk] = supralist[ci].next;
+          c = supralist + ci;
+          c->next = supralist->next;
+          supralist->next = ci;
+          Newxz(c->data, 3, AM_SHORT);
+          c->data[2] = subcontextnumber;
+          c->data[0] = 1;
+          for (i = 0; i < (1 << active); ++i) {
+            if (lattice[i] == 0) {
+              lattice[i] = ci;
+              ++count;
+            }
+          }
+          c->count = count;
+        }
+        continue;
       }
 
       /* set up traversal using Gray code */
       d = context;
-      for (i = 1 << (active - 1); i; i >>= 1)
-        if (!(i & context))
-	        gaps[numgaps++] = i;
+      for (i = 1 << (active - 1); i; i >>= 1) {
+        if (!(i & context)) {
+          gaps[numgaps++] = i;
+        }
+      }
       t = 1 << numgaps;
 
       p = supralist + (pi = lattice[context]);
-      if (pi)
+      if (pi) {
         --(p->count);
+      }
       ci = nextsupra;
       nextsupra = supralist[ci].next;
       p->touched = 1;
@@ -699,7 +737,7 @@ _fillandcount(...)
       c->next = p->next;
       p->next = ci;
       c->count = 1;
-      Newz(0, c->data, p->data[0] + 3, AM_SHORT);
+      Newxz(c->data, p->data[0] + 3, AM_SHORT);
       Copy(p->data + 2, c->data + 3, p->data[0], AM_SHORT);
       c->data[2] = subcontextnumber;
       c->data[0] = p->data[0] + 1;
@@ -708,32 +746,34 @@ _fillandcount(...)
       /* traverse */
       while (--t) {
         /* find the rightmost 1 in t; from HAKMEM, I believe */
-      	for (i = 0, tt = ~t & (t - 1); tt; tt >>= 1, ++i)
+        for (i = 0, tt = ~t & (t - 1); tt; tt >>= 1, ++i) {
           ;
-      	d ^= gaps[i];
+        }
+        d ^= gaps[i];
 
-	      p = supralist + (pi = lattice[d]);
-  	    if (pi)
+        p = supralist + (pi = lattice[d]);
+        if (pi) {
           --(p->count);
-      	switch (p->touched) {
-      	case 1:
-      	  ++supralist[lattice[d] = p->next].count;
-      	  break;
-      	case 0:
-      	  ci = nextsupra;
-      	  nextsupra = supralist[ci].next;
-      	  p->touched = 1;
-      	  c = supralist + ci;
-      	  c->touched = 0;
-      	  c->next = p->next;
-      	  p->next = ci;
-      	  c->count = 1;
-      	  Newz(0, c->data, p->data[0] + 3, AM_SHORT);
-      	  Copy(p->data + 2, c->data + 3, p->data[0], AM_SHORT);
-      	  c->data[2] = subcontextnumber;
-      	  c->data[0] = p->data[0] + 1;
-      	  lattice[d] = ci;
-      	}
+        }
+        switch (p->touched) {
+          case 1:
+            ++supralist[lattice[d] = p->next].count;
+            break;
+          case 0:
+            ci = nextsupra;
+            nextsupra = supralist[ci].next;
+            p->touched = 1;
+            c = supralist + ci;
+            c->touched = 0;
+            c->next = p->next;
+            p->next = ci;
+            c->count = 1;
+            Newxz(c->data, p->data[0] + 3, AM_SHORT);
+            Copy(p->data + 2, c->data + 3, p->data[0], AM_SHORT);
+            c->data[2] = subcontextnumber;
+            c->data[0] = p->data[0] + 1;
+            lattice[d] = ci;
+        }
       }
 
       /* Here we return all AM_SUPRA with count 0 back to the free
@@ -744,22 +784,22 @@ _fillandcount(...)
       p->touched = 0;
       do {
         if (supralist[i = p->next].count == 0) {
-    	    Safefree(supralist[i].data);
-      	  p->next = supralist[i].next;
-      	  supralist[i].next = nextsupra;
-      	  nextsupra = (AM_SHORT) i;
-      	} else {
-      	  p = supralist + p->next;
-      	  p->touched = 0;
-      	}
+          Safefree(supralist[i].data);
+          p->next = supralist[i].next;
+          supralist[i].next = nextsupra;
+          nextsupra = (AM_SHORT) i;
+        } else {
+          p = supralist + p->next;
+          p->touched = 0;
+        }
       } while (p->next);
       nptr[chunk] = nextsupra;
-    }/*end for(chunk = 0...*/
+    } /*end for(chunk = 0...*/
     subcontext -= NUM_LATTICES;
     *subcontext_class = class;
     --subcontext_class;
     --subcontextnumber;
-  }/*end while (he = hv_iternext(...*/
+  } /*end while (he = hv_iternext(...*/
 
   contextsize = guts->contextsize;
   pointers = guts->pointers;
@@ -784,40 +824,42 @@ _fillandcount(...)
     AM_SHORT *k;
 
     /* find intersections */
-    for (p0 = sptr[0] + sptr[0]->next; p0 != sptr[0]; p0 = sptr[0] + p0->next) {
-      for (p1 = sptr[1] + sptr[1]->next; p1 != sptr[1]; p1 = sptr[1] + p1->next) {
+    for (iter_supras(p0, sptr[0])) {
+      for (iter_supras(p1, sptr[1])) {
       /*Find intersection between p0 and p2*/
         k = intersect_supras(
-          p0->data + p0->data[0] + 1,
-          p1->data + p1->data[0] + 1,
+          sublist_top(p0),
+          sublist_top(p1),
           ilist2top
         );
         /* If k has not been increased then intersection was empty */
-        if (k == ilist2top)
+        if (k == ilist2top) {
           continue;
+        }
         *k = 0;
 
-        for (p2 = sptr[2] + sptr[2]->next; p2 != sptr[2]; p2 = sptr[2] + p2->next) {
+        for (iter_supras(p2, sptr[2])) {
 
           /*Find intersection between previous intersection and p2*/
           k = intersect_supras(
             ilist2top,
-            p2->data + p2->data[0] + 1,
+            sublist_top(p2),
             ilist3top
           );
           /* If k has not been increased then intersection was empty */
-          if (k == ilist3top)
+          if (k == ilist3top) {
             continue;
+          }
           *k = 0;
 
-          for (p3 = sptr[3] + sptr[3]->next; p3 != sptr[3]; p3 = sptr[3] + p3->next) {
+          for (iter_supras(p3, sptr[3])) {
 
             /* Find intersection between previous intersection and p3;
              * check for disqualified supras this time.
              */
             length = intersect_supras_final(
               ilist3top,
-              p3->data + p3->data[0] + 1,
+              sublist_top(p3),
               intersectlist,
               subcontext_class
             );
@@ -847,9 +889,10 @@ _fillandcount(...)
               if(!linear_flag){
                 /* If scoring is pointers (quadratic) instead of linear*/
                 AM_LONG pointercount = 0;
-                for (i = 0; i < length; ++i)
+                for (i = 0; i < length; ++i) {
                   pointercount += (AM_LONG) SvUV(*hv_fetch(contextsize,
                       (char *) (subcontext + (NUM_LATTICES * intersectlist[i])), 8, 0));
+                }
                 if (pointercount & 0xffff0000) {
                   AM_SHORT pchi = (AM_SHORT) (high_bits(pointercount));
                   AM_SHORT pclo = (AM_SHORT) (low_bits(pointercount));
@@ -904,21 +947,26 @@ _fillandcount(...)
                   *(p + j) += count[j];
                   carry_pointer(p + j);
                 }
-              }/* end for (i = 0;... */
-            }/* end if (length) */
-          }/* end for (p3 = sptr[3]... */
-        }/* end  for (p2 = sptr[2]... */
-      }/* end  for (p1 = sptr[1]... */
-    }/* end  for (p0 = sptr[0]... */
+              } /* end for (i = 0;... */
+            } /* end if (length) */
+          } /* end for (iter_supras(p3... */
+        } /* end  for (iter_supras(p2... */
+      } /* end  for (iter_supras(p1... */
+    } /* end  for (iter_supras(p0... */
+
     /* clear out the supracontexts */
-    for (p0 = sptr[0] + sptr[0]->next; p0 != sptr[0]; p0 = sptr[0] + p0->next)
+    for (iter_supras(p0, sptr[0])) {
       Safefree(p0->data);
-    for (p1 = sptr[1] + sptr[1]->next; p1 != sptr[1]; p1 = sptr[1] + p1->next)
+    }
+    for (iter_supras(p1, sptr[1])) {
       Safefree(p1->data);
-    for (p2 = sptr[2] + sptr[2]->next; p2 != sptr[2]; p2 = sptr[2] + p2->next)
+    }
+    for (iter_supras(p2, sptr[2])) {
       Safefree(p2->data);
-    for (p3 = sptr[3] + sptr[3]->next; p3 != sptr[3]; p3 = sptr[3] + p3->next)
+    }
+    for (iter_supras(p3, sptr[3])) {
       Safefree(p3->data);
+    }
 
     /*
      * compute analogical set and gang effects
@@ -942,7 +990,7 @@ _fillandcount(...)
     sum = guts->sum;
     num_classes = guts->num_classes;
     hv_iterinit(pointers);
-    while (he = hv_iternext(pointers)) {
+    while ((he = hv_iternext(pointers))) {
       AM_LONG count;
       AM_SHORT counthi, countlo;
       AM_BIG_INT p;
@@ -992,25 +1040,26 @@ _fillandcount(...)
       if (this_class) {
         AM_LONG *s = (AM_LONG *) SvPVX(sum[this_class]);
         for (i = 0; i < 7; ++i) {
-        	*(s + i) += gangcount[i];
+          *(s + i) += gangcount[i];
           carry_pointer(s + i);
         }
       } else {
         dataitem = *hv_fetch(itemcontextchainhead, HeKEY(he), NUM_LATTICES * sizeof(AM_SHORT), 0);
         while (SvIOK(dataitem)) {
-        	IV datanum = SvIVX(dataitem);
-        	IV ocnum = SvIVX(classes[datanum]);
-        	AM_LONG *s = (AM_LONG *) SvPVX(sum[ocnum]);
-        	for (i = 0; i < 7; ++i) {
-        	  *(s + i) += p[i];
+          IV datanum = SvIVX(dataitem);
+          IV ocnum = SvIVX(classes[datanum]);
+          AM_LONG *s = (AM_LONG *) SvPVX(sum[ocnum]);
+          for (i = 0; i < 7; ++i) {
+            *(s + i) += p[i];
             carry_pointer(s + i);
-        	  dataitem = itemcontextchain[datanum];
-        	}
+            dataitem = itemcontextchain[datanum];
+          }
         }
       }
     }
-    for (i = 1; i <= num_classes; ++i) normalize(aTHX_ sum[i])
-      ;
+    for (i = 1; i <= num_classes; ++i) {
+      normalize(aTHX_ sum[i]);
+    }
     tempsv = *hv_fetch(pointers, "grandtotal", 10, 1);
     SvUPGRADE(tempsv, SVt_PVNV);
     sv_setpvn(tempsv, (char *) grandtotal, 8 * sizeof(AM_LONG));

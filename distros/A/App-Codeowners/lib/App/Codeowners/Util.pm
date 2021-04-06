@@ -5,8 +5,8 @@ package App::Codeowners::Util;
 use warnings;
 use strict;
 
-use Encode qw(decode);
 use Exporter qw(import);
+use File::Codeowners::Util;
 use Path::Tiny;
 
 our @EXPORT_OK = qw(
@@ -23,83 +23,26 @@ our @EXPORT_OK = qw(
     zip
 );
 
-our $VERSION = '0.49'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 
-sub find_nearest_codeowners {
-    my $path = path(shift || '.')->absolute;
-
-    while (!$path->is_rootdir) {
-        my $filepath = find_codeowners_in_directory($path);
-        return $filepath if $filepath;
-        $path = $path->parent;
-    }
-}
+sub find_nearest_codeowners { goto &File::Codeowners::Util::find_nearest_codeowners }
 
 
-sub find_codeowners_in_directory {
-    my $path = path(shift) or die;
+sub find_codeowners_in_directory { goto &File::Codeowners::Util::find_codeowners_in_directory }
 
-    my @tries = (
-        [qw(CODEOWNERS)],
-        [qw(docs CODEOWNERS)],
-        [qw(.bitbucket CODEOWNERS)],
-        [qw(.github CODEOWNERS)],
-        [qw(.gitlab CODEOWNERS)],
-    );
 
-    for my $parts (@tries) {
-        my $try = $path->child(@$parts);
-        return $try if $try->is_file;
-    }
-}
+sub run_command { goto &File::Codeowners::Util::run_command }
 
-sub run_command {
-    my $filter;
-    $filter = pop if ref($_[-1]) eq 'CODE';
 
-    print STDERR "# @_\n" if $ENV{GIT_CODEOWNERS_DEBUG};
+sub run_git { goto &File::Codeowners::Util::run_git }
 
-    my ($child_in, $child_out);
-    require IPC::Open2;
-    my $pid = IPC::Open2::open2($child_out, $child_in, @_);
-    close($child_in);
 
-    binmode($child_out, ':encoding(UTF-8)');
+sub git_ls_files { goto &File::Codeowners::Util::git_ls_files }
 
-    my $proc = App::Codeowners::Util::Process->new(
-        pid     => $pid,
-        fh      => $child_out,
-        filter  => $filter,
-    );
 
-    return wantarray ? ($proc, @{$proc->all}) : $proc;
-}
+sub git_toplevel { goto &File::Codeowners::Util::git_toplevel }
 
-sub run_git {
-    return run_command('git', @_);
-}
-
-sub git_ls_files {
-    my $dir = shift || '.';
-    return run_git('-C', $dir, 'ls-files', @_, \&_unescape_git_filepath);
-}
-
-# Depending on git's "core.quotepath" config, non-ASCII chars may be
-# escaped (identified by surrounding dquotes), so try to unescape.
-sub _unescape_git_filepath {
-    return $_ if $_ !~ /^"(.+)"$/;
-    return decode('UTF-8', unbackslash($1));
-}
-
-sub git_toplevel {
-    my $dir = shift || '.';
-
-    my ($proc, $path) = run_git('-C', $dir, qw{rev-parse --show-toplevel});
-
-    return if $proc->wait != 0 || !$path;
-    return path($path);
-}
 
 sub colorstrip {
     my $str = shift || '';
@@ -107,21 +50,12 @@ sub colorstrip {
     return $str;
 }
 
+
 sub stringify {
     my $item = shift;
     return ref($item) eq 'ARRAY' ? join(',', @$item) : $item;
 }
 
-# The zip code is from List::SomeUtils (thanks DROLSKY), copied just so as not
-# to bring in the extra dependency.
-sub zip (\@\@) {    ## no critic (Subroutines::ProhibitSubroutinePrototypes)
-    my $max = -1;
-    $max < $#$_ && ( $max = $#$_ ) foreach @_;
-    map {
-        my $ix = $_;
-        map $_->[$ix], @_;
-    } 0 .. $max;
-}
 
 # The stringf code is from String::Format (thanks SREZIC), with changes:
 # - Use Unicode::GCString for better Unicode character padding,
@@ -198,6 +132,7 @@ sub stringf {
     return $format;
 }
 
+
 # The unbacklash code is from String::Escape (thanks EVO), with changes:
 # - Handle \a, \b, \f and \v (thanks Berk Akinci)
 my %unbackslash;
@@ -215,55 +150,16 @@ sub unbackslash {
     return $str;
 }
 
-{
-    package App::Codeowners::Util::Process;
 
-    sub new {
-        my $class = shift;
-        return bless {@_}, $class;
-    }
-
-    sub next {
-        my $self = shift;
-        my $line = readline($self->{fh});
-        if (defined $line) {
-            chomp $line;
-            if (my $filter = $self->{filter}) {
-                local $_ = $line;
-                $line = $filter->($line);
-            }
-        }
-        $line;
-    }
-
-    sub all {
-        my $self = shift;
-        chomp(my @lines = readline($self->{fh}));
-        if (my $filter = $self->{filter}) {
-            $_ = $filter->($_) for @lines;
-        }
-        \@lines;
-    }
-
-    sub wait {
-        my $self = shift;
-        my $pid  = $self->{pid} or return;
-        if (my $fh = $self->{fh}) {
-            close($fh);
-            delete $self->{fh};
-        }
-        waitpid($pid, 0);
-        my $status = $?;
-        print STDERR "# -> status $status\n" if $ENV{GIT_CODEOWNERS_DEBUG};
-        delete $self->{pid};
-        return $status;
-    }
-
-    sub DESTROY {
-        my ($self, $global_destruction) = @_;
-        return if $global_destruction;
-        $self->wait;
-    }
+# The zip code is from List::SomeUtils (thanks DROLSKY), copied just so as not
+# to bring in the extra dependency.
+sub zip (\@\@) {    ## no critic (Subroutines::ProhibitSubroutinePrototypes)
+    my $max = -1;
+    $max < $#$_ && ( $max = $#$_ ) foreach @_;
+    map {
+        my $ix = $_;
+        map $_->[$ix], @_;
+    } 0 .. $max;
 }
 
 1;
@@ -280,7 +176,7 @@ App::Codeowners::Util - Grab bag of utility subs for Codeowners modules
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 DESCRIPTION
 
@@ -290,44 +186,66 @@ B<DO NOT USE> except in L<App::Codeowners> and related modules.
 
 =head2 find_nearest_codeowners
 
-    $filepath = find_nearest_codeowners($dirpath);
+Deprecated.
 
-Find the F<CODEOWNERS> file in the current working directory, or search in the
-parent directory recursively until a F<CODEOWNERS> file is found.
-
-Returns C<undef> if no F<CODEOWNERS> is found.
+Use L<File::Codeowners::Util/find_nearest_codeowners> instead.
 
 =head2 find_codeowners_in_directory
 
-    $filepath = find_codeowners_in_directory($dirpath);
+Deprecated.
 
-Find the F<CODEOWNERS> file in a given directory. No recursive searching is done.
+Use L<File::Codeowners::Util/find_codeowners_in_directory> instead.
 
-Returns the first of (or undef if none found):
+=head2 run_command
 
-=over 4
+Deprecated.
 
-=item *
+Use L<File::Codeowners::Util/run_command> instead.
 
-F<CODEOWNERS>
+=head2 run_git
 
-=item *
+Deprecated.
 
-F<docs/CODEOWNERS>
+Use L<File::Codeowners::Util/run_git> instead.
 
-=item *
+=head2 git_ls_files
 
-F<.bitbucket/CODEOWNERS>
+Deprecated.
 
-=item *
+Use L<File::Codeowners::Util/git_ls_files> instead.
 
-F<.github/CODEOWNERS>
+=head2 git_toplevel
 
-=item *
+Deprecated.
 
-F<.gitlab/CODEOWNERS>
+Use L<File::Codeowners::Util/git_toplevel> instead.
 
-=back
+=head2 colorstrip
+
+    $str = colorstrip($str);
+
+Strip ANSI color control commands.
+
+=head2 stringify
+
+    $str = stringify($scalar);
+    $str = stringify(\@array);
+
+Get a useful string representation of a scallar or arrayref.
+
+=head2 stringf
+
+TODO
+
+=head2 unbackslash
+
+Deprecated.
+
+Use L<File::Codeowners::Util/unbackslash> instead.
+
+=head2 zip
+
+Same as L<List::SomeUtils/zip-ARRAY1-ARRAY2-[-ARRAY3-...-]>.
 
 =head1 BUGS
 
@@ -344,7 +262,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Charles McGarvey.
+This software is copyright (c) 2021 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

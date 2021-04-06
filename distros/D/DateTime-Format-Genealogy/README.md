@@ -4,7 +4,7 @@ DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -56,6 +56,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2018-2020 Nigel Horne.
+Copyright 2018-2021 Nigel Horne.
 
 This program is released under the following licence: GPL2

@@ -9,10 +9,13 @@ use Config;
 use Fcntl;
 use File::Copy;
 use Getopt::Long;
+use IO::Handle;
+use List::Util qw(shuffle);
 use Pod::Usage;
+use URI;
 use YADA;
 
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 
 GetOptions(
@@ -28,13 +31,16 @@ GetOptions(
     q(timeout=i)        => \my $timeout,
     q(useragent=s)      => \my $useragent,
     q(verbose)          => \my $verbose,
+    q(skip_existing)    => \my $skip_existing,
+    q(shuffle)          => \my $shuffle,
 ) or pod2usage(q(-verbose) => 1);
 pod2usage(q(-verbose) => 1) if $help;
 
 my @urls = <>;
 chomp @urls;
+@urls = shuffle @urls if $shuffle;
 
-local $| = 1;
+autoflush $_, 1 for (\*STDERR, \*STDOUT);
 
 my $q = YADA->new({
     allow_dups  => $dups // 1,
@@ -42,14 +48,15 @@ my $q = YADA->new({
     timeout     => $timeout // 600,
 });
 
+my $c = 0;
 for my $url (@urls) {
-    my ($fh, $name);
+    my $fh;
+    my $name = get_filename(URI->new($url), $skip_existing);
+    next if $skip_existing && -e $name;
     $q->append(
         $url,
         sub {
             my ($self) = @_;
-
-            $name = get_filename($self->initial_url);
 
             # will die() later
             sysopen($fh, $name, O_CREAT | O_NONBLOCK | O_WRONLY);
@@ -74,6 +81,8 @@ for my $url (@urls) {
         },
         sub {
             my ($self) = @_;
+            blocking $fh, 1;
+            flush $fh;
             close $fh;
             ## no critic (ProhibitComplexRegexes)
             #if ($self->has_error or $self->getinfo(q(response_code)) =~ m{^5[0-9]{2}$}) {
@@ -81,8 +90,7 @@ for my $url (@urls) {
                 unlink $name;
             } elsif (${$self->header} =~ m{\bContent-Disposition:\s*attachment;\s*filename=("?[\w\.\-]+"?);?}isx) {
                 my $filename = $1;
-                $filename =~ s/^"//x;
-                $filename =~ s/"$//x;
+                $filename =~ s/^"|"$//gx;
 
                 move($name, $name . q(.tmp));
                 my $new_name = get_filename(URI->new(q(file:///) . $filename));
@@ -94,20 +102,24 @@ for my $url (@urls) {
             }
         },
     );
+    $c++;
 }
 
-$q->wait;
+$q->wait if $c;
 
 sub get_filename {
     my $url = shift->clone->canonical;
+    my $no_check = shift;
 
     my $orig = ($url->path_segments)[-1] || q(index.html);
     $orig .= q(?) . $url->query
         if $url->query;
 
     $orig =~ s{[^\w\.\-]}{_}gsx;
-    my $i = 1;
     my $name = $orig;
+    return $name if $no_check;
+
+    my $i = 1;
     for (;;) {
         -e $name
             ? $name = $orig . q(.) . $i++
@@ -129,7 +141,7 @@ yada - Yet Another Download Accelerator CLI wrapper
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 
@@ -195,7 +207,7 @@ Allow repeated requests to the same URLs (default: true).
 =item --encoding
 
 Sets the contents of the C<Accept-Encoding:> header sent in a HTTP request, and enables decoding of a response when a C<Content-Encoding:> header is received.
-Three encodings are supported: I<identity>, which does nothing, I<deflate> which requests the server to compress its response using the L<zlib> algorithm, and I<gzip> which requests the L<gzip> algorithm.
+Three encodings are supported: I<identity>, which does nothing, I<deflate> which requests the server to compress its response using the I<zlib> algorithm, and I<gzip> which requests the I<gzip> algorithm.
 If a zero-length string is set, then an C<Accept-Encoding:> header containing all supported encodings is sent (default).
 
 =item --max
@@ -222,6 +234,14 @@ Turn off progress output.
 
 Used to set the C<Referer:> header in the http request sent to the remote server.
 
+=item --shuffle
+
+Shuffle the list of URLs before putting them in the queue.
+
+=item --skip_existing
+
+Do not download existing files. Only works if the filename inferred from the URL matches the local filename.
+
 =item --tcp_nodelay
 
 Setting this option will disable TCP's Nagle algorithm.
@@ -239,7 +259,7 @@ Used to set the C<User-Agent:> header in the http request sent to the remote ser
 =item --verbose
 
 Set the parameter to 1 to get the utility to display a lot of verbose information about its operations.
-Very useful for L<libcurl> and/or protocol debugging and understanding.
+Very useful for I<libcurl> and/or protocol debugging and understanding.
 The verbose information will be sent to C<STDERR>.
 
 =back
@@ -264,7 +284,7 @@ Stanislaw Pusep <stas@sysd.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Stanislaw Pusep.
+This software is copyright (c) 2021 by Stanislaw Pusep.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

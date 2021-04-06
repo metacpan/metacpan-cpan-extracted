@@ -1,3 +1,81 @@
+0.0937 2021-04-06
+  - fix accessor get chain bug
+0.0936 2021-04-03
+  - fix bug that when variable argument is empty, compile error occur.
+0.0935 2021-04-02
+  - add the following native APIs
+    new_object_by_name,
+    new_pointer_by_name,
+    set_field_byte_by_name,
+    set_field_short_by_name,
+    set_field_int_by_name,
+    set_field_long_by_name,
+    set_field_float_by_name,
+    set_field_double_by_name,
+    set_field_object_by_name,
+    get_field_byte_by_name,
+    get_field_short_by_name,
+    get_field_int_by_name,
+    get_field_long_by_name,
+    get_field_float_by_name,
+    get_field_double_by_name,
+    get_field_object_by_name,
+    set_package_var_byte_by_name,
+    set_package_var_short_by_name,
+    set_package_var_int_by_name,
+    set_package_var_long_by_name,
+    set_package_var_float_by_name,
+    set_package_var_double_by_name,
+    set_package_var_object_by_name,
+    get_package_var_byte_by_name,
+    get_package_var_short_by_name,
+    get_package_var_int_by_name,
+    get_package_var_long_by_name,
+    get_package_var_float_by_name,
+    get_package_var_double_by_name,
+    get_package_var_object_by_name,
+    call_sub_by_name,
+    call_poly_sub_by_name,
+    get_field_string_chars_by_name,
+  - rename native api get_method_sub_id to get_sub_id_by_object
+  - remove the following native macro
+    SPVM_SUCCESS
+    SPVM_EXCEPTION
+    SPVM_NEW_OBJECT
+    SPVM_NEW_POINTER
+    SPVM_SET_PACKAGE_VAR_BYTE
+    SPVM_SET_PACKAGE_VAR_SHORT
+    SPVM_SET_PACKAGE_VAR_INT
+    SPVM_SET_PACKAGE_VAR_LONG
+    SPVM_SET_PACKAGE_VAR_FLOAT
+    SPVM_SET_PACKAGE_VAR_DOUBLE
+    SPVM_SET_PACKAGE_VAR_OBJECT
+    SPVM_GET_PACKAGE_VAR_BYTE
+    SPVM_GET_PACKAGE_VAR_SHORT
+    SPVM_GET_PACKAGE_VAR_INT
+    SPVM_GET_PACKAGE_VAR_LONG
+    SPVM_GET_PACKAGE_VAR_INT
+    SPVM_GET_PACKAGE_VAR_LONG
+    SPVM_GET_PACKAGE_VAR_FLOAT
+    SPVM_GET_PACKAGE_VAR_DOUBLE
+    SPVM_GET_PACKAGE_VAR_OBJECT
+    SPVM_SET_FIELD_BYTE
+    SPVM_SET_FIELD_SHORT
+    SPVM_SET_FIELD_INT
+    SPVM_SET_FIELD_LONG
+    SPVM_SET_FIELD_FLOAT
+    SPVM_SET_FIELD_DOUBLE
+    SPVM_SET_FIELD_OBJECT
+    SPVM_GET_FIELD_BYTE
+    SPVM_GET_FIELD_SHORT
+    SPVM_GET_FIELD_INT
+    SPVM_GET_FIELD_LONG
+    SPVM_GET_FIELD_INT
+    SPVM_GET_FIELD_LONG
+    SPVM_GET_FIELD_FLOAT
+    SPVM_GET_FIELD_DOUBLE
+    SPVM_GET_FIELD_OBJECT
+
 0.0934 2021-03-29
   - add Add unsigned format for sprintf. %lu and %u.
   - fix msys2 t/ext fail bug.

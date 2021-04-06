@@ -43,10 +43,12 @@ lives_ok {
 
     SKIP: {
         my $sr_installed = try { load 'Spreadsheet::Read'; 1 } catch { undef };
-        skip "Spreadsheet::Read not installed" unless $sr_installed;
+        skip "Spreadsheet::Read >= 0.83 not installed"
+            if not $sr_installed or $Spreadsheet::Read::VERSION < 0.83;
 
         my $spx_installed = try { load 'Spreadsheet::ParseXLSX'; 1 } catch { undef };
-        skip "Spreadsheet::ParseXLSX not installed" unless $spx_installed;
+        skip "Spreadsheet::ParseXLSX >= 0.24 not installed"
+            if  not $spx_installed or $Spreadsheet::ParseXLSX::VERSION < 0.24;
 
         subtest "check $_->[0] report", \&_check_content, @$_ for @reports;
     }

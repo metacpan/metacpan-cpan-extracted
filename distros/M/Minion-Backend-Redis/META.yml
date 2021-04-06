@@ -1,0 +1,51 @@
+---
+abstract: 'Redis backend for Minion job queue'
+author:
+  - 'Difegue <sugoi@cock.li>'
+build_requires:
+  File::Spec: '0'
+  Module::Metadata: '0'
+  POSIX: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Minion-Backend-Redis
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Minion::Backend::Redis:
+    file: lib/Minion/Backend/Redis.pm
+    version: '0.002'
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  List::Util: '1.33'
+  Minion: '10.20'
+  Mojo::Redis: '3.25'
+  Mojolicious: '9.02'
+  Sort::Versions: '0'
+  Sys::Hostname: '0'
+  Time::HiRes: '0'
+  perl: v5.20.2
+resources:
+  bugtracker: https://github.com/Difegue/Minion-Backend-Redis/issues
+  homepage: https://github.com/Difegue/Minion-Backend-Redis
+  repository: https://github.com/Difegue/Minion-Backend-Redis.git
+version: '0.002'
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

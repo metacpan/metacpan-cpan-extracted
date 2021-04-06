@@ -86,6 +86,9 @@ my_strrev(char *str)
 }
 
 #   endif /* strrev */
+#   ifndef stricmp
+#     define stricmp strcasecmp
+#   endif /* stricmp */
 #endif
 
 #define PERL_NO_GET_CONTEXT
@@ -111,7 +114,12 @@ typedef unsigned short WORD;
 #endif
 
 #if PERL_VERSION > 6
-#   define my_utf8_to_uv(s) utf8_to_uvuni(s, NULL)
+#   ifndef NO_MATHOMS
+#      define my_utf8_to_uv(s) utf8_to_uvuni(s, NULL)
+#   else
+       /* this has risk of buffer overflow but too complicated to fix */
+#      define my_utf8_to_uv(s) utf8_to_uvchr_buf(s, s+5, NULL)
+#   endif
 #else
 #   if PERL_SUBVERSION > 0
 #      define my_utf8_to_uv(s) utf8_to_uv_simple(s, NULL)
@@ -439,16 +447,6 @@ MagicGet(pTHX_ SV *sv)
         if (SvGMAGICAL(sv) && SvPOKp(sv))
             SvPOK_on(sv);
     }
-}
-
-BOOL
-StartsWithAlpha(pTHX_ SV *sv)
-{
-    char *str = SvPV_nolen(sv);
-    if (SvUTF8(sv))
-        return isALPHA_uni(my_utf8_to_uv((U8*)str));
-    else
-        return isALPHA(*str);
 }
 
 inline void
@@ -922,12 +920,12 @@ ReportOleError(pTHX_ HV *stash, HRESULT hr, EXCEPINFO *pExcep=NULL,
 	if (warnlvl < 3) {
 	    cv = perl_get_cv("Carp::carp", FALSE);
 	    if (!cv)
-		warn(SvPVX(sv));
+		warn("%s", SvPVX(sv));
 	}
 	else {
 	    cv = perl_get_cv("Carp::croak", FALSE);
 	    if (!cv)
-		croak(SvPVX(sv));
+		croak("%s", SvPVX(sv));
 	}
     }
 
@@ -3550,10 +3548,10 @@ PPCODE:
     /* normal case: no DCOM */
     if (!SvROK(progid) || SvTYPE(SvRV(progid)) != SVt_PVAV) {
 	pBuffer = GetWideChar(aTHX_ progid, Buffer, OLE_BUF_SIZ, cp);
-	if (StartsWithAlpha(aTHX_ progid))
-	    hr = CLSIDFromProgID(pBuffer, &clsid);
-	else
+	if (pBuffer[0] == '{')
 	    hr = CLSIDFromString(pBuffer, &clsid);
+	else
+	    hr = CLSIDFromProgID(pBuffer, &clsid);
 	ReleaseBuffer(aTHX_ pBuffer, Buffer);
 	if (SUCCEEDED(hr)) {
 	    hr = CoCreateInstance(clsid, NULL, CLSCTX_SERVER,
@@ -3603,13 +3601,13 @@ PPCODE:
 
     /* determine CLSID */
     pBuffer = GetWideChar(aTHX_ progid, Buffer, OLE_BUF_SIZ, cp);
-    if (StartsWithAlpha(aTHX_ progid)) {
+    if (pBuffer[0] == '{')
+        hr = CLSIDFromString(pBuffer, &clsid);
+    else {
 	hr = CLSIDFromProgID(pBuffer, &clsid);
 	if (FAILED(hr) && host)
 	    hr = CLSIDFromRemoteRegistry(aTHX_ host, progid, &clsid);
     }
-    else
-        hr = CLSIDFromString(pBuffer, &clsid);
     ReleaseBuffer(aTHX_ pBuffer, Buffer);
     if (FAILED(hr)) {
 	ReportOleError(aTHX_ stash, hr);
@@ -4406,14 +4404,14 @@ PPCODE:
 	}
 	else { /* interface _not_ a Win32::OLE::TypeInfo object */
 	    char *pszItf = SvPV_nolen(itf);
-	    if (isalpha(pszItf[0]))
-		hr = FindIID(aTHX_ pObj, pszItf, &iid, &pTypeInfo, cp, lcid);
-	    else {
+	    if (pszItf[0] == '{') {
 		OLECHAR Buffer[OLE_BUF_SIZ];
 		OLECHAR *pBuffer = GetWideChar(aTHX_ itf, Buffer, OLE_BUF_SIZ, cp);
 		hr = IIDFromString(pBuffer, &iid);
 		ReleaseBuffer(aTHX_ pBuffer, Buffer);
 	    }
+	    else
+		hr = FindIID(aTHX_ pObj, pszItf, &iid, &pTypeInfo, cp, lcid);
 	}
     }
     else
@@ -4942,7 +4940,10 @@ PPCODE:
 		// Retrieve filename of type library
 		char szFile[MAX_PATH+1];
 		LONG cbFile = sizeof(szFile);
-                err = RegQueryValueA(hKeyLangid, "win32", szFile, &cbFile);
+		err = RegQueryValueA(hKeyLangid, "win64", szFile, &cbFile);
+		if (err != ERROR_SUCCESS) {
+		    err = RegQueryValueA(hKeyLangid, "win32", szFile, &cbFile);
+		}
 		if (err == ERROR_SUCCESS && cbFile > 1) {
                     ENTER;
                     SAVETMPS;

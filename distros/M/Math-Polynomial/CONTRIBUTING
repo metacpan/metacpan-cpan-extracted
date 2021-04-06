@@ -1,0 +1,53 @@
+Contributing to Math-Polynomial
+===============================
+
+Thank you for your interest in contributing to this Perl 5
+library.  Currently, it is in active development and maintained
+by its original author.  Bug reports (with or without patch),
+suggestions, feature requests, and comments are welcome.  You may
+submit them through this distribution's bug tracker on github:
+https://github.com/mhasch/perl-Math-Polynomial/issues
+
+You can also reach the author by e-mail:
+Martin Becker, <becker-cpan-mp (at) cozap.com>
+
+The code for this distribution is hosted at GitHub.  The repository is:
+https://github.com/mhasch/perl-Math-Polynomial
+
+If your contribution is accepted, you will be mentioned by name under
+ACKNOWLEDGEMENTS in the documentation.  Please indicate if you prefer
+an alias or to stay anonymous.
+
+Development Guidelines
+----------------------
+
+This library, dealing with a mathematical concept, should first and
+foremost be scientifically sound.  Correctness is rated over all other
+quality aspects.  The second most important goal is a documentation and
+over-all presentation that makes it useful for experts and informative
+for anybody interested in the field.  Thirdly, it should be easy to
+integrate correctly and efficiently with other software.
+
+Topics of interest
+------------------
+
+Possible improvements may address performance, perhaps by making
+third-party math libraries available as backends, or functionality,
+by adding missing operators like resultant and discriminant, or
+interoperability with other computer algebra libraries, or of course
+documentation.
+
+A number of possible extensions, as outlined in the section "EXTENSION
+GUIDELINES" in the main documentation, could be maintained either within
+the same library or separately.  The scope of the library here is general
+functionality with few assumptions about coefficient spaces.  Thus,
+an implementation variant optimized for sparse polynomials may fit here
+very well, while polynomial factoring algorithms, say, probably won't.
+
+Author's Note
+-------------
+
+Thanks again for your interest.
+I am looking forward to your report or e-mail.
+
+Martin Becker, April 3, 2021.

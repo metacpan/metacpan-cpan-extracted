@@ -12,7 +12,7 @@ use HTTP::Tiny;
 use Time::HiRes;
 use String::Similarity qw(similarity);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # Litchfield  38887 38888   City of Santa Rosa Laguna Treatment Plant 22961 22962    Geek Orchard 26363 26364
 
@@ -242,6 +242,10 @@ For example, if C<stash_path> = "/tmp" and C<sensor> = 25407, the JSON blob will
 "/tmp/aqi.25407.json".
 
 The default is undef (not set, will not stash).
+
+=item C<temperature> =E<gt> "C" or "F"
+
+Also display the sensor's reported temperature, in either degrees Celsius or Fahrenheit.
 
 =item C<v> =E<gt> 0 or 1
 
@@ -476,6 +480,7 @@ sub gather_sensors {
 
   $self->ok();
   $sensors = $self->sensors($sensors, $opt_hr) unless (defined $sensors && ref $sensors eq "ARRAY");
+  my @temps;
 
   for my $sensor (@$sensors) {
     my $hr = $self->fetch_aqi($http_or, $sensor, $opt_hr);
@@ -496,6 +501,7 @@ sub gather_sensors {
       
       $aqi = $self->concentration_to_epa($aqi, $opt_hr) unless ($self->opt('raw', 0, $opt_hr)); # approx conversion from raw concentration to US EPA PM2.5
       push @{$aqi_ar}, $aqi if (defined $aqi);
+      push @temps, $results_hr->{temp_f} if (defined $results_hr->{temp_f});
     }
 
     $name //= $sensor;
@@ -504,12 +510,19 @@ sub gather_sensors {
     $report_hr->{$name} = $aqi_ar if (@$aqi_ar > 0);
 
     my $aqi = $self->aqi_calculate($aqi_ar, $opt_hr);
+    my $temp_f = 0;
+    $temp_f += $_ for (@temps);
+    $temp_f /= @temps if (@temps);
+    $temp_f = ($temp_f - 32) * 5 / 9 if (uc($self->opt('temperature', 'F')) eq 'C');
+    $temp_f = int($temp_f + 0.5) if ($self->opt('i'));
+    $report_hr->{temp_f} = $temp_f if ($self->opt('temperature'));
 
     if ($self->opt('v', 0, $opt_hr) && @$aqi_ar) {
       my @p_aqi = @$aqi;
       @p_aqi = map { int($_+0.5) } @p_aqi if ($self->opt('i', 0, $opt_hr));
+      push @p_aqi, $temp_f if ($self->opt('temperature'));
       my $s_aqi = join("\t", @p_aqi);
-      print "$name\t$s_aqi\n"
+      print "$name\t$s_aqi\n";
     }
   }
 

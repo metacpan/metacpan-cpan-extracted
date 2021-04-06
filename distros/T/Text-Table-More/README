@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.011 of Text::Table::More (from Perl
-    distribution Text-Table-More), released on 2021-02-21.
+    This document describes version 0.012 of Text::Table::More (from Perl
+    distribution Text-Table-More), released on 2021-02-26.
 
 SYNOPSIS
      #!perl
@@ -145,6 +145,134 @@ DESCRIPTION
     per-row/column/cell align/valign.
 
     Keywords: rowspan, colspan.
+
+DECLARED FEATURES
+    Features declared by this module:
+
+  From feature set TextTable
+    Features from feature set TextTable declared by this module:
+
+    *   can_align_cell_containing_color_code
+
+        Value: yes.
+
+    *   can_align_cell_containing_newline
+
+        Value: yes.
+
+    *   can_align_cell_containing_wide_character
+
+        Value: yes.
+
+    *   can_color
+
+        Value: yes.
+
+    *   can_color_theme
+
+        Value: yes.
+
+    *   can_colspan
+
+        Value: yes.
+
+    *   can_customize_border
+
+        Value: yes.
+
+    *   can_halign
+
+        Value: yes.
+
+    *   can_halign_individual_cell
+
+        Value: yes.
+
+    *   can_halign_individual_column
+
+        Value: yes.
+
+    *   can_halign_individual_row
+
+        Value: yes.
+
+    *   can_hpad
+
+        Value: yes.
+
+    *   can_hpad_individual_cell
+
+        Value: yes.
+
+    *   can_hpad_individual_column
+
+        Value: yes.
+
+    *   can_hpad_individual_row
+
+        Value: yes.
+
+    *   can_rowspan
+
+        Value: yes.
+
+    *   can_set_cell_height
+
+        Value: yes.
+
+    *   can_set_cell_height_of_individual_row
+
+        Value: yes.
+
+    *   can_set_cell_width
+
+        Value: yes.
+
+    *   can_set_cell_width_of_individual_column
+
+        Value: yes.
+
+    *   can_use_box_character
+
+        Value: yes.
+
+    *   can_valign
+
+        Value: yes.
+
+    *   can_valign_individual_cell
+
+        Value: yes.
+
+    *   can_valign_individual_column
+
+        Value: yes.
+
+    *   can_valign_individual_row
+
+        Value: yes.
+
+    *   can_vpad
+
+        Value: yes.
+
+    *   can_vpad_individual_cell
+
+        Value: yes.
+
+    *   can_vpad_individual_column
+
+        Value: yes.
+
+    *   can_vpad_individual_row
+
+        Value: yes.
+
+    *   speed
+
+        Value: "slow".
+
+    For more details on module features, see Module::Features.
 
 PER-ROW ATTRIBUTES
   align

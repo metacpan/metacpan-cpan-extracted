@@ -1,5 +1,14 @@
 Revision history for Perl extension File::Random.
 
+0.20  2021, Tue Apr 6th
+        - Include the link to the repository in META.json
+        - Add CI Configuration
+        - Remove listing secondary dependencies
+        - Tab to Space
+        - Hide the modules used from testing from CPAN
+
+        Thanks a lot to Gabor Szabo for these improvements
+
 0.19  2020, Tue May 5th
         - add perl license information to Makefile.PL
 

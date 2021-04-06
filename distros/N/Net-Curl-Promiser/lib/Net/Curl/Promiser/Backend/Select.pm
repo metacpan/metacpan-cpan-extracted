@@ -24,7 +24,8 @@ sub get_vecs {
 }
 
 sub get_fds {
-    return keys %{ $_[0]{'rfds'} };
+    my @fds = (keys %{ $_[0]{'rfds'} }, keys %{ $_[0]{'wfds'} });
+    return @fds;
 }
 
 #----------------------------------------------------------------------

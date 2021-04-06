@@ -25,16 +25,16 @@ This example converts an SVG into a PNG:
 <p>
 This renders the following image:
 </p>
-<img width="451.271" height="187.542" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.11/examples/locust.png'>
+<img width="451.271" height="187.542" src='https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.12/examples/locust.png'>
 
 =end html
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.11/examples/synopsis.pl> in the distribution. The L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.11/examples/locust.svg> and L<output files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.11/examples/locust.png> are also included.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.12/examples/synopsis.pl> in the distribution. The L<input|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.12/examples/locust.svg> and L<output files|https://fastapi.metacpan.org/source/BKB/Image-CairoSVG-0.12/examples/locust.png> are also included.)
 
 =head1 VERSION
 
-This documents Image::CairoSVG version 0.11
-corresponding to git commit L<20ccb770f1e9457986846e90d3dc8183040fabdb|https://github.com/benkasminbullock/image-cairosvg/commit/20ccb770f1e9457986846e90d3dc8183040fabdb> released on Mon Jul 8 07:27:15 2019 +0900. 
+This documents Image::CairoSVG version 0.12
+corresponding to git commit L<262421853e0fb85894f354cf7ec4a1ff453d7057|https://github.com/benkasminbullock/image-cairosvg/commit/262421853e0fb85894f354cf7ec4a1ff453d7057> released on Mon Apr 5 09:43:05 2021 +0900. 
 
 =head1 DESCRIPTION
 
@@ -152,9 +152,21 @@ Cairo is used for rendering the image.
 
 Carp is used for reporting errors.
 
+=item L<ExtUtils::ParseXS::Utilities>
+
+This is used for trimming whitespace.
+
+=item L<Graphics::ColorNames::WWW>
+
+This is used for named colours.
+
 =item L<Image::SVG::Path>
 
 Image::SVG::Path is used for parsing the "path" information of the SVG.
+
+=item L<Math::Trig>
+
+Used for the value of C<pi>.
 
 =item L<XML::Parser>
 
@@ -227,7 +239,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2014-2019
+2014-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

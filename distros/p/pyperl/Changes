@@ -1,3 +1,19 @@
+2001-03-06   Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.0.1
+
+   Perl interpreter now destructed when a thread terminates even on
+   Windows.
+
+   Avoid direct dependency from perl2.so to Object.so.  This makes it
+   much easier to create relocatable binary builds.  Some adjustments
+   to the Win32 code because of this.
+
+   Make perlmod.py module thread aware and its PerlModule class now
+   provide an wantarray attribute.
+
+
+
 2001-03-01   Gisle Aas <gisle@ActiveState.com>
 
    Release 1.0

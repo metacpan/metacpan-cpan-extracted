@@ -51,6 +51,6 @@
          "web" : "https://github.com/frank-carnovale/Mojolicious-Plugin-Tables"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

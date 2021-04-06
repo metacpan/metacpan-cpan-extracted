@@ -3,11 +3,17 @@ abstract: "PHP's Mink inspired multi-protocol web-testing library for Perl"
 author:
   - 'Erik Huelsmann <ehuels@gmail.com>'
 build_requires:
+  File::Find: '0'
+  File::Util: '0'
+  Perl::Critic: '0'
+  Pod::Coverage::TrustPod: '0'
   Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,14 +21,17 @@ meta-spec:
 name: Weasel-Driver-Selenium2
 requires:
   Carp::Clan: '0'
+  MIME::Base64: '0'
   Moose: '0'
   Selenium::Remote::Driver: '0'
+  Time::HiRes: '0'
   Weasel::DriverRole: '0.03'
   namespace::autoclean: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/perl-weasel/weasel-driver-selenium2/issues
   repository: https://github.com/perl-weasel/weasel-driver-selenium2.git
-version: '0.11'
+version: '0.12'
 x_generated_by_perl: v5.24.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

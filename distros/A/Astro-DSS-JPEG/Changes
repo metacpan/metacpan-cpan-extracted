@@ -1,8 +1,11 @@
 Revision history for Astro-DSS-JPEG
 
+0.03    2021-04-04
+        Add 'epoch' parameter using Astro::Coord::Precession.
+        Fix reading negative declination string with 0 degrees.
+
 0.02    2020-04-24
         Public release.
 
 0.01    2020-04-11
         Private version.
-

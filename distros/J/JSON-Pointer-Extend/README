@@ -1,0 +1,78 @@
+NAME
+
+    JSON::Pointer::Extend - JSON::Pointer extension module
+
+VERSION
+
+    version 0.01
+
+SYNOPSYS
+
+        use JSON::Pointer::Extend;
+    
+        my $json_pointer = JSON::Pointer::Extend->new(
+            -document       => {
+                'seat'          => {
+                    'name'          => 'Seat 1',
+                },
+                'prices'        => [
+                    {'name'         => 'price1'},
+                    {'name'         => 'price2'},
+                    {'name'         => 'price3'},
+                ],
+            },
+            -pointer        => {
+                '/seat/name'        => sub {
+                    my ($value, $document, $field_name) = @_;
+                    ...
+                },
+                '/prices/*/name'    => sub {
+                    my ($value, $document, $field_name) = @_;
+                    ...
+                },
+            },
+        );
+    
+        $json_pointer->process();
+
+DESCRIPTION
+
+    JSON::Pointer::Extend - Extend Perl implementation of JSON Pointer
+    (RFC6901)
+
+METHODS
+
+ document($document :HashRef) :HashRef
+
+    $document :HashRef - Target perl data structure that is able to be
+    presented by JSON format.
+
+      Get/Set document value.
+
+ pointer($pointer :HashRef) :HashRef
+
+    $pointer :HashRef - Key: JSON Pointer string to identify specified
+    value in the document. Value: Callback to proccess value, args:
+    ($value, $document, $field_name)
+
+      Get/Set pointer value.
+
+ process() :Scalar
+
+    Start process data
+
+DEPENDENCE
+
+    JSON::Pointer, Carp
+
+AUTHORS
+
+      * Pavel Andryushin <vrag867@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2021 by Pavel Andryushin.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

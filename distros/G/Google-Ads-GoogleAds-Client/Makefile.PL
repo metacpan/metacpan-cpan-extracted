@@ -34,6 +34,7 @@ WriteMakefile
                    'JSON::XS' => 0,
                    'LWP::Protocol::https' => 0,
                    'LWP::UserAgent' => 0,
+                   'LWP::UserAgent::Determined' => 0,
                    'List::Util' => 0,
                    'Log::Log4perl' => 0,
                    'MIME::Base64' => 0,

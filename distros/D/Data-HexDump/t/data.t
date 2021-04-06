@@ -6,7 +6,7 @@ use Data::HexDump;
 
 local $^W = 1;
 
-print "1..10\n";
+print "1..11\n";
 my $t = 1;
 my $v = "f";
 
@@ -71,6 +71,11 @@ my $v = "f";
 	"66 66 66 66 66 66 66 66  ffffffffffffffff\n" .
 	"00000010  66 66 66 66 66 66 66 66 - " .
 	"66 66 66 66 66 66 66 66  ffffffffffffffff\n");
+&Check ($t++, HexDump("0"),
+	"          00 01 02 03 04 05 06 07 - " .
+	"08 09 0A 0B 0C 0D 0E 0F  0123456789ABCDEF\n\n" .
+	"00000000  30                        " .
+	"                         0\n");
 
 sub Check {
   my $num = shift;

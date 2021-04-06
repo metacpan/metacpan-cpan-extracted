@@ -3,17 +3,15 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-package Object::Pad;
+package Object::Pad 0.37;
 
 use v5.14;
 use warnings;
 
-our $VERSION = '0.36';
-
 use Carp;
 
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 # So that feature->import will work in `class`
 require feature;

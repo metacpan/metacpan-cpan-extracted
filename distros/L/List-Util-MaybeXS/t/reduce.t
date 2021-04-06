@@ -3,7 +3,7 @@ use warnings;
 
 use List::Util::PP qw(reduce min);
 use Test::More;
-plan tests => 31;
+plan tests => 33;
 
 my $v = reduce {};
 
@@ -123,6 +123,27 @@ SKIP: {
   is($ok, '', 'Not a subroutine reference');
 }
 
+# These tests are only relevant for the real multicall implementation. The
+# psuedo-multicall implementation behaves differently.
+SKIP: {
+    $List::Util::PP::REAL_MULTICALL ||= 0; # Avoid use only once
+    skip("Poor man's MULTICALL can't cope", 2)
+      if !$List::Util::PP::REAL_MULTICALL;
+
+    # Can we goto a label from the reduction sub?
+    eval {()=reduce{goto foo} 1,2; foo: 1};
+    like($@, qr/^Can't "goto" out of a pseudo block/, "goto label");
+
+    # Can we goto a subroutine?
+    eval {()=reduce{goto sub{}} 1,2;};
+    like($@, qr/^Can't goto subroutine from a sort sub/, "goto sub");
+}
+
+{
+  my @ret = reduce { $a + $b } 1 .. 5;
+  is_deeply( \@ret, [ 15 ], 'reduce in list context yields only final answer' );
+}
+
 # XSUB callback
 use constant XSUBC => 42;
 
@@ -142,10 +163,3 @@ ok($@ =~ /^Not a subroutine reference/, 'check for code reference');
 my @names = ("a\x{100}c", "d\x{101}efgh", 'ijk');
 my $longest = reduce { length($a) > length($b) ? $a : $b } @names;
 is( length($longest), 6, 'missing SMG rt#121992');
-
-{
-  my @array = (1..5);
-  my $result = reduce { $a += 1; $b += 1; $a + $b } @array;
-  is_deeply \@array, [1, 3..6],
-    '$b is aliased in reduce';
-}

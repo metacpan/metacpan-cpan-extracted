@@ -9,7 +9,7 @@ my $build = Module::Build->new(
         'Module::Build' => '>= 0'
     },
     'requires'       => {
-        'perl'            => '5.008',
+        'perl'            => '>= 5.008',
         'Time::HiRes'     => '>= 1.9715',
         'Term::ANSIColor' => '>= 4.00',
         'DateTime'        => '>= 1.18',

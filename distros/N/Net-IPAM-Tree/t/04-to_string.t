@@ -29,10 +29,10 @@ foreach my $b ( keys %$blocks ) {
   push @items, Net::IPAM::Block->new($b);
 }
 
-my $t = Net::IPAM::Tree->new;
+my $t = Net::IPAM::Tree->new();
 ok( !$t->to_string, '$tree->to_string is undef if $t is empty' );
 
-$t->insert(@items);
+$t = Net::IPAM::Tree->new(@items);
 
 my $decorate_cb = sub {
   my $item       = shift;

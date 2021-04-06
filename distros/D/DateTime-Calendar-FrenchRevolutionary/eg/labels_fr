@@ -1,6 +1,6 @@
 #
 #     French strings for the examples scripts of DateTime::Calendar::FrenchRevolutionary
-#     Copyright (C) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019 Jean Forget, all rights reserved
+#     Copyright (C) 2003, 2004, 2010, 2011, 2012, 2014, 2016, 2019, 2021 Jean Forget, all rights reserved
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
@@ -22,7 +22,7 @@
 #     GNU General Public License for more details.
 #
 #     You should have received a copy of the GNU General Public License
-#     along with this program; if not, write to the Free Software Foundation,
+#     along with this program; if not, contact the Free Software Foundation,
 #     Inc., <https://www.fsf.org/>.
 #
 # Le hachage des libellés

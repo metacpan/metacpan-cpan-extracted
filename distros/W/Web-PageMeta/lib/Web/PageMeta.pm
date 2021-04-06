@@ -1,20 +1,22 @@
 package Web::PageMeta;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use 5.010;
 use Moose;
 use MooseX::Types::URI qw(Uri);
+use MooseX::StrictConstructor;
 use URI;
 use URI::QueryParam;
 use Log::Any qw($log);
-use Future 0.44;
+use Future '0.44';
 use Future::AsyncAwait;
 use Future::HTTP::AnyEvent;
 use Web::Scraper;
 use Encode qw(find_mime_encoding);
 use Time::HiRes qw(time);
 use HTTP::Exception;
+use List::Util qw(pairmap);
 
 use namespace::autoclean;
 
@@ -32,6 +34,20 @@ has 'user_agent' => (
     default =>
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36',
     lazy => 1,
+);
+
+has 'extra_headers' => (
+    isa      => 'HashRef',
+    is       => 'ro',
+    required => 1,
+    default  => sub {{}},
+    lazy     => 1,
+);
+
+has 'cookie_jar' => (
+    isa       => 'Object',
+    is        => 'ro',
+    predicate => 'has_cookie_jar',
 );
 
 has 'title' => (
@@ -65,6 +81,20 @@ has 'page_meta' => (
     is      => 'rw',
     lazy    => 1,
     default => sub {$_[0]->fetch_page_meta_ft->get},
+);
+
+has 'page_body_hdr' => (
+    isa     => 'ArrayRef',
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {$_[0]->fetch_page_body_hdr_ft->get},
+);
+
+has 'fetch_page_body_hdr_ft' => (
+    isa     => 'Future',
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build__fetch_page_body_hdr_ft',
 );
 
 has 'fetch_page_meta_ft' => (
@@ -112,22 +142,45 @@ sub _build__html_meta_scraper {
     return $html_meta_scraper;
 }
 
-async sub _build__fetch_page_meta_ft {
+sub compile_headers {
+    my ($self) = @_;
+
+    my %headers = (
+        'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'User-Agent' => $self->user_agent,
+    );
+    if ($self->has_cookie_jar) {
+        my $cookies = $self->cookie_jar->get_cookies($self->url);
+        if (%$cookies) {
+            $headers{'Cookie'} = join("; ", pairmap {$a . "=" . $b} %$cookies);
+            $headers{'Cookie2'} = '$Version="1"';
+        }
+    }
+    %headers = (%headers, %{$self->extra_headers});
+    return \%headers;
+}
+
+async sub _build__fetch_page_body_hdr_ft {
     my ($self) = @_;
 
     # await url htmp http download
     my $timer = time();
     my ( $body, $headers ) = await $self->_ua->http_get(
         $self->url,
-        headers => {
-            'Accept'     => 'text/html',
-            'User-Agent' => $self->user_agent,
-        },
+        headers => $self->compile_headers,
     );
     my $status = _get_update_status_reason($headers);
     $log->debugf('page meta fetch %d %s finished in %.3fs', $status, $self->url, time() - $timer);
     HTTP::Exception->throw($status, status_message => $headers->{Reason})
         if ($status != 200);
+
+    return [$body, $headers];
+}
+
+async sub _build__fetch_page_meta_ft {
+    my ($self) = @_;
+
+    my ( $body, $headers ) = @{await $self->fetch_page_body_hdr_ft};
 
     # turn body to utf-8
     if (my $content_type = $headers->{'content-type'}) {
@@ -178,16 +231,14 @@ async sub _build__fetch_image_data_ft {
     # await for image link
     await $self->fetch_page_meta_ft;
     my $fetch_url = $self->image;
-    return $self->{image_data} = ''
+    HTTP::Exception->throw(404, status_message => 'No image found')
         unless $fetch_url;
 
     # await image http download
     my $timer = time();
     my ($body, $headers) = await $self->_ua->http_get(
         $fetch_url,
-        headers => {
-            'User-Agent' => $self->user_agent,
-        },
+        headers => $self->compile_headers,
     );
     my $status = _get_update_status_reason($headers);
     $log->debugf('img fetch %d %s for %s finished in %.3fs',
@@ -273,6 +324,16 @@ HTTP url to fetch data from.
 User-Agent header to use for http requests.
 Default is one from Chrome 89.0.4389.90.
 
+=head2 extra_headers
+
+HashRef with extra http request headers.
+
+=head2 cookie_jar
+
+Accepts optional L<HTTP::Cookies> compatible object that must provide
+C<get_cookies()> method. If set will send http cookie headers with each
+request.
+
 =head2 title
 
 Returns title of the page.
@@ -289,16 +350,18 @@ Returns image location of the page.
 
 Returns image binary data of L</image> link.
 
+Will throw 404 exception if there is not L</image> link.
+
 =head2 page_meta
 
 Returns hash ref with all open-graph data.
 
 =head2 extra_scraper
 
-L<Web::Scrape> object to fetch image, title or description from different
+L<Web::Scraper> object to fetch image, title or description from different
 than default location.
 
-    use Web::Scrape;
+    use Web::Scraper;
     use Web::PageMeta;
     my $escraper = scraper {
         process_first '.slider .camera_wrap div', 'image' => '@data-src';
@@ -307,6 +370,11 @@ than default location.
         url => 'https://www.meon.eu/',
         extra_scraper => $escraper,
     );
+
+=head2 page_body_hdr
+
+Returns array ref with page [$body,$headers]. Can be useful for
+post-processing or special/additional data extractions.
 
 =head2 fetch_page_meta_ft
 
@@ -317,6 +385,11 @@ On done L</page_meta> hash is returned.
 
 Returns future object for fetching image data. See L</"ASYNC USE">
 On done L</image_data> scalar is returned.
+
+=head2 fetch_page_body_hdr_ft
+
+Returns future object for fetching page content and headers. See L</"ASYNC USE">
+On done L</page_body_hdr> array ref is returned.
 
 =head1 ASYNC USE
 

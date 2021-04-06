@@ -45,7 +45,7 @@
             "Carp" : "0",
             "Moo" : "2.004004",
             "Scalar::Util" : "0",
-            "Sub::Meta" : "0.05",
+            "Sub::Meta" : "0.09",
             "Sub::WrapInType" : "0.05",
             "Type::Tiny" : "1.010004",
             "namespace::autoclean" : "0.29",
@@ -62,7 +62,7 @@
    "provides" : {
       "Types::TypedCodeRef" : {
          "file" : "lib/Types/TypedCodeRef.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Types::TypedCodeRef::Factory" : {
          "file" : "lib/Types/TypedCodeRef/Factory.pm"
@@ -79,10 +79,10 @@
          "web" : "https://github.com/ybrliiu/p5-Types-TypedCodeRef"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
+   "x_authority" : "cpan:MPOLIIU",
    "x_contributors" : [
-      "kfly8 <kfly@cpan.org>",
-      "kusuda <kusuda@mfac.jp>"
+      "kfly8 <kfly@cpan.org>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1

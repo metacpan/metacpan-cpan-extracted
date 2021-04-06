@@ -3,6 +3,29 @@ Revision history for Perl extension Win32::OLE.
 Changes in version 0.01-0.03 are by Gurusamy Sarathy. All other changes
 are by Jan Dubois unless attributed otherwise.
 
+0.1713  April, 2nd 2021
+        - Make the code compatible with NO_MATHOMS.
+          Thanks to Danial Dragan [RT #100554].
+
+        - Allow default event sources that don't start with an alpha character.
+          Thanks to ernest@eis.ru [rt #43574]
+
+        - Declare TPJ.pod charset as latin1, run Test::Pod over all pods.
+          Thanks to Alan Berndt [PR#5]
+
+        - Fix compilation on cygwin.
+          Thanks to BinGOs [PR#6].
+          Also thanks to Paulo Custodio for providing an alternate patch [PR#8].
+
+        - Make Win32::OLE::Const work with Win64.
+          Thanks to Takuto Naito [PR#9].
+
+        - Make code pass under -Werror=format-security.
+          Thanks to David Dyck [PR#11].
+
+        - Adjust t/ole.t test 27 because DATE_LONGDATE no longer seems
+          to emit a leading 0 for single-digit day numbers.
+
 0.1712  May, 14th 2014
         - Make OLE.xs compatible with 64-bit Cygwin.  Thanks to
           Alexander Stadler [RT #95612]

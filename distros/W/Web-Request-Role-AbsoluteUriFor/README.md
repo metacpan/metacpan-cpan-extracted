@@ -4,7 +4,7 @@ Web::Request::Role::AbsoluteUriFor - Construct an absolute URI honoring script\_
 
 # VERSION
 
-version 1.002
+version 1.003
 
 # SYNOPSIS
 

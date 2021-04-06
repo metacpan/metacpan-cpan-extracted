@@ -1,0 +1,122 @@
+{
+   "abstract" : "Read and write CODEOWNERS files",
+   "author" : [
+      "Charles McGarvey <chazmcgarvey@brokenzipper.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Codeowners",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::ConsistentVersionTest" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::RemovePhasedPrereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::CCM" : "0",
+            "Dist::Zilla::PluginBundle::Filter" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::ConsistentVersion" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::No404s" : "0",
+            "Test::Portability::Files" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "FindBin" : "0",
+            "IPC::Open2" : "0",
+            "Path::Tiny" : "0.089",
+            "Scalar::Util" : "0",
+            "Text::Gitignore" : "0",
+            "perl" : "v5.10.1",
+            "strict" : "0",
+            "warnings" : "0"
+         },
+         "suggests" : {
+            "Test::Builder" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Codeowners" : {
+         "file" : "lib/File/Codeowners.pm",
+         "version" : "0.53"
+      },
+      "File::Codeowners::Util" : {
+         "file" : "lib/File/Codeowners/Util.pm",
+         "version" : "0.53"
+      },
+      "File::Codeowners::Util::Process" : {
+         "file" : "lib/File/Codeowners/Util.pm",
+         "version" : "0.53"
+      },
+      "Test::File::Codeowners" : {
+         "file" : "lib/Test/File/Codeowners.pm",
+         "version" : "0.53"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chazmcgarvey/File-Codeowners/issues"
+      },
+      "homepage" : "https://github.com/chazmcgarvey/File-Codeowners",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/chazmcgarvey/File-Codeowners.git",
+         "web" : "https://github.com/chazmcgarvey/File-Codeowners"
+      }
+   },
+   "version" : "0.53",
+   "x_authority" : "cpan:CCM",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

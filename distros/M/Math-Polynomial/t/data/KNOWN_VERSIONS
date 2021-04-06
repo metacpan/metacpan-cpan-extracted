@@ -36,6 +36,8 @@
 1.018  SHA256 e14de6ef284316a237bc501a18efa44be49c319e3fb27075354579cfbadc25f9  lib/Math/Polynomial.pm
 1.019  SHA1 90c9413d02561eab7469022722b74be4aaeb8450  lib/Math/Polynomial.pm
 1.019  SHA256 646584f34522d835c5b3229ffc012a3bb29ef11a32cc09e681ad7ae2a5fff7a9  lib/Math/Polynomial.pm
+1.021  SHA1 52130a29bce548ffd1968e7e056565eb0680ca54  lib/Math/Polynomial.pm
+1.021  SHA256 e809e2feb320a5f110df7e36ef34f36cbaa6c7d80b10275032af31973be5a3d7  lib/Math/Polynomial.pm
 
 0.001  SHA1 7691df469a5bed1e9db51a602e5eb2b6575390dc  lib/Math/Polynomial/Generic.pm
 0.001  SHA256 fcf31c62c5045f9677b623f9f823b77f7c6852c185a618d316a8e916db6c5862  lib/Math/Polynomial/Generic.pm
@@ -82,3 +84,5 @@
 0.009  SHA256 906dd91cfeb5c6b405ef9b789dd275b8f6fc25d618b2eb6330634900dc7703db  t/lib/Test/MyUtils.pm
 0.011  SHA1 a98f85cfcf8428b530ff17f8ff572b7454d97da3  t/lib/Test/MyUtils.pm
 0.011  SHA256 b4cb87c87368800758e1408832ff5d4ebde403661cd0ae9d6b068dac55be9aa3  t/lib/Test/MyUtils.pm
+0.012  SHA1 a98f85cfcf8428b530ff17f8ff572b7454d97da3  t/lib/Test/MyUtils.pm
+0.012  SHA256 b4cb87c87368800758e1408832ff5d4ebde403661cd0ae9d6b068dac55be9aa3  t/lib/Test/MyUtils.pm

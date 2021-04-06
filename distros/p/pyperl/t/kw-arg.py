@@ -1,4 +1,4 @@
-print "1..6"
+print("1..6")
 
 import perl
 
@@ -19,7 +19,7 @@ sub foo {
         $o->foo();
     };
     #print $@;
-    print "not " unless "$@" =~ /^python.exceptions.TypeError: not enough arguments/;
+    print "not " unless "$@" =~ /^python.<type 'exceptions.TypeError'>: foo\(\) takes at least 2 arguments \(1 given\)/;
     print "ok 1\n";
 
     my $res;

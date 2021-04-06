@@ -66,4 +66,4 @@ ok(! eval { plugin yaml_config => {file => 'nonexisted'} }, 'no config file');
 
 __DATA__
 @@ index.html.ep
-<%= $config->{foo} %>
+<%= config->{foo} %>

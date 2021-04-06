@@ -1,5 +1,18 @@
 Revision history for List-Util-MaybeXS
 
+1.500006 - 2021-04-06
+  - added missing change log entries for 1.500005
+  - added sample to List::Util::MaybeXS pod
+
+1.500005 - 2021-04-06
+  - added reductions function, as added in List::Util 1.54
+  - added sample function, as added in List::Util 1.54
+  - added uniqint function, as added in List::Util 1.55
+  - added zip and mesh and related functions, as added in List::Util 1.56
+  - added support for $List::Util::RAND callback for random number generation
+  - fix compatibility with ancient List::Util versions
+  - additional uniqnum testing
+
 1.500004 - 2019-09-05
   - fixed uniqnum to be more accurate in on machines with unusual numeric
     formats

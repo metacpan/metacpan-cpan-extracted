@@ -1,10 +1,11 @@
 package CtrlO::Crypt::XkcdPassword;
 use strict;
 use warnings;
+use 5.010;
 
 # ABSTRACT: Yet another xkcd style password generator
 
-our $VERSION = '1.009'; # VERSION
+our $VERSION = '1.010'; # VERSION
 
 use Carp qw(croak);
 use Crypt::Rijndael;
@@ -150,7 +151,7 @@ CtrlO::Crypt::XkcdPassword - Yet another xkcd style password generator
 
 =head1 VERSION
 
-version 1.009
+version 1.010
 
 =head1 SYNOPSIS
 
@@ -185,7 +186,7 @@ C<CtrlO::Crypt::XkcdPassword> generates a random password using the
 algorithm suggested in L<https://xkcd.com/936/>: It selects 4 words
 from a curated list of words and combines them into a hopefully easy
 to remember password (actually a passphrase, but we're all trying to
-getting things done, so who cares..).
+get things done, so who cares..).
 
 See L<this
 explaination|https://www.explainxkcd.com/wiki/index.php/936:_Password_Strength>
@@ -242,7 +243,7 @@ Or in a module:
       wordlist => 'My::Wordlist'
   );
 
-See L</"DEFINING CUSTOM WORD LISTS"> for more info
+See L</"DEFINING CUSTOM WORD LISTS"> for more info.
 
 =head2 xkcd
 
@@ -341,12 +342,12 @@ prior to a proper installation.
 
 =head1 SEE ALSO
 
-Inspired by L<https://xkcd.com/936/> and L<https://xkcd.com/927/>
+Inspired by L<https://xkcd.com/936/> and L<https://xkcd.com/927/>.
 
 There are a lot of similar modules on CPAN, so we just point you to
-L<Neil Bower's comparison of CPAN modules for generating passwords|http://neilb.org/reviews/passwords.html>
+L<Neil Bower's comparison of CPAN modules for generating passwords|http://neilb.org/reviews/passwords.html>.
 
-=head2 But we did we write yet another module?
+=head2 But why did we write yet another module?
 
 =over
 
@@ -361,14 +362,15 @@ L<Data::Entropy>, which provides good entropy while still being portable.
 
 While L<Crypt::Diceware> has good entropy, we did not like its word
 lists. Of course we could have just provided a word list better suited
-to our needs, but we wanted it to be very easy to generate xkcd-Style
-passwords
+to our needs, but we wanted it to be very easy to generate xkcd-style
+passwords.
 
 =item * Easy API
 
 C<< my $pwd = CtrlO::Crypt::XkcdPassword->new->xkcd >> returns 4 words
 starting with an uppercase letter as a string, which is our main use
-case. But the API also allows for more or less words, or even some digits.
+case. Nevertheless, the API also allows for more or fewer words, or
+even some digits.
 
 =item * Fork save
 

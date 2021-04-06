@@ -1,4 +1,4 @@
-Math-Polynomial version 1.019
+Math-Polynomial version 1.021
 =============================
 
 Math::Polynomial is a Perl class representing polynomials in one
@@ -9,14 +9,6 @@ capabilities.
 
 More documentation is in the module file, available through perldoc.
 Some additional usage examples can be found in the examples subdirectory.
-
-DLSIP STATUS
-
-   Development State:  R - Released
-   Language Used:      p - Perl-only
-   Support Level:      d - Developer
-   Interface Style:    O - Object oriented
-   Public License:     p - Standard-Perl
 
 INSTALLATION
 
@@ -29,10 +21,9 @@ To install this module type the following:
 
 PROVIDED MODULES AND SCRIPTS
 
-The distribution provides these modules:
+The distribution provides this module:
 
   - Math::Polynomial          - main module
-  - Math::Polynomial::Generic - interface extension (discontinued)
 
 There are no scripts included as a part of the user interface.
 

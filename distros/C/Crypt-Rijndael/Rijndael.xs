@@ -32,8 +32,9 @@
 typedef struct cryptstate {
   RIJNDAEL_context ctx;
   uint8_t iv[RIJNDAEL_BLOCKSIZE];
-  int mode;
 } *Crypt__Rijndael;
+
+typedef const char* IVEC;
 
 MODULE = Crypt::Rijndael		PACKAGE = Crypt::Rijndael
 
@@ -58,49 +59,40 @@ new(class, key, mode=MODE_ECB)
 	SV * class
 	SV * key
 	int mode
-	CODE:
-		{
+	PREINIT:
 		STRLEN keysize;
-
-		if (!SvPOK (key))
-			Perl_croak(aTHX_ "key must be an untainted string scalar");
+	CODE:
+		if (!SvPOK(key))
+			Perl_croak(aTHX_ "Key must be an string scalar");
+		if (SvTAINTED(key))
+			Perl_croak(aTHX_ "Key must be untainted");
 
 		keysize = SvCUR(key);
 
 		if (keysize != 16 && keysize != 24 && keysize != 32)
-			Perl_croak(aTHX_ "wrong key length: key must be 128, 192 or 256 bits long");
+			Perl_croak(aTHX_ "Wrong key length: key must be 128, 192 or 256 bits long");
 		if (mode != MODE_ECB && mode != MODE_CBC && mode != MODE_CFB && mode != MODE_OFB && mode != MODE_CTR)
-			Perl_croak(aTHX_ "illegal mode, see documentation for valid modes");
+			Perl_croak(aTHX_ "Illegal mode, see documentation for valid modes");
 
-		Newz(0, RETVAL, 1, struct cryptstate);
-		RETVAL->ctx.mode = RETVAL->mode = mode;
-		/* set the IV to zero on initialization */
-		Zero(RETVAL->iv, RIJNDAEL_BLOCKSIZE, char);
-		rijndael_setup(&RETVAL->ctx, keysize, (uint8_t *) SvPV_nolen(key));
-		}
+		Newxz(RETVAL, 1, struct cryptstate);
+		RETVAL->ctx.mode = mode;
+		rijndael_setup(&RETVAL->ctx, keysize, (uint8_t *) SvPVbyte_nolen(key));
 	OUTPUT:
 		RETVAL
 
 SV *
 set_iv(self, data)
 	Crypt::Rijndael self
-	SV * data
-
+	IVEC data
 	CODE:
-		{
-		SV *res;
-		STRLEN size;
-		void *rawbytes = SvPV(data,size);
+		Copy(data, self->iv, RIJNDAEL_BLOCKSIZE, char);
 
-		if( size !=  RIJNDAEL_BLOCKSIZE )
-			Perl_croak(aTHX_ "set_iv: initial value must be the blocksize (%d bytes), but was %d bytes", RIJNDAEL_BLOCKSIZE, size);
-		Copy(rawbytes, self->iv, RIJNDAEL_BLOCKSIZE, char);
-		}
 
 SV *
-encrypt(self, data)
+encrypt(self, data, iv = self->iv)
 	Crypt::Rijndael self
 	SV * data
+	IVEC iv
 	ALIAS:
 		decrypt = 1
 
@@ -108,20 +100,20 @@ encrypt(self, data)
 		{
 		SV *res;
 		STRLEN size;
-		void *rawbytes = SvPV(data,size);
+		void *rawbytes = SvPVbyte(data,size);
 
 		if (size) {
 			uint8_t* buffer;
 
-			if (size % RIJNDAEL_BLOCKSIZE)
+			if ((self->ctx.mode == MODE_ECB || self->ctx.mode == MODE_CBC) && size % RIJNDAEL_BLOCKSIZE)
 				Perl_croak(aTHX_ "encrypt: datasize not multiple of blocksize (%d bytes)", RIJNDAEL_BLOCKSIZE);
 
 			RETVAL = newSV(size);
 			SvPOK_only(RETVAL);
 			SvCUR_set(RETVAL, size);
-			buffer = (uint8_t *)SvPV_nolen(RETVAL);
+			buffer = (uint8_t *)SvPVbyte_nolen(RETVAL);
 			(ix ? block_decrypt : block_encrypt)
-				(&self->ctx, rawbytes, size, buffer, self->iv);
+				(&self->ctx, rawbytes, size, buffer, iv);
 			buffer[size] = '\0';
 		}
 		else

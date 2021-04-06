@@ -1,12 +1,14 @@
 package Dist::Zilla::PluginBundle::RJBS;
 # ABSTRACT: BeLike::RJBS when you build your dists
-$Dist::Zilla::PluginBundle::RJBS::VERSION = '5.013';
+$Dist::Zilla::PluginBundle::RJBS::VERSION = '5.015';
 use Moose;
 use Dist::Zilla 2.100922; # TestRelease
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
     'Dist::Zilla::Role::PluginBundle::PluginRemover' => { -version => '0.103' },
     'Dist::Zilla::Role::PluginBundle::Config::Slicer';
+
+use v5.20.0;
 
 #pod =head1 DESCRIPTION
 #pod
@@ -105,6 +107,8 @@ has weaver_config => (
 
 sub mvp_multivalue_args { qw(dont_compile) }
 
+sub mvp_aliases { return { 'perl-support' => 'perl_support' } }
+
 has dont_compile => (
   is      => 'ro',
   isa     => 'ArrayRef[Str]',
@@ -117,6 +121,11 @@ has package_name_version => (
   isa     => 'Bool',
   lazy    => 1,
   default => sub { $_[0]->payload->{package_name_version} // 0 },
+);
+
+has perl_support => (
+  is      => 'ro',
+  default => sub { $_[0]->payload->{perl_support} },
 );
 
 sub configure {
@@ -204,6 +213,7 @@ sub configure {
   if ($self->is_task) {
     $self->add_plugins('TaskWeaver');
   } else {
+    our $perl_support = $self->perl_support;
     $self->add_plugins([
       PodWeaver => {
         config_plugin => $self->weaver_config,
@@ -247,7 +257,7 @@ Dist::Zilla::PluginBundle::RJBS - BeLike::RJBS when you build your dists
 
 =head1 VERSION
 
-version 5.013
+version 5.015
 
 =head1 DESCRIPTION
 
@@ -295,6 +305,14 @@ point to GitHub issues for the dist's bugtracker.
 
 This bundle makes use of L<Dist::Zilla::Role::PluginBundle::PluginRemover> and
 L<Dist::Zilla::Role::PluginBundle::Config::Slicer> to allow further customization.
+
+=head1 PERL VERSION SUPPORT
+
+This module is shipped with no promise about what version of perl it will
+require in the future.  In practice, this tends to mean "you need a perl from
+the last three years," but you can't rely on that.  If a new version of perl
+ship, this software B<may> begin to require it for any reason, and there is no
+promise that patches will be accepted to lower the minimum required perl.
 
 =head1 AUTHOR
 

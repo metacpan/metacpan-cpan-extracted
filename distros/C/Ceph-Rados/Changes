@@ -1,5 +1,11 @@
 Revision history for Perl extension Ceph::Rados.
 
+0.13  Fri  2 Apr 21:24:51 BST 2021
+    - fixes _write_to_fh()
+
+0.14  Thu  1 Apr 17:58:23 BST 2021
+    - fixes range buffer length bug
+
 0.13  Mon 22 Mar 17:33:28 GMT 2021
     - allow randed hadle reads (for e.g. serving Catalyst 'Range:' header requests)
     - rados_ioctx_pool_required_alignment() is deprecated, replace with

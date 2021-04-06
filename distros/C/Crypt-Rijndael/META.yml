@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/leont/crypt-rijndael/issues
   homepage: https://github.com/leont/crypt-rijndael
   repository: https://github.com/leont/crypt-rijndael.git
-version: '1.15'
+version: '1.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,5 @@
-package RandomFileWithUnknownParameters;
+package
+    RandomFileWithUnknownParameters;
 use base qw/RandomFileMethodBase/;
 use TestConstants;
 

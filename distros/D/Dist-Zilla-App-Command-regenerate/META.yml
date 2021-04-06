@@ -15,28 +15,33 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-App-Command-regenerate
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
 provides:
   Dist::Zilla::App::Command::regenerate:
     file: lib/Dist/Zilla/App/Command/regenerate.pm
-    version: '0.001001'
+    version: '0.001002'
   Dist::Zilla::Plugin::Regenerate:
     file: lib/Dist/Zilla/Plugin/Regenerate.pm
-    version: '0.001001'
+    version: '0.001002'
   Dist::Zilla::Plugin::Regenerate::AfterReleasers:
     file: lib/Dist/Zilla/Plugin/Regenerate/AfterReleasers.pm
-    version: '0.001001'
+    version: '0.001002'
   Dist::Zilla::Role::Regenerator:
     file: lib/Dist/Zilla/Role/Regenerator.pm
-    version: '0.001001'
-recommends:
-  Moose: '2.000'
-  Path::Tiny: '0.058'
+    version: '0.001002'
 requires:
   Beam::Emitter: '0'
   Beam::Event: '0'
@@ -52,7 +57,15 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/kentnl/Dist-Zilla-App-Command-regenerate/issues
-  homepage: https://github.com/kentnl/Dist-Zilla-App-Command-regenerate
-  repository: https://github.com/kentnl/Dist-Zilla-App-Command-regenerate.git
-version: '0.001001'
+  bugtracker: https://github.com/Grinnz/Dist-Zilla-App-Command-regenerate/issues
+  homepage: https://github.com/Grinnz/Dist-Zilla-App-Command-regenerate
+  repository: https://github.com/Grinnz/Dist-Zilla-App-Command-regenerate.git
+version: '0.001002'
+x_BuiltWith:
+  external_file: misc/built_with.json
+x_authority: cpan:DBOOK
+x_contributors:
+  - 'Yanick Champoux <yanick@babyl.ca>'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

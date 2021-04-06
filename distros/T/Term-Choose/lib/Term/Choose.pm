@@ -4,22 +4,16 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.720';
+our $VERSION = '1.730';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
 use Carp qw( croak carp );
 
-use Term::Choose::Constants       qw( :keys WIDTH_CURSOR );
+use Term::Choose::Constants       qw( :keys :index WIDTH_CURSOR );
 use Term::Choose::LineFold        qw( line_fold print_columns cut_to_printwidth );
 use Term::Choose::Screen          qw( :all );
 use Term::Choose::ValidateOptions qw( validate_options );
-
-use constant {
-    ROW => 0,
-    COL => 1,
-};
-
 
 my $Plugin;
 
@@ -83,6 +77,7 @@ sub _defaults {
         pad                 => 2,
         page                => 1,
         #prompt             => undef,
+        #skip_items         => undef,
         #tabs_info          => undef,
         #tabs_prompt        => undef,
         undef               => '<undef>',
@@ -119,9 +114,9 @@ sub _valid_options {
         tabs_prompt         => 'Array_Int',
         empty               => 'Str',
         footer              => 'Str',
-        footer_string       => 'Str',   # for Term:TablePrint versions 0.120 - 0.122     22.10.2020
         info                => 'Str',
         prompt              => 'Str',
+        skip_items          => 'Str', # experimental
         undef               => 'Str',
         busy_string         => 'Str',
     };
@@ -216,9 +211,18 @@ sub __reset_term {
 
 sub __get_key {
     my ( $self ) = @_;
-    my $key = $self->{plugin}->__get_key_OS( $self->{mouse} );
+    my $key;
+    if ( defined $self->{skip_items} ) {
+        my $idx = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
+        if ( $self->{list}[$idx] =~ /$self->{skip_items}/ ) {
+            $key = $self->Term::Choose::Opt::SkipItems::__key_skipped();
+        }
+    }
+    if ( ! defined $key ) {
+        $key = $self->{plugin}->__get_key_OS( $self->{mouse} );
+    }
     return $key if ref $key ne 'ARRAY';
-    return $self->__mouse_info_to_key( @$key );
+    return $self->Term::Choose::Opt::Mouse::__mouse_info_to_key( @$key );
 }
 
 
@@ -239,13 +243,6 @@ sub __choose {
     croak "choose: the first argument must be an ARRAY reference" if ref $orig_list_ref ne 'ARRAY';
     if ( defined $opt ) {
         croak "choose: the (optional) second argument must be a HASH reference" if ref $opt ne 'HASH';
-
-        ##### 22.10.2020
-        if ( ! defined $opt->{footer} && defined $opt->{footer_string} ) {
-            $opt->{footer} = $opt->{footer_string};
-        }
-        #####
-
         validate_options( _valid_options(), $opt );
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
@@ -265,11 +262,18 @@ sub __choose {
     if ( ! defined $self->{prompt} ) {
         $self->{prompt} = defined $self->{wantarray} ? 'Your choice:' : 'Close with ENTER';
     }
+    if ( $self->{mouse} ) {
+        require Term::Choose::Opt::Mouse;
+    }
     if ( $^O eq "MSWin32" ) {
         print $opt->{codepage_mapping} ? "\e(K" : "\e(U";
     }
     $self->__copy_orig_list( $orig_list_ref );
     $self->__length_list_elements();
+    if ( defined $self->{skip_items} ) {
+        require Term::Choose::Opt::SkipItems;
+        $self->Term::Choose::Opt::SkipItems::__prepare_default();
+    }
     if ( exists $ENV{TC_RESET_AUTO_UP} ) {
         $ENV{TC_RESET_AUTO_UP} = 0;
     }
@@ -293,6 +297,7 @@ sub __choose {
             carp "EOT: $!";
             return;
         }
+        $self->{pressed_key} = $key;
         my ( $new_width, $new_height ) = get_term_size();
         if ( $new_width != $self->{term_width} || $new_height != $self->{term_height} ) {
             if ( $self->{ll} ) {
@@ -559,10 +564,12 @@ sub __choose {
         }
         elsif ( $key == LINE_FEED || $key == CARRIAGE_RETURN ) { # ENTER key
             if ( $self->{search} ) {
-                $self->__search_end();
+                require Term::Choose::Opt::Search;
+                $self->Term::Choose::Opt::Search::__search_end();
                 next GET_KEY;
             }
-            my $index = $self->{index} || $self->{ll};
+            my $opt_index = $self->{index} || $self->{ll};
+            my $idx = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
             if ( ! defined $self->{wantarray} ) {
                 $self->__reset_term( 1 );
                 return;
@@ -579,7 +586,7 @@ sub __choose {
                 }
                 if ( defined $self->{meta_items} && ! $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] ) {
                     for my $meta_item ( @{$self->{meta_items}} ) {
-                        if ( $meta_item == $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]] ) {
+                        if ( $meta_item == $idx ) {
                             $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
                             last;
                         }
@@ -587,21 +594,21 @@ sub __choose {
                 }
                 my $chosen = $self->__marked_rc2idx();
                 $self->__reset_term( 1 );
-                return $index ? @$chosen : @{$orig_list_ref}[@$chosen];
+                return $opt_index ? @$chosen : @{$orig_list_ref}[@$chosen];
             }
             else {
-                my $i = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
-                my $chosen = $index ? $i : $orig_list_ref->[$i];
+                my $chosen = $opt_index ? $idx : $orig_list_ref->[$idx];
                 $self->__reset_term( 1 );
                 return $chosen;
             }
         }
         elsif ( $key == KEY_SPACE ) {
             if ( $self->{wantarray} ) {
+                my $idx = $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]];
                 my $locked = 0;
                 if ( defined $self->{no_spacebar} || defined $self->{meta_items} ) {
                     for my $no_spacebar ( @{$self->{no_spacebar}||[]}, @{$self->{meta_items}||[]} ) {
-                        if ( $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]] == $no_spacebar ) {
+                        if ( $idx == $no_spacebar ) {
                             ++$locked;
                             last;
                         }
@@ -626,12 +633,16 @@ sub __choose {
                         $self->{marked}[$i][$j] = ! $self->{marked}[$i][$j];
                     }
                 }
+                if ( $self->{skip_items} ) {
+                    $self->Term::Choose::Opt::SkipItems::__unmark_skip_items();
+                }
                 if ( defined $self->{no_spacebar} ) {
                     $self->__marked_idx2rc( $self->{no_spacebar}, 0 );
                 }
                 if ( defined $self->{meta_items} ) {
                     $self->__marked_idx2rc( $self->{meta_items}, 0 );
                 }
+
                 $self->__wr_screen();
             }
             else {
@@ -639,14 +650,15 @@ sub __choose {
             }
         }
         elsif ( $key == VK_F3 && $self->{f3} ) {
+            require Term::Choose::Opt::Search;
             if ( $self->{ll} ) {
                 $self->__reset_term( 0 );
                 return -13;
             }
             if ( $self->{search} ) {
-                $self->__search_end();
+                $self->Term::Choose::Opt::Search::__search_end();
             }
-            $self->__search_begin();
+            $self->Term::Choose::Opt::Search::__search_begin();
         }
         else {
             $self->__beep();
@@ -726,11 +738,11 @@ sub __prepare_page_number {
 }
 
 
-sub __set_default_cell {
-    my ( $self ) = @_;
+sub __set_cell {
+    my ( $self, $idx ) = @_;
     LOOP: for my $i ( 0 .. $#{$self->{rc2idx}} ) {
         for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
-            if ( $self->{default} == $self->{rc2idx}[$i][$j] ) {
+            if ( $idx == $self->{rc2idx}[$i][$j] ) {
                 $self->{pos} = [ $i, $j ];
                 last LOOP;
             }
@@ -761,7 +773,7 @@ sub __wr_first_screen {
         $self->__marked_idx2rc( $self->{mark}, 1 );
     }
     if ( defined $self->{default} && $self->{default} <= $#{$self->{list}} ) {
-        $self->__set_default_cell();
+        $self->__set_cell( $self->{default} );
     }
     if ( $self->{clear_screen} ) {
         print clear_screen();
@@ -1137,168 +1149,6 @@ sub __marked_rc2idx {
 }
 
 
-sub __mouse_info_to_key {
-    my ( $self, $button, $mouse_x, $mouse_y ) = @_;
-    if ( $button == 4 ) {
-        return VK_PAGE_UP;
-    }
-    elsif ( $button == 5 ) {
-        return VK_PAGE_DOWN;
-    }
-    # ..._y, ..._x: absolute position, one-based index
-    my $mouse_row = $mouse_y - 1 - $self->{offset_rows};
-    my $mouse_col = $mouse_x - 1;
-    if ( $mouse_row < 0 || $mouse_row > $#{$self->{rc2idx}} ) {
-        return NEXT_get_key;
-    }
-    my $matched_col;
-    my $begin_this_col = 0;
-    my $row = $mouse_row + $self->{first_page_row};
-
-    COL: for my $col ( 0 .. $#{$self->{rc2idx}[$row]} ) {
-        my $begin_next_col;
-        if ( $self->{current_layout} == -1 ) {
-            my $idx = $self->{rc2idx}[$row][$col];
-            $begin_next_col = $begin_this_col + $self->{length}[$idx] + $self->{pad};
-        }
-        else {
-            $begin_next_col = $begin_this_col + $self->{col_width_plus};
-        }
-        if ( $col == 0 ) {
-            $begin_next_col -= int( $self->{pad} / 2 );
-        }
-        if ( $col == $#{$self->{rc2idx}[$row]} && $begin_next_col > $self->{avail_width} ) {
-            $begin_next_col = $self->{avail_width};
-        }
-        if ( $mouse_col >= $begin_this_col && $mouse_col < $begin_next_col ) {
-            $matched_col = $col;
-            last COL;
-        }
-        $begin_this_col = $begin_next_col;
-    }
-    if ( ! defined $matched_col ) {
-        return NEXT_get_key;
-    }
-    if ( $button == 1 ) {
-        $self->{pos}[ROW] = $row;
-        $self->{pos}[COL] = $matched_col;
-        return LINE_FEED;
-    }
-    if ( $row != $self->{pos}[ROW] || $matched_col != $self->{pos}[COL] ) {
-        my $not_pos = $self->{pos};
-        $self->{pos} = [ $row, $matched_col ];
-        $self->__wr_cell( $not_pos->[0], $not_pos->[1] );
-        $self->__wr_cell( $self->{pos}[ROW], $self->{pos}[COL] );
-    }
-    if ( $button == 3 ) {
-        return KEY_SPACE;
-    }
-    else {
-        return NEXT_get_key;
-    }
-}
-
-
-sub __user_input {
-    my ( $self, $prompt ) = @_;
-    $self->{plugin}->__reset_mode( { mouse => $self->{mouse}, hide_cursor => $self->{hide_cursor} } );
-    my $string;
-    if ( ! eval {
-        require Term::Form;
-        Term::Form->VERSION(0.530);
-        my $term = Term::Form->new();
-        $string = $term->readline( $prompt, { hide_cursor => 2, clear_screen => 2, color => $self->{color} } );
-        1 }
-    ) {
-        print "\r", clear_to_end_of_line();
-        print show_cursor() if ! $self->{hide_cursor};
-        print $prompt;
-        $string = <STDIN>;
-        print hide_cursor() if ! $self->{hide_cursor};
-        chomp $string;
-    }
-    $self->__init_term();
-    return $string;
-}
-
-
-sub __search_begin {
-    my ( $self ) = @_;
-    $self->{search} = 1;
-    $self->{map_search_list_index} = [];
-    my $search_str = $self->__user_input( '> search-pattern: ' );
-    if ( ! length $search_str ) {
-        $self->__search_end();
-        return;
-    }
-    if ( $self->{f3} == 1 ) {
-        $search_str = '(?i)' . $search_str;
-    }
-    $self->{backup_list} = [ @{$self->{list}} ];
-    my $filtered_list = [];
-    for my $i ( 0 .. $#{$self->{list}} ) {
-        if ( $self->{list}[$i] =~ /$search_str/ ) {
-            push @{$self->{map_search_list_index}}, $i;
-            push @$filtered_list, $self->{list}[$i];
-        }
-    }
-    if ( ! @$filtered_list ) {
-        $filtered_list = [ 'No matches found.' ];
-        $self->{map_search_list_index} = [ 0 ];
-    }
-    $self->{mark} = $self->__marked_rc2idx();
-    $self->{list} = $filtered_list;
-    $self->{backup_length} = [ @{$self->{length}} ];
-    $self->{backup_col_width} = $self->{col_width};
-    $self->__length_list_elements();
-    $self->{default} = 0;
-    for my $opt ( qw(meta_items no_spacebar mark) ) {
-        if ( defined $self->{$opt} ) {
-            $self->{'backup_' . $opt} = [ @{$self->{$opt}} ];
-            my $tmp = [];
-            for my $orig_idx ( @{$self->{$opt}} ) {
-                for my $i ( 0 .. $#{$self->{map_search_list_index}} ) {
-                    if ( $self->{map_search_list_index}[$i] == $orig_idx ) {
-                        push @$tmp, $i;
-                    }
-                }
-            }
-            $self->{$opt} = $tmp;
-        }
-    }
-    my $up = $self->{i_row} + $self->{count_prompt_lines} + 1; # + 1 => readline
-    print up( $up ) if $up;
-    $self->__wr_first_screen();
-}
-
-
-sub __search_end {
-    my ( $self ) = @_;
-    if ( defined $self->{map_search_list_index} && @{$self->{map_search_list_index}} ) {
-        $self->{default} = $self->{map_search_list_index}[$self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]]];
-        $self->{mark} = $self->__marked_rc2idx();
-        my $tmp_mark = [];
-        for my $i ( @{$self->{mark}} ) {
-            push @$tmp_mark, $self->{map_search_list_index}[$i];
-        }
-        my %seen;
-        $self->{mark} = [ grep !$seen{$_}++, @$tmp_mark, defined $self->{backup_mark} ? @{$self->{backup_mark}} : () ];
-    }
-    delete $self->{map_search_list_index};
-    delete $self->{backup_mark};
-    for my $key ( qw(list length col_width meta_items no_spacebar) ) {
-        my $key_backup = 'backup_' . $key;
-        $self->{$key} = $self->{$key_backup} if defined $self->{$key_backup};
-        delete $self->{$key_backup};
-    }
-    $self->{search} = 0;
-    my $up = $self->{i_row} + $self->{count_prompt_lines};
-    print up( $up ) if $up;
-    print "\r" . clear_to_end_of_screen();
-    $self->__wr_first_screen();
-}
-
-
 1;
 
 
@@ -1314,7 +1164,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.720
+Version 1.730
 
 =cut
 
@@ -1797,6 +1647,16 @@ If the I<prompt> value is an empty string ("") no prompt-line will be shown.
 default in list and scalar context: C<Your choice:>
 
 default in void context: C<Close with ENTER>
+
+=head3 skip_items
+
+This option is experimental.
+
+When navigating through the list, the elements that match the regex pattern passed with this option are skipped.
+
+In list context: these elements cannot be marked.
+
+(default: undefined)
 
 =head3 tabs_info
 

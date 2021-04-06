@@ -29,6 +29,7 @@ lib/Test2/Harness/UI/Controller/Job.pm
 lib/Test2/Harness/UI/Controller/Query.pm
 lib/Test2/Harness/UI/Controller/Run.pm
 lib/Test2/Harness/UI/Controller/Stream.pm
+lib/Test2/Harness/UI/Controller/Sweeper.pm
 lib/Test2/Harness/UI/Controller/Upload.pm
 lib/Test2/Harness/UI/Controller/User.pm
 lib/Test2/Harness/UI/Controller/View.pm

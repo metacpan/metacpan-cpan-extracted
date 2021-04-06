@@ -19,7 +19,6 @@ t/021_example_key.t
 t/030_json_schema.t
 t/040_string_format.t
 t/050_complex.t
-t/060_recursion.t
 t/500_gh-2_unique_items_loop.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

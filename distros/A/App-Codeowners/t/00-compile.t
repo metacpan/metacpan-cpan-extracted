@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/Codeowners.pm',
@@ -18,9 +18,7 @@ my @module_files = (
     'App/Codeowners/Formatter/Table.pm',
     'App/Codeowners/Formatter/YAML.pm',
     'App/Codeowners/Options.pm',
-    'App/Codeowners/Util.pm',
-    'File/Codeowners.pm',
-    'Test/File/Codeowners.pm'
+    'App/Codeowners/Util.pm'
 );
 
 my @scripts = (

@@ -1,4 +1,4 @@
-print "1..5"
+print("1..5")
 
 import perl
 perl.eval("""
@@ -13,20 +13,20 @@ $Foo::bar = 33;
 
 """)
 
-if perl.defined("baz") or perl.defined("baz"): print "not ",
-print "ok 1"
+if perl.defined("baz") or perl.defined("baz"): print("not ", end=' ')
+print("ok 1")
 
-if not perl.defined("foo") and perl.defined("bar"): print "not ",
-print "ok 2"
+if not perl.defined("foo") and perl.defined("bar"): print("not ", end=' ')
+print("ok 2")
 
-if not perl.defined("@baz"): print "not ",
-print "ok 3"
+if not perl.defined("@baz"): print("not ", end=' ')
+print("ok 3")
 
-if not perl.defined("$Foo::bar"): print "not ",
-print "ok 4"
+if not perl.defined("$Foo::bar"): print("not ", end=' ')
+print("ok 4")
 
 try:
-    if perl.defined(" $Foo::bar"): print "not ",
+    if perl.defined(" $Foo::bar"): print("not ", end=' ')
 except perl.PerlError:
-    print "ok 5"
+    print("ok 5")
 

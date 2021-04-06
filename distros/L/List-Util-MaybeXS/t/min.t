@@ -63,7 +63,7 @@ is($v, 1, 'bigint and normal int');
 {
     # test that min/max and sum call GETMAGIC properly
     # note, in my tests how this fails depends on exactly
-    # which List::Util subs are called and in what order.
+    # which List::Util::PP subs are called and in what order.
     my @list;
     for my $size (10, 20, 10, 30) {
         @list = ( 1 ) x $size;

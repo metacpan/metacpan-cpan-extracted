@@ -4,13 +4,13 @@
       "Dimitrios Kechagias <dkechag@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Astro-DSS-JPEG",
    "no_index" : {
@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Astro::Coord::Precession" : "0",
             "LWP::UserAgent" : "0",
             "perl" : "5.008"
          }
@@ -46,6 +47,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dkechag/Astro-DSS-JPEG.git",
+         "web" : "https://github.com/dkechag/Astro-DSS-JPEG"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,5 +1,8 @@
 Revision history for App-Codeowners.
 
+0.50      2021-04-02 17:14:52-06:00 America/Denver
+  * Split off File::Codeowners to its own distribution.
+
 0.49      2020-03-22 01:30:54-06:00 MST7MDT
   * Fix an encoding issue with the YAML formatter.
   * Add rename_owner methods.

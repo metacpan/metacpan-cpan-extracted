@@ -1,5 +1,11 @@
 Revision history for Net-IPAddress-Util
 
+5.000   2018-09-03
+        v3.x data is not "broken", just "following a different (and more commonly followed) RFC".
+        Go back to v3.x being the default, but allow v4.x to be specified with an option-setting method.
+        Make the output of Data::Dumper *not* break certain terminals.
+        Fix a bug where dot-quad octets beginning with '0' were not being treated as octal.
+
 4.004   2017-10-05
         Enhanced detection and logging of repairable <= v3.x data.
 

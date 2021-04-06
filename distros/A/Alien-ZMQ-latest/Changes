@@ -1,3 +1,16 @@
+0.005 2021-04-05 08:30:58-0500
+
+  Build changes
+
+   - Stub out test library build on Windows.
+
+     See <https://github.com/zmughal-CPAN/p5-Alien-ZMQ-latest/pull/9>.
+
+   - Add CI testing on GitHub Actions.
+
+     See <https://github.com/zmughal-CPAN/p5-Alien-ZMQ-latest/pull/8>.
+
+
 0.004 2017-12-15 10:28:20-0600
 
   Features

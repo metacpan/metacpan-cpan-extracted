@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-ToJSON
 
+0.19  2021-04-06
+        - Remove reursion tests - this is now handled upstream (#8)
+
 0.18  2020-08-04
         - Tweak docs to demonstrate faking larger schemas (#7)
 

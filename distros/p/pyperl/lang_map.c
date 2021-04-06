@@ -8,17 +8,12 @@
 #include <perl.h>
 #include <Python.h>
 
+#include "pycompat.h"
 #include "lang_map.h"
 #include "lang_lock.h"
 #include "thrd_ctx.h"
 #include "svrv_object.h"
-
-#ifdef WIN32
-extern SV* (*pnewPerlPyObject_inc)(PyObject *py);  /* From perlmodule.c */
-#define newPerlPyObject_inc(x) (*pnewPerlPyObject_inc)(x)
-#else
-extern SV* newPerlPyObject_inc(PyObject *py);  /* From Python-Object/Object.xs */
-#endif
+#include "pyo.h"
 
 /* when the pyo2sv or sv2py functions are called, both the perl and the python
  * lock need to be held.  These functions must guaranty that they will not
@@ -36,11 +31,11 @@ pyo2sv(PyObject *o)
     if (o == Py_None) {
 	return newSV(0);
     }
-    else if (PyString_Check(o)) {
-	return newSVpvn(PyString_AS_STRING(o), PyString_GET_SIZE(o));
+    else if (PyUnicode_Check(o)) {
+	return newSVpvn(PyUnicode_AsUTF8(o), PyUnicode_GetLength(o));
     }
-    else if (PyInt_Check(o)) {
-	return newSViv(PyInt_AsLong(o));
+    else if (PyLong_Check(o)) {
+	return newSViv(PyLong_AsLong(o));
     }
     else if (PyLong_Check(o)) {
 	unsigned long tmp = PyLong_AsUnsignedLong(o);

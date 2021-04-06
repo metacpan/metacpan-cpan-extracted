@@ -1,3 +1,33 @@
+commit 9b1b03c97bf3282ca02650dac922576d479bd590
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sat May 16 12:52:14 2020 +0100
+
+    Build version 1.05
+
+commit 623482048a8a3c97581007128a3d6813534eec54
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Thu May 14 17:16:35 2020 +0100
+
+    first childset display should be ordered
+
+commit 36c543f85f62d55dfc2112ff8aacdcba497e6676
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Wed May 13 10:49:49 2020 +0100
+
+    make logourl conditional
+
+commit abe4f6ef46e3c2732671701f66628c619fc9838f
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Feb 28 17:43:47 2020 +0000
+
+    readme
+
+commit a97effb3e8aedec57be68135a1c2fea3cdb0bb39
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Feb 28 17:39:00 2020 +0000
+
+    Built version 1.04
+
 commit d64d4ed106793f854e29b76c2e77844febbdd73e
 Author: Frank Carnovale <frank.carnovale@gmail.com>
 Date:   Fri Feb 28 17:34:52 2020 +0000

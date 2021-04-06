@@ -3,7 +3,7 @@ package Bundle::ExCore::Perl5018;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 1;
 
@@ -52,14 +52,19 @@ L<Bundle::ExCore>
 
 =head1 AUTHOR
 
-Martin Becker, E<lt>mhasch@cpan.orgE<gt>
+Martin Becker, E<lt>mhasch I<at> cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2015-2019 by Martin Becker.  All rights reserved.
+Copyright (c) 2015-2021 by Martin Becker, Blaubeuren.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.6.0 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
 
 =cut

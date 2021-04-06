@@ -11,6 +11,9 @@ package TestCase::Simple : public {
   has float_value : rw public float;
   has double_value : rw public double;
   has object_value : rw public TestCase::Minimal;
+  has string_value : rw public string;
+
+  has minimal : rw public TestCase::Minimal;
   
   our $FOO : public rw int;
   our $VAR_PRIVATE : private int;

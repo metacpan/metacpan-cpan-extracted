@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::CIDR::Lite.
 
+0.22  2021-04-04
+    - Security: IPv4 octets with leading zeroes are no longer allowed.
+      https://blog.urth.org/2021/03/29/security-issues-in-perl-ip-address-distros/
 0.21  Wed Mar 28 14:34:18 2007
     - Fix RT Tickets:
     - 14535: Fix spanner clean() docs (reported by carbon at pobox.com).

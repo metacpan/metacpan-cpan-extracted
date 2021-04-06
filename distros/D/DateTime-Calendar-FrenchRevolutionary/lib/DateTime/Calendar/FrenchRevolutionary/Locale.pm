@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 # Perl DateTime extension for providing localised strings for the French Revolutionary calendar
-# Copyright (c) 2003, 2004, 2010, 2011, 2014, 2016, 2019 Jean Forget. All rights reserved.
+# Copyright (c) 2003, 2004, 2010, 2011, 2014, 2016, 2019, 2021 Jean Forget. All rights reserved.
 #
 # See the license in the embedded documentation below.
 #
@@ -13,7 +13,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '0.15'; # same as parent module DT::C::FR
+$VERSION = '0.17'; # same as parent module DT::C::FR
 
 sub load {
   my ($self, $lang) = @_;
@@ -40,12 +40,37 @@ Please refer to parent module:
 
   perldoc DateTime::Calendar::FrenchRevolutionary
 
+=head1 METHOD
+
+=head2 C<load>
+
+Used internally by C<DateTime::Calendar::FrenchRevolutionary>.
+
 =head1 SUPPORT
 
 Support for this module is provided via the datetime@perl.org email
 list. See L<https://lists.perl.org/> for more details.
 
-Please enter bug reports at L<https://rt.cpan.org/>
+Please   report  any   bugs   or  feature   requests   to  Github   at
+L<https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary>,
+and create an issue or submit a pull request.
+
+If you have no  feedback after a week or so, try to  reach me by email
+at JFORGET  at cpan  dot org.  The notification  from Github  may have
+failed to reach  me. In your message, please  mention the distribution
+name in the subject, so my spam  filter and I will easily dispatch the
+email to the proper folder.
+
+On the other  hand, I may be  on vacation or away from  Internet for a
+good  reason. Do  not be  upset if  I do  not answer  immediately. You
+should write  me at a leisurely  rythm, about once per  month, until I
+react.
+
+If after about six  months or a year, there is  still no reaction from
+me, you can worry and start the CPAN procedure for module adoption.
+See L<https://groups.google.com/g/perl.module-authors/c/IPWjASwuLNs>
+L<https://www.cpan.org/misc/cpan-faq.html#How_maintain_module>
+and L<https://www.cpan.org/misc/cpan-faq.html#How_adopt_module>.
 
 =head1 AUTHOR
 
@@ -53,8 +78,8 @@ Jean Forget <JFORGET@cpan.org>
 
 =head1 LICENSE STUFF
 
-Copyright (c)  2003, 2004, 2010,  2012, 2014, 2016, 2019  Jean Forget.
-All  rights  reserved.   This  program  is  free   software.  You  can
+Copyright  (c) 2003,  2004, 2010,  2012, 2014,  2016, 2019,  2021 Jean
+Forget. All  rights reserved. This  program is free software.  You can
 distribute,      adapt,     modify,      and     otherwise      mangle
 DateTime::Calendar::FrenchRevolutionary under  the same terms  as perl
 5.16.3.
@@ -78,8 +103,8 @@ WITHOUT   ANY  WARRANTY;   without  even   the  implied   warranty  of
 MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
 General Public License for more details.
 
-You  should have received  a copy  of the  GNU General  Public License
-along with this program; if not, see <https://www.gnu.org/licenses/> or
-write to the Free Software Foundation, Inc., L<https://www.fsf.org>.
+You should  have received  a copy  of the  GNU General  Public License
+along with this program;  if not, see L<https://www.gnu.org/licenses/>
+or contact the Free Software Foundation, Inc., L<https://www.fsf.org>.
 
 =cut

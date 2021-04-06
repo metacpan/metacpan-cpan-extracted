@@ -12,7 +12,7 @@
               |___/      
 
 
-This is the README for HTML::Make::Page version 0.01.
+This is the README for HTML::Make::Page version 0.02.
 
 HTML::Make::Page is a "module" for the Perl computer programming language,
 a library of computer code to install on a computer.  This document
@@ -91,11 +91,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm HTML::Make::Page
 
-To install the module from the source file, HTML-Make-Page-0.01.tar.gz,
+To install the module from the source file, HTML-Make-Page-0.02.tar.gz,
 follow this sequence of commands:
 
-    tar xfz HTML-Make-Page-0.01.tar.gz
-    cd HTML-Make-Page-0.01
+    tar xfz HTML-Make-Page-0.02.tar.gz
+    cd HTML-Make-Page-0.02
     perl Makefile.PL
     make
     make install
@@ -120,6 +120,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Mon Mar  8 16:01:17 2021.
+This README was written on Tue Apr  6 20:24:07 2021.
 
 -----------------------------------------------------------------------------

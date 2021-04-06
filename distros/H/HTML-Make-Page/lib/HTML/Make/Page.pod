@@ -35,13 +35,13 @@ produces output
     </html>
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Page-0.01/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Page-0.02/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.01 of HTML-Make-Page
-corresponding to L<git commit 3b2c40c43000eb55733c8abf6bc21a2fc6512aef|https://github.com/benkasminbullock/html-make-page/commit/3b2c40c43000eb55733c8abf6bc21a2fc6512aef> released on Mon Mar 8 16:00:38 2021 +0900.
+This documents version 0.02 of HTML-Make-Page
+corresponding to L<git commit 4eaaced079d780001a6dd1b4c12b1bb39a071554|https://github.com/benkasminbullock/html-make-page/commit/4eaaced079d780001a6dd1b4c12b1bb39a071554> released on Tue Apr 6 20:22:23 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -107,6 +107,8 @@ reference in place of the name of the script with the keys C<src> for
 the file and then any true value for C<async> or C<defer> to add
 those.
 
+To add JavaScript as text, use a field C<text>.
+
 
     my ($h, $b) = make_page (js => ['cat.js', 'dog.js', {src => 'parrot.js', async => 1}]);
 
@@ -160,9 +162,9 @@ added for you.
 
 
     my $style = <<EOF;
-h1 => {
-   color => 'white';
-   background-color => '#FFF';
+h1 {
+   color: white;
+   background-color: #FFF;
 }
 EOF
     my ($h, $b) = make_page (style => $style);
@@ -179,6 +181,48 @@ L</quiet>.
 
 
 =back
+
+=head2 Examples
+
+=head3 Inline JavaScript in the header
+
+This puts JavaScript inline into the header and then calls the
+JavaScript using C<onload> on the C<< <body> >> HTML element.
+
+    
+    use utf8;
+    use HTML::Make::Page 'make_page';
+    my $jstext = <<EOF;
+    function love() {
+        alert ("💕 I love you baby 🥰");
+    }
+    EOF
+    my ($h, $b) = make_page (js => [{text => $jstext}], title => '💌');
+    $b->add_attr (onload => 'love ();');
+    print $h->text ();
+
+
+produces output
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <script>
+    function love() {
+        alert ("💕 I love you baby 🥰");
+    }
+    </script>
+    <title>💌</title>
+    </head>
+    <body onload="love ();">
+    </body>
+    </html>
+
+
+(This example is included as L<F<js-text.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-Page-0.02/examples/js-text.pl> in the distribution.)
+
 
 =head1 DEPENDENCIES
 

@@ -1,0 +1,29 @@
+---
+abstract: 'Hexadecial Dumper'
+author:
+  - 'Fabien Tassin <neilb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-HexDump
+requires:
+  Carp: '0'
+  Exporter: '0'
+  FileHandle: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/neilb/Data-HexDump/issues
+  homepage: https://github.com/neilb/Data-HexDump
+  repository: https://github.com/neilb/Data-HexDump.git
+version: '0.04'
+x_generated_by_perl: v5.28.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

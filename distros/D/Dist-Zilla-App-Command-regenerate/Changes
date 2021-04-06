@@ -1,5 +1,8 @@
 Release history for Dist-Zilla-App-Command-regenerate
 
+0.001002 2021-04-03T21:28:35Z
+ - New maintainer, update repository/bugtracker metadata
+
 0.001001 2017-03-07T07:23:11Z 51829dd
  [Bugfix]
  - Avoid test failures with -Ddefault_inc_excludes_dot

@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-PluginBundle-RJBS
 
+5.015     2021-04-03 21:03:38-04:00 America/New_York
+        - allow "perl-support" as a config alias for perl_support
+          (because LOW LINE is the worst!)
+
+5.014     2021-04-03 17:22:04-04:00 America/New_York
+        - require perl v5.20.0 (effectively already required by DZ anyway)
+        - add "perl_support" option to add a Pod section about what, if any,
+          promises about minimum perl version requirements are made
+
 5.013     2021-03-16 22:30:44-04:00 America/New_York
         - require at least ExtUtils::MakeMaker 6.78 to avoid -w being used on
           perls when running "make test"

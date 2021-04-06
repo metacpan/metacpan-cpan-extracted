@@ -74,9 +74,9 @@ _write_from_fh(ioctx, oid, fh, psize, debug=false)
             croak("cannot read from filehandle: %s", strerror(-err));
         if (debug)
             printf("writing %" PRIu64 "-%" PRIu64 " / %" PRIu64 " bytes from FH to %s\n", off, off+len, psize, oid);
-        err = rados_read(ioctx, oid, buf, len, off);
+        err = rados_write(ioctx, oid, buf, len, off);
         if (err < 0)
-            croak("cannot write striped object '%s': %s", oid, strerror(-err));
+            croak("cannot write object '%s': %s", oid, strerror(-err));
         retlen += len;
     }
     if (debug)
@@ -138,9 +138,9 @@ _read(io, oid, len, off = 0)
   OUTPUT:
     RETVAL
 
-int
+size_t
 _read_to_fh(ioctx, oid, fh, len = 0, off = 0, debug=false)
-    rados_ioctx_t  ioctx
+    rados_ioctx_t    ioctx
     const char *     oid
     SV *             fh
     size_t           len
@@ -169,10 +169,10 @@ _read_to_fh(ioctx, oid, fh, len = 0, off = 0, debug=false)
     if (debug)
         printf("preparing to write from %s to FH, %zu bytes\n", oid, len);
     for (bufpos=off; bufpos<len+off; bufpos+=chk_sz) {
-        // logic is 'will bufpos move past ien+offnext cycle'
-        buflen = len+off < bufpos+chk_sz ? len+off % chk_sz : chk_sz;
+        // logic is 'will bufpos move past ien+off next cycle'
+        buflen = len+off < bufpos+chk_sz ? len % chk_sz : chk_sz;
         if (debug)
-            printf("Reading %u bytes, offset %" PRIu64 ", of %" PRIu64 "-%" PRIu64 "/%" PRIu64 " from striper\n", buflen, bufpos, off, len+off, psize);
+            printf("Reading %u bytes, offset %" PRIu64 ", of %" PRIu64 "-%" PRIu64 "/%" PRIu64 " from cephio\n", buflen, bufpos, off, len+off, psize);
 
         err = rados_read(ioctx, oid, buf, buflen, bufpos);
         if (err < 0)
@@ -185,7 +185,7 @@ _read_to_fh(ioctx, oid, fh, len = 0, off = 0, debug=false)
     }
     if (err < 0)
         croak("cannot read object '%s': %s", oid, strerror(-err));
-    RETVAL = err;
+    RETVAL = len;
   OUTPUT:
     RETVAL
 

@@ -5,7 +5,7 @@ package App::Codeowners::Formatter::Table;
 use warnings;
 use strict;
 
-our $VERSION = '0.49'; # VERSION
+our $VERSION = '0.50'; # VERSION
 
 use parent 'App::Codeowners::Formatter';
 
@@ -39,7 +39,7 @@ App::Codeowners::Formatter::Table - Format codeowners output as a table
 
 =head1 VERSION
 
-version 0.49
+version 0.50
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Charles McGarvey.
+This software is copyright (c) 2021 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

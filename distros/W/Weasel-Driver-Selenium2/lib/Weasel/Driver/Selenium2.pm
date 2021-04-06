@@ -5,7 +5,7 @@ Weasel::Driver::Selenium2 - Weasel driver wrapping Selenium::Remote::Driver
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ use English qw(-no_match_vars);
 use Moose;
 with 'Weasel::DriverRole';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 
 =head1 ATTRIBUTES
@@ -297,7 +297,12 @@ sub execute_script {
 sub get_attribute {
     my ($self, $id, $att) = @_;
 
-    return $self->_resolve_id($id)->get_attribute($att,1);
+    my $element = $self->_resolve_id($id);
+    my $value;
+    $value = $element->get_attribute($att)  # Try with property/attribute
+        if $self->_driver->{is_wd3};
+    return $value
+        // $element->get_attribute($att,1); # Force using attribute
 }
 
 =item get_page_source($fh)

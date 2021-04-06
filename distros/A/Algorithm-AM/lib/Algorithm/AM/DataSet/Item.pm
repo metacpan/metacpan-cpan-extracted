@@ -1,7 +1,7 @@
 package Algorithm::AM::DataSet::Item;
 use strict;
 use warnings;
-our $VERSION = '3.11';
+our $VERSION = '3.12';
 # ABSTRACT: A single item for classification training and testing
 use Carp;
 our @CARP_NOT = qw(Algorithm::AM::DataSet);
@@ -153,7 +153,7 @@ Algorithm::AM::DataSet::Item - A single item for classification training and tes
 
 =head1 VERSION
 
-version 3.11
+version 3.12
 
 =head1 SYNOPSIS
 
@@ -223,7 +223,7 @@ Theron Stanford <shixilun@yahoo.com>, Nathan Glenn <garfieldnate@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Royal Skousen.
+This software is copyright (c) 2021 by Royal Skousen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

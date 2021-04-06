@@ -1,29 +1,35 @@
 ==================================================
-Changes from 2017-03-25 00:00:00 +0000 to present.
+Changes from 2020-04-06 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 0.3 at 2018-03-25 09:52:32 +0000
+version 0.4 at 2021-04-06 08:19:35 +0000
 ----------------------------------------
 
-  Change: 3a4650dda73f2753f91cd5bd000ce10a09ad642d
+  Change: 85582696a1b138f30bfade55108228910b8e634b
+  Author: thibaultduponchelle
+  <580360+thibaultduponchelle@users.noreply.github.com>
+  Date : 2021-04-06 10:03:51 +0000
+
+    README is no longer a symlink (#4)
+
+    Recent versions of libusb do not require this patch and it may now
+    fail the build. Fix it and while at it remove the now unused import. 
+
+  Change: 4255fcf83152fd8c6b22a240654284d212153ad5
   Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2018-03-25 11:48:29 +0000
+  Date : 2020-05-07 21:45:13 +0000
 
-    Require Alien::libudev on Linux
+    Merge pull request #3 from plicease-pr/graham/search-dep
 
-    Fixes #2. 
+    use Build::SearchDep for proper dynamic prereqs 
 
-----------------------------------------
-version 0.2 at 2017-07-31 19:36:13 +0000
-----------------------------------------
+  Change: 17eb27bce8dfe6ba3f34ac474f10495dbc0b2bb6
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2020-05-05 14:18:25 +0000
 
-  Change: 6728fe597f79efe47e3df3292bf24282143359c0
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2017-07-31 21:36:13 +0000
+    use Build::SearchDep for proper dynamic prereqs 
 
-    Initial commit 
-
-================
-End of releases.
-================
+================================================
+Plus 2 releases after 2020-04-06 00:00:00 +0000.
+================================================

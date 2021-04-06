@@ -1,5 +1,9 @@
 Revision history for Web::Request::Role::AbsoluteUriFor
 
+1.003     2021-04-04 16:20:28+02:00
+    - move data from global dist.ini into dist (Thomas Klausner)
+
+
 1.002     2021-01-03 18:12:52+01:00
     - dist housekeeping: github issues,
       Dist::Zilla::PluginBundle::Author::DOMM

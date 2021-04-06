@@ -25,7 +25,7 @@ use Net::Curl::Share;
 
 use AnyEvent::Net::Curl::Queued::Multi;
 
-our $VERSION = '0.047'; # VERSION
+our $VERSION = '0.048'; # VERSION
 
 
 has allow_dups  => (is => 'ro', isa => Bool, default => sub { 0 });
@@ -247,7 +247,7 @@ AnyEvent::Net::Curl::Queued - Moo wrapper for queued downloads via Net::Curl & A
 
 =head1 VERSION
 
-version 0.047
+version 0.048
 
 =head1 SYNOPSIS
 
@@ -661,7 +661,7 @@ Stanislaw Pusep <stas@sysd.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Stanislaw Pusep.
+This software is copyright (c) 2021 by Stanislaw Pusep.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -67,6 +67,6 @@
          "web" : "https://github.com/tomk3003/spreadsheet-compare"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

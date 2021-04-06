@@ -2,10 +2,10 @@
 
 import perl
 if not perl.MULTI_PERL:
-        print "1..0"
+        print("1..0")
         raise SystemExit
 
-print "1..3"
+print("1..3")
 
 import perl
 import re
@@ -32,7 +32,7 @@ sub foo { 42; }
 """)
 
 mask = perl.call("Opcode::opset", "bless", "add")
-print perl.call_tuple("Opcode::opset_to_ops", mask)
+#print perl.call_tuple("Opcode::opset_to_ops", mask)
 
 perl.safecall("Safe1", mask, ('_compile', 'my $n = shift; print "ok $n\\n";'))
 perl.safecall("Safe1", mask, ('do', 1))
@@ -40,10 +40,10 @@ perl.safecall("Safe1", mask, ('do', 1))
 # try a trapped opcode
 try:
     perl.safecall("Safe1", mask, ('_compile', 'return bless {}, "Foo"'))
-except perl.PerlError, v:
+except perl.PerlError as v:
     #print v
-    if not re.match('^bless trapped by operation mask', str(v)): print "not ",
-    print "ok 2"
+    if not re.match('^\'bless\' trapped by operation mask', str(v)): print("not ", end=' ')
+    print("ok 2")
 
 # The following call reset the perl parser state enought to
 # avoid the 'nexttoke' bug.

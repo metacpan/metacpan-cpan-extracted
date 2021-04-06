@@ -1,4 +1,4 @@
-package Dancer2::Plugin::DBIx::Class 1.02;
+package Dancer2::Plugin::DBIx::Class 1.03;
 use strict;
 use warnings;
 use Dancer2::Plugin;
@@ -51,6 +51,17 @@ sub _maybe_prefix_method {
     return join( '_', $self->export_prefix, $method );
 }
 
+has export_exclude => (
+    is        => 'ro',
+    predicate => 1,
+    default   => sub { [] },
+    builder   => sub {
+        my ($self) = @_;
+        my $config = $self->config;
+        return $config->{export_exclude};
+    },
+);
+
 has _export_schema_methods => (
     is      => 'ro',
     default => sub { [] },
@@ -90,8 +101,16 @@ sub BUILD {
     $kw{'schema'}    = sub { shift->schema(@_) };
     my @export_methods
         = ( $self->_rs_name_methods, @{ $self->_export_schema_methods } );
+    my $dsl_keywords = $self->dsl->keywords;
 
     foreach my $exported_method (@export_methods) {
+        next if grep( { $_ eq $exported_method } @{ $self->export_exclude } );
+        if ( !$self->export_prefix
+            && defined $dsl_keywords->{$exported_method} ) {
+            carp
+                "Dancer2::Plugin::DBIx::Class cannot export $exported_method, because it is a Dancer2 keyword. You can either prefix your schema with export_prefix, or silence this warning with export_exclude";
+            next;
+        }
         $kw{ $self->_maybe_prefix_method($exported_method) } = sub {
             shift->schema->$exported_method(@_);
         };
@@ -111,7 +130,7 @@ Dancer2::Plugin::DBIx::Class - syntactic sugar for DBIx::Class in Dancer2, optio
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -134,17 +153,35 @@ The configuration for this plugin can go in your config.yml, or in your environm
 
     plugins:
       DBIC:
-        dsn: dbi:SQLite:dbname=my.db    # Just about any DBI-compatible DSN goes here
+        # Just about any DBI-compatible DSN
+        dsn: dbi:SQLite:dbname=my.db
+        # Your application's schema class
         schema_class: MyApp::Schema
-        export_prefix: 'db_'            # Optional, unless a table name (singular or plural)
-                                        # is also a DSL keyword.
+        # Optional. If a table name (singular or plural) is a DSL keyword, you can
+        # use this to export it anyway. Module adds separator '_', so you don't
+        # have to.
+        export_prefix: 'db'
+        # Optional. If included here, the module will not attempt to export that
+        # ResultSetName at all.
+        export_exclude: 
+          - session      # will still export "sessions"!
+          - posts        # will still attempt to export "post"! (see below)
 
 =head1 YOU HAVE BEEN WARNED
 
-The "optional" C<export_prefix> configuration adds the given prefix to the ResultSet names, if you
-are using L<DBIx::Class::Schema::ResultSetNames>. It is wise to do this, if you have table names
-that collide with other L<Dancer2::Core::DSL> keywords, or those added by other plugins.  It is
-likely that horrible, horrible things will happen to your app if you don't take care of this.
+The "optional" C<export_prefix> configuration adds the given prefix and an underscore
+to the ResultSet names, if you are using L<DBIx::Class::Schema::ResultSetNames>. It
+is wise to do this, if you have table names that collide with other
+L<Dancer2::Core::DSL> keywords, or those added by other plugins.
+
+As an alternative, you can use C<export_exclude> to simply skip those ResultSet names. You
+can still access them with C<resultset('Whatever')>
+
+If you don't do either of those, the module will not export ResultSet names that collide with
+DSL keywords; it will C<carp> a warning to you, advising you to use one or the other of these
+options to shut it up.
+
+The logic here takes care of the horrible, horrible things will happen to your app otherwise.
 (C<session> is a good example--ask me know I know!)
 
 =head1 FUNCTIONS

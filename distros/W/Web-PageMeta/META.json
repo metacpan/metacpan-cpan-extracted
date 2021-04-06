@@ -26,11 +26,11 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "AnyEvent" : "0",
-            "AnyEvent::Future" : "0",
-            "Path::Class" : "0",
-            "Test::Most" : "0",
-            "URI::Escape" : "0"
+            "AnyEvent" : "7.17",
+            "AnyEvent::Future" : "0.04",
+            "Path::Class" : "0.37",
+            "Test::Most" : "0.37",
+            "URI::Escape" : "5.07"
          }
       },
       "configure" : {
@@ -40,20 +40,22 @@
       },
       "runtime" : {
          "requires" : {
-            "AnyEvent::HTTP" : "0",
-            "Encode" : "0",
-            "Future" : "0",
-            "Future::AsyncAwait" : "0",
-            "Future::HTTP::AnyEvent" : "0",
-            "HTTP::Exception" : "0",
-            "Log::Any" : "0",
-            "Moose" : "0",
-            "MooseX::Types::URI" : "0",
-            "Time::HiRes" : "0",
-            "URI" : "0",
-            "URI::QueryParam" : "0",
-            "Web::Scraper" : "0",
-            "namespace::autoclean" : "0",
+            "AnyEvent::HTTP" : "2.25",
+            "Encode" : "3.06",
+            "Future" : "0.47",
+            "Future::AsyncAwait" : "0.48",
+            "Future::HTTP::AnyEvent" : "0.14",
+            "HTTP::Exception" : "1.1",
+            "List::Util" : "1.55",
+            "Log::Any" : "1.709",
+            "Moose" : "2.2014",
+            "MooseX::StrictConstructor" : "0.21",
+            "MooseX::Types::URI" : "0.08",
+            "Time::HiRes" : "1.9764",
+            "URI" : "5.07",
+            "URI::QueryParam" : "5.07",
+            "Web::Scraper" : "0.38",
+            "namespace::autoclean" : "0.29",
             "perl" : "5.022"
          }
       }
@@ -61,7 +63,7 @@
    "provides" : {
       "Web::PageMeta" : {
          "file" : "lib/Web/PageMeta.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -76,6 +78,6 @@
          "url" : "https://github.com/jozef/Web-PageMeta"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

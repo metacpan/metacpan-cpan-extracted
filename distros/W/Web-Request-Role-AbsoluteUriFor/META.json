@@ -56,7 +56,7 @@
    "provides" : {
       "Web::Request::Role::AbsoluteUriFor" : {
          "file" : "lib/Web/Request/Role/AbsoluteUriFor.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/domm/Web-Request-Role-AbsoluteUriFor"
       }
    },
-   "version" : "1.002",
+   "version" : "1.003",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

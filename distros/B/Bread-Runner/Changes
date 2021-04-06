@@ -1,5 +1,10 @@
 Revision history for Bread::Runner
 
+0.905     2021-04-04 16:22:27+02:00
+    - move data from global dist.ini into dist (Thomas Klausner)
+    - Minor pod tidy up. (Mohammad S Anwar)
+
+
 0.904     2021-01-03 16:50:23+01:00
     - dist housekeeping: github issues,
       Dist::Zilla::PluginBundle::Author::DOMM

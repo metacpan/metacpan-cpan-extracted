@@ -4,11 +4,11 @@ use warnings;
 
 package Dist::Zilla::Plugin::Regenerate;
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001002';
 
 # ABSTRACT: Write contents to your source tree explicitly
 
-our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
+our $AUTHORITY = 'cpan:DBOOK'; # AUTHORITY
 
 use Moose qw( with has around );
 use Beam::Event qw();
@@ -96,7 +96,7 @@ Dist::Zilla::Plugin::Regenerate - Write contents to your source tree explicitly
 
 =head1 VERSION
 
-version 0.001001
+version 0.001002
 
 =head1 SYNOPSIS
 
@@ -164,7 +164,7 @@ Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Kent Fredric <kentfredric@gmail.com>.
+This software is copyright (c) 2016-2017 by Kent Fredric <kentfredric@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

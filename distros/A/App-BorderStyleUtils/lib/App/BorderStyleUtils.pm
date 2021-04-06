@@ -1,9 +1,9 @@
 package App::BorderStyleUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-19'; # DATE
+our $DATE = '2021-01-23'; # DATE
 our $DIST = 'App-BorderStyleUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,6 +40,83 @@ sub list_border_style_modules {
     [200, "OK", \@res, \%resmeta];
 }
 
+$SPEC{show_border_style} = {
+    v => 1.1,
+    summary => 'Show example table with specified border style',
+    args => {
+        style => {
+            schema => 'perl::borderstyle::modname_with_optional_args*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub show_border_style {
+    require Module::Load::Util;
+
+    my %args = @_;
+
+    my @res;
+    my %resmeta;
+
+    my $bs = Module::Load::Util::instantiate_class_with_optional_args(
+        {ns_prefix=>'BorderStyle'}, $args{style});
+
+    return [412, "Box char styles not supported yet"]
+        if $bs->get_struct->{box_chars};
+
+    my $map = {
+        A => sub { $bs->get_border_char(0, 0) // '' },
+        B => sub { $bs->get_border_char(0, 1) // '' },
+        C => sub { $bs->get_border_char(0, 2) // '' },
+        D => sub { $bs->get_border_char(0, 3) // '' },
+        E => sub { $bs->get_border_char(1, 0) // '' },
+        F => sub { $bs->get_border_char(1, 1) // '' },
+        G => sub { $bs->get_border_char(1, 2) // '' },
+        H => sub { $bs->get_border_char(2, 0) // '' },
+        I => sub { $bs->get_border_char(2, 1) // '' },
+        J => sub { $bs->get_border_char(2, 2) // '' },
+        K => sub { $bs->get_border_char(2, 3) // '' },
+        a => sub { $bs->get_border_char(2, 4) // '' },
+        b => sub { $bs->get_border_char(2, 5) // '' },
+        L => sub { $bs->get_border_char(3, 0) // '' },
+        M => sub { $bs->get_border_char(3, 1) // '' },
+        N => sub { $bs->get_border_char(3, 2) // '' },
+        O => sub { $bs->get_border_char(4, 0) // '' },
+        P => sub { $bs->get_border_char(4, 1) // '' },
+        Q => sub { $bs->get_border_char(4, 2) // '' },
+        R => sub { $bs->get_border_char(4, 3) // '' },
+        e => sub { $bs->get_border_char(4, 4) // '' },
+        f => sub { $bs->get_border_char(4, 5) // '' },
+        g => sub { $bs->get_border_char(4, 6) // '' },
+        h => sub { $bs->get_border_char(4, 7) // '' },
+        S => sub { $bs->get_border_char(5, 0) // '' },
+        T => sub { $bs->get_border_char(5, 1) // '' },
+        U => sub { $bs->get_border_char(5, 2) // '' },
+        V => sub { $bs->get_border_char(5, 3) // '' },
+    };
+
+    my $table = <<'_';
+ABBBCBBBCBBBCBBBD
+E       F   F   G
+HIIIaIIIJIIIbIIIK
+L   M   M       N
+OPPPfPPPQPPPePPPR
+L       M   M   N
+OPPPPPPPQPPPePPPR
+L       M       N
+L       gPPPPPPPR
+L       M       N
+OPPPPPPPh       N
+L       M       N
+STTTTTTTUTTTTTTTV
+_
+
+    $table =~ s{(.)}{$map->{$1} ? $map->{$1}->() : $1}eg;
+
+    [200, "OK", $table];
+}
+
 1;
 # ABSTRACT: CLI utilities related to border styles
 
@@ -55,7 +132,7 @@ App::BorderStyleUtils - CLI utilities related to border styles
 
 =head1 VERSION
 
-This document describes version 0.002 of App::BorderStyleUtils (from Perl distribution App-BorderStyleUtils), released on 2020-06-19.
+This document describes version 0.004 of App::BorderStyleUtils (from Perl distribution App-BorderStyleUtils), released on 2021-01-23.
 
 =head1 DESCRIPTION
 
@@ -64,6 +141,8 @@ This distribution contains the following CLI utilities:
 =over
 
 =item * L<list-border-style-modules>
+
+=item * L<show-border-style>
 
 =back
 
@@ -100,6 +179,38 @@ that contains extra information.
 
 Return value:  (any)
 
+
+
+=head2 show_border_style
+
+Usage:
+
+ show_border_style(%args) -> [status, msg, payload, meta]
+
+Show example table with specified border style.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<style>* => I<perl::borderstyle::modname_with_optional_args>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-BorderStyleUtils>.
@@ -110,7 +221,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-BorderStyleUtils
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BorderStyleUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-BorderStyleUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -126,7 +237,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

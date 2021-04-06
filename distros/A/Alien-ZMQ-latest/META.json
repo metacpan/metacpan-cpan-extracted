@@ -4,13 +4,13 @@
       "Zakariyya Mughal <zmughal@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Alien-ZMQ-latest",
    "prereqs" : {
@@ -51,24 +51,25 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/zmughal/p5-Alien-ZMQ-latest",
+      "homepage" : "https://github.com/zmughal-CPAN/p5-Alien-ZMQ-latest",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/zmughal/p5-Alien-ZMQ-latest.git",
-         "web" : "https://github.com/zmughal/p5-Alien-ZMQ-latest"
+         "url" : "https://github.com/zmughal-CPAN/p5-Alien-ZMQ-latest.git",
+         "web" : "https://github.com/zmughal-CPAN/p5-Alien-ZMQ-latest"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.31",
       "requires" : {
          "share" : {
             "Archive::Tar" : "0",
             "Config" : "0",
-            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
             "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
@@ -77,6 +78,8 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

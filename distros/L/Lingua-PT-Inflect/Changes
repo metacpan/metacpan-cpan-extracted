@@ -1,5 +1,9 @@
 Revision history for Perl extension Lingua::PT::Inflect.
 
+0.07  Tue Apr 04 19:56:42 2021
+	- add POD encoding flag
+    - cosmetic changes to dist
+
 0.06  Mon Nov 01 19:49:00 2004
 	- minor changes in the documentation
 	- added pod.t and pod-coverage.t to the tests

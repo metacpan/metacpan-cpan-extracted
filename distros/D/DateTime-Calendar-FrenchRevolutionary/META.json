@@ -55,17 +55,20 @@
    "provides" : {
       "DateTime::Calendar::FrenchRevolutionary" : {
          "file" : "lib/DateTime/Calendar/FrenchRevolutionary.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary.git",
          "web" : "https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary"
       }
    },
-   "version" : "0.15",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

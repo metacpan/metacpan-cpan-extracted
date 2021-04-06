@@ -162,6 +162,7 @@ be displayed correctly)
 =cut
 
 use Term::Scroller;
+use Term::Scroller::Linefeed qw(linefeed);
 
 use File::Temp;
 use Getopt::Long qw(:config auto_help pass_through require_order);
@@ -171,6 +172,7 @@ use Scalar::Util qw(openhandle);
 
 use IO::Pty;
 use Encode::Locale qw(decode_argv);
+
 
 my %default_windows = (
     'box'       => '─┐│┘─└│┌',
@@ -285,7 +287,7 @@ for (\%comm_out, \%comm_err) {
 }
 
 # Create a pty that tee's input between the scroller and the
-# given filehandle. Retruns an array with the pty filehandle
+# given filehandle. Retruns a hash with the pty filehandle
 # and the pid of the forked process.
 sub tee_fh {
     my $out    = shift;
@@ -297,10 +299,9 @@ sub tee_fh {
 
     # Child
     close $pty;
-    my $slave = $pty->slave;
-    while(my $line = <$slave>) {
-        print $scroller $line;
-        print $out      $line;
+    while (my $line = linefeed($pty) ) {
+        print $scroller $line;  $scroller->flush;
+        print $out      $line;  $out->flush;
     }
     exit;
 }
@@ -323,13 +324,13 @@ my $exitcode = $?;
 # pty, send an EOF to that pty and wait for it to close.
 if ($comm_out{pid} != $scroller_pid) {
     my $fh = $comm_out{fh};
-    print $fh "\04";
+    print $fh "\n\04";
     waitpid($comm_out{pid}, 0);
     close $comm_out{fh};
 }
 if ($comm_err{pid} != $scroller_pid) {
     my $fh = $comm_err{fh};
-    print $fh "\04";
+    print $fh "\n\04";
     waitpid($comm_err{pid}, 0);
     close $comm_err{fh};
 }

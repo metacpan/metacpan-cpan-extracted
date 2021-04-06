@@ -1,0 +1,50 @@
+{
+   "abstract" : "Hexadecial Dumper",
+   "author" : [
+      "Fabien Tassin <neilb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-HexDump",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "FileHandle" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/neilb/Data-HexDump/issues"
+      },
+      "homepage" : "https://github.com/neilb/Data-HexDump",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Data-HexDump.git",
+         "web" : "https://github.com/neilb/Data-HexDump"
+      }
+   },
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24"
+}
+

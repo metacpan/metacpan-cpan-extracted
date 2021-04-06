@@ -1,25 +1,36 @@
-0.260   2017-09-08 (PERLANCAR)
+0.262   2021-02-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Add options: ns_prefixes.
+
+
+0.261   2021-02-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Complete::Path 0.251 (add options 'recurse_matching',
+	  'exclude_leaf', 'exclude_dir').
+
+
+0.260   2017-09-08  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace List::MoreUtils (uniq) with List::Util.
 
 
-0.25    2017-07-11 (PERLANCAR)
+0.25    2017-07-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [test] Replace File::Slurp::Tiny with File::Slurper.
 
 
-0.24    2015-12-02 (PERLANCAR)
+0.24    2015-12-02  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Remove old 'use' statement [CT].
 
 
-0.23    2015-11-29 (PERLANCAR)
+0.23    2015-11-29  Released-By: PERLANCAR
 
 	- Updates to Complete::Common 0.21.
 
@@ -28,7 +39,7 @@
 	  encouraged to set these behaviors globally via Complete::Common.
 
 
-0.22    2015-10-08 (PERLANCAR)
+0.22    2015-10-08  Released-By: PERLANCAR
 
 	- Add prefix shortcuts: dz (for Dist/Zilla/) and pw (for
 	  Pod/Weaver/).
@@ -36,17 +47,17 @@
 	- [Bugfix] Fix typo in Rinci metadata.
 
 
-0.21    2015-09-23 (PERLANCAR)
+0.21    2015-09-23  Released-By: PERLANCAR
 
 	- Add default shortcut prefix: df (DateTime/Format/).
 
 
-0.20    2015-09-17 (PERLANCAR)
+0.20    2015-09-17  Released-By: PERLANCAR
 
 	- Add fuzzy matching.
 
 
-0.19    2015-09-09 (PERLANCAR)
+0.19    2015-09-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -55,7 +66,7 @@
 	  requirement.
 
 
-0.18    2015-09-03 (PERLANCAR)
+0.18    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -64,52 +75,52 @@
 	  requirement.
 
 
-0.17    2015-03-13 (PERLANCAR)
+0.17    2015-03-13  Released-By: PERLANCAR
 
 	- Add shortcut prefixes: pwr (Pod::Weaver::Role) & dzr
 	  (Dist::Zilla::Role).
 
 
-0.16    2015-03-03 (PERLANCAR)
+0.16    2015-03-03  Released-By: PERLANCAR
 
 	- Add option: path_sep.
 
 
-0.15    2015-01-13 (PERLANCAR)
+0.15    2015-01-13  Released-By: PERLANCAR
 
 	- Add option: dig_leaf.
 
 	- Adjust to Complete 0.11 & Complete::Path 0.12.
 
 
-0.14    2015-01-09 (PERLANCAR)
+0.14    2015-01-09  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Reupload to PAUSE to see if this time it gets indexed.
 
 
-0.13    2014-12-28 (PERLANCAR)
+0.13    2014-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [Bugfix] forgot to avoid emptying @INC in a couple of places.
 
 
-0.12    2014-12-28 (PERLANCAR)
+0.12    2014-12-28  Released-By: PERLANCAR
 
 	- Return hash form of completion answer so path-like completing
 	  works.
 
 
-0.11    2014-12-28 (PERLANCAR)
+0.11    2014-12-28  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Minor fixes.
 
 
-0.10    2014-12-28 (PERLANCAR)
+0.10    2014-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -117,7 +128,7 @@
 	  because emptying @INC will fail on some systems [CT, NANIS].
 
 
-0.09    2014-12-28 (PERLANCAR)
+0.09    2014-12-28  Released-By: PERLANCAR
 
         - Incorporate all the convenience features from App::PMUtils's
           completion routine to this module (i.e. autoselect path separator,
@@ -132,7 +143,7 @@
           now '/', unless word has '::' or '.' in it.
 
 
-0.08    2014-12-26 (PERLANCAR)
+0.08    2014-12-26  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -140,14 +151,14 @@
 	  required by new Test::Simple (1.301002+) [CT].
 
 
-0.07    2014-12-25 (PERLANCAR)
+0.07    2014-12-25  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Fix typo in test.
 
 
-0.06    2014-12-25 (PERLANCAR) - ♪ so this is xmas
+0.06    2014-12-25  Released-By: PERLANCAR; Note: ♪ so this is xmas
 
 	- Use Complete::Path to avoid code duplication and gain features like
           expand intermediate path (exp_im_path option) and map case (map_case
@@ -160,26 +171,28 @@
           will be put in App::PMUtils.
 
 
-0.05    2014-12-24 (PERLANCAR)
+0.05    2014-12-24  Released-By: PERLANCAR
 
 	- Follow convention of Complete 0.06.
 
 
-0.04     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.04     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - Add option: ns_prefix.
 
 
-0.03     2014-06-25 (SHARYANTO)
+0.03     2014-06-25  Released-By: SHARYANTO
 
          - Add option: ci (case-insensitive).
 
 
-0.02     2014-06-24 (SHARYANTO)
+0.02     2014-06-24  Released-By: SHARYANTO
 
          - Fix a couple of bugs, add more tests.
 
 
-0.01     2014-06-22 (SHARYANTO)
+0.01     2014-06-22  Released-By: SHARYANTO
 
          - First release.
+
+

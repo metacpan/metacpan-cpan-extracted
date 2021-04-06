@@ -1,7 +1,7 @@
 package Complete::Module;
 
-our $DATE = '2017-09-08'; # DATE
-our $VERSION = '0.260'; # VERSION
+our $DATE = '2021-02-06'; # DATE
+our $VERSION = '0.262'; # VERSION
 
 use 5.010001;
 use strict;
@@ -112,7 +112,7 @@ _
         },
         ns_prefix => {
             summary => 'Namespace prefix',
-            schema  => 'str*',
+            schema  => 'perl::modname*',
             description => <<'_',
 
 This is useful if you want to complete module under a specific namespace
@@ -123,6 +123,33 @@ This is useful if you want to complete module under a specific namespace
 
 _
         },
+        ns_prefixes => {
+            summary => 'Namespace prefixes',
+            schema => ['array*', of=>'perl::modname*'],
+            description => <<'_',
+
+If you specify this instead of `ns_prefix`, then the routine will search from
+all the prefixes instead of just one.
+
+_
+        },
+        recurse => {
+            schema => 'bool*',
+            cmdline_aliases => {r=>{}},
+        },
+        recurse_matching => {
+            schema => ['str*', in=>['level-by-level', 'all-at-once']],
+            default => 'level-by-level',
+        },
+        exclude_leaf => {
+            schema => 'bool*',
+        },
+        exclude_dir => {
+            schema => 'bool*',
+        },
+    },
+    args_rels => {
+        choose_one => [qw/ns_prefix ns_prefixes/],
     },
     result_naked => 1,
 };
@@ -134,9 +161,6 @@ sub complete_module {
     my $word = $args{word} // '';
     #$log->tracef('[compmod] Entering complete_module(), word=<%s>', $word);
     #$log->tracef('[compmod] args=%s', \%args);
-
-    my $ns_prefix = $args{ns_prefix} // '';
-    $ns_prefix =~ s/(::)+\z//;
 
     # convenience: allow Foo/Bar.{pm,pod,pmc}
     $word =~ s/\.(pm|pmc|pod)\z//;
@@ -171,34 +195,55 @@ sub complete_module {
     my $find_pod     = $args{find_pod}    // 1;
     my $find_prefix  = $args{find_prefix} // 1;
 
-    #$log->tracef('[compmod] invoking complete_path, word=<%s>', $word);
-    my $res = Complete::Path::complete_path(
-        word => $word,
-        starting_path => $ns_prefix,
-        list_func => sub {
-            my ($path, $intdir, $isint) = @_;
-            (my $fspath = $path) =~ s!::!/!g;
-            my @res;
-            for my $inc (@INC) {
-                next if ref($inc);
-                my $dir = $inc . (length($fspath) ? "/$fspath" : "");
-                opendir my($dh), $dir or next;
-                for (readdir $dh) {
-                    next if $_ eq '.' || $_ eq '..';
-                    next unless /\A\w+(\.\w+)?\z/;
-                    my $is_dir = (-d "$dir/$_");
-                    next if $isint && !$is_dir;
-                    push @res, "$_\::" if $is_dir && ($isint || $find_prefix);
-                    push @res, $1 if /(.+)\.pm\z/  && $find_pm;
-                    push @res, $1 if /(.+)\.pmc\z/ && $find_pmc;
-                    push @res, $1 if /(.+)\.pod\z/ && $find_pod;
+    my @ns_prefixes  = $args{ns_prefixes} ? @{$args{ns_prefixes}} : ($args{ns_prefix});
+    my $res = [];
+    for my $ns_prefix (@ns_prefixes) {
+        $ns_prefix //= '';
+        $ns_prefix =~ s/(::)+\z//;
+
+        #$log->tracef('[compmod] invoking complete_path, word=<%s>', $word);
+        my $cp_res = Complete::Path::complete_path(
+            word => $word,
+            starting_path => $ns_prefix,
+            list_func => sub {
+                my ($path, $intdir, $isint) = @_;
+                (my $fspath = $path) =~ s!::!/!g;
+                my @res;
+                for my $inc (@INC) {
+                    next if ref($inc);
+                    my $dir = $inc . (length($fspath) ? "/$fspath" : "");
+                    opendir my($dh), $dir or next;
+                    for (readdir $dh) {
+                        next if $_ eq '.' || $_ eq '..';
+                        next unless /\A\w+(\.\w+)?\z/;
+                        my $is_dir = (-d "$dir/$_");
+                        next if $isint && !$is_dir;
+                        push @res, "$_\::" if $is_dir && ($isint || $find_prefix);
+                        push @res, $1 if /(.+)\.pm\z/  && $find_pm;
+                        push @res, $1 if /(.+)\.pmc\z/ && $find_pmc;
+                        push @res, $1 if /(.+)\.pod\z/ && $find_pod;
+                    }
                 }
-            }
-            [sort(uniq(@res))];
-        },
-        path_sep => '::',
-        is_dir_func => sub { }, # not needed, we already suffix "dirs" with ::
-    );
+                [sort(uniq(@res))];
+            },
+            path_sep => '::',
+            is_dir_func => sub { }, # not needed, we already suffix "dirs" with ::
+            recurse => $args{recurse},
+            recurse_matching => $args{recurse_matching},
+            exclude_leaf => $args{exclude_leaf},
+            exclude_dir  => $args{exclude_dir},
+        );
+        push @$res, @$cp_res;
+    } # for $ns_prefix
+
+    # dedup
+    {
+        last unless @ns_prefixes > 1;
+        my $res_dedup = [];
+        my %seen;
+        for (@$res) { push @$res_dedup, $_ unless $seen{$_}++ }
+        $res = $res_dedup;
+    }
 
     for (@$res) { s/::/$sep/g }
 
@@ -222,7 +267,7 @@ Complete::Module - Complete with installed Perl module names
 
 =head1 VERSION
 
-This document describes version 0.260 of Complete::Module (from Perl distribution Complete-Module), released on 2017-09-08.
+This document describes version 0.262 of Complete::Module (from Perl distribution Complete-Module), released on 2021-02-06.
 
 =head1 SYNOPSIS
 
@@ -285,6 +330,10 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<exclude_dir> => I<bool>
+
+=item * B<exclude_leaf> => I<bool>
+
 =item * B<find_pm> => I<bool> (default: 1)
 
 Whether to find .pm files.
@@ -301,7 +350,7 @@ Whether to find .pod files.
 
 Whether to find module prefixes.
 
-=item * B<ns_prefix> => I<str>
+=item * B<ns_prefix> => I<perl::modname>
 
 Namespace prefix.
 
@@ -310,6 +359,13 @@ This is useful if you want to complete module under a specific namespace
 C<Dist::Zilla::Plugin> (or C<Dist::Zilla::Plugin::>) and word is C<F>, you can get
 C<['FakeRelease', 'FileFinder::', 'FinderCode']> (those are modules under the
 C<Dist::Zilla::Plugin::> namespace).
+
+=item * B<ns_prefixes> => I<array[perl::modname]>
+
+Namespace prefixes.
+
+If you specify this instead of C<ns_prefix>, then the routine will search from
+all the prefixes instead of just one.
 
 =item * B<path_sep> => I<str>
 
@@ -321,9 +377,14 @@ default to C</>. This is because C<::> (contains colon) is rather problematic as
 it is by default a word-break character in bash and the word needs to be quoted
 to avoid word-breaking by bash.
 
+=item * B<recurse> => I<bool>
+
+=item * B<recurse_matching> => I<str> (default: "level-by-level")
+
 =item * B<word>* => I<str> (default: "")
 
 Word to complete.
+
 
 =back
 
@@ -352,7 +413,7 @@ Source repository is at L<https://github.com/perlancar/perl-Complete-Module>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Module>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Complete-Module/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -368,7 +429,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

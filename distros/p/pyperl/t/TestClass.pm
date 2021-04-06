@@ -44,8 +44,8 @@ sub error {
 
 sub dump {
     my $self = shift;
-    require Data::Dump;
-    print Data::Dump::dump($self), "\n";
+    require Data::Dumper;
+    print Dumper ($self), "\n";
 }
 
 1;

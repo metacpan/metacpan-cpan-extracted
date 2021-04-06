@@ -22,8 +22,8 @@
       "runtime" : {
          "requires" : {
             "List::MoreUtils" : "0.420_001",
-            "Net::IPAM::Block" : "3.00",
-            "Net::IPAM::IP" : "2.00",
+            "Net::IPAM::Block" : "4.11",
+            "Net::IPAM::IP" : "3.00",
             "Scalar::Util" : "1.39",
             "perl" : "v5.10.0"
          }
@@ -37,13 +37,13 @@
    "provides" : {
       "Net::IPAM::Tree" : {
          "file" : "lib/Net/IPAM/Tree.pm",
-         "version" : "2.11"
+         "version" : "3.00"
       },
-      "Net::IPAM::Tree::Node" : {
-         "file" : "lib/Net/IPAM/Tree/Node.pm"
+      "Net::IPAM::Tree::Private" : {
+         "file" : "lib/Net/IPAM/Tree/Private.pm"
       }
    },
    "release_status" : "stable",
-   "version" : "2.11",
+   "version" : "3.00",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

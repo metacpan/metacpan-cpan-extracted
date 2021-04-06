@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 19;
+use Test::Most tests => 20;
 use Test::NoWarnings;
 use Test::Deep;
 
@@ -10,12 +10,13 @@ BEGIN {
 	use_ok('DateTime::Format::Genealogy');
 }
 
-DATA: {
+DATE: {
 	my $f = new_ok('DateTime::Format::Genealogy');
 
 	cmp_deeply($f->parse_datetime('29 Sep 1939'), methods('dmy' => '29-09-1939'));
 	cmp_deeply($f->parse_datetime(date => '29 Sep 1939'), methods('dmy' => '29-09-1939'));
 	cmp_deeply($f->parse_datetime({ date => '29 Sep 1939' }), methods('dmy' => '29-09-1939'));
+	cmp_deeply($f->parse_datetime({ date => 'Sep 29, 1939' }), methods('dmy' => '29-09-1939'));
 
 	ok(!defined($f->parse_datetime(date => 'bet 28 Jul 1914 and 11 Nov 1919')));
 

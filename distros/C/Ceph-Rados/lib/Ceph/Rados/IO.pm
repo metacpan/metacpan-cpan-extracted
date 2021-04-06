@@ -106,10 +106,10 @@ sub read_handle_perl {
 }
 
 sub read_handle {
-    my ($self, $oid, $handle) = @_;
+    my ($self, $oid, $handle, $len, $off) = @_;
     Carp::confess "Called with not an open handle"
         unless openhandle $handle;
-    &_read_to_fh
+    $self->_read_to_fh($oid, $handle, $len||0, $off||0);
 }
 
 

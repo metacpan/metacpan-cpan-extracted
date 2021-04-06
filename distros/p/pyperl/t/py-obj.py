@@ -1,4 +1,4 @@
-print "1..14"
+print("1..14")
 
 class Foo:
     plain = 34
@@ -18,7 +18,6 @@ use Python qw(getattr hasattr setattr getitem);
 
 sub foo {
    my $foo = shift;
-   print "$foo\n";
 
    print "not " unless hasattr($foo, "plain") && getattr($foo, "plain") == 34;
    print "ok 1\n";
@@ -71,7 +70,7 @@ sub foo {
    eval {
        $foo->plain_list("foo", "bar");
    };
-   print "not " unless $@ && $@ =~ /^Can't call a non-callable object/;
+   print "not " unless $@ && $@ =~ /^python\.<type 'exceptions\.TypeError'>: 'list' object is not callable/;
    print "ok 13\n";
 
    # Strings are a sequences too, but they are not unwrapped.

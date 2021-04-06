@@ -1,0 +1,22 @@
+---
+- title: __GLOBAL__
+  type: DB
+  dsns:
+    - dsn: 'dbi:SQLite:dbname=%{rootdir}/../Northwind_small.sqlite'
+  report_diff_row: 1
+  identity:
+    - Id
+  limit_rel:
+    __default__: .1
+    Freight: 0.08
+  limit_abs:
+    __default__: none
+#=============================================
+- title: db_order details
+  sql:
+    - select * from [OrderDetails_V]
+    - select * from [NewOrderDetails_V]
+  diff_relative:
+    - UnitPriceProduct
+  ignore:
+    - OrderDate

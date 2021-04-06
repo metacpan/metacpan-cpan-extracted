@@ -1,4 +1,4 @@
-[![Build Status](https://circleci.com/gh/ybrliiu/p5-Types-TypedCodeRef.svg)](https://circleci.com/gh/ybrliiu/p5-Types-TypedCodeRef) [![Coverage Status](http://codecov.io/github/ybrliiu/p5-Types-TypedCodeRef/coverage.svg?branch=master)](https://codecov.io/github/ybrliiu/p5-Types-TypedCodeRef?branch=master)
+[![Build Status](https://circleci.com/gh/ybrliiu/p5-Types-TypedCodeRef.svg)](https://circleci.com/gh/ybrliiu/p5-Types-TypedCodeRef) [![Coverage Status](http://codecov.io/github/ybrliiu/p5-Types-TypedCodeRef/coverage.svg?branch=master)](https://codecov.io/github/ybrliiu/p5-Types-TypedCodeRef?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/Types-TypedCodeRef.svg)](https://metacpan.org/release/Types-TypedCodeRef)
 # NAME
 
 Types::TypedCodeRef - Type constraint for any typed subroutine.

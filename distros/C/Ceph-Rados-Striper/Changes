@@ -1,5 +1,8 @@
 Revision history for Perl extension Ceph::Rados::Striper.
 
+0.07  Thu  1 Apr 17:03:13 BST 2021
+  - fixes range buffer legth bug
+
 0.06  Fri 26 Mar 09:53:11 GMT 2021
   - handle range requsts on read_handle()
 

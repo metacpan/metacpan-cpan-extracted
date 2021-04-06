@@ -4,7 +4,7 @@
       "Theron Stanford <shixilun@yahoo.com>, Nathan Glenn <garfieldnate@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,6 @@
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::InstallGuide" : "0",
             "Dist::Zilla::PluginBundle::NGLENN" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
@@ -51,8 +50,7 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
-            "Test::Version" : "1",
-            "blib" : "1.01"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -95,27 +93,27 @@
    "provides" : {
       "Algorithm::AM" : {
          "file" : "lib/Algorithm/AM.pm",
-         "version" : "3.11"
+         "version" : "3.12"
       },
       "Algorithm::AM::Batch" : {
          "file" : "lib/Algorithm/AM/Batch.pm",
-         "version" : "3.11"
+         "version" : "3.12"
       },
       "Algorithm::AM::BigInt" : {
          "file" : "lib/Algorithm/AM/BigInt.pm",
-         "version" : "3.11"
+         "version" : "3.12"
       },
       "Algorithm::AM::DataSet" : {
          "file" : "lib/Algorithm/AM/DataSet.pm",
-         "version" : "3.11"
+         "version" : "3.12"
       },
       "Algorithm::AM::DataSet::Item" : {
          "file" : "lib/Algorithm/AM/DataSet/Item.pm",
-         "version" : "3.11"
+         "version" : "3.12"
       },
       "Algorithm::AM::Result" : {
          "file" : "lib/Algorithm/AM/Result.pm",
-         "version" : "3.11"
+         "version" : "3.12"
       }
    },
    "release_status" : "stable",
@@ -130,12 +128,14 @@
          "web" : "https://github.com/garfieldnate/Algorithm-AM"
       }
    },
-   "version" : "3.11",
+   "version" : "3.12",
    "x_authority" : "cpan:NGLENN",
    "x_contributors" : [
       "Nathan Glenn <nathan-gary.glenn@trivago.com>",
       "Nick Logan <nlogan@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "x_generated_by_perl" : "v5.32.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

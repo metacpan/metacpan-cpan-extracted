@@ -1,5 +1,12 @@
 Revision history for CtrlO-Crypt-XkcdPassword
 
+1.010     2021-04-04 16:41:54+02:00
+    - Add initial GitHub actions config (Paul Cochrane)
+    - Set minimum Perl version explicitly (Paul Cochrane)
+    - Fix typos, docs, remove whitespace (Paul Cochrane)
+    - Add missing `dist.ini` attributes (Paul Cochrane)
+
+
 1.009     2021-01-03 17:23:09+01:00
     - dist housekeeping: github issues,
       Dist::Zilla::PluginBundle::Author::DOMM

@@ -4,9 +4,11 @@ use Mojo::Base 'Spreadsheet::Compare::Reader', -signatures;
 use Spreadsheet::Compare::Common;
 use Text::CSV;
 
+my %csv_options_default = qw(allow_whitespace 1 binary 1 decode_utf8 0);
+
 #<<<
 use Spreadsheet::Compare::Config {
-    csv_options        => sub { { allow_whitespace => 1 } },
+    csv_options        => sub { {} },
     files              => sub {[]},
     fix_empty_header   => 1,
     make_header_unique => 0,
@@ -20,7 +22,13 @@ has filename    => undef, ro => 1;
 has filehandle  => undef, ro => 1;
 has _chunk_data => sub { {} }, ro => 1;
 has csv         => sub {
-    my $csv = Text::CSV->new( $_[0]->csv_options );
+    my $co = { $_[0]->csv_options->%* };
+    my $clear = delete $co->{__clear__};
+    unless ($clear) {
+        $co->{$_} //= $csv_options_default{$_} for keys %csv_options_default;
+    }
+    DEBUG "using Text::CSV with options:", Dump($co);
+    my $csv = Text::CSV->new( $co );
     LOGDIE join( ',', Text::CSV->error_diag ) unless $csv;
     return $csv;
 }, ro => 1;
@@ -38,7 +46,7 @@ sub setup ($self) {
     ( $trace, $debug ) = get_log_settings();
 
     my $proot = path( $self->rootdir // '.' );
-    my $fn    = path($self->files->[ $self->index ]);
+    my $fn    = path( $self->files->[ $self->index ] );
     my $pfull = $self->{__ro__filename} = $fn->is_absolute ? $fn : $proot->child($fn);
 
     INFO "opening input file >>$pfull<<";
@@ -146,7 +154,7 @@ sub _set_header ($self) {
                     $sep_set ? ( sep_set => $sep_set ) : (),
                     munge_column_names => sub ($hcol) {
                         state $count = 0;
-                        state $seen = {};
+                        state $seen  = {};
                         $hcol = 'unnamed_' . ++$count
                             if $hcol !~ /\S/ and $self->fix_empty_header;
                         if ( $self->make_header_unique ) {
@@ -204,25 +212,22 @@ sub _read_record ( $self, $rec_info = undef ) {
     my $pos;
     my $sln;
     my $rcount;
+    my $csv = $self->csv;
     if ( defined $rec_info ) {
         seek( $fh, $rec_info->{pos}, 0 );
-        try {
-            $rec = $self->csv->getline($fh);
+        $rec = $csv->getline($fh);
+        unless ( $rec or $csv->eof ) {
+            LOGDIE "Error reading csv data:", $csv->error_diag;
         }
-        catch {
-            LOGDIE "Error reading csv data, $_";
-        };
         $sln    = $rec_info->{sln};
         $rcount = tell($fh) - $rec_info->{pos};
     }
     else {
         $pos = tell($fh);
-        try {
-            $rec = $self->csv->getline($fh);
+        $rec = $csv->getline($fh);
+        unless ( $rec or $csv->eof ) {
+            LOGDIE "Error reading csv data:", $csv->error_diag;
         }
-        catch {
-            LOGDIE "Error reading csv data, $_";
-        };
         $sln    = ++$self->{_sln};
         $rcount = tell($fh) - $pos;
     }
@@ -282,16 +287,18 @@ passed to L<Spreadsheet::Compare> or L<spreadcomp>.
 =head2 csv_options
 
   possible values: <hash>
-  default: { allow_whitespace : 1 }
+  default: { allow_whitespace : 1, binary : 1, decode_utf8 : 0 }
 
 Example:
 
   csv_options:
+    __clear__: 1
     allow_loose_quotes: 1
     allow_whitespace: 1
     sep: ';'
 
-A reference to a hash with options for calling the L<Text::CSV> constructor.
+A reference to a hash with options for calling the L<Text::CSV> constructor. These will be added to
+the default setting. To clear the default first, set the option C<__clear__> to a true value.
 
 =head2 filehandle
 

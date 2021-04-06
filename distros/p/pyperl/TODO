@@ -1,9 +1,7 @@
 PYPERL TODO
 -----------
 
-On Win32: free_thread_ctx() needs to be called in perl.pyd's DllMain()
-when the thread detaches (not sure if python has a standard way to do
-this)
+On Win32: change hardcoded DllMain() to python's frozen_dllmain mechanism?
 
 Python::Object wrappings for lists and dictionaries should perhaps
 always evaluate to a TRUE value??

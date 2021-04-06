@@ -1,8 +1,8 @@
 .github/ISSUE_TEMPLATE/bug_report.md
 .github/ISSUE_TEMPLATE/feature_request.md
+.idea/google-ads-perl.iml
 .idea/misc.xml
 .idea/modules.xml
-.idea/perl5local.xml
 .idea/vcs.xml
 .idea/workspace.xml
 .perltidyrc
@@ -157,7 +157,6 @@ examples/targeting/add_demographic_targeting_criteria.pl
 examples/targeting/get_campaign_targeting_criteria.pl
 examples/targeting/get_geo_target_constants_by_names.pl
 examples/targeting/search_for_language_and_carrier_constants.pl
-google-ads-perl.iml
 googleads.properties
 lib/Google/Ads/GoogleAds/BaseEntity.pm
 lib/Google/Ads/GoogleAds/BaseService.pm

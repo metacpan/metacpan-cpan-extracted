@@ -1,5 +1,8 @@
 Revision history for Perl extension Types-TypedCodeRef
 
+0.08 2021-04-04T11:00:43Z
+    - Type name that shows using Sub::Meta (kfly8)
+
 0.07 2021-03-08T16:37:37Z
     - Support Sub::Meta->is_method
 
