@@ -1,0 +1,32 @@
+% layout 'layout.ep';
+% content title => 'Sign In';
+% content css => begin
+<style></style>
+% end
+
+%= form_tag { method_attr 'POST', style_attr 'width:20em; margin:auto' }, begin
+  <fieldset>
+    <legend>
+      Sign In
+    </legend>
+    <div class='form-group'>
+      %= errors_box $error, class=>'alert alert-danger', style=>'margin: 16px 0 0 0', role=>'alert';
+    </div>
+    <div class='form-group'>
+      %= label_tag { for=>'username' }, 'User Name'
+      %= input_tag { name=>'username', type=>'text', class=>'form-control' }
+    </div>
+    <div class='form-group'>
+      %= label_tag { for=>'password' }, 'Password'
+      %= input_tag { name=>'password', type=>'password', class=>'form-control' }
+    </div>
+    %= button_tag { class=>'btn btn-lg btn-primary btn-block', value=>'Sign In' }, 'Sign In'
+  </fieldset>
+  <div class='text-center'><a href="/register">Register</a></div>
+% end
+
+
+
+
+
+

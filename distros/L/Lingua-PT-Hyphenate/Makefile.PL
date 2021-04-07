@@ -4,8 +4,20 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'		=> 'Lingua::PT::Hyphenate',
-    'VERSION_FROM'	=> 'Hyphenate.pm', # finds $VERSION
+    'VERSION_FROM'	=> 'lib/Lingua/PT/Hyphenate.pm', # finds $VERSION
+    'ABSTRACT_FROM'  => 'lib/Lingua/PT/Hyphenate.pm', # retrieve abstract from module
     'PREREQ_PM'		=> {}, # e.g., Module::Name => 1.1
-    ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
-      (AUTHOR     => 'Jose Alves de Castro <cog@cpan.org>') : ()),
+    'TEST_REQUIRES' => {
+        # modules only required for testing
+        'Test::More' => '0.98',
+        'Test::Pod' => '1.0',
+        'Test::Pod::Coverage' => '1.08',
+    },
+    'META_MERGE'    => {
+        'resources' => {
+            'repository' => 'https://github.com/asb-capfan/Lingua-PT-Hyphenate',
+        },
+    },
+    'AUTHOR'     => 'Jose Alves de Castro <cog@cpan.org>',
+    'LICENSE'      => 'perl_5',
 );

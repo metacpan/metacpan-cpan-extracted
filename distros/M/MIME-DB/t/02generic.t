@@ -3,6 +3,9 @@ use Test::More;
 
 require_ok 'MIME::DB';
 
+# might change for future versions:
+is(MIME::DB->version, MIME::DB->VERSION);
+
 ok(my $db = MIME::DB->data, 'data call');
 
 ## only test known and stable MIME types

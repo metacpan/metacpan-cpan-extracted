@@ -23,13 +23,23 @@
 *** BUILDING:
 
     On UNIX:
-
+	export DB2_HOME=<path to CLI DRIVER installation>/clidriver
+	export PERL5LIB=~/lib/perl5/lib/perl5/site_perl:$HOME/DBD-DB2-1.85/tests:$HOME/DBD-DB2-1.85/Constants
+	
     perl Makefile.PL            # use a perl that's in your PATH
     make
     make test
     make install (if the tests look okay)
+	
+	NOTE: 
+	For non root installation specify the installation into ~/lib/perl5 instead for non-root installation:
 
-    On Windows:
+	perl Makefile.PL PREFIX=~/lib/perl5
+	make
+	make test
+	make install
+	
+	On Windows:
 
     perl Makefile.PL
     nmake

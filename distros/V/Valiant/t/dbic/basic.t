@@ -556,6 +556,7 @@ ok $state->id;
   };
 
   ok my @ccs = $person->credit_cards->all;
+  is scalar(@ccs), 2;
   is_deeply +{ $ccs[0]->errors->to_hash }, +{
     card_number => [
       "is too short (minimum is 13 characters)",

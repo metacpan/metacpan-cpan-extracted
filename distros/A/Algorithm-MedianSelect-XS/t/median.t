@@ -9,11 +9,11 @@ use Test::More tests => 6;
 my @nums = (21, 6, 2, 9, 5, 1, 14, 7, 12, 3, 19);
 my @desc = (
     'list',
-    'list reference',
+    'array reference',
     'list (algorithm "bubble")',
-    'list reference (algorithm "bubble")',
+    'array reference (algorithm "bubble")',
     'list (algorithm "quick")',
-    'list reference (algorithm "quick")'
+    'array reference (algorithm "quick")'
 );
 
 is(median(@nums),                              7, $desc[0]);

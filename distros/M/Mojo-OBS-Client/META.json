@@ -39,7 +39,7 @@
             "Mojo::JSON" : "0",
             "Mojo::UserAgent" : "0",
             "Net::Protocol::OBSRemote" : "0",
-            "perl" : "5.010"
+            "perl" : "5.012"
          }
       },
       "test" : {
@@ -62,7 +62,7 @@
          "web" : "https://github.com/Corion/Mojo-OBS-Client"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

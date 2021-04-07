@@ -29,7 +29,7 @@ requires:
   XML::Compile::Tester: '0.90'
 resources:
   homepage: http://perl.overmeer.net/CPAN/
-  license: http://dev.perl.org/licenses/
+  license: http://dev.perl.org/xml-compile/
   repository: https://github.com/markov2/perl5-XML-Compile-SOAP.git
-version: '3.26'
+version: '3.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

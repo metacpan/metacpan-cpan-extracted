@@ -1,4 +1,4 @@
-# Copyrights 2007-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2021 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package XML::Compile::SOAP::Server;
 use vars '$VERSION';
-$VERSION = '3.26';
+$VERSION = '3.27';
 
 
 use warnings;
@@ -61,10 +61,10 @@ sub compileHandler(@)
         my $data;
         if($decode)
         {   $data = try { $decode->($xmlin) };
-            if($@)
-            {   $@->wasFatal->throw(reason => 'INFO', is_fatal => 0);
+            if(my $err = $@->wasFatal)
+            {   $err->throw(reason => 'INFO', is_fatal => 0);
                 return ( RC_NOT_ACCEPTABLE, 'input validation failed'
-                   , $self->faultValidationFailed($name, $@->wasFatal))
+                   , $self->faultValidationFailed($name, $err))
             }
         }
         else

@@ -500,8 +500,11 @@ Schema->resultset("State")->populate([
   }, 'Got expected errors';
 
   $person->discard_changes;
+  #$person = Schema->resultset('Person')->find({id=>$person->id},{prefetch=>'state'});
+
   $person->update({
     state => { abbreviation => 'TX' }
+    #state => { id => 1 }
   });
 
   ok $person->valid;
@@ -564,10 +567,10 @@ Schema->resultset("Role")->populate([
   ok $person->valid;
   ok $person->in_storage;
 
-  # modif it.   We expect to add one
+  # modif it.   We expect to replace the existing
   $person->discard_changes;
   $person->update({
-    person_roles => [
+    'person_roles' => [
         {role => {label=>'admin'}},
     ]
   });
@@ -578,7 +581,6 @@ Schema->resultset("Role")->populate([
   is $person->state->abbreviation, 'TX';
   my $rs = $person->person_roles->search({},{order_by=>'role_id ASC'});
   is $rs->next->role->label, 'admin';
-  is $rs->next->role->label, 'user';
   ok !$rs->next;
 
   $person->discard_changes;
@@ -604,12 +606,6 @@ Schema->resultset("Role")->populate([
     "person_roles.2.role" => [
       "Person Roles Role already has role admin",
     ],
-    roles => [
-      "Roles Is Invalid",
-    ],
-    "roles.0.label" => [
-      "Roles Label adminxx is not a valid",
-    ],
   }, 'Got expected errors';
 
   $person->update({
@@ -620,9 +616,8 @@ Schema->resultset("Role")->populate([
 
   ok $person->valid;
   my $rs2 = $person->person_roles->search({},{order_by=>'role_id ASC'});
-  is $rs2->next->role->label, 'admin';
-  is $rs2->next->role->label, 'user';
   is $rs2->next->role->label, 'superuser';
+  ok !$rs->next;
 }
 
 {
@@ -719,59 +714,3 @@ Schema->resultset("Role")->populate([
 }
 
 done_testing;
-
-__END__
-
-  warn scalar @{$parent->children->get_cache};
-
-  $parent->discard_changes;
-  is $parent->children->count, 3;
-
-
-
-
-  $parent->discard_changes;
-
-  $parent->update({
-    children => [
-      { id => 1, value => 'one.four' },
-      { value => 'two.two' },
-    ],
-  });
-
-  ok $parent->valid;
-  is $parent->children->count, 4;
-
-
-
-  
-
-  use Devel::Dwarn;
-  Dwarn +{$person->errors->to_hash(full_messages=>1)};
-
-  
-  is_deeply +{$might->errors->to_hash(full_messages=>1)}, +{
-    one => [
-      "One Is Invalid",
-    ],
-    "one.value" => [
-      "One Value is too short (minimum is 2 characters)",
-    ],
-  }, 'Got expected errors';
-
-  use Devel::Dwarn;
-  Dwarn +{$might->one->oneone->errors->to_hash(full_messages=>1)};
-  Dwarn $might->one->oneone->value;
-
-
-$might->one->oneone->validate;
-  Dwarn +{$might->one->oneone->errors->to_hash(full_messages=>1)};
-  Dwarn +{$might->errors->to_hash(full_messages=>1)};
-
-
-
-  
-  use Devel::Dwarn;
-  Dwarn +{$one->errors->to_hash(full_messages=>1)};
-
-# also terset from oneone to one (we expect one to exist so that should always be an update)

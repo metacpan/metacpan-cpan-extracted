@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 use Carp ();
 use Scalar::Util ();
@@ -111,9 +111,9 @@ sub _normalize_args_parameters {
 }
 
 sub sub() :method { my $self = shift; return $self->{sub} } ## no critic (ProhibitBuiltinHomonyms)
-sub subname()     { my $self = shift; return $self->subinfo->[1] }
-sub stashname()   { my $self = shift; return $self->subinfo->[0] }
-sub fullname()    { my $self = shift; return @{$self->subinfo} ? sprintf('%s::%s', $self->stashname || '', $self->subname || '') : undef }
+sub subname()     { my $self = shift; return $self->subinfo->[1] // '' }
+sub stashname()   { my $self = shift; return $self->subinfo->[0] // '' }
+sub fullname()    { my $self = shift; return @{$self->subinfo} ? sprintf('%s::%s', $self->stashname, $self->subname) : '' }
 
 sub subinfo()     {
     my $self = shift;
@@ -136,6 +136,14 @@ sub slurpy()      { my $self = shift; return $self->parameters->slurpy }
 sub nshift()      { my $self = shift; return $self->parameters->nshift }
 sub invocant()    { my $self = shift; return $self->parameters->invocant }
 sub invocants()   { my $self = shift; return $self->parameters->invocants }
+
+sub has_sub()        { my $self = shift; return defined $self->{sub} }
+sub has_subname()    { my $self = shift; return defined $self->subinfo->[1] }
+sub has_stashname()  { my $self = shift; return defined $self->subinfo->[0] }
+sub has_prototype()  { my $self = shift; return !!$self->prototype } # after build_prototype
+sub has_attribute()  { my $self = shift; return !!$self->attribute } # after build_attribute
+sub has_parameters() { my $self = shift; return defined $self->{parameters} }
+sub has_returns()    { my $self = shift; return defined $self->{returns} }
 
 sub set_sub {
     my ($self, $v) = @_;
@@ -232,7 +240,7 @@ sub _build_subinfo     { my $self = shift; return $self->sub ? [ Sub::Identify::
 sub _build_file        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[0] : '' }
 sub _build_line        { my $self = shift; return $self->sub ? (Sub::Identify::get_code_location($self->sub))[1] : undef }
 sub _build_is_constant { my $self = shift; return $self->sub ? Sub::Identify::is_sub_constant($self->sub) : undef }
-sub _build_prototype   { my $self = shift; return $self->sub ? Sub::Util::prototype($self->sub) : '' }
+sub _build_prototype   { my $self = shift; return $self->sub ? Sub::Util::prototype($self->sub) : undef }
 sub _build_attribute   { my $self = shift; return $self->sub ? [ attributes::get($self->sub) ] : undef }
 
 sub apply_subname {
@@ -277,17 +285,33 @@ sub is_same_interface {
 
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
 
-    return unless defined $self->subname ? defined $other->subname && $self->subname eq $other->subname
-                                         : !defined $other->subname;
+    if ($self->has_subname) {
+        return unless $self->subname eq $other->subname
+    }
+    else {
+        return if $other->has_subname;
+    }
 
-    return unless $self->is_method ? $other->is_method
-                                   : !$other->is_method;
+    if ($self->is_method) {
+        return unless $other->is_method
+    }
+    else {
+        return if $other->is_method
+    }
 
-    return unless $self->parameters ? $self->parameters->is_same_interface($other->parameters)
-                                    : !$other->parameters;
+    if ($self->has_parameters) {
+        return unless $self->parameters->is_same_interface($other->parameters)
+    }
+    else {
+        return if $other->has_parameters;
+    }
 
-    return unless $self->returns ? $self->returns->is_same_interface($other->returns)
-                                 : !$other->returns;
+    if ($self->has_returns) {
+        return unless $self->returns->is_same_interface($other->returns)
+    }
+    else {
+        return if $other->has_returns;
+    }
 
     return !!1;
 }
@@ -299,26 +323,64 @@ sub is_same_interface_inlined {
 
     push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta')", $v, $v);
 
-    push @src => defined $self->subname ? sprintf("defined %s->subname && '%s' eq %s->subname", $v, "@{[$self->subname]}", $v)
-                                        : sprintf('!defined %s->subname', $v);
+    push @src => $self->has_subname ? sprintf("'%s' eq %s->subname", $self->subname, $v)
+                                    : sprintf('!%s->has_subname', $v);
 
     push @src => $self->is_method ? sprintf('%s->is_method', $v)
                                   : sprintf('!%s->is_method', $v);
 
-    push @src => $self->parameters ? $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v))
-                                   : sprintf('!%s->parameters', $v);
+    push @src => $self->has_parameters ? $self->parameters->is_same_interface_inlined(sprintf('%s->parameters', $v))
+                                       : sprintf('!%s->has_parameters', $v);
 
-    push @src => $self->returns ? $self->returns->is_same_interface_inlined(sprintf('%s->returns', $v))
-                                : sprintf('!%s->returns', $v);
+    push @src => $self->has_returns ? $self->returns->is_same_interface_inlined(sprintf('%s->returns', $v))
+                                    : sprintf('!%s->has_returns', $v);
 
     return join "\n && ", @src;
+}
+
+sub interface_error_message {
+    my ($self, $other) = @_;
+
+    return sprintf('must be Sub::Meta. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta');
+
+    if ($self->has_subname) {
+        return sprintf('invalid subname. got: %s, expected: %s', $other->subname, $self->subname)
+            unless $self->subname eq $other->subname
+    }
+    else {
+        return sprintf('should not have subname. got: %s', $other->subname) if $other->has_subname;
+    }
+
+    if ($self->is_method) {
+        return 'must be method' unless $other->is_method
+    }
+    else {
+        return 'should not be method' if $other->is_method;
+    }
+
+    if ($self->has_parameters) {
+        return $self->parameters->interface_error_message($other->parameters)
+            unless $self->parameters->is_same_interface($other->parameters)
+    }
+    else {
+        return 'should not have parameters' if $other->parameters;
+    }
+
+    if ($self->has_returns) {
+        return $self->returns->interface_error_message($other->returns)
+    }
+    else {
+        return 'should not have returns' if $other->returns;
+    }
+    return '';
 }
 
 sub display {
     my $self = shift;
 
     my $keyword = $self->is_method ? 'method' : 'sub';
-    my $subname = $self->subname // '';
+    my $subname = $self->subname;
 
     my $s = $keyword;
     $s .= ' ' . $subname if $subname;
@@ -477,21 +539,57 @@ Another way to create a Sub::Meta is to use L<Sub::Meta::Creator>:
 
 =head3 sub
 
-A subroutine reference.
+Accessor for subroutine.
 
-=head3 set_sub
+=over
 
-Setter for subroutine reference.
+=item C<< sub >>
+
+    method sub() Maybe[CodeRef]
+
+Return a subroutine.
+
+=item C<< has_sub >>
+
+    method has_sub() => Bool
+
+Whether Sub::Meta has subroutine or not.
+
+=item C<< set_sub($sub) >>
+
+    method set_sub(CodeRef $sub) => $self
+
+Setter for subroutine.
 
     sub hello { ... }
     $meta->set_sub(\&hello);
     $meta->sub # => \&hello
 
+    # And set subname, stashname
+    $meta->subname; # hello
+    $meta->stashname; # main
+
+=back
+
 =head3 subname
 
-A subroutine name, e.g. C<hello>
+Accessor for subroutine name
 
-=head3 set_subname($subname)
+=over
+
+=item C<< subname >>
+
+    method subname() => Str
+
+=item C<< has_subname >>
+
+    method has_subname() => Bool
+
+Whether Sub::Meta has subroutine name or not.
+
+=item C<< set_subname($subname) >>
+
+    method set_subname(Str $subname) => $self
 
 Setter for subroutine name.
 
@@ -500,7 +598,9 @@ Setter for subroutine name.
     $meta->subname; # world
     Sub::Util::subname($meta->sub); # hello (NOT apply to sub)
 
-=head3 apply_subname($subname)
+=item C<< apply_subname($subname) >>
+
+    method apply_subname(Str $subname) => $self
 
 Sets subroutine name and apply to the subroutine reference.
 
@@ -509,153 +609,316 @@ Sets subroutine name and apply to the subroutine reference.
     $meta->subname; # world
     Sub::Util::subname($meta->sub); # world
 
+=back
+
 =head3 fullname
+
+Accessor for subroutine full name
+
+=over
+
+=item C<< fullname >>
+
+    method fullname() => Str
 
 A subroutine full name, e.g. C<main::hello>
 
-=head3 set_fullname($fullname)
+=item C<< has_fullname >>
+
+    method has_fullname() => Bool
+
+Whether Sub::Meta has subroutine full name or not.
+
+=item C<< set_fullname($fullname) >>
+
+    method set_fullname(Str $fullname) => $self
 
 Setter for subroutine full name.
 
+=back
+
 =head3 stashname
+
+Accessor for subroutine stash name
+
+=over
+
+=item C<< stashname >>
+
+    method stashname() => Str
 
 A subroutine stash name, e.g. C<main>
 
-=head3 set_stashname($stashname)
+=item C<< has_stashname >>
+
+    method has_stashname() => Bool
+
+Whether Sub::Meta has subroutine stash name or not.
+
+=item C<< set_stashname($stashname) >>
+
+    method set_stashname(Str $stashname) => $self
 
 Setter for subroutine stash name.
 
+=back
+
 =head3 subinfo
+
+Accessor for subroutine information
+
+=over
+
+=item C<< subinfo >>
+
+    method subinfo() => Tuple[Str,Str]
 
 A subroutine information, e.g. C<['main', 'hello']>
 
-=head3 set_subinfo([$stashname, $subname])
+=item C<< set_subinfo($stashname, $subname) >>
+
+    method set_stashname(Str $stashname, Str $subname) => $self
+    method set_stashname(Tuple[Str, Str]) => $self
 
 Setter for subroutine information.
 
-=head3 file
+=back
+
+=head3 file, line
+
+Accessor for filename and line where subroutine is defined
+
+=over
+
+=item C<< file >>
+
+    method file() => Str
 
 A filename where subroutine is defined, e.g. C<path/to/main.pl>.
 
-=head3 set_file($filepath)
+=item C<< set_file($filepath) >>
+
+    method set_file(Str $filepath) => $self
 
 Setter for C<file>.
 
-=head3 line
+=item C<< line >>
+
+    method line() => Int
 
 A line where the definition of subroutine started, e.g. C<5>
 
-=head3 set_line($line)
+=item C<< set_line($line) >>
+
+    method set_line(Int $line) => $self
 
 Setter for C<line>.
 
+=back
+
 =head3 is_constant
 
-A boolean value indicating whether the subroutine is a constant or not.
+=over
 
-=head3 set_is_constant($bool)
+=item C<< is_constant >>
+
+    method is_constant() => Maybe[Bool]
+
+If the subroutine is set, it returns whether it is a constant or not, if not set, it returns undef.
+
+=item C<< set_is_constant($bool) >>
+
+    method set_is_constant(Bool $bool) => $self
 
 Setter for C<is_constant>.
 
+=back
+
 =head3 prototype
 
-A prototype of subroutine reference, e.g. C<$@>
+Accessor for prototype of subroutine reference.
 
-=head3 set_prototype($prototype)
+=over
+
+=item C<< prototype >>
+
+    method prototype() => Maybe[Str]
+
+If the subroutine is set, it returns a prototype of subroutine, if not set, it returns undef.
+e.g. C<$@>
+
+=item C<< has_prototype >>
+
+    method has_prototype() => Bool
+
+Whether Sub::Meta has prototype or not.
+
+=item C<< set_prototype($prototype) >>
+
+    method set_prototype(Str $prototype) => $self
 
 Setter for C<prototype>.
 
-=head3 apply_prototype($prototype)
+=item C<< apply_prototype($prototype) >>
+
+    method apply_prototype(Str $prototype) => $self
 
 Sets subroutine prototype and apply to the subroutine reference.
 
+=back
+
 =head3 attribute
 
-A attribute of subroutine reference, e.g. C<undef>, C<['method']>
+Accessor for attribute of subroutine reference.
 
-=head3 set_attribute($attribute)
+=over
+
+=item C<< attribute >>
+
+    method attribute() => Maybe[ArrayRef[Str]]
+
+If the subroutine is set, it returns a attribute of subroutine, if not set, it returns undef.
+e.g. C<['method']>, C<undef> 
+
+=item C<< has_attribute >>
+
+    method has_attribute() => Bool
+
+Whether Sub::Meta has attribute or not.
+
+=item C<< set_attribute($attribute) >>
+
+    method set_attribute(ArrayRef[Str] $attribute) => $self
 
 Setter for C<attribute>.
 
-=head3 apply_attribute(@attribute)
+=item C<< apply_attribute(@attribute) >>
+
+    method apply_attribute(Str @attribute) => $self
 
 Sets subroutine attributes and apply to the subroutine reference.
 
-=head3 apply_meta($other_meta)
-
-Apply subroutine subname, prototype and attributes of C<$other_meta>.
+=back
 
 =head3 is_method
 
-A boolean value indicating whether the subroutine is a method or not.
+=over
 
-=head3 set_is_method($bool)
+=item C<< is_method >>
+
+    method is_method() => Bool
+
+Whether the subroutine is a method or not.
+
+=item C<< set_is_method($bool) >>
+
+    method set_is_method(Bool $bool) => Bool
 
 Setter for C<is_method>.
 
+=back
+
 =head3 parameters
 
-Parameters object of L<Sub::Meta::Parameters>.
+Accessor for parameters object of L<Sub::Meta::Parameters>
 
-=head3 set_parameters($parameters)
+=over
+
+=item C<< parameters >>
+
+    method parameters() => Maybe[InstanceOf[Sub::Meta]]
+
+If the parameters is set, it returns the parameters object.
+
+=item C<< has_parameters >>
+
+    method has_parameters() => Bool
+
+Whether Sub::Meta has parameters or not.
+
+=item C<< set_parameters($parameters) >>
+
+    method set_parameters(InstanceOf[Sub::Meta::Parameters] $parameters) => $self
+    method set_parameters(@sub_meta_parameters_args) => $self
 
 Sets the parameters object of L<Sub::Meta::Parameters>.
 
     my $meta = Sub::Meta->new;
-    $meta->set_parameters(args => ['Str']);
-    $meta->parameters; # => Sub::Meta::Parameters->new(args => ['Str']);
+
+    my $parameters = Sub::Meta::Parameters->new(args => ['Str']);
+    $meta->set_parameters($parameters);
 
     # or
-    $meta->set_parameters(Sub::Meta::Parameters->new(args => ['Str']));
+    $meta->set_parameters(args => ['Str']);
+    $meta->parameters; # => Sub::Meta::Parameters->new(args => ['Str']);
 
     # alias
     $meta->set_args(['Str']);
 
-=head3 args
+=item C<< args >>
 
 The alias of C<parameters.args>.
 
-=head3 set_args($args)
+=item C<< set_args($args) >>
 
 The alias of C<parameters.set_args>.
 
-=head3 all_args
+=item C<< all_args >>
 
 The alias of C<parameters.all_args>.
 
-=head3 nshift
+=item C<< nshift >>
 
 The alias of C<parameters.nshift>.
 
-=head3 set_nshift($nshift)
+=item C<< set_nshift($nshift) >>
 
 The alias of C<parameters.set_nshift>.
 
-=head3 invocant
+=item C<< invocant >>
 
 The alias of C<parameters.invocant>.
 
-=head3 invocants
+=item C<< invocants >>
 
 The alias of C<parameters.invocants>.
 
-=head3 set_invocant($invocant)
+=item C<< set_invocant($invocant) >>
 
 The alias of C<parameters.set_invocant>.
 
-=head3 slurpy
+=item C<< slurpy >>
 
 The alias of C<parameters.slurpy>.
 
-=head3 set_slurpy($slurpy)
+=item C<< set_slurpy($slurpy) >>
 
 The alias of C<parameters.set_slurpy>.
 
+=back
+
 =head3 returns
 
-Returns object of L<Sub::Meta::Returns>.
+Accessor for returns object of L<Sub::Meta::Returns>
 
-=head3 set_returns($returns)
+=over
+
+=item C<< returns >>
+
+    method returns() => Maybe[InstanceOf[Sub::Meta]]
+
+If the returns is set, it returns the returns object.
+
+=item C<< has_returns >>
+
+    method has_returns() => Bool
+
+Whether Sub::Meta has returns or not.
+
+=item C<< set_returns($returns) >>
+
+    method set_returns(InstanceOf[Sub::Meta::Returns] $returns) => $self
+    method set_returns(@sub_meta_returns_args) => $self
 
 Sets the returns object of L<Sub::Meta::Returns> or any object.
 
@@ -667,14 +930,26 @@ Sets the returns object of L<Sub::Meta::Returns> or any object.
     $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
     $meta->set_returns(MyReturns->new)
 
+=back
+
 =head2 METHODS
 
+=head3 apply_meta($other_meta)
+
+    method apply_meta(InstanceOf[Sub::Meta] $other_meta) => $self
+
+Apply subroutine subname, prototype and attributes of C<$other_meta>.
+
 =head3 is_same_interface($other_meta)
+
+    method is_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
 
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether C<subname>, C<is_method>, C<parameters> and C<returns> are equal.
 
 =head3 is_same_interface_inlined($other_meta_inlined)
+
+    method is_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
 
 Returns inlined C<is_same_interface> string:
 
@@ -691,7 +966,15 @@ Returns inlined C<is_same_interface> string:
     $check->(Sub::Meta->new(subname => 'hello')); # => OK
     $check->(Sub::Meta->new(subname => 'world')); # => NG
 
+=head3 interface_error_message($other_meta)
+
+    method interface_error_message(InstanceOf[Sub::Meta] $other_meta) => Str
+
+Return the error message when the interface does not match. If match, then return empty string.
+
 =head3 display
+
+    method display() => Str
 
 Returns the display of Sub::Meta:
 
@@ -709,10 +992,14 @@ Returns the display of Sub::Meta:
 
 =head3 parameters_class
 
+    method parameters_class() => Str
+
 Returns class name of parameters. default: Sub::Meta::Parameters
 Please override for customization.
 
 =head3 returns_class
+
+    method returns_class() => Str
 
 Returns class name of returns. default: Sub::Meta::Returns
 Please override for customization.
@@ -735,7 +1022,7 @@ If that fails, or if the environment variable C<PERL_SUB_META_PP> is defined to 
 
 =head1 SEE ALSO
 
-L<Sub::Identify>, L<Sub::Util>, L<Sub::Info>, L<Function::Parameters::Info>, L<Function::Return::Info>
+L<Sub::Identify>, L<Sub::Util>, L<Sub::Info>
 
 =head1 LICENSE
 

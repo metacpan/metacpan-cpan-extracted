@@ -156,214 +156,459 @@ my $meta = $creator->create(\&hello);
 
 ### sub
 
-A subroutine reference.
+Accessor for subroutine.
 
-### set\_sub
+- `sub`
 
-Setter for subroutine reference.
+    ```perl
+    method sub() Maybe[CodeRef]
+    ```
 
-```perl
-sub hello { ... }
-$meta->set_sub(\&hello);
-$meta->sub # => \&hello
-```
+    Return a subroutine.
+
+- `has_sub`
+
+    ```perl
+    method has_sub() => Bool
+    ```
+
+    Whether Sub::Meta has subroutine or not.
+
+- `set_sub($sub)`
+
+    ```perl
+    method set_sub(CodeRef $sub) => $self
+    ```
+
+    Setter for subroutine.
+
+    ```perl
+    sub hello { ... }
+    $meta->set_sub(\&hello);
+    $meta->sub # => \&hello
+
+    # And set subname, stashname
+    $meta->subname; # hello
+    $meta->stashname; # main
+    ```
 
 ### subname
 
-A subroutine name, e.g. `hello`
+Accessor for subroutine name
 
-### set\_subname($subname)
+- `subname`
 
-Setter for subroutine name.
+    ```perl
+    method subname() => Str
+    ```
 
-```perl
-$meta->subname; # hello
-$meta->set_subname('world');
-$meta->subname; # world
-Sub::Util::subname($meta->sub); # hello (NOT apply to sub)
-```
+- `has_subname`
 
-### apply\_subname($subname)
+    ```perl
+    method has_subname() => Bool
+    ```
 
-Sets subroutine name and apply to the subroutine reference.
+    Whether Sub::Meta has subroutine name or not.
 
-```perl
-$meta->subname; # hello
-$meta->apply_subname('world');
-$meta->subname; # world
-Sub::Util::subname($meta->sub); # world
-```
+- `set_subname($subname)`
+
+    ```perl
+    method set_subname(Str $subname) => $self
+    ```
+
+    Setter for subroutine name.
+
+    ```perl
+    $meta->subname; # hello
+    $meta->set_subname('world');
+    $meta->subname; # world
+    Sub::Util::subname($meta->sub); # hello (NOT apply to sub)
+    ```
+
+- `apply_subname($subname)`
+
+    ```perl
+    method apply_subname(Str $subname) => $self
+    ```
+
+    Sets subroutine name and apply to the subroutine reference.
+
+    ```perl
+    $meta->subname; # hello
+    $meta->apply_subname('world');
+    $meta->subname; # world
+    Sub::Util::subname($meta->sub); # world
+    ```
 
 ### fullname
 
-A subroutine full name, e.g. `main::hello`
+Accessor for subroutine full name
 
-### set\_fullname($fullname)
+- `fullname`
 
-Setter for subroutine full name.
+    ```perl
+    method fullname() => Str
+    ```
+
+    A subroutine full name, e.g. `main::hello`
+
+- `has_fullname`
+
+    ```perl
+    method has_fullname() => Bool
+    ```
+
+    Whether Sub::Meta has subroutine full name or not.
+
+- `set_fullname($fullname)`
+
+    ```perl
+    method set_fullname(Str $fullname) => $self
+    ```
+
+    Setter for subroutine full name.
 
 ### stashname
 
-A subroutine stash name, e.g. `main`
+Accessor for subroutine stash name
 
-### set\_stashname($stashname)
+- `stashname`
 
-Setter for subroutine stash name.
+    ```perl
+    method stashname() => Str
+    ```
+
+    A subroutine stash name, e.g. `main`
+
+- `has_stashname`
+
+    ```perl
+    method has_stashname() => Bool
+    ```
+
+    Whether Sub::Meta has subroutine stash name or not.
+
+- `set_stashname($stashname)`
+
+    ```perl
+    method set_stashname(Str $stashname) => $self
+    ```
+
+    Setter for subroutine stash name.
 
 ### subinfo
 
-A subroutine information, e.g. `['main', 'hello']`
+Accessor for subroutine information
 
-### set\_subinfo(\[$stashname, $subname\])
+- `subinfo`
 
-Setter for subroutine information.
+    ```perl
+    method subinfo() => Tuple[Str,Str]
+    ```
 
-### file
+    A subroutine information, e.g. `['main', 'hello']`
 
-A filename where subroutine is defined, e.g. `path/to/main.pl`.
+- `set_subinfo($stashname, $subname)`
 
-### set\_file($filepath)
+    ```perl
+    method set_stashname(Str $stashname, Str $subname) => $self
+    method set_stashname(Tuple[Str, Str]) => $self
+    ```
 
-Setter for `file`.
+    Setter for subroutine information.
 
-### line
+### file, line
 
-A line where the definition of subroutine started, e.g. `5`
+Accessor for filename and line where subroutine is defined
 
-### set\_line($line)
+- `file`
 
-Setter for `line`.
+    ```perl
+    method file() => Str
+    ```
+
+    A filename where subroutine is defined, e.g. `path/to/main.pl`.
+
+- `set_file($filepath)`
+
+    ```perl
+    method set_file(Str $filepath) => $self
+    ```
+
+    Setter for `file`.
+
+- `line`
+
+    ```perl
+    method line() => Int
+    ```
+
+    A line where the definition of subroutine started, e.g. `5`
+
+- `set_line($line)`
+
+    ```perl
+    method set_line(Int $line) => $self
+    ```
+
+    Setter for `line`.
 
 ### is\_constant
 
-A boolean value indicating whether the subroutine is a constant or not.
+- `is_constant`
 
-### set\_is\_constant($bool)
+    ```perl
+    method is_constant() => Maybe[Bool]
+    ```
 
-Setter for `is_constant`.
+    If the subroutine is set, it returns whether it is a constant or not, if not set, it returns undef.
+
+- `set_is_constant($bool)`
+
+    ```perl
+    method set_is_constant(Bool $bool) => $self
+    ```
+
+    Setter for `is_constant`.
 
 ### prototype
 
-A prototype of subroutine reference, e.g. `$@`
+Accessor for prototype of subroutine reference.
 
-### set\_prototype($prototype)
+- `prototype`
 
-Setter for `prototype`.
+    ```perl
+    method prototype() => Maybe[Str]
+    ```
 
-### apply\_prototype($prototype)
+    If the subroutine is set, it returns a prototype of subroutine, if not set, it returns undef.
+    e.g. `$@`
 
-Sets subroutine prototype and apply to the subroutine reference.
+- `has_prototype`
+
+    ```perl
+    method has_prototype() => Bool
+    ```
+
+    Whether Sub::Meta has prototype or not.
+
+- `set_prototype($prototype)`
+
+    ```perl
+    method set_prototype(Str $prototype) => $self
+    ```
+
+    Setter for `prototype`.
+
+- `apply_prototype($prototype)`
+
+    ```perl
+    method apply_prototype(Str $prototype) => $self
+    ```
+
+    Sets subroutine prototype and apply to the subroutine reference.
 
 ### attribute
 
-A attribute of subroutine reference, e.g. `undef`, `['method']`
+Accessor for attribute of subroutine reference.
 
-### set\_attribute($attribute)
+- `attribute`
 
-Setter for `attribute`.
+    ```perl
+    method attribute() => Maybe[ArrayRef[Str]]
+    ```
 
-### apply\_attribute(@attribute)
+    If the subroutine is set, it returns a attribute of subroutine, if not set, it returns undef.
+    e.g. `['method']`, `undef` 
 
-Sets subroutine attributes and apply to the subroutine reference.
+- `has_attribute`
 
-### apply\_meta($other\_meta)
+    ```perl
+    method has_attribute() => Bool
+    ```
 
-Apply subroutine subname, prototype and attributes of `$other_meta`.
+    Whether Sub::Meta has attribute or not.
+
+- `set_attribute($attribute)`
+
+    ```perl
+    method set_attribute(ArrayRef[Str] $attribute) => $self
+    ```
+
+    Setter for `attribute`.
+
+- `apply_attribute(@attribute)`
+
+    ```perl
+    method apply_attribute(Str @attribute) => $self
+    ```
+
+    Sets subroutine attributes and apply to the subroutine reference.
 
 ### is\_method
 
-A boolean value indicating whether the subroutine is a method or not.
+- `is_method`
 
-### set\_is\_method($bool)
+    ```perl
+    method is_method() => Bool
+    ```
 
-Setter for `is_method`.
+    Whether the subroutine is a method or not.
+
+- `set_is_method($bool)`
+
+    ```perl
+    method set_is_method(Bool $bool) => Bool
+    ```
+
+    Setter for `is_method`.
 
 ### parameters
 
-Parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters).
+Accessor for parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters)
 
-### set\_parameters($parameters)
+- `parameters`
 
-Sets the parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters).
+    ```perl
+    method parameters() => Maybe[InstanceOf[Sub::Meta]]
+    ```
 
-```perl
-my $meta = Sub::Meta->new;
-$meta->set_parameters(args => ['Str']);
-$meta->parameters; # => Sub::Meta::Parameters->new(args => ['Str']);
+    If the parameters is set, it returns the parameters object.
 
-# or
-$meta->set_parameters(Sub::Meta::Parameters->new(args => ['Str']));
+- `has_parameters`
 
-# alias
-$meta->set_args(['Str']);
-```
+    ```perl
+    method has_parameters() => Bool
+    ```
 
-### args
+    Whether Sub::Meta has parameters or not.
 
-The alias of `parameters.args`.
+- `set_parameters($parameters)`
 
-### set\_args($args)
+    ```perl
+    method set_parameters(InstanceOf[Sub::Meta::Parameters] $parameters) => $self
+    method set_parameters(@sub_meta_parameters_args) => $self
+    ```
 
-The alias of `parameters.set_args`.
+    Sets the parameters object of [Sub::Meta::Parameters](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AParameters).
 
-### all\_args
+    ```perl
+    my $meta = Sub::Meta->new;
 
-The alias of `parameters.all_args`.
+    my $parameters = Sub::Meta::Parameters->new(args => ['Str']);
+    $meta->set_parameters($parameters);
 
-### nshift
+    # or
+    $meta->set_parameters(args => ['Str']);
+    $meta->parameters; # => Sub::Meta::Parameters->new(args => ['Str']);
 
-The alias of `parameters.nshift`.
+    # alias
+    $meta->set_args(['Str']);
+    ```
 
-### set\_nshift($nshift)
+- `args`
 
-The alias of `parameters.set_nshift`.
+    The alias of `parameters.args`.
 
-### invocant
+- `set_args($args)`
 
-The alias of `parameters.invocant`.
+    The alias of `parameters.set_args`.
 
-### invocants
+- `all_args`
 
-The alias of `parameters.invocants`.
+    The alias of `parameters.all_args`.
 
-### set\_invocant($invocant)
+- `nshift`
 
-The alias of `parameters.set_invocant`.
+    The alias of `parameters.nshift`.
 
-### slurpy
+- `set_nshift($nshift)`
 
-The alias of `parameters.slurpy`.
+    The alias of `parameters.set_nshift`.
 
-### set\_slurpy($slurpy)
+- `invocant`
 
-The alias of `parameters.set_slurpy`.
+    The alias of `parameters.invocant`.
+
+- `invocants`
+
+    The alias of `parameters.invocants`.
+
+- `set_invocant($invocant)`
+
+    The alias of `parameters.set_invocant`.
+
+- `slurpy`
+
+    The alias of `parameters.slurpy`.
+
+- `set_slurpy($slurpy)`
+
+    The alias of `parameters.set_slurpy`.
 
 ### returns
 
-Returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AReturns).
+Accessor for returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AReturns)
 
-### set\_returns($returns)
+- `returns`
 
-Sets the returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AReturns) or any object.
+    ```perl
+    method returns() => Maybe[InstanceOf[Sub::Meta]]
+    ```
 
-```perl
-my $meta = Sub::Meta->new;
-$meta->set_returns({ type => 'Type'});
-$meta->returns; # => Sub::Meta::Returns->new({type => 'Type'});
+    If the returns is set, it returns the returns object.
 
-# or
-$meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
-$meta->set_returns(MyReturns->new)
-```
+- `has_returns`
+
+    ```perl
+    method has_returns() => Bool
+    ```
+
+    Whether Sub::Meta has returns or not.
+
+- `set_returns($returns)`
+
+    ```perl
+    method set_returns(InstanceOf[Sub::Meta::Returns] $returns) => $self
+    method set_returns(@sub_meta_returns_args) => $self
+    ```
+
+    Sets the returns object of [Sub::Meta::Returns](https://metacpan.org/pod/Sub%3A%3AMeta%3A%3AReturns) or any object.
+
+    ```perl
+    my $meta = Sub::Meta->new;
+    $meta->set_returns({ type => 'Type'});
+    $meta->returns; # => Sub::Meta::Returns->new({type => 'Type'});
+
+    # or
+    $meta->set_returns(Sub::Meta::Returns->new(type => 'Foo'));
+    $meta->set_returns(MyReturns->new)
+    ```
 
 ## METHODS
 
+### apply\_meta($other\_meta)
+
+```perl
+method apply_meta(InstanceOf[Sub::Meta] $other_meta) => $self
+```
+
+Apply subroutine subname, prototype and attributes of `$other_meta`.
+
 ### is\_same\_interface($other\_meta)
+
+```perl
+method is_same_interface(InstanceOf[Sub::Meta] $other_meta) => Bool
+```
 
 A boolean value indicating whether the subroutine's interface is same or not.
 Specifically, check whether `subname`, `is_method`, `parameters` and `returns` are equal.
 
 ### is\_same\_interface\_inlined($other\_meta\_inlined)
+
+```perl
+method is_same_interface_inlined(InstanceOf[Sub::Meta] $other_meta) => Str
+```
 
 Returns inlined `is_same_interface` string:
 
@@ -382,7 +627,19 @@ $check->(Sub::Meta->new(subname => 'hello')); # => OK
 $check->(Sub::Meta->new(subname => 'world')); # => NG
 ```
 
+### interface\_error\_message($other\_meta)
+
+```perl
+method interface_error_message(InstanceOf[Sub::Meta] $other_meta) => Str
+```
+
+Return the error message when the interface does not match. If match, then return empty string.
+
 ### display
+
+```perl
+method display() => Str
+```
 
 Returns the display of Sub::Meta:
 
@@ -402,10 +659,18 @@ $meta->display;  # 'method hello(Str) => Str'
 
 ### parameters\_class
 
+```perl
+method parameters_class() => Str
+```
+
 Returns class name of parameters. default: Sub::Meta::Parameters
 Please override for customization.
 
 ### returns\_class
+
+```perl
+method returns_class() => Str
+```
 
 Returns class name of returns. default: Sub::Meta::Returns
 Please override for customization.
@@ -430,7 +695,7 @@ If that fails, or if the environment variable `PERL_SUB_META_PP` is defined to a
 
 # SEE ALSO
 
-[Sub::Identify](https://metacpan.org/pod/Sub%3A%3AIdentify), [Sub::Util](https://metacpan.org/pod/Sub%3A%3AUtil), [Sub::Info](https://metacpan.org/pod/Sub%3A%3AInfo), [Function::Parameters::Info](https://metacpan.org/pod/Function%3A%3AParameters%3A%3AInfo), [Function::Return::Info](https://metacpan.org/pod/Function%3A%3AReturn%3A%3AInfo)
+[Sub::Identify](https://metacpan.org/pod/Sub%3A%3AIdentify), [Sub::Util](https://metacpan.org/pod/Sub%3A%3AUtil), [Sub::Info](https://metacpan.org/pod/Sub%3A%3AInfo)
 
 # LICENSE
 

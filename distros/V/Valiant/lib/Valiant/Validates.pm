@@ -102,6 +102,10 @@ has 'errors' => (
   },
 );
 
+sub has_errors {
+  shift->errors->size ? 1:0; 
+}
+
 has 'validated' => (is=>'rw', required=>1, init_args=>undef, default=>0);
 has 'skip_validation' =>  (is=>'rw', required=>1, init_args=>undef, default=>0);
 
@@ -518,6 +522,12 @@ validations have not been run (via C<validate>) then we will first run validatio
 to L</valiates>.  If validations have already been run we just return true or false directly UNLESS you
 pass arguments in which case we clear errors first and then rerun validations with the arguments before
 returning true or false.
+
+=head2 has_errors
+
+Returns a boolean indicating if the object currently has errors.   This does not run a validation
+check first (unlike C<valid> or C<invalid>).   So if you just want to check the current state of
+the errors list and not tamper with that state you can use this.
 
 =head2 clear_validated
 

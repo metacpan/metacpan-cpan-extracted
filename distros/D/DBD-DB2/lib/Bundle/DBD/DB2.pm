@@ -1,6 +1,6 @@
 package Bundle::DBD::DB2;
 
-$VERSION = '1.85';
+$VERSION = '1.87';
 
 1;
 
@@ -39,7 +39,7 @@ Bundle::DBI
 
 =head1 AUTHOR
 
-DB2PERL E<lt>F<db2perl@ca.ibm.com>E<gt>
+DB2PERL E<lt>F<bkumar@rocketsoftware.com>E<gt>
 
 =head1 THANKS
 

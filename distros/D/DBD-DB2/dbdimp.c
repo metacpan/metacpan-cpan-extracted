@@ -2894,7 +2894,7 @@ AV *dbd_st_fetch( SV *sth,
 					  );
 					
               if( longTruncOk )
-                warn( msg );
+                warn( "%s", msg );
               else
                 croak( msg );
             }

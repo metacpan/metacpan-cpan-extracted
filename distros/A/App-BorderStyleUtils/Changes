@@ -1,3 +1,9 @@
+0.005   2021-01-23  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] [cli show-border-style] Tweak table output to test
+	  alignment, show table without row/column spans as well.
+
+
 0.004   2021-01-23  Released-By: PERLANCAR; Urgency: medium
 
 	- Avoid perl undef warning.

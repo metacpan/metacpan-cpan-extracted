@@ -12,12 +12,9 @@ dist.ini
 example/Makefile
 example/cpanfile
 example/lib/Catalyst/ActionRole/RequestModel.pm
-example/lib/Catalyst/Plugin/Errors.pm
-example/lib/Catalyst/View/Errors/HTML.pm
-example/lib/Catalyst/View/Errors/JSON.pm
-example/lib/Catalyst/View/Errors/Text.pm
 example/lib/Example.pm
 example/lib/Example/Controller/Root.pm
+example/lib/Example/Model/Schema.pm
 example/lib/Example/Schema.pm
 example/lib/Example/Schema/DefaultRS.pm
 example/lib/Example/Schema/Result.pm
@@ -30,15 +27,15 @@ example/lib/Example/Schema/Result/State.pm
 example/lib/Example/Schema/ResultSet.pm
 example/lib/Example/Schema/ResultSet/PersonRole.pm
 example/lib/Example/Server.pm
+example/lib/Example/View/HTML.pm
 example/lib/locale/names.pl
 example/root/authenticate.ep
-'example/root/authenticate.ep copy'
 example/root/home.html
 example/root/layout.ep
+example/root/login.ep
 example/root/navbar.html
 example/root/not_found.html
 example/root/profile.ep
-'example/root/profile.ep copy'
 example/root/register.ep
 example/sqitch.conf
 example/sql/deploy/2020-09-28-64975-first.sql
@@ -124,6 +121,7 @@ t/dbic/basic.t
 t/dbic/create.t
 t/dbic/m2m.t
 t/dbic/nested.t
+t/dbic/new_result.t
 t/dbic/todo_tests.t
 t/dbic/update.t
 t/error.t

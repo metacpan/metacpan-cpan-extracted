@@ -5,7 +5,7 @@
 ##======================================================================
 
 #require "../VectorValued/Version.pm"; ##-- use perl-reversion from Perl::Version instead
-my $VERSION = '1.0.9';
+my $VERSION = '1.0.10';
 pp_setversion($VERSION);
 
 require "../VectorValued/Dev.pm";
@@ -435,8 +435,13 @@ EOD
 # note: we export them to the PDL Core structure for use in
 #       other modules (eg Image2D)
 foreach (keys %PDL::Types::typehash) {
-    my $ctype = $PDL::Types::typehash{$_}{ctype};
-    my $ppsym = $PDL::Types::typehash{$_}{ppsym};
+    my $type_info = $PDL::Types::typehash{$_};
+
+    # skip non-real value types (do not support comparison operators).
+    next if(exists $type_info->{real} && ! $type_info->{real});
+
+    my $ctype = $type_info->{ctype};
+    my $ppsym = $type_info->{ppsym};
 
     pp_addhdr(<<"FOO"
 
@@ -557,8 +562,13 @@ Vectors with bad components should be moved to the end of the array.
 
 # Internal utility sorting routine for vv_qsortveci
 foreach (keys %PDL::Types::typehash) {
-    my $ctype = $PDL::Types::typehash{$_}{ctype};
-    my $ppsym = $PDL::Types::typehash{$_}{ppsym};
+    my $type_info = $PDL::Types::typehash{$_};
+
+    # skip non-real value types (do not support comparison operators).
+    next if(exists $type_info->{real} && ! $type_info->{real});
+
+    my $ctype = $type_info->{ctype};
+    my $ppsym = $type_info->{ppsym};
 
     pp_addhdr(<<"FOO"
       /*-- vector-based sorted index acquisition --*/

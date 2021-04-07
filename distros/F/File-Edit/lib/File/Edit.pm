@@ -2,7 +2,7 @@ package File::Edit;
 use Mojo::Base -base;
 use Path::Tiny qw/path/;
 use Carp;
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 has 'file';
 has 'found';        # Line numbers of found lines. ArrayRef.
@@ -129,7 +129,7 @@ File::Edit - A naive, probably buggy, file editor.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.0.2
 
 =cut
 =head1 SYNOPSIS

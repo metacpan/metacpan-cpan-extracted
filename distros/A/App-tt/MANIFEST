@@ -6,7 +6,6 @@ cpanfile
 lib/App/tt.pm
 Makefile.PL
 MANIFEST			This list of files
-README
 README.md
 script/tt
 t/00-basic.t

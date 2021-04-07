@@ -1,5 +1,9 @@
 Revision history for File-Edit
 
+0.0.2   07 Apr, 2021
+        Fixed missing PREREQ_PM in Makefile.PL.
+        Fixed test that failed on some OSes.
+
 0.0.1   06 Apr, 2021
         First version, released on an unsuspecting world.
 

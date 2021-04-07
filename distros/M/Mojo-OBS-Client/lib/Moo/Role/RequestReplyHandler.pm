@@ -1,11 +1,12 @@
 package Moo::Role::RequestReplyHandler;
 use Moo::Role;
+use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 use Scalar::Util 'weaken';
 use Moo::Role::RequestReplyHandler::EventListener;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 requires 'get_reply_key';
 

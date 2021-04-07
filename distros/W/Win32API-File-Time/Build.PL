@@ -16,25 +16,32 @@ my $meta = My::Module::Meta->new();
 $meta->os_check();
 
 my %args = (
-    dist_author => 'Tom Wyant (wyant at cpan dot org)',
-    dist_abstract => 'Get and set file times in Windows - including open files',
-    module_name => 'Win32API::File::Time',
-    requires => $meta->requires(
+    add_to_cleanup	=> $meta->add_to_cleanup(),
+    build_requires	=> $meta->build_requires(),
+    configure_requires	=> $meta->configure_requires(),
+    dist_abstract	=> $meta->abstract(),
+    dist_author	=> $meta->author(),
+    dist_name	=> $meta->dist_name(),
+    license	=> $meta->license(),
+    module_name	=> $meta->module_name(),
+    requires	=> $meta->requires(
 	perl	=> $meta->requires_perl(),
     ),
-    build_requires => $meta->build_requires(),
-    license => 'perl',
-    add_to_cleanup	=> [ qw{ cover_db } ],
+    script_files	=> $meta->script_files(),
 );
 
-$mbv >= 0.28
-    and $args{meta_merge} = $meta->meta_merge();
+if ( $mbv >= 0.28 ) {
+    $args{meta_merge} = $meta->meta_merge();
+    $args{meta_add} = {
+	no_index	=> $meta->no_index(),
+    };
+}
 
 $mbv >= 0.34
     and $args{auto_configure_requires} = 0;	# Don't require Module::Build
 
-my $bldr = My::Module::Build->new(%args);
+my $bldr = My::Module::Build->new( %args );
 
-$bldr->create_build_script ();
+$bldr->create_build_script();
 
 # ex: set textwidth=72 :

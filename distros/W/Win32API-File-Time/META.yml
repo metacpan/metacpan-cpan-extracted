@@ -3,7 +3,12 @@ abstract: 'Get and set file times in Windows - including open files'
 author:
   - 'Tom Wyant (wyant at cpan dot org)'
 build_requires:
+  File::Temp: '0'
   Test::More: '0.88'
+  constant: '0'
+configure_requires:
+  Config: '0'
+  lib: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -19,7 +24,7 @@ no_index:
 provides:
   Win32API::File::Time:
     file: lib/Win32API/File/Time.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -29,11 +34,10 @@ requires:
   parent: '0'
   perl: '5.006002'
   strict: '0'
-  vars: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/trwyant/perl-Win32API-File-Time/issues
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Win32API-File-Time
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Win32API-File-Time.git
-version: '0.010'
+version: '0.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

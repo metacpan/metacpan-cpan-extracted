@@ -2,6 +2,11 @@
 ##
 ## Change log for perl distribution PDL::VectorValued
 
+v1.0.10 Wed, 07 Apr 2021 09:52:45 +0200 moocow
+	* applied Zaki Mughal's patch for PDL native complex types in PDL > 2.028
+	  - https://github.com/zmughal/PDL-VectorValued/compare/skip-complex-types
+	  - fixes RT bug #134962
+
 v1.0.9 Fri, 18 May 2018 09:44:25 +0200 moocow
 	* added README.rpod to MANIFEST
 	* only include README.txt in "realclean" targets if README.rpod is present

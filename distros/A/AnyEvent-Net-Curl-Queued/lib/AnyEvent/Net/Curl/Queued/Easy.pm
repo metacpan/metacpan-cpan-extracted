@@ -39,7 +39,7 @@ use AnyEvent::Net::Curl::Queued::Stats;
 
 no if ($] >= 5.017010), warnings => q(experimental);
 
-our $VERSION = '0.048'; # VERSION
+our $VERSION = '0.049'; # VERSION
 
 has json        => (
     is          => 'ro',
@@ -421,7 +421,7 @@ AnyEvent::Net::Curl::Queued::Easy - Net::Curl::Easy wrapped by Moo
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 

@@ -12,7 +12,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::CustomField::HideEmptyValues');
@@ -25,7 +25,7 @@ INSTALLATION
         @Plugins line.
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
@@ -42,7 +42,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-CustomField-HideEmptyValues>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2009-2014 by Best Pracical Solutions,
+    This software is Copyright (c) 2009-2021 by Best Pracical Solutions,
     LLC.
 
     This is free software, licensed under:

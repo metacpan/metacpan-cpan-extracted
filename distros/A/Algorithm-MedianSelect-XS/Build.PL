@@ -16,15 +16,16 @@ my $build = Module::Build->new
                  'XSLoader' => 0,
                },
    build_requires => { 'Test::More' => 0 },
-   recommends => {
-                   'Test::Pod' => '1.14',
-                   'Test::Pod::Coverage' => '1.04',
-                 },
    xs_files => { 'XS.xs' => 'lib/Algorithm/MedianSelect/XS.xs' },
    include_dirs => [ '.' ],
    license => 'perl',
    create_readme => 1,
    create_makefile_pl => 'traditional',
+   meta_merge => {
+       resources => {
+           repository => 'https://github.com/stsc/Algorithm-MedianSelect-XS',
+       }
+   }
   );
-  
+
 $build->create_build_script;

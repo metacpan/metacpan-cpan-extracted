@@ -11,7 +11,12 @@ subtest 'empty' => sub {
     is $returns->scalar, undef;
     is $returns->list, undef;
     is $returns->void, undef;
-    ok !$returns->coerce;
+    is $returns->coerce, undef;
+
+    ok !$returns->has_scalar;
+    ok !$returns->has_list;
+    ok !$returns->has_void;
+    ok !$returns->has_coerce;
 };
 
 subtest 'sinble object' => sub {
@@ -20,7 +25,12 @@ subtest 'sinble object' => sub {
     is $returns->scalar, Int;
     is $returns->list, Int;
     is $returns->void, Int;
-    ok !$returns->coerce;
+    is $returns->coerce, undef;
+
+    ok $returns->has_scalar;
+    ok $returns->has_list;
+    ok $returns->has_void;
+    ok !$returns->has_coerce;
 };
 
 subtest 'sinble string' => sub {
@@ -29,7 +39,12 @@ subtest 'sinble string' => sub {
     is $returns->scalar, 'Int';
     is $returns->list, 'Int';
     is $returns->void, 'Int';
-    ok !$returns->coerce;
+    is $returns->coerce, undef;
+
+    ok $returns->has_scalar;
+    ok $returns->has_list;
+    ok $returns->has_void;
+    ok !$returns->has_coerce;
 };
 
 subtest 'arrayref' => sub {
@@ -38,7 +53,12 @@ subtest 'arrayref' => sub {
     is $returns->scalar, [ Int, Str ];
     is $returns->list, [ Int, Str ];
     is $returns->void, [ Int, Str ];
-    ok !$returns->coerce;
+    is $returns->coerce, undef;
+
+    ok $returns->has_scalar;
+    ok $returns->has_list;
+    ok $returns->has_void;
+    ok !$returns->has_coerce;
 };
 
 subtest 'hashref' => sub {
@@ -48,7 +68,12 @@ subtest 'hashref' => sub {
         is $returns->scalar, undef;
         is $returns->list, undef;
         is $returns->void, undef;
-        ok !$returns->coerce;
+        is $returns->coerce, undef;
+
+        ok !$returns->has_scalar;
+        ok !$returns->has_list;
+        ok !$returns->has_void;
+        ok !$returns->has_coerce;
     };
 
     subtest 'specify scalar' => sub {
@@ -57,7 +82,12 @@ subtest 'hashref' => sub {
         is $returns->scalar, Int;
         is $returns->list, undef;
         is $returns->void, undef;
-        ok !$returns->coerce;
+        is $returns->coerce, undef;
+
+        ok $returns->has_scalar;
+        ok !$returns->has_list;
+        ok !$returns->has_void;
+        ok !$returns->has_coerce;
     };
 
     subtest 'specify list' => sub {
@@ -66,7 +96,12 @@ subtest 'hashref' => sub {
         is $returns->scalar, undef;
         is $returns->list, Int;
         is $returns->void, undef;
-        ok !$returns->coerce;
+        is $returns->coerce, undef;
+
+        ok !$returns->has_scalar;
+        ok $returns->has_list;
+        ok !$returns->has_void;
+        ok !$returns->has_coerce;
     };
 
     subtest 'specify void' => sub {
@@ -75,7 +110,12 @@ subtest 'hashref' => sub {
         is $returns->scalar, undef;
         is $returns->list, undef;
         is $returns->void, Int;
-        ok !$returns->coerce;
+        is $returns->coerce, undef;
+
+        ok !$returns->has_scalar;
+        ok !$returns->has_list;
+        ok $returns->has_void;
+        ok !$returns->has_coerce;
     };
 
     subtest 'specify coerce' => sub {
@@ -84,7 +124,12 @@ subtest 'hashref' => sub {
         is $returns->scalar, undef;
         is $returns->list, undef;
         is $returns->void, undef;
-        ok $returns->coerce;
+        is $returns->coerce, !!1;
+
+        ok !$returns->has_scalar;
+        ok !$returns->has_list;
+        ok !$returns->has_void;
+        ok $returns->has_coerce;
     };
 
     subtest 'mixed' => sub {
@@ -93,7 +138,12 @@ subtest 'hashref' => sub {
         is $returns->scalar, Int;
         is $returns->list, Str;
         is $returns->void, [Int, Str];
-        ok $returns->coerce;
+        is $returns->coerce, !!1; 
+
+        ok $returns->has_scalar;
+        ok $returns->has_list;
+        ok $returns->has_void;
+        ok $returns->has_coerce;
     };
 };
 
@@ -104,7 +154,12 @@ subtest 'list' => sub {
         is $returns->scalar, Int;
         is $returns->list, undef;
         is $returns->void, undef;
-        ok !$returns->coerce;
+        is $returns->coerce, undef;
+
+        ok $returns->has_scalar;
+        ok !$returns->has_list;
+        ok !$returns->has_void;
+        ok !$returns->has_coerce;
     };
 
     subtest 'specify list' => sub {
@@ -113,7 +168,12 @@ subtest 'list' => sub {
         is $returns->scalar, undef;
         is $returns->list, Int;
         is $returns->void, undef;
-        ok !$returns->coerce;
+        is $returns->coerce, undef;
+
+        ok !$returns->has_scalar;
+        ok $returns->has_list;
+        ok !$returns->has_void;
+        ok !$returns->has_coerce;
     };
 
     subtest 'specify void' => sub {
@@ -122,7 +182,12 @@ subtest 'list' => sub {
         is $returns->scalar, undef;
         is $returns->list, undef;
         is $returns->void, Int;
-        ok !$returns->coerce;
+        is $returns->coerce, undef;
+
+        ok !$returns->has_scalar;
+        ok !$returns->has_list;
+        ok $returns->has_void;
+        ok !$returns->has_coerce
     };
 
     subtest 'specify coerce' => sub {
@@ -131,7 +196,12 @@ subtest 'list' => sub {
         is $returns->scalar, undef;
         is $returns->list, undef;
         is $returns->void, undef;
-        ok $returns->coerce;
+        is $returns->coerce, !!1;
+
+        ok !$returns->has_scalar;
+        ok !$returns->has_list;
+        ok !$returns->has_void;
+        ok $returns->has_coerce
     };
 
     subtest 'mixed' => sub {
@@ -140,7 +210,12 @@ subtest 'list' => sub {
         is $returns->scalar, Int;
         is $returns->list, Str;
         is $returns->void, [Int, Str];
-        ok $returns->coerce;
+        is $returns->coerce, !!1;
+
+        ok $returns->has_scalar;
+        ok $returns->has_list;
+        ok $returns->has_void;
+        ok $returns->has_coerce
     };
 };
 
@@ -160,11 +235,10 @@ subtest 'setters' => sub {
     is $returns->set_void('Int'), $returns, 'set_void';
     is $returns->void, 'Int', 'void';
 
-    ok !$returns->coerce, 'coerce';
-    is $returns->set_coerce, $returns, 'set_coerce';
-    ok $returns->coerce, 'coerce';
-    is $returns->set_coerce(0), $returns, 'set_coerce';
-    ok !$returns->coerce, 'coerce';
+    my $coerce = sub { };
+    is $returns->coerce, undef, 'coerce';
+    is $returns->set_coerce($coerce), $returns, 'set_coerce';
+    is $returns->coerce, $coerce, 'coerce';
 };
 
 done_testing;

@@ -3,6 +3,13 @@ use strict;
 use utf8;
 use warnings qw(all);
 
+BEGIN {
+    unless ($ENV{AUTHOR_TESTING}) {
+        require Test::More;
+        Test::More::plan(skip_all => q(these tests are for testing by the author));
+    }
+}
+
 use Test::More;
 
 use AnyEvent::Net::Curl::Queued;

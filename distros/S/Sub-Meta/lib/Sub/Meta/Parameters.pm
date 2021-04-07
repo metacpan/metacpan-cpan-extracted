@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.10";
+our $VERSION = "0.11";
 
 use Carp ();
 use Scalar::Util ();
@@ -30,17 +30,20 @@ sub new {
 
     $self->set_invocant(delete $args{invocant}) if exists $args{invocant};
     $self->set_nshift(delete $args{nshift}) if exists $args{nshift};
-    $self->set_slurpy(delete $args{slurpy}) if exists $args{slurpy};
+    $self->set_slurpy(delete $args{slurpy}) if $args{slurpy};
 
     return $self;
 }
 
 sub nshift()    { my $self = shift; return $self->{nshift} // 0 }
-sub slurpy()    { my $self = shift; return $self->{slurpy} ? $self->{slurpy} : !!0 }
+sub slurpy()    { my $self = shift; return $self->{slurpy} }
 sub args()      { my $self = shift; return $self->{args} }
 sub invocant()  { my $self = shift; return $self->{invocant} }
 sub invocants() { my $self = shift; return defined $self->{invocant} ? [ $self->{invocant} ] : [] }
 sub all_args()  { my $self = shift; return [ @{$self->invocants}, @{$self->args} ] }
+
+sub has_invocant() { my $self = shift; return defined $self->{invocant} }
+sub has_slurpy()   { my $self = shift; return defined $self->{slurpy} }
 
 sub set_slurpy {
     my ($self, $v) = @_;
@@ -164,16 +167,20 @@ sub is_same_interface {
 
     return unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
 
-    return unless $self->slurpy ? $self->slurpy->is_same_interface($other->slurpy)
-                                : !$other->slurpy;
+    if ($self->has_slurpy) {
+        return unless $self->slurpy->is_same_interface($other->slurpy)
+    }
+    else {
+        return if $other->has_slurpy;
+    }
+
+    return unless $self->nshift == $other->nshift;
 
     return unless @{$self->all_args} == @{$other->all_args};
 
     for (my $i = 0; $i < @{$self->all_args}; $i++) {
         return unless $self->all_args->[$i]->is_same_interface($other->all_args->[$i]);
     }
-
-    return unless $self->nshift == $other->nshift;
 
     return !!1;
 }
@@ -185,8 +192,10 @@ sub is_same_interface_inlined {
 
     push @src => sprintf("Scalar::Util::blessed(%s) && %s->isa('Sub::Meta::Parameters')", $v, $v);
 
-    push @src => $self->slurpy ? $self->slurpy->is_same_interface_inlined(sprintf('%s->slurpy', $v))
-                               : sprintf('!%s->slurpy', $v);
+    push @src => $self->has_slurpy ? $self->slurpy->is_same_interface_inlined(sprintf('%s->slurpy', $v))
+                                   : sprintf('!%s->has_slurpy', $v);
+
+    push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
 
     push @src => sprintf('%d == @{%s->all_args}', scalar @{$self->all_args}, $v);
 
@@ -194,9 +203,37 @@ sub is_same_interface_inlined {
         push @src => $self->all_args->[$i]->is_same_interface_inlined(sprintf('%s->all_args->[%d]', $v, $i))
     }
 
-    push @src => sprintf('%d == %s->nshift', $self->nshift, $v);
-
     return join "\n && ", @src;
+}
+
+sub interface_error_message {
+    my ($self, $other) = @_;
+
+    return sprintf('must be Sub::Meta::Parameters. got: %s', $other // '')
+        unless Scalar::Util::blessed($other) && $other->isa('Sub::Meta::Parameters');
+
+    if ($self->has_slurpy) {
+        return sprintf('invalid slurpy. got: %s, expected: %s', $other->has_slurpy ? $other->slurpy->display : '', $self->slurpy->display)
+            unless $self->slurpy->is_same_interface($other->slurpy)
+    }
+    else {
+        return 'should not have slurpy' if $other->has_slurpy;
+    }
+
+    return sprintf('nshift is not equal. got: %d, expected: %d', $other->nshift, $self->nshift)
+        unless $self->nshift == $other->nshift;
+
+    return sprintf('args length is not equal. got: %d, expected: %d', scalar @{$other->all_args}, scalar @{$self->all_args})
+        unless @{$self->all_args} == @{$other->all_args};
+
+    for (my $i = 0; $i < @{$self->all_args}; $i++) {
+        my $s = $self->all_args->[$i];
+        my $o = $other->all_args->[$i];
+        return sprintf('args[%d] is invalid. got: %s, expected: %s', $i, $o->display, $s->display)
+            unless $s->is_same_interface($o);
+    }
+
+    return '';
 }
 
 sub display {
@@ -281,9 +318,16 @@ Constructor of C<Sub::Meta::Parameters>.
 
 =head3 args
 
+    method args() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Subroutine arguments arrayref.
 
-=head3 set_args(ArrayRef), set_args(HashRef), set_args(Ref)
+=head3 set_args
+
+    method set_args(ArrayRef[InstanceOf[Sub::Meta::Param]]) => $self
+    method set_args(ArrayRef[$sub_meta_param_args]) => $self
+    method set_args(Dict[Str, $sub_meta_param_args]) => $self
+    method set_args(Ref $type) => $self
 
 Setter for subroutine arguments.
 An element can be an argument of C<Sub::Meta::Param>.
@@ -306,22 +350,39 @@ An element can be an argument of C<Sub::Meta::Param>.
 
 =head3 all_args
 
+    method all_args() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Subroutine invocants and arguments arrayref.
 
 =head3 nshift
 
+    method nshift() => Enum[0,1]
+
 Number of shift arguments.
 
 =head3 set_nshift($nshift)
+
+    method nshift(Enum[0,1] $nshift) => $self
 
 Setter for nshift.
 For example, it is assumed that 1 is specified in the case of methods, and 0 is specified in the case of normal functions.
 
 =head3 slurpy
 
+    method slurpy() => Maybe[InstanceOf[Sub::Meta::Param]]
+
 Subroutine all rest arguments.
 
+=head3 has_slurpy
+
+    method has_slurpy() => Bool
+
+Whether Sub::Meta::Parameters has slurpy or not.
+
 =head3 set_slurpy($param_args)
+
+    method set_slurpy(InstanceOf[Sub::Meta::Param]) => $self> or
+    method set_slurpy($sub_meta_param_args)> or
 
 Setter for slurpy:
 
@@ -330,37 +391,62 @@ Setter for slurpy:
 
 =head3 positional
 
+    method positional() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Returns an arrayref of parameter objects for the positional arguments.
 
 =head3 positional_required
+
+    method positional_required() => ArrayRef[InstanceOf[Sub::Meta::Param]]
 
 Returns an arrayref of parameter objects for the required positional arguments.
 
 =head3 positional_optional
 
+    method positional_optional() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Returns an arrayref of parameter objects for the optional positional arguments.
 
 =head3 named
+
+    method named() => ArrayRef[InstanceOf[Sub::Meta::Param]]
 
 Returns an arrayref of parameter objects for the named arguments.
 
 =head3 named_required
 
+    method named_required() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Returns an arrayref of parameter objects for the required named arguments.
 
 =head3 named_optional
+
+    method named_optional() => ArrayRef[InstanceOf[Sub::Meta::Param]]
 
 Returns an arrayref of parameter objects for the optional named arguments.
 
 =head3 invocant
 
+    method invocant() => Maybe[InstanceOf[Sub::Meta::Param]]
+
 First element of invocants.
 
 =head3 invocants
 
+    method invocants() => ArrayRef[InstanceOf[Sub::Meta::Param]]
+
 Returns an arrayref of parameter objects for the variables into which initial arguments are shifted automatically. This will usually return () for normal functions and ('$self') for methods.
 
-=head3 set_invocant
+=head3 has_invocant 
+
+    method has_invocant() => Bool
+
+Whether Sub::Meta::Parameters has invocant or not.
+
+=head3 set_invocant($param_args)
+
+    method set_invocant(InstanceOf[Sub::Meta::Param]) => $self
+    method set_invocant($sub_meta_param_args) => $self
 
 Setter for invocant:
 
@@ -373,6 +459,8 @@ Setter for invocant:
 
 =head3 args_min
 
+    method args_min() => NonNegativeInt
+
 Returns the minimum number of required arguments.
 
 This is computed as follows:
@@ -382,6 +470,8 @@ This is computed as follows:
   Slurpy parameters don't count either because they accept empty lists.
 
 =head3 args_max
+
+    method args_max() => NonNegativeInt
 
 Returns the maximum number of arguments.
 
@@ -393,14 +483,26 @@ This is computed as follows:
 
 =head3 is_same_interface($other_meta)
 
+    method is_same_interface(InstanceOf[Sub::Meta::Parameters] $other_meta) => Bool
+
 A boolean value indicating whether C<Sub::Meta::Parameters> object is same or not.
 Specifically, check whether C<args>, C<nshift> and C<slurpy> are equal.
 
 =head3 is_same_interface_inlined($other_meta_inlined)
 
+    method is_same_interface_inlined(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
+
 Returns inlined C<is_same_interface> string.
 
+=head3 interface_error_message($other_meta)
+
+    method interface_error_message(InstanceOf[Sub::Meta::Parameters] $other_meta) => Str
+
+Return the error message when the interface does not match.
+
 =head3 display
+
+    method display() => Str
 
 Returns the display of Sub::Meta::Parameters:
 
@@ -417,6 +519,8 @@ Returns the display of Sub::Meta::Parameters:
 =head2 OTHERS
 
 =head3 param_class
+
+    method param_class() => Str
 
 Returns class name of param. default: Sub::Meta::Param
 Please override for customization.

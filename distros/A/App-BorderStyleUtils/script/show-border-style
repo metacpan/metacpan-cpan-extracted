@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-23'; # DATE
 our $DIST = 'App-BorderStyleUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,7 +41,7 @@ show-border-style - Show example table with specified border style
 
 =head1 VERSION
 
-This document describes version 0.004 of show-border-style (from Perl distribution App-BorderStyleUtils), released on 2021-01-23.
+This document describes version 0.005 of show-border-style (from Perl distribution App-BorderStyleUtils), released on 2021-01-23.
 
 =head1 SYNOPSIS
 

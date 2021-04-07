@@ -2,6 +2,7 @@ use Test2::V0;
 
 use Sub::Meta::Parameters;
 
+my $slurpy = Sub::Meta::Param->new("Slurpy");
 my $p1 = Sub::Meta::Param->new("Str");
 my $p2 = Sub::Meta::Param->new("Int");
 sub param { my @args = @_; return Sub::Meta::Param->new(@args); }
@@ -9,49 +10,49 @@ sub param { my @args = @_; return Sub::Meta::Param->new(@args); }
 my $obj = bless {} => 'Some';
 
 my @TEST = (
-    { args => [], slurpy => 0, nshift => 0 } => {
+    { args => [], slurpy => undef, nshift => 0 } => {
     NG => [
     undef, 'invalid other',
     $obj, 'invalid obj',
-    { args => [$p1], slurpy => 0, nshift => 0 }, 'invalid args',
-    { args => [], slurpy => 1, nshift => 0 }, 'invalid slurpy',
-    #{ args => [], slurpy => 0, nshift => 1 }, 'invalid nshift', => exception _assert_nshift
+    { args => [$p1], slurpy => undef, nshift => 0 }, 'invalid args',
+    { args => [], slurpy => $slurpy, nshift => 0 }, 'invalid slurpy',
+    { args => [], slurpy => undef, nshift => 1 }, 'invalid nshift',
     ],
     OK => [
-    { args => [], slurpy => 0, nshift => 0 }, 'valid',
+    { args => [], slurpy => undef, nshift => 0 }, 'valid',
     ]},
 
     # one args
-    { args => [$p1], slurpy => 0, nshift => 0 } => {
+    { args => [$p1], slurpy => undef, nshift => 0 } => {
     NG => [
-    { args => [$p2], slurpy => 0, nshift => 0 }, 'invalid args',
-    { args => [$p1, $p2], slurpy => 0, nshift => 0 }, 'too many args',
-    { args => [], slurpy => 0, nshift => 0 }, 'too few args',
+    { args => [$p2], slurpy => undef, nshift => 0 }, 'invalid args',
+    { args => [$p1, $p2], slurpy => undef, nshift => 0 }, 'too many args',
+    { args => [], slurpy => undef, nshift => 0 }, 'too few args',
     ],
     OK => [
-    { args => [$p1], slurpy => 0, nshift => 0 }, 'valid',
+    { args => [$p1], slurpy => undef, nshift => 0 }, 'valid',
     ]},
 
     # two args
-    { args => [$p1, $p2], slurpy => 0, nshift => 0 } => {
+    { args => [$p1, $p2], slurpy => undef, nshift => 0 } => {
     NG => [
-    { args => [$p2, $p1], slurpy => 0, nshift => 0 }, 'invalid args',
-    { args => [$p1, $p2, $p1], slurpy => 0, nshift => 0 }, 'too many args',
-    { args => [$p1], slurpy => 0, nshift => 0 }, 'too few args',
+    { args => [$p2, $p1], slurpy => undef, nshift => 0 }, 'invalid args',
+    { args => [$p1, $p2, $p1], slurpy => undef, nshift => 0 }, 'too many args',
+    { args => [$p1], slurpy => undef, nshift => 0 }, 'too few args',
     ],
     OK => [
-    { args => [$p1, $p2], slurpy => 0, nshift => 0 }, 'valid',
+    { args => [$p1, $p2], slurpy => undef, nshift => 0 }, 'valid',
     ]},
 
     # slurpy
-    { args => [], slurpy => 1, nshift => 0 } => {
+    { args => [], slurpy => $slurpy, nshift => 0 } => {
     NG => [
-    { args => [$p1], slurpy => 0, nshift => 0 }, 'invalid args',
-    { args => [], slurpy => 0, nshift => 0 }, 'invalid slurpy',
-    #{ args => [], slurpy => 0, nshift => 1 }, 'invalid nshift', => exception _assert_nshift
+    { args => [$p1], slurpy => undef, nshift => 0 }, 'invalid args',
+    { args => [], slurpy => undef, nshift => 0 }, 'invalid slurpy',
+    { args => [], slurpy => $slurpy, nshift => 1 }, 'invalid nshift',
     ],
     OK => [
-    { args => [], slurpy => 1, nshift => 0 }, 'valid',
+    { args => [], slurpy => $slurpy, nshift => 0 }, 'valid',
     ]},
 
     # empty slurpy
@@ -64,28 +65,28 @@ my @TEST = (
     ]},
 
     # nshift
-    { args => [$p1], slurpy => 0, nshift => 1 } => {
+    { args => [$p1], slurpy => undef, nshift => 1 } => {
     NG => [
-    { args => [$p2], slurpy => 0, nshift => 1 }, 'invalid args',
-    { args => [$p1, $p2], slurpy => 0, nshift => 1 }, 'too many args',
-    { args => [$p1], slurpy => 1, nshift => 1 }, 'invalid slurpy',
+    { args => [$p2], slurpy => undef, nshift => 1 }, 'invalid args',
+    { args => [$p1, $p2], slurpy => undef, nshift => 1 }, 'too many args',
+    { args => [$p1], slurpy => $slurpy, nshift => 1 }, 'invalid slurpy',
     ],
     OK => [
-    { args => [$p1], slurpy => 0, nshift => 1 }, 'valid',
+    { args => [$p1], slurpy => undef, nshift => 1 }, 'valid',
     ]},
 
     # slurpy & nshift
-    { args => [$p1], slurpy => 1, nshift => 1 } => {
+    { args => [$p1], slurpy => $slurpy, nshift => 1 } => {
     NG => [
-    { args => [$p2], slurpy => 1, nshift => 1 }, 'invalid args',
-    { args => [$p1, $p2], slurpy => 1, nshift => 1 }, 'too many args',
-    { args => [$p1], slurpy => 0, nshift => 1 }, 'invalid slurpy',
-    { args => [$p1], slurpy => 1, nshift => 0 }, 'invalid nshift',
-    { args => [$p1], slurpy => 1, invocant => param(invocant => 1, name => '$self') }, 'valid',
+    { args => [$p2], slurpy => $slurpy, nshift => 1 }, 'invalid args',
+    { args => [$p1, $p2], slurpy => $slurpy, nshift => 1 }, 'too many args',
+    { args => [$p1], slurpy => undef, nshift => 1 }, 'invalid slurpy',
+    { args => [$p1], slurpy => $slurpy, nshift => 0 }, 'invalid nshift',
+    { args => [$p1], slurpy => $slurpy, invocant => param(invocant => 1, name => '$self') }, 'valid',
     ],
     OK => [
-    { args => [$p1], slurpy => 1, nshift => 1 }, 'valid',
-    { args => [$p1], slurpy => 1, invocant => param(invocant => 1) }, 'valid',
+    { args => [$p1], slurpy => $slurpy, nshift => 1 }, 'valid',
+    { args => [$p1], slurpy => $slurpy, invocant => param(invocant => 1) }, 'valid',
     ]},
 
     # default invocant

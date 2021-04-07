@@ -40,7 +40,7 @@ my %module = (
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.010', # I use // in some places
+    MIN_PERL_VERSION => '5.012', # I use // and say() in some places
 
     'LICENSE'=> 'perl',
 

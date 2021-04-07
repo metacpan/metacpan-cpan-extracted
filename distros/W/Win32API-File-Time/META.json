@@ -23,7 +23,15 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "File::Temp" : "0",
+            "Test::More" : "0.88",
+            "constant" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "lib" : "0"
          }
       },
       "runtime" : {
@@ -36,7 +44,6 @@
             "parent" : "0",
             "perl" : "5.006002",
             "strict" : "0",
-            "vars" : "0",
             "warnings" : "0"
          }
       }
@@ -44,14 +51,14 @@
    "provides" : {
       "Win32API::File::Time" : {
          "file" : "lib/Win32API/File/Time.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "wyant@cpan.org",
-         "web" : "https://github.com/trwyant/perl-Win32API-File-Time/issues"
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Win32API-File-Time"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -62,6 +69,6 @@
          "web" : "https://github.com/trwyant/perl-Win32API-File-Time"
       }
    },
-   "version" : "0.010",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.011",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

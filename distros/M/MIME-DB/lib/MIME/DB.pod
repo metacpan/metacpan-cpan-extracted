@@ -19,7 +19,7 @@ The database does not include any logic, allowing it to remain as un-opinionated
 
     my @known_html_extensions = @{ $db->{'text/html'}->{extensions} || [] };
 
-    my $version = MIME::DB->VERSION;
+    my $version = MIME::DB->version;
 
     print "As of version $version:\n";
 
@@ -35,9 +35,23 @@ The database does not include any logic, allowing it to remain as un-opinionated
         }
     }
 
-C<data> returns the database as a HASH reference.
+=over 4
 
-Each call to C<data> returns an independant copy of the database, so it can be modified without affecting others.
+=item data
+
+returns the database as a HASH reference.
+
+Each call to C<data> returns an independent copy of the database, so it can be modified without affecting others.
+
+It is highly recommended to store it in a variable if several calls are to be issued, for performance reasons.
+
+=item version
+
+returns the version of the database.
+
+This might be different from C<$VERSION>.
+
+=back
 
 =head1 Data Structure
 
@@ -71,20 +85,18 @@ If unknown, every property could be undefined.
 
 L<mime-db github homepage|https://github.com/jshttp/mime-db>
 
-=head1 AUTHORS
+=head1 AUTHOR
 
 =over 2
 
-=item * Jonathan Ong E<lt>me@jongleberry.comE<gt> (original JavaScript package)
-
-=item * Thomas Drugeon, E<lt>tdrugeon@cpan.orgE<gt> (Perl port)
+=item * Thomas Drugeon, E<lt>tdrugeon@cpan.orgE<gt>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-L<mime-db|https://github.com/jshttp/mime-db> is copyright (c) 2014 Jonathan Ong and licensed under the MIT License
+L<mime-db|https://github.com/jshttp/mime-db> is copyright 2014 Jonathan Ong and licensed under the MIT License
 
-L<MIME::DB> is copyright (c) 2021 Thomas Drugeon and licensed under the MIT License
+L<MIME::DB> is copyright 2021 Thomas Drugeon and licensed under the MIT License
 
 =cut

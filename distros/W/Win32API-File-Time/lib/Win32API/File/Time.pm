@@ -71,7 +71,7 @@ use Time::Local;
 use Win32::API;
 use Win32API::File qw{ :ALL };
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 our @EXPORT_OK = qw{ GetFileTime SetFileTime utime };
 our %EXPORT_TAGS = (
@@ -103,7 +103,6 @@ sub GetFileTime {
     CloseHandle( $fh );
     return _filetime_to_perltime( $atime, $mtime, $ctime );
 }
-
 
 =item SetFileTime( filename, atime, mtime, ctime );
 
@@ -162,7 +161,6 @@ sub utime {	## no critic (ProhibitBuiltinHomonyms)
     return $num;
 }
 
-
 #######################################################################
 #
 #	Internal subroutines
@@ -179,7 +177,6 @@ sub _close_handle {
     $^E = $err;	## no critic (RequireLocalizedPunctuationVars)
     return;
 }
-
 
 #	_filetime_to_perltime
 #
@@ -223,7 +220,6 @@ sub _filetime_to_perltime {
     return wantarray ? @result : $result[0];
 }
 
-
 #	_get_handle
 #
 #	This subroutine takes a file name and returns a handle to the
@@ -258,7 +254,6 @@ sub _get_handle {
     return $handle;
 }
 
-
 #	_map
 #
 #	This subroutine calls Win32API to map an entry point.
@@ -267,7 +262,6 @@ sub _map {
 return Win32::API->new ( @_ ) ||
     croak "Error - Failed to map $_[1] from $_[0]: $^E";
 }
-
 
 #	_perltime_to_filetime
 #
@@ -369,6 +363,7 @@ L<https://docs.microsoft.com/en-us/windows/win32/sysinfo/file-times>.
 Access time resolution seems to be to the nearest day.
 
 Support is by the author. Please file bug reports at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Win32API-File-Time>,
 L<https://github.com/trwyant/perl-Win32API-File-Time/issues>, or in
 electronic mail to the author.
 

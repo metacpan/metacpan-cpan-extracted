@@ -26,11 +26,11 @@ requires:
   Mojo::JSON: '0'
   Mojo::UserAgent: '0'
   Net::Protocol::OBSRemote: '0'
-  perl: '5.010'
+  perl: '5.012'
 resources:
   bugtracker: https://github.com/Corion/Mojo-OBS-Client/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Mojo-OBS-Client.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

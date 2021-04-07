@@ -1,4 +1,4 @@
-# Copyrights 2007-2019 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2021 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package XML::Compile::Transport;
 use vars '$VERSION';
-$VERSION = '3.26';
+$VERSION = '3.27';
 
 use base 'XML::Compile::SOAP::Extension';
 
@@ -72,14 +72,14 @@ sub compileClient(@)
         my $connected = time;
         $trace->{connect_elapse}   = $connected - $stringify;
         if($@)
-        {   $trace->{errors} = [$@->wasFatal];
+        {   $trace->{errors} = [ $@->wasFatal ];
             return;
         }
 
         my $xmlin;
         if($textin)
-        {   $xmlin = try {XML::LibXML->load_xml(string => $$textin)};
-            if($@) { $trace->{errors} = [$@->wasFatal] }
+        {   $xmlin = try { XML::LibXML->load_xml(string => $$textin) };
+            if($@) { $trace->{errors} = [ $@->wasFatal ] }
             else   { $trace->{response_dom} = $xmlin }
         }
 

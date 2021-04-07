@@ -6,7 +6,7 @@ subtest 'single arg' => sub {
     my $param = Sub::Meta::Param->new('Type');
     is $param->type, 'Type', 'type';
     is $param->isa_, 'Type', 'isa';
-    is $param->name, undef, 'name';
+    is $param->name, '', 'name';
     is $param->default, undef, 'default';
     is $param->coerce, undef, 'coerce';
     ok $param->positional, 'positional';
@@ -14,6 +14,10 @@ subtest 'single arg' => sub {
     ok $param->required, 'required';
     ok !$param->optional, 'optional';
     ok !$param->invocant, 'not invocant';
+    ok !$param->has_name;
+    ok $param->has_type;
+    ok !$param->has_default;
+    ok !$param->has_coerce;
 };
 
 subtest 'hashref arg' => sub {
@@ -27,6 +31,10 @@ subtest 'hashref arg' => sub {
     ok !$param->required, 'required';
     ok $param->optional, 'optional';
     ok !$param->invocant, 'not invocant';
+    ok $param->has_name;
+    ok $param->has_type;
+    ok $param->has_default;
+    ok !$param->has_coerce;
 };
 
 subtest 'setter' => sub {

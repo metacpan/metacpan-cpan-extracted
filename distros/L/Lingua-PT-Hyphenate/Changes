@@ -1,5 +1,9 @@
 Revision history for Lingua-PT-Hyphenate
 
+1.06  Tue Apr 07 13:17:42 2021
+    - cosmetic improvements to dist and POD
+    - added GitHub repo
+
 1.05  Sat Apr 03 11:41:00 2005
 	- added some .t files to the MANIFEST (last version add missed
 	  them)

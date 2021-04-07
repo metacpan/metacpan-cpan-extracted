@@ -15,6 +15,7 @@ __PACKAGE__->setup_plugins([qw/
 
 __PACKAGE__->config(
   disable_component_resolution_regex_fallback => 1,
+  default_view => 'HTML',
   'Plugin::Session' => { storage_secret_key => 'abc123' },
   'Plugin::Authentication' => {
     default_realm => 'members',

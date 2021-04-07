@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
 =encoding utf-8
 
@@ -14,37 +14,37 @@ ansifold - fold command handling ANSI terminal sequences
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =head1 SYNOPSIS
 
 ansifold [ options ]
 
-    -w#, --width=#                Folding width (default 72)
-         --boundary=word          Fold on word boundary
-         --padding                Padding to margin space
-         --padchar=_              Padding character
-         --ambiguous=narrow|wide  Unicode ambiguous character handling
-    -p,  --paragraph              Print extra newline
-         --separate=string        Set separator string (default newline)
-    -n                            Short cut for --separate ''
-         --linebreak=mode         Line-break adjustment rule (default all)
-         --runin                  Run-in width (default 4)
-         --runout                 Run-out width (default 4)
-    -s,  --smart                  Short cut for --boundary=word --linebreak=all
-         --expand[=mode]          Expand tabs
-         --tabstop=n              Tab-stop position (default 8)
-         --tabhead=char           Tab-head character (default space)
-         --tabspace=char          Tab-space character (default space)
-         --tabstyle=style         Tab expansion style
+    -w#   --width=#                Folding width (default 72)
+          --boundary=word          Fold on word boundary
+          --padding                Padding to margin space
+          --padchar=_              Padding character
+          --ambiguous=narrow|wide  Unicode ambiguous character handling
+    -p    --paragraph              Print extra newline
+          --separate=string        Set separator string (default newline)
+    -n                             Same as --separate ''
+          --linebreak=mode         Line-break mode (all, runin, runout, none)
+          --runin                  Run-in width (default 4)
+          --runout                 Run-out width (default 4)
+    -s    --smart                  Same as --boundary=word --linebreak=all
+    -x[#] --expand[=#]             Expand tabs
+          --tabstop=n              Tab-stop position (default 8)
+          --tabhead=char           Tab-head character (default space)
+          --tabspace=char          Tab-space character (default space)
+          --tabstyle=style         Tab expansion style (shade, dot, symbol)
 
 =head1 DESCRIPTION
 
 B<ansifold> is a fold(1) compatible command utilizing
 L<Text::ANSI::Fold> module, which enables to handle ANSI terminal
-sequences and Unicode multi-byte characters properly.
+sequences.
 
-=head2 WIDTH
+=head2 FOLD BY WIDTH
 
 B<ansifold> folds lines in 72 column by default.  Use option B<-w> to
 change the folding width.
@@ -52,6 +52,14 @@ change the folding width.
     $ ansifold -w132
 
 Single field is used repeatedly for the same line.
+
+With option B<--padding>, remained columns are filled by padding
+character (space by default).  You can use B<--padchar> to change
+padding character.
+
+B<ansifold> handles Unicode multi-byte characters properly.  Option
+B<--ambiguous> takes I<wide> or I<narrow> and it specifies the visual
+width of Unicode ambiguous characters.
 
 =head2 MULTIPLE WIDTH
 
@@ -95,6 +103,10 @@ option implements ANSI/Unicode aware L<expand(1)> command.
 
     $ ansifold -w -1 --expand
 
+This can be written as this.
+
+    $ ansifold -xw-1
+
 =head2 NUMBERS
 
 Number description is handled by L<Getopt::EX::Numbers> module, and
@@ -134,10 +146,17 @@ microsoft word document.
 
 =head1 LINE BREAKING
 
+=head2 B<--boundary>=I<word>
+
 Option B<--boundary=word> prohibit to break line in the middle of
 alphanumeric word.  This version also supports line break adjustment,
 mainly to perform Japanese ``KINSOKU'' processing.  Use
 B<--linebreak=all> to enable it.
+
+=head2 B<--linebreak>=I<all>|I<ruunin>|I<runout>|I<none>
+
+Option B<--linebreak> takes a value of I<all>, I<runin>, I<runout> or
+I<none>.  Default value is I<none>.
 
 When B<--linebreak> option is enabled, if the cut-off text start with
 space or prohibited characters (e.g. closing parenthesis), they are
@@ -147,31 +166,66 @@ If the trimmed text end with prohibited characters (e.g. opening
 parenthesis), they are ran-out to the head of next line, provided it
 fits to maximum width.
 
-Option B<--linebreak> takes a value of I<all>, I<runin>, I<runout> or
-I<none>.  Default value is I<none>.
+=head2 B<--runin>=I<width>, B<--runout>=I<width>
 
 Maximum width of run-in/run-out characters are defined by B<--runin>
 and B<--runout> option.  Default values are 4.
 
-Option B<--smart> (or simply B<-s>) is shortcut for
-"B<--boundary=word> B<--linebreak=all>" and enables all smart text
-formatting capability.
+=head2 B<--smart>
+
+Option B<--smart> (or simply B<-s>) set both B<--boundary=word> and
+B<--linebreak=all>, and enables all smart text formatting capability.
 
 =head1 TAB EXPANSION
 
-Option B<--expand> enables tab character expansion.  Each tab
-character is converted to B<tabhead> and following B<tabspace>
-characters (both are space by default).  They can be specified by
-B<--tabhead> and B<--tabspace> option.  If the option value is longer
-than single characger, it is evaluated as unicode name.  Next example
-makes tab character visible keeping text layout.
+=head2 B<--expand>
+
+Option B<--expand> (or B<-x>) enables tab character expansion.
+
+    $ ansifold --expand
+
+Takes optional number for tabstop and it precedes to B<--tabstop>
+option.
+
+    $ ansifold -x4w-1
+
+=head2 B<--tabhead>, B<--tabspace>
+
+Each tab character is converted to B<tabhead> and following
+B<tabspace> characters (both are space by default).  They can be
+specified by B<--tabhead> and B<--tabspace> option.  If the option
+value is longer than single characger, it is evaluated as unicode
+name.  Next example makes tab character visible keeping text layout.
 
     $ ansifold --expand --tabhead="MEDIUM SHADE" --tabspace="LIGHT SHADE"
+
+=head2 B<--tabstyle>
 
 Option B<--tabstyle> allow to set B<--tabhead> and B<--tabspace>
 characters at once according to the given style name.  Select from
 C<dot>, C<symbol> or C<shade>.  Styles are defined in
 L<Text::ANSI::Fold> library.
+
+    $ ansifold --expand --tabstyle=shade
+
+=head1 FILES
+
+=over 4
+
+=item F<~/.ansifoldrc>
+
+Start-up file.
+See L<Getopt::EX::Module> for format.
+
+=back
+
+=head1 INSTALL
+
+=head2 CPANMINUS
+
+    $ cpanm App::ansifold
+    or
+    $ curl -sL http://cpanmin.us | perl - App::ansifold
 
 =head1 SEE ALSO
 
@@ -261,13 +315,13 @@ my @optargs = (
 	    }
 	};
     },
-    "expand!"    => \$opt{expand},
-    "tabstop=i"  => \$opt{tabstop},
-    "tabhead=s"  => \$opt{tabhead},
-    "tabspace=s" => \$opt{tabspace},
-    "tabstyle=s" => \$opt{tabstyle},
-    "discard=s"  =>  $opt{discard},
-    "version|v" => sub {
+    "expand|x:-1" => \$opt{expand},
+    "tabstop=i"   => \$opt{tabstop},
+    "tabhead=s"   => \$opt{tabhead},
+    "tabspace=s"  => \$opt{tabspace},
+    "tabstyle=s"  => \$opt{tabstyle},
+    "discard=s"   =>  $opt{discard},
+    "version|v"   => sub {
 	print "Version: $VERSION\n";
 	exit;
     },
@@ -310,6 +364,10 @@ $opt{width} = do {
 	\@width;
     }
 };
+
+if ($opt{expand} > 0) {
+    $opt{tabstop} = $opt{expand};
+}
 
 use charnames ':loose';
 for (@opt{qw(tabhead tabspace)}) {

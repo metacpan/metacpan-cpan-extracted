@@ -9,7 +9,7 @@ use JSON::XS qw(decode_json);
 
 my $cmd = join(" ", $0, @ARGV);
 
-my $tag = shift || 'v1.46.0';
+my $tag = shift || 'v1.47.0';
 
 $tag = "v$tag" unless $tag =~ /^v/;
 
@@ -33,11 +33,12 @@ print STDERR "creating lib/MIME/DB.pm\n";
 	mkdir('lib');
 	mkdir('lib/MIME');
 	open(my $fh, '>', 'lib/MIME/DB.pm') or die $!;
-	printf $fh ("package MIME::DB;\n\$VERSION = '%s';\n# generation date: %s\n# command: %s\n# source url: %s\nsub data { %s }\n1",
+	printf $fh ("package MIME::DB;\n\$VERSION = '%s';\n# generation date: %s\n# command: %s\n# source url: %s\nuse constant version => '%s';\nsub data { %s }\n1",
 		$tag,
 		time2isoz(),
 		$cmd,
 		$url,
+		$tag,
 		minidump($db)
 	);
 }

@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.827",
     "Sah::Schema::perl::borderstyle::modname_with_optional_args" => 0,
+    "String::Pad" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,6 +60,7 @@ my %FallbackPrereqs = (
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.827",
   "Sah::Schema::perl::borderstyle::modname_with_optional_args" => 0,
+  "String::Pad" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

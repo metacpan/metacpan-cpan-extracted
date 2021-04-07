@@ -6,7 +6,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has 'target' => (
     is => 'ro',

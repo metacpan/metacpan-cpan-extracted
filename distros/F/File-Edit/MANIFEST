@@ -1,7 +1,8 @@
 Changes
+LICENSE
 lib/File/Edit.pm
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 README
 t/00-load.t
 t/10-edit.t

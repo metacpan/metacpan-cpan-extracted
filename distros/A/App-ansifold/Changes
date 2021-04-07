@@ -1,5 +1,10 @@
 Revision history for `ansifold' command.
 
+1.08 2021-04-07T14:18:48Z
+
+    - Option --expand, -x takes optional tabstop width.
+    - Update document a lot.
+
 1.07 2021-03-23T14:39:32Z
 
     - Move to github actions.

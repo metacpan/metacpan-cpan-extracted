@@ -7,7 +7,7 @@ use Mojo::JSON 'decode_json', 'encode_json';
 use Net::Protocol::OBSRemote;
 use Future::Mojo;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Filter::signatures;
 use feature 'signatures';

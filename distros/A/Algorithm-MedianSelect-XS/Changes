@@ -1,5 +1,35 @@
 Revision history for Perl extension Algorithm::MedianSelect::XS.
 
+0.22  2021-04-06  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.21_01  2021-04-05  <schubiger@cpan.org>
+
+ - Refactor {quick,bubble}_sort().
+
+ - Allocate space on heap instead of stack for numbers.
+
+ - Define croak() wrappers.
+
+ - Adjust fatal error messages.
+
+ - Use Perl's TRUE/FALSE. [rt #76474 - Slaven Rezić]
+
+ - Reword documentation.
+
+ - Update broken license link.
+
+ - Add metadata repository link.
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Skip documentation tests for non-release testing.
+
+ - Amend t/median.t test descriptions.
+
+ - Remove the testing diagnostic.
+
 0.21 Sun Jun 22 14:45:50 CEST 2008
 
  - Fixed installation for Module::Build users.

@@ -16,10 +16,11 @@ with 'DBIx::Class::Valiant::Validates';
 with 'Valiant::Filterable';
 
 use DBIx::Class::Candy::Exports;
-export_methods ['filters', 'validates', 'filters_with', 'validates_with', 'accept_nested_for'];
+export_methods ['filters', 'validates', 'filters_with', 'validates_with', 'accept_nested_for', 'auto_validation'];
 
 __PACKAGE__->mk_classdata( _m2m_metadata => {} );
 __PACKAGE__->mk_classdata( auto_validation => 1 );
+__PACKAGE__->mk_classdata( _nested => [] );
 
 sub many_to_many {
   my $class = shift;
@@ -59,25 +60,26 @@ sub new { # also support for the filter role
   return $class->next::method(\%filtered);
 }
 
-my @accept_nested_for;
 sub accept_nested_for {
   my $class = blessed($_[0]) ? ref(shift) : shift;
-  my $varname = "${class}::accept_nested_for";
   my %default_config = (
     allow_destroy => 0,
     reject_if => 0,
     limit => 0,
     update_only => 0,
   );
-  
-  no strict "refs";
+
+  my @existing = @{$class->_nested};
+  my $changed = 0;
   while(my $attribute = shift) {
-    my $config = ref($_[0]) eq 'HASH' ? shift : +{};
-    push @$varname, $attribute;
-    push @$varname, +{ %default_config, %$config };
+    my $config = (ref($_[0])||'') eq 'HASH' ? shift : +{};    
+    push @existing, $attribute;
+    push @existing, +{ %default_config, %$config };
+    $changed = 1;
   }
+  $class->_nested(\@existing) if $changed;
   
-  return @$varname;
+  return @existing;
 }
 
 sub insert {
@@ -86,9 +88,17 @@ sub insert {
   my $context = $args{context}||[];
   my @context = ref($context)||'' eq 'ARRAY' ? @$context : ($context);
   push @context, 'create' unless grep { $_ eq 'create' } @context;
+
+  # Add in any extra or new contexts passed as ->insert({__context=>...})
+  if( (ref($args[0])||'') eq 'HASH') {
+    my $ctx = delete($args[0]->{__context})||[];
+    my @ctx = ref($ctx)||'' eq 'ARRAY' ? @$ctx : ($ctx);
+    push @context, @ctx unless grep { $_ eq 'update' } @context;
+  }
+
   $args{context} = \@context;
 
-  debug 2, "About to run validations for @{[$self]}";
+  debug 2, "About to run validations for @{[$self]} on insert";
   $self->validate(%args) if $self->auto_validation;
 
   if($self->errors->size) {
@@ -107,6 +117,7 @@ sub update {
 
   my %related = ();
   my %nested = $self->result_class->accept_nested_for;
+
   foreach my $associated(keys %nested) {
     $related{$associated} = delete($upd->{$associated})
       if exists($upd->{$associated});
@@ -140,34 +151,43 @@ sub update {
       my $num = scalar @{$related{$related}};
       confess "Relationship $related can't create more than $limit rows at once" if $num > $limit;      
     }
-    debug 2, "Settinged related $related for @{[ ref $self ]} ";
+    debug 2, "Setting related '$related' for @{[ ref $self ]} ";
 
     #$self->update_or_create_related($related, $related{$related});
     $self->{_valiant_nested_info} = $nested{$related};
     $self->set_related_from_params($related, $related{$related});
+
     delete $self->{_valiant_nested_info};
   }
 
-  debug 2, "About to run validations for @{[$self]}";
+  debug 2, "About to run validations for @{[$self]} on update";
   $self->validate(%validate_args) if $self->auto_validation;
 
   return $self if $self->errors->size;
+  debug 2, "No validation issues found, proceeding to mutate @{[ ref $self ]} ";
+
+  # wrap it all in a transaction to undo if issues.
+  my $txn_guard = $self->result_source->schema->txn_scope_guard;
+
   foreach my $related(keys %nested) {
     if(my $cb = $nested{$related}->{reject_if}) {
       next if $cb->($self, $related{$related});
     }
+    debug 3, "mutating related $related for  @{[ ref $self ]} ";
     $self->_mutate_related($related);
   }
 
-  return $self->next::method();
+  my $result = $self->next::method();
+  $txn_guard->commit;
+
+  return $result;
+
 }
 
 sub register_column {
   my $self = shift;
   my ($column, $info) = @_;
   $self->next::method(@_);
-  #use Devel::Dwarn;
-  #Dwarn \@_;
   # TODO future home of validations declares inside the register column call
 }
 
@@ -232,7 +252,7 @@ sub read_attribute_for_validation {
     }
 
   }
-  debug 1, "Failin back to accessor for 'read_attribute_for_validation'";
+  debug 1, "Failing back to accessor for 'read_attribute_for_validation' for attribute $attribute";
   return $self->$attribute if $self->can($attribute); 
 }
 
@@ -283,7 +303,8 @@ sub build_related {
   my ($self, $related, $attrs) = @_;
   debug 2, "Building related entity '$related' for @{[ $self->model_name->human ]}";
 
-  my $related_obj = $self->new_related($related, ($attrs||+{}));
+  my $related_obj = $attrs ? $self->find_or_new_related($related, $attrs) : $self->new_related($related, +{});
+  return if $related_obj->in_storage;  #I think we can skip if its found
 
   # TODO do this dance need to go into other places???
   # TODO do I need some set_from_related or something here to get everthing into _relationship_data ???
@@ -304,13 +325,29 @@ sub build_related {
 sub build_related_if_empty {
   my ($self, $related, $attrs) = @_;
   debug 2, "Build related entity '$related' for @{[ ref $self ]} if empty";
+
+  my $rel_data = $self->relationship_info($related);
+  unless($rel_data) {
+    if(my $rel_data = $self->_m2m_metadata->{$related}) {
+      my $relation = $rel_data->{relation};
+      my $foreign_relation = $rel_data->{foreign_relation};
+
+      return if @{ $self->related_resultset($relation)->get_cache ||[] };
+      my $obj = $self->build_related_if_empty($relation, $attrs);
+      return if @{ $obj->related_resultset($foreign_relation)->get_cache ||[] };
+      return $obj->build_related_if_empty($foreign_relation);
+    }
+  }  
+
   return if @{ $self->related_resultset($related)->get_cache ||[] };
   return $self->build_related($related, $attrs);
 }
 
 sub set_from_params_recursively {
   my ($self, %params) = @_;
+  debug 2, "Starting 'set_from_params_recursively' for  @{[ ref $self ]}";
   foreach my $param (keys %params) { # probably needs to be sorted so we get specials (_destroy) first
+    debug 3, "Starting param $param";
     # Spot to normalize serialized params (like for dates, etc).
     if($self->has_column($param)) {
       $self->set_column($param => $params{$param});
@@ -319,7 +356,7 @@ sub set_from_params_recursively {
       if(my $cb =  $nested{$param}->{reject_if}) {
         next if $cb->($self, $params{$param});
       }
-      debug 2, "set_related_from_params for @{[ ref $self ]}, related $param";
+      debug 3, "set_related_from_params for @{[ ref $self ]}, related $param";
       $self->set_related_from_params($param, $params{$param});
     } elsif($self->can($param)) {
       # Right now this is only used by confirmation stuff
@@ -333,7 +370,7 @@ sub set_from_params_recursively {
       }
     } elsif($param eq '_restore' && $params{$param}) {
       if($self->in_storage) {
-        debug 2, "Unmarking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
+        debug 3, "Unmarking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
         $self->unmark_for_deletion;
         delete $params{_destroy}; 
       } else {
@@ -351,6 +388,7 @@ sub set_related_from_params {
 
   unless($rel_data) {
     if(my $rel_data = $self->_m2m_metadata->{$related}) {
+      debug 2, "Setting params for $related on @{[ ref $self ]} using rel_type m2m";
       return $self->set_m2m_related_from_params($related, $params, $rel_data);
     }
   }
@@ -361,7 +399,6 @@ sub set_related_from_params {
   return $self->set_single_related_from_params($related, $params) if $rel_type eq 'single'; 
   return $self->set_multi_related_from_params($related, $params) if $rel_type eq 'multi'; 
   die "Unhandled relationship type: $rel_type";
-
 }
 
 # m2m is tricky
@@ -370,7 +407,29 @@ sub set_m2m_related_from_params {
   my $relation = $rel_data->{relation};
   my $foreign_relation = $rel_data->{foreign_relation};
 
-  return $self->set_multi_related_from_params($relation, [ map { +{ $foreign_relation => $_ } } @$params ]);
+  # We do this to allow for both multi create/update via an array (typical DBIC
+  # usage or via a hash of ordered keys (typical via CGI/Web).
+  my @param_rows = ();
+  if(ref($params) eq 'HASH') {
+    @param_rows = map { $params->{$_} } sort { $a <=> $b} keys %{$params || +{}};
+  } elsif(ref($params) eq 'ARRAY') { 
+    @param_rows = @{$params || []};
+  } else {
+    # I think if we are here its because the nests set is
+    # empty and we can ignore it for now but... not 100% sure :)
+    next;
+    die "We expect '$params' to be some sort of reference but its not!";
+  }
+  debug 2, "Setting m2m relation '$related' for@{[ ref $self ]} via '$foreign_relation'";
+
+  # TODO its possible we need to creeate the m2m cache here
+  return $self->set_multi_related_from_params($relation, [ map { +{ $foreign_relation => $_ } } @param_rows ]);
+}
+
+## TODO
+sub is_in_deleted_branch {
+  ## This will be true if the result is marked for deletion OR if any parent relation (via belongs to)
+  ## is marked for deletion.
 }
 
 sub set_multi_related_from_params {
@@ -396,10 +455,42 @@ sub set_multi_related_from_params {
     if(blessed $param_row) {
       $related_model = $param_row;
     } else {
-      $related_model = $self->find_or_new_related($related, $param_row);
+      $related_model = $self->find_or_new_related($related, $param_row) if (ref($param_row)||'') eq 'HASH';
       $related_model->set_from_params_recursively(%$param_row);
     }
+
     push @related_models, $related_model;
+  }
+
+  my @new_pks =  map {
+    my $r = $_; 
+    +{
+      map { $_ => $r->$_ } $r->result_source->primary_columns
+    } 
+  } grep { $_->in_storage } @related_models;
+
+  my $rs = $self->related_resultset($related);
+  unless(scalar @{$rs->get_cache||[]}) {
+    #die "You must prefetch rows for relation '$related'"; ## TODO not sure we want this
+  }
+
+  while(my $current = $rs->next) {
+    next if grep {
+      my %fields = %$_;
+      my @matches = grep { 
+        $current->get_column($_) eq $fields{$_}
+      } keys %fields;
+      scalar(@matches) == keys %fields ? 1 : 0;
+    } @new_pks;
+    $current->mark_for_deletion if $current->in_storage; #Don't mark to delete if not already stored
+
+    ## TODO to solve the 'is in a deleted branch' issue either when we mark for deletion
+    # we immediately recursively look into its related caches and mark all children as 'in a deleted branch
+    # OR we have the code 'is_in_deleted_branch' follow up all belongs to rels looking for 'marked_for_deletion
+    # OR we have some sort of index/map (not sure how tod this)
+    # Option one at first look seems the least painful / most performant
+
+    push @related_models, $current if $current->in_storage; # don't preserve unsaved previous
   }
 
   $self->related_resultset($related)->set_cache(\@related_models);
@@ -420,6 +511,8 @@ sub set_single_related_from_params {
     ## TODO I might need to do something else if $params is blessed
     ## TODO I think we need the below logic to see if $params has a PK and then use
     ## that as an override.
+    #
+    ## TODO this is probably wrong if $params has different FKs or unique fields
 
     debug 2, "Found cached related_result $related for @{[ ref $self ]} ";
     $related_result->set_from_params_recursively(%$params);
@@ -437,7 +530,6 @@ sub set_single_related_from_params {
 
       if($self->in_storage) {
         debug 2, "Updating related result '$related' for @{[ ref $self ]} ";
-
         my %local_params = %$params;
         my %pk = map { $_ => delete $local_params{$_} }
           grep { exists $local_params{$_} }
@@ -447,8 +539,7 @@ sub set_single_related_from_params {
         # also apply any updates to that record as indicated.
         if(%pk) {
           debug 3, "Updating with exact record matching pk";
-
-          $related_result = $self->result_source->related_source($related)->resultset->find($params);
+          $related_result = $self->result_source->related_source($related)->resultset->find($params); ## TODO shouldnt this be \%pk??
           $self->set_from_related($related, $related_result);
 
           #my $rev_data = $self->result_source->reverse_relationship_info($related);
@@ -456,8 +547,9 @@ sub set_single_related_from_params {
           #$related_result->set_from_related($reverse_related, $self) if $reverse_related; # Don't have this for might_have
 
           $related_result->set_from_params_recursively(%$params);
+
         } else {
-          debug 3, "Updating with record from params";
+          debug 3, "Updating with record from params (no matching PK)";
 
           # If the user did not give us a PK either;
           #   1) if undate_only=>1 then update the current record (if existing; create otherwise)
@@ -465,18 +557,38 @@ sub set_single_related_from_params {
           
           if(+{$self->result_class->accept_nested_for}->{$related}{update_only}) {
             debug 3, 'update_only true';
-            $related_result = $self->find_or_new_related($related, $params);
+            $related_result = $self->related_resultset($related)->single;
+            unless($related_result) {
+              $related_result = $self->find_or_new_related($related, $params); # TODO should find from any unique keys only
+            }
           } else {
             debug 3, "update_only false for rel $related on @{[ $self]}";
 
-            $related_result = $self->result_source->related_source($related)->resultset->find($params);
+            my %uniques = $self->related_resultset($related)->result_source->unique_constraints;
+            if(%uniques) {
+              debug 4, "Have unique constraints to try to find on";
+              foreach my $unique_key (keys %uniques) {
+                next if $unique_key eq 'primary'; # already done
+                debug 4, "checking key $unique_key for related $related";
+                my %keys_found = map { $_=>$params->{$_} } grep { exists $params->{$_} } @{$uniques{$unique_key}};
+                #$related_result = $self->find_related($related, \%keys_found);
+                $related_result = $self->result_source->related_source($related)->resultset->find(\%keys_found);
+                if($related_result) {
+                  debug 4, "found result with unique key $unique_key";
+                  last;
+                }
+              }
+            }
+            
+            #$related_result = $self->result_source->related_source($related)->resultset->find($params);  # TODO problably shoulld search on unique keys only
             unless($related_result) {
-              debug 3, "Did not find result so creating new result";
-              $related_result = $self->result_source->related_source($related)->resultset->new_result;
+              debug 3, "Did not find result for $related so creating new result";
+              # $self is in storage so it 'shou;d be safe to do this;
+              $related_result = $self->new_related($related, $params);
+              #$related_result = $self->result_source->related_source($related)->resultset->new_result($params);
             }
 
             $self->set_from_related($related, $related_result);
-
             #my $rev_data = $self->result_source->reverse_relationship_info($related);
             # my ($key) = keys(%$rev_data);
             #$related_result->set_from_related($key, $self) if $key; # Don't have this for might_hav
@@ -484,9 +596,38 @@ sub set_single_related_from_params {
           $related_result->set_from_params_recursively(%$params);
         }
       } else {
-        debug 2, "Find or new related result '$related' for @{[ ref $self ]} ";
-        $related_result = $self->find_or_new_related($related, $params);
-        $related_result->set_from_params_recursively(%$params);
+        debug 2, "Find or new related result '$related' for @{[ ref $self ]} which is not saved yet"; 
+        # Ok so the object isn't in storage, which means you don't have an database supplied PKs.  So
+        # can't do related_resultset since that always returns nothing (if $self doesn't exist in the DB
+        # there's nothing in the DB to find.
+        #$related_result = $self->find_or_new_related($related, $params);
+        #$related_result->set_from_params_recursively(%$params);
+
+        my %local_params = %$params;
+        my %pk = map { $_ => delete $local_params{$_} }
+          grep { exists $local_params{$_} }
+          $self->related_resultset($related)->result_source->primary_columns;
+
+        # If the user supplied the PK that means use that exact record and replace the current one
+        # also apply any updates to that record as indicated.
+        if(%pk) {
+          debug 3, "setting with exact record matching pk %pk";
+          $related_result = $self->result_source->related_source($related)->resultset->find(\%pk);
+          #   $self->set_from_related($related, $related_result);
+          $related_result->set_from_params_recursively(%$params);
+        } else {
+          debug 3, "finding with params matching";
+          $related_result = $self->result_source->related_source($related)->resultset->find($params);  # TODO problably shoulld search on unique keys only
+          unless($related_result) {
+            debug 3, "Did not find result for $related so creating new result";
+            $related_result = $self->new_related($related, $params);
+          }
+          #    $self->set_from_related($related, $related_result);
+          $related_result->set_from_params_recursively(%$params);
+        }
+
+
+
       }
     }
   }
@@ -575,6 +716,15 @@ sub _mutate_multi_related {
     $related_result->set_from_related($reverse_related, $self) if $reverse_related; # Don't have this for might_have
     $related_result->mutate_recursively;
   }
+
+  # If the mutation completed we need to remove all marked for delation
+  my @new_results = grep { !$_->is_marked_for_deletion } @related_results;
+
+  $self->related_resultset($related)->set_cache(\@new_results);
+  $self->{_relationship_data}{$related} = \@new_results;
+  $self->{__valiant_related_resultset}{$related} = [@new_results];
+
+  # TODO need to update rels
 }
 
 

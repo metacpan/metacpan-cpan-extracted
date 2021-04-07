@@ -3,25 +3,32 @@ use Test2::V0;
 use Sub::Meta;
 use Sub::Identify;
 
+sub hello($$) :method { } ## no critic (ProhibitSubroutinePrototypes)
+
 subtest 'non sub' => sub {
     my $meta = Sub::Meta->new;
     is $meta->sub, undef, 'sub';
-    is $meta->subname, undef, 'subname';
-    is $meta->fullname, undef, 'fullname';
-    is $meta->stashname, undef, 'stashname';
+    is $meta->subname, '', 'subname';
+    is $meta->fullname, '', 'fullname';
+    is $meta->stashname, '', 'stashname';
     is $meta->file, '', 'file';
     is $meta->line, undef, 'line';
     is $meta->is_constant, undef, 'is_constant';
-    is $meta->prototype, '', 'prototype';
+    is $meta->prototype, undef, 'prototype';
     is $meta->attribute, undef, 'prototype';
     ok !$meta->is_method, 'is_method';
     is $meta->parameters, undef, 'parameters';
     is $meta->returns, undef, 'returns';
+    ok !$meta->has_sub;
+    ok !$meta->has_subname;
+    ok !$meta->has_stashname;
+    ok !$meta->has_prototype;
+    ok !$meta->has_attribute;
+    ok !$meta->has_parameters;
+    ok !$meta->has_returns;
 };
 
 subtest 'has sub' => sub {
-
-    sub hello($$) :method { } ## no critic (ProhibitSubroutinePrototypes)
 
     subtest 'getter' => sub {
         my $meta = Sub::Meta->new(sub => \&hello);
@@ -30,13 +37,20 @@ subtest 'has sub' => sub {
         is $meta->fullname, 'main::hello', 'fullname';
         is $meta->stashname, 'main', 'stashname';
         is $meta->file, 't/01_meta.t', 'file';
-        is $meta->line, 24, 'line';
+        is $meta->line, 6, 'line';
         ok !$meta->is_constant, 'is_constant';
         is $meta->prototype, '$$', 'prototype';
         is $meta->attribute, ['method'], 'attribute';
         ok !$meta->is_method, 'is_method';
         is $meta->parameters, undef, 'parameters';
         is $meta->returns, undef, 'returns';
+        ok $meta->has_sub;
+        ok $meta->has_subname;
+        ok $meta->has_stashname;
+        ok $meta->has_prototype;
+        ok $meta->has_attribute;
+        ok !$meta->has_parameters;
+        ok !$meta->has_returns;
     };
 
     subtest 'setter' => sub {
@@ -158,13 +172,13 @@ subtest 'new' => sub {
 
 subtest 'subname/stashname/fullname' => sub {
     my $meta = Sub::Meta->new;
-    is $meta->subname, undef, 'undef subname';
-    is $meta->stashname, undef, 'undef stashname';
-    is $meta->fullname, undef, 'undef fullname';
+    is $meta->subname, '', 'empty subname';
+    is $meta->stashname, '', 'empty stashname';
+    is $meta->fullname, '', 'empty fullname';
 
     is $meta->set_subname('foo'), $meta;
     is $meta->subname, 'foo', 'subname';
-    is $meta->stashname, undef, 'undef stashname';
+    is $meta->stashname, '', 'empty stashname';
     is $meta->fullname, '::foo', 'fullname';
 
     is $meta->set_stashname('Bar'), $meta;
@@ -173,7 +187,7 @@ subtest 'subname/stashname/fullname' => sub {
     is $meta->fullname, 'Bar::foo', 'fullname';
 
     is $meta->set_subname(undef), $meta;
-    is $meta->subname, undef, 'undef subname';
+    is $meta->subname, '', 'empty subname';
     is $meta->stashname, 'Bar', 'stashname';
     is $meta->fullname, 'Bar::', 'fullname';
 

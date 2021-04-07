@@ -3,7 +3,7 @@ package App::BorderStyleUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-23'; # DATE
 our $DIST = 'App-BorderStyleUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,6 +53,7 @@ $SPEC{show_border_style} = {
 };
 sub show_border_style {
     require Module::Load::Util;
+    require String::Pad;
 
     my %args = @_;
 
@@ -94,25 +95,44 @@ sub show_border_style {
         T => sub { $bs->get_border_char(5, 1) // '' },
         U => sub { $bs->get_border_char(5, 2) // '' },
         V => sub { $bs->get_border_char(5, 3) // '' },
+
+        x => sub { "Table without row/column spans" },
+        y => sub { "Table with row/column spans" },
+        _text => sub {
+            my $template = shift;
+            String::Pad::pad($template =~ /,/ ? 'header' : 'cell', length($template), 'r', ' ', 1);
+        },
     };
 
     my $table = <<'_';
-ABBBCBBBCBBBCBBBD
-E       F   F   G
-HIIIaIIIJIIIbIIIK
-L   M   M       N
-OPPPfPPPQPPPePPPR
-L       M   M   N
-OPPPPPPPQPPPePPPR
-L       M       N
-L       gPPPPPPPR
-L       M       N
-OPPPPPPPh       N
-L       M       N
-STTTTTTTUTTTTTTTV
+ABBBBBBBBCBBBBBBBBD     #
+E ,,,,,, F ,,,,,, G     #
+HIIIIIIIIJIIIIIIIIK     #
+L ...... M ...... N     # x
+OPPPPPPPPQPPPPPPPPR     #
+L ...... M ...... N     #
+STTTTTTTTUTTTTTTTTV     #
+
+ABBBBBCBBBBBCBBBBBCBBBBBD     #
+E ,,,,,,,,, F ,,, F ,,, G     #
+HIIIIIaIIIIIJIIIIIbIIIIIK     #
+L ... M ... M ......... N     #
+OPPPPPfPPPPPQPPPPPePPPPPR     #
+L ......... M ... M ... N     #
+OPPPPPPPPPPPQPPPPPePPPPPR     # y
+L ......... M ......... N     #
+L           gPPPPPPPPPPPR     #
+L           M ......... N     #
+OPPPPPPPPPPPh           N     #
+L ......... M           N     #
+STTTTTTTTTTTUTTTTTTTTTTTV     #
 _
 
-    $table =~ s{(.)}{$map->{$1} ? $map->{$1}->() : $1}eg;
+    $table =~ s{([A-Za-z#]|([.,])+)}
+               {
+                   $2 ? $map->{_text}->($1) :
+                       $map->{$1} ? $map->{$1}->() : $1
+               }eg;
 
     [200, "OK", $table];
 }
@@ -132,7 +152,7 @@ App::BorderStyleUtils - CLI utilities related to border styles
 
 =head1 VERSION
 
-This document describes version 0.004 of App::BorderStyleUtils (from Perl distribution App-BorderStyleUtils), released on 2021-01-23.
+This document describes version 0.005 of App::BorderStyleUtils (from Perl distribution App-BorderStyleUtils), released on 2021-01-23.
 
 =head1 DESCRIPTION
 

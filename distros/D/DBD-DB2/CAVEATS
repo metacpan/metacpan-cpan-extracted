@@ -51,6 +51,9 @@ Known Test Case issues:
 2) perld071_connIncorrectPortRemote: This test case checks that a proper connection failure message is thrown when passed wrong port information.
 	Given that the protocol specific codes is different on different platforms you might see this case failing on some platforms due to mismatch
 	in the protocol code.
+3) NOTE:
+	On RHEL-8 if you face issue with Graphics data type test case in test suite then run below command and then retry:
+	>export LANG="en_US"
 	
 Special Notes re: Linux
 -----------------------

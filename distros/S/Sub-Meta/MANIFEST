@@ -15,13 +15,16 @@ lib/Sub/Meta/Returns.pm
 minil.toml
 t/00_compile.t
 t/01_meta.t
+t/01_meta/interface_error_message.t
 t/01_meta/is_same_interface.t
 t/01_meta/new.t
 t/02_parameters.t
+t/02_parameters/interface_error_message.t
 t/02_parameters/is_same_interface.t
 t/03_param.t
 t/03_param/is_same_interface.t
 t/04_returns.t
+t/04_returns/interface_error_message.t
 t/04_returns/is_same_interface.t
 t/05_mymeta.t
 t/06_library.t

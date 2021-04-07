@@ -1,5 +1,11 @@
 Revision history for Perl extension Sub-Meta
 
+0.11 2021-04-07T15:17:42Z
+    [IMPROVEMENTS]
+    - feat: add interface_error_message method #32
+    - feat: add has_xxx methods #33
+    - improve document
+
 0.10 2021-03-29T14:56:13Z
     - use Perl::Critic & support severity 3 #29 #30 #31
 

@@ -4,6 +4,10 @@ DBD::DB2::Changes - List of changes
 
 =cut
 
+=head2 Changes in DBD::DB2 1.87, April 07, 2021
+
+  Fixed RHEL-8 related issue in C code compilation. Tested on 5.18 and above.
+
 =head2 Changes in DBD::DB2 1.85, Oct 08, 2012
 
   Fixed issue cpan #77414 - Bind fails when run with Perl 5.16

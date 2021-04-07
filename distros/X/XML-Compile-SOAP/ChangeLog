@@ -1,6 +1,12 @@
 
 === version history of distribution XML-Compile-SOAP
 
+version 3.27: Wed  7 Apr 09:52:29 CEST 2021
+
+	Fixes:
+	- $@ is volatile, unknown change broke input validation error.
+	  https://github.com/markov2/perl5-XML-Compile-SOAP/issues/5 [MadLord80]
+
 version 3.26: Wed 20 Nov 08:43:52 CET 2019
 
 	Fixes:

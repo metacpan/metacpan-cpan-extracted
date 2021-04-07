@@ -4,40 +4,54 @@
 
 #include "ppport.h"
 
-enum { false, true };
+#define croak_msg(msg) \
+    croak ("median(): %s", msg)
+#define croak_msg_internal(msg) \
+    croak ("median(): internal error: %s", msg)
 
-bool
-quick_sort (const long *num1, const long *num2)
+enum { LESS_THAN = -1, EQUAL_TO, GREATER_THAN };
+
+static int
+quick_sort (const void *arg1, const void *arg2)
 {
-    if (*num1 <  *num2) return -1;
-    if (*num1 == *num2) return  0;
-    if (*num1 >  *num2) return  1;
+    const long num1 = *(long *)arg1, num2 = *(long *)arg2;
+    if (num1 < num2)
+      return LESS_THAN;
+    else if (num1 == num2)
+      return EQUAL_TO;
+    else if (num1 > num2)
+      return GREATER_THAN;
+    else
+      croak_msg_internal ("quick sort did not return a long integer");
 }
 
-void
+#define SWAP(num_curr, num_next) \
+    const long tmp = num_curr;   \
+    num_curr = num_next;         \
+    num_next = tmp;
+
+static void
 bubble_sort (long *numbers, unsigned int realitems)
 {
-    bool sorted;
-    unsigned int i;
-    long buffer;
+    bool sort;
 
     do
       {
-        sorted = true;
+        unsigned int i;
+        sort = FALSE;
         for (i = 0; i < (realitems - 1); i++)
           {
-            if ((numbers[i - 1] < numbers[i]) && (numbers[i] < numbers[i + 1]))
-              continue;
-            if (numbers[i] > numbers[i + 1])
+            if (i >= 1
+            && (numbers[i - 1] <= numbers[i]) && (numbers[i] <= numbers[i + 1]))
+              continue; /* optimization */
+            else if (numbers[i] > numbers[i + 1])
               {
-                buffer         = numbers[i];
-                numbers[i]     = numbers[i + 1];
-                numbers[i + 1] = buffer;
-                sorted = false;
+                SWAP (numbers[i], numbers[i + 1]);
+                sort = TRUE;
               }
           }
       }
-    while (!sorted);
+    while (sort);
 }
 
 MODULE = Algorithm::MedianSelect::XS        PACKAGE = Algorithm::MedianSelect::XS
@@ -46,9 +60,9 @@ void
 xs_median (...)
     PROTOTYPE: @\@
     INIT:
-      long numbers[items > 1 ? items : (av_len ((AV*)SvRV(ST(0))) + 1)];
-      unsigned int i, median, realitems;
-      AV* aref;
+      long *numbers = NULL;
+      unsigned int median, realitems;
+      enum { BUBBLE_SORT = 1, QUICK_SORT };
     PPCODE:
       if (items == 1)
         {
@@ -56,35 +70,38 @@ xs_median (...)
             {
               if (SvTYPE (SvRV(ST(0))) == SVt_PVAV)
                 {
-                  aref = (AV*) SvRV (ST(0));
-                  for (i = 0; i <= av_len (aref); i++)
-                    numbers[i] = SvIV (*av_fetch(aref, i, 0));
+                  AV *aref = (AV *)SvRV (ST(0));
+                  unsigned int i;
                   realitems = av_len (aref) + 1;
+                  Newx (numbers, realitems, long);
+                  for (i = 0; i < realitems; i++)
+                    numbers[i] = (long)SvIV (*av_fetch(aref, i, 0));
                 }
               else
-                croak ("median(): reference is not a list reference");
+                croak_msg ("reference is not an array reference");
             }
           else
-            croak ("median(): requires either list or reference to list");
+            croak_msg ("requires either list or reference to an array");
         }
       else
         {
-          for (i = 0; i < items; i++)
-            numbers[i] = SvIV (ST(i));
+          unsigned int i;
           realitems = items;
+          Newx (numbers, realitems, long);
+          for (i = 0; i < realitems; i++)
+            numbers[i] = (long)SvIV (ST(i));
         }
 
       switch (SvIV (get_sv("Algorithm::MedianSelect::XS::ALGORITHM", FALSE)))
         {
-          case 1:
+          case BUBBLE_SORT:
             bubble_sort (numbers, realitems);
             break;
-          case 2:
-            qsort (numbers, realitems, sizeof (long), (void *) quick_sort);
+          case QUICK_SORT:
+            qsort (numbers, realitems, sizeof (long), quick_sort);
             break;
           default:
-            croak ("median(): internal error: no mode available");
-            break;
+            croak_msg_internal ("no mode available");
         }
 
       if (realitems % 2 == 0)
@@ -94,3 +111,5 @@ xs_median (...)
 
       EXTEND (SP, 1);
       PUSHs (sv_2mortal(newSViv(numbers[median])));
+
+      Safefree (numbers);

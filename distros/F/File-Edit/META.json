@@ -32,6 +32,9 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Mojolicious" : "8.33",
+            "Path::Tiny" : "0.108",
             "perl" : "5.006"
          }
       },
@@ -42,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.1",
+   "version" : "v0.0.2",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

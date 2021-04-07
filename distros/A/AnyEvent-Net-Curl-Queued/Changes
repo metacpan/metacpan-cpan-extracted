@@ -1,6 +1,10 @@
 Changelog for AnyEvent-Net-Curl-Queued
 
-0.048 2021-04-05T11:27:15
+0.049 2021-04-07T07:01:38
+ - Minor POD fixes (Stanislaw Pusep)
+ - Demote t/71-bad-address.t to AUTHOR_TESTING (Stanislaw Pusep)
+
+0.048 2021-04-05T08:17:58
  - Fixed no-clobbering behavior (Stanislaw Pusep)
  - Bump copyright year (Stanislaw Pusep)
  - Fix for Test::Synopsis (Stanislaw Pusep)
@@ -66,8 +70,8 @@ Changelog for AnyEvent-Net-Curl-Queued
  - disable compression in Mojo::UA benchmark (Stanislaw Pusep)
  - Mojo::UserAgent benchmark fixed (mea culpa) (Stanislaw Pusep)
  - t/73-cycle.t is an author test (Stanislaw Pusep)
- - eg/yada-crawler.pl: simplified parser initialization (Stanislaw Pusep)
  - fixed taskset(1) link (Stanislaw Pusep)
+ - eg/yada-crawler.pl: simplified parser initialization (Stanislaw Pusep)
 
 0.038 2013-01-24T22:11:02
  - ooops, Mojo can't start/stop several times anymore? (Stanislaw Pusep)

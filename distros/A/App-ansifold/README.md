@@ -5,37 +5,37 @@ ansifold - fold command handling ANSI terminal sequences
 
 # VERSION
 
-Version 1.07
+Version 1.08
 
 # SYNOPSIS
 
 ansifold \[ options \]
 
-    -w#, --width=#                Folding width (default 72)
-         --boundary=word          Fold on word boundary
-         --padding                Padding to margin space
-         --padchar=_              Padding character
-         --ambiguous=narrow|wide  Unicode ambiguous character handling
-    -p,  --paragraph              Print extra newline
-         --separate=string        Set separator string (default newline)
-    -n                            Short cut for --separate ''
-         --linebreak=mode         Line-break adjustment rule (default all)
-         --runin                  Run-in width (default 4)
-         --runout                 Run-out width (default 4)
-    -s,  --smart                  Short cut for --boundary=word --linebreak=all
-         --expand[=mode]          Expand tabs
-         --tabstop=n              Tab-stop position (default 8)
-         --tabhead=char           Tab-head character (default space)
-         --tabspace=char          Tab-space character (default space)
-         --tabstyle=style         Tab expansion style
+    -w#   --width=#                Folding width (default 72)
+          --boundary=word          Fold on word boundary
+          --padding                Padding to margin space
+          --padchar=_              Padding character
+          --ambiguous=narrow|wide  Unicode ambiguous character handling
+    -p    --paragraph              Print extra newline
+          --separate=string        Set separator string (default newline)
+    -n                             Same as --separate ''
+          --linebreak=mode         Line-break mode (all, runin, runout, none)
+          --runin                  Run-in width (default 4)
+          --runout                 Run-out width (default 4)
+    -s    --smart                  Same as --boundary=word --linebreak=all
+    -x[#] --expand[=#]             Expand tabs
+          --tabstop=n              Tab-stop position (default 8)
+          --tabhead=char           Tab-head character (default space)
+          --tabspace=char          Tab-space character (default space)
+          --tabstyle=style         Tab expansion style (shade, dot, symbol)
 
 # DESCRIPTION
 
 **ansifold** is a fold(1) compatible command utilizing
 [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) module, which enables to handle ANSI terminal
-sequences and Unicode multi-byte characters properly.
+sequences.
 
-## WIDTH
+## FOLD BY WIDTH
 
 **ansifold** folds lines in 72 column by default.  Use option **-w** to
 change the folding width.
@@ -43,6 +43,14 @@ change the folding width.
     $ ansifold -w132
 
 Single field is used repeatedly for the same line.
+
+With option **--padding**, remained columns are filled by padding
+character (space by default).  You can use **--padchar** to change
+padding character.
+
+**ansifold** handles Unicode multi-byte characters properly.  Option
+**--ambiguous** takes _wide_ or _narrow_ and it specifies the visual
+width of Unicode ambiguous characters.
 
 ## MULTIPLE WIDTH
 
@@ -86,6 +94,10 @@ option implements ANSI/Unicode aware [expand(1)](http://man.he.net/man1/expand) 
 
     $ ansifold -w -1 --expand
 
+This can be written as this.
+
+    $ ansifold -xw-1
+
 ## NUMBERS
 
 Number description is handled by [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers) module, and
@@ -125,10 +137,17 @@ microsoft word document.
 
 # LINE BREAKING
 
+## **--boundary**=_word_
+
 Option **--boundary=word** prohibit to break line in the middle of
 alphanumeric word.  This version also supports line break adjustment,
 mainly to perform Japanese \`\`KINSOKU'' processing.  Use
 **--linebreak=all** to enable it.
+
+## **--linebreak**=_all_|_ruunin_|_runout_|_none_
+
+Option **--linebreak** takes a value of _all_, _runin_, _runout_ or
+_none_.  Default value is _none_.
 
 When **--linebreak** option is enabled, if the cut-off text start with
 space or prohibited characters (e.g. closing parenthesis), they are
@@ -138,31 +157,62 @@ If the trimmed text end with prohibited characters (e.g. opening
 parenthesis), they are ran-out to the head of next line, provided it
 fits to maximum width.
 
-Option **--linebreak** takes a value of _all_, _runin_, _runout_ or
-_none_.  Default value is _none_.
+## **--runin**=_width_, **--runout**=_width_
 
 Maximum width of run-in/run-out characters are defined by **--runin**
 and **--runout** option.  Default values are 4.
 
-Option **--smart** (or simply **-s**) is shortcut for
-"**--boundary=word** **--linebreak=all**" and enables all smart text
-formatting capability.
+## **--smart**
+
+Option **--smart** (or simply **-s**) set both **--boundary=word** and
+**--linebreak=all**, and enables all smart text formatting capability.
 
 # TAB EXPANSION
 
-Option **--expand** enables tab character expansion.  Each tab
-character is converted to **tabhead** and following **tabspace**
-characters (both are space by default).  They can be specified by
-**--tabhead** and **--tabspace** option.  If the option value is longer
-than single characger, it is evaluated as unicode name.  Next example
-makes tab character visible keeping text layout.
+## **--expand**
+
+Option **--expand** (or **-x**) enables tab character expansion.
+
+    $ ansifold --expand
+
+Takes optional number for tabstop and it precedes to **--tabstop**
+option.
+
+    $ ansifold -x4w-1
+
+## **--tabhead**, **--tabspace**
+
+Each tab character is converted to **tabhead** and following
+**tabspace** characters (both are space by default).  They can be
+specified by **--tabhead** and **--tabspace** option.  If the option
+value is longer than single characger, it is evaluated as unicode
+name.  Next example makes tab character visible keeping text layout.
 
     $ ansifold --expand --tabhead="MEDIUM SHADE" --tabspace="LIGHT SHADE"
+
+## **--tabstyle**
 
 Option **--tabstyle** allow to set **--tabhead** and **--tabspace**
 characters at once according to the given style name.  Select from
 `dot`, `symbol` or `shade`.  Styles are defined in
 [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) library.
+
+    $ ansifold --expand --tabstyle=shade
+
+# FILES
+
+- `~/.ansifoldrc`
+
+    Start-up file.
+    See [Getopt::EX::Module](https://metacpan.org/pod/Getopt::EX::Module) for format.
+
+# INSTALL
+
+## CPANMINUS
+
+    $ cpanm App::ansifold
+    or
+    $ curl -sL http://cpanmin.us | perl - App::ansifold
 
 # SEE ALSO
 

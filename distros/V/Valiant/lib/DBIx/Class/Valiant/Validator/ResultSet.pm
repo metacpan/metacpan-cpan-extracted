@@ -29,7 +29,8 @@ sub validate_each {
   # If a row is marked to be deleted then don't bother to validate it.
   # We use ->next and avoiod ->all because ->all resets the cache.
   my @rows;
-  while(my $row = $value->next) {
+  foreach my $row ( @{$value->get_cache||[]} ) {
+  #foreach my $row ( $value->all ) {
     push @rows, $row unless $row->is_marked_for_deletion;
   }
 

@@ -17,11 +17,14 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
+        'Mojolicious'       => '8.33',
+        'Path::Tiny'        => '0.108',
+        'Carp'              => '0',
         #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'File-Edit-*' },
+    clean => { FILES => '' },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

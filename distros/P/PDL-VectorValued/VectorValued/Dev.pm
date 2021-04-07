@@ -1,7 +1,7 @@
 ## -*- Mode: CPerl -*-
 ##  + CPerl pukes on '/esg'-modifiers.... bummer
 ##
-## $Id: Dev.pm 9589 2018-05-18 07:47:27Z moocow $
+## $Id: Dev.pm 2869 2021-04-07 07:56:50Z moocow $
 ##
 ## File: PDL::VectorValued::Dev.pm
 ## Author: Bryan Jurish <moocow@cpan.org>
@@ -16,7 +16,7 @@ use strict;
 #use PDL::PP; ##-- do NOT do this!
 use Exporter;
 
-our $VERSION = '1.0.9'; ##-- v1.0.4: use perl-reversion from Perl::Version instead
+our $VERSION = '1.0.10'; ##-- v1.0.4: use perl-reversion from Perl::Version instead
 our @ISA = qw(Exporter);
 our @EXPORT_OK =
   (
@@ -86,12 +86,20 @@ Wrapper for pp_def() which calls vvpp_expand() on 'Code' and 'BadCode'
 values in %args.
 
 =cut
-
+our @_REAL_TYPES =
+	  map { $_->{ppsym} }
+	  # Older PDLs:
+	  # - no native complex types, did not have real key
+	  # Newer PDLs:
+	  # - native complex types, have real key
+	  grep { ! exists $_->{real} || $_->{real} }
+	  @PDL::Types::typehash{PDL::Types::typesrtkeys()};
 sub vvpp_def {
   my ($name,%args) = @_;
   foreach (qw(Code BadCode)) {
     $args{$_} = vvpp_expand($args{$_}) if (defined($args{$_}));
   }
+  $args{GenericTypes} = \@_REAL_TYPES unless exists $args{GenericTypes};
   PDL::PP::pp_def($name,%args);
 }
 

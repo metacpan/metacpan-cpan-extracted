@@ -4,28 +4,33 @@
   <style></style>
 % end
 
-%= form_for $model, style=>'width:27em; margin:auto', begin
+%= form_tag { method_attr 'POST', style_attr 'width:27em; margin:auto', id=>'person', name=>'person'}, begin
   <fieldset>
-    <legend><%= $model->model_name->human %></legend>
+    <legend>Register</legend>
     <div class='form-group'>
-      %= model_errors class=>'alert alert-danger', style=>'margin: 16px 0 0 0', role=>'alert';
+      %= errors_box $person, class=>'alert alert-danger', style=>'margin: 16px 0 0 0', role=>'alert';
     </div>
     <div class='form-group'>
-      %= input 'first_name', class=>'form-control', label=>1;
+      %= label_tag { for=>'first_name' }, 'First Name'
+      %= input_tag { name=>'first_name', type=>'text', class=>'form-control', value=>$person->first_name }
     </div>
     <div class='form-group'>
-      %= input 'last_name', class=>'form-control', label=>1;
+      %= label_tag { for=>'last_name' }, 'Last Name'
+      %= input_tag { name=>'last_name', type=>'text', class=>'form-control', value=>$person->last_name }
     </div>
     <div class='form-group'>
-      %= input 'username', class=>'form-control', label=>1;
+      %= label_tag { for=>'username' }, 'User Name'
+      %= input_tag { name=>'username', type=>'text', class=>'form-control', value=>$person->username }
     </div>
     <div class='form-group'>
-      %= password 'password', class=>'form-control', label=>1;
+      %= label_tag { for=>'password' }, 'Password'
+      %= input_tag { name=>'password', type=>'text', class=>'form-control' }
     </div>
     <div class='form-group'>
-      %= password 'password_confirmation', class=>'form-control', label=>1;
+      %= label_tag { for=>'password_confirmation' }, 'Password Confirmation'
+      %= input_tag { name=>'password_confirmation', type=>'text', class=>'form-control' }
     </div>
-    %= submit 'update', class=>'btn btn-lg btn-primary btn-block', value=>'Register';
+    %= button_tag { class=>'btn btn-lg btn-primary btn-block', value=>'Sign In' }, 'Sign In'
   </fieldset>
 % end
 

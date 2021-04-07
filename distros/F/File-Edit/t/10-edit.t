@@ -34,7 +34,7 @@ is($got, $exp, $msg);
 
 $msg = '->_find_one - line_re ok';
 $got = $ed->_line_re;
-$exp = '(?^:targetSdkVersion 29)';
+$exp = qr/targetSdkVersion 29/;
 is($got, $exp, $msg);
 
 

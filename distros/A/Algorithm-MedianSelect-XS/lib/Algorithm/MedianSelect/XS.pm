@@ -8,7 +8,7 @@ use Carp qw(carp croak);
 
 our ($VERSION, @EXPORT_OK);
 
-$VERSION = '0.21';
+$VERSION = '0.22';
 @EXPORT_OK = qw(median);
 
 require XSLoader;
@@ -20,7 +20,7 @@ sub median
     my @nums = @_;
 
     my $count = ref $nums[0] eq 'ARRAY' ? @{$nums[0]} : @nums;
-    croak "median(): list must have odd count of elements and must have more than one element\n" 
+    croak "median(): list must have odd count of elements and must have more than one element\n"
       if ($count % 2 == 0 or $count == 1);
 
     my $i;
@@ -73,7 +73,7 @@ than half of the integers and bigger than half of the integers.
 
 =head2 median
 
-Takes a list or reference to list of integers and returns the median number.
+Takes a list or reference to an array of integers and returns the median number.
 Optionally, the algorithm being used for computation may be specified within
 a hash reference. See SYNOPSIS for algorithms currently available.
 
@@ -94,7 +94,7 @@ Steven Schubiger <schubiger@cpan.org>
 This program is free software; you may redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See L<http://www.perl.com/perl/misc/Artistic.html>
+See L<http://dev.perl.org/licenses/>
 
 =cut
 
