@@ -1,5 +1,11 @@
 Revision history for perl distribution App-tt
 
+0.16 2021-04-08T10:42:01+0900
+ - Fix editing last file, even if "previous" is corrupted
+ - Changed output text
+ - Changed from JSON::XS to JSON::PP
+ - Removed File::HomeDir as a dependency
+
 0.15 2021-04-07T22:26:31+0900
  - Nicer formatting
  - Fix uninitialized duration

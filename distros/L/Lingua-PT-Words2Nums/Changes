@@ -1,5 +1,9 @@
 Revision history for Perl extension Lingua::PT::Words2Nums.
 
+1.04  Tue Apr 07 22:20:42 2021
+	- cosmetic fixes to dist
+    - added GitHub repo
+
 1.04  Mon Nov 08 19:58:00 2004
 	- moved a few things around
         - changes in the documentation

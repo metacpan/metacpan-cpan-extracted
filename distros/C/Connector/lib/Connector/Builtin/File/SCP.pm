@@ -12,6 +12,8 @@ use Template;
 use Moose;
 extends 'Connector::Builtin';
 
+with 'Connector::Role::LocalPath';
+
 has noargs => (
     is  => 'rw',
     isa => 'Bool',
@@ -277,31 +279,13 @@ sub _sanitize_path {
         return $host;
     }
 
-    my @args = $self->_build_path_with_prefix( $inargs );
-
-
-    my $file;
-    my $template = Template->new({});
-
-    if ($self->path()) {
-        my $pattern = $self->path();
-        $self->log()->debug('Process template ' . $pattern);
-        $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || die "Error processing file template.";
-    } elsif ($self->file()) {
-        my $pattern = $self->file();
-        my $template = Template->new({});
-        $self->log()->debug('Process template ' . $pattern);
-        $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || die "Error processing file template.";
-        if ($file =~ m{[\/\\]}) {
-            $self->log()->error('Target file name contains directory seperator! Consider using path instead.');
-            die "Target file name contains directory seperator! Consider using path instead.";
-        }
-    } else {
+    if (!$self->path() && !$self->file())        
         $self->log()->error('Neither target pattern nor noargs set');
         die "You must set either file or path or use the noargs option.";
     }
 
-    $file =~ s/[^\s\w\.\-\\]//g;
+    my @args = $self->_build_path_with_prefix( $inargs );
+    my $file = $self->_render_local_path( \@args, $data );
 
     my $filename;
     # check if the LOCATION already has a path spec

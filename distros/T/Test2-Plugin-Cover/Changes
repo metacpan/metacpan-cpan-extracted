@@ -1,3 +1,13 @@
+0.000011  2021-04-08 08:21:18-07:00 America/Los_Angeles
+
+    - Remove garbage blib/ dir from dist
+
+0.000010  2021-04-07 20:56:32-07:00 America/Los_Angeles
+
+    - Add submap collection data
+    - Add openmap collection data
+    - Add set_from, get_from, and clear_from methods
+
 0.000009  2020-07-11 23:42:31-07:00 America/Los_Angeles
 
     - Fix another extraction bug

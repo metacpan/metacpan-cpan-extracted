@@ -56,6 +56,7 @@
       "test" : {
          "requires" : {
             "IPC::System::Simple" : "0",
+            "Test::Carp" : "0",
             "Test::Most" : "0",
             "Test::NoWarnings" : "0"
          }
@@ -75,6 +76,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-ObituaryDailyTimes"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

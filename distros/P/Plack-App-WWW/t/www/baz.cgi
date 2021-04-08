@@ -1,0 +1,3 @@
+#!perl
+
+print 2;

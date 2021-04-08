@@ -8,7 +8,7 @@ use Carp;
 
 require Exporter;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04';
 
 our $DEBUG = 0;     # set to 1 to enable debug printing
 

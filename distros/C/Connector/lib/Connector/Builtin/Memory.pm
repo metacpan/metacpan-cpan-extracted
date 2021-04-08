@@ -210,6 +210,7 @@ sub set {
         }
     }
     $ptr->{$entry} = $value;
+    return 1;
 }
 
 

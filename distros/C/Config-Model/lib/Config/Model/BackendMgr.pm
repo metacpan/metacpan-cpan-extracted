@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendMgr 2.141;
+package Config::Model::BackendMgr 2.142;
 
 use Mouse;
 use strict;
@@ -508,7 +508,7 @@ sub is_auto_write_for_type {
 
 __PACKAGE__->meta->make_immutable;
 
-package Config::Model::DeprecatedHandle 2.141;
+package Config::Model::DeprecatedHandle 2.142;
 
 our $AUTOLOAD;
 
@@ -552,7 +552,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.141
+version 2.142
 
 =head1 SYNOPSIS
 

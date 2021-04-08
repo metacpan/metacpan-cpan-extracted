@@ -1,3 +1,8 @@
+0.006   2021-01-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Fix typo.
+
+
 0.005   2021-01-23  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] [cli show-border-style] Tweak table output to test

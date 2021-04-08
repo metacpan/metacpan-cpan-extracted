@@ -230,7 +230,7 @@ sub _build_search_options {
     return %options;
 }
 
-# NOTE: it returns undef in case of error
+# dies in case of error
 sub _new_ldap {
     my $self = shift;
     my $ldapuri = $self->LOCATION();
@@ -240,11 +240,12 @@ sub _new_ldap {
         onerror => 'undef',
         $self->_build_new_options(),
     );
-    if(defined $ldap) {
-        $self->log()->debug('Connection established');
-    } else {
-        $self->log()->error('Connection failed (error: '.$@.')');
+
+    if (!$ldap) {
+       $self->_log_and_die("Could not instantiate ldap object ($@)");
     }
+
+    $self->log()->debug('Connection established');
     return $ldap;
 }
 
@@ -253,9 +254,6 @@ sub _bind {
     my $self = shift;
     my $mesg;
     my $ldap = $self->_ldap;
-    if(!defined $ldap) {
-        return undef;
-    }
     if(defined $self->binddn()) {
         $self->log()->debug('Binding to "'.$self->binddn().'"');
         my %options = $self->_build_bind_options();
@@ -287,10 +285,7 @@ sub _search_user {
     my $user = shift;
 
     my $ldap = $self->_ldap();
-    if(!defined $ldap) {
-        $self->log()->error('Can not perform LDAP search');
-        return undef;
-    }
+
     $self->log()->debug('Searching LDAP databse for user "'.$user. '"');
     my $result = $ldap->search(
         $self->_build_search_options({ LOGIN => $user })
@@ -321,6 +316,7 @@ sub _check_user_group {
     my $self = shift;
     my $dn = shift;
     my $ldap = $self->_ldap();
+
     $self->log()->debug('Checking if "'.$dn.'" belongs to group "'.$self->groupdn().'"');
     my $result = $ldap->compare($self->groupdn(), attr => $self->groupattr(), value => $dn);
     if($result->is_error()) {

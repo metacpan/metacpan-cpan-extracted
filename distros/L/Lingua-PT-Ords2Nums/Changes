@@ -1,5 +1,9 @@
 Revision history for Perl extension Lingua::PT::Ords2Nums.
 
+0.08  Tue Apr 07 21:54:42 2004
+	- fixed a bug with hash sort order
+    - cosmetic changes to dist
+
 0.07  Tue Nov 09 20:14:00 2004
 	- fixed a bug that had to do with dependencies
 

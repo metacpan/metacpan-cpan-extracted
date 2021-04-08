@@ -1,7 +1,9 @@
-use lib '.';
-use t::Helper;
+use strict;
+use warnings;
+use File::Spec::Functions qw(rel2abs);
+use Test::More;
 
-my $tt = t::Helper->tt;
+plan skip_all => "Cannot load tt: $! ($@)" unless my $tt = do(rel2abs 'script/tt');
 ok $tt->can("command_$_"), "tt $_" for qw(export log start stop status register);
 
 eval { $tt->_time('13T29') };
@@ -12,6 +14,22 @@ test_time('3T23',                '03T23:00:00');
 test_time('9-3T23',              '09-03T23:00:00');
 test_time('6:5',                 'T06:05:00');
 test_time('09:04:01',            'T09:04:01');
+
+my $home = $tt->home;
+
+{
+  local $ENV{TT_HOME} = '/tmp/tt';
+  delete $tt->{home};
+  is $tt->home, '/tmp/tt', 'TIMETRACKER_HOME';
+  isnt $tt->home, $home, 'not default home';
+}
+
+{
+  local $ENV{TIMETRACKER_HOME} = '/tmp/tt';
+  delete $tt->{home};
+  is $tt->home, '/tmp/tt', 'TIMETRACKER_HOME';
+  isnt $tt->home, $home, 'not default home';
+}
 
 done_testing;
 

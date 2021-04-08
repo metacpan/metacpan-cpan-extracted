@@ -3,7 +3,7 @@ package App::BorderStyleUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-23'; # DATE
 our $DIST = 'App-BorderStyleUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -113,7 +113,7 @@ OPPPPPPPPQPPPPPPPPR     #
 L ...... M ...... N     #
 STTTTTTTTUTTTTTTTTV     #
 
-ABBBBBCBBBBBCBBBBBCBBBBBD     #
+ABBBBBBBBBBBCBBBBBCBBBBBD     #
 E ,,,,,,,,, F ,,, F ,,, G     #
 HIIIIIaIIIIIJIIIIIbIIIIIK     #
 L ... M ... M ......... N     #
@@ -152,7 +152,7 @@ App::BorderStyleUtils - CLI utilities related to border styles
 
 =head1 VERSION
 
-This document describes version 0.005 of App::BorderStyleUtils (from Perl distribution App-BorderStyleUtils), released on 2021-01-23.
+This document describes version 0.006 of App::BorderStyleUtils (from Perl distribution App-BorderStyleUtils), released on 2021-01-23.
 
 =head1 DESCRIPTION
 

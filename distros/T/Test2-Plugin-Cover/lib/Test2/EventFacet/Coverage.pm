@@ -2,10 +2,10 @@ package Test2::EventFacet::Coverage;
 use strict;
 use warnings;
 
-our $VERSION = '0.000009';
+our $VERSION = '0.000011';
 
 BEGIN { require Test2::EventFacet; our @ISA = qw(Test2::EventFacet) }
-use Test2::Util::HashBase qw{ files };
+use Test2::Util::HashBase qw{ files submap openmap };
 
 1;
 
@@ -36,6 +36,59 @@ Summary of files run.
 =item $arrayref = $about->{files}
 
 =item $arrayref = $about->files()
+
+Arrayref of files touched during testing. This includes modules that were
+loaded or had subroutines called. This also includes files opened via
+C<open()>.
+
+=item $hashref = $about->{submap}
+
+=item $hashref = $about->submap()
+
+    {
+        'SomeModule.pm' => {
+            # The wildcard is used when a proper sub name cannot be determined
+            '*' => { ... },
+
+            'SomeModule::subroutine' => {
+                sub_package => 'SomeModule',
+                sub_name    => 'subroutine',
+
+                call_count => $INTEGER,
+
+                # The items in this list can be anything, strings, numbers,
+                # data structures, etc.
+                # A naive attempt is made to avoid duplicates in this list,
+                # so the same string or reference will not appear twice, but 2
+                # different references with identical contents may appear.
+                called_by => [
+                    '*',     # The wildcard is used when no 'called by' can be determined
+                    $FROM_A,
+                    $FROM_B,
+                    ...
+                ],
+            },
+        },
+        ...
+    }
+
+
+=item $hashref = $about->{openmap}
+
+=item $hashref = $about->openmap()
+
+    {
+        # The items in this list can be anything, strings, numbers,
+        # data structures, etc.
+        # A naive attempt is made to avoid duplicates in this list,
+        # so the same string or reference will not appear twice, but 2
+        # different references with identical contents may appear.
+        "some_file.ext" => [
+            '*',        # The wildcard is used when no 'called by' can be determined
+            $FROM_A,
+            $FROM_b,
+        ],
+    }
 
 =back
 

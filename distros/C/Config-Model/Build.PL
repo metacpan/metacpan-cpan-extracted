@@ -80,7 +80,6 @@ my $build = $class->new(
     'Test::More' => '0',
     'Test::Pod' => '1.00',
     'Test::Warn' => '0.11',
-    'XXX' => '0',
     'boolean' => '0',
     'lib' => '0'
   },

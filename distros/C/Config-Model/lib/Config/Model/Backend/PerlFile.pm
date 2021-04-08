@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::PerlFile 2.141;
+package Config::Model::Backend::PerlFile 2.142;
 
 use 5.10.1;
 use Carp;
@@ -86,7 +86,7 @@ Config::Model::Backend::PerlFile - Read and write config as a Perl data structur
 
 =head1 VERSION
 
-version 2.141
+version 2.142
 
 =head1 SYNOPSIS
 

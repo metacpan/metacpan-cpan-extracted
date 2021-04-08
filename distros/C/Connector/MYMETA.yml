@@ -51,5 +51,5 @@ resources:
   bugtracker: https://github.com/mrscotty/connector/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/mrscotty/connector
-version: '1.36'
+version: '1.37'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

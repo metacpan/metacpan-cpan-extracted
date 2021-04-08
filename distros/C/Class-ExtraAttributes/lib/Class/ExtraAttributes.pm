@@ -1,7 +1,7 @@
 package Class::ExtraAttributes;
 
 # version
-$VERSION= '0.03';
+$VERSION= '0.04';
 
 # be as strict and verbose as possible
 use strict;
@@ -30,9 +30,8 @@ my %attributes;
 # OUT: 1 list (or list ref) with extra attributes
 
 sub attributes {
-
     # fetch attributes
-    my @attributes= keys %{ $attributes{ $_[1] || caller() } || {} };
+    my @attributes= keys %{ $attributes{ $_[1] ? $_[1] : caller() } || {} };
 
     return wantarray ? @attributes : \@attributes;
 }    #attributes
@@ -89,7 +88,7 @@ Class::ExtraAttributes - extra attributes for a class
 
 =head1 VERSION
 
-This documentation describes version 0.03.
+This documentation describes version 0.04.
 
 =head1 SYNOPSIS
 
@@ -142,9 +141,9 @@ will export accessors / mutators with the given names into that namespace,
 provided they don't exist yet.  These accessors / mutators in turn call the
 C<OOB_set> and C<OOB_get> functions of the L<OOB> module.
 
-=head2 CLASS METHODS
+=head1 CLASS METHODS
 
-=head1 attributes
+=head2 attributes
 
  my @attributes = Class::ExtraAttributes->attributes; # caller's namespace
 

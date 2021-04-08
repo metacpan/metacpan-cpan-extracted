@@ -12,14 +12,27 @@ subtest simple_coverage => sub {
     # Start fresh
     $CLASS->clear;
 
-    is(Fake1->fake, 'fake', "Got fake 1");
-    is(Fake2->fake, 'fake', "Got fake 2");
+    Fake1->fake;
+    Fake2->fake;
+
+    $CLASS->set_from('simple_coverage');
+    Fake1->fake;
+    Fake1->fake;
+    Fake2->fake;
+    Fake2->fake;
+
+    $CLASS->set_from('simple_coverage_x');
+    Fake1->fake;
+    Fake1->fake;
+    Fake2->fake;
+    Fake2->fake;
+    $CLASS->clear_from;
+
+    Fake1->fake;
+    Fake2->fake;
 
     # This is just to add another sub call we want filtered
     path('.');
-
-    ok(keys %Test2::Plugin::Cover::FILES > 2,                          "More than 2 files were tracked");
-    ok((grep { m/Path.Tiny\.pm$/ } keys %Test2::Plugin::Cover::FILES), "Path::Tiny is in the list of files seen");
 
     is(
         $CLASS->files(root => path('t/lib')),
@@ -30,9 +43,42 @@ subtest simple_coverage => sub {
         "Got just the 2 files under the specified dir"
     );
 
+    is(
+        $CLASS->submap(root => path('t/lib')),
+        {
+            'Fake1.pm' => {
+                'Fake1::fake' => {
+                    call_count  => 6,
+                    called_by   => ['*', 'simple_coverage', 'simple_coverage_x'],
+                    sub_name    => 'fake',
+                    sub_package => 'Fake1'
+                }
+            },
+            'Fake2.pm' => {
+                'Fake2::fake' => {
+                    call_count  => 6,
+                    called_by   => ['*', 'simple_coverage', 'simple_coverage_x'],
+                    sub_name    => 'fake',
+                    sub_package => 'Fake2',
+                },
+            },
+        },
+        "Got expected submap"
+    );
+
     $CLASS->clear;
-    my %data = %Test2::Plugin::Cover::FILES;
-    ok(!keys %data, "wiped out coverage data");
+
+    is(
+        $CLASS->files(root => path('t/lib')),
+        [],
+        "Cleared files"
+    );
+
+    is(
+        $CLASS->submap(root => path('t/lib')),
+        {},
+        "Cleared submap",
+    );
 };
 
 subtest goto_and_lvalue => sub {
@@ -45,9 +91,6 @@ subtest goto_and_lvalue => sub {
     is($CLASS->files(root => path('t/lib')), ['Fake1.pm',], "Found with an lvalue");
 };
 
-# Final cleanup
 $CLASS->clear;
-$CLASS->filter("not a file");
-like($CLASS->files(), [qr/lib.Test2.Plugin.Cover\.pm$/], "Found Test::Plugin::Cover");
 
 done_testing;

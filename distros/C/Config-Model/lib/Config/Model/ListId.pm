@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ListId 2.141;
+package Config::Model::ListId 2.142;
 
 use 5.10.1;
 use Mouse;
@@ -186,12 +186,9 @@ sub load {
                   /x;
 
     while ( length($string) ) {
-
-        #print "string: $string\n";
         $string =~ s/$regex// or last;
         my $tmp = $1;
 
-        #print "tmp: $tmp\n";
         $tmp =~ s/^"|"$//g if defined $tmp;
         $tmp =~ s/\\"/"/g  if defined $tmp;
         push @set, $tmp;
@@ -210,7 +207,7 @@ sub load {
         );
     }
 
-    $self->store_set(@set);
+    $self->store_set(\@set, check => $check);
 }
 
 sub store_set {
@@ -534,7 +531,7 @@ sub load_data {
     foreach my $item (@$data) {
         my $obj = $self->fetch_with_id( $idx );
         # increment idx only if the value was accepted. This allow to
-        # prune the arrau to the right size.
+        # prune the array to the right size.
         $idx += $obj->load_data( %args, data => $item );
     }
 
@@ -560,7 +557,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.141
+version 2.142
 
 =head1 SYNOPSIS
 

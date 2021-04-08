@@ -75,37 +75,45 @@ $Lingua::EN::NameCase::POSTNOMINAL = 0;
 
 # print '"last","first","maiden","age","place","newspapername","newspaperdate","tag"', "\n";
 
+my $dbh = DBI->connect("dbi:SQLite:dbname=$filename", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' });
+die "$filename: $!" if(!defined($dbh));
+
+$dbh->do('PRAGMA cache_size = -65536');	# 64MB
+$dbh->do('PRAGMA journal_mode = OFF');
+$dbh->do('CREATE TABLE obituaries(first VARCHAR, middle, VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL, url VARCHAR NOT NULL)');
+
 my @queue;
 my $page = 1;
 while(mlarchives($ua, $page)) {
 	$page++;
+	flush($dbh) if(scalar(@queue) > 200_000);
 };
 
 print ' ' x 78, "\r";
+
+flush($dbh);
 
 my $issue = 9;
 while(freelists($ua, 'v25no' . sprintf('%03d', $issue))) {
 	$issue++;
 }
 
+flush($dbh);
+
 $issue = 1;
 while(freelists($ua, 'v26no' . sprintf('%03d', $issue))) {
 	$issue++;
+	if($issue == 52) {
+		$issue++;	# https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-v26no052 doesn't exist
+	}
 }
+
+flush($dbh);
 
 print "\n";
 
-if(my $dbh = DBI->connect("dbi:SQLite:dbname=$filename", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' })) {
-	$dbh->do('PRAGMA cache_size = -65536');	# 64MB
-	$dbh->do('PRAGMA journal_mode = OFF');
-	$dbh->do('CREATE TABLE obituaries(first VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL, url VARCHAR NOT NULL)');
-
-	flush($dbh);
-	$dbh->commit();
-	$dbh->disconnect();
-} else {
-	die "$filename: $!";
-}
+$dbh->commit();
+$dbh->disconnect();
 
 sub mlarchives($$) {
 	my $ua = shift;
@@ -243,19 +251,25 @@ sub freelists($$) {
 	# print $data;
 	# exit;
 
-	$data =~ s/.*?^\-\-\-\-+<br>$//ms;
-	$data =~ s/.*?^\-\-\-\-+<br>$//ms;
-	# $data =~ s/(.*?)^\-\-\-\-+<br>$/$1/ms;
+	my @lines = split(/<br>|<br \/>$/ms, $data);
 
-	my @lines = split(/<br>$/ms, $data);
 	my $rc;
 
+	my $stage = 0;
 	while(my $line = shift(@lines)) {
 		# LAST NAME, First Name (MAIDEN); Age; Place of Death; Newspaper Name; Newspaper date; tagname
 
 		$line =~ s/^\n//;
-		last if($line =~ /^\-\-\-\-\-\-\-\-/);
+		next if($line eq '');
+		if($line =~ /\-\-\-\-\-\-\-\-/) {
+			$stage++;
+			last if($stage >= 3);
+			$line =~ s/^.*\-+//;
+			next if($line eq '');
+		}
+		next if($stage != 2);
 		$line =~ s/&nbsp;/ /g;
+		$line =~ s/\x{a0}/ /g;
 		$line = decode_entities($line);
 		$line =~ s/'/''/g;
 		my ($name, $age, $place, $newspaper, $date, $tag) = split(/;\s?/, $line);
@@ -265,16 +279,19 @@ sub freelists($$) {
 			$cont =~ s/^\n//;
 			last if($cont =~ /^\-\-\-\-\-\-\-\-/);
 			$cont =~ s/&nbsp;/ /g;
+			$cont =~ s/\x{a0}/ /g;
 			$cont =~ s/&gt;/>/g;
 			$line =~ s/&quot;/"/g;
 			$line .= $cont;
 			($name, $age, $place, $newspaper, $date, $tag) = split(/;\s?/, $line);
 		}
+		# print __LINE__, ": $line: ($stage): $name, $age, $place, $newspaper, $date, $tag\n";
 		# use Data::Dumper;
 		# print __LINE__, ": $issue: ", Data::Dumper->new([split(/;\s?/, $line)])->Dump();
 		next unless(defined($name));
 		my ($last, $first) = split(',\s', $name);
 		next unless(defined($last));
+		next unless(defined($first));
 
 		# Parsing completely broken
 		# e.g. https://www.freelists.org/post/obitdailytimes/Obituary-Daily-Times-v25no010
@@ -291,8 +308,9 @@ sub freelists($$) {
 		}
 		# $age //= '';
 
-		# print "$line->>>>>>>>>>\n";
-		# print "\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
+		# print "$line:\n",
+			# "\t\"$last\",\"$first\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
+			# # "\t\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
 		queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, $url) if($last =~ /^[A-Z]/);
 		$rc = 1;
 	}
@@ -304,25 +322,27 @@ sub queue($$$$$$$$)
 {
 	my ($first, $last, $maiden, $age, $place, $date, $newspaper, $url) = @_;
 
+	# If we don't know the date of publication, it's not easy to find
+	return unless(defined($date));
+
+	return unless($date =~ /^\d/);
+
 	my %columns = (
 		first => $first,
 		last => $last,
+		date => $date,
 		newspaper => $newspaper,
 		place => $place,
 		url => $url
 	);
-	# If we don't know the date of publication, it's not easy to find
-	if($date) {
-		return unless($date =~ /^\d/);
-		$columns{'date'} = $date;
-		if(defined($age) && ($age ne '')) {
-			$columns{'age'} = $age;
-		}
-		if($maiden) {
-			$columns{'maiden'} = $maiden;
-		}
-		push @queue, \%columns;
+
+	if(defined($age) && ($age ne '')) {
+		$columns{'age'} = $age;
 	}
+	if($maiden) {
+		$columns{'maiden'} = $maiden;
+	}
+	push @queue, \%columns;
 }
 
 sub flush($)
@@ -333,16 +353,21 @@ sub flush($)
 
 	while(my $row = pop @queue) {
 		if(!defined($query)) {
-			$query = 'INSERT INTO obituaries(first, last, maiden, age, place, date, newspaper, url) VALUES (';
+			$query = 'INSERT INTO obituaries(first, middle, last, maiden, age, place, date, newspaper, url) VALUES (';
 		} else {
 			$query .= ',(';
 		}
 		my %columns = %{$row};
 
 		if($columns{'first'}) {
-			$query .= "'" . $columns{'first'} . "','" . $columns{'last'} . "',";
+			if($columns{'first'} =~ /(.+)\s(.+)/) {
+				# Has a middle name
+				$query .= "'$1','$2','" . $columns{'last'} . "',";
+			} else {
+				$query .= "'" . $columns{'first'} . "',NULL,'" . $columns{'last'} . "',";
+			}
 		} else {
-			$query .= "NULL,'" . $columns{'last'} . "',";
+			$query .= "NULL,NULL,'" . $columns{'last'} . "',";
 		}
 		if($columns{'maiden'} && ($columns{'maiden'} ne ' ')) {
 			$query .= "'" . $columns{'maiden'} . "',";
@@ -378,6 +403,7 @@ sub flush($)
 		die "\nError in insert ($query) called from line ",
 			$call_details[2], ': ', $dbh->errstr();
 	};
+	@queue = ();	# Make sure Perl really frees all memory
 }
 
 # Reduce the very large number of calls to Lingua::EN::NameCase

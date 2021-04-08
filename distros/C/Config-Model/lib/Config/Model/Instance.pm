@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.141;
+package Config::Model::Instance 2.142;
 
 #use Scalar::Util qw(weaken) ;
 use strict;
@@ -308,7 +308,7 @@ sub preset_clear {
 
     my $leaf_cb = sub {
         my ( $scanner, $data_ref, $node, $element_name, $index, $leaf_object ) = @_;
-        $leaf_object->clear_preset;
+        $$data_ref ||= $leaf_object->clear_preset;
     };
 
     $self->_stuff_clear($leaf_cb);
@@ -357,7 +357,11 @@ sub _stuff_clear {
         my ( $scanner, $data_ref, $node, $element_name, @keys ) = @_;
         my $obj = $node->fetch_element($element_name);
 
-        foreach my $k (@keys) {
+        # Since remove method uses splice(array) on list elements, the
+        # removal must be done in reverse order to avoid messing up
+        # the indexes of the array (i.e. the last indexes becomes
+        # greater than the length of the array).
+        foreach my $k (reverse @keys) {
             my $has_data = 0;
             $scanner->scan_hash( \$has_data, $node, $element_name, $k );
             $obj->remove($k) unless $has_data;
@@ -661,7 +665,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.141
+version 2.142
 
 =head1 SYNOPSIS
 

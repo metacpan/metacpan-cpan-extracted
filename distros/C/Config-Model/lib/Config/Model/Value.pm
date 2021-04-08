@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.141;
+package Config::Model::Value 2.142;
 
 use 5.10.1;
 
@@ -1157,7 +1157,6 @@ sub apply_fix {
     no warnings "uninitialized";
     if ( $_ ne $$value_r ) {
         $fix_logger->info( $self->location . ": fix changed value from '$$value_r' to '$_'" );
-        $DB::single =1 if $self-> element_name =~ /undef/;
         $self->_store_fix( $$value_r, $_, $msg );
         $$value_r = $_; # so chain of fixes work
     }
@@ -1333,7 +1332,7 @@ sub store {
     my $user_cb = $args{callback} ;
     $user_cb->(%args) if $user_cb;
 
-    return $ok;
+    return $ok || ($check eq 'no');
 }
 
 #
@@ -1567,7 +1566,7 @@ sub load_data {
             my $str = $data // '<undef>';
             $logger->info( "Value load_data (", $self->location, ") will store value $str" );
         }
-        $self->store(%args, value => $data);
+        return $self->store(%args, value => $data);
     }
 }
 
@@ -1997,7 +1996,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.141
+version 2.142
 
 =head1 SYNOPSIS
 

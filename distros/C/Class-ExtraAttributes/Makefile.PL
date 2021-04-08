@@ -8,6 +8,6 @@ WriteMakefile (
  ABSTRACT	=> 'extra attributes for a class',
  VERSION_FROM	=> 'lib/Class/ExtraAttributes.pm',
  PREREQ_PM	=> { qw(
-                    OOB    0.08
+                    OOB    1.00
                    ) },
 );

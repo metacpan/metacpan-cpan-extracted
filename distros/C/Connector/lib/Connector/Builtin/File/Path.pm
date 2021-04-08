@@ -16,11 +16,7 @@ use Template;
 use Moose;
 extends 'Connector::Builtin';
 
-
-has file => (
-    is  => 'rw',
-    isa => 'Str',
-);
+with 'Connector::Role::LocalPath';
 
 has content => (
     is  => 'rw',
@@ -189,18 +185,8 @@ sub _sanitize_path {
 
     my @args = $self->_build_path_with_prefix( $inargs );
 
+    my $file = $self->_render_local_path( \@args, $data );
 
-    my $file;
-    if ($self->file()) {
-        my $pattern = $self->file();
-        my $template = Template->new({});
-        $self->log()->debug('Process template ' . $pattern);
-        $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || die "Error processing argument template.";
-    } else {
-        $file = join $self->DELIMITER(), @args;
-    }
-
-    $file =~ s/[^\s\w\.-]//g;
     my $filename = $self->{LOCATION}.'/'.$file;
 
     $self->log()->debug('Filename evaluated to ' . $filename);
@@ -230,11 +216,13 @@ Highly configurable file writer/reader.
 
 The base directory where the files are located. This parameter is mandatory.
 
-=item file
+=item file/path
 
 Pattern for Template Toolkit to build the filename.
 The path components are available in the key ARGS. In set mode the unfiltered
 data is available in key DATA.
+
+See also Connector::Role::LocalPath
 
 =item content
 

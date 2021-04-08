@@ -17,8 +17,7 @@ my %WriteMakefileArgs = (
 ,
   PREREQ_PM      => {
   'Applify' => '0.21',
-  'File::HomeDir' => '1.00',
-  'JSON::XS' => '3.00',
+  'JSON::PP' => '2.20',
   'List::Util' => '1.45',
   'perl' => '5.010001'
 }

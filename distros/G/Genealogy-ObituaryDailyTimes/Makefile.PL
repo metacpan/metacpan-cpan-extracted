@@ -42,6 +42,7 @@ WriteMakefile(
 	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES => (defined($ENV{'AUTOMATED_TESTING'}) ? {} : {'bin/create_db.PL' => 'bin/create_db'}),
 	TEST_REQUIRES => {
+		'Test::Carp' => 0,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		# 'Test::Kwalitee' => 0,

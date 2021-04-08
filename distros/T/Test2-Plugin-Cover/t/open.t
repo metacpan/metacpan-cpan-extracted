@@ -7,25 +7,42 @@ $CLASS->clear;
 my $fh;
 open($fh, '<', 'aaa.json');
 open($fh, '<bbb.json');
+$CLASS->set_from('xxx');
 open($fh, '+<ccc.json');
 open($fh, '-<ddd.json');
 open($fh, File::Spec->catfile('dir', 'eee'));
+open($fh, File::Spec->catfile('dir', 'eee'));
+$CLASS->set_from('yyy');
+open($fh, File::Spec->catfile('dir', 'eee'));
 
+my $eee = path(File::Spec->catfile('dir', 'eee'))->relative(path('.'))->stringify();
 
 close($fh);
 my $data = $CLASS->files(root => path('.'));
 like(
     [ sort grep { !m/\.pm$/ } @$data ],
     array {
-        item('aaa.json');
-        item('bbb.json');
-        item('ccc.json');
-        item('ddd.json');
-        item(path(File::Spec->catfile('dir', 'eee'))->relative(path('.'))->stringify());
+        item 'aaa.json';
+        item 'bbb.json';
+        item 'ccc.json';
+        item 'ddd.json';
+        item $eee;
     },
     "Got files we (tried to) open",
 );
 
+$data = $CLASS->openmap(root => path('.'));
+like(
+    $data,
+    hash {
+        field 'aaa.json' => ['*'];
+        field 'bbb.json' => ['*'];
+        field 'ccc.json' => ['xxx'];
+        field 'ddd.json' => ['xxx'];
+        field $eee => ['xxx', 'yyy'];
+    },
+    "Got list of what callers tried to open the files"
+);
 
 $CLASS->clear;
 

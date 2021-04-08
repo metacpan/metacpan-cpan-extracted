@@ -93,7 +93,6 @@
             "Test::More" : "0",
             "Test::Pod" : "1.00",
             "Test::Warn" : "0.11",
-            "XXX" : "0",
             "boolean" : "0",
             "lib" : "0"
          }
@@ -112,8 +111,8 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.141",
-   "x_generated_by_perl" : "v5.32.0",
+   "version" : "2.142",
+   "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "LGPL-2.1"
 }

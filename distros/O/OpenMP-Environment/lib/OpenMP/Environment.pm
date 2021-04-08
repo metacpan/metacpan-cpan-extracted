@@ -5,7 +5,7 @@ use warnings;
 
 use Validate::Tiny qw/filter is_in/;
 
-our $VERSION = q{1.0.0};
+our $VERSION = q{1.0.2};
 
 our @_OMP_VARS = (
     qw/OMP_CANCELLATION OMP_DISPLAY_ENV OMP_DEFAULT_DEVICE
@@ -497,14 +497,31 @@ to C<OMP_NUM_THREADS>.
     }
   }
 
-There are setters, getters, and unsetters for all published OpenMP
-(and GOMP) environmental variables, in additional to some utility
-methods.
+Note: While it has not been tested, theoretically any Perl module that
+utilizes compiled libraries (via C::Inline, XS, FFIs, etc) that are C<OpenMP>
+aware should also be at home within the context of this module.
+
+Example 4; Theoretical use with an XS module that itself is C<OpenMP> aware:
+
+  use OpenMP::Environment;
+  use My::XS::OpenMP::Aware::Thing;
+
+  my $env = OpenMP::Environment->new;
+  my $omp_aware = My::XS::OpenMP::Aware::Thing->new;
+
+  foreach my $i (1 2 4 8 16 32 64 128 256) {
+    $env->set_omp_num_threads($i); # Note: validated
+    my $result = $omp_aware->do_something_implemented_with_openmp();
+  }
 
 =head1 DESCRIPTION
 
 Provides accessors for affecting the OpenMP/GOMP environmental
 variables described at at the time of this writing, as:
+
+There are setters, getters, and unsetters for all published OpenMP
+(and GOMP) environmental variables, in additional to some utility
+methods.
 
 C<The environment variables which beginning with OMP_ are defined
 by section 4 of the OpenMP specification in version 4.5, while
@@ -798,7 +815,7 @@ Unsets C<GOMP_RTEMS_THREAD_POOLS>, deletes it from localized C<%ENV>.
 
 =head1 SUPPORTED C<OpenMP> ENVIRONMENTAL VARIABLES
 
-Essentially direct copy from the URL in L<DESCRIPTION>.
+The following is essentially direct copy from the URL in DESCRIPTION:
 
 =over 3
 

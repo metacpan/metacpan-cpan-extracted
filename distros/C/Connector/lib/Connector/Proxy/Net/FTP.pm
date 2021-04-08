@@ -12,23 +12,14 @@ use Template;
 
 use Moose;
 extends 'Connector::Proxy';
+with 'Connector::Role::LocalPath';
 
 has port => (
     is  => 'rw',
     isa => 'Int',
     default => 21,
 );
-
-has file => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
-has path => (
-    is  => 'rw',
-    isa => 'Str',
-);
-
+ 
 has basedir => (
     is  => 'rw',
     isa => 'Str',
@@ -222,30 +213,18 @@ sub _sanitize_path {
     my $file;
     my $template = Template->new({});
 
-    if ($self->path()) {
-        my $pattern = $self->path();
-        $self->log()->debug('Process template ' . $pattern);
-        $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || $self->_log_and_die("Error processing file template.");
-    } elsif ($self->file()) {
-        my $pattern = $self->file();
-        my $template = Template->new({});
-        $self->log()->debug('Process template ' . $pattern);
-        $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || $self->_log_and_die("Error processing file template.");
-        if ($file =~ m{[\/\\]}) {
-            $self->_log_and_die('Target file name contains directory seperator! Consider using path instead.');
-        }
+    if ($self->path() || $self->file()) {
+        $file = $self->_render_local_path( \@args, $data );
     } else {
         $self->log()->debug('Neither target pattern nor file set, join arguments');
-
         map {
             if ($_ =~ /\.\.|\//) {
                 $self->_log_and_die("args contains invalid characters (double dot or slash)");
             }
         } @args;
         $file = join("/", @args);
+        $file =~ s/[^\s\w\.\-\\\/]//g;
     }
-
-    $file =~ s/[^\s\w\.\-\\\/]//g;
 
     $self->log()->debug('Filename evaluated to ' . $file);
 

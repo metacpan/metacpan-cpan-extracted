@@ -5,35 +5,15 @@ package Connector::Proxy::HTTP;
 use strict;
 use warnings;
 use English;
-use Try::Tiny;
-use Data::Dumper;
-use LWP::UserAgent;
 use Template;
 
 use Moose;
 extends 'Connector::Proxy';
-
-has timeout => (
-    is => 'rw',
-    isa => 'Int',
-    required => 0,
-    default => 10,
-    );
-
-has proxy => (
-    is => 'rw',
-    isa => 'Str',
-    required => 0,
-    );
-
-has agent => (
-    is => 'rw',
-    isa => 'Object',
-    lazy => 1,
-    builder => '_init_agent',
+with qw( 
+    Connector::Role::SSLUserAgent 
+    Connector::Role::LocalPath
 );
-
-
+ 
 # If not set, the path items are added to the base url as uri path
 # if set, the keys from named parameters are combined and used as query string
 # not implemented
@@ -42,59 +22,7 @@ has agent => (
 #    isa => 'ArrayRef|Str|Undef',
 #    trigger => \&_convert_parameters,
 #    );
-
-has use_net_ssl => (
-    is => 'rw',
-    isa => 'Bool',
-    default => 0,
-    );
-
-has ssl_ignore_hostname => (
-    is => 'rw',
-    isa => 'Bool',
-    default => 0,
-    );
-
-has ssl_ignore_mode => (
-    is => 'rw',
-    isa => 'Bool',
-    default => 0,
-    );
-
-has certificate_file => (
-    is => 'rw',
-    isa => 'Str',
-    );
-
-has certificate_key_file => (
-    is => 'rw',
-    isa => 'Str',
-    );
-
-has certificate_p12_file => (
-    is => 'rw',
-    isa => 'Str',
-    );
-
-has certificate_key_password => (
-    is => 'rw',
-    isa => 'Str',
-    );
-
-has ca_certificate_path => (
-    is => 'rw',
-    isa => 'Str',
-    );
-
-has ca_certificate_file => (
-    is => 'rw',
-    isa => 'Str',
-    );
-
-has file => (
-    is => 'rw',
-    isa => 'Str',
-    );
+ 
 
 has content => (
     is  => 'rw',
@@ -122,6 +50,19 @@ has http_auth => (
     isa => 'HashRef',
     );
 
+has undef_on_404 => (
+    is  => 'ro',
+    isa => 'Bool',
+    default => 0,
+    );
+
+has chomp_result => (
+    is  => 'ro',
+    isa => 'Bool',
+    default => 0,
+    );
+
+
 # If named_parameters is set using a string (necessary atm for Config::Std)
 # its converted to an arrayref. Might be removed if Config::* improves
 # This might create indefinite loops if something goes wrong on the conversion!
@@ -135,110 +76,7 @@ sub _convert_parameters {
     }
 
 }
-
-sub _init_agent {
-
-    my $self = shift;
-
-    my %ENV_BACKUP = %ENV;
-
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout( $self->timeout() );
-    if ($self->proxy()) {
-        $ua->proxy(['http', 'https'], $self->proxy());
-    }
-
-    # Force usage of net::ssl
-    if ($self->use_net_ssl()) {
-        require Net::SSL;
-        $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "Net::SSL";
-
-        if ($self->certificate_p12_file) {
-            $ENV{HTTPS_PKCS12_FILE}  = $self->certificate_p12_file;
-
-            if ($self->certificate_key_file || $self->certificate_file) {
-                die "Options certificate_file/certificate_key_file and certificate_p12_file are mutually exclusive";
-            }
-
-            if ($self->certificate_key_password) {
-                $ENV{HTTPS_PKCS12_PASSWORD}  = $self->certificate_key_password;
-            }
-        }
-
-        if ($self->certificate_key_file) {
-            if ($self->certificate_key_password) {
-                die "Net::SSL does not support password protected keys - use certificate_p12_file instead";
-            }
-
-            if (!$self->certificate_file) {
-                die "You need to pass certificate AND key file, use certificate_p12_file to pass a PKCS12";
-            }
-
-            $ENV{HTTPS_KEY_FILE}  = $self->certificate_key_file;
-            $ENV{HTTPS_CERT_FILE} = $self->certificate_file;
-
-        } elsif ($self->certificate_file) {
-            die "You need to pass certificate AND key file, use certificate_p12_file to pass a PKCS12";
-        }
-
-        if ($self->ca_certificate_path) {
-            $ENV{HTTPS_CA_DIR} = $self->ca_certificate_path;
-        }
-
-        if ($self->ca_certificate_file) {
-            $ENV{HTTPS_CA_FILE} = $self->ca_certificate_file;
-        }
-
-        $self->log()->trace('Using Net::SSL, EVN is' . Dumper $ENV);
-
-    } # end of Net:SSL, IO::Socket::SSL
-    elsif( $self->LOCATION() =~ /^https:/i ) {
-
-        use IO::Socket::SSL;
-        $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = "IO::Socket::SSL";
-
-        my $ssl_opts = {
-            verify_hostname => ($self->ssl_ignore_hostname ? 0 : 1),
-            SSL_verify_mode => ($self->ssl_ignore_mode ? 0 : 1)
-        };
-        if ($self->certificate_p12_file) {
-            die "Using pkcs12 containers is not supported by IO::Socket::SSL"
-        }
-
-        if ($self->certificate_key_file) {
-            if (!$self->certificate_file) {
-                die "You need to pass certificate AND key file";
-            }
-            $ssl_opts->{SSL_key_file}  = $self->certificate_key_file;
-            $ssl_opts->{SSL_cert_file}  = $self->certificate_file;
-
-            if ( $self->certificate_key_password ) {
-                $ssl_opts->{SSL_passwd_cb} = sub { return $self->certificate_key_password; };
-            }
-
-        } elsif ($self->certificate_file) {
-            die "You need to pass certificate AND key file";
-        }
-
-        if ($self->ca_certificate_path) {
-	        $ssl_opts->{SSL_ca_path}  = $self->ca_certificate_path;
-        }
-
-        if ($self->ca_certificate_file) {
-            $ssl_opts->{SSL_ca_file}  = $self->ca_certificate_file;
-        }
-
-        $ua->ssl_opts( %{$ssl_opts} );
-
-        $self->log()->trace('Using IO::Socket::SSL with options ' . Dumper $ssl_opts);
-    } else {
-        # No ssl
-    }
-
-    return $ua;
-}
-
-
+ 
 sub get {
     my $self = shift;
 
@@ -267,6 +105,10 @@ sub get {
     my $response = $self->agent()->request($req);
     
     if (!$response->is_success) {
+        if ( $response->code == 404 && $self->undef_on_404()) {
+            $self->log()->warn("Resource not found");
+            return $self->_node_not_exists();
+        }
         $self->log()->error($response->status_line);
         die "Unable to retrieve data from server";
     }
@@ -340,19 +182,10 @@ sub _sanitize_path {
 
     my @args = $self->_build_path_with_prefix( $inargs );
 
-    my $file;
-    my $filename = $self->{LOCATION};
-    if ($self->file()) {
-        my $pattern = $self->file();
-        my $template = Template->new({});
-        $self->log()->debug('Process template ' . $pattern);
-        $template->process( \$pattern, { ARGS => \@args, DATA => $data }, \$file) || die "Error processing argument template.";
-    } elsif (scalar @args) {
-        $file = join $self->DELIMITER(), @args;
-    }
+    my $file = $self->_render_local_path( \@args, $data );
 
+    my $filename = $self->LOCATION();
     if (defined $file && $file ne "") {
-        $file =~ s/[^\s\w\.-]//g;
         $filename .= '/'.$file;
     }
 
@@ -365,7 +198,10 @@ sub _parse_result {
 
     my $self  = shift;
     my $response = shift;
-    return $response->decoded_content;
+
+    my $res = $response->decoded_content;
+    chomp $res if ($self->chomp_result());
+    return $res;
 }
 
 
@@ -375,11 +211,11 @@ __PACKAGE__->meta->make_immutable;
 1;
 __END__
 
-=head 1 NAME
+=head1 NAME
 
 Connector::Proxy::HTTP
 
-=head 1 DESCRIPTION
+=head1 DESCRIPTION
 
 Send or retrieve data from a defined URI using HTTP.
 
@@ -387,9 +223,13 @@ Send or retrieve data from a defined URI using HTTP.
 
 =head2 minimal setup
 
-  Connector::Proxy::HTTP::Lite->new({
+  Connector::Proxy::HTTP->new({
     LOCATION => 'https://127.0.0.1/my/base/url',
   });
+
+=head2 connection settings
+
+See Connector::Role::SSLUserAgent for SSL and HTTP related settings
 
 =head2 additional options
 
@@ -408,33 +248,28 @@ A HashRef, the key/value pairs are set as HTTP headers.
 A HashRef with I<user> and I<pass> used as credentials to perform a
 HTTP Basic Authentication.
 
+=item chomp_result
+
+When working with text documents the transport layer adds a trailing
+newline which might be unhandy when working with scalar values. If
+set to a true value, a trailing newline will be removed by calling C<chomp>.
+
+=item undef_on_404
+
+By default, the connector will die if a resource is not found. If set
+to a true value the connector returns undef, note that die_on_undef
+will be obeyed.
+
 =back
-
-=head2 LWP options
-
-=over
-
-=item timeout
-
-Timeout for the connection in seconds, default is 10.
-
-=item proxy
-
-URL of a proxy to use, must include protocol and port,
-e.g. https://proxy.intranet.company.com:8080/
 
 =head2 Parameter used with set
 
 =over
 
-=item file
+=item file/path
 
-A template toolkit string to generate the filename to write to. The
-arguments given as connector location are available in I<ARGS>, the
-payload data in I<DATA>. The result is sanitized and must not contain
-any other characters than word, whitespace, dash or dot.
-
-The result is appended to LOCATION.
+You can append a templated string to the LOCATION by setting I<file>,
+I<path> or simply pass I<ARGS>. See Connector::Role::LocalPath for details.
 
 =item content
 
@@ -451,59 +286,6 @@ The http method to use, default is PUT.
 
 =back
 
-=head2 SSL support
-
-This connector supports client authentication using certificates.
-
-=over
-
-=item use_net_ssl
-
-Set this to a true value to use Net::SSL as backend library (otherwise
-IO::Socket::SSL is used). Be aware the Net::SSL does not check the hostname
-of the server certificate so Man-in-the-Middle-Attacks might be possible.
-You should use this only with a really good reason or if you need support
-for PKCS12 containers.
-
-=item ssl_ignore_hostname
-
-Do not validate the hostname of the server certificate (only useful with
-IO::Socket::SSL as Net::SSL does not check the hostname at all).
-
-=item certificate_file
-
-Path to a PEM encoded certificate file.
-
-=item certificate_key_file
-
-Path to a PEM encoded key file.
-
-=item certificate_p12_file
-
-Path to a PKCS12 container file. This is only supported by Net:SSL and can
-not be used together with certificate_file/certificate_key_file.
-
-=item certificate_key_password
-
-The plain password of your encrypted key or PKCS12 container. Note that
-Net::SSL does not support password protected keys. You need to use a PKCS12
-container instead! Leave this empty if your key is not protected by a password.
-
-=item ca_certificate_path
-
-Path to a directory with trusted certificates (with openssl hashed names).
-Also used to validate the server certificate even if no client authentication
-is used.
-
-=item ca_certificate_file
-
-Same as ca_certificate_path pointing to a single file.
-
-=item ssl_ignore_mode
-
-Boolean, turn of validation of ssl peer certificate (IO::Socket only).
-
-=back
 
 =head1 Result Handling
 

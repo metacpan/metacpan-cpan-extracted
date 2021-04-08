@@ -3,6 +3,8 @@ abstract: 'mixed-base number arithmetic (like APL encode/decode)'
 author:
   - 'Gary Puckering <jgpuckering@rogers.com>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -13,6 +15,18 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Math-BaseArith
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Math::BaseArith:
+    file: lib/Math/BaseArith.pm
+    version: '1.04'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -20,7 +34,7 @@ requires:
   perl: '5.006'
   strict: '0'
   warnings: '0'
-version: '1.03'
+version: '1.04'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -22,7 +22,9 @@ Note: Replace '1.10' in the examples below with the current version.
 
 * Run unit tests for multiple Perl versions using perlbrew on Vagrant
 
+    vagrant up
     vagrant ssh --command "perlbrew exec --halt-on-error /vagrant/vag-tests.sh" 1>&2 | tee test.out
+    vagrant halt
 
 * Bump version number in lib/Connector.pm
 

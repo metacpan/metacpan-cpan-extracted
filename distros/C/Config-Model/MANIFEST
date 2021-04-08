@@ -102,6 +102,7 @@ t/backend_multiple.t
 t/backend_plainfile.t
 t/check_list.t
 t/check_list_warp.t
+t/cme-force-load.t
 t/cme-function.t
 t/describe_node.t
 t/dump_as_data.t

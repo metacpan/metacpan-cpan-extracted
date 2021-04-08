@@ -1,0 +1,142 @@
+#!/usr/bin/env perl
+
+my $copyright = <<'COPYRIGHT';
+# Copyright 2021 by Christian Jaeger <ch@christianjaeger.ch>
+# Published under the same terms as perl itself
+COPYRIGHT
+
+use strict;
+use warnings;
+use warnings FATAL => 'uninitialized';
+use experimental 'signatures';
+
+my ($email_full) = $copyright =~ / by ([^\n]*)/s;
+
+my ($mydir, $myname);
+
+BEGIN {
+    $0 =~ /(.*?)([^\/]+)\z/s or die "?";
+    ($mydir, $myname) = ($1, $2);
+}
+
+sub usage {
+    print STDERR map {"$_\n"} @_ if @_;
+    print "$myname
+
+  Read copy-paste from repl ('fperl' script or other FP::Repl
+  invocation) and print as a series of Chj::TEST 'TEST' statements.
+
+  ($email_full)
+";
+    exit(@_ ? 1 : 0);
+}
+
+use lib "$mydir/../lib/";
+
+use FP::RegexMatch
+    qw(all_continuous_matches_whole all_continuous_matches1 fullmatching);
+use FP::autobox;
+use FP::Ops qw(the_method);
+use Chj::xperlfunc qw(xprint);
+use Chj::TEST;
+
+use Getopt::Long;
+our ($debug, $opt_repl);
+GetOptions("debug" => \$debug, "repl" => \$opt_repl, "help" => sub {usage})
+    or exit 1;
+
+my $in = do { local $/; <> };
+$in .= "\n" unless $in =~ /\n\z/;
+
+package PFLANZE::Test {
+    use FP::Struct ["input", "results"];
+
+    sub string ($self) {
+        my $results = $self->results;
+        if ($results->length > 1) {
+            my $input = $self->input;
+            my $inp2  = $input =~ /;/ ? "do { $input }" : $input;
+            "TEST { [ $inp2 ] } [ " . $results->strings_join(", ") . " ];\n"
+        } else {
+            "TEST { " . $self->input . " } " . $results->first . ";\n"
+        }
+    }
+    _END_
+}
+PFLANZE::Test::constructors->import;
+
+my $Namespace  = qr/[a-zA-Z_]\w*(?:::[a-zA-Z_]\w*)*/s;
+my $Prompt     = qr/${Namespace}>/s;
+my $Result     = qr/\n\$VAR\d+ = (.*?); */s;
+my $Invocation = qr/${Prompt}\s*(.*?)($Result(?:$Result)*)\n/s;
+
+sub matches($in) {
+    my $a = fullmatching(\&all_continuous_matches_whole)->($in, $Invocation);
+    $a->map(
+        sub ($inv) {
+            my ($input, $_results) = $inv =~ $Invocation or die "bug";
+            my $results
+                = fullmatching(\&all_continuous_matches1)->($_results, $Result);
+
+            # use FP::Repl;repl;
+            Test($input, $results)
+        }
+    )
+}
+
+TEST {
+    my $in = q&main> all_matches1 "foo barO", qr/(o)/i
+$VAR1 = [
+          'o',
+          'o',
+          'O'
+        ];
+main> all_matches_whole "foo barO", qr/o/i
+$VAR1 = [
+          'o',
+          'o',
+          'O'
+        ];
+main> all_continuous_matches_whole "oOo barO", qr/o/i
+$VAR1 = [
+          'o',
+          'O',
+          'o'
+        ];
+$VAR2 = 3;
+main> all_continuous_matches_whole "BoOo barO", qr/o/i
+$VAR1 = [];
+$VAR2 = 0;
+    &;
+    matches($in)->map(the_method "string")->join("")
+}
+q&TEST { all_matches1 "foo barO", qr/(o)/i } [
+          'o',
+          'o',
+          'O'
+        ];
+TEST { all_matches_whole "foo barO", qr/o/i } [
+          'o',
+          'o',
+          'O'
+        ];
+TEST { [ all_continuous_matches_whole "oOo barO", qr/o/i ] } [ [
+          'o',
+          'O',
+          'o'
+        ], 3 ];
+TEST { [ all_continuous_matches_whole "BoOo barO", qr/o/i ] } [ [], 0 ];
+&;
+
+if ($opt_repl) {
+    require FP::Repl;
+    FP::Repl::repl();
+} else {
+    my $strs = matches($in)->map(the_method "string");
+    $strs = $strs->intersperse("----") if $debug;
+    $strs->for_each(\&xprint);
+}
+
+#use Chj::ruse;
+#use Chj::Backtrace;
+

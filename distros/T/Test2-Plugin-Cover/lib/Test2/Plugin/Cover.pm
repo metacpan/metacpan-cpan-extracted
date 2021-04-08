@@ -9,12 +9,17 @@ use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000009';
+our $VERSION = '0.000011';
 
-our %FILES;
+my %REPORT;
+our $FROM;
+our @TOUCHED;
+our @OPENED;
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
+
+1;
 
 my $IMPORTED = 0;
 sub import {
@@ -38,7 +43,15 @@ sub import {
     eval 'END { local $?; $callback->() }; 1' or die $@;
 }
 
-sub clear { %FILES = () }
+sub clear {
+    @TOUCHED = ();
+    @OPENED  = ();
+    %REPORT  = ();
+}
+
+sub get_from   { $FROM }
+sub set_from   { $FROM = pop }
+sub clear_from { $FROM = undef }
 
 sub filter {
     my $class = shift;
@@ -98,30 +111,157 @@ sub extract {
     return;
 }
 
+my %FILTER = (
+    $0 => 1,
+    __FILE__, 1,
+);
+
+my %SPECIAL_SUBS = (
+    '__ANON__'  => 1,
+    'eval'      => 1,
+    'BEGIN'     => 1,
+    'CHECK'     => 1,
+    'END'       => 1,
+    'INIT'      => 1,
+    'UNITCHECK' => 1,
+);
+
+sub _process {
+    my $class = shift;
+    my %params = @_;
+
+    my $filter  = $class->can('filter');
+    my $extract = $class->can('extract');
+
+    my $seen  = $REPORT{_seen}  //= {files => {}, touched => {}, opened => {}};
+    my $files = $REPORT{files} //= [];
+    my $submap = $REPORT{submap} //= {};
+    my $openmap = $REPORT{openmap} //= {};
+
+    my @touched = @TOUCHED;
+    my @opened  = @OPENED;
+
+    my $changed = 0;
+    my $handle_file = sub {
+        my ($raw) = @_;
+        return unless $raw;
+
+        my $file = $class->$extract($raw, %params) // return;
+        return if $FILTER{$file};
+
+        my $path = $class->$filter($file, %params) // return;
+        return if $FILTER{$path};
+
+        unless ($seen->{files}->{$file}++) {
+            push @$files => $path;
+            $REPORT{sorted} = 0;
+        }
+
+        return $path;
+    };
+
+    while (my $touch = shift @touched) {
+        my $path = $handle_file->($touch->{file}) or next;
+
+        my $sub_name    = $touch->{sub_name};
+        my $sub_package = $touch->{sub_package};
+
+        my $fmap  = $submap->{$path} //= {};
+        my $fseen = $seen->{touched}->{$path} //= {};
+
+        my $fqsn;
+        if ($sub_name && $sub_package) {
+            next if $SPECIAL_SUBS{$sub_name};
+            $fqsn = "${sub_package}::${sub_name}";
+        }
+        else {
+            $fqsn = '*';
+        }
+
+        my $smap  = $fmap->{$fqsn}  //= {};
+        my $sseen = $fseen->{$fqsn} //= {};
+
+        $smap->{sub_name}    = $sub_name    if $sub_name;
+        $smap->{sub_package} = $sub_package if $sub_package;
+        $smap->{call_count}++;
+
+        my $called_by = $touch->{called_by} // '*';
+        push @{$smap->{called_by}} => $called_by unless $sseen->{$called_by}++;
+    }
+
+    for my $set (@opened) {
+        my ($raw, $called_by) = @$set;
+        my $path = $handle_file->($raw) // next;
+
+        my $oseen = $seen->{opened}->{$path} //= {};
+
+        $called_by //= '*';
+        push @{$openmap->{$path}} => $called_by unless $oseen->{$called_by}++;
+    }
+
+    @TOUCHED = ();
+    @OPENED = ();
+
+    return \%REPORT;
+}
+
+sub _sort {
+    my $class = shift;
+    my %params = @_;
+
+    $class->_process(%params) if @TOUCHED || @OPENED;
+    return if $REPORT{sorted};
+
+    @{$REPORT{files}} = sort @{$REPORT{files}};
+
+    return;
+}
+
 sub files {
     my $class = shift;
     my %params = @_;
 
-    my $filter  = $params{filter}  // $class->can('filter');
-    my $extract = $params{extract} // $class->can('extract');
+    $class->_process(%params) if @TOUCHED || @OPENED;
+    $class->_sort(%params) unless $REPORT{sorted};
 
-    my %seen = ($0 => 1);
-    my @files = sort map { my $f = $class->$extract($_, %params); ($f && !$seen{$f}++) ? ($class->$filter($f, %params)) : () } keys %FILES;
-    return \@files;
+    return $REPORT{files};
+}
+
+sub submap {
+    my $class = shift;
+    my %params = @_;
+
+    $class->_process(%params) if @TOUCHED || @OPENED;
+
+    return $REPORT{submap};
+}
+
+sub openmap {
+    my $class = shift;
+    my %params = @_;
+
+    $class->_process(%params) if @TOUCHED || @OPENED;
+
+    return $REPORT{openmap};
 }
 
 sub report {
     my $class = shift;
     my %params = @_;
 
-    my $files = $class->files(%params);
+    $class->_process(%params) if @TOUCHED || @OPENED;
+    $class->_sort(%params) unless $REPORT{sorted};
+
+    my $files   = $REPORT{files};
+    my $submap  = $REPORT{submap};
+    my $openmap = $REPORT{openmap};
 
     my $details = "This test covered " . @$files . " source files.";
 
     my $ctx = $params{ctx} // context();
     my $event = $ctx->send_ev2(
         about    => {package => __PACKAGE__, details => $details},
-        coverage => {files => $files, details => $details},
+        coverage => {files => $files, submap => $submap, openmap => $openmap, details => $details},
 
         info => [{tag => 'COVERAGE', details => $details, debug => $params{verbose}}],
 
@@ -196,9 +336,12 @@ code obtains the next op that will be run and tries to pull the filename from
 it. C<eval>, XS, Moose, and other magic can sometimes mask the filename, this
 module only makes a minimal attempt to find the filename in these cases.
 
-This tool DOES NOT cover anything beyond files in which subs executed by the
-test were defined. If you want sub names, lines executed, and more, use
-L<Devel::Cover>.
+Originally this module only collected the filenames touched by a test. Now in
+addition to that data it can give you seperate lists of files where subs were
+called, and files that were touched via open(). Additionally the sub list
+includes the info about what subs were called. In all of these cases it is also
+possible to know what secgtions of your test called the subs or opened the
+files.
 
 =head2 REAL EXAMPLES
 
@@ -241,6 +384,13 @@ L<Test2::Plugin::Cover> was written to address.
     # Arrayref of files covered so far
     my $covered_files = Test2::Plugin::Cover->files;
 
+    # A mapping of what subs were called in which files
+    my $subs_called = Test2::Plugin::Cover->submap;
+
+    # A mapping of what files were opened, and where possible what section of
+    # the test triggered the opening.
+    my $openmap = Test2::Plugin::Cover->openmap;
+
 =head2 COMMAND LINE
 
 You can tell prove to use the module this way:
@@ -263,26 +413,109 @@ INLINE:
 
     use Test2::Plugin::Cover no_event => 1;
 
+=head1 KNOWING WHAT CALLED WHAT
+
+If you use a system like L<Test::Class>, L<Test::Class::Moose>, or
+L<Test2::Tools::Spec> then you divide your tests into subtests (or similar). In
+these cases it would be nice to track what subtest (or equivelent) touched what
+files.
+
+There are 3 methods telated to this, C<set_from()>, C<get_from()>, and
+C<clear_from()> which you can use to manage this meta-data:
+
+    subtest foo => sub {
+        # Note, this is a simple string, but the 'from' data can also be a data
+        # structure.
+        Test2::Plugin::Cover->set_from("foo");
+
+        # subroutine() from Some.pm will be recorded as having been called by 'foo'.
+        Some::subroutine();
+
+        Test2::Plugin::Cover->clear_from();
+    };
+
+Doing this manually for all blocks is not ideal, ideally you would hook your
+tool, such as L<Test::Class> to call C<set_from()> and C<clear_from()> for you.
+Adding such a hook is left as an exercide to the reader, and if you make one
+for a popular tool please upload it to cpan and add a ticket or send an email
+for me to link to it here.
+
+Once you have these hooks in place the data will not only show files and subs
+that were called, but what called them.
+
 =head1 CLASS METHODS
 
 =over 4
 
 =item $arrayref = $class->files()
 
-=item $arrayref = $class->files(filter => \&filter, extract => \&extract)
+=item $arrayref = $class->files(root => $path)
 
-This will return an arrayref of all files touched so far. If no C<filter> or
-C<extract> callbacks are provided then C<< $class->filter() >> and
-C<< $class->extract() >> will be used as defaults.
+This will return an arrayref of all files touched so far.
 
 The list of files will be sorted alphabetically, and duplicates will be
 removed.
 
-Custom filter callbacks should match the interface for
-C<< $class->filter() >>.
+If a root path is provided it B<MUST> be a L<Path::Tiny> instance. This path
+will be used to filter out any files not under the root directory.
 
-Custom extract callbacks should match the interface for
-C<< $class->extract() >>.
+=item $hashref = $class->submap()
+
+=item $hashref = $class->submap(root => $path)
+
+Returns a structure like this:
+
+    {
+        'SomeModule.pm' => {
+            # The wildcard is used when a proper sub name cannot be determined
+            '*' => { ... },
+
+            'SomeModule::subroutine' => {
+                sub_package => 'SomeModule',
+                sub_name    => 'subroutine',
+
+                call_count => $INTEGER,
+
+                # the items in this list can be anything, strings, numbers,
+                # data structures, etc.
+                # A naive attempt is made to avoid duplicates in this list,
+                # so the same string or reference will not appear twice, but 2
+                # different references with identical contents may appear.
+                called_by => [
+                    '*',     # The wildcard is used when no 'called by' can be determined
+                    $FROM_A,
+                    $FROM_B,
+                    ...
+                ],
+            },
+        },
+        ...
+    }
+
+If a root path is provided it B<MUST> be a L<Path::Tiny> instance. This path
+will be used to filter out any files not under the root directory.
+
+=item $hashref = $class->openmap()
+
+=item $hashref = $class->openmap(root => $path)
+
+Returns a structure like this:
+
+    {
+        # the items in this list can be anything, strings, numbers,
+        # data structures, etc.
+        # A naive attempt is made to avoid duplicates in this list,
+        # so the same string or reference will not appear twice, but 2
+        # different references with identical contents may appear.
+        "some_file.ext" => [
+            '*',        # The wildcard is used when no 'called by' can be determined
+            $FROM_A,
+            $FROM_b,
+        ],
+    }
+
+If a root path is provided it B<MUST> be a L<Path::Tiny> instance. This path
+will be used to filter out any files not under the root directory.
 
 =item $event = $class->report(%options)
 
@@ -298,14 +531,6 @@ Options:
 Normally this is set to the current directory at module load-time. This is used
 to filter out any source files that do not live under the current directory.
 This B<MUST> be a L<Path::Tiny> instance, passing a string will not work.
-
-=item filter => sub { ... }
-
-Normally C<< $class->filter() >> is used.
-
-=item extract => sub { ... }
-
-Normally C<< $class->extract() >> is used.
 
 =item verbose => $BOOL
 

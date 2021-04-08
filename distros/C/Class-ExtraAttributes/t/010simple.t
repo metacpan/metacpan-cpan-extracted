@@ -8,10 +8,9 @@ BEGIN {				# Magic Perl CORE pragma
 use strict;
 use warnings;
 
-
 package Foo;
 
-use Test::More tests => 8;
+use Test::More tests => 11;
 use Scalar::Util qw( blessed );
 
 sub new { bless {}, shift }
@@ -33,3 +32,11 @@ ok( !$result, "check failed to add 'new' as attribute" );
 my @attributes = Class::ExtraAttributes->attributes;
 is( scalar @attributes, 1, "only one extra attribute: @attributes" );
 is( $attributes[0], 'bar', 'extra attribute' );
+
+@attributes = Class::ExtraAttributes->attributes('Foo');
+is( scalar @attributes, 1, "only one extra attribute: @attributes" );
+is( $attributes[0], 'bar', 'extra attribute' );
+
+my $attributes = Class::ExtraAttributes->attributes('Bar');
+is( scalar @{$attributes}, 0, "no extra attribute: @attributes" );
+

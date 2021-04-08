@@ -3,6 +3,7 @@
 #include <XSUB.h>
 #include <stdio.h>
 
+static GV *sub_to_gv(pTHX_ SV *sv);
 Perl_ppaddr_t orig_subhandler;
 Perl_ppaddr_t orig_openhandler;
 Perl_ppaddr_t orig_sysopenhandler;
@@ -11,33 +12,148 @@ Perl_ppaddr_t orig_sysopenhandler;
 // The performance impact of fetching it each time is significant, so avoid it
 // if we can.
 #ifdef USE_ITHREADS
-#define fetch_files \
-    HV *files = get_hv("Test2::Plugin::Cover::FILES", GV_ADDMULTI)
+#define fetch_touched AV *touched = get_av("Test2::Plugin::Cover::TOUCHED", GV_ADDMULTI);
+#define fetch_opened  HV *opened  = get_av("Test2::Plugin::Cover::OPENED",  GV_ADDMULTI);
 #else
-HV *files;
-#define fetch_files NOOP
+AV *touched;
+AV *opened;
+#define fetch_touched NOOP
+#define fetch_opened NOOP
 #endif
 
+#define fetch_from SV *from = get_sv("Test2::Plugin::Cover::FROM", 0);
+
 static OP* my_subhandler(pTHX) {
+    SV *subpkg  = NULL;
+    SV *subname = NULL;
+
+    dSP;
+    GV *my_gv = sub_to_gv(aTHX_ *SP);
+    if (my_gv != NULL) {
+        subpkg  = newSVpv(HvNAME(GvSTASH(my_gv)), 0);
+        subname = newSVpv(GvNAME(my_gv), 0);
+    }
+
     OP* out = orig_subhandler(aTHX);
 
     if (out != NULL && (out->op_type == OP_NEXTSTATE || out->op_type == OP_DBSTATE)) {
-        fetch_files;
-        char *file = CopFILE(cCOPx(out));
-        long len = strlen(file);
+        HV *item = newHV();
 
-        // There was 0 performance difference between always setting it, and
-        // setting it only if it did not exist yet.
-        hv_store(files, file, len, &PL_sv_yes, 0);
+        SV *file = newSVpv(CopFILE(cCOPx(out)), 0);
+        hv_store(item, "file", 4, file, 0);
+
+        fetch_from;
+        if (from && SvOK(from)) {
+            SV *from_val = sv_mortalcopy(from);
+            SvREFCNT_inc(from_val);
+            hv_store(item, "called_by", 9, from_val, 0);
+        }
+
+        if (subpkg) {
+            hv_store(item, "sub_package", 11, subpkg, 0);
+        }
+        if (subname) {
+            hv_store(item, "sub_name", 8, subname, 0);
+        }
+
+        fetch_touched;
+        av_push(touched, newRV((SV *)item));
     }
 
     return out;
 }
 
+// Copied and modified from Devel::NYTProf
+static GV *sub_to_gv(pTHX_ SV *sv) {
+    CV *cv = NULL;
+
+    /* copied from top of perl's pp_entersub */
+    /* modified to return either CV or else a GV */
+    /* or a NULL in cases that pp_entersub would croak */
+    switch (SvTYPE(sv)) {
+        default:
+            if (!SvROK(sv)) {
+                char *sym;
+
+                if (sv == &PL_sv_yes) {           /* unfound import, ignore */
+                    return NULL;
+                }
+                if (SvGMAGICAL(sv)) {
+                    mg_get(sv);
+                    if (SvROK(sv))
+                        goto got_rv;
+                    sym = SvPOKp(sv) ? SvPVX(sv) : Nullch;
+                }
+                else
+                    sym = SvPV_nolen(sv);
+                if (!sym)
+                    return NULL;
+                if (PL_op->op_private & HINT_STRICT_REFS)
+                    return NULL;
+                cv = get_cv(sym, TRUE);
+                break;
+            }
+            got_rv:
+            {
+                SV **sp = &sv;                    /* Used in tryAMAGICunDEREF macro. */
+                tryAMAGICunDEREF(to_cv);
+            }
+            cv = (CV*)SvRV(sv);
+            if (SvTYPE(cv) == SVt_PVCV)
+                break;
+
+            /* FALL THROUGH */
+        case SVt_PVHV:
+        case SVt_PVAV:
+            return NULL;
+
+        case SVt_PVCV:
+            cv = (CV*)sv;
+            break;
+
+        case SVt_PVGV:
+            if (!(isGV_with_GP(sv) && (cv = GvCVu((GV*)sv)))) {
+                HV *stash = NULL;
+                GV *gv = NULL;
+                cv = sv_2cv(sv, &stash, &gv, FALSE);
+
+                if (gv) {
+                    return gv;
+                }
+            }
+
+            if (!cv) {                            /* would autoload in this situation */
+                return NULL;
+            }
+
+            break;
+    }
+
+    if (cv) {
+        GV *out = CvGV(cv);
+        if (out && isGV_with_GP(out)) {
+            return out;
+        }
+    }
+
+    return NULL;
+}
+
 void _sv_file_handler(SV *file) {
     if (file != NULL && SvPOKp(file)) {
-        fetch_files;
-        hv_store_ent(files, file, &PL_sv_yes, 0);
+        fetch_opened;
+
+        AV *item = newAV();
+        av_push(item, file);
+        SvREFCNT_inc(file);
+        av_push(opened, newRV((SV *)item));
+
+        fetch_from;
+        if (from && SvOK(from)) {
+            SV *from_val = sv_mortalcopy(from);
+            SvREFCNT_inc(from_val);
+            av_push(item, from_val);
+        }
     }
 }
 
@@ -75,8 +191,10 @@ BOOT:
     {
         //Initialize the global files HV, but only if we are not a threaded perl
 #ifndef USE_ITHREADS
-        files = get_hv("Test2::Plugin::Cover::FILES", GV_ADDMULTI);
-        SvREFCNT_inc(files);
+        touched = get_av("Test2::Plugin::Cover::TOUCHED", GV_ADDMULTI);
+        opened  = get_av("Test2::Plugin::Cover::OPENED",  GV_ADDMULTI);
+        SvREFCNT_inc(touched);
+        SvREFCNT_inc(opened);
 #endif
 
         orig_subhandler = PL_ppaddr[OP_ENTERSUB];

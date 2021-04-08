@@ -1,0 +1,14 @@
+Revision history for Perl module Math-BaseArith
+
+1.04      2021-04-07
+  - Add CONTRIBUTING file
+  - Correct Changes content
+
+1.03      2021-04-04
+  - Deprecate encode/decode; add encode_base/decode_base; add export options
+        
+1.02      2002-10-15
+  - Bug fix: copy list arguments so they won't be changed
+
+1.01      2002-10-15
+  - First release to CPAN

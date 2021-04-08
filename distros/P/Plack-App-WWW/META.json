@@ -1,0 +1,55 @@
+{
+   "abstract" : "Serve cgi-bin and static files from root directory",
+   "author" : [
+      "Lucas Tiago de Moraes <lucastiagodemoraes@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-App-WWW",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Compile" : "0",
+            "CGI::Emulate::PSGI" : "0",
+            "Plack" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ltmbr/Plack-App-WWW/issues"
+      },
+      "homepage" : "https://github.com/ltmbr/Plack-App-WWW",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/ltmbr/Plack-App-WWW"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}
