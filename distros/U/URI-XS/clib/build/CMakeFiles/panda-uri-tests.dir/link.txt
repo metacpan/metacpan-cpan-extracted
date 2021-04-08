@@ -1,0 +1,2 @@
+/usr/bin/ar qc libpanda-uri-tests.a  CMakeFiles/panda-uri-tests.dir/tests/change.cc.o CMakeFiles/panda-uri-tests.dir/tests/encode.cc.o CMakeFiles/panda-uri-tests.dir/tests/parse-stringify.cc.o CMakeFiles/panda-uri-tests.dir/tests/path_segments.cc.o CMakeFiles/panda-uri-tests.dir/tests/query.cc.o CMakeFiles/panda-uri-tests.dir/tests/scheme/custom.cc.o CMakeFiles/panda-uri-tests.dir/tests/scheme/list.cc.o CMakeFiles/panda-uri-tests.dir/tests/scheme/strict.cc.o
+/usr/bin/ranlib libpanda-uri-tests.a

@@ -3,14 +3,19 @@ abstract: 'fast base64, base32, base16 encode/decode functions'
 author:
   - unknown
 build_requires:
+  Test::Catch: v1.0.15
   Test::Deep: '0'
   Test::More: '0'
   Test::Simple: '0.96'
+  XS::libcatch: v2.13.4.0
+  XS::libpanda: v1.5.0
 configure_requires:
-  XS::Install: v1.2.16
-  XS::libpanda: v1.3.13
+  Test::Catch: v1.0.15
+  XS::Install: v1.3.2
+  XS::libcatch: v2.13.4.0
+  XS::libpanda: v1.5.0
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +27,7 @@ no_index:
     - inc
 requires:
   Export::XS: '0'
-  XS::Install: v1.2.16
-  XS::libpanda: v1.3.13
-version: v1.0.2
+  XS::Install: v1.3.2
+  XS::libpanda: v1.5.0
+version: v1.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

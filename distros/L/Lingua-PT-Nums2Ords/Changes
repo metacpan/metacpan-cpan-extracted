@@ -1,5 +1,9 @@
 Revision history for Perl extension Lingua::PT::Nums2Ords.
 
+0.08  Tue Nov 09 20:14:00 2004
+	- added GitHub repo
+    - cosmetic changes to dist
+
 0.07  Tue Nov 09 20:14:00 2004
 	- fixed a bug that had to do with dependencies
 

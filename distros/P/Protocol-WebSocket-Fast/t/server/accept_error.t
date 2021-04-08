@@ -3,6 +3,9 @@ use warnings;
 use lib 't/lib';
 use MyTest 'accept_packet';
 use Test::More;
+use Test::Catch;
+
+catch_run("[server-accept_error]");
 
 my $p = new Protocol::WebSocket::Fast::ServerParser;
 

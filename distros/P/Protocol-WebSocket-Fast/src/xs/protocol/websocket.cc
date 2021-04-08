@@ -36,22 +36,15 @@ Array header_values_to_av (const HeaderValues& vals) {
     return ret;
 }
 
-void av_to_vstring (const Array& av, std::vector<string>& v) {
-    for (const auto& elem : av) {
-        if (!elem.defined()) continue;
-        v.push_back(xs::in<string>(elem));
-    }
-}
-
 ConnectRequestSP make_request (const Hash& params, const ConnectRequestSP& dest) {
     auto ret = dest ? dest : ConnectRequestSP(new ConnectRequest());
     http::fill(ret, params);
 
     Scalar val;
 
-    if ((val = params.fetch("ws_key")))      ret->ws_key      = xs::in<string>(val);
-    if ((val = params.fetch("ws_version")))  ret->ws_version  = SvIV(val);
-    if ((val = params.fetch("ws_protocol"))) ret->ws_protocol = xs::in<string>(val);
+    if ((val = params.fetch("ws_key")))      ret->ws_key(xs::in<string>(val));
+    if ((val = params.fetch("ws_version")))  ret->ws_version(SvIV(val));
+    if ((val = params.fetch("ws_protocol"))) ret->ws_protocol(xs::in<string>(val));
 
     if ((val = params.fetch("ws_extensions"))) {
         auto exts_av = xs::in<Array>(val);
@@ -74,7 +67,7 @@ ConnectResponseSP make_response (const Hash& params, const ConnectResponseSP& de
         ret->ws_extensions(exts);
     }
 
-    if ((val = params.fetch("ws_protocol"))) ret->ws_protocol = xs::in<string>(val);
+    if ((val = params.fetch("ws_protocol"))) ret->ws_protocol(xs::in<string>(val));
 
     return ret;
 }
@@ -92,6 +85,19 @@ void parser_config_in (Parser::Config& cfg, const Hash& h) {
         auto dcfg = xs::in<panda::protocol::websocket::DeflateExt::Config>(deflate_settings);
         cfg.deflate = dcfg;
     }
+}
+
+Hash parser_config_out (Parser::Config& cfg) {
+    auto ret = Hash {
+        {"max_frame_size", xs::out(cfg.max_frame_size)},
+        {"max_message_size", xs::out(cfg.max_message_size)},
+        {"max_handshake_size", xs::out(cfg.max_handshake_size)},
+        {"check_utf8", xs::out(cfg.check_utf8)},
+    };
+    if (cfg.deflate) {
+        ret.store("deflate", deflate_config_out(cfg.deflate.value()));
+    }
+    return  ret;
 }
 
 void deflate_config_in (DeflateExt::Config& cfg, const Hash& h) {

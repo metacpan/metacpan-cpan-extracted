@@ -11,7 +11,7 @@ sub concur {
     XLog::test($nthr, $cnt);
 }
 
-XLog::set_format("%m");
+XLog::set_formatter("%m");
 XLog::set_logger(sub { });
 
 XLog::set_level(XLog::DEBUG);

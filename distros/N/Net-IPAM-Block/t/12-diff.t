@@ -29,8 +29,11 @@ foreach my $item (@inner_str) {
 }
 
 my @diff = $outer->diff( shuffle @inner );
-
 my @diff_str = map { $_->to_string } @diff;
+is_deeply( \@diff_str, \@expected_str, 'IPv4 diff' );
+
+my $diff = $outer->diff( shuffle @inner );
+@diff_str = map { $_->to_string } @$diff;
 is_deeply( \@diff_str, \@expected_str, 'IPv4 diff' );
 
 ###############
@@ -68,6 +71,7 @@ foreach my $item (@inner_str) {
 }
 
 @diff = $outer->diff( shuffle @inner );
+$diff = $outer->diff( shuffle @inner );
 
 @diff_str = map { $_->to_string } @diff;
 is_deeply( \@diff_str, \@expected_str, 'IANAv6 blocks' );
@@ -95,6 +99,7 @@ foreach my $item (@inner_str) {
 }
 
 @diff = $outer->diff( shuffle @inner );
+$diff = $outer->diff( shuffle @inner );
 
 @diff_str = map { $_->to_string } @diff;
 is_deeply( \@diff_str, \@expected_str, 'IPv4 diff' );
@@ -117,6 +122,7 @@ foreach my $item (@inner_str) {
 }
 
 @diff = $outer->diff( shuffle @inner );
+$diff = $outer->diff( shuffle @inner );
 
 @diff_str = map { $_->to_string } @diff;
 is_deeply( \@diff_str, \@expected_str, 'IPv6 diff' );

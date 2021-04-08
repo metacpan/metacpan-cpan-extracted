@@ -1,0 +1,15 @@
+/tmp/mkcpandist/dist_28570/clib/cmake_props/CMakeFiles/install/strip.dir
+/tmp/mkcpandist/dist_28570/clib/cmake_props/CMakeFiles/install.dir
+/tmp/mkcpandist/dist_28570/clib/cmake_props/CMakeFiles/install/local.dir
+/tmp/mkcpandist/dist_28570/clib/cmake_props/CMakeFiles/list_install_components.dir
+/tmp/mkcpandist/dist_28570/clib/cmake_props/CMakeFiles/edit_cache.dir
+/tmp/mkcpandist/dist_28570/clib/cmake_props/CMakeFiles/rebuild_cache.dir
+/tmp/mkcpandist/dist_28570/clib/build/CMakeFiles/install/strip.dir
+/tmp/mkcpandist/dist_28570/clib/build/CMakeFiles/install/local.dir
+/tmp/mkcpandist/dist_28570/clib/build/CMakeFiles/install.dir
+/tmp/mkcpandist/dist_28570/clib/build/CMakeFiles/panda-encode-base2n-tests.dir
+/tmp/mkcpandist/dist_28570/clib/build/CMakeFiles/panda-encode-base2n.dir
+/tmp/mkcpandist/dist_28570/clib/build/CMakeFiles/panda-encode-base2n-runtests.dir
+/tmp/mkcpandist/dist_28570/clib/build/CMakeFiles/edit_cache.dir
+/tmp/mkcpandist/dist_28570/clib/build/CMakeFiles/rebuild_cache.dir
+/tmp/mkcpandist/dist_28570/clib/build/CMakeFiles/list_install_components.dir

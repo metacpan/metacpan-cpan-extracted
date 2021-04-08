@@ -1,7 +1,11 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Catch;
+use lib 't/lib'; use MyTest;
 use URI::XS qw/uri :const/;
+
+catch_run('[scheme-custom]');
 
 package MyScheme;
 use parent 'URI::XS';

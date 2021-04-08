@@ -53,7 +53,7 @@ panda::string type_details(const std::type_info& ti) {
     panda::string exc("no default perl class defined for typemap '");
     exc += type_details(ti);
     exc += "', either define it or explicitly bless PROTO on output";
-    throw exc;
+    throw panda::exception(exc);
 }
 
 [[ noreturn ]] void _throw_incorrect_arg(SV* arg, const std::type_info& expected, panda::string_view package) {

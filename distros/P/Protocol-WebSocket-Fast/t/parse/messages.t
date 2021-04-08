@@ -4,8 +4,11 @@ use lib 't/lib';
 use MyTest qw/gen_frame gen_message test_message/;
 use Test::More;
 use Test::Deep;
+use Test::Catch;
 use Test::Exception;
 use Protocol::WebSocket::Fast;
+
+catch_run("[parse-messages]");
 
 dies_ok { Protocol::WebSocket::Fast::ServerParser->new->get_messages('asdasd') } "cant get messages until established";
 

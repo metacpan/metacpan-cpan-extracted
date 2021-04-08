@@ -1,3 +1,5 @@
+1.0.7    08.04.2021
+         - cmakefile improvement
 1.0.6    25.11.2020
          - lower cmake requirements
          - improve docs

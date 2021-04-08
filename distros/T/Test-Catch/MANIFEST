@@ -1,5 +1,6 @@
 Catch.xs
 Changes
+INSTALL.SKIP
 lib/Test/Catch.pm
 lib/Test/Catch.pod
 Makefile.PL

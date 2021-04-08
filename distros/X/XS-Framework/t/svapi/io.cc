@@ -2,7 +2,7 @@
 
 using Test = TestSv<Io>;
 
-TEST_CASE("Io", "[Sv]") {
+TEST_CASE("Io", "[Io]") {
     perlvars vars;
     Io my(vars.io);
     Sv oth_valid(vars.io), oth_invalid(vars.hv);
@@ -35,7 +35,7 @@ TEST_CASE("Io", "[Sv]") {
     }
 
     SECTION("operator=") {
-        Io o(eval_pv("*STDIN{IO}", 1));
+        Io o(eval("*STDIN{IO}"));
         SECTION("SV") {
             SECTION("undef SV")  { Test::assign(o, vars.undef, behaviour_t::EMPTY); }
             SECTION("number SV") { Test::assign(o, vars.iv, behaviour_t::THROWS); }
@@ -92,18 +92,18 @@ TEST_CASE("Io", "[Sv]") {
     }
 
     SECTION("fileno") {
-        Io o(eval_pv("*STDIN{IO}", 1));
+        Io o(eval("*STDIN{IO}"));
         CHECK(o.fileno() == 0);
-        o = eval_pv("*STDOUT{IO}", 1);
+        o = eval("*STDOUT{IO}");
         CHECK(o.fileno() == 1);
-        o = eval_pv("*STDERR{IO}", 1);
+        o = eval("*STDERR{IO}");
         CHECK(o.fileno() == 2);
     }
 
     SECTION("iotype") {
-        Io o(eval_pv("*STDIN{IO}", 1));
+        Io o(eval("*STDIN{IO}"));
         CHECK(o.iotype() == IoTYPE_RDONLY);
-        o = eval_pv("*STDOUT{IO}", 1);
+        o = eval("*STDOUT{IO}");
         CHECK(o.iotype() == IoTYPE_WRONLY);
     }
 }

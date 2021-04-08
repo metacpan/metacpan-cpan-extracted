@@ -19,20 +19,13 @@ Don't pollute the B<< namespace >> of Net::IPAM::Block
 
 =cut
 
-# only masks without a gap, representable as CIDR, are allowed
-#
-# 11111111_11111111_11111111_11111111
-# 11111111_11111111_11111111_11111110
-# 11111111_11111111_11111111_11111100
-# ...
-# 11100000_00000000_00000000_00000000
-# 11000000_00000000_00000000_00000000
-# 10000000_00000000_00000000_00000000
-my %valid_masks = map { pack( 'N', ( 0xffff_ffff >> $_ ) << $_ ) => $_ } 0 .. 31;
+# use some pre-calculated tables for speed, see end of package
+my ( %valid_masks4, @table_mask_n, @nlz8 );
 
-# 00000000_00000000_00000000_00000000
-# extra treatment for 32bit, still support 32 bit perl, thanks to the smoke testers!
-$valid_masks{ pack( 'N', 0x0000_0000 ) } = 32;
+sub _clone {
+  my $self = shift;
+  return bless {%$self}, ref $self;
+}
 
 # 1.2.3.4/255.0.0.0  => {base: 1.0.0.0, last: 1.255.255.255, mask: 255.0.0.0}
 # 1.2.3.4/24         => {base: 1.2.3.0, last: 1.2.3.255,     mask: 255.255.255.0}
@@ -50,11 +43,11 @@ sub _fromMask {
 
   my $prefix = Net::IPAM::IP->new($prefix_str) // return;
 
-  my ( $mask, $mask_n );
+  my $mask_n;
   if ( index( $suffix_str, '.' ) >= 0 ) {
-    $mask   = Net::IPAM::IP->new($suffix_str) // return;
-    $mask_n = $mask->bytes;
-    return unless exists $valid_masks{$mask_n};
+    my $ip = Net::IPAM::IP->new($suffix_str) // return;
+    $mask_n = $ip->bytes;
+    return unless exists $valid_masks4{$mask_n};
   }
   else {
     my $bits = 32;
@@ -64,15 +57,10 @@ sub _fromMask {
     return if $suffix_str > $bits;
 
     $mask_n = _make_mask_n( $suffix_str, $bits );
-    $mask   = Net::IPAM::IP->new_from_bytes($mask_n);
   }
 
-  my $base_n = _make_base_n( $prefix->bytes, $mask_n );
-  my $last_n = _make_last_n( $prefix->bytes, $mask_n );
-
-  $self->{base} = Net::IPAM::IP->new_from_bytes($base_n);
-  $self->{last} = Net::IPAM::IP->new_from_bytes($last_n);
-  $self->{mask} = $mask;
+  $self->{base} = Net::IPAM::IP->new_from_bytes( _make_base_n( $prefix->bytes, $mask_n ) );
+  $self->{last} = Net::IPAM::IP->new_from_bytes( _make_last_n( $prefix->bytes, $mask_n ) );
 
   return $self;
 }
@@ -98,7 +86,6 @@ sub _fromRange {
 
   $self->{base} = $base_ip;
   $self->{last} = $last_ip;
-  $self->{mask} = _get_mask_ip( $base_ip, $last_ip );
 
   return $self;
 }
@@ -109,14 +96,9 @@ sub _fromAddr {
   my ( $self, $addr ) = @_;
 
   my $base = Net::IPAM::IP->new($addr) // return;
-  my $bits = 32;
-  $bits = 128 if $base->version == 6;
-
-  my $mask_n = _make_mask_n( $bits, $bits );
 
   $self->{base} = $base;
-  $self->{last} = Net::IPAM::IP->new_from_bytes( $base->bytes );
-  $self->{mask} = Net::IPAM::IP->new_from_bytes($mask_n);
+  $self->{last} = $base;
 
   return $self;
 }
@@ -124,18 +106,12 @@ sub _fromAddr {
 # 1.2.3.4 => {base: 1.2.3.4, last: 1.2.3.4, mask: 255.255.255.255}
 # fe80::1 => {base: fe80::1, last: fe80::1, mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff}
 sub _fromIP {
-  my ( $self, $base ) = @_;
+  my ( $self, $ip ) = @_;
 
-  return unless Scalar::Util::blessed($base) && $base->isa('Net::IPAM::IP');
+  return unless Scalar::Util::blessed($ip) && $ip->isa('Net::IPAM::IP');
 
-  my $bits = 32;
-  $bits = 128 if $base->version == 6;
-
-  my $mask_n = _make_mask_n( $bits, $bits );
-
-  $self->{base} = $base;
-  $self->{last} = Net::IPAM::IP->new_from_bytes( $base->bytes );
-  $self->{mask} = Net::IPAM::IP->new_from_bytes($mask_n);
+  $self->{base} = $ip;
+  $self->{last} = $ip;
 
   return $self;
 }
@@ -154,146 +130,350 @@ sub _contains_block {
   return $_[0]->{base}->cmp( $_[1]->{base} ) <= 0 && $_[0]->{last}->cmp( $_[1]->{last} ) >= 0;
 }
 
-# count leading ones:
-# 0xffff_ff80 => 25
-# 0xffff_ffff_ffff_ff00_0000_0000_0000_0000 => 56
-#
-sub _leading_ones {
-  my $n    = shift or die 'missing arg,';
-  my $ones = 0;
+# count leading zeros
+sub _leading_zeros {
+  my $n     = shift or die 'missing arg,';
+  my $zeros = 0;
 
-  # step bytewise through $n from left to right
+  # step byte-wise through $n from left to right
   for my $i ( 0 .. length($n) - 1 ) {
     my $byte = vec( $n, $i, 8 );
 
     # count bytes
-    if ( $byte == 0xff ) {
-      $ones += 8;
+    if ( $byte == 0x00 ) {
+      $zeros += 8;
       next;
     }
 
-    # count bits
-    while ( ( $byte & 0b1000_0000 ) != 0 ) {
-      $ones++;
-      $byte = $byte << 1;
-    }
+    # count bits, use a pre-calculated table
+    $zeros += $nlz8[$byte];
     last;
   }
 
-  return $ones;
+  return $zeros;
 }
 
-# makes base address from address and netmask:
+# number of common leading bits
+sub _common_prefix {
+  my ( $base_n, $last_n ) = @_;
+  return _leading_zeros( $base_n ^ $last_n );
+}
+
+# recursion ahead
+# end condition: is_cidr
+# split the range in the middle
+# call both halves recursively
+#
+sub _to_cidrs_rec {
+  my ( $self, $buf ) = @_;
+
+  if ( $self->is_cidr ) {
+    push @$buf, $self;
+    return $buf;
+  }
+
+  my $base_ip = $self->{base};
+  my $last_ip = $self->{last};
+
+  my $base_n = $self->{base}->bytes;
+  my $last_n = $self->{last}->bytes;
+
+  my $pfx  = _common_prefix( $base_n, $last_n );
+  my $bits = 32;
+  $bits = 128 if $self->version == 6;
+
+  # make next mask
+  my $mask_n = _make_mask_n( $pfx + 1, $bits );
+
+  # split range with new mask
+  my $mid_last_n = _make_last_n( $base_n, $mask_n );
+  my $mid_base_n = _make_base_n( $last_n, $mask_n );
+
+  # make IPs from bitstring
+  my $mid_last_ip = Net::IPAM::IP->new_from_bytes($mid_last_n);
+  my $mid_base_ip = Net::IPAM::IP->new_from_bytes($mid_base_n);
+
+  # make two new blocks
+  my $b1 = bless {}, ref $self;
+  $b1->{base} = $base_ip;
+  $b1->{last} = $mid_last_ip;
+
+  my $b2 = bless {}, ref $self;
+  $b2->{base} = $mid_base_ip;
+  $b2->{last} = $last_ip;
+
+  # make rec-descent call with both halves
+  $buf = _to_cidrs_rec( $b1, $buf );
+  $buf = _to_cidrs_rec( $b2, $buf );
+
+  return $buf;
+}
+
+# returns true if base and last forms a CIDR range
+sub _is_cidr {
+  my $self = shift;
+
+  if ( $self->version == 4 ) {
+    return _is_cidr4( $self->{base}->bytes, $self->{last}->bytes );
+  }
+
+  return _is_cidr6( $self->{base}->bytes, $self->{last}->bytes );
+}
+
+sub _is_cidr4 {
+  my ( $base_n, $last_n ) = @_;
+
+  # get the mask
+  my $pfx    = _common_prefix( $base_n, $last_n );
+  my $mask_n = _strip_to_32_bits( $table_mask_n[$pfx] );
+
+  # apply mask to base and last as AND and OR
+  # and check for all zeros and all ones => it's a CIDR
+  my $is_all_zeros = ( $base_n ^ ( $base_n & $mask_n ) ) eq _strip_to_32_bits( $table_mask_n[0] );
+  my $is_all_ones  = ( $last_n | $mask_n ) eq _strip_to_32_bits( $table_mask_n[128] );
+
+  return $is_all_zeros && $is_all_ones;
+}
+
+sub _is_cidr6 {
+  my ( $base_n, $last_n ) = @_;
+
+  # get the mask
+  my $pfx    = _common_prefix( $base_n, $last_n );
+  my $mask_n = $table_mask_n[$pfx];
+
+  # apply mask to base and last as AND and OR
+  # and check for all zeros and all ones => it's a CIDR
+  my $is_all_zeros = ( $base_n ^ ( $base_n & $mask_n ) ) eq $table_mask_n[0];
+  my $is_all_ones  = ( $last_n | $mask_n ) eq $table_mask_n[128];
+
+  return $is_all_zeros && $is_all_ones;
+}
+
+# base = addr & netMask
 sub _make_base_n {
   my ( $addr_n, $mask_n ) = @_;
   return $addr_n & $mask_n;
 }
 
-# makes last address from address and netmask:
-#
-# last = base | hostMask
-#
-# Example:
-#   ~netMask(255.0.0.0) = hostMask(0.255.255.255)
-#
-#   ~0xff_00_00_00  = 0x00_ff_ff_ff
-#  -----------------------------------------------
-#
-#    0x7f_00_00_00 base
-#  | 0x00_ff_ff_ff hostMask
-#  ----------------------
-#    0x7f_ff_ff_ff last
-#
+# last = addr | hostMask
 sub _make_last_n {
   my ( $addr_n, $mask_n ) = @_;
   return $addr_n | ~$mask_n;
 }
+
+# cut off the bits after 32, used for IPv4
+sub _strip_to_32_bits { return $_[0] & "\xff\xff\xff\xff" }
 
 # make CIDR mask from bits:
 # (24, 32)  => 0xffff_ff00
 # (56, 128) => 0xffff_ffff_ffff_ff00_0000_0000_0000_0000
 #
 sub _make_mask_n {
-  my ( $ones, $bits ) = @_;
-  my $zeros = $bits - $ones;
-
-  return pack( "B$bits", '1' x $ones . '0' x $zeros );
+  my ( $n, $bits ) = @_;
+  my $mask_n = $table_mask_n[$n];
+  #
+  # cut to first 32 bits
+  if ( $bits == 32 ) {
+    return _strip_to_32_bits($mask_n);
+  }
+  return $mask_n;
 }
 
-# _bitlen returns the minimum number of bits to represent a range from base_n to last_n
-#
-# 10.0.0.0  = base_n  = 00001010_00000000_00000000_00000000
-# 10.0.0.17 = last_n  = 00001010_00000000_00000000_00010001
-# ---------------------------------------------------------
-#                   ^ = 00000000_00000000_00000000_00010001 XOR FOR LEADING ZEROS
-#                   ~ = 11111111_11111111_11111111_11101110 COMPLEMENT FOR LEADING ONES
-#                                                     ^^^^^ BITLEN = BITS - LEADING ONES
-sub _bitlen {
-  my ( $base_n, $last_n, $bits ) = @_;
-  return $bits - _leading_ones( ~( $base_n ^ $last_n ) );
-}
-
-# try to _get_mask from base_ip and last_ip, returns undef if base-last is no CIDR
-sub _get_mask_ip {
+sub _get_mask_n {
   my ( $base_ip, $last_ip ) = @_;
 
-  # version base != version last
-  my $version = $base_ip->version;
-  Carp::croak 'version mismatch,' if $version != $last_ip->version;
-
-  # base > last?
-  Carp::croak 'base > last,' if $base_ip->cmp($last_ip) > 0;
+  my $pfx = _common_prefix( $base_ip->bytes, $last_ip->bytes );
 
   my $bits = 32;
-  $bits = 128 if $version == 6;
+  $bits = 128 if $base_ip->version == 6;
 
-  my $base_n = $base_ip->bytes;
-  my $last_n = $last_ip->bytes;
-
-  # get outer mask for range
-  my $bitlen = _bitlen( $base_n, $last_n, $bits );
-  my $mask_n = _make_mask_n( $bits - $bitlen, $bits );
-
-  # is range a real CIDR?
-  if ( ( $base_n eq _make_base_n( $base_n, $mask_n ) )
-    && ( $last_n eq _make_last_n( $last_n, $mask_n ) ) )
-  {
-    return Net::IPAM::IP->new_from_bytes($mask_n);
-  }
-
-  return;
+  return _make_mask_n( $pfx, $bits );
 }
 
-# input:  sorted blocks
-# output: remaining blocks after sieving dups and subsets
-sub _sieve (@) {
-  my @result;
+#############################
+#     pre-calc tables
+#############################
 
-  my $i = 0;
-  while ( $i < @_ ) {
+#<<< skip marker for perltidy
 
-    my $j;
-    for ( $j = $i + 1 ; $j < @_ ; $j++ ) {
+# pre-calced masks for 0.0.0.0 - 255.255.255.255
+# only IPv4 addresses representable as a sequence of 1 bits followed by 0 bits
+# are allowed as masks as input
 
-      # skip over dups
-      next if $_[$i]->cmp( $_[$j] ) == 0;
+%valid_masks4 = (
+  "\x00\x00\x00\x00" => 0,  "\x80\x00\x00\x00" => 1,  "\xc0\x00\x00\x00" => 2,
+  "\xe0\x00\x00\x00" => 3,  "\xf0\x00\x00\x00" => 4,  "\xf8\x00\x00\x00" => 5,
+  "\xfc\x00\x00\x00" => 6,  "\xfe\x00\x00\x00" => 7,  "\xff\x00\x00\x00" => 8,
+  "\xff\x80\x00\x00" => 9,  "\xff\xc0\x00\x00" => 10, "\xff\xe0\x00\x00" => 11,
+  "\xff\xf0\x00\x00" => 12, "\xff\xf8\x00\x00" => 13, "\xff\xfc\x00\x00" => 14,
+  "\xff\xfe\x00\x00" => 15, "\xff\xff\x00\x00" => 16, "\xff\xff\x80\x00" => 17,
+  "\xff\xff\xc0\x00" => 18, "\xff\xff\xe0\x00" => 19, "\xff\xff\xf0\x00" => 20,
+  "\xff\xff\xf8\x00" => 21, "\xff\xff\xfc\x00" => 22, "\xff\xff\xfe\x00" => 23,
+  "\xff\xff\xff\x00" => 24, "\xff\xff\xff\x80" => 25, "\xff\xff\xff\xc0" => 26,
+  "\xff\xff\xff\xe0" => 27, "\xff\xff\xff\xf0" => 28, "\xff\xff\xff\xf8" => 29,
+  "\xff\xff\xff\xfc" => 30, "\xff\xff\xff\xfe" => 31, "\xff\xff\xff\xff" => 32,
+);
 
-      # skip over subsets
-      next if _contains_block( $_[$i], $_[$j] );
+# pre-calced CIDR masks for /0 .. /128,
+# e.g.
+# $table_mask_n[3]   == "\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+# $table_mask_n[64]  == "\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00"
+# $table_mask_n[128] == "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff"
 
-      # stop skipping
-      last;
-    }
+@table_mask_n = (
+  "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x00",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\x80",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xc0",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xe0",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf0",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xf8",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfc",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe",
+  "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff",
+);
 
-    # keep $i
-    push @result, $_[$i];
+# pre-calced 'number of leading zeros' for byte values 0x00 - 0xff
+# e.g.
+# $nlz[0]  ==  8 # 0b0000_0000
+# $nlz[1]  ==  7 # 0b0000_0001
+# $nlz[64] ==  1 # 0b0100_0000
+# $nlz[128] == 0 # 0b1000_0000
 
-    # push $i forward to last $j
-    $i = $j;
-  }
+@nlz8 = (
+	8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, # 00..1f
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, # 20..3f
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, # 40..5f
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, # 60..7f
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, # 80..9f
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, # a0..bf
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, # c0..df
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, # e0..ff
+);
 
-  return @result;
-}
+####################################
+#>>> end of skip marker for perltidy
+####################################
 
 =head1 AUTHOR
 
@@ -301,7 +481,7 @@ Karl Gaissmaier, C<< <karl.gaissmaier(at)uni-ulm.de> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2020 by Karl Gaissmaier.
+This software is copyright (c) 2020-2021 by Karl Gaissmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,13 +1,14 @@
 #pragma once
-#include <fstream>
 #include <panda/log.h>
+#include <stdio.h>
+
 
 namespace panda { namespace log {
 
 struct FileLogger : ILogger {
     struct Config {
         string   file;
-        bool     autoflush = false;
+        bool     autoflush = true;
         uint32_t check_freq = 1000; // [ms]
     };
 
@@ -17,12 +18,12 @@ struct FileLogger : ILogger {
     void log (const string&, const Info&) override;
 
 private:
-    string        file;
-    bool          autoflush;
-    std::ofstream fh;
-    uint64_t      inode;
-    uint32_t      check_freq;
-    uint64_t      last_check = 0;
+    string   file;
+    bool     autoflush;
+    FILE*    fh = nullptr;
+    uint64_t inode;
+    uint32_t check_freq;
+    uint64_t last_check = 0;
 
     bool reopen ();
 };

@@ -177,38 +177,80 @@ subtest "large odd number of elements in a dict", sub {
         qr/Invalid element: \[undef\] isn't Text/,
         "exists() dies when asked for something hopelessly invalid"
 };
-
-subtest "large even number of elements dict", sub {
-    open(my $fh, '<', \(
-        "$header_bytes".                                     # 0x00
-        "$DICTBYTE\x06".                                     # 0x05
-        "\x13".    "\x16".                                   # 0x07 and 0x08
-        "\x19".    "\x1c".                                   # 0x09 and 0x0a
-        "\x1f".    "\x22".                                   # 0x0b and 0x0c
-        "\x25".    "\x28".                                   # 0x0d and 0x0e
-        "\x2b".    "\x2e".                                   # 0x0f and 0x10
-        "\x31".    "\x34".                                   # 0x11 and 0x12
-        "$TEXTBYTE\x01a".                                    # 0x13
-        "$TEXTBYTE\x01A".                                    # 0x16
-        "$TEXTBYTE\x01b".                                    # 0x19
-        "$TEXTBYTE\x01B".                                    # 0x1c
-        "$TEXTBYTE\x01c".                                    # 0x1f
-        "$TEXTBYTE\x01C".                                    # 0x22
-        "$TEXTBYTE\x01d".                                    # 0x25
-        "$TEXTBYTE\x01D".                                    # 0x28
-        "$TEXTBYTE\x01e".                                    # 0x2b
-        "$TEXTBYTE\x01E".                                    # 0x2e
-        "$TEXTBYTE\x01f".                                    # 0x31
-        "$TEXTBYTE\x01F"                                     # 0x34
-    ));
-    my $dict = Data::CompactReadonly->read($fh);
-    is($dict->count(), 6, "6 element dict");
-    is($dict->element('a'), 'A', 'can fetch element 0 from dictionary');
-    is($dict->element('b'), 'B', 'can fetch element 1 from dictionary');
-    is($dict->element('c'), 'C', 'can fetch element 2 from dictionary');
-    is($dict->element('d'), 'D', 'can fetch element 3 from dictionary');
-    is($dict->element('e'), 'E', 'can fetch element 4 from dictionary');
-    is($dict->element('f'), 'F', 'can fetch element 5 from dictionary');
-};
+        
+foreach my $use_cache (0, 1) {
+    subtest ''.($use_cache ? 'using' : 'not using').' fast collections cache' => sub {
+        subtest "large even number of elements dict", sub {
+            open(my $fh, '<', \(
+                "$header_bytes".                                     # 0x00
+                "$DICTBYTE\x06".                                     # 0x05
+                "\x13".    "\x16".                                   # 0x07 and 0x08
+                "\x19".    "\x1c".                                   # 0x09 and 0x0a
+                "\x1f".    "\x22".                                   # 0x0b and 0x0c
+                "\x25".    "\x28".                                   # 0x0d and 0x0e
+                "\x2b".    "\x2e".                                   # 0x0f and 0x10
+                "\x31".    "\x34".                                   # 0x11 and 0x12
+                "$TEXTBYTE\x01a".                                    # 0x13
+                "$TEXTBYTE\x01A".                                    # 0x16
+                "$TEXTBYTE\x01b".                                    # 0x19
+                "$TEXTBYTE\x01B".                                    # 0x1c
+                "$TEXTBYTE\x01c".                                    # 0x1f
+                "$TEXTBYTE\x01C".                                    # 0x22
+                "$TEXTBYTE\x01d".                                    # 0x25
+                "$TEXTBYTE\x01D".                                    # 0x28
+                "$TEXTBYTE\x01e".                                    # 0x2b
+                "$TEXTBYTE\x01E".                                    # 0x2e
+                "$TEXTBYTE\x01f".                                    # 0x31
+                "$TEXTBYTE\x01F"                                     # 0x34
+            ));
+            my $dict = Data::CompactReadonly->read($fh, fast_collections => $use_cache);
+            if($use_cache) {
+                eq_or_diff(
+                    $dict->{cache},
+                    {},
+                    "start with empty cache"
+                );
+            }
+            is($dict->count(), 6, "6 element dict");
+            if($use_cache) {
+                eq_or_diff(
+                    $dict->{cache},
+                    { count => 6 },
+                    "count cached"
+                );
+            }
+            is($dict->element('a'), 'A', 'can fetch element 0 from dictionary');
+            if($use_cache) {
+                eq_or_diff(
+                    $dict->{cache},
+                    {
+                        count  => 6,
+                        keys   => { 0 => 'a', 1 => 'b', 2 => 'c' },
+                        values => { 0 => 'A' },
+                    },
+                    "cache partially populated"
+                );
+            }
+            is($dict->element('b'), 'B', 'can fetch element 1 from dictionary');
+            is($dict->element('c'), 'C', 'can fetch element 2 from dictionary');
+            is($dict->element('d'), 'D', 'can fetch element 3 from dictionary');
+            is($dict->element('e'), 'E', 'can fetch element 4 from dictionary');
+            is($dict->element('f'), 'F', 'can fetch element 5 from dictionary');
+            if($use_cache) {
+                eq_or_diff(
+                    $dict->{cache},
+                    {
+                        count  => 6,
+                        keys   => { 0 => 'a', 1 => 'b', 2 => 'c', 3 => 'd', 4 => 'e', 5 => 'f' },
+                        values => { 0 => 'A', 1 => 'B', 2 => 'C', 3 => 'D', 4 => 'E', 5 => 'F' },
+                    },
+                    "cache fully populated"
+                );
+                close($fh);
+                is($dict->element('f'), 'F', 'and yep, we definitely use the cache');
+            }
+        };
+    };
+}
 
 done_testing;

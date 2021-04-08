@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use lib 't/lib'; use MyTest;
 
+catch_run("[relative-operations]");
+
 subtest 'basic' => sub {
     my $rel;
     

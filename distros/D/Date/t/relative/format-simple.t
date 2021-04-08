@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use lib 't/lib'; use MyTest;
 
+catch_run("[relative-format-simple]");
+
 my $fmt = Date::Rel::FORMAT_SIMPLE;
 
 subtest 's' => sub {

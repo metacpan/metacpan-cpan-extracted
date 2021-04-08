@@ -1,0 +1,28 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/bench.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/compile/chunks.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/compile/compression.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/compile/cookies.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/compile/form.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/compile/message.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/compile/request.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/compile/response.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/cookie-jar.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/header.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/parse/chunks.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/parse/compression.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/parse/content-length.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/parse/cookies.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/parse/message.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/parse/request.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/parse/response.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/parse/special-codes.cc.o"
+  "CMakeFiles/panda-protocol-http-tests.dir/tests/regression.cc.o"
+  "libpanda-protocol-http-tests.pdb"
+  "libpanda-protocol-http-tests.a"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/panda-protocol-http-tests.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

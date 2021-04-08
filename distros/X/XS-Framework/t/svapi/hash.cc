@@ -2,7 +2,7 @@
 
 using Test = TestSv<Hash>;
 
-TEST_CASE("Hash", "[Sv]") {
+TEST_CASE("Hash", "[Hash]") {
     perlvars vars;
     Hash my(vars.hv);
     Sv oth_valid(vars.ohv), oth_invalid(vars.av);

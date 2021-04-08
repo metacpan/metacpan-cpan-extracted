@@ -2,6 +2,7 @@ CallbackDispatcher.xsi
 Changes
 Error.xsi
 Framework.xs
+INSTALL.SKIP
 lib/XS/ErrorCode.pm
 lib/XS/ErrorCode.pod
 lib/XS/Framework.pm
@@ -96,6 +97,7 @@ src/xs/typemap/base.h
 src/xs/typemap/containers.h
 src/xs/typemap/error.cc
 src/xs/typemap/error.h
+src/xs/typemap/expected.h
 src/xs/typemap/numeric.h
 src/xs/typemap/object.cc
 src/xs/typemap/object.h
@@ -166,9 +168,10 @@ t/typemap/container.t
 t/typemap/container.xsi
 t/typemap/error.t
 t/typemap/error.xsi
+t/typemap/expected.t
+t/typemap/expected.xsi
 t/typemap/function.cc
 t/typemap/function.t
-t/typemap/function.xsi
 t/typemap/not_null.t
 t/typemap/not_null.xsi
 t/typemap/object/avhv.t

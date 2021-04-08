@@ -111,8 +111,7 @@ subtest 'logXXXX optimizations' => sub {
     };
 
     subtest '1 arg, module' => sub {
-        my $mod = XLog::Module->new("mymod");
-        $mod->level(XLog::INFO);
+        my $mod = XLog::Module->new("mymod", XLog::INFO);
         subtest 'not-logged' => sub {
             my $cnt = test_call(sub {
                 XLog::debug($mod) for(1..$RUNS);
@@ -130,8 +129,7 @@ subtest 'logXXXX optimizations' => sub {
 
     subtest 'module + message' => sub {
         my $c = 0;
-        my $mod = XLog::Module->new("mymod");
-        $mod->level(XLog::INFO);
+        my $mod = XLog::Module->new("mymod", XLog::INFO);
 
         subtest 'not-logged' => sub {
             my $cnt = test_call(sub {
@@ -238,8 +236,7 @@ subtest 'low-level log($level, ...) optimizations' => sub {
     };
 
     subtest '1 level arg (const) + module (padsv)' => sub {
-        my $mod = XLog::Module->new("mymod");
-        $mod->level(XLog::INFO);
+        my $mod = XLog::Module->new("mymod", XLog::INFO);
 
         subtest 'not-logged' => sub {
             my $cnt = test_call(sub {
@@ -257,8 +254,7 @@ subtest 'low-level log($level, ...) optimizations' => sub {
     };
 
     subtest '1 level arg (const) + module (padsv) + message' => sub {
-        my $mod = XLog::Module->new("mymod");
-        $mod->level(XLog::INFO);
+        my $mod = XLog::Module->new("mymod", XLog::INFO);
 
         subtest 'not-logged' => sub {
             my $cnt = test_call(sub {
@@ -305,8 +301,7 @@ subtest "no crashes on wrong args" => sub {
     };
 
     subtest 'wrong module arg' => sub {
-        my $mod = XLog::Module->new("mymod");
-        $mod->level(XLog::INFO);
+        my $mod = XLog::Module->new("mymod", XLog::INFO);
         my $sub = sub {
             my ($level, $module) = @_;
             XLog::log($level, $module);

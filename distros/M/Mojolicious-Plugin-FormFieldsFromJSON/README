@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.02
+    version 1.03
 
 SYNOPSIS
 
@@ -1250,6 +1250,13 @@ Validation
       },
 
     Validation checks are done in asciibetical order.
+
+    You can also use the filters:
+
+      "validation" : {
+          "size" : [ 2, 5 ],
+          "filters" : [ "trim" ]
+      },
 
  Check a string for its length
 

@@ -36,13 +36,13 @@ static inline TimezoneSP list2vals (SV** args, I32 items, ptime_t vals[8]) {
     } else {
         if (items > 8) items = 8;
         switch (items) {
-            case 8: tz      = xs::in<TimezoneSP>(args[7]);
-            case 7: vals[6] = SvIV(args[6]);
-            case 6: vals[5] = xs::in<ptime_t>(args[5]);
-            case 5: vals[4] = xs::in<ptime_t>(args[4]);
-            case 4: vals[3] = xs::in<ptime_t>(args[3]);
-            case 3: vals[2] = xs::in<ptime_t>(args[2]);
-            case 2: vals[1] = xs::in<ptime_t>(args[1]);
+            case 8: tz      = xs::in<TimezoneSP>(args[7]);  // fall through
+            case 7: vals[6] = SvIV(args[6]);                // fall through
+            case 6: vals[5] = xs::in<ptime_t>(args[5]);     // fall through
+            case 5: vals[4] = xs::in<ptime_t>(args[4]);     // fall through
+            case 4: vals[3] = xs::in<ptime_t>(args[3]);     // fall through
+            case 3: vals[2] = xs::in<ptime_t>(args[2]);     // fall through
+            case 2: vals[1] = xs::in<ptime_t>(args[1]);     // fall through
             case 1: vals[0] = SvIV(args[0]);
         }
     }

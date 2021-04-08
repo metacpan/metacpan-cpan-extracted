@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use lib 't/lib'; use MyTest;
 
+catch_run("[clone]");
+
 subtest 'clone()' => sub {
     my $date = Date::date('2014-01-01 00:00:00');
     ok($date->tzlocal);

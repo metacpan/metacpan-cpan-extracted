@@ -1,5 +1,8 @@
 Revision history for perl distribution CellBIS-SQL-Abstract
 
+1.4       2021-04-09 01:02:00+08:00 Asia/Makassar
+          - fix missing Mojo::SQLite #4 - eserte
+
 1.3       2021-01-28 07:44:33+08:00 Asia/Makassar
           - fix error if create table with foreign key
           - support create table PostgreSQL

@@ -87,9 +87,28 @@ string tzdir (SV* newdir = NULL) {
     RETVAL = tzdir();
 }
 
-string tzsysdir () {
-    RETVAL = tzsysdir();
+string tzsysdir ()
+
+string tzembededdir(SV* newdir = NULL) {
+    if (newdir) {
+        tzembededdir(xs::in<string>(newdir));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = tzembededdir();
 }
+
+void available_timezones () {
+    auto list = available_timezones();
+    if (list.size()) EXTEND(SP, (int)list.size());
+    for (auto& name : list) {
+        mPUSHs(xs::out(name).detach());
+    }
+    XSRETURN(list.size());
+}
+
+void use_system_timezones ()
+
+void use_embed_timezones ()
 
 void gmtime (SV* epochSV = {}, TimezoneSP tz = {}) : ALIAS(localtime=1, anytime=2) {
     ptime_t epoch;
@@ -172,12 +191,7 @@ Date* today () {
 }
 
 ptime_t today_epoch () {
-    datetime date;
-    localtime(::time(NULL), &date);
-    date.sec = 0;
-    date.min = 0;
-    date.hour = 0;
-    RETVAL = timelocall(&date);
+    RETVAL = Date::today_epoch();
 }
 
 Date* date (SV* val = {}, TimezoneSP tz = {}, int fmt = Date::InputFormat::all) {
@@ -341,8 +355,8 @@ string strftime (Sv arg0, SV* arg1, ...) {
         date.isdst = -1;
         
         switch (items) {
-            case 9: tz = xs::in<TimezoneSP>(ST(8));
-            case 8: date.isdst = SvIV(ST(7));
+            case 9: tz = xs::in<TimezoneSP>(ST(8));     // fall through
+            case 8: date.isdst = SvIV(ST(7));           // fall through
             case 7:
                 date.sec   = xs::in<ptime_t>(ST(1));
                 date.min   = xs::in<ptime_t>(ST(2));
@@ -352,7 +366,7 @@ string strftime (Sv arg0, SV* arg1, ...) {
                 date.year  = xs::in<ptime_t>(ST(6));
                 timeany(&date, tz ? tz : tzlocal());
                 break;
-            case 3: tz = xs::in<TimezoneSP>(ST(2));
+            case 3: tz = xs::in<TimezoneSP>(ST(2));     // fall through
             case 2: {
                 auto epoch  = xs::in<ptime_t>(arg1);
                 if (!anytime(epoch, &date, tz ? tz : tzlocal())) XSRETURN_UNDEF;

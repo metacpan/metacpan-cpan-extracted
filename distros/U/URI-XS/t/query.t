@@ -2,7 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Deep;
+use Test::Catch;
+use lib 't/lib'; use MyTest;
 use URI::XS;
+
+catch_run("[query]");
 
 my $uri;
 
@@ -29,7 +33,7 @@ ok(!ref($query->{p2}));
 ok(!ref($uri->param('p2')));
 cmp_bag([$uri->multiparam('p2')], ['v2', 'v2v2']);
 
-$uri->query({a => 1, "key space" => 2, b => "val space", multi => [1,2,3], "" => 'emtpy'});
+$uri->query({a => 1, "key space" => 2, b => "val space", multi => [1,2,3], "" => 'empty'});
 my $qstr = $uri->query_string;
 like($qstr, '/(^|&)a=1(&|$)/');
 like($qstr, '/(^|&)key%20space=2(&|$)/');
@@ -37,7 +41,7 @@ like($qstr, '/(^|&)b=val%20space(&|$)/');
 like($qstr, '/(^|&)multi=1(&|$)/');
 like($qstr, '/(^|&)multi=2(&|$)/');
 like($qstr, '/(^|&)multi=3(&|$)/');
-like($qstr, '/(^|&)=emtpy(&|$)/');
+like($qstr, '/(^|&)=empty(&|$)/');
 
 $uri = new URI::XS("https://ya.ru/my/path?a=b");
 $uri->add_query('');

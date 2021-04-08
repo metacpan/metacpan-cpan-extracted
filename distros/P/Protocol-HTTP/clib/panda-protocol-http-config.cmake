@@ -1,0 +1,8 @@
+if (NOT TARGET panda-protocol-http)
+    find_package(Boost REQUIRED)
+    find_package(range-v3 REQUIRED)
+    find_package(panda-uri REQUIRED)
+    find_package(panda-date REQUIRED)
+    find_package(ZLIB REQUIRED)
+    include(${CMAKE_CURRENT_LIST_DIR}/panda-protocol-http-targets.cmake)
+endif()

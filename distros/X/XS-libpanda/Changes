@@ -1,3 +1,16 @@
+1.5.0    08.04.2021
+            - exceptions, give libunwind priority (needed for *bsd)
+            - exceptions, libunwind: with fake 1st frame with IP = 0
+            - move C part to separate folder
+            - panda-log: support for logger & formatter in log modules, improve API
+            - panda-log: add %4t pattern to format dates lke '2020/12/14 17:48:30'
+            - panda-log: allow to assign custom program name
+            - improve owning_list
+            - support for weak ref in atomic refcnt
+            - ifunction now uses atomic refcnt
+            - support recursive multilogger, support passthrough for loggers
+            - add catch tests helper header
+            - add compilation fix for expected/excepted
 1.4.11    25.11.2020
             - more correct libunwind usage and detection on *bsd
             - improve makefile

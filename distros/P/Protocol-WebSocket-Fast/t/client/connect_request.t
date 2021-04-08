@@ -3,6 +3,9 @@ use warnings;
 use lib 't/lib';
 use MyTest;
 use Test::More;
+use Test::Catch;
+
+catch_run("[client-connect-request]");
 
 subtest 'parser create' => sub {
     my $p = new Protocol::WebSocket::Fast::ClientParser;

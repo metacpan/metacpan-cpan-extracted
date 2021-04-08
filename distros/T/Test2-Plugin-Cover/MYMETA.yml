@@ -26,5 +26,5 @@ requires:
   Test2::API: '1.302166'
   Test2::EventFacet: '1.302166'
   perl: '5.012000'
-version: '0.000010'
+version: '0.000012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

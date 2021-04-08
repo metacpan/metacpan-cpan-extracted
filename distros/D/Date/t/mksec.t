@@ -4,6 +4,8 @@ use Test::More;
 use Test::Deep;
 use lib 't/lib'; use MyTest;
 
+catch_run("[mksec]");
+
 sub is_approx ($$;$) {
     my ($testv, $v, $name) = @_;
     cmp_ok abs($testv - $v), '<', 0.000001;

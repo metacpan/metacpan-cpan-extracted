@@ -60,4 +60,17 @@ std::ostream& operator<< (std::ostream& os, const Sv& sv) {
     }
 }
 
+Sv eval (const panda::string& code) {
+    Sv ret = eval_pv(code.c_str(), 0);
+
+    auto errsv = GvSV(PL_errgv);
+    if (SvTRUE(errsv)) {
+        auto exc = Sv::noinc(errsv);
+        GvSV(PL_errgv) = newSVpvs("");
+        throw PerlRuntimeException(exc);
+    }
+
+    return ret;
+}
+
 }

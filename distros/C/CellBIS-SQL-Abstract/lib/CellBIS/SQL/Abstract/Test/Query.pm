@@ -15,7 +15,7 @@ sub new {
 }
 
 package CellBIS::SQL::Abstract::Test::Query::_users;
-$CellBIS::SQL::Abstract::Test::Query::_users::VERSION = '1.3';
+$CellBIS::SQL::Abstract::Test::Query::_users::VERSION = '1.4';
 use Mojo::Base -base;
 
 # Table fields
@@ -49,7 +49,7 @@ sub create {
 }
 
 package CellBIS::SQL::Abstract::Test::Query::_roles;
-$CellBIS::SQL::Abstract::Test::Query::_roles::VERSION = '1.3';
+$CellBIS::SQL::Abstract::Test::Query::_roles::VERSION = '1.4';
 use Mojo::Base -base;
 
 # Table fields

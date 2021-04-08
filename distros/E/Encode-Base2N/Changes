@@ -1,3 +1,6 @@
+1.0.3    08.04.2021
+          - move C codes to own lib with cmake
+          - add C tests
 1.0.2    25.03.2020
           - add MIME::Base32::XS to benchmarks
           - remove Test::Warnings usage from tests

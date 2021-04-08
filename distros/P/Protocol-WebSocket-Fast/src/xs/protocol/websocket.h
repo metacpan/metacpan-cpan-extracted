@@ -50,12 +50,11 @@ struct XSFrameSender : FrameSender {
 void  av_to_header_values (const Array& av, HeaderValues* vals);
 Array header_values_to_av (const HeaderValues& vals);
 
-void av_to_vstring (const Array& av, std::vector<string>& v);
-
 ConnectRequestSP  make_request  (const Hash& params, const ConnectRequestSP& = {});
 ConnectResponseSP make_response (const Hash& params, const ConnectResponseSP& = {});
 
 void parser_config_in   (Parser::Config&, const Hash&);
+Hash parser_config_out  (Parser::Config& cfg);
 void deflate_config_in  (DeflateExt::Config&, const Hash&);
 Sv   deflate_config_out (const DeflateExt::Config&);
 
@@ -144,6 +143,14 @@ namespace xs {
             TYPE cfg;
             xs::protocol::websocket::parser_config_in(cfg, arg);
             return cfg;
+        }
+
+        static Sv out (TYPE var, const Sv& = Sv()) { return Ref::create(xs::protocol::websocket::parser_config_out(var)); }
+    };
+
+    template <> struct Typemap<panda::protocol::websocket::IsFinal> : TypemapBase<panda::protocol::websocket::IsFinal> {
+        static panda::protocol::websocket::IsFinal in (SV* arg) {
+            return SvTRUE(arg) ? panda::protocol::websocket::IsFinal::YES : panda::protocol::websocket::IsFinal::NO;
         }
     };
 }

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019-2020 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2019-2021 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -51,7 +51,8 @@ keys yields an exception.
 
 =head1 SEE ALSO
 
-Implements: L<FP::Abstract::Map>.
+Implements: L<FP::Abstract::Pure>, L<FP::Abstract::Map>,
+L<FP::Abstract::Equal>, L<FP::Abstract::Show>
 
 =head1 NOTE
 
@@ -67,7 +68,7 @@ use warnings FATAL => 'uninitialized';
 use Exporter "import";
 
 our @EXPORT      = qw(purehash);
-our @EXPORT_OK   = qw();
+our @EXPORT_OK   = qw(hash_clone_to_purehash hash_to_purehash);
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use FP::Docstring;
@@ -96,6 +97,16 @@ sub purehash {
     # XX ^ this also changes the behaviour accessing a non-existing key, yeah;
     # why not just   overload? oh  that was said to be slow or was it Tie  ?
     $res
+}
+
+sub hash_clone_to_purehash {
+    @_ == 1 or fp_croak_arity 1;
+    FP::_::PureHash->new_from_hash({ %{ $_[0] } })
+}
+
+sub hash_to_purehash {
+    @_ == 1 or fp_croak_arity 1;
+    FP::_::PureHash->new_from_hash($_[0])
 }
 
 sub is_purehash {
@@ -131,11 +142,39 @@ package FP::Hash::Mixin {
     _END_
 }
 
+package FP::PureHash::autobox {
+    our $AUTOLOAD;
+
+    sub AUTOLOAD {
+        my $methodname = $AUTOLOAD;
+        $methodname =~ s/.*:://;
+        my $v = FP::_::PureHash->new_from_hash($_[0]);
+        if (my $m = $v->can($methodname)) {
+            goto $m
+        } else {
+            die "no method '$methodname' found for object: $v";
+        }
+    }
+}
+
 package FP::_::PureHash {
     use base "FP::Hash::Mixin";
     use FP::Interfaces;
     use FP::Carp;
     use Chj::NamespaceCleanAbove;
+
+    sub new_from_hash {
+        @_ == 2 or fp_croak_arity 2;
+        my ($class, $out) = @_;
+        if ($FP::PureHash::immutable) {
+            for my $k (keys %$out) {
+                Internals::SvREADONLY $out->{$k}, 1
+            }
+        }
+        my $res = bless $out, "FP::_::PureHash";
+        Internals::SvREADONLY %$out, 1 if $FP::PureHash::immutable;
+        $res
+    }
 
     sub constructor_name {"purehash"}
 
@@ -167,6 +206,41 @@ package FP::_::PureHash {
         my $res = bless \%out, "FP::_::PureHash";
         Internals::SvREADONLY %out, 1 if $FP::PureHash::immutable;
         $res
+    }
+
+    sub key_value_pairs {
+        @_ == 1 or fp_croak_arity 1;
+        my ($h) = @_;
+        map { [$_, $h->{$_}] } sort keys %$h
+    }
+
+    sub array {
+        @_ == 1 or fp_croak_arity 1;
+        my ($h) = @_;
+        [$h->key_value_pairs]
+    }
+
+    sub purearray {
+        @_ == 1 or fp_croak_arity 1;
+        my ($h) = @_;
+
+        # XX load FP::PureArray or not, here or always?
+        FP::_::PureArray->new_from_array($h->array)
+    }
+
+    sub list {
+        @_ == 1 or fp_croak_arity 1;
+        my ($h) = @_;
+
+        # XX load FP::List or not, here or always?
+        FP::List::array_to_list($h->array)
+    }
+
+    # Should we add this? Auto-choose the best sequence for the task?
+    sub sequence {
+        @_ == 1 or fp_croak_arity 1;
+        my ($h) = @_;
+        $h->purearray
     }
 
     FP::Interfaces::implemented qw(

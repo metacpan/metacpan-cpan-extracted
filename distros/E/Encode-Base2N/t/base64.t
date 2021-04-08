@@ -1,15 +1,13 @@
 use 5.012;
 use warnings;
 use Test::More;
-use Encode();
+use Test::Catch;
+use lib 't/lib'; use MyTest;
 use Encode::Base2N qw/encode_base64 encode_base64url encode_base64pad decode_base64/;
 
-my $ok = eval {
-    require MIME::Base64;
-    1;
-};
+catch_run('[base64]');
 
-plan skip_all => 'MIME::Base64 required for testing' unless $ok;
+plan skip_all => 'MIME::Base64 required for testing' unless eval {require MIME::Base64; 1};
 
 my $str = join('', map {chr($_)} 0..255);
 

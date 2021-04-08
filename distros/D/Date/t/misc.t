@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use lib 't/lib'; use MyTest;
 
+catch_run("[misc]");
+
 sub test ($&);
 
 test 'magic string in ctor' => sub {

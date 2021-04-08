@@ -4,7 +4,7 @@ my %params = (
     NAME      => 'XS::libcatch',
     BIN_SHARE => {
         CPLUS   => 11,
-        INCLUDE => {'src' => '/'},
+        INCLUDE => {'clib/single_include' => '/'},
     },
 );
 

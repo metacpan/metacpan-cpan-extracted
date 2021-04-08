@@ -29,7 +29,7 @@ static inline const char* date_thaw (ptime_t* epoch, const Timezone** zone, cons
         return ptr;
     }
     size_t znlen = strlen(ptr);
-    *zone = tzget(ptr);
+    if (znlen) *zone = tzget(ptr);
     return ptr + znlen;
 }
 
@@ -54,7 +54,7 @@ Date* STORABLE_attach (SV* CLASS, bool, SV* serialized) {
     STRLEN len;
     const char* str = SvPV(serialized, len);
     ptime_t epoch;
-    const Timezone* zone;
+    const Timezone* zone = nullptr;
     date_thaw(&epoch, &zone, str, len);
     RETVAL = new Date(epoch, zone);
     PROTO = CLASS;

@@ -1,0 +1,11 @@
+MODULE = Protocol::WebSocket::Fast                PACKAGE = Protocol::WebSocket::Fast::FrameSender
+PROTOTYPES: DISABLE
+
+string XSFrameSender::send (Sv payload_sv, IsFinal final = IsFinal::NO) {
+    if (payload_sv.is_array_ref()) {
+        auto list = xs::in<std::vector<string_view>>(payload_sv);
+        RETVAL = THIS->send(list.begin(), list.end(), final);
+    } else {
+        RETVAL = THIS->send(xs::in<string_view>(payload_sv), final);
+    }
+}

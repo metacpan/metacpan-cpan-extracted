@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -27,39 +27,39 @@
          "requires" : {
             "Alien::cmake3" : "0",
             "Export::XS" : "v3.0.5",
-            "Test::Catch" : "v1.0.14",
-            "XS::Framework" : "v1.3.3",
-            "XS::Install" : "v1.3.1",
-            "XS::libcatch" : "v2.12.1.1",
-            "XS::libpanda" : "v1.4.11",
+            "Test::Catch" : "v1.0.15",
+            "XS::Framework" : "v1.3.4",
+            "XS::Install" : "v1.3.2",
+            "XS::libcatch" : "v2.13.4.0",
+            "XS::libpanda" : "v1.5.0",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
             "Export::XS" : "v3.0.5",
-            "XS::Framework" : "v1.3.3",
-            "XS::Install" : "v1.3.1",
-            "XS::libpanda" : "v1.4.11",
+            "XS::Framework" : "v1.3.4",
+            "XS::Install" : "v1.3.2",
+            "XS::libpanda" : "v1.5.0",
             "next::XS" : "v1.0.7"
          }
       },
       "test" : {
          "requires" : {
             "Export::XS" : "v3.0.5",
-            "Test::Catch" : "v1.0.14",
+            "Test::Catch" : "v1.0.15",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XS::Framework" : "v1.3.3",
-            "XS::libcatch" : "v2.12.1.1",
-            "XS::libpanda" : "v1.4.11",
+            "XS::Framework" : "v1.3.4",
+            "XS::libcatch" : "v2.13.4.0",
+            "XS::libpanda" : "v1.5.0",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.6",
+   "version" : "v1.0.7",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

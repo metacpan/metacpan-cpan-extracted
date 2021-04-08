@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use lib 't/lib'; use MyTest;
 
+catch_run("[relative-basic]");
+
 subtest 'ctor' => sub {
     subtest 'empty' => sub {
         my $rel = new Date::Rel;

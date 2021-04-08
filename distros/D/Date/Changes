@@ -1,3 +1,8 @@
+5.2.3    08.04.2021
+           - move C codes to own lib with cmake
+           - several bugfixes
+           - make Date thread-safe
+           - date objects in localzone (created with null tomezine), now follows tzset() (after they are changed)
 5.2.2    25.11.2020
            - support for magical vars in date & daterel ctor
            - change Timezone* -> TimezoneSP back

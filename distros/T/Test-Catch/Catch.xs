@@ -1,6 +1,7 @@
 #include <math.h> // this fixes win32 because <cmath> that is included by <catch.hpp> breaks <perl.h> unless previously included <math.h>
 #define CATCH_CONFIG_RUNNER
 #define CATCH_CONFIG_DEFAULT_REPORTER "perl"
+//#define CATCH_CONFIG_ENABLE_BENCHMARKING
 #include <catch2/catch.hpp>
 #include <vector>
 #include <xsheader.h>
@@ -69,10 +70,10 @@ struct Printer {
     }
 
 private:
-    static inline void expr_replace (string& expr, char c, const string& subs) {
+    static inline void expr_replace (string& expr, const string& c, const string& subs) {
         size_t pos = expr.find(c);
         while (pos < expr.length()) {
-            expr.replace(pos, 1, subs);
+            expr.replace(pos, c.length(), subs);
             pos = expr.find(c, pos + subs.length());
         }
     }
@@ -95,8 +96,12 @@ private:
         if (!result.hasExpandedExpression()) return;
         stream << " for: ";
         string expr = result.getExpandedExpression();
-        expr_replace(expr, '\r', "\\r");
-        expr_replace(expr, '\n', "\\n");
+        // prevent "str" == "str" splitting into several lines
+        expr_replace(expr, "\"\r\n==\r\n\"", "\" == \"");
+        expr_replace(expr, "\"\n==\n\"", "\" == \"");
+        // replace remaining newlines in text/expressions
+        expr_replace(expr, "\r", "\\r");
+        expr_replace(expr, "\n", "\\n");
         stream << expr;
     }
 
@@ -263,26 +268,27 @@ struct PerlReporter : IStreamingReporter {
             bool is_test = result.getResultType() != ResultWas::Info && result.getResultType() != ResultWas::Warning;
             
             Colour::Code color = Colour::None;
-            startLine();
+            ostream& ss = result.succeeded() ? startLine() : startErrorLine();
+            
             if (is_test) {
                 ++scope->count;
                 if (result.succeeded()) {
-                    stream << "ok";
+                    ss << "ok";
                 } else {
                     ++scope->failed;
-                    stream << "not ok";
+                    ss << "not ok";
                     color = Colour::ResultError;
                 }
-                stream << " " << scope->count << " -";
+                ss << " " << scope->count << " -";
             }
             
             {
                 Colour cg(color); (void)cg;
-                stream << row.expr;
-                stream << " # at " << result.getSourceInfo();
+                ss << row.expr;
+                ss << " # at " << result.getSourceInfo();
             }
     
-            stream << endl;
+            ss << endl;
     
             if (is_test && !result.succeeded()) {
                 startErrorLine() << "#\e[1;31m Failed test in section [" << scope->fullname << "] at " << result.getSourceInfo() << "\e[0m" << endl;
@@ -294,6 +300,11 @@ struct PerlReporter : IStreamingReporter {
     void fatalErrorEncountered (StringRef) override {
         fatal = true;
     }
+    
+//    void benchmarkPreparing (const std::string& ) override {}
+//    void benchmarkStarting  (const BenchmarkInfo& ) override {}
+//    void benchmarkEnded     (const BenchmarkStats<>& ) override {}
+//    void benchmarkFailed    (const std::string& ) override {}
 
 private:
     struct AData {

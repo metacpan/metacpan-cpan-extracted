@@ -1,3 +1,5 @@
+1.2.1    08.04.2021
+          - fix warnings
 1.2.0    25.11.2020
           - fix paths for windows
           - renamed to Config::MorePerl

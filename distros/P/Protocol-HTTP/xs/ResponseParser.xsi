@@ -1,0 +1,43 @@
+MODULE = Protocol::HTTP              PACKAGE = Protocol::HTTP::ResponseParser
+PROTOTYPES: DISABLE
+
+ResponseParser* ResponseParser::new ()
+
+RequestSP ResponseParser::context_request ()
+
+void ResponseParser::set_context_request (Request* req)
+
+void ResponseParser::parse (const string& buf) : ALIAS(parse_shift=1) {
+    if (ix && !buf) XSRETURN_EMPTY;  // make "while(my(...) = $p->parse_shift($s)) {}" stop when string is fully parsed
+    auto result = THIS->parse(buf);
+    SV* bufsv = ST(1);
+    EXTEND(SP, 4);
+    
+    mPUSHs(xs::out(result.response).detach());
+    mPUSHs(xs::out(result.state).detach());
+    
+    if (ix) sv_insert(bufsv, 0, result.position, "", 0);
+    else    mPUSHu(result.position);
+    
+    if (result.error) mPUSHs(xs::out(result.error).detach());
+}
+
+void ResponseParser::eof () {
+    auto result = THIS->eof();
+    EXTEND(SP, 3);
+    
+    mPUSHs(xs::out(result.response).detach());
+    mPUSHs(xs::out(result.state).detach());
+    
+    if (result.error) {
+        PUSHs(&PL_sv_undef);
+        mPUSHs(xs::out(result.error).detach());
+    }
+}
+
+void ResponseParser::reset ()
+
+SV* CLONE_SKIP (...) {
+    XSRETURN_YES;
+    PERL_UNUSED_VAR(items);
+}

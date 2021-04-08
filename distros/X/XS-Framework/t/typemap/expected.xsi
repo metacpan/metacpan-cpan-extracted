@@ -1,0 +1,55 @@
+MODE: INLINE
+#include <xs/typemap/expected.h>
+
+MODULE = MyTest::Typemap                PACKAGE = MyTest::Expected
+PROTOTYPES: DISABLE
+
+TYPEMAP: << END
+expected<void,std::error_code>   T_xs_expected
+expected<string,std::error_code> T_xs_expected
+END
+
+void void_ok (...) {
+    expected<void,std::error_code> ret = {};
+    XSRETURN_EXPECTED(ret);
+}
+
+expected<void,std::error_code> void_err (...) {
+    RETVAL = make_unexpected(make_error_code(std::errc::timed_out));
+}
+
+void ret_ok (...) {
+    expected<string,std::error_code> ret = string("hi");
+    XSRETURN_EXPECTED(ret);
+}
+
+expected<string,std::error_code> ret_err (...) {
+    RETVAL = make_unexpected(make_error_code(std::errc::timed_out));
+}
+
+
+MODULE = MyTest::Typemap                PACKAGE = MyTest::Excepted
+PROTOTYPES: DISABLE
+
+TYPEMAP: << END
+excepted<void,std::error_code>   T_xs_expected
+excepted<string,std::error_code> T_xs_expected
+END
+
+void void_ok (...) {
+    excepted<void,std::error_code> ret = {};
+    XSRETURN_EXPECTED(ret);
+}
+
+excepted<void,std::error_code> void_err (...) {
+    RETVAL = make_unexpected(make_error_code(std::errc::timed_out));
+}
+
+void ret_ok (...) {
+    excepted<string,std::error_code> ret = string("hi");
+    XSRETURN_EXPECTED(ret);
+}
+
+excepted<string,std::error_code> ret_err (...) {
+    RETVAL = make_unexpected(make_error_code(std::errc::timed_out));
+}

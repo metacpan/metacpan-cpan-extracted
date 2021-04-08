@@ -4,7 +4,7 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -25,7 +25,7 @@
       "runtime" : {
          "requires" : {
             "Mojo::File" : "0",
-            "Mojolicious" : "5.67",
+            "Mojolicious" : "6.50",
             "perl" : "5.010"
          }
       }
@@ -33,22 +33,22 @@
    "provides" : {
       "Mojolicious::Plugin::FormFieldsFromJSON" : {
          "file" : "lib/Mojolicious/Plugin/FormFieldsFromJSON.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON/issues"
+         "web" : "https://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON/issues"
       },
-      "homepage" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON",
+      "homepage" : "https://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON",
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON.git",
-         "web" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON"
+         "url" : "https://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON.git",
+         "web" : "https://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_contributors" : [
       "Csizmar Roland <csizmar.roland@mithrandir.hu>",
       "H\u00e5kon H\u00e6gland <hakon.hagland@gmail.com>",
@@ -61,6 +61,8 @@
       "reneeb <info@perl-services.de>",
       "Renee <reb@perl-services.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

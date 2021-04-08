@@ -1,3 +1,7 @@
+2021-04-08    0.0.5    Introduce optional caching for Dictionaries, to make reads faster at the
+                         expense of eating more memory;
+                       Other speed improvements
+
 2020-12-18    0.0.4    Bugfixes for writing nested data structures and reading empty tied hashes;
                        Bugfix for calling exists() on an empty Dictionary;
                        De-dup entire hashes/arrays on file creation if their contents are the same

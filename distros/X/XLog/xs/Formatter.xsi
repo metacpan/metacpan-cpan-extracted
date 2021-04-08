@@ -6,12 +6,68 @@ PerlObjectFormatter* PerlObjectFormatter::new () {
     RETVAL = new PerlObjectFormatter();
 }
 
+MODE: INLINE
+
+static const char* DECORATOR_KEY = "_decorator";
+
+// let it be only script basename, without file
+static string decorate_default(const char* name) {
+    string in(name);
+    auto pos = in.find_last_of("/\\");
+    if (pos == string::npos) {
+        return in;
+    }
+    return in.substr(pos + 1);
+}
+
+static xs::Sv::payload_marker_t spy_$0_marker{};
+
+static int spy_$0(pTHX_ SV* sv, MAGIC* mg) {
+    if (mg->mg_virtual == &spy_$0_marker) {
+        Stash stash("XLog::Formatter::Pattern");
+        auto decorator = stash.sub(DECORATOR_KEY);
+        string $0;
+        if (decorator) {
+            auto decorated = decorator.call(sv);
+            $0 = SvPV_nolen(decorated);
+        }
+        else {
+            $0 = decorate_default(SvPV_nolen(sv));
+        }
+        set_program_name($0);
+    }
+    return 0;
+}
 
 MODULE = XLog                PACKAGE = XLog::Formatter::Pattern
 PROTOTYPES: DISABLE
 
 BOOT {
     Stash(__PACKAGE__).inherit("XLog::IFormatter");
+
+    spy_$0_marker.svt_set = spy_$0;
+
+    auto $0_sv = get_sv("0", 0);
+    MAGIC* mg;
+    Newx(mg, 1, MAGIC);
+    mg->mg_moremagic = SvMAGIC($0_sv);
+    SvMAGIC_set($0_sv, mg);
+    mg->mg_virtual = const_cast<xs::Sv::payload_marker_t*>(&spy_$0_marker);
+    mg->mg_type = PERL_MAGIC_ext;
+    mg->mg_len = 0;
+    mg->mg_private = 0;
+    mg->mg_flags = 0;
+    mg->mg_ptr = NULL;
+    mg->mg_obj = NULL;
+
+    auto $0 = SvPV_nolen($0_sv);
+    set_program_name(decorate_default($0));
 }
 
 IFormatter* PatternFormatter::new (string_view fmt)
+
+void set_program_decorator(Sub callback) {
+    Stash stash(__PACKAGE__);
+    stash.store(DECORATOR_KEY, callback);
+}
+

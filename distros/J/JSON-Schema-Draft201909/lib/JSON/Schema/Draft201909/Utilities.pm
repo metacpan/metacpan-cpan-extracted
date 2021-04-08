@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Draft201909
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -105,6 +105,7 @@ sub get_type {
 
 # compares two arbitrary data payloads for equality, as per
 # https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.2.3
+# if provided with a state hashref, any differences are recorded within
 sub is_equal {
   my ($x, $y, $state) = @_;
   $state->{path} //= '';
@@ -158,7 +159,8 @@ sub jsonp {
   return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, grep defined, @_);
 }
 
-# get all annotations produced for the current instance data location
+# get all annotations produced for the current instance data location (that are visible to this
+# schema location)
 sub local_annotations {
   my ($state) = @_;
   grep $_->instance_location eq $state->{data_path}, @{$state->{annotations}};
@@ -304,7 +306,7 @@ JSON::Schema::Draft201909::Utilities - Internal utilities for JSON::Schema::Draf
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 

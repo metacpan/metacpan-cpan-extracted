@@ -4,6 +4,8 @@ use Test::More;
 use Test::Deep;
 use lib 't/lib'; use MyTest;
 
+catch_run("[format-dot]");
+
 tzset('Europe/Moscow');
 
 subtest 'parse' => sub {

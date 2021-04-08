@@ -1,7 +1,6 @@
 Backtrace.xs
-BacktraceInfo.xsi
 Changes
-DualTrace.xsi
+INSTALL.SKIP
 lib/Exception/Backtrace.pm
 lib/Exception/Backtrace.pod
 lib/Exception/Backtrace/BacktraceInfo.pm
@@ -11,7 +10,6 @@ lib/Exception/Backtrace/DualTrace.pod
 lib/Exception/Backtrace/Stackframe.pm
 lib/Exception/Backtrace/Stackframe.pod
 Makefile.PL
-Makefile.test
 MANIFEST			This list of files
 misc/devel-trace.pl
 misc/exception-bactrace.pl
@@ -22,7 +20,6 @@ src/xs/DualTrace.cc
 src/xs/DualTrace.h
 src/xs/PerlTrace.cc
 src/xs/PerlTrace.h
-Stackframe.xsi
 t/04-no-segfault-at-start.t
 t/05-perl-exceptions.t
 t/06-c-exceptions.t
@@ -31,5 +28,8 @@ t/08-subname.t
 t/09-global-destruction.t
 t/MyTest.pm
 t/MyTest.xs
+xs/BacktraceInfo.xsi
+xs/DualTrace.xsi
+xs/Stackframe.xsi
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

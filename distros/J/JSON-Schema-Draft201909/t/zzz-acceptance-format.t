@@ -9,6 +9,8 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::More;
 use List::Util 1.50 'head';
+use Safe::Isa;
+use Feature::Compat::Try;
 use Config;
 
 BEGIN {
@@ -41,14 +43,19 @@ my %options = (validate_formats => 1);
 my $js = JSON::Schema::Draft201909->new(%options);
 my $js_short_circuit = JSON::Schema::Draft201909->new(%options, short_circuit => 1);
 
-my $add_resource = sub {
-  my ($uri, $schema) = @_;
-  $js->add_schema($uri => $schema);
-  $js_short_circuit->add_schema($uri => $schema);
-};
-
 my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, convert_blessed => 1, canonical => 1, pretty => 1);
 $encoder->indent_length(2) if $encoder->can('indent_length');
+
+my $add_resource = sub {
+  my ($uri, $schema) = @_;
+  try {
+    $js->add_schema($uri => $schema);
+    $js_short_circuit->add_schema($uri => $schema);
+  }
+  catch ($e) {
+    die $e->$_isa('JSON::Schema::Draft201909::Result') ? $encoder->encode($e->TO_JSON) : $e;
+  }
+};
 
 $accepter->acceptance(
   validate_data => sub {
@@ -115,6 +122,7 @@ memory_cycle_ok($js_short_circuit, 'no leaks in the short-circuiting evaluator o
 # 2020-12-04  1.003  0.018  Looks like you failed 40 tests of 1265.
 # 2021-03-17  1.004  0.024  Looks like you failed 23 tests of 242. <-- manually edited to only include optional/format
 # 2021-03-23  1.005  0.024  Looks like you failed 23 tests of 245.
+# 2021-04-08  1.006  0.025  Looks like you failed 23 tests of 247.
 
 
 END {
@@ -132,8 +140,8 @@ DIAG
 done_testing;
 __END__
 
-# Results using Test::JSON::Schema::Acceptance 1.005
-# with commit cd73775f22d4cae64587486c0ee7efca9131643c (2.0.0-311-gcd73775)
+# Results using Test::JSON::Schema::Acceptance 1.006
+# with commit fc68499eafa2cdbe52b4ed4d219dbb1c8c99fb2b (2.0.0-322-gfc68499)
 # from git://github.com/json-schema-org/JSON-Schema-Test-Suite.git:
 # using custom test directory: /Volumes/amaretto/Users/ether/.perlbrew/libs/33.8@std/lib/perl5/auto/share/dist/Test-JSON-Schema-Acceptance/tests/draft2019-09/optional/format
 # optional tests included: yes
@@ -147,7 +155,7 @@ __END__
 # hostname.json                 12          0     0
 # idn-email.json                 4          0     0
 # idn-hostname.json             29         16     0
-# ipv4.json                      6          0     0
+# ipv4.json                      8          0     0
 # ipv6.json                     29          0     0
 # iri-reference.json             5          2     0
 # iri.json                       8          1     0
@@ -160,4 +168,4 @@ __END__
 # uri.json                      19          1     0
 # uuid.json                     12          0     0
 # -------------------------------------------------
-# TOTAL                        220         23     0
+# TOTAL                        222         23     0

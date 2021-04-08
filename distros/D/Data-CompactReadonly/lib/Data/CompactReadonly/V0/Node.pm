@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Node;
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 use warnings;
 use strict;
@@ -14,6 +14,7 @@ use Data::Dumper;
 sub _init {
     my($class, %args) = @_;
     my $self = bless(\%args, $class);
+    $self->{root} = $self;
     return $self->_node_at_current_offset();
 }
 
@@ -73,6 +74,11 @@ sub _db_base {
     return $self->_root()->{db_base};
 }
 
+sub _fast_collections {
+    my $self = shift;
+    return $self->_root()->{'fast_collections'};
+}
+
 sub _tied {
     my $self = shift;
     return $self->_root()->{'tie'};
@@ -83,8 +89,10 @@ sub _tied {
 sub _node_at_current_offset {
     my $self = shift;
 
+    # for performance, cache the filehandle in this object
+    $self->{_fh} ||= $self->_fh();
     my $type_class = $self->_type_class(from_byte => $self->_bytes_at_current_offset(1));
-    return $type_class->_init(parent => $self, offset => tell($self->_fh()) - $self->_db_base());
+    return $type_class->_init(root => $self->_root(), offset => tell($self->{_fh}) - $self->_db_base());
 }
 
 # what's the minimum number of bytes required to store this int?
@@ -164,6 +172,25 @@ sub _type_map_from_data {
              : die("Can't yet create from '$data'\n");
 }
 
+my $type_by_bits = {
+    0b00 => 'Text',
+    0b01 => 'Array',
+    0b10 => 'Dictionary',
+    0b11 => 'Scalar'
+};
+my $subtype_by_bits = { 
+    0b0000 => 'Byte',      0b0001 => 'NegativeByte',
+    0b0010 => 'Short',     0b0011 => 'NegativeShort',
+    0b0100 => 'Medium',    0b0101 => 'NegativeMedium',
+    0b0110 => 'Long',      0b0111 => 'NegativeLong',
+    0b1000 => 'Huge',      0b1001 => 'NegativeHuge',
+    0b1010 => 'Null',
+    0b1011 => 'Float',
+    (map { $_ => 'Reserved' } (0b1100 .. 0b1111))
+};
+my $bits_by_type    = { reverse %{$type_by_bits} };
+my $bits_by_subtype = { reverse %{$subtype_by_bits} };
+
 # used by classes when serialising themselves to figure out what their
 # type specifier byte should be
 sub _type_byte_from_class {
@@ -171,31 +198,9 @@ sub _type_byte_from_class {
     $class =~ /.*::([^:]+)::([^:]+)/;
     my($type, $subtype) = ($1, $2);
     return chr(
-        ({ reverse($class->_type_by_bits())    }->{$type}    << 6) +
-        ({ reverse($class->_subtype_by_bits()) }->{$subtype} << 2)
+        ($bits_by_type->{$type}       << 6) +
+        ($bits_by_subtype->{$subtype} << 2)
     );
-}
-
-sub _type_by_bits {
-    (
-        0b00 => 'Text',
-        0b01 => 'Array',
-        0b10 => 'Dictionary',
-        0b11 => 'Scalar'
-    )
-}
-
-sub _subtype_by_bits {
-    (
-        0b0000 => 'Byte',      0b0001 => 'NegativeByte',
-        0b0010 => 'Short',     0b0011 => 'NegativeShort',
-        0b0100 => 'Medium',    0b0101 => 'NegativeMedium',
-        0b0110 => 'Long',      0b0111 => 'NegativeLong',
-        0b1000 => 'Huge',      0b1001 => 'NegativeHuge',
-        0b1010 => 'Null',
-        0b1011 => 'Float',
-        (map { $_ => 'Reserved' } (0b1100 .. 0b1111))
-    )
 }
 
 # work out what node type is represented by a given node specifier byte
@@ -203,8 +208,8 @@ sub _type_map_from_byte {
     my $class   = shift;
     my $in_type = ord(shift());
 
-    my $type        = { $class->_type_by_bits()    }->{$in_type >> 6};
-    my $scalar_type = { $class->_subtype_by_bits() }->{($in_type & 0b111100) >> 2};
+    my $type        = $type_by_bits->{$in_type >> 6};
+    my $scalar_type = $subtype_by_bits->{($in_type & 0b111100) >> 2};
 
     die(sprintf("$class: Invalid type: 0b%08b: Reserved\n", $in_type))
         if($scalar_type eq 'Reserved');
@@ -219,16 +224,20 @@ sub _type_class {
     my($class, $from, $in_type) = @_;
     my $map_method = "_type_map_$from";
     my $type_name = "Data::CompactReadonly::V0::".$class->$map_method($in_type);
-    eval "use $type_name";
-    die($@) if($@);
+    unless($type_name->VERSION()) {
+        eval "use $type_name";
+        die($@) if($@);
+    }
     return $type_name;
 }
 
 # read N bytes from the current offset
 sub _bytes_at_current_offset {
     my($self, $bytes) = @_;
-    my $tell = tell($self->_fh());
-    my $chars_read = read($self->_fh(), my $data, $bytes);
+    # for performance, cache the filehandle in this object
+    $self->{_fh} ||= $self->_fh();
+    my $tell = tell($self->{_fh});
+    my $chars_read = read($self->{_fh}, my $data, $bytes);
 
     if(!defined($chars_read)) {
         die(
@@ -252,8 +261,10 @@ sub _bytes_at_current_offset {
 sub _seek {
     my $self = shift;
     if($#_ == 0) { # for when reading
-        my $to   = shift;
-        seek($self->_fh(), $self->_db_base() + $to, SEEK_SET);
+        my $to = shift;
+        # for performance, cache the filehandle in this object
+        $self->{_fh} ||= $self->_fh();
+        seek($self->{_fh}, $self->_db_base() + $to, SEEK_SET);
     } else { # for when writing
         my %args = @_;
         die($self->_ptr_blown())
@@ -270,17 +281,9 @@ sub _offset {
     return $self->{offset};
 }
 
-# the parent object for this node
-sub _parent {
-    my $self = shift;
-    return exists($self->{parent}) ? $self->{parent} : undef;
-}
-
-# call _parent iteratively to find the root node
 sub _root {
     my $self = shift;
-    while($self->_parent()) { $self = $self->_parent(); }
-    return $self;
+    return $self->{root};
 }
 
 # the filehandle, currently only used when reading, see the TODO above

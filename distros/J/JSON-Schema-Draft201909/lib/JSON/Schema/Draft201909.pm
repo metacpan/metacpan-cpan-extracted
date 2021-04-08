@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.024-23-gfc4a281
+package JSON::Schema::Draft201909; # git description: v0.025-10-g4578ce8
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -108,7 +108,7 @@ sub add_schema {
 
   die JSON::Schema::Draft201909::Result->new(
     output_format => $self->output_format,
-    result => 0,
+    valid => 0,
     errors => [ $document->errors ],
   ) if $document->has_errors;
 
@@ -148,7 +148,7 @@ sub evaluate_json_string {
   catch ($e) {
     return JSON::Schema::Draft201909::Result->new(
       output_format => $self->output_format,
-      result => 0,
+      valid => 0,
       errors => [
         JSON::Schema::Draft201909::Error->new(
           keyword => undef,
@@ -236,7 +236,7 @@ sub evaluate {
     evaluator => $self,
   };
 
-  my $result;
+  my $valid;
   try {
     my ($schema, $canonical_uri, $document, $document_path);
 
@@ -245,6 +245,7 @@ sub evaluate {
       ($schema, $canonical_uri, $document, $document_path) = $self->_fetch_schema_from_uri($schema_reference);
     }
     else {
+      # traverse is called via add_schema -> ::Document->new -> ::Document->BUILD
       $document = $self->add_schema($state->{canonical_schema_uri}, $schema_reference);
       ($schema, $canonical_uri) = map $document->$_, qw(schema canonical_uri);
       $document_path = '';
@@ -264,7 +265,7 @@ sub evaluate {
 
     @$state{qw(canonical_schema_uri document document_path)} = ($canonical_uri, $document, $document_path);
 
-    $result = $self->_eval($data, $schema, $state);
+    $valid = $self->_eval($data, $schema, $state);
   }
   catch ($e) {
     if ($e->$_isa('JSON::Schema::Draft201909::Result')) {
@@ -277,13 +278,13 @@ sub evaluate {
       E($state, 'EXCEPTION: '.$e);
     }
 
-    $result = 0;
+    $valid = 0;
   }
 
   return JSON::Schema::Draft201909::Result->new(
     output_format => $self->output_format,
-    result => $result,
-    $result
+    valid => $valid,
+    $valid
       # strip annotations from result if user didn't explicitly ask for them
       ? ($config_override->{collect_annotations} // $self->collect_annotations
           ? (annotations => $state->{annotations}) : ())
@@ -334,8 +335,9 @@ sub _traverse {
 sub _eval {
   my ($self, $data, $schema, $state) = @_;
 
-  $state = { %$state };     # changes to $state should only affect subschemas, not parents
-  my @parent_annotations = @{$state->{annotations}};
+  # do not propagate upwards changes to depth, traversed paths,
+  # but additions to annotations, errors are by reference and will be retained
+  $state = { %$state };
   delete $state->{keyword};
 
   abort($state, 'EXCEPTION: maximum evaluation depth exceeded')
@@ -356,27 +358,39 @@ sub _eval {
   # this should never happen, due to checks in traversal
   abort($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
-  my $result = 1;
-
+  my $valid = 1;
   my %unknown_keywords = map +($_ => undef), keys %$schema;
+  my $orig_annotations = $state->{annotations};
+  $state->{annotations} = [];
+  my @new_annotations;
 
+  ALL_KEYWORDS:
   foreach my $vocabulary (@{$state->{vocabularies}}) {
     foreach my $keyword ($vocabulary->keywords) {
       next if not exists $schema->{$keyword};
 
-      $state->{keyword} = $keyword;
-      my $method = '_eval_keyword_'.($keyword =~ s/^\$//r);
-      $result = 0 if $vocabulary->can($method) and not $vocabulary->$method($data, $schema, $state);
-
       delete $unknown_keywords{$keyword};
-      last if not $result and $state->{short_circuit};
+
+      my $method = '_eval_keyword_'.($keyword =~ s/^\$//r);
+      next if not $vocabulary->can($method);
+
+      $state->{keyword} = $keyword;
+      $valid = 0 if not $vocabulary->$method($data, $schema, $state);
+
+      last ALL_KEYWORDS if not $valid and $state->{short_circuit};
+
+      push @new_annotations, @{$state->{annotations}}[$#new_annotations+1 .. $#{$state->{annotations}}];
     }
   }
 
-  annotate_self(+{ %$state, keyword => $_ }, $schema) foreach sort keys %unknown_keywords;
+  $state->{annotations} = $orig_annotations;
 
-  @{$state->{annotations}} = @parent_annotations if not $result;
-  return $result;
+  if ($valid) {
+    push @{$state->{annotations}}, @new_annotations;
+    annotate_self(+{ %$state, keyword => $_ }, $schema) foreach sort keys %unknown_keywords;
+  }
+
+  return $valid;
 }
 
 sub keywords { qw(definitions dependencies) }
@@ -548,7 +562,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -926,7 +940,11 @@ L<RFC3986: Uniform Resource Identifier (URI): Generic Syntax|https://tools.ietf.
 
 =item *
 
-L<Test::JSON::Schema::Acceptance>
+L<Test::JSON::Schema::Acceptance>: contains the official JSON Schema test suite
+
+=item *
+
+L<JSON::Schema::Tiny>: a more minimal implementation of the specification, with fewer dependencies
 
 =item *
 

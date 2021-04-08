@@ -1,0 +1,8 @@
+MODULE = Exception::Backtrace       PACKAGE = Exception::Backtrace::DualTrace
+PROTOTYPES: DISABLE
+
+iptr<BacktraceInfo> DualTrace::c_trace () { RETVAL = THIS->get_c_trace(); }
+
+iptr<BacktraceInfo> DualTrace::perl_trace () { RETVAL = THIS->get_perl_trace(); }
+
+string DualTrace::to_string()

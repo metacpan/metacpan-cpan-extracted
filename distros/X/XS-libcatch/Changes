@@ -1,3 +1,7 @@
+2.13.4.1 08.04.2021
+          - fix MANIFEST.SKIP
+2.13.4.0 08.04.2021
+          - libcatch updated to 2.13.4
 2.12.1.1 30.10.2020
           - catch.hpp moved to catch2/ folder
 2.12.1  19.06.2020

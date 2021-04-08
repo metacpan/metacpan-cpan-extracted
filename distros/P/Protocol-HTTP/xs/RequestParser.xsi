@@ -1,0 +1,37 @@
+MODE: INLINE
+
+namespace {
+    struct XSRequestParserFactory : RequestParser::IFactory {
+        RequestSP new_request () override { return new XSRequest(); }
+    };
+    static XSRequestParserFactory xs_request_parser_factory;
+}
+
+MODULE = Protocol::HTTP              PACKAGE = Protocol::HTTP::RequestParser
+PROTOTYPES: DISABLE
+
+RequestParser* RequestParser::new () {
+    RETVAL = new RequestParser(&xs_request_parser_factory);
+}
+
+void RequestParser::parse (const string& buf) : ALIAS(parse_shift=1) {
+    if (ix && !buf) XSRETURN_EMPTY;  // make "while(my(...) = $p->parse_shift($s)) {}" stop when string is fully parsed
+    auto result = THIS->parse(buf);
+    SV* bufsv = ST(1);
+    EXTEND(SP, 4);
+    
+    mPUSHs(xs::out(result.request).detach());
+    mPUSHs(xs::out(result.state).detach());
+    
+    if (ix) sv_insert(bufsv, 0, result.position, "", 0);
+    else    mPUSHu(result.position);
+    
+    if (result.error) mPUSHs(xs::out(result.error).detach());
+}
+
+void RequestParser::reset ()
+
+SV* CLONE_SKIP (...) {
+    XSRETURN_YES;
+    PERL_UNUSED_VAR(items);
+}

@@ -5,7 +5,7 @@
 #include <panda/error.h>
 
 using namespace xs;
-using panda::ErrorCode;
+using namespace panda;
 
 DCnt dcnt;
 
@@ -37,6 +37,6 @@ INCLUDE: not_null.xsi
 
 INCLUDE: svapi.xsi
 
-INCLUDE: function.xsi
-
 INCLUDE: error.xsi
+
+INCLUDE: expected.xsi

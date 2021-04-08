@@ -5,6 +5,11 @@
 
 namespace xs {
 
+Sub Sub::create (panda::string_view sub_code) {
+    auto code = panda::string("sub { ") + sub_code + " }";
+    return eval(code);
+}
+
 Stash Sub::stash () const { return CvSTASH((CV*)sv); }
 
 Glob Sub::glob () const { return CvGV((CV*)sv); }
@@ -32,7 +37,7 @@ size_t Sub::_call (CV* cv, I32 flags, const CallArgs& args, SV** ret, size_t max
         PUTBACK; FREETMPS; LEAVE;
         auto exc = Sv::noinc(errsv);
         GvSV(PL_errgv) = newSVpvs("");
-        throw exc;
+        throw PerlRuntimeException(exc);
     }
 
     auto nret = count > maxret ? maxret : count;

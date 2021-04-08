@@ -2,7 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
+use Test::Catch;
+use lib 't/lib'; use MyTest;
 use URI::XS qw/uri :const/;
+
+catch_run('[scheme-strict]');
 
 my $wrong_scheme = qr/panda::uri::WrongScheme/;
 

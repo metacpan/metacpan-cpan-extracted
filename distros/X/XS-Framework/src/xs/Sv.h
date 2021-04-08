@@ -3,6 +3,7 @@
 #include <string>
 #include <panda/memory.h>
 #include <panda/traits.h>
+#include <panda/string.h>
 #include <panda/string_view.h>
 #include <panda/exception.h>
 
@@ -183,5 +184,18 @@ template <class T, typename = enable_if_rawsv_t<T>> inline bool operator!= (T* l
 inline void swap (Sv& lh, Sv& rh) { std::swap(lh.sv, rh.sv); }
 
 std::ostream& operator<< (std::ostream& os, const Sv& sv);
+
+
+struct PerlRuntimeException : std::exception {
+    Sv sv;
+
+    PerlRuntimeException(const Sv& sv) : sv(sv) {assert(sv);}
+
+    virtual const char* what() const noexcept override {
+        return SvPV_nolen(sv);
+    }
+};
+
+Sv eval (const panda::string& code);
 
 }

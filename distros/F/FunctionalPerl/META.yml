@@ -62,5 +62,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/pflanze/functional-perl.git
-version: v0.72.48
+version: v0.72.49
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

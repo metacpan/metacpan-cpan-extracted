@@ -41,10 +41,11 @@ sub before_release {
   die $error if $error;
 
   if (my @missing = map s/^-//r, grep m{^-share/}, split /\n/, $diff) {
-    die join "\n", '',
+    $self->log_fatal(join "\n", '',
       'These files were removed from the test suite and must be added to the config for [=inc::OldShareDirFiles]:',
       @missing,
-      '';
+      '',
+    );
   }
 }
 

@@ -6,7 +6,7 @@ struct PerlObjectFormatter : IFormatter, Backref {
     string format (std::string& msg, const Info& i) const override {
         if (!is_perl_thread()) throw std::logic_error("can't call pure-perl formatting callback: log() called from perl-foreign thread");
         Object o = xs::out(this);
-        auto ret = o.call("format", xs::out(msg), xs::out(i.level), xs::out(i.module->name), xs::out(i.file), xs::out(i.line), xs::out(i.func));
+        auto ret = o.call("format", xs::out(msg), xs::out(i.level), xs::out(i.module->name()), xs::out(i.file), xs::out(i.line), xs::out(i.func));
         return xs::in<string>(ret);
     }
     
@@ -19,7 +19,7 @@ struct PerlObjectLogger : ILogger, Backref {
         Object o = xs::out(this);
         auto sub = o.method("log_format");
         if (!sub) return ILogger::log_format(msg, i, fmt);
-        sub.call(o.ref(), xs::out(msg), xs::out(i.level), xs::out(i.module->name), xs::out(i.file), xs::out(i.line), xs::out(i.func), xs::out(&fmt));
+        sub.call(o.ref(), xs::out(msg), xs::out(i.level), xs::out(i.module->name()), xs::out(i.file), xs::out(i.line), xs::out(i.func), xs::out(&fmt));
     }
     
     void log (const string& msg, const Info& info) override {
@@ -40,10 +40,13 @@ namespace xs {
 #define PANDA_LOG_CODE_POINT make_code_point()
 
 static inline CV* get_context_sub () {
-    auto ctx = caller_cx(0, nullptr);
-    if (!ctx) return nullptr;
-    assert(CxTYPE(ctx) == CXt_SUB);
-    return ctx->blk_sub.cv;
+    int depth = 0;
+    auto ctx = caller_cx(depth, nullptr);
+    while (ctx) {
+        if (CxTYPE(ctx) == CXt_SUB) return ctx->blk_sub.cv;
+        ctx = caller_cx(++depth, nullptr);
+    }
+    return nullptr;
 }
 
 static inline CodePoint make_code_point () {
@@ -59,9 +62,13 @@ static inline CodePoint make_code_point () {
     return CodePoint{CopFILE(cop), CopLINE(cop), func};
 }
 
-static inline Simple format_args (SV** args, int items) {
+static inline Sv format_args (SV** args, int items) {
     if (!items) return Simple(default_message);
-    if (items == 1) return args[0];
+    if (items == 1) {
+        Sv arg(args[0]);
+        if (arg.is_simple()) { return arg; }
+        else                 { return Simple(SvPV_nolen(args[0]));  }
+    }
     STRLEN patlen;
     auto pat = SvPV(args[0], patlen);
     auto ret = Simple::create(patlen * 1.5);
@@ -70,10 +77,7 @@ static inline Simple format_args (SV** args, int items) {
     return ret;
 }
 
-static void xslog (Level level, SV** args, I32 items) {
-    const Module* module = nullptr;
-    Sub sub;
-    
+static inline void peep_args (SV**& args, I32& items, const Module*& module, Sub& sub) {
     if (items && SvROK(args[0])) {
         auto first = SvRV(args[0]);
         if (has_module(first)) {
@@ -86,15 +90,29 @@ static void xslog (Level level, SV** args, I32 items) {
             sub = first;
         }
     }
-    
-    if (!module) module = get_module_by_namespace(); // auto detect module by namespace
-    
-    panda_log(level, *module, [&]{
-        Simple msg;
-        if (sub) msg = sub.call();
-        else     msg = format_args(args, items);
-        log << msg.as_string<string_view>();
-    });
+
+    if (!module) module = resolve_module(0); // auto detect module by namespace
+}
+
+template<typename Log>
+void forward(Log&& log, SV**& args, I32& items, Sub& sub) {
+    Simple msg;
+    if (sub) {
+        Sv ret = sub.call();
+        SV* sv = ret;
+        msg = format_args(&sv, 1);
+    }
+    else  {
+        msg = format_args(args, items);
+    }
+    log << msg.as_string<string_view>();
+}
+
+static void xslog (Level level, SV** args, I32 items) {
+    const Module* module = nullptr;
+    Sub sub;
+    peep_args(args, items, module, sub);
+    panda_log(level, *module, [&]{ forward(log, args, items, sub); });
 }
 
 MODULE = XLog                PACKAGE = XLog
@@ -115,8 +133,11 @@ BOOT {
         {"EMERGENCY",     (int)Level::Emergency},
     });
     
+    auto root_module = xs::out(&::panda_log_module);
+    root_module.readonly(1);
     stash.add_const_sub("default_format", xs::out(default_format));
-    stash.add_const_sub("root", xs::out(&::panda_log_module));
+    stash.add_const_sub("root", root_module);
+    stash.store("root_module", root_module);
     
     xs::at_perl_destroy([]{
         if (dyn_cast<PerlObjectLogger*>(get_logger().get())) set_logger(nullptr);
@@ -124,19 +145,28 @@ BOOT {
     });
 }
 
-void set_level (Level level, string_view module = {}) {
-    set_level(level, module);
-}
+void set_level (Level level, string_view module = {})
 
 void set_logger (ILoggerSP logger)
 
-void set_formatter (IFormatterSP fmt)
+void set_formatter (IFormatterSP fmt) : ALIAS(set_format=1) {
+    (void)ix;
+    set_formatter(fmt);
+}
 
-void set_format (string_view pattern)
+ILoggerSP get_logger ()
+
+IFormatterSP get_formatter ()
+
+Module* get_module (string_view name)
 
 void log (Level level, ...) {
     xslog(level, &ST(1), items-1);
     if (!(PL_op->op_spare & 1)) xlog::optimize();
+}
+
+Module* resolve_module(size_t depth = 0) {
+    RETVAL = resolve_module(depth);
 }
 
 void __logXXX (...) : ALIAS(verbose_debug=0, debug=1, info=2, notice=3, warning=4, error=5, critical=6, alert=7, emergency=8) {

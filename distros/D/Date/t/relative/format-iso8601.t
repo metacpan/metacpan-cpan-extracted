@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use lib 't/lib'; use MyTest;
 
+catch_run("[relative-format-iso8601]");
+
 subtest 'iso8601 duration' => sub {
     my $fmt = Date::Rel::FORMAT_ISO8601D;
     

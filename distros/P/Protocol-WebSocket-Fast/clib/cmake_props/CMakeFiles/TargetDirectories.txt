@@ -1,0 +1,15 @@
+/tmp/mkcpandist/dist_32368/clib/cmake_props/CMakeFiles/install/strip.dir
+/tmp/mkcpandist/dist_32368/clib/cmake_props/CMakeFiles/install.dir
+/tmp/mkcpandist/dist_32368/clib/cmake_props/CMakeFiles/install/local.dir
+/tmp/mkcpandist/dist_32368/clib/cmake_props/CMakeFiles/list_install_components.dir
+/tmp/mkcpandist/dist_32368/clib/cmake_props/CMakeFiles/edit_cache.dir
+/tmp/mkcpandist/dist_32368/clib/cmake_props/CMakeFiles/rebuild_cache.dir
+/tmp/mkcpandist/dist_32368/clib/build/CMakeFiles/install/local.dir
+/tmp/mkcpandist/dist_32368/clib/build/CMakeFiles/install.dir
+/tmp/mkcpandist/dist_32368/clib/build/CMakeFiles/list_install_components.dir
+/tmp/mkcpandist/dist_32368/clib/build/CMakeFiles/install/strip.dir
+/tmp/mkcpandist/dist_32368/clib/build/CMakeFiles/panda-protocol-websocket-tests.dir
+/tmp/mkcpandist/dist_32368/clib/build/CMakeFiles/panda-protocol-websocket.dir
+/tmp/mkcpandist/dist_32368/clib/build/CMakeFiles/panda-protocol-websocket-runtests.dir
+/tmp/mkcpandist/dist_32368/clib/build/CMakeFiles/edit_cache.dir
+/tmp/mkcpandist/dist_32368/clib/build/CMakeFiles/rebuild_cache.dir

@@ -4,6 +4,9 @@ use lib 't/lib';
 use MyTest qw/accept_packet accept_parsed/;
 use Test::More;
 use Test::Deep;
+use Test::Catch;
+
+catch_run("[server-accept]");
 
 my $p = new Protocol::WebSocket::Fast::ServerParser;
 

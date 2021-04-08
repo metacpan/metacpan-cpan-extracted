@@ -12,7 +12,7 @@ template <> SV* _get_xv<Io>     (const char* name) {
     panda::string code = "*";
     code += name;
     code += "{IO}";
-    auto ret = eval_pv(code.c_str(), 1);
+    auto ret = eval(code);
     return ret;
 }
 
@@ -52,7 +52,7 @@ void test_set_slot (Glob& o, const T& sv) {
     REQUIRE(o.slot<SlotClass>() == _get_xv<SlotClass>("M1::gv2set"));
 }
 
-TEST_CASE("Glob", "[Sv]") {
+TEST_CASE("Glob", "[Glob]") {
     perlvars vars;
     Glob my(vars.gv);
     Sv oth_valid(vars.gv), oth_invalid(vars.hv);

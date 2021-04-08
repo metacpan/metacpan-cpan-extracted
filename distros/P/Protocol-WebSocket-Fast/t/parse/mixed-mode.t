@@ -4,7 +4,10 @@ use lib 't/lib';
 use MyTest qw/gen_frame gen_message/;
 use Test::More;
 use Test::Deep;
+use Test::Catch;
 use Protocol::WebSocket::Fast;
+
+catch_run("[parse-mixed-mode]");
 
 my $p = MyTest::get_established_server();
 

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.004-2-g150a61e
+package Test::JSON::Schema::Acceptance; # git description: v1.005-6-g2dc2ec5
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 use 5.014;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -191,6 +191,7 @@ sub acceptance {
     $ctx->$diag('using custom test directory: '.$self->test_dir);
   }
   $ctx->$diag('optional tests included: '.($self->include_optional ? 'yes' : 'no'));
+  $ctx->$diag('skipping directory: '.$_) foreach @{ $self->skip_dir };
 
   $ctx->$diag('');
   my $length = max(10, map length $_->{file}, @$tests);
@@ -347,7 +348,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 

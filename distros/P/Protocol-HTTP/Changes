@@ -1,3 +1,7 @@
+1.1.0    08.04.2021
+           - C++ codes moved to its own library with cmake
+           - do not automatically add "Content-Length: 0" header to response for 304 code unless provided by user
+           - treat protocol-relative urls as path
 1.0.11   25.11.2020
            - improve makefile
            - change constant names

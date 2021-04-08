@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use lib 't/lib'; use MyTest;
 
+catch_run("[advanced]");
+
 sub test ($&);
 
 my $date;

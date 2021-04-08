@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Dictionary;
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 use warnings;
 use strict;
@@ -11,14 +11,15 @@ use Devel::StackTrace;
 
 sub _init {
     my($class, %args) = @_;
-    my($parent, $offset) = @args{qw(parent offset)};
+    my($root, $offset) = @args{qw(root offset)};
 
     my $object = bless({
-        parent => $parent,
-        offset => $offset
+        root   => $root,
+        offset => $offset,
+        cache  => ($root->_fast_collections() ? {} : undef),
     }, $class);
 
-    if($parent->_tied()) {
+    if($root->_tied()) {
         tie my %dict, 'Data::CompactReadonly::V0::TiedDictionary', $object;
         return \%dict;
     } else {
@@ -64,7 +65,10 @@ sub _create {
                 my $node_class = 'Data::CompactReadonly::V0::Node';
                 if($item->{coerce_to_text}) {
                     $node_class = 'Data::CompactReadonly::V0::'.$class->_text_type_for_data($item->{data});
-                    eval "use $node_class";
+                    unless($node_class->VERSION()) {
+                        eval "use $node_class";
+                        die($@) if($@);
+                    }
                 }
                 $node_class->_create(%args, data => $item->{data});
             }
@@ -130,11 +134,16 @@ sub exists {
 
 sub _nth_key {
     my($self, $n) = @_;
-
+    if($self->{cache} && exists($self->{cache}->{keys}->{$n})) {
+        return $self->{cache}->{keys}->{$n}
+    }
+    
     $self->_seek($self->_nth_key_ptr_location($n));
     $self->_seek($self->_ptr_at_current_offset());
 
-    my $offset = tell($self->_fh());
+    # for performance, cache the filehandle in this object
+    $self->{_fh} ||= $self->_fh();
+    my $offset = tell($self->{_fh});
     my $key = $self->_node_at_current_offset();
     if(!defined($key) || ref($key)) {
         die("$self: Invalid type: ".
@@ -145,7 +154,27 @@ sub _nth_key {
             Devel::StackTrace->new()->as_string()
         );
     }
+    if($self->{cache}) {
+        return $self->{cache}->{keys}->{$n} = $key;
+    }
     return $key;
+}
+
+sub _nth_value {
+    my($self, $n) = @_;
+    if($self->{cache} && exists($self->{cache}->{values}->{$n})) {
+        return $self->{cache}->{values}->{$n}
+    }
+
+    $self->_seek($self->_nth_key_ptr_location($n) + $self->_ptr_size());
+    $self->_seek($self->_ptr_at_current_offset());
+
+    my $val = $self->_node_at_current_offset();
+
+    if($self->{cache}) {
+        return $self->{cache}->{values}->{$n} = $val;
+    }
+    return $val;
 }
 
 sub _nth_key_ptr_location {
@@ -159,15 +188,6 @@ sub _ptr_at_current_offset {
     return $self->_decode_ptr(
         $self->_bytes_at_current_offset($self->_ptr_size())
     );
-}
-
-sub _nth_value {
-    my($self, $n) = @_;
-
-    $self->_seek($self->_nth_key_ptr_location($n) + $self->_ptr_size());
-    $self->_seek($self->_ptr_at_current_offset());
-
-    return $self->_node_at_current_offset();
 }
 
 sub indices {

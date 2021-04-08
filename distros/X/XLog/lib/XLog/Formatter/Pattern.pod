@@ -56,19 +56,21 @@ Current time.
 
 Modifier C<x> chooses time format, C<y> chooses microseconds precision
 
-x=0: YYYY/MM/DD HH:MM:SS
+x=0: YYYY-MM-DD HH:MM:SS
 
-x=1: YY/MM/DD HH:MM:SS
+x=1: YY-MM-DD HH:MM:SS
 
 x=2: HH:MM:SS
 
-x=3: UNIX TIMESTAMP
+x=3: YYYY/MM/DD HH:MM:SS
+
+x=4: UNIX TIMESTAMP
 
 y>0: high resolution time, adds fractional part after seconds with "y" digits precision
 
 Examples:
 
-    %t: 2020/01/31 23:59:59
+    %t: 2020-01-31 23:59:59
     %2t: 23:59:59
     %2.3t: 23:59:59.345
 
@@ -82,7 +84,8 @@ Current process id.
 
 =item %P
 
-Current process title
+Current process title. There is a trick, as for Perl interpreter it will always be C<perl>, which makes it senseless.
+Instead, it spies on C<$0> and uses that value (transformed via decorator, see below) as process name.
 
 =item %c
 
@@ -101,6 +104,26 @@ End colored text
 =head4 new($format)
 
 Create pattern formatter object
+
+=head1 FUNCTIONS
+
+=head4 set_program_decorator($callback)
+
+Sets the callback, which will be invoked as
+
+    $callback->($0)
+
+to get process name for C<%P> in pattern above.
+
+The callback is invoked only upon C<$0> changing.
+
+If no decorator has been set, the default one is applied. It will cut script path in C<$0>, leaving only script basename, i.e.
+
+    perl path/to/my_script.pl
+
+the C<$0> will be set to C<path/to/my_script.pl> by default. The default decorator will cut it to:
+
+    my_script.pl
 
 =cut
 

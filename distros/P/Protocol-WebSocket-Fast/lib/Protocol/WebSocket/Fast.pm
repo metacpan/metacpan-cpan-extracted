@@ -4,7 +4,7 @@ use URI::XS();
 use Export::XS();
 use Encode::Base2N();
 
-our $VERSION = '1.1.4';
+our $VERSION = '1.2.0';
 
 XS::Loader::load();
 

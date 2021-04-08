@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use lib 't/lib'; use MyTest;
 
+catch_run("[timezone]");
+
 my ($date, $date2, $date3);
 
 subtest 'local' => sub {

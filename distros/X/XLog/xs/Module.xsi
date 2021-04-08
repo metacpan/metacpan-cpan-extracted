@@ -30,18 +30,18 @@ Sv new (SV* cls, string name, Sv arg1 = {}, Sv arg2 = {}) {
     RETVAL = o.ref();
 }
 
-string Module::name () {
-    RETVAL = THIS->name;
-}
+string Module::name ()
 
-Level Module::level (Sv val = {}) {
-    if (val) {
-        THIS->level = xs::in<Level>(val);
-        XSRETURN_UNDEF;
-    }
-    RETVAL = THIS->level;
-}
+Level Module::level ()
 
-void Module::set_level (Level level) {
-    THIS->set_level(level);
-}
+bool Module::passthrough ()
+
+void Module::set_level (Level level)
+
+void Module::set_logger (ILoggerSP logger, bool passthrough = false)
+
+void Module::set_formatter (IFormatterSP formatter)
+
+ILoggerSP Module::get_logger ()
+
+IFormatterSP Module::get_formatter ()

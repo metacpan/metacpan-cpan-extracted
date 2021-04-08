@@ -1,10 +1,27 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Lingua-PT-Nums2Words
-version:      1.06
-version_from: Nums2Words.pm
-installdirs:  site
-requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+---
+abstract: 'Converts numbers to Portuguese words'
+author:
+  - 'Jose Alves de Castro <cog@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+  Test::Pod: '1.0'
+  Test::Pod::Coverage: '1.08'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-PT-Nums2Words
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  repository: https://github.com/asb-capfan/Lingua-PT-Nums2Words
+version: '1.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

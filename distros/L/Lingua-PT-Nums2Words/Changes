@@ -1,5 +1,9 @@
 Revision history for Perl extension Lingua::PT::Nums2Words.
 
+1.07  Wed Apr 08 21:27:42 2021
+	- added GitHub repo
+    - cosmetic changes to dist
+
 1.06  Mon Nov 08 19:49:00 2004
 	- moved a few things around
         - changes in the documentation

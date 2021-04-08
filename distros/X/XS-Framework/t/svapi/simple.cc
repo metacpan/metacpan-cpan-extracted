@@ -83,11 +83,11 @@ static void test_as_string () {
     REQUIRE(o.as_string<T>() == src);
 }
 
-TEST_CASE("Simple", "[Sv]") {
+TEST_CASE("Simple", "[Simple]") {
     perlvars vars;
     Simple my(vars.iv);
     Sv oth_valid(vars.ov), oth_invalid(vars.av);
-    int ivsize = Simple(eval_pv("use Config; $Config{ivsize}", 0));
+    int ivsize = Simple(eval("use Config; $Config{ivsize}"));
 
     SECTION("ctor") {
         SECTION("empty") {

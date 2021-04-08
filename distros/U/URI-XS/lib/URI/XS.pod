@@ -172,6 +172,10 @@ Returns default port for the uri's scheme. Returns 0 if scheme is not specified/
 
 Sets/returns path part of uri as string.
 
+=head4 path_info()
+
+Returns URI-decoded path as per RFC 3875
+
 =head4 query_string([$new_query_string])
 
 Sets/returns query string part of uri as string. String is expected/returned in decoded, but plain format,
@@ -425,8 +429,8 @@ Register your new scheme somewhere in program's initialization:
 
 That's it. Now use your custom scheme:
 
-    URI* uri = URI::create("myproto://myinfo@google.com");
-    URImyproto myuri = dynamic_cast<URImyproto*>(uri); // will return not-null
+    auto uri = URI::create("myproto://myinfo@google.com");
+    auto myuri = dynamic_cast<URImyproto*>(uri.get()); // will return not-null
     cout << myuri->some_data_from_user_info();
 
 Finally, create an XS and register a perl class
@@ -462,7 +466,7 @@ Finally, create an XS and register a perl class
 
 =head2 TYPEMAPS
 
-=head4 panda::uri::URI*
+=head4 panda::uri::URI*, panda::uri::URISP
 
 Typemap for input/output any URI objects.
 
@@ -475,7 +479,7 @@ Typemaps for input/output strict uris.
 Output-only typemap for autodetecting strict uri type and setting right perl class to bless to.
 
     # XS
-    URI* my_cool_uri_create1 (string url) {
+    URISP my_cool_uri_create1 (string url) {
         RETVAL = URI::create(url);
     }
     

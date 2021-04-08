@@ -1,5 +1,6 @@
 Changes
 File.xs
+INSTALL.SKIP
 lib/XLog/File.pm
 lib/XLog/File.pod
 Makefile.PL

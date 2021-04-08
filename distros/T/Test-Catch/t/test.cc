@@ -1,4 +1,6 @@
+//#define CATCH_CONFIG_ENABLE_BENCHMARKING
 #include <catch2/catch.hpp>
+#include <string>
 
 TEST_CASE("a", "[single]") {
     REQUIRE(1);
@@ -16,7 +18,8 @@ TEST_CASE("c", "[single][s3]") {
 
 TEST_CASE("d", "[multi]") {
     SECTION("subtest1") {
-        REQUIRE(1);
+        std::string s = "hello worldhello worldhello worldhello worldhello worldhello worldhello worldhello worldhello worldhello worldhello world";
+        REQUIRE(s == "hello worldhello worldhello worldhello worldhello worldhello worldhello worldhello worldhello worldhello worldhello world");
         REQUIRE(1);
     }
     SECTION("subtest2") {
@@ -42,3 +45,9 @@ TEST_CASE("e", "[multi]") {
     }
     REQUIRE(cnt);
 }
+
+//TEST_CASE("bench", "[.]") {
+//    BENCHMARK("hello") {
+//        return 1;
+//    };
+//}

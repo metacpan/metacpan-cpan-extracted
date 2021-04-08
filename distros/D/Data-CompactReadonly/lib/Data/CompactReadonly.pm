@@ -7,7 +7,7 @@ use Data::CompactReadonly::V0::Node;
 
 # Yuck, semver. I give in, the stupid cult that doesn't understand
 # what the *number* bit of *version number* means has won.
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 =head1 NAME
 
@@ -95,6 +95,15 @@ be able to access data by de-referencing and pretending to access elements
 directly. Under the bonnet this wraps around the objects as documented below,
 so is just a layer of indirection. On modern hardware you probably won't notice
 the concomittant slow down but may appreciate the convenience.
+
+=item fast_collections
+
+If true Dictionary keys and values will be permanently cached in memory the
+first time they are seen, instead of being fetched from the file when needed.
+Yes, this means that objects will grow in memory, potentially very large.
+Only use this if if it an acceptable pay-off for much faster access.
+
+This is not yet implemented for Arrays.
 
 =back
 
@@ -226,7 +235,9 @@ sub read {
         ptr_size            => $ptr_size,
         fh                  => $fh,
         db_base             => $original_file_pointer,
-        exists($args{'tie'}) ? ('tie' => 1 ) : ()
+        map {
+            exists($args{$_}) ? ($_ => 1 ) : ()
+        } qw(fast_collections tie)
     );
 }
 

@@ -36,8 +36,8 @@ iptr<DualTrace> create_backtrace() {
 
 Sv safe_wrap_exception(Sv ex) { RETVAL = safe_wrap_exception(ex); }
 
-INCLUDE: DualTrace.xsi
+INCLUDE: xs/DualTrace.xsi
 
-INCLUDE: BacktraceInfo.xsi
+INCLUDE: xs/BacktraceInfo.xsi
 
-INCLUDE: Stackframe.xsi
+INCLUDE: xs/Stackframe.xsi

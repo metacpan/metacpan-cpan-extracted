@@ -1,0 +1,30 @@
+#include <sys/types.h>
+#include <dirent.h>
+
+namespace panda { namespace time {
+
+static void _scan_files_recursive (const string& dir, const string& prefix, std::vector<string>& list) {
+    DIR* dh = opendir(dir.c_str());
+    if (!dh) throw std::runtime_error("could not open timezones dir");
+
+    struct dirent *ent;
+    while ((ent = readdir(dh))) {
+        auto fname = string(ent->d_name, strlen(ent->d_name));
+        if (fname == "." || fname == "..") continue;
+        if (ent->d_type == DT_DIR) _scan_files_recursive(dir + fname + "/", prefix + fname + "/", list);
+        else if (ent->d_type == DT_REG || ent->d_type == DT_LNK) list.push_back(prefix + fname);
+    }
+    closedir(dh);
+}
+
+static std::vector<string> scan_files_recursive (string dir) {
+    std::vector<string> ret;
+    
+    if (!dir) dir = "./";
+    else if (dir.back() != '/' && dir.back() != '\\') dir += '/';
+    
+    _scan_files_recursive(dir, "", ret);
+    return ret;
+}
+
+}}

@@ -31,7 +31,10 @@ subtest 'set logger object' => sub {
             sub log { @args = @_; }
         }
         
-        XLog::set_logger(MySimpleLogger->new);
+        my $logger = MySimpleLogger->new;
+        XLog::set_logger($logger);
+        is XLog::get_logger(), $logger;
+        undef $logger; # logger is held by C++
         
         XLog::log(XLog::ERROR, "shit happens");
         
@@ -59,7 +62,7 @@ subtest 'set logger object' => sub {
         is $args[2], XLog::ERROR;
         is $args[3], "";
         like $args[4], qr/logger.t/;
-        is $args[5], 54;
+        is $args[5], 57;
         is $args[6], "__ANON__";
     };
 };

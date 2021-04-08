@@ -9,7 +9,7 @@ XLog::Multi - XLog backend for logging into multiple backends
     my $multi = XLog::Multi->new([
         {logger => XLog::Console->new, min_level => XLog::INFO},
         {logger => XLog::File->new({file => "all.log"}), min_level => XLog::DEBUG, formatter => XLog::Formatter::Pattern->new("[%L] %t: %m")},
-        {logger => XLog::File->new({file => "error.log"}), min_level => XLog::WARNING, format => "[%L] %t: %m"},
+        {logger => XLog::File->new({file => "error.log"}), min_level => XLog::WARNING, formatter => "[%L] %t: %m"},
     ]);
     XLog::set_logger($multi);
 
@@ -68,11 +68,7 @@ C<$longmess> in this example will be interpolated but will not be logged. This i
 
 =item formatter [optional]
 
-Formatter object for this backend. If neither C<formatter> nor C<format> is specified, will use main formatter (XLog::set_formatter).
-
-=item format
-
-Log format for this backend (same as formatter => XLog::Formatter::Pattern->new($format)).
+Formatter object/sub/string for this backend. If no C<formatter> is specified, will use main formatter (from module, its parents up to main XLog::set_formatter).
 
 =back
 

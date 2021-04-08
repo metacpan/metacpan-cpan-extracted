@@ -7,7 +7,7 @@ use Test::Catch;
 use Encode::Base2N 'encode_base64pad';
 use Protocol::WebSocket::Fast;
 
-catch_run('[deflate-extension]');
+catch_run("[deflate-frames]");
 
 my $default_compression =<<END;
 GET /?encoding=text HTTP/1.1\r
@@ -128,8 +128,7 @@ subtest 'big (1 mb) server2client frame' => sub {
 
     subtest "it mode" => sub {
         my $bin2 = $create_server->($default_compression)->start_message(deflate => 1)->send(\@payload, 1);
-        #is(length($bin2), length($bin), "frame length ok");
-        is length($bin2), 1043;
+        is length($bin2), length($bin);
     };
 };
 

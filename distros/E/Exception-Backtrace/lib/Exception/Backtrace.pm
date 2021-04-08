@@ -8,7 +8,7 @@ use overload
     '""'     => sub { shift->{_value} },
     fallback => 1;
 
-our $VERSION = '1.0.10';
+our $VERSION = '1.0.11';
 
 
 require XS::Loader;
@@ -18,7 +18,7 @@ XS::Loader::load();
 my $handler = sub {
     my $ex = shift;
     my $wrapped_ex = Exception::Backtrace::safe_wrap_exception($ex);
-    die($wrapped_ex) if ($wrapped_ex)
+    die($wrapped_ex) if ($wrapped_ex);
 };
 
 sub install {

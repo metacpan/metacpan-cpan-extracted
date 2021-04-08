@@ -5,6 +5,8 @@ use Test::More;
 use Test::Deep;
 use lib 't/lib'; use MyTest;
 
+catch_run("[format-iso]");
+
 tzset('Europe/Moscow');
 
 sub is_approx ($$;$) {

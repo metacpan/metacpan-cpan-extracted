@@ -8,6 +8,9 @@ BEGIN { use_ok('Net::IPAM::Block') || print "Bail out!\n"; }
 
 can_ok( 'Net::IPAM::Block', 'new' );
 
+eval { Net::IPAM::Block->new() };
+like( $@, qr/missing/i, 'new() without arg croaks' );
+
 my $good = [
   [qw(1.2.3.4-1.2.3.4 1.2.3.4/32)],
   [qw(fe80::1-fe80::1 fe80::1/128)],
@@ -71,6 +74,12 @@ ok( $b->last eq '10.1.255.255',    'last' );
 ok( $b->mask eq '255.255.0.0',     'mask' );
 ok( $b->hostmask eq '0.0.255.255', 'hostmask' );
 
+$b = Net::IPAM::Block->new('::-::2');
+ok( $b->base eq '::',  'base' );
+ok( $b->last eq '::2', 'last' );
+ok( !$b->mask,         '! mask' );
+ok( !$b->hostmask,     '! hostmask' );
+
 my $ips = [
   [qw(1.2.3.4 1.2.3.4/32)],  [qw(::ffff:0.0.0.0 0.0.0.0/32)],
   [qw(fe80::1 fe80::1/128)], [qw(::cafe:affe ::cafe:affe/128)],
@@ -91,11 +100,6 @@ my $bl = [
   [qw(2001:db8::affe-2001:db8::cafe 15)],
 ];
 
-foreach my $tt (@$bl) {
-  my $b = Net::IPAM::Block->new( $tt->[0] );
-  ok( $b->bitlen == $tt->[1], "bitlen for $b == " . $tt->[1] );
-}
-
 my $bi = [ [ '10.0.0.2-10.0.0.7', 6 ], [ '10.0.0.0/19', 2**13 ], [ '2001:db8::affe-2001:db8::cafe', 6913 ], ];
 
 foreach my $tt (@$bi) {
@@ -103,6 +107,27 @@ foreach my $tt (@$bi) {
   my @ips;
   push @ips, $_ while $_ = $b->iter;
   ok( scalar @ips == $tt->[1], "num iterations for $b == " . $tt->[1] );
+}
+
+{
+  $SIG{__WARN__} = sub { die $_[0] };
+  eval { Net::IPAM::Block->new('::')->bitlen };
+  like($@, qr/DEPRECATED/i, 'got deprecation message for bitlen');
+}
+
+{
+  $SIG{__WARN__} = sub { };
+  my @tt = (
+    { b => '10.0.0.17',               bitlen => 0, msg => 'bitlen for IPv4 address is 0' },
+    { b => '10.0.0.17-10.13.2.3',     bitlen => 20, msg => 'bitlen for IPv4 block is 20' },
+    { b => '::',                      bitlen => 0, msg => 'bitlen for IPv6 address is 0' },
+    { b => '2001:db8::-2001:db8::fe', bitlen => 8, msg => 'bitlen for IPv6 block is 8' },
+  );
+
+  foreach my $t (@tt) {
+    my $b = Net::IPAM::Block->new( $t->{b} );
+    is( $b->bitlen, $t->{bitlen}, $t->{msg} );
+  }
 }
 
 done_testing();

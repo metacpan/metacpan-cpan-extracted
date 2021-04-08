@@ -5,6 +5,8 @@ use Test::Deep;
 use lib 't/lib'; use MyTest;
 use Date;
 
+catch_run("[basic]");
+
 subtest 'from zero epoch' => sub {
     my $date = Date->new(0);
     is $date->epoch, 0;
@@ -119,24 +121,6 @@ subtest 'from string' => sub {
         ok !date("2013-03-05", undef, INPUT_FORMAT_ISO8601)->error;
         ok !date("2013-03-05", undef, INPUT_FORMAT_ISO)->error;
     };
-};
-
-subtest 'error' => sub {
-    is(Date->new(+67767976233446399 + 1)->error, Date::Error::out_of_range);
-   ok(Date->new(undef)->error); 
-};
-
-subtest64 "MEIACORE-728 bugfix" => sub {
-    is(Date->new("-567815678-12-27 02:52:56")->error, Date::Error::parser_error);
-    is(Date->new("567815678-12-27 02:52:56")->error, Date::Error::parser_error);
-    is(Date->new("+999999999-12-31 23:59:59")->error, Date::Error::parser_error);
-    is(Date->new("1234567890-12-27 02:52:56")->error, Date::Error::parser_error);
-    is(Date->new("1234567890-12-27 02:52:56")->error, Date::Error::parser_error);
-    is(Date->new("-1234567890-12-27 02:52:56")->error, Date::Error::parser_error);
-    is(Date->new("-1234567890-12-27 02:52:56")->error, Date::Error::parser_error);
-    is(Date->new(-1977603371737344898)->error, Date::Error::out_of_range);
-    is(Date->new(-67768100567884800 - 1)->error, Date::Error::out_of_range);
-    is(Date->new(+67767976233446399 + 1)->error, Date::Error::out_of_range);
 };
 
 done_testing();

@@ -46,7 +46,7 @@ our @levels = (
     sub new {
         my $self = bless {cnt => 0}, shift;
         XLog::set_level(XLog::WARNING);
-        XLog::set_format("%m");
+        XLog::set_formatter("%m");
         XLog::set_logger(ContextLogger->new($self));
         return $self;
     }
@@ -61,10 +61,18 @@ our @levels = (
         
         return unless %p;
         
+        local $Test::Builder::Level = $Test::Builder::Level + 1;
         foreach my $key (qw/level module file line func/) {
             is $self->{$key}, $p{$key}, "$key=$p{$key}" if exists $p{$key};
         }
-        is $self->{msg}, $p{msg}, "message '$p{msg}'" if exists $p{msg};
+        if (exists $p{msg}) {
+            my $pattern = $p{msg};
+            if (ref($pattern) eq 'Regexp') {
+                like $self->{msg}, $pattern, "message like '$pattern'";
+            } else {
+                is $self->{msg}, $pattern, "message '$pattern'";;
+            }
+        }
     }
     
     sub DESTROY {

@@ -3,7 +3,7 @@ use 5.012;
 use Path::Class;
 use Data::Recursive(); # XS code needs xs::merge
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.2.1';
 
 XS::Loader::load();
 
@@ -82,8 +82,8 @@ sub _process_file {
 
 sub _process_directive {
     my ($curdir, $ns, $directive, $rest) = @_;
-    $rest =~ s/\s+$//;
     $rest //= '';
+    $rest =~ s/\s+$//;
     if (index($directive, 'namespace') == 0) {
         $ns = '' if $directive eq 'namespace-abs';
         my $pkg = $ns ? "NS::$ns" : 'NS';

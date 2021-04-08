@@ -40,3 +40,7 @@ uint64_t test_leaks1 (string cls, string meth, int cnt) {
         RETVAL += (uint64_t)ref.get();
     }
 }
+
+void call_me(Sub s) {
+    s();
+}

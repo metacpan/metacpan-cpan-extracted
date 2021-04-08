@@ -1,5 +1,12 @@
 Revision history for Net-IPAM-Block
 
+5.00    Thu, 08 Apr 2021 22:31:34 +0200
+        * better algo for diff()
+        * better recursive algo for to_cidrs()
+        * faster algo for mask calculations with precalculated tables
+        * DEPRECATE: aggregate() in favor of merge()
+        * DEPRECATE: bitlen()
+
 4.11    Mon, 08 Mar 2021 18:03:02 +0100
         * FIXED: overflow bug in diff()
 

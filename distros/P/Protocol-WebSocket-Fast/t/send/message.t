@@ -3,7 +3,10 @@ use warnings;
 use lib 't/lib';
 use MyTest qw/gen_frame is_bin/;
 use Test::More;
+use Test::Catch;
 use Protocol::WebSocket::Fast;
+
+catch_run("[send-message]");
 
 my $p = MyTest::get_established_server();
 

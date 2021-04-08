@@ -23,7 +23,7 @@
          "requires" : {
             "Carp" : "0",
             "List::Util" : "1.43",
-            "Net::IPAM::IP" : "2.00",
+            "Net::IPAM::IP" : "3.00",
             "Scalar::Util" : "1.39",
             "perl" : "v5.10.0"
          }
@@ -37,13 +37,13 @@
    "provides" : {
       "Net::IPAM::Block" : {
          "file" : "lib/Net/IPAM/Block.pm",
-         "version" : "4.11"
+         "version" : "5.00"
       },
       "Net::IPAM::Block::Private" : {
          "file" : "lib/Net/IPAM/Block/Private.pm"
       }
    },
    "release_status" : "stable",
-   "version" : "4.11",
+   "version" : "5.00",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

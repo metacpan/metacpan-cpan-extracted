@@ -3,7 +3,7 @@
 using Test = TestSv<Stash>;
 using panda::string_view;
 
-TEST_CASE("Stash", "[Sv]") {
+TEST_CASE("Stash", "[Stash]") {
     perlvars vars;
     Stash my(vars.stash);
     Hash h_valid(vars.stash), h_invalid(vars.hv);

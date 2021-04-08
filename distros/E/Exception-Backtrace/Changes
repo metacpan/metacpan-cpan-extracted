@@ -1,6 +1,13 @@
+1.0.11   08.04.2021
+    - Don't gather traces twice. Might happen if perl exception is
+      invoked twice, i.e. in Perl layers in the flow "Perl->C->Perl"
+    - make C++ traces symbolization lazy, as this is heavy operation
+      and it is not always needed
+
 1.0.10   24.11.2020
     - separate out C++ sources into dedicated XS::libpanda::backtrace
     - relax tests checks for *bsd with new libpanda
+
 1.0.9    30.07.2020
     - use heap istead of stack to avoid stack corruption on
       large backtraces

@@ -4,8 +4,11 @@ use lib 't/lib';
 use MyTest qw/gen_frame test_frame/;
 use Test::More;
 use Test::Deep;
+use Test::Catch;
 use Test::Exception;
 use Protocol::WebSocket::Fast;
+
+catch_run("[parse-frames]");
 
 subtest "server parser" => sub {
     my $p = MyTest::get_established_server();
@@ -126,4 +129,3 @@ subtest "client parser" => sub {
 };
 
 done_testing();
-

@@ -48,7 +48,7 @@ static void test_create (const T& o) {
     REQUIRE(o.use_count() == rcnt);
 }
 
-TEST_CASE("Ref", "[Sv]") {
+TEST_CASE("Ref", "[Ref]") {
     perlvars vars;
     Ref my(vars.rv);
     Sv oth_valid(vars.rv), oth_invalid(vars.av);

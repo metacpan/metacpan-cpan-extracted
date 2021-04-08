@@ -4,7 +4,7 @@
 
 namespace xs { namespace xlog {
 
-const panda::log::Module* get_module_by_namespace ();
+panda::log::Module* resolve_module(size_t depth);
 bool has_module (SV* ref);
 void optimize ();
 void optimize (panda::log::Level level);

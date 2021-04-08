@@ -1,7 +1,11 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Catch;
+use lib 't/lib'; use MyTest;
 use URI::XS qw/encode_uri_component decode_uri_component/;
+
+catch_run('[encode]');
 
 ok(encode_uri_component("hello world") eq "hello%20world");
 ok(encode_uri_component("http://ya.ru") eq "http%3A%2F%2Fya.ru");

@@ -1,3 +1,7 @@
+1.0.15  08.04.2021
+         - enable benchmarking
+         - print failed assertions to stderr instead of default stream
+         - prettier tap reporter output
 1.0.14  30.10.2020
          - bump for libcatch
 1.0.13  30.01.2020

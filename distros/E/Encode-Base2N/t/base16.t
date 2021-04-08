@@ -1,7 +1,11 @@
 use 5.012;
 use warnings;
 use Test::More;
+use Test::Catch;
+use lib 't/lib'; use MyTest;
 use Encode::Base2N qw/encode_base16 encode_base16low decode_base16/;
+
+catch_run('[base16]');
 
 my $str = join('', map {chr($_)} 0..255);
 

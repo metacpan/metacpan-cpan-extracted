@@ -3,6 +3,9 @@ use warnings;
 use lib 't/lib';
 use MyTest;
 use Test::More;
+use Test::Catch;
+
+catch_run("[deflate-selection]");
 
 my $req = {
     uri    => "ws://crazypanda.ru",

@@ -1,5 +1,9 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.006     2021-04-08 20:05:11Z
+        - also list skipped directories in diagnostic output
+        - updated test suite to commit fc68499eafa2cdbe52b4ed4d219dbb1c8c99fb2b
+
 1.005     2021-03-23 21:24:15Z
         - specification => latest now uses draft2020-12
 

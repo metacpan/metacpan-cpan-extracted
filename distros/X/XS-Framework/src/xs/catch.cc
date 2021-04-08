@@ -33,6 +33,9 @@ static Sv _exc2sv_default (const Sub&) {
     catch (const string_view& err)   { return Simple(err); }
     catch (const panda::string& err) { return Simple(err); }
     catch (const std::string& err)   { return Simple(string_view(err.data(), err.length())); }
+    catch (const PerlRuntimeException& err) {
+        return err.sv;
+    }
     catch (std::exception& err) {
         dTHX;
         auto tn = get_type_name(typeid(err));

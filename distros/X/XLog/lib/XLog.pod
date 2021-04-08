@@ -7,7 +7,7 @@ XLog - Unified logging API, without performance penalties.
 =head1 SYNPOSIS
 
     XLog::set_logger(sub { say $_[0] });
-    XLog::set_format("%1t %c[%L/%1M]%C %f:%l,%F(): %m");
+    XLog::set_formatter("%1t %c[%L/%1M]%C %f:%l,%F(): %m");
     XLog::set_level(XLog::INFO);
     
     XLog::info("number=%d", $num);
@@ -31,6 +31,7 @@ XLog - Unified logging API, without performance penalties.
         package MyPackage;
         our $xlog_module = XLog::Module->new("my module"); # every log in this package will use this log module
         $xlog_module->set_level(XLog::ERROR);
+        $xlog_module->set_logger(sub { send_somewhere($_[0]) });
         
         ...
         
@@ -60,11 +61,9 @@ XLog - Unified logging API, without performance penalties.
         {logger => sub { send over network... }, min_level => XLog::ERROR},
     ]));
 
-
-
 =head1 DESCRIPTION
 
-XLog is a centralized logging API both from perl and C level. It is written in C and is very fast.
+XLog is a centralized thread-safe logging API both from perl and C level. It is written in C and is very fast.
 
 One of its main features is that if message is not to be logged (due to log level) then arguments will not be evaluated and function is not called.
 Closest example of this behaviour (but ugly and non-flexible)
@@ -75,7 +74,9 @@ XLog is an API, not an implementation. You can choose which backend to use among
 To create your own backend see L<XLog::Logger>.
 
 XLog supports C<logging modules>. Modules are used to separate log levels in one part of the application from another so that you can enable for example debug
-logs only for part of your application, not for the whole app.
+logs only for part of your application, not for the whole app. Also modules allow to log various parts of application to different destinations.
+
+More detailed info on modules in L<XLog::Module>.
 
 
 
@@ -93,74 +94,7 @@ which receives a log message and must log it somewhere and somehow.
 
 =head1 LOG MODULES
 
-Log modules are used to separate logs of one part of the application from another. For example image you have network layer in your application and
-logic layer.
-
-    # network layer
-    ...
-    XLog::debug("data received: $raw_data");
-    
-    #logic layer
-    ...
-    XLog::debug("message: ".Dump($msg));
-    
-    ...
-    #somewhere
-    XLog::set_level(XLog::DEBUG);
-
-You want to debug your network layer and enable debug logs but you don't want to enable debug logs everywhere across your app.
-In this case you can create 2 log modules, use it when logging and enable debug log only for certain log module.
-
-    package NetworkLayer;
-    our $xlog_module = XLog::Module->new("network");
-    ...
-    XLog::debug($xlog_module, "data received: $raw_data");
-    
-    package LogicLayer;
-    our $xlog_module = XLog::Module->new("logic");
-    ...
-    XLog::debug($xlog_module, "message: ".Dump($msg));
-
-    ...
-    #somewhere
-    $NetworkLayer::xlog_module->set_level(XLog::DEBUG);
-    # or
-    XLog::set_level(XLog::DEBUG, "network");
-
-Now min level DEBUG is only set for C<network> log module while C<logic> still have WARNING as min level.
-
-
-Module parameter to log functions can be omitted if variable's name holding log module is C<xlog_module> and it is global and in the same package
-or lower package as logging code.
-
-    {
-        package MyApp;
-        our $xlog_module = XLog::Module->new("myapp");
-    
-        {
-            package MyApp::Other;
-            XLog::debug("hello"); # logging to myapp
-        }
-        {
-            package MyApp::NetworkLayer;
-            our $xlog_module = XLog::Module->new("network");
-            XLog::debug("hello"); # logging to network module
-        }
-        XLog::debug("hi"); # logging to myapp module
-    }
-    XLog::debug("hi"); # logging to root module
-
-
-Modules can be organised in hierarchies (parent-child).
-
-    package AAA;
-    our $xlog_module = XLog::Module->new("aaa");
-    
-    package BBB;
-    our $xlog_module = XLog::Module->new("bbb", $AAA::xlog_module);
-    
-In this case, module C<bbb> is a child of module C<aaa> and setting log level for C<aaa> also sets level for C<bbb> but not vice-versa.
-Child modules partially inherits names from their parents, so in this case the name of BBB module will be C<aaa::bbb>.
+See L<XLog::Module>.
 
 
 
@@ -184,7 +118,7 @@ Otherwise, set minimum log level only for specified module and its children. Eff
 
 =head4 set_logger($logger)
 
-Set backend. Must be a subref or logging object compatible with XLog.
+Set backend globally (for root module). Must be a subref or logging object compatible with XLog.
 
 If C<$logger> is subref it will receive formatted message and log level.
 
@@ -200,7 +134,7 @@ Or you can create your own backend, see L<XLog::Logger>.
 
 =head4 set_formatter($formatter)
 
-Set log message formatter. Must be a subref or formatter object.
+Set log message formatter globally (for root module). Must be a subref, formatter object or pattern string.
 
 If C<$formatter> is a subref, it will receive the following parameters:
 
@@ -242,16 +176,13 @@ Subroutine must return final log message which will be passed to backend.
 C<$formatter> may also be an object, for example L<XLog::Formatter::Pattern>.
 You can create your own formatter class, see L<XLog::Formatter>.
 
+If C<$formatter> is a string, the effect is the same as 
 
-=head4 set_format($format)
+    XLog::set_formatter(XLog::Formatter::Pattern->new($formatter));
 
-Set format string. The default is C<%1t %c[%L/%1M]%C %f:%l,%F(): %m>.
-
-This is a shortcut for
-
-    XLog::set_formatter(XLog::Formatter::Pattern->new($format));
-    
 See L<XLog::Formatter::Pattern> for details
+
+The default global formatter is C<%1t %c[%L/%1M]%C %f:%l,%F(): %m>.
 
 
 =head4 log($level, [$module], $message, [@args])
@@ -293,6 +224,47 @@ In either case if supplied C<$level> is not sufficient for logging (i.e. message
 =head4 emergency(...)
 
 Same as C<XLog::log()> passing corresponding log level as a first arg.
+
+
+=head4 get_module($name)
+
+Returns module object registered as C<$name> or undef if no such module.
+
+Saving this object for later use and accessing it after module is deleted is undefined behaviour.
+
+
+=head4 resolve_module($depth = 0)
+
+When L<XLog::log> is invoked, it should find the module having only C<caller> information. By default it uses the top frame (C<$depth = 0>),
+and it is correct in the majority of use cases. However, sometimes logging function is written dedicated package with it's own
+module and it is desirable to skip it and let the log message appear in the sake of the outer context. The L<resolve_module> function comes to help:
+
+    package XXX {
+        our $xlog_module = XLog::Module->new("XXX");
+
+        sub log_event {
+            my $message = shift;
+            my $module = resolve_module(1);
+            XLog::info($module, $message, ...);
+        }
+    }
+
+    package YYY {
+        our $xlog_module = XLog::Module->new("YYY");
+
+        sub something1{
+            XXX::log_event("lorem ipsum"); # will be routed via "YYY" module
+        }
+    }
+
+    package ZZZ {
+        our $xlog_module = XLog::Module->new("ZZZ");
+
+        sub something_else {
+            XXX::log_event("sit amet"); # will be routed via "ZZZ" module
+        }
+    }
+
 
 
 
@@ -358,11 +330,20 @@ In next examples, module/message is a complex expression, so optimizations are d
 
 =head1 SEE ALSO
 
+L<XLog::Module>
+
 L<XLog::Multi>
 
 L<XLog::Console>
 
 L<XLog::File>
+
+L<XLog::Logger>
+
+L<XLog::Formatter>
+
+L<XLog::Formatter::Pattern>
+
 
 
 =head1 AUTHOR

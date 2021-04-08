@@ -1,3 +1,11 @@
+1.1.0  08.04.2021
+           - support for set_logger/set_formatter in modules
+           - add XLog::Module docs
+           - allow $0 decorations via XLog::Formatter::Pattern
+           - add XLog::resolve_module() helper function
+           - fix: custom blessed object can be logged in stringified form
+           - passthrough support for module loggers
+           - add XLog::get_module($name)
 1.0.3  25.11.2020
            - fix docs
            - panda::log log levels related changes

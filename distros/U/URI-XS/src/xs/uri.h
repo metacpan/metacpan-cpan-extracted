@@ -6,18 +6,14 @@
 
 namespace xs {
     namespace uri {
+        using panda::uri::URISP;
+
         void data_attach (Sv& sv);
         Stash get_perl_class (const panda::uri::URI* uri);
 
-        struct URIx {
-            using URI = panda::uri::URI;
-            URI* uri;
-            URIx () : uri(nullptr) {}
-            URIx (URI* uri) : uri(uri) {}
-            URI* operator-> () const { return uri; }
-            URI& operator*  () const { return *uri; }
-            operator URI*   () const { return uri; }
-            URIx& operator= (URI* uri) { this->uri = uri; return *this; }
+        struct URIx : URISP {
+            using URISP::URISP;
+            using URISP::operator=;
         };
     }
 

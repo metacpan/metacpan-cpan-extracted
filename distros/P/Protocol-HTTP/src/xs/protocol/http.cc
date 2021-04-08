@@ -18,6 +18,7 @@ static inline void msgfill (Message* m, const Hash& h) {
             Array a(sv);
             switch (a.size()) {
                 case 2: m->compression.level = (Compression::Level)SvIV(a[1]);
+                        // fall through
                 case 1: m->compression.type  = (Compression::Type)SvIV(a[0]);
             }
         }

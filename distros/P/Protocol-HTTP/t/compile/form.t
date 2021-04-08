@@ -36,7 +36,6 @@ my $sample = $canonize->(
 );
 
 subtest "simple multipart/form-data" => sub {
-    MyTest::native_srand(777);
     my $req = Protocol::HTTP::Request->new({
         uri  => '/abc',
         form => [k1 => 'v1', k2 => 'v2'],
@@ -45,7 +44,6 @@ subtest "simple multipart/form-data" => sub {
 };
 
 subtest "multipart/form-data (2)" => sub {
-    MyTest::native_srand(777);
     my $req = Protocol::HTTP::Request->new({
         uri  => '/abc',
         form => {
@@ -57,7 +55,6 @@ subtest "multipart/form-data (2)" => sub {
 };
 
 subtest "multipart/form-data (file)" => sub {
-    MyTest::native_srand(777);
     my $req = Protocol::HTTP::Request->new({
         uri  => '/abc',
         form => {
@@ -82,7 +79,6 @@ subtest "multipart/form-data (file)" => sub {
 };
 
 subtest "allow to submit multipart/form-data with GET-request" => sub {
-    MyTest::native_srand(777);
     my $req = Protocol::HTTP::Request->new({
         uri  => '/abc',
         method => METHOD_GET,
@@ -94,7 +90,6 @@ subtest "allow to submit multipart/form-data with GET-request" => sub {
 
 
 subtest "multipart/form-data (3)" => sub {
-    MyTest::native_srand(777);
     my $req = Protocol::HTTP::Request->new({
         uri  => '/abc?k1=v1&k2=v2',
         form => ENCODING_MULTIPART,

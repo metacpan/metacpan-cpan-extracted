@@ -3,7 +3,10 @@ use warnings;
 use lib 't/lib';
 use MyTest qw/gen_frame gen_message/;
 use Test::More;
+use Test::Catch;
 use Protocol::WebSocket::Fast;
+
+catch_run("[parse-utf8]");
 
 my $ascii        = "ok";
 my $valid_utf8   = "жопа";

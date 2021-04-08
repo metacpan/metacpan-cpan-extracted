@@ -2,7 +2,7 @@
 
 using Test = TestSv<Array>;
 
-TEST_CASE("Array", "[Sv]") {
+TEST_CASE("Array", "[Array]") {
     perlvars vars;
     Array my(vars.av);
     Sv oth_valid(vars.oav), oth_invalid(vars.hv);

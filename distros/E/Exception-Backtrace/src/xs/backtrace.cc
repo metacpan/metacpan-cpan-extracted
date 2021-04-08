@@ -181,22 +181,23 @@ panda::iptr<DualTrace> get_backtrace(Ref except) {
     if (it.payload_exists(&backtrace_perl_marker)) {
         r = new DualTrace();
         auto payload = it.payload(&backtrace_perl_marker);
-        auto bt = xs::in<BacktraceInfo*>(payload.obj);
-        r->perl_trace = bt;
+        panda::BacktraceInfoSP bt(xs::in<BacktraceInfo*>(payload.obj));
+        r->set_perl_trace([bt = bt]{ return bt; });
     }
     if (r && it.payload_exists(&backtrace_c_marker)) {
         auto payload = it.payload(&backtrace_c_marker);
-        auto bt = static_cast<Backtrace*>(payload.ptr);
-        r->c_trace = bt->get_backtrace_info();
+        auto bt_ptr = static_cast<Backtrace*>(payload.ptr);
+        r->set_c_trace([bt = *bt_ptr]{ return bt.get_backtrace_info(); });
     }
     return r;
 }
 
 panda::iptr<DualTrace> create_backtrace() {
     panda::iptr<DualTrace> r(new DualTrace());
-    Backtrace bt;
-    r->c_trace = bt.get_backtrace_info();
-    r->perl_trace = get_trace();
+    Backtrace c_bt;
+    auto perl_bt = get_trace();
+    r->set_c_trace([bt = c_bt]{ return bt.get_backtrace_info(); });
+    r->set_perl_trace([perl_bt = perl_bt] { return perl_bt; });
     return r;
 }
 
@@ -233,6 +234,11 @@ Ref _is_safe_to_wrap(Sv& ex, bool add_frame_info) {
 
 };
 
+static bool has_backtraces(const Ref& except) {
+    auto it = except.value();
+    return it.payload_exists(&backtrace_c_marker) && it.payload_exists(&backtrace_perl_marker);
+}
+
 static void attach_backtraces(Ref except, const PerlTraceSP& perl_trace) {
     auto it = except.value();
     if (!it.payload_exists(&backtrace_c_marker)) {
@@ -247,6 +253,10 @@ static void attach_backtraces(Ref except, const PerlTraceSP& perl_trace) {
 Sv safe_wrap_exception(Sv ex) {
     auto ref = _is_safe_to_wrap(ex, false);
     if (ref) {
+        if (has_backtraces(ref)) {
+            return Sv(ref);
+        }
+
         auto perl_traces = get_trace();
         auto& frames = perl_traces->get_frames();
         bool in_destroy = std::any_of(frames.begin(), frames.end(), [](auto& frame) { return frame->name == "DESTROY"; } );
@@ -287,5 +297,26 @@ void install_exception_processor() {
         return ex;
     });
 }
+
+panda::string as_perl_string(const panda::Stackframe& frame) {
+    string r;
+    r += frame.library;
+    r += "::";
+    r += frame.name;
+    r += "(";
+    auto& args = frame.args;
+    auto last = args.size() - 1;
+    for (size_t i = 0; i < args.size(); ++i) {
+        r += args[i];
+        if (i < last) { r += ", "; }
+    }
+    r += ")";
+    r += " at ";
+    r += frame.file;
+    r += ":";
+    r += string::from_number(frame.line_no, 10);
+    return r;
+}
+
 
 }

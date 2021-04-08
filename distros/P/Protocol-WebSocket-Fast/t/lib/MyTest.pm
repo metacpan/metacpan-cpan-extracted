@@ -60,27 +60,6 @@ sub accept_parsed {
     );
 }
 
-sub connect_request {
-    return {
-        uri           => URI::XS->new("ws://crazypanda.ru:4321/path?a=b"),
-        ws_protocol   => 'fuck',
-        ws_extensions => [ [ 'permessage-deflate', { 'client_max_window_bits' => '' } ] ],
-        ws_version    => 13,
-        headers       => {
-            'Accept-Encoding' => 'gzip, deflate, sdch',
-            'Origin'          => 'http://www.crazypanda.ru',
-            'Cache-Control'   => 'no-cache',
-            'User-Agent'      => 'PWS-Test',
-        },
-    };
-}
-
-sub connect_response {
-    return all(
-       qr/^GET \/path?a=b HTTP\/1.1$/,
-    );
-}
-
 sub get_established_server {
     my $p = Protocol::WebSocket::Fast::ServerParser->new(shift);
     _establish_server($p);
@@ -109,6 +88,7 @@ sub get_established_client {
 
 sub _establish_client {
     my $p = shift;
+    $p->no_deflate;
     my $cstr = $p->connect_request({uri => "ws://jopa.ru"});
     my $sp = new Protocol::WebSocket::Fast::ServerParser;
     $sp->accept($cstr) or die "should not happen";
@@ -178,9 +158,7 @@ sub gen_message {
     my $payload = $params->{data} // '';
     my $opcode  = $params->{opcode} // OPCODE_TEXT;
 
-    my $frame_len = int(length($payload) / $nframes);
     my @bin;
-
     my $frames_left = $nframes;
     while ($frames_left) {
         my $curlen = (length($payload) / $frames_left--);
@@ -255,7 +233,7 @@ sub test_frame {
             cmp_deeply($frame, methods(%$check_data), "frame properties ok");
         }
     }
-};
+}
 
 sub test_message {
     my ($p, $message_data, $error) = @_;

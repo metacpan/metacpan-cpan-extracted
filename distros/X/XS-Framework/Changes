@@ -1,3 +1,7 @@
+1.3.4  08.04.2021
+           - wrapper for perl exceptions
+           - function typemap now support threads in threaded perl (typemap-in should be used with caution)
+           - add eval / sub eval to svapi
 1.3.3  30.10.2020
            - libcatch related bump
 1.3.2  19.06.2020

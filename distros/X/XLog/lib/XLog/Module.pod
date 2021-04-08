@@ -1,0 +1,191 @@
+=head1 NAME
+
+XLog::Module - logging module with separate settings
+
+
+
+=head1 SYNPOSIS
+
+    package NetworkLayer;
+    our $xlog_module = XLog::Module->new("network");
+    ...
+    XLog::debug($xlog_module, "data received: $raw_data");
+    
+    package LogicLayer;
+    our $xlog_module = XLog::Module->new("logic");
+    ...
+    XLog::debug($xlog_module, "message: ".Dump($msg));
+
+    ...
+    #somewhere
+    $NetworkLayer::xlog_module->set_level(XLog::DEBUG);
+    # or
+    XLog::set_level(XLog::DEBUG, "network");
+    ...
+    $NetworkLayer::xlog_module->set_logger(XLog::File->new({file => 'network.log'}));
+    $NetworkLayer::xlog_module->set_formatter($formatter);
+    
+
+
+=head1 DESCRIPTION
+
+Log modules are used to separate logs of one part of the application from another. For example image you have network layer in your application and
+logic layer.
+
+    # network layer
+    ...
+    XLog::debug("data received: $raw_data");
+    
+    #logic layer
+    ...
+    XLog::debug("message: ".Dump($msg));
+    
+    ...
+    #somewhere
+    XLog::set_level(XLog::DEBUG);
+
+You want to debug your network layer and enable debug logs but you don't want to enable debug logs everywhere across your app.
+In this case you can create 2 log modules, use it when logging and enable debug log only for certain log module.
+
+    package NetworkLayer;
+    our $xlog_module = XLog::Module->new("network");
+    ...
+    XLog::debug($xlog_module, "data received: $raw_data");
+    
+    package LogicLayer;
+    our $xlog_module = XLog::Module->new("logic");
+    ...
+    XLog::debug($xlog_module, "message: ".Dump($msg));
+
+    ...
+    #somewhere
+    $NetworkLayer::xlog_module->set_level(XLog::DEBUG);
+    # or
+    XLog::set_level(XLog::DEBUG, "network");
+
+Now min level DEBUG is only set for C<network> log module while C<logic> still have WARNING as min level.
+
+
+Module parameter to log functions can be omitted if variable's name holding log module is C<xlog_module> and it is global and in the same package
+or lower package as logging code.
+
+    {
+        package MyApp;
+        our $xlog_module = XLog::Module->new("myapp");
+    
+        {
+            package MyApp::Other;
+            XLog::debug("hello"); # logging to myapp
+        }
+        {
+            package MyApp::NetworkLayer;
+            our $xlog_module = XLog::Module->new("network");
+            XLog::debug("hello"); # logging to network module
+        }
+        XLog::debug("hi"); # logging to myapp module
+    }
+    XLog::debug("hi"); # logging to root module
+
+
+Modules can be organised in hierarchies (parent-child).
+
+    package AAA;
+    our $xlog_module = XLog::Module->new("aaa");
+    
+    package BBB;
+    our $xlog_module = XLog::Module->new("bbb", $AAA::xlog_module);
+    
+In this case, module C<bbb> is a child of module C<aaa> and setting log level for C<aaa> also sets level for C<bbb> but not vice-versa.
+Child modules partially inherits names from their parents, so in this case the name of BBB module will be C<aaa::bbb>.
+
+Also modules support setting custom C<logger> and C<formatter>. By default, if none is set to any module, all modules will use logger/formatter from the
+root module (set via XLog::set_logger/set_formatter).
+
+If you set logger or formatter explicitly for some module
+
+    $xlog_module->set_logger($my_logger);
+    $xlog_module->set_formatter($my_formatter);
+    
+then C<$xlog_module> and all of its children will use logger/formatter provided. 
+
+To revert to default behaviour (inherit logger/formatter from parent) set them to C<undef>
+
+    $xlog_module->set_logger(undef);
+    $xlog_module->set_formatter(undef);
+
+
+
+=head1 METHODS
+
+=head4 new($name, [$min_level=WARNING)
+
+Creates a new module with root module as its parent. C<$min_level> is minimal logging level for all logs written with this module.
+The default is C<>.
+
+
+=head4 new($name, $parent_module, [$min_level=WARNING])
+
+Creates a module with C<$parent_module> as its parent. C<$min_level> is minimal logging level for all logs written with this module.
+
+The name of the newly created module is its parent name plus the name of the module separated by "::"
+
+If C<$parent_module> is C<undef> then creates a new root module. Such module and its children will not react to XLog::set_level/set_logger/etc, but only
+to direct configuring.
+
+    $module->set_level(...);
+    $module->set_logger(...);
+
+
+=head4 name()
+
+Returns full module name
+
+
+=head4 level()
+
+Returns minimal log level for this module
+
+
+=head4 set_level($new_min_level)
+
+Sets minimal log level for this module and all of its children
+
+
+=head4 set_logger($logger, [$passthrough = false])
+
+Sets logger backend for this module. Logging that is done with this module or any of its children will use this logger unless some child has its own
+logger configured explicitly.
+
+See L<XLog>'s set_logger for details on what C<$logger> can be.
+
+To revert to using parent's logger, just set it to C<undef>.
+
+    $module->set_logger(undef);
+    
+Setting C<undef> as logger for root module (module with no parent) disables logging for such module and its children except for child modules that has
+its own logger configured explicitly.
+
+If C<$passthrough> is set, after logging to this logger, will log also to parent's logger is if this logger wasn't present
+
+
+=head4 set_formatter($formatter)
+
+Sets formatter for this module. Logging that is done with this module or any of its children will use this formatter unless some child has its own
+formatter configured explicitly.
+
+See L<XLog>'s set_formatter for details on what C<$formatter> can be.
+
+To revert to using parent's formatter, just set it to C<undef>.
+
+    $module->set_formatter(undef);
+    
+Setting C<undef> as formatter for root module (module with no parent) reverts to using default formatter (XLog::Formatter::Pattern with default pattern).
+
+
+=head4 passthrough()
+
+Returns true if C<$passthrough> was set on last C<set_logger> call to this module.
+
+=cut
+
+1;

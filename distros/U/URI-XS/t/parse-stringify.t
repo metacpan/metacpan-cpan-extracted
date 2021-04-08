@@ -1,7 +1,11 @@
 use 5.012;
 use warnings;
 use Test::More;
+use Test::Catch;
+use lib "t/lib"; use MyTest;
 use URI::XS qw/:const/;
+
+catch_run("[parse-stringify]");
 
 our $flags;
 

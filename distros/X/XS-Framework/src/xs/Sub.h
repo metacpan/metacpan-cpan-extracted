@@ -8,6 +8,8 @@ namespace xs {
 using xs::my_perl;
 
 struct Sub : Sv {
+    static Sub create (panda::string_view code);
+
     static Sub noinc (SV* val) { return Sub(val, NONE); }
     static Sub noinc (CV* val) { return Sub(val, NONE); }
 

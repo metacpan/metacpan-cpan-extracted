@@ -24,19 +24,22 @@ AV *opened;
 #define fetch_from SV *from = get_sv("Test2::Plugin::Cover::FROM", 0);
 
 static OP* my_subhandler(pTHX) {
-    SV *subpkg  = NULL;
-    SV *subname = NULL;
-
     dSP;
-    GV *my_gv = sub_to_gv(aTHX_ *SP);
-    if (my_gv != NULL) {
-        subpkg  = newSVpv(HvNAME(GvSTASH(my_gv)), 0);
-        subname = newSVpv(GvNAME(my_gv), 0);
-    }
-
     OP* out = orig_subhandler(aTHX);
 
     if (out != NULL && (out->op_type == OP_NEXTSTATE || out->op_type == OP_DBSTATE)) {
+        SV *subpkg  = NULL;
+        SV *subname = NULL;
+
+        GV *my_gv = sub_to_gv(aTHX_ *SP);
+        if (my_gv != NULL) {
+            HV *stash = GvSTASH(my_gv);
+            if (stash) {
+                subpkg = newSVpv(HvNAME(stash), 0);
+            }
+            subname = newSVpv(GvNAME(my_gv), 0);
+        }
+
         HV *item = newHV();
 
         SV *file = newSVpv(CopFILE(cCOPx(out)), 0);

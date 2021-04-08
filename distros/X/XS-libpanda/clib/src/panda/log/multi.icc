@@ -1,0 +1,32 @@
+#include "multi.h"
+#include "../exception.h"
+
+namespace panda { namespace log {
+
+MultiLogger::MultiLogger (const Channels& list) : channels(list) {
+    for (auto& row : channels) {
+        if (!row.logger) throw exception("logger must be defined");
+    }
+}
+
+MultiLogger::~MultiLogger () {}
+
+void MultiLogger::log_format (std::string& rawmsg, const Info& info, const IFormatter& fmt) {
+    string defmsg;
+    for (auto& row : channels) {
+        if (info.level < row.min_level) continue;
+        
+        auto sub_multilogger = panda::dyn_cast<MultiLogger*>(row.logger.get());
+        if (sub_multilogger) {
+            sub_multilogger->log_format(rawmsg, info, row.formatter ? *row.formatter : fmt);
+        }
+        else if (row.formatter) {
+            row.logger->log_format(rawmsg, info, *row.formatter);
+        } else {
+            if (!defmsg) defmsg = fmt.format(rawmsg, info);
+            row.logger->log(defmsg, info);
+        }
+    }
+};
+
+}}

@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Collection;
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 use warnings;
 use strict;
@@ -16,8 +16,19 @@ sub _numeric_type_for_length {
 
 sub count {
     my $self = shift;
+    if($self->{cache} && exists($self->{cache}->{count})) {
+        return $self->{cache}->{count};
+    } elsif($self->{cache}) {
+        return $self->{cache}->{count} = $self->_count();
+    } else {
+        return $self->_count();
+    }
+}
+
+sub _count {
+    my $self = shift;
     $self->_seek($self->_offset());
-    return $self->_numeric_type_for_length()->_init(parent => $self->_parent());
+    return $self->_numeric_type_for_length()->_init(root => $self->_root());
 }
 
 sub id {

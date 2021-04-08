@@ -66,14 +66,14 @@ TEST("log") {
     FileLogger::Config cfg;
     cfg.file = c.dir + "/file.log";
     set_logger(new FileLogger(cfg));
-    set_format("%m");
+    set_formatter("%m");
     set_level(Level::Debug);
     panda_log_debug("hello");
     set_logger(nullptr);
 
     set_logger(new FileLogger(cfg));
     panda_log_debug("world");
-    set_logger(nullptr); // need to close file to flush it
+    set_logger(nullptr);  // need to close file to flush it
 
     CHECK(c.readfile(cfg.file) == "hello" NL "world" NL);
 }
@@ -84,7 +84,7 @@ TEST("autoflush") {
     cfg.file = c.dir + "/file.log";
     cfg.autoflush = true;
     set_logger(new FileLogger(cfg));
-    set_format("%m");
+    set_formatter("%m");
     set_level(Level::Debug);
 
     panda_log_debug("hello");
@@ -104,14 +104,15 @@ TEST("reopen log file if moved/deleted/etc") {
     cfg.autoflush = true;
     cfg.check_freq = 0;
     set_logger(new FileLogger(cfg));
-    set_format("%m");
+    set_formatter("%m");
     set_level(Level::Debug);
 
     panda_log_debug("hello");
 
     CHECK(c.readfile(cfg.file) == "hello" NL);
 
-    Fs::remove(cfg.file);
+    SECTION("remove") { Fs::remove(cfg.file); }
+    SECTION("move") { Fs::rename(cfg.file, cfg.file + ".tmp"); }
 
     panda_log_debug("world");
 
@@ -123,6 +124,7 @@ TEST("ignore logging if log file could not be created/written") {
     Ctx c;
     FileLogger::Config cfg;
     cfg.check_freq = 0;
+    cfg.autoflush = true;
 
     string to_delete;
     SECTION("mkpath fails") {

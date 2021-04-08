@@ -5,6 +5,6 @@ write_makefile(
     NAME      => 'XS::librangeV3',
     BIN_SHARE => {
     	CPLUS   => 11,
-        INCLUDE => {'include' => '/'},
+        INCLUDE => {'clib/include' => '/'},
     },
 );

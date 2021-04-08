@@ -1,5 +1,6 @@
 #include <catch2/catch.hpp>
 #include <xs/function.h>
+#include <thread>
 
 using namespace xs;
 using namespace panda;
@@ -42,11 +43,102 @@ namespace xs {
 using vv_fn  = function<void()>;
 using vi_fn  = function<void(int)>;
 using iid_fn = function<int(int, panda::string_view)>;
+using iis_fn = function<int(int, panda::string_view)>;
 
 struct Data {
     int i;
     Data (int i) : i(i) {}
 };
+
+TEST_CASE("sub->function", "[function]") {
+    eval("$MyTest::_marker = undef");
+    auto marker = Stash("MyTest")["_marker"].scalar();
+
+    SECTION("void()") {
+        auto fn = xs::in<vv_fn>(Sub::create("$MyTest::_marker = 1"));
+        fn();
+        CHECK(marker.is_true());
+    }
+    SECTION("void(int)") {
+        auto fn = xs::in<vi_fn>(Sub::create("$MyTest::_marker = shift"));
+        fn(42);
+        CHECK(Simple(marker) == 42);
+    }
+    SECTION("void(int) custom") {
+        auto sub = Sub::create("$MyTest::_marker = shift");
+        auto fn = xs::sub2function<vi_fn>(sub, [](int val) { return Simple(val + 100); });
+        fn(42);
+        CHECK(Simple(marker) == 142);
+    }
+    SECTION("int(int,string_view)") {
+        auto sub = Sub::create("$MyTest::_marker = [@_]; return 10");
+        auto fn = xs::in<iis_fn>(sub);
+        auto res = fn(42, "the string");
+        CHECK(res == 10);
+        CHECK(Simple(Array(marker)[0]) == 42);
+        CHECK(Simple(Array(marker)[1]) == "the string");
+    }
+    SECTION("int(int,string_view) custom") {
+        auto sub = Sub::create("$MyTest::_marker = [@_]; return 10");
+
+        auto fn = xs::sub2function<iis_fn>(
+            sub,
+            [=](const Sv& sv) { return SvIV(sv) + 10; },
+            [](int val)       { return Simple(val + 100); }
+        );
+
+        auto res = fn(42, "a string");
+        CHECK(res == 20);
+        CHECK(Simple(Array(marker)[0]) == 142);
+        CHECK(Simple(Array(marker)[1]) == "a string");
+    }
+    SECTION("sub->function->sub") {
+        auto src = Sub::create("$MyTest::_marker = shift");
+        auto fn = xs::in<vi_fn>(src);
+        Sub sub = xs::out(fn);
+        CHECK(sub == src);
+        sub.call(Simple(43));
+        CHECK(Simple(marker) == 43);
+    }
+    SECTION("custom when no typemap") {
+        auto sub = Sub::create("$MyTest::_marker = $_[0]; return $_[0] + 100");
+
+        auto fn = sub2function<function<Data(const Data&)>>(
+            sub,
+            [=](const Sv& sv)     { return Data((int)Simple(sv) + 1); },
+            [] (const Data& data) { return Simple(data.i + 2); }
+        );
+
+        auto ret = fn(Data(100));
+        CHECK(ret.i == 203);
+        CHECK(Simple(marker) == 102);
+    }
+    #ifdef USE_ITHREADS
+    SECTION("with threads") {
+        eval("require threads");
+        Stash threads("threads");
+        int tid = threads.call<Simple>("tid");
+        auto sub = Sub::create("$MyTest::_marker = threads->tid(); return $_[0] + 10");
+        auto fn = xs::in<function<int(int)>>(sub);
+
+        auto res = fn(1);
+        CHECK(res == 11);
+        CHECK(Simple(marker) == tid);
+
+        function<void()> thr_fn = [&] { res = fn(2); };
+
+        // fn() must call correct sub (from correct interpreter thread)
+        Stash("threads").call<Object>("create", xs::out(thr_fn)).call("join");
+        CHECK(res == 12);
+        CHECK(Simple(marker) == tid); // marker in master thread should not be changed
+
+        // check that fn() is not corrupted by svt_dup or svt_free
+        res = fn(3);
+        CHECK(res == 13);
+        CHECK(Simple(marker) == tid);
+    }
+    #endif
+}
 
 TEST_CASE("function->sub", "[function]") {
     int ecnt = 0;
@@ -154,6 +246,68 @@ TEST_CASE("function->sub", "[function]") {
             CHECK(Simple(ret) == "hello_inR_call_outR");
         }
     }
+    #ifdef USE_ITHREADS
+    SECTION("with threads") {
+        std::thread::id id;
+        eval("require threads");
+        function<int()> fn = [&]{ id = std::this_thread::get_id(); return 55; };
+        Sub sub = xs::out(fn);
+        // sub must clone it's magic ptr on svt_dup
+        Object thr = Stash("threads").call("create", Ref::create(sub));
+        Simple res = thr.call("join");
+        CHECK(res == 55);
+        CHECK(id != std::this_thread::get_id());
+        //check that sub isn't broken by svt_dup
+        res = sub.call();
+        CHECK(res == 55);
+        CHECK(id == std::this_thread::get_id());
+    }
+    #endif
 
     CHECK(cnt == ecnt);
 }
+
+//uint64_t bench_vv (Sub sub, int cnt) {
+//    RETVAL = 0;
+//    for (int i = 0; i < cnt; ++i) {
+//        RETVAL += (uint64_t)sub2function<vv_fn>(sub).func.get();
+//    }
+//}
+//
+//uint64_t bench_vi (Sub sub, int cnt) {
+//    RETVAL = 0;
+//    for (int i = 0; i < cnt; ++i) {
+//        RETVAL += (uint64_t)sub2function<vi_fn>(sub).func.get();
+//    }
+//}
+//
+//uint64_t bench_iis (Sub sub, int cnt) {
+//    RETVAL = 0;
+//    for (int i = 0; i < cnt; ++i) {
+//        RETVAL += (uint64_t)sub2function<iis_fn>(sub).func.get();
+//    }
+//}
+//
+//uint64_t bench_vvR (int cnt) {
+//    RETVAL = 0;
+//    vv_fn fn = [](){};
+//    for (int i = 0; i < cnt; ++i) {
+//        RETVAL += (uint64_t)function2sub(fn).get();
+//    }
+//}
+//
+//uint64_t bench_viR (int cnt) {
+//    RETVAL = 0;
+//    vi_fn fn = [](int){};
+//    for (int i = 0; i < cnt; ++i) {
+//        RETVAL += (uint64_t)function2sub(fn).get();
+//    }
+//}
+//
+//uint64_t bench_iisR (int cnt) {
+//    RETVAL = 0;
+//    iis_fn fn = [](int a, string_view d) -> int { return a + d.length(); };
+//    for (int i = 0; i < cnt; ++i) {
+//        RETVAL += (uint64_t)function2sub(fn).get();
+//    }
+//}

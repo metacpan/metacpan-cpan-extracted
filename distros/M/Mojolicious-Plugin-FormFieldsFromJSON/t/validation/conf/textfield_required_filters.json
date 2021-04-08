@@ -1,0 +1,12 @@
+ [
+    {
+        "label" : "Name",
+        "type" : "text",
+        "validation" : {
+            "required" : "name",
+            "in" : ["test"],
+            "filters" : [ "trim" ]
+        },
+        "name" : "name"
+    }
+ ]

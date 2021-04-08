@@ -1,6 +1,10 @@
 Release history for Mojolicious::Plugin::FormFieldsFromJSON
 ===========================================================
 
+1.03 2021-04-08 17:45:00
+
+  * Add filters for validation
+
 1.02 2020-11-08
 
   * Fix internal pod links. (PR #8, thanks to Håkon Hægland)

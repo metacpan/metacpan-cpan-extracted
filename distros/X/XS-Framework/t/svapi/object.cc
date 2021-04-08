@@ -2,7 +2,7 @@
 
 using Test = TestSv<Object>;
 
-TEST_CASE("Object", "[Sv]") {
+TEST_CASE("Object", "[Object]") {
     perlvars vars;
     Object my(vars.ov);
     Sv oth_valid(vars.oavr), oth_invalid(vars.av);

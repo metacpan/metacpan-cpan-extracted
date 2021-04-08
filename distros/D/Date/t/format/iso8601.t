@@ -4,6 +4,8 @@ use Test::More;
 use Test::Deep;
 use lib 't/lib'; use MyTest;
 
+catch_run("[format-iso8601");
+
 tzset('Europe/Moscow');
 
 subtest 'parse' => sub {

@@ -11,9 +11,11 @@ namespace xs {
             FileLogger::Config cfg;
             Sv val;
             
-            cfg.file = xs::in<string>(h.fetch("file"));
-            if ((val = h.fetch("autoflush")))  cfg.autoflush = val.is_true();
-            if ((val = h.fetch("check_freq"))) cfg.check_freq = Simple(val);
+            if (val = h.fetch("file")) {
+                cfg.file = xs::in<string>(val);
+                if ((val = h.fetch("autoflush")))  cfg.autoflush = val.is_true();
+                if ((val = h.fetch("check_freq"))) cfg.check_freq = Simple(val);
+            }
             
             return cfg;
         }

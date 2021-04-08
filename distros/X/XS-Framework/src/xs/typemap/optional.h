@@ -46,7 +46,7 @@ struct nn {
 
     operator T () { return val; }
 
-private:
+protected:
     T val;
 };
 

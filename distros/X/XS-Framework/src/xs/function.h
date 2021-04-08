@@ -4,13 +4,16 @@
 #include <utility>
 #include <panda/cast.h>
 #include <panda/function.h>
+#ifdef USE_ITHREADS
+    #include <mutex>
+#endif
 
 namespace xs { namespace func {
 
-using panda::function;
-using panda::dyn_cast;
+using namespace panda;
 
-extern Sv::payload_marker_t marker;
+extern Sv::payload_marker_t out_marker;
+extern Sv::payload_marker_t in_marker;
 
 template <class T, class F>
 struct ConverterIn {
@@ -58,16 +61,54 @@ struct ConverterOut<void, std::nullptr_t> {
     Sv out () { return {}; }
 };
 
-template <typename Ret, typename...Args>
-struct SubHolder : panda::Ifunction<Ret, Args...> {
-    Sub sub;
-    SubHolder (const Sub& sub) : sub(sub) {}
+#ifdef USE_ITHREADS
+    struct SubPad : AtomicRefcnt {
+        SubPad (const Sub& sub);
 
-    bool equals (const panda::function_details::AnyFunction* oth) const override {
-        auto oth_caller = dyn_cast<const SubHolder*>(oth);
-        return oth_caller && this->sub == oth_caller->sub;
-    }
-};
+        const Sub& get_sub    () const;
+        void       add_sub    (const Sub& sub);
+        void       remove_sub ();
+
+        static SubPad* get (Sub);
+
+    private:
+        mutable std::mutex mutex;
+        std::vector<std::pair<PerlInterpreter*, Sub>> pad;
+    };
+
+    template <typename Ret, typename...Args>
+    struct SubHolder : panda::Ifunction<Ret, Args...> {
+        SubHolder (const Sub& sub) : pad(SubPad::get(sub)) {}
+
+        const Sub& sub () const { return pad->get_sub(); }
+
+        bool equals (const panda::function_details::AnyFunction* oth) const override {
+            auto oth_caller = dyn_cast<const SubHolder*>(oth);
+            return oth_caller && this->sub() == oth_caller->sub();
+        }
+
+    private:
+        iptr<SubPad> pad;
+    };
+#else
+    template <typename Ret, typename...Args>
+    struct SubHolder : panda::Ifunction<Ret, Args...> {
+        SubHolder (const Sub& sub) : _sub(sub) {}
+
+        const Sub& sub () const {
+            if (SvREFCNT(_sub) == 0) throw "calling typemap'ed perl function after perl global destroy";
+            return _sub;
+        }
+
+        bool equals (const panda::function_details::AnyFunction* oth) const override {
+            auto oth_caller = dyn_cast<const SubHolder*>(oth);
+            return oth_caller && this->_sub == oth_caller->_sub;
+        }
+
+    private:
+        Sub _sub;
+    };
+#endif
 
 template <typename Ret, typename...Args>
 struct SubCallerComparator : SubHolder<Ret, Args...> {
@@ -108,19 +149,20 @@ private:
     }
 
     Ret call_impl (SV** args, size_t items, std::false_type) {
-        Scalar ret = this->sub.call(args, items);
+        Scalar ret = this->sub().call(args, items);
         for (size_t i = 0; i < items; ++i) SvREFCNT_dec(args[i]);
         return ret_conv.in(ret ? ret : Scalar::undef);
     }
 
     Ret call_impl (SV** args, size_t items, std::true_type) {
-        this->sub.template call<void>(args, items);
+        this->sub().template call<void>(args, items);
         for (size_t i = 0; i < items; ++i) SvREFCNT_dec(args[i]);
     }
 };
 
 struct IFunctionCaller {
     virtual Sv call (SV**, size_t) = 0;
+    virtual IFunctionCaller* clone () const = 0;
     virtual ~IFunctionCaller () {}
 };
 
@@ -144,10 +186,16 @@ struct FunctionCaller : FunctionHolder<typename RetConv::type, typename Convs::t
 
     FunctionCaller (const Func& f, const RetConv& rc, const Convs&...acs) : Super(f), ret_conv(rc), arg_convs(acs...) {}
 
+    FunctionCaller (const FunctionCaller& oth) = default;
+
     Sv call (SV** svs, size_t items) override {
         constexpr size_t ARGS_COUNT = sizeof...(Convs);
         if (items != ARGS_COUNT) throw Simple::format("wrong number of arguments for subroutine call: expected %d, passed %d", ARGS_COUNT, items);
         return call_impl(svs, std::make_index_sequence<ARGS_COUNT>(), typename std::is_void<Ret>::type());
+    }
+
+    IFunctionCaller* clone () const override {
+        return new FunctionCaller(*this);
     }
 
 private:
@@ -203,7 +251,7 @@ IFunctionCaller* function2sub_impl (const panda::function<Ret(Args...)>& f, Conv
 template <typename Ret, typename...Args, typename...ConvArgs>
 std::enable_if_t<std::is_void<Ret>::value, panda::function<Ret(Args...)>>
 sub2function (panda::function<Ret(Args...)>*, const Sub& sub, ConvArgs&&...cargs) {
-    auto fc = reinterpret_cast<IFunctionCaller*>(sub.payload(&marker).ptr);
+    auto fc = reinterpret_cast<IFunctionCaller*>(sub.payload(&out_marker).ptr);
     if (auto holder = dyn_cast<FunctionHolder<Ret, Args...>*>(fc)) return holder->func;
     return sub2function_impl<Ret, Args...>(sub, nullptr, std::forward<ConvArgs>(cargs)...);
 }
@@ -211,7 +259,7 @@ sub2function (panda::function<Ret(Args...)>*, const Sub& sub, ConvArgs&&...cargs
 template <typename Ret, typename...Args, typename...ConvArgs>
 std::enable_if_t<!std::is_void<Ret>::value, panda::function<Ret(Args...)>>
 sub2function (panda::function<Ret(Args...)>*, const Sub& sub, ConvArgs&&...cargs) {
-    auto fc = reinterpret_cast<IFunctionCaller*>(sub.payload(&marker).ptr);
+    auto fc = reinterpret_cast<IFunctionCaller*>(sub.payload(&out_marker).ptr);
     if (auto holder = dyn_cast<FunctionHolder<Ret, Args...>*>(fc)) return holder->func;
     return sub2function_impl<Ret, Args...>(sub, std::forward<ConvArgs>(cargs)...);
 }
@@ -266,7 +314,7 @@ namespace xs {
     Sub function2sub (const panda::function<Ret(Args...)>& f, ConvArgs&&...cargs) {
         if (!f) return {};
         auto caller = panda::dyn_cast<xs::func::SubHolder<Ret, Args...>*>(f.func.get());
-        if (caller) return caller->sub;
+        if (caller) return caller->sub();
         return xs::func::create_sub(xs::func::function2sub(f, std::forward<ConvArgs>(cargs)...));
     }
 

@@ -1,10 +1,11 @@
 Changes
 Makefile.PL
 MANIFEST
-Nums2Ords.pm
-README
+lib/Lingua/PT/Nums2Ords.pm
+README.md
 t/01-basic_tests.t
 t/02-misc.t
 META.yml                                 Module meta-data (added by MakeMaker)
 t/pod.t
 t/pod-coverage.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -25,10 +25,8 @@ bool has_module (SV* ref) {
     return false;
 }
 
-const Module* get_module_by_namespace () {
-    Stash stash = CopSTASH(PL_curcop);
-    if (!stash) return &::panda_log_module;
-    auto module = (const Module*)stash.payload(&module_cache_marker).ptr; // try to get module from cache
+Module* get_module_by_namespace (Stash stash) {
+    auto module = (Module*)stash.payload(&module_cache_marker).ptr; // try to get module from cache
     if (module) return module;
 
     Object module_obj;
@@ -62,6 +60,38 @@ const Module* get_module_by_namespace () {
     return module;
 }
 
+Module* resolve_module(size_t depth) {
+    Stash stash;
+    if (depth == 0) {
+        stash = CopSTASH(PL_curcop);
+    }
+    else {
+        const PERL_CONTEXT *dbcx = nullptr;
+        const PERL_CONTEXT *cx = caller_cx(depth, &dbcx);
+        if (cx) {
+            if ((CxTYPE(cx) == CXt_SUB || CxTYPE(cx) == CXt_FORMAT)) {
+                #ifdef CvHASGV
+                    bool has_gv = CvHASGV(dbcx->blk_sub.cv);
+                #else
+                    GV * const cvgv = CvGV(dbcx->blk_sub.cv);
+                    /* So is ccstack[dbcxix]. */
+                    bool has_gv = (cvgv && isGV(cvgv));
+                #endif
+                if (has_gv) {
+                    xs::Sub sub(dbcx->blk_sub.cv);
+                    stash = sub.glob().effective_stash();
+                }
+            }
+            else stash =  CopSTASH(cx->blk_oldcop);
+        }
+    }
+    // fallback
+    if (!stash) return &::panda_log_module;
+
+    return get_module_by_namespace(stash);
+}
+
+
 template<typename SkipPredicate>
 inline static OP* pp_maybe_skip(SkipPredicate&& p) {
     bool skip = true;
@@ -91,8 +121,8 @@ static bool final_check(Level level, SV* mod_sv) {
             }
         }
     }
-    if (!module) module = get_module_by_namespace();
-    return module->level > level;
+    if (!module) module = resolve_module(0);
+    return module->level() > level;
 }
 
 namespace access {

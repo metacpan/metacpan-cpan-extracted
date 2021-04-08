@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Array;
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 use warnings;
 use strict;
@@ -9,14 +9,14 @@ use Data::CompactReadonly::V0::TiedArray;
 
 sub _init {
     my($class, %args) = @_;
-    my($parent, $offset) = @args{qw(parent offset)};
+    my($root, $offset) = @args{qw(root offset)};
 
     my $object = bless({
-        parent => $parent,
+        root => $root,
         offset => $offset
     }, $class);
 
-    if($parent->_tied()) {
+    if($root->_tied()) {
         tie my @array, 'Data::CompactReadonly::V0::TiedArray', $object;
         return \@array;
     } else {

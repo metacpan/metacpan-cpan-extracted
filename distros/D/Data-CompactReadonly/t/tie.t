@@ -20,6 +20,19 @@ Data::CompactReadonly->create($filename, [
     'fishfingers',
     []
 ]);
+
+subtest 'tieing with fast_collections cache' => sub {
+    my $tied = Data::CompactReadonly->read($filename, 'tie' => 1, fast_collections => 1);
+    ok(tied(@{$tied}), "db is tied");
+
+    is($tied->[2]->{hash}->{lemon}, 'curry', "can read from hashes");
+    eq_or_diff(
+        $tied->[2]->{array},
+        [qw(lemon curry)],
+        "read some more"
+    );
+};
+
 my $tied   = Data::CompactReadonly->read($filename, 'tie' => 1);
 my $untied = Data::CompactReadonly->read($filename);
 

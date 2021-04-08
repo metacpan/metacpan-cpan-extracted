@@ -4,6 +4,8 @@ use Test::More;
 use Test::Exception;
 use lib 't/lib'; use MyTest;
 
+catch_run("[operations]");
+
 my $date;
 
 subtest 'compare' => sub { 

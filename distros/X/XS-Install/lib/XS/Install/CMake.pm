@@ -28,6 +28,10 @@ macro(find_package)
     _find_package(${find_package_ARGS})
 endmacro()
 
+if (WIN32)
+    list(APPEND CMAKE_FIND_LIBRARY_SUFFIXES .dll)
+endif()
+
 function(is_good_lib_item ret name)
     set(${ret} FALSE PARENT_SCOPE)
     if(${name} MATCHES "debug|optimized|general|PRIVATE|PUBLIC|INTERFACE" OR ${name} MATCHES "^-.*" OR TARGET ${name})
@@ -147,7 +151,8 @@ EOS
 sub import_cmake_properites {
     my $source = shift;
     my $result = {
-        INCLUDE => _get_prop($source, 'INTERFACE_INCLUDE_DIRECTORIES', 'BUILD_INTERFACE'),
+        INSTALL_INCLUDE => _get_prop($source, 'INTERFACE_INCLUDE_DIRECTORIES', 'INSTALL_INTERFACE'),
+        BUILD_INCLUDE => _get_prop($source, 'INTERFACE_INCLUDE_DIRECTORIES', 'BUILD_INTERFACE'),
         INC => _get_prop($source, 'INC', 'INSTALL_INTERFACE'),
     };
 
@@ -155,11 +160,15 @@ sub import_cmake_properites {
     my $link_opts = _get_prop($source, 'INTERFACE_LINK_OPTIONS');
     my $locations = _get_prop($source, 'LOCATIONS');
 
-    push ( @$link_opts, map({"-l$_"} @$libs), @$locations );
+    push ( @$link_opts, map({($_ =~ /-/) ? $_ : "-l$_"} @$libs), @$locations );
     $result->{"LIBS"} = $link_opts;
 
     $result->{"DEFINE"} = [map {"-D$_"} @{_get_prop($source, 'INTERFACE_COMPILE_DEFINITIONS')}];
     $result->{"CCFLAGS"} = _get_prop($source, 'IMPORT_COMPILE_OPTIONS');
+
+    my $ok = eval { require Alien::cmake3; 1 };
+    die "This module requires Alien::cmake3 to build.\n" unless $ok;
+    $result->{"CMAKE_BIN"} = File::Spec->catfile(Alien::cmake3->bin_dir, Alien::cmake3->exe);
 
     return $result;
 }

@@ -64,6 +64,10 @@ T_xs_List
     $arg = NULL;
     XSRETURN($var.push_on_stack(MARK));
 
+T_xs_expected
+    $arg = NULL;
+    XSRETURN_EXPECTED($var);
+
 ######################################################################
 INPUT
 

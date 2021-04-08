@@ -1,3 +1,8 @@
+2.1.1    08.04.2021
+           - move C part to C lib with cmake
+           - add C tests
+           - add more query methods to C++ interface
+           - add path_info()
 2.1.0    25.11.2020
            - added ALLOW_EXTENDED_CHARS flag
            - fix strict uris when using from other shared library

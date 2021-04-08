@@ -4,6 +4,9 @@ use lib 't/lib';
 use MyTest;
 use Test::More;
 use Test::Deep;
+use Test::Catch;
+
+catch_run("[client-connect]");
 
 my $test_connect = sub {
     my ($req, $check) = @_;

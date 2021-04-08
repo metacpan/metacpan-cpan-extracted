@@ -5,7 +5,7 @@ using Test = TestSv<Scalar>;
 // when policy = INCREMENT, and SV* declined, do nothing (+1 -1)
 // when policy = NONE and SV* declined, it MUST be decremented
 
-TEST_CASE("Scalar", "[Sv]") {
+TEST_CASE("Scalar", "[Scalar]") {
     perlvars vars;
     Scalar my(vars.iv);
     Sv oth_valid(vars.rv), oth_invalid(vars.av);

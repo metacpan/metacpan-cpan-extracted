@@ -4,7 +4,10 @@ use lib 't/lib';
 use MyTest;
 use Test::More;
 use Test::Fatal;
+use Test::Catch;
 use Protocol::WebSocket::Fast;
+
+catch_run("[inflate-frames]");
 
 my $create_pair = sub {
     my $configure = shift;

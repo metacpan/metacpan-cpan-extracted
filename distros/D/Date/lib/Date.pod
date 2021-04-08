@@ -811,7 +811,7 @@ The name of localzone. Note that in some cases the real name of localzone is not
 (for example when localzone is retrieved from /etc/localtime file, tzname() will return ':/etc/localtime')
 
 
-=head4 use_system_zones()
+=head4 use_system_timezones()
 
 Use your OS's timezones dir. This is default behaviour if your OS has /usr/share/zoneinfo DB. Otherwise embedded zones
 are used by default (for example, on MS Windows).
@@ -819,7 +819,7 @@ are used by default (for example, on MS Windows).
 If your OS doesn't have /usr/share/zoneinfo DB, this function warns and does nothing.
 
 
-=head4 use_embed_zones()
+=head4 use_embed_timezones()
 
 Use timezone files which come with this module (they may be newer or older than system ones).
 
@@ -835,7 +835,7 @@ If there was an error (!exists, !readable, etc) returns false and leaves tzdir u
     tzset('Europe/Moscow'); # set /home/frank/myzones/Europe/Moscow as localzone
 
 
-=head4 available_zones()
+=head4 available_timezones()
 
 Returns list of all available timezones in tzdir().
 

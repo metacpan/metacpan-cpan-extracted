@@ -3,6 +3,10 @@ use warnings;
 use lib 't/lib'; use MyTest;
 use Test::More;
 
+sub mysub {
+    XLog::log(XLog::ERROR, "mymsg");
+}
+
 subtest 'set formatter callback' => sub {
     my $ctx = Context->new;
     my @args;
@@ -13,13 +17,13 @@ subtest 'set formatter callback' => sub {
     });
     XLog::set_logger(sub { $msg = shift });
     
-    XLog::log(XLog::ERROR, "hello");
+    XLog::log(XLog::ERROR, "hello"); my $line = __LINE__;
     
     is $args[0], "hello";
     is $args[1], XLog::ERROR;
     is $args[2], "";
     like $args[3], qr/formatter.t/;
-    is $args[4], 16;
+    is $args[4], $line;
     is $args[5], "__ANON__";
     is $msg, "formatted";
 };
@@ -37,11 +41,15 @@ subtest 'set formatter object' => sub {
         }
     }
     my $msg;
-        
-    XLog::set_formatter(MyFormatter->new);
+
     XLog::set_logger(sub { $msg = shift });
         
-    XLog::log(XLog::ERROR, "hello");
+    my $formatter = MyFormatter->new;
+    XLog::set_formatter($formatter);
+    is XLog::get_formatter(), $formatter;
+    undef $formatter;
+       
+    XLog::log(XLog::ERROR, "hello"); my $line = __LINE__;
         
     my @args = @MyFormatter::args;
     is ref($args[0]), 'MyFormatter';
@@ -49,7 +57,7 @@ subtest 'set formatter object' => sub {
     is $args[2], XLog::ERROR;
     is $args[3], "";
     like $args[4], qr/formatter.t/;
-    is $args[5], 44;
+    is $args[5], $line;
     is $args[6], "__ANON__";
     is $msg, "epta";
 };
@@ -76,20 +84,42 @@ subtest 'formatter destroy' => sub {
     is $MyFormatterDtor::dtor, 2;
 } if $^V >= '5.24'; # on perl < 5.24 false DESTROY could be called when no refs from perl
 
-sub mysub {
-    XLog::log(XLog::ERROR, "mymsg");
-}
 
 subtest 'set_format' => sub {
     my $ctx = Context->new;
     
-    XLog::set_format("LEVEL=%L FILE=%f LINE=%l FUNC=%F MODULE=%M MESSAGE=%m");
+    XLog::set_formatter("LEVEL=%L FILE=%f LINE=%l FUNC=%F MODULE=%M MESSAGE=%m");
     my $msg;
     XLog::set_logger(sub { $msg = shift });
     
     mysub();
     
-    is $msg, "LEVEL=error FILE=formatter.t LINE=80 FUNC=mysub MODULE= MESSAGE=mymsg";
+    is $msg, "LEVEL=error FILE=formatter.t LINE=7 FUNC=mysub MODULE= MESSAGE=mymsg";
+};
+
+subtest 'program-decorator' => sub {
+    my $ctx = Context->new;
+
+    my $msg;
+    XLog::set_logger(sub { $msg = shift });
+    XLog::set_formatter("dollar-zero: %P");
+
+    subtest "applied by default" => sub {
+        mysub();
+        my $script = __FILE__ =~ s|(.+)/(.+)|$2|r;
+        like $msg, qr/dollar-zero: $script/;
+    };
+
+    subtest "spy on custom" => sub {
+        XLog::Formatter::Pattern::set_program_decorator(sub {
+            my $name = shift;
+            return "---===[$name]===---";
+        });
+        $0 = "my_script";
+        mysub();
+
+        is $msg, "dollar-zero: ---===[my_script]===---";
+    };
 };
 
 done_testing();

@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Scalar::NegativeMedium;
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 use warnings;
 use strict;

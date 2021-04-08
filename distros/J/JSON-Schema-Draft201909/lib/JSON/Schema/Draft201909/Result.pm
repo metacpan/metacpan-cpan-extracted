@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.025';
+our $VERSION = '0.026';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -22,15 +22,16 @@ use List::Util 1.50 'head';
 use namespace::clean;
 
 use overload
-  'bool'  => sub { $_[0]->result },
+  'bool'  => sub { $_[0]->valid },
   '0+'    => sub { $_[0]->count },
   fallback => 1;
 
-has result => (
+has valid => (
   is => 'ro',
   isa => InstanceOf['JSON::PP::Boolean'],
   coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
 );
+sub result { goto \&valid } # backcompat only
 
 has $_.'s' => (
   is => 'bare',
@@ -54,32 +55,32 @@ has output_format => (
 
 sub BUILD {
   my $self = shift;
-  warn 'result is false but there are no errors' if not $self->result and not $self->error_count;
+  warn 'result is false but there are no errors' if not $self->valid and not $self->error_count;
 }
 
 sub format {
   my ($self, $style) = @_;
   if ($style eq 'flag') {
-    return +{ valid => $self->result };
+    return +{ valid => $self->valid };
   }
-  if ($style eq 'basic') {
+  elsif ($style eq 'basic') {
     return +{
-      valid => $self->result,
-      $self->result
+      valid => $self->valid,
+      $self->valid
         ? ($self->annotation_count ? (annotations => [ map $_->TO_JSON, $self->annotations ]) : ())
         : (errors => [ map $_->TO_JSON, $self->errors ]),
     };
   }
   # note: strict_basic will NOT be supported after draft 2019-09!
-  if ($style eq 'strict_basic') {
+  elsif ($style eq 'strict_basic') {
     return +{
-      valid => $self->result,
-      $self->result
+      valid => $self->valid,
+      $self->valid
         ? ($self->annotation_count ? (annotations => [ map _map_uris($_->TO_JSON), $self->annotations ]) : ())
         : (errors => [ map _map_uris($_->TO_JSON), $self->errors ]),
     };
   }
-  if ($style eq 'terse') {
+  elsif ($style eq 'terse') {
     # we can also drop errors for unevaluatedItems, unevaluatedProperties
     # when there is another (non-discarded) error at the same instance location or parent keyword
     # location (indicating that "unevaluated" is actually "unsuccessfully evaluated").
@@ -121,11 +122,11 @@ sub format {
     }
     $self->errors;
 
-    die 'uh oh, have no errors left to report' if not $self->result and not @errors;
+    die 'uh oh, have no errors left to report' if not $self->valid and not @errors;
 
     return +{
-      valid => $self->result,
-      $self->result
+      valid => $self->valid,
+      $self->valid
         ? ($self->annotation_count ? (annotations => [ map $_->TO_JSON, $self->annotations ]) : ())
         : (errors => [ map $_->TO_JSON, @errors ]),
     };
@@ -134,7 +135,7 @@ sub format {
   die 'unsupported output format';
 }
 
-sub count { $_[0]->result ? $_[0]->annotation_count : $_[0]->error_count }
+sub count { $_[0]->valid ? $_[0]->annotation_count : $_[0]->error_count }
 
 sub TO_JSON {
   my $self = shift;
@@ -166,7 +167,7 @@ JSON::Schema::Draft201909::Result - Contains the result of a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -190,12 +191,12 @@ L<JSON::Schema::Draft201909>.
 
 =head1 OVERLOADS
 
-The object contains a boolean overload, which evaluates to the value of L</result>, so you can
+The object contains a boolean overload, which evaluates to the value of L</valid>, so you can
 use the result of L<JSON::Schema::Draft201909/evaluate> in boolean context.
 
 =head1 ATTRIBUTES
 
-=head2 result
+=head2 valid
 
 A boolean. Indicates whether validation was successful or failed.
 
@@ -245,7 +246,7 @@ C<allOf> failed evaluation).
 
 =head1 METHODS
 
-=for Pod::Coverage BUILD OUTPUT_FORMATS
+=for Pod::Coverage BUILD OUTPUT_FORMATS result
 
 =head2 format
 

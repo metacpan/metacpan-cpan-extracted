@@ -7,6 +7,12 @@ use Test::More;
 
 BEGIN { use_ok('Net::IPAM::Block') || print "Bail out!\n"; }
 
+eval { Net::IPAM::Block->new('::')->contains() };
+like( $@, qr/wrong/i, 'contains croaks on missing input' );
+
+eval { Net::IPAM::Block->new('::')->contains( bless {}, 'foo' ) };
+like( $@, qr/wrong/i, 'contains croaks on wrong input' );
+
 my $good = [
   { a => "0.0.0.0/0", b => "10.0.0.0/8", name => "a contains b" },
   { a => "0.0.0.0/0", b => "0.0.0.0/8",  name => "a contains b" },

@@ -60,7 +60,8 @@ sub parse_query {
 
 sub encdec_uric {
     my $big = "01234567890123456789012345678901234567890123456789%01%02%03%04%05%06%07%08%09%10%11%12%13%14%15%16%17%18%19%20";
-    my $sml = "hi%20i%20m%20here";    
+    my $sml = "hi%20i%20m%20here";
+    say URI::XS::decode_uri_component($big);
     timethese(-1, {
         encbig => sub { URI::XS::bench_encode_uri_component($big) },
         encsml => sub { URI::XS::bench_encode_uri_component($sml) },

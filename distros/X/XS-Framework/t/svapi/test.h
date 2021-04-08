@@ -86,7 +86,7 @@ struct TestSv {
     }
 
     template <class T>
-    static void ctor (T& src, behaviour_t behaviour) {
+    static void ctor (T&& src, behaviour_t behaviour) {
         SECTION("copy") { _ctor(src, behaviour, false); }
         SECTION("move") { _ctor(std::move(src), behaviour, true); }
     }
@@ -127,7 +127,7 @@ struct TestSv {
     }
 
     template <class T>
-    static void assign (const TestClass& o, T& oth, behaviour_t behaviour) {
+    static void assign (const TestClass& o, T&& oth, behaviour_t behaviour) {
         REQUIRE(o);
         SECTION("copy") {
             SECTION("default")  { _assign(o, oth, behaviour, false); }

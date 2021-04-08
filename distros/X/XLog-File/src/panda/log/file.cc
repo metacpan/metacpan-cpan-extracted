@@ -4,6 +4,13 @@
 #include <panda/unievent/Fs.h>
 #include <panda/unievent/util.h>
 
+#include <string.h>
+#include <stdio.h>
+#ifdef __unix__
+#include <unistd.h>
+#include <fcntl.h>
+#endif
+
 namespace panda { namespace log {
 
 using namespace unievent;
@@ -23,10 +30,18 @@ FileLogger::FileLogger (const Config& cfg) : file(cfg.file), autoflush(cfg.autof
     reopen();
 }
 
-FileLogger::~FileLogger () {}
+FileLogger::~FileLogger () {
+    if (fh) {
+        fclose(fh);
+        fh = nullptr;
+    }
+}
 
 bool FileLogger::reopen () {
-    if (fh.is_open()) fh.close();
+    if (fh) {
+        fclose(fh);
+        fh = nullptr;
+    }
     inode = 0;
 
     if (!Fs::exists(file)) {
@@ -40,34 +55,74 @@ bool FileLogger::reopen () {
         }
     }
 
-    fh.open(file.c_str(), std::ios_base::app | std::ios_base::out);
-    if (!fh.good()) {
+    fh = fopen(file.c_str(), "a+b");
+    if (!fh) {
         std::cerr << "[FileLogger] logging disabled: could not open log file '" << file << "': " << last_sys_error().message() << std::endl;
         return false;
     }
 
-    auto res = Fs::stat(file);
-    if (!res) {
-        std::cerr << "[FileLogger] logging disabled: could not stat log file '" << file << "': " << res.error() << std::endl;
+    auto fd = fileno(fh);
+    if (fd < 0) {
+        std::cerr << "[FileLogger] logging disabled: get file descriptor '" << file << "': " << strerror(errno) << std::endl;
         return false;
     }
+
+    auto res = Fs::stat(fd);
+    if (!res) {
+        std::cerr << "[FileLogger] logging disabled: could not stat log file '" << file << "': " << strerror(errno) << std::endl;
+        return false;
+    }
+
+#ifdef __unix__
+    int flags = fcntl(fd, F_GETFD);
+    if (flags < 0) {
+        std::cerr << "[FileLogger] logging disabled: get file descriptor flags '" << file << "': " << strerror(errno) << std::endl;
+        return false;
+    }
+    flags |= FD_CLOEXEC;
+    if (fcntl(fd, F_SETFD, flags) < 0) {
+        std::cerr << "[FileLogger] logging disabled: cannot apply FD_CLOEXEC '" << file << "': " << strerror(errno) << std::endl;
+        return false;
+    }
+#endif
 
     inode = res.value().ino;
     return true;
 }
 
 void FileLogger::log (const string& msg, const Info& info) {
-    uint64_t now = (uint64_t)info.time.tv_sec + info.time.tv_nsec / 1000000;
+    uint64_t now = ((uint64_t)info.time.tv_sec) * 1000 + info.time.tv_nsec / 1000000;
     if (now >= last_check + check_freq) {
         last_check = now;
         auto res = Fs::stat(file);
         if (!res || res.value().type() != Fs::FileType::FILE || res.value().ino != inode) reopen();
     }
 
-    if (!fh || !fh.is_open()) return; // logging not available
+    if (!fh) return; // logging not available
 
-    fh << msg << std::endl;
-    if (autoflush) fh.flush();
+    auto items = fwrite(msg.data(), msg.size(), 1, fh);
+    if (!items) {
+        std::cerr << "[FileLogger] cannot write message to '" << file << "': " << strerror(errno) << ", message: " << msg << std::endl;
+        return;
+    }
+
+#ifdef _WIN32
+    items = fwrite("\r\n", 2, 1, fh);
+#else
+    items = fwrite("\n", 1, 1, fh);
+#endif
+    if (!items) {
+        std::cerr << "[FileLogger] cannot write message to '" << file << "': " << strerror(errno) << std::endl;
+        return;
+    }
+
+    if (autoflush) {
+        auto r = fflush(fh);
+        if (r != 0) {
+            std::cerr << "[FileLogger] flush message to '" << file << "': " << strerror(errno) << std::endl;
+            return;
+        }
+    };
 };
 
 }}

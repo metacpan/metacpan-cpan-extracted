@@ -78,6 +78,21 @@ subtest 'formatted logging' => sub {
     };
 };
 
+{
+    package BBB;
+    use overload '""' => sub { 'custom-stringification' };
+}
+
+subtest "custom obj logging (no overload)" => sub {
+    my $ctx = Context->new;
+
+    XLog::log(XLog::WARNING, bless {} => 'AAA');
+    $ctx->check(msg => qr/AAA/);
+
+    XLog::log(XLog::WARNING, bless {} => 'BBB');
+    $ctx->check(msg => qr/custom-stringification/);
+};
+
 subtest 'callback logging' => sub {
     my $ctx = Context->new;
     
@@ -86,6 +101,21 @@ subtest 'callback logging' => sub {
     
     XLog::error(sub { 123 });
     $ctx->check(msg => "123");
+
+    XLog::error(sub { bless {} => 'AAA' });
+    $ctx->check(msg => qr/AAA/);
+
+    XLog::error(sub { bless {} => 'BBB' });
+    $ctx->check(msg => qr/custom-stringification/);
+};
+
+subtest 'from eval block' => sub {
+    my $ctx = Context->new;
+
+    eval {
+        XLog::log(XLog::WARNING, sub { "abcdef" });
+    };
+    ok "passed";
 };
 
 done_testing();

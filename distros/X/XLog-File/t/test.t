@@ -17,7 +17,7 @@ sub test ($&) {
 }
 
 test "log" => sub {
-    XLog::set_logger(XLog::File->new({file => $file}));
+    XLog::set_logger(XLog::File->new({file => $file, autoflush => 1}));
     XLog::set_format("%m");
     XLog::set_level(XLog::DEBUG);
     
