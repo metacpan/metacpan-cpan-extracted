@@ -1,3 +1,16 @@
+0.35.15 2021-04-09 15:08:19 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix regression ; -> :
+
+0.35.14 2021-04-09 14:36:56 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - no double translation
+ - support dataModified in popup.js
+
+0.35.13 2021-04-09 13:31:23 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix msgbox regression
+
 0.35.12 2021-03-31 18:24:31 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - make calls to postProcessCfg idempotent

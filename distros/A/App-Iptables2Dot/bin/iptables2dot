@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v0.2.4');
+use version; our $VERSION = qv('v0.2.5');
 
 use App::Iptables2Dot;
 use Getopt::Long;
@@ -82,7 +82,16 @@ parser from L<App::Iptables2Dot>.
 If the program dies with the message
 I<unknown argument in rule: --unknown-opt arg>, you could run it like this:
 
+ iptables2dot --add-optdef unknown-opt iptables-save-output
+
+If the unknown option takes itself an argument, you should run it like this:
+
  iptables2dot --add-optdef unknown-opt=s iptables-save-output
+
+The suffix C<=s> tells the rule parser
+that C<unknown-opts> takes a string as argument.
+See L<Getopt::Long> for further possibilities
+regarding the arguments of this option.
 
 This may allow you to finish your analysis of iptables-save-output-file
 without having to modify the module source in I<lib/App/Iptables2Dot.pm>.

@@ -1,5 +1,14 @@
 Revision history for Perl module YAML::PP
 
+0.027 2021-04-09 11:13:28+02:00
+
+    - Forbid duplicate keys by default like announced in 0.026
+    - Add possibility to preserve alias names (see 'preserve' option)
+    - Highlighter: Add option to expand tabs in ansi color mode
+    - yamlpp-events: Add option --module
+    - Improve error message when trying to load an undefined alias
+    - Fix a test for perl 5.8.8
+
 0.026 2020-09-11 00:39:09+02:00
 
     - Add option 'duplicate_keys'. The default allows it for now and will

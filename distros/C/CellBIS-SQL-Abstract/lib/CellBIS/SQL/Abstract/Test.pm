@@ -1,5 +1,5 @@
 package CellBIS::SQL::Abstract::Test;
-$CellBIS::SQL::Abstract::Test::VERSION = '1.4';
+$CellBIS::SQL::Abstract::Test::VERSION = '1.5';
 use Mojo::Base -base;
 
 use Carp 'croak';

@@ -1,6 +1,7 @@
 package Chemistry::File::Formula;
-$VERSION = '0.37';
-# $Id: Formula.pm,v 1.16 2009/05/10 19:37:59 itubert Exp $
+
+our $VERSION = '0.38'; # VERSION
+# $Id$
 
 use strict;
 use base "Chemistry::File";
@@ -200,7 +201,7 @@ sub write_string {
     my $fh = $mol->formula_hash;
     $format =~ s/%%/\\%/g;                          # escape %% with a \
     my $joiner = "";
-    $joiner = $1 if $format =~ s/(?<!\\)%j{(.*?)}//;        # joiner %j{}
+    $joiner = $1 if $format =~ s/(?<!\\)%j\{(.*?)}//;       # joiner %j{}
 
     my @symbols;
     if ($opts{formula_sort}) {
@@ -356,9 +357,9 @@ sub ParensBalanced {
 
 1;
 
-=head1 VERSION
+=head1 SOURCE CODE REPOSITORY
 
-0.37
+L<https://github.com/perlmol/Chemistry-Mol>
 
 =head1 SEE ALSO
 
@@ -367,8 +368,6 @@ L<Chemistry::Mol>, L<Chemistry::File>
 For discussion about Hill order, just search the web for C<formula "hill
 order">. The original reference is I<J. Am. Chem. Soc.> B<1900>, I<22>,
 478-494.  L<http://dx.doi.org/10.1021/ja02046a005>.
-
-The PerlMol website L<http://www.perlmol.org/>
 
 =head1 AUTHOR
 

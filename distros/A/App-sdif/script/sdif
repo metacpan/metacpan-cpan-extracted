@@ -16,7 +16,7 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.18.2
+Version 4.19.0
 
 =head1 SYNOPSIS
 
@@ -42,6 +42,7 @@ diff ... | sdif
     --column=order	set column order (default ONM)
     --view, -v		viewer mode
     --ambiguous=s       ambiguous character width (detect, wide, narrow)
+    --[no]command	print diff control command (default on)
     --[no]prefix	process git --graph output (default on)
     --prefix-pattern    prefix pattern
 
@@ -125,8 +126,9 @@ my $opt_W;
 my $opt_colortable;
 my %opt_visible;
 my $opt_tabstop  = 8;
-my $opt_tabhead  = "\N{MEDIUM SHADE}";
-my $opt_tabspace = "\N{LIGHT SHADE}";
+my $opt_tabstyle = undef;
+my $opt_tabhead  = undef;
+my $opt_tabspace = undef;
 
 #
 # options only for cdif
@@ -187,14 +189,15 @@ my @optargs = (
     "nocdif|no-cdif" => sub { $opt_cdif = undef },
     "cdifopts=s" => sub { push @opt_cdifopts, shellwords $_[1] },
     "colortable" => \$opt_colortable,
-    "lenience!" => \$opt_lenience,
-    "visible=i" => \%opt_visible,
-    "tabstop=i" => \$opt_tabstop,
-    "tabhead=s" => \$opt_tabhead,
+    "lenience!"  => \$opt_lenience,
+    "visible=i"  => \%opt_visible,
+    "tabstop=i"  => \$opt_tabstop,
+    "tabhead=s"  => \$opt_tabhead,
+    "tabstyle=s" => \$opt_tabstyle,
     "tabspace=s" => \$opt_tabspace,
 
-    "unit=s" => \$opt_unit,
-    "mecab!" => sub { $opt_unit = $_[1] ? 'mecab' : $opt_unit_default },
+    "unit|by=s"  => \$opt_unit,
+    "mecab!"     => sub { $opt_unit = $_[1] ? 'mecab' : $opt_unit_default },
 );
 
 my @SAVEDARGV = @ARGV;
@@ -211,15 +214,18 @@ use Text::VisualWidth::PP qw(vwidth);
 use Text::ANSI::Fold qw(ansi_fold :constants);
 Text::ANSI::Fold->configure(padding => 1, expand => 1, tabstop => $opt_tabstop);
 
-if ($opt_visible{ht}) {
+if ($opt_visible{ht} or $opt_tabstyle) {
     Text::ANSI::Fold->configure(
-	tabhead  => unicode($opt_tabhead),
-	tabspace => unicode($opt_tabspace),
-    );
+	tabstyle => $opt_tabstyle,
+	map  { $_->[0] => unicode($_->[1]) }
+	grep { $_->[1] }
+	[ tabhead  => $opt_tabhead  ],
+	[ tabspace => $opt_tabspace ],
+	);
 }
 
 sub unicode {
-    my $char = shift;
+    my $char = shift or return undef;
     if ($char =~ /^\X$/) {
 	$char;
     } else {
@@ -598,7 +604,7 @@ continue {
 }
 
 close DIFF;
-my $exit = $? >> 8;
+my $exit = $DIFF =~ /\|$/ ? $? >> 8 : 0;
 
 if ($readfile) {
     if ($exit < 2) {
@@ -608,7 +614,7 @@ if ($readfile) {
     close NEW;
 }
 
-exit($exit == 2);
+exit($exit > 1);
 
 ######################################################################
 
@@ -983,6 +989,10 @@ B<--no-cdif> option to disable it.  Option B<--unit> (default word)
 will be passed through to B<cdif>.  Other B<cdif> options can be
 specified by B<--cdifopts>.
 
+=head2 EXIT STATUS
+
+B<sdif> always exit with status zero unless error occured.
+
 =head1 OPTIONS
 
 =over 7
@@ -1001,12 +1011,12 @@ allows to run-in and run-out prohibited characters at the head-and-end
 of line.  Margin columns are used to run-in prohibited characters from
 the head of next line.  See `perldoc Text::ANSI::Fold` for detail.
 
-=item B<-->[B<no>]B<number>, B<-n>
+=item B<-->[B<no->]B<number>, B<-n>
 
 Print line number on each lines.
 Default false.
 
-=item B<-->[B<no>]B<command>
+=item B<-->[B<no->]B<command>
 
 Print diff command control lines.
 Default true.
@@ -1030,17 +1040,17 @@ Passed through to the back-end diff command.  Sdif can interpret the
 output from normal, context (I<diff -c>) and unified diff (I<diff
 -u>).
 
-=item B<-->[B<no>]B<truncate>, B<-t>
+=item B<-->[B<no->]B<truncate>, B<-t>
 
 Truncate lines if they are longer than printing width.
 Default false.
 
-=item B<-->[B<no>]B<onword>
+=item B<-->[B<no->]B<onword>
 
 Fold long line at word boundaries.
 Default true.
 
-=item B<-->[B<no>]B<cdif>[=I<command>]
+=item B<-->[B<no->]B<cdif>[=I<command>]
 
 Use B<cdif> command instead of normal diff command.  Enabled by
 default and use B<--no-cdif> option explicitly to disable it.  This
@@ -1050,14 +1060,16 @@ option accepts optional parameter as an actual B<cdif> command.
 
 Specify options for back-end B<cdif> command.
 
-=item B<--unit>=I<unit>
+=item B<--unit>=I<word>|I<char>|I<mecab>
+
+=item B<--by>=I<word>|I<char>|I<mecab>
 
 =item B<--mecab>
 
 These options are simply sent to back-end B<cdif> command.  Default is
 B<--unit>=I<word> and I<char> and I<mecab> can be used.  Option
-B<--mecab> is same as B<--unit=mecab>.  Use B<--cdifopts> to set other
-options.
+B<--by> is an alias for B<--unit>.  Option B<--mecab> is same as
+B<--unit=mecab>.  Use B<--cdifopts> to set other options.
 
 =item B<--diff>=I<command>
 
@@ -1091,11 +1103,11 @@ Next two commands produce same output.
 
     $ git diff v3 v1 v2 | sdif
 
-=item B<-->[B<no>]B<color>
+=item B<-->[B<no->]B<color>
 
 Use ANSI color escape sequence for output.  Default is true.
 
-=item B<-->[B<no>]B<256>
+=item B<-->[B<no->]B<256>
 
 Use ANSI 256 color mode.  Default is true.
 
@@ -1129,7 +1141,7 @@ Treat ambiguous characters as narrow.
 
 =back
 
-=item B<-->[B<no>]B<prefix>
+=item B<-->[B<no->]B<prefix>
 
 Understand prefix for diff output including B<git> B<--graph> option.
 True by default.
@@ -1143,7 +1155,7 @@ Specify prefix pattern in regex.  Default pattern is:
 This pattern matches B<git> graph style and whitespace indented diff
 output.
 
-=item B<-->[B<no>]B<lenience>
+=item B<-->[B<no->]B<lenience>
 
 Supress warning message for unexpected input from diff command.  True
 by default.
@@ -1160,6 +1172,15 @@ following B<tabspace> characters.  They can be specified by
 B<--tabhead> and B<--tabspace> option and default value is C<\N{MEDIUM
 SHADE}> and C<\N{LIGHT SHADE}>.  If the option value is longer than
 single characger, it is evaluated as unicode name.
+
+B<cdif> shows non-space control characters visible by default. See
+L<cdif/--visible>.
+
+=item B<--tabstyle>=I<dot>|I<symbol>|I<shade>
+
+Option B<--tabstyle> allow to set B<--tabhead> and B<--tabspace>
+characters at once according to the given style name.  Select from
+C<dot>, C<symbol> or C<shade>.  See L<Text::ANSI::Fold/tabstyle>.
 
 =item B<--tabstop>=I<n>
 

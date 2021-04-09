@@ -1,5 +1,14 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.4.3    2021-04-09 16:39:01+01:00 Europe/London
+  [Enhancements]
+  - Add more file extensions to script_extensions rule.
+
+  - Add more extensions to the misc_extensions rule.
+
+  [Documentation]
+  - Bump copyright year.
+
 v0.4.2    2020-07-31 14:35:48+01:00 Europe/London
   [Toolchain]
   - Add core modules in the prerequisites.

@@ -15,6 +15,12 @@ my $builder = Module::Build->new(
     dist_author         => 'Mathias Weidner <mamawe@cpan.org>',
     dist_version_from   => 'lib/App/Iptables2Dot.pm',
     license             => 'perl',
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/matwei/perl-App-Iptables2Dot',
+            bugtracker => 'https://rt.cpan.org/Public/Dist/Display.html?Name=App-Iptables2Dot',
+        }
+    },
     module_name         => 'App::Iptables2Dot',
     requires => {
 	# Perls prior to 5.6 don't support the three-argument form of open.

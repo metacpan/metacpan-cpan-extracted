@@ -6,7 +6,6 @@ use t::Util;
 
 use LINE::Bot::Message::Narrowcast;
 use Furl;
-use JSON::XS;
 
 my $bot = LINE::Bot::Message::Narrowcast->new(
     channel_secret       => 'testsecret',
@@ -32,6 +31,10 @@ subtest '#get_narrowcast_message_status' => sub {
         is $res->failed_description, 'sample description'; # alias
         is $res->errorCode, 1;
         is $res->error_code, 1;
+        is $res->acceptedTime, '2021-01-01T00:00:00.000Z';
+        is $res->accepted_time, '2021-01-01T00:00:00.000Z'; # alias
+        is $res->completedTime, '2021-01-01T01:23:45.678Z';
+        is $res->completed_time, '2021-01-01T01:23:45.678Z'; # alias
     } receive_request {
         my %args = @_;
         is $args{method}, 'GET';
@@ -44,6 +47,8 @@ subtest '#get_narrowcast_message_status' => sub {
             targetCount => 100,
             failedDescription => 'sample description',
             errorCode => 1,
+            acceptedTime => '2021-01-01T00:00:00.000Z',
+            completedTime => '2021-01-01T01:23:45.678Z'
         }
     }
 };

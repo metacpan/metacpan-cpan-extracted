@@ -73,17 +73,17 @@ my $opt_prefix_pattern = q/(?:\\| )*(?:  )*/;
 my $opt_lenience = 1;
 
 my %visible = (
-    nul => [ 1,  "\000"  => "\N{SYMBOL FOR NULL}" ],
-    bel => [ 1,  "\007"  => "\N{SYMBOL FOR BELL}" ],
-    bs  => [ 1,  "\010"  => "\N{SYMBOL FOR BACKSPACE}" ],
-    ht  => [ 0,  "\011"  => "\N{SYMBOL FOR HORIZONTAL TABULATION}" ],
-    nl  => [ 0,  "\012"  => "\N{SYMBOL FOR NEWLINE}" . "\n" ],
-    vt  => [ 1,  "\013"  => "\N{SYMBOL FOR VERTICAL TABULATION}" ],
-    np  => [ 1,  "\014"  => "\N{SYMBOL FOR FORM FEED}" ],
-    cr  => [ 1,  "\015"  => "\N{SYMBOL FOR CARRIAGE RETURN}" ],
-    esc => [ 1,  "\033"  => "\N{SYMBOL FOR ESCAPE}" ],
-    sp  => [ 0,  "\040"  => "\N{SYMBOL FOR SPACE}" ],
-    del => [ 1,  "\177"  => "\N{SYMBOL FOR DELETE}" ],
+    nul => [ 1, "\000" => "\N{SYMBOL FOR NULL}" ],
+    bel => [ 1, "\007" => "\N{SYMBOL FOR BELL}" ],
+    bs  => [ 1, "\010" => "\N{SYMBOL FOR BACKSPACE}" ],
+    ht  => [ 0, "\011" => "\N{SYMBOL FOR HORIZONTAL TABULATION}" ],
+    nl  => [ 0, "\012" => "\N{SYMBOL FOR NEWLINE}" . "\n" ],
+    vt  => [ 1, "\013" => "\N{SYMBOL FOR VERTICAL TABULATION}" ],
+    np  => [ 1, "\014" => "\N{SYMBOL FOR FORM FEED}" ],
+    cr  => [ 1, "\015" => "\N{SYMBOL FOR CARRIAGE RETURN}" ],
+    esc => [ 1, "\033" => "\N{SYMBOL FOR ESCAPE}" ],
+    sp  => [ 0, "\040" => "\N{SYMBOL FOR SPACE}" ],
+    del => [ 1, "\177" => "\N{SYMBOL FOR DELETE}" ],
     );
 my %opt_visible = do {
     map { $_ => splice @{$visible{$_}}, 0, 1 }
@@ -128,14 +128,18 @@ my @optargs = (
     "markcolor|mc!" => \$opt_markcolor,
     "textcolor|tc!" => \$opt_textcolor,
     "unknowncolor|uc!" => \$opt_unknowncolor,
+    "sdif" => sub {
+	$opt_commandcolor = 0;
+	$opt_markcolor    = 0;
+	$opt_textcolor    = 0;
+    },
     "colormap|cm=s" => \@opt_colormap,
     "colordump" => \$opt_colordump,
     "h|help" => sub { usage() },
     "man" => sub { pod2usage({-verbose => 2}) },
     "env!" => \$opt_env,
     "stat!" => \$opt_stat,
-    "unit=s" => \$opt_unit,
-#   "B|char!" => sub { $opt_unit = $_[1] ? 'char' : $opt_unit_default },
+    "unit|by=s" => \$opt_unit,
     "mecab!" => sub { $opt_unit = $_[1] ? 'mecab' : $opt_unit_default },
     "old!" => \$opt_old,
     "new!" => \$opt_new,
@@ -561,6 +565,8 @@ continue {
     }
 }
 close DIFF;
+my $exit = $DIFF =~ /\|$/ ? $? >> 8 : 0;
+
 select STDOUT;
 
 if ($opt_stat) {
@@ -581,7 +587,7 @@ if ($opt_stat) {
 	   $stat{'cnlb'});
 }
 
-exit $? >> 8;
+exit($exit > 1);
 
 ######################################################################
 
@@ -921,7 +927,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.18.2
+Version 4.19.0
 
 =head1 SYNOPSIS
 
@@ -937,8 +943,6 @@ Options:
 	-b		ignore space change
 	-w		ignore whitespace
 	-t		expand tabs
-	--rcs		use rcsdiff
-	-r<rev>, -q	rcs options
 
 	--diff=command      specify diff command
 	--subdiff=command   specify backend diff command
@@ -977,6 +981,58 @@ output from diff command.
 Lines those don't look like diff output are simply ignored and
 printed.
 
+=head2 STARTUP and MODULE
+
+B<cdif> utilizes Perl L<Getopt::EX> module, and reads I<~/.cdifrc>
+file if available when starting up.  You can define original and
+default option there.  Next line enables B<--mecab> option and add
+cossed-out effect for deleted words.
+
+    option default --mecab --cm DELETE=+X
+
+Modules under B<App::cdif> can be loaded by B<-M> option without
+prefix.  Next command load B<App::cdif::colors> module.
+
+    $ cdif -Mcolors
+
+You can also define options in module file.  Read `perldoc
+Getopt::EX::Module` for detail.
+
+=head2 COLOR
+
+Each lines are displayed in different colors.  Each text segment has
+own labels, and color for them can be specified by B<--colormap>
+option.  Read `perldoc Getopt::EX::Colormap` for detail.
+
+Standard module B<-Mcolors> is loaded by default, and define several
+color maps for light and dark screen.  If you want to use CMY colors in
+dark screen, place next line in your F<~/.cdifrc>.
+
+    option default --dark-cmy
+
+Option B<--autocolor> is defined in B<default> module to call
+L<Getopt::EX::termcolor> module.  It sets B<--light> or B<--dark>
+option according to the brightness of the terminal screen.  You can
+set preferred color in your F<~/.cdifrc> like:
+
+    option --light --cmy
+    option --dark  --dark-cmy
+
+Automatic setting is done by L<Getopt::EX::termcolor> module and it
+works with macOS Terminal.app and iTerm.app, and other XTerm
+compatible terminals.  This module accept environment variable
+L<TERM_BGCOLOR> as a terminal background color.  For exapmle, use
+C<000> or C<#000000> for black and C<555> or C<#FFFFFF> for white.
+
+Option B<--autocolor> is set by default, so override it to do nothing
+to disable.
+
+    option --autocolor --nop
+
+=head2 EXIT STATUS
+
+B<cdif> always exit with status zero unless error occured.
+
 =head1 OPTIONS
 
 =over 7
@@ -985,10 +1041,14 @@ printed.
 
 Almost same as B<diff> command.
 
+=begin deprecated
+
 =item B<--rcs>, B<-r>I<rev>, B<-q>
 
 Use rcsdiff instead of normal diff.  Option B<--rcs> is not required
 when B<-r>I<rev> is supplied.
+
+=end deprecated
 
 =item B<-->B<unit>=I<word>|I<char>|I<mecab>
 
@@ -1001,15 +1061,6 @@ character-by-character.
 When I<mecab> is given as an unit, B<mecab> command is called as a
 tokenizer for non-ASCII text.  ASCII text is compared word-by-word.
 External B<mecab> command has to been installed.
-
-=begin deprecated
-
-=item B<-B>, B<--char>
-
-Shortcut for B<--unit=char>.  This option is being deprecated, and
-will be removed in a future.
-
-=end deprecated
 
 =item B<--mecab>
 
@@ -1029,7 +1080,7 @@ option.
 
     --subdiff="git diff -U0 --no-index --histogram"
 
-=item B<-->[B<no>]B<color>
+=item B<-->[B<no->]B<color>
 
 Use ANSI color escape sequence for output.
 
@@ -1140,29 +1191,34 @@ This is equivalent to :
          --cm 'OTEXT=C,NTEXT=M,*CHANGE=BD/445,DELETE=APPEND=RD/544' \
          --cm 'CMARK=GS,MMARK=YS,CTEXT=G,MTEXT=Y'
 
-=item B<-->[B<no>]B<commandcolor>, B<--cc>
+=item B<-->[B<no->]B<commandcolor>, B<-->[B<no->]B<cc>
 
-=item B<-->[B<no>]B<markcolor>, B<--mc>
+=item B<-->[B<no->]B<markcolor>, B<-->[B<no->]B<mc>
 
-=item B<-->[B<no>]B<textcolor>, B<--tc>
+=item B<-->[B<no->]B<textcolor>, B<-->[B<no->]B<tc>
 
-=item B<-->[B<no>]B<unknowncolor>, B<--uc>
+=item B<-->[B<no->]B<unknowncolor>, B<-->[B<no->]B<uc>
 
 Enable/Disable using color for the corresponding field.
 
-=item B<-->[B<no>]B<old>, B<-->[B<no>]B<new>
+=item B<--sdif>
+
+Disable options appropriate to use for B<sdif>'s input:
+B<--commandcolor>, B<--markcolor> and B<--textcolor>.
+
+=item B<-->[B<no->]B<old>, B<-->[B<no->]B<new>
 
 Print or not old/new text in diff output.
 
-=item B<-->[B<no>]B<command>
+=item B<-->[B<no->]B<command>
 
 Print or not command lines preceding diff output.
 
-=item B<-->[B<no>]B<unknown>
+=item B<-->[B<no->]B<unknown>
 
 Print or not lines not look like diff output.
 
-=item B<-->[B<no>]B<mark>
+=item B<-->[B<no->]B<mark>
 
 Print or not marks at the top of diff output lines.  At this point,
 this option is effective only for unified diff.
@@ -1174,7 +1230,7 @@ effects.
 
 These options are prepared for watchdiff(1) command.
 
-=item B<-->[B<no>]B<prefix>
+=item B<-->[B<no->]B<prefix>
 
 Understand prefix for diff output including B<git> B<--graph> option.
 True by default.
@@ -1221,9 +1277,9 @@ in L<Getopt::EX::Colormap>).
 
 =begin deprecated
 
-=item B<-->[B<no>]B<visible-cr>
+=item B<-->[B<no->]B<visible-cr>
 
-=item B<-->[B<no>]B<visible-esc>
+=item B<-->[B<no->]B<visible-esc>
 
 Set CARRIAGE-RETURN and ESCAPE visible attributes.  These options will
 be deprecated soon.  Use B<--visible> option instead.
@@ -1238,16 +1294,37 @@ common to have many insertions and deletions of newlines because of
 text filling process.  So normal information is followed by modified
 number which ignores insert/delete newlines.
 
-=item B<-->[B<no>]B<lenience>
+=item B<-->[B<no->]B<lenience>
 
 Suppress warning message for unexpected input from diff command.  True
 by default.
 
 =back
 
+=head1 GIT
+
+See `perldoc App::sdif` how to use related commands under the GIT
+environment.
+
 =head1 ENVIRONMENT
 
+=over 7
+
+=item B<CDIFOPTS>
+
 Environment variable B<CDIFOPTS> is used to set default options.
+
+=item B<LESS>
+
+=item B<LESSANSIENDCHARS>
+
+Since B<cdif> produces ANSI Erase Line terminal sequence, it is
+convenient to set B<less> command understand them.
+
+    LESS=-cR
+    LESSANSIENDCHARS=mK
+
+=back
 
 =head1 AUTHOR
 
@@ -1263,7 +1340,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<https://github.com/kaz-utashiro/sdif-tools>
+L<App::sdif>, L<https://github.com/kaz-utashiro/sdif-tools>
 
 L<sdif(1)>, L<watchdiff(1)>
 

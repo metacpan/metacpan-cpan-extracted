@@ -1,8 +1,8 @@
 use Test::More;
 my @lines;
 
-open F, "<", "formula_tests.txt"
-    or die "couldn't open formula_tests.txt; $!";
+open F, "<", "t/formula_tests.txt"
+    or die "couldn't open t/formula_tests.txt; $!";
 @lines = <F>;
 close F;
 

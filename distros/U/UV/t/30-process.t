@@ -42,6 +42,9 @@ is($exit_cb_called, 1, "The exit callback was run");
     is($exit_status, 5, 'exit status from `perl -e "exit 5"`');
 }
 
+# WTF? This one kills the current process (this test) with a SIGBREAK
+# instead sending a SIGTERM, on Windows?!
+if( $^O ne 'MSWin32' )
 {
     my $term_signal;
 

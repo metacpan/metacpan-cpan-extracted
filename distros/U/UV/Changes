@@ -1,5 +1,8 @@
 Revision history for Perl extension UV
 
+1.907 2021-04-09
+    - Various small fixes from @Corion to improve unit testing on MSWin32
+
 1.906 2021-03-25
     - Don't worry about `AI_V4MAPPED` on systems which don't provide it
     - Removed now-dead `cpanfile`

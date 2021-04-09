@@ -50,6 +50,6 @@
          "web" : "https://github.com/ltmbr/Plack-App-WWW"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

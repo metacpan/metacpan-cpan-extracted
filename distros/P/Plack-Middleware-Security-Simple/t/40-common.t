@@ -43,12 +43,21 @@ test_psgi
         is $res->code, HTTP_OK, "HTTP_OK";
     };
 
-    subtest 'blocked' => sub {
-        my $req = GET "/some/thing.php";
+    subtest 'not blocked (.ps)' => sub {
+        my $req = GET "/some/thing.ps";
         my $res = $cb->($req);
-        ok is_error( $res->code ), join( " ", $req->method, $req->uri );
-        is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+        ok is_success( $res->code ), join( " ", $req->method, $req->uri );
+        is $res->code, HTTP_OK, "HTTP_OK";
     };
+
+    for my $ext (qw/ asp ash aspx ashx axd bat cfm cgi com dll exe jsp jspa lua php php5 pl pm ps1 psh psd1 psm1 sh sht shtml sql /) {
+        subtest "blocked (.${ext})" => sub {
+            my $req = GET "/some/thing.${ext}";
+            my $res = $cb->($req);
+            ok is_error( $res->code ), join( " ", $req->method, $req->uri );
+            is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
+        };
+    }
 
     subtest 'blocked' => sub {
         my $req = GET "/some/thing/?file=/etc/passwd";

@@ -1,6 +1,14 @@
+2.015 2021-04-09
+- loosen title-setting test as Gnuplot 5.4 puts on different line
+
+2.014 2021-04-08
+- Add workaround to shut up some font engines complaining about rendering time
+- allow 3-part Gnuplot version - thanks @akhuettel
+
 2.013 2019-12-12
 - fix for pre-5.20
 - Fix documentation for linecolor to reflect actual usage - thanks @d-lamb
+- Shut up warning on MacOS that's mistakenly marked as an error message
 
 2.012 (released 2-Dec-2019)
  - Stabilization release incorporates many smaller bug fixes

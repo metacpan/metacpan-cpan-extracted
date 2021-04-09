@@ -4,13 +4,13 @@
       "Ivan Kohler <ivan-ippay@freeside.biz>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-OnlinePayment-IPPay",
    "no_index" : {
@@ -43,5 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

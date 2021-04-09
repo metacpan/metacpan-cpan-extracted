@@ -1,5 +1,14 @@
 Revision history for Perl extension Business::OnlinePayment::IPPay.
 
+0.11  Fri Apr 09 07:35:21 AM PDT 2021  
+        - ACH SEC code: Allow setting, default to CCD for business accounts,
+          PPD otherwise (was: always PPD)
+        - doc: Update copyright and maintainer information
+        - Update tests for new test server
+
+0.10  unreleased (2015)
+        - UserIPAddr is now UserIPAddress
+
 0.09  Tue Jun 10 23:26:54 PDT 2014
         - Set UDField3 per IPPay request
         - Require password

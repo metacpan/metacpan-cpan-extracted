@@ -37,7 +37,7 @@ package App::sdif::colors;
 
 __DATA__
 
-option --light $<move(0,0)>
+option --light $<ignore>
 option --dark  --dark-green
 
 option	--green \

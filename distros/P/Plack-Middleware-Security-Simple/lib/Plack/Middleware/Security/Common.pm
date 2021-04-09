@@ -22,7 +22,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.4.2';
+our $VERSION = 'v0.4.3';
 
 
 
@@ -53,7 +53,7 @@ sub dot_files {
 
 
 sub misc_extensions {
-    my $re = qr{[.](?:bak|dat|inc)\b};
+    my $re = qr{[.](?:bak|cfg|conf|dat|inc|ini)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -85,7 +85,7 @@ sub require_content {
 
 
 sub script_extensions {
-    my $re = qr{[.](?:aspx?|cgi|php|p[lm]|sql)\b};
+    my $re = qr{[.](?:as[hp]x?|axd|bat|cfm|cgi|com|dll|exe|jspa?|lua|php5?|p[lm]|ps[dm]?[1h]|sht?|shtml|sql)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -137,7 +137,7 @@ Plack::Middleware::Security::Common - A simple security filter for with common r
 
 =head1 VERSION
 
-version v0.4.2
+version v0.4.3
 
 =head1 SYNOPSIS
 
@@ -193,6 +193,9 @@ the F</.well-known/> path.
 
 This blocks requests with miscellenious extensions in the path or
 query string.
+
+This includes common extensions for backups, includes or configuration
+files.
 
 =head2 non_printable_chars
 
@@ -261,7 +264,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2018-2020 by Robert Rothenberg.
+This software is Copyright (c) 2014,2018-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

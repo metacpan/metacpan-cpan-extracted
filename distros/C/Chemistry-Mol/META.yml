@@ -1,14 +1,29 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Chemistry-Mol
-version:      0.37
-version_from: Mol.pm
-installdirs:  site
+---
+abstract: 'Molecule object toolkit'
+author:
+  - 'Ivan Tubert-Brohman <itub@cpan.org>'
+build_requires:
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Chemistry-Mol
+recommends:
+  Chemistry::InternalCoords: '0'
+  Chemistry::Isotope: '0'
+  Compress::Zlib: '0'
 requires:
-    Math::VectorReal:              1
-    Scalar::Util:                  1.01
-    Test::Simple:                  0
-    Text::Balanced:                0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  IO::String: '0'
+  Math::VectorReal: '1.0'
+  Scalar::Util: '1.01'
+  Text::Balanced: '0'
+resources:
+  homepage: https://search.cpan.org/dist/Chemistry-Mol
+  repository: git://github.com/perlmol/chemistry-mol.git
+version: '0.38'
+x_serialization_backend: 'YAML::Tiny version 1.70'

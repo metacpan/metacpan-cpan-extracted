@@ -1,5 +1,5 @@
 package CellBIS::SQL::Abstract::Test::Table;
-$CellBIS::SQL::Abstract::Test::Table::VERSION = '1.4';
+$CellBIS::SQL::Abstract::Test::Table::VERSION = '1.5';
 use Mojo::Base -base;
 
 has 'users';
@@ -18,7 +18,7 @@ sub new {
 }
 
 package CellBIS::SQL::Abstract::Test::Table::_users;
-$CellBIS::SQL::Abstract::Test::Table::_users::VERSION = '1.4';
+$CellBIS::SQL::Abstract::Test::Table::_users::VERSION = '1.5';
 use Mojo::Base -base;
 
 # Table fields
@@ -111,7 +111,7 @@ sub pg {
 }
 
 package CellBIS::SQL::Abstract::Test::Table::_roles;
-$CellBIS::SQL::Abstract::Test::Table::_roles::VERSION = '1.4';
+$CellBIS::SQL::Abstract::Test::Table::_roles::VERSION = '1.5';
 use Mojo::Base -base;
 
 # Table fields

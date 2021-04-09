@@ -2009,8 +2009,8 @@ if($Alien::Gnuplot::VERSION < 1.031) {
     die "PDL::Graphics::Gnuplot requires Alien::Gnuplot version 1.031 or higher\n (v$Alien::Gnuplot::VERSION found). You can pull the latest from CPAN.\n";
 }
 
-our $gnuplot_dep_v = 4.6; # Versions below this are deprecated.
-our $gnuplot_req_v = 4.4; # Versions below this are not supported.
+our $gnuplot_dep_v = 4.006; # Versions below this are deprecated.
+our $gnuplot_req_v = 4.004; # Versions below this are not supported.
 
 # Compile time config flags...
 our $check_syntax = 0;
@@ -2019,10 +2019,11 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.013';
+our $VERSION = '2.015';
 $VERSION = eval $VERSION;
 
-our $gp_version = undef;   # eventually gets the extracted gnuplot(1) version number.
+our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
+our $gp_numversion = undef; # which is here converted to a float
 
 my $did_warn_non_numeric_patchlevel; # whether we already warned about this
 
@@ -6217,7 +6218,7 @@ our $_OptionEmitters = {
 	#### This is because some "withs" (e.g. "lines") must have dt specifiers for the correct behavior,
 	#### but other "withs" (e.g. "labels") barf if dt is specified.
     'dt' => sub { my($k,$v,$h, $w) = @_;
-		  return "" unless($gp_version >= 5.0);
+		  return "" unless($gp_numversion >= 5.0);
 		  return "" if(($v//"") eq 'INVALID');
 		  unless($v) {
 		      if($w->{options}->{terminal} =~ m/dashed/) {
@@ -7489,11 +7490,13 @@ EOM
 ##############################
 # Parse version number.  If the version or pl changed, try reloading Alien::Gnuplot
 # to get them in sync.
-	if( $s =~ m/Version (\d+\.\d+) (patchlevel (\w+))?/i ) {
+	if( $s =~ m/Version ((\d+)\.(\d+)(\.(\d+))?) (patchlevel (\w+))?/i ) {
 	    $gp_version = $1;
-	    $gp_pl = $3;
+            $gp_numversion = $2 + 0.001*$3 + 0.000001*($5||0);
+	    $gp_pl = $7;
 	    $this->{gp_version} = $1;
-	    $this->{gp_pl} = $3;
+            $this->{gp_numversion} = $gp_numversion;
+	    $this->{gp_pl} = $7;
 	} else {
 
 	    # Something went wrong with i/o.  See if the process still exists.
@@ -7546,12 +7549,12 @@ EOM
 	    }
             
             # On windows, gnuplot versions 4.6.5 and older echo back commands.
-            if ( $gp_version <= '4.6' && $gp_pl <= 5 ) {
+            if ( $gp_numversion <= '4.006' && $gp_pl <= 5 ) {
                 $echo_eating = 1;
             }
 	}
 
-	if( $gp_version < $gnuplot_dep_v  and  !$PDL::Graphics::Gnuplot::deprecated_this_session ) {
+	if( $gp_numversion < $gnuplot_dep_v  and  !$PDL::Graphics::Gnuplot::deprecated_this_session ) {
             $PDL::Graphics::Gnuplot::deprecated_this_session = 1;
 	    unless($ENV{GNUPLOT_DEPRECATED}){
 	    carp <<"EOM";
@@ -7949,7 +7952,9 @@ EOM
 	# Find, report, and strip warnings. This is complicated by the fact
 	# that some warnings come with a line specifier and others don't.
 
-	WARN: while( $fromerr =~ m/^(\s*(line \d+\:\s*)?[wW]arning\:.*)$/m ) {
+      WARN: while( $fromerr =~ m/^(\s*(line \d+\:\s*)?[wW]arning\:.*)$/m or
+		   $fromerr =~ m/^Populating font family aliases took/m     # CED - Quicktime on MacOS Catalina throws a warning marked as an error.  Stupid.
+	    ) {
 	  if($2){
 	      # it's a warning with a line specifier. Break off two more lines before it.
 	      last WARN unless($fromerr =~ s/^((gnu|multi)plot\>.*\n\s*\^\s*\n\s*(line \d+\:\s*)?[wW]arning\:.*(\n|$))//m);
@@ -7969,7 +7974,9 @@ EOM
 	    $fromerr =~ s/^\s*Terminal type set to \'[^\']*\'.*Options are \'[^\']*\'//s;
 	} else {
 	    # Hack to avoid spurious the pdfcairo errors in MacOS 10.5 - strip out obsolete-function errors.
-	    while( $fromerr =~ s/^.*obsolete\s*function.*system\s*performance.\s*//s ) {
+	    while( $fromerr =~ s/^.*obsolete\s*function.*system\s*performance.\s*//s or
+		   $fromerr =~ s/^.*Populating font family aliases took.*cost\.//s
+		) {
 		# do nothing
 	    }
 	}

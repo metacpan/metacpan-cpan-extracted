@@ -26,8 +26,7 @@ package App::cdif::colors;
 
 __DATA__
 
-define {NOP} $<move(0,0)>
-option --light {NOP}
+option --light $<ignore>
 option --green --light
 option --cmy   --light
 

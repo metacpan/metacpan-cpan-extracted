@@ -1,5 +1,6 @@
 package Chemistry::File;
-$VERSION = '0.37';
+
+our $VERSION = '0.38'; # VERSION
 
 =head1 NAME
 
@@ -21,7 +22,8 @@ Chemistry::File - Molecule file I/O base class
 
     package Chemistry::File::Myfile;
     use base qw(Chemistry::File);
-    Chemistry::Mol->register_type("myfile", __PACKAGE__);
+    use Chemistry::Mol;
+    Chemistry::Mol->register_format("myfile", __PACKAGE__);
 
     # override the read_mol method
     sub read_mol {
@@ -605,15 +607,13 @@ sub write {
 The :auto feature may not be entirely portable, but it is known to work under
 Unix and Windows (either Cygwin or ActiveState).
 
-=head1 VERSION
+=head1 SOURCE CODE REPOSITORY
 
-0.37
+L<https://github.com/perlmol/Chemistry-Mol>
 
 =head1 SEE ALSO
 
 L<Chemistry::Mol>
-
-The PerlMol website L<http://www.perlmol.org/>
 
 =head1 AUTHOR
 

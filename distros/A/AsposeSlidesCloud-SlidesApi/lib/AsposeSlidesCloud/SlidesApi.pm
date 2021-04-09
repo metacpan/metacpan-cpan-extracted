@@ -2855,7 +2855,7 @@ sub delete_sections {
 }
 
 #
-# delete_slide_animation
+# delete_animation
 #
 # Remove animation from a slide.
 # 
@@ -2892,7 +2892,7 @@ sub delete_sections {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slide_animation' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_animation' } = { 
     	summary => 'Remove animation from a slide.',
         params => $params,
         returns => 'SlideAnimation',
@@ -2900,7 +2900,7 @@ sub delete_sections {
 }
 # @return SlideAnimation
 #
-sub delete_slide_animation {
+sub delete_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -2971,7 +2971,59 @@ sub delete_slide_animation {
 }
 
 #
-# delete_slide_animation_effect
+# delete_slide_animation
+#
+# Remove animation from a slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_animation' } = { 
+    	summary => 'Remove animation from a slide.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub delete_slide_animation {
+    warnings::warnif("deprecated", "delete_slide_animation is deprecated, use delete_animation instead");
+  
+    return delete_animation(@_);
+}
+
+#
+# delete_animation_effect
 #
 # Remove an effect from slide animation.
 # 
@@ -3014,7 +3066,7 @@ sub delete_slide_animation {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slide_animation_effect' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_animation_effect' } = { 
     	summary => 'Remove an effect from slide animation.',
         params => $params,
         returns => 'SlideAnimation',
@@ -3022,7 +3074,7 @@ sub delete_slide_animation {
 }
 # @return SlideAnimation
 #
-sub delete_slide_animation_effect {
+sub delete_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -3105,7 +3157,65 @@ sub delete_slide_animation_effect {
 }
 
 #
-# delete_slide_animation_interactive_sequence
+# delete_slide_animation_effect
+#
+# Remove an effect from slide animation.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $effect_index Index of the effect to be removed. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'effect_index' => {
+        data_type => 'int',
+        description => 'Index of the effect to be removed.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_animation_effect' } = { 
+    	summary => 'Remove an effect from slide animation.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub delete_slide_animation_effect {
+    warnings::warnif("deprecated", "delete_slide_animation_effect is deprecated, use delete_animation_effect instead");
+  
+    return delete_animation_effect(@_);
+}
+
+#
+# delete_animation_interactive_sequence
 #
 # Remove an interactive sequence from slide animation.
 # 
@@ -3148,7 +3258,7 @@ sub delete_slide_animation_effect {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slide_animation_interactive_sequence' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_animation_interactive_sequence' } = { 
     	summary => 'Remove an interactive sequence from slide animation.',
         params => $params,
         returns => 'SlideAnimation',
@@ -3156,7 +3266,7 @@ sub delete_slide_animation_effect {
 }
 # @return SlideAnimation
 #
-sub delete_slide_animation_interactive_sequence {
+sub delete_animation_interactive_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -3239,7 +3349,65 @@ sub delete_slide_animation_interactive_sequence {
 }
 
 #
-# delete_slide_animation_interactive_sequence_effect
+# delete_slide_animation_interactive_sequence
+#
+# Remove an interactive sequence from slide animation.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $sequence_index The index of an interactive sequence to be deleted. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'sequence_index' => {
+        data_type => 'int',
+        description => 'The index of an interactive sequence to be deleted.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_animation_interactive_sequence' } = { 
+    	summary => 'Remove an interactive sequence from slide animation.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub delete_slide_animation_interactive_sequence {
+    warnings::warnif("deprecated", "delete_slide_animation_interactive_sequence is deprecated, use delete_animation_interactive_sequence instead");
+  
+    return delete_animation_interactive_sequence(@_);
+}
+
+#
+# delete_animation_interactive_sequence_effect
 #
 # Remove an effect from slide animation interactive sequence.
 # 
@@ -3288,7 +3456,7 @@ sub delete_slide_animation_interactive_sequence {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slide_animation_interactive_sequence_effect' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_animation_interactive_sequence_effect' } = { 
     	summary => 'Remove an effect from slide animation interactive sequence.',
         params => $params,
         returns => 'SlideAnimation',
@@ -3296,7 +3464,7 @@ sub delete_slide_animation_interactive_sequence {
 }
 # @return SlideAnimation
 #
-sub delete_slide_animation_interactive_sequence_effect {
+sub delete_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -3391,6 +3559,186 @@ sub delete_slide_animation_interactive_sequence_effect {
 }
 
 #
+# delete_slide_animation_interactive_sequence_effect
+#
+# Remove an effect from slide animation interactive sequence.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $sequence_index Interactive sequence index. (required)
+# @param int $effect_index Index of the effect to be removed. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'sequence_index' => {
+        data_type => 'int',
+        description => 'Interactive sequence index.',
+        required => '1',
+    },
+    'effect_index' => {
+        data_type => 'int',
+        description => 'Index of the effect to be removed.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_animation_interactive_sequence_effect' } = { 
+    	summary => 'Remove an effect from slide animation interactive sequence.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub delete_slide_animation_interactive_sequence_effect {
+    warnings::warnif("deprecated", "delete_slide_animation_interactive_sequence_effect is deprecated, use delete_animation_interactive_sequence_effect instead");
+  
+    return delete_animation_interactive_sequence_effect(@_);
+}
+
+#
+# delete_animation_interactive_sequences
+#
+# Clear all interactive sequences from slide animation.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_animation_interactive_sequences' } = { 
+    	summary => 'Clear all interactive sequences from slide animation.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub delete_animation_interactive_sequences {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_slide_animation_interactive_sequences");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_slide_animation_interactive_sequences");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/animation/interactiveSequences';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SlideAnimation', $response);
+    return $_response_object;
+}
+
+#
 # delete_slide_animation_interactive_sequences
 #
 # Clear all interactive sequences from slide animation.
@@ -3437,20 +3785,72 @@ sub delete_slide_animation_interactive_sequence_effect {
 # @return SlideAnimation
 #
 sub delete_slide_animation_interactive_sequences {
+    warnings::warnif("deprecated", "delete_slide_animation_interactive_sequences is deprecated, use delete_animation_interactive_sequences instead");
+  
+    return delete_animation_interactive_sequences(@_);
+}
+
+#
+# delete_animation_main_sequence
+#
+# Clear main sequence in slide animation.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_animation_main_sequence' } = { 
+    	summary => 'Clear main sequence in slide animation.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub delete_animation_main_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
     unless (exists $args{'name'} && $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling delete_slide_animation_interactive_sequences");
+      croak("Missing the required parameter 'name' when calling delete_slide_animation_main_sequence");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling delete_slide_animation_interactive_sequences");
+      croak("Missing the required parameter 'slide_index' when calling delete_slide_animation_main_sequence");
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/animation/interactiveSequences';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/animation/mainSequence';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -3553,77 +3953,13 @@ sub delete_slide_animation_interactive_sequences {
 # @return SlideAnimation
 #
 sub delete_slide_animation_main_sequence {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'name' is set
-    unless (exists $args{'name'} && $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling delete_slide_animation_main_sequence");
-    }
-
-    # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling delete_slide_animation_main_sequence");
-    }
-
-    # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/animation/mainSequence';
-
-    my $_method = 'DELETE';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # header params
-    if ( exists $args{'password'}) {
-        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
-    }
-
-    # path params
-    if ( exists $args{'name'}) {
-        my $_base_variable = "{" . "name" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'slide_index'}) {
-        my $_base_variable = "{" . "slideIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    my $_body_data;
-    my $files;
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $files);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('SlideAnimation', $response);
-    return $_response_object;
+    warnings::warnif("deprecated", "delete_slide_animation_main_sequence is deprecated, use delete_animation_main_sequence instead");
+  
+    return delete_animation_main_sequence(@_);
 }
 
 #
-# delete_slide_by_index
+# delete_slide
 #
 # Delete a presentation slide by index.
 # 
@@ -3660,7 +3996,7 @@ sub delete_slide_animation_main_sequence {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slide_by_index' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_slide' } = { 
     	summary => 'Delete a presentation slide by index.',
         params => $params,
         returns => 'Slides',
@@ -3668,7 +4004,7 @@ sub delete_slide_animation_main_sequence {
 }
 # @return Slides
 #
-sub delete_slide_by_index {
+sub delete_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -3739,7 +4075,59 @@ sub delete_slide_by_index {
 }
 
 #
-# delete_slide_shape
+# delete_slide_by_index
+#
+# Delete a presentation slide by index.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_by_index' } = { 
+    	summary => 'Delete a presentation slide by index.',
+        params => $params,
+        returns => 'Slides',
+        };
+}
+# @return Slides
+#
+sub delete_slide_by_index {
+    warnings::warnif("deprecated", "delete_slide_by_index is deprecated, use delete_slide instead");
+  
+    return delete_slide(@_);
+}
+
+#
+# delete_shape
 #
 # Remove a shape.
 # 
@@ -3782,7 +4170,7 @@ sub delete_slide_by_index {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slide_shape' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_shape' } = { 
     	summary => 'Remove a shape.',
         params => $params,
         returns => 'Shapes',
@@ -3790,7 +4178,7 @@ sub delete_slide_by_index {
 }
 # @return Shapes
 #
-sub delete_slide_shape {
+sub delete_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -3873,7 +4261,65 @@ sub delete_slide_shape {
 }
 
 #
-# delete_slide_shapes
+# delete_slide_shape
+#
+# Remove a shape.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_shape' } = { 
+    	summary => 'Remove a shape.',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub delete_slide_shape {
+    warnings::warnif("deprecated", "delete_slide_shape is deprecated, use delete_shape instead");
+  
+    return delete_shape(@_);
+}
+
+#
+# delete_shapes
 #
 # Remove a range of shapes.
 # 
@@ -3916,7 +4362,7 @@ sub delete_slide_shape {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slide_shapes' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_shapes' } = { 
     	summary => 'Remove a range of shapes.',
         params => $params,
         returns => 'Shapes',
@@ -3924,7 +4370,7 @@ sub delete_slide_shape {
 }
 # @return Shapes
 #
-sub delete_slide_shapes {
+sub delete_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -4000,7 +4446,65 @@ sub delete_slide_shapes {
 }
 
 #
-# delete_slide_subshape
+# delete_slide_shapes
+#
+# Remove a range of shapes.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $shapes The indices of the shapes to be deleted; delete all by default. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shapes' => {
+        data_type => 'string',
+        description => 'The indices of the shapes to be deleted; delete all by default.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_shapes' } = { 
+    	summary => 'Remove a range of shapes.',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub delete_slide_shapes {
+    warnings::warnif("deprecated", "delete_slide_shapes is deprecated, use delete_shapes instead");
+  
+    return delete_shapes(@_);
+}
+
+#
+# delete_subshape
 #
 # Remove a shape (for smart art and group shapes).
 # 
@@ -4049,7 +4553,7 @@ sub delete_slide_shapes {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slide_subshape' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_subshape' } = { 
     	summary => 'Remove a shape (for smart art and group shapes).',
         params => $params,
         returns => 'Shapes',
@@ -4057,7 +4561,7 @@ sub delete_slide_shapes {
 }
 # @return Shapes
 #
-sub delete_slide_subshape {
+sub delete_subshape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -4152,7 +4656,71 @@ sub delete_slide_subshape {
 }
 
 #
-# delete_slide_subshapes
+# delete_slide_subshape
+#
+# Remove a shape (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_subshape' } = { 
+    	summary => 'Remove a shape (for smart art and group shapes).',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub delete_slide_subshape {
+    warnings::warnif("deprecated", "delete_slide_subshape is deprecated, use delete_subshape instead");
+  
+    return delete_subshape(@_);
+}
+
+#
+# delete_subshapes
 #
 # Remove a range of shapes (for smart art and group shapes).
 # 
@@ -4201,7 +4769,7 @@ sub delete_slide_subshape {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slide_subshapes' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_subshapes' } = { 
     	summary => 'Remove a range of shapes (for smart art and group shapes).',
         params => $params,
         returns => 'Shapes',
@@ -4209,7 +4777,7 @@ sub delete_slide_subshape {
 }
 # @return Shapes
 #
-sub delete_slide_subshapes {
+sub delete_subshapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -4297,7 +4865,71 @@ sub delete_slide_subshapes {
 }
 
 #
-# delete_slides_clean_slides_list
+# delete_slide_subshapes
+#
+# Remove a range of shapes (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param string $shapes The indices of the shapes to be deleted; delete all by default. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shapes' => {
+        data_type => 'string',
+        description => 'The indices of the shapes to be deleted; delete all by default.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_subshapes' } = { 
+    	summary => 'Remove a range of shapes (for smart art and group shapes).',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub delete_slide_subshapes {
+    warnings::warnif("deprecated", "delete_slide_subshapes is deprecated, use delete_subshapes instead");
+  
+    return delete_subshapes(@_);
+}
+
+#
+# delete_slides
 #
 # Delete presentation slides.
 # 
@@ -4334,7 +4966,7 @@ sub delete_slide_subshapes {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slides_clean_slides_list' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_slides' } = { 
     	summary => 'Delete presentation slides.',
         params => $params,
         returns => 'Slides',
@@ -4342,7 +4974,7 @@ sub delete_slide_subshapes {
 }
 # @return Slides
 #
-sub delete_slides_clean_slides_list {
+sub delete_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -4406,7 +5038,59 @@ sub delete_slides_clean_slides_list {
 }
 
 #
-# delete_slides_document_properties
+# delete_slides_clean_slides_list
+#
+# Delete presentation slides.
+# 
+# @param string $name Document name. (required)
+# @param string $slides The indices of the slides to be deleted; delete all by default. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slides' => {
+        data_type => 'string',
+        description => 'The indices of the slides to be deleted; delete all by default.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slides_clean_slides_list' } = { 
+    	summary => 'Delete presentation slides.',
+        params => $params,
+        returns => 'Slides',
+        };
+}
+# @return Slides
+#
+sub delete_slides_clean_slides_list {
+    warnings::warnif("deprecated", "delete_slides_clean_slides_list is deprecated, use delete_slides instead");
+  
+    return delete_slides(@_);
+}
+
+#
+# delete_document_properties
 #
 # Clean document properties.
 # 
@@ -4437,7 +5121,7 @@ sub delete_slides_clean_slides_list {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slides_document_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_document_properties' } = { 
     	summary => 'Clean document properties.',
         params => $params,
         returns => 'DocumentProperties',
@@ -4445,7 +5129,7 @@ sub delete_slides_clean_slides_list {
 }
 # @return DocumentProperties
 #
-sub delete_slides_document_properties {
+sub delete_document_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -4504,7 +5188,53 @@ sub delete_slides_document_properties {
 }
 
 #
-# delete_slides_document_property
+# delete_slides_document_properties
+#
+# Clean document properties.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slides_document_properties' } = { 
+    	summary => 'Clean document properties.',
+        params => $params,
+        returns => 'DocumentProperties',
+        };
+}
+# @return DocumentProperties
+#
+sub delete_slides_document_properties {
+    warnings::warnif("deprecated", "delete_slides_document_properties is deprecated, use delete_document_properties instead");
+  
+    return delete_document_properties(@_);
+}
+
+#
+# delete_document_property
 #
 # Delete document property.
 # 
@@ -4541,7 +5271,7 @@ sub delete_slides_document_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slides_document_property' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_document_property' } = { 
     	summary => 'Delete document property.',
         params => $params,
         returns => 'DocumentProperties',
@@ -4549,7 +5279,7 @@ sub delete_slides_document_properties {
 }
 # @return DocumentProperties
 #
-sub delete_slides_document_property {
+sub delete_document_property {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -4620,7 +5350,59 @@ sub delete_slides_document_property {
 }
 
 #
-# delete_slides_slide_background
+# delete_slides_document_property
+#
+# Delete document property.
+# 
+# @param string $name Document name. (required)
+# @param string $property_name The property name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'property_name' => {
+        data_type => 'string',
+        description => 'The property name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slides_document_property' } = { 
+    	summary => 'Delete document property.',
+        params => $params,
+        returns => 'DocumentProperties',
+        };
+}
+# @return DocumentProperties
+#
+sub delete_slides_document_property {
+    warnings::warnif("deprecated", "delete_slides_document_property is deprecated, use delete_document_property instead");
+  
+    return delete_document_property(@_);
+}
+
+#
+# delete_background
 #
 # Remove background from a slide.
 # 
@@ -4657,7 +5439,7 @@ sub delete_slides_document_property {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slides_slide_background' } = { 
+    __PACKAGE__->method_documentation->{ 'delete_background' } = { 
     	summary => 'Remove background from a slide.',
         params => $params,
         returns => 'SlideBackground',
@@ -4665,7 +5447,7 @@ sub delete_slides_document_property {
 }
 # @return SlideBackground
 #
-sub delete_slides_slide_background {
+sub delete_background {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -4733,6 +5515,58 @@ sub delete_slides_slide_background {
     }
     my $_response_object = $self->{api_client}->deserialize('SlideBackground', $response);
     return $_response_object;
+}
+
+#
+# delete_slides_slide_background
+#
+# Remove background from a slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slides_slide_background' } = { 
+    	summary => 'Remove background from a slide.',
+        params => $params,
+        returns => 'SlideBackground',
+        };
+}
+# @return SlideBackground
+#
+sub delete_slides_slide_background {
+    warnings::warnif("deprecated", "delete_slides_slide_background is deprecated, use delete_background instead");
+  
+    return delete_background(@_);
 }
 
 #
@@ -5851,7 +6685,7 @@ sub get_layout_slide {
 }
 
 #
-# get_layout_slides_list
+# get_layout_slides
 #
 # Read presentation layoutSlides info.
 # 
@@ -5882,7 +6716,7 @@ sub get_layout_slide {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_layout_slides_list' } = { 
+    __PACKAGE__->method_documentation->{ 'get_layout_slides' } = { 
     	summary => 'Read presentation layoutSlides info.',
         params => $params,
         returns => 'LayoutSlides',
@@ -5890,7 +6724,7 @@ sub get_layout_slide {
 }
 # @return LayoutSlides
 #
-sub get_layout_slides_list {
+sub get_layout_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -5946,6 +6780,52 @@ sub get_layout_slides_list {
     }
     my $_response_object = $self->{api_client}->deserialize('LayoutSlides', $response);
     return $_response_object;
+}
+
+#
+# get_layout_slides_list
+#
+# Read presentation layoutSlides info.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_layout_slides_list' } = { 
+    	summary => 'Read presentation layoutSlides info.',
+        params => $params,
+        returns => 'LayoutSlides',
+        };
+}
+# @return LayoutSlides
+#
+sub get_layout_slides_list {
+    warnings::warnif("deprecated", "get_layout_slides_list is deprecated, use get_layout_slides instead");
+  
+    return get_layout_slides(@_);
 }
 
 #
@@ -6065,7 +6945,7 @@ sub get_master_slide {
 }
 
 #
-# get_master_slides_list
+# get_master_slides
 #
 # Read presentation masterSlides info.
 # 
@@ -6096,7 +6976,7 @@ sub get_master_slide {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_master_slides_list' } = { 
+    __PACKAGE__->method_documentation->{ 'get_master_slides' } = { 
     	summary => 'Read presentation masterSlides info.',
         params => $params,
         returns => 'MasterSlides',
@@ -6104,7 +6984,7 @@ sub get_master_slide {
 }
 # @return MasterSlides
 #
-sub get_master_slides_list {
+sub get_master_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -6160,6 +7040,52 @@ sub get_master_slides_list {
     }
     my $_response_object = $self->{api_client}->deserialize('MasterSlides', $response);
     return $_response_object;
+}
+
+#
+# get_master_slides_list
+#
+# Read presentation masterSlides info.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_master_slides_list' } = { 
+    	summary => 'Read presentation masterSlides info.',
+        params => $params,
+        returns => 'MasterSlides',
+        };
+}
+# @return MasterSlides
+#
+sub get_master_slides_list {
+    warnings::warnif("deprecated", "get_master_slides_list is deprecated, use get_master_slides instead");
+  
+    return get_master_slides(@_);
 }
 
 #
@@ -6279,7 +7205,7 @@ sub get_notes_slide {
 }
 
 #
-# get_notes_slide_exists
+# notes_slide_exists
 #
 # Get info whether a notes slide exists.
 # 
@@ -6316,7 +7242,7 @@ sub get_notes_slide {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_notes_slide_exists' } = { 
+    __PACKAGE__->method_documentation->{ 'notes_slide_exists' } = { 
     	summary => 'Get info whether a notes slide exists.',
         params => $params,
         returns => 'EntityExists',
@@ -6324,7 +7250,7 @@ sub get_notes_slide {
 }
 # @return EntityExists
 #
-sub get_notes_slide_exists {
+sub notes_slide_exists {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -6395,15 +7321,15 @@ sub get_notes_slide_exists {
 }
 
 #
-# get_notes_slide_header_footer
+# get_notes_slide_exists
 #
-# Get header/footer info for the notes slide.
+# Get info whether a notes slide exists.
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -6421,14 +7347,66 @@ sub get_notes_slide_exists {
         description => 'Document password.',
         required => '0',
     },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
     'storage' => {
         data_type => 'string',
         description => 'Document storage.',
         required => '0',
     },
+    };
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_exists' } = { 
+    	summary => 'Get info whether a notes slide exists.',
+        params => $params,
+        returns => 'EntityExists',
+        };
+}
+# @return EntityExists
+#
+sub get_notes_slide_exists {
+    warnings::warnif("deprecated", "get_notes_slide_exists is deprecated, use notes_slide_exists instead");
+  
+    return notes_slide_exists(@_);
+}
+
+#
+# get_notes_slide_header_footer
+#
+# Get header/footer info for the notes slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
         required => '0',
     },
     };
@@ -6469,13 +7447,13 @@ sub get_notes_slide_header_footer {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -6645,7 +7623,7 @@ sub get_notes_slide_shape {
 }
 
 #
-# get_notes_slide_shape_paragraph
+# get_notes_slide_paragraph
 #
 # Read shape paragraph info.
 # 
@@ -6694,7 +7672,7 @@ sub get_notes_slide_shape {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_notes_slide_shape_paragraph' } = { 
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_paragraph' } = { 
     	summary => 'Read shape paragraph info.',
         params => $params,
         returns => 'Paragraph',
@@ -6702,7 +7680,7 @@ sub get_notes_slide_shape {
 }
 # @return Paragraph
 #
-sub get_notes_slide_shape_paragraph {
+sub get_notes_slide_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -6797,7 +7775,71 @@ sub get_notes_slide_shape_paragraph {
 }
 
 #
-# get_notes_slide_shape_paragraphs
+# get_notes_slide_shape_paragraph
+#
+# Read shape paragraph info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_shape_paragraph' } = { 
+    	summary => 'Read shape paragraph info.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub get_notes_slide_shape_paragraph {
+    warnings::warnif("deprecated", "get_notes_slide_shape_paragraph is deprecated, use get_notes_slide_paragraph instead");
+  
+    return get_notes_slide_paragraph(@_);
+}
+
+#
+# get_notes_slide_paragraphs
 #
 # Read shape paragraphs info.
 # 
@@ -6840,7 +7882,7 @@ sub get_notes_slide_shape_paragraph {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_notes_slide_shape_paragraphs' } = { 
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_paragraphs' } = { 
     	summary => 'Read shape paragraphs info.',
         params => $params,
         returns => 'Paragraphs',
@@ -6848,7 +7890,7 @@ sub get_notes_slide_shape_paragraph {
 }
 # @return Paragraphs
 #
-sub get_notes_slide_shape_paragraphs {
+sub get_notes_slide_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -6931,7 +7973,65 @@ sub get_notes_slide_shape_paragraphs {
 }
 
 #
-# get_notes_slide_shape_portion
+# get_notes_slide_shape_paragraphs
+#
+# Read shape paragraphs info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_shape_paragraphs' } = { 
+    	summary => 'Read shape paragraphs info.',
+        params => $params,
+        returns => 'Paragraphs',
+        };
+}
+# @return Paragraphs
+#
+sub get_notes_slide_shape_paragraphs {
+    warnings::warnif("deprecated", "get_notes_slide_shape_paragraphs is deprecated, use get_notes_slide_paragraphs instead");
+  
+    return get_notes_slide_paragraphs(@_);
+}
+
+#
+# get_notes_slide_portion
 #
 # Read paragraph portion info.
 # 
@@ -6986,7 +8086,7 @@ sub get_notes_slide_shape_paragraphs {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_notes_slide_shape_portion' } = { 
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_portion' } = { 
     	summary => 'Read paragraph portion info.',
         params => $params,
         returns => 'Portion',
@@ -6994,7 +8094,7 @@ sub get_notes_slide_shape_paragraphs {
 }
 # @return Portion
 #
-sub get_notes_slide_shape_portion {
+sub get_notes_slide_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -7101,7 +8201,77 @@ sub get_notes_slide_shape_portion {
 }
 
 #
-# get_notes_slide_shape_portions
+# get_notes_slide_shape_portion
+#
+# Read paragraph portion info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_shape_portion' } = { 
+    	summary => 'Read paragraph portion info.',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub get_notes_slide_shape_portion {
+    warnings::warnif("deprecated", "get_notes_slide_shape_portion is deprecated, use get_notes_slide_portion instead");
+  
+    return get_notes_slide_portion(@_);
+}
+
+#
+# get_notes_slide_portions
 #
 # Read paragraph portions info.
 # 
@@ -7150,7 +8320,7 @@ sub get_notes_slide_shape_portion {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_notes_slide_shape_portions' } = { 
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_portions' } = { 
     	summary => 'Read paragraph portions info.',
         params => $params,
         returns => 'Portions',
@@ -7158,7 +8328,7 @@ sub get_notes_slide_shape_portion {
 }
 # @return Portions
 #
-sub get_notes_slide_shape_portions {
+sub get_notes_slide_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -7250,6 +8420,70 @@ sub get_notes_slide_shape_portions {
     }
     my $_response_object = $self->{api_client}->deserialize('Portions', $response);
     return $_response_object;
+}
+
+#
+# get_notes_slide_shape_portions
+#
+# Read paragraph portions info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_shape_portions' } = { 
+    	summary => 'Read paragraph portions info.',
+        params => $params,
+        returns => 'Portions',
+        };
+}
+# @return Portions
+#
+sub get_notes_slide_shape_portions {
+    warnings::warnif("deprecated", "get_notes_slide_shape_portions is deprecated, use get_notes_slide_portions instead");
+  
+    return get_notes_slide_portions(@_);
 }
 
 #
@@ -7369,7 +8603,7 @@ sub get_notes_slide_shapes {
 }
 
 #
-# get_notes_slide_with_format
+# download_notes_slide
 #
 # Convert notes slide to the specified image format.
 # 
@@ -7430,7 +8664,7 @@ sub get_notes_slide_shapes {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_notes_slide_with_format' } = { 
+    __PACKAGE__->method_documentation->{ 'download_notes_slide' } = { 
     	summary => 'Convert notes slide to the specified image format.',
         params => $params,
         returns => 'File',
@@ -7438,7 +8672,7 @@ sub get_notes_slide_shapes {
 }
 # @return File
 #
-sub get_notes_slide_with_format {
+sub download_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -7536,7 +8770,83 @@ sub get_notes_slide_with_format {
 }
 
 #
-# get_paragraph_portion
+# get_notes_slide_with_format
+#
+# Convert notes slide to the specified image format.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $format Output file format. (required)
+# @param int $width Output file width. (optional)
+# @param int $height Output file height. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Output file format.',
+        required => '1',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Output file width.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Output file height.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Storage folder containing custom fonts to be used with the document.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_with_format' } = { 
+    	summary => 'Convert notes slide to the specified image format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub get_notes_slide_with_format {
+    warnings::warnif("deprecated", "get_notes_slide_with_format is deprecated, use download_notes_slide instead");
+  
+    return download_notes_slide(@_);
+}
+
+#
+# get_portion
 #
 # Read paragraph portion info.
 # 
@@ -7591,7 +8901,7 @@ sub get_notes_slide_with_format {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_paragraph_portion' } = { 
+    __PACKAGE__->method_documentation->{ 'get_portion' } = { 
     	summary => 'Read paragraph portion info.',
         params => $params,
         returns => 'Portion',
@@ -7599,7 +8909,7 @@ sub get_notes_slide_with_format {
 }
 # @return Portion
 #
-sub get_paragraph_portion {
+sub get_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -7706,7 +9016,77 @@ sub get_paragraph_portion {
 }
 
 #
-# get_paragraph_portions
+# get_paragraph_portion
+#
+# Read paragraph portion info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_paragraph_portion' } = { 
+    	summary => 'Read paragraph portion info.',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub get_paragraph_portion {
+    warnings::warnif("deprecated", "get_paragraph_portion is deprecated, use get_portion instead");
+  
+    return get_portion(@_);
+}
+
+#
+# get_portions
 #
 # Read paragraph portions info.
 # 
@@ -7755,7 +9135,7 @@ sub get_paragraph_portion {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_paragraph_portions' } = { 
+    __PACKAGE__->method_documentation->{ 'get_portions' } = { 
     	summary => 'Read paragraph portions info.',
         params => $params,
         returns => 'Portions',
@@ -7763,7 +9143,7 @@ sub get_paragraph_portion {
 }
 # @return Portions
 #
-sub get_paragraph_portions {
+sub get_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -7855,6 +9235,70 @@ sub get_paragraph_portions {
     }
     my $_response_object = $self->{api_client}->deserialize('Portions', $response);
     return $_response_object;
+}
+
+#
+# get_paragraph_portions
+#
+# Read paragraph portions info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_paragraph_portions' } = { 
+    	summary => 'Read paragraph portions info.',
+        params => $params,
+        returns => 'Portions',
+        };
+}
+# @return Portions
+#
+sub get_paragraph_portions {
+    warnings::warnif("deprecated", "get_paragraph_portions is deprecated, use get_portions instead");
+  
+    return get_portions(@_);
 }
 
 #
@@ -7956,7 +9400,7 @@ sub get_sections {
 }
 
 #
-# get_slide_animation
+# get_animation
 #
 # Read slide animation effects.
 # 
@@ -7999,7 +9443,7 @@ sub get_sections {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_animation' } = { 
+    __PACKAGE__->method_documentation->{ 'get_animation' } = { 
     	summary => 'Read slide animation effects.',
         params => $params,
         returns => 'SlideAnimation',
@@ -8007,7 +9451,7 @@ sub get_sections {
 }
 # @return SlideAnimation
 #
-sub get_slide_animation {
+sub get_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -8080,6 +9524,64 @@ sub get_slide_animation {
     }
     my $_response_object = $self->{api_client}->deserialize('SlideAnimation', $response);
     return $_response_object;
+}
+
+#
+# get_slide_animation
+#
+# Read slide animation effects.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. If specified, only effects related to that shape are returned. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index. If specified, only effects related to that shape are returned.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_animation' } = { 
+    	summary => 'Read slide animation effects.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub get_slide_animation {
+    warnings::warnif("deprecated", "get_slide_animation is deprecated, use get_animation instead");
+  
+    return get_animation(@_);
 }
 
 #
@@ -8199,7 +9701,7 @@ sub get_slide_header_footer {
 }
 
 #
-# get_slide_shape
+# get_shape
 #
 # Read slide shape info.
 # 
@@ -8242,7 +9744,7 @@ sub get_slide_header_footer {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_shape' } = { 
+    __PACKAGE__->method_documentation->{ 'get_shape' } = { 
     	summary => 'Read slide shape info.',
         params => $params,
         returns => 'ShapeBase',
@@ -8250,7 +9752,7 @@ sub get_slide_header_footer {
 }
 # @return ShapeBase
 #
-sub get_slide_shape {
+sub get_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -8333,7 +9835,65 @@ sub get_slide_shape {
 }
 
 #
-# get_slide_shape_paragraph
+# get_slide_shape
+#
+# Read slide shape info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_shape' } = { 
+    	summary => 'Read slide shape info.',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub get_slide_shape {
+    warnings::warnif("deprecated", "get_slide_shape is deprecated, use get_shape instead");
+  
+    return get_shape(@_);
+}
+
+#
+# get_paragraph
 #
 # Read shape paragraph info.
 # 
@@ -8382,7 +9942,7 @@ sub get_slide_shape {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_shape_paragraph' } = { 
+    __PACKAGE__->method_documentation->{ 'get_paragraph' } = { 
     	summary => 'Read shape paragraph info.',
         params => $params,
         returns => 'Paragraph',
@@ -8390,7 +9950,7 @@ sub get_slide_shape {
 }
 # @return Paragraph
 #
-sub get_slide_shape_paragraph {
+sub get_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -8485,7 +10045,71 @@ sub get_slide_shape_paragraph {
 }
 
 #
-# get_slide_shape_paragraphs
+# get_slide_shape_paragraph
+#
+# Read shape paragraph info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_shape_paragraph' } = { 
+    	summary => 'Read shape paragraph info.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub get_slide_shape_paragraph {
+    warnings::warnif("deprecated", "get_slide_shape_paragraph is deprecated, use get_paragraph instead");
+  
+    return get_paragraph(@_);
+}
+
+#
+# get_paragraphs
 #
 # Read shape paragraphs info.
 # 
@@ -8528,7 +10152,7 @@ sub get_slide_shape_paragraph {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_shape_paragraphs' } = { 
+    __PACKAGE__->method_documentation->{ 'get_paragraphs' } = { 
     	summary => 'Read shape paragraphs info.',
         params => $params,
         returns => 'Paragraphs',
@@ -8536,7 +10160,7 @@ sub get_slide_shape_paragraph {
 }
 # @return Paragraphs
 #
-sub get_slide_shape_paragraphs {
+sub get_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -8619,7 +10243,65 @@ sub get_slide_shape_paragraphs {
 }
 
 #
-# get_slide_shapes
+# get_slide_shape_paragraphs
+#
+# Read shape paragraphs info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_shape_paragraphs' } = { 
+    	summary => 'Read shape paragraphs info.',
+        params => $params,
+        returns => 'Paragraphs',
+        };
+}
+# @return Paragraphs
+#
+sub get_slide_shape_paragraphs {
+    warnings::warnif("deprecated", "get_slide_shape_paragraphs is deprecated, use get_paragraphs instead");
+  
+    return get_paragraphs(@_);
+}
+
+#
+# get_shapes
 #
 # Read slide shapes info.
 # 
@@ -8656,7 +10338,7 @@ sub get_slide_shape_paragraphs {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_shapes' } = { 
+    __PACKAGE__->method_documentation->{ 'get_shapes' } = { 
     	summary => 'Read slide shapes info.',
         params => $params,
         returns => 'Shapes',
@@ -8664,7 +10346,7 @@ sub get_slide_shape_paragraphs {
 }
 # @return Shapes
 #
-sub get_slide_shapes {
+sub get_shapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -8735,7 +10417,59 @@ sub get_slide_shapes {
 }
 
 #
-# get_slide_subshape
+# get_slide_shapes
+#
+# Read slide shapes info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_shapes' } = { 
+    	summary => 'Read slide shapes info.',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub get_slide_shapes {
+    warnings::warnif("deprecated", "get_slide_shapes is deprecated, use get_shapes instead");
+  
+    return get_shapes(@_);
+}
+
+#
+# get_subshape
 #
 # Read slide shape info (for smart art and group shapes).
 # 
@@ -8784,7 +10518,7 @@ sub get_slide_shapes {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_subshape' } = { 
+    __PACKAGE__->method_documentation->{ 'get_subshape' } = { 
     	summary => 'Read slide shape info (for smart art and group shapes).',
         params => $params,
         returns => 'ShapeBase',
@@ -8792,7 +10526,7 @@ sub get_slide_shapes {
 }
 # @return ShapeBase
 #
-sub get_slide_subshape {
+sub get_subshape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -8887,7 +10621,71 @@ sub get_slide_subshape {
 }
 
 #
-# get_slide_subshape_paragraph
+# get_slide_subshape
+#
+# Read slide shape info (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_subshape' } = { 
+    	summary => 'Read slide shape info (for smart art and group shapes).',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub get_slide_subshape {
+    warnings::warnif("deprecated", "get_slide_subshape is deprecated, use get_subshape instead");
+  
+    return get_subshape(@_);
+}
+
+#
+# get_subshape_paragraph
 #
 # Read shape paragraph info (for smart art and group shapes).
 # 
@@ -8942,7 +10740,7 @@ sub get_slide_subshape {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_subshape_paragraph' } = { 
+    __PACKAGE__->method_documentation->{ 'get_subshape_paragraph' } = { 
     	summary => 'Read shape paragraph info (for smart art and group shapes).',
         params => $params,
         returns => 'Paragraph',
@@ -8950,7 +10748,7 @@ sub get_slide_subshape {
 }
 # @return Paragraph
 #
-sub get_slide_subshape_paragraph {
+sub get_subshape_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -9057,7 +10855,77 @@ sub get_slide_subshape_paragraph {
 }
 
 #
-# get_slide_subshape_paragraphs
+# get_slide_subshape_paragraph
+#
+# Read shape paragraph info (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_subshape_paragraph' } = { 
+    	summary => 'Read shape paragraph info (for smart art and group shapes).',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub get_slide_subshape_paragraph {
+    warnings::warnif("deprecated", "get_slide_subshape_paragraph is deprecated, use get_subshape_paragraph instead");
+  
+    return get_subshape_paragraph(@_);
+}
+
+#
+# get_subshape_paragraphs
 #
 # Read shape paragraphs info (for smart art and group shapes).
 # 
@@ -9106,7 +10974,7 @@ sub get_slide_subshape_paragraph {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_subshape_paragraphs' } = { 
+    __PACKAGE__->method_documentation->{ 'get_subshape_paragraphs' } = { 
     	summary => 'Read shape paragraphs info (for smart art and group shapes).',
         params => $params,
         returns => 'Paragraphs',
@@ -9114,7 +10982,7 @@ sub get_slide_subshape_paragraph {
 }
 # @return Paragraphs
 #
-sub get_slide_subshape_paragraphs {
+sub get_subshape_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -9209,7 +11077,71 @@ sub get_slide_subshape_paragraphs {
 }
 
 #
-# get_slide_subshapes
+# get_slide_subshape_paragraphs
+#
+# Read shape paragraphs info (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_subshape_paragraphs' } = { 
+    	summary => 'Read shape paragraphs info (for smart art and group shapes).',
+        params => $params,
+        returns => 'Paragraphs',
+        };
+}
+# @return Paragraphs
+#
+sub get_slide_subshape_paragraphs {
+    warnings::warnif("deprecated", "get_slide_subshape_paragraphs is deprecated, use get_subshape_paragraphs instead");
+  
+    return get_subshape_paragraphs(@_);
+}
+
+#
+# get_subshapes
 #
 # Read slide shapes info.
 # 
@@ -9252,7 +11184,7 @@ sub get_slide_subshape_paragraphs {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_subshapes' } = { 
+    __PACKAGE__->method_documentation->{ 'get_subshapes' } = { 
     	summary => 'Read slide shapes info.',
         params => $params,
         returns => 'Shapes',
@@ -9260,7 +11192,7 @@ sub get_slide_subshape_paragraphs {
 }
 # @return Shapes
 #
-sub get_slide_subshapes {
+sub get_subshapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -9343,14 +11275,72 @@ sub get_slide_subshapes {
 }
 
 #
-# get_slides_api_info
+# get_slide_subshapes
+#
+# Read slide shapes info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path (for smart art and group shapes). (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path (for smart art and group shapes).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_subshapes' } = { 
+    	summary => 'Read slide shapes info.',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub get_slide_subshapes {
+    warnings::warnif("deprecated", "get_slide_subshapes is deprecated, use get_subshapes instead");
+  
+    return get_subshapes(@_);
+}
+
+#
+# get_api_info
 #
 # Get API info.
 # 
 {
     my $params = {
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_api_info' } = { 
+    __PACKAGE__->method_documentation->{ 'get_api_info' } = { 
     	summary => 'Get API info.',
         params => $params,
         returns => 'ApiInfo',
@@ -9358,7 +11348,7 @@ sub get_slide_subshapes {
 }
 # @return ApiInfo
 #
-sub get_slides_api_info {
+sub get_api_info {
     my ($self, %args) = @_;
 
     # parse inputs
@@ -9390,14 +11380,36 @@ sub get_slides_api_info {
 }
 
 #
-# get_slides_document
+# get_slides_api_info
+#
+# Get API info.
+# 
+{
+    my $params = {
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_api_info' } = { 
+    	summary => 'Get API info.',
+        params => $params,
+        returns => 'ApiInfo',
+        };
+}
+# @return ApiInfo
+#
+sub get_slides_api_info {
+    warnings::warnif("deprecated", "get_slides_api_info is deprecated, use get_api_info instead");
+  
+    return get_api_info(@_);
+}
+
+#
+# get_presentation
 #
 # Read presentation info.
 # 
 # @param string $name Document name. (required)
 # @param string $password Document password. (optional)
-# @param string $storage Documentstorage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Documentstorage. (optional)
 {
     my $params = {
     'name' => {
@@ -9410,18 +11422,18 @@ sub get_slides_api_info {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Documentstorage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Documentstorage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_document' } = { 
+    __PACKAGE__->method_documentation->{ 'get_presentation' } = { 
     	summary => 'Read presentation info.',
         params => $params,
         returns => 'Document',
@@ -9429,7 +11441,7 @@ sub get_slides_api_info {
 }
 # @return Document
 #
-sub get_slides_document {
+sub get_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -9453,13 +11465,13 @@ sub get_slides_document {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -9488,7 +11500,53 @@ sub get_slides_document {
 }
 
 #
-# get_slides_document_properties
+# get_slides_document
+#
+# Read presentation info.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Documentstorage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Documentstorage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_document' } = { 
+    	summary => 'Read presentation info.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub get_slides_document {
+    warnings::warnif("deprecated", "get_slides_document is deprecated, use get_presentation instead");
+  
+    return get_presentation(@_);
+}
+
+#
+# get_document_properties
 #
 # Read presentation document properties.
 # 
@@ -9519,7 +11577,7 @@ sub get_slides_document {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_document_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'get_document_properties' } = { 
     	summary => 'Read presentation document properties.',
         params => $params,
         returns => 'DocumentProperties',
@@ -9527,7 +11585,7 @@ sub get_slides_document {
 }
 # @return DocumentProperties
 #
-sub get_slides_document_properties {
+sub get_document_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -9586,7 +11644,53 @@ sub get_slides_document_properties {
 }
 
 #
-# get_slides_document_property
+# get_slides_document_properties
+#
+# Read presentation document properties.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_document_properties' } = { 
+    	summary => 'Read presentation document properties.',
+        params => $params,
+        returns => 'DocumentProperties',
+        };
+}
+# @return DocumentProperties
+#
+sub get_slides_document_properties {
+    warnings::warnif("deprecated", "get_slides_document_properties is deprecated, use get_document_properties instead");
+  
+    return get_document_properties(@_);
+}
+
+#
+# get_document_property
 #
 # Read presentation document property.
 # 
@@ -9623,7 +11727,7 @@ sub get_slides_document_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_document_property' } = { 
+    __PACKAGE__->method_documentation->{ 'get_document_property' } = { 
     	summary => 'Read presentation document property.',
         params => $params,
         returns => 'DocumentProperty',
@@ -9631,7 +11735,7 @@ sub get_slides_document_properties {
 }
 # @return DocumentProperty
 #
-sub get_slides_document_property {
+sub get_document_property {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -9702,7 +11806,59 @@ sub get_slides_document_property {
 }
 
 #
-# get_slides_image_with_default_format
+# get_slides_document_property
+#
+# Read presentation document property.
+# 
+# @param string $name Document name. (required)
+# @param string $property_name The property name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'property_name' => {
+        data_type => 'string',
+        description => 'The property name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_document_property' } = { 
+    	summary => 'Read presentation document property.',
+        params => $params,
+        returns => 'DocumentProperty',
+        };
+}
+# @return DocumentProperty
+#
+sub get_slides_document_property {
+    warnings::warnif("deprecated", "get_slides_document_property is deprecated, use get_document_property instead");
+  
+    return get_document_property(@_);
+}
+
+#
+# download_image_default_format
 #
 # Get image binary data.
 # 
@@ -9739,7 +11895,7 @@ sub get_slides_document_property {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_image_with_default_format' } = { 
+    __PACKAGE__->method_documentation->{ 'download_image_default_format' } = { 
     	summary => 'Get image binary data.',
         params => $params,
         returns => 'File',
@@ -9747,7 +11903,7 @@ sub get_slides_document_property {
 }
 # @return File
 #
-sub get_slides_image_with_default_format {
+sub download_image_default_format {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -9818,7 +11974,59 @@ sub get_slides_image_with_default_format {
 }
 
 #
-# get_slides_image_with_format
+# get_slides_image_with_default_format
+#
+# Get image binary data.
+# 
+# @param string $name Document name. (required)
+# @param int $index Image index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'index' => {
+        data_type => 'int',
+        description => 'Image index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_image_with_default_format' } = { 
+    	summary => 'Get image binary data.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub get_slides_image_with_default_format {
+    warnings::warnif("deprecated", "get_slides_image_with_default_format is deprecated, use download_image_default_format instead");
+  
+    return download_image_default_format(@_);
+}
+
+#
+# download_image
 #
 # Get image in specified format.
 # 
@@ -9861,7 +12069,7 @@ sub get_slides_image_with_default_format {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_image_with_format' } = { 
+    __PACKAGE__->method_documentation->{ 'download_image' } = { 
     	summary => 'Get image in specified format.',
         params => $params,
         returns => 'File',
@@ -9869,7 +12077,7 @@ sub get_slides_image_with_default_format {
 }
 # @return File
 #
-sub get_slides_image_with_format {
+sub download_image {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -9952,7 +12160,65 @@ sub get_slides_image_with_format {
 }
 
 #
-# get_slides_images
+# get_slides_image_with_format
+#
+# Get image in specified format.
+# 
+# @param string $name Document name. (required)
+# @param int $index Image index. (required)
+# @param string $format Export format (png, jpg, gif). (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'index' => {
+        data_type => 'int',
+        description => 'Image index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format (png, jpg, gif).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_image_with_format' } = { 
+    	summary => 'Get image in specified format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub get_slides_image_with_format {
+    warnings::warnif("deprecated", "get_slides_image_with_format is deprecated, use download_image instead");
+  
+    return download_image(@_);
+}
+
+#
+# get_presentation_images
 #
 # Read presentation images info.
 # 
@@ -9983,7 +12249,7 @@ sub get_slides_image_with_format {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_images' } = { 
+    __PACKAGE__->method_documentation->{ 'get_presentation_images' } = { 
     	summary => 'Read presentation images info.',
         params => $params,
         returns => 'Images',
@@ -9991,7 +12257,7 @@ sub get_slides_image_with_format {
 }
 # @return Images
 #
-sub get_slides_images {
+sub get_presentation_images {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -10050,7 +12316,53 @@ sub get_slides_images {
 }
 
 #
-# get_slides_placeholder
+# get_slides_images
+#
+# Read presentation images info.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_images' } = { 
+    	summary => 'Read presentation images info.',
+        params => $params,
+        returns => 'Images',
+        };
+}
+# @return Images
+#
+sub get_slides_images {
+    warnings::warnif("deprecated", "get_slides_images is deprecated, use get_presentation_images instead");
+  
+    return get_presentation_images(@_);
+}
+
+#
+# get_placeholder
 #
 # Read slide placeholder info.
 # 
@@ -10093,7 +12405,7 @@ sub get_slides_images {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_placeholder' } = { 
+    __PACKAGE__->method_documentation->{ 'get_placeholder' } = { 
     	summary => 'Read slide placeholder info.',
         params => $params,
         returns => 'Placeholder',
@@ -10101,7 +12413,7 @@ sub get_slides_images {
 }
 # @return Placeholder
 #
-sub get_slides_placeholder {
+sub get_placeholder {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -10184,7 +12496,65 @@ sub get_slides_placeholder {
 }
 
 #
-# get_slides_placeholders
+# get_slides_placeholder
+#
+# Read slide placeholder info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $placeholder_index Placeholder index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'placeholder_index' => {
+        data_type => 'int',
+        description => 'Placeholder index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_placeholder' } = { 
+    	summary => 'Read slide placeholder info.',
+        params => $params,
+        returns => 'Placeholder',
+        };
+}
+# @return Placeholder
+#
+sub get_slides_placeholder {
+    warnings::warnif("deprecated", "get_slides_placeholder is deprecated, use get_placeholder instead");
+  
+    return get_placeholder(@_);
+}
+
+#
+# get_placeholders
 #
 # Read slide placeholders info.
 # 
@@ -10221,7 +12591,7 @@ sub get_slides_placeholder {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_placeholders' } = { 
+    __PACKAGE__->method_documentation->{ 'get_placeholders' } = { 
     	summary => 'Read slide placeholders info.',
         params => $params,
         returns => 'Placeholders',
@@ -10229,7 +12599,7 @@ sub get_slides_placeholder {
 }
 # @return Placeholders
 #
-sub get_slides_placeholders {
+sub get_placeholders {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -10300,7 +12670,59 @@ sub get_slides_placeholders {
 }
 
 #
-# get_slides_presentation_text_items
+# get_slides_placeholders
+#
+# Read slide placeholders info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_placeholders' } = { 
+    	summary => 'Read slide placeholders info.',
+        params => $params,
+        returns => 'Placeholders',
+        };
+}
+# @return Placeholders
+#
+sub get_slides_placeholders {
+    warnings::warnif("deprecated", "get_slides_placeholders is deprecated, use get_placeholders instead");
+  
+    return get_placeholders(@_);
+}
+
+#
+# get_presentation_text_items
 #
 # Extract presentation text items.
 # 
@@ -10337,7 +12759,7 @@ sub get_slides_placeholders {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_presentation_text_items' } = { 
+    __PACKAGE__->method_documentation->{ 'get_presentation_text_items' } = { 
     	summary => 'Extract presentation text items.',
         params => $params,
         returns => 'TextItems',
@@ -10345,7 +12767,7 @@ sub get_slides_placeholders {
 }
 # @return TextItems
 #
-sub get_slides_presentation_text_items {
+sub get_presentation_text_items {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -10409,7 +12831,59 @@ sub get_slides_presentation_text_items {
 }
 
 #
-# get_slides_protection_properties
+# get_slides_presentation_text_items
+#
+# Extract presentation text items.
+# 
+# @param string $name Document name. (required)
+# @param boolean $with_empty True to incude empty items. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'with_empty' => {
+        data_type => 'boolean',
+        description => 'True to incude empty items.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_presentation_text_items' } = { 
+    	summary => 'Extract presentation text items.',
+        params => $params,
+        returns => 'TextItems',
+        };
+}
+# @return TextItems
+#
+sub get_slides_presentation_text_items {
+    warnings::warnif("deprecated", "get_slides_presentation_text_items is deprecated, use get_presentation_text_items instead");
+  
+    return get_presentation_text_items(@_);
+}
+
+#
+# get_protection_properties
 #
 # Read presentation protection properties.
 # 
@@ -10440,7 +12914,7 @@ sub get_slides_presentation_text_items {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_protection_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'get_protection_properties' } = { 
     	summary => 'Read presentation protection properties.',
         params => $params,
         returns => 'ProtectionProperties',
@@ -10448,7 +12922,7 @@ sub get_slides_presentation_text_items {
 }
 # @return ProtectionProperties
 #
-sub get_slides_protection_properties {
+sub get_protection_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -10507,7 +12981,53 @@ sub get_slides_protection_properties {
 }
 
 #
-# get_slides_slide
+# get_slides_protection_properties
+#
+# Read presentation protection properties.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_protection_properties' } = { 
+    	summary => 'Read presentation protection properties.',
+        params => $params,
+        returns => 'ProtectionProperties',
+        };
+}
+# @return ProtectionProperties
+#
+sub get_slides_protection_properties {
+    warnings::warnif("deprecated", "get_slides_protection_properties is deprecated, use get_protection_properties instead");
+  
+    return get_protection_properties(@_);
+}
+
+#
+# get_slide
 #
 # Read presentation slide info.
 # 
@@ -10544,7 +13064,7 @@ sub get_slides_protection_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_slide' } = { 
+    __PACKAGE__->method_documentation->{ 'get_slide' } = { 
     	summary => 'Read presentation slide info.',
         params => $params,
         returns => 'Slide',
@@ -10552,7 +13072,7 @@ sub get_slides_protection_properties {
 }
 # @return Slide
 #
-sub get_slides_slide {
+sub get_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -10623,7 +13143,59 @@ sub get_slides_slide {
 }
 
 #
-# get_slides_slide_background
+# get_slides_slide
+#
+# Read presentation slide info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_slide' } = { 
+    	summary => 'Read presentation slide info.',
+        params => $params,
+        returns => 'Slide',
+        };
+}
+# @return Slide
+#
+sub get_slides_slide {
+    warnings::warnif("deprecated", "get_slides_slide is deprecated, use get_slide instead");
+  
+    return get_slide(@_);
+}
+
+#
+# get_background
 #
 # Read slide background info.
 # 
@@ -10660,7 +13232,7 @@ sub get_slides_slide {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_slide_background' } = { 
+    __PACKAGE__->method_documentation->{ 'get_background' } = { 
     	summary => 'Read slide background info.',
         params => $params,
         returns => 'SlideBackground',
@@ -10668,7 +13240,7 @@ sub get_slides_slide {
 }
 # @return SlideBackground
 #
-sub get_slides_slide_background {
+sub get_background {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -10739,7 +13311,59 @@ sub get_slides_slide_background {
 }
 
 #
-# get_slides_slide_comments
+# get_slides_slide_background
+#
+# Read slide background info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_slide_background' } = { 
+    	summary => 'Read slide background info.',
+        params => $params,
+        returns => 'SlideBackground',
+        };
+}
+# @return SlideBackground
+#
+sub get_slides_slide_background {
+    warnings::warnif("deprecated", "get_slides_slide_background is deprecated, use get_background instead");
+  
+    return get_background(@_);
+}
+
+#
+# get_comments
 #
 # Read presentation slide comments.
 # 
@@ -10776,7 +13400,7 @@ sub get_slides_slide_background {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_slide_comments' } = { 
+    __PACKAGE__->method_documentation->{ 'get_comments' } = { 
     	summary => 'Read presentation slide comments.',
         params => $params,
         returns => 'SlideComments',
@@ -10784,7 +13408,7 @@ sub get_slides_slide_background {
 }
 # @return SlideComments
 #
-sub get_slides_slide_comments {
+sub get_comments {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -10855,7 +13479,59 @@ sub get_slides_slide_comments {
 }
 
 #
-# get_slides_slide_images
+# get_slides_slide_comments
+#
+# Read presentation slide comments.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index The position of the slide to be reordered. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'The position of the slide to be reordered.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_slide_comments' } = { 
+    	summary => 'Read presentation slide comments.',
+        params => $params,
+        returns => 'SlideComments',
+        };
+}
+# @return SlideComments
+#
+sub get_slides_slide_comments {
+    warnings::warnif("deprecated", "get_slides_slide_comments is deprecated, use get_comments instead");
+  
+    return get_comments(@_);
+}
+
+#
+# get_slide_images
 #
 # Read slide images info.
 # 
@@ -10892,7 +13568,7 @@ sub get_slides_slide_comments {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_slide_images' } = { 
+    __PACKAGE__->method_documentation->{ 'get_slide_images' } = { 
     	summary => 'Read slide images info.',
         params => $params,
         returns => 'Images',
@@ -10900,7 +13576,7 @@ sub get_slides_slide_comments {
 }
 # @return Images
 #
-sub get_slides_slide_images {
+sub get_slide_images {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -10971,7 +13647,59 @@ sub get_slides_slide_images {
 }
 
 #
-# get_slides_slide_properties
+# get_slides_slide_images
+#
+# Read slide images info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_slide_images' } = { 
+    	summary => 'Read slide images info.',
+        params => $params,
+        returns => 'Images',
+        };
+}
+# @return Images
+#
+sub get_slides_slide_images {
+    warnings::warnif("deprecated", "get_slides_slide_images is deprecated, use get_slide_images instead");
+  
+    return get_slide_images(@_);
+}
+
+#
+# get_slide_properties
 #
 # Read presentation slide properties.
 # 
@@ -11002,7 +13730,7 @@ sub get_slides_slide_images {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_slide_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'get_slide_properties' } = { 
     	summary => 'Read presentation slide properties.',
         params => $params,
         returns => 'SlideProperties',
@@ -11010,7 +13738,7 @@ sub get_slides_slide_images {
 }
 # @return SlideProperties
 #
-sub get_slides_slide_properties {
+sub get_slide_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -11069,13 +13797,59 @@ sub get_slides_slide_properties {
 }
 
 #
-# get_slides_slide_text_items
+# get_slides_slide_properties
+#
+# Read presentation slide properties.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_slide_properties' } = { 
+    	summary => 'Read presentation slide properties.',
+        params => $params,
+        returns => 'SlideProperties',
+        };
+}
+# @return SlideProperties
+#
+sub get_slides_slide_properties {
+    warnings::warnif("deprecated", "get_slides_slide_properties is deprecated, use get_slide_properties instead");
+  
+    return get_slide_properties(@_);
+}
+
+#
+# get_slide_text_items
 #
 # Extract slide text items.
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param boolean $with_empty True to incude empty items. (optional, default to false)
+# @param boolean $with_empty True to include empty items. (optional, default to false)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -11093,7 +13867,7 @@ sub get_slides_slide_properties {
     },
     'with_empty' => {
         data_type => 'boolean',
-        description => 'True to incude empty items.',
+        description => 'True to include empty items.',
         required => '0',
     },
     'password' => {
@@ -11112,7 +13886,7 @@ sub get_slides_slide_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_slide_text_items' } = { 
+    __PACKAGE__->method_documentation->{ 'get_slide_text_items' } = { 
     	summary => 'Extract slide text items.',
         params => $params,
         returns => 'TextItems',
@@ -11120,7 +13894,7 @@ sub get_slides_slide_properties {
 }
 # @return TextItems
 #
-sub get_slides_slide_text_items {
+sub get_slide_text_items {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -11196,7 +13970,65 @@ sub get_slides_slide_text_items {
 }
 
 #
-# get_slides_slides_list
+# get_slides_slide_text_items
+#
+# Extract slide text items.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param boolean $with_empty True to include empty items. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'with_empty' => {
+        data_type => 'boolean',
+        description => 'True to include empty items.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_slide_text_items' } = { 
+    	summary => 'Extract slide text items.',
+        params => $params,
+        returns => 'TextItems',
+        };
+}
+# @return TextItems
+#
+sub get_slides_slide_text_items {
+    warnings::warnif("deprecated", "get_slides_slide_text_items is deprecated, use get_slide_text_items instead");
+  
+    return get_slide_text_items(@_);
+}
+
+#
+# get_slides
 #
 # Read presentation slides info.
 # 
@@ -11227,7 +14059,7 @@ sub get_slides_slide_text_items {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_slides_list' } = { 
+    __PACKAGE__->method_documentation->{ 'get_slides' } = { 
     	summary => 'Read presentation slides info.',
         params => $params,
         returns => 'Slides',
@@ -11235,7 +14067,7 @@ sub get_slides_slide_text_items {
 }
 # @return Slides
 #
-sub get_slides_slides_list {
+sub get_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -11294,7 +14126,53 @@ sub get_slides_slides_list {
 }
 
 #
-# get_slides_theme
+# get_slides_slides_list
+#
+# Read presentation slides info.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_slides_list' } = { 
+    	summary => 'Read presentation slides info.',
+        params => $params,
+        returns => 'Slides',
+        };
+}
+# @return Slides
+#
+sub get_slides_slides_list {
+    warnings::warnif("deprecated", "get_slides_slides_list is deprecated, use get_slides instead");
+  
+    return get_slides(@_);
+}
+
+#
+# get_theme
 #
 # Read slide theme info.
 # 
@@ -11331,7 +14209,7 @@ sub get_slides_slides_list {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_theme' } = { 
+    __PACKAGE__->method_documentation->{ 'get_theme' } = { 
     	summary => 'Read slide theme info.',
         params => $params,
         returns => 'Theme',
@@ -11339,7 +14217,7 @@ sub get_slides_slides_list {
 }
 # @return Theme
 #
-sub get_slides_theme {
+sub get_theme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -11410,7 +14288,59 @@ sub get_slides_theme {
 }
 
 #
-# get_slides_theme_color_scheme
+# get_slides_theme
+#
+# Read slide theme info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_theme' } = { 
+    	summary => 'Read slide theme info.',
+        params => $params,
+        returns => 'Theme',
+        };
+}
+# @return Theme
+#
+sub get_slides_theme {
+    warnings::warnif("deprecated", "get_slides_theme is deprecated, use get_theme instead");
+  
+    return get_theme(@_);
+}
+
+#
+# get_color_scheme
 #
 # Read slide theme color scheme info.
 # 
@@ -11447,7 +14377,7 @@ sub get_slides_theme {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_theme_color_scheme' } = { 
+    __PACKAGE__->method_documentation->{ 'get_color_scheme' } = { 
     	summary => 'Read slide theme color scheme info.',
         params => $params,
         returns => 'ColorScheme',
@@ -11455,7 +14385,7 @@ sub get_slides_theme {
 }
 # @return ColorScheme
 #
-sub get_slides_theme_color_scheme {
+sub get_color_scheme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -11526,7 +14456,59 @@ sub get_slides_theme_color_scheme {
 }
 
 #
-# get_slides_theme_font_scheme
+# get_slides_theme_color_scheme
+#
+# Read slide theme color scheme info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_theme_color_scheme' } = { 
+    	summary => 'Read slide theme color scheme info.',
+        params => $params,
+        returns => 'ColorScheme',
+        };
+}
+# @return ColorScheme
+#
+sub get_slides_theme_color_scheme {
+    warnings::warnif("deprecated", "get_slides_theme_color_scheme is deprecated, use get_color_scheme instead");
+  
+    return get_color_scheme(@_);
+}
+
+#
+# get_font_scheme
 #
 # Read slide theme font scheme info.
 # 
@@ -11563,7 +14545,7 @@ sub get_slides_theme_color_scheme {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_theme_font_scheme' } = { 
+    __PACKAGE__->method_documentation->{ 'get_font_scheme' } = { 
     	summary => 'Read slide theme font scheme info.',
         params => $params,
         returns => 'FontScheme',
@@ -11571,7 +14553,7 @@ sub get_slides_theme_color_scheme {
 }
 # @return FontScheme
 #
-sub get_slides_theme_font_scheme {
+sub get_font_scheme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -11642,7 +14624,59 @@ sub get_slides_theme_font_scheme {
 }
 
 #
-# get_slides_theme_format_scheme
+# get_slides_theme_font_scheme
+#
+# Read slide theme font scheme info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_theme_font_scheme' } = { 
+    	summary => 'Read slide theme font scheme info.',
+        params => $params,
+        returns => 'FontScheme',
+        };
+}
+# @return FontScheme
+#
+sub get_slides_theme_font_scheme {
+    warnings::warnif("deprecated", "get_slides_theme_font_scheme is deprecated, use get_font_scheme instead");
+  
+    return get_font_scheme(@_);
+}
+
+#
+# get_format_scheme
 #
 # Read slide theme format scheme info.
 # 
@@ -11679,7 +14713,7 @@ sub get_slides_theme_font_scheme {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_theme_format_scheme' } = { 
+    __PACKAGE__->method_documentation->{ 'get_format_scheme' } = { 
     	summary => 'Read slide theme format scheme info.',
         params => $params,
         returns => 'FormatScheme',
@@ -11687,7 +14721,7 @@ sub get_slides_theme_font_scheme {
 }
 # @return FormatScheme
 #
-sub get_slides_theme_format_scheme {
+sub get_format_scheme {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -11758,7 +14792,59 @@ sub get_slides_theme_format_scheme {
 }
 
 #
-# get_slides_view_properties
+# get_slides_theme_format_scheme
+#
+# Read slide theme format scheme info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_theme_format_scheme' } = { 
+    	summary => 'Read slide theme format scheme info.',
+        params => $params,
+        returns => 'FormatScheme',
+        };
+}
+# @return FormatScheme
+#
+sub get_slides_theme_format_scheme {
+    warnings::warnif("deprecated", "get_slides_theme_format_scheme is deprecated, use get_format_scheme instead");
+  
+    return get_format_scheme(@_);
+}
+
+#
+# get_view_properties
 #
 # Read presentation document properties.
 # 
@@ -11789,7 +14875,7 @@ sub get_slides_theme_format_scheme {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slides_view_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'get_view_properties' } = { 
     	summary => 'Read presentation document properties.',
         params => $params,
         returns => 'ViewProperties',
@@ -11797,7 +14883,7 @@ sub get_slides_theme_format_scheme {
 }
 # @return ViewProperties
 #
-sub get_slides_view_properties {
+sub get_view_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -11856,7 +14942,53 @@ sub get_slides_view_properties {
 }
 
 #
-# get_subshape_paragraph_portion
+# get_slides_view_properties
+#
+# Read presentation document properties.
+# 
+# @param string $name Document name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slides_view_properties' } = { 
+    	summary => 'Read presentation document properties.',
+        params => $params,
+        returns => 'ViewProperties',
+        };
+}
+# @return ViewProperties
+#
+sub get_slides_view_properties {
+    warnings::warnif("deprecated", "get_slides_view_properties is deprecated, use get_view_properties instead");
+  
+    return get_view_properties(@_);
+}
+
+#
+# get_subshape_portion
 #
 # Read paragraph portion info (for smart art and group shapes).
 # 
@@ -11917,7 +15049,7 @@ sub get_slides_view_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_subshape_paragraph_portion' } = { 
+    __PACKAGE__->method_documentation->{ 'get_subshape_portion' } = { 
     	summary => 'Read paragraph portion info (for smart art and group shapes).',
         params => $params,
         returns => 'Portion',
@@ -11925,7 +15057,7 @@ sub get_slides_view_properties {
 }
 # @return Portion
 #
-sub get_subshape_paragraph_portion {
+sub get_subshape_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -12044,7 +15176,83 @@ sub get_subshape_paragraph_portion {
 }
 
 #
-# get_subshape_paragraph_portions
+# get_subshape_paragraph_portion
+#
+# Read paragraph portion info (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_subshape_paragraph_portion' } = { 
+    	summary => 'Read paragraph portion info (for smart art and group shapes).',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub get_subshape_paragraph_portion {
+    warnings::warnif("deprecated", "get_subshape_paragraph_portion is deprecated, use get_subshape_portion instead");
+  
+    return get_subshape_portion(@_);
+}
+
+#
+# get_subshape_portions
 #
 # Read paragraph portions info (for smart art and group shapes).
 # 
@@ -12099,7 +15307,7 @@ sub get_subshape_paragraph_portion {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_subshape_paragraph_portions' } = { 
+    __PACKAGE__->method_documentation->{ 'get_subshape_portions' } = { 
     	summary => 'Read paragraph portions info (for smart art and group shapes).',
         params => $params,
         returns => 'Portions',
@@ -12107,7 +15315,7 @@ sub get_subshape_paragraph_portion {
 }
 # @return Portions
 #
-sub get_subshape_paragraph_portions {
+sub get_subshape_portions {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -12211,6 +15419,76 @@ sub get_subshape_paragraph_portions {
     }
     my $_response_object = $self->{api_client}->deserialize('Portions', $response);
     return $_response_object;
+}
+
+#
+# get_subshape_paragraph_portions
+#
+# Read paragraph portions info (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_subshape_paragraph_portions' } = { 
+    	summary => 'Read paragraph portions info (for smart art and group shapes).',
+        params => $params,
+        returns => 'Portions',
+        };
+}
+# @return Portions
+#
+sub get_subshape_paragraph_portions {
+    warnings::warnif("deprecated", "get_subshape_paragraph_portions is deprecated, use get_subshape_portions instead");
+  
+    return get_subshape_portions(@_);
 }
 
 #
@@ -12510,7 +15788,7 @@ sub object_exists {
 }
 
 #
-# post_add_new_paragraph
+# create_paragraph
 #
 # Creates new paragraph.
 # 
@@ -12518,10 +15796,10 @@ sub object_exists {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
 # @param Paragraph $dto Paragraph DTO. (required)
+# @param int $position Position of the new paragraph in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
-# @param int $position Position of the new paragraph in the list. Default is at the end of the list. (optional)
 {
     my $params = {
     'name' => {
@@ -12544,6 +15822,11 @@ sub object_exists {
         description => 'Paragraph DTO.',
         required => '1',
     },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new paragraph in the list. Default is at the end of the list.',
+        required => '0',
+    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
@@ -12559,13 +15842,8 @@ sub object_exists {
         description => 'Document storage.',
         required => '0',
     },
-    'position' => {
-        data_type => 'int',
-        description => 'Position of the new paragraph in the list. Default is at the end of the list.',
-        required => '0',
-    },
     };
-    __PACKAGE__->method_documentation->{ 'post_add_new_paragraph' } = { 
+    __PACKAGE__->method_documentation->{ 'create_paragraph' } = { 
     	summary => 'Creates new paragraph.',
         params => $params,
         returns => 'Paragraph',
@@ -12573,7 +15851,7 @@ sub object_exists {
 }
 # @return Paragraph
 #
-sub post_add_new_paragraph {
+sub create_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -12612,6 +15890,11 @@ sub post_add_new_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -12619,11 +15902,6 @@ sub post_add_new_paragraph {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
-    if (exists $args{'position'} && defined $args{'position'}) {
-        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
     }
 
     # header params
@@ -12671,7 +15949,77 @@ sub post_add_new_paragraph {
 }
 
 #
-# post_add_new_portion
+# post_add_new_paragraph
+#
+# Creates new paragraph.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param Paragraph $dto Paragraph DTO. (required)
+# @param int $position Position of the new paragraph in the list. Default is at the end of the list. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Paragraph',
+        description => 'Paragraph DTO.',
+        required => '1',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new paragraph in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_new_paragraph' } = { 
+    	summary => 'Creates new paragraph.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub post_add_new_paragraph {
+    warnings::warnif("deprecated", "post_add_new_paragraph is deprecated, use create_paragraph instead");
+  
+    return create_paragraph(@_);
+}
+
+#
+# create_portion
 #
 # Creates new portion.
 # 
@@ -12680,10 +16028,10 @@ sub post_add_new_paragraph {
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param Portion $dto Portion DTO. (required)
+# @param int $position Position of the new portion in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
-# @param int $position Position of the new portion in the list. Default is at the end of the list. (optional)
 {
     my $params = {
     'name' => {
@@ -12711,6 +16059,11 @@ sub post_add_new_paragraph {
         description => 'Portion DTO.',
         required => '1',
     },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new portion in the list. Default is at the end of the list.',
+        required => '0',
+    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
@@ -12726,13 +16079,8 @@ sub post_add_new_paragraph {
         description => 'Document storage.',
         required => '0',
     },
-    'position' => {
-        data_type => 'int',
-        description => 'Position of the new portion in the list. Default is at the end of the list.',
-        required => '0',
-    },
     };
-    __PACKAGE__->method_documentation->{ 'post_add_new_portion' } = { 
+    __PACKAGE__->method_documentation->{ 'create_portion' } = { 
     	summary => 'Creates new portion.',
         params => $params,
         returns => 'Portion',
@@ -12740,7 +16088,7 @@ sub post_add_new_paragraph {
 }
 # @return Portion
 #
-sub post_add_new_portion {
+sub create_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -12784,6 +16132,11 @@ sub post_add_new_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -12791,11 +16144,6 @@ sub post_add_new_portion {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
-    if (exists $args{'position'} && defined $args{'position'}) {
-        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
     }
 
     # header params
@@ -12850,18 +16198,19 @@ sub post_add_new_portion {
 }
 
 #
-# post_add_new_shape
+# post_add_new_portion
 #
-# Create new shape.
+# Creates new portion.
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param ShapeBase $dto Shape DTO. (optional)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param Portion $dto Portion DTO. (required)
+# @param int $position Position of the new portion in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
-# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
-# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
 {
     my $params = {
     'name' => {
@@ -12874,9 +16223,24 @@ sub post_add_new_portion {
         description => 'Slide index.',
         required => '1',
     },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
     'dto' => {
-        data_type => 'ShapeBase',
-        description => 'Shape DTO.',
+        data_type => 'Portion',
+        description => 'Portion DTO.',
+        required => '1',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new portion in the list. Default is at the end of the list.',
         required => '0',
     },
     'password' => {
@@ -12894,6 +16258,51 @@ sub post_add_new_portion {
         description => 'Document storage.',
         required => '0',
     },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_new_portion' } = { 
+    	summary => 'Creates new portion.',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub post_add_new_portion {
+    warnings::warnif("deprecated", "post_add_new_portion is deprecated, use create_portion instead");
+  
+    return create_portion(@_);
+}
+
+#
+# create_shape
+#
+# Create new shape.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param ShapeBase $dto Shape DTO. (optional)
+# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
+# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '0',
+    },
     'shape_to_clone' => {
         data_type => 'int',
         description => 'Optional index for clone shape instead of adding a new one.',
@@ -12904,8 +16313,23 @@ sub post_add_new_portion {
         description => 'Position of the new shape in the list. Default is at the end of the list.',
         required => '0',
     },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'post_add_new_shape' } = { 
+    __PACKAGE__->method_documentation->{ 'create_shape' } = { 
     	summary => 'Create new shape.',
         params => $params,
         returns => 'ShapeBase',
@@ -12913,7 +16337,7 @@ sub post_add_new_portion {
 }
 # @return ShapeBase
 #
-sub post_add_new_shape {
+sub create_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -12942,16 +16366,6 @@ sub post_add_new_shape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'shape_to_clone'} && defined $args{'shape_to_clone'}) {
         $query_params->{'shapeToClone'} = $self->{api_client}->to_query_value($args{'shape_to_clone'});
     }
@@ -12959,6 +16373,16 @@ sub post_add_new_shape {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -12999,7 +16423,77 @@ sub post_add_new_shape {
 }
 
 #
-# post_add_new_subshape
+# post_add_new_shape
+#
+# Create new shape.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param ShapeBase $dto Shape DTO. (optional)
+# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
+# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '0',
+    },
+    'shape_to_clone' => {
+        data_type => 'int',
+        description => 'Optional index for clone shape instead of adding a new one.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new shape in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_new_shape' } = { 
+    	summary => 'Create new shape.',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub post_add_new_shape {
+    warnings::warnif("deprecated", "post_add_new_shape is deprecated, use create_shape instead");
+  
+    return create_shape(@_);
+}
+
+#
+# create_subshape
 #
 # Create new shape (for smart art and group shapes).
 # 
@@ -13007,11 +16501,11 @@ sub post_add_new_shape {
 # @param int $slide_index Slide index. (required)
 # @param string $path Shape path. (required)
 # @param ShapeBase $dto Shape DTO. (optional)
+# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
+# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
-# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
-# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
 {
     my $params = {
     'name' => {
@@ -13034,6 +16528,16 @@ sub post_add_new_shape {
         description => 'Shape DTO.',
         required => '0',
     },
+    'shape_to_clone' => {
+        data_type => 'int',
+        description => 'Optional index for clone shape instead of adding a new one.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new shape in the list. Default is at the end of the list.',
+        required => '0',
+    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
@@ -13049,18 +16553,8 @@ sub post_add_new_shape {
         description => 'Document storage.',
         required => '0',
     },
-    'shape_to_clone' => {
-        data_type => 'int',
-        description => 'Optional index for clone shape instead of adding a new one.',
-        required => '0',
-    },
-    'position' => {
-        data_type => 'int',
-        description => 'Position of the new shape in the list. Default is at the end of the list.',
-        required => '0',
-    },
     };
-    __PACKAGE__->method_documentation->{ 'post_add_new_subshape' } = { 
+    __PACKAGE__->method_documentation->{ 'create_subshape' } = { 
     	summary => 'Create new shape (for smart art and group shapes).',
         params => $params,
         returns => 'ShapeBase',
@@ -13068,7 +16562,7 @@ sub post_add_new_shape {
 }
 # @return ShapeBase
 #
-sub post_add_new_subshape {
+sub create_subshape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -13102,16 +16596,6 @@ sub post_add_new_subshape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'shape_to_clone'} && defined $args{'shape_to_clone'}) {
         $query_params->{'shapeToClone'} = $self->{api_client}->to_query_value($args{'shape_to_clone'});
     }
@@ -13119,6 +16603,16 @@ sub post_add_new_subshape {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -13166,7 +16660,83 @@ sub post_add_new_subshape {
 }
 
 #
-# post_add_new_subshape_paragraph
+# post_add_new_subshape
+#
+# Create new shape (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param ShapeBase $dto Shape DTO. (optional)
+# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
+# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '0',
+    },
+    'shape_to_clone' => {
+        data_type => 'int',
+        description => 'Optional index for clone shape instead of adding a new one.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new shape in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_new_subshape' } = { 
+    	summary => 'Create new shape (for smart art and group shapes).',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub post_add_new_subshape {
+    warnings::warnif("deprecated", "post_add_new_subshape is deprecated, use create_subshape instead");
+  
+    return create_subshape(@_);
+}
+
+#
+# create_subshape_paragraph
 #
 # Creates new paragraph (for smart art and group shapes).
 # 
@@ -13175,10 +16745,10 @@ sub post_add_new_subshape {
 # @param string $path Shape path. (required)
 # @param int $shape_index Shape index. (required)
 # @param Paragraph $dto Paragraph DTO. (required)
+# @param int $position Position of the new paragraph in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
-# @param int $position Position of the new paragraph in the list. Default is at the end of the list. (optional)
 {
     my $params = {
     'name' => {
@@ -13206,6 +16776,11 @@ sub post_add_new_subshape {
         description => 'Paragraph DTO.',
         required => '1',
     },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new paragraph in the list. Default is at the end of the list.',
+        required => '0',
+    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
@@ -13221,13 +16796,8 @@ sub post_add_new_subshape {
         description => 'Document storage.',
         required => '0',
     },
-    'position' => {
-        data_type => 'int',
-        description => 'Position of the new paragraph in the list. Default is at the end of the list.',
-        required => '0',
-    },
     };
-    __PACKAGE__->method_documentation->{ 'post_add_new_subshape_paragraph' } = { 
+    __PACKAGE__->method_documentation->{ 'create_subshape_paragraph' } = { 
     	summary => 'Creates new paragraph (for smart art and group shapes).',
         params => $params,
         returns => 'Paragraph',
@@ -13235,7 +16805,7 @@ sub post_add_new_subshape {
 }
 # @return Paragraph
 #
-sub post_add_new_subshape_paragraph {
+sub create_subshape_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -13279,6 +16849,11 @@ sub post_add_new_subshape_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -13286,11 +16861,6 @@ sub post_add_new_subshape_paragraph {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
-    if (exists $args{'position'} && defined $args{'position'}) {
-        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
     }
 
     # header params
@@ -13345,7 +16915,83 @@ sub post_add_new_subshape_paragraph {
 }
 
 #
-# post_add_new_subshape_portion
+# post_add_new_subshape_paragraph
+#
+# Creates new paragraph (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param Paragraph $dto Paragraph DTO. (required)
+# @param int $position Position of the new paragraph in the list. Default is at the end of the list. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Paragraph',
+        description => 'Paragraph DTO.',
+        required => '1',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new paragraph in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_new_subshape_paragraph' } = { 
+    	summary => 'Creates new paragraph (for smart art and group shapes).',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub post_add_new_subshape_paragraph {
+    warnings::warnif("deprecated", "post_add_new_subshape_paragraph is deprecated, use create_subshape_paragraph instead");
+  
+    return create_subshape_paragraph(@_);
+}
+
+#
+# create_subshape_portion
 #
 # Creates new portion (for smart art and group shapes).
 # 
@@ -13355,10 +17001,10 @@ sub post_add_new_subshape_paragraph {
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param Portion $dto Portion DTO. (required)
+# @param int $position Position of the new portion in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
-# @param int $position Position of the new portion in the list. Default is at the end of the list. (optional)
 {
     my $params = {
     'name' => {
@@ -13391,6 +17037,11 @@ sub post_add_new_subshape_paragraph {
         description => 'Portion DTO.',
         required => '1',
     },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new portion in the list. Default is at the end of the list.',
+        required => '0',
+    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
@@ -13406,13 +17057,8 @@ sub post_add_new_subshape_paragraph {
         description => 'Document storage.',
         required => '0',
     },
-    'position' => {
-        data_type => 'int',
-        description => 'Position of the new portion in the list. Default is at the end of the list.',
-        required => '0',
-    },
     };
-    __PACKAGE__->method_documentation->{ 'post_add_new_subshape_portion' } = { 
+    __PACKAGE__->method_documentation->{ 'create_subshape_portion' } = { 
     	summary => 'Creates new portion (for smart art and group shapes).',
         params => $params,
         returns => 'Portion',
@@ -13420,7 +17066,7 @@ sub post_add_new_subshape_paragraph {
 }
 # @return Portion
 #
-sub post_add_new_subshape_portion {
+sub create_subshape_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -13469,6 +17115,11 @@ sub post_add_new_subshape_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -13476,11 +17127,6 @@ sub post_add_new_subshape_portion {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
-    if (exists $args{'position'} && defined $args{'position'}) {
-        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
     }
 
     # header params
@@ -13542,7 +17188,89 @@ sub post_add_new_subshape_portion {
 }
 
 #
-# post_add_notes_slide
+# post_add_new_subshape_portion
+#
+# Creates new portion (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param Portion $dto Portion DTO. (required)
+# @param int $position Position of the new portion in the list. Default is at the end of the list. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Portion',
+        description => 'Portion DTO.',
+        required => '1',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new portion in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_new_subshape_portion' } = { 
+    	summary => 'Creates new portion (for smart art and group shapes).',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub post_add_new_subshape_portion {
+    warnings::warnif("deprecated", "post_add_new_subshape_portion is deprecated, use create_subshape_portion instead");
+  
+    return create_subshape_portion(@_);
+}
+
+#
+# create_notes_slide
 #
 # Add new notes slide.
 # 
@@ -13585,7 +17313,7 @@ sub post_add_new_subshape_portion {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_add_notes_slide' } = { 
+    __PACKAGE__->method_documentation->{ 'create_notes_slide' } = { 
     	summary => 'Add new notes slide.',
         params => $params,
         returns => 'NotesSlide',
@@ -13593,7 +17321,7 @@ sub post_add_new_subshape_portion {
 }
 # @return NotesSlide
 #
-sub post_add_notes_slide {
+sub create_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -13674,7 +17402,291 @@ sub post_add_notes_slide {
 }
 
 #
-# post_chart_category
+# post_add_notes_slide
+#
+# Add new notes slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param NotesSlide $dto A NotesSlide object with notes slide data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'NotesSlide',
+        description => 'A NotesSlide object with notes slide data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_notes_slide' } = { 
+    	summary => 'Add new notes slide.',
+        params => $params,
+        returns => 'NotesSlide',
+        };
+}
+# @return NotesSlide
+#
+sub post_add_notes_slide {
+    warnings::warnif("deprecated", "post_add_notes_slide is deprecated, use create_notes_slide instead");
+  
+    return create_notes_slide(@_);
+}
+
+#
+# align_shapes
+#
+# Changes the placement of selected shapes on the slide. Aligns shapes to the margins or the edge of the slide or aligns them relative to each other.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $alignment_type Alignment type that will be applied to the shapes. (required)
+# @param boolean $align_to_slide If true, shapes will be aligned relative to the slide edges. (optional, default to false)
+# @param string $shapes Shapes indexes. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'alignment_type' => {
+        data_type => 'string',
+        description => 'Alignment type that will be applied to the shapes.',
+        required => '1',
+    },
+    'align_to_slide' => {
+        data_type => 'boolean',
+        description => 'If true, shapes will be aligned relative to the slide edges.',
+        required => '0',
+    },
+    'shapes' => {
+        data_type => 'string',
+        description => 'Shapes indexes.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'align_shapes' } = { 
+    	summary => 'Changes the placement of selected shapes on the slide. Aligns shapes to the margins or the edge of the slide or aligns them relative to each other.',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub align_shapes {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_align_shapes");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_align_shapes");
+    }
+
+    # verify the required parameter 'alignment_type' is set
+    unless (exists $args{'alignment_type'} && $args{'alignment_type'}) {
+      croak("Missing the required parameter 'alignment_type' when calling post_align_shapes");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/align/{alignmentType}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'align_to_slide'} && defined $args{'align_to_slide'}) {
+        $query_params->{'alignToSlide'} = $self->{api_client}->to_boolean_query_value($args{'align_to_slide'});
+    }
+
+    # query params
+    if (exists $args{'shapes'} && defined $args{'shapes'}) {
+        $query_params->{'shapes'} = $self->{api_client}->to_query_value($args{'shapes'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'alignment_type'}) {
+        my $_base_variable = "{" . "alignmentType" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'alignment_type'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Shapes', $response);
+    return $_response_object;
+}
+
+#
+# post_align_shapes
+#
+# Changes the placement of selected shapes on the slide. Aligns shapes to the margins or the edge of the slide or aligns them relative to each other.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $alignment_type Alignment type that will be applied to the shapes. (required)
+# @param boolean $align_to_slide If true, shapes will be aligned relative to the slide edges. (optional, default to false)
+# @param string $shapes Shapes indexes. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'alignment_type' => {
+        data_type => 'string',
+        description => 'Alignment type that will be applied to the shapes.',
+        required => '1',
+    },
+    'align_to_slide' => {
+        data_type => 'boolean',
+        description => 'If true, shapes will be aligned relative to the slide edges.',
+        required => '0',
+    },
+    'shapes' => {
+        data_type => 'string',
+        description => 'Shapes indexes.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_align_shapes' } = { 
+    	summary => 'Changes the placement of selected shapes on the slide. Aligns shapes to the margins or the edge of the slide or aligns them relative to each other.',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub post_align_shapes {
+    warnings::warnif("deprecated", "post_align_shapes is deprecated, use align_shapes instead");
+  
+    return align_shapes(@_);
+}
+
+#
+# create_chart_category
 #
 # Add a new category to a chart.
 # 
@@ -13723,7 +17735,7 @@ sub post_add_notes_slide {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_chart_category' } = { 
+    __PACKAGE__->method_documentation->{ 'create_chart_category' } = { 
     	summary => 'Add a new category to a chart.',
         params => $params,
         returns => 'Chart',
@@ -13731,7 +17743,7 @@ sub post_add_notes_slide {
 }
 # @return Chart
 #
-sub post_chart_category {
+sub create_chart_category {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -13824,7 +17836,71 @@ sub post_chart_category {
 }
 
 #
-# post_chart_data_point
+# post_chart_category
+#
+# Add a new category to a chart.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param ChartCategory $category Category DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'category' => {
+        data_type => 'ChartCategory',
+        description => 'Category DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_chart_category' } = { 
+    	summary => 'Add a new category to a chart.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub post_chart_category {
+    warnings::warnif("deprecated", "post_chart_category is deprecated, use create_chart_category instead");
+  
+    return create_chart_category(@_);
+}
+
+#
+# create_chart_data_point
 #
 # Add a new data point to a chart series.
 # 
@@ -13879,7 +17955,7 @@ sub post_chart_category {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_chart_data_point' } = { 
+    __PACKAGE__->method_documentation->{ 'create_chart_data_point' } = { 
     	summary => 'Add a new data point to a chart series.',
         params => $params,
         returns => 'Chart',
@@ -13887,7 +17963,7 @@ sub post_chart_category {
 }
 # @return Chart
 #
-sub post_chart_data_point {
+sub create_chart_data_point {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -13992,7 +18068,77 @@ sub post_chart_data_point {
 }
 
 #
-# post_chart_series
+# post_chart_data_point
+#
+# Add a new data point to a chart series.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $series_index Series index. (required)
+# @param DataPoint $data_point Data point DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'series_index' => {
+        data_type => 'int',
+        description => 'Series index.',
+        required => '1',
+    },
+    'data_point' => {
+        data_type => 'DataPoint',
+        description => 'Data point DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_chart_data_point' } = { 
+    	summary => 'Add a new data point to a chart series.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub post_chart_data_point {
+    warnings::warnif("deprecated", "post_chart_data_point is deprecated, use create_chart_data_point instead");
+  
+    return create_chart_data_point(@_);
+}
+
+#
+# create_chart_series
 #
 # Add a new series to a chart.
 # 
@@ -14041,7 +18187,7 @@ sub post_chart_data_point {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_chart_series' } = { 
+    __PACKAGE__->method_documentation->{ 'create_chart_series' } = { 
     	summary => 'Add a new series to a chart.',
         params => $params,
         returns => 'Chart',
@@ -14049,7 +18195,7 @@ sub post_chart_data_point {
 }
 # @return Chart
 #
-sub post_chart_series {
+sub create_chart_series {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -14142,7 +18288,71 @@ sub post_chart_series {
 }
 
 #
-# post_copy_layout_slide_from_source_presentation
+# post_chart_series
+#
+# Add a new series to a chart.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index (must be a chart). (required)
+# @param Series $series Series DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index (must be a chart).',
+        required => '1',
+    },
+    'series' => {
+        data_type => 'Series',
+        description => 'Series DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_chart_series' } = { 
+    	summary => 'Add a new series to a chart.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub post_chart_series {
+    warnings::warnif("deprecated", "post_chart_series is deprecated, use create_chart_series instead");
+  
+    return create_chart_series(@_);
+}
+
+#
+# copy_layout_slide
 #
 # Copy layoutSlide from source presentation.
 # 
@@ -14197,7 +18407,7 @@ sub post_chart_series {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_copy_layout_slide_from_source_presentation' } = { 
+    __PACKAGE__->method_documentation->{ 'copy_layout_slide' } = { 
     	summary => 'Copy layoutSlide from source presentation.',
         params => $params,
         returns => 'LayoutSlide',
@@ -14205,7 +18415,7 @@ sub post_chart_series {
 }
 # @return LayoutSlide
 #
-sub post_copy_layout_slide_from_source_presentation {
+sub copy_layout_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -14294,7 +18504,77 @@ sub post_copy_layout_slide_from_source_presentation {
 }
 
 #
-# post_copy_master_slide_from_source_presentation
+# post_copy_layout_slide_from_source_presentation
+#
+# Copy layoutSlide from source presentation.
+# 
+# @param string $name Document name. (required)
+# @param string $clone_from Name of the document to clone layoutSlide from. (required)
+# @param int $clone_from_position Position of cloned layout slide. (required)
+# @param string $clone_from_password Password for the document to clone layoutSlide from. (optional)
+# @param string $clone_from_storage Storage of the document to clone layoutSlide from. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'clone_from' => {
+        data_type => 'string',
+        description => 'Name of the document to clone layoutSlide from.',
+        required => '1',
+    },
+    'clone_from_position' => {
+        data_type => 'int',
+        description => 'Position of cloned layout slide.',
+        required => '1',
+    },
+    'clone_from_password' => {
+        data_type => 'string',
+        description => 'Password for the document to clone layoutSlide from.',
+        required => '0',
+    },
+    'clone_from_storage' => {
+        data_type => 'string',
+        description => 'Storage of the document to clone layoutSlide from.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_copy_layout_slide_from_source_presentation' } = { 
+    	summary => 'Copy layoutSlide from source presentation.',
+        params => $params,
+        returns => 'LayoutSlide',
+        };
+}
+# @return LayoutSlide
+#
+sub post_copy_layout_slide_from_source_presentation {
+    warnings::warnif("deprecated", "post_copy_layout_slide_from_source_presentation is deprecated, use copy_layout_slide instead");
+  
+    return copy_layout_slide(@_);
+}
+
+#
+# copy_master_slide
 #
 # Copy masterSlide from source presentation.
 # 
@@ -14355,7 +18635,7 @@ sub post_copy_layout_slide_from_source_presentation {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_copy_master_slide_from_source_presentation' } = { 
+    __PACKAGE__->method_documentation->{ 'copy_master_slide' } = { 
     	summary => 'Copy masterSlide from source presentation.',
         params => $params,
         returns => 'MasterSlide',
@@ -14363,7 +18643,7 @@ sub post_copy_layout_slide_from_source_presentation {
 }
 # @return MasterSlide
 #
-sub post_copy_master_slide_from_source_presentation {
+sub copy_master_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -14457,7 +18737,1304 @@ sub post_copy_master_slide_from_source_presentation {
 }
 
 #
-# post_get_notes_slide
+# post_copy_master_slide_from_source_presentation
+#
+# Copy masterSlide from source presentation.
+# 
+# @param string $name Document name. (required)
+# @param string $clone_from Name of the document to clone masterSlide from. (required)
+# @param int $clone_from_position Position of cloned master slide. (required)
+# @param string $clone_from_password Password for the document to clone masterSlide from. (optional)
+# @param string $clone_from_storage Storage of the document to clone masterSlide from. (optional)
+# @param boolean $apply_to_all True to apply cloned master slide to every existing slide. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'clone_from' => {
+        data_type => 'string',
+        description => 'Name of the document to clone masterSlide from.',
+        required => '1',
+    },
+    'clone_from_position' => {
+        data_type => 'int',
+        description => 'Position of cloned master slide.',
+        required => '1',
+    },
+    'clone_from_password' => {
+        data_type => 'string',
+        description => 'Password for the document to clone masterSlide from.',
+        required => '0',
+    },
+    'clone_from_storage' => {
+        data_type => 'string',
+        description => 'Storage of the document to clone masterSlide from.',
+        required => '0',
+    },
+    'apply_to_all' => {
+        data_type => 'boolean',
+        description => 'True to apply cloned master slide to every existing slide.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_copy_master_slide_from_source_presentation' } = { 
+    	summary => 'Copy masterSlide from source presentation.',
+        params => $params,
+        returns => 'MasterSlide',
+        };
+}
+# @return MasterSlide
+#
+sub post_copy_master_slide_from_source_presentation {
+    warnings::warnif("deprecated", "post_copy_master_slide_from_source_presentation is deprecated, use copy_master_slide instead");
+  
+    return copy_master_slide(@_);
+}
+
+#
+# download_image_default_format_online
+#
+# Get image binary data.
+# 
+# @param File $document Document data. (required)
+# @param int $index Image index. (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'index' => {
+        data_type => 'int',
+        description => 'Image index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download_image_default_format_online' } = { 
+    	summary => 'Get image binary data.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download_image_default_format_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_export_image_with_default_format");
+    }
+
+    # verify the required parameter 'index' is set
+    unless (exists $args{'index'}) {
+      croak("Missing the required parameter 'index' when calling post_export_image_with_default_format");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/images/{index}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'index'}) {
+        my $_base_variable = "{" . "index" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_export_image_with_default_format
+#
+# Get image binary data.
+# 
+# @param File $document Document data. (required)
+# @param int $index Image index. (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'index' => {
+        data_type => 'int',
+        description => 'Image index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_export_image_with_default_format' } = { 
+    	summary => 'Get image binary data.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_export_image_with_default_format {
+    warnings::warnif("deprecated", "post_export_image_with_default_format is deprecated, use download_image_default_format_online instead");
+  
+    return download_image_default_format_online(@_);
+}
+
+#
+# download_image_online
+#
+# Get image in specified format.
+# 
+# @param File $document Document data. (required)
+# @param int $index Image index. (required)
+# @param string $format Export format (png, jpg, gif). (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'index' => {
+        data_type => 'int',
+        description => 'Image index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format (png, jpg, gif).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download_image_online' } = { 
+    	summary => 'Get image in specified format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download_image_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_export_image_with_format");
+    }
+
+    # verify the required parameter 'index' is set
+    unless (exists $args{'index'}) {
+      croak("Missing the required parameter 'index' when calling post_export_image_with_format");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling post_export_image_with_format");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/images/{index}/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'index'}) {
+        my $_base_variable = "{" . "index" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_export_image_with_format
+#
+# Get image in specified format.
+# 
+# @param File $document Document data. (required)
+# @param int $index Image index. (required)
+# @param string $format Export format (png, jpg, gif). (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'index' => {
+        data_type => 'int',
+        description => 'Image index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format (png, jpg, gif).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_export_image_with_format' } = { 
+    	summary => 'Get image in specified format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_export_image_with_format {
+    warnings::warnif("deprecated", "post_export_image_with_format is deprecated, use download_image_online instead");
+  
+    return download_image_online(@_);
+}
+
+#
+# download_images_online
+#
+# Get all presentation images in specified format. 
+# 
+# @param File $document Document data. (required)
+# @param string $format Export format (png, jpg, gif). (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format (png, jpg, gif).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download_images_online' } = { 
+    	summary => 'Get all presentation images in specified format. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download_images_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_export_images_from_request_with_format");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling post_export_images_from_request_with_format");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/images/download/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_export_images_from_request_with_format
+#
+# Get all presentation images in specified format. 
+# 
+# @param File $document Document data. (required)
+# @param string $format Export format (png, jpg, gif). (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format (png, jpg, gif).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_export_images_from_request_with_format' } = { 
+    	summary => 'Get all presentation images in specified format. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_export_images_from_request_with_format {
+    warnings::warnif("deprecated", "post_export_images_from_request_with_format is deprecated, use download_images_online instead");
+  
+    return download_images_online(@_);
+}
+
+#
+# download_images_default_format
+#
+# Get all presentation images.
+# 
+# @param string $name  (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download_images_default_format' } = { 
+    	summary => 'Get all presentation images.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download_images_default_format {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_export_images_with_default_format");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/images/download';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_export_images_with_default_format
+#
+# Get all presentation images.
+# 
+# @param string $name  (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_export_images_with_default_format' } = { 
+    	summary => 'Get all presentation images.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_export_images_with_default_format {
+    warnings::warnif("deprecated", "post_export_images_with_default_format is deprecated, use download_images_default_format instead");
+  
+    return download_images_default_format(@_);
+}
+
+#
+# download_images
+#
+# Get all presentation images in specified format.
+# 
+# @param string $name  (required)
+# @param string $format Export format (png, jpg, gif). (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format (png, jpg, gif).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download_images' } = { 
+    	summary => 'Get all presentation images in specified format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download_images {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_export_images_with_format");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling post_export_images_with_format");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/images/download/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_export_images_with_format
+#
+# Get all presentation images in specified format.
+# 
+# @param string $name  (required)
+# @param string $format Export format (png, jpg, gif). (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format (png, jpg, gif).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_export_images_with_format' } = { 
+    	summary => 'Get all presentation images in specified format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_export_images_with_format {
+    warnings::warnif("deprecated", "post_export_images_with_format is deprecated, use download_images instead");
+  
+    return download_images(@_);
+}
+
+#
+# download_shape_online
+#
+# Render shape to specified picture format.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download_shape_online' } = { 
+    	summary => 'Render shape to specified picture format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download_shape_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_export_shape");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_export_shape");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling post_export_shape");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling post_export_shape");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/slides/{slideIndex}/shapes/{shapeIndex}/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
+        $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
+    }
+
+    # query params
+    if (exists $args{'scale_y'} && defined $args{'scale_y'}) {
+        $query_params->{'scaleY'} = $self->{api_client}->to_query_value($args{'scale_y'});
+    }
+
+    # query params
+    if (exists $args{'bounds'} && defined $args{'bounds'}) {
+        $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_export_shape
+#
+# Render shape to specified picture format.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_export_shape' } = { 
+    	summary => 'Render shape to specified picture format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_export_shape {
+    warnings::warnif("deprecated", "post_export_shape is deprecated, use download_shape_online instead");
+  
+    return download_shape_online(@_);
+}
+
+#
+# download_slide_online
+#
+# Save a slide to a specified format.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $format Output file format. (required)
+# @param int $width Output file width; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param int $height Output file height; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Output file format.',
+        required => '1',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Output file width; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Output file height; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Storage folder containing custom fonts to be used with the document.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download_slide_online' } = { 
+    	summary => 'Save a slide to a specified format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download_slide_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_export_slide");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_export_slide");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling post_export_slide");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/slides/{slideIndex}/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'width'} && defined $args{'width'}) {
+        $query_params->{'width'} = $self->{api_client}->to_query_value($args{'width'});
+    }
+
+    # query params
+    if (exists $args{'height'} && defined $args{'height'}) {
+        $query_params->{'height'} = $self->{api_client}->to_query_value($args{'height'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_export_slide
+#
+# Save a slide to a specified format.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $format Output file format. (required)
+# @param int $width Output file width; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param int $height Output file height; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Output file format.',
+        required => '1',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Output file width; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Output file height; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Storage folder containing custom fonts to be used with the document.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_export_slide' } = { 
+    	summary => 'Save a slide to a specified format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_export_slide {
+    warnings::warnif("deprecated", "post_export_slide is deprecated, use download_slide_online instead");
+  
+    return download_slide_online(@_);
+}
+
+#
+# get_notes_slide_online
 #
 # Read notes slide info.
 # 
@@ -14482,7 +20059,7 @@ sub post_copy_master_slide_from_source_presentation {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_get_notes_slide' } = { 
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_online' } = { 
     	summary => 'Read notes slide info.',
         params => $params,
         returns => 'NotesSlide',
@@ -14490,7 +20067,7 @@ sub post_copy_master_slide_from_source_presentation {
 }
 # @return NotesSlide
 #
-sub post_get_notes_slide {
+sub get_notes_slide_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
@@ -14549,7 +20126,47 @@ sub post_get_notes_slide {
 }
 
 #
-# post_get_notes_slide_exists
+# post_get_notes_slide
+#
+# Read notes slide info.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_get_notes_slide' } = { 
+    	summary => 'Read notes slide info.',
+        params => $params,
+        returns => 'NotesSlide',
+        };
+}
+# @return NotesSlide
+#
+sub post_get_notes_slide {
+    warnings::warnif("deprecated", "post_get_notes_slide is deprecated, use get_notes_slide_online instead");
+  
+    return get_notes_slide_online(@_);
+}
+
+#
+# notes_slide_exists_online
 #
 # Get info whether a notes slide exists.
 # 
@@ -14574,7 +20191,7 @@ sub post_get_notes_slide {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_get_notes_slide_exists' } = { 
+    __PACKAGE__->method_documentation->{ 'notes_slide_exists_online' } = { 
     	summary => 'Get info whether a notes slide exists.',
         params => $params,
         returns => 'EntityExists',
@@ -14582,7 +20199,7 @@ sub post_get_notes_slide {
 }
 # @return EntityExists
 #
-sub post_get_notes_slide_exists {
+sub notes_slide_exists_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
@@ -14641,7 +20258,47 @@ sub post_get_notes_slide_exists {
 }
 
 #
-# post_get_notes_slide_with_format
+# post_get_notes_slide_exists
+#
+# Get info whether a notes slide exists.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_get_notes_slide_exists' } = { 
+    	summary => 'Get info whether a notes slide exists.',
+        params => $params,
+        returns => 'EntityExists',
+        };
+}
+# @return EntityExists
+#
+sub post_get_notes_slide_exists {
+    warnings::warnif("deprecated", "post_get_notes_slide_exists is deprecated, use notes_slide_exists_online instead");
+  
+    return notes_slide_exists_online(@_);
+}
+
+#
+# download_notes_slide_online
 #
 # Convert notes slide to the specified image format.
 # 
@@ -14690,7 +20347,7 @@ sub post_get_notes_slide_exists {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_get_notes_slide_with_format' } = { 
+    __PACKAGE__->method_documentation->{ 'download_notes_slide_online' } = { 
     	summary => 'Convert notes slide to the specified image format.',
         params => $params,
         returns => 'File',
@@ -14698,7 +20355,7 @@ sub post_get_notes_slide_exists {
 }
 # @return File
 #
-sub post_get_notes_slide_with_format {
+sub download_notes_slide_online {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
@@ -14784,7 +20441,179 @@ sub post_get_notes_slide_with_format {
 }
 
 #
-# post_notes_slide_add_new_paragraph
+# post_get_notes_slide_with_format
+#
+# Convert notes slide to the specified image format.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $format Output file format. (required)
+# @param int $width Output file width. (optional)
+# @param int $height Output file height. (optional)
+# @param string $password Document password. (optional)
+# @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Output file format.',
+        required => '1',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Output file width.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Output file height.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Storage folder containing custom fonts to be used with the document.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_get_notes_slide_with_format' } = { 
+    	summary => 'Convert notes slide to the specified image format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_get_notes_slide_with_format {
+    warnings::warnif("deprecated", "post_get_notes_slide_with_format is deprecated, use download_notes_slide_online instead");
+  
+    return download_notes_slide_online(@_);
+}
+
+#
+# download_images_default_format_online
+#
+# Get all presentation images.
+# 
+# @param File $document Document data. (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'download_images_default_format_online' } = { 
+    	summary => 'Get all presentation images.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub download_images_default_format_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_images_from_request_with_default_format");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/images/download';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_images_from_request_with_default_format
+#
+# Get all presentation images.
+# 
+# @param File $document Document data. (required)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_images_from_request_with_default_format' } = { 
+    	summary => 'Get all presentation images.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_images_from_request_with_default_format {
+    warnings::warnif("deprecated", "post_images_from_request_with_default_format is deprecated, use download_images_default_format_online instead");
+  
+    return download_images_default_format_online(@_);
+}
+
+#
+# create_notes_slide_paragraph
 #
 # Creates new paragraph.
 # 
@@ -14792,10 +20621,10 @@ sub post_get_notes_slide_with_format {
 # @param int $slide_index Slide index. (required)
 # @param int $shape_index Shape index. (required)
 # @param Paragraph $dto Paragraph DTO. (required)
+# @param int $position Position of the new paragraph in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
-# @param int $position Position of the new paragraph in the list. Default is at the end of the list. (optional)
 {
     my $params = {
     'name' => {
@@ -14818,6 +20647,11 @@ sub post_get_notes_slide_with_format {
         description => 'Paragraph DTO.',
         required => '1',
     },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new paragraph in the list. Default is at the end of the list.',
+        required => '0',
+    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
@@ -14833,13 +20667,8 @@ sub post_get_notes_slide_with_format {
         description => 'Document storage.',
         required => '0',
     },
-    'position' => {
-        data_type => 'int',
-        description => 'Position of the new paragraph in the list. Default is at the end of the list.',
-        required => '0',
-    },
     };
-    __PACKAGE__->method_documentation->{ 'post_notes_slide_add_new_paragraph' } = { 
+    __PACKAGE__->method_documentation->{ 'create_notes_slide_paragraph' } = { 
     	summary => 'Creates new paragraph.',
         params => $params,
         returns => 'Paragraph',
@@ -14847,7 +20676,7 @@ sub post_get_notes_slide_with_format {
 }
 # @return Paragraph
 #
-sub post_notes_slide_add_new_paragraph {
+sub create_notes_slide_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -14886,6 +20715,11 @@ sub post_notes_slide_add_new_paragraph {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -14893,11 +20727,6 @@ sub post_notes_slide_add_new_paragraph {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
-    if (exists $args{'position'} && defined $args{'position'}) {
-        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
     }
 
     # header params
@@ -14945,7 +20774,77 @@ sub post_notes_slide_add_new_paragraph {
 }
 
 #
-# post_notes_slide_add_new_portion
+# post_notes_slide_add_new_paragraph
+#
+# Creates new paragraph.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param Paragraph $dto Paragraph DTO. (required)
+# @param int $position Position of the new paragraph in the list. Default is at the end of the list. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Paragraph',
+        description => 'Paragraph DTO.',
+        required => '1',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new paragraph in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_notes_slide_add_new_paragraph' } = { 
+    	summary => 'Creates new paragraph.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub post_notes_slide_add_new_paragraph {
+    warnings::warnif("deprecated", "post_notes_slide_add_new_paragraph is deprecated, use create_notes_slide_paragraph instead");
+  
+    return create_notes_slide_paragraph(@_);
+}
+
+#
+# create_notes_slide_portion
 #
 # Creates new portion.
 # 
@@ -14954,10 +20853,10 @@ sub post_notes_slide_add_new_paragraph {
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param Portion $dto Portion DTO. (required)
+# @param int $position Position of the new portion in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
-# @param int $position Position of the new portion in the list. Default is at the end of the list. (optional)
 {
     my $params = {
     'name' => {
@@ -14985,6 +20884,11 @@ sub post_notes_slide_add_new_paragraph {
         description => 'Portion DTO.',
         required => '1',
     },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new portion in the list. Default is at the end of the list.',
+        required => '0',
+    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
@@ -15000,13 +20904,8 @@ sub post_notes_slide_add_new_paragraph {
         description => 'Document storage.',
         required => '0',
     },
-    'position' => {
-        data_type => 'int',
-        description => 'Position of the new portion in the list. Default is at the end of the list.',
-        required => '0',
-    },
     };
-    __PACKAGE__->method_documentation->{ 'post_notes_slide_add_new_portion' } = { 
+    __PACKAGE__->method_documentation->{ 'create_notes_slide_portion' } = { 
     	summary => 'Creates new portion.',
         params => $params,
         returns => 'Portion',
@@ -15014,7 +20913,7 @@ sub post_notes_slide_add_new_paragraph {
 }
 # @return Portion
 #
-sub post_notes_slide_add_new_portion {
+sub create_notes_slide_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -15058,6 +20957,11 @@ sub post_notes_slide_add_new_portion {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
     if (exists $args{'folder'} && defined $args{'folder'}) {
         $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
@@ -15065,11 +20969,6 @@ sub post_notes_slide_add_new_portion {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
-    if (exists $args{'position'} && defined $args{'position'}) {
-        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
     }
 
     # header params
@@ -15124,18 +21023,94 @@ sub post_notes_slide_add_new_portion {
 }
 
 #
-# post_notes_slide_add_new_shape
+# post_notes_slide_add_new_portion
+#
+# Creates new portion.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param Portion $dto Portion DTO. (required)
+# @param int $position Position of the new portion in the list. Default is at the end of the list. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Portion',
+        description => 'Portion DTO.',
+        required => '1',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new portion in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_notes_slide_add_new_portion' } = { 
+    	summary => 'Creates new portion.',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub post_notes_slide_add_new_portion {
+    warnings::warnif("deprecated", "post_notes_slide_add_new_portion is deprecated, use create_notes_slide_portion instead");
+  
+    return create_notes_slide_portion(@_);
+}
+
+#
+# create_notes_slide_shape
 #
 # Create new shape.
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param ShapeBase $dto Shape DTO. (required)
+# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
+# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
-# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
-# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
 {
     my $params = {
     'name' => {
@@ -15153,6 +21128,16 @@ sub post_notes_slide_add_new_portion {
         description => 'Shape DTO.',
         required => '1',
     },
+    'shape_to_clone' => {
+        data_type => 'int',
+        description => 'Optional index for clone shape instead of adding a new one.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new shape in the list. Default is at the end of the list.',
+        required => '0',
+    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
@@ -15168,18 +21153,8 @@ sub post_notes_slide_add_new_portion {
         description => 'Document storage.',
         required => '0',
     },
-    'shape_to_clone' => {
-        data_type => 'int',
-        description => 'Optional index for clone shape instead of adding a new one.',
-        required => '0',
-    },
-    'position' => {
-        data_type => 'int',
-        description => 'Position of the new shape in the list. Default is at the end of the list.',
-        required => '0',
-    },
     };
-    __PACKAGE__->method_documentation->{ 'post_notes_slide_add_new_shape' } = { 
+    __PACKAGE__->method_documentation->{ 'create_notes_slide_shape' } = { 
     	summary => 'Create new shape.',
         params => $params,
         returns => 'ShapeBase',
@@ -15187,7 +21162,7 @@ sub post_notes_slide_add_new_portion {
 }
 # @return ShapeBase
 #
-sub post_notes_slide_add_new_shape {
+sub create_notes_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -15221,16 +21196,6 @@ sub post_notes_slide_add_new_shape {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'shape_to_clone'} && defined $args{'shape_to_clone'}) {
         $query_params->{'shapeToClone'} = $self->{api_client}->to_query_value($args{'shape_to_clone'});
     }
@@ -15238,6 +21203,16 @@ sub post_notes_slide_add_new_shape {
     # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -15278,7 +21253,77 @@ sub post_notes_slide_add_new_shape {
 }
 
 #
-# post_notes_slide_shape_save_as
+# post_notes_slide_add_new_shape
+#
+# Create new shape.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param ShapeBase $dto Shape DTO. (required)
+# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
+# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '1',
+    },
+    'shape_to_clone' => {
+        data_type => 'int',
+        description => 'Optional index for clone shape instead of adding a new one.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new shape in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_notes_slide_add_new_shape' } = { 
+    	summary => 'Create new shape.',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub post_notes_slide_add_new_shape {
+    warnings::warnif("deprecated", "post_notes_slide_add_new_shape is deprecated, use create_notes_slide_shape instead");
+  
+    return create_notes_slide_shape(@_);
+}
+
+#
+# download_notes_slide_shape
 #
 # Render shape to specified picture format.
 # 
@@ -15287,12 +21332,12 @@ sub post_notes_slide_add_new_shape {
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
 # @param IShapeExportOptions $options export options (optional)
-# @param string $password Document password. (optional)
-# @param string $folder Presentation folder. (optional)
-# @param string $storage Presentation storage. (optional)
 # @param double $scale_x X scale ratio. (optional, default to 0.0)
 # @param double $scale_y Y scale ratio. (optional, default to 0.0)
 # @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
 # @param string $fonts_folder Fonts folder. (optional)
 {
     my $params = {
@@ -15321,21 +21366,6 @@ sub post_notes_slide_add_new_shape {
         description => 'export options',
         required => '0',
     },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Presentation folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Presentation storage.',
-        required => '0',
-    },
     'scale_x' => {
         data_type => 'double',
         description => 'X scale ratio.',
@@ -15351,13 +21381,28 @@ sub post_notes_slide_add_new_shape {
         description => 'Shape thumbnail bounds type.',
         required => '0',
     },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
     'fonts_folder' => {
         data_type => 'string',
         description => 'Fonts folder.',
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_notes_slide_shape_save_as' } = { 
+    __PACKAGE__->method_documentation->{ 'download_notes_slide_shape' } = { 
     	summary => 'Render shape to specified picture format.',
         params => $params,
         returns => 'File',
@@ -15365,7 +21410,7 @@ sub post_notes_slide_add_new_shape {
 }
 # @return File
 #
-sub post_notes_slide_shape_save_as {
+sub download_notes_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -15404,16 +21449,6 @@ sub post_notes_slide_shape_save_as {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
         $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
     }
@@ -15426,6 +21461,16 @@ sub post_notes_slide_shape_save_as {
     # query params
     if (exists $args{'bounds'} && defined $args{'bounds'}) {
         $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -15485,15 +21530,109 @@ sub post_notes_slide_shape_save_as {
 }
 
 #
-# post_presentation_merge
+# post_notes_slide_shape_save_as
+#
+# Render shape to specified picture format.
+# 
+# @param string $name Presentation name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param IShapeExportOptions $options export options (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Presentation name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'IShapeExportOptions',
+        description => 'export options',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_notes_slide_shape_save_as' } = { 
+    	summary => 'Render shape to specified picture format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_notes_slide_shape_save_as {
+    warnings::warnif("deprecated", "post_notes_slide_shape_save_as is deprecated, use download_notes_slide_shape instead");
+  
+    return download_notes_slide_shape(@_);
+}
+
+#
+# merge
 #
 # Merge the presentation with other presentations specified in the request parameter.
 # 
 # @param string $name Document name. (required)
 # @param PresentationsMergeRequest $request PresentationsMergeRequest with a list of presentations to merge. (required)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -15511,18 +21650,18 @@ sub post_notes_slide_shape_save_as {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'post_presentation_merge' } = { 
+    __PACKAGE__->method_documentation->{ 'merge' } = { 
     	summary => 'Merge the presentation with other presentations specified in the request parameter.',
         params => $params,
         returns => 'Document',
@@ -15530,7 +21669,7 @@ sub post_notes_slide_shape_save_as {
 }
 # @return Document
 #
-sub post_presentation_merge {
+sub merge {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -15559,13 +21698,13 @@ sub post_presentation_merge {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -15599,7 +21738,462 @@ sub post_presentation_merge {
 }
 
 #
-# post_section
+# post_presentation_merge
+#
+# Merge the presentation with other presentations specified in the request parameter.
+# 
+# @param string $name Document name. (required)
+# @param PresentationsMergeRequest $request PresentationsMergeRequest with a list of presentations to merge. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'request' => {
+        data_type => 'PresentationsMergeRequest',
+        description => 'PresentationsMergeRequest with a list of presentations to merge.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_presentation_merge' } = { 
+    	summary => 'Merge the presentation with other presentations specified in the request parameter.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub post_presentation_merge {
+    warnings::warnif("deprecated", "post_presentation_merge is deprecated, use merge instead");
+  
+    return merge(@_);
+}
+
+#
+# replace_presentation_text_online
+#
+# Replace text with a new value.
+# 
+# @param File $document Document data. (required)
+# @param string $old_value Text value to be replaced. (required)
+# @param string $new_value Text value to replace with. (required)
+# @param boolean $ignore_case True if character case must be ignored. (optional, default to false)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'old_value' => {
+        data_type => 'string',
+        description => 'Text value to be replaced.',
+        required => '1',
+    },
+    'new_value' => {
+        data_type => 'string',
+        description => 'Text value to replace with.',
+        required => '1',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True if character case must be ignored.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'replace_presentation_text_online' } = { 
+    	summary => 'Replace text with a new value.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub replace_presentation_text_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_presentation_replace_text");
+    }
+
+    # verify the required parameter 'old_value' is set
+    unless (exists $args{'old_value'} && $args{'old_value'}) {
+      croak("Missing the required parameter 'old_value' when calling post_presentation_replace_text");
+    }
+
+    # verify the required parameter 'new_value' is set
+    unless (exists $args{'new_value'} && $args{'new_value'}) {
+      croak("Missing the required parameter 'new_value' when calling post_presentation_replace_text");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/replaceText';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'old_value'} && defined $args{'old_value'}) {
+        $query_params->{'oldValue'} = $self->{api_client}->to_query_value($args{'old_value'});
+    }
+
+    # query params
+    if (exists $args{'new_value'} && defined $args{'new_value'}) {
+        $query_params->{'newValue'} = $self->{api_client}->to_query_value($args{'new_value'});
+    }
+
+    # query params
+    if (exists $args{'ignore_case'} && defined $args{'ignore_case'}) {
+        $query_params->{'ignoreCase'} = $self->{api_client}->to_boolean_query_value($args{'ignore_case'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_presentation_replace_text
+#
+# Replace text with a new value.
+# 
+# @param File $document Document data. (required)
+# @param string $old_value Text value to be replaced. (required)
+# @param string $new_value Text value to replace with. (required)
+# @param boolean $ignore_case True if character case must be ignored. (optional, default to false)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'old_value' => {
+        data_type => 'string',
+        description => 'Text value to be replaced.',
+        required => '1',
+    },
+    'new_value' => {
+        data_type => 'string',
+        description => 'Text value to replace with.',
+        required => '1',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True if character case must be ignored.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_presentation_replace_text' } = { 
+    	summary => 'Replace text with a new value.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_presentation_replace_text {
+    warnings::warnif("deprecated", "post_presentation_replace_text is deprecated, use replace_presentation_text_online instead");
+  
+    return replace_presentation_text_online(@_);
+}
+
+#
+# split_online
+#
+# Splits PowerPoint presentation slides from the specified range into separate files and exports them in the specified file format. If the range is not provided all slides will be processed. 
+# 
+# @param File $document Document data. (required)
+# @param string $format ExportFormat (required)
+# @param int $width Slide width. (optional)
+# @param int $height Slide height. (optional)
+# @param int $from The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation. (optional)
+# @param int $to The last slide number for splitting, if is not specified splitting ends at the last slide of the document. (optional)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'ExportFormat',
+        required => '1',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Slide width.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Slide height.',
+        required => '0',
+    },
+    'from' => {
+        data_type => 'int',
+        description => 'The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation.',
+        required => '0',
+    },
+    'to' => {
+        data_type => 'int',
+        description => 'The last slide number for splitting, if is not specified splitting ends at the last slide of the document.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'split_online' } = { 
+    	summary => 'Splits PowerPoint presentation slides from the specified range into separate files and exports them in the specified file format. If the range is not provided all slides will be processed. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub split_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_presentation_split");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling post_presentation_split");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/split/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'width'} && defined $args{'width'}) {
+        $query_params->{'width'} = $self->{api_client}->to_query_value($args{'width'});
+    }
+
+    # query params
+    if (exists $args{'height'} && defined $args{'height'}) {
+        $query_params->{'height'} = $self->{api_client}->to_query_value($args{'height'});
+    }
+
+    # query params
+    if (exists $args{'from'} && defined $args{'from'}) {
+        $query_params->{'from'} = $self->{api_client}->to_query_value($args{'from'});
+    }
+
+    # query params
+    if (exists $args{'to'} && defined $args{'to'}) {
+        $query_params->{'to'} = $self->{api_client}->to_query_value($args{'to'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_presentation_split
+#
+# Splits PowerPoint presentation slides from the specified range into separate files and exports them in the specified file format. If the range is not provided all slides will be processed. 
+# 
+# @param File $document Document data. (required)
+# @param string $format ExportFormat (required)
+# @param int $width Slide width. (optional)
+# @param int $height Slide height. (optional)
+# @param int $from The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation. (optional)
+# @param int $to The last slide number for splitting, if is not specified splitting ends at the last slide of the document. (optional)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'ExportFormat',
+        required => '1',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Slide width.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Slide height.',
+        required => '0',
+    },
+    'from' => {
+        data_type => 'int',
+        description => 'The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation.',
+        required => '0',
+    },
+    'to' => {
+        data_type => 'int',
+        description => 'The last slide number for splitting, if is not specified splitting ends at the last slide of the document.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_presentation_split' } = { 
+    	summary => 'Splits PowerPoint presentation slides from the specified range into separate files and exports them in the specified file format. If the range is not provided all slides will be processed. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_presentation_split {
+    warnings::warnif("deprecated", "post_presentation_split is deprecated, use split_online instead");
+  
+    return split_online(@_);
+}
+
+#
+# create_section
 #
 # Create a section starting at a specified slide index.
 # 
@@ -15642,7 +22236,7 @@ sub post_presentation_merge {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_section' } = { 
+    __PACKAGE__->method_documentation->{ 'create_section' } = { 
     	summary => 'Create a section starting at a specified slide index.',
         params => $params,
         returns => 'Sections',
@@ -15650,7 +22244,7 @@ sub post_presentation_merge {
 }
 # @return Sections
 #
-sub post_section {
+sub create_section {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -15729,7 +22323,65 @@ sub post_section {
 }
 
 #
-# post_section_move
+# post_section
+#
+# Create a section starting at a specified slide index.
+# 
+# @param string $name Document name. (required)
+# @param string $section_name Section name. (required)
+# @param int $slide_index Slide index (one-based). (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'section_name' => {
+        data_type => 'string',
+        description => 'Section name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index (one-based).',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_section' } = { 
+    	summary => 'Create a section starting at a specified slide index.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub post_section {
+    warnings::warnif("deprecated", "post_section is deprecated, use create_section instead");
+  
+    return create_section(@_);
+}
+
+#
+# move_section
 #
 # Move presentation section to a specified position.
 # 
@@ -15772,7 +22424,7 @@ sub post_section {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_section_move' } = { 
+    __PACKAGE__->method_documentation->{ 'move_section' } = { 
     	summary => 'Move presentation section to a specified position.',
         params => $params,
         returns => 'Sections',
@@ -15780,7 +22432,7 @@ sub post_section {
 }
 # @return Sections
 #
-sub post_section_move {
+sub move_section {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -15861,7 +22513,65 @@ sub post_section_move {
 }
 
 #
-# post_shape_save_as
+# post_section_move
+#
+# Move presentation section to a specified position.
+# 
+# @param string $name Document name. (required)
+# @param int $section_index The position of the section to be reordered. (required)
+# @param int $new_position The new position of the reordered section. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'section_index' => {
+        data_type => 'int',
+        description => 'The position of the section to be reordered.',
+        required => '1',
+    },
+    'new_position' => {
+        data_type => 'int',
+        description => 'The new position of the reordered section.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_section_move' } = { 
+    	summary => 'Move presentation section to a specified position.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub post_section_move {
+    warnings::warnif("deprecated", "post_section_move is deprecated, use move_section instead");
+  
+    return move_section(@_);
+}
+
+#
+# download_shape
 #
 # Render shape to specified picture format.
 # 
@@ -15870,12 +22580,12 @@ sub post_section_move {
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
 # @param IShapeExportOptions $options export options (optional)
-# @param string $password Document password. (optional)
-# @param string $folder Presentation folder. (optional)
-# @param string $storage Presentation storage. (optional)
 # @param double $scale_x X scale ratio. (optional, default to 0.0)
 # @param double $scale_y Y scale ratio. (optional, default to 0.0)
 # @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
 # @param string $fonts_folder Fonts folder. (optional)
 {
     my $params = {
@@ -15904,21 +22614,6 @@ sub post_section_move {
         description => 'export options',
         required => '0',
     },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Presentation folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Presentation storage.',
-        required => '0',
-    },
     'scale_x' => {
         data_type => 'double',
         description => 'X scale ratio.',
@@ -15934,13 +22629,28 @@ sub post_section_move {
         description => 'Shape thumbnail bounds type.',
         required => '0',
     },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
     'fonts_folder' => {
         data_type => 'string',
         description => 'Fonts folder.',
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_shape_save_as' } = { 
+    __PACKAGE__->method_documentation->{ 'download_shape' } = { 
     	summary => 'Render shape to specified picture format.',
         params => $params,
         returns => 'File',
@@ -15948,7 +22658,7 @@ sub post_section_move {
 }
 # @return File
 #
-sub post_shape_save_as {
+sub download_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -15987,16 +22697,6 @@ sub post_shape_save_as {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
         $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
     }
@@ -16009,6 +22709,16 @@ sub post_shape_save_as {
     # query params
     if (exists $args{'bounds'} && defined $args{'bounds'}) {
         $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -16068,7 +22778,101 @@ sub post_shape_save_as {
 }
 
 #
-# post_slide_animation_effect
+# post_shape_save_as
+#
+# Render shape to specified picture format.
+# 
+# @param string $name Presentation name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param IShapeExportOptions $options export options (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Presentation name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'IShapeExportOptions',
+        description => 'export options',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_shape_save_as' } = { 
+    	summary => 'Render shape to specified picture format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_shape_save_as {
+    warnings::warnif("deprecated", "post_shape_save_as is deprecated, use download_shape instead");
+  
+    return download_shape(@_);
+}
+
+#
+# create_animation_effect
 #
 # Add an effect to slide animation.
 # 
@@ -16111,7 +22915,7 @@ sub post_shape_save_as {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slide_animation_effect' } = { 
+    __PACKAGE__->method_documentation->{ 'create_animation_effect' } = { 
     	summary => 'Add an effect to slide animation.',
         params => $params,
         returns => 'SlideAnimation',
@@ -16119,7 +22923,7 @@ sub post_shape_save_as {
 }
 # @return SlideAnimation
 #
-sub post_slide_animation_effect {
+sub create_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -16200,7 +23004,65 @@ sub post_slide_animation_effect {
 }
 
 #
-# post_slide_animation_interactive_sequence
+# post_slide_animation_effect
+#
+# Add an effect to slide animation.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param Effect $effect Animation effect DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'effect' => {
+        data_type => 'Effect',
+        description => 'Animation effect DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slide_animation_effect' } = { 
+    	summary => 'Add an effect to slide animation.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub post_slide_animation_effect {
+    warnings::warnif("deprecated", "post_slide_animation_effect is deprecated, use create_animation_effect instead");
+  
+    return create_animation_effect(@_);
+}
+
+#
+# create_animation_interactive_sequence
 #
 # Set slide animation.
 # 
@@ -16243,7 +23105,7 @@ sub post_slide_animation_effect {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slide_animation_interactive_sequence' } = { 
+    __PACKAGE__->method_documentation->{ 'create_animation_interactive_sequence' } = { 
     	summary => 'Set slide animation.',
         params => $params,
         returns => 'SlideAnimation',
@@ -16251,7 +23113,7 @@ sub post_slide_animation_effect {
 }
 # @return SlideAnimation
 #
-sub post_slide_animation_interactive_sequence {
+sub create_animation_interactive_sequence {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -16332,7 +23194,65 @@ sub post_slide_animation_interactive_sequence {
 }
 
 #
-# post_slide_animation_interactive_sequence_effect
+# post_slide_animation_interactive_sequence
+#
+# Set slide animation.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param InteractiveSequence $sequence Animation sequence DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'sequence' => {
+        data_type => 'InteractiveSequence',
+        description => 'Animation sequence DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slide_animation_interactive_sequence' } = { 
+    	summary => 'Set slide animation.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub post_slide_animation_interactive_sequence {
+    warnings::warnif("deprecated", "post_slide_animation_interactive_sequence is deprecated, use create_animation_interactive_sequence instead");
+  
+    return create_animation_interactive_sequence(@_);
+}
+
+#
+# create_animation_interactive_sequence_effect
 #
 # Add an animation effect to a slide interactive sequence.
 # 
@@ -16381,7 +23301,7 @@ sub post_slide_animation_interactive_sequence {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slide_animation_interactive_sequence_effect' } = { 
+    __PACKAGE__->method_documentation->{ 'create_animation_interactive_sequence_effect' } = { 
     	summary => 'Add an animation effect to a slide interactive sequence.',
         params => $params,
         returns => 'SlideAnimation',
@@ -16389,7 +23309,7 @@ sub post_slide_animation_interactive_sequence {
 }
 # @return SlideAnimation
 #
-sub post_slide_animation_interactive_sequence_effect {
+sub create_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -16482,7 +23402,264 @@ sub post_slide_animation_interactive_sequence_effect {
 }
 
 #
-# post_slide_save_as
+# post_slide_animation_interactive_sequence_effect
+#
+# Add an animation effect to a slide interactive sequence.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $sequence_index The position of the interactive sequence. (required)
+# @param Effect $effect Animation effect DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'sequence_index' => {
+        data_type => 'int',
+        description => 'The position of the interactive sequence.',
+        required => '1',
+    },
+    'effect' => {
+        data_type => 'Effect',
+        description => 'Animation effect DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slide_animation_interactive_sequence_effect' } = { 
+    	summary => 'Add an animation effect to a slide interactive sequence.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub post_slide_animation_interactive_sequence_effect {
+    warnings::warnif("deprecated", "post_slide_animation_interactive_sequence_effect is deprecated, use create_animation_interactive_sequence_effect instead");
+  
+    return create_animation_interactive_sequence_effect(@_);
+}
+
+#
+# replace_slide_text_online
+#
+# Replace slide text with a new value.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Index of target slide. (required)
+# @param string $old_value Text value to be replaced. (required)
+# @param string $new_value Text value to replace with. (required)
+# @param boolean $ignore_case True if character case must be ignored. (optional, default to false)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Index of target slide.',
+        required => '1',
+    },
+    'old_value' => {
+        data_type => 'string',
+        description => 'Text value to be replaced.',
+        required => '1',
+    },
+    'new_value' => {
+        data_type => 'string',
+        description => 'Text value to replace with.',
+        required => '1',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True if character case must be ignored.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'replace_slide_text_online' } = { 
+    	summary => 'Replace slide text with a new value.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub replace_slide_text_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling post_slide_replace_text");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_slide_replace_text");
+    }
+
+    # verify the required parameter 'old_value' is set
+    unless (exists $args{'old_value'} && $args{'old_value'}) {
+      croak("Missing the required parameter 'old_value' when calling post_slide_replace_text");
+    }
+
+    # verify the required parameter 'new_value' is set
+    unless (exists $args{'new_value'} && $args{'new_value'}) {
+      croak("Missing the required parameter 'new_value' when calling post_slide_replace_text");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/slides/{slideIndex}/replaceText';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'old_value'} && defined $args{'old_value'}) {
+        $query_params->{'oldValue'} = $self->{api_client}->to_query_value($args{'old_value'});
+    }
+
+    # query params
+    if (exists $args{'new_value'} && defined $args{'new_value'}) {
+        $query_params->{'newValue'} = $self->{api_client}->to_query_value($args{'new_value'});
+    }
+
+    # query params
+    if (exists $args{'ignore_case'} && defined $args{'ignore_case'}) {
+        $query_params->{'ignoreCase'} = $self->{api_client}->to_boolean_query_value($args{'ignore_case'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_slide_replace_text
+#
+# Replace slide text with a new value.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Index of target slide. (required)
+# @param string $old_value Text value to be replaced. (required)
+# @param string $new_value Text value to replace with. (required)
+# @param boolean $ignore_case True if character case must be ignored. (optional, default to false)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Index of target slide.',
+        required => '1',
+    },
+    'old_value' => {
+        data_type => 'string',
+        description => 'Text value to be replaced.',
+        required => '1',
+    },
+    'new_value' => {
+        data_type => 'string',
+        description => 'Text value to replace with.',
+        required => '1',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True if character case must be ignored.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slide_replace_text' } = { 
+    	summary => 'Replace slide text with a new value.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_slide_replace_text {
+    warnings::warnif("deprecated", "post_slide_replace_text is deprecated, use replace_slide_text_online instead");
+  
+    return replace_slide_text_online(@_);
+}
+
+#
+# download_slide
 #
 # Save a slide to a specified format.
 # 
@@ -16549,7 +23726,7 @@ sub post_slide_animation_interactive_sequence_effect {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slide_save_as' } = { 
+    __PACKAGE__->method_documentation->{ 'download_slide' } = { 
     	summary => 'Save a slide to a specified format.',
         params => $params,
         returns => 'File',
@@ -16557,7 +23734,7 @@ sub post_slide_animation_interactive_sequence_effect {
 }
 # @return File
 #
-sub post_slide_save_as {
+sub download_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -16660,22 +23837,109 @@ sub post_slide_save_as {
 }
 
 #
-# post_slides_add
+# post_slide_save_as
 #
-# Create a slide.
+# Save a slide to a specified format.
 # 
 # @param string $name Document name. (required)
-# @param int $position The target position at which to create the slide. Add to the end by default. (optional)
+# @param int $slide_index Slide index. (required)
+# @param string $format Output file format. (required)
+# @param ExportOptions $options Export options. (optional)
+# @param int $width Output file width; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param int $height Output file height; 0 to not adjust the size. Default is 0. (optional, default to 0)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
-# @param string $layout_alias Alias of layout slide for new slide. Alias may be the type of layout, name of layout slide or index (optional)
+# @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
 {
     my $params = {
     'name' => {
         data_type => 'string',
         description => 'Document name.',
         required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Output file format.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'ExportOptions',
+        description => 'Export options.',
+        required => '0',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Output file width; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Output file height; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Storage folder containing custom fonts to be used with the document.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slide_save_as' } = { 
+    	summary => 'Save a slide to a specified format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_slide_save_as {
+    warnings::warnif("deprecated", "post_slide_save_as is deprecated, use download_slide instead");
+  
+    return download_slide(@_);
+}
+
+#
+# create_slide
+#
+# Create a slide.
+# 
+# @param string $name Document name. (required)
+# @param string $layout_alias Alias of layout slide for new slide. Alias may be the type of layout, name of layout slide or index (optional)
+# @param int $position The target position at which to create the slide. Add to the end by default. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'layout_alias' => {
+        data_type => 'string',
+        description => 'Alias of layout slide for new slide. Alias may be the type of layout, name of layout slide or index',
+        required => '0',
     },
     'position' => {
         data_type => 'int',
@@ -16697,13 +23961,8 @@ sub post_slide_save_as {
         description => 'Document storage.',
         required => '0',
     },
-    'layout_alias' => {
-        data_type => 'string',
-        description => 'Alias of layout slide for new slide. Alias may be the type of layout, name of layout slide or index',
-        required => '0',
-    },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_add' } = { 
+    __PACKAGE__->method_documentation->{ 'create_slide' } = { 
     	summary => 'Create a slide.',
         params => $params,
         returns => 'Slides',
@@ -16711,7 +23970,7 @@ sub post_slide_save_as {
 }
 # @return Slides
 #
-sub post_slides_add {
+sub create_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -16735,6 +23994,11 @@ sub post_slides_add {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
+    if (exists $args{'layout_alias'} && defined $args{'layout_alias'}) {
+        $query_params->{'layoutAlias'} = $self->{api_client}->to_query_value($args{'layout_alias'});
+    }
+
+    # query params
     if (exists $args{'position'} && defined $args{'position'}) {
         $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
     }
@@ -16747,11 +24011,6 @@ sub post_slides_add {
     # query params
     if (exists $args{'storage'} && defined $args{'storage'}) {
         $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
-    if (exists $args{'layout_alias'} && defined $args{'layout_alias'}) {
-        $query_params->{'layoutAlias'} = $self->{api_client}->to_query_value($args{'layout_alias'});
     }
 
     # header params
@@ -16780,13 +24039,72 @@ sub post_slides_add {
 }
 
 #
-# post_slides_convert
+# post_slides_add
+#
+# Create a slide.
+# 
+# @param string $name Document name. (required)
+# @param string $layout_alias Alias of layout slide for new slide. Alias may be the type of layout, name of layout slide or index (optional)
+# @param int $position The target position at which to create the slide. Add to the end by default. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'layout_alias' => {
+        data_type => 'string',
+        description => 'Alias of layout slide for new slide. Alias may be the type of layout, name of layout slide or index',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'The target position at which to create the slide. Add to the end by default.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_add' } = { 
+    	summary => 'Create a slide.',
+        params => $params,
+        returns => 'Slides',
+        };
+}
+# @return Slides
+#
+sub post_slides_add {
+    warnings::warnif("deprecated", "post_slides_add is deprecated, use create_slide instead");
+  
+    return create_slide(@_);
+}
+
+#
+# convert
 #
 # Convert presentation from request content to format specified.
 # 
 # @param File $document Document data. (required)
 # @param string $format Export format. (required)
 # @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
 {
     my $params = {
@@ -16805,13 +24123,18 @@ sub post_slides_add {
         description => 'Document password.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     'fonts_folder' => {
         data_type => 'string',
         description => 'Custom fonts folder.',
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_convert' } = { 
+    __PACKAGE__->method_documentation->{ 'convert' } = { 
     	summary => 'Convert presentation from request content to format specified.',
         params => $params,
         returns => 'File',
@@ -16819,7 +24142,7 @@ sub post_slides_add {
 }
 # @return File
 #
-sub post_slides_convert {
+sub convert {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
@@ -16846,6 +24169,11 @@ sub post_slides_convert {
         $header_params->{'Accept'} = $_header_accept;
     }
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
 
     # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
@@ -16883,7 +24211,59 @@ sub post_slides_convert {
 }
 
 #
-# post_slides_copy
+# post_slides_convert
+#
+# Convert presentation from request content to format specified.
+# 
+# @param File $document Document data. (required)
+# @param string $format Export format. (required)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_convert' } = { 
+    	summary => 'Convert presentation from request content to format specified.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_slides_convert {
+    warnings::warnif("deprecated", "post_slides_convert is deprecated, use convert instead");
+  
+    return convert(@_);
+}
+
+#
+# copy_slide
 #
 # Copy a slide from the current or another presentation.
 # 
@@ -16944,7 +24324,7 @@ sub post_slides_convert {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_copy' } = { 
+    __PACKAGE__->method_documentation->{ 'copy_slide' } = { 
     	summary => 'Copy a slide from the current or another presentation.',
         params => $params,
         returns => 'Slides',
@@ -16952,7 +24332,7 @@ sub post_slides_convert {
 }
 # @return Slides
 #
-sub post_slides_copy {
+sub copy_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -17041,7 +24421,83 @@ sub post_slides_copy {
 }
 
 #
-# post_slides_document
+# post_slides_copy
+#
+# Copy a slide from the current or another presentation.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_to_copy The index of the slide to be copied from the source presentation. (required)
+# @param int $position The target position at which to copy the slide. Copy to the end by default. (optional)
+# @param string $source Name of the document to copy a slide from. (optional)
+# @param string $source_password Password for the document to copy a slide from. (optional)
+# @param string $source_storage Template storage name. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_to_copy' => {
+        data_type => 'int',
+        description => 'The index of the slide to be copied from the source presentation.',
+        required => '1',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'The target position at which to copy the slide. Copy to the end by default.',
+        required => '0',
+    },
+    'source' => {
+        data_type => 'string',
+        description => 'Name of the document to copy a slide from.',
+        required => '0',
+    },
+    'source_password' => {
+        data_type => 'string',
+        description => 'Password for the document to copy a slide from.',
+        required => '0',
+    },
+    'source_storage' => {
+        data_type => 'string',
+        description => 'Template storage name.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_copy' } = { 
+    	summary => 'Copy a slide from the current or another presentation.',
+        params => $params,
+        returns => 'Slides',
+        };
+}
+# @return Slides
+#
+sub post_slides_copy {
+    warnings::warnif("deprecated", "post_slides_copy is deprecated, use copy_slide instead");
+  
+    return copy_slide(@_);
+}
+
+#
+# create_presentation
 #
 # Create a presentation.
 # 
@@ -17049,8 +24505,8 @@ sub post_slides_copy {
 # @param File $data Document input data. (optional)
 # @param string $input_password The password for input document. (optional)
 # @param string $password The document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -17073,18 +24529,18 @@ sub post_slides_copy {
         description => 'The document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_document' } = { 
+    __PACKAGE__->method_documentation->{ 'create_presentation' } = { 
     	summary => 'Create a presentation.',
         params => $params,
         returns => 'Document',
@@ -17092,7 +24548,7 @@ sub post_slides_copy {
 }
 # @return Document
 #
-sub post_slides_document {
+sub create_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -17116,13 +24572,13 @@ sub post_slides_document {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -17161,15 +24617,73 @@ sub post_slides_document {
 }
 
 #
-# post_slides_document_from_html
+# post_slides_document
+#
+# Create a presentation.
+# 
+# @param string $name Document name. (required)
+# @param File $data Document input data. (optional)
+# @param string $input_password The password for input document. (optional)
+# @param string $password The document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'data' => {
+        data_type => 'File',
+        description => 'Document input data.',
+        required => '0',
+    },
+    'input_password' => {
+        data_type => 'string',
+        description => 'The password for input document.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'The document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_document' } = { 
+    	summary => 'Create a presentation.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub post_slides_document {
+    warnings::warnif("deprecated", "post_slides_document is deprecated, use create_presentation instead");
+  
+    return create_presentation(@_);
+}
+
+#
+# import_from_html
 #
 # Create presentation document from html.
 # 
 # @param string $name Document name. (required)
 # @param string $html HTML data. (optional)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -17187,18 +24701,18 @@ sub post_slides_document {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_document_from_html' } = { 
+    __PACKAGE__->method_documentation->{ 'import_from_html' } = { 
     	summary => 'Create presentation document from html.',
         params => $params,
         returns => 'Document',
@@ -17206,7 +24720,7 @@ sub post_slides_document {
 }
 # @return Document
 #
-sub post_slides_document_from_html {
+sub import_from_html {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -17230,13 +24744,13 @@ sub post_slides_document_from_html {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -17270,15 +24784,67 @@ sub post_slides_document_from_html {
 }
 
 #
-# post_slides_document_from_pdf
+# post_slides_document_from_html
+#
+# Create presentation document from html.
+# 
+# @param string $name Document name. (required)
+# @param string $html HTML data. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'html' => {
+        data_type => 'string',
+        description => 'HTML data.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_document_from_html' } = { 
+    	summary => 'Create presentation document from html.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub post_slides_document_from_html {
+    warnings::warnif("deprecated", "post_slides_document_from_html is deprecated, use import_from_html instead");
+  
+    return import_from_html(@_);
+}
+
+#
+# import_from_pdf
 #
 # Create presentation document from pdf or append pdf to an existing presentation.
 # 
 # @param string $name Document name. (required)
 # @param File $pdf PDF data. (optional)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -17296,18 +24862,18 @@ sub post_slides_document_from_html {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_document_from_pdf' } = { 
+    __PACKAGE__->method_documentation->{ 'import_from_pdf' } = { 
     	summary => 'Create presentation document from pdf or append pdf to an existing presentation.',
         params => $params,
         returns => 'Document',
@@ -17315,7 +24881,7 @@ sub post_slides_document_from_html {
 }
 # @return Document
 #
-sub post_slides_document_from_pdf {
+sub import_from_pdf {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -17339,13 +24905,13 @@ sub post_slides_document_from_pdf {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -17379,7 +24945,59 @@ sub post_slides_document_from_pdf {
 }
 
 #
-# post_slides_document_from_source
+# post_slides_document_from_pdf
+#
+# Create presentation document from pdf or append pdf to an existing presentation.
+# 
+# @param string $name Document name. (required)
+# @param File $pdf PDF data. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'pdf' => {
+        data_type => 'File',
+        description => 'PDF data.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_document_from_pdf' } = { 
+    	summary => 'Create presentation document from pdf or append pdf to an existing presentation.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub post_slides_document_from_pdf {
+    warnings::warnif("deprecated", "post_slides_document_from_pdf is deprecated, use import_from_pdf instead");
+  
+    return import_from_pdf(@_);
+}
+
+#
+# create_presentation_from_source
 #
 # Create a presentation from an existing source.
 # 
@@ -17388,8 +25006,8 @@ sub post_slides_document_from_pdf {
 # @param string $source_password Template file password. (optional)
 # @param string $source_storage Template storage name. (optional)
 # @param string $password The document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -17417,18 +25035,18 @@ sub post_slides_document_from_pdf {
         description => 'The document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_document_from_source' } = { 
+    __PACKAGE__->method_documentation->{ 'create_presentation_from_source' } = { 
     	summary => 'Create a presentation from an existing source.',
         params => $params,
         returns => 'Document',
@@ -17436,7 +25054,7 @@ sub post_slides_document_from_pdf {
 }
 # @return Document
 #
-sub post_slides_document_from_source {
+sub create_presentation_from_source {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -17470,13 +25088,13 @@ sub post_slides_document_from_source {
     }
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -17510,7 +25128,71 @@ sub post_slides_document_from_source {
 }
 
 #
-# post_slides_document_from_template
+# post_slides_document_from_source
+#
+# Create a presentation from an existing source.
+# 
+# @param string $name Document name. (required)
+# @param string $source_path Template file path. (optional)
+# @param string $source_password Template file password. (optional)
+# @param string $source_storage Template storage name. (optional)
+# @param string $password The document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'source_path' => {
+        data_type => 'string',
+        description => 'Template file path.',
+        required => '0',
+    },
+    'source_password' => {
+        data_type => 'string',
+        description => 'Template file password.',
+        required => '0',
+    },
+    'source_storage' => {
+        data_type => 'string',
+        description => 'Template storage name.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'The document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_document_from_source' } = { 
+    	summary => 'Create a presentation from an existing source.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub post_slides_document_from_source {
+    warnings::warnif("deprecated", "post_slides_document_from_source is deprecated, use create_presentation_from_source instead");
+  
+    return create_presentation_from_source(@_);
+}
+
+#
+# create_presentation_from_template
 #
 # Create a presentation.
 # 
@@ -17521,8 +25203,8 @@ sub post_slides_document_from_source {
 # @param string $template_storage Template storage name. (optional)
 # @param boolean $is_image_data_embedded True if image data is embedded. (optional, default to false)
 # @param string $password The document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -17560,18 +25242,18 @@ sub post_slides_document_from_source {
         description => 'The document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_document_from_template' } = { 
+    __PACKAGE__->method_documentation->{ 'create_presentation_from_template' } = { 
     	summary => 'Create a presentation.',
         params => $params,
         returns => 'Document',
@@ -17579,7 +25261,7 @@ sub post_slides_document_from_source {
 }
 # @return Document
 #
-sub post_slides_document_from_template {
+sub create_presentation_from_template {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -17623,13 +25305,13 @@ sub post_slides_document_from_template {
     }
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -17668,7 +25350,202 @@ sub post_slides_document_from_template {
 }
 
 #
-# post_slides_pipeline
+# post_slides_document_from_template
+#
+# Create a presentation.
+# 
+# @param string $name Document name. (required)
+# @param string $template_path Template file path. (required)
+# @param string $data Document input data. (optional)
+# @param string $template_password Template file password. (optional)
+# @param string $template_storage Template storage name. (optional)
+# @param boolean $is_image_data_embedded True if image data is embedded. (optional, default to false)
+# @param string $password The document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'template_path' => {
+        data_type => 'string',
+        description => 'Template file path.',
+        required => '1',
+    },
+    'data' => {
+        data_type => 'string',
+        description => 'Document input data.',
+        required => '0',
+    },
+    'template_password' => {
+        data_type => 'string',
+        description => 'Template file password.',
+        required => '0',
+    },
+    'template_storage' => {
+        data_type => 'string',
+        description => 'Template storage name.',
+        required => '0',
+    },
+    'is_image_data_embedded' => {
+        data_type => 'boolean',
+        description => 'True if image data is embedded.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'The document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_document_from_template' } = { 
+    	summary => 'Create a presentation.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub post_slides_document_from_template {
+    warnings::warnif("deprecated", "post_slides_document_from_template is deprecated, use create_presentation_from_template instead");
+  
+    return create_presentation_from_template(@_);
+}
+
+#
+# merge_online
+#
+# Merges the presentation with other presentations or some of their slides specified in the request parameter. Returns result file in the response. 
+# 
+# @param ARRAY[string] $files Files to merge (optional)
+# @param OrderedMergeRequest $request Merge request. (optional)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'files' => {
+        data_type => 'ARRAY[string]',
+        description => 'Files to merge',
+        required => '0',
+    },
+    'request' => {
+        data_type => 'OrderedMergeRequest',
+        description => 'Merge request.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'merge_online' } = { 
+    	summary => 'Merges the presentation with other presentations or some of their slides specified in the request parameter. Returns result file in the response. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub merge_online {
+    my ($self, %args) = @_;
+
+    # parse inputs
+    my $_resource_path = '/slides/merge';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files;
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # body params
+    if ( exists $args{'request'}) {
+        $_body_data = $args{'request'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
+# post_slides_merge
+#
+# Merges the presentation with other presentations or some of their slides specified in the request parameter. Returns result file in the response. 
+# 
+# @param ARRAY[string] $files Files to merge (optional)
+# @param OrderedMergeRequest $request Merge request. (optional)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'files' => {
+        data_type => 'ARRAY[string]',
+        description => 'Files to merge',
+        required => '0',
+    },
+    'request' => {
+        data_type => 'OrderedMergeRequest',
+        description => 'Merge request.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_merge' } = { 
+    	summary => 'Merges the presentation with other presentations or some of their slides specified in the request parameter. Returns result file in the response. ',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_slides_merge {
+    warnings::warnif("deprecated", "post_slides_merge is deprecated, use merge_online instead");
+  
+    return merge_online(@_);
+}
+
+#
+# pipeline
 #
 # Performs slides pipeline.
 # 
@@ -17687,7 +25564,7 @@ sub post_slides_document_from_template {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_pipeline' } = { 
+    __PACKAGE__->method_documentation->{ 'pipeline' } = { 
     	summary => 'Performs slides pipeline.',
         params => $params,
         returns => 'File',
@@ -17695,7 +25572,7 @@ sub post_slides_document_from_template {
 }
 # @return File
 #
-sub post_slides_pipeline {
+sub pipeline {
     my ($self, %args) = @_;
 
     # verify the required parameter 'pipeline' is set
@@ -17741,7 +25618,41 @@ sub post_slides_pipeline {
 }
 
 #
-# post_slides_presentation_replace_text
+# post_slides_pipeline
+#
+# Performs slides pipeline.
+# 
+# @param Pipeline $pipeline A Pipeline object. (required)
+# @param ARRAY[string] $files Files to upload with the pipeline (optional)
+{
+    my $params = {
+    'pipeline' => {
+        data_type => 'Pipeline',
+        description => 'A Pipeline object.',
+        required => '1',
+    },
+    'files' => {
+        data_type => 'ARRAY[string]',
+        description => 'Files to upload with the pipeline',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_pipeline' } = { 
+    	summary => 'Performs slides pipeline.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_slides_pipeline {
+    warnings::warnif("deprecated", "post_slides_pipeline is deprecated, use pipeline instead");
+  
+    return pipeline(@_);
+}
+
+#
+# replace_presentation_text
 #
 # Replace text with a new value.
 # 
@@ -17790,7 +25701,7 @@ sub post_slides_pipeline {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_presentation_replace_text' } = { 
+    __PACKAGE__->method_documentation->{ 'replace_presentation_text' } = { 
     	summary => 'Replace text with a new value.',
         params => $params,
         returns => 'DocumentReplaceResult',
@@ -17798,7 +25709,7 @@ sub post_slides_pipeline {
 }
 # @return DocumentReplaceResult
 #
-sub post_slides_presentation_replace_text {
+sub replace_presentation_text {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -17882,7 +25793,71 @@ sub post_slides_presentation_replace_text {
 }
 
 #
-# post_slides_reorder
+# post_slides_presentation_replace_text
+#
+# Replace text with a new value.
+# 
+# @param string $name Document name. (required)
+# @param string $old_value Text value to be replaced. (required)
+# @param string $new_value Text value to replace with. (required)
+# @param boolean $ignore_case True if character case must be ignored. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'old_value' => {
+        data_type => 'string',
+        description => 'Text value to be replaced.',
+        required => '1',
+    },
+    'new_value' => {
+        data_type => 'string',
+        description => 'Text value to replace with.',
+        required => '1',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True if character case must be ignored.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_presentation_replace_text' } = { 
+    	summary => 'Replace text with a new value.',
+        params => $params,
+        returns => 'DocumentReplaceResult',
+        };
+}
+# @return DocumentReplaceResult
+#
+sub post_slides_presentation_replace_text {
+    warnings::warnif("deprecated", "post_slides_presentation_replace_text is deprecated, use replace_presentation_text instead");
+  
+    return replace_presentation_text(@_);
+}
+
+#
+# move_slide
 #
 # Reorder presentation slide position.
 # 
@@ -17925,7 +25900,7 @@ sub post_slides_presentation_replace_text {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_reorder' } = { 
+    __PACKAGE__->method_documentation->{ 'move_slide' } = { 
     	summary => 'Reorder presentation slide position.',
         params => $params,
         returns => 'Slides',
@@ -17933,7 +25908,7 @@ sub post_slides_presentation_replace_text {
 }
 # @return Slides
 #
-sub post_slides_reorder {
+sub move_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -18014,7 +25989,65 @@ sub post_slides_reorder {
 }
 
 #
-# post_slides_reorder_many
+# post_slides_reorder
+#
+# Reorder presentation slide position.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index The position of the slide to be reordered. (required)
+# @param int $new_position The new position of the reordered slide. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'The position of the slide to be reordered.',
+        required => '1',
+    },
+    'new_position' => {
+        data_type => 'int',
+        description => 'The new position of the reordered slide.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_reorder' } = { 
+    	summary => 'Reorder presentation slide position.',
+        params => $params,
+        returns => 'Slides',
+        };
+}
+# @return Slides
+#
+sub post_slides_reorder {
+    warnings::warnif("deprecated", "post_slides_reorder is deprecated, use move_slide instead");
+  
+    return move_slide(@_);
+}
+
+#
+# reorder_slides
 #
 # Reorder presentation slides positions.
 # 
@@ -18057,7 +26090,7 @@ sub post_slides_reorder {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_reorder_many' } = { 
+    __PACKAGE__->method_documentation->{ 'reorder_slides' } = { 
     	summary => 'Reorder presentation slides positions.',
         params => $params,
         returns => 'Slides',
@@ -18065,7 +26098,7 @@ sub post_slides_reorder {
 }
 # @return Slides
 #
-sub post_slides_reorder_many {
+sub reorder_slides {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -18134,7 +26167,65 @@ sub post_slides_reorder_many {
 }
 
 #
-# post_slides_save_as
+# post_slides_reorder_many
+#
+# Reorder presentation slides positions.
+# 
+# @param string $name Document name. (required)
+# @param string $old_positions A comma separated array of positions of slides to be reordered. (optional)
+# @param string $new_positions A comma separated array of new slide positions. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'old_positions' => {
+        data_type => 'string',
+        description => 'A comma separated array of positions of slides to be reordered.',
+        required => '0',
+    },
+    'new_positions' => {
+        data_type => 'string',
+        description => 'A comma separated array of new slide positions.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_reorder_many' } = { 
+    	summary => 'Reorder presentation slides positions.',
+        params => $params,
+        returns => 'Slides',
+        };
+}
+# @return Slides
+#
+sub post_slides_reorder_many {
+    warnings::warnif("deprecated", "post_slides_reorder_many is deprecated, use reorder_slides instead");
+  
+    return reorder_slides(@_);
+}
+
+#
+# download_presentation
 #
 # Save a presentation to a specified format.
 # 
@@ -18142,8 +26233,8 @@ sub post_slides_reorder_many {
 # @param string $format Export format. (required)
 # @param ExportOptions $options Export options. (optional)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
 {
     my $params = {
@@ -18167,14 +26258,14 @@ sub post_slides_reorder_many {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
         required => '0',
     },
     'fonts_folder' => {
@@ -18183,7 +26274,7 @@ sub post_slides_reorder_many {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_save_as' } = { 
+    __PACKAGE__->method_documentation->{ 'download_presentation' } = { 
     	summary => 'Save a presentation to a specified format.',
         params => $params,
         returns => 'File',
@@ -18191,7 +26282,7 @@ sub post_slides_reorder_many {
 }
 # @return File
 #
-sub post_slides_save_as {
+sub download_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -18220,13 +26311,13 @@ sub post_slides_save_as {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -18272,7 +26363,71 @@ sub post_slides_save_as {
 }
 
 #
-# post_slides_set_document_properties
+# post_slides_save_as
+#
+# Save a presentation to a specified format.
+# 
+# @param string $name Document name. (required)
+# @param string $format Export format. (required)
+# @param ExportOptions $options Export options. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'ExportOptions',
+        description => 'Export options.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_save_as' } = { 
+    	summary => 'Save a presentation to a specified format.',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_slides_save_as {
+    warnings::warnif("deprecated", "post_slides_save_as is deprecated, use download_presentation instead");
+  
+    return download_presentation(@_);
+}
+
+#
+# set_document_properties
 #
 # Set document properties.
 # 
@@ -18309,7 +26464,7 @@ sub post_slides_save_as {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_set_document_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'set_document_properties' } = { 
     	summary => 'Set document properties.',
         params => $params,
         returns => 'DocumentProperties',
@@ -18317,7 +26472,7 @@ sub post_slides_save_as {
 }
 # @return DocumentProperties
 #
-sub post_slides_set_document_properties {
+sub set_document_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -18386,7 +26541,59 @@ sub post_slides_set_document_properties {
 }
 
 #
-# post_slides_slide_replace_text
+# post_slides_set_document_properties
+#
+# Set document properties.
+# 
+# @param string $name Document name. (required)
+# @param DocumentProperties $properties New properties. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'properties' => {
+        data_type => 'DocumentProperties',
+        description => 'New properties.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_set_document_properties' } = { 
+    	summary => 'Set document properties.',
+        params => $params,
+        returns => 'DocumentProperties',
+        };
+}
+# @return DocumentProperties
+#
+sub post_slides_set_document_properties {
+    warnings::warnif("deprecated", "post_slides_set_document_properties is deprecated, use set_document_properties instead");
+  
+    return set_document_properties(@_);
+}
+
+#
+# replace_slide_text
 #
 # Replace text with a new value.
 # 
@@ -18441,7 +26648,7 @@ sub post_slides_set_document_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_slide_replace_text' } = { 
+    __PACKAGE__->method_documentation->{ 'replace_slide_text' } = { 
     	summary => 'Replace text with a new value.',
         params => $params,
         returns => 'SlideReplaceResult',
@@ -18449,7 +26656,7 @@ sub post_slides_set_document_properties {
 }
 # @return SlideReplaceResult
 #
-sub post_slides_slide_replace_text {
+sub replace_slide_text {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -18545,7 +26752,77 @@ sub post_slides_slide_replace_text {
 }
 
 #
-# post_slides_split
+# post_slides_slide_replace_text
+#
+# Replace text with a new value.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $old_value Text value to be replaced. (required)
+# @param string $new_value Text value to replace with. (required)
+# @param boolean $ignore_case True if character case must be ignored. (optional, default to false)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'old_value' => {
+        data_type => 'string',
+        description => 'Text value to be replaced.',
+        required => '1',
+    },
+    'new_value' => {
+        data_type => 'string',
+        description => 'Text value to replace with.',
+        required => '1',
+    },
+    'ignore_case' => {
+        data_type => 'boolean',
+        description => 'True if character case must be ignored.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_slide_replace_text' } = { 
+    	summary => 'Replace text with a new value.',
+        params => $params,
+        returns => 'SlideReplaceResult',
+        };
+}
+# @return SlideReplaceResult
+#
+sub post_slides_slide_replace_text {
+    warnings::warnif("deprecated", "post_slides_slide_replace_text is deprecated, use replace_slide_text instead");
+  
+    return replace_slide_text(@_);
+}
+
+#
+# split
 #
 # Splitting presentations. Create one image per slide.
 # 
@@ -18554,12 +26831,12 @@ sub post_slides_slide_replace_text {
 # @param string $format Export format. Default value is jpeg. (optional, default to 0)
 # @param int $width The width of created images. (optional)
 # @param int $height The height of created images. (optional)
-# @param int $to The last slide number for splitting, if is not specified splitting ends at the last slide of the document. (optional)
 # @param int $from The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation. (optional)
+# @param int $to The last slide number for splitting, if is not specified splitting ends at the last slide of the document. (optional)
 # @param string $dest_folder Folder on storage where images are going to be uploaded. If not specified then images are uploaded to same folder as presentation. (optional)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
 {
     my $params = {
@@ -18588,14 +26865,14 @@ sub post_slides_slide_replace_text {
         description => 'The height of created images.',
         required => '0',
     },
-    'to' => {
-        data_type => 'int',
-        description => 'The last slide number for splitting, if is not specified splitting ends at the last slide of the document.',
-        required => '0',
-    },
     'from' => {
         data_type => 'int',
         description => 'The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation.',
+        required => '0',
+    },
+    'to' => {
+        data_type => 'int',
+        description => 'The last slide number for splitting, if is not specified splitting ends at the last slide of the document.',
         required => '0',
     },
     'dest_folder' => {
@@ -18608,14 +26885,14 @@ sub post_slides_slide_replace_text {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
         required => '0',
     },
     'fonts_folder' => {
@@ -18624,7 +26901,7 @@ sub post_slides_slide_replace_text {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_slides_split' } = { 
+    __PACKAGE__->method_documentation->{ 'split' } = { 
     	summary => 'Splitting presentations. Create one image per slide.',
         params => $params,
         returns => 'SplitDocumentResult',
@@ -18632,7 +26909,7 @@ sub post_slides_slide_replace_text {
 }
 # @return SplitDocumentResult
 #
-sub post_slides_split {
+sub split {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -18671,13 +26948,13 @@ sub post_slides_split {
     }
 
     # query params
-    if (exists $args{'to'} && defined $args{'to'}) {
-        $query_params->{'to'} = $self->{api_client}->to_query_value($args{'to'});
+    if (exists $args{'from'} && defined $args{'from'}) {
+        $query_params->{'from'} = $self->{api_client}->to_query_value($args{'from'});
     }
 
     # query params
-    if (exists $args{'from'} && defined $args{'from'}) {
-        $query_params->{'from'} = $self->{api_client}->to_query_value($args{'from'});
+    if (exists $args{'to'} && defined $args{'to'}) {
+        $query_params->{'to'} = $self->{api_client}->to_query_value($args{'to'});
     }
 
     # query params
@@ -18686,13 +26963,13 @@ sub post_slides_split {
     }
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -18731,7 +27008,101 @@ sub post_slides_split {
 }
 
 #
-# post_subshape_save_as
+# post_slides_split
+#
+# Splitting presentations. Create one image per slide.
+# 
+# @param string $name Document name. (required)
+# @param ExportOptions $options Export options. (optional)
+# @param string $format Export format. Default value is jpeg. (optional, default to 0)
+# @param int $width The width of created images. (optional)
+# @param int $height The height of created images. (optional)
+# @param int $from The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation. (optional)
+# @param int $to The last slide number for splitting, if is not specified splitting ends at the last slide of the document. (optional)
+# @param string $dest_folder Folder on storage where images are going to be uploaded. If not specified then images are uploaded to same folder as presentation. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'ExportOptions',
+        description => 'Export options.',
+        required => '0',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format. Default value is jpeg.',
+        required => '0',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'The width of created images.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'The height of created images.',
+        required => '0',
+    },
+    'from' => {
+        data_type => 'int',
+        description => 'The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation.',
+        required => '0',
+    },
+    'to' => {
+        data_type => 'int',
+        description => 'The last slide number for splitting, if is not specified splitting ends at the last slide of the document.',
+        required => '0',
+    },
+    'dest_folder' => {
+        data_type => 'string',
+        description => 'Folder on storage where images are going to be uploaded. If not specified then images are uploaded to same folder as presentation.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_slides_split' } = { 
+    	summary => 'Splitting presentations. Create one image per slide.',
+        params => $params,
+        returns => 'SplitDocumentResult',
+        };
+}
+# @return SplitDocumentResult
+#
+sub post_slides_split {
+    warnings::warnif("deprecated", "post_slides_split is deprecated, use split instead");
+  
+    return split(@_);
+}
+
+#
+# download_subshape
 #
 # Render shape to specified picture format (for smart art and group shapes).
 # 
@@ -18741,12 +27112,12 @@ sub post_slides_split {
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
 # @param IShapeExportOptions $options export options (optional)
-# @param string $password Document password. (optional)
-# @param string $folder Presentation folder. (optional)
-# @param string $storage Presentation storage. (optional)
 # @param double $scale_x X scale ratio. (optional, default to 0.0)
 # @param double $scale_y Y scale ratio. (optional, default to 0.0)
 # @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
 # @param string $fonts_folder Fonts folder. (optional)
 {
     my $params = {
@@ -18780,21 +27151,6 @@ sub post_slides_split {
         description => 'export options',
         required => '0',
     },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Presentation folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Presentation storage.',
-        required => '0',
-    },
     'scale_x' => {
         data_type => 'double',
         description => 'X scale ratio.',
@@ -18810,13 +27166,28 @@ sub post_slides_split {
         description => 'Shape thumbnail bounds type.',
         required => '0',
     },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
     'fonts_folder' => {
         data_type => 'string',
         description => 'Fonts folder.',
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_subshape_save_as' } = { 
+    __PACKAGE__->method_documentation->{ 'download_subshape' } = { 
     	summary => 'Render shape to specified picture format (for smart art and group shapes).',
         params => $params,
         returns => 'File',
@@ -18824,7 +27195,7 @@ sub post_slides_split {
 }
 # @return File
 #
-sub post_subshape_save_as {
+sub download_subshape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -18868,16 +27239,6 @@ sub post_subshape_save_as {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
         $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
     }
@@ -18890,6 +27251,16 @@ sub post_subshape_save_as {
     # query params
     if (exists $args{'bounds'} && defined $args{'bounds'}) {
         $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -18956,7 +27327,107 @@ sub post_subshape_save_as {
 }
 
 #
-# put_chart_category
+# post_subshape_save_as
+#
+# Render shape to specified picture format (for smart art and group shapes).
+# 
+# @param string $name Presentation name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param IShapeExportOptions $options export options (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Presentation name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'IShapeExportOptions',
+        description => 'export options',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_subshape_save_as' } = { 
+    	summary => 'Render shape to specified picture format (for smart art and group shapes).',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_subshape_save_as {
+    warnings::warnif("deprecated", "post_subshape_save_as is deprecated, use download_subshape instead");
+  
+    return download_subshape(@_);
+}
+
+#
+# update_chart_category
 #
 # Update a chart category.
 # 
@@ -19011,7 +27482,7 @@ sub post_subshape_save_as {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_chart_category' } = { 
+    __PACKAGE__->method_documentation->{ 'update_chart_category' } = { 
     	summary => 'Update a chart category.',
         params => $params,
         returns => 'Chart',
@@ -19019,7 +27490,7 @@ sub post_subshape_save_as {
 }
 # @return Chart
 #
-sub put_chart_category {
+sub update_chart_category {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -19124,7 +27595,77 @@ sub put_chart_category {
 }
 
 #
-# put_chart_data_point
+# put_chart_category
+#
+# Update a chart category.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $category_index Category index. (required)
+# @param ChartCategory $category Category DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'category_index' => {
+        data_type => 'int',
+        description => 'Category index.',
+        required => '1',
+    },
+    'category' => {
+        data_type => 'ChartCategory',
+        description => 'Category DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_chart_category' } = { 
+    	summary => 'Update a chart category.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub put_chart_category {
+    warnings::warnif("deprecated", "put_chart_category is deprecated, use update_chart_category instead");
+  
+    return update_chart_category(@_);
+}
+
+#
+# update_chart_data_point
 #
 # Update a data point in a chart series.
 # 
@@ -19185,7 +27726,7 @@ sub put_chart_category {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_chart_data_point' } = { 
+    __PACKAGE__->method_documentation->{ 'update_chart_data_point' } = { 
     	summary => 'Update a data point in a chart series.',
         params => $params,
         returns => 'Chart',
@@ -19193,7 +27734,7 @@ sub put_chart_category {
 }
 # @return Chart
 #
-sub put_chart_data_point {
+sub update_chart_data_point {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -19310,7 +27851,83 @@ sub put_chart_data_point {
 }
 
 #
-# put_chart_series
+# put_chart_data_point
+#
+# Update a data point in a chart series.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $series_index Series index. (required)
+# @param int $point_index Data point index. (required)
+# @param DataPoint $data_point Data point DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'series_index' => {
+        data_type => 'int',
+        description => 'Series index.',
+        required => '1',
+    },
+    'point_index' => {
+        data_type => 'int',
+        description => 'Data point index.',
+        required => '1',
+    },
+    'data_point' => {
+        data_type => 'DataPoint',
+        description => 'Data point DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_chart_data_point' } = { 
+    	summary => 'Update a data point in a chart series.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub put_chart_data_point {
+    warnings::warnif("deprecated", "put_chart_data_point is deprecated, use update_chart_data_point instead");
+  
+    return update_chart_data_point(@_);
+}
+
+#
+# update_chart_series
 #
 # Update a series in a chart.
 # 
@@ -19365,7 +27982,7 @@ sub put_chart_data_point {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_chart_series' } = { 
+    __PACKAGE__->method_documentation->{ 'update_chart_series' } = { 
     	summary => 'Update a series in a chart.',
         params => $params,
         returns => 'Chart',
@@ -19373,7 +27990,7 @@ sub put_chart_data_point {
 }
 # @return Chart
 #
-sub put_chart_series {
+sub update_chart_series {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -19478,7 +28095,602 @@ sub put_chart_series {
 }
 
 #
-# put_layout_slide
+# put_chart_series
+#
+# Update a series in a chart.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index (must be a chart). (required)
+# @param int $series_index Series index. (required)
+# @param Series $series Series DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index (must be a chart).',
+        required => '1',
+    },
+    'series_index' => {
+        data_type => 'int',
+        description => 'Series index.',
+        required => '1',
+    },
+    'series' => {
+        data_type => 'Series',
+        description => 'Series DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_chart_series' } = { 
+    	summary => 'Update a series in a chart.',
+        params => $params,
+        returns => 'Chart',
+        };
+}
+# @return Chart
+#
+sub put_chart_series {
+    warnings::warnif("deprecated", "put_chart_series is deprecated, use update_chart_series instead");
+  
+    return update_chart_series(@_);
+}
+
+#
+# save_shape_online
+#
+# Render shape to specified picture format.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param string $out_path Path to save result. (required)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Path to save result.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'save_shape_online' } = { 
+    	summary => 'Render shape to specified picture format.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub save_shape_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling put_export_shape");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling put_export_shape");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling put_export_shape");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling put_export_shape");
+    }
+
+    # verify the required parameter 'out_path' is set
+    unless (exists $args{'out_path'} && $args{'out_path'}) {
+      croak("Missing the required parameter 'out_path' when calling put_export_shape");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/slides/{slideIndex}/shapes/{shapeIndex}/{format}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'out_path'} && defined $args{'out_path'}) {
+        $query_params->{'outPath'} = $self->{api_client}->to_query_value($args{'out_path'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
+        $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
+    }
+
+    # query params
+    if (exists $args{'scale_y'} && defined $args{'scale_y'}) {
+        $query_params->{'scaleY'} = $self->{api_client}->to_query_value($args{'scale_y'});
+    }
+
+    # query params
+    if (exists $args{'bounds'} && defined $args{'bounds'}) {
+        $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
+}
+
+#
+# put_export_shape
+#
+# Render shape to specified picture format.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param string $out_path Path to save result. (required)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Path to save result.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_export_shape' } = { 
+    	summary => 'Render shape to specified picture format.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub put_export_shape {
+    warnings::warnif("deprecated", "put_export_shape is deprecated, use save_shape_online instead");
+  
+    return save_shape_online(@_);
+}
+
+#
+# save_slide_online
+#
+# Save a slide to a specified format.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $format Output file format. (required)
+# @param string $out_path Path to save result. (required)
+# @param int $width Output file width; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param int $height Output file height; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Output file format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Path to save result.',
+        required => '1',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Output file width; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Output file height; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Storage folder containing custom fonts to be used with the document.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'save_slide_online' } = { 
+    	summary => 'Save a slide to a specified format.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub save_slide_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling put_export_slide");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling put_export_slide");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling put_export_slide");
+    }
+
+    # verify the required parameter 'out_path' is set
+    unless (exists $args{'out_path'} && $args{'out_path'}) {
+      croak("Missing the required parameter 'out_path' when calling put_export_slide");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/slides/{slideIndex}/{format}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'out_path'} && defined $args{'out_path'}) {
+        $query_params->{'outPath'} = $self->{api_client}->to_query_value($args{'out_path'});
+    }
+
+    # query params
+    if (exists $args{'width'} && defined $args{'width'}) {
+        $query_params->{'width'} = $self->{api_client}->to_query_value($args{'width'});
+    }
+
+    # query params
+    if (exists $args{'height'} && defined $args{'height'}) {
+        $query_params->{'height'} = $self->{api_client}->to_query_value($args{'height'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
+}
+
+#
+# put_export_slide
+#
+# Save a slide to a specified format.
+# 
+# @param File $document Document data. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $format Output file format. (required)
+# @param string $out_path Path to save result. (required)
+# @param int $width Output file width; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param int $height Output file height; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Output file format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Path to save result.',
+        required => '1',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Output file width; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Output file height; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Storage folder containing custom fonts to be used with the document.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_export_slide' } = { 
+    	summary => 'Save a slide to a specified format.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub put_export_slide {
+    warnings::warnif("deprecated", "put_export_slide is deprecated, use save_slide_online instead");
+  
+    return save_slide_online(@_);
+}
+
+#
+# update_layout_slide
 #
 # Update a layoutSlide.
 # 
@@ -19521,7 +28733,7 @@ sub put_chart_series {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_layout_slide' } = { 
+    __PACKAGE__->method_documentation->{ 'update_layout_slide' } = { 
     	summary => 'Update a layoutSlide.',
         params => $params,
         returns => 'LayoutSlide',
@@ -19529,7 +28741,7 @@ sub put_chart_series {
 }
 # @return LayoutSlide
 #
-sub put_layout_slide {
+sub update_layout_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -19610,7 +28822,65 @@ sub put_layout_slide {
 }
 
 #
-# put_notes_slide_header_footer
+# put_layout_slide
+#
+# Update a layoutSlide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param LayoutSlide $slide_dto Slide update data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'slide_dto' => {
+        data_type => 'LayoutSlide',
+        description => 'Slide update data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_layout_slide' } = { 
+    	summary => 'Update a layoutSlide.',
+        params => $params,
+        returns => 'LayoutSlide',
+        };
+}
+# @return LayoutSlide
+#
+sub put_layout_slide {
+    warnings::warnif("deprecated", "put_layout_slide is deprecated, use update_layout_slide instead");
+  
+    return update_layout_slide(@_);
+}
+
+#
+# set_notes_slide_header_footer
 #
 # Set header/footer the notes slide.
 # 
@@ -19618,8 +28888,8 @@ sub put_layout_slide {
 # @param int $slide_index Slide index. (required)
 # @param NotesSlideHeaderFooter $dto Header/footer to set. (required)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -19642,18 +28912,18 @@ sub put_layout_slide {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'put_notes_slide_header_footer' } = { 
+    __PACKAGE__->method_documentation->{ 'set_notes_slide_header_footer' } = { 
     	summary => 'Set header/footer the notes slide.',
         params => $params,
         returns => 'NotesSlideHeaderFooter',
@@ -19661,7 +28931,7 @@ sub put_layout_slide {
 }
 # @return NotesSlideHeaderFooter
 #
-sub put_notes_slide_header_footer {
+sub set_notes_slide_header_footer {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -19695,13 +28965,13 @@ sub put_notes_slide_header_footer {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -19742,7 +29012,65 @@ sub put_notes_slide_header_footer {
 }
 
 #
-# put_notes_slide_shape_save_as
+# put_notes_slide_header_footer
+#
+# Set header/footer the notes slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param NotesSlideHeaderFooter $dto Header/footer to set. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'NotesSlideHeaderFooter',
+        description => 'Header/footer to set.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_notes_slide_header_footer' } = { 
+    	summary => 'Set header/footer the notes slide.',
+        params => $params,
+        returns => 'NotesSlideHeaderFooter',
+        };
+}
+# @return NotesSlideHeaderFooter
+#
+sub put_notes_slide_header_footer {
+    warnings::warnif("deprecated", "put_notes_slide_header_footer is deprecated, use set_notes_slide_header_footer instead");
+  
+    return set_notes_slide_header_footer(@_);
+}
+
+#
+# save_notes_slide_shape
 #
 # Render shape to specified picture format.
 # 
@@ -19752,12 +29080,12 @@ sub put_notes_slide_header_footer {
 # @param string $format Export picture format. (required)
 # @param string $out_path Output path. (required)
 # @param IShapeExportOptions $options export options (optional)
-# @param string $password Document password. (optional)
-# @param string $folder Presentation folder. (optional)
-# @param string $storage Presentation storage. (optional)
 # @param double $scale_x X scale ratio. (optional, default to 0.0)
 # @param double $scale_y Y scale ratio. (optional, default to 0.0)
 # @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
 # @param string $fonts_folder Fonts folder. (optional)
 {
     my $params = {
@@ -19791,21 +29119,6 @@ sub put_notes_slide_header_footer {
         description => 'export options',
         required => '0',
     },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Presentation folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Presentation storage.',
-        required => '0',
-    },
     'scale_x' => {
         data_type => 'double',
         description => 'X scale ratio.',
@@ -19821,13 +29134,28 @@ sub put_notes_slide_header_footer {
         description => 'Shape thumbnail bounds type.',
         required => '0',
     },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
     'fonts_folder' => {
         data_type => 'string',
         description => 'Fonts folder.',
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_notes_slide_shape_save_as' } = { 
+    __PACKAGE__->method_documentation->{ 'save_notes_slide_shape' } = { 
     	summary => 'Render shape to specified picture format.',
         params => $params,
         returns => undef,
@@ -19835,7 +29163,7 @@ sub put_notes_slide_header_footer {
 }
 # @return void
 #
-sub put_notes_slide_shape_save_as {
+sub save_notes_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -19884,16 +29212,6 @@ sub put_notes_slide_shape_save_as {
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
         $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
     }
@@ -19906,6 +29224,16 @@ sub put_notes_slide_shape_save_as {
     # query params
     if (exists $args{'bounds'} && defined $args{'bounds'}) {
         $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -19961,15 +29289,115 @@ sub put_notes_slide_shape_save_as {
 }
 
 #
-# put_presentation_merge
+# put_notes_slide_shape_save_as
+#
+# Render shape to specified picture format.
+# 
+# @param string $name Presentation name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param string $out_path Output path. (required)
+# @param IShapeExportOptions $options export options (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Presentation name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Output path.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'IShapeExportOptions',
+        description => 'export options',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_notes_slide_shape_save_as' } = { 
+    	summary => 'Render shape to specified picture format.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub put_notes_slide_shape_save_as {
+    warnings::warnif("deprecated", "put_notes_slide_shape_save_as is deprecated, use save_notes_slide_shape instead");
+  
+    return save_notes_slide_shape(@_);
+}
+
+#
+# ordered_merge
 #
 # Merge the presentation with other presentations or some of their slides specified in the request parameter.
 # 
 # @param string $name Document name. (required)
 # @param OrderedMergeRequest $request OrderedMergeRequest with a list of presentations and slide indices to merge. (required)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -19987,18 +29415,18 @@ sub put_notes_slide_shape_save_as {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'put_presentation_merge' } = { 
+    __PACKAGE__->method_documentation->{ 'ordered_merge' } = { 
     	summary => 'Merge the presentation with other presentations or some of their slides specified in the request parameter.',
         params => $params,
         returns => 'Document',
@@ -20006,7 +29434,7 @@ sub put_notes_slide_shape_save_as {
 }
 # @return Document
 #
-sub put_presentation_merge {
+sub ordered_merge {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -20035,13 +29463,13 @@ sub put_presentation_merge {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -20075,7 +29503,310 @@ sub put_presentation_merge {
 }
 
 #
-# put_section
+# put_presentation_merge
+#
+# Merge the presentation with other presentations or some of their slides specified in the request parameter.
+# 
+# @param string $name Document name. (required)
+# @param OrderedMergeRequest $request OrderedMergeRequest with a list of presentations and slide indices to merge. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'request' => {
+        data_type => 'OrderedMergeRequest',
+        description => 'OrderedMergeRequest with a list of presentations and slide indices to merge.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_presentation_merge' } = { 
+    	summary => 'Merge the presentation with other presentations or some of their slides specified in the request parameter.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub put_presentation_merge {
+    warnings::warnif("deprecated", "put_presentation_merge is deprecated, use ordered_merge instead");
+  
+    return ordered_merge(@_);
+}
+
+#
+# split_and_save_online
+#
+# Splits PowerPoint presentation slides from the specified range into separate files and exports them in the specified file format. If the range is not provided all slides will be processed. 
+# 
+# @param File $document Document data. (required)
+# @param string $format ExportFormat (required)
+# @param string $dest_folder Folder on storage where images are going to be uploaded. If not specified then images are uploaded to the root folder. (optional, default to )
+# @param int $width Slide width. (optional)
+# @param int $height Slide height. (optional)
+# @param int $from The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation. (optional)
+# @param int $to The last slide number for splitting, if is not specified splitting ends at the last slide of the document. (optional)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'ExportFormat',
+        required => '1',
+    },
+    'dest_folder' => {
+        data_type => 'string',
+        description => 'Folder on storage where images are going to be uploaded. If not specified then images are uploaded to the root folder.',
+        required => '0',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Slide width.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Slide height.',
+        required => '0',
+    },
+    'from' => {
+        data_type => 'int',
+        description => 'The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation.',
+        required => '0',
+    },
+    'to' => {
+        data_type => 'int',
+        description => 'The last slide number for splitting, if is not specified splitting ends at the last slide of the document.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'split_and_save_online' } = { 
+    	summary => 'Splits PowerPoint presentation slides from the specified range into separate files and exports them in the specified file format. If the range is not provided all slides will be processed. ',
+        params => $params,
+        returns => 'SplitDocumentResult',
+        };
+}
+# @return SplitDocumentResult
+#
+sub split_and_save_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'document' is set
+    unless (exists $args{'document'} && $args{'document'}) {
+      croak("Missing the required parameter 'document' when calling put_presentation_split");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'} && $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling put_presentation_split");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/split/{format}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'dest_folder'} && defined $args{'dest_folder'}) {
+        $query_params->{'destFolder'} = $self->{api_client}->to_query_value($args{'dest_folder'});
+    }
+
+    # query params
+    if (exists $args{'width'} && defined $args{'width'}) {
+        $query_params->{'width'} = $self->{api_client}->to_query_value($args{'width'});
+    }
+
+    # query params
+    if (exists $args{'height'} && defined $args{'height'}) {
+        $query_params->{'height'} = $self->{api_client}->to_query_value($args{'height'});
+    }
+
+    # query params
+    if (exists $args{'from'} && defined $args{'from'}) {
+        $query_params->{'from'} = $self->{api_client}->to_query_value($args{'from'});
+    }
+
+    # query params
+    if (exists $args{'to'} && defined $args{'to'}) {
+        $query_params->{'to'} = $self->{api_client}->to_query_value($args{'to'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files;
+    # form params
+    if ( exists $args{'document'} ) {
+        $_body_data = $args{'document'};
+    }
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('SplitDocumentResult', $response);
+    return $_response_object;
+}
+
+#
+# put_presentation_split
+#
+# Splits PowerPoint presentation slides from the specified range into separate files and exports them in the specified file format. If the range is not provided all slides will be processed. 
+# 
+# @param File $document Document data. (required)
+# @param string $format ExportFormat (required)
+# @param string $dest_folder Folder on storage where images are going to be uploaded. If not specified then images are uploaded to the root folder. (optional, default to )
+# @param int $width Slide width. (optional)
+# @param int $height Slide height. (optional)
+# @param int $from The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation. (optional)
+# @param int $to The last slide number for splitting, if is not specified splitting ends at the last slide of the document. (optional)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'ExportFormat',
+        required => '1',
+    },
+    'dest_folder' => {
+        data_type => 'string',
+        description => 'Folder on storage where images are going to be uploaded. If not specified then images are uploaded to the root folder.',
+        required => '0',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Slide width.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Slide height.',
+        required => '0',
+    },
+    'from' => {
+        data_type => 'int',
+        description => 'The start slide number for splitting, if is not specified splitting starts from the first slide of the presentation.',
+        required => '0',
+    },
+    'to' => {
+        data_type => 'int',
+        description => 'The last slide number for splitting, if is not specified splitting ends at the last slide of the document.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_presentation_split' } = { 
+    	summary => 'Splits PowerPoint presentation slides from the specified range into separate files and exports them in the specified file format. If the range is not provided all slides will be processed. ',
+        params => $params,
+        returns => 'SplitDocumentResult',
+        };
+}
+# @return SplitDocumentResult
+#
+sub put_presentation_split {
+    warnings::warnif("deprecated", "put_presentation_split is deprecated, use split_and_save_online instead");
+  
+    return split_and_save_online(@_);
+}
+
+#
+# update_section
 #
 # Update section name.
 # 
@@ -20118,7 +29849,7 @@ sub put_presentation_merge {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_section' } = { 
+    __PACKAGE__->method_documentation->{ 'update_section' } = { 
     	summary => 'Update section name.',
         params => $params,
         returns => 'Sections',
@@ -20126,7 +29857,7 @@ sub put_presentation_merge {
 }
 # @return Sections
 #
-sub put_section {
+sub update_section {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -20207,7 +29938,65 @@ sub put_section {
 }
 
 #
-# put_sections
+# put_section
+#
+# Update section name.
+# 
+# @param string $name Document name. (required)
+# @param int $section_index The position of the section to be updated. (required)
+# @param string $section_name Section name. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'section_index' => {
+        data_type => 'int',
+        description => 'The position of the section to be updated.',
+        required => '1',
+    },
+    'section_name' => {
+        data_type => 'string',
+        description => 'Section name.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_section' } = { 
+    	summary => 'Update section name.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub put_section {
+    warnings::warnif("deprecated", "put_section is deprecated, use update_section instead");
+  
+    return update_section(@_);
+}
+
+#
+# set_sections
 #
 # Replace existing presentation sections with the ones provided in the sections DTO.
 # 
@@ -20244,7 +30033,7 @@ sub put_section {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_sections' } = { 
+    __PACKAGE__->method_documentation->{ 'set_sections' } = { 
     	summary => 'Replace existing presentation sections with the ones provided in the sections DTO.',
         params => $params,
         returns => 'Sections',
@@ -20252,7 +30041,7 @@ sub put_section {
 }
 # @return Sections
 #
-sub put_sections {
+sub set_sections {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -20321,7 +30110,59 @@ sub put_sections {
 }
 
 #
-# put_set_paragraph_portion_properties
+# put_sections
+#
+# Replace existing presentation sections with the ones provided in the sections DTO.
+# 
+# @param string $name Document name. (required)
+# @param Sections $sections Sections DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'sections' => {
+        data_type => 'Sections',
+        description => 'Sections DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_sections' } = { 
+    	summary => 'Replace existing presentation sections with the ones provided in the sections DTO.',
+        params => $params,
+        returns => 'Sections',
+        };
+}
+# @return Sections
+#
+sub put_sections {
+    warnings::warnif("deprecated", "put_sections is deprecated, use set_sections instead");
+  
+    return set_sections(@_);
+}
+
+#
+# update_portion
 #
 # Update portion properties.
 # 
@@ -20382,7 +30223,7 @@ sub put_sections {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_set_paragraph_portion_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'update_portion' } = { 
     	summary => 'Update portion properties.',
         params => $params,
         returns => 'Portion',
@@ -20390,7 +30231,7 @@ sub put_sections {
 }
 # @return Portion
 #
-sub put_set_paragraph_portion_properties {
+sub update_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -20507,7 +30348,83 @@ sub put_set_paragraph_portion_properties {
 }
 
 #
-# put_set_paragraph_properties
+# put_set_paragraph_portion_properties
+#
+# Update portion properties.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param Portion $dto Portion DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Portion',
+        description => 'Portion DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_set_paragraph_portion_properties' } = { 
+    	summary => 'Update portion properties.',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub put_set_paragraph_portion_properties {
+    warnings::warnif("deprecated", "put_set_paragraph_portion_properties is deprecated, use update_portion instead");
+  
+    return update_portion(@_);
+}
+
+#
+# update_paragraph
 #
 # Update paragraph properties.
 # 
@@ -20562,7 +30479,7 @@ sub put_set_paragraph_portion_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_set_paragraph_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'update_paragraph' } = { 
     	summary => 'Update paragraph properties.',
         params => $params,
         returns => 'Paragraph',
@@ -20570,7 +30487,7 @@ sub put_set_paragraph_portion_properties {
 }
 # @return Paragraph
 #
-sub put_set_paragraph_properties {
+sub update_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -20675,7 +30592,77 @@ sub put_set_paragraph_properties {
 }
 
 #
-# put_set_subshape_paragraph_portion_properties
+# put_set_paragraph_properties
+#
+# Update paragraph properties.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param Paragraph $dto Paragraph DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Paragraph',
+        description => 'Paragraph DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_set_paragraph_properties' } = { 
+    	summary => 'Update paragraph properties.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub put_set_paragraph_properties {
+    warnings::warnif("deprecated", "put_set_paragraph_properties is deprecated, use update_paragraph instead");
+  
+    return update_paragraph(@_);
+}
+
+#
+# update_subshape_portion
 #
 # Update portion properties (for smart art and group shapes).
 # 
@@ -20742,7 +30729,7 @@ sub put_set_paragraph_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_set_subshape_paragraph_portion_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'update_subshape_portion' } = { 
     	summary => 'Update portion properties (for smart art and group shapes).',
         params => $params,
         returns => 'Portion',
@@ -20750,7 +30737,7 @@ sub put_set_paragraph_properties {
 }
 # @return Portion
 #
-sub put_set_subshape_paragraph_portion_properties {
+sub update_subshape_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -20879,7 +30866,89 @@ sub put_set_subshape_paragraph_portion_properties {
 }
 
 #
-# put_set_subshape_paragraph_properties
+# put_set_subshape_paragraph_portion_properties
+#
+# Update portion properties (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param Portion $dto Portion DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Portion',
+        description => 'Portion DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_set_subshape_paragraph_portion_properties' } = { 
+    	summary => 'Update portion properties (for smart art and group shapes).',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub put_set_subshape_paragraph_portion_properties {
+    warnings::warnif("deprecated", "put_set_subshape_paragraph_portion_properties is deprecated, use update_subshape_portion instead");
+  
+    return update_subshape_portion(@_);
+}
+
+#
+# update_subshape_paragraph
 #
 # Update paragraph properties (for smart art and group shapes).
 # 
@@ -20940,7 +31009,7 @@ sub put_set_subshape_paragraph_portion_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_set_subshape_paragraph_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'update_subshape_paragraph' } = { 
     	summary => 'Update paragraph properties (for smart art and group shapes).',
         params => $params,
         returns => 'Paragraph',
@@ -20948,7 +31017,7 @@ sub put_set_subshape_paragraph_portion_properties {
 }
 # @return Paragraph
 #
-sub put_set_subshape_paragraph_properties {
+sub update_subshape_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -21065,7 +31134,83 @@ sub put_set_subshape_paragraph_properties {
 }
 
 #
-# put_shape_save_as
+# put_set_subshape_paragraph_properties
+#
+# Update paragraph properties (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param Paragraph $dto Paragraph DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Paragraph',
+        description => 'Paragraph DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_set_subshape_paragraph_properties' } = { 
+    	summary => 'Update paragraph properties (for smart art and group shapes).',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub put_set_subshape_paragraph_properties {
+    warnings::warnif("deprecated", "put_set_subshape_paragraph_properties is deprecated, use update_subshape_paragraph instead");
+  
+    return update_subshape_paragraph(@_);
+}
+
+#
+# save_shape
 #
 # Render shape to specified picture format.
 # 
@@ -21075,12 +31220,12 @@ sub put_set_subshape_paragraph_properties {
 # @param string $format Export picture format. (required)
 # @param string $out_path Output path. (required)
 # @param IShapeExportOptions $options export options (optional)
-# @param string $password Document password. (optional)
-# @param string $folder Presentation folder. (optional)
-# @param string $storage Presentation storage. (optional)
 # @param double $scale_x X scale ratio. (optional, default to 0.0)
 # @param double $scale_y Y scale ratio. (optional, default to 0.0)
 # @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
 # @param string $fonts_folder Fonts folder. (optional)
 {
     my $params = {
@@ -21114,21 +31259,6 @@ sub put_set_subshape_paragraph_properties {
         description => 'export options',
         required => '0',
     },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Presentation folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Presentation storage.',
-        required => '0',
-    },
     'scale_x' => {
         data_type => 'double',
         description => 'X scale ratio.',
@@ -21144,13 +31274,28 @@ sub put_set_subshape_paragraph_properties {
         description => 'Shape thumbnail bounds type.',
         required => '0',
     },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
     'fonts_folder' => {
         data_type => 'string',
         description => 'Fonts folder.',
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_shape_save_as' } = { 
+    __PACKAGE__->method_documentation->{ 'save_shape' } = { 
     	summary => 'Render shape to specified picture format.',
         params => $params,
         returns => undef,
@@ -21158,7 +31303,7 @@ sub put_set_subshape_paragraph_properties {
 }
 # @return void
 #
-sub put_shape_save_as {
+sub save_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -21207,16 +31352,6 @@ sub put_shape_save_as {
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
         $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
     }
@@ -21229,6 +31364,16 @@ sub put_shape_save_as {
     # query params
     if (exists $args{'bounds'} && defined $args{'bounds'}) {
         $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -21284,7 +31429,107 @@ sub put_shape_save_as {
 }
 
 #
-# put_slide_animation
+# put_shape_save_as
+#
+# Render shape to specified picture format.
+# 
+# @param string $name Presentation name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param string $out_path Output path. (required)
+# @param IShapeExportOptions $options export options (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Presentation name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Output path.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'IShapeExportOptions',
+        description => 'export options',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_shape_save_as' } = { 
+    	summary => 'Render shape to specified picture format.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub put_shape_save_as {
+    warnings::warnif("deprecated", "put_shape_save_as is deprecated, use save_shape instead");
+  
+    return save_shape(@_);
+}
+
+#
+# set_animation
 #
 # Set slide animation.
 # 
@@ -21327,7 +31572,7 @@ sub put_shape_save_as {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slide_animation' } = { 
+    __PACKAGE__->method_documentation->{ 'set_animation' } = { 
     	summary => 'Set slide animation.',
         params => $params,
         returns => 'SlideAnimation',
@@ -21335,7 +31580,7 @@ sub put_shape_save_as {
 }
 # @return SlideAnimation
 #
-sub put_slide_animation {
+sub set_animation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -21416,7 +31661,65 @@ sub put_slide_animation {
 }
 
 #
-# put_slide_animation_effect
+# put_slide_animation
+#
+# Set slide animation.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param SlideAnimation $animation Animation DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'animation' => {
+        data_type => 'SlideAnimation',
+        description => 'Animation DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slide_animation' } = { 
+    	summary => 'Set slide animation.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub put_slide_animation {
+    warnings::warnif("deprecated", "put_slide_animation is deprecated, use set_animation instead");
+  
+    return set_animation(@_);
+}
+
+#
+# update_animation_effect
 #
 # Modify an animation effect for a slide.
 # 
@@ -21465,7 +31768,7 @@ sub put_slide_animation {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slide_animation_effect' } = { 
+    __PACKAGE__->method_documentation->{ 'update_animation_effect' } = { 
     	summary => 'Modify an animation effect for a slide.',
         params => $params,
         returns => 'SlideAnimation',
@@ -21473,7 +31776,7 @@ sub put_slide_animation {
 }
 # @return SlideAnimation
 #
-sub put_slide_animation_effect {
+sub update_animation_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -21566,7 +31869,71 @@ sub put_slide_animation_effect {
 }
 
 #
-# put_slide_animation_interactive_sequence_effect
+# put_slide_animation_effect
+#
+# Modify an animation effect for a slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $effect_index The position of the effect to be modified. (required)
+# @param Effect $effect Animation effect DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'effect_index' => {
+        data_type => 'int',
+        description => 'The position of the effect to be modified.',
+        required => '1',
+    },
+    'effect' => {
+        data_type => 'Effect',
+        description => 'Animation effect DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slide_animation_effect' } = { 
+    	summary => 'Modify an animation effect for a slide.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub put_slide_animation_effect {
+    warnings::warnif("deprecated", "put_slide_animation_effect is deprecated, use update_animation_effect instead");
+  
+    return update_animation_effect(@_);
+}
+
+#
+# update_animation_interactive_sequence_effect
 #
 # Modify an animation effect for a slide interactive sequence.
 # 
@@ -21621,7 +31988,7 @@ sub put_slide_animation_effect {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slide_animation_interactive_sequence_effect' } = { 
+    __PACKAGE__->method_documentation->{ 'update_animation_interactive_sequence_effect' } = { 
     	summary => 'Modify an animation effect for a slide interactive sequence.',
         params => $params,
         returns => 'SlideAnimation',
@@ -21629,7 +31996,7 @@ sub put_slide_animation_effect {
 }
 # @return SlideAnimation
 #
-sub put_slide_animation_interactive_sequence_effect {
+sub update_animation_interactive_sequence_effect {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -21734,7 +32101,77 @@ sub put_slide_animation_interactive_sequence_effect {
 }
 
 #
-# put_slide_header_footer
+# put_slide_animation_interactive_sequence_effect
+#
+# Modify an animation effect for a slide interactive sequence.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $sequence_index The position of the interactive sequence. (required)
+# @param int $effect_index The position of the effect to be modified. (required)
+# @param Effect $effect Animation effect DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'sequence_index' => {
+        data_type => 'int',
+        description => 'The position of the interactive sequence.',
+        required => '1',
+    },
+    'effect_index' => {
+        data_type => 'int',
+        description => 'The position of the effect to be modified.',
+        required => '1',
+    },
+    'effect' => {
+        data_type => 'Effect',
+        description => 'Animation effect DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slide_animation_interactive_sequence_effect' } = { 
+    	summary => 'Modify an animation effect for a slide interactive sequence.',
+        params => $params,
+        returns => 'SlideAnimation',
+        };
+}
+# @return SlideAnimation
+#
+sub put_slide_animation_interactive_sequence_effect {
+    warnings::warnif("deprecated", "put_slide_animation_interactive_sequence_effect is deprecated, use update_animation_interactive_sequence_effect instead");
+  
+    return update_animation_interactive_sequence_effect(@_);
+}
+
+#
+# set_slide_header_footer
 #
 # Set footer the slide.
 # 
@@ -21777,7 +32214,7 @@ sub put_slide_animation_interactive_sequence_effect {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slide_header_footer' } = { 
+    __PACKAGE__->method_documentation->{ 'set_slide_header_footer' } = { 
     	summary => 'Set footer the slide.',
         params => $params,
         returns => 'HeaderFooter',
@@ -21785,7 +32222,7 @@ sub put_slide_animation_interactive_sequence_effect {
 }
 # @return HeaderFooter
 #
-sub put_slide_header_footer {
+sub set_slide_header_footer {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -21866,7 +32303,65 @@ sub put_slide_header_footer {
 }
 
 #
-# put_slide_save_as
+# put_slide_header_footer
+#
+# Set footer the slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index The position of the slide to be reordered. (required)
+# @param HeaderFooter $dto Footer to set. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'The position of the slide to be reordered.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'HeaderFooter',
+        description => 'Footer to set.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slide_header_footer' } = { 
+    	summary => 'Set footer the slide.',
+        params => $params,
+        returns => 'HeaderFooter',
+        };
+}
+# @return HeaderFooter
+#
+sub put_slide_header_footer {
+    warnings::warnif("deprecated", "put_slide_header_footer is deprecated, use set_slide_header_footer instead");
+  
+    return set_slide_header_footer(@_);
+}
+
+#
+# save_slide
 #
 # Save a slide to a specified format.
 # 
@@ -21939,7 +32434,7 @@ sub put_slide_header_footer {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slide_save_as' } = { 
+    __PACKAGE__->method_documentation->{ 'save_slide' } = { 
     	summary => 'Save a slide to a specified format.',
         params => $params,
         returns => undef,
@@ -21947,7 +32442,7 @@ sub put_slide_header_footer {
 }
 # @return void
 #
-sub put_slide_save_as {
+sub save_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -22056,7 +32551,95 @@ sub put_slide_save_as {
 }
 
 #
-# put_slide_shape_info
+# put_slide_save_as
+#
+# Save a slide to a specified format.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $format Output file format. (required)
+# @param string $out_path Path to upload the output file to. (required)
+# @param ExportOptions $options Export options. (optional)
+# @param int $width Output file width; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param int $height Output file height; 0 to not adjust the size. Default is 0. (optional, default to 0)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Storage folder containing custom fonts to be used with the document. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Output file format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Path to upload the output file to.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'ExportOptions',
+        description => 'Export options.',
+        required => '0',
+    },
+    'width' => {
+        data_type => 'int',
+        description => 'Output file width; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'height' => {
+        data_type => 'int',
+        description => 'Output file height; 0 to not adjust the size. Default is 0.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Storage folder containing custom fonts to be used with the document.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slide_save_as' } = { 
+    	summary => 'Save a slide to a specified format.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub put_slide_save_as {
+    warnings::warnif("deprecated", "put_slide_save_as is deprecated, use save_slide instead");
+  
+    return save_slide(@_);
+}
+
+#
+# update_shape
 #
 # Update shape properties.
 # 
@@ -22105,7 +32688,7 @@ sub put_slide_save_as {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slide_shape_info' } = { 
+    __PACKAGE__->method_documentation->{ 'update_shape' } = { 
     	summary => 'Update shape properties.',
         params => $params,
         returns => 'ShapeBase',
@@ -22113,7 +32696,7 @@ sub put_slide_save_as {
 }
 # @return ShapeBase
 #
-sub put_slide_shape_info {
+sub update_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -22206,7 +32789,71 @@ sub put_slide_shape_info {
 }
 
 #
-# put_slide_subshape_info
+# put_slide_shape_info
+#
+# Update shape properties.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param ShapeBase $dto Shape DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slide_shape_info' } = { 
+    	summary => 'Update shape properties.',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub put_slide_shape_info {
+    warnings::warnif("deprecated", "put_slide_shape_info is deprecated, use update_shape instead");
+  
+    return update_shape(@_);
+}
+
+#
+# update_subshape
 #
 # Update shape properties (for smart art and group shapes).
 # 
@@ -22261,7 +32908,7 @@ sub put_slide_shape_info {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slide_subshape_info' } = { 
+    __PACKAGE__->method_documentation->{ 'update_subshape' } = { 
     	summary => 'Update shape properties (for smart art and group shapes).',
         params => $params,
         returns => 'ShapeBase',
@@ -22269,7 +32916,7 @@ sub put_slide_shape_info {
 }
 # @return ShapeBase
 #
-sub put_slide_subshape_info {
+sub update_subshape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -22374,7 +33021,77 @@ sub put_slide_subshape_info {
 }
 
 #
-# put_slides_convert
+# put_slide_subshape_info
+#
+# Update shape properties (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param ShapeBase $dto Shape DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slide_subshape_info' } = { 
+    	summary => 'Update shape properties (for smart art and group shapes).',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub put_slide_subshape_info {
+    warnings::warnif("deprecated", "put_slide_subshape_info is deprecated, use update_subshape instead");
+  
+    return update_subshape(@_);
+}
+
+#
+# convert_and_save
 #
 # Convert presentation from request content to format specified.
 # 
@@ -22382,6 +33099,7 @@ sub put_slide_subshape_info {
 # @param string $format Export format. (required)
 # @param string $out_path Path to save result. (required)
 # @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
 {
     my $params = {
@@ -22405,13 +33123,18 @@ sub put_slide_subshape_info {
         description => 'Document password.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     'fonts_folder' => {
         data_type => 'string',
         description => 'Custom fonts folder.',
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slides_convert' } = { 
+    __PACKAGE__->method_documentation->{ 'convert_and_save' } = { 
     	summary => 'Convert presentation from request content to format specified.',
         params => $params,
         returns => undef,
@@ -22419,7 +33142,7 @@ sub put_slide_subshape_info {
 }
 # @return void
 #
-sub put_slides_convert {
+sub convert_and_save {
     my ($self, %args) = @_;
 
     # verify the required parameter 'document' is set
@@ -22458,6 +33181,11 @@ sub put_slides_convert {
     }
 
     # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
     if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
         $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
     }
@@ -22489,6 +33217,64 @@ sub put_slides_convert {
 }
 
 #
+# put_slides_convert
+#
+# Convert presentation from request content to format specified.
+# 
+# @param File $document Document data. (required)
+# @param string $format Export format. (required)
+# @param string $out_path Path to save result. (required)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Path to save result.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_convert' } = { 
+    	summary => 'Convert presentation from request content to format specified.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub put_slides_convert {
+    warnings::warnif("deprecated", "put_slides_convert is deprecated, use convert_and_save instead");
+  
+    return convert_and_save(@_);
+}
+
+#
 # put_slides_document_from_html
 #
 # Update presentation document from html.
@@ -22496,8 +33282,8 @@ sub put_slides_convert {
 # @param string $name Document name. (required)
 # @param string $html HTML data. (optional)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -22515,14 +33301,14 @@ sub put_slides_convert {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
         required => '0',
     },
     };
@@ -22558,13 +33344,13 @@ sub put_slides_document_from_html {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -22598,15 +33384,15 @@ sub put_slides_document_from_html {
 }
 
 #
-# put_slides_header_footer
+# set_presentation_header_footer
 #
 # Set footers for all slides in a presentation.
 # 
 # @param string $name Document name. (required)
 # @param HeaderFooter $dto HeaderFooter instance. (required)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -22624,18 +33410,18 @@ sub put_slides_document_from_html {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
         required => '0',
     },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
     };
-    __PACKAGE__->method_documentation->{ 'put_slides_header_footer' } = { 
+    __PACKAGE__->method_documentation->{ 'set_presentation_header_footer' } = { 
     	summary => 'Set footers for all slides in a presentation.',
         params => $params,
         returns => 'Document',
@@ -22643,7 +33429,7 @@ sub put_slides_document_from_html {
 }
 # @return Document
 #
-sub put_slides_header_footer {
+sub set_presentation_header_footer {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -22672,13 +33458,13 @@ sub put_slides_header_footer {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -22712,7 +33498,213 @@ sub put_slides_header_footer {
 }
 
 #
-# put_slides_protection_properties
+# put_slides_header_footer
+#
+# Set footers for all slides in a presentation.
+# 
+# @param string $name Document name. (required)
+# @param HeaderFooter $dto HeaderFooter instance. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'HeaderFooter',
+        description => 'HeaderFooter instance.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_header_footer' } = { 
+    	summary => 'Set footers for all slides in a presentation.',
+        params => $params,
+        returns => 'Document',
+        };
+}
+# @return Document
+#
+sub put_slides_header_footer {
+    warnings::warnif("deprecated", "put_slides_header_footer is deprecated, use set_presentation_header_footer instead");
+  
+    return set_presentation_header_footer(@_);
+}
+
+#
+# merge_and_save_online
+#
+# Merges the presentation with other presentations or some of their slides specified in the request parameter. Puts result in the storage. 
+# 
+# @param string $out_path Path to save result. (required)
+# @param ARRAY[string] $files Files to merge (optional)
+# @param OrderedMergeRequest $request Merge request. (optional)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'out_path' => {
+        data_type => 'string',
+        description => 'Path to save result.',
+        required => '1',
+    },
+    'files' => {
+        data_type => 'ARRAY[string]',
+        description => 'Files to merge',
+        required => '0',
+    },
+    'request' => {
+        data_type => 'OrderedMergeRequest',
+        description => 'Merge request.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'merge_and_save_online' } = { 
+    	summary => 'Merges the presentation with other presentations or some of their slides specified in the request parameter. Puts result in the storage. ',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub merge_and_save_online {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'out_path' is set
+    unless (exists $args{'out_path'} && $args{'out_path'}) {
+      croak("Missing the required parameter 'out_path' when calling put_slides_merge");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/merge';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'out_path'} && defined $args{'out_path'}) {
+        $query_params->{'outPath'} = $self->{api_client}->to_query_value($args{'out_path'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    my $_body_data;
+    my $files;
+    if ( exists $args{'files'}) {
+        $files = $args{'files'};
+    }
+
+    # body params
+    if ( exists $args{'request'}) {
+        $_body_data = $args{'request'};
+    }
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    return;
+}
+
+#
+# put_slides_merge
+#
+# Merges the presentation with other presentations or some of their slides specified in the request parameter. Puts result in the storage. 
+# 
+# @param string $out_path Path to save result. (required)
+# @param ARRAY[string] $files Files to merge (optional)
+# @param OrderedMergeRequest $request Merge request. (optional)
+# @param string $password Document password. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'out_path' => {
+        data_type => 'string',
+        description => 'Path to save result.',
+        required => '1',
+    },
+    'files' => {
+        data_type => 'ARRAY[string]',
+        description => 'Files to merge',
+        required => '0',
+    },
+    'request' => {
+        data_type => 'OrderedMergeRequest',
+        description => 'Merge request.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_merge' } = { 
+    	summary => 'Merges the presentation with other presentations or some of their slides specified in the request parameter. Puts result in the storage. ',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub put_slides_merge {
+    warnings::warnif("deprecated", "put_slides_merge is deprecated, use merge_and_save_online instead");
+  
+    return merge_and_save_online(@_);
+}
+
+#
+# set_protection_properties
 #
 # Update presentation protection properties.
 # 
@@ -22749,7 +33741,7 @@ sub put_slides_header_footer {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slides_protection_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'set_protection_properties' } = { 
     	summary => 'Update presentation protection properties.',
         params => $params,
         returns => 'ProtectionProperties',
@@ -22757,7 +33749,7 @@ sub put_slides_header_footer {
 }
 # @return ProtectionProperties
 #
-sub put_slides_protection_properties {
+sub set_protection_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -22826,17 +33818,69 @@ sub put_slides_protection_properties {
 }
 
 #
-# put_slides_save_as
+# put_slides_protection_properties
+#
+# Update presentation protection properties.
+# 
+# @param string $name Document name. (required)
+# @param ProtectionProperties $dto The view properties data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ProtectionProperties',
+        description => 'The view properties data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_protection_properties' } = { 
+    	summary => 'Update presentation protection properties.',
+        params => $params,
+        returns => 'ProtectionProperties',
+        };
+}
+# @return ProtectionProperties
+#
+sub put_slides_protection_properties {
+    warnings::warnif("deprecated", "put_slides_protection_properties is deprecated, use set_protection_properties instead");
+  
+    return set_protection_properties(@_);
+}
+
+#
+# save_presentation
 #
 # Save a presentation to a specified format.
 # 
 # @param string $name Document name. (required)
-# @param string $out_path Output path. (required)
 # @param string $format Export format. (required)
+# @param string $out_path Output path. (required)
 # @param ExportOptions $options Export options. (optional)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
 # @param string $fonts_folder Custom fonts folder. (optional)
 {
     my $params = {
@@ -22845,14 +33889,14 @@ sub put_slides_protection_properties {
         description => 'Document name.',
         required => '1',
     },
-    'out_path' => {
-        data_type => 'string',
-        description => 'Output path.',
-        required => '1',
-    },
     'format' => {
         data_type => 'string',
         description => 'Export format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Output path.',
         required => '1',
     },
     'options' => {
@@ -22865,14 +33909,14 @@ sub put_slides_protection_properties {
         description => 'Document password.',
         required => '0',
     },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
     'folder' => {
         data_type => 'string',
         description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
         required => '0',
     },
     'fonts_folder' => {
@@ -22881,7 +33925,7 @@ sub put_slides_protection_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slides_save_as' } = { 
+    __PACKAGE__->method_documentation->{ 'save_presentation' } = { 
     	summary => 'Save a presentation to a specified format.',
         params => $params,
         returns => undef,
@@ -22889,7 +33933,7 @@ sub put_slides_protection_properties {
 }
 # @return void
 #
-sub put_slides_save_as {
+sub save_presentation {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -22897,14 +33941,14 @@ sub put_slides_save_as {
       croak("Missing the required parameter 'name' when calling put_slides_save_as");
     }
 
-    # verify the required parameter 'out_path' is set
-    unless (exists $args{'out_path'} && $args{'out_path'}) {
-      croak("Missing the required parameter 'out_path' when calling put_slides_save_as");
-    }
-
     # verify the required parameter 'format' is set
     unless (exists $args{'format'} && $args{'format'}) {
       croak("Missing the required parameter 'format' when calling put_slides_save_as");
+    }
+
+    # verify the required parameter 'out_path' is set
+    unless (exists $args{'out_path'} && $args{'out_path'}) {
+      croak("Missing the required parameter 'out_path' when calling put_slides_save_as");
     }
 
     # parse inputs
@@ -22928,13 +33972,13 @@ sub put_slides_save_as {
     }
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -22976,7 +34020,77 @@ sub put_slides_save_as {
 }
 
 #
-# put_slides_set_document_property
+# put_slides_save_as
+#
+# Save a presentation to a specified format.
+# 
+# @param string $name Document name. (required)
+# @param string $format Export format. (required)
+# @param string $out_path Output path. (required)
+# @param ExportOptions $options Export options. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+# @param string $fonts_folder Custom fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Output path.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'ExportOptions',
+        description => 'Export options.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Custom fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_save_as' } = { 
+    	summary => 'Save a presentation to a specified format.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub put_slides_save_as {
+    warnings::warnif("deprecated", "put_slides_save_as is deprecated, use save_presentation instead");
+  
+    return save_presentation(@_);
+}
+
+#
+# set_document_property
 #
 # Set document property.
 # 
@@ -23019,7 +34133,7 @@ sub put_slides_save_as {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slides_set_document_property' } = { 
+    __PACKAGE__->method_documentation->{ 'set_document_property' } = { 
     	summary => 'Set document property.',
         params => $params,
         returns => 'DocumentProperty',
@@ -23027,7 +34141,7 @@ sub put_slides_save_as {
 }
 # @return DocumentProperty
 #
-sub put_slides_set_document_property {
+sub set_document_property {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -23108,7 +34222,65 @@ sub put_slides_set_document_property {
 }
 
 #
-# put_slides_slide
+# put_slides_set_document_property
+#
+# Set document property.
+# 
+# @param string $name Document name. (required)
+# @param string $property_name The property name. (required)
+# @param DocumentProperty $property Property with the value. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'property_name' => {
+        data_type => 'string',
+        description => 'The property name.',
+        required => '1',
+    },
+    'property' => {
+        data_type => 'DocumentProperty',
+        description => 'Property with the value.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_set_document_property' } = { 
+    	summary => 'Set document property.',
+        params => $params,
+        returns => 'DocumentProperty',
+        };
+}
+# @return DocumentProperty
+#
+sub put_slides_set_document_property {
+    warnings::warnif("deprecated", "put_slides_set_document_property is deprecated, use set_document_property instead");
+  
+    return set_document_property(@_);
+}
+
+#
+# update_slide
 #
 # Update a slide.
 # 
@@ -23151,7 +34323,7 @@ sub put_slides_set_document_property {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slides_slide' } = { 
+    __PACKAGE__->method_documentation->{ 'update_slide' } = { 
     	summary => 'Update a slide.',
         params => $params,
         returns => 'Slide',
@@ -23159,7 +34331,7 @@ sub put_slides_set_document_property {
 }
 # @return Slide
 #
-sub put_slides_slide {
+sub update_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -23240,15 +34412,73 @@ sub put_slides_slide {
 }
 
 #
-# put_slides_slide_background
+# put_slides_slide
+#
+# Update a slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param Slide $slide_dto Slide update data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'slide_dto' => {
+        data_type => 'Slide',
+        description => 'Slide update data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_slide' } = { 
+    	summary => 'Update a slide.',
+        params => $params,
+        returns => 'Slide',
+        };
+}
+# @return Slide
+#
+sub put_slides_slide {
+    warnings::warnif("deprecated", "put_slides_slide is deprecated, use update_slide instead");
+  
+    return update_slide(@_);
+}
+
+#
+# set_background
 #
 # Set background for a slide.
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param SlideBackground $background Slide background update data. (required)
-# @param string $folder Document folder. (optional)
 # @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
 {
     my $params = {
@@ -23267,14 +34497,14 @@ sub put_slides_slide {
         description => 'Slide background update data.',
         required => '1',
     },
-    'folder' => {
-        data_type => 'string',
-        description => 'Document folder.',
-        required => '0',
-    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
         required => '0',
     },
     'storage' => {
@@ -23283,7 +34513,7 @@ sub put_slides_slide {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slides_slide_background' } = { 
+    __PACKAGE__->method_documentation->{ 'set_background' } = { 
     	summary => 'Set background for a slide.',
         params => $params,
         returns => 'SlideBackground',
@@ -23291,7 +34521,7 @@ sub put_slides_slide {
 }
 # @return SlideBackground
 #
-sub put_slides_slide_background {
+sub set_background {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -23372,15 +34602,73 @@ sub put_slides_slide_background {
 }
 
 #
-# put_slides_slide_background_color
+# put_slides_slide_background
+#
+# Set background for a slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param SlideBackground $background Slide background update data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'background' => {
+        data_type => 'SlideBackground',
+        description => 'Slide background update data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_slide_background' } = { 
+    	summary => 'Set background for a slide.',
+        params => $params,
+        returns => 'SlideBackground',
+        };
+}
+# @return SlideBackground
+#
+sub put_slides_slide_background {
+    warnings::warnif("deprecated", "put_slides_slide_background is deprecated, use set_background instead");
+  
+    return set_background(@_);
+}
+
+#
+# set_background_color
 #
 # Set background color for a slide.
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
 # @param string $color Slide background target color in RRGGBB format. (required)
-# @param string $folder Document folder. (optional)
 # @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
 {
     my $params = {
@@ -23399,14 +34687,14 @@ sub put_slides_slide_background {
         description => 'Slide background target color in RRGGBB format.',
         required => '1',
     },
-    'folder' => {
-        data_type => 'string',
-        description => 'Document folder.',
-        required => '0',
-    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
         required => '0',
     },
     'storage' => {
@@ -23415,7 +34703,7 @@ sub put_slides_slide_background {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slides_slide_background_color' } = { 
+    __PACKAGE__->method_documentation->{ 'set_background_color' } = { 
     	summary => 'Set background color for a slide.',
         params => $params,
         returns => 'SlideBackground',
@@ -23423,7 +34711,7 @@ sub put_slides_slide_background {
 }
 # @return SlideBackground
 #
-sub put_slides_slide_background_color {
+sub set_background_color {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -23504,7 +34792,65 @@ sub put_slides_slide_background_color {
 }
 
 #
-# put_slides_slide_properties
+# put_slides_slide_background_color
+#
+# Set background color for a slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $color Slide background target color in RRGGBB format. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'color' => {
+        data_type => 'string',
+        description => 'Slide background target color in RRGGBB format.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_slide_background_color' } = { 
+    	summary => 'Set background color for a slide.',
+        params => $params,
+        returns => 'SlideBackground',
+        };
+}
+# @return SlideBackground
+#
+sub put_slides_slide_background_color {
+    warnings::warnif("deprecated", "put_slides_slide_background_color is deprecated, use set_background_color instead");
+  
+    return set_background_color(@_);
+}
+
+#
+# set_slide_properties
 #
 # Update presentation slide properties.
 # 
@@ -23541,7 +34887,7 @@ sub put_slides_slide_background_color {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slides_slide_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'set_slide_properties' } = { 
     	summary => 'Update presentation slide properties.',
         params => $params,
         returns => 'SlideProperties',
@@ -23549,7 +34895,7 @@ sub put_slides_slide_background_color {
 }
 # @return SlideProperties
 #
-sub put_slides_slide_properties {
+sub set_slide_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -23618,18 +34964,15 @@ sub put_slides_slide_properties {
 }
 
 #
-# put_slides_slide_size
+# put_slides_slide_properties
 #
-# Set slide size for a presentation.
+# Update presentation slide properties.
 # 
 # @param string $name Document name. (required)
+# @param SlideProperties $dto The view properties data. (required)
 # @param string $password Document password. (optional)
-# @param string $storage Document storage. (optional)
 # @param string $folder Document folder. (optional)
-# @param int $width Slide width. (optional, default to 0)
-# @param int $height Slide height. (optional, default to 0)
-# @param string $size_type Standard slide size type. (optional)
-# @param string $scale_type Standard slide scale type. (optional, default to 0)
+# @param string $storage Document storage. (optional)
 {
     my $params = {
     'name' => {
@@ -23637,9 +34980,19 @@ sub put_slides_slide_properties {
         description => 'Document name.',
         required => '1',
     },
+    'dto' => {
+        data_type => 'SlideProperties',
+        description => 'The view properties data.',
+        required => '1',
+    },
     'password' => {
         data_type => 'string',
         description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
         required => '0',
     },
     'storage' => {
@@ -23647,10 +35000,40 @@ sub put_slides_slide_properties {
         description => 'Document storage.',
         required => '0',
     },
-    'folder' => {
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_slide_properties' } = { 
+    	summary => 'Update presentation slide properties.',
+        params => $params,
+        returns => 'SlideProperties',
+        };
+}
+# @return SlideProperties
+#
+sub put_slides_slide_properties {
+    warnings::warnif("deprecated", "put_slides_slide_properties is deprecated, use set_slide_properties instead");
+  
+    return set_slide_properties(@_);
+}
+
+#
+# put_slides_slide_size
+#
+# Set slide size for a presentation.
+# 
+# @param string $name Document name. (required)
+# @param int $width Slide width. (optional, default to 0)
+# @param int $height Slide height. (optional, default to 0)
+# @param string $size_type Standard slide size type. (optional)
+# @param string $scale_type Standard slide scale type. (optional, default to 0)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
         data_type => 'string',
-        description => 'Document folder.',
-        required => '0',
+        description => 'Document name.',
+        required => '1',
     },
     'width' => {
         data_type => 'int',
@@ -23670,6 +35053,21 @@ sub put_slides_slide_properties {
     'scale_type' => {
         data_type => 'string',
         description => 'Standard slide scale type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
         required => '0',
     },
     };
@@ -23705,16 +35103,6 @@ sub put_slides_slide_size {
     $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
 
     # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
     if (exists $args{'width'} && defined $args{'width'}) {
         $query_params->{'width'} = $self->{api_client}->to_query_value($args{'width'});
     }
@@ -23732,6 +35120,16 @@ sub put_slides_slide_size {
     # query params
     if (exists $args{'scale_type'} && defined $args{'scale_type'}) {
         $query_params->{'scaleType'} = $self->{api_client}->to_query_value($args{'scale_type'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # header params
@@ -23760,7 +35158,7 @@ sub put_slides_slide_size {
 }
 
 #
-# put_slides_view_properties
+# set_view_properties
 #
 # Update presentation document properties.
 # 
@@ -23797,7 +35195,7 @@ sub put_slides_slide_size {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_slides_view_properties' } = { 
+    __PACKAGE__->method_documentation->{ 'set_view_properties' } = { 
     	summary => 'Update presentation document properties.',
         params => $params,
         returns => 'ViewProperties',
@@ -23805,7 +35203,7 @@ sub put_slides_slide_size {
 }
 # @return ViewProperties
 #
-sub put_slides_view_properties {
+sub set_view_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -23874,7 +35272,59 @@ sub put_slides_view_properties {
 }
 
 #
-# put_subshape_save_as
+# put_slides_view_properties
+#
+# Update presentation document properties.
+# 
+# @param string $name Document name. (required)
+# @param ViewProperties $dto The view properties data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ViewProperties',
+        description => 'The view properties data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slides_view_properties' } = { 
+    	summary => 'Update presentation document properties.',
+        params => $params,
+        returns => 'ViewProperties',
+        };
+}
+# @return ViewProperties
+#
+sub put_slides_view_properties {
+    warnings::warnif("deprecated", "put_slides_view_properties is deprecated, use set_view_properties instead");
+  
+    return set_view_properties(@_);
+}
+
+#
+# save_subshape
 #
 # Render shape to specified picture format.
 # 
@@ -23885,12 +35335,12 @@ sub put_slides_view_properties {
 # @param string $format Export picture format. (required)
 # @param string $out_path Output path. (required)
 # @param IShapeExportOptions $options export options (optional)
-# @param string $password Document password. (optional)
-# @param string $folder Presentation folder. (optional)
-# @param string $storage Presentation storage. (optional)
 # @param double $scale_x X scale ratio. (optional, default to 0.0)
 # @param double $scale_y Y scale ratio. (optional, default to 0.0)
 # @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
 # @param string $fonts_folder Fonts folder. (optional)
 {
     my $params = {
@@ -23929,21 +35379,6 @@ sub put_slides_view_properties {
         description => 'export options',
         required => '0',
     },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Presentation folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Presentation storage.',
-        required => '0',
-    },
     'scale_x' => {
         data_type => 'double',
         description => 'X scale ratio.',
@@ -23959,13 +35394,28 @@ sub put_slides_view_properties {
         description => 'Shape thumbnail bounds type.',
         required => '0',
     },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
     'fonts_folder' => {
         data_type => 'string',
         description => 'Fonts folder.',
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_subshape_save_as' } = { 
+    __PACKAGE__->method_documentation->{ 'save_subshape' } = { 
     	summary => 'Render shape to specified picture format.',
         params => $params,
         returns => undef,
@@ -23973,7 +35423,7 @@ sub put_slides_view_properties {
 }
 # @return void
 #
-sub put_subshape_save_as {
+sub save_subshape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -24027,16 +35477,6 @@ sub put_subshape_save_as {
     }
 
     # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
     if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
         $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
     }
@@ -24049,6 +35489,16 @@ sub put_subshape_save_as {
     # query params
     if (exists $args{'bounds'} && defined $args{'bounds'}) {
         $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
     }
 
     # query params
@@ -24111,7 +35561,113 @@ sub put_subshape_save_as {
 }
 
 #
-# put_update_notes_slide
+# put_subshape_save_as
+#
+# Render shape to specified picture format.
+# 
+# @param string $name Presentation name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path (for smart art and group shapes). (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param string $out_path Output path. (required)
+# @param IShapeExportOptions $options export options (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Presentation name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path (for smart art and group shapes).',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Output path.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'IShapeExportOptions',
+        description => 'export options',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_subshape_save_as' } = { 
+    	summary => 'Render shape to specified picture format.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub put_subshape_save_as {
+    warnings::warnif("deprecated", "put_subshape_save_as is deprecated, use save_subshape instead");
+  
+    return save_subshape(@_);
+}
+
+#
+# update_notes_slide
 #
 # Update notes slide properties.
 # 
@@ -24154,7 +35710,7 @@ sub put_subshape_save_as {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_update_notes_slide' } = { 
+    __PACKAGE__->method_documentation->{ 'update_notes_slide' } = { 
     	summary => 'Update notes slide properties.',
         params => $params,
         returns => 'NotesSlide',
@@ -24162,7 +35718,7 @@ sub put_subshape_save_as {
 }
 # @return NotesSlide
 #
-sub put_update_notes_slide {
+sub update_notes_slide {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -24243,7 +35799,65 @@ sub put_update_notes_slide {
 }
 
 #
-# put_update_notes_slide_shape
+# put_update_notes_slide
+#
+# Update notes slide properties.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param NotesSlide $dto A NotesSlide object with notes slide data. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'NotesSlide',
+        description => 'A NotesSlide object with notes slide data.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_update_notes_slide' } = { 
+    	summary => 'Update notes slide properties.',
+        params => $params,
+        returns => 'NotesSlide',
+        };
+}
+# @return NotesSlide
+#
+sub put_update_notes_slide {
+    warnings::warnif("deprecated", "put_update_notes_slide is deprecated, use update_notes_slide instead");
+  
+    return update_notes_slide(@_);
+}
+
+#
+# update_notes_slide_shape
 #
 # Update shape properties.
 # 
@@ -24292,7 +35906,7 @@ sub put_update_notes_slide {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_update_notes_slide_shape' } = { 
+    __PACKAGE__->method_documentation->{ 'update_notes_slide_shape' } = { 
     	summary => 'Update shape properties.',
         params => $params,
         returns => 'ShapeBase',
@@ -24300,7 +35914,7 @@ sub put_update_notes_slide {
 }
 # @return ShapeBase
 #
-sub put_update_notes_slide_shape {
+sub update_notes_slide_shape {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -24393,7 +36007,71 @@ sub put_update_notes_slide_shape {
 }
 
 #
-# put_update_notes_slide_shape_paragraph
+# put_update_notes_slide_shape
+#
+# Update shape properties.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param ShapeBase $dto Shape DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_update_notes_slide_shape' } = { 
+    	summary => 'Update shape properties.',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub put_update_notes_slide_shape {
+    warnings::warnif("deprecated", "put_update_notes_slide_shape is deprecated, use update_notes_slide_shape instead");
+  
+    return update_notes_slide_shape(@_);
+}
+
+#
+# update_notes_slide_paragraph
 #
 # Update paragraph properties.
 # 
@@ -24448,7 +36126,7 @@ sub put_update_notes_slide_shape {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_update_notes_slide_shape_paragraph' } = { 
+    __PACKAGE__->method_documentation->{ 'update_notes_slide_paragraph' } = { 
     	summary => 'Update paragraph properties.',
         params => $params,
         returns => 'Paragraph',
@@ -24456,7 +36134,7 @@ sub put_update_notes_slide_shape {
 }
 # @return Paragraph
 #
-sub put_update_notes_slide_shape_paragraph {
+sub update_notes_slide_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -24561,7 +36239,77 @@ sub put_update_notes_slide_shape_paragraph {
 }
 
 #
-# put_update_notes_slide_shape_portion
+# put_update_notes_slide_shape_paragraph
+#
+# Update paragraph properties.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param Paragraph $dto Paragraph DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Paragraph',
+        description => 'Paragraph DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_update_notes_slide_shape_paragraph' } = { 
+    	summary => 'Update paragraph properties.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub put_update_notes_slide_shape_paragraph {
+    warnings::warnif("deprecated", "put_update_notes_slide_shape_paragraph is deprecated, use update_notes_slide_paragraph instead");
+  
+    return update_notes_slide_paragraph(@_);
+}
+
+#
+# update_notes_slide_portion
 #
 # Update portion properties.
 # 
@@ -24622,7 +36370,7 @@ sub put_update_notes_slide_shape_paragraph {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_update_notes_slide_shape_portion' } = { 
+    __PACKAGE__->method_documentation->{ 'update_notes_slide_portion' } = { 
     	summary => 'Update portion properties.',
         params => $params,
         returns => 'Portion',
@@ -24630,7 +36378,7 @@ sub put_update_notes_slide_shape_paragraph {
 }
 # @return Portion
 #
-sub put_update_notes_slide_shape_portion {
+sub update_notes_slide_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
@@ -24744,6 +36492,82 @@ sub put_update_notes_slide_shape_portion {
     }
     my $_response_object = $self->{api_client}->deserialize('Portion', $response);
     return $_response_object;
+}
+
+#
+# put_update_notes_slide_shape_portion
+#
+# Update portion properties.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param Portion $dto Portion DTO. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Portion',
+        description => 'Portion DTO.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_update_notes_slide_shape_portion' } = { 
+    	summary => 'Update portion properties.',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub put_update_notes_slide_shape_portion {
+    warnings::warnif("deprecated", "put_update_notes_slide_shape_portion is deprecated, use update_notes_slide_portion instead");
+  
+    return update_notes_slide_portion(@_);
 }
 
 #

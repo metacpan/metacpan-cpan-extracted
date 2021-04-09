@@ -184,18 +184,27 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'source' => {
+    	datatype => 'string',
+    	base_name => 'Source',
+    	description => 'Merge (request or storage). ',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
     'path' => 'string',
     'password' => 'string',
-    'slides' => 'ARRAY[int]'
+    'slides' => 'ARRAY[int]',
+    'source' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
     'path' => 'Path',
     'password' => 'Password',
-    'slides' => 'Slides'
+    'slides' => 'Slides',
+    'source' => 'Source'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

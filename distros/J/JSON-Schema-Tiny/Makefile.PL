@@ -100,6 +100,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Dumper" => 0,
     "Email::Address::XS" => 0,
     "File::Spec" => 0,
     "List::Util" => "1.50",
@@ -114,7 +115,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -123,6 +124,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "B" => 0,
   "Carp" => 0,
+  "Data::Dumper" => 0,
   "Email::Address::XS" => 0,
   "Exporter" => "5.57",
   "Feature::Compat::Try" => 0,

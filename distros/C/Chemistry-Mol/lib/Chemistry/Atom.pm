@@ -1,7 +1,7 @@
 package Chemistry::Atom;
 
-$VERSION = '0.37';
-# $Id: Atom.pm,v 1.44 2009/05/10 19:37:58 itubert Exp $
+our $VERSION = '0.38'; # VERSION
+# $Id$
 
 =head1 NAME
 
@@ -839,17 +839,15 @@ sub printf {
 
 =back
 
-=head1 VERSION
+=head1 SOURCE CODE REPOSITORY
 
-0.37
+L<https://github.com/perlmol/Chemistry-Mol>
 
 =head1 SEE ALSO
 
 L<Chemistry::Mol>, L<Chemistry::Bond>, 
 L<Math::VectorReal>, L<Chemistry::Tutorial>,
 L<Chemistry::InternalCoords>
-
-The PerlMol website L<http://www.perlmol.org/>
 
 =head1 AUTHOR
 

@@ -1,5 +1,8 @@
 Revision history for perl distribution CellBIS-SQL-Abstract
 
+1.5       2021-04-09 05:29:56+08:00 Asia/Makassar
+          - fix missing Mojo::SQLite on Makefile.PL
+
 1.4       2021-04-09 01:02:00+08:00 Asia/Makassar
           - fix missing Mojo::SQLite #4 - eserte
 

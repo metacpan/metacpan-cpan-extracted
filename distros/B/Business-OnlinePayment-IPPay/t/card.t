@@ -66,6 +66,7 @@ my $voidable_amount = 0;
     authorization => qr/^$/,
     avs_code      => '',           # so rather pointless :\
     cvv2_response => '',           # ...
+    order_number  => qr/^$/,
   );
 }
 
@@ -90,10 +91,7 @@ my $voidable_amount = 0;
 }
 
 # authorization void test
-SKIP: {
-  #XXX void is returning "The transaction type is not a valid transaction type."
-  # with current IPPay.  did something change about the API, is this broken?
-  skip 'Reverse Authorization not currently working (against test account?)', 7;
+{
 
   my $tx = Business::OnlinePayment->new("IPPay", %opt);
   $tx->content(%content, action => 'authorization only',  amount => '3.00' );
@@ -110,10 +108,10 @@ SKIP: {
       desc          => "reverse authorization",
       is_success    => 1,
       result_code   => '000',
-      error_message => 'APPROVED',
+      error_message => 'VOID SUCCESSFUL',
       authorization => qr/TEST\d{2}/,
       avs_code      => '',          # so rather pointless :\
-      cvv2_response => '',          # ...
+      cvv2_response => 'P',          # ...
     );
   }
   else {
@@ -122,7 +120,7 @@ SKIP: {
 }
 
 # post authorization test
-SKIP: {
+{
   my $tx = new Business::OnlinePayment( "IPPay", %opt );
   $tx->content( %content, 'action'       => "post authorization", 
                           'amount'       => $postable_amount,    # not required
@@ -141,7 +139,7 @@ SKIP: {
 }
 
 # void test
-SKIP: {
+{
   my $tx = new Business::OnlinePayment( "IPPay", %opt );
   $tx->content( %content, 'action' => "Void",
                           'order_number' => $voidable,
@@ -152,15 +150,15 @@ SKIP: {
     desc          => "void",
     is_success    => 1,
     result_code   => '000',
-    error_message => 'VOID PROCESSED',
-    authorization => qr/^$voidable_auth$/,
+    error_message => 'VOID SUCCESSFUL',
+    authorization => qr/TEST\d{2}/,
     avs_code      => '',
-    cvv2_response => '',
+    cvv2_response => 'P',
     );
 }
 
 # credit test
-SKIP: {
+{
   my $tx = new Business::OnlinePayment( "IPPay", %opt );
   $tx->content( %content, 'action' => "credit");
   tx_check(
@@ -168,10 +166,10 @@ SKIP: {
     desc          => "credit",
     is_success    => 1,
     result_code   => '000',
-    error_message => 'RETURN ACCEPTED',
-    authorization => qr/\d{6}/,
+    error_message => 'APPROVED',
+    authorization => qr/TEST\d{2}/,
     avs_code      => '',
-    cvv2_response => '',
+    cvv2_response => 'P',
     );
 }
 
@@ -183,13 +181,14 @@ sub tx_check {
     $tx->test_transaction(1);
     $tx->submit;
 
-    is( $tx->is_success,    $o{is_success},    "$o{desc}: " . tx_info($tx) );
-    is( $tx->result_code,   $o{result_code},   "result_code(): RESULT" );
-    is( $tx->error_message, $o{error_message}, "error_message() / RESPMSG" );
-    like( $tx->authorization, $o{authorization}, "authorization() / AUTHCODE" );
-    is( $tx->avs_code,  $o{avs_code},  "avs_code() / AVSADDR and AVSZIP" );
-    is( $tx->cvv2_response, $o{cvv2_response}, "cvv2_response() / CVV2MATCH" );
-    like( $tx->order_number, qr/^\w{18}/, "order_number() / PNREF" );
+    is(   $tx->is_success,    $o{is_success},    "$o{desc}: ". tx_info($tx)  );
+    is(   $tx->result_code,   $o{result_code},   "$o{desc}: result_code()"   );
+    is(   $tx->error_message, $o{error_message}, "$o{desc}: error_message()" );
+    like( $tx->authorization, $o{authorization}, "$o{desc}: authorization()" );
+    is(   $tx->avs_code,      $o{avs_code},      "$o{desc}: avs_code()"      );
+    is(   $tx->cvv2_response, $o{cvv2_response}, "$o{desc}: cvv2_response()" );
+    like( $tx->order_number,  $o{order_number}
+                                || qr/^\w{18}/,  "$o{desc}: order_number()"  );
 }
 
 sub tx_info {

@@ -18,8 +18,14 @@ my @tests = (
   { schema => false, result => false },
   { schema => true, result => true },
   { schema => {}, result => true },
+  { schema => 0, result => false },
+  { schema => 1, result => false },
+  { schema => \0, result => false },
+  { schema => \1, result => false },
 );
 
+BOOLEAN_TESTS:
+note '$MOJO_BOOLEANS = '.(0+!!$JSON::Schema::Tiny::MOJO_BOOLEANS);
 foreach my $test (@tests) {
   my $data = 'hello';
   is(
@@ -43,6 +49,12 @@ foreach my $test (@tests) {
   );
 }
 
+if (not $JSON::Schema::Tiny::MOJO_BOOLEANS) {
+  # schemas still do not accept mojo booleans
+  $JSON::Schema::Tiny::MOJO_BOOLEANS = 1;
+  goto BOOLEAN_TESTS;
+}
+
 cmp_deeply(
   evaluate('hello', []),
   {
@@ -55,7 +67,22 @@ cmp_deeply(
       },
     ],
   },
-  'invalid schema type results in error',
+  'array for schema results in error',
+);
+
+cmp_deeply(
+  evaluate('hello', \0),
+  {
+    valid => false,
+    errors => [
+      {
+        instanceLocation => '',
+        keywordLocation => '',
+        error => 'invalid schema type: reference to SCALAR',
+      },
+    ],
+  },
+  'scalarref for schema results in error, even when $MOJO_BOOLEANS is true',
 );
 
 done_testing;

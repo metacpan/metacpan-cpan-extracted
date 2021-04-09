@@ -2,7 +2,7 @@ package Data::LnArray;
 use strict;
 no warnings;
 use base 'Import::Export';
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %EX = (
         arr => [qw/all/],
@@ -49,7 +49,7 @@ sub isArray {
 	my ($self) = shift;
 
 	my ($data) = @_;
-	my $ref = ref $data;
+	my $ref = ref $data || "";
 	$ref eq 'ARRAY' ? \1 : \0;
 }
 
@@ -92,12 +92,7 @@ sub copyWithin {
 	}
 
 	while ( $count > 0 ) {
-		if ( $self->[$from] ) {
-			$self->[$to] = $self->[$from];
-		}
-		else {
-			delete $self->[$to];    # slice
-		}
+		$self->[$to] = $self->[$from];
 		$from += $direction;
 		$to   += $direction;
 		$count--;
@@ -385,7 +380,7 @@ Data::LnArray - The great new Data::LnArray!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

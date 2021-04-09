@@ -26,6 +26,7 @@ use Exception::Class (
 );
 
 use Log::Log4perl qw( get_logger );
+use Log::Log4perl::Level;
 
 my %TYPE_CLASSES = (
     condition_error     => 'Workflow::Exception::Condition',
@@ -34,8 +35,16 @@ my %TYPE_CLASSES = (
     validation_error    => 'Workflow::Exception::Validation',
     workflow_error      => 'Workflow::Exception',
 );
+my %TYPE_LOGGING = (
+    condition_error     => $TRACE,
+    configuration_error => $ERROR,
+    persist_error       => $ERROR,
+    validation_error    => $INFO,
+    workflow_error      => $ERROR,
+);
 
-$Workflow::Exception::VERSION   = '1.52';
+
+$Workflow::Exception::VERSION   = '1.53';
 @Workflow::Exception::ISA       = qw( Exporter Exception::Class::Base );
 @Workflow::Exception::EXPORT_OK = keys %TYPE_CLASSES;
 
@@ -45,15 +54,15 @@ sub _mythrow {
     my ( $type, @items ) = @_;
 
     my ( $msg, %params ) = _massage(@items);
-    my $log = get_logger();
+    my $caller = caller;
+    my $log = get_logger($caller); # log as if part of the package of the caller
     my ( $pkg, $line ) = (caller)[ 0, 2 ];
     my ( $prev_pkg, $prev_line ) = ( caller 1 )[ 0, 2 ];
 
     # Do not log condition errors
-    if ($type ne 'condition_error') {
-        $log->error( "$type exception thrown from [$pkg: $line; before: ",
-            "$prev_pkg: $prev_line]: $msg" );
-    }
+    $log->log( $TYPE_LOGGING{$type},
+               "$type exception thrown from [$pkg: $line; before: ",
+               "$prev_pkg: $prev_line]: $msg" );
 
     goto &Exception::Class::Base::throw(
         $TYPE_CLASSES{$type},
@@ -104,6 +113,7 @@ sub _massage {
 
     my %params = ( ref $items[-1] eq 'HASH' ) ? %{ pop @items } : ();
     my $msg = join '', @items;
+    $msg =~ s/\\n/ /g; # don't log newlines as per Log4perl recommendations
     return ( $msg, %params );
 }
 
@@ -119,7 +129,7 @@ Workflow::Exception - Base class for workflow exceptions
 
 =head1 VERSION
 
-This documentation describes version 1.52 of this package
+This documentation describes version 1.53 of this package
 
 =head1 SYNOPSIS
 

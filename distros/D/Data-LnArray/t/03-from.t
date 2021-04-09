@@ -32,6 +32,9 @@ is($array[2], 4);
 is($array[3], 6);
 is($array[4], 8);
 
+eval { $array->from({}) };
+
+like($@, qr/currently cannot handle/);
 
 
 done_testing;

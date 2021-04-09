@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +18,14 @@ name: App-Iptables2Dot
 provides:
   App::Iptables2Dot:
     file: lib/App/Iptables2Dot.pm
-    version: v0.2.4
+    version: v0.2.5
 requires:
   Carp: '0'
   perl: v5.10.1
   version: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Iptables2Dot
   license: http://dev.perl.org/licenses/
-version: v0.2.4
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+  repository: https://github.com/matwei/perl-App-Iptables2Dot
+version: v0.2.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

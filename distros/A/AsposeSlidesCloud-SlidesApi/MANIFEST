@@ -127,6 +127,7 @@ lib/AsposeSlidesCloud/Object/ShapeBase.pm
 lib/AsposeSlidesCloud/Object/ShapeExportFormat.pm
 lib/AsposeSlidesCloud/Object/ShapeImageExportOptions.pm
 lib/AsposeSlidesCloud/Object/Shapes.pm
+lib/AsposeSlidesCloud/Object/ShapesAlignmentType.pm
 lib/AsposeSlidesCloud/Object/ShapeThumbnailBounds.pm
 lib/AsposeSlidesCloud/Object/SizeType.pm
 lib/AsposeSlidesCloud/Object/Slide.pm

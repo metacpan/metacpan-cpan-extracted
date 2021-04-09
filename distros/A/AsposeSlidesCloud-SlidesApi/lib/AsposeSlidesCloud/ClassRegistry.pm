@@ -187,6 +187,7 @@ my %determiners = (
     'ShapeExportFormat' => {  },
     'ShapeImageExportOptions' => {  },
     'ShapeThumbnailBounds' => {  },
+    'ShapesAlignmentType' => {  },
     'SizeType' => {  },
     'SlideComment' => {  },
     'SlideExportFormat' => {  },

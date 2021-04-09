@@ -1,5 +1,12 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.19.0 2021-04-09T01:57:53Z
+
+    - Exit with status 0 unless error occured.
+    - Add --by alias for --unit option to sdif/cdif.
+    - Add sdif friendly option --sdif to cdif.
+    - Add --tabstyle option to sdif.
+
 4.18.2 2021-01-13T02:07:20Z
 
     - Deprecate cdif options: -B, --char, --visible-cr, -visible-esc

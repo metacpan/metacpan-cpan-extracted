@@ -1,6 +1,7 @@
 package Chemistry::Bond;
-$VERSION = '0.37';
-# $Id: Bond.pm,v 1.36 2009/05/10 19:37:58 itubert Exp $
+
+our $VERSION = '0.38'; # VERSION
+# $Id$
 
 =head1 NAME
 
@@ -218,15 +219,13 @@ sub parent {
 
 =back
 
-=head1 VERSION
+=head1 SOURCE CODE REPOSITORY
 
-0.37
+L<https://github.com/perlmol/Chemistry-Mol>
 
 =head1 SEE ALSO
 
 L<Chemistry::Mol>, L<Chemistry::Atom>, L<Chemistry::Tutorial>
-
-The PerlMol website L<http://www.perlmol.org/>
 
 =head1 AUTHOR
 

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Molecule object toolkit",
+   "author" : [
+      "Ivan Tubert-Brohman <itub@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Chemistry-Mol",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Chemistry::InternalCoords" : "0",
+            "Chemistry::Isotope" : "0",
+            "Compress::Zlib" : "0"
+         },
+         "requires" : {
+            "IO::String" : "0",
+            "Math::VectorReal" : "1.0",
+            "Scalar::Util" : "1.01",
+            "Text::Balanced" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://search.cpan.org/dist/Chemistry-Mol",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perlmol/chemistry-mol.git",
+         "web" : "https://github.com/perlmol/chemistry-mol"
+      }
+   },
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

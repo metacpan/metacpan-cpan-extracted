@@ -7,7 +7,7 @@ use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( configuration_error );
 use English qw( -no_match_vars );
 
-$Workflow::Action::InputField::VERSION = '1.52';
+$Workflow::Action::InputField::VERSION = '1.53';
 
 my @PROPS = qw( name label description type requirement
     source_class source_list class );
@@ -17,7 +17,7 @@ my %INCLUDED = ();
 
 sub new {
     my ( $class, $params ) = @_;
-    my $log = get_logger();
+    my $log = get_logger($class);
     $log->debug("Instantiating new field '$params->{name}'")
         if $params->{name};
 
@@ -121,7 +121,7 @@ Workflow::Action::InputField - Metadata about information required by an Action
 
 =head1 VERSION
 
-This documentation describes version 1.52 of this package
+This documentation describes version 1.53 of this package
 
 =head1 SYNOPSIS
 

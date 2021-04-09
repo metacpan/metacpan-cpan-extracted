@@ -16,13 +16,14 @@ meta-spec:
 name: CellBIS-SQL-Abstract
 requires:
   Hash::MultiValue: '0'
+  Mojo::SQLite: '0'
   Mojolicious: '0'
   Scalar::Util: '0'
 resources:
   bugtracker: https://github.com/CellBIS/CellBIS-SQL-Abstract/issues
   homepage: https://metacpan.org/pod/CellBIS::SQL::Abstract
   repository: git://github.com/CellBIS/CellBIS-SQL-Abstract.git
-version: '1.4'
+version: '1.5'
 x_generated_by_perl: v5.33.5
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0

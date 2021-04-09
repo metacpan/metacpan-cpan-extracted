@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Tiny; # git description: a043fb2
+package JSON::Schema::Tiny; # git description: v0.001-16-g0881487
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema, minimally
 # KEYWORDS: JSON Schema data validation structure specification tiny
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use 5.016;  # for the unicode_strings feature
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -30,6 +30,7 @@ our @EXPORT_OK = qw(evaluate);
 our $BOOLEAN_RESULT = 0;
 our $SHORT_CIRCUIT = 0;
 our $MAX_TRAVERSAL_DEPTH = 50;
+our $MOJO_BOOLEANS = 0;
 
 sub evaluate {
   my ($data, $schema) = @_;
@@ -74,7 +75,9 @@ sub evaluate {
 sub _eval {
   my ($data, $schema, $state) = @_;
 
-  $state = { %$state };     # changes to $state should only affect subschemas, not parents
+  # do not propagate upwards changes to depth, traversed paths,
+  # but additions to errors are by reference and will be retained
+  $state = { %$state };
   delete $state->{keyword};
 
   abort($state, 'EXCEPTION: maximum evaluation depth exceeded')
@@ -122,7 +125,7 @@ sub _eval {
     # CORE KEYWORDS
     qw($id $anchor $recursiveAnchor $recursiveRef $vocabulary $dynamicAnchor $dynamicRef definitions),
     # APPLICATOR KEYWORDS
-    qw(dependencies unevaluatedItems unevaluatedProperties),
+    qw(dependencies prefixItems unevaluatedItems unevaluatedProperties),
   ) {
     next if not exists $schema->{$keyword};
     abort({ %$state, keyword => $keyword }, 'keyword not supported');
@@ -157,7 +160,6 @@ sub _eval_keyword_ref {
   my $fragment = $uri->fragment;
 
   my $subschema = Mojo::JSON::Pointer->new($state->{root_schema})->get($fragment);
-  # thsi is not a runtime exception because all $refs must be local
   abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not defined $subschema;
 
   return _eval($data, $subschema,
@@ -185,14 +187,17 @@ sub _eval_keyword_type {
     abort($state, '"type" values are not unique') if not is_elements_unique($schema->{type});
 
     foreach my $type (@{$schema->{type}}) {
-      return 1 if is_type($type, $data);
+      return 1 if is_type($type, $data)
+        or ($type eq 'boolean' and $MOJO_BOOLEANS and is_type('reference to SCALAR', $data));
     }
     return E($state, 'wrong type (expected one of %s)', join(', ', @{$schema->{type}}));
   }
   else {
     abort($state, 'unrecognized type "%s"', $schema->{type}//'<null>')
       if not any { ($schema->{type}//'') eq $_ } qw(null boolean object array string number integer);
-    return 1 if is_type($schema->{type}, $data);
+
+    return 1 if is_type($schema->{type}, $data)
+      or ($schema->{type} eq 'boolean' and $MOJO_BOOLEANS and is_type('reference to SCALAR', $data));
     return E($state, 'wrong type (expected %s)', $schema->{type});
   }
 }
@@ -204,17 +209,19 @@ sub _eval_keyword_enum {
   abort($state, '"enum" values are not unique') if not is_elements_unique($schema->{enum});
 
   my @s; my $idx = 0;
-  return 1 if any { is_equal($data, $_, $s[$idx++] = {}) } @{$schema->{enum}};
+  return 1
+    if any { is_equal($data, $_, $s[$idx++] = { $MOJO_BOOLEANS ? (lhs_mojo_bool => 1) : () }) }
+      @{$schema->{enum}};
 
   return E($state, 'value does not match'
     .(!(grep $_->{path}, @s) ? ''
-      : ' (differences start '.join(', ', map 'from #'.$_.' at "'.$s[$_]->{path}.'"', 0..$#s).')'));
+      : ' (differences start '.join(', ', map 'from item #'.$_.' at "'.$s[$_]->{path}.'"', 0..$#s).')'));
 }
 
 sub _eval_keyword_const {
   my ($data, $schema, $state) = @_;
 
-  return 1 if is_equal($data, $schema->{const}, my $s = {});
+  return 1 if is_equal($data, $schema->{const}, my $s = { $MOJO_BOOLEANS ? (lhs_mojo_bool => 1) : () });
   return E($state, 'value does not match'
     .($s->{path} ? ' (differences start at "'.$s->{path}.'")' : ''));
 }
@@ -777,6 +784,10 @@ sub is_type {
     }
   }
 
+  if ($type eq 'reference to SCALAR') {
+    return ref($value) eq 'SCALAR';
+  }
+
   croak sprintf('unknown type "%s"', $type);
 }
 
@@ -790,7 +801,10 @@ sub get_type {
   return 'array' if is_plain_arrayref($value);
   return 'boolean' if is_bool($value);
 
-  croak sprintf('unsupported reference type %s', ref $value) if is_ref($value);
+  if (my $ref = ref($value)) {
+    return 'reference to SCALAR' if $ref eq 'SCALAR';
+    croak sprintf('unsupported reference type %s', $ref);
+  }
 
   my $flags = B::svref_2object(\$value)->FLAGS;
   return 'string' if $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
@@ -802,11 +816,16 @@ sub get_type {
 
 # compares two arbitrary data payloads for equality, as per
 # https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.4.2.3
+# if provided with a state hashref, any differences are recorded within
 sub is_equal {
   my ($x, $y, $state) = @_;
   $state->{path} //= '';
 
   my @types = map get_type($_), $x, $y;
+
+  return 1 if $state->{lhs_mojo_bool}
+    and $types[0] eq 'reference to SCALAR' and $types[1] eq 'boolean' and not ($$x xor $y);
+
   return 0 if $types[0] ne $types[1];
   return 1 if $types[0] eq 'null';
   return $x eq $y if $types[0] eq 'string';
@@ -947,7 +966,7 @@ JSON::Schema::Tiny - Validate data against a schema, minimally
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -958,7 +977,7 @@ version 0.001
     type => "object",
     properties => { hello => { type => "integer" } },
   };
-  my $success = evaluate($data, $schema); # true
+  my $result = evaluate($data, $schema); # { valid => true }
 
 =head1 DESCRIPTION
 
@@ -983,7 +1002,7 @@ allows: null, boolean, string, number, object, array. (See L</TYPES> below.)
 The schema must represent a JSON Schema that respects the Draft 2019-09 meta-schema at
 L<https://json-schema.org/draft/2019-09/schema>, in the form of a Perl data structure, such as what is returned from a JSON decode operation.
 
-With default configuration values, the return value is a hashref indicating the validation success
+With default configuration settings, the return value is a hashref indicating the validation success
 or failure, plus (when validation failed), an arrayref of error strings in standard JSON Schema
 format. For example:
 
@@ -1037,6 +1056,15 @@ The maximum number of levels deep a schema traversal may go, before evaluation i
 protect against accidental infinite recursion, such as from two subschemas that each reference each
 other, or badly-written schemas that could be optimized. Defaults to 50.
 
+=head2 C<$MOJO_BOOLEANS>
+
+When true, any type that is expected to be a boolean B<in the instance data> may also be expressed as
+scalar references to a number, e.g. C<\0> or C<\1> (which are serialized as booleans by L<Mojo::JSON>).
+(Warning: scalar references and real booleans should not be mixed in data being checked by the
+C<uniqueItems> keyword.)
+
+Defaults to false.
+
 =head1 UNSUPPORTED JSON-SCHEMA FEATURES
 
 Unlike L<JSON::Schema::Draft201909>, this is not a complete implementation of the JSON Schema
@@ -1051,7 +1079,7 @@ any output format other than C<flag> (when C<$BOOLEAN_RESULT> is true) or C<basi
 
 =item *
 
-annotations in successful evaluation results (see L<Annotations|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.7.7>).
+L<annotations|https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.7.7> in successful evaluation results
 
 =item *
 
@@ -1094,6 +1122,9 @@ C<format>
 
 =back
 
+For a more full-featured implementation of the JSON Schema specification, see
+L<JSON::Schema::Draft201909>.
+
 =head1 LIMITATIONS
 
 =head2 Types
@@ -1109,8 +1140,7 @@ For more information, see L<Cpanel::JSON::XS/MAPPING>.
 
 =head1 SECURITY CONSIDERATIONS
 
-The C<pattern> and C<patternProperties> keywords, and the C<regex> format validator,
-evaluate regular expressions from the schema.
+The C<pattern> and C<patternProperties> keywords evaluate regular expressions from the schema.
 No effort is taken (at this time) to sanitize the regular expressions for embedded code or
 potentially pathological constructs that may pose a security risk, either via denial of service
 or by allowing exposure to the internals of your application. B<DO NOT USE SCHEMAS FROM UNTRUSTED
@@ -1122,11 +1152,11 @@ SOURCES.>
 
 =item *
 
-L<JSON::Schema::Draft201909>: a more spec-compliant JSON Schema evaluator
+L<JSON::Schema::Draft201909>: a more specification-compliant JSON Schema evaluator
 
 =item *
 
-L<Test::JSON::Schema::Acceptance>
+L<Test::JSON::Schema::Acceptance>: contains the official JSON Schema test suite
 
 =item *
 

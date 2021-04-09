@@ -232,7 +232,7 @@ qx.Class.define("callbackery.ui.MsgBox", {
          */
         warn : function(title, text, html, icons, size) {
             this.__setIcons(icons);
-            this.__show_btn(['cancel','apply'], icons.button);
+            this.__show_btn(['cancel','apply'], icons);
             this.__open(title, text, html, size);
             return this;
         },
@@ -248,7 +248,7 @@ qx.Class.define("callbackery.ui.MsgBox", {
          */
         yesno : function(title, text, html, icons, size) {
             this.__setIcons(icons);
-            this.__show_btn(['yes','no'], icons.button);
+            this.__show_btn(['yes','no'], icons);
             this.__open(title, text, html, size);
             return this;
         }

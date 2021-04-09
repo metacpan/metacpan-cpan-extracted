@@ -1,6 +1,8 @@
 package Chemistry::Obj;
-$VERSION = 0.37;
-# $Id: Obj.pm,v 1.30 2009/05/10 19:37:58 itubert Exp $
+
+our $VERSION = '0.38'; # VERSION
+# $Id$
+
 use 5.006;
 
 use strict;
@@ -241,15 +243,13 @@ sub use {
 
 1;
 
-=head1 VERSION
+=head1 SOURCE CODE REPOSITORY
 
-0.37
+L<https://github.com/perlmol/Chemistry-Mol>
 
 =head1 SEE ALSO
 
 L<Chemistry::Atom>, L<Chemistry::Bond>, L<Chemistry::Mol>
-
-The PerlMol website L<http://www.perlmol.org/>
 
 =head1 AUTHOR
 

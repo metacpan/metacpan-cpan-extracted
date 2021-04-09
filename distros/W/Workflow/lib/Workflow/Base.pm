@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use base qw( Class::Accessor );
 use Log::Log4perl;
-$Workflow::Base::VERSION = '1.52';
+$Workflow::Base::VERSION = '1.53';
 
 sub new {
     my ( $class, @params ) = @_;
@@ -20,7 +20,11 @@ sub new {
     return $self;
 }
 
-sub init {return}
+sub init {return};
+
+sub log {
+    return ( $_[0]->{log} ||=  Log::Log4perl->get_logger(ref $_[0]) );
+}
 
 sub param {
     my ( $self, $name, $value ) = @_;
@@ -98,7 +102,7 @@ Workflow::Base - Base class with constructor
 
 =head1 VERSION
 
-This documentation describes version 1.52 of this package
+This documentation describes version 1.53 of this package
 
 =head1 SYNOPSIS
 
@@ -127,6 +131,10 @@ Returns: new object
 
 Subclasses may implement to do initialization. The C<@params> are
 whatever is passed into C<new()>. Nothing need be returned.
+
+=head3 log()
+
+Returns the logger for the instance, based on the instance class.
 
 =head3 param( [ $name, $value ] )
 

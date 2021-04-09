@@ -4,7 +4,7 @@ package App::cdif::default;
 
 __DATA__
 
-option --nop $<move(0,0)>
+option --nop $<ignore>
 
 option --autocolor -Mtermcolor::bg(light=--light,dark=--dark)
 option default --autocolor

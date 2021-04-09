@@ -64,6 +64,7 @@ lib/LINE/Bot/API/Response/AudienceGroupForClickRetargeting.pm
 lib/LINE/Bot/API/Response/AudienceGroupForImpressionRetargeting.pm
 lib/LINE/Bot/API/Response/AudienceGroupForUploadingUserId.pm
 lib/LINE/Bot/API/Response/AudienceMultipleData.pm
+lib/LINE/Bot/API/Response/BotInfo.pm
 lib/LINE/Bot/API/Response/Common.pm
 lib/LINE/Bot/API/Response/Content.pm
 lib/LINE/Bot/API/Response/Count.pm
@@ -84,6 +85,8 @@ lib/LINE/Bot/API/Response/TargetLimit.pm
 lib/LINE/Bot/API/Response/Token.pm
 lib/LINE/Bot/API/Response/TotalUsage.pm
 lib/LINE/Bot/API/Response/UserInteractionStatistics.pm
+lib/LINE/Bot/API/Response/WebhookInformation.pm
+lib/LINE/Bot/API/Response/WebhookTest.pm
 lib/LINE/Bot/API/Types.pm
 lib/LINE/Bot/Audience.pm
 lib/LINE/Bot/Message/Narrowcast.pm
@@ -133,6 +136,10 @@ t/52_rich_menu.t
 t/52_rich_menu_response.t
 t/52_upload_rich_menu_image.t
 t/53-retry_key.t
+t/54-get_bot_info.t
+t/55-get-webhook-endpoint-information.t
+t/55-set-webhook-url.t
+t/55-test-webhook.t
 t/PR75-get-number-of-followers.t
 t/author-critic.t
 t/author-pod-syntax.t

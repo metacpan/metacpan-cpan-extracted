@@ -11,7 +11,7 @@ use Business::OnlinePayment::HTTPS;
 use vars qw($VERSION $DEBUG @ISA $me);
 
 @ISA = qw(Business::OnlinePayment::HTTPS);
-$VERSION = '0.09';
+$VERSION = '0.11';
 $VERSION = eval $VERSION; # modperlstyle: convert the string into a number
 
 $DEBUG = 0;
@@ -217,6 +217,7 @@ sub submit {
   }
   if ($self->test_transaction()) {
     $content{'login'} = 'TESTTERMINAL';
+    $self->server('testgtwy.ippay.com') if $self->server eq 'gtwy.ippay.com';
   }
   $self->content(%content);
 
@@ -359,7 +360,7 @@ sub submit {
                           BillingCountry      => \$country,
                           BillingPhone        => 'phone',
                           Email               => 'email',
-                          UserIPAddr          => 'customer_ip',
+                          UserIPAddress       => 'customer_ip',
                           UserHost            => 'UserHost',
                           UDField1            => 'UDField1',
                           UDField2            => 'UDField2',
@@ -377,11 +378,11 @@ sub submit {
                                 ENCODING    => 'us-ascii',
                               );
   $writer->xmlDecl();
-  $writer->startTag('JetPay');
+  $writer->startTag('ippay');
   foreach ( keys ( %req ) ) {
     $self->_xmlwrite($writer, $_, $req{$_});
   }
-  $writer->endTag('JetPay');
+  $writer->endTag('ippay');
   $writer->end();
 
   warn "$post_data\n" if $DEBUG > 1;
@@ -448,7 +449,8 @@ sub _xmlwrite {
   if ( $item eq 'ACH' ) {
     $att{'Type'} = $self->{_content}->{'account_type'}
       if $self->{_content}->{'account_type'}; #necessary so we don't pass empty?
-    $att{'SEC'}  = 'PPD';
+    $att{'SEC'}  = $self->{_content}->{'nacha_sec_code'}
+                 || ( $att{'Type'} =~ /business/i ? 'CCD' : 'PPD' );
   }
 
   $writer->startTag($item, %att);
@@ -588,7 +590,7 @@ from content(%content):
       BillingCountry      => 'country',           # forced to ISO-3166-alpha-3
       BillingPhone        => 'phone',
       Email               => 'email',
-      UserIPAddr          => 'customer_ip',
+      UserIPAddress        => 'customer_ip',
       UserHost            => 'UserHost',
       UDField1            => 'UDField1',
       UDField2            => 'UDField2',
@@ -606,14 +608,13 @@ from content(%content):
           Country             => 'ship_country',  # forced to ISO-3166-alpha-3
           Phone               => 'ship_phone',
 
-=head1 NOTE
-
 =head1 COMPATIBILITY
 
 Version 0.07 changes the server name and path for IPPay's late 2012 update.
 
-Business::OnlinePayment::IPPay uses IPPay XML Product Specifications version
-1.1.2.
+Business::OnlinePayment::IPPay implemented the IPPay XML Product Specifications
+Revision 1.1.2 (historically), updated in 2021 using revision 1-1-9.1
+(September 2018).
 
 See http://www.ippay.com/ for more information.
 
@@ -624,6 +625,15 @@ Original author: Jeff Finucane
 Current maintainer: Ivan Kohler <ivan-ippay@freeside.biz>
 
 Reverse Authorization patch from dougforpres
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 1999 Jason Kohles
+Copyright (c) 2002-2003 Ivan Kohler
+Copyright (c) 2008-2021 Freeside Internet Services, Inc.
+
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
 
 =head1 ADVERTISEMENT
 

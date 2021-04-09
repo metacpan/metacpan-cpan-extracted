@@ -1,5 +1,5 @@
-# version  : 2.06 - November 2020
-# author   : Thierry LE GALL 
+# version  : 2.08 - April 2021
+# author   : Thierry Le Gall
 # contact  : facila@gmx.fr
 
 # This program is free software: you can redistribute it and/or modify
@@ -21,7 +21,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.06';
+our $VERSION = '2.08';
 
 my @mask = qw ( 0.0.0.0
 128.0.0.0       192.0.0.0       224.0.0.0       240.0.0.0       248.0.0.0       252.0.0.0       254.0.0.0       255.0.0.0
@@ -289,7 +289,7 @@ sub local_list_1 {
        $mask =~ tr/ //d;
        push @$ref_out , "$ip $mask";
        $$ref_text .= sprintf $s_format , '1.' , ++$i , $ip , $mask , '' , '' }
-    return 99 if $i < 2 }
+    return 99 if $i < 1 }
 
 sub local_list_2 {
     # List format start end : ip + decimal
@@ -297,12 +297,12 @@ sub local_list_2 {
     my $i = 0;
     foreach ( @$ref_in ) {
        my ($ip,$mask) = split;
-       my $invers = &invers($mask); 
 
-       if    ( ! $mask                  ) { $mask = '255.255.255.255' }
-       elsif (   $mask =~ /\/(.+)/      ) { $mask = &mask($1) }
-       elsif ( ! &error('mask',$invers) ) { $mask = $invers }
-       elsif (   &error('mask',$mask  ) ) { return }
+       if    ( ! $mask ) { $mask = '255.255.255.255' }
+       elsif ( &error('mask',$mask) ) {
+             if   ( $mask =~ / *\/(\d+)/ ) { $mask = &mask($1) }
+             else                          { $mask = &invers($mask) }
+             return if &error('mask',$mask) }
 
        my $start   = &local_net('network'  ,$ip,$mask);
        my $end     = &local_net('broadcast',$ip,$mask);
@@ -545,7 +545,7 @@ __END__
  examples :
   - range ('0.0.0.1','255.255.255.254')
 
-=head2 7 : List sort on address ip column
+=head2 7 : Sorting a list by an IP address column
 
  sort ($list,$options);
 
@@ -628,8 +628,8 @@ __END__
 
 =head1 VERSION AND AUTHOR
 
- Version  : v2.06 - November 2020
- Author   : Thierry LE GALL
+ Version  : v2.08 - April 2021
+ Author   : Thierry Le Gall
  Contact  : facila@gmx.fr
 
 =cut

@@ -70,6 +70,7 @@ qx.Class.define("callbackery.ui.Popup", {
                 this.fireDataEvent('actionResponse',data);
                 switch (data.action){
                 case 'wait':
+                case 'dataModified':
                     break;
                 case 'showMessage':
                 case 'dataSaved':

@@ -12,8 +12,6 @@ $ENV{TT_PTY}             = 1;
 plan skip_all => "Cannot load tt: $! ($@)" unless my $tt = do(rel2abs 'script/tt');
 plan skip_all => "home is not a tempdir" if int $tt->home->list_tree;
 
-use Mojo::Util;
-
 note 'zero events';
 test_output(
   'command_log', [],
@@ -48,8 +46,8 @@ test_output('command_status', [], qr{Tracking "oss-tt" for 0h 0m \ds since \d\d:
 test_output('command_stop',   [], \qr{Dropping "oss-tt" since the event is shorter than 300s\.});
 
 note 'start, stop, status - with time';
-my $h = +(localtime)[2] - 1;
-test_output('command_start',  ["foo", "$h:02"], qr{Started "foo" at 09:02:00\.});
+my $h = +(localtime(time - 3600))[2];
+test_output('command_start',  ["foo", "$h:02"], qr{Started "foo" at 0*$h:02:00\.});
 test_output('command_stop',   ["$h:32:1"],      qr{Stopped "foo" at .* after 0h 30m 1s\.});
 test_output('command_status', [],               qr{Stopped "foo" at .* after 0h 30m 1s\.});
 
@@ -60,7 +58,7 @@ test_output(
   'command_log', [],
   qr{Log for \w+ \d+},
   qr{Month\s+Date\s+Start\s+Duration\s+Project\s+Tags},
-  qr{9:02.*foo}s, qr{9:30.*oss-tt}s,
+  qr{$h:02.*foo}s, qr{\d+:30.*oss-tt}s,
   qr{Total events\s+:\s+2},
   qr{Total time\s+:\s+1h 34m 6s},
 );

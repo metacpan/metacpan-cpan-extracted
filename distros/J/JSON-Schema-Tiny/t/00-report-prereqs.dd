@@ -60,6 +60,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Data::Dumper' => '0',
                                    'Email::Address::XS' => '0',
                                    'File::Spec' => '0',
                                    'List::Util' => '1.50',

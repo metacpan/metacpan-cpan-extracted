@@ -3,7 +3,7 @@ package App::BorderStyleUtils;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2021-01-23'; # DATE
 our $DIST = 'App-BorderStyleUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,9 +62,6 @@ sub show_border_style {
 
     my $bs = Module::Load::Util::instantiate_class_with_optional_args(
         {ns_prefix=>'BorderStyle'}, $args{style});
-
-    return [412, "Box char styles not supported yet"]
-        if $bs->get_struct->{box_chars};
 
     my $map = {
         A => sub { $bs->get_border_char(0, 0) // '' },
@@ -152,7 +149,7 @@ App::BorderStyleUtils - CLI utilities related to border styles
 
 =head1 VERSION
 
-This document describes version 0.006 of App::BorderStyleUtils (from Perl distribution App-BorderStyleUtils), released on 2021-01-23.
+This document describes version 0.007 of App::BorderStyleUtils (from Perl distribution App-BorderStyleUtils), released on 2021-01-23.
 
 =head1 DESCRIPTION
 

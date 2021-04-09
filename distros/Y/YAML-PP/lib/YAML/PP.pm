@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.026'; # VERSION
+our $VERSION = '0.027'; # VERSION
 
 use YAML::PP::Schema;
 use YAML::PP::Schema::JSON;
@@ -206,6 +206,7 @@ sub preserved_mapping {
     %$data = %$hash;
     my $t = tied %$data;
     $t->{style} = $args{style};
+    $t->{alias} = $args{alias};
     return $data;
 }
 
@@ -216,6 +217,7 @@ sub preserved_sequence {
     push @$data, @$array;
     my $t = tied @$data;
     $t->{style} = $args{style};
+    $t->{alias} = $args{alias};
     return $data;
 }
 
@@ -362,7 +364,8 @@ sub new {
 }
 sub value { $_[0]->{value} }
 sub tag { $_[0]->{tag} }
-sub style { $_[0]->{style} }
+sub style { $_[0]->{style} || 0 }
+sub alias { $_[0]->{alias} }
 
 1;
 
@@ -550,13 +553,11 @@ Defines what to do when a cyclic reference is detected when loading.
 
 =item duplicate_keys
 
-Default: 1
+Default: 0
 
-Since version 0.026
+Since version 0.027
 
 This option is for loading.
-
-NOTE: THIS OPTION WILL BE SET TO 0 IN THE NEXT RELEASE.
 
 The YAML Spec says duplicate mapping keys should be forbidden.
 
@@ -602,7 +603,7 @@ Default: 1
 
 This option is for dumping.
 
-Print document heaader C<--->
+Print document header C<--->
 
 =item footer
 
@@ -692,6 +693,9 @@ Preserving scalar styles is still experimental.
     # Preserve block/flow style (since 0.024)
     my $yp = YAML::PP->new( preserve => PRESERVE_FLOW_STYLE );
 
+    # Preserve alias names (since 0.027)
+    my $yp = YAML::PP->new( preserve => PRESERVE_ALIAS );
+
     # Combine, e.g. preserve order and scalar style
     my $yp = YAML::PP->new( preserve => PRESERVE_ORDER | PRESERVE_SCALAR_STYLE );
 
@@ -709,20 +713,38 @@ If you load the following input:
     - |
       literal
     ---
-    block mapping:
+    block mapping: &alias
       flow sequence: [a, b]
+    same mapping: *alias
     flow mapping: {a: b}
+
 
 with this code:
 
     my $yp = YAML::PP->new(
-        preserve => PRESERVE_ORDER | PRESERVE_SCALAR_STYLE | PRESERVE_FLOW_STYLE
+        preserve => PRESERVE_ORDER | PRESERVE_SCALAR_STYLE
+                    | PRESERVE_FLOW_STYLE | PRESERVE_ALIAS
     );
     my ($hash, $styles, $flow) = $yp->load_file($file);
     $yp->dump_file($hash, $styles, $flow);
 
 Then dumping it will return the same output.
 Only folded block scalars '>' cannot preserve the style yet.
+
+Note that YAML allows repeated definition of anchors. They cannot be preserved
+with YAML::PP right now. Example:
+
+    ---
+    - &seq [a]
+    - *seq
+    - &seq [b]
+    - *seq
+
+Because the data could be shuffled before dumping again, the anchor definition
+could be broken. In this case repeated anchor names will be discarded when
+loading and dumped with numeric anchors like usual.
+
+Implementation:
 
 When loading, hashes will be tied to an internal class
 (C<YAML::PP::Preserve::Hash>) that keeps the key order.
@@ -737,8 +759,8 @@ a scalar, the object will be replaced by a simple scalar.
 You can also pass C<1> as a value. In this case all preserving options will be
 enabled, also if there are new options added in the future.
 
-There are also methods to craete preserved nodes from scratch. See the
-C<preserved_(scalar|mapping|sequence> L<"METHODS"> below.
+There are also methods to create preserved nodes from scratch. See the
+C<preserved_(scalar|mapping|sequence)> L<"METHODS"> below.
 
 =back
 
@@ -1171,7 +1193,7 @@ they will be dumped with double quotes.
 It will recognize JSON::PP::Boolean and boolean.pm objects and dump them
 correctly.
 
-Numbers which also have a PV flag will be recognized as numbers and not
+Numbers which also have a C<PV> flag will be recognized as numbers and not
 as strings:
 
     my $int = 23;

@@ -115,12 +115,19 @@ like(
 );
 
 subtest 'get_type for references' => sub {
+  is(
+    JSON::Schema::Tiny::get_type($_->[0]),
+    $_->[1],
+    $_->[1].' reference type is understood, without an exception',
+  ) foreach (
+    [ \1, 'reference to SCALAR' ],
+  );
+
   like(
     exception { $line = __LINE__; JSON::Schema::Tiny::get_type($_->[0]) },
     qr/^unsupported reference type $_->[1]/,
     $_->[1].' reference type results in exception',
   ) foreach (
-    [ \1, 'SCALAR' ],
     [ \\2, 'REF' ],
     [ sub { 1 }, 'CODE' ],
     [ \*stdout, 'GLOB' ],

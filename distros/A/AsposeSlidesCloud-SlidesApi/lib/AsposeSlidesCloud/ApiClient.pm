@@ -186,7 +186,7 @@ sub get_body_data {
     my $fileIndex = 1;
     foreach (@$files) {
         $_body_data = $_body_data . "\r\n--${boundary}\r\n";
-        $_body_data = $_body_data . "Content-Disposition: form-data; name=\"file${fileIndex}\";filename=\"null\"\r\n";
+        $_body_data = $_body_data . "Content-Disposition: form-data; name=\"file${fileIndex}\";filename=\"file${fileIndex}\"\r\n";
         $_body_data = $_body_data . "Content-Type: application/octet-stream\r\n";
         $_body_data = $_body_data . "\r\n";
         $_body_data = $_body_data . $_;

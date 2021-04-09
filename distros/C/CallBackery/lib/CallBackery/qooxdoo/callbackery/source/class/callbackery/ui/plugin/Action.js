@@ -241,7 +241,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 iframe.addListener('load',function(e){
                                     var response = {
                                         exception: {
-                                            message: that.tr("No Data"),
+                                            message: String(that.tr("No Data")),
                                             code: 9999
                                         }
                                     };

@@ -1,5 +1,6 @@
 package Chemistry::File::Dumper;
-$VERSION = '0.37';
+
+our $VERSION = '0.38'; # VERSION
 
 require 5.006;
 use strict;
@@ -101,9 +102,9 @@ sub string_is {
 
 1;
 
-=head1 VERSION
+=head1 SOURCE CODE REPOSITORY
 
-0.37
+L<https://github.com/perlmol/Chemistry-Mol>
 
 =head1 SEE ALSO
 

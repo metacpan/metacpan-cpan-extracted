@@ -23,6 +23,9 @@ $array = $array->copyWithin(-2, -3, -1);
 
 is_deeply([@$array], [1, 2, 3, 3, 4]);
 
+my $array = Data::LnArray->new(1, 2, 3, 4, 5);
 
+$array = $array->copyWithin(1, 6, 2);
+is_deeply($array, [1,2,3,4,5]);
 
 done_testing;

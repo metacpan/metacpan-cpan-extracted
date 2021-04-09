@@ -8,7 +8,7 @@ use Log::Log4perl qw( get_logger );
 use Workflow::Exception qw( configuration_error persist_error );
 use English qw( -no_match_vars );
 
-$Workflow::Persister::SPOPS::VERSION = '1.52';
+$Workflow::Persister::SPOPS::VERSION = '1.53';
 
 my @FIELDS = qw( workflow_class history_class );
 __PACKAGE__->mk_accessors(@FIELDS);
@@ -71,8 +71,7 @@ sub update_workflow {
 
 sub create_history {
     my ( $self, $wf, @history ) = @_;
-    my $log = get_logger();
-    $log->debug( "Saving history for workflow ", $wf->id );
+    $self->log->debug( "Saving history for workflow ", $wf->id );
     foreach my $h (@history) {
         next if ( $h->is_saved );
         my $hist_persist = eval {
@@ -91,7 +90,7 @@ sub create_history {
         } else {
             $h->id( $hist_persist->id );
             $h->set_saved();
-            $log->info( "Created history record with ID ",
+            $self->log->info( "Created history record with ID ",
                 $hist_persist->id );
         }
     }
@@ -144,7 +143,7 @@ Workflow::Persister::SPOPS - Persist workflows using SPOPS
 
 =head1 VERSION
 
-This documentation describes version 1.52 of this package
+This documentation describes version 1.53 of this package
 
 =head1 SYNOPSIS
 

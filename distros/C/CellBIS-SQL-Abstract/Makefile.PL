@@ -21,10 +21,11 @@ my %WriteMakefileArgs = (
   "NAME" => "CellBIS::SQL::Abstract",
   "PREREQ_PM" => {
     "Hash::MultiValue" => 0,
+    "Mojo::SQLite" => 0,
     "Mojolicious" => 0,
     "Scalar::Util" => 0
   },
-  "VERSION" => "1.4",
+  "VERSION" => "1.5",
   "test" => {
     "TESTS" => "t/*.t t/02-query/*.t t/03-additional/mariadb/*.t t/03-additional/pg/*.t t/03-additional/sqlite/*.t t/04-dbms/*.t"
   }
@@ -34,6 +35,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Hash::MultiValue" => 0,
   "Module::Build" => "0.28",
+  "Mojo::SQLite" => 0,
   "Mojolicious" => 0,
   "Scalar::Util" => 0
 );

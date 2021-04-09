@@ -3,15 +3,13 @@ package Workflow::Condition::GreedyOR;
 use strict;
 use warnings;
 
-our $VERSION = '1.52';
+our $VERSION = '1.53';
 
 use base qw( Workflow::Condition::Nested );
 use Workflow::Exception qw( condition_error configuration_error );
 use English qw( -no_match_vars );
 
 __PACKAGE__->mk_accessors('conditions');
-
-my ($log);
 
 sub _init {
     my ( $self, $params ) = @_;
@@ -59,7 +57,7 @@ Workflow::Condition::GreedyOR
 
 =head1 VERSION
 
-This documentation describes version 1.52 of this package
+This documentation describes version 1.53 of this package
 
 =head1 DESCRIPTION
 

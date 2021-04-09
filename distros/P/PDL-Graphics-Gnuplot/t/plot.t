@@ -853,9 +853,9 @@ SKIP:{
     skip "Skipping title tests due to obsolete version of gnuplot (BSD uses 4.2, which fails these)",3 
 	if($w->{gp_version} < $PDL::Graphics::Gnuplot::gnuplot_req_v);
 
-    ok($lines[1] =~ m/This is a plot title/, "Plot title gets placed on plot");
-    
-    
+    like("@lines[0..3]", qr/This is a plot title/, "Plot title gets placed on plot")
+      or diag explain \@lines;
+
     eval { $w->plot({title=>""},with=>'points',xvals(5));};
     ok(!$@, "Non-title plotting works, no error");
     

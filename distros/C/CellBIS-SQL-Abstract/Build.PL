@@ -19,12 +19,13 @@ my %module_build_args = (
     "Achmad Yusri Afandi <yusrideb\@cpan.org>"
   ],
   "dist_name" => "CellBIS-SQL-Abstract",
-  "dist_version" => "1.4",
+  "dist_version" => "1.5",
   "license" => "artistic_2",
   "module_name" => "CellBIS::SQL::Abstract",
   "recursive_test_files" => 1,
   "requires" => {
     "Hash::MultiValue" => 0,
+    "Mojo::SQLite" => 0,
     "Mojolicious" => 0,
     "Scalar::Util" => 0
   }
