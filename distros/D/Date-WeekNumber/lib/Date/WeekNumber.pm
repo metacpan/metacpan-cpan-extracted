@@ -1,6 +1,6 @@
 package Date::WeekNumber;
 # ABSTRACT: calculate week of the year (ISO 8601 weeks, or 'CPAN weeks')
-$Date::WeekNumber::VERSION = '0.06';
+$Date::WeekNumber::VERSION = '0.07';
 use 5.006;
 use strict;
 use warnings;
@@ -117,8 +117,8 @@ and C<cpan_week_number()>, where the weeks run from Sunday through Saturday.
 A more complete definition of the week naming schemes is given below.
 
 The CPAN week number is the definition used by Chris Madsen's
-L<CPAN once a week, every week|http://onceaweek.cjmweb.net> contest,
-and my L<CPAN new dist per month|http://neilb.org/neocpanisms/> contest.
+L<CPAN once a week, every week|https://github.com/madsen/cpan-once-a-week-data> contest,
+and my L<CPAN Regulars Releasers|http://neilb.org/cpan-regulars/> page.
 
 There are a number of modules that can be used to calculate the week
 number, but I wanted a minimalist interface that returned a string format,
@@ -213,6 +213,11 @@ It also provides C<strftime()>.
 
 L<Date::Calc> provides C<Week_of_Year()>, which returns
 the ISO week number and associated year.
+
+L<Date::Manip> provides a function C<Date_WeekOfYear>
+which returns a week number between 0 and 53.
+Zero means it's a week in the previous year,
+and 53 I<may> be in the following year.
 
 L<Date::ISO8601> provides a number of functions for converting
 dates according to ISO 8601.

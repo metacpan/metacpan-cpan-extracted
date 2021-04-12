@@ -2,6 +2,8 @@
 
 UniEvent::Resolver - performs asynchronous DNS resolution.
 
+
+
 =head1 SYNOPSIS
 
     my $loop = UniEvent::Loop->new;
@@ -25,39 +27,51 @@ UniEvent::Resolver - performs asynchronous DNS resolution.
             say "resolved as ", $addr->[0]->ip, ":", $addr->[0]->port;
         },
     });
+    
+    # using loop's resolver
+    $loop->resolver->resolve('crazypanda.ru', sub { ... });
 
 
 =head1 DESCRIPTION
 
-Resolver performs asynchronous DNS resolution, i.e. it maps symbolic names like
-"crazypanda.ru" into IP addresses like 91.234.119.79.
+Resolver performs asynchronous DNS resolution, i.e. it maps symbolic names like "crazypanda.ru" into IP addresses like 91.234.119.79.
 
-Under the hood it uses C<c-ares|https://c-ares.haxx.se/> library for performing
-resolution.
+Under the hood it uses L<c-ares|https://c-ares.haxx.se/> library for performing resolution.
 
-There is a hidden per-loop resolver instance, so, generally, there is no need
-of creating separate Resolver instance for use L<UniEvent::Tcp> or L<UniEvent::Udp>.
+Normally, you don't need to call resolver methods directly, as methods like C<connect($host, $port)> in L<UniEvent::Tcp> implicitly uses this resolver.
+However if you need to resolve something by yourself, it is recommended to use per-loop resolver instance accessible via loop's C<resolver()> method.
+Such usage shares resolver's cache and worker connections across all loop's consumers.
+
+    $loop->resolver->resolve(...);
+
+Per-loop resolver is autocreated with default config on first use.
+If you need your own custom-configured resolver, you need to create resolver instance and use it instead of per-loop resolver. Alternatively, you can change some
+settings in per-loop resolver.
+
+
 
 =head1 METHODS
 
-=head2 new([$loop = UniEvent::Loop->default_loop [, $config = {}]])
+=head2 new([$loop = default], [$config = default])
 
 Constructs new resolver instance, binding the supplied C<$loop> to it and using
-the provided config. The config is hashmap with the following properties:
+the provided config. The config is a hashref with the following properties:
 
 =over
 
 =item cache_expiration_time
 
-How much time (in seconds) should pass since cached last address resolution to
-let it be considered outdated and the new resolving operation will be performed.
+If a cache entry is older (in seconds) than C<cache_expiration_time>, it will be deleted from cache and the actual resolving will be made,
+adding a fresh entry into cache.
 
-Default value: 120 seconds.
+Default value: 1200 seconds.
 
 =item cache_limit
 
-Maximum size of cached addresses in the resolver cache. Currently the cache will
-be cleared upon hiting the limit.
+Maximum size of cached addresses in the resolver cache.
+All entries in cache will be cleared upon hitting the limit.
+
+If set to zero, requests will not be cached at all.
 
 Default value: 10000 records.
 
@@ -65,27 +79,27 @@ Default value: 10000 records.
 
 Timeout value for single request resolution, in seconds.
 
-Default value: 0.5 seconds.
+Default value: 5 seconds.
 
 =item workers
 
-The number of concurrently resolved requests.
+Maximum number of concurrently resolved requests.
 
 Default value: 5.
 
 =back
 
 
-=head2 resolve($hostname [, $callback = undef [, $timeout = 5.0]])
+=head2 resolve($hostname, $callback, [$timeout = 5.0])
 
-=head2 resolve($params)
+=head2 resolve(\%params)
 
-Initiates asynchronous DNS resolution. In the simple form, just C<$hostname> to be resolved
-is expected. In more advanced form the C<$params> is a hashref with the following options:
+Initiates asynchronous DNS resolution. In the simple form, just hostname (node) to be resolved, callback and request timeout is expected.
+In more advanced form, hashref with the following options is expected:
 
 =over
 
-=item node
+=item node [required]
 
 The host name to be resolved
 
@@ -95,12 +109,11 @@ Max time for address resolution, in seconds
 
 =item service
 
-The name of the service (see C</etc/services>) for port mapping. It can be a number; in that
-case the C<NUMERICSERV> address hints flag have to be specified.
+string with port number or name of the service (see C</etc/services>) for port mapping.
 
 =item port
 
-Already mapped service to port (as a number).
+Port number
 
 =item hints
 
@@ -108,7 +121,7 @@ Address info hints. Use C<hints> function for costruction.
 
 =item use_cache
 
-Whether the default caching mechanism for resolved hosts should be used.
+If set to C<false>, cache is not used and actual resolving will be made (after which cache will not be updated).
 
 =item on_resolve
 
@@ -119,45 +132,47 @@ The callback.
 The L<UniEvent::Resolver::Request> is returned. It can be used for tracking address
 resolution or for the request cancellation.
 
-After request completion, the C<$callback> is invoked as:
+Callback signature is:
 
-    $callback->($addresses, $error_code, $request)
+    my ($addresses, $error, $request) = @_;
 
-Where the addresses are the array of L<Net::SockAddr>.
+Where C<$addresses> is the array of L<Net::SockAddr>.
 
-=head2 cache_expiration_time([$value = undef]) {
 
-Returns how much time (in seconds) should pass since cached last address resolution to
-let it be considered outdated and the new resolving operation will be performed.
+=head2 cache_expiration_time([$value]) {
 
-If C<$vale> is defined, it is set as the new cache expiration time.
+Get/set cache expiration time in seconds.
 
-=head2 cache_limit ([$value = undef])
 
-Returns the maximum size of cached addresses in the resolver cache. Currently the
-cache will be cleared upon hiting the limit.
+=head2 cache_limit ([$value])
 
-If C<$vale> is defined, it is set as the new limit value.
+Get/set cache limit.
+
 
 =head2 cache_size ()
 
-Returns the current size of cache.
+Returns current size of the cache (number of entries).
+
 
 =head2 queue_size ()
 
 Returns the amount of requests, which are waiting to be resolved by workers.
 
+
 =head2 clear_cache ()
 
 Clears cache by force.
 
+
 =head2 reset()
 
 Cancels all resolving and pending requests.
+Their callbacks will be called with C<UE::SystemError::operation_canceled> error.
+
 
 =head1 FUNCTIONS
 
-=head2 hints($family, $socktype [, $protocol = 0 [, $flags = 0]])
+=head2 hints($family, $socktype, [$protocol = 0], [$flags = 0])
 
 Constructs address info hints for address resolution.
 
@@ -170,27 +185,21 @@ Constructs address info hints for address resolution.
 The address info hints is opaque structure without any user visible operations
 on it. Its sole purpose is to construct hints for the address resolution.
 
-=head1 CONSTANTS
+Flags can be:
 
-This are the resolver hints:
+=over
 
-=head2 NUMERICSERV
+=item NUMERICSERV
 
 If this option is set service field will be treated as a numeric value, i.e.
 instead of "https" it will assume the number "443" (as a string).
 
-=head2 CANONNAME
+=item CANONNAME
 
 Resolves L<CNAME records|https://en.wikipedia.org/wiki/CNAME_record>
 
 Check type constant
 
-=head1 REFERENCES
-
-L<Net::SockAddr>
-
-L<UniEvent::Resolver::Request>
-
-L<UniEvent>
+=back
 
 =cut

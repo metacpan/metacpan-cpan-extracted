@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.76 2021-04-11
+
+ - Add support for Greek script
+
 1.75 2021-03-14
 
  - Fix crash on muse_format_line on bidi indicator

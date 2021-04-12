@@ -337,8 +337,9 @@ my $number = 1;
 sub test ($$){
     local($^W) = 0;
     my($true,$msg) = @_;
+    $msg =~ s/\n$//;
     ++$number;
-    print($true ? "ok $number\n" : "not ok $number $msg\n");
+    print($true ? "ok $number\n" : "not ok $number # $msg\n");
 }
 
 sub skip {

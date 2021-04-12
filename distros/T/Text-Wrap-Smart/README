@@ -4,16 +4,14 @@ NAME
 SYNOPSIS
      use Text::Wrap::Smart ':all';
      # or
-     use Text::Wrap::Smart qw(exact_wrap fuzzy_wrap wrap_smart);
+     use Text::Wrap::Smart qw(exact_wrap fuzzy_wrap);
 
      @chunks = exact_wrap($text, $wrap_at);
      @chunks = fuzzy_wrap($text, $wrap_at);
 
-     @chunks = wrap_smart($text, \%options); # DEPRECATED
-
 DESCRIPTION
-    `Text::Wrap::Smart' is the pure perl companion of
-    `Text::Wrap::Smart::XS'.
+    "Text::Wrap::Smart" is the pure perl companion of
+    "Text::Wrap::Smart::XS".
 
 FUNCTIONS
   exact_wrap
@@ -38,21 +36,12 @@ FUNCTIONS
     Optionally a wrapping length may be specified; if no length is supplied,
     a default of 160 will be assumed.
 
-  wrap_smart (DEPRECATED)
-     @chunks = wrap_smart($text [, { options } ]);
-
-    The `options' hash reference may contain the `no_split' option which
-    specifies that words shall not be broken up (i.e., fuzzy wrapping); if
-    `no_split' is not set, exact wrapping will be applied). The
-    `max_msg_size' option used to set the character length boundary for each
-    chunk emitted, but has been changed to set the wrapping length now.
-
 EXPORT
   Functions
-    `exact_wrap(), fuzzy_wrap() and wrap_smart()' are exportable.
+    "exact_wrap(), fuzzy_wrap()" are exportable.
 
   Tags
-    `:all - *()'
+    ":all - *()"
 
 BUGS & CAVEATS
     The wrapping length will not be applied directly, but is used to
@@ -72,5 +61,5 @@ LICENSE
     This program is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See <http://dev.perl.org/licenses/>
 

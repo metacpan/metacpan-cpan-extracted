@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.201] - 2021-04-11
+### Added
+- Added Github Actions as a CI/CD pipeline.
+
 ## [0.200] - 2015-12-01
 ### Added
 - Added CPAN metadata files.
@@ -25,4 +29,5 @@
 ## 0.100 - 2000-11-03
 Initial revision.
 
+[0.201]: https://github.com/mrogaski/Log-Agent-Logger/compare/v0.200...v0.201
 [0.200]: https://github.com/mrogaski/Log-Agent-Logger/compare/v0.101...v0.200

@@ -37,6 +37,7 @@ my @files = (
     't/020_dsakeys-2048.t',
     't/021_dsakeys-3072.t',
     't/022_sign_no_xml_declaration.t',
+    't/023_hmac.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
@@ -73,6 +74,7 @@ my @files = (
     't/unsigned/sign_multiple_sections.xml',
     't/unsigned/xml-sig-unsigned-dsa-multiple.xml',
     't/unsigned/xml-sig-unsigned-rsa-multiple.xml',
+    't/xmlsec-keys.xml',
     't/xmlsec1_commands_to_sign_verify.txt'
 );
 

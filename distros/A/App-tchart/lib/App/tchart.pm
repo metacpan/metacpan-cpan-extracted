@@ -1,7 +1,9 @@
 package App::tchart;
 
-our $DATE = '2016-03-10'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-04-10'; # DATE
+our $DIST = 'App-tchart'; # DIST
+our $VERSION = '0.060'; # VERSION
 
 1;
 # ABSTRACT: Generate text-based chart
@@ -18,7 +20,7 @@ App::tchart - Generate text-based chart
 
 =head1 VERSION
 
-This document describes version 0.05 of App::tchart (from Perl distribution App-tchart), released on 2016-03-10.
+This document describes version 0.060 of App::tchart (from Perl distribution App-tchart), released on 2021-04-10.
 
 =head1 SYNOPSIS
 
@@ -46,7 +48,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

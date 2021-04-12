@@ -10,7 +10,7 @@ share {
 	requires 'Path::Tiny' => 0;
 
 	plugin Download => (
-		url => 'https://github.com/nucleic/kiwi/archive/master.zip',
+		url => 'https://github.com/nucleic/kiwi/archive/main.zip',
 	);
 
 	plugin Extract => 'zip';

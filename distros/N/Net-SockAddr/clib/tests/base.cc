@@ -22,18 +22,18 @@ TEST_CASE("base") {
         SECTION("from inet4") {
             SockAddr sa = (SockAddr)SockAddr::Inet4("10.10.10.2", 1234);
             CHECK(sa.is_inet4());
-            CHECK(sa.inet4().ip() == "10.10.10.2");
+            CHECK(sa.as_inet4().ip() == "10.10.10.2");
         }
         SECTION("from inet6") {
             SockAddr sa = (SockAddr)SockAddr::Inet6("::1", 1234);
             CHECK(sa.is_inet6());
-            CHECK(sa.inet6().ip() == "::1");
+            CHECK(sa.as_inet6().ip() == "::1");
         }
         #ifndef _WIN32
         SECTION("from unix") {
             SockAddr sa = (SockAddr)SockAddr::Unix("/path");
             CHECK(sa.is_unix());
-            CHECK(sa.unix().path() == "/path");
+            CHECK(sa.as_unix().path() == "/path");
         }
         #endif
     }

@@ -2,8 +2,8 @@
 use strict;
 use warnings;
 
-use lib $ENV{HOME} . '/sandbox/MIDI-Util/lib';
-use MIDI::Util;
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util qw(setup_score set_chan_patch);
 use Music::Duration;
 
 Music::Duration::tuplet( 'wn', 'a', 5 );
@@ -19,7 +19,7 @@ Music::Duration::tuplet( 'wn', 'l', 15 );
 
 my $bars = 13;
 
-my $score = MIDI::Util::setup_score( bpm => 60 );
+my $score = setup_score( bpm => 60 );
 
 $score->synch(
     \&pulse,
@@ -31,7 +31,7 @@ $score->write_score("$0.mid");
 sub pulse {
     my $s = shift;
 
-    MIDI::Util::set_chan_patch( $s, 0, 34 );
+    set_chan_patch( $s, 0, 34 );
 
     for ( 1 .. $bars ) {
         $s->n( 'en', 'C4' ) for 1 .. 8;
@@ -41,7 +41,7 @@ sub pulse {
 sub poly {
     my $s = shift;
 
-    MIDI::Util::set_chan_patch( $s, 1, 7 );
+    set_chan_patch( $s, 1, 7 );
 
     my $note = 'G4';
 

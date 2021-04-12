@@ -1,0 +1,7 @@
+Demonstration of C<OpenMP::Environment>'s ability to
+serve as a benchmark driver.
+
+NPB benchmarks is a Public Domain paid for by US Citizens'
+tax dollars and converted into source code by NASA. Thanks.
+
+https://www.nas.nasa.gov/publications/npb.html

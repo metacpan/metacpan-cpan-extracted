@@ -22,8 +22,10 @@ $written_pwd_file = 'PWD';
 # regexp to find libct/libsybct, and avoid picking up libct_cu which isn't anything we want at all...
 # https://github.com/mpeppler/DBD-Sybase/issues/64
 my $libct_re = qr/\blib(syb)?ct(64)?\./i;
+# freetds can be installed in system lib directories. We can pick those out
+# from Config{libsdir}
+my @libsdir = split(' ', $Config{libsdirs});
 
-#$libdir           = 'lib';
 
 my $file;
 my $chained;
@@ -153,20 +155,22 @@ sub configure {
     }
   }
 
-  my @libdir = ( 'lib', 'lib64' );
+  my @libdir = ( "$SYBASE/lib", "$SYBASE/lib64", @libsdir);
   if ( $^O eq 'MSWin32' ) {
-    @libdir = ('dll');
+    @libdir = ("$SYBASE/dll");
   }
+
   foreach my $l (@libdir) {
-    if ( -d "$SYBASE/$l" ) {
-      if ( checkLib("$SYBASE/$l") ) {
+    if ( -d $l ) {
+      if ( checkLib($l) ) {
         $libdir = $l;
+        last;
       }
     }
   }
 
   die "Can't find any Sybase libraries in "
-    . join( ' or ', map "$SYBASE/$_", @libdir )
+    . join( ' or ', @libdir )
     unless defined $libdir;
 
   my $inc_found = 0;
@@ -184,7 +188,7 @@ sub configure {
   die "Can't find the Client Library include files under $SYBASE"
     unless ($inc_found);
 
-  my $version = getLibVersion("$SYBASE/$libdir");
+  my $version = getLibVersion($libdir);
 
   #    if(!$version || $version lt '12') {
   #print "FreeTDS or older Client Library. Enabling CS-Lib Callbacks\n";
@@ -194,7 +198,7 @@ sub configure {
   checkChainedAutoCommit();
 
   #    print "OS = $^O\n";
-  my %libname = loadSybLibs( "$SYBASE/$libdir",
+  my %libname = loadSybLibs( $libdir,
       $^O eq 'MSWin32' ? qr/lib/
     : $^O eq 'VMS'     ? qr/olb/
     :                    qr/(?:so|a|sl)/ );
@@ -206,10 +210,10 @@ sub configure {
 
       # $libsub is "dll" on Windows...
       $lib_string =
-"-L$SYBASE/$libdir -llibsybct.lib -llibsybcs.lib -llibsybtcl.lib -llibsybcomn.lib -llibsybintl.lib -llibsybblk.lib $attr{EXTRA_LIBS} -lm";
+"-L$libdir -llibsybct.lib -llibsybcs.lib -llibsybtcl.lib -llibsybcomn.lib -llibsybintl.lib -llibsybblk.lib $attr{EXTRA_LIBS} -lm";
     } else {
       $lib_string =
-"-L$SYBASE/$libdir -llibct.lib -llibcs.lib -llibtcl.lib -llibcomn.lib -llibintl.lib -llibblk.lib $attr{EXTRA_LIBS} -lm";
+"-L$libdir -llibct.lib -llibcs.lib -llibtcl.lib -llibcomn.lib -llibintl.lib -llibblk.lib $attr{EXTRA_LIBS} -lm";
     }
   } elsif ( $^O eq 'VMS' ) {
     $lib_string =
@@ -232,13 +236,13 @@ sub configure {
     # Supplied by Erick Calder. I'm not sure why libsybsrv is needed...
     $attr{EXTRA_LIBS} .= " -lsybsrv" if $^O eq 'darwin';
 
-    my $extra = getExtraLibs( $SYBASE, $attr{EXTRA_LIBS}, $version );
+    my $extra = getExtraLibs( $attr{EXTRA_LIBS}, $version );
     if ($file) {
       $lib_string =
-"-L$SYBASE/$libdir -lct -lcs -ltcl -lcomn -lintl -lblk $attr{EXTRA_LIBS} -ldl -lm";
+"-L$libdir -lct -lcs -ltcl -lcomn -lintl -lblk $attr{EXTRA_LIBS} -ldl -lm";
     } else {
       $lib_string =
-        "-L$SYBASE/$libdir -lct -lcs -ltcl -lcomn -lintl -lblk $extra -ldl -lm";
+        "-L$libdir -lct -lcs -ltcl -lcomn -lintl -lblk $extra -ldl -lm";
     }
     if ($newlibnames) {
       foreach (qw(ct cs tcl comn intl blk)) {
@@ -389,14 +393,13 @@ sub getLibVersion {
 }
 
 sub getExtraLibs {
-  my $dir     = shift;
   my $cfg     = shift;
   my $version = shift;
 
-  opendir( DIR, "$dir/$libdir" ) || die "Can't access $dir/$libdir: $!";
+  opendir( DIR, "$libdir" ) || die "Can't access $libdir: $!";
   my %files =
     map { $_ =~ s/lib([^\.]+)\..*/$1/; $_ => 1 }
-    grep( /lib/ && -f "$dir/$libdir/$_", readdir(DIR) );
+    grep( /lib/ && -f "$libdir/$_", readdir(DIR) );
   closedir(DIR);
 
   my %x     = map { $_ => 1 } split( ' ', $cfg );
@@ -409,7 +412,7 @@ sub getExtraLibs {
   }
 
   foreach my $f (qw(insck tli sdna dnet_stub tds skrb gss)) {
-    $x{"-l$f"} = 1 if exists $files{$f} && -f "$dir/$libdir/lib$f.$dlext";
+    $x{"-l$f"} = 1 if exists $files{$f} && -f "$libdir/lib$f.$dlext";
   }
   if ( $version gt '11' ) {
     delete( $x{-linsck} );

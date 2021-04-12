@@ -2,8 +2,8 @@ NAME
     App::td - Manipulate table data
 
 VERSION
-    This document describes version 0.101 of App::td (from Perl distribution
-    App-td), released on 2020-11-08.
+    This document describes version 0.102 of App::td (from Perl distribution
+    App-td), released on 2021-04-10.
 
 FUNCTIONS
   td
@@ -224,7 +224,7 @@ SEE ALSO
     can be specified in enveloped result's `meta` hash in the `table` key
     (see Perinci::Sub::Property::result::table).
 
-    TableData::Object
+    Data::TableData::Object
 
     Perinci::CmdLine
 
@@ -232,7 +232,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by
+    This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

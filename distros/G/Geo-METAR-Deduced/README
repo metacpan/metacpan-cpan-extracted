@@ -1,6 +1,6 @@
 Geo::METAR::Deduced is Copyright (C) 2020-2021, Roland van Ipenburg
 
-Geo::METAR::Deduced version v0.0.6
+Geo::METAR::Deduced version v1.0.3
 ==================================
 
 This module can be used to deduce aviation information from parsed METAR data.
@@ -10,24 +10,32 @@ INSTALLATION
 To install this module type the following:
 
    perl Build.PL
+
    ./Build
+
    ./Build test
+
    ./Build install
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Moose
   Class::Measure::Scientific::FX_992vb
+
   English
+
   Geo::ICAO
+
   Geo::METAR
+
   Moose
+
   MooseX::NonMoose
+
   Readonly 1.03
+
   Set::Scalar
-  version
 
 LICENSE INFORMATION
 

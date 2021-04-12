@@ -4,7 +4,7 @@ package Markdown::Pod;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Encode qw( encodings );
 use List::Util qw( first );
@@ -91,7 +91,7 @@ Markdown::Pod - Convert Markdown to POD
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -173,7 +173,7 @@ L<https://github.com/keedi/Markdown-Pod>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Speer (ASPEER) Jason McIntosh (JMAC) Zakariyya Mughal (ZMUGHAL)
+=for stopwords Andrew Speer (ASPEER) Dave Rolsky (DROLSKY) Jason McIntosh (JMAC) Ji-Hyeon Gim (POTATOGIM) Slaven Rezić (SREZIC) Zakariyya Mughal (ZMUGHAL)
 
 =over 4
 
@@ -183,7 +183,19 @@ Andrew Speer (ASPEER) <andrew@webdyne.org>
 
 =item *
 
+Dave Rolsky (DROLSKY) <autarch@urth.org>
+
+=item *
+
 Jason McIntosh (JMAC) <jmac@jmac.org>
+
+=item *
+
+Ji-Hyeon Gim (POTATOGIM) <potatogim@potatogim.net>
+
+=item *
+
+Slaven Rezić (SREZIC) <slaven@rezic.de>
 
 =item *
 
@@ -193,7 +205,7 @@ Zakariyya Mughal (ZMUGHAL) <zmughal@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Keedi Kim.
+This software is copyright (c) 2021 by Keedi Kim.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

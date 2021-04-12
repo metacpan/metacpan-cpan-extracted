@@ -18,8 +18,8 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited methods
-can_ok $object, qw( organisation org_name org_type descr remarks address phone
-    e_mail fax_no org abuse_c admin_c tech_c ref_nfy mnt_ref notify mnt_by changed source);
+can_ok $object, qw( country organisation org_name org_type descr remarks address phone
+    e_mail fax_no org abuse_c admin_c tech_c ref_nfy mnt_ref notify mnt_by source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -127,29 +127,23 @@ is_deeply( $object->notify(), ['CPNY-MNT'], 'notify properly parsed' );
 $object->notify('CPNY-MNT2');
 is( $object->notify()->[1], 'CPNY-MNT2', 'notify properly added' );
 
-# Test 'abuse_mailbox'
-$tested{'abuse_mailbox'}++;
-is_deeply( $object->abuse_mailbox(), ['abuse1@somewhere.com','abuse2@somewhere.com'], 'abuse_mailbox properly parsed' );
-$object->abuse_mailbox('abuse3@somewhere.com');
-is( $object->abuse_mailbox()->[2], 'abuse3@somewhere.com', 'abuse_mailbox properly added' );
-
 # Test 'descr'
 $tested{'descr'}++;
 is_deeply( $object->descr(), ['Providing happiness from 7am to 7pm'], 'descr properly parsed' );
 $object->descr('Idle');
 is( $object->descr()->[1], 'Idle', 'descr properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['someone@somewhere.com 20120131'], 'changed properly parsed' );
-$object->changed('someone@somewhere.com 20120228');
-is( $object->changed()->[1], 'someone@somewhere.com 20120228', 'changed properly added' );
-
 # Test 'source'
 $tested{'source'}++;
 is( $object->source(), 'RIPE', 'source properly parsed' );
 $object->source('APNIC');
 is( $object->source(), 'APNIC', 'source properly set' );
+
+# Test 'country'
+$tested{'country'}++;
+is( $object->country(), 'FR', 'country properly parsed' );
+$object->country('EN');
+is( $object->country(), 'EN', 'country properly set' );
 
 # Test 'org'
 $tested{'org'}++;
@@ -184,8 +178,6 @@ ref-nfy:        someone@somewhere.com
 mnt-ref:        CPNY-MNT
 mnt-by:         CPNY-MNT
 notify:         CPNY-MNT
-abuse-mailbox:  abuse1@somewhere.com
-abuse-mailbox:  abuse2@somewhere.com
-changed:        someone@somewhere.com 20120131
+country:        FR
 source:         RIPE
 

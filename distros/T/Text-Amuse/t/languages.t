@@ -32,9 +32,10 @@ my %langs = (
              pl => 'polish',
              sq => 'albanian',
              id => 'bahasai',
+             el => 'greek',
             );
 
-plan tests => (scalar(keys %langs) + 8) * 10;
+plan tests => (scalar(keys %langs) + 8) * 10 + 2;
 
 foreach my $k (keys %langs) {
     test_lang($k, $k, $langs{$k});
@@ -80,5 +81,12 @@ sub test_lang {
     is($doc->as_latex, "\nHello\n\n", "body ok");
     ok(!$doc->other_language_codes);
     ok(!$doc->other_languages);
+    if ($doc->language_code eq 'el') {
+        is $doc->font_script, 'Greek';
+    }
+    if ($doc->language_code eq 'ru') {
+        is $doc->font_script, 'Cyrillic';
+    }
+
 }
 

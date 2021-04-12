@@ -1,0 +1,2 @@
+/usr/bin/ar qc libunievent-socks.a  CMakeFiles/unievent-socks.dir/src/panda/unievent/socks.cc.o CMakeFiles/unievent-socks.dir/src/panda/unievent/socks/SocksFilter.cc.o CMakeFiles/unievent-socks.dir/src/panda/unievent/socks/SocksParser.cc.o CMakeFiles/unievent-socks.dir/src/panda/unievent/socks/error.cc.o
+/usr/bin/ranlib libunievent-socks.a

@@ -206,6 +206,7 @@ sub _fontspec_args {
                    farsi      => 'Arabic',
                    arabic     => 'Arabic',
                    hebrew     => 'Hebrew',
+                   greek      => 'Greek',
                   );
     my $def = $self->definitions->{$slot} or die "bad usage, can't find $slot";
     my $script = $scripts{$language} || 'Latin';

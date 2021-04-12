@@ -19,6 +19,7 @@ use base qw/Net::Whois::Object/;
 # descr:          [optional]   [multiple]   [ ]
 # remarks:        [optional]   [multiple]   [ ]
 # address:        [mandatory]  [multiple]   [ ]
+# country:        [optional]   [single]     [ ]
 # phone:          [optional]   [multiple]   [ ]
 # fax-no:         [optional]   [multiple]   [ ]
 # e-mail:         [mandatory]  [multiple]   [lookup key]
@@ -31,21 +32,19 @@ use base qw/Net::Whois::Object/;
 # ref-nfy:        [optional]   [multiple]   [inverse key]
 # mnt-ref:        [mandatory]  [multiple]   [inverse key]
 # notify:         [optional]   [multiple]   [inverse key]
-# abuse-mailbox:  [optional]   [multiple]   [inverse key]
 # mnt-by:         [mandatory]  [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-1)
+# % This query was served by the RIPE Database Query Service version 1.99 (HEREFORD)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'organisation' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'organisation', 'org_name', 'org_type', 'address', 'e_mail', 'mnt_ref', 'mnt_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',    [ 'descr', 'remarks', 'phone', 'fax_no', 'geoloc', 'language', 'org', 'admin_c', 'tech_c', 'abuse_c', 'ref_nfy', 'notify', 'abuse_mailbox', 'created', 'last_modified' ] );
-__PACKAGE__->attributes( 'single',      [ 'organisation', 'org_name', 'org_type', 'geoloc', 'abuse_c', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'descr', 'remarks', 'address', 'phone', 'fax_no', 'e_mail', 'language', 'org', 'admin_c', 'tech_c', 'ref_nfy', 'mnt_ref', 'notify', 'abuse_mailbox', 'mnt_by', 'changed' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'organisation', 'org_name', 'org_type', 'address', 'e_mail', 'mnt_ref', 'mnt_by', 'source' ] );
+__PACKAGE__->attributes( 'optional',    [ 'descr', 'remarks', 'country', 'phone', 'fax_no', 'geoloc', 'language', 'org', 'admin_c', 'tech_c', 'abuse_c', 'ref_nfy', 'notify', 'created', 'last_modified' ] );
+__PACKAGE__->attributes( 'single',      [ 'organisation', 'org_name', 'org_type', 'country', 'geoloc', 'abuse_c', 'created', 'last_modified', 'source' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'descr', 'remarks', 'address', 'phone', 'fax_no', 'e_mail', 'language', 'org', 'admin_c', 'tech_c', 'ref_nfy', 'mnt_ref', 'notify', 'mnt_by' ] );
 
 # End of auto-generated lines
 #######################################################################################

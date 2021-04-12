@@ -22,7 +22,7 @@ use Getargs::Long qw(ignorecase);
 # File rotating policy
 #
 
-our $VERSION = "1.200";
+our $VERSION = "1.201";
 $VERSION = eval $VERSION;
 
 use constant {

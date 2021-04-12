@@ -4,7 +4,7 @@ StreamFinder::IHeartRadio - Fetch actual raw streamable URLs from radio-station 
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2020 by
+This module is Copyright (C) 2017-2021 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -299,7 +299,7 @@ L<http://search.cpan.org/dist/StreamFinder-IHeartRadio/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2020 Jim Turner.
+Copyright 2017-2021 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

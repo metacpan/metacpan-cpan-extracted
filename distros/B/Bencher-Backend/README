@@ -2,8 +2,8 @@ NAME
     Bencher::Backend - Backend for Bencher
 
 VERSION
-    This document describes version 1.052 of Bencher::Backend (from Perl
-    distribution Bencher-Backend), released on 2020-09-21.
+    This document describes version 1.053 of Bencher::Backend (from Perl
+    distribution Bencher-Backend), released on 2021-04-10.
 
 FUNCTIONS
   bencher
@@ -542,7 +542,7 @@ FUNCTIONS
   format_result
     Usage:
 
-     format_result($envres, $formatters, $options, $exclude_formatters) -> [status, msg, payload, meta]
+     format_result( [ \%optional_named_args ] , $envres, $formatters, $options) -> [status, msg, payload, meta]
 
     Format bencher result.
 
@@ -554,7 +554,7 @@ FUNCTIONS
 
         Enveloped result from bencher.
 
-    *   $exclude_formatters => *any*
+    *   exclude_formatters => *any*
 
         Exclude Formatters specification.
 
@@ -669,8 +669,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

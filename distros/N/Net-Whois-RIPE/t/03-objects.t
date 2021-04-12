@@ -20,13 +20,13 @@ can_ok $o[0], qw( comment );
 ok( !$o[0]->can('source'), "No AUTOLOAD interference with ${class}::Information tests" );
 
 isa_ok $o[3], $class . "::AsBlock";
-can_ok $o[3], qw( as_block org source ), qw( descr remarks notify mnt_lower mnt_by changed);
+can_ok $o[3], qw( as_block org source ), qw( descr remarks notify mnt_by );
 ok( !$o[3]->can('bogusmethod'), "No AUTOLOAD interference with ${class}::AsBlock tests" );
 
 isa_ok $o[5], $class . "::AutNum";
 can_ok $o[5], qw( aut_num as_name org source ), qw( descr member_of import mp_import export mp_export
     default remarks tech_c admin_c notify
-    mnt_lower mnt_by mnt_routes changed);
+    mnt_by );
 ok( !$o[5]->can('bogusmethod'), "No AUTOLOAD interference with ${class}::AutNum tests" );
 
 #
@@ -157,7 +157,6 @@ remarks:
 admin-c:         CPNY-RIPE
 tech-c:          CPNY-RIPE
 mnt-by:          COMPANY-MNT
-mnt-routes:      COMPANY-MNT
 mnt-by:          RIPE-NCC-END-MNT
 source:          RIPE # Filtered
 

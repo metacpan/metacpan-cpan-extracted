@@ -1,0 +1,6 @@
+Revision history for Perl extension Stats::Hawking.
+
+0.01  Mon Apr 12 20:39:34 2021
+	- original version; created by h2xs 1.23 with options
+		-X -n Stats::Hawking
+

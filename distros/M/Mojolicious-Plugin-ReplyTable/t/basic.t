@@ -16,7 +16,9 @@ my $data = [
   [qw/r2c1  r2c2☃ r2c3 /],
 ];
 
-any '/table' => sub {
+my @format = Mojolicious->VERSION('9.11') ? [format => 1] : ();
+
+any '/table' => @format => sub {
   my $c = shift;
   $c->stash('reply_table.tablify' => 1) if $c->param('tablify');
   $c->stash('reply_table.csv_options' => { sep_char => "|" }) if $c->param('format_as_psv');
@@ -24,9 +26,9 @@ any '/table' => sub {
 
   $c->reply->table($data);
 };
-any '/json' => sub { shift->reply->table(json => $data) };
-any '/header' => sub { shift->stash('reply_table.header_row' => 1)->reply->table($data) };
-any '/override' => sub { shift->reply->table(txt => $data, txt => { text => 'hello world' }) };
+any '/json'     => @format => sub { shift->reply->table(json => $data) };
+any '/header'   => @format => sub { shift->stash('reply_table.header_row' => 1)->reply->table($data) };
+any '/override' => @format => sub { shift->reply->table(txt => $data, txt => { text => 'hello world' }) };
 
 my $t = Test::Mojo->new;
 

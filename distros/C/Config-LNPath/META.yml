@@ -20,8 +20,8 @@ no_index:
 requires:
   Blessed::Merge: '0.07'
   Carp: '0'
-  Data::LNPath: '0.08'
+  Data::LNPath: '1.00'
   YAML::XS: '0.66'
   perl: '5.006'
-version: '0.03'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

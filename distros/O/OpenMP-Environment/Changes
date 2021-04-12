@@ -13,3 +13,10 @@ Revision history for Perl extension OpenMP::Environment.
         - tiny POD fi
 
 1.0.2 Wen Apr 7 12:00:00 2021
+        - POD
+
+1.0.3 Wen Apr 11 2:00:00 2021
+         - POD
+         - added more examples pertaining to programs included in
+           perl scripts via Inline::C.
+         - added example benchmark driver and public domain benchmark

@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4 * 2;
-use Text::Wrap::Smart qw(exact_wrap wrap_smart);
+use Test::More tests => 2 * 2;
+use Text::Wrap::Smart qw(exact_wrap);
 
 my $join = sub { local $_ = shift; chomp; s/\n/ /g; $_ };
 
@@ -47,7 +47,6 @@ my @entries = (
 
 foreach my $entry (@entries) {
     test_wrap(@$entry);
-    test_wrap_deprecated(@$entry);
 }
 
 sub test_wrap
@@ -58,24 +57,6 @@ sub test_wrap
 
     my $length = $wrap_at ? $wrap_at : 'default';
     my $message = "(wrapping length: $length) [ordinary]";
-
-    is(@strings, $count, "$message amount of substrings");
-    is_deeply(\@strings, $expected, "$message splitted at word boundary");
-}
-
-sub test_wrap_deprecated
-{
-    my ($text, $expected, $count, $wrap_at) = @_;
-
-    local $SIG{__WARN__} = sub { warn @_ unless $_[0] =~ /deprecated/ };
-
-    my %opts;
-    $opts{max_msg_size} = $wrap_at if $wrap_at > 0;
-
-    my @strings = wrap_smart($text, \%opts);
-
-    my $length = $wrap_at ? $wrap_at : 'default';
-    my $message = "(wrapping length: $length) [deprecated]";
 
     is(@strings, $count, "$message amount of substrings");
     is_deeply(\@strings, $expected, "$message splitted at word boundary");

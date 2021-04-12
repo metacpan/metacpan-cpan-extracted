@@ -1,5 +1,5 @@
 package Statocles::Plugin::HTMLLint;
-our $VERSION = '0.097';
+our $VERSION = '0.098';
 # ABSTRACT: Check HTML for common errors and issues
 
 use Statocles::Base 'Class';
@@ -96,7 +96,7 @@ Statocles::Plugin::HTMLLint - Check HTML for common errors and issues
 
 =head1 VERSION
 
-version 0.097
+version 0.098
 
 =head1 SYNOPSIS
 

@@ -1,120 +1,134 @@
 =head1 NAME
 
-UniEvent::Poll - polls sockets or files for readability or writeability
+UniEvent::Poll - poll sockets or files for readability or writeability
+
+
 
 =head1 SYNOPSIS
 
-	use UniEvent::Poll;
+    use UniEvent::Poll;
 
-    my $loop = UniEvent::Loop->new;
-    my $fd = ...; # obtain it somehow, i.e. via socket call
-    my $h = UniEvent::Poll->new($fd, $loop);
-    $h->event->add(sub {
-    	my ($handle, $events, $error_code) = @_;
-    	die("error: $error_code") if $error_code;
+    my $h = UniEvent::Poll->new($fd);
+    close($fd); # it is safe to close, UniEvent::Poll duplicates it
+    
+    $h->start(READABLE | WRITABLE, sub {
+    	my ($handle, $events, $error) = @_;
+    	die "error: $error" if $error;
     	say "can read" if $events & READABLE;
     	say "can write" if $events & WRITABLE;
     });
-    $h->start;
-    $loop->run;
+    
+    UE::Loop->default->run;
+    
     $h->stop;
-	close($fd); # it is safe to close now
+
+
 
 =head1 DESCRIPTION
 
 The Poll handle polls sockets or files for readability or writeability.
 It was designed for intergration of raw sockets with third-party libraries
 that signal about socket status change. Using the Poll handle for other
-purposes is discouraged as it is not very efficient; it is better to use
-standard L<UniEvent::Tcp> capabilities, for example.
+purposes is discouraged as it is not very efficient on certain systems.
+It is better to use L<UniEvent::Tcp>, L<UniEvent::Pipe>, etc... capabilities.
 
-Beware that only one Poll handle should be per one socket, otherwise
-undefined behaviour might happen.
-
-The user should not close a file descriptor while it is being polled by
-an active poll handle.
-
-Portability notest: on *nix any file descriptor (including sockets) can be
-polled; on Windows only socket can be polled.
+Beware that only one Poll handle should be per one file descriptor, otherwise undefined behaviour might happen.
 
 The Poll handle is inherited from L<UniEvent::Handle>.
 
+
+
 =head1 METHODS
 
-=head2 new($fd [, $loop = UniEvent::Loop->default_loop])
+All methods of L<UniEvent::Handle> also apply.
+
+=head2 create($fd, $events, $callback, [$loop = default])
+
+    my $handle = UniEvent::Poll->create($fd, $events, sub { say "hi" });
+
+Creates and starts a poll handle. Alias for C<new($fd, $loop)> + C<start($events, $callback)>.
+
+
+=head2 new($fd, [$loop = default])
 
 Constructs new Poll handle for the specified file descriptor C<$fd>
 and binds it to the specified event loop.
 
-=head2 start($interested_events [, $callback = undef])
+The descriptor C<$fd> is duplicated so you can close it via Perl's C<close()> to forget about further descriptor management.
 
-Starts the poll handle to watch the supplied C<$interested_events> for
-the next event loop iteration. Optionally it adds the C<$callback> to
-the event listeners.
+
+=head2 start($events, [$callback])
+
+Starts the poll handle to watch the supplied C<$events>. Optionally it adds the C<$callback> as ->event->add($callback).
+
+C<$events> is a bitmask of the following constants (in UE::Poll::*):
+
+=over
+
+=item READABLE
+
+Event when socket is readable
+
+=item WRITABLE
+
+Event when socket is writeable
+
+=item PRIORITIZED
+
+Event is used to watch for sysfs interrupts or TCP out-of-band messages
+
+=item DISCONNECT
+
+Event is optional in the sense that it may not be reported and the user is free to ignore it, but it can help optimize the shutdown path
+because an extra read or write call might be avoided.
+
+=back
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
 
 =head2 stop()
 
 Stops the poll handle, i.e. makes it inactive for the next event loop
-iteration. It is safe to close the underlying socket.
+iteration.
 
-=head2 callback($code)
+L<May return error|UniEvent/"OPTIONAL ERRORS">
 
-Sets the callback, which will be invoked in loop run. All previously
-set event listeners or callbacks are discarded.
+
+=head2 callback($callback)
 
 =head2 event()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked in loop run.
+Callback signature:
 
-The C++ interface is:
+    my ($handle, $events, $error) = @_;
 
-    void(const PollSP& handle, int events, const std::error_code& err)
+Where C<$handle> is the Poll handle object itself.
 
-On perl side it the callbacks will be called :
+The C<$events> parameter is an ORed mask of events constants (see C<start()>).
 
-    $callback->($handle, $occured_events, $error_code)
+The C<$err> parameter will be an L<XS::ErrorCode> object if any.
 
-The callback returns nothing.
+See L<UniEvent/"EVENT CALLBACKS">
 
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
 
-=head2 event_listener($delegate [, $weak = false])
+=head2 event_listener($delegate, [$weak])
 
-Creates and returns wrapper around the C<$delegate> object of arbitrary
-class, having the following methods:
+Method C<on_poll> will be called.
 
-  $delegate->on_poll($handle, $occured_events, $error_code);
+See L<UniEvent/"EVENT LISTENER">
 
-The delegated object can be seen as alternative of setting indivitual callbacks
-or as a way of groupping them. The C<$delegate> object can optionally be weakened.
 
-=head2 call_now($events, $error_code = undef)
+=head2 call_now($events, [$error])
 
-Immediately ivokes assigned callbacks and listeners in the caller context
-(i.e. not waiting loop run).
+Immediately ivokes assigned callbacks and listeners passing C<$events> and C<$error> to them.
 
-=head1 CONSTANTS
 
-=head2 READABLE
 
-Checks whether the socket is readable
+=head1 CAVEATS
 
-=head2 WRITABLE
+On *nix any file descriptor (including sockets) can be polled.
 
-Checks whether the socket is writeable
-
-=head2 TYPE
-
-Poll type constant
-
-=head1 REFERENCES
-
-L<UniEvent::Handle>
-
-L<UniEvent::Idle>
-
-L<XS::Framework::CallbackDispatcher>
+On Windows only socket can be polled.
 
 =cut

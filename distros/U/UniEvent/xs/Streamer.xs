@@ -159,7 +159,7 @@ BOOT {
      Stash(__PACKAGE__).inherit("UniEvent::Streamer::IOutput");
 }
 
-FileOutput* FileOutput::new (string_view path)
+FileOutput* FileOutput::new (string_view path, int mode = Fs::DEFAULT_FILE_MODE)
 
 
 

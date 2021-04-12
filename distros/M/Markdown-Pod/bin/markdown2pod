@@ -25,7 +25,7 @@ markdown2pod - markdown2pod - convert Markdown text to Pod
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ then check L<Markdown::Pod> module.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Keedi Kim.
+This software is copyright (c) 2021 by Keedi Kim.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

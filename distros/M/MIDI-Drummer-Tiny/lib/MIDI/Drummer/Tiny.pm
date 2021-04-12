@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.1802';
+our $VERSION = '0.1803';
 
 use Math::Bezier;
 use MIDI::Simple ();
@@ -119,18 +119,18 @@ has sixteenth                     => (is => 'ro', default => sub { 'sn' });
 has triplet_sixteenth             => (is => 'ro', default => sub { 'tsn' });
 has dotted_sixteenth              => (is => 'ro', default => sub { 'dsn' });
 has double_dotted_sixteenth       => (is => 'ro', default => sub { 'ddsn' });
-has thirtysecond                  => (is => 'ro', default => sub { 'yn' });
-has triplet_thirtysecond          => (is => 'ro', default => sub { 'tyn' });
-has dotted_thirtysecond           => (is => 'ro', default => sub { 'dyn' });
-has double_dotted_thirtysecond    => (is => 'ro', default => sub { 'ddyn' });
-has sixtyfourth                   => (is => 'ro', default => sub { 'xn' });
-has triplet_sixtyfourth           => (is => 'ro', default => sub { 'txn' });
-has dotted_sixtyfourth            => (is => 'ro', default => sub { 'dxn' });
-has double_dotted_sixtyfourth     => (is => 'ro', default => sub { 'ddxn' });
-has onetwentyeighth               => (is => 'ro', default => sub { 'on' });
-has triplet_onetwentyeighth       => (is => 'ro', default => sub { 'ton' });
-has dotted_onetwentyeighth        => (is => 'ro', default => sub { 'don' });
-has double_dotted_onetwentyeighth => (is => 'ro', default => sub { 'ddon' });
+has thirtysecond                  => (is => 'ro', default => sub { 'xn' });
+has triplet_thirtysecond          => (is => 'ro', default => sub { 'txn' });
+has dotted_thirtysecond           => (is => 'ro', default => sub { 'dxn' });
+has double_dotted_thirtysecond    => (is => 'ro', default => sub { 'ddxn' });
+has sixtyfourth                   => (is => 'ro', default => sub { 'yn' });
+has triplet_sixtyfourth           => (is => 'ro', default => sub { 'tyn' });
+has dotted_sixtyfourth            => (is => 'ro', default => sub { 'dyn' });
+has double_dotted_sixtyfourth     => (is => 'ro', default => sub { 'ddyn' });
+has onetwentyeighth               => (is => 'ro', default => sub { 'zn' });
+has triplet_onetwentyeighth       => (is => 'ro', default => sub { 'tzn' });
+has dotted_onetwentyeighth        => (is => 'ro', default => sub { 'dzn' });
+has double_dotted_onetwentyeighth => (is => 'ro', default => sub { 'ddzn' });
 
 
 sub note { return shift->score->n(@_) }
@@ -381,7 +381,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.1802
+version 0.1803
 
 =head1 SYNOPSIS
 
@@ -719,7 +719,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

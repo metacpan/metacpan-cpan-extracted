@@ -7,12 +7,20 @@ subtest "uv backend" => sub {
     is UniEvent::Backend::UV()->name, "uv", "name ok";
 };
 
-UniEvent::default_backend()->name;
+subtest "default backend" => sub {
+    UniEvent::default_backend()->name;
+    dies_ok { UniEvent::set_default_backend(undef) } "cannot set null as default backend";
+};
 
-dies_ok { UniEvent::set_default_backend(undef) } "cannot set null as default backend";
+subtest "set default backend" => sub {
+    UniEvent::set_default_backend(UniEvent::Backend::UV());
+    UniEvent::Loop->default_loop();
+    dies_ok { UniEvent::set_default_backend(UniEvent::Backend::UV()) } "cannot change backend after global/default loop is accessed";
+};
 
-UniEvent::set_default_backend(UniEvent::Backend::UV());
-
-UniEvent::Loop->new(UniEvent::Backend::UV());
+subtest "create loop with specified backend" => sub {
+    UniEvent::Loop->new(UniEvent::Backend::UV());
+    pass();
+};
 
 done_testing();

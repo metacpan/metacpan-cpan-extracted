@@ -2,6 +2,8 @@ use 5.012;
 use warnings;
 use lib 't/lib'; use MyTest;
 
+test_catch '[timer]';
+
 my $l = UniEvent::Loop->default;
 
 subtest 'once timer' => sub {
@@ -46,15 +48,14 @@ subtest 'stop' => sub {
 subtest 'initial = repeat' => sub {
     $l->update_time;
     my $t = new UniEvent::Timer;
-    $t->event->add(sub {
+    time_mark();
+    $t->start(0.01, sub {
         my $h = shift;
         count();
         check_mark(0.01, "first call time and repeat call time are correct");
         time_mark();
         $h->stop if ++(state $i) == 10;
     });
-    time_mark();
-    $t->start(0.01);
     $l->run;
     check_count(10, "timer run 10 times");
 };
@@ -62,7 +63,8 @@ subtest 'initial = repeat' => sub {
 subtest 'different initial and repeat' => sub {
     $l->update_time;
     my $t = new UniEvent::Timer;
-    $t->event->add(sub {
+    time_mark();
+    $t->start(0.01, 0.03, sub {
         my $h = shift;
         ++(state $i);
         count();
@@ -71,8 +73,6 @@ subtest 'different initial and repeat' => sub {
         time_mark();
         $h->stop if $i == 5;
     });
-    time_mark();
-    $t->start(0.01, 0.03);
     $l->run;
     check_count(5, "timer run 5 times");
 };
@@ -82,7 +82,7 @@ subtest 'change repeat' => sub {
         $l->update_time;
         my $initial_meth = shift;
         my $t = new UniEvent::Timer;
-        $t->event->add(sub { $l->stop });
+        $t->callback(sub { $l->stop });
         $t->$initial_meth(0.02);
         $t->repeat(0.04);
         time_mark();
@@ -133,22 +133,53 @@ subtest 'reset' => sub {
     check_mark(0.02, "reset works");
 };
 
-subtest 'new start' => sub {
-    my $cnt = 0;
-    my $t = UE::Timer->start(0.001, sub {
-        my $t = shift;
-        $t->stop if ++$cnt == 2;
-    });
-    $l->run;
-    is $cnt, 2;
+subtest 'static ctors' => sub {
+    subtest 'create' => sub {
+        my $cnt = 0;
+        my $t = UE::Timer->create(0.001, sub { shift->stop if ++$cnt == 2 });
+        $l->run;
+        is $cnt, 2;
+    };
+
+    subtest 'UE::timer' => sub {
+        my $cnt = 0;
+        my $t = UE::timer 0.001, sub { shift->stop if ++$cnt == 2 };
+        $l->run;
+        is $cnt, 2;
+    };
+    
+    subtest 'create_once' => sub {
+        my $cnt = 0;
+        my $t = UE::Timer->create_once(0.001, sub {++$cnt});
+        $l->run for 1..3;
+        is $cnt, 1;
+    };
+    
+    subtest 'UE::timer_once' => sub {
+        my $cnt = 0;
+        my $t = UE::timer_once 0.001, sub {++$cnt};
+        $l->run for 1..3;
+        is $cnt, 1;
+    };
+    
+    subtest 'deprecated start' => sub {
+        my $cnt = 0;
+        my $t = UE::Timer->start(0.001, sub {
+            my $t = shift;
+            $t->stop if ++$cnt == 2;
+        });
+        $l->run;
+        is $cnt, 2;
+    };
+    
+    subtest 'deprecated once' => sub {
+        my $cnt = 0;
+        my $t = UE::Timer->once(0.001, sub {++$cnt});
+        $l->run for 1..3;
+        is $cnt, 1;
+    };
 };
 
-subtest 'new once' => sub {
-    my $cnt = 0;
-    my $t = UE::Timer->once(0.001, sub {++$cnt});
-    $l->run for 1..3;
-    is $cnt, 1;
-};
 
 subtest 'event listener' => sub {
     no warnings 'once';

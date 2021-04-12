@@ -78,11 +78,6 @@ NAME
     attributes, so if you don't want these values you'll have to explicitly
     set them to something else in the constructor.
 
-    Music::Intervals does some quite expensive calculations during the
-    process method. By default this method will run process before
-    returning the interval. You can avoid this by adding the argument
-    <no_process = 1>> to this method's arguments.
-
     NOTE: It would be nice to have the subtract method return a
     Music::Interval but it's a complex module, and only seems to deal with
     intervals inside a single octave.

@@ -1,17 +1,23 @@
-0.03    2017-06-01 (PERLANCAR)
+0.041   2021-04-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Update dependency's new name {,Data::}TableData::Object.
+
+
+0.03    2017-06-01  Released-By: PERLANCAR
 
 	- Update to newer TableData::Object API.
 
 	- Mention App::tchart.
 
 
-0.02    2015-01-03 (PERLANCAR)
+0.02    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.01    2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.01    2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
         - First release.
+

@@ -1,5 +1,12 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+1.4  Sun Apr 11 16:23:54 CEST 2021
+
+- Addressed issue with homebrew path reported for Crypt::OpenSSL::X509
+  REF: https://github.com/dsully/perl-crypt-openssl-x509/issues/81
+
+  The pattern is the same in this distribution
+
 1.3  Thu Jun  4 21:39:30 CEST 2020
 
 - Maintenance release addressing the broken inc/ configuration pointed out in: RT:77784 by HMBRAND

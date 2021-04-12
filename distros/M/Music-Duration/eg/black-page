@@ -6,17 +6,17 @@
 use strict;
 use warnings;
 
-use lib $ENV{HOME} . '/sandbox/MIDI-Util/lib';
-use MIDI::Util;
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util qw(setup_score);
 use Music::Duration;
 
-my $score = MIDI::Util::setup_score( bpm => 60 );
+my $score = setup_score( bpm => 60 );
 
 $score->n( 'qn', 'B4' );
-$score->n( 'yn', 'Fs4' );
-$score->n( 'yn', 'Fs4' );
-$score->n( 'yn', 'Cs4' );
-$score->n( 'yn', 'B4' );
+$score->n( 'xn', 'Fs4' );
+$score->n( 'xn', 'Fs4' );
+$score->n( 'xn', 'Cs4' );
+$score->n( 'xn', 'B4' );
 $score->n( 'den', 'A5' );
 $score->n( 'sn', 'G5' );
 $score->n( 'den', 'E5' );
@@ -39,21 +39,21 @@ $score->n( 'zhn', 'F5' );
 $score->n( 'zhn', 'D5' );
 
 $score->n( 'den', 'Cs4' );
-$score->n( 'yn', 'D4' );
-$score->n( 'yn', 'G5' );
+$score->n( 'xn', 'D4' );
+$score->n( 'xn', 'G5' );
 $score->n( 'dhn', 'E4' );
 
 Music::Duration::tuplet( 'en', 'z', 5 );
 Music::Duration::tuplet( 'qn', 'z', 7 );
 
-$score->n( 'yn', 'C4' );
-$score->n( 'yn', 'E4' );
-$score->n( 'yn', 'D4' );
-$score->n( 'yn', 'F4' );
-$score->n( 'yn', 'E4' );
-$score->n( 'yn', 'G4' );
-$score->n( 'yn', 'F5' );
-$score->n( 'yn', 'D4' );
+$score->n( 'xn', 'C4' );
+$score->n( 'xn', 'E4' );
+$score->n( 'xn', 'D4' );
+$score->n( 'xn', 'F4' );
+$score->n( 'xn', 'E4' );
+$score->n( 'xn', 'G4' );
+$score->n( 'xn', 'F5' );
+$score->n( 'xn', 'D4' );
 $score->n( 'ten', 'A5' );
 $score->n( 'ten', 'C5' );
 $score->n( 'ten', 'E5' );

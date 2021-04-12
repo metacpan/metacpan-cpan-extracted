@@ -4,3 +4,12 @@ xmlsec1 --sign --privkey-pem t/dsa.private.key --id-attr:ID "Response" --id-attr
 
 # Apply Signature 1 - DSA Signed
 xmlsec1 --sign --privkey-pem t/dsa.private.key --id-attr:ID "Assertion" t/unsigned/xml-sig-unsigned-dsa-multiple-1.xml > t/unsigned/xml-sig-unsigned-dsa-multiple-2.xml
+
+# hmac generate key
+xmlsec1 --keys --gen-key:tim hmac-1024 tim.xml
+
+# sign with hmac key
+xmlsec1 --sign --hmackey:tim tim.xml --id-attr:ID "foo" tmp.xml > hmac.xml
+
+# verify with hmac key
+xmlsec1 --verify --hmackey:tim tim.xml --id-attr:ID "foo" hmac.xml

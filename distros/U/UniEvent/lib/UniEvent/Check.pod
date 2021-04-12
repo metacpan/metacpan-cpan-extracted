@@ -1,10 +1,11 @@
 =head1 NAME
 
-UniEvent::Check - runs the given callback once after polling for I/O
+UniEvent::Check - run the given callback once per loop iteration, right after polling for i/o.
+
+
 
 =head1 SYNOPSIS
 
-    my $loop = UniEvent::Loop->new;
     my $h = UniEvent::Check->new($loop);
     $h->event->add(sub { say 'hello' });
     $h->start;
@@ -14,81 +15,68 @@ UniEvent::Check - runs the given callback once after polling for I/O
     $h->stop;
     $loop->run_nowait;  # no effect
 
-    $h->reset;
+    $h = UE::check sub { ... }, $loop;
+
+
 
 =head1 DESCRIPTION
 
-The Check handle is useful for doing post-I/O actions for a loop with
-the help of callback or listener. It is inherited from L<UniEvent::Handle>.
+The Check handle is useful for doing post-I/O actions for a loop.
+It is inherited from L<UniEvent::Handle>.
 
-If you need to do some actions B<before> polling I/O, consider using
-L<UniEvent::Prepare>.
+
 
 =head1 METHODS
 
-=head2 new([$loop = UniEvent::Loop->default_loop])
+All methods of L<UniEvent::Handle> also apply.
+
+=head2 create($callback, [$loop = default])
+
+    my $handle = UniEvent::Check->create(sub { say "hi" });
+
+Creates and starts a check handle. Alias for C<new($loop)> + C<start($callback)>.
+
+
+
+=head2 new([$loop = default])
 
 Constructs new Check handle and binds it to the specified event loop
 
-=head2 start([$callback = undef])
+
+
+=head2 start([$callback])
 
 Starts the check handle, i.e. makes it active for the next even loop
 iteration. Optionally it adds the C<$callback> to the event listeners.
 
+
+
 =head2 stop()
 
-Stops the check handle, i.e. makes it inactive for the next event loop
-iteration.
+Stops the check handle, i.e. makes it inactive for the next event loop iteration.
 
-=head2 callback($code)
 
-Sets the callback, which will be invoked after loop run. All previously
-set event listeners or callbacks are discarded.
+
+=head2 callback($sub)
 
 =head2 event()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked after loop run.
+Callback signature:
 
-The C++ interface is:
+    my $handle = shift; # the "check" handle itself
 
-    void(const CheckSP&);
+See L<UniEvent/"EVENT CALLBACKS">
 
-i.e. the callback returns nothing and as an argument takes Check handle
-itself.
 
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
+=head2 event_listener($delegate, [$weak])
 
-=head2 event_listener($delegate [, $weak = false])
+Method C<on_check> will be called.
 
-Creates and returns wrapper around the C<$delegate> object of arbitrary
-class, having the following methods:
+See L<UniEvent/"EVENT LISTENER">
 
-  $delegate->on_check($handle);
-
-The delegated object can be seen as alternative of setting indivitual callbacks
-or as a way of groupping them. The C<$delegate> object can optionally be weakened.
 
 =head2 call_now()
 
-Immediately ivokes assigned callbacks and listeners in the caller context
-(i.e. not waiting loop run).
-
-=head1 CONSTANTS
-
-=head2 TYPE
-
-Check type constant
-
-=head1 REFERENCES
-
-L<UniEvent::Handle>
-
-L<UniEvent::Idle>
-
-L<UniEvent::Prepare>.
-
-L<XS::Framework::CallbackDispatcher>
+Immediately invokes assigned callbacks and listeners.
 
 =cut

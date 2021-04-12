@@ -1,12 +1,15 @@
+#!/usr/bin/env perl
+# -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2021, Roland van Ipenburg
 use strict;
 use warnings;
 use utf8;
+use 5.014000;
 
 use Test::More;
-use Test::Warn;
-$ENV{AUTHOR_TESTING} && eval { require Test::NoWarnings };
+use Test::NoWarnings;
 
-use version;
+our $VERSION = 'v1.0.3';
 
 my @metars = (
     [
@@ -39,17 +42,11 @@ my @metars = (
     ],
 );
 
-plan tests => ( 0 + @metars ) + 1;
+Test::More::plan 'tests' => ( 0 + @metars ) + 1;
 
 require Geo::METAR::Deduced;
 my $m = Geo::METAR::Deduced->new();
 foreach my $metar (@metars) {
     $m->metar( @{$metar}[0] );
-    is( $m->rules(), @{$metar}[1], @{$metar}[2] );
+    Test::More::is( $m->rules(), @{$metar}[1], @{$metar}[2] );
 }
-
-my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
-SKIP: {
-    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
-}
-$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();

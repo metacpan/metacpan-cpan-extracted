@@ -1,7 +1,9 @@
 #include <xs/export.h>
 #include <xs/unievent/Signal.h>
+#include <xs/typemap/expected.h>
 #include <xs/unievent/Listener.h>
 #include <xs/CallbackDispatcher.h>
+#include <xs/unievent/error.h>
 
 using namespace xs;
 using namespace xs::unievent;
@@ -36,8 +38,19 @@ BOOT {
     unievent::register_perl_class(Signal::TYPE, stash);
 }
 
-Signal* Signal::new (LoopSP loop = {}) {
-    if (!loop) loop = Loop::default_loop();
+SignalSP create (SV* proto, int signum, Signal::signal_fn cb, DLoopSP loop = {}) {
+    PROTO = proto;
+    RETVAL = make_backref<Signal>(loop);
+    RETVAL->start(signum, cb);
+}
+
+SignalSP create_once (SV* proto, int signum, Signal::signal_fn cb, DLoopSP loop = {}) {
+    PROTO = proto;
+    RETVAL = make_backref<Signal>(loop);
+    RETVAL->once(signum, cb);
+}
+
+Signal* Signal::new (DLoopSP loop = {}) {
     RETVAL = make_backref<Signal>(loop);
 }
 
@@ -62,12 +75,18 @@ string signame (Sv obj_or_class_or_signum, SV* signum_sv = NULL) {
     else // $signal_class->signame($signum) or UniEvent::Signal::signame($signum)
         RETVAL = Signal::signame(signum_sv ? SvIV(signum_sv) : SvIV(obj_or_class_or_signum));
 }
-    
-void Signal::start (int signum, Signal::signal_fn cb = nullptr)
 
-void Signal::once (int signum, Signal::signal_fn cb = nullptr)
+void Signal::start (int signum, Signal::signal_fn cb = {}) {
+    XSRETURN_EXPECTED(THIS->start(signum, cb));
+}
 
-void Signal::stop ()
+void Signal::once (int signum, Signal::signal_fn cb = {}) {
+    XSRETURN_EXPECTED(THIS->once(signum, cb));
+}
+
+void Signal::stop () {
+    XSRETURN_EXPECTED(THIS->stop());
+}
 
 void Signal::call_now (int signum)
 
@@ -76,4 +95,17 @@ SignalSP watch (SV* CLASS, int signum, Signal::signal_fn cb, LoopSP loop = {}) {
     if (!loop) loop = Loop::default_loop();
     RETVAL = make_backref<Signal>(loop);
     RETVAL->start(signum, cb);
+}
+
+MODULE = UniEvent::Signal                PACKAGE = UniEvent
+PROTOTYPES: DISABLE
+
+SignalSP signal (int signum, Signal::signal_fn cb, DLoopSP loop = {}) {
+    RETVAL = make_backref<Signal>(loop);
+    RETVAL->start(signum, cb);
+}
+
+SignalSP signal_once (int signum, Signal::signal_fn cb, DLoopSP loop = {}) {
+    RETVAL = make_backref<Signal>(loop);
+    RETVAL->once(signum, cb);
 }

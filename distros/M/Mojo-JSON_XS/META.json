@@ -3,7 +3,7 @@
    "author" : [
       "Nic Sandfield <niczero@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -24,7 +24,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -35,24 +35,22 @@
       "runtime" : {
          "requires" : {
             "Cpanel::JSON::XS" : "3.0109",
-            "Mojolicious" : "5.66",
-            "perl" : "5.010001"
+            "Mojolicious" : "5.66"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "http://github.com/niczero/mojo-jsonxs/issues"
-      },
       "homepage" : "http://niczero.github.io/mojo-jsonxs",
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
-      ],
-      "repository" : {
-         "url" : "http://github.com/niczero/mojo-jsonxs"
-      }
+      ]
    },
-   "version" : 1.011,
+   "version" : 1.022,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

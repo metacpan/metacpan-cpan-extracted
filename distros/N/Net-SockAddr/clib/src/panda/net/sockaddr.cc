@@ -94,8 +94,8 @@ bool SockAddr::operator== (const SockAddr& oth) const {
 string SockAddr::ip () const {
     switch (sa.sa_family) {
         case AF_UNSPEC: return {};
-        case AF_INET:   return inet4().ip();
-        case AF_INET6:  return inet6().ip();
+        case AF_INET:   return as_inet4().ip();
+        case AF_INET6:  return as_inet6().ip();
         default: throw _not_supported();
     }
 }
@@ -103,8 +103,8 @@ string SockAddr::ip () const {
 uint16_t SockAddr::port () const {
     switch (sa.sa_family) {
         case AF_UNSPEC: return 0;
-        case AF_INET:   return inet4().port();
-        case AF_INET6:  return inet6().port();
+        case AF_INET:   return as_inet4().port();
+        case AF_INET6:  return as_inet6().port();
         default: throw _not_supported();
     }
 }
@@ -133,14 +133,14 @@ void SockAddr::fix_unix_path (size_t length) noexcept {
 std::ostream& operator<< (std::ostream& os, const SockAddr& sa) {
     switch (sa.family()) {
         case AF_UNSPEC : os << "<empty>"; break;
-        case AF_INET   : os << sa.inet4().ip() << ':' << sa.inet4().port(); break;
+        case AF_INET   : os << sa.as_inet4().ip() << ':' << sa.as_inet4().port(); break;
         case AF_INET6  :
-            os << '[' << sa.inet6().ip();
-            if (sa.inet6().scope_id()) os << '%' << sa.inet6().scope_id();
-            os << "]:" << sa.inet6().port();
+            os << '[' << sa.as_inet6().ip();
+            if (sa.as_inet6().scope_id()) os << '%' << sa.as_inet6().scope_id();
+            os << "]:" << sa.as_inet6().port();
             break;
         #ifndef _WIN32
-        case AF_UNIX   : os << sa.unix().path(); break;
+        case AF_UNIX   : os << sa.as_unix().path(); break;
         #endif
         default        : throw _not_supported();
     }

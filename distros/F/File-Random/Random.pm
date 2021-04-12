@@ -31,7 +31,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{':all'} }, 'corf' );
 our @EXPORT = qw(
 	
 );
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub _standard_dir($);
 sub _dir(%);

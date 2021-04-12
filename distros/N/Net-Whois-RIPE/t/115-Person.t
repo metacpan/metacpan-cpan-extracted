@@ -19,7 +19,7 @@ isa_ok $object, $class;
 
 # Non-inherited methods
 can_ok $object, qw( person address phone fax_no e_mail nic_hdl remarks notify
-    mnt_by changed source);
+    mnt_by source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -79,23 +79,11 @@ is_deeply( $object->notify(), ['MAIN-FR-MNT'], 'notify properly parsed' );
 $object->notify('Added notify');
 is( $object->notify()->[1], 'Added notify', 'notify properly added' );
 
-# Test 'abuse_mailbox'
-$tested{'abuse_mailbox'}++;
-is_deeply( $object->abuse_mailbox(), ['abuse@somewhere.com'], 'abuse_mailbox properly parsed' );
-$object->abuse_mailbox('abuse2@elsewhere.com');
-is( $object->abuse_mailbox()->[1], 'abuse2@elsewhere.com', 'abuse_mailbox properly added' );
-
 # Test 'remarks'
 $tested{'remarks'}++;
 is_deeply( $object->remarks(), ['Simple person object'], 'remarks properly parsed' );
 $object->remarks('Added remarks');
 is( $object->remarks()->[1], 'Added remarks', 'remarks properly added' );
-
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['xxx@somewhere.com 20121016'], 'changed properly parsed' );
-$object->changed('Added changed');
-is( $object->changed()->[1], 'Added changed', 'changed properly added' );
 
 # Test 'source'
 $tested{'source'}++;
@@ -122,8 +110,6 @@ org:          ORG-MISC02-RIPE
 nic-hdl:      NC123-RIPE
 mnt-by:       MAIN-FR-MNT
 notify:       MAIN-FR-MNT
-abuse-mailbox: abuse@somewhere.com
-changed:      xxx@somewhere.com 20121016
 source:       RIPE # Filtered
 
 

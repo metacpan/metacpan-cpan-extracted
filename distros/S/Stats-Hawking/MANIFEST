@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Stats-Hawking.t
+lib/Stats/Hawking.pm

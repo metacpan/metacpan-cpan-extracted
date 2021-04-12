@@ -1,4 +1,5 @@
 #include <xs/unievent/Stream.h>
+#include <xs/typemap/expected.h>
 #include <xs/unievent/Listener.h>
 #include <xs/CallbackDispatcher.h>
 
@@ -152,7 +153,8 @@ Ref Stream::event_listener (Sv lst = Sv(), bool weak = false) {
     RETVAL = event_listener<XSStreamListener>(THIS, ST(0), lst, weak);
 }
 
-#// listen([$callback], [$backlog]) or listen($backlog)
+#// listen([$callback], [$backlog])
+#// listen($backlog)
 void Stream::listen (Sv cb_bl = Sv(), int backlog = Stream::DEFAULT_BACKLOG) {
     if (items == 2 && cb_bl.is_simple()) {
         backlog = SvIV(cb_bl);
@@ -162,21 +164,12 @@ void Stream::listen (Sv cb_bl = Sv(), int backlog = Stream::DEFAULT_BACKLOG) {
         auto fn = xs::in<Stream::connection_fn>(cb_bl);
         if (fn) THIS->connection_event.add(fn);
     }
-    auto ret = THIS->listen(backlog);
-    if (GIMME_V == G_VOID) {
-        if (!ret) panda::exthrow(ret.error());
-        XSRETURN_EMPTY;
-    }
-    XPUSHs(boolSV(ret));
-    if (GIMME_V == G_ARRAY) {
-        if (ret) XPUSHs(&PL_sv_undef);
-        else     mXPUSHs(xs::out(ret.error()).detach());
-        XSRETURN(2);
-    }
-    XSRETURN(1);
+    XSRETURN_EXPECTED(THIS->listen(backlog));
 }
 
-void Stream::read_start ()
+void Stream::read_start () {
+    XSRETURN_EXPECTED(THIS->read_start());
+}
 
 void Stream::read_stop ()
 
@@ -216,14 +209,16 @@ void Stream::use_ssl (SslContext ctx = NULL) {
     else THIS->use_ssl();
 }
 
-int Stream::recv_buffer_size (Simple newval = Simple()) {
-    if (newval) THIS->recv_buffer_size(newval);
-    RETVAL = THIS->recv_buffer_size();
+void Stream::no_ssl ()
+
+void Stream::recv_buffer_size (Simple newval = Simple()) {
+    if (newval) XSRETURN_EXPECTED(THIS->recv_buffer_size(newval));
+    else        XSRETURN_EXPECTED(THIS->recv_buffer_size());
 }
 
-int Stream::send_buffer_size (Simple newval = Simple()) {
-    if (newval) THIS->send_buffer_size(newval);
-    RETVAL = THIS->send_buffer_size();
+void Stream::send_buffer_size (Simple newval = Simple()) {
+    if (newval) XSRETURN_EXPECTED(THIS->send_buffer_size(newval));
+    else        XSRETURN_EXPECTED(THIS->send_buffer_size());
 }
 
 void Stream::run_in_order (Stream::run_fn cb)

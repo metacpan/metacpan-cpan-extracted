@@ -28,7 +28,7 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.94"
+            "Rinci" : "v1.1.96"
          }
       },
       "runtime" : {
@@ -43,7 +43,7 @@
             "HTTP::CookieJar::LWP" : "0",
             "JSON::Encode::TableData" : "0",
             "LWP::UserAgent::Plugin" : "0.004",
-            "Log::ger" : "0.037",
+            "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Lite" : "1.827",
             "Sah::Schema::dirname" : "0",
@@ -67,7 +67,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom"
+         "web" : "https://github.com/perlancar/perl-App-CekBpom/issues"
       },
       "homepage" : "https://metacpan.org/release/App-CekBpom",
       "repository" : {
@@ -76,7 +76,7 @@
          "web" : "https://github.com/perlancar/perl-App-CekBpom"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -201,7 +201,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.041"
+            "version" : "0.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",

@@ -4,6 +4,8 @@ use MyTest;
 use UniEvent::Fs;
 use UniEvent::Error;
 
+test_catch '[fs]';
+
 BEGIN { *Fs:: = *UniEvent::Fs:: }
 
 my $vdir  = var("");
@@ -217,6 +219,12 @@ subtest 'xs-sync' => sub {
             Fs::close($fd);
         };
     };
+    
+    subtest "statfs" => sub {
+        my $ret = Fs::statfs("/");
+        ok $ret->[STATFS_BSIZE];
+        ok $ret->[STATFS_BLOCKS];
+    } unless win32();
 
     subtest "exists/isfile/isdir" => sub {
         ok !Fs::exists($file);
@@ -345,11 +353,36 @@ subtest 'xs-sync' => sub {
         ok Fs::isfile($file2);
         ok !Fs::exists($file);
     };
+    
+    subtest "mkdtemp" => sub {
+        my $dir = Fs::mkdtemp(var("tmpXXXXXX"));
+        ok $dir;
+        ok Fs::isdir($dir);
+    };
+
+    subtest "mkstemp" => sub {
+        my $ret = Fs::mkstemp(var("tmpXXXXXX"));
+        ok $ret;
+        ok $ret->[0];
+        ok $ret->[1];
+        ok Fs::isfile($ret->[0]);
+        Fs::write($ret->[1], "hello world");
+        Fs::close($ret->[1]);
+        is Fs::stat($ret->[0])->[STAT_SIZE], 11;
+    };
 };
 
 ######################### ASYNC ###############################
 subtest 'xs-async' => sub {
     $async_mode = 1;
+    
+    subtest "fs request" => sub {
+        my $req = Fs::mkdtemp(var("tmpXXXXXX"), sub { $happened++ });
+        isa_ok $req, 'UniEvent::Request::Fs';
+        isa_ok $req, 'UniEvent::Work';
+        ok $req->active;
+        $l->run();
+    };
     
     subtest "mkdir" => sub {
         subtest "ok" => sub {
@@ -451,6 +484,15 @@ subtest 'xs-async' => sub {
             Fs::close($fd);
         };
     };
+    
+    subtest "statfs" => sub {
+        my ($info, $err);
+        Fs::statfs("/", sub { ($info, $err) = @_; $happened++ });
+        $l->run;
+        ok !$err;
+        ok $info->[STATFS_BSIZE];
+        ok $info->[STATFS_BLOCKS];
+    } unless win32();
 
     subtest "exists/isfile/isdir" => sub {
         $expected = 9;
@@ -634,6 +676,28 @@ subtest 'xs-async' => sub {
         $l->run();
         ok !Fs::exists($file);
         ok Fs::isfile($file2);
+    };
+    
+    subtest "mkdtemp" => sub {
+        my ($path, $err);
+        Fs::mkdtemp(var("tmpXXXXXX"), sub { ($path, $err) = @_; $happened++ });
+        $l->run();
+        ok !$err;
+        ok $path;
+        ok Fs::isdir($path);
+    };
+
+    subtest "mkstemp" => sub {
+        my ($path, $fd, $err);
+        Fs::mkstemp(var("tmpXXXXXX"), sub { ($path, $fd, $err) = @_; $happened++ });
+        $l->run();
+        ok !$err;
+        ok $path;
+        ok Fs::isfile($path);
+
+        Fs::write($fd, "hello world");
+        Fs::close($fd);
+        is Fs::stat($path)->[STAT_SIZE], 11;
     };
 };
 

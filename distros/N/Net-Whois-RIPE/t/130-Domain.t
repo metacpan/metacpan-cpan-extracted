@@ -19,7 +19,7 @@ isa_ok $object, $class;
 
 # Non-inherited methods
 can_ok $object, qw( domain descr org admin_c tech_c zone_c nserver ds_rdata 
-    remarks notify mnt_by changed source);
+    remarks notify mnt_by source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -91,12 +91,6 @@ is_deeply( $object->notify(), ['watcher@somewhere.net'], 'notify properly parsed
 $object->notify('Added notify');
 is( $object->notify()->[1], 'Added notify', 'notify properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['someoneelese@somewere.net 20090429'], 'changed properly parsed' );
-$object->changed('Added changed');
-is( $object->changed()->[1], 'Added changed', 'changed properly added' );
-
 # Test 'source'
 $tested{'source'}++;
 is( $object->source(), 'RIPE # Filtered', 'source properly parsed' );
@@ -121,6 +115,5 @@ remarks:    Nothing to say
 notify:     watcher@somewhere.net
 mnt-by:     DOM-MAINT
 ds-rdata:   64431 5 1 278BF194C29A812B33935BB2517E17D1486210FA
-changed:    someoneelese@somewere.net 20090429
 source:     RIPE # Filtered
 

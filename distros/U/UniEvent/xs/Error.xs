@@ -24,11 +24,12 @@ BOOT {
     
     Stash("UniEvent")["SystemError::"] = Stash("XS::STL")["errc::"];
     
-    error_stash.add_const_sub("system_category",  xs::out<const std::error_category*>(&make_error_code(std::errc::timed_out).category()));
-    error_stash.add_const_sub("category",         xs::out<const std::error_category*>(&error_category));
-    error_stash.add_const_sub("resolve_category", xs::out<const std::error_category*>(&resolve_error_category));
-    error_stash.add_const_sub("ssl_category",     xs::out<const std::error_category*>(&ssl_error_category));
-    error_stash.add_const_sub("openssl_category", xs::out<const std::error_category*>(&openssl_error_category));
+    error_stash.add_const_sub("system_category",   xs::out<const std::error_category*>(&make_error_code(std::errc::timed_out).category()));
+    error_stash.add_const_sub("category",          xs::out<const std::error_category*>(&error_category));
+    error_stash.add_const_sub("resolve_category",  xs::out<const std::error_category*>(&resolve_error_category));
+    error_stash.add_const_sub("ssl_category",      xs::out<const std::error_category*>(&ssl_error_category));
+    error_stash.add_const_sub("openssl_category",  xs::out<const std::error_category*>(&openssl_error_category));
+    error_stash.add_const_sub("streamer_category", xs::out<const std::error_category*>(&streamer_error_category));
     
     create_error_constants(error_stash, {
         {"unknown_error",                               errc::unknown_error},
@@ -78,6 +79,12 @@ BOOT {
         {"not_initialized",       resolve_errc::not_initialized},
         {"iphlpapi_load_error",   resolve_errc::iphlpapi_load_error},
         {"no_get_network_params", resolve_errc::no_get_network_params},
+    });
+    
+    Stash streamer_error_stash("UniEvent::StreamerError", GV_ADD);
+    create_error_constants(streamer_error_stash, {
+        {"read_error",  streamer_errc::read_error},
+        {"write_error", streamer_errc::write_error},
     });
 }
 

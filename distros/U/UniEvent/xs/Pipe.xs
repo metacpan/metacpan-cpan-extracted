@@ -1,22 +1,13 @@
+#include <xs/export.h>
 #include <xs/unievent/Pipe.h>
+#include <xs/typemap/expected.h>
 #include <panda/unievent/util.h>
 
 using namespace xs;
+using namespace panda::unievent;
 using namespace xs::unievent;
 using panda::string;
 using panda::ErrorCode;
-using panda::unievent::Pipe;
-using panda::unievent::Loop;
-using panda::unievent::Error;
-using panda::unievent::Stream;
-using panda::unievent::LoopSP;
-using panda::unievent::PipeSP;
-using panda::unievent::StreamSP;
-using panda::unievent::Ownership;
-using panda::unievent::last_sys_error;
-using panda::unievent::ConnectRequest;
-using panda::unievent::ConnectRequestSP;
-using panda::unievent::PipeConnectRequest;
 
 static inline PipeSP create_pipe (const LoopSP& loop, bool ipc) {
     PipeSP ret = make_backref<Pipe>(loop, ipc);
@@ -38,6 +29,13 @@ BOOT {
     s.inherit("UniEvent::Stream");
     s.add_const_sub("TYPE", Simple(Pipe::TYPE.name));
     unievent::register_perl_class(Pipe::TYPE, s);
+    
+    xs::exp::create_constants(s, {
+        {"MODE_NOT_CONNECTED", Pipe::Mode::not_connected},
+        {"MODE_READABLE",      Pipe::Mode::readable},
+        {"MODE_WRITABLE",      Pipe::Mode::writable}
+    });
+    xs::exp::autoexport(s);
 }
 
 PipeSP Pipe::new (LoopSP loop = {}, bool ipc = false) {
@@ -45,11 +43,13 @@ PipeSP Pipe::new (LoopSP loop = {}, bool ipc = false) {
     RETVAL = create_pipe(loop, ipc);
 }
 
-void Pipe::open (Sv fd, bool connected = false) {
-    THIS->open(sv2fd(fd), Ownership::SHARE, connected);
+void Pipe::open (Sv fd, int mode) {
+    XSRETURN_EXPECTED(THIS->open(sv2fd(fd), mode, Ownership::SHARE));
 }
 
-void Pipe::bind (panda::string_view name)
+void Pipe::bind (panda::string_view name) {
+    XSRETURN_EXPECTED(THIS->bind(name));
+}
 
 ConnectRequestSP Pipe::connect (string name, Sub callback = Sub()) {
     Stream::connect_fn fn;
@@ -63,13 +63,16 @@ ConnectRequestSP Pipe::connect (string name, Sub callback = Sub()) {
     RETVAL = req;
 }
 
-string Pipe::sockname () : ALIAS(peername=1) {
+void Pipe::sockname () : ALIAS(peername=1) {
     auto ret = ix == 0 ? THIS->sockname() : THIS->peername();
-    if (!ret) XSRETURN_UNDEF;
-    RETVAL = *ret;
+    XSRETURN_EXPECTED(ret);
 }
 
 void Pipe::pending_instances (int count)
+
+void Pipe::chmod (int mode) {
+    XSRETURN_EXPECTED(THIS->chmod(mode));
+}
 
 #// pair([$loop])
 #// pair($reader, $writer)
@@ -91,22 +94,9 @@ void pair (Sv arg1 = Sv(), Sv arg2 = Sv()) {
     if (!reader) reader = create_pipe(loop, false);
     if (!writer) writer = create_pipe(loop, false);
     if (reader->ipc() || writer->ipc()) throw "both reader and writer must be created with ipc = false";
-
-    int fds[2];
-    if (PerlProc_pipe(fds) < 0) throw Error(last_sys_error());
-
-    try {
-        reader->read_start();
-        reader->open(fds[0], Ownership::TRANSFER, true);
-        writer->read_stop();
-        writer->open(fds[1], Ownership::TRANSFER, true);
-    } catch (...) {
-        reader->reset();
-        writer->reset();
-        PerlLIO_close(fds[0]);
-        PerlLIO_close(fds[1]);
-        throw;
-    }
+    
+    auto ret = Pipe::pair(reader, writer);
+    if (!ret) throw Error(ret.error());
 
     mXPUSHs(xs::out(reader).detach());
     mXPUSHs(xs::out(writer).detach());

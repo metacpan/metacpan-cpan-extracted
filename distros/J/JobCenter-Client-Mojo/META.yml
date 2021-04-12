@@ -22,7 +22,7 @@ resources:
   bugtracker: https://github.com/a6502/JobCenter-Client-Mojo/issues
   homepage: https://github.com/a6502/JobCenter-Client-Mojo
   repository: https://github.com/a6502/JobCenter-Client-Mojo.git
-version: '0.43'
+version: '0.44'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

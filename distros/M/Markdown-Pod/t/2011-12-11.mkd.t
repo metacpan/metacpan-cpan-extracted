@@ -41,7 +41,7 @@ Gnome 데스크탑의 기본 뼈대가 되는 부분이라고 해도 과언이 �
 그 편의성은 상상 그 이상이라고 할 수 있습니다.
 
 =for html <img src="2011-12-11-01.png" alt="GE.TT" width="700" />
-<br  />
+<br />
 
 I<그림 1.> GE.TT L<(원본)|2011-12-11-01.png>
 
@@ -161,7 +161,7 @@ I<Create app>을 클릭한 다음 이름과 웹사이트 및 설명을 입력하
 C<api_key>를 발급 받습니다.
 
 =for html <img src="2011-12-11-02.png" alt="GE.TT API 키 발급" width="700" />
-<br  />
+<br />
 
 I<그림 2.> GE.TT API 키 발급 L<(원본)|2011-12-11-02.png>
 
@@ -236,7 +236,7 @@ I<노틸러스 동작 설정> 프로그램의 영문 이름은 I<Nautilus Action
 로컬 설정이 달라서 영문 버전을 사용한다면 참고하세요.
 
 =for html <img src="2011-12-11-03.png" alt="시스템 - 기본 설정 - 노틸러스 동작 설정" />
-<br  />
+<br />
 
 I<그림 3.> 시스템 - 기본 설정 - 노틸러스 동작 설정
 
@@ -253,7 +253,7 @@ C<File - New action>을 누르거나 툴바 메뉴에서 C<+> 기호가 있는 �
 팝업 메뉴에서 보일 이름입니다.
 
 =for html <img src="2011-12-11-04.png" alt="노틸러스 동작 추가" width="700" />
-<br  />
+<br />
 
 I<그림 4.> 노틸러스 동작 추가 L<(원본)|2011-12-11-04.png>
 
@@ -276,7 +276,7 @@ I<Parameters>: C<%M>
 =back
 
 =for html <img src="2011-12-11-05.png" alt="Command 섹션 변경" width="700" />
-<br  />
+<br />
 
 I<그림 5.> Command 섹션 변경 L<(원본)|2011-12-11-05.png>
 
@@ -296,7 +296,7 @@ C<Appears if selection has multiple files or folders> 체크박스를
 활성화시킵니다.
 
 =for html <img src="2011-12-11-06.png" alt="Conditions 섹션 변경" width="700" />
-<br  />
+<br />
 
 I<그림 6.> Conditions 섹션 변경 L<(원본)|2011-12-11-06.png>
 
@@ -306,7 +306,7 @@ C<gconf-editor> 명령을 실행시키면 C</apps/nautilus-actions/configuration
 하부에 조금 전에 추가한 노틸러스 동작이 저장되어 있는 것을 확인할 수 있습니다.
 
 =for html <img src="2011-12-11-07.png" alt="gconf-editor" width="700" />
-<br  />
+<br />
 
 I<그림 7.> gconf-editor L<(원본)|2011-12-11-07.png>
 
@@ -508,7 +508,7 @@ L<INI 형식의 설정 파일|http://en.wikipedia.org/wiki/INI_file>은 L<CPAN�
 버튼을 눌러서 C<Send to GE.TT> 항목을 선택합니다.
 
 =for html <img src="2011-12-11-08.png" alt="GE.TT로 파일 공유하기" />
-<br  />
+<br />
 
 I<그림 8.> GE.TT로 파일 공유하기
 
@@ -517,7 +517,7 @@ C<zenity>에게 보내주므로 일정 시간이 지나면 Gnome 데스크탑 �
 결과를 보여줍니다.
 
 =for html <img src="2011-12-11-09.png" alt="성공!!" width="700" />
-<br  />
+<br />
 
 I<그림 9.> 성공!! L<(원본)|2011-12-11-09.png>
 
@@ -526,7 +526,7 @@ I<그림 9.> 성공!! L<(원본)|2011-12-11-09.png>
 이제 링크를 필요한 사람에게 알려주는 일만 남았네요. :)
 
 =for html <img src="2011-12-11-10.png" alt="GE.TT 사이트에서 확인한 화면" width="700" />
-<br  />
+<br />
 
 I<그림 10.> GE.TT 사이트에서 확인한 화면 L<(원본)|2011-12-11-10.png>
 

@@ -34,6 +34,7 @@ my $key = $options{'k'} || $options{'p'} || get_key(!$decrypt);
 my $cipher = Crypt::CBC->new(-pass   =>  $key,
 			     -cipher => 'Crypt::Cipher::AES',
 			     -pbkdf  => 'pbkdf2',
+			     -chain_mode => 'ctr',
 			    ) || die "Couldn't create CBC object";
 $cipher->start($decrypt ? 'decrypt' : 'encrypt');
 

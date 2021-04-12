@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "HTTP::CookieJar::LWP" => 0,
     "JSON::Encode::TableData" => 0,
     "LWP::UserAgent::Plugin" => "0.004",
-    "Log::ger" => "0.037",
+    "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.827",
     "Sah::Schema::dirname" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -67,7 +67,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON::Encode::TableData" => 0,
   "LWP::UserAgent::Plugin" => "0.004",
-  "Log::ger" => "0.037",
+  "Log::ger" => "0.038",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.827",
   "Sah::Schema::dirname" => 0,

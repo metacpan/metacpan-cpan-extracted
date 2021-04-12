@@ -4,8 +4,10 @@ author:
   - 'Patrick Lecoanet <lecoanet@cena.fr>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Tk: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -19,9 +21,9 @@ no_index:
     - inc
 requires:
   ExtUtils::MakeMaker: '6.98'
-  Tk: '8.004'
+  Tk: '800.004'
   perl: '5.006'
 resources:
   repository: https://github.com/asb-capfan/TkZinc
-version: 3.304
+version: 3.306
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

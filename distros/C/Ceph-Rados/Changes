@@ -1,5 +1,8 @@
 Revision history for Perl extension Ceph::Rados.
 
+0.14  Mon 12 Apr 17:29:09 BST 2021
+    - read to handle now supports pseudo-handles (objects with a 'write' method)
+
 0.13  Fri  2 Apr 21:24:51 BST 2021
     - fixes _write_to_fh()
 
@@ -7,7 +10,7 @@ Revision history for Perl extension Ceph::Rados.
     - fixes range buffer length bug
 
 0.13  Mon 22 Mar 17:33:28 GMT 2021
-    - allow randed hadle reads (for e.g. serving Catalyst 'Range:' header requests)
+    - allow ranged haindle reads (for e.g. serving Catalyst 'Range:' header requests)
     - rados_ioctx_pool_required_alignment() is deprecated, replace with
       rados_ioctx_pool_required_alignment2()
 

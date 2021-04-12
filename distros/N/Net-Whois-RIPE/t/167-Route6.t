@@ -20,7 +20,7 @@ isa_ok $object, $class;
 # Non-inherited methods
 can_ok $object, qw( route6 descr origin org holes member_of inject aggr_mtd
     aggr_bndry export_comps components remarks notify mnt_lower mnt_routes mnt_by
-    changed source);
+    source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -136,12 +136,6 @@ is_deeply( $object->mnt_routes(), ['MAINT-EXAMPLECOM'], 'mnt_routes properly par
 $object->mnt_routes('MAINT2-EXAMPLECOM');
 is( $object->mnt_routes()->[1], 'MAINT2-EXAMPLECOM', 'mnt_routes properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['abc@somewhere.com 20120131'], 'changed properly parsed' );
-$object->changed('abc@somewhere.com 20120228');
-is( $object->changed()->[1], 'abc@somewhere.com 20120228', 'changed properly added' );
-
 # Test 'source'
 $tested{'source'}++;
 is( $object->source(), 'RIPE', 'source properly parsed' );
@@ -172,7 +166,6 @@ mnt-lower:      MAINT-EXAMPLECOM
 mnt-routes:     MAINT-EXAMPLECOM
 pingable:       10.0.0.1
 ping-hdl:       PING-EXAMPLECOM
-changed:        abc@somewhere.com 20120131
 source:         RIPE
 
 

@@ -1,0 +1,28 @@
+---
+abstract: 'generate openapi definition'
+author:
+  - 'Anton Fedotov <tosha.fedotov.2000@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenAPI-Generator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/doojonio/OpenAPI-Generator/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/doojonio/OpenAPI-Generator.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

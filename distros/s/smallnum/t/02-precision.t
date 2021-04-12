@@ -1,7 +1,7 @@
 use Test::More;
-use smallnum '0.1';
-is(smallnum::num(\1), 1);
-is(smallnum::num(0.23765234354654), 0.2);
+use smallnum '0.1', '0.55555555';
+is(smallnum::_num(\1), 1);
+is(smallnum::_num(0.23765234354654), 0.2);
 is(0.23765234354654, 0.2);
 is(10 + 20.45, 30.5);
 is(15 / 5.34, 2.8);
@@ -24,4 +24,7 @@ my $other = 10;
 my $l = ($yay + $other) / 2;
 is($l, 7.5);
 is(10 + -10, 0);
+is(smallnum::_num(-5), -5);
+is(smallnum::_divide(10, 0), 0);
+is(smallnum::_divide(0, 10), 0);
 done_testing;

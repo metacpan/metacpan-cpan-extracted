@@ -12,9 +12,7 @@ my $l = UniEvent::Loop->default_loop;
 sub slp ($) { select undef, undef, undef, $_[0]; }
 
 subtest 'non-existant file' => sub {
-    my $h = new UniEvent::FsPoll;
-    $h->start(var 'file', 0.01);
-    $h->poll_callback(check_err(UE::SystemError::ENOENT, "watch non-existant file"));
+    my $h = UniEvent::FsPoll->create(var 'file', 0.01, check_err(UE::SystemError::ENOENT, "watch non-existant file"));
     is($h->path, var 'file', "path getter works");
     $l->run;
     $l->run_nowait; # must be called only once
@@ -22,9 +20,7 @@ subtest 'non-existant file' => sub {
 };
 
 subtest 'file appears' => sub {
-    my $h = new UniEvent::FsPoll;
-    $h->start(var 'file', 0.01);
-    $h->poll_callback(check_err(UE::SystemError::ENOENT, "watch non-existant file"));
+    my $h = UE::fs_poll var 'file', 0.01, check_err(UE::SystemError::ENOENT, "watch non-existant file");
     $l->run;
     check_call_cnt(1);
     $h->poll_callback(check_appears("file appears"));

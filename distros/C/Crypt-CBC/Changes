@@ -1,4 +1,8 @@
 Revision history for Perl extension Crypt::CBC.
+3.02
+	- CTR mode now requires the Math::Int128 module, which gives a ~5x performance
+	  boost over Math::BigInt.
+	
 3.01
 	- Warn when the deprecated opensslv1 PBKDF (key derivation function) is used
 	  for encryption. Turn off with -nodeprecate=>1 or by choosing a different

@@ -18,7 +18,7 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited methods
-can_ok $object, qw( role address phone fax_no e_mail admin_c tech_c nic_hdl remarks notify mnt_by changed source);
+can_ok $object, qw( role address phone fax_no e_mail admin_c tech_c nic_hdl remarks notify mnt_by source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -96,12 +96,6 @@ is_deeply( $object->notify(), ['E???-MNT'], 'notify properly parsed' );
 $object->notify('Added notify');
 is( $object->notify()->[1], 'Added notify', 'notify properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['xxx@somewhere.com 20121016'], 'changed properly parsed' );
-$object->changed('Added changed');
-is( $object->changed()->[1], 'Added changed', 'changed properly added' );
-
 # Test 'abuse_mailbox'
 $tested{'abuse_mailbox'}++;
 $object->abuse_mailbox('foo@example.com');
@@ -140,6 +134,5 @@ tech-c:         C?????-RIPE
 nic-hdl:        C??????-RIPE
 mnt-by:         E???-MNT
 notify:         E???-MNT
-changed:        xxx@somewhere.com 20121016
 source:         RIPE # Filtered
 

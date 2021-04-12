@@ -1,5 +1,5 @@
 package Statocles::Role::PageAttrs;
-our $VERSION = '0.097';
+our $VERSION = '0.098';
 # ABSTRACT: A role implementing common attributes for pages/documents
 
 use Statocles::Base 'Role';
@@ -160,7 +160,7 @@ Statocles::Role::PageAttrs - A role implementing common attributes for pages/doc
 
 =head1 VERSION
 
-version 0.097
+version 0.098
 
 =head1 ATTRIBUTES
 

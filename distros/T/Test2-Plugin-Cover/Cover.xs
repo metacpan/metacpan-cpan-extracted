@@ -28,15 +28,15 @@ static OP* my_subhandler(pTHX) {
     OP* out = orig_subhandler(aTHX);
 
     if (out != NULL && (out->op_type == OP_NEXTSTATE || out->op_type == OP_DBSTATE)) {
-        SV *subpkg  = NULL;
+//        SV *subpkg  = NULL;
         SV *subname = NULL;
 
         GV *my_gv = sub_to_gv(aTHX_ *SP);
         if (my_gv != NULL) {
-            HV *stash = GvSTASH(my_gv);
-            if (stash) {
-                subpkg = newSVpv(HvNAME(stash), 0);
-            }
+//            HV *stash = GvSTASH(my_gv);
+//            if (stash) {
+//                subpkg = newSVpv(HvNAME(stash), 0);
+//            }
             subname = newSVpv(GvNAME(my_gv), 0);
         }
 
@@ -52,9 +52,9 @@ static OP* my_subhandler(pTHX) {
             hv_store(item, "called_by", 9, from_val, 0);
         }
 
-        if (subpkg) {
-            hv_store(item, "sub_package", 11, subpkg, 0);
-        }
+//        if (subpkg) {
+//            hv_store(item, "sub_package", 11, subpkg, 0);
+//        }
         if (subname) {
             hv_store(item, "sub_name", 8, subname, 0);
         }

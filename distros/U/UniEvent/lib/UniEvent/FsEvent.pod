@@ -1,105 +1,123 @@
 =head1 NAME
 
-UniEvent::FsEvent - cross-platform file monitoring
+UniEvent::FsEvent - cross-platform file/dir monitoring
+
+
 
 =head1 SYNOPSIS
 
     use UniEvent::FsEvent; # imports constants
 
-    my $loop = UniEvent::Loop->new;
-    my $h = UniEvent::FsEvent->new($loop);
-    my $dir = "/tmp/";
-    $h->start($dir);
-    $h->callback(sub {
+    my $h = UniEvent::FsEvent->new;
+    $h->start("/tmp/", RECURSIVE, sub {
         my ($handle, $filename, $events, $error_code) = @_;
             if ($events & RENAME) {
-            say "file $dir/$filename has been renamed";
+            say "file $filename has been renamed";
         }
     });
-    $loop->run;
+    UE::Loop->default->run;
+
+
 
 =head1 DESCRIPTION
 
 The C<FsEvent> is useful for monitoring individual file events , e.g.
 when file is renamed, created or when its content was changed.
 It works on major operational systems, including Windows; however
-the order of events might very system dependent.
+the order of events might be system dependent.
+This handle uses the best backend for the job on each platform.
 
 The C<UniEvent::FsEvent> is inherited from L<UniEvent::Handle>.
 
+
+
 =head1 METHODS
 
-=head2 new([$loop = UniEvent::Loop->default_loop])
+All methods of L<UniEvent::Handle> also apply.
+
+=head2 create($path, $flags, $callback, [$loop = default])
+
+    my $handle = UniEvent::FsEvent->create("my/file", 0, sub { say "hi" });
+
+Creates and starts an fs event handle. Alias for C<new($loop)> + C<start($path, $flags, $callback)>.
+
+
+=head2 new([$loop = default])
 
 Constructs new FsEvent handle and binds it to the specified event loop
 
-=head2 start($path [, $flags = 0 [, $callback]] )
+
+=head2 start($path, [$flags], [$callback])
 
 Starts monitoring file system events on the specified C<$path>,
 i.e. makes it active for the next even loop iteration. The C<$path>
 can point to file as well as to directory.
 
-The C<$flags> is a bitmask of interested events (see C<FLAGS> below)
+The C<$flags> is a bitmask of (in UE::FsEvent::*):
 
-The C<$callback> is invoked with the current handle, C<$filename>
-where change occured, the bitmask of actually occurred event and
-error code, i.e.
+=over
 
-   $callback->($handle, $filename, $events, $error_code)
+=item RECURSIVE
 
-=head2 callback($code)
+Watch for changes recursively (might not be available on all operating systems)
 
-Sets the callback, which will be triggered once an event occur.
+=back
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 stop()
+
+Stops monitoring file system events.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 callback($sub)
 
 =head2 event()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked upon changes on a file.
-The C++ interface is:
+Callback signature:
 
-    void(const FsEventSP&, const string_view& file, int events, const std::error_code&);
+    my ($handle, $filename, $events, $error) = @_;
 
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
+Where C<$handle> is the FsEvent handle object itself.
 
-=head2 event_listener($delegate [, $weak = false])
+C<$filename> is path to the triggered file. If the handle was started with a directory the filename parameter will be a relative path
+to a file contained in the directory.
 
-Creates and returns wrapper around the C<$delegate> object of arbitrary
-class, having the following methods:
+The C<$events> parameter is an ORed mask of these flags (in UE::FsEvent::*):
 
-  $delegate->on_fs_event($filename, $events, $error_code);
+=over
 
-The delegated object can be seen as alternative of setting indivitual callbacks
-or as a way of groupping them. The C<$delegate> object can optionally be weakened.
+=item RENAME
+
+When file was moved
+
+=item CHANGE
+
+When file data (content) or metadata changes (e.g. C<mtime>).
+
+=back
+
+The C<$error> parameter will be an L<XS::ErrorCode> object if any.
+
+See L<UniEvent/"EVENT CALLBACKS">
+
+
+=head2 event_listener($delegate, [$weak])
+
+Method C<on_fs_event> will be called.
+
+See L<UniEvent/"EVENT LISTENER">
+
 
 =head2 path()
 
 Returns the currently monitored path.
 
+
 =head1 CONSTANTS
 
-=head2 FLAGS
-
-=head3 RECURSIVE
-
-Watch for changes recursively (might not be available on all OSes)
-
-=head3 RENAME
-
-Watch for file or directory renaming
-
-=head3 CHANGE
-
-Watch for the file data (content) or metadata changes (e.g. C<mtime>)
-
-=head2 TYPE
-
-FsEvent type constant
-
-=head1 REFERENCES
-
-L<UniEvent::Handle>
-
-L<XS::Framework::CallbackDispatcher>
 
 =cut

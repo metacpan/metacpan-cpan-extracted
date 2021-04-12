@@ -15,7 +15,7 @@ BEGIN { use_ok('DBI');
 
 my ($Uid, $Pwd, $Srv, $Db) = _test::get_info();
 
-my $dbh = DBI->connect("dbi:Sybase:server=$Srv;database=$Db", $Uid, $Pwd, {PrintError => 1});
+my $dbh = DBI->connect("dbi:Sybase:$Srv;database=$Db", $Uid, $Pwd, {PrintError => 1});
 
 plan skip_all => "No connection - did you set the user, password and server name correctly in PWD?\n"
     unless $dbh;
@@ -80,7 +80,7 @@ SKIP: {
     ];
 
 SKIP: {
-    skip 'requires ASE 15 ', 1 if $dbh->{syb_server_version} lt '15' || $dbh->{syb_server_version} eq 'Unknown';
+    skip 'requires ASE 15 ', 1 if $dbh->{syb_server_version} lt '15' || $dbh->{syb_server_version} eq 'Unknown' || $dbh->{syb_server_version} eq 'MS-SQL';
     $dbh->do("create table #t2(t1 tinyint, t2 bigint)");
     
     my $sth3 = $dbh->prepare("insert #t2 values(?, ?)");

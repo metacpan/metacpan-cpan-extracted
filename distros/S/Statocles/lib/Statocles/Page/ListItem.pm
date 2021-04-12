@@ -1,5 +1,5 @@
 package Statocles::Page::ListItem;
-our $VERSION = '0.097';
+our $VERSION = '0.098';
 # ABSTRACT: An item in a List page
 
 use Statocles::Base 'Class';
@@ -142,7 +142,7 @@ Statocles::Page::ListItem - An item in a List page
 
 =head1 VERSION
 
-version 0.097
+version 0.098
 
 =head1 DESCRIPTION
 

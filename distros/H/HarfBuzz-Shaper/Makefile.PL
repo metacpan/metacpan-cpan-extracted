@@ -99,6 +99,9 @@ EOD
     if ( $Config{osname} eq "freebsd" && $Config{osvers} =~ /^10\./ ) {
 	$args{LIBS} = [];
     }
+    elsif ( $^O =~ /darwin/i ) {
+	$args{LIBS} = [ '-lc++' ];
+    }
     else {
 	$args{LIBS} = [ '-lstdc++' ];
     }

@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Encode;
 
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 require XSLoader;
 XSLoader::load('HarfBuzz::Shaper', $VERSION);

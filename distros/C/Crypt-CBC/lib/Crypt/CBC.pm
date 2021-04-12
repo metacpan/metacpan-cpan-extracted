@@ -6,7 +6,7 @@ use Crypt::CBC::PBKDF;
 use bytes;
 use vars qw($VERSION);
 no warnings 'uninitialized';
-$VERSION = '3.01';
+$VERSION = '3.02';
 
 use constant RANDOM_DEVICE      => '/dev/urandom';
 use constant DEFAULT_PBKDF      => 'opensslv1';
@@ -219,7 +219,9 @@ sub crypt (\$$){
     }
 
     my $code = $self->chaining_method($d);
-    $self->$code($self->{crypt},\$iv,\$result,\@blocks);
+    #    $self->$code($self->{crypt},\$iv,\$result,\@blocks);
+    # calling the code sub directly is slightly faster for some reason
+    $code->($self,$self->{crypt},\$iv,\$result,\@blocks);
 
     $self->{'civ'} = $iv;	        # remember the iv
     return $result;
@@ -443,8 +445,9 @@ sub _get_chain_mode {
 sub _load_module {
     my $self   = shift;
     my ($module,$args) = @_;
-    return 1 if eval "\$$module\:\:VERSION";
-    return eval "use $module $args; 1;";
+    my $result = eval "use $module $args; 1;";
+    warn $@ if $@;
+    return $result;
 }
 
 sub _deprecation_warning {
@@ -468,18 +471,26 @@ sub _needs_padding {
 sub _cbc_encrypt {
     my $self = shift;
     my ($crypt,$iv,$result,$blocks) = @_;
-    foreach my $plaintext (@$blocks) {
-	$$result .= $$iv = $crypt->encrypt($$iv ^ $plaintext);
+    # the copying looks silly, but it is slightly faster than dereferencing the
+    # variables each time
+    my ($i,$r) = ($$iv,$$result);
+    foreach (@$blocks) {
+	$r .= $i = $crypt->encrypt($i ^ $_);
     }
+    ($$iv,$$result) = ($i,$r);
 }
 
 sub _cbc_decrypt {
     my $self = shift;
     my ($crypt,$iv,$result,$blocks) = @_;
-    foreach my $encrypted (@$blocks) {
-	$$result .= $$iv ^ $crypt->decrypt($encrypted);
-	$$iv      = $encrypted;
+    # the copying looks silly, but it is slightly faster than dereferencing the
+    # variables each time
+    my ($i,$r) = ($$iv,$$result);
+    foreach (@$blocks) {
+	$r    .= $i ^ $crypt->decrypt($_);
+	$i     = $_;
     }
+    ($$iv,$$result) = ($i,$r);
 }
 
 sub _pcbc_encrypt {
@@ -503,28 +514,34 @@ sub _pcbc_decrypt {
 sub _cfb_encrypt {
     my $self = shift;
     my ($crypt,$iv,$result,$blocks) = @_;
+    my ($i,$r) = ($$iv,$$result);
     foreach my $plaintext (@$blocks) {
-	$$result .= $$iv = $plaintext ^ $crypt->encrypt($$iv) 
+	$r .= $i = $plaintext ^ $crypt->encrypt($i) 
     }
+    ($$iv,$$result) = ($i,$r);
 }
 
 sub _cfb_decrypt {
     my $self = shift;
     my ($crypt,$iv,$result,$blocks) = @_;
+    my ($i,$r) = ($$iv,$$result);
     foreach my $ciphertext (@$blocks) {
-	$$result .= $ciphertext ^ $crypt->encrypt($$iv);
-	$$iv      = $ciphertext;
+	$r .= $ciphertext ^ $crypt->encrypt($i);
+	$i      = $ciphertext;
     }
+    ($$iv,$$result) = ($i,$r);
 }
 
 sub _ofb_encrypt {
     my $self = shift;
     my ($crypt,$iv,$result,$blocks) = @_;
+    my ($i,$r) = ($$iv,$$result);
     foreach my $plaintext (@$blocks) {
-	my $ciphertext = $plaintext ^ ($$iv = $crypt->encrypt($$iv));
+	my $ciphertext = $plaintext ^ ($i = $crypt->encrypt($i));
 	substr($ciphertext,length $plaintext) = '';  # truncate
-	$$result .= $ciphertext;
+	$r .= $ciphertext;
     }
+    ($$iv,$$result) = ($i,$r);    
 }
 
 *_ofb_decrypt = \&_ofb_encrypt;  # same code
@@ -539,13 +556,14 @@ sub _ofb_encrypt {
 sub _ctr_encrypt {
     my $self = shift;
     my ($crypt,$iv,$result,$blocks) = @_;
-
+    my $bs = $self->blocksize;
+	
     $self->_upgrade_iv_to_ctr($iv);
-    my $bs    = $self->blocksize;
+    my ($i,$r) = ($$iv,$$result);
 
     foreach my $plaintext (@$blocks) {
-	my $bytes = ($$iv++)->as_bytes;
-	
+	my $bytes = int128_to_net($i++);
+
 	# pad with leading nulls if there are insufficient bytes
 	# (there's gotta be a better way to do this)
 	if ($bs > length $bytes) {
@@ -554,8 +572,9 @@ sub _ctr_encrypt {
 
 	my $ciphertext = $plaintext ^ ($crypt->encrypt($bytes));
 	substr($ciphertext,length $plaintext) = '';  # truncate
-	$$result      .= $ciphertext;
+	$r      .= $ciphertext;
     }
+    ($$iv,$$result) = ($i,$r);
 }
 
 *_ctr_decrypt = \&_ctr_encrypt; # same code
@@ -565,17 +584,13 @@ sub _ctr_encrypt {
 sub _upgrade_iv_to_ctr {
     my $self = shift;
     my $iv   = shift;  # this is a scalar reference
+    return if ref $$iv; # already upgraded to an object
 
-    $self->_load_module('Math::BigInt',"lib => 'GMP'")
-	or croak "Optional Math::BigInt module must be installed to use the CTR chaining method";
-    
-    # convert IV into a Math::BigInt object if it is not already
-    if (!ref $$iv) {  # safer to use: $$iv->isa('Math::BigInt')
-	$$iv  = Math::BigInt->from_bytes($$iv);
-	return 1;
-    }
+    $self->_load_module("Math::Int128" => "'net_to_int128','int128_to_net'")
+	or croak "Optional Math::Int128 module must be installed to use the CTR chaining method";
 
-    return;
+    $$iv  = net_to_int128($$iv);
+    return 1;
 }
 
 ######################################### chaining mode methods ################################3
@@ -1227,9 +1242,9 @@ block chaining modes. Values are:
               algorithm, and then applied to the block of text. If one
               bit of the input text is damaged, it only affects 1 bit
               of the output text. To use CTR mode you will need to
-              install the Perl Math::BigInt module. I recommend
-              installing Math::BigInt::GMP as well in order to avoid a
-              large performance hit.
+              install the Perl Math::Int128 module. This chaining method
+              is roughly half the speed of the others due to integer
+              arithmetic.
 
 Passing a B<-pcbc> argument of true will have the same effect as
 -chaining_mode=>'pcbc', and is included for backward

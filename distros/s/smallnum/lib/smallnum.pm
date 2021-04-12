@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use POSIX ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use overload fallback => 1, 
-	'""' => \&num,
-	'*' => \&multiply,
-	'/' => \&divide;
+	'""' => \&_num,
+	'*' => \&_multiply,
+	'/' => \&_divide;
 
 our $precision = .01;
 our $offset = 0.5555555;
@@ -17,33 +17,33 @@ our $offset = 0.5555555;
 sub import {
 	$precision = $_[1] if $_[1];
 	$offset = $_[2] if $_[2];
-	overload::constant integer => \&smallnum;
-	overload::constant float => \&smallnum;
-	overload::constant binary => \&smallnum;
+	overload::constant integer => \&_smallnum;
+	overload::constant float => \&_smallnum;
+	overload::constant binary => \&_smallnum;
 }
 
-sub smallnum {
+sub _smallnum {
 	my $n = shift;
 	bless \$n, __PACKAGE__;
 }
 
-sub num {
+sub _num {
 	my $num = _sref($_[0]);
- 	return $num >= 0 
+	return $num >= 0 
 		? $precision * int(($num + ($offset * $precision)) / $precision)
 		: $precision * POSIX::ceil(($num - $offset * $precision) / $precision);
 }
 
-sub divide {
+sub _divide {
 	my (@ot) = (_sref($_[0]), _sref($_[1])); 
 	return $ot[0] && $ot[1]
-		? smallnum($_[2] ? ($ot[1] / $ot[0]) : ($ot[0] / $ot[1])) 
-		: smallnum(0);
+		? _smallnum($_[2] ? ($ot[1] / $ot[0]) : ($ot[0] / $ot[1])) 
+		: _smallnum(0);
 }
 
-sub multiply {
+sub _multiply {
 	my (@ot) = (_sref($_[0]), _sref($_[1])); 
-	return smallnum($ot[1] * $ot[0]);
+	return _smallnum($ot[1] * $ot[0]);
 }
 
 sub _sref { ref $_[0] ? ${$_[0]} : $_[0] }
@@ -57,7 +57,7 @@ smallnum - Transparent "SmallNumber" support for Perl
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -132,7 +132,7 @@ L<https://metacpan.org/release/smallnum>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2021 by LNATION.
 
 This is free software, licensed under:
 

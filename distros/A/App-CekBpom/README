@@ -3,8 +3,8 @@ NAME
     command-line (CLI interface for cekbpom.pom.go.id)
 
 VERSION
-    This document describes version 0.012 of App::CekBpom (from Perl
-    distribution App-CekBpom), released on 2020-11-13.
+    This document describes version 0.013 of App::CekBpom (from Perl
+    distribution App-CekBpom), released on 2021-02-19.
 
 DESCRIPTION
     See included script cek-bpom-products and cek-bpom-manufacturers.
@@ -132,7 +132,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom>
+    <https://github.com/perlancar/perl-App-CekBpom/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -144,7 +144,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

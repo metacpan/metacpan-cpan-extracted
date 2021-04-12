@@ -1,0 +1,17 @@
+lib/MIDI/SP404sx.pm
+lib/MIDI/SP404sx/Constants.pm
+lib/MIDI/SP404sx/MIDIIO.pm
+lib/MIDI/SP404sx/Note.pm
+lib/MIDI/SP404sx/Pattern.pm
+lib/MIDI/SP404sx/PTNIO.pm
+LICENSE
+MANIFEST			This list of files
+README.md
+script/spmidi
+t/00-load.t
+t/PTN00001.BIN
+t/PTN00001.mid
+t/PTN00001round.bin
+t/PTN00015.BIN
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

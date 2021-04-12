@@ -26,6 +26,24 @@ share {
   patch sub {
     my($build) = @_;
 
+    # https://git.savannah.gnu.org/cgit/automake.git/commit/configure.ac?id=ccb57553e3433df3e52e534e6f87915db23ff9a5
+    Path::Tiny->new('configure')->edit_lines(sub {
+      my $replace = <<'EOF';
+printf '%s\n' > conftest/conftest.ac \
+  'AC''_INIT([smoke-test], [1])' \
+  'AC''_OUTPUT'
+EOF
+      s{echo 'AC''_INIT' > conftest/conftest.ac}{$replace};
+      $replace = <<'END_OF_PATCH';
+printf '%s\n' > conftest/conftest.ac \
+  'AC'"_PREREQ([$required_autoconf_version])" \
+  'AC''_INIT([smoke-test], [1])' \
+  'AC''_OUTPUT'
+END_OF_PATCH
+      s{echo 'AC'"_PREREQ\(\[\$required_autoconf_version\]\)" > conftest/conftest.ac}{$replace};
+    });
+    Path::Tiny->new('configure')->chmod(0755);
+
     # https://debbugs.gnu.org/cgi/bugreport.cgi?bug=20903
     # bug in automake: it puts the @datadir@ in double quotes
     # in one place in bin/aclocal, which causes Perl to barf

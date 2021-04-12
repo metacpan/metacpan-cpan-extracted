@@ -1,59 +1,67 @@
 =head1 NAME
 
-UniEvent::Error - Perl bindings for UniEvent and system errors.
+UniEvent::Error - UniEvent error constants
+
+
 
 =head1 DESCRIPTION
 
-The package allows to create and inspect errors, created in UnieEvent.
+This package contains all generic UniEvent error constants.
+
+Also objects of class C<UniEvent::Error> can be thrown in case of critical malfunction.
+
+
 
 =head1 SYNOPSIS
 
-    my $e = UniEvent::Error->new("message");
-    say "got error: ", $e->what, "\n";
-    my $c = $e->clone;
+    $tcp->connect($host, $port);
+    $tcp->connect_callback(sub {
+        my ($tcp, $err) = @_;
+        if ($err) {
+            if    ($err == UE::Error::ssl_error)     { ... }
+            elsif ($err == UE::Error::resolve_error) { ... }
+            ...
+        }
+    });
 
-=head1 METHODS
 
-=head2 new($string)
-
-=head2 new($error_code)
-
-Constructs new Error object either from textual description or
-prepared L<XS::ErrorCode>.
-
-=head2 what()
-
-Returns human-readable description of the error
-
-=head2 clone()
-
-Clones the error
 
 =head1 CONSTANTS
 
-=head2 There is a list of predefined L<error categories|XS::STL::ErrorCategory>:
 
-=head3 system_category
+=head2 ERROR CATEGORIES
 
-An alias for standard syster error category
+These constants hold various error categories used by UniEvent, as L<XS::STL::ErrorCategory> objects.
 
 =head3 category
 
-Own UniEvent errors
+Generic unievent errors category. All possible errors for this category are listed in this package, see below.
+
+=head3 system_category
+
+An alias for C<XS::STL::ErrorCode::system_category>, a standard system error category. All possible errors for this category are listed in
+C<XS::STL::errc> package, see L<XS::STL::ErrorCode>.
 
 =head3 resolve_category
 
-DNS resolver error category
+DNS resolver error category. All possible errors for this category are listed in L<UniEvent::ResolveError>.
 
 =head3 ssl_category
 
-SSL and TLS error category (high-level errors)
+SSL and TLS error category (high-level errors). These are returned from SSL library.
 
 =head3 openssl_category
 
-Low level openssl library errors.
+Low level openssl library errors. These are returned from SSL library.
 
-Predefined list of error codes of the own UniEvent error category:
+=head3 streamer_category
+
+Streamer error category (L<UniEvent::Streamer>). All possible errors for this category are listed in L<UniEvent::StreamerError>.
+
+
+=head2 GENERIC UNIEVENT ERRORS
+
+These are possible errors for generic unievent category (UniEvent::Error::category())
 
 =head3 unknown_error
 
@@ -101,14 +109,26 @@ Predefined list of error codes of the own UniEvent error category:
 
 =head3 remote_io
 
-=head1 REFERENCES
 
-L<UniEvent::ResolveError>
 
-L<XS::ErrorCode>
+=head1 METHODS
 
-L<XS::STL::ErrorCode>
+Methods of C<UniEvent::Error> objects which may be thrown in case of critical errors.
 
-L<XS::STL::ErrorCategory>
+=head2 new($string)
+
+=head2 new($error_code)
+
+Constructs new Error object either from textual description or from L<XS::ErrorCode> object.
+
+
+=head2 what()
+
+Returns human-readable description of the error
+
+
+=head2 clone()
+
+Clones the error
 
 =cut

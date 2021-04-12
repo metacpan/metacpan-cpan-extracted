@@ -2,6 +2,8 @@ use 5.012;
 use lib 't/lib'; use MyTest;
 use lib 't/streamer'; use TestStreamer;
 
+test_catch '[streamer-stream]';
+
 subtest 'normal input' => sub {
     my $test = UE::Test::Async->new(1);
     my $p = make_pair($test->loop, 10, 10);

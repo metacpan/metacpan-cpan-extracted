@@ -86,15 +86,15 @@ SockAddr new (SV*, string_view ip, uint16_t port) {
 }
 
 string SockAddr::ip () {
-    RETVAL = THIS->inet4().ip();
+    RETVAL = THIS->as_inet4().ip();
 }
 
 uint16_t SockAddr::port () {
-    RETVAL = THIS->inet4().port();
+    RETVAL = THIS->as_inet4().port();
 }
 
 string_view SockAddr::addr () {
-    RETVAL = addr2sv(THIS->inet4().addr());
+    RETVAL = addr2sv(THIS->as_inet4().addr());
 }
 
 
@@ -111,23 +111,23 @@ SockAddr new (SV*, string_view ip, uint16_t port, uint32_t scope_id = 0, uint32_
 }
 
 string SockAddr::ip () {
-    RETVAL = THIS->inet6().ip();
+    RETVAL = THIS->as_inet6().ip();
 }
 
 uint16_t SockAddr::port () {
-    RETVAL = THIS->inet6().port();
+    RETVAL = THIS->as_inet6().port();
 }
 
 uint32_t SockAddr::scope_id () {
-    RETVAL = THIS->inet6().scope_id();
+    RETVAL = THIS->as_inet6().scope_id();
 }
 
 uint32_t SockAddr::flowinfo () {
-    RETVAL = THIS->inet6().flowinfo();
+    RETVAL = THIS->as_inet6().flowinfo();
 }
 
 string_view SockAddr::addr () {
-    RETVAL = addr2sv(THIS->inet6().addr());
+    RETVAL = addr2sv(THIS->as_inet6().addr());
 }
 
 
@@ -141,7 +141,7 @@ SockAddr new (SV*, string_view path) {
 }
 
 string_view SockAddr::path () {
-    RETVAL = THIS->unix().path();
+    RETVAL = THIS->as_unix().path();
 }
 
 #endif

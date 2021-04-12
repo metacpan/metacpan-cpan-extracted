@@ -19,7 +19,7 @@ isa_ok $object, $class;
 
 # Non-inherited methods
 can_ok $object, qw( poem descr form text author remarks notify mnt_by
-    changed source);
+    source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -79,12 +79,6 @@ is( $object->source(), 'RIPE #Filtered', 'source properly parsed' );
 $object->source('APNIC');
 is( $object->source(), 'APNIC', 'source properly set' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['arhuman@gmail.com 20110214'], 'changed properly parsed' );
-$object->changed('arhuman@gmail.com 20110213');
-is( $object->changed()->[1], 'arhuman@gmail.com 20110213', 'changed properly added' );
-
 # Common tests
 do './t/common.pl';
 ok( $tested{common_loaded}, "t/common.pl properly loaded" );
@@ -103,6 +97,5 @@ text:
 author:         GEEK-01
 mnt-by:         CPNY-MNT
 notify:         CPNY-MNT
-changed:        arhuman@gmail.com 20110214
 source:         RIPE #Filtered
 

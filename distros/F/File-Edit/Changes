@@ -1,5 +1,11 @@
 Revision history for File-Edit
 
+0.0.4   12 Apr, 2021
+        Handle regex meta characters when replacing.
+
+0.0.3   10 Apr, 2021
+        Fixed tests that failed on even more OSes
+
 0.0.2   07 Apr, 2021
         Fixed missing PREREQ_PM in Makefile.PL.
         Fixed test that failed on some OSes.

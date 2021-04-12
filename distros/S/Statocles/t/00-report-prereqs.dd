@@ -26,7 +26,7 @@ do { my $x = {
                                       'Import::Base' => '0.012',
                                       'JSON::PP' => '0',
                                       'List::UtilsBy' => '0.09',
-                                      'Mojolicious' => '6.54',
+                                      'Mojolicious' => '9',
                                       'Moo' => '2.000001',
                                       'Path::Tiny' => '0.084',
                                       'Pod::Simple' => '3.31',
@@ -37,7 +37,7 @@ do { my $x = {
                                       'Type::Tiny' => '0',
                                       'Types::Path::Tiny' => '0',
                                       'YAML' => '0',
-                                      'perl' => '5.014',
+                                      'perl' => '5.016',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

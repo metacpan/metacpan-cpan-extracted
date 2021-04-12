@@ -1,0 +1,18 @@
+#include <xs/function.h>
+#include <xs/unievent/util.h>
+
+MODULE = UniEvent                PACKAGE = UniEvent
+PROTOTYPES: DISABLE
+
+RandomRequest* get_random (size_t len, RandomRequest::random_fn cb = nullptr, DLoopSP loop = {}) {
+    if (!cb) XSRETURN_EXPECTED(get_random(len));
+    RETVAL = get_random(len, cb, loop);
+}
+
+MODULE = UniEvent                PACKAGE = UniEvent::Request::Random
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash s(__PACKAGE__, GV_ADD);
+    s.inherit("UniEvent::Work");
+}

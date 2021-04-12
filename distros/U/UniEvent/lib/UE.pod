@@ -1,0 +1,20 @@
+=head1 NAME
+
+UE - aliased namespace for UniEvent
+
+=head1 DESCRIPTION
+
+This module is just a shortcut for L<UniEvent>. E.g. instead of
+
+    my $loop = UniEvent::Loop->new;
+
+it can be written as
+
+    my $loop = UE::Loop->new;
+
+However keep in mind, that created objects are always of C<UniEvent::XXXX> class. It matters in these kind of checks:
+
+    if (ref($t) eq 'UniEvent::Timer') # ok
+    if (ref($t) eq 'UE::Timer')       # WRONG!
+
+=cut

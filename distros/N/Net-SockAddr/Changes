@@ -1,3 +1,5 @@
+1.1.0    09.04.2021
+         - change several function names in C++ API to avoid clashing with FUCKING C macro
 1.0.7    08.04.2021
          - cmakefile improvement
 1.0.6    25.11.2020

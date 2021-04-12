@@ -4,7 +4,7 @@ package Markdown::Pod::Handler;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Markdent::Types;
 
@@ -341,12 +341,26 @@ sub html_tag {
 
     my $attributes_str = q{};
     $attributes_str = join q{ },
-        map { qq|$_="$attributes->{$_}"| } sort keys %$attributes;
+        map {
+            defined $attributes->{$_}
+                ? qq|$_="$attributes->{$_}"|
+                : qq|$_|
+            } sort keys %$attributes;
     if ( $tag =~ /^br$/i ) {
-        $self->_stream(qq|<$tag $attributes_str />\n|);
+        if ($attributes_str) {
+            $self->_stream(qq|<$tag $attributes_str />\n|);
+        }
+        else {
+            $self->_stream(qq|<$tag />\n|);
+        }
     }
     else {
-        $self->_stream(qq|<$tag $attributes_str />|);
+        if ($attributes_str) {
+            $self->_stream(qq|<$tag $attributes_str />|);
+        }
+        else {
+            $self->_stream(qq|<$tag />|);
+        }
     }
 }
 
@@ -475,7 +489,7 @@ Markdown::Pod::Handler - Parser module to convert from markdown to POD
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -587,7 +601,7 @@ L<Text::MultiMarkdown>, L<Text::Markdown>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Keedi Kim.
+This software is copyright (c) 2021 by Keedi Kim.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

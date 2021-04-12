@@ -1,8 +1,9 @@
-name = "App-sdif"
+name         = "App-sdif"
 script_files = [ "script/sdif", "script/cdif", "script/watchdiff" ]
-badges = ['travis-ci.com', 'metacpan']
-authority="cpan:UTASHIRO"
-module_maker="ModuleBuildTiny"
+badges       = [ 'github-actions/test', 'metacpan' ]
+authority    = "cpan:UTASHIRO"
+module_maker = "ModuleBuildTiny"
+
 [unsupported]
 os = [
     "MSWin32",

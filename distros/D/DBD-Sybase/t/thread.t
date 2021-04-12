@@ -101,7 +101,7 @@ sub test_it {
 
 sub getDbh {
     my $dbname = shift || 'master';
-    my $dbh = DBI->connect("dbi:Sybase:server=$Srv;database=$dbname;timeout=60;loginTimeout=20", $Uid, $Pwd, {PrintError => 1});
+    my $dbh = DBI->connect("dbi:Sybase:$Srv;database=$dbname;timeout=60;loginTimeout=20", $Uid, $Pwd, {PrintError => 1});
 
     if(!$dbh) {
 	warn "No connection - did you set the user, password and server name correctly in PWD?\n";

@@ -1,7 +1,9 @@
 package Bencher::Formatter::DeleteNotesFieldIfEmpty;
 
-our $DATE = '2020-09-21'; # DATE
-our $VERSION = '1.052'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-04-10'; # DATE
+our $DIST = 'Bencher-Backend'; # DIST
+our $VERSION = '1.053'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,7 +44,7 @@ Bencher::Formatter::DeleteNotesFieldIfEmpty - Delete notes field if there are no
 
 =head1 VERSION
 
-This document describes version 1.052 of Bencher::Formatter::DeleteNotesFieldIfEmpty (from Perl distribution Bencher-Backend), released on 2020-09-21.
+This document describes version 1.053 of Bencher::Formatter::DeleteNotesFieldIfEmpty (from Perl distribution Bencher-Backend), released on 2021-04-10.
 
 =for Pod::Coverage .*
 
@@ -68,7 +70,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

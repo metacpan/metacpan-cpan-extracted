@@ -4,7 +4,7 @@ package Markdown::Pod::script;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Encode qw( encodings decode );
 use Getopt::Long;
@@ -144,7 +144,7 @@ Markdown::Pod::script - script to convert Markdown to POD
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,7 @@ This module contains script related functions.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Keedi Kim.
+This software is copyright (c) 2021 by Keedi Kim.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

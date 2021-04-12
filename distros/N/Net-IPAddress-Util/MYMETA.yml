@@ -26,5 +26,5 @@ requires:
   Math::BigInt: '0'
   overload: '0'
   perl: '5.012000'
-version: '5.000'
+version: '5.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

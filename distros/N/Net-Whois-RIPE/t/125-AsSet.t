@@ -19,7 +19,7 @@ isa_ok $object, $class;
 
 # Non-inherited methods
 can_ok $object, qw( as_set descr members mbrs_by_ref remarks tech_c admin_c
-    notify mnt_by changed source );
+    notify mnt_by source );
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -91,12 +91,6 @@ is_deeply( $object->mnt_lower(), ['THE-LMNT'], 'mnt_lower properly parsed' );
 $object->mnt_lower('Added mnt_lower');
 is( $object->mnt_lower()->[1], 'Added mnt_lower', 'mnt_lower properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), [ 'someone@somewhere.net 20080422', 'someoneelese@somewere.net 20090429' ], 'changed properly parsed' );
-$object->changed('Added changed');
-is( $object->changed()->[2], 'Added changed', 'changed properly added' );
-
 # Test 'source'
 $tested{'source'}++;
 is( $object->source(), 'RIPE # Filtered', 'source properly parsed' );
@@ -128,7 +122,5 @@ tech-c:         CXXXXX-RIPE
 notify:         watcher@somewhere.com
 mnt-by:         THE-MNT
 mnt-lower:      THE-LMNT
-changed:        someone@somewhere.net 20080422
-changed:        someoneelese@somewere.net 20090429
 source:         RIPE # Filtered
 

@@ -8,7 +8,7 @@ use warnings;
 use Text::Amuse::Compile;
 use Path::Tiny;
 use Data::Dumper;
-use Test::More tests => 31;
+use Test::More tests => 38;
 
 my $muse = <<'MUSE';
 #title My title
@@ -27,6 +27,9 @@ Done
 ; :DEFAULT: \fussy
 ; :c111: \sloppy
 END
+
+; :*: \clearpage
+; :ALL: \clearpage
 
 MUSE
 
@@ -50,6 +53,8 @@ foreach my $id (qw/DEFAULT c111 c1 c9/, '', 'test me', '\\') {
     else {
         unlike $tex, qr{START.*\\(fussy|sloppy).*Done.*\\(sloppy|fussy).*END/}ms;
     }
+    diag $tex;
+    like $tex, qr{END\s*\\clearpage\s*\\clearpage}ms;
     if ($id eq 'c9') {
         like $tex, qr{^\\newpage\s*\n}ms;
         like $tex, qr{^\\vskip 10mm\s*\n}ms;

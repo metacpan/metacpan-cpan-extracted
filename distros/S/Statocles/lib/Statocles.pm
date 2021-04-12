@@ -1,5 +1,5 @@
 package Statocles;
-our $VERSION = '0.097';
+our $VERSION = '0.098';
 # ABSTRACT: A static site generator
 
 use Statocles::Base 'Class';
@@ -181,7 +181,7 @@ Statocles - A static site generator
 
 =head1 VERSION
 
-version 0.097
+version 0.098
 
 =head1 SYNOPSIS
 
@@ -307,9 +307,13 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Cthulhux David Farrell djerius Ed J Ferenc Erki Joel Berger Kent Fredric Konrad Bucheli Mohammad S Anwar perlancar (@netbook-zenbook-ux305) Roy Storey tadegenban Vladimir Lettiev William Lindley Wojtek Bażant
+=for stopwords Andreas Voegele Cthulhux David Farrell djerius Ed J Ferenc Erki Joel Berger Kent Fredric Konrad Bucheli Mohammad S Anwar perlancar (@netbook-zenbook-ux305) Roy Storey tadegenban Vladimir Lettiev William Lindley Wojtek Bażant
 
 =over 4
+
+=item *
+
+Andreas Voegele <andreas@andreasvoegele.com>
 
 =item *
 

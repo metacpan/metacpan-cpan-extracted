@@ -1,5 +1,6 @@
 #include <xs/export.h>
 #include <xs/unievent/Tty.h>
+#include <xs/typemap/expected.h>
 
 using namespace xs;
 using namespace xs::unievent;
@@ -39,11 +40,11 @@ TtySP Tty::new (Sv fd, LoopSP loop = {}) {
 
 void Tty::set_mode (int mode) {
     if (mode < (int)Tty::Mode::STD || mode > (int)Tty::Mode::IO) throw "invalid mode";
-    THIS->set_mode((Tty::Mode)mode);
+    XSRETURN_EXPECTED(THIS->set_mode((Tty::Mode)mode));
 }
 
 void Tty::get_winsize () {
-    auto wsz = THIS->get_winsize();
+    auto wsz = THIS->get_winsize().value();
     EXTEND(SP, 2);
     mPUSHu(wsz.width);
     mPUSHu(wsz.height);

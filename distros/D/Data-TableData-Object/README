@@ -1,0 +1,52 @@
+NAME
+    Data::TableData::Object - Manipulate data structure via table object
+
+VERSION
+    This document describes version 0.112 of Data::TableData::Object (from
+    Perl distribution Data-TableData-Object), released on 2021-04-10.
+
+FUNCTIONS
+  table($data[ , $spec ]) => obj
+    Shortcut for "Data::TableData::Object->new(...)".
+
+METHODS
+  new($data[ , $spec ]) => obj
+    Detect the structure of $data and create the appropriate
+    "Data::TableData::Object::FORM" object.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-TableData-Object>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-TableData-Object>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-TableData-Object
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::TableData::Object::Base for list of available methods.
+
+    Data::TableData::Object::aos
+
+    Data::TableData::Object::aoaos
+
+    Data::TableData::Object::aohos
+
+    Data::TableData::Object::hash
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

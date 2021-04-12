@@ -1,3 +1,8 @@
+Release 1.18
+
+    Fix further issues with FreeTDS.
+    Improved error handling for numeric/decimal values.
+    Fix logic error in the finish() call when syb_flush_finish is enabled.
 
 Release 1.17
 

@@ -19,9 +19,9 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'YAML::XS' => '0.66',
-        'Data::LNPath' => '0.08',
-		'Carp' => '0',
-		'Blessed::Merge' => '0.07'
+        'Data::LNPath' => '1.00',
+	'Carp' => '0',
+	'Blessed::Merge' => '0.07'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Config-LNPath-*' },

@@ -19,7 +19,7 @@ isa_ok $object, $class;
 
 # Non-inherited methods
 can_ok $object, qw( inet_rtr descr alias local_as ifaddr interface peer mp_peer
-    member_of remarks admin_c tech_c  notify mnt_by changed source );
+    member_of remarks admin_c tech_c  notify mnt_by source );
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -85,12 +85,6 @@ is_deeply( $object->notify(), ['watcher@example.com'], 'notify properly parsed' 
 $object->notify('watcher2@example.com');
 is( $object->notify()->[1], 'watcher2@example.com', 'notify properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['abc@examplenet.com 20101231'], 'changed properly parsed' );
-$object->changed('abc@examplenet.com 20111231');
-is( $object->changed()->[1], 'abc@examplenet.com 20111231', 'changed properly added' );
-
 # Test 'member_of'
 $tested{'member_of'}++;
 is_deeply( $object->member_of(), ['AS2'], 'member_of properly parsed' );
@@ -141,7 +135,6 @@ admin-c:    FR123-AP
 tech-c:     FR123-AP
 mnt-by:     MAINT-EXAMPLENET-AP
 notify:     watcher@example.com
-changed:    abc@examplenet.com 20101231
 member-of:  AS2
 remarks:    No remarks
 source:     RIPE

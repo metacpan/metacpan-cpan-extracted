@@ -1,8 +1,8 @@
 use Test::More;
 use smallnum '1';
 
-is(smallnum::num(\1), 1);
-is(smallnum::num(0.23765234354654), 0);
+is(smallnum::_num(\1), 1);
+is(smallnum::_num(0.23765234354654), 0);
 is(0.23765234354654, 0);
 is(10 + 20.45, 31);
 is(15 / 5.34, 3);

@@ -1,3 +1,6 @@
+2.016 2021-04-10
+- some build improvements plus better test-reporting
+
 2.015 2021-04-09
 - loosen title-setting test as Gnuplot 5.4 puts on different line
 

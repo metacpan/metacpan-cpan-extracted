@@ -4,6 +4,8 @@ use MyTest;
 use Net::SockAddr;
 use Net::SSLeay;
 
+test_catch '[tcp-ssl]';
+
 my $SERV_CERT = "t/cert/ca.pem";
 my $serv_ctx = Net::SSLeay::CTX_new();
 Net::SSLeay::CTX_use_certificate_file($serv_ctx, $SERV_CERT, &Net::SSLeay::FILETYPE_PEM) or sslerr();

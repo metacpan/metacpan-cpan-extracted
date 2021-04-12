@@ -1,0 +1,68 @@
+=head1 NAME
+
+UniEvent::Socks - Socks support for UniEvent's tcp handles.
+
+=cut
+
+=head1 DESCRIPTION
+
+UniEvent::Socks makes it possible to connect UniEvent's tcp handle via socks proxy server.
+
+UniEvent::Socks is a stream filter, it doesn't change API of tcp handle. Just use it as you would without socks proxy.
+
+
+
+=head1 SYNOPSIS
+
+    use UniEvent::Socks;
+    
+    my $tcp = UniEvent::Tcp->new;
+    UniEvent::Socks::use_socks($tcp, $proxy_host, $proxy_port);
+    
+    $tcp->connect($host, $port); # connect to destination via proxy
+    $tcp->connect_callback(sub {
+        # called when connect to destination via proxy is established
+    });
+    ... # use as arbitrary connection
+    
+    # via object method
+    $tcp->use_socks("socks5://myproxy.com:1111");
+
+
+
+=head1 FUNCTIONS
+
+=head2 use_socks($tcp_handle, $proxy_host, $proxy_port, [$login], [$password], [$socks_resolve])
+
+Enables socks proxy for tcp handle.
+
+C<$proxy_host> and C<$proxy_port> is the location of socks 5 proxy. Optional login and password can be defined to authorize on socks proxy.
+
+If C<$socks_resolve> is true and C<host> supplied to tcp handle's C<connect()> method is a domain name, then name resolution will be made on socks proxy
+server's side.
+
+
+=head2 use_socks($tcp_handle, $uri)
+
+Gets C<host>, C<port>, C<login> and C<password> from an URI and calls the above version of C<use_socks()> with these params and C<socks_resolve> = true.
+
+URI must be a string or an object of class L<URI::XS>. It must have "socks5" scheme ("sock5://user:pass@host:port/").
+
+
+
+=head1 METHODS
+
+For convenience, C<UniEvent::Socks> adds C<use_socks()> method to C<UniEvent::Tcp> package. Its synopsis is the same as for functions described above
+except for the first argument C<$tcp_handle> which should not be passed.
+
+
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>, Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

@@ -36,6 +36,15 @@ sub init {
     # if something goes wrong, loop hangs. Make tests fail with SIGALRM instead of hanging forever.
     # each test must not last longer than 10 seconds. If needed, set alarm(more_than_10s) in your test
     alarm(15) unless defined $DB::header;
+    
+    *main::test_catch   = \&test_catch;
+    *main::done_testing = \&done_testing;
+}
+
+sub test_catch {
+    chdir 'clib';
+    catch_run(@_);
+    chdir '../';
 }
 
 sub import {

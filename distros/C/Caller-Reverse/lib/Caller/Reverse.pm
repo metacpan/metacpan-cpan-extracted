@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 use base 'Import::Export';
 
@@ -35,7 +35,7 @@ Caller::Reverse - reverse the caller stack.
 
 =head1 VERSION
 
-Version 0.02
+Version 1.00
 
 =cut
 
@@ -49,7 +49,7 @@ Version 0.02
 
 =head1 DESCRIPTION
 
-This is a quick module to return that reverses the caller stack. 
+This is a quick module that reverses the caller stack. 
 
 =cut
 
@@ -115,7 +115,7 @@ L<https://metacpan.org/release/Caller-Reverse>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2020 by LNATION.
+This software is Copyright (c) 2020->2021 by LNATION.
 
 This is free software, licensed under:
 

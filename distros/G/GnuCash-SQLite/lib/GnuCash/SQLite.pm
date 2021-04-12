@@ -15,11 +15,11 @@ use Path::Tiny;
 
 =head1 VERSION
 
-  version 0.06
+  version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
     my $class = shift;
@@ -393,7 +393,7 @@ review and contribution under the terms of the license.
 
 =head1 CREDITS
 
-Credit goes to L<Sawyer X|https://metacpan.org/author/XSAWYERX> for bug fixes.
+Credit goes to L<Sawyer X|https://metacpan.org/author/XSAWYERX> for fixing long-standing floating-point bug.
 
 =head1 AUTHOR
 

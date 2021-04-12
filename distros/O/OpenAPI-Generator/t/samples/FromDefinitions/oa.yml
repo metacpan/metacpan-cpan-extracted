@@ -1,0 +1,13 @@
+paths:
+  /api/route1:
+    get: value1
+components:
+  schemas:
+    c1:
+      key1: value1
+  parameters:
+    p1:
+      key1: value1
+  securitySchemes:
+    s1:
+      key1: value1

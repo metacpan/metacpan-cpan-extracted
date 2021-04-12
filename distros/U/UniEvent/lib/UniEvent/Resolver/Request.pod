@@ -4,9 +4,6 @@ UniEvent::Resolver::Request - resolver address resolution request
 
 =head1 DESCRIPTION
 
-The entire purpose of the class, is to allow address resolution requests to be
-cancelled.
-
 The reference to the request is always kept in the L<UniEvent::Resolver> object
 itself; that means loosing (or C<undef>'ing) request object B<will not> lead
 to the request cancellation.
@@ -16,9 +13,6 @@ to the request cancellation.
 =head2 cancel()
 
 Cancels started address resolution request.
-
-=head1 REFERENCES
-
-L<UniEvent::Resolver>
+Callback will be called with C<UE::SystemError::operation_canceled> error.
 
 =cut

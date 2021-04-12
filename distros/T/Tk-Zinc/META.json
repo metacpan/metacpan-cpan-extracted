@@ -27,14 +27,20 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Tk" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.98",
-            "Tk" : "8.004",
+            "Tk" : "800.004",
             "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
          }
       }
    },
@@ -44,6 +50,6 @@
          "url" : "https://github.com/asb-capfan/TkZinc"
       }
    },
-   "version" : 3.304,
+   "version" : 3.306,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

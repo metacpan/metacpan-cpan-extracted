@@ -1,0 +1,16 @@
+=head1 NAME
+
+UniEvent::Backend::UV - libuv backend for UniEvent
+
+=head1 SYNOPSIS
+
+    UniEvent::set_default_backend(UniEvent::Backend::UV);
+
+    my $loop = UniEvent::Loop->new(UniEvent::Backend::UV);
+
+=head1 DESCRIPTION
+
+L<libuv|libuv.org> backend for L<UniEvent>.
+There are no public methods here.
+
+=cut

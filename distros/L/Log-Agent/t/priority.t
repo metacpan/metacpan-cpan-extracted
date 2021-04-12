@@ -12,7 +12,7 @@
 #
 ##########################################################################
 
-print "1..5\n";
+print "1..7\n";
 
 require './t/code.pl';
 sub ok;
@@ -39,11 +39,14 @@ logerr "error string";
 logsay "notice string";
 logcarp "carp string";
 logdbg 'info:12', "info string";
+logdebug "debug string in out";
 
 ok 1, contains("t/file.err", "<error/3> error string");
 ok 2, !contains("t/file.err", "notice string");
 ok 3, contains("t/file.err", "<warning/4> carp string");
 ok 4, contains("t/file.out", "<notice/6> notice string");
 ok 5, contains("t/file.err", "<info/12> info string");
+ok 6, !contains("t/file.err", "debug string in out");
+ok 7, contains("t/file.out", "debug string in out");
 
 unlink 't/file.out', 't/file.err';

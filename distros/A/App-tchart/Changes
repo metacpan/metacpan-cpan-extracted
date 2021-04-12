@@ -1,11 +1,14 @@
-Revision history for App-tchart
+0.060   2021-04-10  Released-By: PERLANCAR; Urgency: medium
 
-0.05    2016-03-10 (PERLANCAR)
+	- Update dependency's new name {,Data::}TableData::Object.
+
+
+0.05    2016-03-10  Released-By: PERLANCAR
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-0.04     2015-06-14 (PERLANCAR)
+0.04     2015-06-14  Released-By: PERLANCAR
 
          - No functional changes.
 
@@ -13,7 +16,7 @@ Revision history for App-tchart
            conflict with preexisting CPAN module App::Chart/chart.
 
 
-0.03     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.03     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          [INCOMPATIBLE CHANGES]
 
@@ -38,11 +41,11 @@ Revision history for App-tchart
          - Other fixes.
 
 
-0.02    2014-04-17 (SHARYANTO)
+0.02    2014-04-17  Released-By: SHARYANTO
 
         - Detect enveloped result (see Rinci::function) and adjust accordingly.
 
 
-0.01    2014-04-10 (SHARYANTO)
+0.01    2014-04-10  Released-By: SHARYANTO
 
         - First release.

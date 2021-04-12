@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.25';
+$VERSION = '0.26';
 $VERSION = $VERSION;
 
 # internal use
@@ -1932,6 +1932,11 @@ sub parse_expr {
         $parsed .= $1;
     }
 
+    # -> and any method
+    elsif (/\G ( -> \s* [A-Za-z_][A-Za-z_0-9]* ) /xmsgc) {
+        $parsed .= $1;
+    }
+
     # any operators
     # "\x21" [!] EXCLAMATION MARK (U+0021)
     # "\x2B" [+] PLUS SIGN (U+002B)
@@ -2935,6 +2940,11 @@ sub parse_expr {
         $parsed .= $1;
         $parsed .= parse_expr_balanced($2);
         # without $parsed .= parse_ambiguous_char();
+    }
+
+    # return
+    elsif (/\G ( return ) /xmsgc) {
+        $parsed .= $1;
     }
 
     # any word

@@ -4,8 +4,9 @@ author:
   - 'Craig DeForest <craig@deforest.org>, Dima Kogan <dima@secretsauce.net>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -27,12 +28,11 @@ requires:
   PDL::Transform::Color: '0'
   Safe::Isa: '0'
   Storable: '0'
-  Test::More: '0'
   Time::HiRes: '0'
   perl: '5.006'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=PDL-Graphics-Gnuplot
   homepage: http://github.com/drzowie/PDL-Graphics-Gnuplot
   repository: git://github.com/drzowie/PDL-Graphics-Gnuplot.git
-version: '2.015'
+version: '2.016'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

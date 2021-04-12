@@ -4,6 +4,7 @@ author:
   - unknown
 build_requires:
   Test::Deep: '0'
+  Test::Fatal: '0'
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
@@ -32,5 +33,5 @@ requires:
   XS::Install: v1.3.2
   XS::libpanda: v1.5.0
   next::XS: v1.0.7
-version: v1.2.1
+version: v1.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,9 @@
+=head1 NAME
+
+UniEvent::Request::Send - udp send request
+
+=head1 DESCRIPTION
+
+This is an internal purpose object and can be used for tracking requests.
+
+=cut

@@ -1,0 +1,19 @@
+=head1 NAME
+
+UniEvent::StreamerError - errors constants for streamer error category.
+
+
+
+=head1 DESCRIPTION
+
+The package contains streamer error constants, used with category C<UniEvent::Error::streamer_category()>.
+
+
+
+=head1 CONSTANTS
+
+=head2 read_error
+
+=head2 write_error
+ 
+=cut

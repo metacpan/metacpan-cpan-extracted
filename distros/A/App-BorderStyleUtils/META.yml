@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-BorderStyleUtils/issues
   homepage: https://metacpan.org/release/App-BorderStyleUtils
   repository: git://github.com/perlancar/perl-App-BorderStyleUtils.git
-version: '0.007'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

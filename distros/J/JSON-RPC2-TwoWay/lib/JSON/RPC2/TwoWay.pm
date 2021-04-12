@@ -3,7 +3,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # standard perl
 use Carp;
@@ -27,7 +27,7 @@ sub new {
 	my ($class, %opt) = @_;
 	my $self = {
 		debug => $opt{debug} // 0,
-		json => $opt{json} // JSON::MaybeXS->new(),
+		json => $opt{json} // JSON::MaybeXS->new(utf8 => 1),
 		methods => {},
 	};
 	return bless $self, $class;

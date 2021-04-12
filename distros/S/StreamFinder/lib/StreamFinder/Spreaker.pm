@@ -4,7 +4,7 @@ StreamFinder::Spreaker - Fetch actual raw streamable URLs on widget.spreaker.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2020 by
+This module is Copyright (C) 2021 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -245,7 +245,7 @@ L<http://search.cpan.org/dist/StreamFinder-Spreaker/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020 Jim Turner.
+Copyright 2021 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -363,7 +363,6 @@ sub new
 	}
 
 	my $html = '';
-	print STDERR "-0(Spreaker): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@userAgentOps);		
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
@@ -371,28 +370,42 @@ sub new
 	my $response;
 	my $tried = 0;
 TRYIT:
+	print STDERR "-0(Spreaker): ($tried) FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
+print STDERR "---fetched: html=".substr($html,0,10)."=\n";
 	} else {
 		print STDERR $response->status_line  if ($DEBUG);
+print STDERR "---failed to fetch!\n";
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html && $self->{'id'});  #STEP 1 FAILED, INVALID PODCAST URL, PUNT!
 
-	$self->{'cnt'} = 0;
 	$self->{'title'} = '';
 	$self->{'artist'} = '';
+	$self->{'album'} = '';
+	$self->{'description'} = '';
 	$self->{'created'} = '';
 	$self->{'year'} = '';
+	$self->{'iconurl'} = '';
 	$self->{'streams'} = [];
+	$self->{'cnt'} = 0;
+	$self->{'Url'} = '';
+	$self->{'playlist'} = '';
+	$self->{'albumartist'} = $url2fetch;
 
 	while ($html =~ s#\"(?:playback|download)\_url\"\:\"([^\"]+)\"##gso) {
 		(my $s = $1) =~ s#\\##g;;
 		push @{$self->{'streams'}}, $s;
 		$self->{'cnt'}++;
 	}
-	while ($html =~ s#\s+id\=\"track\_download\"\s+href\=\"([^\"]+)\"##gso) {
+	while ($html =~ s#href\=\"([^\"]+)\"\s+id\=\"track[\_\-]download\"##gso) {
+		(my $s = $1) =~ s#\\##g;;
+		push @{$self->{'streams'}}, $s;
+		$self->{'cnt'}++;
+	}
+	while ($html =~ s#\s+id\=\"track[\_\-]download\"\s+href\=\"([^\"]+)\"##gso) {
 		(my $s = $1) =~ s#\\##g;;
 		push @{$self->{'streams'}}, $s;
 		$self->{'cnt'}++;
@@ -420,7 +433,17 @@ TRYIT:
 		$self->{'artist'} = $1  if ($title_artist =~ s/\s*\|\s+(.+)//);
 		$self->{'title'} ||= $title_artist;
 	}
-	$self->{'description'} = ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:description\"\s+content\=\"([^\"]+)\"\s*\/?\>##s) ? $1 : '';
+	if ($html =~ m#\s+itemprop\=\"description\"\>\s*(.+?)\s*\<\/div\>#s) {
+		$self->{'description'} = $1;
+		$self->{'description'} =~ s#\>\s*\.\.\.\s*<\/span##gs;
+		$self->{'description'} =~ s#\<a.+?\<\/a\>##gs;
+		$self->{'description'} =~ s#\<[^\>]+?\>##gs;
+		$self->{'description'} =~ s#\s\s+# #gs;
+		$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
+		$self->{'description'} = uri_unescape($self->{'description'});
+		$self->{'description'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+	}
+	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:description\"\s+content\=\"([^\"]+)\"\s*\/?\>##s);
 	$self->{'description'} ||= $1  if ($html =~ s#\,\"description\"\:\"([^\"]+)\"##s);
 	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+name\=\"(?:twitter\:)?description\"\s+content\=\"([^\"]+)\"\s*\/?\>##s);
 	$self->{'year'} = ($html =~ s#\,\"published_at\"\:\"(\d\d\d\d)##s) ? $1 : '';
@@ -448,12 +471,19 @@ TRYIT:
 		$self->{'albumartist'} = $urlroot . $1  if ($albumartisthtml =~ s#^.+?\s+href\=\"([^\"]+)\"\s*\>?\s*##s);
 		($self->{'artist'} = $albumartisthtml) =~ s/\<.+$//s;
 	}
+	$self->{'albumartist'} ||= $1  if ($html =~ m#\<meta\s+itemprop\=\"url\"\s+content\=\"([^\"]+)#s);
+	$self->{'album'} = $1  if ($html =~ m#\<meta\s+itemprop\=\"name\"\s+content\=\"([^\"]+)#s);
 	$self->{'imageurl'} = ($html =~ s#\,\"image_original_url\"\:\"([^\"]+)\"##s) ? $1 : '';
 	$self->{'imageurl'} =~ s#\\##g;
 	$self->{'imageurl'} ||= $self->{'iconurl'};  #MAKE SURE WE HAVE BOTH, OTHERWISE IMAGE:=ICON.
 	$self->{'total'} = $self->{'cnt'};
 	print STDERR "-(all)count=".$self->{'total'}."= ID=".$self->{'id'}."= iconurl=".$self->{'iconurl'}."= TITLE=".$self->{'title'}."= DESC=".$self->{'description'}."= YEAR=".$self->{'year'}."=\n"  if ($DEBUG);
 	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\n"  if ($DEBUG);
+	if ($self->{'total'} > 0) {
+		$self->{'playlist'} = "#EXTM3U\n";
+		$self->{'playlist'} .= "#EXTINF:-1, " . $self->{'title'}
+				. "\n#EXTART:" . $self->{'artist'} . "\n" . ${$self->{'streams'}}[0] . "\n";
+	}
 
 	bless $self, $class;   #BLESS IT!
 
@@ -464,6 +494,7 @@ sub get
 {
 	my $self = shift;
 
+	return wantarray ? ($self->{'playlist'}) : $self->{'playlist'}  if (defined($_[0]) && $_[0] =~ /playlist/i);
 	return wantarray ? @{$self->{'streams'}} : ${$self->{'streams'}}[0];
 }
 

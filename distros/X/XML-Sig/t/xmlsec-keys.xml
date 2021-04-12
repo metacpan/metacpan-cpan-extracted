@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<Keys xmlns="http://www.aleksey.com/xmlsec/2002">
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+<KeyName>tim</KeyName>
+<KeyValue>
+<HMACKeyValue xmlns="http://www.aleksey.com/xmlsec/2002">0xXHREA0s/rJwUIa9diyTJVhHgMs8OgMpp7FvGnUH1TApJeCq+PwZKcVCQQmaNNn
+yl5pRE67PP9+f9og/JIg3TdJBbzMR/XVjowRQWY4tM4iufz+TIcgjLtPGgriQ+vk
+1ABik1RrS9rZzxgCSvizfUmDaNsS/oIHhyVXoc2JXTM=</HMACKeyValue>
+</KeyValue>
+</KeyInfo>
+</Keys>

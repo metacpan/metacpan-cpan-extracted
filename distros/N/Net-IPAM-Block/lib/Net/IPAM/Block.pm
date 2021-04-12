@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '5.00';
+our $VERSION = '5.01';
 
 use 5.10.0;
 use strict;
@@ -117,7 +117,7 @@ Returns 4 or 6.
 
 # just return the version from the base IP
 sub version {
-  return $_[0]->base->version;
+  return $_[0]->{base}->version;
 }
 
 =head2 to_string
@@ -339,13 +339,26 @@ sub hostmask {
 
 =head2 bitlen
 
-*** DEPRECATED *** will be removed in the next version
+C<< bitlen >> returns the minimum number of bits to represent a range from base to last
+
+  $n = $b->bitlen
+
+obvious for CIDR blocks:
+
+  $b = Net::IPAM::Block->new('10.0.0.0/24')
+  say $b->bitlen;     # 32 - 24 = 8 bit
+
+  $b = Net::IPAM::Block->new('::/0');
+  say $b->bitlen;     # 128 - 0 = 128 bit
+
+not so obvious for ranges:
+
+  $b = Net::IPAM::Block->new('2001:db8::affe-2001:db8::cafe');
+  say $b->bitlen;     # 15 bit (at least)
 
 =cut
 
 sub bitlen {
-  Carp::carp("DEPRECATED: will be removed in the next version,");
-
   my $self = shift;
 
   my $bits = 32;
@@ -421,8 +434,8 @@ cmp() returns -1, 0, +1:
 =cut
 
 sub cmp {
-  return ( $_[0]->base->cmp( $_[1]->base ) )
-    || ( $_[1]->last->cmp( $_[0]->last ) );
+  return ( $_[0]->{base}->cmp( $_[1]->{base} ) )
+    || ( $_[1]->{last}->cmp( $_[0]->{last} ) );
 }
 
 =head2 is_disjunct_with
@@ -628,7 +641,7 @@ Faster sort implemention (Schwartzian transform) as explcit sort function:
 sub sort_block {
   return map { $_->[0] }
     sort     { $a->[1]->cmp( $b->[1] ) || $b->[2]->cmp( $a->[2] ) }
-    map      { [ $_, $_->base, $_->last ] } @_;
+    map      { [ $_, $_->{base}, $_->{last} ] } @_;
 }
 
 =head2 merge

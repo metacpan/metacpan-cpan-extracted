@@ -1,0 +1,10 @@
+0.002   2021-04-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module/dist {,Data-}TableData-Lookup, because the
+	  TableData namespace will be used for modules that contain table
+	  data (previously Tables).
+
+
+0.001   2021-01-16  Released-By: PERLANCAR
+
+        - First version.

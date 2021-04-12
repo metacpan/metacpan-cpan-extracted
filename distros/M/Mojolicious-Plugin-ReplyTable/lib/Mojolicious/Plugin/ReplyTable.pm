@@ -2,7 +2,7 @@ package Mojolicious::Plugin::ReplyTable;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 $VERSION = eval $VERSION;
 
 use Mojo::Util;
@@ -113,7 +113,11 @@ Mojolicious::Plugin::ReplyTable - Easily render rectangular data in many formats
   use Mojolicious::Lite;
   plugin 'ReplyTable';
 
-  any '/table' => sub {
+  my $format = [format => [qw(
+    txt csv html json
+    xls xlsx
+  )]];
+  any '/table' => $format => sub {
     my $c = shift;
     my $data = [
       [qw/a b c d/],
@@ -217,6 +221,17 @@ Add additional formats, like OpenOffice/LibreOffice.
 If needed these can be appended via additional handlers to the helper.
 
 =back
+
+=head1 A NOTE ON FORMAT DETECTION
+
+As of L<Mojolicious> version 9.11, format detection is disabled by default.
+To enable it you can pass an array reference of C<< [format=>\@formats] >> to the route, where C<@formats> is the supported file extensions.
+You may also use the shortcut C< [format => 1] >> to enable detection of any format, though that may change in the future.
+
+As of Mojolicious 9.16 you can inherit these formats from a parent route:
+
+  my $with_formats = $app->routes->any([format => \@formats]);
+  $with_formats->get('/data')->to('MyController#my_action');
 
 =head1 SEE ALSO
 

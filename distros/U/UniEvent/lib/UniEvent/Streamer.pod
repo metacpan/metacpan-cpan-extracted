@@ -2,82 +2,70 @@
 
 UniEvent::Streamer - generic connector for read and write streams
 
+
+
 =head1 SYNOPSIS
 
-    use UniEvent;
-
-    # let's stream self for target connection
-    my $loop   = UE::Loop->default_loop;
-    my $client = UE::Tcp->new;
-    ... # connect
-
-    my $input    = UE::Streamer::FileInput->new(__FILE__);
-    my $output   = UE::Streamer::StreamOutput->new($client);
+    my $input    = UE::Streamer::FileInput->new("file.txt");
+    my $output   = UE::Streamer::StreamOutput->new($connection);
     my $streamer = UE::Streamer->new($input, $output);
     $streamer->start();
-    $streamer->finish_callback(sub { $loop->stop; });
-    $loop->run;
+    $streamer->finish_callback(sub { ... });
+    
+    UE::Loop->default->run;
+
+
 
 =head1 DESCRIPTION
 
-Streamer redirects byte stream from input stream (aka producer) into
-output stream (aka consumer). It automatically adjusts input stream
-speed if the consumer it too slow; to implement that the internal
-temporally buffer is used.
+Streamer redirects byte stream from input stream (aka producer) into output stream (aka consumer).
+It automatically synchronizes speed between input and output.
 
-Any input and output combination is possible, i.e. read data from
-L<file|UniEvent::Streamer::FileInput> and stream it into network over
-L<TCP connection|UniEvent::Streamer::StreamOutput>, or read data from
-L<TTY|UniEvent::Streamer::StreamInput> and stream it into
-L<Pipe|UniEvent::Streamer::StreamOutput>. Pure perl L<input|UniEvent::Streamer::Input> /
-L<output|UniEvent::Streamer::Output> is also possible to allow custom processing.
+To use Streamer you need to create a streamer input and streamer output object.
+Those can be one of the built-in classes (see L<UniEvent::Streamer/"BUILT-IN PRODUCERS AND CONSUMERS">) or your own custom classes.
+
+To create custom input and/or output you need to create a class that inherits from L<UniEvent::Streamer::Input> or L<UniEvent::Streamer::Output>.
+See those classes' docs for more details.
+
+
 
 =head1 METHODS
 
-=head2 new($input, $output [, $max_buf = 10_000_000] [$loop = UniEvent::Loop->default_loop])
+=head2 new($input, $output, [$max_buf = 10_000_000], [$loop = default])
 
-Constructs new Streamer object, connecting C<$intput> sink to C<$output> using intermediate
-buffer of C<$max_buf> size bytes.
+Constructs new Streamer object, connecting C<$input> sink to C<$output>.
+C<$max_buf> is the buffer size (maximum amount of data to read-ahead from input).
+If output is not fast enough and this buffer gets full, then input is paused until some part of the buffer is processed by output.
+
+NOTE: if you use inputs/outputs that works with handles (like C<StreamOutput/StreamInput>), make sure that those handles that you pass to their constructor
+use loop C<$loop>. 
 
 =head2 start()
 
-Starts the streamer, i.e. makes it active for the next even loop iteration.
+Starts the streamer, i.e. start the process of reading from input and writing to output.
+
 
 =head2 stop()
 
-Stops the streamer, i.e. makes it inactive for the next event loop iteration.
+Interrupt streaming process. Callback will be called with UniEvent::SystemError::operation_canceled error.
 
-=head2 finish_callback($code)
 
-Sets the callback, which will be invoked upon streaming completion. All previously
-set event listeners or callbacks are discarded.
+=head2 finish_callback($sub)
 
 =head2 finish_event()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked upon streaming completion.
+Callback will be called upon completion of streaming process (successful or unsuccessful).
 
-The C++ interface is:
+Callback signature:
 
-    void(const ErrorCode& err)
+    my $error = shift;
+    
+Where C<$error> (if any) is an object of class L<XS::ErrorCode>.
 
-On perl side it the callbacks will be called :
-
-    $callback->($error_code);
-
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
+See L<UniEvent/"EVENT CALLBACKS">
 
 
-=head1 REFERENCES
-
-L<UniEvent::Streamer::IInput>
-
-L<UniEvent::Streamer::Input>
-
-L<UniEvent::Streamer::Output>
-
-L<UniEvent::Streamer::IOutput>
+=head1 BUILT-IN PRODUCERS AND CONSUMERS
 
 L<UniEvent::Streamer::FileInput>
 
@@ -86,7 +74,5 @@ L<UniEvent::Streamer::FileOutput>
 L<UniEvent::Streamer::StreamInput>
 
 L<UniEvent::Streamer::StreamOutput>
-
-L<XS::Framework::CallbackDispatcher>
 
 =cut

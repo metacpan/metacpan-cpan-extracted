@@ -57,12 +57,6 @@ is_deeply( $object->notify(), ['CPNY-MNT'], 'notify properly parsed' );
 $object->notify('CPNY-MNT2');
 is( $object->notify()->[1], 'CPNY-MNT2', 'notify properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['arhuman@gmail.com 20120623'], 'changed properly parsed' );
-$object->changed('arhuman@gmail.com 20120624');
-is( $object->changed()->[1], 'arhuman@gmail.com 20120624', 'changed properly added' );
-
 # Test 'source'
 $tested{'source'}++;
 is( $object->source(), 'RIPE #Filtered', 'source properly parsed' );
@@ -85,6 +79,5 @@ descr:
 admin-c:        CPNY-ADM
 mnt-by:         CPNY-MNT
 notify:         CPNY-MNT
-changed:        arhuman@gmail.com 20120623
 source:         RIPE #Filtered
 

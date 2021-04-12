@@ -16,7 +16,7 @@ StreamFinder - Fetch actual raw streamable URLs from various radio-station, vide
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2020 by
+This module is Copyright (C) 2017-2021 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -113,7 +113,7 @@ of these URLs in order to have the option to stream the station / video in one's
 own choice of media player software rather than using their web browser and 
 accepting flash, ads, javascript, cookies, trackers, web-bugs, and other 
 crapware associated with that method of play.  The author uses his own 
-custom all-purpose media player called "Fauxdacious" (his custom hacked 
+custom all-purpose media player called "Fauxdacious" (his custom forked 
 version of the open-source "Audacious" audio player).  "Fauxdacious" 
 (L<https://wildstar84.wordpress.com/fauxdacious/>) incorporates this module to 
 decode and play streams, along with their titles / station names, and station 
@@ -139,7 +139,7 @@ and (youtube.com, et. al and other sites that youtube-dl supports)
 (L<StreamFinder::Youtube>).  
 
 NOTE:  StreamFinder::Reciva will likely be removed next release after 
-January 30, 2021 due to that site's announcement that they're going 
+April 30, 2021 due to that site's announcement that they're going 
 offline after that date!
 
 NOTE:  Facebook (Streamfinder::Facebook) has been removed because 
@@ -180,7 +180,8 @@ for streams on that site and I'll consider it!  The easiest way to do this
 is to take one of the existing submodules, copy it to 
 "StreamFinder::I<YOURSITE>.pm and modify it (and the POD docs) to your 
 specific site's needs, test it on several of their pages (see the "SYNOPSIS" 
-code above), and send it to me (That's what I do)!
+code above), and send it to me (That's what I do when I want to add a 
+new site)!
 
 =head1 SUBROUTINES/METHODS
 
@@ -208,9 +209,16 @@ turns on debugging output.  A numeric option can follow specifying
 the level (0, 1, or 2).  0 is none, 1 is basic, 2 is detailed.  
 Default:  B<1> (if I<-debug> is specified).
 
-=item $station->B<get>()
+=item $station->B<get>(['playlist'])
 
 Returns an array of strings representing all stream URLs found.
+If I<"playlist"> is specified, then an extended m3u playlist is returned 
+instead of stream url(s).  NOTE:  For Apple, Castbox, and Google 
+podcasts, if an author / channel page url is given, rather than an 
+individual podcast episode's url, get() returns the first (latest?) 
+podcast episode found, and get("playlist") returns an extended m3u 
+playlist containing the urls, titles, etc. for all the podcast 
+episodes found on that page url.
 
 =item $station->B<getURL>([I<options>])
 
@@ -364,7 +372,7 @@ L<http://search.cpan.org/dist/StreamFinder/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2020 Jim Turner.
+Copyright 2017-2021 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -412,7 +420,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 our $DEBUG = 0;
 
 require Exporter;

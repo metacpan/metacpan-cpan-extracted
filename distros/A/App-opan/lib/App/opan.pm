@@ -4,7 +4,7 @@ package App::opan;
 
 use strictures 2;
 
-our $VERSION = '0.003003';
+our $VERSION = '0.003004';
 
 use Dist::Metadata;
 use File::Open qw(fopen);
@@ -318,7 +318,7 @@ post "/upload" => sub {
 
 push(@{app->commands->namespaces}, 'App::opan::Command');
 
-helper cpan_url => sub { Mojo::URL->new($ENV{OPAN_MIRROR} || 'http://www.cpan.org/') };
+helper cpan_url => sub { Mojo::URL->new($ENV{OPAN_MIRROR} || 'https://www.cpan.org/') };
 
 my $nopin_static = Mojolicious::Static->new(
   paths => [ 'pans/custom/dists' ]

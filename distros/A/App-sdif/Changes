@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.19.1 2021-04-11T03:10:55Z
+
+    - Update behavior of --visible/--tabstyle.
+
 4.19.0 2021-04-09T01:57:53Z
 
     - Exit with status 0 unless error occured.

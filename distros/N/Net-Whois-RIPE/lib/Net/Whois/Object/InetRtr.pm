@@ -14,7 +14,7 @@ use base qw/Net::Whois::Object/;
 # % See http://www.ripe.net/db/support/db-terms-conditions.pdf
 # 
 # inet-rtr:       [mandatory]  [single]     [primary/lookup key]
-# descr:          [mandatory]  [multiple]   [ ]
+# descr:          [optional]   [multiple]   [ ]
 # alias:          [optional]   [multiple]   [ ]
 # local-as:       [mandatory]  [single]     [inverse key]
 # ifaddr:         [mandatory]  [multiple]   [inverse key]
@@ -28,19 +28,18 @@ use base qw/Net::Whois::Object/;
 # tech-c:         [mandatory]  [multiple]   [inverse key]
 # notify:         [optional]   [multiple]   [inverse key]
 # mnt-by:         [mandatory]  [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-2)
+# % This query was served by the RIPE Database Query Service version 1.99 (ANGUS)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'inet_rtr' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'inet_rtr', 'descr', 'local_as', 'ifaddr', 'admin_c', 'tech_c', 'mnt_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',    [ 'alias', 'interface', 'peer', 'mp_peer', 'member_of', 'remarks', 'org', 'notify', 'created', 'last_modified' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'inet_rtr', 'local_as', 'ifaddr', 'admin_c', 'tech_c', 'mnt_by', 'source' ] );
+__PACKAGE__->attributes( 'optional',    [ 'descr', 'alias', 'interface', 'peer', 'mp_peer', 'member_of', 'remarks', 'org', 'notify', 'created', 'last_modified' ] );
 __PACKAGE__->attributes( 'single',      [ 'inet_rtr', 'local_as', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'descr', 'alias', 'ifaddr', 'interface', 'peer', 'mp_peer', 'member_of', 'remarks', 'org', 'admin_c', 'tech_c', 'notify', 'mnt_by', 'changed' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'descr', 'alias', 'ifaddr', 'interface', 'peer', 'mp_peer', 'member_of', 'remarks', 'org', 'admin_c', 'tech_c', 'notify', 'mnt_by' ] );
 
 # End of auto-generated lines
 #######################################################################################

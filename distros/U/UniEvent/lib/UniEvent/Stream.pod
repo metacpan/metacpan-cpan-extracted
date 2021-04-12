@@ -1,378 +1,425 @@
-=head1 NAME UniEvent::Stream - abstract base class for streaming handles
+=head1 NAME
+
+UniEvent::Stream - abstract handle of a duplex communication channel
+
+
 
 =head1 DESCRIPTION
 
-The class shares common interface (and implementation) for the
+The class shares common interface and implementation for the
 L<UniEvent::Tcp>, L<UniEvent::Pipe> and L<UniEvent::Tty> handles.
 
 The key feature of L<UniEvent::Stream> that it is aimed to handle
-connected-oriented full-duplex messaging aka steaming, i.e., first,
+connected-oriented full-duplex messaging aka streaming, i.e., first,
 the connection should be established, and then traffic might flow
 independently in both directions.
 
-To use SSL-version of the library, the L<use_ssl> method should
-be invoced first, before binding/listening (for server) or
+To use SSL with a stream, the C<use_ssl()> method should
+be invoked first, before binding/listening (for server) or
 before connecting (for client).
 
-Examples of using streams can be seen in the C<examples> directory,
-shipped within the module distribution.
+It is inherited from L<UniEvent::Handle>.
+
+
 
 =head1 METHODS
 
-=head2 readable()
+All methods of L<UniEvent::Handle> also apply.
 
-Returns C<true> if the stream is readable.
+=head2 listen([$backlog = 128])
 
-=head2 writable()
+=head2 listen([$callback], [$backlog = 128])
 
-Returns C<true> if the stream is writable.
+Start listening for incoming connections (stream becomes a server). C<$backlog> indicates the number of
+connections the kernel might queue. If C<$callback> is present, it is added as connection_event()->add($cb)
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
 
 =head2 listening()
 
-Returns C<true> if listening has been started on the stream.
+Returns C<true> if stream is listening for connections.
 
-=head2 connecting()
-
-Returns C<true> if connecting has been initiated for the stream.
-
-=head2 established()
-
-Returns C<true> if the previous (lower, physical) layer of the stream
-has succesfully connected to the peer. It is C<true>, for example,
-when TCP connection has been established, but the possible SSL-hanshake is
-not been confirmed yet.
-
-For handlers without SSL, the C<connected> and C<established> coincide.
-
-=head2 connected()
-
-Returns C<true> if the next (high, logical) layer of the stream
-has succesfully connected to the peer. It is C<true>, for example,
-when TCP connection has been established, and the SSL-hanshake has been
-confirmed.
-
-For handlers without SSL, the C<connected> and C<established> coincide.
-
-=head2 wantread()
-
-Returns C<true> if the stream is ready for reading incoming data.
-
-=head2 shutting_down()
-
-Returns C<true> shutdown procedure has been initiated on the handle.
-
-=head2 is_shut_down()
-
-Returns C<true> shutdown procedure has been finished on the handle.
-
-=head2 write_queue_size()
-
-Returns the amount of queued bytes waiting to be sent.
-
-=head2 is_secure()
-
-Returns C<true> if the handler has SSL-context.
 
 =head2 connection_factory($callback)
 
-When handle is in the listening mode, it is possible to do custom
-incoming peer handle upgrade via the C<$callback>. The C<$callback>
-must return the stream handle object. For example, to inject custom
-field it can be done like:
+Allows for setting callback which will be called by server handle when new connection is accepted. This callback is expected to return a stream handle object
+which will represent a client connection. This object must be of appropriate class (L<UniEvent::Tcp>, L<UniEvent::Pipe>) or inherit from it. Object must be in
+initial state.
+
+By default, if this factory callback is not set, UniEvent will create client handles as objects of default classes (L<UniEvent::Tcp>, L<UniEvent::Pipe>).
+
+Callback receives just one argument: server stream object.
+
+    package MyConnection;
+    use parent 'UniEvent::Tcp';
+    
+    sub new {
+        my $class = shift;
+        my $self = $class->SUPER::new(@_);
+        XS::Framework::obj2hv($self); # upgrade handle object from scalar ref to hash ref to be able to store properties
+        $self->{prop} = "val";
+        return $self;
+    }
+    
+    ...
 
     my $server = UniEvent::Tcp->new;
     $server->bind(...);
     $server->listen();
     ...
     $server->connection_factory(sub {
-        my $client = shift;
-        XS::Framework::obj2hv($client);
-        $client->{my_data} = 'sample data';
-        return $client;
+        my $server = shift;
+        ...
+        return MyConnection->new($server->loop);
     });
 
-=head2 connection_callback($code)
 
-Sets the callback, which will be invoked during loop run, when the stream
-handle B<in listening mode> accepts new client.
-
-All previously set event listeners or callbacks are discarded.
+=head2 connection_callback($sub)
 
 =head2 connection_event()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked during loop run, when
-the stream handle in listening mode accepts new client
+Callbacks set via these methods will be invoked on servers when they establish new connection with client. Callbacks will be called only when both physical
+and logical layers of connection are established (for example, for tcp ssl servers, when client tcp connection is established and ssl handshake is done).
 
-The C++ interface is:
+Callback signature:
 
-    void(const StreamSP& handle, const StreamSP& client, const ErrorCode& err);
+    my ($server_stream, $client_stream, $error) = @_;
+    
+Where C<$server_stream> is the server stream handle object which was listening.
 
-On perl side it the callbacks will be called :
+C<$client_stream> is newly created client stream handle object.
 
-    $callback->($server, $client, $error_code);
+C<$error> is an optional L<XS::ErrorCode> object and may present if there were any errors during physical or logical process of establishing connection.
+In this case C<$client_stream> may or may not be defined depending on state when error occured.
 
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
+See L<UniEvent/"EVENT CALLBACKS">
 
 
-=head2 connect_callback($code)
-
-Sets the callback, which will be invoked during loop run, when the stream
-handle (client) successfully connects to a peer (i.e. C<connected()> returns
-C<true>).
-
-All previously set event listeners or callbacks are discarded.
+=head2 connect_callback($sub)
 
 =head2 connect_event()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked during loop run, when
-the stream handle (client) successfully connects to a peer, (i.e. C<connected()>
-returns C<true>).
+Callbacks set via these methods will be invoked on clients when they establish connection with server. Callbacks will be called only when both physical
+and logical layers of connection are established (for example, for tcp ssl clients, when connection with server is established and ssl handshake is done).
 
-The C++ interface is:
+Callback signature:
 
-    void(const StreamSP& handle, const ErrorCode& err, const ConnectRequestSP& req);
+    my ($stream, $error, $connect_request) = @_;
+    
+Where C<$stream> is the client stream handle object.
 
-On perl side it the callbacks will be called :
+C<$error> is an optional L<XS::ErrorCode> object and may present if there were any errors during physical or logical process of establishing connection.
 
-    $callback->($handle, $error_code, $connect_request);
+C<$connect_request> is an L<UniEvent::Request::Connect> object, which is an internal purpose object and passed to callback for request tracking purposes only.
 
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
-
-=head2 read_callback($code)
-
-Sets the callback, which will be invoked during loop run, when the handle
-has read piece of data from remote peer.
-
-All previously set event listeners or callbacks are discarded.
-
-=head2 read_event()
-
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked during loop run, when
-the handle has read piece of data from remote peer.
-
-The C++ interface is:
-
-    void(const StreamSP& handle, string& piece, const ErrorCode& err)
-
-On perl side it the callbacks will be called :
-
-    $callback->($handle, $piece, $error_code);
-
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
+See L<UniEvent/"EVENT CALLBACKS">
 
 
-=head2 write_callback($code)
+=head2 connecting()
 
-Sets the callback, which will be invoked during loop run, when the handle
-has wrote piece of data (previously queued for writing via C<write> method).
+Returns C<true> if stream is currently connecting.
 
-All previously set event listeners or callbacks are discarded.
 
-=head2 write_event()
+=head2 established()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked during loop run, when
-the handle has wrote piece of data (previously queued for writing via C<write>
-method).
+Returns C<true> if physical layer of the stream has succesfully connected to the peer.
+It is C<true>, for example, for ssl TCP connection, when tcp connection has been established, even if SSL-hanshake has not been done yet.
 
-The C++ interface is:
+For basic handlers without SSL, the C<connected> and C<established> coincide.
 
-    void(const StreamSP& handle, const ErrorCode& err, const WriteRequestSP& req)
 
-On perl side it the callbacks will be called :
+=head2 connected()
 
-    $callback->($handle, $error_code, $write_request);
+Returns C<true> if logical layer of the stream has succesfully connected to the peer.
+It is C<true>, for example, for ssl TCP connection, when tcp connection has been established and SSL-hanshake has been done.
 
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
+For basic handlers without SSL, the C<connected> and C<established> coincide.
 
-=head2 shutdown_callback($code)
 
-Sets the callback, which will be invoked during loop run, when the handle
-successfully shuts down. This happens when write requests are complete,
-and a peer confirmed it has received data (i.e. via C<ACK>) and
-C<shutdown> of the handle has been requested. If there are no data to write,
-and C<shutdown> has been requested, the C<shutdown_callback> will be invoked
-too.
+=head2 readable()
 
-The shutdown callback/event is opposite to eof callback/event.
+Returns C<true> if stream is readable.
 
-All previously set event listeners or callbacks are discarded.
 
-=head2 shutdown_event()
+=head2 writable()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked during loop run, when
-the handle successfully shuts down. This happens when write requests are complete,
-and a peer confirmed it has received data (i.e. via C<ACK>) and
-C<shutdown> of the handle has been requested. If there are no data to write,
-and C<shutdown> has been requested, the C<shutdown_callback> will be invoked
-too.
+Returns C<true> if stream is writable.
 
-The shutdown callback/event is opposite to eof callback/event.
-
-The C++ interface is:
-
-    void(const StreamSP& handle, const ErrorCode& err, const ShutdownRequestSP& req);
-
-On perl side it the callbacks will be called :
-
-    $callback->($handle, $error_code, $shutdown_request);
-
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
-
-=head2 eof_callback($callback)
-
-Sets the callback, which will be invoked during loop run, when a B<peer> of the
-handle shuts down, i.e. no more data will be received.
-
-The eof callback/event is opposite to shutdown callback/event.
-
-All previously set event listeners or callbacks are discarded.
-
-=head2 eof_event()
-
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked during loop run, when
-B<peer> of the handle shuts down, i.e. no more data will be received.
-
-The C++ interface is:
-
-    void(const StreamSP& handle);
-
-On perl side it the callbacks will be called :
-
-    $callback->($handle);
-
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
-
-=head2 event_listener($delegate [, $weak = false])
-
-Creates and returns wrapper around the C<$delegate> object of arbitrary
-class, having the following methods:
-
-  $delegate->create_connection($handle);
-  $delegate->on_connection    ($handle, $peer_handle, $error_code       );
-  $delegate->on_connect       ($handle, $error_code,  $connect_request  );
-  $delegate->on_read          ($handle, $buffer,      $error_code       );
-  $delegate->on_write         ($handle, $error_code,  $write_request    );
-  $delegate->on_shutdown      ($handle, $error_code,  $shutdown_request );
-  $delegate->on_eof           ($handle);
-
-The delegated object can be seen as alternative of setting indivitual callbacks
-or as a way of groupping them. The C<$delegate> object can optionally be weakened.
-
-=head2 listen([$callback = undef [, $backlog = 128]]) -> excepted<void, ErrorCode> ?
-
-Start listening for incoming connections. C<$backlog> indicates the number of
-connections the kernel might queue, same as C<listen(2)>. The connection C<$callback>
-can be added if needed.
-
-When a new peer connects, the connection callback/event is invoked.
-
-C<true> is returned in scalar context on success. Otherwise, in non-list context
-exception will be thrown. In list context C<(undef, $error_code)> is returned
-in case of error.
 
 =head2 read_start()
 
-Instructs the stream to read data from an peer during loop iteration. It reads until
-eof or error condition are met, or until C<read_stop>.
+Instructs the stream to watch for and read data from peer. Can only be called on readable and connected streams.
 
-Read callback/event are invoked if new data is received.
+The C<read_event()>'s callbacks will be invoked when data arrives.
+
+If you call this method when stream is not yet connected, it remembers your "wish" and will start reading when the stream is connected.
+
+By default, all streams (except for L<UniEvent::Tty>) "wishes" to read, so that normally you don't need to call this method by yourself.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
 
 =head2 read_stop()
 
-Stop reading data from the stream.
+Stops watching for and reading data from the stream, and thus C<read_event()> callbacks will not be invoked from now on.
 
-=head2 write($data [, $write_callback = undef])
+If you call this method before the stream is connected, it remembers your "wish" not to read data and thus C<read_start()> will not be automatically called
+when the stream is connected.
 
-Writes C<$data> to the stream. One-shot C<$write_callback> will be invocked upon
-successful operation completion.
+You can call C<read_start()> later to start reading again.
 
-The L<UniEvent::Request::Write> is returned.
 
-=head2 shutdown([$timeout = 0 [, $shutdown_callback = undef]])
+=head2 wantread()
 
-Shutdown the outgoing (write) side of a duplex stream. It waits for pending write
-requests to complete during C<$timeout> (if it is non-zero). If timeout timer
-triggers, than all pending write requests are cancelled and the stream it shutdown
-by force.
+Returns C<true> if stream is watching for incoming data (or will watch for it some time in the future in case if handle is not connected yet).
 
-The C<$shutdown_callback> is one-shot callback invoked upon operation completion.
 
-The L<UniEvent::Request::Shutdown> is returned.
+=head2 read_callback($sub)
 
-=head2 use_ssl([$ssl_context = undef])
+=head2 read_event()
 
-Sets or resets C<$ssl_context> on the stream. The ssl context can be created via
-the L<Net::SSLeay> package, e.g.:
+Callbacks set via these methods will be invoked on readable connected streams when new data from peer has been read.
 
-  use Net::SSLeay;
+Callback signature:
 
-  my $SERV_CERT = "ca.pem";
-  my $serv_ctx = Net::SSLeay::CTX_new();
-  Net::SSLeay::CTX_use_certificate_file($serv_ctx, $SERV_CERT, &Net::SSLeay::FILETYPE_PEM) or die;
-  Net::SSLeay::CTX_use_PrivateKey_file($serv_ctx, "ca.key", &Net::SSLeay::FILETYPE_PEM) or die;
-  Net::SSLeay::CTX_check_private_key($serv_ctx) or die;
-  my $srv = UE::Tcp->new;
-  $srv->use_ssl($serv_ctx);
+    my ($stream, $data, $error) = @_;
+    
+Where C<$stream> is the stream object.
 
-=head2 recv_buffer_size([$value = undef])
+C<$data> is the data has been read.
 
-Gets or sets (if C<$value> is defined) the size of the receive buffer that the operating
-system uses for the stream.
+C<$error> is an optional L<XS::ErrorCode> object and if it is present then C<$data> may be undefined.
 
-Returns the current size of buffer.
+If the stream is readable and you didn't set any read callbacks (and didn't call C<read_stop()>) then the stream will receive data from peer and discard it.
+If you want to prevent peer from sending data to your stream call C<read_stop()>.
 
-=head2 send_buffer_size([$value = undef])
+See L<UniEvent/"EVENT CALLBACKS">
 
-Gets or sets (if C<$value> is defined) the size of the send buffer that the operating
-system uses for the stream.
 
-Returns the current size of buffer.
+=head2 recv_buffer_size([$value])
+
+Gets or sets the size of the receive buffer that the operating system uses for the stream.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 write($data, [$callback])
+
+Queues a write request to the stream. Request will be executed when all previous pending requests are done, so that it is possible to write data immediately,
+even when stream is not yet connected. Example:
+
+    $tcp->connect($host, $port); # asynchronous operation!
+    $tcp->write("data"); # by this line, $tcp is not connected yet, will write data when it gets connected
+    $tcp->write("data2"); # will write it when get connected and written previous request 
+    
+i.e. it is the same as
+
+    $tcp->connect($host, $port, sub {
+        $tcp->write("data");
+    });
+
+One-shot C<$callback> will be invoked upon operation completion (see C<write_event()> for callback's signature).
+
+Returns L<UniEvent::Request::Write> object which is an internal purpose object and returned for request tracking purposes only.
+
+
+=head2 write_callback($sub)
+
+=head2 write_event()
+
+Callbacks set via these methods will be invoked every time write operation caused by C<write()> method is completed.
+
+Callback signature:
+
+    my ($stream, $error, $write_request) = @_;
+    
+Where C<$stream> is the stream object.
+
+C<$error> is an optional L<XS::ErrorCode> object.
+
+C<$write_request> is an L<UniEvent::Request::Write> object, which is an internal purpose object and passed to callback for request tracking purposes only.
+
+See L<UniEvent/"EVENT CALLBACKS">
+
+
+=head2 write_queue_size()
+
+Returns the amount of queued bytes waiting to be sent.
+
+
+=head2 send_buffer_size([$value])
+
+Gets or sets the size of the send buffer that the operating system uses for the stream.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 shutdown([$callback])
+
+=head2 shutdown([$timeout = 0], [$callback])
+
+Queues a shutdown for the outgoing (write) side of a duplex stream. It waits for all pending requests to complete during C<$timeout> (if it is non-zero).
+If timeout timer triggers, than all pending write requests are cancelled and the stream is shutdown by force. Thus it is possible to write code like this:
+
+    $tcp->connect($host, $port);
+    $tcp->write("data");
+    $tcp->shutdown; # will shutdown then connect and write are completed
+    # keep reference to $tcp somewhere!
+    
+and it is the same as
+
+    $tcp->connect($host, $port, sub {
+        $tcp->write("data", sub {
+            $tcp->shutdown;
+        });
+    });
+
+When the operation is completed, EOF on the peer side will be triggered.
+
+The C<$callback> is one-shot callback invoked upon operation completion (see C<shutdown_event()> for callback's signature).
+
+Returns L<UniEvent::Request::Shutdown> object which is an internal purpose object and returned for request tracking purposes only.
+
+
+=head2 shutdown_callback($sub)
+
+=head2 shutdown_event()
+
+Callbacks set via these methods will be invoked every time shutdown operation caused by C<shutdown()> method is completed.
+
+Callback signature:
+
+    my ($stream, $error, $shutdown_request) = @_;
+    
+Where C<$stream> is the stream object.
+
+C<$error> is an optional L<XS::ErrorCode> object.
+
+C<$shutdown_request> is an L<UniEvent::Request::Shutdown> object, which is an internal purpose object and passed to callback for request tracking purposes only.
+
+See L<UniEvent/"EVENT CALLBACKS">
+
+
+=head2 shutting_down()
+
+Returns C<true> if stream is currently shutting down.
+
+
+=head2 is_shut_down()
+
+Returns C<true> if stream has been shut down.
+
+
+=head2 eof_callback($sub)
+
+=head2 eof_event()
+
+Callbacks set via these methods will be invoked when peer shuts down (i.e. no more data will be received) or disconnects.
+
+Callback signature:
+
+    my $stream = shift; # the stream object itself
+
+See L<UniEvent/"EVENT CALLBACKS">
+
+
+=head2 disconnect()
+
+Queues a disconnect request, i.e. waits until all pending requests are completed and then disconnects.
+
+    $tcp->connect($host, $port);
+    $tcp->write("data");
+    $tcp->disconnect; # waits for pending requests, then disconnects
+    # keep reference to $tcp somewhere!
+
+The example above is the same as
+
+    $tcp->connect($host, $port, sub {
+        $tcp->write("data", sub {
+            $tcp->disconnect;
+        });
+    });
+
+The only exception is when the only pending request is a connect request. In this case, connect request is immediately cancelled, and the stream disconnects.
+
+NOTE: if you want to immediately disconnect the stream cancelling all pending requests, call L<UniEvent::Handle/"reset()"> or L<UniEvent::Handle/"clear()">
+
+
+=head2 event_listener($delegate, [$weak])
+
+Methods C<on_connection>, C<on_connect>, C<on_read>, C<on_write>, C<on_shutdown>, C<on_eof> will be called.
+
+See L<UniEvent/"EVENT LISTENER">
+
+
+=head2 use_ssl([$ssl_context])
+
+Enables SSL for the stream (adds SSL filter).
+
+C<$ssl_context> can be created via L<Net::SSLeay> and may be omitted for clients if default behaviour is ok. For servers, ssl context is required.
+
+    my $client = UE::Tcp->new;
+    $client->use_ssl;
+    $client->connect($host, $port);
+    ...
+
+For servers, SSL must be enabled on listening stream, not on individual connection streams. The same SSL context will be used for accepted streams.
+
+    my $server = UE::Tcp->new;
+    my $ssl_ctx = Net::SSLeay::CTX_new();
+    Net::SSLeay::CTX_use_certificate_file($ssl_ctx, "ca.pem", &Net::SSLeay::FILETYPE_PEM) or die;
+    Net::SSLeay::CTX_use_PrivateKey_file($ssl_ctx, "ca.key", &Net::SSLeay::FILETYPE_PEM) or die;
+    Net::SSLeay::CTX_check_private_key($ssl_ctx) or die;
+    $server->use_ssl($ssl_ctx);
+    $server->bind(...);
+    $server->listen;
+
+Enabling or disabling (see C<no_ssl()>) SSL can only be done in certain moments:
+
+=over
+
+=item
+
+For client streams, only before stream starts connecting or after it disconnects.
+
+=item
+
+For server stream, at any moment (further accepted connections will use SSL).
+
+=item
+
+For server connections (server-client streams), it is not possible as they are connected from the beginning and not used after disconnection.
+You must call this method on server listening stream.
+
+=back
+
+
+=head2 no_ssl()
+
+Disables SSL for the stream (removes SSL filter).
+See C<use_ssl()> for details when this method can be called.
+
+
+=head2 is_secure()
+
+Returns C<true> if stream is using SSL.
+
 
 =head2 run_in_order($callback)
 
-If there is any pending I/O requests, the C<$callback> will be attached to the last one, and
-exected rigth upon I/O request completion, in the loop run context.
+Queues a callback to the stream. Callback will be invoked when all requests queued before this callback are done, but before requests queued after this callback
+start executing.
 
-Otherwise, if there is no any pending I/O requests, the C<$callback> will be executed
-immedialy in the caller context.
+    $tcp->connect($host, $port);
+    $tcp->write("first");
+    $tcp->run_in_order(sub { ... });
+    $tcp->write("second");
+    
+In the example above, callback will be called after the stream is connected and sent first message. After calling callback, second message will be written.
 
-The main purpose of the method is to allow attach the execution of different one-shot
-"on completion" callbacks right after enqueing I/O operation.
+In other words, C<run_in_order()> is the same as adding one more callback to the previous request.
 
-The callback will be invoked as
-
-    $callback->($stream);
-
-=head1 REFERENCES
-
-L<UniEvent::Handle>
-
-L<UniEvent::Pipe>
-
-L<UniEvent::Tcp>
-
-L<UniEvent::Tty>
-
-L<UniEvent::Request::Connect>
-
-L<UniEvent::Request::Write>
-
-L<UniEvent::Request::Shutdown>
-
-L<XS::Framework::CallbackDispatcher>
-
-L<XS::Framework>
+Callback is invoked with a single argument - the stream object. 
 
 =cut

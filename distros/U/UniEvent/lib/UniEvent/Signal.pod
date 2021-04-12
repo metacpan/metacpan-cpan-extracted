@@ -2,181 +2,179 @@
 
 UniEvent::Signal - runs callbacks upon UNIX signals
 
+
+
 =head1 SYNOPSIS
 
     use UniEvent::Signal; # for constants
 
-    my $loop = UniEvent::Loop->new;
-    # handy way
-    my $h = UniEvent::Signal::watch(SIGINT, sub { say "got SIGINT" }, $loop);
+    my $h = UE::signal SIGINT, sub { say "got SIGINT" };
 
     # more verbose way
-    my $h = UniEvent::Signal->new($loop);
+    my $h = UniEvent::Signal->new();
     $h->start(SIGINT, sub {
-        my ($h, $signal) = @_;
-        say "got signal $signal";
+        my ($h, $signum) = @_;
+        say "got signal $signum";
     });
-    $loop->run;
 
     # one shot signal watcher
-    $h->once(SIGTERM);
+    $h->once(SIGTERM, sub { ... });
+
+
 
 =head1 DESCRIPTION
 
-Allow to check UNIX signals and, if a signal appears, execute approprate
-handlers during loop iteration. One callback is capable to handle
-multiple signals if needed.
+Allow to check UNIX signals and, if a signal appears, execute appropriate
+handlers during loop iteration.
 
 It is inherited from L<UniEvent::Handle>.
 
-=head1 FUNCTIONS
 
-=head2 watch($signal, $callback [, $loop = UniEvent::Loop->default_loop])
-
-Handy function which creates handler, sets the C<$callback> and marks
-the C<$signal> for permanent watching for the next event loop iterations.
-
-Returns the signal handler.
 
 =head1 METHODS
 
-=head2 new([$loop = UniEvent::Loop->default_loop])
+All methods of L<UniEvent::Handle> also apply.
+
+
+=head2 create($signum, $callback, [$loop = default])
+
+    my $handle = UniEvent::Signal->create(SIGINT, sub { say "hi" });
+
+Creates and starts a signal handle. Alias for C<new($loop)> + C<start($signum, $callback)>.
+
+
+=head2 create_once($signum, $callback, [$loop = default])
+
+    my $handle = UniEvent::Signal->create_once(SIGINT, sub { say "hi" });
+
+Creates and starts a one-shot signal handle. Alias for C<new($loop)> + C<once($signum, $callback)>.
+
+
+=head2 new([$loop = default])
 
 Constructs new Signal handle and binds it to the specified event loop.
 
-=head2 start($signal, [$callback = undef])
 
-Marks C<$signal> to be B<permanently> handled in the next event loop iterations.
-Optionally it adds the C<$callback> to the existing event listeners.
+=head2 start($signum, [$callback])
+
+Marks C<$signum> to be B<permanently> handled in the next event loop iterations.
+
+If C<$callback> is present, it is added as event()->add($cb)
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 once($signum, [$callback])
+
+B<Temporally> marks C<$signum> to be watched in the next event loop iteration(s).
+Upon C<$signum> receiving, handle will no longer watch for it (as if C<stop()> was called).
+
+If C<$callback> is present, it is added as event()->add($cb)
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
 
 =head2 stop()
 
-Stops the singal handle, i.e. makes it inactive for the next event loop
-iteration.
+Stops the singal handle, i.e. makes it inactive for the next event loop iteration.
 
-=head2 callback($code)
+L<May return error|UniEvent/"OPTIONAL ERRORS">
 
-Sets the callback, which will be invoked upon the interested signals. All previously
-set event listeners or callbacks are discarded.
+
+=head2 callback($sub)
 
 =head2 event()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked upon signal in
-loop iteration.
+Callback signature:
 
-The C++ interface is:
+    my ($handle, $signum) = @_;
+    
+Where C<$handle> is the Signal handle object itself.
 
-    void(const SignalSP& handle, int signum)
+C<$signum> is the signal number that fired. It is useful when you add the same callback for several signal watchers.
 
-On perl side it the callbacks will be called:
+See L<UniEvent/"EVENT CALLBACKS">
 
-    $callback->($handle, $signal);
 
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
+=head2 event_listener($delegate, [$weak])
 
-=head2 event_listener($delegate [, $weak = false])
+Method C<on_signal> will be called.
 
-Creates and returns wrapper around the C<$delegate> object of arbitrary
-class, having the following methods:
+See L<UniEvent/"EVENT LISTENER">
 
-  $delegate->on_signal($handle, $signal);
 
-The delegated object can be seen as alternative of setting indivitual callbacks
-or as a way of groupping them. The C<$delegate> object can optionally be weakened.
-
-=head2 call_now($signal)
+=head2 call_now($signum)
 
 Immediately ivokes assigned callbacks and listeners in the caller context
 (i.e. not waiting loop run) with the given signal.
 
-=head2 once($signal [, $callback = undef])
-
-B<Temporally> marks C<$signal> to be watched in the next event loop iteration(s).
-Upon C<$signal> receiving, callback will no longer watch for it.
-
-Optionally it adds the C<$callback> to the existing event listeners.
-
 
 =head1 CONSTANTS
 
-=head2 SIGNAL NAMES
-
 Some signals might be not available for particular platforms.
 
-=head3 SIGINT
+=head2 SIGINT
 
-=head3 SIGILL
+=head2 SIGILL
 
-=head3 SIGABRT
+=head2 SIGABRT
 
-=head3 SIGFPE
+=head2 SIGFPE
 
-=head3 SIGSEGV
+=head2 SIGSEGV
 
-=head3 SIGTERM
+=head2 SIGTERM
 
-=head3 SIGHUP
+=head2 SIGHUP
 
-=head3 SIGQUIT
+=head2 SIGQUIT
 
-=head3 SIGTRAP
+=head2 SIGTRAP
 
-=head3 SIGBUS
+=head2 SIGBUS
 
-=head3 SIGKILL
+=head2 SIGKILL
 
-=head3 SIGUSR1
+=head2 SIGUSR1
 
-=head3 SIGUSR2
+=head2 SIGUSR2
 
-=head3 SIGPIPE
+=head2 SIGPIPE
 
-=head3 SIGALRM
+=head2 SIGALRM
 
-=head3 SIGSTKFLT
+=head2 SIGSTKFLT
 
-=head3 SIGCHLD
+=head2 SIGCHLD
 
-=head3 SIGCONT
+=head2 SIGCONT
 
-=head3 SIGSTOP
+=head2 SIGSTOP
 
-=head3 SIGTSTP
+=head2 SIGTSTP
 
-=head3 SIGTTIN
+=head2 SIGTTIN
 
-=head3 SIGTTOU
+=head2 SIGTTOU
 
-=head3 SIGURG
+=head2 SIGURG
 
-=head3 SIGXCPU
+=head2 SIGXCPU
 
-=head3 SIGXFSZ
+=head2 SIGXFSZ
 
-=head3 SIGVTALRM
+=head2 SIGVTALRM
 
-=head3 SIGPROF
+=head2 SIGPROF
 
-=head3 SIGWINCH
+=head2 SIGWINCH
 
-=head3 SIGIO
+=head2 SIGIO
 
-=head3 SIGPOLL
+=head2 SIGPOLL
 
-=head3 SIGPWR
+=head2 SIGPWR
 
-=head3 SIGSYS
-
-=head2 TYPE
-
-Signal type constant
-
-=head1 REFERENCES
-
-L<UniEvent::Handle>
-
-L<XS::Framework::CallbackDispatcher>
+=head2 SIGSYS
 
 =cut

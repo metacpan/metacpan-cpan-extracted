@@ -1,5 +1,9 @@
 Revision history for perlfaq
 
+5.20210411  2021-04-11 00:45:30Z
+  * Add entry to faq4 for equivalent to ruby #{}, python fstring
+    (PR#93, John Karr)
+
 5.20201107  2020-11-07 21:02:39Z
   * typo fix (PR#90, Samanta Navarro)
   * fix learn.perl.org link, which now directs to perldoc.perl.org (PR#91, Dan

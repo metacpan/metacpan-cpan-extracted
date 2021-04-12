@@ -3,7 +3,7 @@ package Crypt::OpenSSL::PKCS12;
 use strict;
 use Exporter;
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
@@ -117,7 +117,7 @@ Dan Sully, E<lt>daniel@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004-2018 by Dan Sully
+Copyright 2004-2021 by Dan Sully
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

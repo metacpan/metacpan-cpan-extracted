@@ -14,7 +14,7 @@ use Scalar::Util qw(blessed);
 use constant CHUNK_SIZE => $ENV{MOJO_CHUNK_SIZE} || 131072;
 use constant DEBUG      => $ENV{MOJO_READWRITEFORK_DEBUG} && 1;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 our @SAFE_SIG
   = grep { !m!^(NUM\d+|__[A-Z0-9]+__|ALL|CATCHALL|DEFER|HOLD|IGNORE|MAX|PAUSE|RTMAX|RTMIN|SEGV|SETS)$! } keys %SIG;
@@ -249,7 +249,7 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
 
 =head1 VERSION
 
-1.00
+1.01
 
 =head1 SYNOPSIS
 
@@ -274,7 +274,8 @@ Mojo::IOLoop::ReadWriteFork - Fork a process and read/write from it
   $fork->run("bash", -c => q(echo $YIKES foo bar baz));
 
   # Using promises
-  $fork->on(read => sub { ... })->run_p("bash", -c => q(echo $YIKES foo bar baz))->wait;
+  $fork->on(read => sub { ... });
+  $fork->run_p("bash", -c => q(echo $YIKES foo bar baz))->wait;
 
 See also
 L<https://github.com/jhthorsen/mojo-ioloop-readwritefork/tree/master/example/tail.pl>

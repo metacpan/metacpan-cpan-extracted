@@ -1,3 +1,7 @@
+1.022 2021-04-11
+  - Update package metadata
+    - thanks to Karen Etheridge
+
 1.011 2020-02-18
   - Avoid 'duplicate keys' bug.
   - Add deprecation notice.

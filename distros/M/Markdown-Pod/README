@@ -2,7 +2,7 @@ NAME
     Markdown::Pod - Convert Markdown to POD
 
 VERSION
-    version 0.007
+    version 0.008
 
 SYNOPSIS
         use Markdown::Pod;
@@ -59,12 +59,18 @@ AUTHOR
 CONTRIBUTORS
     *   Andrew Speer (ASPEER) <andrew@webdyne.org>
 
+    *   Dave Rolsky (DROLSKY) <autarch@urth.org>
+
     *   Jason McIntosh (JMAC) <jmac@jmac.org>
+
+    *   Ji-Hyeon Gim (POTATOGIM) <potatogim@potatogim.net>
+
+    *   Slaven Rezić (SREZIC) <slaven@rezic.de>
 
     *   Zakariyya Mughal (ZMUGHAL) <zmughal@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by Keedi Kim.
+    This software is copyright (c) 2021 by Keedi Kim.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libunievent-socks-tests.a  CMakeFiles/unievent-socks-tests.dir/tests/socks.cc.o
+/usr/bin/ranlib libunievent-socks-tests.a

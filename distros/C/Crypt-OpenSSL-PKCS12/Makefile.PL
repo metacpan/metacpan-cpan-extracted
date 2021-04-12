@@ -1,8 +1,9 @@
 # $Id: Makefile.PL 10 1998-12-16 23:02:45Z daniel $
 
-BEGIN { push @INC, '.' unless $INC[-1] eq '.' }
+use lib '.';
 use inc::Module::Install;
 
+use File::Spec;
 use Config;
 
 name('Crypt-OpenSSL-PKCS12');
@@ -20,14 +21,19 @@ test_requires 'Test::More' => '0.47';
 
 requires_external_cc();
 
-inc '-I/usr/local/opt/openssl/include -I/usr/include/openssl -I/usr/local/include/ssl -I/usr/local/ssl/include';
-libs '-L/usr/local/opt/openssl/lib -L/usr/lib -L/usr/local/lib -L/usr/local/ssl/lib -lcrypto -lssl';
-
-if ($^O ne 'darwin') {
-    cc_optimize_flags('-O2 -g -Wall -Werror');
+if ($^O ne 'MSWin32' and my $prefix = `brew --prefix openssl 2>@{[File::Spec->devnull]}`) {
+  chomp $prefix;
+  inc "-I$prefix/include";
+  libs "-L$prefix/lib -lcrypto -lssl";
+} else {
+  inc '-I/usr/local/opt/openssl/include -I/usr/local/include/openssl -I/usr/include/openssl -I/usr/local/include/ssl -I/usr/local/ssl/include';
+  libs '-L/usr/local/opt/openssl/lib -L/usr/local/lib -L/usr/lib -L/usr/local/ssl/lib -lcrypto -lssl';
 }
-else {
+
+if ($Config::Config{myuname} =~ /darwin/i) {
     cc_optimize_flags('-O2 -g -Wall -Werror -Wno-deprecated-declarations');
+} else {
+    cc_optimize_flags('-O2 -g -Wall -Werror');
 }
 
 auto_install();

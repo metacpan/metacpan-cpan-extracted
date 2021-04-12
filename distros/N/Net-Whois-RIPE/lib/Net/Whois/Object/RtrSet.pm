@@ -14,7 +14,7 @@ use base qw/Net::Whois::Object/;
 # % See http://www.ripe.net/db/support/db-terms-conditions.pdf
 # 
 # rtr-set:        [mandatory]  [single]     [primary/lookup key]
-# descr:          [mandatory]  [multiple]   [ ]
+# descr:          [optional]   [multiple]   [ ]
 # members:        [optional]   [multiple]   [ ]
 # mp-members:     [optional]   [multiple]   [ ]
 # mbrs-by-ref:    [optional]   [multiple]   [inverse key]
@@ -25,19 +25,18 @@ use base qw/Net::Whois::Object/;
 # notify:         [optional]   [multiple]   [inverse key]
 # mnt-by:         [mandatory]  [multiple]   [inverse key]
 # mnt-lower:      [optional]   [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-4)
+# % This query was served by the RIPE Database Query Service version 1.99 (ANGUS)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'rtr_set' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'rtr_set', 'descr', 'tech_c', 'admin_c', 'mnt_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',    [ 'members', 'mp_members', 'mbrs_by_ref', 'remarks', 'org', 'notify', 'mnt_lower', 'created', 'last_modified' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'rtr_set', 'tech_c', 'admin_c', 'mnt_by', 'source' ] );
+__PACKAGE__->attributes( 'optional',    [ 'descr', 'members', 'mp_members', 'mbrs_by_ref', 'remarks', 'org', 'notify', 'mnt_lower', 'created', 'last_modified' ] );
 __PACKAGE__->attributes( 'single',      [ 'rtr_set', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'descr', 'members', 'mp_members', 'mbrs_by_ref', 'remarks', 'org', 'tech_c', 'admin_c', 'notify', 'mnt_by', 'mnt_lower', 'changed' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'descr', 'members', 'mp_members', 'mbrs_by_ref', 'remarks', 'org', 'tech_c', 'admin_c', 'notify', 'mnt_by', 'mnt_lower' ] );
 
 # End of auto-generated lines
 #######################################################################################

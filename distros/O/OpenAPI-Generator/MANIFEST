@@ -1,0 +1,24 @@
+Changes
+lib/OpenAPI/Generator.pm
+lib/OpenAPI/Generator/From/Definitions.pm
+lib/OpenAPI/Generator/From/Pod.pm
+lib/OpenAPI/Generator/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/from_definitions.t
+t/from_pod.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/samples/FromDefinitions/oa.yml
+t/samples/FromDefinitions/openapi.json
+t/samples/FromDefinitions/openapi.yaml
+t/samples/FromPod/Controller.pod
+t/samples/FromPod/Controller2.pod
+t/samples/FromPod/Empty.pm
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

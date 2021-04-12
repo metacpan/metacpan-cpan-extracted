@@ -1,7 +1,7 @@
 Geo::IP2Location
 ================
 
-This Perl module provides fast lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand, elevation and usage type from IP address using IP2Location database. This module uses a file based BIN database available at https://www.ip2location.com/database/ip2location upon subscription. You can visit https://www.ip2location.com/development-libraries to download BIN sample files. This database consists of IP address as keys and other information as values. It supports all IP addresses in IPv4 and IPv6.
+This Perl module provides fast lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand, elevation, usage type, IP address type and IAB advertising category from IP address using IP2Location database. This module uses a file based BIN database available at https://www.ip2location.com/database/ip2location upon subscription. You can visit https://www.ip2location.com/development-libraries to download BIN sample files. This database consists of IP address as keys and other information as values. It supports all IP addresses in IPv4 and IPv6.
 
 This module can be used in many types of project such as:
 
@@ -33,6 +33,6 @@ The complete database is available at https://www.ip2location.com under subscrip
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2020 by IP2Location.com, support@ip2location.com
+Copyright (C) 2021 by IP2Location.com, support@ip2location.com
 
 This library is released under the MIT license. See the LICENSE file for full license information.

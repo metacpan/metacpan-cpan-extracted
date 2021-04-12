@@ -5,7 +5,7 @@ requires 'Getopt::EX', 'v1.21.1';
 requires 'Getopt::EX::termcolor', '1.07';
 requires 'Text::VisualWidth::PP', '0.05';
 requires 'Unicode::EastAsianWidth::Detect';
-requires 'Text::ANSI::Fold', '2.08';
+requires 'Text::ANSI::Fold', '2.10';
 requires 'Term::ReadKey';
 
 on 'test' => sub {

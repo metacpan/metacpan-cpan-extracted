@@ -18,7 +18,7 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited methods
-can_ok $object, qw( irt phone fax_no e_mail abuse_mailbox signature encryption admin_c tech_c auth remarks irt_nfy notify mnt_by changed);
+can_ok $object, qw( irt phone fax_no e_mail signature encryption admin_c tech_c auth remarks irt_nfy notify mnt_by );
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -47,12 +47,6 @@ $tested{'fax_no'}++;
 is_deeply( $object->fax_no(), ['+33 102030405'], 'fax_no properly parsed' );
 $object->fax_no('+33 102030407');
 is( $object->fax_no()->[1], '+33 102030407', 'fax_no properly added' );
-
-# Test 'abuse_mailbox'
-$tested{'abuse_mailbox'}++;
-is_deeply( $object->abuse_mailbox(), ['abuse@demo.com'], 'abuse_mailbox properly parsed' );
-$object->abuse_mailbox('otherabuse@demo.com');
-is( $object->abuse_mailbox()->[1], 'otherabuse@demo.com', 'abuse_mailbox properly added' );
 
 # Test 'signature'
 $tested{'signature'}++;
@@ -120,12 +114,6 @@ is_deeply( $object->auth(), ['PGPKEY-F004BF15'], 'mnt_by properly parsed' );
 $object->auth('PGPKEY-F004BF16');
 is( $object->auth()->[1], 'PGPKEY-F004BF16', 'mnt_by properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['someone@demo.com 20120131'], 'changed properly parsed' );
-$object->changed('someone@demo.com 20120228');
-is( $object->changed()->[1], 'someone@demo.com 20120228', 'changed properly added' );
-
 # Test 'source'
 $tested{'source'}++;
 is( $object->source(), 'RIPE', 'source properly parsed' );
@@ -150,14 +138,12 @@ org:            ORG-MISC01-RIPE
 remarks:        No remarks
 irt-nfy:        notify@demo.com
 mnt-by:         MAINT-DEMO-COM
-abuse-mailbox:  abuse@demo.com
 e-mail:         someone@demo.com
 tech-c:         DC007-AP
 admin-c:        DC008-AP
 auth:           PGPKEY-F004BF15
 remarks:        24/24 7/7
 remarks:        https://www.demo.com
-changed:        someone@demo.com 20120131
 notify:         someone@demo.com
 source:         RIPE
 

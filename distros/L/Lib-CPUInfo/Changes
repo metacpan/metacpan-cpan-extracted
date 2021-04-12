@@ -1,0 +1,4 @@
+NEXT
+
+    * Initial commit. All public functions are supported, thoroughly tested,
+      some benchmarks done too.

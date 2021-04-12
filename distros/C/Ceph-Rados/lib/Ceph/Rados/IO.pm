@@ -90,26 +90,44 @@ sub append {
 }
 
 sub read_handle_perl {
-    my ($self, $oid, $handle) = @_;
-    (my $length, undef) = $self->_stat($oid);
+    my ($self, $oid, $handle, $len, $off) = @_;
+    my $is_filehandle = openhandle($handle);
+    my $is_writable_object = blessed($handle) and $handle->can('write');
+    Carp::confess "Called with neither an open filehandle equivalent nor an object with a \`write\` method"
+        unless $is_filehandle or $is_writable_object;
+    $off //= 0;
+    if (!$len) {
+        ($len, undef) = $self->_stat($oid);
+    }
+    my $count = 0;
     #
-    for (my $offset = 0; $offset <= $length; $offset += $DEFAULT_OSD_MAX_WRITE) {
+    for (my $pos = 0; $pos <= $len; $pos += $DEFAULT_OSD_MAX_WRITE) {
         my $chunk;
-        if ($offset + $DEFAULT_OSD_MAX_WRITE > $length) {
-            $chunk = $length % $DEFAULT_OSD_MAX_WRITE;
+        if ($pos + $DEFAULT_OSD_MAX_WRITE > $len) {
+            $chunk = $len % $DEFAULT_OSD_MAX_WRITE;
         } else {
             $chunk = $DEFAULT_OSD_MAX_WRITE;
         }
-        my $data = $self->_read($oid, $chunk, $offset);
-        syswrite $handle, $data;
+        my $data = $self->_read($oid, $chunk, $pos);
+        if ($is_filehandle) {
+            syswrite $handle, $data;
+        } else {
+            $handle->write($data)
+        }
+        $count += length $data;
     }
+    return $count;
 }
 
 sub read_handle {
     my ($self, $oid, $handle, $len, $off) = @_;
-    Carp::confess "Called with not an open handle"
-        unless openhandle $handle;
-    $self->_read_to_fh($oid, $handle, $len||0, $off||0);
+    if (blessed($handle) and $handle->can('write')) {
+        &read_handle_perl;
+    } elsif (openhandle $handle) {
+        $self->_read_to_fh($oid, $handle, $len||0, $off||0);
+    } else {
+        Carp::confess "Called with neither an open filehandle equivalent nor an object with a \`write\` method";
+    }
 }
 
 

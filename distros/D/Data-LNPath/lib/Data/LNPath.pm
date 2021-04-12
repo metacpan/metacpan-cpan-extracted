@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '0.10';
+our $VERSION = '1.00';
 
 our (%ERROR, %METH, $caller);
 
@@ -133,7 +133,7 @@ Data::LNPath - lookup on nested data via path
 
 =head1 VERSION
 
-Version 0.10
+Version 1.00
 
 =cut
 
@@ -257,7 +257,7 @@ L<http://search.cpan.org/dist/Data-LNPath/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2021 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

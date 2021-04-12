@@ -1,7 +1,6 @@
 # -*-Perl-*-
-# $Id: Sybase.pm,v 1.119 2017/09/10 14:31:45 mpeppler Exp $
 
-# Copyright (c) 1996-2011   Michael Peppler
+# Copyright (c) 1996-2021   Michael Peppler
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -25,7 +24,7 @@
 
   $hostname  = Sys::Hostname::hostname();
   $init_done = 0;
-  $VERSION   = '1.17';
+  $VERSION   = '1.18';
   
   require_version DBI 1.30;
 
@@ -237,9 +236,9 @@
                , TABLE_NAME      = o.name
                , TABLE_TYPE      =
                    case o.type
-                       when "U" then "TABLE"
-                       when "V" then "VIEW"
-                       when "S" then "SYSTEM TABLE"
+                       when 'U' then 'TABLE'
+                       when 'V' then 'VIEW'
+                       when 'S' then 'SYSTEM TABLE'
                    end
                , REMARKS         = NULL
             from sysobjects o
@@ -1144,6 +1143,8 @@ results remaining for the current command by actually fetching them.
 The default behaviour is to issue a ct_cancel(CS_CANCEL_ALL), but this
 I<appears> to cause connections to hang or to fail in certain cases
 (although I've never witnessed this myself.)
+I would recommend leaving this set to the default value unless this really
+causes issues.
 
 =item syb_dynamic_supported (bool)
 

@@ -215,6 +215,19 @@ sub html {
   <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
 [% css %]
+@media only screen {
+  body {
+    margin: 40px auto;
+    max-width: 720px;
+    line-height: 1.6;
+    font-size: 18px;
+    color: rgb(0, 0, 0);
+    padding: 0 20px;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+  }
+}
   /*]]>*/-->
     </style>
 </head>
@@ -323,6 +336,7 @@ html,body {
 	border: none;
  	background: transparent;
 	font-family: [% IF fonts %]"[% fonts.main.name %]",[% END %] serif;
+    word-wrap: break-word;
 }
 
 div#thework {

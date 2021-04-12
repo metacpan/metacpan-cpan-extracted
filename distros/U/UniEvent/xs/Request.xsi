@@ -1,0 +1,7 @@
+MODULE = UniEvent                PACKAGE = UniEvent::Request
+PROTOTYPES: DISABLE
+
+BOOT {
+    Stash stash(__PACKAGE__, GV_ADD);
+    (void)stash;
+}

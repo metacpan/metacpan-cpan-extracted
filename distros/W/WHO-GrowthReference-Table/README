@@ -3,9 +3,9 @@ NAME
     chart (a.k.a. growth reference, growth standards)
 
 VERSION
-    This document describes version 0.008 of WHO::GrowthReference::Table
+    This document describes version 0.009 of WHO::GrowthReference::Table
     (from Perl distribution WHO-GrowthReference-Table), released on
-    2021-02-27.
+    2021-04-11.
 
 SYNOPSIS
      use WHO::GrowthReference::Table qw(get_who_growth_reference);

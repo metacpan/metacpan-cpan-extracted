@@ -208,7 +208,7 @@ our %EXPORT_TAGS = (
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
-our $VERSION = 9;
+our $VERSION = 10;
 
 require XSLoader;
 XSLoader::load( 'Graphics::TIFF', $VERSION );
@@ -246,7 +246,7 @@ Graphics::TIFF - Perl extension for the libtiff library
 
 =head1 VERSION
 
-9
+10
 
 =head1 SYNOPSIS
 
@@ -699,3 +699,12 @@ it under the same terms as Perl itself, either Perl version 5.8.5 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
+
+/* http://libtiff.org/man/TIFFReadRGBAImage.3t.html
+   #define TIFFGetR(abgr) ((abgr) & 0xff)
+   #define TIFFGetG(abgr) (((abgr) >> 8) & 0xff)
+   #define TIFFGetB(abgr) (((abgr) >> 16) & 0xff)
+   #define TIFFGetA(abgr) (((abgr) >> 24) & 0xff)
+   int TIFFReadRGBAImage(TIFF *tif, u_long width, u_long height, u_long *raster, int stopOnError)
+   int TIFFReadRGBAImageOriented(TIFF *tif, u_long width, u_long height, u_long *raster, int orientation, int stopOnError)
+*/

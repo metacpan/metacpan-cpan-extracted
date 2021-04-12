@@ -18,27 +18,23 @@ use base qw/Net::Whois::Object/;
 # remarks:        [optional]   [multiple]   [ ]
 # org:            [optional]   [multiple]   [inverse key]
 # notify:         [optional]   [multiple]   [inverse key]
-# mnt-by:         [mandatory]  [single]     [inverse key]
+# mnt-by:         [mandatory]  [multiple]   [inverse key]
 # mnt-lower:      [optional]   [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-1)
+# % This query was served by the RIPE Database Query Service version 1.99 (HEREFORD)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'as_block' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'as_block', 'mnt_by', 'changed', 'source' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'as_block', 'mnt_by', 'source' ] );
 __PACKAGE__->attributes( 'optional',    [ 'descr', 'remarks', 'org', 'notify', 'mnt_lower', 'created', 'last_modified' ] );
-__PACKAGE__->attributes( 'single',      [ 'as_block', 'mnt_by', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'descr', 'remarks', 'org', 'notify', 'mnt_lower', 'changed' ] );
+__PACKAGE__->attributes( 'single',      [ 'as_block', 'created', 'last_modified', 'source' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'descr', 'remarks', 'org', 'notify', 'mnt_by', 'mnt_lower' ] );
 
 # End of auto-generated lines
 #######################################################################################
-
-# Found in the wild
-# org:
 
 =head1 NAME
 

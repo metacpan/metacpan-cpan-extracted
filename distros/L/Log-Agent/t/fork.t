@@ -16,9 +16,10 @@ use strict;
 use Test;
 require './t/common.pl';
 
-BEGIN { plan tests => 19 }
+BEGIN { plan tests => 27 }
 
 use Log::Agent;
+use Log::Agent::Priorities qw(:LEVELS);
 require Log::Agent::Driver::Fork;
 require Log::Agent::Driver::Default;
 require Log::Agent::Driver::File;
@@ -35,7 +36,7 @@ my $driver = Log::Agent::Driver::Fork->make(
 	-duperr => 1,
     )
 );
-logconfig( -driver => $driver );
+logconfig( -driver => $driver, -level => DEBUG );
 
 open(ORIGOUT, ">&STDOUT")           or die "can't dup STDOUT: $!\n";
 open(STDOUT, ">t/fork_std.out") or die "can't redirect STDOUT: $!\n";
@@ -46,6 +47,8 @@ select(ORIGOUT); $| = 1;
 
 logerr "out of pez";
 logsay "una is a growing pup";
+loginfo "COOLING";
+logdebug "COOKING";
 logtrc 'debug', "HLAGHLAGHLAGH";
 logwarn "do not try this at home";
 eval { logdie "et tu, Chuckles?" };
@@ -62,7 +65,11 @@ ok($@);
 ok(contains("t/fork_std.err", '^moose: out of pez$'));
 ok(! contains("t/fork_std.err", '^Out of pez$'));
 ok(contains("t/fork_std.err", '^moose: una is a growing pup$'));
+ok(contains("t/fork_std.err", '^moose: COOLING'));
+ok(contains("t/fork_std.err", '^moose: COOKING'));
 ok(! contains("t/fork_std.err", '^Una is a growing pup$'));
+ok(! contains("t/fork_std.err", '^COOKING$'));
+ok(! contains("t/fork_std.err", '^COOLING$'));
 ok(contains("t/fork_std.err", '^moose: et tu, Chuckles\?$'));
 ok(! contains("t/fork_std.err", '^Et tu, Chuckles\?$'));
 ok(contains("t/fork_std.err", '^moose: do not try this at home$'));
@@ -75,10 +82,14 @@ ok(contains("t/fork_file.err", '^DATE squirrel\[\d+\]: out of pez$'));
 ok(contains("t/fork_file.out", 'ERROR: out of pez'));
 ok(contains("t/fork_file.out", '^DATE squirrel\[\d+\]: una is a growing pup$'));
 ok(! contains("t/fork_file.err", 'una is a growing pup'));
+ok(! contains("t/fork_file.err", 'COOKING'));
+ok(! contains("t/fork_file.err", 'COOLING'));
 ok(contains("t/fork_file.err", '^DATE squirrel\[\d+\]: do not try this at home$'));
 ok(contains("t/fork_file.out", 'WARNING: do not try this at home'));
 ok(contains("t/fork_file.err", '^DATE squirrel\[\d+\]: et tu, Chuckles\?$'));
 ok(contains("t/fork_file.out", 'FATAL: et tu, Chuckles\?'));
+ok(contains("t/fork_file.out", 'COOKING'));
+ok(contains("t/fork_file.out", 'COOLING'));
 
 unlink 't/fork_std.out', 't/fork_std.err',
         't/fork_file.out', 't/fork_file.err';

@@ -295,7 +295,8 @@ Nunchuck 연결
 
 
 - [동영상1. Nunchuck 마우스][youtube-nunchuck]
-<br /><iframe width="560" height="315" src="http://www.youtube.com/embed/1_gaxw9GKRg" frameborder="0" allowfullscreen></iframe>
+<br />
+<iframe width="560" height="315" src="http://www.youtube.com/embed/1_gaxw9GKRg" frameborder="0" allowfullscreen></iframe>
 
 
 정리하며

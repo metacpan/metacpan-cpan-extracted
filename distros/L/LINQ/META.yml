@@ -1,0 +1,118 @@
+---
+abstract: "an interpretation of Microsoft's Language Integrated Query"
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::Modern: '0.008'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 1
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LINQ
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  LINQ:
+    file: lib/LINQ.pm
+    version: '0.001'
+  LINQ::Array:
+    file: lib/LINQ/Array.pm
+    version: '0.001'
+  LINQ::Collection:
+    file: lib/LINQ/Collection.pm
+    version: '0.001'
+  LINQ::END:
+    file: lib/LINQ.pm
+    version: '0.001'
+  LINQ::Exception:
+    file: lib/LINQ/Exception.pm
+    version: '0.001'
+  LINQ::Exception::CallerError:
+    file: lib/LINQ/Exception.pm
+    version: '0.001'
+  LINQ::Exception::Cast:
+    file: lib/LINQ/Exception.pm
+    version: '0.001'
+  LINQ::Exception::CollectionError:
+    file: lib/LINQ/Exception.pm
+    version: '0.001'
+  LINQ::Exception::InternalError:
+    file: lib/LINQ/Exception.pm
+    version: '0.001'
+  LINQ::Exception::MultipleFound:
+    file: lib/LINQ/Exception.pm
+    version: '0.001'
+  LINQ::Exception::NotFound:
+    file: lib/LINQ/Exception.pm
+    version: '0.001'
+  LINQ::Exception::Unimplemented:
+    file: lib/LINQ/Exception.pm
+    version: '0.001'
+  LINQ::Field:
+    file: lib/LINQ/Field.pm
+    version: '0.001'
+  LINQ::FieldSet:
+    file: lib/LINQ/FieldSet.pm
+    version: '0.001'
+  LINQ::FieldSet::Assertion:
+    file: lib/LINQ/FieldSet/Assertion.pm
+    version: '0.001'
+  LINQ::FieldSet::Assertion::AND:
+    file: lib/LINQ/FieldSet/Assertion.pm
+    version: '0.001'
+  LINQ::FieldSet::Assertion::Combination:
+    file: lib/LINQ/FieldSet/Assertion.pm
+    version: '0.001'
+  LINQ::FieldSet::Assertion::NOT:
+    file: lib/LINQ/FieldSet/Assertion.pm
+    version: '0.001'
+  LINQ::FieldSet::Assertion::OR:
+    file: lib/LINQ/FieldSet/Assertion.pm
+    version: '0.001'
+  LINQ::FieldSet::Selection:
+    file: lib/LINQ/FieldSet/Selection.pm
+    version: '0.001'
+  LINQ::Grouping:
+    file: lib/LINQ/Grouping.pm
+    version: '0.001'
+  LINQ::Iterator:
+    file: lib/LINQ/Iterator.pm
+    version: '0.001'
+  LINQ::LAST:
+    file: lib/LINQ.pm
+    version: '0.001'
+  LINQ::Util:
+    file: lib/LINQ/Util.pm
+    version: '0.001'
+  LINQ::Util::Internal:
+    file: lib/LINQ/Util/Internal.pm
+    version: '0.001'
+requires:
+  Class::Tiny: '0.005'
+  Exporter::Shiny: '0'
+  List::Util: '1.35'
+  Object::Adhoc: '0'
+  Role::Tiny: '1.003003'
+  Scalar::Util: '0'
+  match::simple: '0'
+  parent: '0.224'
+  perl: '5.008003'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/LINQ/project
+  bugtracker: https://github.com/tobyink/p5-linq/issues
+  homepage: https://metacpan.org/release/LINQ
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-linq.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

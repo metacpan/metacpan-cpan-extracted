@@ -2,26 +2,875 @@
 
 UniEvent - Object-oriented, fast and extendable event loop abstraction framework with Perl and C++ interface.
 
-=cut
+
+
+=head1 SYNOPSIS
+
+    use UniEvent;
+    
+    my $timer = UniEvent::Timer->create($interval, sub { ... }); 
+
+    my $signal = UniEvent::Signal->create(SIGHUP, sub {...});
+    
+    my $client = UniEvent::Tcp->new;
+    $client->use_ssl();
+    $client->connect($host, $port);
+    $client->write($data);
+    $client->read_callback(sub {
+        my ($self, $data, $err) = @_;
+        ...
+    });
+    
+    my $server = UniEvent::Tcp->new;
+    $server->use_ssl;
+    $server->bind($host, $port);
+    $server->listen;
+    $server->connection_callback(sub {
+        my ($self, $client, $err) = @_;
+        $client->write("hello");
+        $client->read_callback(sub { ... });
+        $client->eof_callback(sub { ... });
+    });
+   
+    Fs::stat($path, sub { ... });
+    
+    UniEvent::Loop->default->run;
+
+
 
 =head1 DESCRIPTION
 
 UniEvent is an extendable object-oriented event loop framework. It's also an abstraction layer on top of event loop which
-provides engine-independent API (like L<AnyEvent>). It's written fully in C++ and is very fast.
+provides engine-independent API (like L<AnyEvent>).
 
-The main feature is that it supports implementing third-party plugins (protocol adapters) in C++/XS 
-(see L<XS::Manifesto>)  and therefore without any perfomance penalties. UniEvent support multiple backends 
+This module is an XS port of the very fast C++ panda::unievent framework.
+
+The main feature is that it supports implementing third-party plugins (protocol adapters) in C++/XS
+(see L<XS::Manifesto>) and therefore without any perfomance penalties. UniEvent support multiple backends
 (libuv is the only implemented at the moment).
 
-=head1 SYNOPSIS
 
-Documentation will be available later
 
-=SEE ALSO
+=head1 LOOP
+
+The heart of event programming is an event loop object. This object runs the loop and polls for all registered events (handles).
+
+You can create as many loops as you wish but you can only run one loop at a time. Each loop only polls for events registred with this loop.
+
+    my $loop = UE::Loop->new;
+    my $timer = UE::timer 10, sub {...}, $loop;
+    $loop->run; # timer will fire every 10 seconds
+
+By default, one loop (which is called main or default) is automatically created for you and is accessible as
+
+    UE::Loop->default;
+    
+All event handles (watchers) will register in default loop if you don't specify a loop in their constructor.
+
+    my $timer = UE::timer 10, sub {...}; # registered in default loop
+    UE::Loop->default->run;
+
+When you run
+
+    $loop->run;
+    
+The execution flow will not return until there are no more active handles in the loop or loop stop() is called from some callback.
+
+    $loop->stop;
+    
+Each handle has a strong refence to it's event loop so that loop will not be destroyed until you loose all refs to it and all it's handles are destroyed.
+The default loop is never destroyed.
+
+
+
+=head1 HANDLES (WATCHERS)
+
+There are a number of different handle classes to watch for different events like timers, signals, tcp and udp handles, filesystem operations,
+and so on. You can find detailed description of each handle class in reference.
+
+Each handle object binds to a specific loop upon creation. Re-binding a handle to a different loop object after creation is not supported.
+A handle will watch for events as soon as you run the loop it was bound to.
+
+
+=head2 Timer
+
+Timer handle invokes callback periodically at some interval (may be fractional).
+
+See L<UniEvent::Timer> for details.
+
+
+=head2 Signal
+
+Signal handle watches for signal events.
+
+    my $signal = UE::signal SIGINT(), sub {
+        finish_stuff();
+        exit 1;
+    };
+    
+You can get signal constant from C<UniEvent::Signal::SIGxxx()> or from any perl module that provides it.
+
+Signal will not interrupt your program and the callback is invoked as soon as possible when it's safe to do so.
+
+UniEvent replaces signal watcher in C<libc> so you MUST NOT mix it with perl's %SIG callbacks for the same signal numbers.
+
+See L<UniEvent::Signal> for details.
+
+
+=head2 Idle
+
+Idle handle invokes callback when the loop is idle, i.e. there are no new events after polling for i/o, timer, etc. On each loop iteration.
+
+Normally, loop polls for events with some suitable timeout. If an idle handle is started, the timeout is 0. This means that your process will consume
+all available CPU resources until idle handle is stopped.
+
+This is useful when you want to do some expensive work but you don't want to block process and you want to continue processing new events as they
+occur. IN this case you can setup and idle handle and do some small chunk of work on each callback invocation and then remove the idle handle when
+you're done.
+
+    my $idle = UE::idle sub {
+        if (my $job = @stuff_to_do) {
+            # do the job
+        } else {
+            $idle = undef;
+        }
+    };
+
+See L<UniEvent::Idle> for details.
+
+
+=head2 Prepare/Check
+
+C<Prepare> handles will run the given callback once per loop iteration, right before polling for i/o.
+
+C<Check> handles will run the given callback once per loop iteration, right after polling for i/o.
+
+See L<UniEvent::Prepare> and L<UniEvent::Check> for details.
+
+
+=head2 TCP
+
+TCP handles are used to represent both TCP streams and servers.
+
+    my $tcp = UE::Tcp->new;
+    $tcp->connect($host, $port); # async resolve and connect
+    $tcp->write("data"); # will write when connected
+    $tcp->read_callback(sub {
+        my ($tcp, $data, $err) = @_;
+        ...
+    });
+    ...
+    $tcp->disconnect;
+    
+    $tcp = UE::Tcp->new;
+    $tcp->bind($host, $port);
+    $tcp->listen;
+    $tcp->connection_callback(sub {
+        my ($server, $client, $err) = @_;
+        $client->read_callback(sub { ... });
+        ...
+    });
+
+See L<UniEvent::Tcp> for details.
+
+
+=head2 Pipe
+
+Pipe handles provide an abstraction over streaming files on Unix (including local domain sockets, pipes, and FIFOs) and named pipes on Windows.
+
+See L<UniEvent::Pipe> for details.
+
+
+=head2 TTY
+
+TTY handles represent a stream for the console.
+
+See L<UniEvent::Tty> for details.
+
+
+=head2 UDP
+
+UDP handles encapsulate UDP communication for both clients and servers.
+
+See L<UniEvent::Udp> for details.
+
+
+=head2 I/O poll
+
+Poll handles are used to watch file descriptors for readability, writability and disconnection.
+
+NOTE: If you want to connect, write, and read from network connections or make a network server,
+you'd better use more convenient and more efficient cross-platform C<tcp>, C<udp>, C<pipe>, etc... handles.
+Also those handles make use of fast I/O completion ports (IOCP) on Windows which is not possible with pure I/O poll handle.
+
+The purpose of poll handles is to enable integrating external libraries that rely on the event loop to signal it about the socket status changes.
+
+
+    my $h = UE::poll $filehande_or_fileno, UE::Poll::READABLE | UE::Poll::WRITABLE, sub {
+        my ($handle, $events, $err) = @_;
+        ...
+    };
+
+
+=head2 Filesystem events
+
+FS Event handles allow the user to monitor a given path for changes, for example, if the file was renamed or there was a generic change in it.
+This handle uses the best backend for the job on each platform.
+
+    my $handle = UE::fs_event $path, UE::FsEvent::CHANGE, sub {
+        my ($handle, $path, $events, $err) = @_;
+        # file $path changed
+    };
+    
+See L<UniEvent::FsEvent> for details.
+
+
+=head2 Filesystem poll
+
+FS Poll handles allow the user to monitor a given path for changes.
+Unlike C<FsEvent>, fs poll handles use C<stat> to detect when a file has changed so they can work on file systems where fs event handles can’t.
+
+    my $handle = UE::fs_poll $path, $interval, sub {
+        my ($handle, $prev_stat, $cur_stat, $err) = @_;
+        ...
+    };
+
+See L<UniEvent::FsPoll> for details.
+
+
+=head2 HOLDING HANDLES
+
+UniEvent does not hold a strong reference for created handle objects. You must hold them by yourself otherwise no events will be watched for.
+
+    UE::timer 1, sub {...}; # timer is destroyed immediately as you didn't hold it
+    UE::Loop->default->run; # no events to watch, run() will return immediately
+    
+Usually you have an object to place a refence to handle to. However sometimes it is convenient to capture handle in callback. Keep in mind that if
+you do this
+
+    my $timer = UE::Timer->new($loop);
+    $timer->start(1, sub {
+        ...
+        if (...) { $timer->stop }
+    });
+
+yes, you will hold the timer, however you will create a cyclic reference timer -> callback -> timer and thus create a memory leak.
+This code will stop the timer but will never destroy it. To remove cyclic reference, you need to break the cycle
+
+    my $timer = UE::Timer->new($loop);
+    $timer->start(1, sub {
+        ...
+        if (...) {
+            $timer->stop;
+            $timer = undef; # release captured variable
+        }
+    });
+
+or
+
+    my $timer = UE::Timer->new($loop);
+    $timer->start(1, sub {
+        ...
+        if (...) {
+            $timer->stop;
+            $timer->event->remove_all; # remove all callbacks
+        }
+    });
+
+
+
+=head1 EVENT CALLBACKS
+
+Each handle provides several methods for setting event callbacks.
+
+The naming rule for such methods is usually as follows:
+
+=over
+
+=item
+
+If a handle provides only single type of event (like L<UniEvent::Timer>, L<UniEvent::Idle>, etc...),
+then these methods are named C<callback()> and C<event()>.
+
+    $timer->callback(sub { ... });
+    $timer->event->add(sub { ... });
+
+=item
+
+If a handle provides several types of events (like any of L<UniEvent::Stream>'s ancestors, L<UniEvent::Udp>, etc...),
+then these methods are named C<xxxx_callback()> and C<xxxx_event()>, when C<xxxx> is an event name.
+
+    $tcp->read_callback(sub { ... });
+    $tcp->write_event->add(sub { ... });
+
+=back
+
+A handle can hold any number of callbacks for each event type. A callback will receive certain parameters which is documented in each handle's docs.
+The first parameter is always the handle object it is set to.
+
+Calling C<event()> method returns L<XS::Framework::CallbackDispatcher> object which is a special container for callbacks.
+To add several callbacks, simply call C<add()> method several times on that object.
+
+    $timer->event->add(sub { ... });
+    $timer->event->add(sub { ... });
+    
+Keep in mind that the callbacks call order by default is reverse, i.e. the last added callback is called first.
+This behaviour can be changed, see L<XS::Framework::CallbackDispatcher> docs.
+
+To remove a certain callback, call C<remove()> with corresponding subroutine reference.
+
+    my $cb = sub { ... };
+    $timer->event->add($cb);
+    $timer->event->remove($cb);
+
+An anonymous callback can remove itself like this:
+
+    $timer->event->add(sub {
+        my $timer = shift;
+        if (...) {
+            $timer->event->remove(__SUB__);
+        }
+    });
+
+To remove all callbacks from an event object, call C<remove_all()>.
+
+    $timer->event->add(sub { ... });
+    $timer->event->add(sub { ... });
+    $timer->event->remove_all; # removes both callbacks
+
+Method C<callback()> is an efficient shortcut which sets a single callback removing any previously set callbacks if any
+
+    $timer->callback(sub { ... }); # same as $timer->event->remove_all() + $timer->event->add(sub { ... })    
+
+
+=head4 EVENT LISTENER
+
+Instead of setting callbacks for each event type
+
+    $tcp->read_callback(sub { ... });
+    $tcp->write_callback(sub { ... });
+
+you can set an event listener object which can watch for all events types.
+
+    package MyListener;
+    
+    sub on_read { ... }
+    sub on_write { ... }
+    sub on_shutdown { ... }
+    sub on_disconnect { ... }
+    ...
+    
+    $tcp->event_listener(MyListener->new);
+
+Event listener can be object of any type. If event listener is set, a handle will call methods C<on_xxxx()> on it, where C<xxxx> is an event name.
+The parameters are the same as for callback version (first param is the event listener object itself, of course, second is the handle object, and other
+params are according to event documentation).
+
+An event listener object can be set to multiple handles.
+
+    package MyListener;
+    
+    sub on_timer { ... }
+    sub on_check { ... }
+    ...
+
+    my $lst = MyListener->new;
+    $timer->event_listener($lst);
+    $check->event_listener($lst);
+
+Event listener can't be set via simple API C<UE::check($callback, $loop)>. Only subroutines are accepted there.
+
+Event listener does not disable callbacks, i.e. if both event listener object and callbacks are set to a handle, both will be called
+(first callbacks, then event listener's method).
+
+Event listener is convenient when some object makes use of several handles and wants to listen events from them. Then instead of setting many callbacks
+it can set itself as a listener for those handles. This saves cpu time and can make the code clearer.
+
+    package MyClass;
+    
+    sub new {
+        my $self = bless {}, shift;
+        $self->{timer} = UE::Timer->new;
+        $self->{timer}->start(10);
+        $self->{timer}->event_listener($self, 1);
+        
+        $self->{tcp} = UE::Tcp->new;
+        $self->{tcp}->connect($host, $port);
+        $self->{tcp}->event_listener($self, 1);
+    }
+    
+    sub on_timer {
+        my ($self, $timer) = @_;
+        ...
+    }
+    
+    sub on_connect {
+        my ($self, $tcp, $err) = @_;
+        ...
+    }
+    
+Second argument to C<event_listener> is an C<weak> flag. If set to C<true>, handle will hold an event listener object by a weak reference.
+In our example, setting this flag is mandatory, because otherwise a memory leak would occur due to indirect
+cyclic reference $self -> timer/tcp handle -> $self (event listener)
+
+In the previous examples with C<MyListener> class, C<weak> flag should NOT be set as we need strong reference there, otherwise, when local variable
+C<$lst> goes out of scope, event listener object will be destroyed and removed from all handles it was set to.
+
+
+=head1 ASYNC DNS
+
+UniEvent supports for trully asyncronous resolve (async DNS). You may use it indirectly, for example via $tcp->connect($host, $port) method
+or directly like this:
+
+    my $resolver = UniEvent::Resolver->new($loop);
+    $resolver->resolve({
+        node       => 'myhost.com',
+        use_cache  => 1,
+        hints      => {family => UniEvent::AF_INET},
+        on_resolve => sub {
+            my ($addr, $err) = @_;
+            say $addr->[0]->ip;
+        },
+    });
+    $loop->run;
+
+For more details, see L<UniEvent::Resolver>, L<UniEvent::Tcp>.
+
+
+
+=head1 FILESYSTEM ASYNC OPERATIONS
+
+UniEvent provides a wide variety of cross-platform sync and async file system operations. For example:
+
+    UE::Fs::stat($file, sub {
+        my ($stat, $err) = @_;
+        ...
+    });
+    
+    UE::Fs::mkstemp($template, sub {
+        my ($path, $fd, $err) = @_;
+        ...
+    });
+    
+    UE::Loop->default->run;
+
+See L<UniEvent::Fs> for details.
+
+
+
+=head1 UTILITY FUNCTIONS
+
+UniEvent provides a number of cross-platform utility functions described in C<FUNCTIONS> section of L<UniEvent> package. Almost all of them are
+syncronous and not related to an event loop.
+
+    my $info = UniEvent::cpu_info();
+    my $num_cpus = @$info;
+    for (1..$num_cpus) {
+        ...
+        fork();
+        ...
+    }
+
+See L<UniEvent/FUNCTIONS> section.
+
+
+
+=head1 OPTIONAL ERRORS
+
+Some functions and methods in L<UniEvent> uses optional error return.
+Such functions instead of throwing an exception (if any error occurs) can return that error if asked to do so.
+
+You can choose desired behaviour by calling those function in certain context.
+
+There are two types of function / methods returning optional exceptions:
+
+=over
+
+=item functions with result
+
+If you call such a function normally, in scalar context, it will throw an exception if anything goes wrong, for example.
+    
+    my $sockaddr = $tcp->sockaddr; # either return a sockaddr or throw an exception
+
+It's okay if you don't bother about possible errors and agree to die if an error occurs.
+However if you desire to catch errors and process them, then exceptions are not always a convenient way and definitely not efficient.
+It could be more desirable to get the error directly as return value. To do so simply call such function in two-value context and it will return a
+possible error as the second value.
+
+    my ($sockaddr, $error) = $tcp->sockaddr; # never throws
+
+In this case if no errors occur, C<$error> will be C<undef>. Otherwise C<$sockaddr> will be undef and C<$error> will be an error object
+L<XS::ErrorCode> or L<XS::STL::ErrorCode>. You can inspect that object to find out what exactly happened.
+
+Calling such function in void context is the same as calling in scalar context (it will throw an exception in case of error).
+
+=item functions with no result (void)
+
+If you call such a function normally, in void context, it will throw an exception if anything goes wrong, for example.
+
+    $tcp->open($socket); # either succeed or throws
+
+If called in scalar context, such function will return just an "ok" flag and will not throw an exception.
+
+    my $ok = $tcp->open($socket); # never throws
+    
+    unless ($tcp->open($socket)) { # never throws
+        # failover somehow
+    }
+
+If called in two-value context it will return an "ok" flag and an error if any.
+
+    my ($ok, $error) = $tcp->open($socket); # never throws
+    say $error if $error;
+    
+=back
+
+Such functions are marked in documentation as L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+NOTE: async functions and methods doesn't use this approach, they always pass errors as an argument to async callback and never throws.
+
+
+
+=head1 FORK
+
+UniEvent is completely fork-aware. It automatically does all the stuff needed after fork.
+You can just fork() and run any loop after that including the ones that were in use in the master process.
+
+However keep in mind, that if you run the same loop in child process that was running in master process, you should probably remove the master's
+process event handles to avoid double execution. This is especially important for I/O handles like tcp, udp, pipe and so on, because no usable
+behaviour will occur if you watch for the same descriptior with 2 or more different handles.
+
+That's why it is often more convenient to run different loop in child process than to remove all master's recources from the same loop.
+
+    # master
+    my $loop  = UE::Loop->new;
+    my $timer = UE::timer 1, sub {...}, $loop;
+    my $tcp   = UE::Tcp->new();
+    ...
+    
+    fork();
+    
+    #child
+    my $child_loop = UE::Loop->new;
+    ...add events
+    $child_loop->run;
+
+
+
+=head1 THREADS
+
+UniEvent supports perl threads, however perl threads support is highly experimental and requires all XS modules in stack to support them.
+Threads behaviour in perl and C/C++ is completely different so it requires a huge amount of magic for XS module which ports a complex C++ framework to work.
+
+UniEvent depends on a number of XS modules and a number of XS modules depend on UniEvent. If there will be a single perl-threads-unaware thing, the
+app may crash at some point.
+
+Event loops and handles are NOT thread-safe, you can't run or access the same loop/handles in different threads.
+The only exception is L<UniEvent::Async> handle which is thread-safe and designed for inter-thread communication.
+
+In threaded perl UniEvent::Loop->default is thread-local (different in each thread), so you can safely create handles and run default loop in each thread.
+
+For safety, UniEvent objects are non-clonable, i.e. after creating a thread, all UniEvent objects (like loop, handles, requests, etc)
+that existed before threading will become C<undef> in child thread.
+
+NOTE: using threaded perl and NOT creating a second thread is fully supported and operational.
+
+
+
+=head1 SHORT API
+
+C<UE> is an alias for C<UniEvent>. You can use it whereever you would use C<UniEvent>.
+
+    my $t = UniEvent::Timer->new;
+    my $t = UE::Timer->new; # the same
+
+However keep in mind, that created objects are always of C<UniEvent::XXXX> class. It matters in these kind of checks:
+
+    if (ref($t) eq 'UniEvent::Timer') # ok
+    if (ref($t) eq 'UE::Timer')       # WRONG!
+
+
+
+=head1 FUNCTIONS
+
+=head2 check($callback, [$loop = default])
+
+=head2 fs_event($path, $flags, $callback, [$loop = default])
+
+=head2 fs_poll($path, $interval, $callback, [$loop = default])
+
+=head2 idle($callback, [$loop = default])
+
+=head2 poll($fd, $events, $callback, [$loop = default])
+
+=head2 prepare($callback, [$loop = default])
+
+=head2 signal($signum, $callback, [$loop = default])
+
+=head2 signal_once($signum, $callback, [$loop = default])
+
+=head2 timer($repeat, $callback, [$loop = default])
+
+=head2 timer_once($initial, $callback, [$loop = default])
+
+A shortcuts for corresponding UniEvent::XXXXX->create(...) call.
+
+    my $timer = UniEvent::timer($repeat, $cb);
+    my $timer = UniEvent::Timer->create($repeat, $cb); # the same
+
+See corresponding package's docs for more info.
+
+
+=head2 hostname()
+
+Returns current machine host name
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 uname()
+
+Retrieves system information. Data includes the operating system name, release, version, and machine.
+
+    {
+       machine => 'x86_64'
+       release => '4.19.0-14-amd64'
+       sysname => 'Linux'
+       version => '#1 SMP Debian 4.19.171-2 (2021-01-30)'
+    }
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 get_rss()
+
+Gets the resident set size (RSS) for the current process (in bytes).
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 get_free_memory()
+
+Gets the amount of free memory available in the system, as reported by the kernel (in bytes).
+
+
+=head2 get_total_memory()
+
+Gets the total amount of physical memory in the system (in bytes).
+
+
+=head2 interface_info()
+
+Gets address information about the network interfaces on the system. Sample output:
+
+    [{
+         address     => 127.0.0.1:0,      # Net::SockAddr
+         is_internal => 1,
+         name        => 'lo',
+         netmask     => 255.0.0.0:0,      # Net::SockAddr
+         phys_addr   => "\0\0\0\0\0\0"
+     },
+     {
+         address     => 10.10.10.92:0,    # Net::SockAddr
+         is_internal => 0,
+         name        => 'wlp2s0',
+         netmask     => 255.255.254.0:0,  # Net::SockAddr
+         phys_addr   => "\274\250\246\203S\$"
+     }
+    ]
+    ...
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 cpu_info()
+
+Gets information about the CPUs on the system. Sample output:
+
+    [{
+       cpu_times => {
+                      idle => 168327400,
+                      irq  => 655200,
+                      nice => 1495000,
+                      sys  => 3045400,
+                      user => 11124000
+                    },
+       model     => 'Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz',
+       speed     => 800
+     },
+     {
+       cpu_times => {
+                      idle => 168750000,
+                      irq  => 598300,
+                      nice => 1300800,
+                      sys  => 2522600,
+                      user => 11583100
+                    },
+       model     => 'Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz',
+       speed     => 800
+     }
+    ];
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 get_rusage()
+
+Gets the resource usage measures for the current process. Some platforms might not
+have all fields. Sample output:
+
+    {
+       idrss    => 0,           # integral unshared data size
+       inblock  => 0,           # block input operations
+       isrss    => 0,           # integral unshared stack size
+       ixrss    => 0,           # integral shared memory size
+       majflt   => 0,           # page faults (hard page faults)
+       maxrss   => 50512,       # maximum resident set size
+       minflt   => 9810,        # page reclaims (soft page faults)
+       msgrcv   => 0,           # IPC messages received
+       msgsnd   => 0,           # IPC messages sent
+       nivcsw   => 0,           # involuntary context switches
+       nsignals => 0,           # signals received
+       nswap    => 0,           # swaps
+       nvcsw    => 54,          # voluntary context switches
+       oublock  => 0,           # block output operations
+       stime    => 0.032753,    # user CPU time used
+       utime    => 0.356583     # system CPU time used
+     };
+     
+L<May return error|UniEvent/"OPTIONAL ERRORS">     
+
+
+=head2 get_random($size)
+
+Returns string filled with C<$size> trully random bytes. May block until needed amount of bytes become available.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 get_random($size, $callback, [$loop = default])
+
+Async version of C<get_random()>.
+
+Callback will be called with 3 arguments: resulting string, L<XS::STL::ErrorCode> error object if any and request object.
+
+Returns L<UniEvent::Request::Random> object.
+
+    get_random(1000, sub {
+        my ($data, $err) = @_;
+    });
+    UE::Loop->default->run;
+
+
+=head2 default_backend()
+
+Returns current default L<UniEvent> backend.
+
+Default backend is used when you create a L<UniEvent::Loop> object without specifying backend.
+
+By default, default backend is C<UniEvent::Backend::UV>.
+
+
+=head2 set_default_backend($backend)
+
+Sets default L<UniEvent> backend.
+
+It can only be set very early (usually on program startup), when default loop is not yet created (not accessed).
+This method will throw an exception if it's too late for changing default backend.
+
+
+
+=head1 CONSTANTS
+
+There are many constants in C<UniEvent> framework. Most of them are defined and documented in packages they are used with.
+
+Here is the list of constants that are defined in main C<UniEvent> package because they are used with multiple packages.
+
+=head2 AF_INET
+
+=head2 AF_INET6
+
+=head2 AF_UNSPEC
+
+=head2 PF_INET
+
+=head2 PF_INET6
+
+=head2 PF_UNSPEC
+
+=head2 SOCK_STREAM
+
+=head2 SOCK_DGRAM
+
+
+
+=head1 References
+
+L<UE>
+
+L<UniEvent::Check>
+
+L<UniEvent::Error>
+
+L<UniEvent::Fs>
+
+L<UniEvent::FsEvent>
+
+L<UniEvent::FsPoll>
+
+L<UniEvent::Handle>
+
+L<UniEvent::Idle>
+
+L<UniEvent::Loop>
+
+L<UniEvent::Pipe>
+
+L<UniEvent::Poll>
+
+L<UniEvent::Prepare>
+
+L<UniEvent::ResolveError>
+
+L<UniEvent::Resolver>
+
+L<UniEvent::Signal>
+
+L<UniEvent::Stream>
+
+L<UniEvent::Streamer>
+
+L<UniEvent::SystemError>
+
+L<UniEvent::Tcp>
+
+L<UniEvent::Timer>
+
+L<UniEvent::Tty>
+
+L<UniEvent::Udp>
+
+L<UniEvent::Backend::UV>
+
+L<UniEvent::Streamer::FileInput>
+
+L<UniEvent::Streamer::FileOutput>
+
+L<UniEvent::Streamer::StreamInput>
+
+L<UniEvent::Streamer::StreamOutput>
+
+L<UniEvent::Test::Async>
+
+
+
+=head1 SEE ALSO
 
 L<AnyEvent>
 
 L<libuv|http://libuv.org/>
+
+
 
 =head1 AUTHOR
 
@@ -29,7 +878,11 @@ Pronin Oleg <syber@cpan.org>
 
 Grigory Smorkalov <g.smorkalov@crazypanda.ru>
 
+Ivan Baidakou <i.baydakov@crazypanda.ru>
+
 Crazy Panda LTD
+
+
 
 =head1 LICENSE
 

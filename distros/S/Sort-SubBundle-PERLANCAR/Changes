@@ -1,3 +1,9 @@
+0.082   2021-04-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add a couple Acme::CPANModules headers (so it's ahead of Bencher
+	  headers).
+
+
 0.081   2020-02-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Rename dist PERLANCAR-Sort-Sub to Sort-SubBundle-PERLANCAR.

@@ -26,8 +26,8 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 @ISA = qw(Exporter);
 @EXPORT = qw(
 	logconfig
-	logconfess logcroak logcarp logxcroak logxcarp
-	logsay logerr logwarn logdie logtrc logdbg
+	logconfess logcluck logcroak logcarp logxcroak logxcarp
+	logdebug loginfo logsay logerr logwarn logdie logtrc logdbg
 );
 @EXPORT_OK = qw(
 	logwrite logtags
@@ -36,7 +36,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 use Log::Agent::Priorities qw(:LEVELS priority_level level_from_prio);
 use Log::Agent::Formatting qw(tag_format_args);
 
-our $VERSION = '1.004';
+our $VERSION = '1.005';
 $VERSION = eval $VERSION;
 
 $Trace = NOTICE;	# Default tracing
@@ -310,6 +310,19 @@ sub logxcarp {
 }
 
 #
+# logcluck
+#
+# Warning, with a full stack trace.
+#
+sub logcluck {
+	return if $Trace < WARN;
+	my $ptag = prio_tag(priority_level(WARN)) if defined $Priorities;
+	my $str = tag_format_args($Caller, $ptag, $Tags, \@_);
+	&log_default unless defined $Driver;
+	$Driver->logcluck($str);
+}
+
+#
 # logwarn
 #
 # Log warning at the "warning" level.
@@ -333,6 +346,30 @@ sub logsay {
 	my $str = tag_format_args($Caller, $ptag, $Tags, \@_);
 	&log_default unless defined $Driver;
 	$Driver->logsay($str);
+}
+
+# loginfo
+#
+# Log message at the "info" level.
+#
+sub loginfo {
+	return if $Trace < INFO;
+	my $ptag = prio_tag(priority_level(INFO)) if defined $Priorities;
+	my $str = tag_format_args($Caller, $ptag, $Tags, \@_);
+	&log_default unless defined $Driver;
+	$Driver->loginfo($str);
+}
+
+# logdebug
+#
+# Log message at the "debug" level.
+#
+sub logdebug {
+	return if $Trace < DEBUG;
+	my $ptag = prio_tag(priority_level(INFO)) if defined $Priorities;
+	my $str = tag_format_args($Caller, $ptag, $Tags, \@_);
+	&log_default unless defined $Driver;
+	$Driver->logdebug($str);
 }
 
 #
@@ -553,6 +590,17 @@ Like logdbg() above, you are not restricted to the C<info> priority. This
 routine checks the logging level (either explicit as in C<"info:14">
 or implicit as in C<"notice">) against the trace level.
 
+=item logdebug I<message>
+
+Log the message at the C<debug> priority to the C<output> channel.
+
+The difference with logdbg() is twofold: logging is done on the
+C<output> channel, not the C<debug> one, and the priority is implicit.
+
+=item loginfo I<message>
+
+Log the message at the C<info> priority to the C<output> channel.
+
 =item logsay I<message>
 
 Log the message at the C<notice> priority to the C<output> channel.
@@ -573,6 +621,10 @@ Log a warning message at the C<warning> priority to the C<error> channel.
 
 Same as logwarn(), but issues a Carp::carp(3) call instead, which will
 warn from the perspective of the routine's caller.
+
+=item logcluck I<message>
+
+Same as logwarn(), but dumps a full stacktrace as well.
 
 =item logerr I<message>
 

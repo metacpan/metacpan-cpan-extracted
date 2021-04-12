@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/kaz-utashiro/sdif-tools.svg?branch=master)](https://travis-ci.com/kaz-utashiro/sdif-tools) [![MetaCPAN Release](https://badge.fury.io/pl/App-sdif.svg)](https://metacpan.org/release/App-sdif)
+[![Actions Status](https://github.com/kaz-utashiro/sdif-tools/workflows/test/badge.svg)](https://github.com/kaz-utashiro/sdif-tools/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-sdif.svg)](https://metacpan.org/release/App-sdif)
 # NAME
 
 App::sdif - sdif and family tools, cdif and watchdiff

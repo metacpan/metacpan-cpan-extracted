@@ -4,12 +4,12 @@ use warnings;
 
 use Music::MelodicDevice::Ornamentation;
 
-my $note = shift || 'C';
-my $octave = shift || 4;
-my $scale = shift || 'major';
+my $note     = shift || 'C';
+my $octave   = shift || 4;
+my $scale    = shift || 'major';
 my $ornament = shift || 'grace_note';
-my $offset = shift || 1;
-my $number = shift || 2;
+my $offset   = shift || 1;
+my $number   = shift || 2;
 
 my $md = Music::MelodicDevice::Ornamentation->new(
     scale_note => $note,

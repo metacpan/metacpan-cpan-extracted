@@ -15,7 +15,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.52'
   perl: '5.006'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/Intertangle/p5-Alien-Kiwisolver
   repository: https://github.com/Intertangle/p5-Alien-Kiwisolver.git
-version: '0.001'
+version: '0.002'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.31'
   requires:

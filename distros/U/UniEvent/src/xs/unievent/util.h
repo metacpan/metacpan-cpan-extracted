@@ -29,3 +29,11 @@ inline panda::unievent::sock_t sv2sock (const Sv& sv) {
 panda::string sv2buf (const Sv& sv);
 
 }}
+
+namespace xs {
+
+template <class TYPE> struct Typemap<panda::unievent::RandomRequest*, TYPE> : Typemap<panda::unievent::Work*, TYPE> {
+    static panda::string package () { return "UniEvent::Request::Random"; }
+};
+
+}

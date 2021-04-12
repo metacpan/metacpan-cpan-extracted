@@ -1,5 +1,13 @@
 Revision history for Perl extension Chemistry::File::MDLMol.
 
+0.22  Mon Apr 12 2021
+        - Implemented reading and writing of isotopes (bug 134837)
+        - Fixed typo in documentation.
+        - Switched to Dist::Zilla.
+        - Adjusted URLs in documentation, as the source has been hosted on
+          GitHub.
+        - New co-maintainer Andrius Merkys <merkys@cpan.org>.
+
 0.21  Sun May 10 2009
         - Added automatic aromatization of patterns, as suggested by Peter 
           Spiro.

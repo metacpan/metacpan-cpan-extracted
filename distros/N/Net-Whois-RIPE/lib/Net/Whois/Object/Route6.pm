@@ -14,7 +14,7 @@ use base qw/Net::Whois::Object/;
 # % See http://www.ripe.net/db/support/db-terms-conditions.pdf
 # 
 # route6:         [mandatory]  [single]     [primary/lookup key]
-# descr:          [mandatory]  [multiple]   [ ]
+# descr:          [optional]   [multiple]   [ ]
 # origin:         [mandatory]  [single]     [primary/inverse key]
 # pingable:       [optional]   [multiple]   [ ]
 # ping-hdl:       [optional]   [multiple]   [inverse key]
@@ -31,23 +31,21 @@ use base qw/Net::Whois::Object/;
 # mnt-lower:      [optional]   [multiple]   [inverse key]
 # mnt-routes:     [optional]   [multiple]   [inverse key]
 # mnt-by:         [mandatory]  [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-2)
+# % This query was served by the RIPE Database Query Service version 1.99 (HEREFORD)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'route6' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'route6', 'descr', 'origin', 'mnt_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',    [ 'pingable', 'ping_hdl', 'holes', 'org', 'member_of', 'inject', 'aggr_mtd', 'aggr_bndry', 'export_comps', 'components', 'remarks', 'notify', 'mnt_lower', 'mnt_routes', 'created', 'last_modified' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'route6', 'origin', 'mnt_by', 'source' ] );
+__PACKAGE__->attributes( 'optional',    [ 'descr', 'pingable', 'ping_hdl', 'holes', 'org', 'member_of', 'inject', 'aggr_mtd', 'aggr_bndry', 'export_comps', 'components', 'remarks', 'notify', 'mnt_lower', 'mnt_routes', 'created', 'last_modified' ] );
 __PACKAGE__->attributes( 'single',      [ 'route6', 'origin', 'aggr_mtd', 'aggr_bndry', 'export_comps', 'components', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'descr', 'pingable', 'ping_hdl', 'holes', 'org', 'member_of', 'inject', 'remarks', 'notify', 'mnt_lower', 'mnt_routes', 'mnt_by', 'changed' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'descr', 'pingable', 'ping_hdl', 'holes', 'org', 'member_of', 'inject', 'remarks', 'notify', 'mnt_lower', 'mnt_routes', 'mnt_by' ] );
 
 # End of auto-generated lines
 #######################################################################################
-
 
 =head1 NAME
 

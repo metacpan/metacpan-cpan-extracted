@@ -1,5 +1,5 @@
 package Statocles::Test;
-our $VERSION = '0.097';
+our $VERSION = '0.098';
 # ABSTRACT: Common test routines for Statocles
 
 use Statocles::Base;
@@ -262,21 +262,21 @@ sub build_temp_site {
         theme => {
             class => 'Statocles::Theme',
             args => {
-                store => $tmp->child( 'theme' ),
+                store => "".$tmp->child( 'theme' ),
             },
         },
 
         build => {
             class => 'Statocles::Store',
             args => {
-                path => $tmp->child( 'build_site' ),
+                path => "".$tmp->child( 'build_site' ),
             },
         },
 
         deploy => {
             class => 'Statocles::Deploy::File',
             args => {
-                path => $tmp->child( 'deploy_site' ),
+                path => "".$tmp->child( 'deploy_site' ),
             },
         },
 
@@ -286,7 +286,7 @@ sub build_temp_site {
                 store => {
                     '$class' => 'Statocles::Store',
                     '$args' => {
-                        path => $tmp->child( 'blog' ),
+                        path => "".$tmp->child( 'blog' ),
                     },
                 },
                 url_root => '/blog',
@@ -324,14 +324,14 @@ sub build_temp_site {
         build_foo => {
             class => 'Statocles::Store',
             args => {
-                path => $tmp->child( 'build_foo' ),
+                path => "".$tmp->child( 'build_foo' ),
             },
         },
 
         deploy_foo => {
             class => 'Statocles::Deploy::File',
             args => {
-                path => $tmp->child( 'deploy_foo' ),
+                path => "".$tmp->child( 'deploy_foo' ),
             },
         },
 
@@ -370,7 +370,7 @@ Statocles::Test - Common test routines for Statocles
 
 =head1 VERSION
 
-version 0.097
+version 0.098
 
 =head1 DESCRIPTION
 

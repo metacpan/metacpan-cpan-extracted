@@ -5,17 +5,17 @@ the easiest way could be to use he CPAN.
 To build it you need:
 
 * On a Linux system, you need Perl (>= 5.6) and perl-tk (800 or 804) as well as
-  perl-tk developpement packages.
+  perl-tk development packages.
 
 * On MacOSX you need:
   - fink with tk-pm package and its dependencies (http://fink.sf.net)
     tk-pm is available in unstable. You can add this binary unstable tree to you /sw/etc/apt/sources.list:
     deb http://fink.opendarwin.org/bbraun 10.3/unstable main crypto
     deb http://fink.opendarwin.org/bbraun 10.3/stable main crypto
-  - X11 et X11 sdk from Apple (http://www.apple.com/macosx/x11/)
+  - X11 and X11 SDK from Apple (http://www.apple.com/macosx/x11/)
 
 * On WinXP you need:
-  - activeperl (5.8.6.811 or higher) from activatestate.com 
+  - ActivePerl (5.8.6.811 or higher) from activatestate.com or Strawberry Perl from strawberryperl.com
   - and
     - if you want to compile TkZinc by yourself:
       Visual C++ or the Free Visual C++ Command Line Tools
@@ -47,7 +47,7 @@ WATCH OUT! On Linux it is quite frequent to have both Mesa and proprietary
 
 In the case you need to use another version of perl-tk than the one installed in the 
 system, you should use the following command as a template to adapt to follow your 
-specific pathes of the alternative perl-tk installation:
+specific patches of the alternative perl-tk installation:
 
   env PERL5LIB=/usr/local/test/804_027/lib/perl5/site_perl/5.8.1/i386-linux-thread-multi perl Makefile.PL
   make
@@ -71,16 +71,16 @@ which also includes TkZinc for Tcl/Tk, for Perl/Tk, and for Python.
 
 
 After installation, we recommend you to launch the zinc-demos script,
-a frontend to more than 30 small demos.
+a front-end to more than 30 small demos.
 
 For more information on building Tk::Zinc, a README is available in 
 the tkzinc-*tgz tar file (on Tkzinc web site) used for building all
 flavor of TkZinc (ie tcl, perl and python)
 
-This software is delivered under new  BSD licence.
+This software is delivered under new BSD license.
 For the copyright, please, read the Copyright file.
 
-For any question on Tk::Zinc usage, build or installation pb,
+For any question on Tk::Zinc usage, build or installation,
 please file an inquiry here: https://github.com/asb-capfan/TkZinc/issues
 
 

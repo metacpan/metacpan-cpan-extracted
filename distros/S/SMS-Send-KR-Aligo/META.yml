@@ -1,0 +1,46 @@
+---
+abstract: 'An SMS::Send driver for the smartsms.aligo.in SMS service'
+author:
+  - '김도형 - Keedi Kim <keedi@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SMS-Send-KR-Aligo
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  SMS::Send::KR::Aligo:
+    file: lib/SMS/Send/KR/Aligo.pm
+    version: '0.005'
+requires:
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '2.070'
+  JSON: '0'
+  Net::SSLeay: '1.90'
+  SMS::Send: '1.06'
+  parent: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/keedi/p5-SMS-Send-KR-Aligo/issues
+  homepage: https://github.com/keedi/p5-SMS-Send-KR-Aligo
+  repository: https://github.com/keedi/p5-SMS-Send-KR-Aligo.git
+version: '0.005'
+x_authority: cpan:KEEDI
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

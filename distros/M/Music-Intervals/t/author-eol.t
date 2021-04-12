@@ -17,7 +17,6 @@ use Test::EOL;
 my @files = (
     'lib/Music/Intervals.pm',
     'lib/Music/Intervals/Numeric.pm',
-    'lib/Music/Intervals/Ratio.pm',
     'lib/Music/Intervals/Ratios.pm',
     't/00-compile.t',
     't/01-methods.t',

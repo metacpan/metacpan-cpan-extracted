@@ -1,6 +1,7 @@
 #include <xs/unievent/Loop.h>
 #include <xs/unievent/Handle.h>
 #include <xs/unievent/Prepare.h>
+#include <xs/unievent/Resolver.h>
 #include <xs/CallbackDispatcher.h>
 
 using namespace xs;
@@ -161,6 +162,8 @@ void Loop::cancel_delay (Ref ref) {
 XSCallbackDispatcher* Loop::fork_event () {
     RETVAL = XSCallbackDispatcher::create(THIS->fork_event);
 }
+
+ResolverSP Loop::resolver ()
 
 void Loop::start_debug_tracer (Sub s) {
     THIS->new_handle_event.add([s](const LoopSP&, Handle* h){

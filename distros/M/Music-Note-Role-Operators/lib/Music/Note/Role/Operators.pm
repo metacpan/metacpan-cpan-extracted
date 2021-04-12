@@ -1,5 +1,5 @@
 package Music::Note::Role::Operators;
-$Music::Note::Role::Operators::VERSION = '0.03';
+$Music::Note::Role::Operators::VERSION = '0.04';
 # ABSTRACT: Adds operator overloading, clone and interval calculation to Music::Note
 
 use Storable ();
@@ -136,13 +136,9 @@ Note that this will default to 1 for the following constructor attributes,
 so if you don't want these values you'll have to explicitly set them to
 something else in the constructor.
 
-Music::Intervals does some quite expensive calculations during the
-C<process> method.  By default this method will run C<process> before
-returning the interval.  You can avoid this by adding the argument
-C<<no_process => 1>> to this method's arguments.
-
 NOTE: It would be nice to have the subtract method return a Music::Interval
-but it's a complex module, and only seems to deal with intervals inside a single octave.
+but it's a complex module, and only seems to deal with intervals inside a
+single octave.
 
 =cut
 
@@ -160,13 +156,7 @@ sub get_interval {
     $args{notes} ||= [ $self->format('isobase'), $other->format('isobase') ];
     $args{$_} ||= 1 for qw/chords equalt freqs interval cents prime integer/;
     $args{size} ||= scalar @{$args{notes}};
-    my $no_process;
-    if ($args{no_process}) {
-        $no_process = 1;
-        delete $args{no_process};
-    }
     my $interval = Music::Intervals->new(%args);
-    $interval->process unless $no_process;
     return $interval;
 }
 

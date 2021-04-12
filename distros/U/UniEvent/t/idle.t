@@ -2,6 +2,8 @@ use 5.012;
 use warnings;
 use lib 't/lib'; use MyTest;
 
+test_catch '[idle]';
+
 my $l = UniEvent::Loop->default_loop;
 
 subtest 'start/stop/reset' => sub {
@@ -75,6 +77,14 @@ subtest 'event listener' => sub {
     
     $h->call_now;
     is $cnt, 11, "listener&event called";
+};
+
+subtest 'static ctor' => sub {
+    my $i;
+    my $h1 = UE::Idle->create(sub {$i++});
+    my $h2 = UE::idle sub {$i+=10};
+    $l->run_nowait;
+    is $i, 11;
 };
 
 done_testing();

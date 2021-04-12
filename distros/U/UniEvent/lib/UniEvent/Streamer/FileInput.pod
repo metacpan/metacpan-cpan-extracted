@@ -1,29 +1,29 @@
 =head1 NAME
 
-UniEvent::Streamer::FileInput - file input streams for streamer
+UniEvent::Streamer::FileInput - file input for streamer
+
+
+
+=head1 SYNOPSIS
+
+    my $input = UE::Streamer::FileInput->new("file.txt");
+    my $streamer = UE::Streamer->new($input, $output);
+    $streamer->start();
+    $streamer->finish_callback(sub { ... });
+
+
 
 =head1 DESCRIPTION
 
-Reads file content into internal buffer and feeds it further
-to the L<UniEvent::Streamer>. It is derived from
-L<UniEvent::Streamer::IInput>.
+Reads file content into and feeds it further to the L<UniEvent::Streamer>.
 
-It is implemented in C++ for the speed, so it meant not to be
-derived from; in other words it is use only class.
+
 
 =head1 METHODS
 
-=head2 new($path, $buffer_size = 1000000)
+=head2 new($path, [$chunk_size = 1_000_000])
 
 Constructs new file input stream for the file located at C<$path>
-and with the specified internal C<$buffer_size>.
-
-=head1 REFERENCES
-
-L<UniEvent::Streamer>
-
-L<UniEvent::Streamer::IInput>
-
-L<UniEvent::Streamer::FileOutput>
+and will read it by C<$chunk_size> bytes chunks.
 
 =cut

@@ -1,67 +1,113 @@
 =head1 NAME
 
-UniEvent::Streamer::Input - Pure Perl Input stream bridge
+UniEvent::Streamer::Input - base class for custom producers for streamer
+
+
+=head1 SYNOPSYS
+
+    package MyInput;
+    use parent 'UniEvent::Streamer::Input';
+    use 5.012;
+    
+    sub new {
+        my ($class, ...) = @_;
+        my $self = $class->SUPER::new();
+        ...
+        return $self;
+    }
+    
+    sub start         { ... }
+    sub start_reading { ... }
+    sub stop_reading  { ... }
+    sub stop          { ... }
+
+    ...
+    
+    my $input = MyInput->new(...);
+    my $streamer = UE::Streamer->new($input, $output);
+    ...
+
+
 
 =head1 DESCRIPTION
 
-This is pure perl input stream, meant to be assigned with L<UniEvent::Streamer>.
+This is base class for custom input streams, meant to be assigned with L<UniEvent::Streamer>.
 It is assumed, that some external source will generate data and eof event, and
 via the L<UniEvent::Streamer::Input> it will be fed into L<UniEvent::Streamer>.
 
-For example, it can read a file, encrypt it and conduct it further to TCP
-output stream.
+C<Streamer> will use input object as follows: it will call C<start()> once and expect you to start reading data from your source
+and to call C<handle_read()> every time data arrives. C<Streamer> may call C<stop_reading()/start_reading()> many times to temporarily suspend reading process.
+When you have no more data to read, you must call C<handle_eof()>. In case of any error you must call C<handle_data()> with error. C<Streamer> will call C<stop()>
+method once when the process finishes successfully or with error.
 
-It is derived from L<UniEvent::Streamer::IInput>.
+
 
 =head1 METHODS
 
 =head2 new()
 
-Constructs new pupe perl input stream.
+Constructs new input stream.
+
+If you override this method, you MUST proxy to parent and use return value as C<$self>.
+
 
 =head2 start($loop)
 
-This method is invoked upon underlying L<UniEvent::Streamer> start. Executed
-once per Streamer/Input lifetime.
+This method will be invoked by C<Streamer> upon start. Executed once per object lifetime.
+
+In this method you are expected to start reading data from somewhere and periodically call C<handle_read()> as data arrives.
+
+When data ends you must call C<handle_eof()>.
+
+This method should return C<undef> if no error occured or L<XS::ErrorCode> object otherwise.
+
+NOTE: This is a callback, do not call this method by yourself!
+
 
 =head2 stop()
 
-This method is invoked upon underlying L<UniEvent::Streamer> stop. Executed
-once per Streamer/Input lifetime. No any further I/O is expected.
+This method is invoked when C<Streamer> finishes. Executed once per object lifetime. No any further I/O is expected.
 
-=head2 start_reading()
+In this method you are expected to finalize reading and release all resources.
 
-This method is invoked when underlying L<UniEvent::Streamer> asks
-to start reading. Can be executed multiple times during the object lifetime.
+NOTE: This is a callback, do not call this method by yourself!
 
-It is assumed, that C<handle_read>/C<handle_eof> will be invoked in future.
 
 =head2 stop_reading()
 
-This method is invoked when underlying L<UniEvent::Streamer> asks
-to stop reading.  Can be executed multiple times during the object lifetime.
+This method is invoked when C<Streamer> asks to stop reading. This happens when the output can't write so fast and the buffer in C<Streamer> is full.
+Can be executed multiple times during the object lifetime.
 
-C<handle_read>/C<handle_eof> must not be invoked after the method been
-called.
+You must not call C<handle_read()>/C<handle_eof()> after this method is called (until C<start_reading()> is called).
 
-=head2 handle_read($data [, $error_code = undef])
+NOTE: This is a callback, do not call this method by yourself!
 
-Data consumption method, which must be invoked to feed incoming C<$data>
-with possible C<$error_code> to stop L<UniEvent::Streamer>. By the
-implementation the data is forwarded either to internal buffer of the
-assigned streamer or directly to the output stream.
 
-In the case of error the streamer will stop.
+=head2 start_reading()
+
+This method is invoked when C<Streamer> asks to start reading again after C<stop_reading()>. Can be executed multiple times during the object lifetime.
+
+After this call, you are expected to call C<handle_read()>/C<handle_eof()> in future.
+
+This method should return C<undef> if no error occured or L<XS::ErrorCode> object otherwise.
+
+NOTE: This is a callback, do not call this method by yourself!
+
+
+=head2 handle_read($data, [$error])
+
+You must call this method every time you have another chunk of data read.
+
+If you got an error while reading data, call this method with no data (it is ignored) and error.
+This will make C<Streamer> stop, calling user callback with supplied error nested in C<UniEvent::StreamerError::read_error>.
+
+C<$error> must be L<XS::ErrorCode> object. You can use UniEvent::SystemError::* constants to create errors.
+
+    $self->handle_read(undef, UniEvent::SystemError::timed_out);
+
 
 =head2 handle_eof()
 
-Let the assigned streamer know, that no more data is available from
-the input.
-
-=head1 REFERENCES
-
-L<UniEvent::Streamer>
-
-L<UniEvent::Streamer::IInput>
+Call this method when there will be no more data.
 
 =cut

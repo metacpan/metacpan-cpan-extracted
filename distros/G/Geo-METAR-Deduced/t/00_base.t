@@ -1,28 +1,36 @@
+#!/usr/bin/env perl
+# -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2021, Roland van Ipenburg
 use strict;
 use warnings;
 use utf8;
+use 5.014000;
 
 use Test::More;
-$ENV{AUTHOR_TESTING} && eval { require Test::NoWarnings };
+use Test::NoWarnings;
+
+our $VERSION = 'v1.0.3';
 
 BEGIN {
-    @MAIN::methods = qw(ceiling flight_rule);
-    plan tests => ( 4 + @MAIN::methods ) + 1;
-    ok(1);
-    use_ok('Geo::METAR::Deduced');
+## no critic (ProhibitPackageVars)
+    @main::methods = qw(ceiling flight_rule);
+## no critic (ProhibitMagicNumbers)
+    Test::More::plan 'tests' => ( 4 + @main::methods ) + 1;
+## use critic
+## use critic
+    Test::More::ok(1);
+    Test::More::use_ok('Geo::METAR::Deduced');
 }
-diag("Testing Geo::METAR::Deduced $Geo::METAR::Deduced::VERSION");
-my $obj = new_ok('Geo::METAR::Deduced');
+Test::More::diag("Testing Geo::METAR::Deduced $Geo::METAR::Deduced::VERSION");
+my $deduced = Test::More::new_ok('Geo::METAR::Deduced');
 
+## no critic (RequireExplicitInclusion)
 @Geo::METAR::Deduced::Sub::ISA = qw(Geo::METAR::Deduced);
-my $obj_sub = new_ok('Geo::METAR::Deduced::Sub');
+## use critic
+my $deduced_sub = Test::More::new_ok('Geo::METAR::Deduced::Sub');
 
-foreach my $method (@MAIN::methods) {
-    can_ok( 'Geo::METAR::Deduced', $method );
+## no critic (ProhibitPackageVars)
+foreach my $method (@main::methods) {
+## use critic
+    Test::More::can_ok( 'Geo::METAR::Deduced', $method );
 }
-
-my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
-SKIP: {
-    skip $msg, 1 unless $ENV{AUTHOR_TESTING};
-}
-$ENV{AUTHOR_TESTING} && Test::NoWarnings::had_no_warnings();

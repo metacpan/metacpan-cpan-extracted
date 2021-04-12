@@ -8,15 +8,15 @@ use warnings;
 
 use MIDI::Simple ();
 
-our $VERSION = '0.0802';
+our $VERSION = '0.0900';
 
 
 {
     # Set the initial duration to one below 32nd,
     my $last = 's'; # ..which is a sixteenth.
 
-    # Add 32nd, 64th and 128th as y, x, and o respectively.
-    for my $duration ( qw( y x o ) ) {
+    # Add 32nd, 64th and 128th as x, y, and z respectively.
+    for my $duration ( qw( x y z ) ) {
         # Create a MIDI::Simple format note identifier.
         my $n = $duration . 'n';
 
@@ -67,7 +67,7 @@ Music::Duration - Add 32nd, 64th, 128th and tuplet durations to MIDI-Perl
 
 =head1 VERSION
 
-version 0.0802
+version 0.0900
 
 =head1 SYNOPSIS
 
@@ -99,24 +99,24 @@ module will insert any named note duration to the length hash.
 
 32nd durations added:
 
-  yn:   thirty-second note
-  dyn:  dotted thirty-second note
-  ddyn: double dotted thirty-second note
-  tyn:  thirty-second note triplet
+    xn: thirty-second note
+   dxn: dotted thirty-second note
+  ddxn: double dotted thirty-second note
+   txn: thirty-second note triplet
 
 64th durations added:
 
-  xn:   sixty-fourth note
-  dxn:  dotted sixty-fourth note
-  ddxn: double dotted sixty-fourth note
-  txn:  sixty-fourth note triplet
+    yn: sixty-fourth note
+   dyn: dotted sixty-fourth note
+  ddyn: double dotted sixty-fourth note
+   tyn: sixty-fourth note triplet
 
 128th durations added:
 
-  on:   128th note
-  don:  dotted 128th note
-  ddon: double dotted 128th note
-  ton:  128th note triplet
+    zn: 128th note
+   dzn: dotted 128th note
+  ddzn: double dotted 128th note
+   tzn: 128th note triplet
 
 =head1 FUNCTIONS
 
@@ -164,7 +164,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

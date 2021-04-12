@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.43'; # VERSION
+our $VERSION = '0.44'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -73,7 +73,7 @@ sub new {
 	$self->{debug} = $args{debug} // 1;
 	$self->{jobs} = {};
 	$self->{json} = $json;
-	$self->{jsonobject} = $args{jsonobject}  // JSON::MaybeXS->new(),
+	$self->{jsonobject} = $args{jsonobject}  // JSON::MaybeXS->new(utf8 => 1),
 	$self->{ping_timeout} = $args{ping_timeout} // 300;
 	$self->{log} = $log;
 	$self->{method} = $method;

@@ -1,0 +1,65 @@
+{
+   "abstract" : "Fetch values from sequences of the OEIS.",
+   "author" : [
+      "Abigail <cpan-oeis@abigail.freedom.nl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OEIS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "LWP::Simple" : "0",
+            "experimental" : "0",
+            "perl" : "5.032",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Abigail/OEIS.git"
+      }
+   },
+   "version" : "2021041201",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_test_requires" : {
+      "Test::More" : 0.88,
+      "strict" : 0,
+      "warnings" : 0
+   }
+}

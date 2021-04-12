@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/unievent-socks-runtests.dir/tests/socks.cc.o CMakeFiles/unievent-socks-runtests.dir/tests/main.cc.o  -o unievent-socks-runtests libunievent-socks.a libunievent-socks-tests.a libunievent-socks.a 

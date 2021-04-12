@@ -2,7 +2,7 @@ package File::Edit;
 use Mojo::Base -base;
 use Path::Tiny qw/path/;
 use Carp;
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.4';
 
 has 'file';
 has 'found';        # Line numbers of found lines. ArrayRef.
@@ -91,11 +91,11 @@ sub _find_one {
 
     # Init search result
     $o->found([]);
-    $line_re = ref $line_re eq 'Regexp' ? $line_re : qr/$line_re/;
+    $line_re = ref $line_re eq 'Regexp' ? $line_re : _qre($line_re);
     $o->_line_re($line_re);
 
     foreach my $l (@{$o->_lines}) {
-        push @{$o->found}, $n if $l =~ /\s*$line_re\s*/;
+        push @{$o->found}, $n if $l =~ $line_re;
         $n++;
     }
 
@@ -121,6 +121,10 @@ sub _replace_found {
 
     return $o;
 }
+sub _qre {  ## ($string) :> regex
+    my $quoted = quotemeta(shift);
+    return qr/$quoted/;
+}
 
 
 =head1 NAME
@@ -129,7 +133,7 @@ File::Edit - A naive, probably buggy, file editor.
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.0.4
 
 =cut
 =head1 SYNOPSIS

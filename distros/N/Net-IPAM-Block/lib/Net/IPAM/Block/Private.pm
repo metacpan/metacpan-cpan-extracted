@@ -22,11 +22,6 @@ Don't pollute the B<< namespace >> of Net::IPAM::Block
 # use some pre-calculated tables for speed, see end of package
 my ( %valid_masks4, @table_mask_n, @nlz8 );
 
-sub _clone {
-  my $self = shift;
-  return bless {%$self}, ref $self;
-}
-
 # 1.2.3.4/255.0.0.0  => {base: 1.0.0.0, last: 1.255.255.255, mask: 255.0.0.0}
 # 1.2.3.4/24         => {base: 1.2.3.0, last: 1.2.3.255,     mask: 255.255.255.0}
 # fe80::1/124 =>        {base: fe80::,  last: fe80::f,       mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:fff0}
@@ -114,6 +109,17 @@ sub _fromIP {
   $self->{last} = $ip;
 
   return $self;
+}
+
+# my $b = _clone($self)
+sub _clone {
+  my $self  = shift;
+  my $clone = bless {}, ref $self;
+
+  $clone->{base} = Net::IPAM::IP->new_from_bytes( $self->{base}->bytes );
+  $clone->{last} = Net::IPAM::IP->new_from_bytes( $self->{last}->bytes );
+
+  return $clone;
 }
 
 # a.base <= b && a.last >= b

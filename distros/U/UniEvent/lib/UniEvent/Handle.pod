@@ -1,11 +1,13 @@
 =head1 NAME
 
-Base abstract class for all handle types
+UniEvent::Handle -  Base abstract class for all handle types
+
+
 
 =head1 SYNOPSIS
 
-    # since Handle is abstract, only concrete class can be instantiated
-    my $h = UniEvent::Timer->new; 
+    # since Handle is abstract, only certain class can be instantiated
+    my $h = UniEvent::Timer->new;
     $h->loop; # event loop is returned, the default one in the case
     $h->type; # UniEvent::Timer::TYPE
 
@@ -19,9 +21,12 @@ Base abstract class for all handle types
     $h->clear;
 
 
+
 =head1 DESCRIPTION
 
-The class contains methods, shared for all hanlde types.
+The class contains methods common for all hanlde types.
+
+
 
 =head1 METHODS
 
@@ -29,36 +34,49 @@ The class contains methods, shared for all hanlde types.
 
 Returns assigned to the handle event loop instance.
 
+
 =head2 type()
 
-Returns an integer, which uniquely identifies handle type (e.g.  UniEvent::Timer::TYPE).
+Returns an integer, which uniquely identifies handle type.
+You can check it against constants in handle classes (like UniEvent::Timer::TYPE).
+
+    if ($handle->type == UE::Tcp::TYPE) {
+        # $handle is TCP handle
+    }
+
+Every handle class has C<TYPE> constant.
+
 
 =head2 active()
 
 Returns true if the handle is "active". What "active" means depends on the concrete
-handle type, i.e. for timer hanlde active means, that it was started, for pipe, tcp etc.
-handle types "active" means that I/O operations will be performed.
+handle type, i.e. for timer handle active means, that it was started, for pipe, tcp etc.
+handle types "active" means that I/O operations will be performed or watched for.
 
 Usually, if there is a C<start()> method, then handle is active afther the invokation
 of the method, and vise versa, C<stop()> method deactivates handle.
 
-=head2 weak([$value = false])
 
-Marks the handle as weak (if C<$value> is true) or unmarks it (if value is defined
-and false). 
+=head2 weak([$value])
 
-Under the hood it increments/decrements refcounter for the backend handler. 
+If no argument is passed, returns true if handle is weak, false otherwise.
 
-The freshly created handle instance is non-weak (strong) by default.
+With argument, marks the handle as weak (if C<$value> is true) or unmarks it (if false).
+
+Weak handles do not keep the loop from bailing out of C<run()> method (regardless of whether handle is active or not). That means that if all the
+handles left in the loop are weak, it will return from it's C<run()> method.
+
+The freshly created handle instance is non-weak by default.
+
 
 =head2 reset()
 
-Cancels (stops) the handle, resetting it to initial state, with the exception, that
-assigned callbacks are kept.
+Stops the handle, making it inactive, resetting it to initial state, with the exception, that
+assigned callbacks and event listener are kept.
+
 
 =head2 clear()
 
-Resets everything, including assigned callbacks, as if the hanle has been created
-anew.
+Resets everything, including assigned callbacks and event listener, as if the hanle has been created anew.
 
 =cut

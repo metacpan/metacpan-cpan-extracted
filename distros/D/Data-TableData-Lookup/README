@@ -1,0 +1,237 @@
+NAME
+    Data::TableData::Lookup - Lookup value in a table data structure
+
+VERSION
+    This document describes version 0.002 of Data::TableData::Lookup (from
+    Perl distribution Data-TableData-Lookup), released on 2021-04-11.
+
+SYNOPSIS
+     use Data::TableData::Lookup qw(
+         table_vlookup
+     );
+
+     # exact matching
+     table_vlookup(
+       table => [
+         {min_income=>      0, tax_rate=>0.13},
+         {min_income=>  8_000, tax_rate=>0.18},
+         {min_income=> 15_000, tax_rate=>0.22},
+         {min_income=> 35_000, tax_rate=>0.30},
+         {min_income=> 85_000, tax_rate=>0.39},
+         {min_income=>140_000, tax_rate=>0.45},
+       ],
+       lookup_field => 'min_income',
+       lookup_value => 35_000,
+       result_field => 'tax_rate',
+     ); # => 0.30
+
+     # exact matching, not found
+     table_vlookup(
+       table => [
+         {min_income=>      0, tax_rate=>0.13},
+         {min_income=>  8_000, tax_rate=>0.18},
+         {min_income=> 15_000, tax_rate=>0.22},
+         {min_income=> 35_000, tax_rate=>0.30},
+         {min_income=> 85_000, tax_rate=>0.39},
+         {min_income=>140_000, tax_rate=>0.45},
+       ],
+       lookup_field => 'min_income',
+       lookup_value => 40_000,
+       result_field => 'tax_rate',
+     ); # => undef
+
+     # approximate matching
+     table_vlookup(
+       table => [
+         {min_income=>      0, tax_rate=>0.13},
+         {min_income=>  8_000, tax_rate=>0.18},
+         {min_income=> 15_000, tax_rate=>0.22},
+         {min_income=> 35_000, tax_rate=>0.30},
+         {min_income=> 85_000, tax_rate=>0.39},
+         {min_income=>140_000, tax_rate=>0.45},
+       ],
+       lookup_field => 'min_income',
+       lookup_value => 40_000,
+       result_field => 'tax_rate',
+       approx => 1,
+     ); # => 0.30
+
+     # approximate matching & interpolated result
+     table_vlookup(
+       table => [
+         {min_income=>      0, tax_rate=>0.13},
+         {min_income=>  8_000, tax_rate=>0.18},
+         {min_income=> 15_000, tax_rate=>0.22},
+         {min_income=> 35_000, tax_rate=>0.30},
+         {min_income=> 85_000, tax_rate=>0.39},
+         {min_income=>140_000, tax_rate=>0.45},
+       ],
+       lookup_field => 'min_income',
+       lookup_value => 40_000,
+       result_field => 'tax_rate',
+       approx => 1,
+       interpolate => 1,
+     ); # => 0.309
+
+FUNCTIONS
+  table_vlookup
+    Usage:
+
+     table_vlookup(%args) -> any
+
+    Look up value in a table row by row.
+
+    This routine looks up value in a table row by row. It is similar to the
+    spreadsheet function VLOOKUP, hence the same name being used. It is
+    basically a glorified map()+grep() that returns a single value (or you
+    can also say it's a glorified map+List::Util::first()).
+
+    Given a table, which is either an array-of-arrayrefs (aoa) or
+    array-of-hashrefs (aoh), this routine will run through it row by row
+    until it finds the value that you want. Once found, the value will be
+    returned. Otherwise, undef is returned.
+
+    Exact matching
+
+    The table is expected to be sorted in ascending order by the lookup
+    field. You specify a lookup value, which will be looked up in the lookup
+    field. Once the value is found, the result field of the correspending
+    row is returned and lookup is completed. When the lookup field already
+    exceeds the lookup value, the routine also concludes that the value is
+    not found, and the lookup is completed.
+
+    Example:
+
+     table => [
+       {min_income=>      0, tax_rate=>0.13},
+       {min_income=>  8_000, tax_rate=>0.18},
+       {min_income=> 15_000, tax_rate=>0.22},
+       {min_income=> 35_000, tax_rate=>0.30},
+       {min_income=> 85_000, tax_rate=>0.39},
+       {min_income=>140_000, tax_rate=>0.45},
+     ],
+     lookup_field => 'min_income',
+     lookup_value => 35_000,
+     result_field => 'tax_rate',
+
+    will result in:
+
+     0.30
+
+    while if the lookup_value is 40_000, undef will be returned since it is
+    not found in any row of the table.
+
+    Approximate matching
+
+    If "approx" option is set to true, once the lookup field in a row
+    exceeds the lookup value, the result field of the previous row will be
+    returned (if any). For example, if lookup value is 40_000 then 0.30 will
+    be returned (the row where "min_income" is 35_000) since the next row
+    has "min_income" of 85_000 which already exceeds 40_000.
+
+    Interpolation of result
+
+    If, additionally, "interpolate" option is also set to true in addition
+    to "approx" option being set to true, a linear interpolation will be
+    done when an exact match fails. In the previous example, when lookup
+    value is 40_000, 0.309 will be returned, which is calculated with:
+
+     0.3 + (40_000 - 35_000)/(85_000 - 35_000)*(0.39 - 0.30)
+
+    In the case of there is no next row after "min_income" of 35_000, 0.30
+    will still be returned.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   approx => *bool*
+
+        Whether to do an approximate instead of an exact match.
+
+        See example in the function description.
+
+    *   interpolate => *bool*
+
+        Do a linear interpolation.
+
+        When this option is set to true, will do a linear interpolation of
+        result when an exact match is not found. This will only be performed
+        if "approx" is also set to true.
+
+        See example in the function description.
+
+        Currently, you cannot use "interpolate" with "lookup_code".
+
+    *   lookup_code => *code*
+
+        Supply code to match a row.
+
+        Unless what you want to match is custom, you usually specify
+        "lookup_value" and "lookup_field" instead.
+
+        The code will be passed the row (which is an arrayref or a hashref)
+        and optionally the lookup value too as the second argument if the
+        lookup value is specified. It is expected to return either -1, 0, 1
+        like the Perl's "cmp" or "<=>" operator. -1 means the lookup field
+        is less than the lookup value, 0 means equal, and 1 means greater
+        than.
+
+        With "approx" option not set to true, lookup will succeed once 0 is
+        returned. With "approx" set to true, lookup will succeed once 0 or 1
+        is returned.
+
+    *   lookup_field => *str*
+
+        Where to look up the lookup value in.
+
+        Either an integer array index (for aoa table) or a string hash key
+        (for aoh table).
+
+        Instead of "lookup_value" and "lookup_field", you can also specify
+        "lookup_code" instead.
+
+    *   lookup_value => *any*
+
+        The value that you want to look up in the lookup field.
+
+        Instead of "lookup_value" and "lookup_field", you can also specify
+        "lookup_code" instead.
+
+    *   result_field* => *str*
+
+        Where to get the result from.
+
+        Either an integer array index (for aoa table) or a string hash key
+        (for aoh table).
+
+    *   table* => *array*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-TableData-Lookup>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-TableData-Lookup>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-TableData-Lookup
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

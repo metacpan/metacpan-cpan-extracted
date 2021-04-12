@@ -1,5 +1,11 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.61 2021-04-11
+
+ - Improve CSS for HTML on screen
+ - Add support for Greek script
+ - Add new magic comment syntax for all formats (:*: or :ALL:)
+
 1.60 2021-02-06
 
  - Remove the old webfonts handling.

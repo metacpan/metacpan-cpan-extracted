@@ -27,8 +27,13 @@ BOOT {
     unievent::register_perl_class(Check::TYPE, stash);
 }
 
-Check* Check::new (LoopSP loop = {}) {
-    if (!loop) loop = Loop::default_loop();
+CheckSP create (Sv proto, Check::check_fn cb, DLoopSP loop = {}) {
+    PROTO = proto;
+    RETVAL = make_backref<Check>(loop);
+    RETVAL->start(cb);
+}
+
+Check* Check::new (DLoopSP loop = {}) {
     RETVAL = make_backref<Check>(loop);
 }
     
@@ -41,12 +46,21 @@ void Check::callback (Check::check_fn cb) {
     if (cb) THIS->event.add(cb);
 }
 
-Ref Check::event_listener (Sv lst = Sv(), bool weak = false) {
+Ref Check::event_listener (Sv lst = {}, bool weak = false) {
     RETVAL = event_listener<XSCheckListener>(THIS, ST(0), lst, weak);
 }
 
-void Check::start (Check::check_fn cb = nullptr)
+void Check::start (Check::check_fn cb = {})
 
 void Check::stop ()
 
 void Check::call_now ()
+
+
+MODULE = UniEvent::Check                PACKAGE = UniEvent
+PROTOTYPES: DISABLE
+
+CheckSP check (Check::check_fn cb, DLoopSP loop = {}) {
+    RETVAL = make_backref<Check>(loop);
+    RETVAL->start(cb);
+}

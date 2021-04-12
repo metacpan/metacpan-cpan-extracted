@@ -1,0 +1,384 @@
+# PODNAME: Lib::CPUInfo::Core
+# ABSTRACT: CPUInfo Core object
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lib::CPUInfo::Core - CPUInfo Core object
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    my $index  = 0;
+    my $core   = get_core($index);
+    my $vendor = $core->vendor();
+    ...
+
+=head1 ATTRIBUTES
+
+=head2 C<processor_start>
+
+    my $start = $core->processor_start();
+
+Returns an integer.
+
+=head2 C<processor_count>
+
+    my $count = $core->processor_count();
+
+=head2 C<core_id>
+
+    my $id = $core->core_id();
+
+Returns an integer.
+
+=head2 C<cluster>
+
+    my $cluster = $core->cluster();
+
+Returns the L<Lib::CPUInfo::Cluster> cluster object.
+
+=head2 C<package>
+
+    my $package = $core->package();
+
+Returns the L<Lib::CPUInfo::Package> package object.
+
+=head2 C<vendor>
+
+    my $vendor = $core->vendor();
+
+Returns the vendor string for the core.
+
+Available values:
+
+=over 4
+
+=item * C<unknown>
+
+=item * C<intel>
+
+=item * C<amd>
+
+=item * C<arm>
+
+=item * C<qualcomm>
+
+=item * C<apple>
+
+=item * C<samsung>
+
+=item * C<nvidia>
+
+=item * C<mips>
+
+=item * C<ibm>
+
+=item * C<ingenic>
+
+=item * C<via>
+
+=item * C<cavium>
+
+=item * C<broadcom>
+
+=item * C<apm>
+
+=item * C<huawei>
+
+=item * C<hygon>
+
+=item * C<texas_instruments>
+
+=item * C<marvell>
+
+=item * C<rdc>
+
+=item * C<dmp>
+
+=item * C<motorola>
+
+=item * C<transmeta>
+
+=item * C<cyrix>
+
+=item * C<rise>
+
+=item * C<nsc>
+
+=item * C<sis>
+
+=item * C<nexgen>
+
+=item * C<umc>
+
+=item * C<dec>
+
+=back
+
+=head2 C<uarch>
+
+    my $uarch = $core->uarch();
+
+Returns the uarch string for the core.
+
+Available values:
+
+=over 4
+
+=item * C<unknown>
+
+=item * C<p5>
+
+=item * C<quark>
+
+=item * C<p6>
+
+=item * C<dothan>
+
+=item * C<yonah>
+
+=item * C<conroe>
+
+=item * C<penryn>
+
+=item * C<nehalem>
+
+=item * C<sandy_bridge>
+
+=item * C<ivy_bridge>
+
+=item * C<haswell>
+
+=item * C<broadwell>
+
+=item * C<sky_lake>
+
+=item * C<kaby_lake>
+
+=item * C<palm_cove>
+
+=item * C<sunny_cove>
+
+=item * C<willamette>
+
+=item * C<prescott>
+
+=item * C<bonnell>
+
+=item * C<saltwell>
+
+=item * C<silvermont>
+
+=item * C<airmont>
+
+=item * C<goldmont>
+
+=item * C<goldmont_plus>
+
+=item * C<knights_ferry>
+
+=item * C<knights_corner>
+
+=item * C<knights_landing>
+
+=item * C<knights_hill>
+
+=item * C<knights_mill>
+
+=item * C<xscale>
+
+=item * C<k5>
+
+=item * C<k6>
+
+=item * C<k7>
+
+=item * C<k8>
+
+=item * C<k10>
+
+=item * C<bulldozer>
+
+=item * C<piledriver>
+
+=item * C<steamroller>
+
+=item * C<excavator>
+
+=item * C<zen>
+
+=item * C<zen2>
+
+=item * C<geode>
+
+=item * C<bobcat>
+
+=item * C<jaguar>
+
+=item * C<puma>
+
+=item * C<arm7>
+
+=item * C<arm9>
+
+=item * C<arm11>
+
+=item * C<cortex_a5>
+
+=item * C<cortex_a7>
+
+=item * C<cortex_a8>
+
+=item * C<cortex_a9>
+
+=item * C<cortex_a12>
+
+=item * C<cortex_a15>
+
+=item * C<cortex_a17>
+
+=item * C<cortex_a32>
+
+=item * C<cortex_a35>
+
+=item * C<cortex_a53>
+
+=item * C<cortex_a55r0>
+
+=item * C<cortex_a55>
+
+=item * C<cortex_a57>
+
+=item * C<cortex_a65>
+
+=item * C<cortex_a72>
+
+=item * C<cortex_a73>
+
+=item * C<cortex_a75>
+
+=item * C<cortex_a76>
+
+=item * C<cortex_a76ae>
+
+=item * C<cortex_a77>
+
+=item * C<neoverse_n1>
+
+=item * C<neoverse_e1>
+
+=item * C<scorpion>
+
+=item * C<krait>
+
+=item * C<kryo>
+
+=item * C<falkor>
+
+=item * C<saphira>
+
+=item * C<denver>
+
+=item * C<denver2>
+
+=item * C<carmel>
+
+=item * C<exynos_m1>
+
+=item * C<exynos_m2>
+
+=item * C<exynos_m3>
+
+=item * C<exynos_m4>
+
+=item * C<exynos_m5>
+
+=item * C<mongoose_m1>
+
+=item * C<mongoose_m2>
+
+=item * C<meerkat_m3>
+
+=item * C<meerkat_m4>
+
+=item * C<swift>
+
+=item * C<cyclone>
+
+=item * C<typhoon>
+
+=item * C<twister>
+
+=item * C<hurricane>
+
+=item * C<monsoon>
+
+=item * C<mistral>
+
+=item * C<vortex>
+
+=item * C<tempest>
+
+=item * C<lightning>
+
+=item * C<thunder>
+
+=item * C<thunderx>
+
+=item * C<thunderx2>
+
+=item * C<pj4>
+
+=item * C<brahma_b15>
+
+=item * C<brahma_b53>
+
+=item * C<xgene>
+
+=item * C<dhyana>
+
+=back
+
+=head2 C<cpuid>
+
+    my $cpuid = $core->cpuid();
+
+Returns an integer.
+
+This is only available on C<x86_64>.
+
+=head2 C<midr>
+
+    my $midr = $core->midr();
+
+Returns an integer.
+
+This is only available on ARM or ARM64.
+
+=head2 C<frequency>
+
+    my $frequency = $cluster->frequency();
+
+Returns an integer.
+
+=head1 AUTHOR
+
+Sawyer X
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Sawyer X.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

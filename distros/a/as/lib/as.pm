@@ -1,7 +1,7 @@
 package as;
 
 # make sure we have version info for this module
-$VERSION= '0.12';
+$VERSION= '0.13';
 
 # be as strict and verbose as possible
 use strict;
@@ -173,7 +173,7 @@ as - load OO module under another name
 
 =head1 VERSION
 
-This documentation describes version 0.12.
+This documentation describes version 0.13.
 
 =head1 SYNOPSIS
 
@@ -226,12 +226,14 @@ an import method anyway.
 
 Elizabeth Mattijsen, <liz@dijkmat.nl>.
 
+maintained by LNATION, <thisusedtobeanemail@gmail.com>
+
 Please report bugs to <perlbugs@dijkmat.nl>.
 
 =head1 COPYRIGHT
 
 Copyright (c) 2003, 2004, 2005, 2006, 2009, 2012 Elizabeth Mattijsen
-<liz@dijkmat.nl>. All rights reserved.  This program is free software; you
+<liz@dijkmat.nl>. 2021 LNATION <thisusedtobeanemail@gmail.com> All rights reserved.  This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

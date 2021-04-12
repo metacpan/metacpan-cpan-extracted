@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 use Graphics::TIFF ':all';
-use Test::More tests => 49;
+use Test::More tests => 50;
 use Test::Deep;
 use IPC::Cmd qw(can_run);
 use Test::Requires qw( Image::Magick );
@@ -189,6 +189,13 @@ is $#{ $values[0] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP r';
 is $#{ $values[1] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP g';
 is $#{ $values[2] }, 255, 'GetFieldDefaulted TIFFTAG_COLORMAP b';
 
+$tif->Close;
+
+#########################
+
+system "convert rose: -define tiff:predictor=2 -compress lzw $file";
+$tif = Graphics::TIFF->Open( $file, 'r' );
+is $tif->GetField(TIFFTAG_PREDICTOR), PREDICTOR_HORIZONTAL, 'GetField TIFFTAG_PREDICTOR';
 $tif->Close;
 
 #########################

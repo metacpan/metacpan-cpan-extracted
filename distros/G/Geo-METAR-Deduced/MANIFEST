@@ -7,6 +7,8 @@ LICENSES/Artistic
 LICENSES/Copying
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
+META.yml
 README
 t/00_base.t
 t/00_signature.t
@@ -15,14 +17,14 @@ t/02_rules.t
 t/03_visibility.t
 t/04_field.t
 t/05_flight.t
-t/09_pod.t
-t/10_pod-coverage.t
-t/11_test-coverage.t
-t/12_manifest.t
-t/13_critic.t
-t/14_kwalitee.t
 t/metar.t
-t/perlcriticrc
-META.yml
-META.json
+xt/author/coverage.t
+xt/author/critic.t
+xt/author/kwalitee.t
+xt/author/manifest.t
+xt/author/perlcriticrc
+xt/author/pod_coverage.t
+xt/author/pod_syntax.t
+xt/author/signature.t
+xt/author/spelling.t
 SIGNATURE    Added here by Module::Build

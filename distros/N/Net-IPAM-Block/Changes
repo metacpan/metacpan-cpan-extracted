@@ -1,5 +1,9 @@
 Revision history for Net-IPAM-Block
 
+5.01    Sun, 11 Apr 2021 16:53:20 +0200
+        * bitlen() still useful, deprecation was a fault
+        * better _clone()
+
 5.00    Thu, 08 Apr 2021 22:31:34 +0200
         * better algo for diff()
         * better recursive algo for to_cidrs()

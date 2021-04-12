@@ -5,7 +5,7 @@ use warnings;
 
 use Validate::Tiny qw/filter is_in/;
 
-our $VERSION = q{1.0.2};
+our $VERSION = q{1.0.3};
 
 our @_OMP_VARS = (
     qw/OMP_CANCELLATION OMP_DISPLAY_ENV OMP_DEFAULT_DEVICE
@@ -501,18 +501,79 @@ Note: While it has not been tested, theoretically any Perl module that
 utilizes compiled libraries (via C::Inline, XS, FFIs, etc) that are C<OpenMP>
 aware should also be at home within the context of this module.
 
-Example 4; Theoretical use with an XS module that itself is C<OpenMP> aware:
+Example 4; Use with an XS module that itself is C<OpenMP> aware:
 
-  use OpenMP::Environment;
-  use My::XS::OpenMP::Aware::Thing;
+Note: OpenMP::Environment has no effect on Perl interfaces
+that utilize compiled code as shared objects, that also
+contain OpenMP constructs.
 
-  my $env = OpenMP::Environment->new;
-  my $omp_aware = My::XS::OpenMP::Aware::Thing->new;
+The reason for this is that OpenMP implemented by compilers,
+gcc (gomp), anyway, only read in the environment once. In our
+use of Inline::C, this corresponds to the actual loading of
+the .so that is linked to the XS-based Perl interface it
+presents.  As a result, a developer must use the OpenMP API
+that is exposed. In the example below, we're using the
+C<omp_set_num_threads> rather than setting C<OMP_NUM_THREADS>
+via %ENV or using OpenMP::Environment's C<omp_num_threads>
+method.
 
-  foreach my $i (1 2 4 8 16 32 64 128 256) {
-    $env->set_omp_num_threads($i); # Note: validated
-    my $result = $omp_aware->do_something_implemented_with_openmp();
-  }
+This example uses OpenMP::Environment, but shows that it works
+with two caveats:
+
+=over 4
+
+=item It must be called in a C<BEGIN> block that contains the
+invocation of C<Inline::C>
+
+=item It as only this single opportunity to effect the variables
+that it sets
+
+=back
+
+    use OpenMP::Environment ();
+    use constant USE_DEFAULT => 0;
+    
+    BEGIN {
+        my $oenv = OpenMP::Environment->new;
+        $oenv->omp_num_threads(16);     # serve as "default" (actual standard default is 4)
+        $oenv->omp_thread_limit(32);    # demonstrate setting of the max number of threads
+    
+        # build and load subroutines
+        use Inline (
+            C           => 'DATA',
+            name        => q{Test},
+            ccflagsex   => q{-fopenmp},
+            lddlflags   => join( q{ }, $Config::Config{lddlflags}, q{-fopenmp} ),
+            BUILD_NOISY => 1,
+        );
+    }
+    
+    # use default
+    test(USE_DEFAULT);
+    
+    for my $num_threads (qw/1 2 4 8 16 32 64 128 256/) {
+        test($num_threads);
+    }
+    
+    exit;
+    
+    __DATA__
+    
+    __C__
+    #include <omp.h>
+    #include <stdio.h>
+    void test(int num_threads) {
+    
+      // invoke default set at library load time if a number less than 1 is provided
+      if (num_threads > 0)
+        omp_set_num_threads(num_threads);
+    
+      #pragma omp parallel
+      {
+        if (0 == omp_get_thread_num())
+          printf("wanted '%d', got '%d' (max number is %d)\n", num_threads, omp_get_num_threads(), omp_get_thread_limit()); 
+      }
+    }
 
 =head1 DESCRIPTION
 
@@ -542,7 +603,9 @@ able if they are already set in C<%ENV>.
 
 L<https://gcc.gnu.org/onlinedocs/libgomp/Environment-Variables.html>
 
-=head1 EXAMPLES
+=head1 USES AND USE CASES
+
+=head2 EXAMPLES
 
 There is a growing set of example scripts in the distribution's,
 C<examples/> directory.
@@ -554,6 +617,27 @@ Lastly, the Section L<SUPPORTED C<OpenMP> ENVIRONMENTAL VARIABLES> provides
 the full description of each environmental variable available in the OpenMP
 and GOMP documentation. It also describes the range of values that are deemed
 C<valid> for each variable.
+
+=head2 BENCHMARKS
+
+This module is ideal to support benchmarks and test suites that are
+implemented using OpenMP. As a small example, there is an example of such
+a script, in C<benchmarks/demo-dc-NASA.pl> that shows the building and
+execution of the C<DC> benchmark. Distributed with this source is are the
+C and Fortran protions of NASA's NPB (version 3.4.1) benchmarking suite
+for OpenMP. It's okay, technically I in addition to all US Citizens own
+this code since we paid for it :). The link to the benchmark suite is
+L<https://www.nas.nasa.gov/publications/npb.html>, but it is one of many
+such OpenMP benchmarks and validation suites.
+
+=head2 SUPPORTING XS MODULES USING OPENMP
+
+The caveats for linking shared libraries that contain OpenMP are explained
+in C<Example 4> above. The C<OpenMP::Environment> module is not as effect
+as it is with stand alone executables that use OpenMP; but the can be
+made so with some minor modifications to the code that provide additional
+support for passing number of threads, etc and using the OpenMP API (e.g.,
+C<omp_set_num_threads>) to affect the number of threads.
 
 =head1 METHODS
 
@@ -975,6 +1059,13 @@ L<https://gcc.gnu.org/onlinedocs/libgomp/index.html>
 =head1 AUTHOR
 
 oodler577
+
+=head1 ACKNOWLEDGEMENTS
+
+So far I've received great help on irc.perl.org channels, C<#pdl> and C<#native>. Specificially,
+C<sivoais>, C<mohawk_pts>, and C<plicease>; and specifically in regards to the use of C<Inline::C>
+above and investigating the issues related to shared library load time versus run time; and when
+the environment is initialized.
 
 =head1 COPYRIGHT AND LICENSE
 

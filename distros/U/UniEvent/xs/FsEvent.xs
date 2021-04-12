@@ -1,4 +1,5 @@
 #include <xs/export.h>
+#include <xs/typemap/expected.h>
 #include <xs/unievent/FsEvent.h>
 #include <xs/unievent/Listener.h>
 #include <xs/CallbackDispatcher.h>
@@ -37,7 +38,13 @@ BOOT {
     unievent::register_perl_class(FsEvent::TYPE, s);
 }
 
-FsEvent* FsEvent::new (LoopSP loop = Loop::default_loop()) {
+FsEventSP create (Sv proto, string_view path, int flags, FsEvent::fs_event_fn cb, DLoopSP loop = {}) {
+    PROTO = proto;
+    RETVAL = make_backref<FsEvent>(loop);
+    RETVAL->start(path, flags, cb);
+}
+
+FsEvent* FsEvent::new (DLoopSP loop = {}) {
     RETVAL = make_backref<FsEvent>(loop);
 }
 
@@ -56,6 +63,18 @@ Ref FsEvent::event_listener (Sv lst = Sv(), bool weak = false) {
 
 string_view FsEvent::path ()
 
-void FsEvent::start (string_view path, int flags = 0, FsEvent::fs_event_fn cb = nullptr)
+void FsEvent::start (string_view path, int flags = 0, FsEvent::fs_event_fn cb = nullptr) {
+    XSRETURN_EXPECTED(THIS->start(path, flags, cb));
+}
 
-void FsEvent::stop ()
+void FsEvent::stop () {
+    XSRETURN_EXPECTED(THIS->stop());
+}
+
+MODULE = UniEvent::FsEvent                PACKAGE = UniEvent
+PROTOTYPES: DISABLE
+
+FsEventSP fs_event (string_view path, int flags, FsEvent::fs_event_fn cb, DLoopSP loop = {}) {
+    RETVAL = make_backref<FsEvent>(loop);
+    RETVAL->start(path, flags, cb);
+}

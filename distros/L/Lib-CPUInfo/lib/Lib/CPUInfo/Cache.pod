@@ -1,0 +1,86 @@
+# PODNAME: Lib::CPUInfo::Cache
+# ABSTRACT: CPUInfo Cache object
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lib::CPUInfo::Cache - CPUInfo Cache object
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    my $index = 0;
+    my $cache = get_l1i_cache($index);
+    my $size  = $cache->size();
+    ...
+
+=head1 ATTRIBUTES
+
+=head2 C<size>
+
+    my $size = $cache->size();
+
+Returns an integer.
+
+=head2 C<associativity>
+
+    my $size = $cache->associativity();
+
+Returns an integer.
+
+=head2 C<sets>
+
+    my $size = $cache->sets();
+
+Returns an integer.
+
+=head2 C<partitions>
+
+    my $size = $cache->partitions();
+
+Returns an integer.
+
+=head2 C<line_size>
+
+    my $size = $cache->line_size();
+
+Returns an integer.
+
+=head2 C<flags>
+
+    my $size = $cache->flags();
+
+Returns an integer.
+
+=head2 C<processor_start>
+
+    my $size = $cache->processor_start();
+
+Returns an integer.
+
+=head2 C<processor_count>
+
+    my $size = $cache->processor_count();
+
+Returns an integer.
+
+=head1 AUTHOR
+
+Sawyer X
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Sawyer X.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

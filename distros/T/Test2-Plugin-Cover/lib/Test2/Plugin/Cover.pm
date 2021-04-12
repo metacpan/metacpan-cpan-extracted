@@ -9,7 +9,7 @@ use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000013';
+our $VERSION = '0.000014';
 
 my %REPORT;
 our $FROM;
@@ -163,30 +163,24 @@ sub _process {
     while (my $touch = shift @touched) {
         my $path = $handle_file->($touch->{file}) or next;
 
-        my $sub_name    = $touch->{sub_name};
-        my $sub_package = $touch->{sub_package};
+        my $sub_name = $touch->{sub_name};
 
         my $fmap  = $submap->{$path} //= {};
         my $fseen = $seen->{touched}->{$path} //= {};
 
         my $fqsn;
-        if ($sub_name && $sub_package) {
-            next if $SPECIAL_SUBS{$sub_name};
-            $fqsn = "${sub_package}::${sub_name}";
+        if ($sub_name && !$SPECIAL_SUBS{$sub_name}) {
+            $fqsn = $sub_name;
         }
         else {
             $fqsn = '*';
         }
 
-        my $smap  = $fmap->{$fqsn}  //= {};
+        my $smap  = $fmap->{$fqsn}  //= [];
         my $sseen = $fseen->{$fqsn} //= {};
 
-        $smap->{sub_name}    = $sub_name    if $sub_name;
-        $smap->{sub_package} = $sub_package if $sub_package;
-        $smap->{call_count}++;
-
         my $called_by = $touch->{called_by} // '*';
-        push @{$smap->{called_by}} => $called_by unless $sseen->{$called_by}++;
+        push @$smap => $called_by unless $sseen->{$called_by}++;
     }
 
     for my $set (@opened) {
@@ -465,29 +459,21 @@ will be used to filter out any files not under the root directory.
 
 Returns a structure like this:
 
+    { Source => { subname => \@called_by }
+
+Example:
+
     {
         'SomeModule.pm' => {
             # The wildcard is used when a proper sub name cannot be determined
             '*' => { ... },
 
-            'SomeModule::subroutine' => {
-                sub_package => 'SomeModule',
-                sub_name    => 'subroutine',
-
-                call_count => $INTEGER,
-
-                # the items in this list can be anything, strings, numbers,
-                # data structures, etc.
-                # A naive attempt is made to avoid duplicates in this list,
-                # so the same string or reference will not appear twice, but 2
-                # different references with identical contents may appear.
-                called_by => [
-                    '*',     # The wildcard is used when no 'called by' can be determined
-                    $FROM_A,
-                    $FROM_B,
-                    ...
-                ],
-            },
+            'subname' => [
+                '*',     # The wildcard is used when no 'called by' can be determined
+                $FROM_A,
+                $FROM_B,
+                ...
+            ],
         },
         ...
     }

@@ -1402,7 +1402,11 @@ sub _interpolate_magic_comments {
     my $prefix = qr{
                 \%
                 \x{20}+
-                \:\Q$format\E\:
+                \:
+                (?:
+                    \Q$format\E | \* | ALL
+                )
+                \:
                 \x{20}+
                 \\textbackslash\{\}
                }x;

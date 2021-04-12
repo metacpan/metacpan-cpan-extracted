@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -69,7 +69,7 @@ sub new {
 	$self->{channels} = {}; # per channel hash of waitids
 	$self->{debug} = $debug;
 	$self->{json} = $args{json} // 1;
-	$self->{jsonobject} = $args{jsonobject}  // JSON::MaybeXS->new(),
+	$self->{jsonobject} = $args{jsonobject}  // JSON::MaybeXS->new(utf8 => 1),
 	$self->{ping_timeout} = $args{ping_timeout} // 300;
 	$self->{ioloop} = $args{ioloop} // Mojo::IOLoop->singleton;
 	$self->{log} = $args{log}

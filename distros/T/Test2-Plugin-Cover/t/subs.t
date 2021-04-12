@@ -47,20 +47,10 @@ subtest simple_coverage => sub {
         $CLASS->submap(root => path('t/lib')),
         {
             'Fake1.pm' => {
-                'Fake1::fake' => {
-                    call_count  => 6,
-                    called_by   => ['*', 'simple_coverage', 'simple_coverage_x'],
-                    sub_name    => 'fake',
-                    sub_package => 'Fake1'
-                }
+                'fake' => ['*', 'simple_coverage', 'simple_coverage_x'],
             },
             'Fake2.pm' => {
-                'Fake2::fake' => {
-                    call_count  => 6,
-                    called_by   => ['*', 'simple_coverage', 'simple_coverage_x'],
-                    sub_name    => 'fake',
-                    sub_package => 'Fake2',
-                },
+                'fake' => ['*', 'simple_coverage', 'simple_coverage_x'],
             },
         },
         "Got expected submap"
@@ -84,11 +74,11 @@ subtest simple_coverage => sub {
 subtest goto_and_lvalue => sub {
     $CLASS->clear;
     Fake1->gfake;
-    is($CLASS->files(root => path('t/lib')), ['Fake1.pm',], "Found with a goto");
+    is($CLASS->files(root => path('t/lib')), ['Fake1.pm'], "Found with a goto");
 
     $CLASS->clear;
     Fake1->lfake = 'xxx';
-    is($CLASS->files(root => path('t/lib')), ['Fake1.pm',], "Found with an lvalue");
+    is($CLASS->files(root => path('t/lib')), ['Fake1.pm'], "Found with an lvalue");
 };
 
 $CLASS->clear;

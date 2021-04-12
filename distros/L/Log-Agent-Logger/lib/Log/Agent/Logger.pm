@@ -19,7 +19,7 @@ package Log::Agent::Logger;
 
 use vars qw($VERSION);
 
-our $VERSION = '0.200';
+our $VERSION = '0.201';
 $VERSION = eval $VERSION;
 
 use Log::Agent;

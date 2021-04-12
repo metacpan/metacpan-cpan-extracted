@@ -104,17 +104,42 @@ subtest 'call_now' => sub {
     is $sig, SIGINT;
 };
 
-subtest 'watch' => sub {
+subtest 'static ctor' => sub {
     my $l = UE::Loop->new;
     my $signum = SIGINT;
     my $rcv;
-    my $h = UniEvent::Signal->watch($signum, sub {
+    
+    my $h = UniEvent::Signal->create($signum, sub {
         $rcv = $_[1];
         $l->stop;
     }, $l);
     trigger($l, $signum);
     $l->run;
-    is $rcv, $signum
+    is $rcv, $signum;
+    
+    $h = UniEvent::signal $signum, sub {
+        $rcv = $_[1];
+        $l->stop;
+    }, $l;
+    trigger($l, $signum);
+    $l->run;
+    is $rcv, $signum;
+    
+    $h = UniEvent::Signal->create_once($signum, sub {
+        $rcv = $_[1];
+        $l->stop;
+    }, $l);
+    trigger($l, $signum);
+    $l->run;
+    is $rcv, $signum;
+    
+    $h = UniEvent::signal_once $signum, sub {
+        $rcv = $_[1];
+        $l->stop;
+    }, $l;
+    trigger($l, $signum);
+    $l->run;
+    is $rcv, $signum;
 };
 
 subtest 'event listener' => sub {

@@ -123,7 +123,7 @@ Log::Agent::Channel::Syslog - syslog logging channel for Log::Agent::Logger
      -prefix     => prefix,
      -facility   => "user",
      -showpid    => 1,
-     -socktype   => "unix",
+     -socktype   => { port => 514, type => "udp" },
      -logopt     => "ndelay",
  );
 
@@ -155,10 +155,24 @@ The I<prefix> here is syslog's identification string.
 
 Set to true to have the PID of the process logged. It is false by default.
 
-=item C<-socktype> => (I<unix> | I<inet>)
+=item C<-socktype> => I<options>
 
-Specifies the logging socket type to use. The default behaviour is to
-use Sys:Syslog's default.
+Configures the logging socket.
+
+The given I<options> are passed without interpretation to C<setlogsock()>
+hence refer to Sys::Sylog(3) for the exhaustive set of configuration
+options there.
+
+If you run C<rsyslogd> over TCP on a non-standard port 60514 for instance, you
+could say:
+
+=over 4
+
+	-socktype => { port => 60514, type => "tcp" }
+
+=back
+
+but there are many other configuration possibilities.
 
 =back
 
@@ -168,6 +182,6 @@ Raphael Manfredi F<E<lt>Raphael_Manfredi@pobox.comE<gt>>
 
 =head1 SEE ALSO
 
-Log::Agent::Logger(3).
+Log::Agent::Logger(3), Sys::Syslog(3).
 
 =cut

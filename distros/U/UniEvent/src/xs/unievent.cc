@@ -126,22 +126,66 @@ Sv Typemap<Fs::FStat>::out (const Fs::FStat& s, const Sv&) {
 
 Fs::FStat Typemap<Fs::FStat>::in (const Array& a) {
     Fs::FStat ret;
-    ret.dev       = Simple(a[0]);
-    ret.ino       = Simple(a[1]);
-    ret.mode      = Simple(a[2]);
-    ret.nlink     = Simple(a[3]);
-    ret.uid       = Simple(a[4]);
-    ret.gid       = Simple(a[5]);
-    ret.rdev      = Simple(a[6]);
-    ret.size      = Simple(a[7]);
-    ret.atime     = Simple(a[8]);
-    ret.mtime     = Simple(a[9]);
-    ret.ctime     = Simple(a[10]);
-    ret.blksize   = Simple(a[11]);
-    ret.blocks    = Simple(a[12]);
-    ret.flags     = Simple(a[13]);
-    ret.gen       = Simple(a[14]);
-    ret.birthtime = Simple(a[15]);
+    ret.dev       = Simple(a.fetch(0));
+    ret.ino       = Simple(a.fetch(1));
+    ret.mode      = Simple(a.fetch(2));
+    ret.nlink     = Simple(a.fetch(3));
+    ret.uid       = Simple(a.fetch(4));
+    ret.gid       = Simple(a.fetch(5));
+    ret.rdev      = Simple(a.fetch(6));
+    ret.size      = Simple(a.fetch(7));
+    ret.atime     = Simple(a.fetch(8));
+    ret.mtime     = Simple(a.fetch(9));
+    ret.ctime     = Simple(a.fetch(10));
+    ret.blksize   = Simple(a.fetch(11));
+    ret.blocks    = Simple(a.fetch(12));
+    ret.flags     = Simple(a.fetch(13));
+    ret.gen       = Simple(a.fetch(14));
+    ret.birthtime = Simple(a.fetch(15));
+    return ret;
+}
+
+uint64_t type;
+uint64_t bsize;
+uint64_t blocks;
+uint64_t bfree;
+uint64_t bavail;
+uint64_t files;
+uint64_t ffree;
+uint64_t spare[4];
+
+Sv Typemap<Fs::FsInfo>::out (const Fs::FsInfo& i, const Sv&) {
+    return Ref::create(Array::create({
+        Simple(i.type),
+        Simple(i.bsize),
+        Simple(i.blocks),
+        Simple(i.bfree),
+        Simple(i.bavail),
+        Simple(i.files),
+        Simple(i.ffree),
+        Ref::create(Array::create({
+            Simple(i.spare[0]),
+            Simple(i.spare[1]),
+            Simple(i.spare[2]),
+            Simple(i.spare[3]),
+        })),
+    }));
+}
+
+Fs::FsInfo Typemap<Fs::FsInfo>::in (const Array& a) {
+    Fs::FsInfo ret;
+    ret.type   = Simple(a.fetch(0));
+    ret.bsize  = Simple(a.fetch(1));
+    ret.blocks = Simple(a.fetch(2));
+    ret.bfree  = Simple(a.fetch(3));
+    ret.bavail = Simple(a.fetch(4));
+    ret.files  = Simple(a.fetch(5));
+    ret.ffree  = Simple(a.fetch(6));
+    Array spare = a.fetch(7);
+    ret.spare[0] = Simple(spare.fetch(0));
+    ret.spare[1] = Simple(spare.fetch(1));
+    ret.spare[2] = Simple(spare.fetch(2));
+    ret.spare[3] = Simple(spare.fetch(3));
     return ret;
 }
 
@@ -154,6 +198,17 @@ Sv Typemap<Fs::DirEntry>::out (const Fs::DirEntry& de, const Sv&) {
 
 Fs::DirEntry Typemap<Fs::DirEntry>::in (const Array& a) {
     return Fs::DirEntry(Simple(a[0]).as_string(), (Fs::FileType)(int)Simple(a[1]));
+}
+
+Sv Typemap<Fs::path_fd_t>::out (const Fs::path_fd_t& val, const Sv&) {
+    return Ref::create(Array::create({
+        Simple(val.path),
+        Simple(val.fd)
+    }));
+}
+
+Fs::path_fd_t Typemap<Fs::path_fd_t>::in (const Array& a) {
+    return Fs::path_fd_t{ Simple(a[0]).as_string(), (fd_t)(int)Simple(a[1]) };
 }
 
 }

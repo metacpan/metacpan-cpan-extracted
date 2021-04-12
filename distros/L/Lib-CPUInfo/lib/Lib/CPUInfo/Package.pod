@@ -1,0 +1,79 @@
+# PODNAME: Lib::CPUInfo::Package
+# ABSTRACT: CPUInfo Package object
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lib::CPUInfo::Package - CPUInfo Package object
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    my $package = get_current_package();
+    printf "Package name: %s\n", $package->name();
+    ...
+
+=head1 ATTRIBUTES
+
+=head2 C<name>
+
+    my $name = $package->name();
+
+Returns the name of the package as a string.
+
+=head2 C<processor_start>
+
+    my $start = $package->processor_start();
+
+Returns an integer of the package processor start.
+
+=head2 C<processor_count>
+
+    my $count = $package->processor_count();
+
+Returns an integer of the package processor count.
+
+=head2 C<core_start>
+
+    my $start = $package->core_start();
+
+Returns an integer of the package core start.
+
+=head2 C<core_count>
+
+    my $count = $package->core_count();
+
+Returns an integer of the package core count.
+
+=head2 C<cluster_start>
+
+    my $start = $package->cluster_start();
+
+Returns an integer of the package cluster start.
+
+=head2 C<cluster_count>
+
+    my $count = $package->cluster_count();
+
+Returns an integer of the package cluster count.
+
+=head1 AUTHOR
+
+Sawyer X
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Sawyer X.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

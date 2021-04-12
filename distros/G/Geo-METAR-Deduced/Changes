@@ -1,5 +1,19 @@
 Revision history for Perl extension Geo::METAR::Deduced.
 
+v1.0.3 Sun Apr 11 15:28:16 UTC 2021
+       * build: properly handle signature matching BB#10
+
+v1.0.2 Sat Apr 10 21:51:27 UTC 2021
+       * build: avoid fail on signature warning BB#9
+
+v1.0.1 Sat Apr 10 15:02:30 UTC 2021
+       * feat: allow line breaks in METAR BB#4
+       * feat: drop leading zeros in returned values BB#5
+       * fix: return Infinity as a number BB#6
+       * test: coverage 100% BB#3
+       * test: improved author testing BB#7
+       * build: add multithreaded perl to Travis CI BB#8
+
 v0.0.6 Mon Jan 25 23:27:34 UTC 2021
        * fix: meta bugtracker
 

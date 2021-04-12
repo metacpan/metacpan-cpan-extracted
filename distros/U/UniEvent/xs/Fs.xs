@@ -4,6 +4,7 @@
 #include <xs/unievent/Loop.h>
 #include <xs/unievent/util.h>
 #include <xs/unievent/error.h>
+#include <xs/typemap/expected.h>
 
 using namespace xs;
 using namespace xs::unievent;
@@ -12,42 +13,12 @@ using panda::string_view;
 
 #define FSXS_FUNC(async, sync) {            \
     if (cb) {                               \
-        if (!l) l = Loop::default_loop();   \
         mXPUSHs(xs::out(async).detach());   \
         XSRETURN(1);                        \
     } else sync;                            \
 }
 
-#define FSXS_FUNC_VOID(async, sync) FSXS_FUNC(async, {      \
-    auto ret = sync;                                        \
-    if (GIMME_V == G_VOID) {                                \
-        if (!ret) throw ret.error();                        \
-        XSRETURN_EMPTY;                                     \
-    }                                                       \
-    XPUSHs(boolSV(ret));                                    \
-    if (GIMME_V == G_ARRAY) {                               \
-        if (ret) XPUSHs(&PL_sv_undef);                      \
-        else     mXPUSHs(xs::out(ret.error()).detach());    \
-        XSRETURN(2);                                        \
-    }                                                       \
-    XSRETURN(1);                                            \
-})
-    
-#define FSXS_FUNC_RET(async, sync) FSXS_FUNC(async, {   \
-    auto ret = sync;                                    \
-    if (ret) {                                          \
-        mXPUSHs(xs::out(ret.value()).detach());         \
-        if (GIMME_V == G_ARRAY) {                       \
-            XPUSHs(&PL_sv_undef);                       \
-            XSRETURN(2);                                \
-        }                                               \
-        XSRETURN(1);                                    \
-    }                                                   \
-    if (GIMME_V != G_ARRAY) throw ret.error();          \
-    XPUSHs(&PL_sv_undef);                               \
-    mXPUSHs(xs::out(ret.error()).detach());             \
-    XSRETURN(2);                                        \
-})
+#define FSXS_EXPECTED(async, sync) FSXS_FUNC(async, XSRETURN_EXPECTED(sync))
 
 #define FSXS_FUNC_BOOL(async, sync) FSXS_FUNC(async, {  \
     auto ret = sync;                                    \
@@ -120,195 +91,219 @@ BOOT {
         {"STAT_GEN",       14},
         {"STAT_BIRTHTIME", 15},
         {"STAT_TYPE",      16},
-        {"STAT_PERMS",     17}
+        {"STAT_PERMS",     17},
+        
+        {"STATFS_TYPE",   0},
+        {"STATFS_BSIZE",  1},
+        {"STATFS_BLOCKS", 2},
+        {"STATFS_BFREE",  3},
+        {"STATFS_BAVAIL", 4},
+        {"STATFS_FILES",  5},
+        {"STATFS_FFREE",  6},
+        {"STATFS_SPARE",  7},
     });
     exp::autoexport(stash);
     stash.add_const_sub("TYPE", Simple(Fs::TYPE.name));
 }
 
-Fs::Request* Fs::Request::new (LoopSP loop = Loop::default_loop()) {
+Fs::Request* Fs::Request::new (DLoopSP loop = {}) {
     RETVAL = new Fs::Request(loop);
 }
 
-void mkdir (string_view path, int mode = Fs::DEFAULT_DIR_MODE, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::mkdir(path, mode, cb, l), Fs::mkdir(path, mode));
+void mkdir (string_view path, int mode = Fs::DEFAULT_DIR_MODE, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::mkdir(path, mode, cb, l), Fs::mkdir(path, mode));
 }
 
-void rmdir (string_view path, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::rmdir(path, cb, l), Fs::rmdir(path));
+void rmdir (string_view path, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::rmdir(path, cb, l), Fs::rmdir(path));
 }
 
-void remove (string_view path, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::remove(path, cb, l), Fs::remove(path));
+void remove (string_view path, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::remove(path, cb, l), Fs::remove(path));
 }
 
-void mkpath (string_view path, int mode = Fs::DEFAULT_DIR_MODE, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::mkpath(path, mode, cb, l), Fs::mkpath(path, mode));
+void mkpath (string_view path, int mode = Fs::DEFAULT_DIR_MODE, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::mkpath(path, mode, cb, l), Fs::mkpath(path, mode));
 }
 
-void scandir (string_view path, Fs::scandir_fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_RET(Fs::scandir(path, cb, l), Fs::scandir(path));
+void scandir (string_view path, Fs::scandir_fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::scandir(path, cb, l), Fs::scandir(path));
 }
 
-void remove_all (string_view path, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::remove_all(path, cb, l), Fs::remove_all(path));
+void remove_all (string_view path, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::remove_all(path, cb, l), Fs::remove_all(path));
 }
 
-void open (string_view path, int flags, int mode = Fs::DEFAULT_FILE_MODE, Fs::open_fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_RET(Fs::open(path, flags, mode, cb, l), Fs::open(path, flags, mode));
+void open (string_view path, int flags, int mode = Fs::DEFAULT_FILE_MODE, Fs::open_fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::open(path, flags, mode, cb, l), Fs::open(path, flags, mode));
 }
 
-void close (Sv _fd, Fs::fn cb = nullptr, LoopSP l = nullptr) {
+void close (Sv _fd, Fs::fn cb = nullptr, DLoopSP l = {}) {
     auto fd = sv2fd(_fd);
-    FSXS_FUNC_VOID(Fs::close(fd, cb, l), Fs::close(fd));
+    FSXS_EXPECTED(Fs::close(fd, cb, l), Fs::close(fd));
 }
 
-void stat (Sv path_or_fd, Fs::stat_fn cb = nullptr, LoopSP l = nullptr) {
+void stat (Sv path_or_fd, Fs::stat_fn cb = nullptr, DLoopSP l = {}) {
     if (path_or_fd.is_string()) {
         auto path = xs::in<string_view>(path_or_fd);
-        FSXS_FUNC_RET(Fs::stat(path, cb, l), Fs::stat(path));
+        FSXS_EXPECTED(Fs::stat(path, cb, l), Fs::stat(path));
     } else {
         auto fd = sv2fd(path_or_fd);
-        FSXS_FUNC_RET(Fs::stat(fd, cb, l), Fs::stat(fd));
+        FSXS_EXPECTED(Fs::stat(fd, cb, l), Fs::stat(fd));
     }
 }
 
-void lstat (string_view path, Fs::stat_fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_RET(Fs::lstat(path, cb, l), Fs::lstat(path));
+void lstat (string_view path, Fs::stat_fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::lstat(path, cb, l), Fs::lstat(path));
 }
 
-void exists (string_view path, Fs::bool_fn cb = nullptr, LoopSP l = nullptr) {
+void statfs (string_view path, Fs::statfs_fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::statfs(path, cb, l), Fs::statfs(path));
+}
+
+void exists (string_view path, Fs::bool_fn cb = nullptr, DLoopSP l = {}) {
     FSXS_FUNC_BOOL(Fs::exists(path, cb, l), Fs::exists(path));
 }
 
-void isfile (string_view path, Fs::bool_fn cb = nullptr, LoopSP l = nullptr) {
+void isfile (string_view path, Fs::bool_fn cb = nullptr, DLoopSP l = {}) {
     FSXS_FUNC_BOOL(Fs::isfile(path, cb, l), Fs::isfile(path));
 }
 
-void isdir (string_view path, Fs::bool_fn cb = nullptr, LoopSP l = nullptr) {
+void isdir (string_view path, Fs::bool_fn cb = nullptr, DLoopSP l = {}) {
     FSXS_FUNC_BOOL(Fs::isdir(path, cb, l), Fs::isdir(path));
 }
 
-void access (string_view path, int mode = 0, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::access(path, mode, cb, l), Fs::access(path, mode));
+void access (string_view path, int mode = 0, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::access(path, mode, cb, l), Fs::access(path, mode));
 }
 
-void unlink (string_view path, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::unlink(path, cb, l), Fs::unlink(path));
+void unlink (string_view path, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::unlink(path, cb, l), Fs::unlink(path));
 }
 
-void sync (Sv _fd, Fs::fn cb = nullptr, LoopSP l = nullptr) {
+void sync (Sv _fd, Fs::fn cb = nullptr, DLoopSP l = {}) {
     auto fd = sv2fd(_fd);
-    FSXS_FUNC_VOID(Fs::sync(fd, cb, l), Fs::sync(fd));
+    FSXS_EXPECTED(Fs::sync(fd, cb, l), Fs::sync(fd));
 }
 
-void datasync (Sv _fd, Fs::fn cb = nullptr, LoopSP l = nullptr) {
+void datasync (Sv _fd, Fs::fn cb = nullptr, DLoopSP l = {}) {
     auto fd = sv2fd(_fd);
-    FSXS_FUNC_VOID(Fs::datasync(fd, cb, l), Fs::datasync(fd));
+    FSXS_EXPECTED(Fs::datasync(fd, cb, l), Fs::datasync(fd));
 }
 
-void truncate (Sv path_or_fd, int64_t length = 0, Fs::fn cb = nullptr, LoopSP l = nullptr) {
+void truncate (Sv path_or_fd, int64_t length = 0, Fs::fn cb = nullptr, DLoopSP l = {}) {
     if (path_or_fd.is_string()) {
         auto path = xs::in<string_view>(path_or_fd);
-        FSXS_FUNC_VOID(Fs::truncate(path, length, cb, l), Fs::truncate(path, length));
+        FSXS_EXPECTED(Fs::truncate(path, length, cb, l), Fs::truncate(path, length));
     } else {
         auto fd = sv2fd(path_or_fd);
-        FSXS_FUNC_VOID(Fs::truncate(fd, length, cb, l), Fs::truncate(fd, length));
+        FSXS_EXPECTED(Fs::truncate(fd, length, cb, l), Fs::truncate(fd, length));
     }
 }
 
-void chmod (Sv path_or_fd, int mode, Fs::fn cb = nullptr, LoopSP l = nullptr) {
+void chmod (Sv path_or_fd, int mode, Fs::fn cb = nullptr, DLoopSP l = {}) {
     if (path_or_fd.is_string()) {
         auto path = xs::in<string_view>(path_or_fd);
-        FSXS_FUNC_VOID(Fs::chmod(path, mode, cb, l), Fs::chmod(path, mode));
+        FSXS_EXPECTED(Fs::chmod(path, mode, cb, l), Fs::chmod(path, mode));
     } else {
         auto fd = sv2fd(path_or_fd);
-        FSXS_FUNC_VOID(Fs::chmod(fd, mode, cb, l), Fs::chmod(fd, mode));
+        FSXS_EXPECTED(Fs::chmod(fd, mode, cb, l), Fs::chmod(fd, mode));
     }
 }
 
-void touch (string_view path, int mode = Fs::DEFAULT_FILE_MODE, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::touch(path, mode, cb, l), Fs::touch(path, mode));
+void touch (string_view path, int mode = Fs::DEFAULT_FILE_MODE, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::touch(path, mode, cb, l), Fs::touch(path, mode));
 }
 
-void utime (Sv path_or_fd, double atime, double mtime, Fs::fn cb = nullptr, LoopSP l = nullptr) {
+void utime (Sv path_or_fd, double atime, double mtime, Fs::fn cb = nullptr, DLoopSP l = {}) {
     if (path_or_fd.is_string()) {
         auto path = xs::in<string_view>(path_or_fd);
-        FSXS_FUNC_VOID(Fs::utime(path, atime, mtime, cb, l), Fs::utime(path, atime, mtime));
+        FSXS_EXPECTED(Fs::utime(path, atime, mtime, cb, l), Fs::utime(path, atime, mtime));
     } else {
         auto fd = sv2fd(path_or_fd);
-        FSXS_FUNC_VOID(Fs::utime(fd, atime, mtime, cb, l), Fs::utime(fd, atime, mtime));
+        FSXS_EXPECTED(Fs::utime(fd, atime, mtime, cb, l), Fs::utime(fd, atime, mtime));
     }
 }
 
-void chown (Sv path_or_fd, uid_t uid, gid_t gid, Fs::fn cb = nullptr, LoopSP l = nullptr) {
+void lutime (string_view path, double atime, double mtime, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::lutime(path, atime, mtime, cb, l), Fs::lutime(path, atime, mtime));
+}
+
+void chown (Sv path_or_fd, uid_t uid, gid_t gid, Fs::fn cb = nullptr, DLoopSP l = {}) {
     if (path_or_fd.is_string()) {
         auto path = xs::in<string_view>(path_or_fd);
-        FSXS_FUNC_VOID(Fs::chown(path, uid, gid, cb, l), Fs::chown(path, uid, gid));
+        FSXS_EXPECTED(Fs::chown(path, uid, gid, cb, l), Fs::chown(path, uid, gid));
     } else {
         auto fd = sv2fd(path_or_fd);
-        FSXS_FUNC_VOID(Fs::chown(fd, uid, gid, cb, l), Fs::chown(fd, uid, gid));
+        FSXS_EXPECTED(Fs::chown(fd, uid, gid, cb, l), Fs::chown(fd, uid, gid));
     }
 }
 
-void lchown (string_view path, uid_t uid, gid_t gid, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::lchown(path, uid, gid, cb, l), Fs::lchown(path, uid, gid));
+void lchown (string_view path, uid_t uid, gid_t gid, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::lchown(path, uid, gid, cb, l), Fs::lchown(path, uid, gid));
 }
 
-void rename (string_view src, string_view dst, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::rename(src, dst, cb, l), Fs::rename(src, dst));
+void rename (string_view src, string_view dst, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::rename(src, dst, cb, l), Fs::rename(src, dst));
 }
 
-void sendfile (Sv _out, Sv _in, int64_t offset, size_t length, Fs::sendfile_fn cb = nullptr, LoopSP l = nullptr) {
+void sendfile (Sv _out, Sv _in, int64_t offset, size_t length, Fs::sendfile_fn cb = nullptr, DLoopSP l = {}) {
     auto out = sv2fd(_out);
     auto in  = sv2fd(_in);
-    FSXS_FUNC_RET(Fs::sendfile(out, in, offset, length, cb, l), Fs::sendfile(out, in, offset, length));
+    FSXS_EXPECTED(Fs::sendfile(out, in, offset, length, cb, l), Fs::sendfile(out, in, offset, length));
 }
 
-void link (string_view src, string_view dst, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::link(src, dst, cb, l), Fs::link(src, dst));
+void link (string_view src, string_view dst, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::link(src, dst, cb, l), Fs::link(src, dst));
 }
 
-void symlink (string_view src, string_view dst, int flags = 0, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::symlink(src, dst, flags, cb, l), Fs::symlink(src, dst, flags));
+void symlink (string_view src, string_view dst, int flags = 0, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::symlink(src, dst, flags, cb, l), Fs::symlink(src, dst, flags));
 }
 
-void readlink (string_view path, Fs::string_fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_RET(Fs::readlink(path, cb, l), Fs::readlink(path));
+void readlink (string_view path, Fs::string_fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::readlink(path, cb, l), Fs::readlink(path));
 }
 
-void realpath (string_view path, Fs::string_fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_RET(Fs::realpath(path, cb, l), Fs::realpath(path));
+void realpath (string_view path, Fs::string_fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::realpath(path, cb, l), Fs::realpath(path));
 }
 
-void copyfile (string_view src, string_view dst, int flags, Fs::fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_VOID(Fs::copyfile(src, dst, flags, cb, l), Fs::copyfile(src, dst, flags));
+void copyfile (string_view src, string_view dst, int flags, Fs::fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::copyfile(src, dst, flags, cb, l), Fs::copyfile(src, dst, flags));
 }
 
-void mkdtemp (string_view path, Fs::string_fn cb = nullptr, LoopSP l = nullptr) {
-    FSXS_FUNC_RET(Fs::mkdtemp(path, cb, l), Fs::mkdtemp(path));
+void mkdtemp (string_view path, Fs::string_fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::mkdtemp(path, cb, l), Fs::mkdtemp(path));
 }
 
-void read (Sv _fd, size_t size, int64_t offset = -1, Fs::string_fn cb = nullptr, LoopSP l = nullptr) {
+void mkstemp (string_view path, Fs::path_fd_fn cb = nullptr, DLoopSP l = {}) {
+    FSXS_EXPECTED(Fs::mkstemp(path, cb, l), Fs::mkstemp(path));
+}
+
+void read (Sv _fd, size_t size, int64_t offset = -1, Fs::string_fn cb = nullptr, DLoopSP l = {}) {
     auto fd = sv2fd(_fd);
-    FSXS_FUNC_RET(Fs::read(fd, size, offset, cb, l), Fs::read(fd, size, offset));
+    FSXS_EXPECTED(Fs::read(fd, size, offset, cb, l), Fs::read(fd, size, offset));
 }
 
-void write (Sv _fd, Sv _buf, int64_t offset = -1, Fs::fn cb = nullptr, LoopSP l = nullptr) {
+void write (Sv _fd, Sv _buf, int64_t offset = -1, Fs::fn cb = nullptr, DLoopSP l = {}) {
     auto fd = sv2fd(_fd);
     auto buf = sv2buf(_buf);
-    FSXS_FUNC_VOID(Fs::write(fd, buf, offset, cb, l), Fs::write(fd, buf, offset));
+    FSXS_EXPECTED(Fs::write(fd, buf, offset, cb, l), Fs::write(fd, buf, offset));
 }
 
 
-MODULE = UniEvent::Fs                PACKAGE = UniEvent::Fs::Request
+MODULE = UniEvent::Fs                PACKAGE = UniEvent::Request::Fs
 PROTOTYPES: DISABLE
 
-Fs::Request* Fs::Request::new (LoopSP loop = Loop::default_loop()) {
-    RETVAL = new Fs::Request(loop);
+BOOT {
+    Stash s(__PACKAGE__);
+    s.inherit("UniEvent::Work");
 }
 
-bool Fs::Request::busy ()
+Fs::Request* Fs::Request::new (DLoopSP loop = {}) {
+    RETVAL = make_backref<Fs::Request>(loop);
+}
 
 fd_t Fs::Request::fd (Sv fd = Sv()) {
     if (fd) {
@@ -340,13 +335,15 @@ void Fs::Request::stat     (Sv arg1, Sv arg2 = Sv()) {
     else      THIS->stat(xs::in<Fs::stat_fn>(arg1));
 }
 
-void Fs::Request::lstat    (string_view path, Fs::stat_fn cb);
+void Fs::Request::lstat    (string_view path, Fs::stat_fn cb)
 
-void Fs::Request::exists   (string_view path, Fs::bool_fn cb);
+void Fs::Request::statfs   (string_view path, Fs::statfs_fn cb)
 
-void Fs::Request::isfile   (string_view path, Fs::bool_fn cb);
+void Fs::Request::exists   (string_view path, Fs::bool_fn cb)
 
-void Fs::Request::isdir    (string_view path, Fs::bool_fn cb);
+void Fs::Request::isfile   (string_view path, Fs::bool_fn cb)
+
+void Fs::Request::isdir    (string_view path, Fs::bool_fn cb)
 
 void Fs::Request::access   (string_view path, int mode, Fs::fn cb)
 
@@ -372,6 +369,8 @@ void Fs::Request::utime (Sv arg1, Sv arg2, Sv arg3, Sv arg4 = Sv()) {
     if (arg4) THIS->utime(xs::in<string_view>(arg1), xs::in<double>(arg2), xs::in<double>(arg3), xs::in<Fs::fn>(arg4));
     else      THIS->utime(xs::in<double>(arg1), xs::in<double>(arg2), xs::in<Fs::fn>(arg3));
 }
+
+void Fs::Request::lutime (string_view path, double atime, double mtime, Fs::fn cb)
 
 void Fs::Request::chown (Sv arg1, Sv arg2, Sv arg3, Sv arg4 = Sv()) {
     if (arg4) THIS->chown(xs::in<string_view>(arg1), xs::in<uid_t>(arg2), xs::in<gid_t>(arg3), xs::in<Fs::fn>(arg4));

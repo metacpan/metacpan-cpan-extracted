@@ -1,0 +1,10 @@
+Revision history for Perl extension Stats::Fermi.
+
+0.1.3 Mon Apr 12 7:22 2021
+
+	bugfixes, package should be ready to use
+
+0.01  Mon Apr 12 10:56:26 2021
+	- original version; created by h2xs 1.23 with options
+		-X -n Stats::Fermi
+

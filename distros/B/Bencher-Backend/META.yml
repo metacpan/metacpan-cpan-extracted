@@ -25,12 +25,13 @@ requires:
   Browser::Open: '0'
   Capture::Tiny: '0'
   Chart::Gnuplot: '0'
-  Complete::Module: '0'
+  Complete::Module: '0.262'
   Complete::Util: '0.608'
   Data::Clean::ForJSON: '0'
   Data::Clone: '0'
   Data::Dmp: '0.240'
   Data::Dump: '0'
+  Data::TableData::Object::aohos: '0'
   Devel::Platform::Info: '0'
   Devel::Size: '0'
   Exporter: '5.57'
@@ -38,11 +39,11 @@ requires:
   File::Digest: '0.009'
   File::Slurper: '0'
   File::Temp: '0.2307'
-  IPC::System::Options: '0.335'
+  IPC::System::Options: '0.339'
   JSON::MaybeXS: '0'
   List::MoreUtils: '0'
   List::Util: '1.45'
-  Log::ger: '0.037'
+  Log::ger: '0.038'
   Math::ScientificNotation::Util: '0'
   Module::Load: '0'
   Module::Path::More: '0.32'
@@ -58,7 +59,6 @@ requires:
   Scalar::Util: '0'
   String::ShellQuote: '0'
   Sys::Info: '0'
-  TableData::Object::aohos: '0.112'
   Time::HiRes: '0'
   experimental: '0'
   parent: '0'
@@ -69,7 +69,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend
   homepage: https://metacpan.org/release/Bencher-Backend
   repository: git://github.com/perlancar/perl-Bencher-Backend.git
-version: '1.052'
+version: '1.053'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -149,7 +149,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Filter/PERLANCAR::BeforeBuild'
-      version: '0.602'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Filter/Rinci::AbstractFromMeta'
@@ -354,7 +354,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Filter/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Filter/SetScriptShebang'

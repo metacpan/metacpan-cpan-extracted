@@ -1,9 +1,9 @@
 package WHO::GrowthReference::Table;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-02-27'; # DATE
+our $DATE = '2021-04-11'; # DATE
 our $DIST = 'WHO-GrowthReference-Table'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1242,7 +1242,7 @@ _
 };
 sub get_who_growth_reference {
     no strict 'refs';
-    require TableData::Lookup;
+    require Data::TableData::Lookup;
 
     my %args = @_;
     my $gender = $args{gender};
@@ -1300,7 +1300,7 @@ sub get_who_growth_reference {
                     if $meta->{fields}{$_};
             }
             last unless defined $args{height};
-            my $pct = TableData::Lookup::table_vlookup(
+            my $pct = Data::TableData::Lookup::table_vlookup(
                 table => [map { [
                     $row->[ $meta->{fields}{$_}{pos} ],
                     $percentiles{$_},
@@ -1315,7 +1315,7 @@ sub get_who_growth_reference {
             );
             $res->[2]{height_percentile} = $pct;
             $res->[2]{height_potential_SD0} = $row_potential->[ $meta->{fields}{P50}{pos} ];
-            $res->[2]{height_potential} = TableData::Lookup::table_vlookup(
+            $res->[2]{height_potential} = Data::TableData::Lookup::table_vlookup(
                 table => [map { [
                     $percentiles{$_},
                     $row_potential->[ $meta->{fields}{$_}{pos} ],
@@ -1340,7 +1340,7 @@ sub get_who_growth_reference {
                     if $meta->{fields}{$_};
             }
             last unless defined $args{height};
-            my $z = TableData::Lookup::table_vlookup(
+            my $z = Data::TableData::Lookup::table_vlookup(
                 table => [map { [
                     $row->[ $meta->{fields}{$_}{pos} ],
                     $zscores{$_},
@@ -1387,7 +1387,7 @@ sub get_who_growth_reference {
                     if $meta->{fields}{$_};
             }
             last unless defined $args{weight};
-            my $pct = TableData::Lookup::table_vlookup(
+            my $pct = Data::TableData::Lookup::table_vlookup(
                 table => [map { [
                     $row->[ $meta->{fields}{$_}{pos} ],
                     $percentiles{$_},
@@ -1413,7 +1413,7 @@ sub get_who_growth_reference {
                     if $meta->{fields}{$_};
             }
             last unless defined $args{weight};
-            my $z = TableData::Lookup::table_vlookup(
+            my $z = Data::TableData::Lookup::table_vlookup(
                 table => [map { [
                     $row->[ $meta->{fields}{$_}{pos} ],
                     $zscores{$_},
@@ -1463,7 +1463,7 @@ sub get_who_growth_reference {
                     if $meta->{fields}{$_};
             }
             last unless defined $bmi;
-            my $pct = TableData::Lookup::table_vlookup(
+            my $pct = Data::TableData::Lookup::table_vlookup(
                 table => [map { [
                     $row->[ $meta->{fields}{$_}{pos} ],
                     $percentiles{$_},
@@ -1490,7 +1490,7 @@ sub get_who_growth_reference {
             }
             last unless defined $bmi;
 
-            my $z = TableData::Lookup::table_vlookup(
+            my $z = Data::TableData::Lookup::table_vlookup(
                 table => [map { [
                     $row->[ $meta->{fields}{$_}{pos} ],
                     $zscores{$_},
@@ -1523,7 +1523,7 @@ WHO::GrowthReference::Table - Lookup height/weight in the WHO growth chart (a.k.
 
 =head1 VERSION
 
-This document describes version 0.008 of WHO::GrowthReference::Table (from Perl distribution WHO-GrowthReference-Table), released on 2021-02-27.
+This document describes version 0.009 of WHO::GrowthReference::Table (from Perl distribution WHO-GrowthReference-Table), released on 2021-04-11.
 
 =head1 SYNOPSIS
 

@@ -1,117 +1,147 @@
 =head1 NAME
 
-UniEvent::Pipe - file streaming abstraction on local machine
+UniEvent::Pipe - abstraction over streaming files and named pipes
+
+
 
 =head1 SYNOPSIS
 
-    my $loop = UniEvent::Loop->new);
-    # just a client
-	my $client = UniEvent::Pipe->new($loop);
-	$client->connect('/path/to/pipe', sub {
-		my ($client, $err) = @_;
+	my $pipe = UniEvent::Pipe->new;
+	$pipe->connect('/path/to/pipe', sub {
+		my ($pipe, $err) = @_;
         die $err if $err;
-        $client->write("hello");
+        $pipe->write("hello");
 
-        $client->read_callback(sub {
-            my ($handle, $data, $err) = @_;
+        $pipe->read_callback(sub {
+            my ($pipe, $data, $err) = @_;
             die $err if $err;
             say "got $data";
-        	$client->shutdown(sub {
-        		say "post-shutdown callback";
-            });
+        	$pipe->disconnect;
         });
 	});
 
-    # pair of connected sockets
-    my ($reader, $writer) = UniEvent::Pipe::pair($loop);
+    # create pipe pair
+    my ($reader, $writer) = UniEvent::Pipe::pair();
+    
+    $reader->read_callback(sub { ... });
+    $writer->write("hello");
+
 
 
 =head1 DESCRIPTION
 
-Pipe handles provide an abstraction over streaming files on Unix
-(including local domain sockets, pipes, and FIFOs) and named pipes on Windows.
-It is inherited from L<UniEvent::Stream>.
+Pipe handles provide an abstraction over streaming files on Unix (including local domain sockets, pipes, and FIFOs) and named pipes on Windows.
+
+It is inherited from L<UniEvent::Stream>, which provides most of the API.
+
+
 
 =head1 FUNCTIONS
 
 =head2 pair($reader, $writer)
 
-=head2 pair($loop)
+=head2 pair([$loop = default])
 
-Opens a pair of connected pipes like the corresponding system call. If only
-C<$loop> argument is specified, then C<$reader> and C<$writer> pipes
-are created and connected.
+Opens a pair of connected pipes like the corresponding system call. 
 
-If C<$writer> is missing, it will be created.
+In the first form, connects already existing objects. Objects must be in "clean" state (i.e. just created or after reset).
 
-It returns pair of L<UniEvent::Pipe> handles.
+In the second form, creates two L<UniEvent::Pipe> objects in C<$loop> and connects them.
 
-See L<perlipc> and L<pipe> how to work with pair of connected pipes.
+In either case, returns those two pipe objects.
+
+    my ($reader, $writer) = UE::Pipe::pair();
+    
+    package MyPipe;
+    use parent 'UniEvent::Pipe';
+    
+    my $reader = MyPipe->new;
+    my $writer = MyPipe->new;
+    UE::Pipe::pair($reader, $writer);
+
+
 
 =head1 METHODS
 
-=head2 new([$loop = UniEvent::Loop->default_loop, [$ipc = false]])
+All methods of L<UniEvent::Stream> also apply.
 
-Constructs new Pipe handle and binds it to the specified event loop. The C<$ipc>
-argument is a boolean to indicate if this pipe will be used for handle passing
+=head2 new([$loop = default], [$ipc = false])
+
+The C<$ipc> argument is a boolean to indicate if this pipe will be used for handle passing
 between processes (which may change the bytes on the wire). Only a connected pipe
 that will be passing the handles should have this flag set, not the listening pipe.
 
-The Pipe hanlde is inherited from L<UniEvent::Handle>.
 
-=head2 open($fd, [$connected = false])
+=head2 open($fd, $mode)
 
-Open an existing file descriptor C<$fd> as a pipe. The C<$connected> flag marks
-the connected state of the stream (see L<UniEvent::Stream>).
+Open an existing file descriptor C<$fd> as a pipe. The C<$mode> flag marks
+the connected state and type of the pipe end.
+
+If fd is not connected, then C<$mode> should be C<MODE_NOT_CONNECTED>.
+
+Otherwise, C<$mode> should be either C<MODE_READABLE> or C<MODE_WRITABLE> depending on what the type of the pipe end is.
+
+In case of connected unix socket, C<$mode> should be a bitmask C<MODE_READABLE | MODE_WRITABLE>
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
 
 =head2 bind($name)
 
-Bind the pipe to a file path (Unix) or a name (Windows). On windows it should
-be something like C<"\\\\.\\pipe\\$name">.
+Bind the pipe to a file path (Unix) or a name (Windows). On windows it should be something like C<"\\\\.\\pipe\\$name">.
 
-=head2 connect($name [, $callback = undef]).
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+NOTE: Paths on Unix get truncated to sizeof(sockaddr_un.sun_path) bytes, typically between 92 and 108 bytes.
+
+
+=head2 connect($name, [$callback])
 
 Connect to the Unix domain socket or the named pipe. Optionally the C<$callback>
-can be specified, which will be called upon connect. The C++ signature is:
+can be specified, which will be added as ->connect_event->add($callback).
 
-    void(const StreamSP& handle, const ErrorCode& err, const ConnectRequestSP& req)
+See L<UniEvent::Stream/connect_event()> for callback signature.
 
-i.e. it will be invoked as:
-
-    $callback->($pipe_handle, $error_code, $connect_request)
-
-The method returns L<connect_request|UniEvent::Request::Connect>, using which the
-connection request can be tracked.
 
 =head2 sockname()
 
 Get the name of the Unix domain socket or the named pipe.
 
+If pipe is not connected, empty string is returned.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
 =head2 peername()
 
-Get the name of the Unix domain socket or the named pipe which the handle
-is connected to.
+Get the name of the Unix domain socket or the named pipe which the handle is connected to.
+
+If pipe is not connected, empty string is returned.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
 
 =head2 pending_instances($count)
 
-Set the number of pending pipe instance handles when the pipe server is waiting
-for connections. Applicable for Windows only.
+Set the number of pending pipe instance handles when the pipe server is waiting for connections.
+Applicable for Windows only.
+
+
+=head2 chmod($mode)
+
+Alters pipe permissions, allowing it to be accessed from processes run by different users. Makes the pipe writable or readable by all users.
+Mode can be MODE_WRITABLE, MODE_READABLE or MODE_WRITABLE | MODE_READABLE.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
 
 =head1 CONSTANTS
 
-=head2 TYPE
+=head2 MODE_NOT_CONNECTED
 
-Pipe type constant
+=head2 MODE_READABLE
 
-=head1 REFERENCES
-
-L<UniEvent::Handle>
-
-L<UniEvent::Stream>
-
-L<UniEvent::Request::Connect>
-
-L<XS::Framework::CallbackDispatcher>
+=head2 MODE_WRITABLE
 
 =cut
-

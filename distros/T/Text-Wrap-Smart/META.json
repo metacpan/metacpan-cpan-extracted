@@ -4,13 +4,13 @@
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Wrap-Smart",
    "prereqs" : {
@@ -35,7 +35,7 @@
    "provides" : {
       "Text::Wrap::Smart" : {
          "file" : "lib/Text/Wrap/Smart.pm",
-         "version" : "0.7"
+         "version" : "0.8"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "url" : "https://github.com/stsc/Text-Wrap-Smart"
       }
    },
-   "version" : "0.7",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.8",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

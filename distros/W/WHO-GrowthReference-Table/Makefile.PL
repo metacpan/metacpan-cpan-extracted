@@ -18,8 +18,8 @@ my %WriteMakefileArgs = (
   "NAME" => "WHO::GrowthReference::Table",
   "PREREQ_PM" => {
     "Data::Section::Seekable::Reader" => 0,
+    "Data::TableData::Lookup" => 0,
     "Exporter" => "5.57",
-    "TableData::Lookup" => 0,
     "Text::CSV" => "1.91",
     "strict" => 0,
     "warnings" => 0
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,11 +39,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Section::Seekable::Reader" => 0,
+  "Data::TableData::Lookup" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "TableData::Lookup" => 0,
   "Test::More" => 0,
   "Text::CSV" => "1.91",
   "strict" => 0,

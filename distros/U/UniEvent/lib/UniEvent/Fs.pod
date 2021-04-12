@@ -2,14 +2,16 @@
 
 UniEvent::Fs - sync and async cross-platform filesystem interface
 
+
+
 =head1 SYNOPSIS
 
     use UniEvent::Fs;
 
     # synchronous API
-    my $fd = UniEvent::Fs::open('/tmp/my-file'); # throws on error
-    copyfile('/tmp/from', '/tmp/to');            # throws on error
-    my ($ok, $err) = is_file('/tmp/murzilka');   # never throws
+    my $fd = UniEvent::Fs::open('/tmp/my-file');  # throws on error
+    copyfile('/tmp/from', '/tmp/to');             # throws on error
+    my ($stat, $err) = Fs::stat('/tmp/murzilka'); # never throws
 
     # asynchronous API
     UniEvent::Fs::open('/tmp/my-file', sub {
@@ -18,295 +20,476 @@ UniEvent::Fs - sync and async cross-platform filesystem interface
     UniEvent::Loop->default_loop->run;
 
 
+
 =head1 DESCRIPTION
 
-The package is a collection of filesystem related functions, like creating
-directory, touching, copying files etc.
+The package is a collection of filesystem related functions, like creating a directory, touching, copying files etc.
 
 All the functions have dual interface, i.e. I<synchronous> and I<asynchronous>.
 For convenience they have the same name and parameters, and only differ by the
-additional trailing parameters: the callback and the optional event loop; if they are
-present that means that a function is asynchronous. If event loop parameter
-is missing, the default loop is used.
+additional trailing parameters: the C<callback> and the optional event C<loop>.
+If C<callback> is specified then function will behave asynchronously.
+If C<loop> argument is not specified while C<callback> present, the default loop is used.
 
 The synchronous functions interface returns their result immediately on the
-stack, while for asynchronous functions it will be returned in the callback.
+stack (if not void), while for asynchronous functions it will be returned in the callback (if not void).
 
-In void and scalar contexts for a synchronous function, if an error occurs, it
-will be thrown. In scalar context it returns either boolean, meaning the success,
-or the appropriate value (e.g. file descriptor). In the list context in the error
-case it returns C<undef> and the L<XS::ErrorCode>; otherwise the first value
-on the stack is the result of an operation, and the second value is C<undef>.
+Many functions here duplicate perl builtin functions, with the exception that there are asynchronous variants.
 
-The most of functions here duplicate perl buildin functions, with the exception
-that there are asynchronous variants (which means they can be executed on different
-threads by backend, e.g. by L<libuv|https://libuv.org>, transparently to the call
-site).
+
 
 =head1 FUNCTIONS
 
-=head2 mkdir($path [, $mode = 0755])
+NOTE: All synchronous versions of the functions L<May return error|UniEvent/"OPTIONAL ERRORS">.
+Exception from this rule is C<exists()>, C<is_dir()>, C<is_file()>. They always return bool without errors.
 
-=head2 mkdir($path, $mode, $callback [, $loop])
+NOTE: Async callback receives one (for void functions) or two arguments (for non-void):
+the return value (as synchronous version would, if not void) and the error object as L<XS::STL::ErrorCode> if any.
+Exception from this rule is C<exists()>, C<is_dir()>, C<is_file()>. Their callbacks receives single bool without errors.
 
-=head2 mkpath($path [, $mode = 0755])
 
-=head2 mkpath($path, $mode, $callback [, $loop])
+=head2 mkdir($path, [$mode = 0755], [$callback] , [$loop])
+
+=head2 mkpath($path, [$mode = 0755], [$callback], [$loop])
 
 C<mkdir> creates I<single> directory with the defined mode. The C<mkpath>
 recursively creates all non-existing directories within the specified I<$path>.
 
-=head2 rmdir($path)
+RETURNS: void
 
-=head2 rmdir($path, $callback [, $loop])
+    Fs::mkdir($path, sub {
+        my $err = shift;
+    });
+
+
+=head2 rmdir($path, [$callback], [$loop])
 
 Removes single empty directory. This function is non-recursive.
 
-=head2 unlink($path)
+RETURNS: void
 
-=head2 unlink($path, $callback [, $loop])
+    Fs::rmdir($path, sub {
+        my $err = shift;
+    });
 
-Remove the file.
 
-=head2 remove($path)
+=head2 unlink($path, [$callback], [$loop])
 
-=head2 remove($path, $callback [, $loop])
+Remove a file.
+
+RETURNS: void
+
+
+=head2 remove($path, [$callback], [$loop])
 
 Remove a file or a directory, non-recursively.
 
-=head2 remove_all($path)
+RETURNS: void
 
-=head2 remove_all($path, $callback [, $loop])
 
-If the I<$path> is a file, removes it. Otherwise, it recursively removes
-the directory.
+=head2 remove_all($path, [$callback], [$loop])
 
-=head2 scandir($path)
+If the I<$path> is a file, removes it. Otherwise, it recursively removes the directory.
 
-=head2 scandir($path, $callback [, $loop])
+RETURNS: void
 
-Recursively traverses over the directory, specified by I<$path> parameter,
-and gathers all files and directories inside. The result is an B<flat>
-arrayref of filenames and file types, i.e.
+
+=head2 scandir($path, [$callback], [$loop])
+
+Recursively traverses over the directory, specified by I<$path> parameter, and gathers all files and directories inside.
+
+RETURNS: arrayref of filenames and file types
 
     my $list = scandir('/tmp');
-    say "found" if (grep { $_->[0] eq 'secret.key' && $_->[1] == FTYPE_DIR);
+    say "found" if (grep { $_->[0] eq 'secret.key' && $_->[1] == UE::Fs::FTYPE_DIR);
 
-=head2 open($path, $flags, [, $mode = 0644])
+For the list of file type constants, see C<stat()> docs below.
 
-=head2 open($path, $flags, $mode, $callback [, $loop])
 
-Opens the file on the specified I<$path> with the specified C<$flags>
-(see "FILE OPEN MODES" below) and C<$mode> (i.e. unix file permissions).
-The return type is I<file descriptor> (aka integer).
+=head2 open($path, $flags, [$mode = 0644], [$callback], [$loop])
 
-    my $fd = Fs::open($file, OPEN_RDWR | OPEN_CREAT);
+Opens the file on the specified I<$path> with the specified C<$flags> and C<$mode> (i.e. unix file permissions).
 
-=head2 close($fd)
+C<$flags> is a bitmask of the following constants (UE::Fs::*):
 
-=head2 close($fd, $callback [, $loop])
+=over
 
-Closes file descriptor C<$fd>. The return type is boolean (success of the operation).
+=item OPEN_APPEND
 
-=head2 stat($fd_or_path)
+=item OPEN_CREAT
 
-=head2 stat($fd_or_path, $callback [, $loop])
+=item OPEN_DIRECT
+
+=item OPEN_DIRECTORY
+
+=item OPEN_DSYNC
+
+=item OPEN_EXCL
+
+=item OPEN_EXLOCK
+
+=item OPEN_NOATIME
+
+=item OPEN_NOCTTY
+
+=item OPEN_NOFOLLOW
+
+=item OPEN_RANDOM
+
+=item OPEN_RDONLY
+
+=item OPEN_RDWR
+
+=item OPEN_SEQUENTIAL
+
+=item OPEN_SHORT_LIVED
+
+=item OPEN_SYMLINK
+
+=item OPEN_SYNC
+
+=item OPEN_TEMPORARY
+
+=item OPEN_TRUNC
+
+=item OPEN_WRONLY
+
+=back
+
+RETURNS: I<file descriptor> (aka integer).
+
+    Fs::open($file, UE::Fs::OPEN_RDWR | UE::Fs::OPEN_CREAT, 0644, sub {
+        my ($fd, $err) = @_;
+    });
+
+
+=head2 close($fd, [$callback], [$loop])
+
+Closes file descriptor C<$fd>.
+
+RETURNS: void
+
+
+=head2 stat($fd_or_path, [$callback], [$loop])
 
 Get information about file, defined by file descriptor or path. The returned
 information is identical to perl buildin L<stat> function.
 
-=head2 lstat($fd_or_path)
+RETURNS: array reference with stat properties.
 
-=head2 lstat($fd_or_path, $callback [, $loop])
+For convenience indexes are defined as constants (UE::Fs::*):
 
-C<stat> version for symbolic link.
+=over
 
-=head2 exists($path)
+=item STAT_DEV
 
-=head2 exists($path, $callback [, $loop])
+=item STAT_INO
 
-Checks whether the file exists.
+=item STAT_MODE
 
-=head2 is_file($path)
+=item STAT_NLINK
 
-=head2 is_file($path, $callback [, $loop])
+=item STAT_UID
 
-Checks whether the file at the C<$path> is regular file or not.
+=item STAT_GID
+
+=item STAT_RDEV
+
+=item STAT_SIZE
+
+=item STAT_ATIME
+
+=item STAT_MTIME
+
+=item STAT_CTIME
+
+=item STAT_BLKSIZE
+
+=item STAT_BLOCKS
+
+=item STAT_FLAGS
+
+=item STAT_GEN
+
+=item STAT_BIRTHTIME
+
+=item STAT_TYPE
+
+File type, one of the following constants (UE::Fs::*):
+
+=over
+
+=item FTYPE_BLOCK
+
+=item FTYPE_CHAR
+
+=item FTYPE_DIR
+
+=item FTYPE_FIFO
+
+=item FTYPE_LINK
+
+=item FTYPE_FILE
+
+=item FTYPE_SOCKET
+
+=item FTYPE_UNKNOWN
+
+=back
+
+=item STAT_PERMS
+
+=back
+
+    my $stat = Fs::stat($path);
+    say $stat->[UE::Fs::STAT_TYPE] == UE::Fs::FTYPE_FILE;
+    say $stat->[UE::Fs::STAT_SIZE];
+
+
+=head2 lstat($path, [$callback], [$loop])
+
+C<stat> version for symbolic link (does not follow symbolic links, instead returns info on the link file itself).
+
+
+=head2 statfs($path, [$callback], [$loop])
+
+Get information about filesystem, like system's C<statfs()>.
+
+RETURNS: array reference with statfs properties.
+
+For convenience indexes are defined as constants (UE::Fs::*):
+
+=over
+
+=item STATFS_TYPE
+
+=item STATFS_BSIZE
+
+=item STATFS_BLOCKS
+
+=item STATFS_BFREE
+
+=item STATFS_BAVAIL
+
+=item STATFS_FILES
+
+=item STATFS_FFREE
+
+=item STATFS_SPARE
+
+=back
+
+
+=head2 exists($path, [$callback], [$loop])
+
+Checks whether the path exists.
+
+RETURNS: bool
+
+
+=head2 is_file($path, [$callback], [$loop])
+
+Checks whether the C<$path> exists and it is a regular file.
+
+RETURNS: bool
+
 
 =head2 is_dir($path)
 
-=head2 is_dir($path, $callback [, $loop])
+=head2 is_dir($path, [$callback], [$loop])
 
-Checks whether the C<$path> is directory or not.
+Checks whether the C<$path> exists and is a directory.
 
-=head2 access($path [, $mode = 0])
+RETURNS: bool
 
-=head2 access($path, $mode, $callback [, $loop])
+
+=head2 access($path, [$mode = 0], [$callback], [$loop])
 
 Determines accessability of the file. The mode is common unix filepath
 permissions, i.e. C<1> for execute, C<2> for writing, C<4> for reading.
 
-=head2 sync($fd)
+RETURNS: void
 
-=head2 sync($fd, $callback [, $loop])
+
+=head2 sync($fd, [$callback], [$loop])
 
 Synchronizes file data and metadata specified by C<$fd> with storage.
 
-=head2 datasync($fd)
+RETURNS: void
 
-=head2 datasync($fd, $callback [, $loop])
+
+=head2 datasync($fd, [$callback], [$loop])
 
 Synchronizes file data specified by C<$fd> with storage.
 
-=head2 truncate($path_or_fd, $length = 0)
+RETURNS: void
 
-=head2 truncate($path_or_fd, $length, $callback [, $loop])
+
+=head2 truncate($path_or_fd, [$length = 0], [$callback], [$loop])
 
 Causes the file to have size exactly C<$length> bytes.
 
-=head2 chmod($path_or_fd, $mode)
+RETURNS: void
 
-=head2 chmod($path_or_fd, $mode, $callback [, $loop])
 
-Changes file mode, e.g. to C<0644>.
+=head2 chmod($path_or_fd, $mode, [$callback], [$loop])
 
-=head2 touch($path [, $mode = DEFAULT_FILE_MODE])
+Changes file mode (permissions).
 
-=head2 touch($path, $mode, $callback [, $fs])
+RETURNS: void
 
-Creates the file if it does not exist, and changes its
-C<$mode>.
 
-=head2 utime($path_or_fd, $atime, $mtime)
+=head2 touch($path, [$mode = DEFAULT_FILE_MODE], [$callback], [$loop])
 
-=head2 utime($path_or_fd, $atime, $mtime, $callback [, $loop])
+Updates file's C<mtime>, creating the file if it does not exist with mode C<$mode>.
+
+RETURNS: void
+
+
+=head2 utime($path_or_fd, $atime, $mtime, [$callback], [$loop])
 
 Changes file access and modification times.
 
-=head2 chown($path_or_fd, $uid, $gid)
+RETURNS: void
 
-=head2 chown($path_or_fd, $uid, $gid, $callback [, $loop])
+
+=head2 lutime($path, $atime, $mtime, [$callback], [$loop])
+
+Changes file access and modification times. Does not follow symlinks.
+
+RETURNS: void
+
+
+=head2 chown($path_or_fd, $uid, $gid, [$callback], [$loop])
 
 Changes file user and group ownership.
 
-=head2 lchown($path_or_fd, $uid, $gid)
+RETURNS: void
 
-=head2 lchown($path_or_fd, $uid, $gid, $callback [, $loop])
 
-C<chown> variant for symbolic links.
+=head2 lchown($path_or_fd, $uid, $gid, [$callback], [$loop])
 
-=head2 rename($from, $to)
+C<chown> variant for symbolic links (does not follow symlinks).
 
-=head2 rename($from, $to, $callback [, $loop])
+RETURNS: void
+
+
+=head2 rename($from, $to, [$callback], [$loop])
 
 Changes name or location of a file.
 
-=head2 sendfile($fd_in, $fd_out, $offset, $length)
+RETURNS: void
 
-=head2 sendfile($fd_in, $fd_out, $offset, $length, $callback [, $loop])
+
+=head2 sendfile($fd_in, $fd_out, $offset, $length, [$callback], [$loop])
 
 Causes OS kernel to transfer bytes between file descriptors.
 
-=head2 link($from, $to)
+RETURNS: number of bytes written to C<$fd_out>
 
-=head2 link($from, $to, $callback [, $loop])
+
+=head2 link($from, $to, [$callback], [$loop])
 
 Make a new hardlink for a regular file.
 
-=head2 symlink($from, $to, $flags = 0)
+RETURNS: void
 
-=head2 symlink($from, $to, $flags, $callback [, $loop])
 
-Make a new symbolic link for a file. See description of C<$flags>
-like C<SYMLINK_DIR> and C<SYMLINK_JUNCTION>.
+=head2 symlink($from, $to, [$flags = 0], [$callback], [$loop])
 
-=head2 readlink($path)
+Make a new symbolic link for a file.
 
-=head2 readlink($path, $callback [, $loop])
+On Windows the C<$flags> parameter can be specified to control how the symlink will be created (UE::Fs::*):
+
+=over
+
+=item SYMLINK_DIR
+
+Indicates that path points to a directory
+
+=item SYMLINK_JUNCTION
+
+request that the symlink is created using junction points.
+
+=back
+
+RETURNS: void
+
+
+=head2 readlink($path, [$callback], [$loop])
 
 Read the contents of a symbolic link, i.e. where the link points to.
 
-=head2 realpath($path)
+RETURNS: string
 
-=head2 realpath($path, $callback [, $loop])
+
+=head2 realpath($path, [$callback], [$loop])
 
 Return the canonicalized absolute pathname.
 
-=head2 copyfile($from, $to, $flags)
+RETURNS: string
 
-=head2 copyfile($from, $to, $flags, $callback [, $loop])
 
-Copies old file from C<$from> into new location, determined by
-C<$to>. For the C<$flags> see description link "COPY FILE MODES"
-below.
+=head2 copyfile($from, $to, $flags, [$callback], [$loop])
 
-=head2 mkdtemp($template)
+Copies old file from C<$from> into new location, determined by C<$to>.
 
-=head2 mkdtemp($template, $callback [, $loop])
+Supported flags are described below (as UE::Fs::* constants):
 
-Create a unique temporary directory, using the $template,
-which must end with six trailing C<X> symbols.
+=over
 
-=head2 read($fd, $size [, $offset = -1])
+=item COPYFILE_EXCL
 
-=head2 read($fd, $size, $offset, $callback [, $loop])
+Copy will fail if the destination path already exists. The default
+behavior is to overwrite the destination if it exists.
 
-Read from file C<$fd> C<$size> bytes (skipping <$offset>). Return
-type is buffer string with the file contents.
+=item COPYFILE_FICLONE
 
-=head2 write($fd, $buffer [, $offset = -1])
+Will attempt to create a copy-on-write reflink. Falls back to
+C<sendfile()> in case of error or if the underlying OS does not support
+that feature.
 
-=head2 write($fd, $buffer, $offset, $callback [, $loop])
+=item COPYFILE_FICLONE_FORCE
 
-Writes C<$buffer> string content into file C<$fd>, skipping C<$offset>
- bytes.
+Will attempt to create a copy-on-write reflink. If the underlying platform does not support copy-on-write,
+or an error occurs while attempting to use copy-on-write, then fails.
+
+=back
+
+RETURNS: void
+
+
+=head2 mkdtemp($template, [$callback], [$loop])
+
+Create a unique temporary directory, using the $template, which must end with six trailing C<XXXXXX> symbols.
+
+RETURNS: string
+
+
+=head2 mkstemp($template, [$callback], [$loop])
+
+Create a unique temporary file, using the $template, which must end with six trailing C<XXXXXX> symbols.
+
+RETURNS: arrayref with 2 elements: resulting path and file descriptor.
+
+
+=head2 read($fd, $size, [$offset = -1], [$callback], [$loop])
+
+Read from file C<$fd> C<$size> bytes (skipping <$offset>).
+
+RETURNS: string with the file contents
+
+
+=head2 write($fd, $buffer, [$offset = -1], [$callback], [$loop])
+
+Writes C<$buffer> into file C<$fd>, skipping C<$offset> bytes.
+
+RETURNS: void
+
 
 =head1 CONSTANTS
 
-=head2 FILE OPEN FLAGS
-
-=head3 OPEN_APPEND
-
-=head3 OPEN_CREAT
-
-=head3 OPEN_DIRECT
-
-=head3 OPEN_DIRECTORY
-
-=head3 OPEN_DSYNC
-
-=head3 OPEN_EXCL
-
-=head3 OPEN_EXLOCK
-
-=head3 OPEN_NOATIME
-
-=head3 OPEN_NOCTTY
-
-=head3 OPEN_NOFOLLOW
-
-=head3 OPEN_RANDOM
-
-=head3 OPEN_RDONLY
-
-=head3 OPEN_RDWR
-
-=head3 OPEN_SEQUENTIAL
-
-=head3 OPEN_SHORT_LIVED
-
-=head3 OPEN_SYMLINK
-
-=head3 OPEN_SYNC
-
-=head3 OPEN_TEMPORARY
-
-=head3 OPEN_TRUNC
-
-=head3 OPEN_WRONLY
-
-
-=head2 FILE/DIR MODES
+Most of the constants are listed in functions docs where they are used.
 
 =head3 DEFAULT_FILE_MODE
 
@@ -316,103 +499,4 @@ C<0644>
 
 C<0755>
 
-=head2 SYMLINK MODES (win32 only)
-
-=head3 SYMLINK_DIR
-
-Indicates that path points to a directory
-
-=head3 SYMLINK_JUNCTION
-
-request that the symlink is created using junction points.
-
-=head2 COPY FILE MODES
-
-=head3 COPYFILE_EXCL
-
-Copy will fail if the destination path already exists. The default
-behavior is to overwrite the destination if it exists.
-
-=head3 COPYFILE_FICLONE
-
-Will attempt to create a copy-on-write reflink. Falls back to
-`sendfile` in case of error or if the underlying OS does not support
-that feature.
-
-=head3 COPYFILE_FICLONE_FORCE
-
-Will attempt to create a copy-on-write reflink.
-
-=head2 FILE TYPES
-
-=head3 FTYPE_BLOCK
-
-=head3 FTYPE_CHAR
-
-=head3 FTYPE_DIR
-
-=head3 FTYPE_FIFO
-
-=head3 FTYPE_LINK
-
-=head3 FTYPE_FILE
-
-=head3 FTYPE_SOCKET
-
-=head3 FTYPE_UNKNOWN
-
-
-=head2 FILE STAT CONSTANTS
-
-=head3 STAT_DEV
-
-=head3 STAT_INO
-
-=head3 STAT_MODE
-
-=head3 STAT_NLINK
-
-=head3 STAT_UID
-
-=head3 STAT_GID
-
-=head3 STAT_RDEV
-
-=head3 STAT_SIZE
-
-=head3 STAT_ATIME
-
-=head3 STAT_MTIME
-
-=head3 STAT_CTIME
-
-=head3 STAT_BLKSIZE
-
-=head3 STAT_BLOCKS
-
-=head3 STAT_FLAGS
-
-=head3 STAT_GEN
-
-=head3 STAT_BIRTHTIME
-
-=head3 STAT_TYPE
-
-=head3 STAT_PERMS
-
-=head2 TYPE
-
-Fs type constant
-
-=head1 REFERENCES
-
-L<UniEvent::Error>
-
-L<XS::ErrorCode>
-
-L<XS::STL::ErrorCode>
-
-L<XS::STL::ErrorCategory>
-
 =cut
-

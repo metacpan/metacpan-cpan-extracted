@@ -116,9 +116,12 @@ sub logconfess	{ intercept(\@_, '**', 'logconfess', 'error',	'FATAL') }
 sub logxcroak	{ intercept(\@_, '**', 'logxcroak',	 'error',	'FATAL') }
 sub logdie		{ intercept(\@_, '**', 'logdie',	 'error',	'FATAL') }
 sub logerr		{ intercept(\@_, '>>', 'logerr',	 'error',	'ERROR') }
+sub logcluck	{ intercept(\@_, '>>', 'logcluck',	 'error',	'WARNING') }
 sub logwarn		{ intercept(\@_, '>>', 'logwarn',	 'error',	'WARNING') }
 sub logxcarp	{ intercept(\@_, '>>', 'logxcarp',	 'error',	'WARNING') }
 sub logsay		{ intercept(\@_, '>>', 'logsay',	 'output') }
+sub loginfo		{ intercept(\@_, '>>', 'loginfo',	 'output') }
+sub logdebug	{ intercept(\@_, '>>', 'logdebug',	 'output') }
 
 #
 # logwrite		-- redefined

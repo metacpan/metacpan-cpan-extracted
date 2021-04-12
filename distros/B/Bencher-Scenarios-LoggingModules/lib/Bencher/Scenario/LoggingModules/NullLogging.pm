@@ -1,7 +1,7 @@
 package Bencher::Scenario::LoggingModules::NullLogging;
 
-our $DATE = '2019-02-22'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2021-04-09'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,6 +24,7 @@ our $scenario = {
         'Log::Log4perl::Tiny' => {},
         'Log::Mini' => {},
         'Mojo::Log' => {},
+        'XLog' => {},
     },
     participants => [
 
@@ -97,6 +98,11 @@ our $scenario = {
             name => 'Mojo::Log-100k_debug' ,
             perl_cmdline_template => ['-MMojo::Log', '-e', '$log = Mojo::Log->new(level=>"warn"); for(1..100_000) { $log->debug("") }'],
         },
+
+        {
+            name => 'XLog-100k_debug' ,
+            perl_cmdline_template => ['-MXLog', '-e', 'for(1..100_000) { XLog::debug("") }'],
+        },
     ],
     precision => 6,
 };
@@ -116,7 +122,7 @@ Bencher::Scenario::LoggingModules::NullLogging - Benchmark logging statement tha
 
 =head1 VERSION
 
-This document describes version 0.003 of Bencher::Scenario::LoggingModules::NullLogging (from Perl distribution Bencher-Scenarios-LoggingModules), released on 2019-02-22.
+This document describes version 0.004 of Bencher::Scenario::LoggingModules::NullLogging (from Perl distribution Bencher-Scenarios-LoggingModules), released on 2021-04-09.
 
 =head1 SYNOPSIS
 
@@ -134,27 +140,29 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::Any> 1.707
+L<Log::Any> 1.708
 
-L<Log::Contextual> 0.007001
+L<Log::Contextual> 0.008001
 
-L<Log::Dispatch::Null> 2.65
+L<Log::Dispatch::Null> 2.68
 
-L<Log::Dispatchouli> 2.015
+L<Log::Dispatchouli> 2.019
 
-L<Log::Fast> v2.0.0
+L<Log::Fast> v2.0.1
 
 L<Log::Log4perl> 1.49
 
 L<Log::Log4perl::Tiny> 1.4.0
 
-L<Log::Mini> 0.0.1
+L<Log::Mini> 0.2.1
 
-L<Log::ger> 0.025
+L<Log::ger> 0.038
 
-L<Log::ger::Plugin::OptAway> 0.006
+L<Log::ger::Plugin::OptAway> 0.009
 
 L<Mojo::Log>
+
+L<XLog> 1.1.0
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -232,22 +240,6 @@ Command line:
 
 
 
-=item * Log::ger-1mil_log_trace (command) (not included by default)
-
-Command line:
-
- #TEMPLATE: #perl -MLog::ger -e for(1..1_000_000) { log_trace(q[]) }
-
-
-
-=item * Log::ger+LGP:OptAway-1mil_log_trace (command) (not included by default)
-
-Command line:
-
- #TEMPLATE: #perl -MLog::ger::Plugin=OptAway -MLog::ger -e for(1..1_000_000) { log_trace(q[]) }
-
-
-
 =item * Log::Log4perl-easy-100k_trace (command)
 
 Command line:
@@ -280,32 +272,41 @@ Command line:
 
 
 
+=item * XLog-100k_debug (command)
+
+Command line:
+
+ #TEMPLATE: #perl -MXLog -e for(1..100_000) { XLog::debug("") }
+
+
+
 =back
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.3.0-64-generic >>.
 
 Benchmark with default options (C<< bencher -m LoggingModules::NullLogging >>):
 
  #table1#
- +-----------------------------------------+-----------+-------+------------+-----------+---------+
- | participant                             | rate (/s) |  time | vs_slowest |  errors   | samples |
- +-----------------------------------------+-----------+-------+------------+-----------+---------+
- | Log::Dispatch::Null-100k_debug          |      0.59 | 1.7   |        1   |   0.013   |       7 |
- | Log::Contextual+Log4perl-100k_trace     |      1.5  | 0.66  |        2.6 |   0.0031  |       7 |
- | Log::Contextual+SimpleLogger-100k_trace |      1.6  | 0.64  |        2.6 |   0.0027  |       6 |
- | Mojo::Log-100k_debug                    |      3.1  | 0.32  |        5.3 |   0.00088 |       6 |
- | Log::Dispatchouli-100k_debug            |      4.7  | 0.21  |        7.9 |   0.00092 |       6 |
- | Log::Log4perl::Tiny-100k_trace          |      7.4  | 0.14  |       12   |   0.00064 |       6 |
- | Log::Mini-100k_trace                    |     11    | 0.088 |       19   |   0.00045 |       7 |
- | Log::Any-null_adapter-100k_log_trace    |     13    | 0.078 |       22   |   0.00018 |       8 |
- | Log::Log4perl-easy-100k_trace           |     15    | 0.067 |       25   |   0.00043 |       6 |
- | Log::Fast-100k_DEBUG                    |     22    | 0.045 |       38   | 9.4e-05   |       8 |
- | Log::Any-no_adapter-100k_log_trace      |     34    | 0.029 |       57   | 4.7e-05   |       6 |
- | Log::ger+LGP:OptAway-100k_log_trace     |     40    | 0.02  |       70   |   0.00046 |       6 |
- | Log::ger-100k_log_trace                 |     61    | 0.017 |      100   | 5.2e-05   |       6 |
- +-----------------------------------------+-----------+-------+------------+-----------+---------+
+ +-----------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | participant                             | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +-----------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
+ | Log::Dispatch::Null-100k_debug          |      1.9  |     510   |                 0.00% |              3813.48% |   0.0011  |       6 |
+ | Log::Contextual+Log4perl-100k_trace     |      2.1  |     470   |                 9.28% |              3481.25% |   0.00073 |       8 |
+ | Log::Contextual+SimpleLogger-100k_trace |      2.3  |     440   |                15.97% |              3274.65% |   0.0011  |       6 |
+ | Log::Dispatchouli-100k_debug            |      6.36 |     157   |               226.94% |              1097.00% |   0.00013 |       6 |
+ | Mojo::Log-100k_debug                    |      6.8  |     150   |               247.48% |              1026.25% |   0.00027 |       6 |
+ | Log::Log4perl::Tiny-100k_trace          |      9.9  |     100   |               406.10% |               673.26% |   0.0008  |       6 |
+ | Log::Mini-100k_trace                    |     16    |      62   |               722.11% |               376.03% |   0.00017 |       7 |
+ | Log::Any-null_adapter-100k_log_trace    |     17    |      61   |               748.41% |               361.27% |   0.00013 |       6 |
+ | Log::Log4perl-easy-100k_trace           |     19.1  |      52.4 |               880.30% |               299.21% | 1.2e-05   |       6 |
+ | Log::Fast-100k_DEBUG                    |     27    |      37   |              1288.07% |               181.94% |   0.00013 |       6 |
+ | XLog-100k_debug                         |     38    |      27   |              1832.76% |               102.48% | 4.7e-05   |       6 |
+ | Log::Any-no_adapter-100k_log_trace      |     38    |      26   |              1872.17% |                98.44% |   0.00016 |       9 |
+ | Log::ger+LGP:OptAway-100k_log_trace     |     44    |      23   |              2165.21% |                72.76% |   0.00019 |       6 |
+ | Log::ger-100k_log_trace                 |     76    |      13   |              3813.48% |                 0.00% | 3.6e-05   |       6 |
+ +-----------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -331,7 +332,7 @@ Source repository is at L<https://github.com/perlancar/perl-Bencher-Scenarios-Lo
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-LoggingModules>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Bencher-Scenarios-LoggingModules/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -343,7 +344,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -28,13 +28,13 @@ print "Switch: $switch->{'Attribution'}, $switch->{'Version'}\n";
 
 print "Available Drivers: ",join(", ",DBI->available_drivers()),"\n";
 
-my $dbh = DBI->connect("dbi:Sybase:server=$Srv;database=$Db", $Uid, $Pwd, {PrintError => 0});
+my $dbh = DBI->connect("dbi:Sybase:$Srv;database=$Db", $Uid, $Pwd, {PrintError => 0});
 
 ok(defined($dbh), 'Connect');
 if(!$dbh) {
     warn "No connection - did you set the user, password and server name correctly in PWD?\n";
     for (4 .. 33) {
-	ok(0);
+      ok(0);
     }
     exit(0);
 }
@@ -199,19 +199,24 @@ if($dbh->{syb_server_version} ge '12.5.3') {
 #
 
 SKIP: {
-    skip 'requires ASE 15 ', 2 if $dbh->{syb_server_version} lt '15' || $dbh->{syb_server_version} eq 'Unknown';
+    skip 'requires ASE 15 ', 2 if $dbh->{syb_server_version} lt '15' || $dbh->{syb_server_version} eq 'Unknown' || $dbh->{syb_server_version} eq 'MS-SQL';
     $dbh->{PrintError} = 1;
     my $sth = $dbh->prepare("select convert(unsigned smallint, power(2, 15)), convert(bigint, power(convert(bigint, 2), 32))");
-    $sth->execute;
-    while(my $r = $sth->fetch) {
-	    print "@$r\n";
-	    ok($r->[0] == 32768, "unsigned smallint");
-	    ok($r->[1] == 4294967296, "bigint");
+    my $rc = $sth->execute;
+    if ($rc) {
+      while(my $r = $sth->fetch) {
+        print "@$r\n";
+        ok($r->[0] == 32768, "unsigned smallint");
+        ok($r->[1] == 4294967296, "bigint");
+      }
+    } else {
+      ok(0 == 1, "unsigned smalling");
+      ok(0 == 1, "bigint");
     }
 }
 
 SKIP: {
-    skip 'requires ASE 15.5 ', 4 if $dbh->{syb_server_version} lt '15.5' || $dbh->{syb_server_version} eq 'Unknown';
+    skip 'requires ASE 15.5 ', 4 if $dbh->{syb_server_version} lt '15.5' || $dbh->{syb_server_version} eq 'Unknown' || $dbh->{syb_server_version} eq 'MS-SQL';
     $dbh->{PrintError} = 1;
     $dbh->syb_date_fmt('LONGMS');
     my $sth = $dbh->prepare("select current_bigdatetime(), current_bigtime()");

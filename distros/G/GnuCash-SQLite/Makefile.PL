@@ -9,7 +9,7 @@ WriteMakefile(
     AUTHOR          => 'Hoe Kit CHEW <hoekit at gmail.com>',
     LICENSE         => 'perl',
     PREREQ_PM       => {
-        'DBD::SQLite'       => 0,
+        'DBD::SQLite'       => 1.42,
         'DBI'               => 0,
         'Carp'              => 0,
         'UUID::Tiny'        => 1.04,

@@ -18,8 +18,8 @@ meta-spec:
 name: WHO-GrowthReference-Table
 requires:
   Data::Section::Seekable::Reader: '0'
+  Data::TableData::Lookup: '0'
   Exporter: '5.57'
-  TableData::Lookup: '0'
   Text::CSV: '1.91'
   perl: '5.010001'
   strict: '0'
@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WHO-GrowthReference-Table
   homepage: https://metacpan.org/release/WHO-GrowthReference-Table
   repository: git://github.com/perlancar/perl-WHO-GrowthReference-Table.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

@@ -1,3 +1,10 @@
+1.2.1     09.04.2021
+           - internal stuff
+1.2.0     09.04.2021
+           - fix Handle typemap for outside-derived classes
+           - move XS-libunievent here
+           - add track load average feature
+           - complete documentation
 1.1.2     25.11.2020
            - remove XLog usage from tests
 1.1.1     25.11.2020

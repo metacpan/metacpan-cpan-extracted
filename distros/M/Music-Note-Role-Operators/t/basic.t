@@ -59,10 +59,6 @@ subtest 'intervals' => sub {
 
     my $same_interval = $note->get_interval(%equiv_args);
     is_deeply $interval, $same_interval, "Special constructor shortcut for interval is sane";
-    my $unprocessed = $note->get_interval(%equiv_args, no_process => 1);
-    is_deeply $unprocessed->eq_tempered_cents, {}, "Unprocessed calculated stuff is empty";
-    $unprocessed->process;
-    is_deeply $interval, $unprocessed, "Same thing after processing";
 };
 
 done_testing;

@@ -19,7 +19,7 @@ Plack::App::WWW - Serve cgi-bin and static files from root directory
 
 Plack::App::WWW allows you to load CGI scripts and static files. This module use [Plack::App::CGIBin](https://metacpan.org/pod/Plack::App::CGIBin) as a base,
 [Plack::App::WrapCGI](https://metacpan.org/pod/Plack::App::WrapCGI) to load CGI scripts and [Plack::App::File](https://metacpan.org/pod/Plack::App::File) to load static files
-and [Plack::App::Directory](https://metacpan.org/pod/Plack::App::Directory) to directory index.
+and [Plack::App::Directory](https://metacpan.org/pod/Plack::App::Directory) to directory index when not have index file: index.pl, index.cgi, index.html and index.htm.
 
 # CONFIGURATION
 

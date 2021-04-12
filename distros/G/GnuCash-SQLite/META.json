@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "DBD::SQLite" : "0",
+            "DBD::SQLite" : "1.42",
             "DBI" : "0",
             "DateTime" : "1.12",
             "Path::Tiny" : "0.055",
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

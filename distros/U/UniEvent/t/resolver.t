@@ -3,6 +3,8 @@ use lib 't/lib';
 use MyTest;
 use UniEvent::Error;
 
+test_catch '[resolver]';
+
 my $l = UniEvent::Loop->default_loop();
 
 subtest 'not cached' => \&test_resolve, 0;
@@ -26,6 +28,13 @@ subtest 'cancel' => sub {
     $l->run;
 };
 
+subtest 'save&use loop resolver after loop is dead' => sub {
+    my $loop = UE::Loop->new;
+    my $resolver = $loop->resolver;
+    undef $loop;
+    dies_ok { $resolver->resolve('localhost', sub {}) };
+};
+
 sub test_resolve {
     my $cached = shift;
     my $resolver = new UniEvent::Resolver();
@@ -33,7 +42,7 @@ sub test_resolve {
     
     my $i = 0;
     
-    # resolve external address reseveral times because sometimes it may fail
+    # resolve external address several times because sometimes it may fail
     $resolver->resolve({
         node       => $host,
         use_cache  => $cached,

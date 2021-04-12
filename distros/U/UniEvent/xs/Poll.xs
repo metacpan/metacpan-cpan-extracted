@@ -2,6 +2,7 @@
 #include <xs/unievent/util.h>
 #include <xs/unievent/Poll.h>
 #include <panda/unievent/Fs.h>
+#include <xs/typemap/expected.h>
 #include <xs/unievent/Listener.h>
 #include <xs/CallbackDispatcher.h>
 
@@ -19,6 +20,13 @@ struct XSPollListener : IPollListener, XSListener {
     }
 };
 
+static Poll* create_poll (Sv fd, LoopSP loop) {
+    if (!loop) loop = Loop::default_loop();
+    auto info = sv_io_info(fd);
+    if (info.is_sock) return make_backref<Poll>(Poll::Socket{info.sock}, loop, Ownership::SHARE);
+    else              return make_backref<Poll>(Poll::Fd    {info.fd  }, loop, Ownership::SHARE);
+}
+
 MODULE = UniEvent::Poll                PACKAGE = UniEvent::Poll
 PROTOTYPES: DISABLE
 
@@ -28,8 +36,10 @@ BOOT {
     s.add_const_sub("TYPE", Simple(Poll::TYPE.name));
     
     xs::exp::create_constants(s, {
-        {"READABLE", Poll::READABLE},
-        {"WRITABLE", Poll::WRITABLE}
+        {"READABLE",    Poll::READABLE},
+        {"WRITABLE",    Poll::WRITABLE},
+        {"PRIORITIZED", Poll::PRIORITIZED},
+        {"DISCONNECT",  Poll::DISCONNECT},
     });
     xs::exp::autoexport(s);
     
@@ -37,11 +47,14 @@ BOOT {
     unievent::register_perl_class(Poll::TYPE, s);
 }
 
-Poll* Poll::new (Sv fd, LoopSP loop = {}) {
-    if (!loop) loop = Loop::default_loop();
-    auto info = sv_io_info(fd);
-    if (info.is_sock) RETVAL = make_backref<Poll>(Poll::Socket{info.sock}, loop);
-    else              RETVAL = make_backref<Poll>(Poll::Fd    {info.fd  }, loop);
+PollSP create (Sv proto, Sv fd, int events, Poll::poll_fn cb, DLoopSP loop = {}) {
+    PROTO = proto;
+    RETVAL = create_poll(fd, loop);
+    RETVAL->start(events, cb);
+}
+
+Poll* Poll::new (Sv fd, DLoopSP loop = {}) {
+    RETVAL = create_poll(fd, loop);
 }
 
 XSCallbackDispatcher* Poll::event () {
@@ -57,11 +70,23 @@ Ref Poll::event_listener (Sv lst = Sv(), bool weak = false) {
     RETVAL = event_listener<XSPollListener>(THIS, ST(0), lst, weak);
 }
 
-void Poll::start (int events, Poll::poll_fn cb = nullptr)
+void Poll::start (int events, Poll::poll_fn cb = {}) {
+    XSRETURN_EXPECTED(THIS->start(events, cb));
+}
 
-void Poll::stop ()
+void Poll::stop () {
+    XSRETURN_EXPECTED(THIS->stop());
+}
 
 void Poll::call_now (int events, Sv sverr = {}) {
     if (sverr) THIS->call_now(events, xs::in<const std::error_code&>(sverr));
     else       THIS->call_now(events);
+}
+
+MODULE = UniEvent::Poll                PACKAGE = UniEvent
+PROTOTYPES: DISABLE
+
+PollSP poll (Sv fd, int events, Poll::poll_fn cb, DLoopSP loop = {}) {
+    RETVAL = create_poll(fd, loop);
+    RETVAL->start(events, cb);
 }

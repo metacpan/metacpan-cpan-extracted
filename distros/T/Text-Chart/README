@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    Text::Chart - Generate text-based chart
 
+VERSION
+    This document describes version 0.041 of Text::Chart (from Perl
+    distribution Text-Chart), released on 2021-04-10.
+
+SYNOPSIS
      use Text::Chart qw(gen_text_chart);
 
     Bar chart:
@@ -34,7 +40,7 @@ SYNOPSIS
      Dewi |********* (9)
      Edi  |**        (2)
 
-    Column chart:
+    "Column chart:"
 
      my $res = gen_text_chart(
          data => [["Andi",1], ["Budi",5], ["Cinta",3], ["Dewi",9], ["Edi",2]],
@@ -55,14 +61,14 @@ SYNOPSIS
       *     *      *     *     *
      Andi  Budi  Cinta  Dewi  Edi
 
-    Sparkline chart:
+    "Sparkline chart:"
 
      my $res = gen_text_chart(
          data => [["Andi",1], ["Budi",5], ["Cinta",3], ["Dewi",9], ["Edi",2]],
          type => 'column',
          show_data_label => 1,
      );
-    
+
      my $res = gen_text_chart(
          data => [1.5, 0.5, 3.5, 2.5, 5.5, 4.5, 7.5, 6.5],
          type => 'sparkline',
@@ -72,38 +78,123 @@ SYNOPSIS
 
      XXX
 
-    Plotting multiple data columns:
+    "Plotting multiple data columns:"
 
      XXX
 
 DESCRIPTION
-
     THIS IS AN EARLY RELEASE, MANY FEATURES ARE NOT YET IMPLEMENTED.
     Currently only sparkline chart is implemented. Showing data labels and
     data values are not yet implemented.
 
     This module lets you generate text-based charts.
 
+FUNCTIONS
+  gen_text_chart
+    Usage:
+
+     gen_text_chart(%args) -> str
+
+    Generate text-based chart.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   chart_height => *float*
+
+    *   chart_width => *float*
+
+    *   data* => *array[num]|array[array]|array[hash]*
+
+        (Table) data to chart.
+
+        Either in the form of array of numbers, example:
+
+         [1366,1248,319,252]
+
+        or an array of arrays (there must be at least one number columns),
+        example:
+
+         [["China",1366],["India",1248],["United Status",319], ["Indonesia",252]]
+
+        or an array of hashes (there must be at least one key which
+        consistently contain numbers), example:
+
+         [{country=>"China"        , population=>1366},
+          {country=>"India"        , population=>1248},
+          {country=>"United Status", population=> 319},
+          {country=>"Indonesia"    , population=> 252}]
+
+        All data needs to be in table form (where there are notions of rows
+        and columns/fields). Array data is assumed to be a single-column
+        table with the column named "data". Array of arrays will have
+        columns named "column0", "column1" and so on. Array of hashes will
+        have columns named according to the hash keys.
+
+    *   data_column => *str|array[str]*
+
+        Which column(s) contain data to plot.
+
+        Multiple data columns are supported.
+
+    *   label_column => *str*
+
+        Which column contains data labels.
+
+        If not specified, the first non-numeric column will be selected.
+
+    *   spec => *hash*
+
+        Table specification, according to TableDef.
+
+    *   type* => *str*
+
+        Chart type.
+
+    Return value: (str)
+
 FAQ
-
- Why am I getting 'Wide character in print/say' warning?
-
+  Why am I getting 'Wide character in print/say' warning?
     You are probably printing Unicode characters to STDOUT without doing
     something like this beforehand:
 
      binmode(STDOUT, ":utf8");
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-Chart>.
 
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Text-Chart>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Chart>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Text::Graph, a mature CPAN module for doing text-based graphs. Before
     writing Text::Chart I used this module for a while, but ran into the
     problem of weird generated graphs. In addition, I don't like the way
     Text::Graph draws things, e.g. a data value of 1 is drawn as zero-width
-    bar, or the label separator : is always drawn. So I decided to write an
-    alternative charting module instead. Compared to Text::Graph, here are
-    the things I want to add or do differently as well: functional (non-OO)
-    interface, colors, Unicode, resampling, more chart types like
+    bar, or the label separator ":" is always drawn. So I decided to write
+    an alternative charting module instead. Compared to Text::Graph, here
+    are the things I want to add or do differently as well: functional
+    (non-OO) interface, colors, Unicode, resampling, more chart types like
     sparkline, animation and some interactivity (perhaps).
 
     App::tchart, a CLI for Text::Chart.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2017, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -19,7 +19,7 @@ isa_ok $object, $class;
 
 # Non-inherited methods
 can_ok $object, qw(rtr_set descr members mp_members mbrs_by_ref
-    admin_c tech_c mnt_by notify changed remarks source);
+    admin_c tech_c mnt_by notify remarks source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -79,12 +79,6 @@ is_deeply( $object->notify(), ['watcher@example.com'], 'notify properly parsed' 
 $object->notify('watcher2@example.com');
 is( $object->notify()->[1], 'watcher2@example.com', 'notify properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['abc@examplenet.com 20101231'], 'changed properly parsed' );
-$object->changed('abc@examplenet.com 20121231');
-is( $object->changed()->[1], 'abc@examplenet.com 20121231', 'changed properly added' );
-
 # Test 'remarks'
 $tested{'remarks'}++;
 is_deeply( $object->remarks(), ['No remarks'], 'remarks properly parsed' );
@@ -123,7 +117,6 @@ admin-c:        FR123-AP
 tech-c:         FR123-AP
 mnt-by:         MAINT-EXAMPLENET-AP
 notify:         watcher@example.com
-changed:        abc@examplenet.com 20101231
 remarks:        No remarks
 org:            ORG-MISC01-RIPE
 source:         RIPE

@@ -3,10 +3,11 @@ abstract: 'Use XS JSON with Mojolicious'
 author:
   - 'Nic Sandfield <niczero@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.3'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -22,11 +23,8 @@ no_index:
 requires:
   Cpanel::JSON::XS: '3.0109'
   Mojolicious: '5.66'
-  perl: '5.010001'
 resources:
-  bugtracker: http://github.com/niczero/mojo-jsonxs/issues
   homepage: http://niczero.github.io/mojo-jsonxs
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: http://github.com/niczero/mojo-jsonxs
-version: 1.011
+version: 1.022
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

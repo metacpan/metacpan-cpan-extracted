@@ -26,19 +26,18 @@ use base qw/Net::Whois::Object/;
 # notify:         [optional]   [multiple]   [inverse key]
 # abuse-mailbox:  [optional]   [single]     [inverse key]
 # mnt-by:         [mandatory]  [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-3)
+# % This query was served by the RIPE Database Query Service version 1.99 (ANGUS)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'role' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'role', 'address', 'e_mail', 'nic_hdl', 'mnt_by', 'changed', 'source' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'role', 'address', 'e_mail', 'nic_hdl', 'mnt_by', 'source' ] );
 __PACKAGE__->attributes( 'optional',    [ 'phone', 'fax_no', 'org', 'admin_c', 'tech_c', 'remarks', 'notify', 'abuse_mailbox', 'created', 'last_modified' ] );
 __PACKAGE__->attributes( 'single',      [ 'role', 'nic_hdl', 'abuse_mailbox', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'address', 'phone', 'fax_no', 'e_mail', 'org', 'admin_c', 'tech_c', 'remarks', 'notify', 'mnt_by', 'changed' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'address', 'phone', 'fax_no', 'e_mail', 'org', 'admin_c', 'tech_c', 'remarks', 'notify', 'mnt_by' ] );
 
 # End of auto-generated lines
 #######################################################################################

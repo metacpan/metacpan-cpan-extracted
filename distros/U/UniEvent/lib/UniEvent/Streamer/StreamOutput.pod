@@ -1,32 +1,32 @@
 =head1 NAME
 
-UniEvent::Streamer::StreamOutput - stream input for streamer
+UniEvent::Streamer::StreamOutput - stream output for streamer
+
+
+
+=head1 SYNOPSIS
+
+    my $stream = UE::Tcp->new;
+    # connect stream
+    my $output = UE::Streamer::StreamOutput->new($stream);
+    my $streamer = UE::Streamer->new($input, $output);
+    $streamer->start();
+    $streamer->finish_callback(sub { ... });
+
+
 
 =head1 DESCRIPTION
 
-Pulls in data from L<UniEvent::Streamer> stream and pushes it furthe into
-the steam handle. The underlying stream can be L<UniEvent::Tcp>, L<UniEvent::Pipe>
-or L<UniEvent::Tty>.
+Writes data from L<UniEvent::Streamer> into a stream handle.
 
-L<UniEvent::Streamer::StreamOutput> is derived from L<UniEvent::Streamer::IOutput>.
+The underlying stream can be L<UniEvent::Tcp>, L<UniEvent::Pipe> or L<UniEvent::Tty>.
 
-It is implemented in C++ for the speed, so it meant not to be
-derived from; in other words it is use only class.
+
 
 =head1 METHODS
 
-=head2 new($stream_handle)
+=head2 new($stream)
 
 Constructs new output stream for from the L<UniEvent::Stream> handle.
-
-=head1 REFERENCES
-
-L<UniEvent::Stream>
-
-L<UniEvent::Streamer>
-
-L<UniEvent::Streamer::IOutput>
-
-L<UniEvent::Streamer::StreamInput>
 
 =cut

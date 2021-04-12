@@ -14,7 +14,7 @@ use base qw/Net::Whois::Object/;
 # % See http://www.ripe.net/db/support/db-terms-conditions.pdf
 # 
 # mntner:         [mandatory]  [single]     [primary/lookup key]
-# descr:          [mandatory]  [multiple]   [ ]
+# descr:          [optional]   [multiple]   [ ]
 # org:            [optional]   [multiple]   [inverse key]
 # admin-c:        [mandatory]  [multiple]   [inverse key]
 # tech-c:         [optional]   [multiple]   [inverse key]
@@ -23,22 +23,19 @@ use base qw/Net::Whois::Object/;
 # auth:           [mandatory]  [multiple]   [inverse key]
 # remarks:        [optional]   [multiple]   [ ]
 # notify:         [optional]   [multiple]   [inverse key]
-# abuse-mailbox:  [optional]   [multiple]   [inverse key]
 # mnt-by:         [mandatory]  [multiple]   [inverse key]
-# referral-by:    [optional]   [single]     [ ]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-3)
+# % This query was served by the RIPE Database Query Service version 1.99 (HEREFORD)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'mntner' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'mntner', 'descr', 'admin_c', 'upd_to', 'auth', 'mnt_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',    [ 'org', 'tech_c', 'mnt_nfy', 'remarks', 'notify', 'abuse_mailbox', 'referral_by', 'created', 'last_modified' ] );
-__PACKAGE__->attributes( 'single',      [ 'mntner', 'referral_by', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'descr', 'org', 'admin_c', 'tech_c', 'upd_to', 'mnt_nfy', 'auth', 'remarks', 'notify', 'abuse_mailbox', 'mnt_by', 'changed' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'mntner', 'admin_c', 'upd_to', 'auth', 'mnt_by', 'source' ] );
+__PACKAGE__->attributes( 'optional',    [ 'descr', 'org', 'tech_c', 'mnt_nfy', 'remarks', 'notify', 'created', 'last_modified' ] );
+__PACKAGE__->attributes( 'single',      [ 'mntner', 'created', 'last_modified', 'source' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'descr', 'org', 'admin_c', 'tech_c', 'upd_to', 'mnt_nfy', 'auth', 'remarks', 'notify', 'mnt_by' ] );
 
 # End of auto-generated lines
 #######################################################################################

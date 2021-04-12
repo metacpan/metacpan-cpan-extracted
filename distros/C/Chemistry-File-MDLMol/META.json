@@ -1,0 +1,51 @@
+{
+   "abstract" : "MDL molfile reader/writer",
+   "author" : [
+      "Ivan Tubert-Brohman <itub@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Chemistry-File-MDLMol",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Chemistry::Isotope" : "0",
+            "Chemistry::Pattern" : "0",
+            "Chemistry::Ring" : "0.19"
+         },
+         "requires" : {
+            "Chemistry::Mol" : "0.35"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://search.cpan.org/dist/Chemistry-File-MDLMol",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/perlmol/chemistry-file-mdlmol.git",
+         "web" : "https://github.com/perlmol/chemistry-file-mdlmol"
+      }
+   },
+   "version" : "0.22",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+}
+

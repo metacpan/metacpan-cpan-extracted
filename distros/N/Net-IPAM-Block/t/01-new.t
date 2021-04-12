@@ -102,32 +102,25 @@ my $bl = [
 
 my $bi = [ [ '10.0.0.2-10.0.0.7', 6 ], [ '10.0.0.0/19', 2**13 ], [ '2001:db8::affe-2001:db8::cafe', 6913 ], ];
 
-foreach my $tt (@$bi) {
-  my $b = Net::IPAM::Block->new( $tt->[0] );
-  my @ips;
-  push @ips, $_ while $_ = $b->iter;
-  ok( scalar @ips == $tt->[1], "num iterations for $b == " . $tt->[1] );
+my @tt = (
+  { b => '10.0.0.17',               bitlen => 0,  msg => 'bitlen for IPv4 address is 0' },
+  { b => '10.0.0.17-10.13.2.3',     bitlen => 20, msg => 'bitlen for IPv4 block is 20' },
+  { b => '::',                      bitlen => 0,  msg => 'bitlen for IPv6 address is 0' },
+  { b => '2001:db8::-2001:db8::fe', bitlen => 8,  msg => 'bitlen for IPv6 block is 8' },
+);
+
+foreach my $t (@tt) {
+  my $b = Net::IPAM::Block->new( $t->{b} );
+  is( $b->bitlen, $t->{bitlen}, $t->{msg} );
 }
 
-{
-  $SIG{__WARN__} = sub { die $_[0] };
-  eval { Net::IPAM::Block->new('::')->bitlen };
-  like($@, qr/DEPRECATED/i, 'got deprecation message for bitlen');
-}
-
-{
-  $SIG{__WARN__} = sub { };
-  my @tt = (
-    { b => '10.0.0.17',               bitlen => 0, msg => 'bitlen for IPv4 address is 0' },
-    { b => '10.0.0.17-10.13.2.3',     bitlen => 20, msg => 'bitlen for IPv4 block is 20' },
-    { b => '::',                      bitlen => 0, msg => 'bitlen for IPv6 address is 0' },
-    { b => '2001:db8::-2001:db8::fe', bitlen => 8, msg => 'bitlen for IPv6 block is 8' },
-  );
-
-  foreach my $t (@tt) {
-    my $b = Net::IPAM::Block->new( $t->{b} );
-    is( $b->bitlen, $t->{bitlen}, $t->{msg} );
-  }
+# _clone()
+foreach my $str (qw(192.168.0.0/16 2001:db8::/32)) {
+  my $b = Net::IPAM::Block->new($str);
+  my $c = Net::IPAM::Block::Private::_clone($b);
+  is_deeply( $b, $c, 'cloned values' );
+  cmp_ok( \$b->{base}, '!=', \$c->{base}, 'cloned base IP pointers differ' );
+  cmp_ok( \$b->{last}, '!=', \$c->{last}, 'cloned last IP pointers differ' );
 }
 
 done_testing();

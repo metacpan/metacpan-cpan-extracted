@@ -232,6 +232,18 @@ sub logwarn {
 }
 
 #
+# logcluck
+#
+# Warning, with stack trace
+#
+sub logcluck {
+    my($self, $str) = @_;
+
+    # log error to all drivers
+    $self->emit_carp('error', 'warning', 0, $str);
+}
+
+#
 # logcarp
 #
 # log a warning, carp-style
@@ -271,6 +283,34 @@ sub logsay {
     # send message to drivers
     #
     $self->emit('output', 'notice', $str);
+}
+
+#
+# loginfo
+#
+# Log message to "output" channel at "info" priority
+#
+sub loginfo {
+    my($self, $str) = @_;
+
+    #
+    # send message to drivers
+    #
+    $self->emit('output', 'info', $str);
+}
+
+#
+# logdebug
+#
+# Log message to "output" channel at "debug" priority
+#
+sub logdebug {
+    my($self, $str) = @_;
+
+    #
+    # send message to drivers
+    #
+    $self->emit('output', 'debug', $str);
 }
 
 1;  # for require

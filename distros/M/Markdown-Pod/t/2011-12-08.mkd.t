@@ -199,7 +199,7 @@ C<styles.xml> 파일은 XML 형식으로 된 CSS라고 보면 됩니다.
 그렇다면 가변 데이터에 해당하는 부분을 C<xxxx>라고 표시합니다.
 
 =for html <img src="2011-12-08-1.png" alt="xxxx 표시" width="700" />
-<br  />
+<br />
 
 I<그림 1.> xxxx 표시 L<(원본)|2011-12-08-1.png>
 
@@ -227,7 +227,7 @@ C<xxxx>로 표시한 것은 가변 데이터의 위치를 쉽게 찾기 위해�
 다시 C<xxxx>가 씌여있는 곳을 찾아봅니다.
 
 =for html <img src="2011-12-08-2.png" alt="XML에서 xxxx가 있는 위치" />
-<br  />
+<br />
 
 I<그림 2.> XML에서 xxxx가 있는 위치
 
@@ -235,7 +235,7 @@ I<그림 2.> XML에서 xxxx가 있는 위치
 이 부분을 템플릿 툴킷 형식인 C<[% name %]>, C<[% date.y %]>, ... 등으로 바꿔줍니다.
 
 =for html <img src="2011-12-08-3.png" alt="xxxx 부분을 변환" />
-<br  />
+<br />
 
 I<그림 3.> xxxx 부분을 변환
 
@@ -319,7 +319,7 @@ I<dest>:         자동으로 생성되는 ODT 파일의 경로를 지정합니�
 완성입니다!
 
 =for html <img src="2011-12-08-4.png" alt="크리스마스카드" width="700" />
-<br  />
+<br />
 
 I<그림 4.> 완성된 크리스마스 카드 L<(원본)|2011-12-08-4.png>
 
@@ -339,7 +339,7 @@ I<그림 4.> 완성된 크리스마스 카드 L<(원본)|2011-12-08-4.png>
 그럼 FormNa게 한 번 만들어볼까요?
 
 =for html <img src="2011-12-08-5.png" alt="Catalyst 로고" />
-<br  />
+<br />
 
 I<그림 5.> Catalyst 로고
 

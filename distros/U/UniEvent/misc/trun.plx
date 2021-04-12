@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
 use 5.012;
 use lib 't/lib';
+use XLog;
 use MyTest;
 use Test::Catch;
-use XLog;
 
 $SIG{PIPE} = 'IGNORE';
 my @vars = @ARGV;
@@ -15,10 +15,11 @@ if ($vars[0] and $vars[0] =~ /^\d+$/) {
 alarm(0);
 
 if ($ENV{LOGGER}) {
+    require XLog;
     XLog::set_logger(XLog::Console->new);
     XLog::set_format("%f:%l: %m");
-    XLog::set_level(XLog::DEBUG, "UniEvent");
-    XLog::set_level(XLog::INFO, "UniEvent::SSL");
+    XLog::set_level(XLog::DEBUG(), "UniEvent");
+    XLog::set_level(XLog::INFO(), "UniEvent::SSL");
 }
 
 if (@vars) {

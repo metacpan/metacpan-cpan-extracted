@@ -1,0 +1,51 @@
+0.007   2021-04-11  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	- Rename modules/dist TablesRoles-Standard -> TableDataRoles-Standard.
+	  Update to latest TableData spec.
+
+	[Removed]
+
+        - Remove TableRole::Util::Basic, now merged into for greater visibility
+	  and convenience. as_aoa() now becomes get_all_rows_arrayref(),
+	  as_aoh() now becomes get_all_rows_hashref().
+
+
+0.006   2020-11-10  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Handle first row is empty.
+
+
+0.005   2020-11-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add Tables::Test::Dynamic, TablesRole::Source::Iterator.
+
+	- Refactor TablesRole::Source::DBI's as_csv() to TablesRole::Util::CSV.
+
+
+0.004   2020-11-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add roles: TablesRole::Util::Basic, TablesRole::Util::Random.
+
+	- [bugfix] Remove whitespace in sample CSV data because by default
+	  Text::CSV_XS doesn't allow whitespace unless allow_whitespace=>1
+	  option is given.
+
+
+0.003   2020-06-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump File::Temp prereq version to 0.2307 (change EX_LOCK default
+	  from true to false) to avoid test failure [RT#132750], thanks
+	  SREZIC.
+
+
+0.002   2020-06-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add role & class: TablesRole::Source::DBI & Tables::DBI.
+
+	- get_column_names: Return arrayref in scalar context (as per Tables
+          0.1.1).
+
+
+0.001   2020-05-31  Released-By: PERLANCAR
+
+        - First, early release.

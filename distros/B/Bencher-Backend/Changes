@@ -1,3 +1,8 @@
+1.053   2021-04-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Update dependency's new name {,Data::}TableData::Object.
+
+
 1.052   2020-09-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Improve multimodver/multiperl mode: Do not dump _code (coderef),

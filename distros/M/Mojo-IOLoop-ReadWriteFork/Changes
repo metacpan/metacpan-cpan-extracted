@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojo-IOLoop-ReadWriteFork
 
+1.01 2021-04-11T12:00:35+0900
+ - Fix issue in SYNOPSIS
+ - Fix Test::Memory::Cycle issues
+
 1.00 2021-03-25T11:05:26+0900
  - Add pids() to Mojo::IOLoop::ReadWriteFork::SIGCHLD
  - Add run_and_capture_p()

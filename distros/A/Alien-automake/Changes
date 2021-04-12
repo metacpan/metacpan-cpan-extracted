@@ -1,5 +1,8 @@
 Revision history for Alien-automake
 
+0.16      2021-04-09 14:27:47 -0600
+  - Fix build issue with macOS (kiwiroy++, gh#7. gh#8)
+
 0.15      2020-02-15 19:14:22 -0700
   - Use https instead of http
 

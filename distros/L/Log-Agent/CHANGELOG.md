@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.005] - 2021-04-11
+### Added
+- Added support for `logcluck`. `loginfo`, and `logdebug`.
+
+### Changed
+- Updated socktype handling to comply with the current language interface.
+- Moved from Drone CI to Github Actions, automating upload to CPAN.
+
 ## [1.004] - 2021-02-13
 ### Changed
 - Moved from Travis CI with Coveralls to Drone CI with CodeCov.
@@ -211,6 +219,7 @@
 ## 0.100
 Initial revision.
 
+[1.005]: https://github.com/mrogaski/Log-Agent/compare/v1.004...v1.005
 [1.004]: https://github.com/mrogaski/Log-Agent/compare/v1.003...v1.004
 [1.003]: https://github.com/mrogaski/Log-Agent/compare/v1.002...v1.003
 [1.002]: https://github.com/mrogaski/Log-Agent/compare/v1.001...v1.002

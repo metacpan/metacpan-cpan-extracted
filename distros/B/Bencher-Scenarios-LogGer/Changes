@@ -1,3 +1,14 @@
+0.018   2021-04-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add participant: XLog.
+
+
+0.017   2021-01-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to Log::ger 0.038: Log::ger::Plugin::MultilevelLog is
+	  renamed to Log::ger::Format::MultilevelLog.
+
+
 0.016   2020-01-13  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

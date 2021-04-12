@@ -6,12 +6,10 @@ use Test::More;
 
 use_ok 'Music::Intervals';
 
-my $obj = Music::Intervals->new;
-isa_ok $obj, 'Music::Intervals', 'default args';
+my $obj = new_ok 'Music::Intervals';
 
 my $scale = [qw( 1.000 1.125 1.250 1.333 1.500 1.667 1.875)];
-for my $n ( 0 .. @$scale - 1 )
-{
+for my $n ( 0 .. @$scale - 1 ) {
     is sprintf('%.3f', $obj->scale->[$n]), $scale->[$n], "scale $n";
 }
 
@@ -23,7 +21,7 @@ is_deeply $obj->by_ratio('27/25'),
     'by_ratio';
 
 my $chord = 'C E G';
-$obj = Music::Intervals->new(
+$obj = new_ok 'Music::Intervals' => [
     chords => 1,
     justin => 1,
     freqs => 1,
@@ -33,9 +31,7 @@ $obj = Music::Intervals->new(
     equalt => 1,
     integer => 1,
     notes => [qw( C E G )],
-);
-isa_ok $obj, 'Music::Intervals';
-$obj->process;
+];
 
 is_deeply $obj->chord_names, { "$chord chord_names" => [ 'C' ] }, 'chord_names';
 is_deeply $obj->natural_frequencies,
@@ -70,15 +66,21 @@ is_deeply $obj->eq_tempered_cents,
     'eq_tempered_cents';
 is_deeply $obj->integer_notation, { "$chord integer_notation" => { 'G' => '67', 'E' => '64', 'C' => '60' } }, 'integer_notation';
 
+my %got = $obj->dyads([qw(C E G)]);
+is $got{'C E'}{natural}, '5/4', 'dyads';
+is $got{'C G'}{natural}, '3/2', 'dyads';
+is $got{'E G'}{natural}, '6/5', 'dyads';
+
+my $got = $obj->ratio_factorize('6/15');
+is $got, '(2*3) / (3*5)', 'ratio_factorize';
+
 $chord = "C C'";
-$obj = Music::Intervals->new(
+$obj = new_ok 'Music::Intervals' => [
     size => 2,
     justin => 1,
     interval => 1,
     notes => [qw( C C' )],
-);
-isa_ok $obj, 'Music::Intervals';
-$obj->process;
+];
 
 is_deeply $obj->natural_intervals,
     { "$chord natural_intervals" => {

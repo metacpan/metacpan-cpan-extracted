@@ -19,7 +19,7 @@ isa_ok $object, $class;
 
 # Non-inherited methods
 can_ok $object, qw( mntner descr admin_c tech_c upd_to mnt_nfy auth
-    remarks notify abuse_mailbox mnt_by referral_by changed source);
+    remarks notify mnt_by source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -78,29 +78,11 @@ is_deeply( $object->notify(), ['watcher@somewhere.com'], 'notify properly parsed
 $object->notify('watcher2@somewhere.com');
 is( $object->notify()->[1], 'watcher2@somewhere.com', 'notify properly added' );
 
-# Test 'abuse_mailbox'
-$tested{'abuse_mailbox'}++;
-is_deeply( $object->abuse_mailbox(), ['abuse@somewhere.com'], 'abuse_mailbox properly parsed' );
-$object->abuse_mailbox('abuse2@somewhere.com');
-is( $object->abuse_mailbox()->[1], 'abuse2@somewhere.com', 'abuse_mailbox properly added' );
-
 # Test 'mnt_by'
 $tested{'mnt_by'}++;
 is_deeply( $object->mnt_by(), ['MAINT-EXAMPLENETCOM'], 'mnt_by properly parsed' );
 $object->mnt_by('MAINT2-EXAMPLENETCOM');
 is( $object->mnt_by()->[1], 'MAINT2-EXAMPLENETCOM', 'mnt_by properly added' );
-
-# Test 'referral_by'
-$tested{'referral_by'}++;
-is( $object->referral_by(), 'RIPE-HM', 'referral_by properly parsed' );
-$object->referral_by('RIPE-HM2');
-is( $object->referral_by(), 'RIPE-HM2', 'reberral_by properly set' );
-
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['abc@somewhere.com 20120131'], 'changeD properly parsed' );
-$object->changed('abc@somewhere.com 20110131');
-is( $object->changed()->[1], 'abc@somewhere.com 20110131', 'changed properly added' );
 
 # Test 'source'
 $tested{'source'}++;
@@ -128,10 +110,7 @@ upd-to:         abc@somewhere.com
 mnt-nfy:        abc@somewhere.com
 auth:           PGPKEY-78BBB10F
 notify:         watcher@somewhere.com
-abuse-mailbox:  abuse@somewhere.com
 mnt-by:         MAINT-EXAMPLENETCOM
-referral-by:    RIPE-HM
-changed:        abc@somewhere.com 20120131
 source:         RIPE
 
 

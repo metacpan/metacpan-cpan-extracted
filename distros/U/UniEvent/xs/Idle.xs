@@ -27,8 +27,13 @@ BOOT {
     unievent::register_perl_class(Idle::TYPE, stash);
 }
 
-Idle* Idle::new (LoopSP loop = {}) {
-    if (!loop) loop = Loop::default_loop();
+IdleSP create (Sv proto, Idle::idle_fn cb, DLoopSP loop = {}) {
+    PROTO = proto;
+    RETVAL = make_backref<Idle>(loop);
+    RETVAL->start(cb);
+}
+
+Idle* Idle::new (DLoopSP loop = {}) {
     RETVAL = make_backref<Idle>(loop);
 }
     
@@ -50,3 +55,11 @@ void Idle::start (Idle::idle_fn cb = nullptr)
 void Idle::stop ()
 
 void Idle::call_now ()
+
+MODULE = UniEvent::Idle                PACKAGE = UniEvent
+PROTOTYPES: DISABLE
+
+IdleSP idle (Idle::idle_fn cb, DLoopSP loop = {}) {
+    RETVAL = make_backref<Idle>(loop);
+    RETVAL->start(cb);
+}

@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::NumericLevel;
 
-our $DATE = '2020-01-13'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2021-04-09'; # DATE
+our $VERSION = '0.018'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ Bencher::Scenario::LogGer::NumericLevel - Benchmark numeric_level()
 
 =head1 VERSION
 
-This document describes version 0.016 of Bencher::Scenario::LogGer::NumericLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2020-01-13.
+This document describes version 0.018 of Bencher::Scenario::LogGer::NumericLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2021-04-09.
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::ger::Util> 0.028
+L<Log::ger::Util> 0.038
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -85,7 +85,7 @@ Function call template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.04 >>, OS kernel: I<< Linux version 5.0.0-37-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.3.0-64-generic >>.
 
 Benchmark with default options (C<< bencher -m LogGer::NumericLevel >>):
 
@@ -93,8 +93,8 @@ Benchmark with default options (C<< bencher -m LogGer::NumericLevel >>):
  +---------+-----------+-----------+-----------------------+-----------------------+---------+---------+
  | dataset | rate (/s) | time (ns) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +---------+-----------+-----------+-----------------------+-----------------------+---------+---------+
- | warn    |   2990000 |     334.5 |                 0.00% |                22.02% | 5.8e-12 |      21 |
- | 10      |   3650000 |     274   |                22.02% |                 0.00% | 5.2e-11 |      20 |
+ | warn    |   2970000 |       337 |                 0.00% |                20.53% | 1.1e-10 |      20 |
+ | 10      |   3580000 |       279 |                20.53% |                 0.00% |   1e-10 |      20 |
  +---------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
 
@@ -104,8 +104,8 @@ Benchmark module startup overhead (C<< bencher -m LogGer::NumericLevel --module-
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
  | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
- | Log::ger::Util      |     11.4  |              4.52 |                 0.00% |                66.32% | 4.7e-06 |      20 |
- | perl -e1 (baseline) |      6.88 |              0    |                66.32% |                 0.00% | 3.4e-06 |      20 |
+ | Log::ger::Util      |      12   |               4.1 |                 0.00% |                50.40% | 1.7e-05 |      21 |
+ | perl -e1 (baseline) |       7.9 |               0   |                50.40% |                 0.00% | 1.3e-05 |      20 |
  +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
 
 
@@ -121,7 +121,7 @@ Source repository is at L<https://github.com/perlancar/perl-Bencher-Scenarios-Lo
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-LogGer>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Bencher-Scenarios-LogGer/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -133,7 +133,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

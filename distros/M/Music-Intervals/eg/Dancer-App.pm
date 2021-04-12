@@ -1,6 +1,6 @@
 package App;
 
-# ABSTRACT: Exposes the mathematical relationships between musical notes
+# ABSTRACT: Exposes the relationships between musical notes
 
 use Dancer2;
 

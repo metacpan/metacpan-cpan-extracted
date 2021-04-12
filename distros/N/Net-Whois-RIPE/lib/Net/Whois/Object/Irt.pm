@@ -18,7 +18,6 @@ use base qw/Net::Whois::Object/;
 # phone:          [optional]   [multiple]   [ ]
 # fax-no:         [optional]   [multiple]   [ ]
 # e-mail:         [mandatory]  [multiple]   [lookup key]
-# abuse-mailbox:  [optional]   [multiple]   [inverse key]
 # signature:      [optional]   [multiple]   [ ]
 # encryption:     [optional]   [multiple]   [ ]
 # org:            [optional]   [multiple]   [inverse key]
@@ -29,19 +28,18 @@ use base qw/Net::Whois::Object/;
 # irt-nfy:        [optional]   [multiple]   [inverse key]
 # notify:         [optional]   [multiple]   [inverse key]
 # mnt-by:         [mandatory]  [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-2)
+# % This query was served by the RIPE Database Query Service version 1.99 (HEREFORD)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'irt' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'irt', 'address', 'e_mail', 'admin_c', 'tech_c', 'auth', 'mnt_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',    [ 'phone', 'fax_no', 'abuse_mailbox', 'signature', 'encryption', 'org', 'remarks', 'irt_nfy', 'notify', 'created', 'last_modified' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'irt', 'address', 'e_mail', 'admin_c', 'tech_c', 'auth', 'mnt_by', 'source' ] );
+__PACKAGE__->attributes( 'optional',    [ 'phone', 'fax_no', 'signature', 'encryption', 'org', 'remarks', 'irt_nfy', 'notify', 'created', 'last_modified' ] );
 __PACKAGE__->attributes( 'single',      [ 'irt', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'address', 'phone', 'fax_no', 'e_mail', 'abuse_mailbox', 'signature', 'encryption', 'org', 'admin_c', 'tech_c', 'auth', 'remarks', 'irt_nfy', 'notify', 'mnt_by', 'changed' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'address', 'phone', 'fax_no', 'e_mail', 'signature', 'encryption', 'org', 'admin_c', 'tech_c', 'auth', 'remarks', 'irt_nfy', 'notify', 'mnt_by' ] );
 
 # End of auto-generated lines
 #######################################################################################

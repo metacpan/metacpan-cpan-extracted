@@ -37,10 +37,9 @@ subtest 'get_total_memory' => sub {
 };
 
 subtest 'cpu info' => sub {
-    my $cnt = UniEvent::cpu_info();
+    my @list = @{UniEvent::cpu_info()};
+    my $cnt = @list;
     cmp_ok $cnt, '>', 0, "we have $cnt processors";
-    my @list = UniEvent::cpu_info();
-    is $cnt, scalar @list, "detailed info for all $cnt processors exists";
     my $i = 0;
     foreach my $row (@list) { subtest 'CPU '.($i++) => sub {
         ok defined $row->{model}, "model $row->{model}";
@@ -54,12 +53,8 @@ subtest 'cpu info' => sub {
 };
 
 subtest 'interface info' => sub {
-    my $cnt = UniEvent::interface_info();
-    ok defined $cnt, "we have $cnt interfaces";
-    return unless $cnt;
-    
-    my @list = UniEvent::interface_info();
-    is scalar(@list), $cnt, "count ok";
+    my @list = @{UniEvent::interface_info()};
+    if (!@list) { pass(); return; }
     
     foreach my $if (@list) {
         subtest 'interface '.$if->{name} => sub {
@@ -88,6 +83,20 @@ subtest 'get_rusage' => sub {
             ok defined $val, $name;
         }
     }
+};
+
+subtest 'get_random' => sub {
+    my $s = UE::get_random(10);
+    ok $s;
+    undef $s;
+    
+    my $err;
+    my $req = UE::get_random(10, sub { ($s, $err) = @_; });
+    ok !$s;
+    ok $req->active;
+    UE::Loop::default->run;
+    ok !$err;
+    ok $s;
 };
 
 subtest 'guess_type' => sub {

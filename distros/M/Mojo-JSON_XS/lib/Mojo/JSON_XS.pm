@@ -2,7 +2,7 @@ package Mojo::JSON_XS;
 use strict;
 use warnings;
 
-our $VERSION = 1.011;
+our $VERSION = 1.022;
 # From groups.google.com/forum/#!msg/mojolicious/a4jDdz-gTH0/Exs0-E1NgQEJ
 
 use Cpanel::JSON::XS;

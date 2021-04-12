@@ -1,29 +1,20 @@
-#!perl
-
-use Test::More tests => 185;
-
-BEGIN {
-    use_ok( 'PDL::Graphics::Gnuplot', qw(plot) ) || print "Bail out!\n";
-}
-
+use Test::More;
+use PDL::Graphics::Gnuplot qw(plot gpwin);
 use File::Temp qw(tempfile);
 use PDL;
-eval "use PDL::Graphics::Gnuplot;";
 
 ##########
 # Uncomment these to test error handling on Microsoft Windows, from within POSIX....
 # $PDL::Graphics::Gnuplot::debug_echo = 1;
 # $PDL::Graphics::Gnuplot::MS_io_braindamage = 1;
 
-ok( !$@, "loaded the module with no error\n");
-
 $ENV{GNUPLOT_DEPRECATED} = 1;   # shut up deprecation warnings
 eval { $w=gpwin() };
 
-ok( (!$@ and defined($w) and ref($w) =~m/PDL::Graphics::Gnuplot/), 
-    "Constructor created a plotting object" );
+is $@, '';
+isa_ok($w, 'PDL::Graphics::Gnuplot', "Constructor created a plotting object");
 
-ok(length($PDL::Graphics::Gnuplot::gp_version), "Extracted a version string from gnuplot");
+ok(length($PDL::Graphics::Gnuplot::gp_version), "Extracted a version string from gnuplot") or diag "Raw output: '$PDL::Graphics::Gnuplot::raw_output'";
 
 diag( "\nP::G::G v$PDL::Graphics::Gnuplot::VERSION, gnuplot v$PDL::Graphics::Gnuplot::gp_version, Perl v$], $^X on $^O #\n" );
 
@@ -38,7 +29,7 @@ our (undef, $testoutput) = tempfile('pdl_graphics_gnuplot_test_XXXXXXX');
   eval{ plot ( {terminal => 'dumb 79 24', output => $testoutput}, $x); };
 
 
-  ok(! $@,           'basic plotting succeeded without error' )
+  is($@, '',           'basic plotting succeeded without error' )
     or diag "plot() died with '$@'";
 
   ok(-e $testoutput, 'basic plotting created an output file' )
@@ -63,12 +54,10 @@ ok($PDL::Graphics::Gnuplot::gp_version, "gp_version is nonzero after first use o
   # anything to Gnuplot.
 
   eval{ plot ( {terminal => 'dumb 79 24', output => $testoutput, silent=>1}, with => 'bogus', $x); };
-  print "error detection: found\n$@\n";
-  ok($@ && $@ =~ /invalid plotstyle \'with\ bogus\' in plot/s,  'we find bogus "with" before sending to gnuplot' )
-    or diag "plot() produced no error";
+  like $@, qr/invalid plotstyle \'with\ bogus\' in plot/s,  'we find bogus "with" before sending to gnuplot';
 
   eval{ plot( {terminal => 'dumb 79 24', output=>$testoutput, topcmds=>"this should fail"}, with=>'line', $x); };
-  ok($@ && $@ =~ m/invalid command/o, "we detect an error message from gnuplot");
+  like $@, qr/invalid command/o, "we detect an error message from gnuplot";
 
   PDL::Graphics::Gnuplot::restart();
 
@@ -95,19 +84,10 @@ SKIP:{
     ok($@ && $@ =~ m/1 second/og, "gnuplot response timeout works" );
 }
 
-
-##############################
-{ 
-    eval { 
-	$w->restart;
-    };
-    print "restart returned '$@'\n";
-    ok(!$@, "restart worked OK\n");
-
-    undef $w;
-    ok("destructor worked OK\n");
-}
-
+eval { $w->restart };
+is($@, '', "restart worked OK\n");
+undef $w;
+ok(1, "destructor worked OK\n");
 
 ##############################
 # Test options parsing
@@ -187,9 +167,6 @@ unlink($testoutput) or warn "\$!: $!";
     @lines = grep m/FOO BAR BAZ/,(<FOO>);
     ok(@lines==1, "xlabel gets reset on multiplots");
 }
-    
-    
-
 
 ##############################
 # Test ascii data transfer (binary is tested by default on platforms where it works)
@@ -200,22 +177,20 @@ eval { $w->options( binary=>0 ); };
 ok( !$@, "set binary mode to 0" );
 
 eval { $w->plot( xvals(5), xvals(5)**2 ); };
-ok(!$@, "ascii plot succeeded");
+is($@, '', "ascii plot succeeded");
 
 eval { $w->plot( xvals(10000), xvals(10000)->sqrt ); };
-ok(!$@, "looong ascii plot succeeded ".($@?"($@)":""));
+is($@, '', "looong ascii plot succeeded ".($@?"($@)":""));
 
 
 ##############################
 # Test replotting
-print "testing replotting...\n";
 
 eval {$w = gpwin('dumb',size=>[79,24,'ch'], output=>$testoutput)};
 ok((!$@ && !!$w),"re-opened window");
 
 eval { $w->plot({xr=>[0,30]},xvals(50),xvals(50)**2); };
-print $@;
-ok(!$@," plot works");
+is($@, ''," plot works");
 
 
 open FOO,"<$testoutput";
@@ -224,14 +199,14 @@ close FOO;
 ok(@lines == 24, "test plot made 24 lines");
 
 eval { $w->restart(); };
-ok(!$@,"restart succeeded");
+is($@, '',"restart succeeded");
 
 unlink($testoutput) or warn "\$!: $!";
 ok(!(-e $testoutput), "test file got deleted");
 
 
 eval { $w->replot(); };
-ok(!$@, "replot works");
+is($@, '', "replot works");
 
 open FOO,"<$testoutput";
 @l2 = <FOO>;
@@ -247,7 +222,7 @@ for $i(0..23) {
 ok($same, "replot reproduces output");
 
 eval { $w->replot(xvals(50),40*xvals(50)) };
-ok(!$@, "replotting and adding a line works");
+is($@, '', "replotting and adding a line works");
 
 # lame test - just make sure the plots include at least two lines
 # and that one is higher than the other.
@@ -272,7 +247,7 @@ if($w->{gp_version} == 5.0 && $Alien::Gnuplot::pl==0
 
 # test that options updating modifies the replot
 eval { $w->options(yrange=>[200,400]);  $w->replot(); };
-ok(!$@, "options set and replot don't crash");
+is($@, '', "options set and replot don't crash");
 
 open FOO,"<$testoutput";
 @l4 = <FOO>;
@@ -293,13 +268,13 @@ ok(!$same, "modifying plot option affects replot");
 
 $w = gpwin('dumb',size=>[79,24,'ch'], output=>$testoutput);
 eval { $w->plot(xmin=>3, xvals(10),xvals(10)); };
-ok(!$@, "plot() worked for x,y plot with unescaped plot option");
+is($@, '', "plot() worked for x,y plot with unescaped plot option");
 
 eval { $w->plot(ls=>4,xmin=>3,xvals(10),xvals(10)) };
 ok($@=~m/No curve option found that matches \'xmin\'/, "xmin after a curve option fails (can't mix curve and plot options)");
 
 eval { $w->plot(xmin=>3,xrange=>[4,5],xvals(10),xvals(10)) };
-ok(!$@, "plot works when curve options are given after plot options");
+is($@, '', "plot works when curve options are given after plot options");
 
 do {
     open FOO,"<$testoutput";
@@ -313,13 +288,13 @@ do {
 # Test parsing of plot options as arrays and/or PDLs, mixed.
 
 eval { $w->plot(xmin=>3,xrange=>[4,5],xvals(10),[1,2,3,4,5,6,7,8,9,10])};
-ok(!$@, "two arguments, second one is an array, works OK");
+is($@, '', "two arguments, second one is an array, works OK");
 
 eval { $w->plot(xmin=>3,xrange=>[4,5],[1,2,3,4,5,6,7,8,9,10],xvals(10))};
-ok(!$@, "two arguments, second one is an array, works OK");
+is($@, '', "two arguments, second one is an array, works OK");
 
 eval { $w->plot([1,2,3,4,5],[6,7,8,9,10]);};
-ok(!$@, "two arguments, both arrays, works OK");
+is($@, '', "two arguments, both arrays, works OK");
 
 eval { $w->plot(xmin=>3,xrange=>[4,5],xvals(10),[1,2,3])};
 ok($@ =~ m/mismatch/, "Mismatch detected in array size vs. PDL size");
@@ -327,15 +302,15 @@ ok($@ =~ m/mismatch/, "Mismatch detected in array size vs. PDL size");
 ##############################
 # Test placement of topcmds, extracmds, and bottomcmds
 eval { $w->plot(xmin=>3,extracmds=>'reset',xrange=>[4,5],xvals(10),xvals(10)**2); };
-ok(!$@, "extracmds does not cause an error");
+is($@, '', "extracmds does not cause an error");
 ok( $PDL::Graphics::Gnuplot::last_plotcmd =~ m/\]\s+reset\s+plot/o, "extracmds inserts exactly one copy in the right place");
 
 eval { $w->plot(xmin=>3,topcmds=>'reset',xrange=>[4,5],xvals(10),xvals(10)**2);};
-ok(!$@, "topcmds does not cause an error");
+is($@, '', "topcmds does not cause an error");
 ok( $PDL::Graphics::Gnuplot::last_plotcmd =~ m/set\s+output\s+\"[^\"]+\"\s+reset\s+set\s+palette/o, "topcmds inserts exactly one copy in the right place");
 
 eval { $w->plot(xmin=>3,bottomcmds=>'reset',xrange=>[4,5],xvals(10),xvals(10)**2);};
-ok(!$@, "bottomcmds does not cause an error");
+is($@, '', "bottomcmds does not cause an error");
 ok( $PDL::Graphics::Gnuplot::last_plotcmd =~ m/\]\s+reset\s*$/o, "bottomcmds inserts exactly one copy in the right place");
 
 ##############################
@@ -343,16 +318,16 @@ ok( $PDL::Graphics::Gnuplot::last_plotcmd =~ m/\]\s+reset\s*$/o, "bottomcmds ins
 # We do not test the entire lookup table, just that the basic code is working
 
 eval { $w->plot(xvals(10)); } ;
-ok(!$@, "2-D line plot accepts one PDL");
+is($@, '', "2-D line plot accepts one PDL");
 
 eval { $w->plot(xvals(10),xvals(10)); };
-ok(!$@, "2-D line plot accepts two PDLs");
+is($@, '', "2-D line plot accepts two PDLs");
 
 eval { $w->plot(xvals(10),xvals(10),xvals(10));};
 ok($@ =~ m/Found 3 PDLs for 2D plot type/, "2-D line plot rejects three PDLs");
 
 eval { $w->plot(ps=>'variable',with=>'points',xvals(10),xvals(10),xvals(10)) };
-ok(!$@, "2-D plot with one variable parameter takes three PDLs");
+is($@, '', "2-D plot with one variable parameter takes three PDLs");
 
 eval { $w->plot(ps=>'variable',with=>'points',xvals(10),xvals(10),xvals(10),xvals(10)) };
 ok($@ =~ m/Found 4 PDLs for 2D/, "2-D plot with one variable parameter rejects four PDLs");
@@ -361,20 +336,20 @@ SKIP: {
     skip "Skipping unsupported mode for deprecated earlier gnuplot",1  
 	if($PDL::Graphics::Gnuplot::gp_version < 4.4);
     eval { $w->plot3d(xvals(10,10))};
-    ok(!$@, "3-D plot accepts one PDL if it is an image");
+    is($@, '', "3-D plot accepts one PDL if it is an image");
 };
 
 eval { $w->plot3d(xvals(10),xvals(10)); };
 ok($@ =~ m/Found 2 PDLs for 3D/,"3-D plot rejects two PDLs");
 
 eval { $w->plot3d(xvals(10),xvals(10),xvals(10)); };
-ok(!$@, "3-D plot accepts three PDLs");
+is($@, '', "3-D plot accepts three PDLs");
 
 eval { $w->plot3d(xvals(10),xvals(10),xvals(10),xvals(10)); };
 ok($@ =~ m/Found 4 PDLs for 3D/,"3-D plot rejects four PDLs");
 
 eval { $w->plot3d(ps=>'variable',with=>'points',xvals(10),xvals(10),xvals(10),xvals(10));};
-ok(!$@, "3-D plot accepts four PDLs with one variable element");
+is($@, '', "3-D plot accepts four PDLs with one variable element");
 
 eval { $w->plot3d(with=>'points',ps=>'variable',palette=>1,xvals(10),xvals(10),xvals(10),xvals(10));};
 ok($@ =~ m/Found 4 PDLs for 3D/,"3-D plot rejects four PDLs with two variable elements");
@@ -383,7 +358,7 @@ SKIP: {
     skip "Skipping unsupported mode for deprecated earlier gnuplot",1  
 	if($PDL::Graphics::Gnuplot::gp_version < 4.4);
     eval { $w->plot3d(with=>'points',ps=>'variable',palette=>1,xvals(10),xvals(10),xvals(10),xvals(10),xvals(10));};
-    ok(!$@, "3-D plot accepts five PDLs with one variable element");
+    is($@, '', "3-D plot accepts five PDLs with one variable element");
 }    ;
 
 eval { $w->plot3d(with=>'points',ps=>'variable',palette=>1,xvals(10),xvals(10),xvals(10),xvals(10),xvals(10),xvals(10));};
@@ -393,7 +368,7 @@ ok($@ =~ m/Found 6 PDLs for 3D/,"3-D plot rejects six PDLs with two variable ele
 ##############################
 # Test threading in arguments
 eval { $w->plot(legend=>['line 1'], pdl(2,3,4)); };
-ok(!$@, "normal legend plotting works OK");
+is($@, '', "normal legend plotting works OK");
 
 eval { $w->plot(legend=>['line 1', 'line 2'], pdl(2,3,4)); };
 ok($@ =~ m/Legend has 2 entries; but 1 curve/, "Failure to thread crashes");
@@ -413,7 +388,7 @@ eval { $w->options(xrange=>[1,2]); };
 ok((!$@  and  $w->{options}->{xrange}->[0] == 1 and $w->{options}->{xrange}->[1] == 2), "xrange set ok\n");
 
 eval { $w->reset; $w->restart; };
-ok(!$@, "reset was ok\n");
+is($@, '', "reset was ok\n");
 
 ok( !defined($w->{options}->{xrange}), "reset cleared xrange option" );
 
@@ -431,16 +406,16 @@ eval { $w->plot(with=>'lines',y2=>3,xvals(5)); };
 ok($@ =~ m/No curve option found that matches \'y2\'/,"y2 gets rejected");
 
 eval { $w->plot(with=>'lines',xvals(5),{lab2=>['foo',at=>[2,3]]}); };
-ok(!$@, "label is accepted ($@)");
+is($@, '', "label is accepted ($@)");
 
 ##############################
 # Test xtics simple-case handling
 
 eval { $w->restart; $w->output('dumb',output=>$testoutput) };
-ok(!$@, "gnuplot restart works");
+is($@, '', "gnuplot restart works");
 
 eval { $w->reset; } ;
-ok(!$@, "gnuplot reset works");
+is($@, '', "gnuplot reset works");
 
 sub get_axis_testoutput {
     my $file = shift;
@@ -448,8 +423,7 @@ sub get_axis_testoutput {
     open FOO,"<$file";
     my @lines = <FOO>;
     
-    print "\n\n@lines\n\n";
-    map { chomp $_ } @lines;
+    chomp for @lines;
     
     for my $i(0..$#lines) {
 	last if( $lines[$#lines] =~ m/[^\s]/ );
@@ -466,14 +440,12 @@ ok( !$@, "plotting after reset worked ok with autotics" );
 $line_nums = (get_axis_testoutput($testoutput, 1));
 $line_nums =~ s/^\s+//;
 $nums= pdl( split /\s+/,$line_nums);
-print "nums is $nums\n";
 
 ok( $nums->nelem==11 && all( $nums == pdl(0,5,10,15,20,25,30,35,40,45,50) ), "autogenerated tics work (case 1)" );
 
 
 eval { $w->plot(xvals(50)->sqrt,{xtics=>0}) };
-ok(!$@, "xvals plot (no xtics) succeeded");
-print "($@)\n" if($@);
+is($@, '', "xvals plot (no xtics) succeeded");
 
 ok($w->{last_plotcmd} =~ m/unset xtics/o, "xtics=>0 generated an 'unset xtics' command");
 
@@ -483,10 +455,10 @@ ok($line_nums =~ m/\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\
 
 
 eval { $w->plot(xvals(50)->sqrt,{"mxtics"=>{}})};
-ok(!$@, "plot with mxtics set to a hash succeeded");
+is($@, '', "plot with mxtics set to a hash succeeded");
 
 eval { $w->plot(xvals(50)->sqrt,{xtics=>10})};
-ok(!$@, "xvals plot(xtics=>10) succeeded");
+is($@, '', "xvals plot(xtics=>10) succeeded");
 
 $line_nums = (get_axis_testoutput($testoutput,1));
 $line_nums =~ s/^\s+//;
@@ -494,7 +466,7 @@ $nums= pdl( split /\s+/,$line_nums);
 ok( $nums->nelem==6 && all( $nums == pdl(0,10,20,30,40,50) ), "tics with spacing 10 work");
 
 eval { $w->plot(xvals(50)->sqrt, {xtics=>[]}) };
-ok(!$@, "xvals plot (xtics=>[]) succeeded");
+is($@, '', "xvals plot (xtics=>[]) succeeded");
 
 $line_nums = (get_axis_testoutput($testoutput, 1));
 $line_nums =~ s/^\s+//;
@@ -508,10 +480,10 @@ unlink($testoutput) or warn "\$!: $!";
 # Test some random plot options parsing cases
 
 eval { $w=gpwin('dumb',output=>$testoutput) };
-ok(!$@, "constructor still works");
+is($@, '', "constructor still works");
 
 eval { $w->plot(xvals(500)-10, xvals(500)+40, { autoscale=>{} }) };
-ok(!$@, "autoscale accepts an empty hash ref");
+is($@, '', "autoscale accepts an empty hash ref");
 
 $ticks = (get_axis_testoutput($testoutput,1));
 $ticks =~ s/^\s*//;
@@ -519,7 +491,7 @@ $ticks = pdl(split /\s+/,$ticks);
 ok($ticks->nelem==12 && all($ticks == pdl(-50,0,50,100,150,200,250,300,350,400,450,500)),"autoscale=>{} gives correct scaling");
 
 eval { $w->plot(xvals(500)-10,xvals(500)+40,{ autoscale=>{x=>fix}}); };
-ok(!$@, "autoscale accepts a non-empty hash ref");
+is($@, '', "autoscale accepts a non-empty hash ref");
 
 $ticks = (get_axis_testoutput($testoutput,1));
 $ticks=~ s/^\s*//;
@@ -536,11 +508,11 @@ if( -e 'Plot-1.txt' ) {
     unlink 'Plot-1.txt' or warn "Can't delete Plot-1.txt: $!";
 }
 eval {$w = gpwin('dumb',size=>[80,24]);};
-ok(!$@,"creation of dumb terminal with no output option works ($@)");
+is($@, '',"creation of dumb terminal with no output option works ($@)");
 eval {$w->line(xvals(50)**2);};
-ok(!$@,"plotting to default output device works ($@)");
+is($@, '',"plotting to default output device works ($@)");
 eval {undef $w;};
-ok(!$@,"closing default output window works");
+is($@, '',"closing default output window works");
 ok((-e 'Plot-1.txt'),"correct file got created by default output");
 unlink 'Plot-1.txt' or warn "Can't delete Plot-1.txt after test: $!";
 
@@ -549,17 +521,17 @@ unlink 'Plot-1.txt' or warn "Can't delete Plot-1.txt after test: $!";
 # Test size option parsing -- inches by default, also
 # accepts both array ref and scalar parameters.
 eval {$w=gpwin('dumb',size=>[7,5]); $w->line(xvals(50)**2); $w->close;};
-ok(!$@, "plotting to 42x30 text file worked");
+is($@, '', "plotting to 42x30 text file worked");
 eval {open FOO,"<Plot-1.txt"; @lines = <FOO>; close FOO;};
-ok(!$@, "read ASCII plot OK");
+is($@, '', "read ASCII plot OK");
 eval { unlink 'Plot-1.txt';};
 
 ok(@lines+0 == 30, "'7x5 inch' ascii plot created 30 lines (created ".(0+@lines).")");
 
 eval {$w=gpwin('dumb',size=>5); $w->line(xvals(50)**2); $w->close;};
-ok(!$@, "plotting to 30x30 text file worked");
+is($@, '', "plotting to 30x30 text file worked");
 eval {open FOO,"<Plot-1.txt"; @lines = <FOO>; close FOO;};
-ok(!$@, "Read ASCII plot #2 OK");
+is($@, '', "Read ASCII plot #2 OK");
 eval { unlink 'Plot-1.txt';};
 
 ok(@lines+0==30,"'5x5 inch' ascii plot with scalar size param worked");
@@ -570,7 +542,7 @@ ok(@lines+0==30,"'5x5 inch' ascii plot with scalar size param worked");
 
 SKIP: {
     unless(exists($ENV{GNUPLOT_INTERACTIVE})) {
-	print STDERR "\n\n******************************\nSkipping 27 interactive tests.\n    Set the environment variable GNUPLOT_INTERACTIVE to enable them.\n******************************\n\n";
+	diag "******************************\nSkipping 27 interactive tests.\n    Set the environment variable GNUPLOT_INTERACTIVE to enable them.\n******************************";
 	skip "Skipping interactive tests - set env. variable GNUPLOT_INTERACTIVE to enable.",29;
     }
 
@@ -579,7 +551,7 @@ SKIP: {
 	$@ = undef;
 	eval { $w = gpwin('x11'); }
     }
-    ok(!$@, "created a wxt or x11 plot object");
+    is($@, '', "created a wxt or x11 plot object");
 
     ok((ref($PDL::Graphics::Gnuplot::termTab->{$w->{terminal}}) eq 'HASH'), "Terminal is a known type");
     
@@ -588,7 +560,7 @@ SKIP: {
     $x = sequence(101)-50;
 
     eval { $w->plot($x**2); };
-    ok(!$@, "plot a parabola to a the display window");
+    is($@, '', "plot a parabola to a the display window");
     
     print STDERR "\n\nIs there a display window and does it show a parabola? (Y/n)";
     $a = <STDIN>;
@@ -650,7 +622,7 @@ SKIP: {
 				   },
 				   with => 'image', $z*2); 
     };
-    ok(!$@, "3-d plot didn't crash");
+    is($@, '', "3-d plot didn't crash");
 
     print STDERR "\n\nDo you see a purple-yellow colormap image of a radial target, in 3-D? (Y/n)";
     $a = <STDIN>;
@@ -665,7 +637,7 @@ SKIP: {
     $z     = zeros(200)->xlinvals(0, 5);
     eval { $w->reset; $w->plot3d(cos($theta), sin($theta), $z); };
 
-    ok(!$@, "plot3d works");
+    is($@, '', "plot3d works");
 
     print STDERR "\n\nSee a nice 3-D plot of a spiral? (Y/n)";
     $a = <STDIN>;
@@ -683,7 +655,7 @@ SKIP: {
     eval { $w->reset; $w->plot({title=>"Parabolic fit"},
 		 with=>"yerrorbars", legend=>"data", $x, $y+(random($y)-0.5)*2*$y/20, pdl($y/20),
 		 with=>"lines",      legend=>"fit",  $x, $y); };
-    ok(!$@, "mocked-up fit plot works");
+    is($@, '', "mocked-up fit plot works");
     print STDERR "\n\nSee a green parabola with red error bar points on it? (Y/n)";
     $a = <STDIN>;
     ok($a !~ m/n/i, "parabolic plot is OK");
@@ -703,14 +675,14 @@ SKIP: {
 	    sin($theta/3)
 	);};	
 
-    ok(!$@, "double helix plot worked");
+    is($@, '', "double helix plot worked");
     
     print STDERR "\n\nSee a double helix plot with variable point sizes and variable color? (Y/n)";
     $a = <STDIN>;
     ok($a !~ m/n/i, "double helix plot is OK");
 
     eval { $w->reset; $w->plot( with=>'image', rvals(9,9), {xr=>[undef,9]}) };
-    ok(!$@, "image plot succeeded");
+    is($@, '', "image plot succeeded");
     print STDERR <<"FOO";
 
 
@@ -727,7 +699,7 @@ FOO
 		    with=>'line', xvals(20)->sqrt
 	       );
     };
-    ok(!$@, "two-image range test plot succeeded");
+    is($@, '', "two-image range test plot succeeded");
     print STDERR <<"FOO";
 
 
@@ -755,8 +727,7 @@ FOO
 	    $w->end_multi;
 	};
 
-	ok(!$@, "bad value plot succeeded");
-	print $@ if($@);
+	is($@, '', "bad value plot succeeded");
 	print STDERR <<"FOO";
 
 The two panels should have the same plot with different titles:  Y=X**2, 
@@ -776,34 +747,28 @@ $a = <STDIN>;
 
     if( $ENV{DISPLAY}  and  $PDL::Graphics::Gnuplot::valid_terms->{x11} ) {
 	eval { $w=gpwin(x11); $w->image(rvals(9,9), {title=>"X11 window for mouse test"}) };
-	ok(!$@, "plotting to x11 window worked.");
+	is($@, '', "plotting to x11 window worked.");
 
 	print STDERR "\n\nClick in the X11 window for mouse test.\n";
 	eval { my $h = $w->read_mouse(); };
-	print STDERR "\n\n$@\n\n" if($@);
-	ok(!$@, "Mouse test read a click");
+	is($@, '', "Mouse test read a click");
 
 	# Try with a new window
 	$w=gpwin($w->{terminal}); 
 	eval { print $w->read_mouse(); };
-	ok($@ =~ m/no existing/,"Trying to read the mouse input on an empty window doesn't work");
+	like $@, qr/no existing/,"Trying to read the mouse input on an empty window doesn't work";
 	
     } else {
 	ok(1,"Skipping x11 plot");
 	ok(1,"Skipping click test for non-x11 device");
 	ok(1,"Skipping mouse input test for non-x11 device");
     }
-    
-
 }
-
-
-
 
 ##############################
 # Test date plotting
 eval {$w=gpwin( "dumb", size=>[79,24,'ch'],output=>$testoutput );};
-ok(!$@, "dumb terminal still works");
+is($@, '', "dumb terminal still works");
 
 # Some date stamps
 @dates = (-14552880,   # Apollo 11 launch
@@ -814,20 +779,19 @@ ok(!$@, "dumb terminal still works");
 $dates = pdl(@dates);
 
 eval { $w->plot( {xdata=>'time'}, with=>'points', $dates->clip(0), xvals($dates) ); };
-ok(!$@, "time plotting didn't fail");
-print "($@)\n" if($@);
+is($@, '', "time plotting didn't fail");
 open FOO,"<$testoutput";
 $lines1 = join("",(<FOO>));
 close FOO;
 
 eval { $w->plot( {xr=>[0,$dates->max],xdata=>'time'}, with=>'points', $dates, xvals($dates) ); };
-ok(!$@, "time plotting with range didn't fail");
+is($@, '', "time plotting with range didn't fail");
 open FOO,"<$testoutput";
 $lines2 = join("",(<FOO>));
 close FOO;
 
 eval { $w->plot( {xr=>[$dates->at(3),$dates->at(4)], xdata=>'time'}, with=>'points', $dates, xvals($dates));};
-ok(!$@, "time plotting with a different range didn't fail");
+is($@, '', "time plotting with a different range didn't fail");
 open FOO,"<$testoutput";
 $lines3 = join("",(<FOO>));
 close FOO;
@@ -843,7 +807,7 @@ ok($lines2 cmp $lines3, "Modifying the time range modifies the graph");
 ##############################
 # Check that title setting/unsetting works OK
 eval { $w->reset; $w->plot({title=>"This is a plot title"},with=>'points',xvals(5));};
-ok(!$@, "Title plotting works, no error");
+is($@, '', "Title plotting works, no error");
 
 open FOO,"<$testoutput";
 @lines = <FOO>;
@@ -857,7 +821,7 @@ SKIP:{
       or diag explain \@lines;
 
     eval { $w->plot({title=>""},with=>'points',xvals(5));};
-    ok(!$@, "Non-title plotting works, no error");
+    is($@, '', "Non-title plotting works, no error");
     
     open FOO,"<$testoutput";
     @lines = <FOO>;
@@ -877,13 +841,13 @@ SKIP:{
 	if($w->{gp_version} < $PDL::Graphics::Gnuplot::gnuplot_dep_v);
 
     eval { $w->plot({trid=>1,title=>""},with=>'lines',sequence(3,3)); };
-    ok(!$@, "3-d grid plot with single column succeeded");
+    is($@, '', "3-d grid plot with single column succeeded");
     open FOO,"<$testoutput";
     $lines = join("",<FOO>);
     close FOO;
     
     eval { $w->plot({trid=>1,title=>"",yr=>[-1,1]},with=>'lines',cdim=>1,sequence(3,3));};
-    ok(!$@, "3-d threaded plot with single column succeeded");
+    is($@, '', "3-d threaded plot with single column succeeded");
     open FOO,"<$testoutput";
     $lines2 = join("",<FOO>);
     close FOO;
@@ -904,11 +868,11 @@ SKIP:{
 
 eval { $w->plot({trid=>1, mapping=>'cylindrical', angles=>'degrees'},
 		wi=>'points',xvals(10)*36,xvals(10)*36,xvals(10)*36); } ;
-ok(!$@, "cylindrical plotting in degrees was parsed OK");
+is($@, '', "cylindrical plotting in degrees was parsed OK");
 
 eval { $w->plot({trid=>1, mapping=>'sph', angles=>'rad'},
 		wi=>'points',xvals(10)*36,xvals(10)*36,xvals(10)*36); } ;
-ok(!$@, "spherical plotting in radians was parsed OK (abbrevs in enums too)");
+is($@, '', "spherical plotting in radians was parsed OK (abbrevs in enums too)");
 
 undef $w;
 unlink($testoutput) or warn "\$!: $!";
@@ -919,7 +883,7 @@ unlink($testoutput) or warn "\$!: $!";
 $w = gpwin();
 
 eval { $w->options(xrange=>pdl(1,2)) };
-ok(!$@, "xrange accepts a PDL option");
+is($@, '', "xrange accepts a PDL option");
 
 ok( (ref($w->{options}->{xrange}) eq 'ARRAY'   and 
     $w->{options}->{xrange}->[0] == 1         and
@@ -931,7 +895,7 @@ eval { $w->options(xrange=>pdl(1,2,3)) };
 ok($@, "xrange rejects a PDL with more than 2 elements");
 
 eval {$w->options(xrange=>[21]);};
-ok(!$@, "xrange accepts a single list element");
+is($@, '', "xrange accepts a single list element");
 
 ok( (  ref($w->{options}->{xrange}) eq 'ARRAY'   and 
        $w->{options}->{xrange}->[0] == 21        and 
@@ -939,14 +903,14 @@ ok( (  ref($w->{options}->{xrange}) eq 'ARRAY'   and
     ), "xrange parses single list element correctly");
 
 eval { $w->options(justify=>"0") };
-ok(!$@, "justify accepts quoted zero");
+is($@, '', "justify accepts quoted zero");
 
 eval { $w->options(justify=>"-1") };
 ok($@ =~ m/positive/, "justify rejects negative numbers");
 undef $@;
 
 eval { $w->options(justify=>"1") };
-ok(!$@, "justify accepts positive numbers");
+is($@, '', "justify accepts positive numbers");
 
 ##############################
 ##############################
@@ -958,24 +922,24 @@ $w = gpwin('dumb', output=>$testoutput);
 $w->options(binary=>0);
 
 eval { $w->plot(with=>'lines',xvals(5)) };
-ok(!$@, "ascii plot with implicit col succeeded");
+is($@, '', "ascii plot with implicit col succeeded");
 
 ok($PDL::Graphics::Gnuplot::last_plotcmd =~ m/plot +\'\-\' +using 0\:1 /,
    "ascii plot with implicit col uses explicit reference to column 0");
 
 eval { $w->plot(with=>'lines',xvals(5),xvals(5)) };
-ok(!$@, "ascii plot with no implicit col succeeded");
+is($@, '', "ascii plot with no implicit col succeeded");
 ok($PDL::Graphics::Gnuplot::last_plotcmd =~ m/plot +\'\-\' +using 1\:2 /s,
    "ascii plot with no implicit cols uses columns 1 and 2");
 
 eval { $w->plot(with=>'lines',xvals(5,5)) };
-ok(!$@, "ascii plot with threaded data and implicit column succeeded");
+is($@, '', "ascii plot with threaded data and implicit column succeeded");
 ok($PDL::Graphics::Gnuplot::last_plotcmd =~ m/plot +\'-\' +using 0\:1 [^u]+using 0\:1 /s,
    "threaded ascii plot with one implicit col does the Right Thing");
 
 
 eval { $w->plot(with=>'lines',xvals(5),{trid=>1}) };
-ok(!$@, "ascii 3-d plot with 2 implicit cols succeeded");
+is($@, '', "ascii 3-d plot with 2 implicit cols succeeded");
 ok($PDL::Graphics::Gnuplot::last_plotcmd =~ m/plot +\'-' +using 0\:\(\$0\*0\)\:1 /s,
    "ascii plot with two implicit cols uses column 0 and zeroed-out column 0");
 
@@ -983,12 +947,12 @@ eval { $w->plot(with=>'lines',xvals(5),xvals(5),{trid=>1})};
 ok($@, "ascii 3-d plot with 1 implicit col fails (0 or 2 only)");
 
 eval { $w->plot(with=>'lines',xvals(5),xvals(5),xvals(5),{trid=>1}) };
-ok(!$@, "ascii 3-d plot with no implicit cols succeeds");
+is($@, '', "ascii 3-d plot with no implicit cols succeeds");
 ok($PDL::Graphics::Gnuplot::last_plotcmd=~ m/plot +\'-\' +using 1\:2\:3 /s,
    "ascii 3-d plot with no implicit cols does the Right Thing");
 
 eval { $w->plot(with=>'lines',xvals(5,5),{trid=>1}) };
-ok(!$@, "ascii 3-d plot with 2-D data and 2 implicit cols succeeded");
+is($@, '', "ascii 3-d plot with 2-D data and 2 implicit cols succeeded");
 ok($PDL::Graphics::Gnuplot::last_plotcmd =~ m/splot +\"-\" binary array\=\(5,5\) /s,
    "ascii plot with 2-D data and 2 implicit cols uses binary ARRAY mode");
 
@@ -996,12 +960,12 @@ eval { $w->plot(with=>'lines',xvals(5,5),xvals(5,5),{trid=>1}) };
 ok($@, "ascii 3-d plot with 2-D data and 1 implicit col fails (0 or 2 only)");
 
 eval { $w->plot(with=>'lines',xvals(5,5),xvals(5,5),xvals(5,5),{trid=>1}) };
-ok(!$@, "ascii 3-d plot with 2-D data and no implicit cols succeeded");
+is($@, '', "ascii 3-d plot with 2-D data and no implicit cols succeeded");
 ok($PDL::Graphics::Gnuplot::last_plotcmd =~ m/splot +\"-\" binary record\=\(5,5\) /s,
    "ascii plot with 2-D data and no implicit cols uses binary RECORD mode");
 
 eval { $w->plot(with=>'yerrorbars', (xvals(50)-25)**2, pdl(0.5),{binary=>0})  };
-ok(!$@, "yerrorbars plot succeeded in ASCII mode");
+is($@, '', "yerrorbars plot succeeded in ASCII mode");
 
 
 ##############################
@@ -1043,12 +1007,11 @@ ok( (  (length($lines[12]) != 0)  and  (substr($lines[12],20,40) =~ m/^\s+$/) ),
 $a = { PDL => xvals(5)**2 };
 bless($a,'MyPackage');
 eval { $w->plot( $a ); };
-ok(!$@), "subclass of PDL plots OK";
+is $@, '', "subclass of PDL plots OK";
 
 # Test terminal defaulting 
 eval { $w=PDL::Graphics::Gnuplot::new(size=>[9,9]); undef($w);};
-print "\$\@ is '$@'\n";
-ok(!$@, "default terminal is selected OK");
+is $@, '', "default terminal is selected OK";
 
 undef $w;
 
@@ -1073,8 +1036,5 @@ unlink($testoutput) or warn "\$!: $!";
      unlink "Plot-1.txt";
      unlink "Plot-2.txt";
 }
-    
 
-
-
-    
+done_testing;

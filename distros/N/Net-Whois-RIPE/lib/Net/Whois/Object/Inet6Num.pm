@@ -37,7 +37,7 @@ use base qw/Net::Whois::Object/;
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.96 (ANGUS)
+# % This query was served by the RIPE Database Query Service version 1.99 (BLAARKOP)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'inet6num' ] );

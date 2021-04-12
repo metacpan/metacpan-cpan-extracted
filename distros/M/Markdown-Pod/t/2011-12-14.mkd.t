@@ -35,7 +35,7 @@ I<네, 그렇습니다.> 이제는 혼자서도 잘 노는 아이가 되어야 �
 
 바로, B<나니카>입니다!
 
-=for html <img src="2011-12-14-1.jpg" alt="귀엽고 사랑스러운 우리의 나니카" /><br  />
+=for html <img src="2011-12-14-1.jpg" alt="귀엽고 사랑스러운 우리의 나니카" /><br />
 
 I<그림 1.> 귀엽고 사랑스러운 우리의 나니카
 
@@ -59,7 +59,7 @@ I<그림 1.> 귀엽고 사랑스러운 우리의 나니카
 L<ssp.shillest.net|http://ssp.shillest.net/>으로 이동한 후 다음 그림에서 빨간 테두리로 표시한 부분을 클릭해 파일을 내려받아 실행하면 설치를 진행합니다.
 (윈도만 지원하고 있습니다.)
 
-=for html <img src="2011-12-14-2.jpg" alt="웹페이지에서 SSP와 한글 지역화 파일을 받는 방법" /><br  />
+=for html <img src="2011-12-14-2.jpg" alt="웹페이지에서 SSP와 한글 지역화 파일을 받는 방법" /><br />
 
 I<그림 2.> 웹페이지에서 SSP와 한글 지역화 파일을 받는 방법
 
@@ -81,7 +81,7 @@ L<narazaka.net/c/ukagaka|http://narazaka.net/c/ukagaka>
 
 =back
 
-=for html <img src="2011-12-14-3.jpg" alt="Shiolink를 내려받는 위치" /><br  />
+=for html <img src="2011-12-14-3.jpg" alt="Shiolink를 내려받는 위치" /><br />
 
 I<그림 3.> Shiolink를 내려받는 위치
 

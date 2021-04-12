@@ -125,7 +125,7 @@ Log::Agent::Driver::Syslog - syslog logging driver for Log::Agent
      -prefix     => prefix,
      -facility   => "user",
      -showpid    => 1,
-     -socktype   => "unix",
+     -socktype   => { port => 514, proto => "udp" },
      -logopt     => "ndelay",
  );
  logconfig(-driver => $driver);
@@ -162,10 +162,13 @@ The I<prefix> here is syslog's identification string.
 
 Set to true to have the PID of the process logged. It is false by default.
 
-=item C<-socktype> => (I<unix> | I<inet>)
+=item C<-socktype> => I<options>
 
-Specifies the logging socket type to use. The default behaviour is to
-use Sys:Syslog's default.
+Specifies the logging socket to use (protocol, destination, etc.).
+The value given is not interpreted and passed as-is to the C<setlogsock()>
+routine in Sys::Syslog(3).
+
+Please refer to Log::Agent::Channel::Syslog(3) for more information.
 
 =back
 
@@ -179,6 +182,6 @@ Raphael Manfredi F<E<lt>Raphael_Manfredi@pobox.comE<gt>>
 
 =head1 SEE ALSO
 
-Log::Agent::Driver(3), Log::Agent::Channel::Syslog(3).
+Log::Agent::Driver(3), Log::Agent::Channel::Syslog(3), Sys::Syslog(3).
 
 =cut

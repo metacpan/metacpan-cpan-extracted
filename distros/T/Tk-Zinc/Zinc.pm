@@ -14,7 +14,7 @@ Construct Tk::Widget 'Zinc';
 use vars qw($VERSION $REVISION);
 
 $REVISION = q$Revision: 1.30 $ ;  # this line is automagically modified by CVS
-$VERSION = 3.304;
+$VERSION = 3.306;
 
 
 bootstrap Tk::Zinc $Tk::VERSION;
@@ -76,7 +76,7 @@ sub coords0 {
     }
     else {
 	## contexte scalaire
-	## le résultat n'était pas utilisé jusqu'à présent, vu le bug...
+	## le rÃ©sultat n'Ã©tait pas utilisÃ© jusqu'Ã  prÃ©sent, vu le bug...
 	## donc inutile de le convertir!
 	return &Tk::Zinc::coords(@_);
     }
@@ -136,7 +136,7 @@ Patrick Lecoanet <lecoanet@cena.fr>
 =head1 COPYRIGHT
 
 Zinc has been developed by the CENA (Centres d'Etudes de la Navigation
-Aérienne) for its own needs in advanced HMI (Human Machine Interfaces or Interactions).
+AÃ©rienne) for its own needs in advanced HMI (Human Machine Interfaces or Interactions).
 Because we are confident in the benefit of free software, the CENA delivered this
 toolkit under the GNU Library General Public License.
 

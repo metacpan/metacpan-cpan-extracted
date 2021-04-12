@@ -342,9 +342,7 @@ block chaining modes. Values are:
                 algorithm, and then applied to the block of text. If one
                 bit of the input text is damaged, it only affects 1 bit
                 of the output text. To use CTR mode you will need to
-                install the Perl Math::BigInt module. I recommend
-                installing Math::BigInt::GMP as well in order to avoid a
-                large performance hit.
+                install the Perl Math::Int128 module.
 
 Passing a **-pcbc** argument of true will have the same effect as
 \-chaining\_mode=>'pcbc', and is included for backward

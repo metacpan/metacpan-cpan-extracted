@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '1.00';
 
 use YAML::XS qw/LoadFile/;
 use Data::LNPath qw/lnpath/, {
@@ -44,7 +44,7 @@ Config::LNPath - A Simple YAML Config Reader.
 
 =head1 VERSION
 
-Version 0.03
+Version 1.00
 
 =cut
 

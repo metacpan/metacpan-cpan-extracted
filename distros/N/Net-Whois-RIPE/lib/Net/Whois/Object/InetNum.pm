@@ -15,14 +15,15 @@ use base qw/Net::Whois::Object/;
 # 
 # inetnum:        [mandatory]  [single]     [primary/lookup key]
 # netname:        [mandatory]  [single]     [lookup key]
-# descr:          [mandatory]  [multiple]   [ ]
+# descr:          [optional]   [multiple]   [ ]
 # country:        [mandatory]  [multiple]   [ ]
 # geoloc:         [optional]   [single]     [ ]
 # language:       [optional]   [multiple]   [ ]
 # org:            [optional]   [single]     [inverse key]
-# sponsoring-org: [generated]  [single]     [ ]
+# sponsoring-org: [optional]   [single]     [ ]
 # admin-c:        [mandatory]  [multiple]   [inverse key]
 # tech-c:         [mandatory]  [multiple]   [inverse key]
+# abuse-c:        [optional]   [single]     [inverse key]
 # status:         [mandatory]  [single]     [ ]
 # remarks:        [optional]   [multiple]   [ ]
 # notify:         [optional]   [multiple]   [inverse key]
@@ -31,19 +32,18 @@ use base qw/Net::Whois::Object/;
 # mnt-domains:    [optional]   [multiple]   [inverse key]
 # mnt-routes:     [optional]   [multiple]   [inverse key]
 # mnt-irt:        [optional]   [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-4)
+# % This query was served by the RIPE Database Query Service version 1.99 (BLAARKOP)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'inetnum' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'inetnum', 'netname', 'descr', 'country', 'admin_c', 'tech_c', 'status', 'mnt_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',    [ 'geoloc', 'language', 'org', 'sponsoring_org', 'remarks', 'notify', 'mnt_lower', 'mnt_domains', 'mnt_routes', 'mnt_irt', 'created', 'last_modified' ] );
-__PACKAGE__->attributes( 'single',      [ 'inetnum', 'netname', 'geoloc', 'org', 'sponsoring_org', 'status', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'descr', 'country', 'language', 'admin_c', 'tech_c', 'remarks', 'notify', 'mnt_by', 'mnt_lower', 'mnt_domains', 'mnt_routes', 'mnt_irt', 'changed' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'inetnum', 'netname', 'country', 'admin_c', 'tech_c', 'status', 'mnt_by', 'source' ] );
+__PACKAGE__->attributes( 'optional',    [ 'descr', 'geoloc', 'language', 'org', 'sponsoring_org', 'abuse_c', 'remarks', 'notify', 'mnt_lower', 'mnt_domains', 'mnt_routes', 'mnt_irt', 'created', 'last_modified' ] );
+__PACKAGE__->attributes( 'single',      [ 'inetnum', 'netname', 'geoloc', 'org', 'sponsoring_org', 'abuse_c', 'status', 'created', 'last_modified', 'source' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'descr', 'country', 'language', 'admin_c', 'tech_c', 'remarks', 'notify', 'mnt_by', 'mnt_lower', 'mnt_domains', 'mnt_routes', 'mnt_irt' ] );
 
 # End of auto-generated lines
 #######################################################################################

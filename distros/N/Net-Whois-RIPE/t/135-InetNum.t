@@ -18,11 +18,17 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited methods
-can_ok $object, qw( inetnum netname descr country org admin_c tech_c status remarks notify mnt_by mnt_lower mnt_routes mnt_domains mnt_irt changed source);
+can_ok $object, qw( abuse_c inetnum netname descr country org admin_c tech_c status remarks notify mnt_by mnt_lower mnt_routes mnt_domains mnt_irt source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
 can_ok $object, $object->attributes('optional');
+
+# Test 'abuse_c'
+is( $object->abuse_c(), 'FR123-AP', 'abuse_c properly parsed' );
+$object->abuse_c('FR456-AP');
+is( $object->abuse_c(), 'FR456-AP', 'abuse_c properly set' );
+$tested{'abuse_c'}++;
 
 # Test 'inetnum'
 $tested{'inetnum'}++;
@@ -114,12 +120,6 @@ is_deeply( $object->mnt_irt(), ['IRT-EXAMPLENET-AP'], 'mnt_irt properly parsed' 
 $object->mnt_irt('IRT-EX2');
 is( $object->mnt_irt()->[1], 'IRT-EX2', 'mnt_irt properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['abc@examplenet.com 20101231'], 'changed properly parsed' );
-$object->changed('Added changed');
-is( $object->changed()->[1], 'Added changed', 'changed properly added' );
-
 # Test 'source'
 $tested{'source'}++;
 is( $object->source(), 'RIPE', 'source properly parsed' );
@@ -161,7 +161,7 @@ mnt-lower:      MAINL-EXAMPLENET-AP
 mnt-routes:     RTES-MNT
 mnt-domains:    DMNS-MNT
 mnt-irt:        IRT-EXAMPLENET-AP
-changed:        abc@examplenet.com 20101231
 source:         RIPE
+abuse-c:        FR123-AP
 notify:         watcher@somewhere.net
 

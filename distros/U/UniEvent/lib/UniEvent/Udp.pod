@@ -1,0 +1,309 @@
+=head1 NAME
+
+UniEvent::Udp - encapsulate UDP communication for both clients and servers
+
+
+
+=head1 SYNOPSIS
+
+  # client
+  my $client = UniEvent::Udp->new;
+
+  $client->recv_start;
+  $client->receive_callback(sub {
+      my ($client, $data, $peer_addr, $flags, $error) = @_;
+      die("receive data error: $error\n") if $error;
+      ...
+  });
+
+  my $dest = Net::SockAddr::Inet4->new($ip, $port);
+  $client->send($data, $dest, sub {
+      my ($client, $error) = @_;
+      die("sending data error: $error\n") if $error;
+      ...
+  });
+  
+  $client->loop->run;
+
+  # server
+  my $server = UniEvent::Udp->new;
+  $server->bind($host, $port);
+
+  $server->recv_start;
+  $server->receive_callback(sub {
+      my ($server, $data, $peer_addr, $flags, $error) = @_;
+      ...
+      say "client ", $peer_addr, " has sent us ", length($data), " bytes";
+  });
+  $server->loop->run;
+
+
+
+=head1 DESCRIPTION
+
+Udp handle allows to send and receive UDP-datagrams, including broadcasting
+and multicasting capabilities. It is able to work over IPv4 as well as over
+IPv6 protocols (aka dual stack mode), the difference between them is abstracted from user.
+
+The handle is inherited from L<UniEvent::Handle>.
+
+
+
+=head1 METHODS
+
+All methods of L<UniEvent::Handle> also apply.
+
+
+=head2 new([$loop = default], [$domain = AF_UNSPEC], [$flags = 0])
+
+Constructs new Udp handle and binds it to the specified event loop.
+
+If C<$domain> or C<$flags> are specified then underlying socket is created immediately and is available via C<fileno()>.
+Otherwise socket creation is postponed.
+
+The only flag at the moment is C<UniEvent::Udp::RECVMMSG>. See L<UniEvent::Udp/CONSTANTS>.
+
+
+=head2 open($fd)
+
+Open an existing file descriptor as Udp handle; it is expected that C<$sock> is valid stream socket.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 bind($host, $port, [$hints], [$flags])
+
+Bind the handle to an address, determined by C<$host>, and the specified C<$port>.
+
+The C<$host> can be a domain name, human-readable IP address or special string C<*>, which means "bind to every available network interface on the host".
+
+C<$port> can be C<0> in which case handle will be bound to a some available port. It can later be inspected via
+
+    say $udp->sockaddr->port;
+
+If C<$host> is a domain name, it is synchronously resolved to address using the specified C<$hints>, see L<UniEvent::Resolver> for the details.
+
+C<$flags> is the bitmask of flags for binding. C<UE::Udp::IPV6ONLY> and C<UE::Udp::REUSEADDR> are supported. See L<UniEvent::Udp/CONSTANTS>.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 bind_addr($addr, $flags)
+
+Bind the handle to an address. C<$addr> can be either a L<Net::SockAddr> object or perl-style packed address (what C<sockaddr_in> returns).
+For details on C<$flags> see C<bind()>.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 connect($sockaddr)
+
+Associate the UDP handle to a remote address and port, so every message sent by this handle is automatically sent to that destination.
+
+Calling this method with an empty addr disconnects the handle.
+
+C<$sockaddr> can be either a L<Net::SockAddr> object or perl-style packed address (what C<sockaddr_in> returns).
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 connect($host, $port, [$hints])
+
+C<$host> is synchronously resolved to address using the specified C<$hints> and then the above version of C<connect()> is called.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 recv_start([$callback])
+
+Instructs to watch for and receive (read) data from the socket. It reads until error condition is met, or until C<recv_stop>.
+
+Receive callback/event will be invoked when new data is received.
+
+If C<$callback> is specified it is added as ->receive_event()->add($callback)
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 recv_stop()
+
+Stop receiving data from the socket.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 receive_callback($sub)
+
+=head2 receive_event()
+
+Callbacks set via these methods will be invoked when new data from peer has been received.
+
+Callback signature:
+
+    my ($udp, $data, $peer_addr, $flags, $error) = @_;
+    
+Where C<$udp> is the udp handle object.
+
+C<$data> is the data has been received.
+
+C<$peer_addr> is the peer address that sent C<$data> as L<Net::SockAddr> object.
+
+C<$flags> is a bitmask of one of L<UniEvent::Udp/FLAGS>.
+
+C<$error> is an optional L<XS::ErrorCode> object and if it is present then C<$data> may be undefined.
+
+See L<UniEvent/"EVENT CALLBACKS">
+
+
+=head2 send($data, $destination, [$callback])
+
+Sends data over the UDP socket to the C<$destination> (which have to be specified in the form of L<Net::SockAddr> or perl-style packed address,
+what C<sockaddr_in> returns). One-shot C<$callback> will be invoked upon successful operation completion.
+
+You should not specify C<$destination> if handle has been previously connected via C<connect()>.
+
+Returns L<UniEvent::Request::Send> object which is an internal purpose object and returned for request tracking purposes only.
+
+
+=head2 send_callback($sub)
+
+=head2 send_event()
+
+Callbacks set via these methods will be invoked every time send operation caused by C<send()> method is completed.
+
+Callback signature:
+
+    my ($udp, $error, $send_request) = @_;
+    
+Where C<$udp> is the udp handle object.
+
+C<$error> is an optional L<XS::ErrorCode> object.
+
+C<$send_request> is an L<UniEvent::Request::Send> object, which is an internal purpose object and passed to callback for request tracking purposes only.
+
+See L<UniEvent/"EVENT CALLBACKS">
+
+
+=head2 event_listener($delegate, [$weak])
+
+Methods C<on_receive>, C<on_send> will be called.
+
+See L<UniEvent/"EVENT LISTENER">
+
+
+=head2 sockaddr()
+
+Returns address (as L<Net::SockAddr> object) of the B<local> endpoint.
+
+If socket is not connected/bound, undef is returned.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 peeraddr()
+
+Returns address (as L<Net::SockAddr> object) of the B<remote> (peer) endpoint.
+
+if socket is not connected, undef is returned.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 set_membership($multicast_addr, $interface_addr, $membership)
+
+Set C<$membership> for a multicast address. The C<$membership> can be either C<UE::Udp::JOIN_GROUP> or C<UE::Udp::LEAVE_GROUP>.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 set_source_membership($multicast_addr, $interface_addr, $source_addr, $membership)
+
+Set C<$membership> for a source-specific multicast group. The C<$membership> can be either C<UE::Udp::JOIN_GROUP> or C<UE::Udp::LEAVE_GROUP>.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 set_multicast_loop($enabled)
+
+Set IP multicast loop flag. Makes multicast packets loop back to local sockets.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 set_multicast_ttl($value)
+
+Set the multicast ttl.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 set_multicast_interface()
+
+Set the multicast interface to send or receive data on.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 set_broadcast($enabled)
+
+Set broadcast on or off.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 set_ttl($value)
+
+Set the time to live.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 recv_buffer_size([$value])
+
+Gets or sets the size of the receive buffer that the operating system uses for the socket.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 send_buffer_size([$value])
+
+Gets or sets the size of the send buffer that the operating system uses for the socket.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 send_queue_size()
+
+Returns the amount of queued bytes waiting to be sent.
+
+
+
+=head1 CONSTANTS
+
+=head2 FLAGS
+
+=head3 PARTIAL
+
+Indicates message was truncated because read buffer was too small. The remainder was discarded
+by the OS.
+
+=head3 IPV6ONLY
+
+Disables dual stack mode.
+
+=head3 REUSEADDR
+
+Indicates that the message was received by recvmmsg.
+
+=head3 RECVMMSG
+
+Indicates that recvmmsg should be used, if available
+
+=head2 GROUP MEMBERSHIP
+
+=head3 LEAVE_GROUP
+
+=head3 JOIN_GROUP
+
+=cut
+

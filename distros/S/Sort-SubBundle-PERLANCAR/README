@@ -2,9 +2,9 @@ NAME
     Sort::SubBundle::PERLANCAR - PERLANCAR's Sort::Sub subroutines
 
 VERSION
-    This document describes version 0.081 of Sort::SubBundle::PERLANCAR
+    This document describes version 0.082 of Sort::SubBundle::PERLANCAR
     (from Perl distribution Sort-SubBundle-PERLANCAR), released on
-    2020-02-19.
+    2021-04-11.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -12,7 +12,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-PERLANCAR-Sort-Sub>.
+    <https://github.com/perlancar/perl-Sort-SubBundle-PERLANCAR>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -26,7 +26,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2017, 2016 by
+    This software is copyright (c) 2021, 2020, 2019, 2017, 2016 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

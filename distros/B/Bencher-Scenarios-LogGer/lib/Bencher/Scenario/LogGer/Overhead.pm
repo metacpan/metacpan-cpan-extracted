@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::Overhead;
 
-our $DATE = '2020-01-13'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2021-04-09'; # DATE
+our $VERSION = '0.018'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,6 +26,7 @@ our $scenario = {
         'Log::Log4perl::Tiny' => {version=>'0'},
         'Log::Dispatchouli' => {version=>'0'},
         'Mojo::Log' => {version=>'0'},
+        'XLog' => {},
     },
     code_startup => 1,
     participants => [
@@ -64,6 +65,8 @@ our $scenario = {
         {code_template=>'use Mojo::Log;'},
         {code_template=>'use Mojo::Log; my $log=Mojo::Log->new(level=>"warn")'},
 
+        {code_template=>'use XLog;'},
+
         # TODO: Lg + Composite (2 outputs)
         # TODO: Lg + Composite (2 outputs + pattern layouts)
         # TODO: Log::Any + Screen
@@ -86,7 +89,7 @@ Bencher::Scenario::LogGer::Overhead - Measure startup overhead of various codes
 
 =head1 VERSION
 
-This document describes version 0.016 of Bencher::Scenario::LogGer::Overhead (from Perl distribution Bencher-Scenarios-LogGer), released on 2020-01-13.
+This document describes version 0.018 of Bencher::Scenario::LogGer::Overhead (from Perl distribution Bencher-Scenarios-LogGer), released on 2021-04-09.
 
 =head1 SYNOPSIS
 
@@ -104,7 +107,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::Any> 1.707
+L<Log::Any> 1.708
 
 L<Log::Contextual> 0.008001
 
@@ -118,15 +121,17 @@ L<Log::Log4perl> 1.49
 
 L<Log::Log4perl::Tiny> 1.4.0
 
-L<Log::ger> 0.028
+L<Log::ger> 0.038
 
-L<Log::ger::App> 0.013
+L<Log::ger::App> 0.018
 
-L<Log::ger::Layout::Pattern> 0.004
+L<Log::ger::Layout::Pattern> 0.007
 
-L<Log::ger::Output> 0.028
+L<Log::ger::Output> 0.038
 
 L<Mojo::Log>
+
+L<XLog> 1.1.0
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -324,43 +329,52 @@ Code template:
 
 
 
+=item * use XLog; (perl_code)
+
+Code template:
+
+ use XLog;
+
+
+
 =back
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 19.04 >>, OS kernel: I<< Linux version 5.0.0-37-generic >>.
+Run on: perl: I<< v5.30.0 >>, CPU: I<< Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz (2 cores) >>, OS: I<< GNU/Linux Ubuntu version 20.04 >>, OS kernel: I<< Linux version 5.3.0-64-generic >>.
 
 Benchmark with default options (C<< bencher -m LogGer::Overhead >>):
 
  #table1#
- +------------------------------------------------------------------+-----------+--------------------+-----------------------+-----------------------+---------+---------+
- | participant                                                      | time (ms) | code_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
- +------------------------------------------------------------------+-----------+--------------------+-----------------------+-----------------------+---------+---------+
- | use Mojo::Log; my $log=Mojo::Log->new(level=>"warn")             |    103    | 96.1               |                 0.00% |              1379.96% | 7.4e-05 |      21 |
- | use Mojo::Log;                                                   |    103    | 96.1               |                 0.04% |              1379.31% | 8.2e-05 |      20 |
- | use Log::Dispatchouli;                                           |     79.3  | 72.4               |                29.65% |              1041.53% | 3.5e-05 |      23 |
- | use Log::Dispatch; my $null = Log::Dispatch->new(outputs=>[ ["Nu |     76.2  | 69.3               |                34.99% |               996.38% | 1.7e-05 |      21 |
- | use Log::Dispatch;                                               |     71.6  | 64.7               |                43.62% |               930.47% | 5.8e-05 |      20 |
- | use Log::Contextual qw(:log);                                    |     68.1  | 61.2               |                50.87% |               880.98% | 4.9e-05 |      20 |
- | use Log::Log4perl;                                               |     34    | 27.1               |               199.94% |               393.41% | 4.2e-05 |      20 |
- | use Log::ger::App; use Log::ger;                                 |     26.4  | 19.5               |               289.97% |               279.50% |   2e-05 |      20 |
- | use Log::ger::App;                                               |     22.7  | 15.8               |               352.31% |               227.20% | 1.1e-05 |      21 |
- | use Log::Log4perl::Tiny;                                         |     18.8  | 11.9               |               447.31% |               170.41% | 1.7e-05 |      20 |
- | use Log::ger::Like::Log4perl;                                    |     17    | 10.1               |               505.97% |               144.23% |   1e-05 |      20 |
- | use Log::Any q($log);                                            |     14.1  |  7.2               |               631.39% |               102.35% |   6e-06 |      20 |
- | use Log::Any;                                                    |     13.6  |  6.7               |               655.33% |                95.93% | 5.3e-06 |      24 |
- | use Log::ger::Output::Composite;                                 |     12.5  |  5.6               |               724.85% |                79.42% | 3.1e-06 |      20 |
- | use Log::ger::Output::Screen;                                    |     11.8  |  4.9               |               767.86% |                70.53% | 2.9e-06 |      20 |
- | use Log::ger::Plugin::OptAway; use Log::ger;                     |      9.58 |  2.68              |               972.95% |                37.93% | 2.5e-06 |      20 |
- | use strict; use warnings;                                        |      8.76 |  1.86              |              1073.05% |                26.16% | 5.4e-06 |      20 |
- | use warnings;                                                    |      8.53 |  1.63              |              1104.69% |                22.85% | 4.2e-06 |      21 |
- | use Log::ger::Like::LogAny;                                      |      7.78 |  0.88              |              1221.30% |                12.01% | 4.7e-06 |      20 |
- | use Log::ger; Log::ger->get_logger;                              |      7.64 |  0.739999999999999 |              1245.54% |                 9.99% | 5.9e-06 |      21 |
- | use Log::ger;                                                    |      7.59 |  0.69              |              1255.32% |                 9.20% | 2.7e-06 |      20 |
- | use Log::ger ();                                                 |      7.54 |  0.64              |              1262.83% |                 8.59% | 5.1e-06 |      20 |
- | use strict;                                                      |      7.33 |  0.43              |              1303.30% |                 5.46% | 6.7e-06 |      20 |
- | perl -e1 (baseline)                                              |      6.9  |  0                 |              1379.96% |                 0.00% | 2.3e-05 |      21 |
- +------------------------------------------------------------------+-----------+--------------------+-----------------------+-----------------------+---------+---------+
+ +------------------------------------------------------------------+-----------+---------------------+-----------------------+-----------------------+-----------+---------+
+ | participant                                                      | time (ms) | code_overhead_time  | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +------------------------------------------------------------------+-----------+---------------------+-----------------------+-----------------------+-----------+---------+
+ | use Mojo::Log;                                                   |    110    | 102                 |                 0.00% |              1222.58% |   0.00026 |      20 |
+ | use Mojo::Log; my $log=Mojo::Log->new(level=>"warn")             |    105    |  97                 |                 0.78% |              1212.35% |   4e-05   |      20 |
+ | use Log::Dispatchouli;                                           |     85    |  77                 |                24.66% |               960.99% |   0.00045 |      20 |
+ | use Log::Dispatch; my $null = Log::Dispatch->new(outputs=>[ ["Nu |     81    |  73                 |                31.32% |               907.18% |   0.00023 |      21 |
+ | use Log::Dispatch;                                               |     73.4  |  65.4               |                44.11% |               817.75% |   5e-05   |      20 |
+ | use Log::Contextual qw(:log);                                    |     71    |  63                 |                48.71% |               789.38% |   0.00024 |      20 |
+ | use Log::Log4perl;                                               |     36    |  28                 |               193.56% |               350.53% |   0.0001  |      20 |
+ | use Log::ger::App; use Log::ger;                                 |     29    |  21                 |               267.84% |               259.56% | 4.6e-05   |      20 |
+ | use Log::ger::App;                                               |     24    |  16                 |               343.30% |               198.35% | 2.7e-05   |      20 |
+ | use XLog;                                                        |     24    |  16                 |               344.67% |               197.43% | 2.5e-05   |      20 |
+ | use Log::Log4perl::Tiny;                                         |     20    |  12                 |               438.17% |               145.75% | 3.6e-05   |      20 |
+ | use Log::ger::Like::Log4perl;                                    |     17    |   9                 |               508.84% |               117.23% | 4.2e-05   |      20 |
+ | use Log::Any q($log);                                            |     20    |  12                 |               561.57% |                99.92% |   0.00021 |      20 |
+ | use Log::Any;                                                    |     14    |   6                 |               647.20% |                77.01% |   2e-05   |      20 |
+ | use Log::ger::Output::Composite;                                 |     12.9  |   4.9               |               716.92% |                61.90% | 6.6e-06   |      21 |
+ | use Log::ger::Output::Screen;                                    |     12    |   4                 |               758.44% |                54.07% | 1.3e-05   |      20 |
+ | use Log::ger::Plugin::OptAway; use Log::ger;                     |     10.1  |   2.1               |               949.31% |                26.04% | 9.2e-06   |      21 |
+ | use strict; use warnings;                                        |      9.5  |   1.5               |              1017.17% |                18.39% |   3e-05   |      20 |
+ | use warnings;                                                    |      9.2  |   1.2               |              1053.37% |                14.67% |   3e-05   |      20 |
+ | use Log::ger::Like::LogAny;                                      |      8.9  |   0.9               |              1093.42% |                10.82% | 2.5e-05   |      20 |
+ | use Log::ger; Log::ger->get_logger;                              |      8.6  |   0.6               |              1130.54% |                 7.48% | 2.5e-05   |      20 |
+ | use Log::ger;                                                    |      8.5  |   0.5               |              1143.82% |                 6.33% | 1.7e-05   |      20 |
+ | use Log::ger ();                                                 |      8.5  |   0.5               |              1147.98% |                 5.98% | 2.4e-05   |      20 |
+ | use strict;                                                      |      8.45 |   0.449999999999999 |              1151.79% |                 5.66% | 6.2e-06   |      20 |
+ | perl -e1 (baseline)                                              |      8    |   0                 |              1222.58% |                 0.00% | 1.6e-05   |      20 |
+ +------------------------------------------------------------------+-----------+---------------------+-----------------------+-----------------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -375,7 +389,7 @@ Source repository is at L<https://github.com/perlancar/perl-Bencher-Scenarios-Lo
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-LogGer>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Bencher-Scenarios-LogGer/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -387,7 +401,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,92 @@
+=head1 NAME
+
+UniEvent::Tty - stream handle for the console
+
+
+
+=head1 SYNOPSIS
+
+    my $tty  = UniEvent::Tty->new(\*STDERR);
+    my ($w, $h) = $tty->get_winsize();
+    say "terminal size: $w x $h";
+    $tty->write("hello world");
+    $tty->loop->run;
+
+    my $tty_in  = UniEvent::Tty->new(\*STDIN);
+    $tty_in->read_callback(sub {
+        my ($tty_in, $data, $error) = @_;
+        ...
+    });
+    $tty_in->eof_callback(sub {
+      ...
+    });
+    $tty_in->read_start();    # Important for STDIN
+    $tty_in->loop->run;
+
+
+
+=head1 DESCRIPTION
+
+Tty handle provide streaming interfrace for terminal device.
+
+It is inherited from L<UniEvent::Stream>.
+
+Comparing to other kind of streams, the L<UniEvent::Tty> is B<not> full-duplex
+stream, i.e. for reading and writing separate handles should be created. As
+reading operation is not supported for writing handles (i.e. for STDERR or
+STDOUT), it is user responsibility to invoke C<read_start()> method to
+receive data from Tty handle.
+
+
+
+=head1 FUNCTIONS
+
+=head2 reset_mode()
+
+To be called when the program exits. Resets TTY settings to default values for the
+next process to take over.
+
+
+
+=head1 METHODS
+
+All methods of L<UniEvent::Stream> also apply.
+
+
+=head2 new($fd, [$loop = default])
+
+Constructs new Tty handle in non-blocking mode with the given file
+descriptor C<$fd> and binds it to the specified event loop.
+
+
+=head2 set_mode($mode)
+
+Set the TTY using the specified terminal mode.
+
+C<$mode> should be on of the following constants (in UE::Tty::*):
+
+=over
+
+=item MODE_STD
+
+Initial/normal terminal mode
+
+=item MODE_RAW
+
+Raw input mode (On Windows, ENABLE_WINDOW_INPUT is also enabled)
+
+=item MODE_IO
+
+Binary-safe I/O mode for IPC (Unix-only)
+
+=back
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 get_winsize()
+
+Returns list of size of the terminal window, i.e. C<($width, $height)>.
+
+=cut
+

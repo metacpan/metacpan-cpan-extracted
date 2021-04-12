@@ -87,7 +87,7 @@ use Time::HiRes qw(time);
 use Cwd;
 use Config;
 
-our $VERSION = "3.004005";      # update after release (same format as perl $])
+our $VERSION = "3.004006";      # update after release (same format as perl $])
 #our $IS_DEVEL_BUILD = 1;        # 1 for devel build 
 our $IS_DEVEL_BUILD = 0;        # 0 for release versions including rc & pre releases
 
@@ -101,18 +101,18 @@ our @ISA = qw();
 
 # SUB_VERSION is now just <yyyy>-<mm>-<dd>
 our $SUB_VERSION = 'svnunknown';
-if ('$LastChangedDate: 2021-03-20 22:14:03 +1300 (Sat, 20 Mar 2021) $' =~ ':') {
-  # Subversion keyword "$LastChangedDate: 2021-03-20 22:14:03 +1300 (Sat, 20 Mar 2021) $" has been successfully expanded.
+if ('$LastChangedDate: 2021-04-09 19:54:52 +1200 (Fri, 09 Apr 2021) $' =~ ':') {
+  # Subversion keyword "$LastChangedDate: 2021-04-09 19:54:52 +1200 (Fri, 09 Apr 2021) $" has been successfully expanded.
   # Doesn't happen with automated launchpad builds:
   # https://bugs.launchpad.net/launchpad/+bug/780916
-  $SUB_VERSION = (split(/\s+/,'$LastChangedDate: 2021-03-20 22:14:03 +1300 (Sat, 20 Mar 2021) $ updated by SVN'))[1];
+  $SUB_VERSION = (split(/\s+/,'$LastChangedDate: 2021-04-09 19:54:52 +1200 (Fri, 09 Apr 2021) $ updated by SVN'))[1];
 }
 
 
 if (defined $IS_DEVEL_BUILD && $IS_DEVEL_BUILD) {
-  if ('$LastChangedRevision: 1887843 $' =~ ':') {
-    # Subversion keyword "$LastChangedRevision: 1887843 $" has been successfully expanded.
-    push(@EXTRA_VERSION, ('r' . qw{$LastChangedRevision: 1887843 $ updated by SVN}[1]));
+  if ('$LastChangedRevision: 1888548 $' =~ ':') {
+    # Subversion keyword "$LastChangedRevision: 1888548 $" has been successfully expanded.
+    push(@EXTRA_VERSION, ('r' . qw{$LastChangedRevision: 1888548 $ updated by SVN}[1]));
   } else {
     push(@EXTRA_VERSION, ('r' . 'svnunknown'));
   }

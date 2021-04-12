@@ -14,7 +14,7 @@ use base qw/Net::Whois::Object/;
 # % See http://www.ripe.net/db/support/db-terms-conditions.pdf
 # 
 # domain:         [mandatory]  [single]     [primary/lookup key]
-# descr:          [mandatory]  [multiple]   [ ]
+# descr:          [optional]   [multiple]   [ ]
 # org:            [optional]   [multiple]   [inverse key]
 # admin-c:        [mandatory]  [multiple]   [inverse key]
 # tech-c:         [mandatory]  [multiple]   [inverse key]
@@ -24,19 +24,18 @@ use base qw/Net::Whois::Object/;
 # remarks:        [optional]   [multiple]   [ ]
 # notify:         [optional]   [multiple]   [inverse key]
 # mnt-by:         [mandatory]  [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-3)
+# % This query was served by the RIPE Database Query Service version 1.99 (WAGYU)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'domain' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'domain', 'descr', 'admin_c', 'tech_c', 'zone_c', 'nserver', 'mnt_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional',    [ 'org', 'ds_rdata', 'remarks', 'notify', 'created', 'last_modified' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'domain', 'admin_c', 'tech_c', 'zone_c', 'nserver', 'mnt_by', 'source' ] );
+__PACKAGE__->attributes( 'optional',    [ 'descr', 'org', 'ds_rdata', 'remarks', 'notify', 'created', 'last_modified' ] );
 __PACKAGE__->attributes( 'single',      [ 'domain', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'descr', 'org', 'admin_c', 'tech_c', 'zone_c', 'nserver', 'ds_rdata', 'remarks', 'notify', 'mnt_by', 'changed' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'descr', 'org', 'admin_c', 'tech_c', 'zone_c', 'nserver', 'ds_rdata', 'remarks', 'notify', 'mnt_by' ] );
 
 # End of auto-generated lines
 #######################################################################################

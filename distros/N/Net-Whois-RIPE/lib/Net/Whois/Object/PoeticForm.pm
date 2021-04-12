@@ -19,19 +19,18 @@ use base qw/Net::Whois::Object/;
 # remarks:        [optional]   [multiple]   [ ]
 # notify:         [optional]   [multiple]   [inverse key]
 # mnt-by:         [mandatory]  [multiple]   [inverse key]
-# changed:        [mandatory]  [multiple]   [ ]
 # created:        [generated]  [single]     [ ]
 # last-modified:  [generated]  [single]     [ ]
 # source:         [mandatory]  [single]     [ ]
 # 
-# % This query was served by the RIPE Database Query Service version 1.79.2 (DB-4)
+# % This query was served by the RIPE Database Query Service version 1.99 (ANGUS)
 # 
 # 
 __PACKAGE__->attributes( 'primary',     [ 'poetic_form' ] );
-__PACKAGE__->attributes( 'mandatory',   [ 'poetic_form', 'admin_c', 'mnt_by', 'changed', 'source' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'poetic_form', 'admin_c', 'mnt_by', 'source' ] );
 __PACKAGE__->attributes( 'optional',    [ 'descr', 'remarks', 'notify', 'created', 'last_modified' ] );
 __PACKAGE__->attributes( 'single',      [ 'poetic_form', 'created', 'last_modified', 'source' ] );
-__PACKAGE__->attributes( 'multiple',    [ 'descr', 'admin_c', 'remarks', 'notify', 'mnt_by', 'changed' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'descr', 'admin_c', 'remarks', 'notify', 'mnt_by' ] );
 
 # End of auto-generated lines
 #######################################################################################

@@ -1,0 +1,5 @@
+if (NOT TARGET unievent-socks)
+    find_package(unievent REQUIRED)
+    find_package(panda-uri REQUIRED)
+    include(${CMAKE_CURRENT_LIST_DIR}/unievent-socks-targets.cmake)
+endif()

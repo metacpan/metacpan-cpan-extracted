@@ -18,10 +18,10 @@ binmode STDOUT, ':encoding(utf-8)';
 binmode STDERR, ':encoding(utf-8)';
 
 if ($ENV{TEST_WITH_LATEX}) {
-    plan tests => 158;
+    plan tests => 171;
 }
 else {
-    plan tests => 141;
+    plan tests => 152;
 }
 
 
@@ -283,6 +283,20 @@ $outbody = test_file($file_no_toc, {
                      qr/\Q$sitename\E/,
                      ],
                     );
+
+test_file(File::Spec->catfile(qw/t tex greek.muse/),
+          {},
+          [ qr/Script=Greek/ ]);
+
+test_file({
+           path => File::Spec->catfile(qw/t tex/),
+           files => [qw/greek testing/],
+           name => 'merged-greek',
+           title => 'Merged Greek',
+          },
+          {},
+          [ qr/Script=Greek.*Script=Cyrillic/sx ]);
+
 sub test_file {
     my ($file, $extra, $like, $unlike) = @_;
     my $c = Text::Amuse::Compile->new(tex => 1, extra => $extra,

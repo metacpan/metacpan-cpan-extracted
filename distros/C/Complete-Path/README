@@ -1,12 +1,112 @@
+NAME
+    Complete::Path - Complete path
+
+VERSION
+    This document describes version 0.251 of Complete::Path (from Perl
+    distribution Complete-Path), released on 2021-02-02.
+
 DESCRIPTION
+FUNCTIONS
+  complete_path
+    Usage:
+
+     complete_path(%args) -> array
+
+    Complete path.
+
+    Complete path, for anything path-like. Meant to be used as backend for
+    other functions like "Complete::File::complete_file" or
+    "Complete::Module::complete_module". Provides features like
+    case-insensitive matching, expanding intermediate paths, and case
+    mapping.
+
+    Algorithm is to split path into path elements, then list items (using
+    the supplied "list_func") and perform filtering (using the supplied
+    "filter_func") at every level.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   exclude_dir => *bool*
+
+    *   exclude_leaf => *bool*
+
+    *   filter_func => *code*
+
+        Provide extra filtering. Code will be given path and should return 1
+        if the item should be included in the final result or 0 if the item
+        should be excluded.
+
+    *   is_dir_func => *code*
+
+        Function to check whether a path is a "dir".
+
+        Optional. You can provide this function to determine if an item is a
+        "directory" (so its name can be suffixed with path separator). You
+        do not need to do this if you already suffix names of "directories"
+        with path separator in "list_func".
+
+        One reason you might want to provide this and not mark "directories"
+        in "list_func" is when you want to do extra filtering with
+        "filter_func". Sometimes you do not want to suffix the names first
+        (example: see "complete_file" in "Complete::File").
+
+    *   list_func* => *code*
+
+        Function to list the content of intermediate "dirs".
+
+        Code will be called with arguments: ($path, $cur_path_elem,
+        $is_intermediate). Code should return an arrayref containing list of
+        elements. "Directories" can be marked by ending the name with the
+        path separator (see "path_sep"). Or, you can also provide an
+        "is_dir_func" function that will be consulted after filtering. If an
+        item is a "directory" then its name will be suffixed with a path
+        separator by "complete_path()".
+
+    *   path_sep => *str* (default: "/")
+
+    *   recurse => *bool*
+
+    *   recurse_matching => *str* (default: "level-by-level")
+
+    *   starting_path* => *str* (default: "")
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
 
 ENVIRONMENT
-
- COMPLETE_PATH_TRACE => bool
-
+  COMPLETE_PATH_TRACE => bool
     If set to true, will produce more log statements for debugging.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Path>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Path>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Complete-Path/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Complete
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

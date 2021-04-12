@@ -6,12 +6,4 @@ UniEvent::Streamer::IOutput - base class for output streams for streamer
 
 This is abstract interface class, which has no methods.
 
-=head1 REFERENCES
-
-L<UniEvent::Streamer::Output>
-
-L<UniEvent::Streamer::FileOutput>
-
-L<UniEvent::Streamer::StreamOutput>
-
 =cut

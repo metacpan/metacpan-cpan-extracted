@@ -36,8 +36,13 @@ BOOT {
     unievent::register_perl_class(FsPoll::TYPE, stash);
 }
 
-FsPoll* FsPoll::new (LoopSP loop = {}) {
-    if (!loop) loop = Loop::default_loop();
+FsPollSP create (Sv proto, string_view path, double interval, FsPoll::fs_poll_fn cb, DLoopSP loop = {}) {
+    PROTO = proto;
+    RETVAL = make_backref<FsPoll>(loop);
+    RETVAL->start(path, interval*1000, cb);
+}
+
+FsPoll* FsPoll::new (DLoopSP loop = {}) {
     RETVAL = make_backref<FsPoll>(loop);
 }
 
@@ -65,10 +70,19 @@ Ref FsPoll::event_listener (Sv lst = Sv(), bool weak = false) {
     RETVAL = event_listener<XSFsPollListener>(THIS, ST(0), lst, weak);
 }
 
-void FsPoll::start (string_view path, double interval = 1, FsPoll::fs_poll_fn cb = nullptr) {
+void FsPoll::start (string_view path, double interval = 1, FsPoll::fs_poll_fn cb = {}) {
     THIS->start(path, interval*1000, cb);
 }
 
 void FsPoll::stop ()
 
 string FsPoll::path ()
+
+
+MODULE = UniEvent::FsPoll                PACKAGE = UniEvent
+PROTOTYPES: DISABLE
+
+FsPollSP fs_poll (string_view path, double interval, FsPoll::fs_poll_fn cb, DLoopSP loop = {}) {
+    RETVAL = make_backref<FsPoll>(loop);
+    RETVAL->start(path, interval*1000, cb);
+}

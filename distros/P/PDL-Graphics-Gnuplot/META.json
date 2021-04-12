@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -41,9 +41,13 @@
             "PDL::Transform::Color" : "0",
             "Safe::Isa" : "0",
             "Storable" : "0",
-            "Test::More" : "0",
             "Time::HiRes" : "0",
             "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
@@ -58,6 +62,6 @@
          "url" : "git://github.com/drzowie/PDL-Graphics-Gnuplot.git"
       }
    },
-   "version" : "2.015",
+   "version" : "2.016",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

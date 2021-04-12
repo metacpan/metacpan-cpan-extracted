@@ -8,7 +8,7 @@ require Net::IPAddress::Util;
 require Net::IPAddress::Util::Collection::Tie;
 require Net::IPAddress::Util::Range;
 
-our $VERSION = '5.000';
+our $VERSION = '5.001';
 
 sub new {
   my $class    = ref($_[0]) ? ref(shift()) : shift;

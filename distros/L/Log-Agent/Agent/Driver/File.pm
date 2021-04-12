@@ -363,6 +363,19 @@ sub logerr {
 }
 
 #
+# ->logcluck
+#
+# When `duperr' is true, emit message on the 'output' channel prefixed
+# with WARNING.
+#
+sub logconfess {
+    my $self = shift;
+    my ($str) = @_;
+    $self->emit_output('warning', "WARNING", $str) if $self->duperr;
+    $self->SUPER::logcluck($str);    # Carp strips calls within hierarchy
+}
+
+#
 # ->logwarn
 #
 # When `duperr' is true, emit message on the 'output' channel prefixed

@@ -1,0 +1,41 @@
+---
+abstract: 'Fetch values from sequences of the OEIS.'
+author:
+  - 'Abigail <cpan-oeis@abigail.freedom.nl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+keywords: []
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OEIS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  LWP::Simple: '0'
+  experimental: '0'
+  perl: '5.032'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/Abigail/OEIS.git
+version: '2021041201'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_test_requires:
+  Test::More: 0.88
+  strict: 0
+  warnings: 0

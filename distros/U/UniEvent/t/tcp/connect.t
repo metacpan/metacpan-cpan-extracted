@@ -4,6 +4,7 @@ use MyTest;
 use Net::SockAddr;
 use XS::Framework;
 
+test_catch '[tcp-connect]';
 
 my $loop = UniEvent::Loop->default_loop;
 

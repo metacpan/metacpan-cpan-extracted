@@ -1,7 +1,9 @@
 package Text::Chart;
 
-our $DATE = '2017-06-01'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-04-10'; # DATE
+our $DIST = 'Text-Chart'; # DIST
+our $VERSION = '0.041'; # VERSION
 
 use 5.010001;
 use strict;
@@ -169,14 +171,14 @@ _
     },
 };
 sub gen_text_chart {
-    require TableData::Object;
+    require Data::TableData::Object;
 
     my %args = @_;
     #use DD; dd \%args;
 
     # XXX schema
     $args{data} or die "Please specify 'data'";
-    my $tbl = TableData::Object->new($args{data}, $args{spec});
+    my $tbl = Data::TableData::Object->new($args{data}, $args{spec});
 
     my @data_columns;
     {
@@ -259,7 +261,7 @@ Text::Chart - Generate text-based chart
 
 =head1 VERSION
 
-This document describes version 0.03 of Text::Chart (from Perl distribution Text-Chart), released on 2017-06-01.
+This document describes version 0.041 of Text::Chart (from Perl distribution Text-Chart), released on 2021-04-10.
 
 =head1 SYNOPSIS
 
@@ -414,6 +416,7 @@ Table specification, according to TableDef.
 
 Chart type.
 
+
 =back
 
 Return value:  (str)
@@ -433,7 +436,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Text-Chart
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Text-Chart>.
+Source repository is at L<https://github.com/perlancar/perl-Text-Chart>.
 
 =head1 BUGS
 
@@ -462,7 +465,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

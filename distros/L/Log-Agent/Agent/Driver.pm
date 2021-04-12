@@ -264,6 +264,18 @@ sub carpmess {
 }
 
 #
+# ->logcluck
+#
+# Warn with a full backtraace.
+#
+sub logcluck {
+    my $self = shift;
+    my ($str) = @_;
+    my $msg = $self->carpmess(0, $str, \&Carp::longmess);
+    $self->emit('error', 'warning', $msg);
+}
+
+#
 # ->logconfess
 #
 # Confess fatal error
@@ -347,6 +359,28 @@ sub logsay {
     my $self = shift;
     my ($str) = @_;
     $self->emit('output', 'notice', $str);
+}
+
+#
+# loginfo
+#
+# Log message at the "info" level.
+#
+sub loginfo {
+    my $self = shift;
+    my ($str) = @_;
+    $self->emit('output', 'info', $str);
+}
+
+#
+# logdebug
+#
+# Log message at the "debug" level.
+#
+sub logdebug {
+    my $self = shift;
+    my ($str) = @_;
+    $self->emit('output', 'debug', $str);
 }
 
 #
@@ -534,6 +568,11 @@ by the overall Log::Agent architecture).
 Confess a fatal error. The error is logged to the C<error> channel at
 the C<critical> priority and then Carp::confess() is called with "$str\n"
 as argument.
+
+=item logcluck($str)
+
+Emit a warning with a backtrace. The message is logged to the C<error>
+channel at the C<warning> priority.
 
 =back
 

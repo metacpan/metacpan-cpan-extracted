@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.26  2021-04-13 00:00:00
+  - fix return then /regexp/
+  - fix $any->split, etc
+  - created by INABA Hitoshi
+
 0.25  2021-03-15 00:00:00
   - fix mb::_ignorecase()
   - created by INABA Hitoshi

@@ -54,6 +54,6 @@
          "web" : "https://github.com/carygravel/graphics-tiff"
       }
    },
-   "version" : 9,
+   "version" : 10,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

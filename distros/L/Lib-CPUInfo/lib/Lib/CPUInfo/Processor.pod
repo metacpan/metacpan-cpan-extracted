@@ -1,0 +1,119 @@
+# PODNAME: Lib::CPUInfo::Processor
+# ABSTRACT: CPUInfo Processor object
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lib::CPUInfo::Processor - CPUInfo Processor object
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    my $processor = get_current_processor();
+
+    my $id      = $processor->smt_id();
+    my $core    = $processor->core();
+    my $cluster = $processor->cluster();
+    my $package = $processor->package();
+    ...
+
+=head1 ATTRIBUTES
+
+=head2 C<smt_id>
+
+    my $id = $processor->smt_id();
+
+Return an integer.
+
+=head2 C<core>
+
+    my $core = $processor->core();
+
+Returns the L<Lib::CPUInfo::Core> package object.
+
+=head2 C<cluster>
+
+    my $cluster = $processor->cluster();
+
+Returns the L<Lib::CPUInfo::Cluster> cluster object.
+
+=head2 C<package>
+
+    my $package = $processor->package();
+
+Returns the L<Lib::CPUInfo::Package> package object.
+
+=head2 C<linux_id>
+
+    my $linux_id = $processor->linux_id();
+
+This is only available on GNU/Linux.
+
+=head2 C<windows_group_id>
+
+    my $gid = $processor->windows_group_id();
+
+This is only available on Windows.
+
+=head2 C<windows_processor_id>
+
+    my $pid = $processor->windows_processor_id();
+
+This is only available on Windows.
+
+=head2 C<apic_id>
+
+    my $apic_id = $processor->apic_id();
+
+This is only available on C<x86_64>.
+
+=head2 C<l1i>
+
+    my $l1i = $processor->l1i();
+
+Return the L<Lib::CPUInfo::Cache> l1i cache object.
+
+=head2 C<l1d>
+
+    my $l1d = $processor->l1d();
+
+Return the L<Lib::CPUInfo::Cache> l1d cache object.
+
+=head2 C<l2>
+
+    my $l2  = $processor->l2();
+
+Return the L<Lib::CPUInfo::Cache> l2 cache object.
+
+=head2 C<l3>
+
+    my $l3  = $processor->l3();
+
+Return the L<Lib::CPUInfo::Cache> l3 cache object.
+
+=head2 C<l4>
+
+    my $l4  = $processor->l4();
+
+Return the L<Lib::CPUInfo::Cache> l4 cache object.
+
+=head1 AUTHOR
+
+Sawyer X
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Sawyer X.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

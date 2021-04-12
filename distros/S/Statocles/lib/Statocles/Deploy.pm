@@ -1,5 +1,5 @@
 package Statocles::Deploy;
-our $VERSION = '0.097';
+our $VERSION = '0.098';
 # ABSTRACT: Base role for ways to deploy a site
 
 use Statocles::Base 'Role';
@@ -58,7 +58,7 @@ Statocles::Deploy - Base role for ways to deploy a site
 
 =head1 VERSION
 
-version 0.097
+version 0.098
 
 =head1 DESCRIPTION
 

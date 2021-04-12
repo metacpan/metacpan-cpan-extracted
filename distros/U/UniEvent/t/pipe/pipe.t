@@ -3,6 +3,8 @@ use warnings;
 use Socket;
 use lib 't/lib'; use MyTest;
 
+test_catch '[pipe]';
+
 use constant PIPE_PATH => MyTest::pipe "pipe1";
 
 subtest 'client-server' => sub {
@@ -13,7 +15,7 @@ subtest 'client-server' => sub {
     $srv->listen();
     
     like($srv->sockname, qr#pipe1#);
-    is $srv->peername, undef;
+    ok !$srv->peername;
     
     my $conn;
     
@@ -69,7 +71,7 @@ subtest 'open connected socket' => sub {
     connect($sock, $sa) or die "$!";
     
     my $client = new UniEvent::Pipe($l);
-    $client->open($sock);
+    $client->open($sock, UE::Pipe::MODE_READABLE | UE::Pipe::MODE_WRITABLE);
     close($sock);
     undef $sock;
     

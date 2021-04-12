@@ -386,8 +386,9 @@ C<Wire.receive()>를 C<Wire.read()>로 변경합니다.
 =item -
 
 L<동영상1. Nunchuck 마우스|http://www.youtube.com/watch?v=1_gaxw9GKRg>
-<br  />
+<br />
 
+<iframe allowfullscreen frameborder="0" height="315" src="http://www.youtube.com/embed/1_gaxw9GKRg" width="560" />
 
 
 =back

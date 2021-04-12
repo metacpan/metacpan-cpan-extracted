@@ -8,7 +8,11 @@ SYNOPSIS
       use Mojolicious::Lite;
       plugin 'ReplyTable';
     
-      any '/table' => sub {
+      my $format = [format => [qw(
+        txt csv html json
+        xls xlsx
+      )]];
+      any '/table' => $format => sub {
         my $c = shift;
         my $data = [
           [qw/a b c d/],
@@ -119,6 +123,20 @@ FUTURE WORK
 
       * Add additional formats, like OpenOffice/LibreOffice. If needed
       these can be appended via additional handlers to the helper.
+
+A NOTE ON FORMAT DETECTION
+
+    As of Mojolicious version 9.11, format detection is disabled by
+    default. To enable it you can pass an array reference of
+    [format=>\@formats] to the route, where @formats is the supported file
+    extensions. You may also use the shortcut  [format = 1] >> to enable
+    detection of any format, though that may change in the future.
+
+    As of Mojolicious 9.16 you can inherit these formats from a parent
+    route:
+
+      my $with_formats = $app->routes->any([format => \@formats]);
+      $with_formats->get('/data')->to('MyController#my_action');
 
 SEE ALSO
 

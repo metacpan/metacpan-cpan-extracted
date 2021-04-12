@@ -2019,7 +2019,7 @@ our $echo_eating = 0;                             # Older versions of gnuplot on
 our $debug_echo = 0;                              # If set, mock up Losedows half-duplex pipes
 
 
-our $VERSION = '2.015';
+our $VERSION = '2.016';
 $VERSION = eval $VERSION;
 
 our $gp_version = undef;    # eventually gets the extracted gnuplot(1) version number.
@@ -7522,6 +7522,7 @@ WARNING: I couldn\'t parse a version number from gnuplot\'s output.  I\'m
 EOM
 ;
 	    $this->{early_gnuplot} = 1;
+	    $PDL::Graphics::Gnuplot::raw_output = $s;
 	    return $this;
 	}
 

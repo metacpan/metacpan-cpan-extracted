@@ -1,53 +1,36 @@
 =head1 NAME
 
-UniEvent::Request::Shutdown - stream write request
+UniEvent::Request::Write - stream write request
 
 =head1 DESCRIPTION
 
-The entire purpose of the class is to allow track write requests.
+This is an internal purpose object and can be used for tracking requests.
+
 It can be used to identify, which pieces of data has been written, e.g.:
 
     my %tracked;
     $stream->write_callback(sub {
-        my ($stream, $error_code, $request) = @_;
-        ... if $error_code;
-        say @{ $tracked{$request} }, " has been written to network";
+        my ($stream, $error, $request) = @_;
+        say $tracked{$request}, " has been written";
     });
     ...;
-    my $piece1 = \"piece1";
-    my $piece2 = \"piece2";
+    my $piece1 = "piece1";
+    my $piece2 = "piece2";
 
-    my $r1 = $stream->write($$piece1);
+    my $r1 = $stream->write($piece1);
     $tracked{$r1} = $piece1;
 
-    my $r2 = $stream->write($$piece2);
+    my $r2 = $stream->write($piece2);
     $tracked{$r2} = $piece2;
 
-As the alternative, the one-shot callback can be used with C<write>
-method, howerver it might be less convenient:
+As the alternative, the one-shot callback can be used with C<write> method:
 
     $stream->write('piece1', sub {
-       my ($stream, $error_code) = @_;
-       ... if $error_code;
+        say "piece1 has been written";
     });
 
     $stream->write('piece2', sub {
-       my ($stream, $error_code) = @_;
-       ... if $error_code;
+        say "piece2 has been written";
     });
-
-=head1 METHODS
-
-There are no methods
-
-=head1 REFERENCES
-
-L<UniEvent::Pipe>
-
-L<UniEvent::Stream>
-
-L<UniEvent::Tcp>
-
-L<UniEvent::Tty>
 
 =cut

@@ -1,3 +1,13 @@
+0.002 2021-04-11 23:53:13-0500
+
+  Bug fixes
+
+   - Update release branch for download to main. Thanks to SREZIC for the bug
+     report.
+
+     See <https://rt.cpan.org/Ticket/Display.html?id=134847>,
+     <https://github.com/Intertangle/p5-Alien-Kiwisolver/pull/6>.
+
 0.001 2020-10-17 00:09:32-0500
 
   Features

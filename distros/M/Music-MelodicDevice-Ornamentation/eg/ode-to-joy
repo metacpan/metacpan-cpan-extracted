@@ -4,10 +4,10 @@ use warnings;
 
 use Data::Dumper::Compact 'ddc';
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
-use MIDI::Util;
+use MIDI::Util qw(midi_format setup_score);
 use Music::MelodicDevice::Ornamentation;
 
-my $score = MIDI::Util::setup_score(patch => 68);
+my $score = setup_score(patch => 68);
 
 my $md = Music::MelodicDevice::Ornamentation->new(
     scale_note => 'D',
@@ -42,11 +42,11 @@ for my $n (0 .. $#$motif) {
     }
 
     if ($spec) {
-        $spec = [ map { [ MIDI::Util::midi_format(@$_) ] } @$spec ];
+        $spec = [ map { [ midi_format(@$_) ] } @$spec ];
         $score->n(@$_) for @$spec;
     }
     else {
-        @note = MIDI::Util::midi_format(@note);
+        @note = midi_format(@note);
         $score->n(@note);
     }
 }

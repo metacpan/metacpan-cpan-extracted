@@ -1,0 +1,69 @@
+=head1 NAME
+
+  Controller - example api conroller
+
+=head1 OPENAPI
+
+=over 2
+
+=item GET /api/route
+
+  parameters:
+    - name: productId
+      in: query
+      schema:
+        type: integer
+    - $ref: "#/components/parameters/UserId"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: number
+  responses:
+    "200":
+      description: response
+=cut
+
+=item PARAM UserId
+
+  name: id
+  in: query
+  schema:
+    type: integer
+    minimum: 1
+
+=item SECURITY ApiKey
+
+  type: apiKey
+  description: api key for my API
+  name: x-Api-Key
+  in: header
+
+=item GET /api/route2
+
+  parameters:
+    - name: id
+      in: query
+      schema:
+        type: integer
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: number
+  responses:
+    "200":
+      description: response
+
+=item SCHEMA User
+
+  type: object
+  properties:
+    username:
+      type: string
+
+=back

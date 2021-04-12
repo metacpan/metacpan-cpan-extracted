@@ -2,6 +2,8 @@ use 5.012;
 use lib 't/lib'; use MyTest;
 use lib 't/streamer'; use TestStreamer;
 
+test_catch '[streamer-file]';
+
 subtest 'normal input' => sub {
     my $test = UE::Test::Async->new(1);
     my $i = UE::Streamer::FileInput->new("t/streamer/file.txt", 10000);

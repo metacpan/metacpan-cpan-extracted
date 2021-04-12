@@ -27,8 +27,13 @@ BOOT {
     unievent::register_perl_class(Prepare::TYPE, stash);
 }
 
-Prepare* Prepare::new (LoopSP loop = {}) {
-    if (!loop) loop = Loop::default_loop();
+PrepareSP create (SV* proto, Prepare::prepare_fn cb, DLoopSP loop = {}) {
+    PROTO = proto;
+    RETVAL = make_backref<Prepare>(loop);
+    RETVAL->start(cb);
+}
+
+Prepare* Prepare::new (DLoopSP loop = {}) {
     RETVAL = make_backref<Prepare>(loop);
 }
 
@@ -50,3 +55,11 @@ void Prepare::start (Prepare::prepare_fn cb = nullptr)
 void Prepare::stop ()
 
 void Prepare::call_now ()
+
+MODULE = UniEvent::Prepare                PACKAGE = UniEvent
+PROTOTYPES: DISABLE
+
+PrepareSP prepare (Prepare::prepare_fn cb, DLoopSP loop = {}) {
+    RETVAL = make_backref<Prepare>(loop);
+    RETVAL->start(cb);
+}

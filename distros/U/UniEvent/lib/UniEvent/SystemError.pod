@@ -1,0 +1,26 @@
+=head1 NAME
+
+UniEvent::SystemError - system error constants
+
+
+
+=head1 SYNOPSIS
+
+    $tcp->connect_callback(sub {
+        my ($tcp, $err) = @_;
+        if ($err) {
+            if    ($err == UE::SystemError::timed_out) { ... }
+            elsif ($err == UE::SystemError::operation_canceled) { ... }
+            ...
+        }
+    });
+
+
+
+=head1 DESCRIPTION
+
+This is alias package for C<XS::STL::errc>, the description of them
+is partially available on L<XS::STL::ErrorCode>, but full specs belong
+to C++ domain, hence, are available at L<cppreference.com|https://en.cppreference.com/w/cpp/error/errc>.
+
+=cut

@@ -1,5 +1,8 @@
 Revision history for GnuPG-Interface
 
+1.02 - 2021-04-09
+ - Work around an issue with CLI options for deleting secret keys in gpg 2.2
+
 1.01 - 2021-01-26
  - Make $gnupg->call('foo') update the internal GnuPG version number.
  - Localize tainted PATH env to make exec happy

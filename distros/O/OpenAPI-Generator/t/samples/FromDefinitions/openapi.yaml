@@ -1,0 +1,14 @@
+---
+paths:
+  /api/route3:
+    put: value3
+components:
+  schemas:
+    c3:
+      key3: value3
+  parameters:
+    p3:
+      key3: value3
+  securitySchemes:
+    s3:
+      key3: value3

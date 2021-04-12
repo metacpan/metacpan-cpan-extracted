@@ -19,7 +19,7 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited method
-can_ok $object, qw( as_block descr remarks notify mnt_lower mnt_by changed source);
+can_ok $object, qw( as_block descr remarks notify mnt_lower mnt_by source);
 can_ok $object, qw( org );
 
 can_ok $object, $object->attributes('mandatory');
@@ -52,9 +52,9 @@ is_deeply( $object->org(), ['ORG-NCC1-RIPE', 'ORG-ADDED'], 'org properly added' 
 
 # Test 'mnt_by'
 $tested{'mnt_by'}++;
-is( $object->mnt_by(), 'RIPE-DBM-MNT', 'mnt_by properly parsed' );
-$object->mnt_by('Modified mnt_by');
-is( $object->mnt_by(), 'Modified mnt_by', 'mnt_by properly modified' );
+is_deeply( $object->mnt_by(), ['RIPE-DBM-MNT','RIPE-DBM-MNT2'], 'mnt_by properly parsed' );
+$object->mnt_by('RIPE-DBM-MNT3');
+is( $object->mnt_by()->[2], 'RIPE-DBM-MNT3', 'mnt_by properly modified' );
 
 # Test 'mnt_lower'
 $tested{'mnt_lower'}++;
@@ -67,12 +67,6 @@ $tested{'notify'}++;
 is_deeply( $object->notify(), ['RIPE-DBM-MNT'], 'notify properly parsed' );
 $object->notify('Added notify');
 is( $object->notify()->[1], 'Added notify', 'notify properly added' );
-
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['arhuman@gmail.com 20120701'], 'changed properly parsed' );
-$object->changed('Added changed');
-is( $object->changed()->[1], 'Added changed', 'changed properly added' );
 
 # Test 'source'
 $tested{'source'}++;
@@ -93,9 +87,9 @@ my $align = Net::Whois::Object::AsBlock->new(
     remarks   =>   '<http://www.ripe.net/ripe/docs/asnrequestform.html>',
     org       =>   'ORG-NCC1-RIPE',
     mnt_by    =>   'RIPE-DBM-MNT',
+    mnt_by    =>   'RIPE-DBM-MNT2',
     notify    =>   'RIPE-DBM-MNT',
     mnt_lower =>   'RIPE-NCC-HM-MNT',
-    changed   =>   'arhuman@gmail.com 20120701',
     source    =>   'RIPE # Filtered',
 );
 
@@ -124,8 +118,8 @@ remarks:        form available in the LIR Portal or at:
 remarks:        <http://www.ripe.net/ripe/docs/asnrequestform.html>
 org:            ORG-NCC1-RIPE
 mnt-by:         RIPE-DBM-MNT
+mnt-by:         RIPE-DBM-MNT2
 notify:         RIPE-DBM-MNT
 mnt-lower:      RIPE-NCC-HM-MNT
-changed:        arhuman@gmail.com 20120701
 source:         RIPE # Filtered
 

@@ -20,7 +20,7 @@ BEGIN { use_ok('DBI');
 ($Uid, $Pwd, $Srv, $Db) = _test::get_info();
 
 #DBI->trace(3);
-my $dbh = DBI->connect("dbi:Sybase:server=$Srv;database=$Db", $Uid, $Pwd, {PrintError => 1});
+my $dbh = DBI->connect("dbi:Sybase:$Srv;database=$Db", $Uid, $Pwd, {PrintError => 1});
 #DBI->trace(0);
 
 ok($dbh, 'Connect');
@@ -32,7 +32,7 @@ $dbh->disconnect if $dbh;
 ok !$dbh->ping, "ping should fail after disconnect";
 
 
-$dbh = DBI->connect("dbi:Sybase:server=$Srv;database=$Db", 'ohmygod', 'xzyzzy', {PrintError => 0});
+$dbh = DBI->connect("dbi:Sybase:$Srv;database=$Db", 'ohmygod', 'xzyzzy', {PrintError => 0});
 
 ok(!$dbh, 'Connect fail');
 

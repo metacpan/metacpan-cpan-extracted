@@ -1,3 +1,8 @@
+0.009   2021-04-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to dependency's new name {,Data::}TableData::Lookup.
+
+
 0.008   2021-02-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump prereq version Text::CSV -> 1.91 (csv() function) (thanks

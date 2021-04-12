@@ -17,8 +17,8 @@ my @v = (
     [qw(QUARTER       _4TH qn 1)],
     [qw(EIGHTH        _8TH en 0.5)],
     [qw(SIXTEENTH    _16TH sn 0.25)],
-    [qw(THIRTYSECOND _32ND yn 0.125)],
-    [qw(SIXTYFOURTH  _64TH xn 0.0625)],
+    [qw(THIRTYSECOND _32ND xn 0.125)],
+    [qw(SIXTYFOURTH  _64TH yn 0.0625)],
 );
 
 # Test durations.

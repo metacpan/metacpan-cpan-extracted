@@ -47,6 +47,16 @@
 #if !defined(PROC_STATUS)
 #define PROC_STATUS 0
 #endif
+
+/* in versions up to 1.17 we always issue a ROLLBACK TRAN on disconnect
+   With Sybase this is fine as a ROLLBACK with no corresponding BEGIN TRAN
+   is a no-op. But this generates an error message with MS-SQL.
+   So we now skip this, as any active transaction will in any case
+   be rolled back if the conection is closed.
+*/
+#if !defined(ROLLBACK_ON_EXIT)
+#define ROLLBACK_ON_EXIT 0
+#endif
 /*
  * In DBD::Sybase 1.09 and before, certain large numeric types (money, bigint)
  * were being kept in native format, and then returned to the caller as a perl NV
@@ -94,7 +104,7 @@
 #endif
 DBISTATE_DECLARE;
 
-static void cleanUp _((imp_sth_t *));
+static void cleanUp _((imp_dbh_t *, imp_sth_t *));
 static char *GetAggOp _((CS_INT));
 static CS_INT get_cwidth _((CS_DATAFMT *));
 static CS_INT display_dlen _((CS_DATAFMT *));
@@ -133,6 +143,9 @@ static int get_server_version(SV *dbh, imp_dbh_t *imp_dbh, CS_CONNECTION *con);
 static void clear_cache(SV *sth, imp_sth_t *imp_sth);
 
 static int _dbd_rebind_ph(SV *sth, imp_sth_t *imp_sth, phs_t *phs, int maxlen);
+
+static CS_RETCODE get_cs_msg(CS_CONTEXT *context, char *msg, SV *sth, imp_sth_t *imp_sth);
+
 
 static CS_INT BLK_VERSION;
 
@@ -640,10 +653,10 @@ static CS_INT get_cwidth(CS_DATAFMT *column) {
   case CS_BINARY_TYPE:
   case CS_VARBINARY_TYPE:
   case CS_LONGBINARY_TYPE:
-//#if defined(CS_UNICHAR_TYPE)
-//	case CS_UNICHAR_TYPE:
-//	case CS_UNITEXT_TYPE:
-//#endif
+#if defined(CS_UNICHAR_TYPE)
+	case CS_UNICHAR_TYPE:
+	case CS_UNITEXT_TYPE:
+#endif
     len = (2 * column->maxlength) + 2;
     break;
 
@@ -695,14 +708,18 @@ static CS_INT get_cwidth(CS_DATAFMT *column) {
     len = 40;
     break;
 
-#if 0
+#if 1
 // According to Sebastien Pardo (https://github.com/mpeppler/DBD-Sybase/issues/48) 
-// The following is needed to handle very large CS_NUMERIC values. Needs to be double
-// checked before being enabled as this code was removed between 1.09 and 1.15 and now I
-// can't remember why...
+// The following is needed to handle very large CS_NUMERIC values. 
+// This code was removed between 1.09 and 1.15. I'm re-enabling it as this appears to
+// only affect the binding of numeric data types in row fetches, and column displays in 
+// the error handler, which shouldn't really be an issue.
   case CS_NUMERIC_TYPE:
   case CS_DECIMAL_TYPE:
-    len = (CS_MAX_PREC + 2);
+    // CS_MAX_PREC is 77 (theoretical max precision) - using the precision/scale of the result set
+    // seems more appropriate.
+    //len = (CS_MAX_PREC + 2);
+    len = column->precision + column->scale + 2;
     break;
 #endif
 
@@ -1681,6 +1698,8 @@ static int extract_version(char *buff, char *ver) {
         strncpy(ver, p, 10);
       }
     }
+  } else if (!strncmp(buff, "Microsoft SQL Server", 20)) {
+    strcpy(ver, "MS-SQL");
   } else {
     strcpy(ver, "Unknown");
   }
@@ -1747,6 +1766,9 @@ static int get_server_version(SV *dbh, imp_dbh_t *imp_dbh, CS_CONNECTION *con) {
         strncpy(imp_dbh->serverVersionString, buff, sizeof(imp_dbh->serverVersionString));
         extract_version(buff, version);
         strncpy(imp_dbh->serverVersion, version, sizeof(imp_dbh->serverVersion));
+        if (!strncmp("MS-SQL", version, 6)) {
+          imp_dbh->isMSSql = 1;
+        }
         if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
           PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    get_server_version() -> version = %s\n",
               imp_dbh->serverVersion);
@@ -2162,11 +2184,19 @@ int syb_db_disconnect(SV *dbh, imp_dbh_t *imp_dbh) {
 
   /* rollback if we get disconnected and no explicit commit
    has been called (when in non-AutoCommit mode) */
+  /* For Sybase, issuing a ROLLBACK TRAN with no corresponding BEGIN TRAN
+     is a no-op, and has no side effects.
+     However, for MS-SQL this generates a warning message.
+     Given that an ongoing transaction is automatically rolled back if
+     the connection is aborted it would seem that issuing this rollback
+     on the disconnect call is realy unnecessary. */
+#if ROLLBACK_ON_EXIT
   if (imp_dbh->isDead == 0) { /* only call if connection still active */
     if (!DBIc_is(imp_dbh, DBIcf_AutoCommit)) {
       syb_db_rollback(dbh, imp_dbh);
     }
   }
+#endif
 
   if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
     PerlIO_printf(DBIc_LOGPIO(imp_dbh),
@@ -2215,7 +2245,12 @@ int syb_db_STORE_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv) {
     on = SvTRUE(valuesv);
     if (imp_dbh->chainedSupported) {
       int autocommit = DBIc_is(imp_dbh, DBIcf_AutoCommit);
-      if (!autocommit) {
+      /* if we're connected to an MSSQL instance, then do not attempt to
+         execute a COMMIT TRAN - as that will generate an error message if we
+         are not in a transaction.
+         If the switch is attempted in a transaction then the perl program will
+         have to be modified to add an explicit call to commit instead.*/
+      if (!autocommit && !imp_dbh->isMSSql) {
         syb_db_commit(dbh, imp_dbh);
       }
       if (on) {
@@ -3132,22 +3167,41 @@ int syb_st_rows(SV *sth, imp_sth_t *imp_sth) {
   return imp_sth->numRows;
 }
 
-static void cleanUp(imp_sth_t *imp_sth) {
+static void cleanUp(imp_dbh_t *imp_dbh, imp_sth_t *imp_sth) {
   int i;
   int numCols = DBIc_NUM_FIELDS(imp_sth);
-  for (i = 0; i < numCols; ++i) {
+  // coldata could be null here if cleanUp() has already been called due to a
+  // processing error in the describe() function.
+  for (i = 0; i < numCols && imp_sth->coldata != NULL; ++i) {
+    if (DBIc_DBISTATE(imp_dbh)->debug >= 4) {
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh),
+          "    cleanUp() -> processing column %d\n", i);
+    }
+
     if (imp_sth->coldata[i].type == CS_CHAR_TYPE
         || imp_sth->coldata[i].type == CS_LONGCHAR_TYPE
         || imp_sth->coldata[i].type == CS_TEXT_TYPE
         || imp_sth->coldata[i].type == CS_IMAGE_TYPE) {
+      if (DBIc_DBISTATE(imp_dbh)->debug >= 4) {
+        PerlIO_printf(DBIc_LOGPIO(imp_dbh),
+            "    cleanUp() -> Safefree for %d, type %d\n", i, imp_sth->coldata[i].type);
+      }
       Safefree(imp_sth->coldata[i].value.c);
     }
   }
 
   if (imp_sth->datafmt) {
+    if (DBIc_DBISTATE(imp_dbh)->debug >= 4) {
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh),
+          "    cleanUp() -> Safefree(datafmt)\n");
+    }
     Safefree(imp_sth->datafmt);
   }
   if (imp_sth->coldata) {
+    if (DBIc_DBISTATE(imp_dbh)->debug >= 4) {
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh),
+          "    cleanUp() -> Safefree(coldata)\n");
+    }
     Safefree(imp_sth->coldata);
   }
   imp_sth->numCols = 0;
@@ -3200,8 +3254,8 @@ static CS_RETCODE describe(SV* sth, imp_sth_t* imp_sth, int restype) {
 
   imp_sth->numCols = numCols;
 
-  New(902, imp_sth->coldata, numCols, ColData);
-  New(902, imp_sth->datafmt, numCols, CS_DATAFMT);
+  Newz(902, imp_sth->coldata, numCols, ColData);
+  Newz(902, imp_sth->datafmt, numCols, CS_DATAFMT);
 
   /* this routine may be called without the connection reference */
   if(restype == CS_COMPUTE_RESULT) {
@@ -3216,7 +3270,7 @@ static CS_RETCODE describe(SV* sth, imp_sth_t* imp_sth, int restype) {
   for(i = 0; i < numCols; ++i) {
     if((retcode = ct_describe(imp_sth->cmd, (i + 1), &imp_sth->datafmt[i])) != CS_SUCCEED) {
       warn("ct_describe() failed");
-      cleanUp(imp_sth);
+      cleanUp(imp_dbh, imp_sth);
       goto GoodBye;
     }
     /* Make sure we have at least some sort of column name: */
@@ -3419,7 +3473,7 @@ static CS_RETCODE describe(SV* sth, imp_sth_t* imp_sth, int restype) {
      switch above: */
     if(retcode != CS_SUCCEED) {
       warn("ct_bind() failed");
-      cleanUp(imp_sth);
+      cleanUp(imp_dbh, imp_sth);
       break;
     }
     if(DBIc_DBISTATE(imp_dbh)->debug >= 3) {
@@ -3430,6 +3484,17 @@ static CS_RETCODE describe(SV* sth, imp_sth_t* imp_sth, int restype) {
 GoodBye:;
   if(retcode == CS_SUCCEED) {
     imp_sth->done_desc = 1;
+  } else {
+    // If we haven't been able to describe this result set correctly, then we won't be able to fetch it
+    // So we probably need to cancel the request:
+    if(DBIc_DBISTATE(imp_dbh)->debug >= 3) {
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "    describe() retcode is NOT CS_SUCCEED - canceling the request.\n");
+    }
+    // disable flushFinish if it is set:
+    int flushFinish = imp_dbh->flushFinish;
+    imp_dbh->flushFinish = 0;
+    syb_st_finish(sth, imp_sth);
+    imp_dbh->flushFinish = flushFinish;
   }
   return retcode == CS_SUCCEED;
 }
@@ -3484,7 +3549,7 @@ static int st_next_result(SV *sth, imp_sth_t *imp_sth) {
     case CS_CURSOR_RESULT:
     case CS_COMPUTE_RESULT:
       if (imp_sth->done_desc) {
-        cleanUp(imp_sth);
+        cleanUp(imp_dbh, imp_sth);
         clear_cache(sth, imp_sth);
       }
       retcode = describe(sth, imp_sth, restype);
@@ -3638,8 +3703,7 @@ static int _convert(void *ptr, char *str, CS_LOCALE *locale,
   return retcode;
 }
 
-static CS_RETCODE get_cs_msg(CS_CONTEXT *context, CS_CONNECTION *connection,
-    char *msg, SV *sth, imp_sth_t *imp_sth) {
+static CS_RETCODE get_cs_msg(CS_CONTEXT *context, char *msg, SV *sth, imp_sth_t *imp_sth) {
   dTHX;
   CS_CLIENTMSG errmsg;
   CS_INT lastmsg = 0;
@@ -3659,7 +3723,7 @@ static CS_RETCODE get_cs_msg(CS_CONTEXT *context, CS_CONNECTION *connection,
   ret = cs_diag(context, CS_GET, CS_CLIENTMSG_TYPE, lastmsg, &errmsg);
   if (DBIc_DBISTATE(imp_sth)->debug >= 4) {
     PerlIO_printf(DBIc_LOGPIO(imp_sth),
-        "get_cs_msg -> cs_diag(CS_GET) ret = %d\n", ret);
+        "get_cs_msg -> cs_diag(CS_GET) ret = %d, errmsg=%s\n", ret, errmsg.msgstring);
   }
   if (ret != CS_SUCCEED) {
     warn("cs_diag(CS_GET) failed");
@@ -3913,7 +3977,7 @@ static int syb_blk_execute(imp_dbh_t *imp_dbh, imp_sth_t *imp_sth, SV *sth) {
               "cs_convert failed: column %d: (_convert(%s, %d))",
               i + 1, (char *) imp_sth->coldata[i].ptr,
               phs->datafmt.datatype);
-          ret = get_cs_msg(context, con, msg, sth, imp_sth);
+          ret = get_cs_msg(context, msg, sth, imp_sth);
           if (ret == CS_FAIL) {
             goto FAIL;
           }
@@ -3958,6 +4022,16 @@ static int syb_blk_execute(imp_dbh_t *imp_dbh, imp_sth_t *imp_sth, SV *sth) {
 
 static int cmd_execute(SV *sth, imp_sth_t *imp_sth) {
   D_imp_dbh_from_sth;
+
+  if (imp_sth->statement == NULL) {
+    if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
+      PerlIO_printf(
+        DBIc_LOGPIO(imp_dbh),
+        "    cmd_execute() -> can't execute a command with a NULL statement string.\n");
+    }
+    syb_set_error(imp_dbh, -1, "execute() called with an invalid SQL string.");
+    return -2;
+  }
 
   if (!imp_sth->dyn_execed) {
     if (!imp_sth->cmd) {
@@ -4526,9 +4600,16 @@ int syb_st_finish(SV *sth, imp_sth_t *imp_sth) {
       PerlIO_printf(DBIc_LOGPIO(imp_dbh),
           "    syb_st_finish() -> flushing\n");
     }
-    DBIh_CLEAR_ERROR(imp_sth); /* so syb_st_fetch can tell us when something goes wrong */
-    while (DBIc_ACTIVE(imp_sth) && !imp_dbh->isDead && imp_sth->exec_done
-        && !SvTRUE(DBIc_ERR(imp_sth))) {
+    /*
+    The clear-error below actually causes any existing errors that may have been recorded
+    to be "forgotten".
+    In addition, stopping on any error (which could be a simple raiserror call rather than any actual
+    error) will potentially leave results pending on the connection.
+    So I have now removed the clear error and the check on any existing issues on the connection.
+    In my testing this appears to work as expected with no bad side-effects.
+    */
+    //DBIh_CLEAR_ERROR(imp_sth); /* so syb_st_fetch can tell us when something goes wrong */
+    while (DBIc_ACTIVE(imp_sth) && !imp_dbh->isDead && imp_sth->exec_done /*&& !SvTRUE(DBIc_ERR(imp_sth))*/ ) {
       AV *retval;
       do {
         retval = syb_st_fetch(sth, imp_sth);
@@ -4657,7 +4738,7 @@ void syb_st_destroy(SV *sth, imp_sth_t *imp_sth) {
     imp_dbh->sql = NULL;
   }
 
-  cleanUp(imp_sth);
+  cleanUp(imp_dbh, imp_sth);
 
   if (imp_sth->cmd) {
     /* Gene Ressler says that this call can fail because we've already 
@@ -5258,14 +5339,17 @@ static int time2str(ColData *colData, CS_DATAFMT *srcfmt, char *buff, CS_INT len
 }
 #endif
 
-static CS_NUMERIC to_numeric(char *str, CS_LOCALE *locale, CS_DATAFMT *datafmt,
-    int type) {
-  CS_NUMERIC mn;
+static int to_numeric(char *str, SV *sth, imp_sth_t *imp_sth, CS_DATAFMT *datafmt,
+    int type, CS_NUMERIC *mn) {
+  //CS_NUMERIC mn;
+  D_imp_dbh_from_sth;
+
   CS_DATAFMT srcfmt;
   CS_INT reslen;
   char *p;
+  CS_LOCALE *locale = LOCALE(imp_dbh);
 
-  memset(&mn, 0, sizeof(mn));
+  memset(mn, 0, sizeof(*mn));
 
   if (!str || !*str) {
     str = "0";
@@ -5273,7 +5357,6 @@ static CS_NUMERIC to_numeric(char *str, CS_LOCALE *locale, CS_DATAFMT *datafmt,
 
   memset(&srcfmt, 0, sizeof(srcfmt));
   srcfmt.datatype = CS_CHAR_TYPE;
-  srcfmt.maxlength = strlen(str);
   srcfmt.format = CS_FMT_NULLTERM;
   srcfmt.locale = locale;
 
@@ -5325,15 +5408,26 @@ static CS_NUMERIC to_numeric(char *str, CS_LOCALE *locale, CS_DATAFMT *datafmt,
     }
   }
 
-  if (cs_convert(context, &srcfmt, str, datafmt, &mn, &reslen) != CS_SUCCEED) {
-    warn("cs_convert failed (to_numeric(%s))", str);
+// ensure that the max length value for the source is adjusted to any changes that may have been
+// done above. This is needed because FreeTDS is very picky and doesn't honor the CS_FMT_NULLTERM
+// setting correctly in this situation.
+  srcfmt.maxlength = strlen(str);
+
+  if ((cs_convert(context, &srcfmt, str, datafmt, mn, &reslen) != CS_SUCCEED) || (reslen == CS_UNUSED)) {
+    char msg[64];
+    sprintf(msg, "cs_convert failed: to_numeric(%s)\n", str);
+    get_cs_msg(context, msg, sth, imp_sth);
+          
+    if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
+      PerlIO_printf(DBIc_LOGPIO(imp_dbh), "       cs_convert failed (to_numeric(%s), type=%d, scale=%d, precision=%d, maxlen=%d)\n", 
+        str, datafmt->datatype, datafmt->scale, datafmt->precision, datafmt->maxlength);
+    //warn("cs_convert failed (to_numeric(%s))", str);
+    }
+    return 0;
   }
 
-  if (reslen == CS_UNUSED) {
-    warn("conversion failed: to_numeric(%s)", str);
-  }
 
-  return mn;
+  return 1;
 }
 
 static CS_MONEY to_money(char *str, CS_LOCALE *locale) {
@@ -5424,6 +5518,9 @@ static int _dbd_rebind_ph(SV *sth, imp_sth_t *imp_sth, phs_t *phs, int maxlen) {
   CS_INT datatype;
   int free_value = 0;
 
+  /* determine the value, and length that we wish to pass to ct_param() */
+  datatype = phs->datafmt.datatype;
+
   if (DBIc_DBISTATE(imp_dbh)->debug >= 3) {
     char *text = neatsvpv(phs->sv, 0);
     PerlIO_printf(DBIc_LOGPIO(imp_dbh), "       bind %s (%s) <== %s (",
@@ -5434,40 +5531,17 @@ static int _dbd_rebind_ph(SV *sth, imp_sth_t *imp_sth, phs_t *phs, int maxlen) {
     } else {
       PerlIO_printf(DBIc_LOGPIO(imp_dbh), "NULL, ");
     }
-    PerlIO_printf(DBIc_LOGPIO(imp_dbh), "ptype %d, otype %d%s)\n",
-        (int) SvTYPE(phs->sv), phs->ftype, (phs->is_inout) ? ", inout"
-            : "");
+    PerlIO_printf(DBIc_LOGPIO(imp_dbh), "ptype %d, otype %d, datatype %d)\n",
+        (int) SvTYPE(phs->sv), phs->ftype, datatype);
   }
 
-  /* At the moment we always do sv_setsv() and rebind.        */
-  /* Later we may optimise this so that more often we can     */
-  /* just copy the value & length over and not rebind.        */
-#if 0 
-  if (phs->is_inout) { /* XXX */
-    if (SvREADONLY(phs->sv))
-    croak(no_modify);
-    /* phs->sv _is_ the real live variable, it may 'mutate' later   */
-    /* pre-upgrade high to reduce risk of SvPVX realloc/move        */
-    (void)SvUPGRADE(phs->sv, SVt_PVNV);
-    /* ensure room for result, 28 is magic number (see sv_2pv)      */
-    SvGROW(phs->sv, (phs->maxlen < 28) ? 28 : phs->maxlen+1);
-  }
-  else {
-    /* phs->sv is copy of real variable, upgrade to at least string */
-    (void)SvUPGRADE(phs->sv, SVt_PV);
-  }
-#else
   /* phs->sv is copy of real variable, upgrade to at least string */
   (void) SvUPGRADE(phs->sv, SVt_PV);
-#endif
 
   /* At this point phs->sv must be at least a PV with a valid buffer, */
   /* even if it's undef (null)                                        */
   /* Here we set phs->sv_buf, and value_len.                */
 
-  /* determine the value, and length that we wish to pass to
-   ct_param() */
-  datatype = phs->datafmt.datatype;
 
   if (SvOK(phs->sv)) {
     phs->sv_buf = SvPV(phs->sv, value_len);
@@ -5494,8 +5568,14 @@ static int _dbd_rebind_ph(SV *sth, imp_sth_t *imp_sth, phs_t *phs, int maxlen) {
 #endif
     case CS_NUMERIC_TYPE:
     case CS_DECIMAL_TYPE:
-      n_value = to_numeric(phs->sv_buf, LOCALE(imp_dbh), &phs->datafmt,
-          imp_sth->type);
+      rc = to_numeric(phs->sv_buf, sth, imp_sth, &phs->datafmt,
+          imp_sth->type, &n_value);
+      if(!rc) {
+        char errbuf[64];
+        sprintf(errbuf, "to_numeric() failed for '%s'", phs->sv_buf);
+        syb_set_error(imp_dbh, -1, errbuf);
+        return 0;
+      }
       phs->datafmt.datatype = CS_NUMERIC_TYPE;
       value = &n_value;
       value_len = sizeof(n_value);
@@ -6214,9 +6294,11 @@ static int toggle_autocommit(SV *dbh, imp_dbh_t *imp_dbh, int flag) {
         current ? "on" : "off", flag ? "on" : "off");
   }
   if (flag) {
-    if (!current) {
+    if (!current && !imp_dbh->isMSSql) {
       /* Going from OFF to ON - so force a COMMIT on any open 
-       transaction */
+       transaction. Note  only doing this for Sybase servers as a 
+       bare COMMIT (outside of a transaction) is a no-op for Sybase,
+       but generates an error/warning message for MS-SQL */
       syb_db_commit(dbh, imp_dbh);
     }
     if (!imp_dbh->doRealTran) {

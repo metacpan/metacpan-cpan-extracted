@@ -1,0 +1,17 @@
+Revision history for OpenAPI-Generator
+
+0.05    12 April 2021
+        Fixed perl version. Added documentation
+
+0.04    11 April 2021
+        Remove optional dependencies. Supported Perl version is 5.14 from this point
+
+0.03    11 April 2021
+        Added generator 'From::Defenitions'. Documentation improvements
+
+0.02    10 April 2021
+        Documentation imrovements
+
+0.01    10 April 2021
+        First version, released on an unsuspecting world.
+

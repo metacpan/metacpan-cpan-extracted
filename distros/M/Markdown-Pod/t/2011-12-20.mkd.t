@@ -161,7 +161,7 @@ C<templates> 부분은 서버의 뷰 부분을 담당하고 있는 친구들인�
 
 이제 웹 브라우저에서 L<http://127.0.0.1:3000/welcome|>에 접근해 봅시다.
 
-=for html <img src="2011-12-20-1.png" alt="생성된 뼈대를 구동해 열어본 웹 페이지" /><br  />
+=for html <img src="2011-12-20-1.png" alt="생성된 뼈대를 구동해 열어본 웹 페이지" /><br />
 
 I<그림 1.> 생성된 뼈대를 구동해 열어본 웹 페이지
 
@@ -399,7 +399,7 @@ C<preventDefault()>를 걸었습니다.
     #!bash
     $ morbo script/chat
 
-=for html <img src="2011-12-20-2.png" alt="완성된 서비스" /><br  />
+=for html <img src="2011-12-20-2.png" alt="완성된 서비스" /><br />
 
 I<그림 2.> 완성된 서비스
 

@@ -1,0 +1,260 @@
+=head1 NAME
+
+UniEvent::Tcp - stream that represents both TCP streams and servers.
+
+
+
+=head1 SYNOPSIS
+
+    use UniEvent;
+
+    my $tcp = UniEvent::Tcp->new;
+    
+    $tcp->connect($host, $port, sub {
+        my ($tcp, $error) = @_;
+        die("cannot connect: $error\n") if $error;
+        ...
+    });
+
+    $tcp->write($data, sub {
+        my ($tcp, $error) = @_;
+        die("writing data error: $error\n") if $error;
+        ...
+    });
+
+    $tcp->read_callback(sub {
+        my ($tcp, $data, $error) = @_;
+        die("reading data error: $error\n") if $error;
+        ...
+    });
+
+    $tcp->eof_callback(sub {
+        my $tcp = shift;
+        ...
+    });
+
+    $tcp->loop->run;
+
+
+
+=head1 DESCRIPTION
+
+Tcp handle allows to establish TCP-connection to local or remote machine.
+It is able to work over IPv4 as well as over IPv6 protocols (aka dual stack mode),
+the difference between them is abstracted from user.
+
+The Tcp hanlde is inherited from L<UniEvent::Stream> where the most part of its functionality is documented.
+
+
+
+=head1 METHODS
+
+All methods of L<UniEvent::Stream> also apply.
+
+
+=head2 new([$loop = default], [$domain = AF_UNSPEC])
+
+Constructs new Tcp handle and binds it to the specified event loop. The domain
+constants can be imported from L<UniEvent> or L<Net::SockAddr> or from L<IO::Socket>.
+By default it is C<AF_UNSPEC> and socket creation is postponed until call to C<connect()> or accepting connection.
+
+
+=head2 open($sock)
+
+Open an existing file descriptor as TCP handle; it is expected that C<$sock> is valid stream socket.
+
+Socket is checked for connectivity and appropriate properties (C<readable>, C<writable>, C<connected>, C<established>, ...) are set.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 bind($host, $port, [$hints = defaults], [$flags])
+
+Bind the handle to an address, determined by C<$host>, and the specified C<$port>.
+
+The C<$host> can be a domain name, human-readable IP address or special string C<*>, which means "bind to every available network interface on the host".
+
+C<$port> can be C<0> in which case handle will be bound to a some available port. It can later be inspected via
+
+    say $tcp->sockaddr->port;
+
+If C<$host> is a domain name, it is synchronously resolved to address using the specified C<$hints>, see L<UniEvent::Resolver> for the details.
+
+C<$flags> is the flags for binding.
+The only supported flag for now is C<UE::Tcp::IPV6ONLY> in which case dual-stack support is disabled and only IPv6 is used.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 bind_addr($addr, $flags)
+
+Bind the handle to an address. C<$addr> can be either a L<Net::SockAddr> object or perl-style packed address (what C<sockaddr_in> returns).
+For details on C<$flags> see C<bind()>.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 connect(\%params)
+
+Start connection process to the specified endpoint. Endpoint is specified in C<params> as either host/port or address.
+
+C<params> is a hashref with the following parameters (the only required is one of C<host+port> or C<addr>):
+
+=over
+
+=item host
+
+Can be a domain name or human-readable IP address. If it is a domain name then asynchronous resolve will be made before connecting.
+
+=item port
+
+=item hints
+
+Used as hints during resolving (when host is a domain name). See L<UniEvent::Resolver> for the details.
+
+=item use_cache
+
+Use resolver cache or not during resolving (when host is a domain name). See L<UniEvent::Resolver> for the details.
+
+Default is true.
+
+=item addr
+
+Use this address as an endpoint. Can be either a L<Net::SockAddr> object or perl-style packed address (what C<sockaddr_in> returns).
+If provided then C<host>, C<port>, C<hints> and C<use_cache> are ignored.
+
+=item timeout
+
+Timeout in seconds for the whole connection process (may be fractional).
+This includes possible resolving process, establishing tcp connection and possible SSL handshake if in use
+(i.e. full time until C<connect_event()> is called). See L<UniEvent::Stream>.
+
+Default is 0 (no timeout).
+
+=item callback
+
+One-shot callback to be called upon completion of the connecting process.
+See L<UniEvent::Stream/"connect_event()"> for signature.
+
+=back
+
+The method returns immediately and provides L<UniEvent::Request::Connect> as the result, i.e.
+actual connection will be performed later durning even loop run.
+
+
+=head2 connect($host, $port, [$callback])
+
+More efficient version of
+
+    $tcp->connect({host => $host, port => $port, callback => $callback})
+
+
+=head2 connect($host, $port, $timeout, [$callback])
+
+More efficient version of
+
+    $tcp->connect({host => $host, port => $port, timeout => $timeout, callback => $callback})
+
+
+=head2 connect_addr($addr, [$callback])
+
+More efficient version of
+
+    $tcp->connect({addr => $addr, callback => $callback})
+
+
+=head2 connect_addr($addr, $timeout, [$callback])
+
+More efficient version of
+
+    $tcp->connect({addr => $addr, timeout => $timeout, callback => $callback})
+
+
+=head2 set_nodelay($enable)
+
+Enables (disables) C<TCP_NODELAY>, which disables(enables) Nagle’s algorithm on the handle.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 set_keepalive($enable, $delay)
+
+Enable / disable TCP keep-alive. C<$delay> is the initial delay in seconds, ignored when enable is C<false>.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 set_simultaneous_accepts($enable)
+
+Enable / disable simultaneous asynchronous accept requests that are queued by the
+operating system when listening for new TCP connections.
+
+This setting is used to tune a TCP server for the desired performance. Having
+simultaneous accepts can significantly improve the rate of accepting connections
+(which is why it is enabled by default) but may lead to uneven load distribution
+in multi-process setups.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 sockaddr()
+
+Returns address (as L<Net::SockAddr> object) of the B<local> endpoint.
+
+If socket is not connected, undef is returned.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 peeraddr()
+
+Returns address (as L<Net::SockAddr> object) of the B<remote> (peer) endpoint.
+
+If socket is not connected, undef is returned.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 dump()
+
+Returns string indentifying the Tcp Handle. To be used for debugging purposes.
+
+
+
+=head1 FUNCTIONS
+
+=head2 pair([$loop = default])
+
+=head2 pair(\%params)
+
+Creates pair of connected L<UniEvent::Tcp> handles in a cross-platform way.
+
+First argument is either C<$loop>, or hashref with the following parameters:
+
+=over
+
+=item type
+
+Defaults to C<UniEvent::SOCK_STREAM>.
+
+=item protocol
+
+Defaults to C<UniEvent::PF_UNSPEC>.
+
+=item handle1
+
+=item handle2
+
+If supplied, will use and connect these tcp handles and instead of creating new ones.
+
+They must be in a "clean" state (i.e. just created or after reset).
+
+=item loop
+
+Defaults to default loop
+
+=back
+
+Returns list of two Tcp handles. Will throw on errors.
+
+=cut

@@ -1,9 +1,9 @@
 package App::td;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-08'; # DATE
+our $DATE = '2021-04-10'; # DATE
 our $DIST = 'App-td'; # DIST
-our $VERSION = '0.101'; # VERSION
+our $VERSION = '0.102'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -88,8 +88,8 @@ sub _get_td_obj {
         if (Data::Check::Structure::is_aohos($input->[2])) {
             $input_form = 'aohos';
             my $spec = _get_table_spec_from_envres($input);
-            require TableData::Object::aohos;
-            $input_obj = TableData::Object::aohos->new($input->[2], $spec);
+            require Data::TableData::Object::aohos;
+            $input_obj = Data::TableData::Object::aohos->new($input->[2], $spec);
             last CHECK_STRUCT;
         } else {
             $input_form_err ||= $Data::Check::Structure::errstr;
@@ -98,8 +98,8 @@ sub _get_td_obj {
         if (Data::Check::Structure::is_aoaos($input->[2])) {
             $input_form = 'aoaos';
             my $spec = _get_table_spec_from_envres($input);
-            require TableData::Object::aoaos;
-            $input_obj = TableData::Object::aoaos->new($input->[2], $spec);
+            require Data::TableData::Object::aoaos;
+            $input_obj = Data::TableData::Object::aoaos->new($input->[2], $spec);
             last CHECK_STRUCT;
         } else {
             $input_form_err ||= $Data::Check::Structure::errstr;
@@ -107,8 +107,8 @@ sub _get_td_obj {
 
         if (Data::Check::Structure::is_aos($input->[2])) {
             $input_form = 'aos';
-            require TableData::Object::aos;
-            $input_obj = TableData::Object::aos->new($input->[2]);
+            require Data::TableData::Object::aos;
+            $input_obj = Data::TableData::Object::aos->new($input->[2]);
             last CHECK_STRUCT;
         } else {
             $input_form_err ||= $Data::Check::Structure::errstr;
@@ -116,8 +116,8 @@ sub _get_td_obj {
 
         if (Data::Check::Structure::is_hos($input->[2])) {
             $input_form = 'hos';
-            require TableData::Object::hash;
-            $input_obj = TableData::Object::hash->new($input->[2]);
+            require Data::TableData::Object::hash;
+            $input_obj = Data::TableData::Object::hash->new($input->[2]);
             last CHECK_STRUCT;
         } else {
             $input_form_err ||= $Data::Check::Structure::errstr;
@@ -390,7 +390,7 @@ sub td {
         }
 
         if ($action eq 'info') {
-            my $form = ref($input_obj); $form =~ s/^TableData::Object:://;
+            my $form = ref($input_obj); $form =~ s/^Data::TableData::Object:://;
             my $info = {
                 form => $form,
                 rowcount => $input_obj->row_count,
@@ -766,7 +766,7 @@ App::td - Manipulate table data
 
 =head1 VERSION
 
-This document describes version 0.101 of App::td (from Perl distribution App-td), released on 2020-11-08.
+This document describes version 0.102 of App::td (from Perl distribution App-td), released on 2021-04-10.
 
 =head1 FUNCTIONS
 
@@ -996,7 +996,7 @@ L<TableDef> for more detailed explanation of table data definition, which can be
 specified in enveloped result's `meta` hash in the `table` key (see
 L<Perinci::Sub::Property::result::table>).
 
-L<TableData::Object>
+L<Data::TableData::Object>
 
 L<Perinci::CmdLine>
 
@@ -1006,7 +1006,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

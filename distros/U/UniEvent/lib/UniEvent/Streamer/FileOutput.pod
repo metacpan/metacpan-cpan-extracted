@@ -1,27 +1,32 @@
 =head1 NAME
 
-UniEvent::Streamer::FileOutput - file output streams for streamer
+UniEvent::Streamer::FileOutput - file output for streamer
+
+
+
+=head1 SYNOPSIS
+
+    my $output = UE::Streamer::FileOutput->new("file.txt");
+    my $streamer = UE::Streamer->new($input, $output);
+    $streamer->start();
+    $streamer->finish_callback(sub { ... });
+
+
 
 =head1 DESCRIPTION
 
-Writes incoming pieces of data, coming from  L<UniEvent::Streamer>,
-directly into local file. It is derived from L<UniEvent::Streamer::IOutput>.
+Writes incoming pieces of data, coming from L<UniEvent::Streamer> into file.
 
-It is implemented in C++ for the speed, so it meant not to be
-derived from; in other words it is use only class.
+
 
 =head1 METHODS
 
-=head2 new($path)
+=head2 new($path, [$mode = 0644])
 
 Constructs new file output stream, which will write data into C<$path>.
 
-=head1 REFERENCES
+If file doesn't exist, it will be created with C<$mode> permissions.
 
-L<UniEvent::Streamer>
-
-L<UniEvent::Streamer::IOutput>
-
-L<UniEvent::Streamer::FileIntput>
+NOTE: it will not create any non-existing subdirectories in C<$path>. In this case the process will end up with error.
 
 =cut

@@ -1,11 +1,11 @@
 package Music::Intervals::Ratios;
-$Music::Intervals::Ratios::VERSION = '0.0507';
+$Music::Intervals::Ratios::VERSION = '0.0603';
 our $AUTHORITY = 'cpan:GENE';
+
+# ABSTRACT: Musical ratios
+
 use strict;
 use warnings;
-
-#> perl -Ilib -MMusic::Intervals::Ratios -le'$x=shift;print $Music::Intervals::Ratios::ratio->{$x}{name}' C
-#unison, perfect prime, tonic
 
 # Note ratios, names and descriptions:
 our $ratio = {
@@ -1817,11 +1817,11 @@ __END__
 
 =head1 NAME
 
-Music::Intervals::Ratios
+Music::Intervals::Ratios - Musical ratios
 
 =head1 VERSION
 
-version 0.0507
+version 0.0603
 
 =head1 AUTHOR
 
@@ -1829,7 +1829,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

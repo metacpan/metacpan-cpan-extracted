@@ -1,5 +1,11 @@
 Release history for Markdown-Pod
 
+0.008     2021-04-11 21:35:57+09:00 Asia/Seoul
+    - Remove double spaces if attributes are empty
+    - [GitHub #13] Fix boolean HTML attribute handling bug (POTATOGIM)
+      - Update module dependency: Markdent 0.40
+      - Reported-by: SREZIC, DROLSKY
+
 0.007     2018-02-24 17:58:42+09:00 Asia/Seoul
     - [GitHub #7] Fix nested list converting bug (ZMUGHAL)
       - Add extra newline when starting a nested list

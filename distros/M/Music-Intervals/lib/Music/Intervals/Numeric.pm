@@ -1,15 +1,19 @@
 package Music::Intervals::Numeric;
+$Music::Intervals::Numeric::VERSION = '0.0603';
 our $AUTHORITY = 'cpan:GENE';
-# ABSTRACT: Mathematical breakdown of musical intervals
+
+# ABSTRACT: Breakdown of numeric musical intervals
+
 use strict;
 use warnings;
-our $VERSION = '0.0101';
 
-use Moo;
 use Algorithm::Combinatorics qw( combinations );
 use Math::Factor::XS qw( prime_factors );
-use Number::Fraction;
-use Music::Intervals::Ratio;
+use Number::Fraction ();
+use Music::Intervals::Ratios;
+use Moo;
+use strictures 2;
+use namespace::clean;
 
 
 has notes     => ( is => 'ro', default => sub { [] } );
@@ -27,45 +31,53 @@ has frequencies => ( is => 'rw', default => sub { {} } );
 has intervals => ( is => 'rw', default => sub { {} } );
 has cent_vals => ( is => 'rw', default => sub { {} } );
 has prime_factor => ( is => 'rw', default => sub { {} } );
+has ratios => ( is => 'rw', lazy => 1, builder => 1 );
+
+sub _build_ratios {
+  my ($self) = @_;
+  no warnings 'once';
+  my $ratios = { map {
+    $Music::Intervals::Ratios::ratio->{$_}{ratio} => $Music::Intervals::Ratios::ratio->{$_}{name}
+  } keys %$Music::Intervals::Ratios::ratio };
+  return $ratios;
+}
 
 
-sub process
-{
+sub process {}
+
+sub BUILD {
     my $self = shift;
+
+    return unless @{ $self->notes };
 
     my %x;
 
     my $iter = combinations( $self->notes, $self->size );
-    while (my $c = $iter->next)
-    {
+    while (my $c = $iter->next) {
         my %dyads = $self->dyads($c);
 
-        if ( $self->freq )
-        {
+        if ( $self->freq ) {
             $self->frequencies->{"@$c"} =
-                { map { $_ => $Music::Intervals::Ratio::ratio->{$_} } @$c };
+                { map { $_ => $self->ratios->{$_} } @$c };
         }
-        if ( $self->interval )
-        {
+        if ( $self->interval ) {
             $self->intervals->{"@$c"} = {
                 map {
                     $_ => {
-                        $dyads{$_} => $Music::Intervals::Ratio::ratio->{ $dyads{$_} }
+                        $dyads{$_} => $self->ratios->{ $dyads{$_} }
                     }
                 } keys %dyads
             };
 
         }
-        if ( $self->cent )
-        {
+        if ( $self->cent ) {
             $self->cent_vals->{"@$c"} = {
                 map {
                     $_ => log( eval $dyads{$_} ) * $self->temper
                 } keys %dyads };
 
         }
-        if ( $self->prime )
-        {
+        if ( $self->prime ) {
             $self->prime_factor->{"@$c"} = {
                 map {
                     $_ => {
@@ -78,8 +90,7 @@ sub process
 }
 
 
-sub dyads
-{
+sub dyads {
     my $self = shift;
     my ($c) = @_;
 
@@ -92,7 +103,7 @@ sub dyads
         my $denominator = Number::Fraction->new( $i->[0] );
         my $fraction = $numerator / $denominator;
 
-        $dyads{"@$i"} = $fraction->to_string();
+        $dyads{"@$i"} = $fraction->to_string;
     }
 
     return %dyads;
@@ -124,16 +135,17 @@ __END__
 
 =head1 NAME
 
-Music::Intervals::Numeric - Mathematical breakdown of musical intervals
+Music::Intervals::Numeric - Breakdown of numeric musical intervals
 
 =head1 VERSION
 
-version 0.0507
+version 0.0603
 
 =head1 SYNOPSIS
 
   use Music::Intervals::Numeric;
-  $m = Music::Intervals::Numeric->new(
+
+  my $m = Music::Intervals::Numeric->new(
     notes => [qw( 1/1 5/4 3/2 15/8 )],
     size => 3,
     freq => 1,
@@ -141,15 +153,13 @@ version 0.0507
     cent => 1,
     prime => 1,
   );
-  $m->process;
-  # Then print Dumper any of:
-  $m->frequencies;
-  $m->intervals;
-  $m->cent_vals;
-  $m->prime_factor;
 
-  # Show all the known intervals:
-  perl -MData::Dumper -MMusic::Intervals::Ratio -e'print Dumper $Music::Intervals::Ratio::ratio'
+  print Dumper(
+    $m->frequencies,
+    $m->intervals,
+    $m->cent_vals,
+    $m->prime_factor,
+  );
 
 =head1 DESCRIPTION
 
@@ -230,23 +240,27 @@ Computed hashref
 
 Computed hashref
 
+=head2 ratios
+
+Computed hashref
+
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
   $x = Music::Intervals->new(%arguments);
 
 Create a new C<Music::Intervals> object.
 
-=head2 process()
+=for Pod::Coverage process
 
-Do the actual computations!
+=for Pod::Coverage BUILD
 
-=head2 dyads()
+=head2 dyads
 
 Return pairs of the given combinations with fractional and pitch ratio parts.
 
-=head2 ratio_factorize()
+=head2 ratio_factorize
 
 Return the dyadic fraction as a prime factored expression.
 
@@ -269,7 +283,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

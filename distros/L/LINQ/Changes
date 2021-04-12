@@ -1,0 +1,107 @@
+LINQ
+====
+
+Created:      2014-06-10
+Home page:    <https://metacpan.org/release/LINQ>
+Bug tracker:  <https://github.com/tobyink/p5-linq/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.001	2021-04-11
+
+ [ Packaging ]
+ - Bump version to 0.001.
+
+0.000_009	2021-04-11
+
+ [ Test Suite ]
+ - Almost 100% test coverage.
+
+ [ Other ]
+ - Added: `check_fields()` now has a `-to` parameter.
+ - LINQ::Iterator's `to_array` method now returns an unblessed copy of the
+   blessed tied arrayref that backs the collection.
+
+0.000_008	2021-04-09
+
+ [ Documentation ]
+ - Add pod for LINQ::Array.
+ - Add pod for LINQ::Field.
+ - Add pod for LINQ::FieldSet.
+ - Add pod for LINQ::FieldSet::Assertion.
+ - Add pod for LINQ::FieldSet::Selection.
+ - Add pod for LINQ::Grouping.
+ - Add pod for LINQ::Iterator.
+ - Add pod for LINQ::Util::Internal.
+ - Improve documentation for LINQ::Exception.
+
+ [ Test Suite ]
+ - Improve test coverage.
+
+ [ Other ]
+ - Allow `-nocase` and `-in` to be used together in `check_fields()`.
+ - Change `-not` to `-nix` in `check_fields()`.
+
+0.000_007	2021-04-08	LINQ, James LINQ
+
+ [ Documentation ]
+ - Document working with infinite LINQ collections.
+
+ [ Other ]
+ - Improved `any` and `all` methods.
+ - Improved `contains` method.
+ - Improved `select_many` method.
+ - Improved `select` and `where` methods.
+ - Improved `sequence_equal` method.
+
+0.000_006	2021-04-08
+
+ [ Packaging ]
+ - Require Perl 5.8.3, Object::Adhoc, and match::simple.
+ - Use Github Issues as issue tracker.
+
+ [ Other ]
+ - Added: LINQ::Field, LINQ::FieldSet, LINQ::FieldSet::Selection, and
+   LINQ::FieldSet::Assertion modules.
+ - Added: New LINQ::Util module with two new functions: `fields` and
+   `check_fields`.
+ - Improved `concat` method.
+ - Improved `skip` and `skip_while` methods.
+ - Make `zip` work on potentially infinite collections.
+
+0.000_005	2021-04-06
+
+ [ Documentation ]
+ - Document LINQ::Exception.
+
+ [ Other ]
+ - Added: `foreach` method
+ - Removed: `target_class` method
+
+0.000_004	2021-04-04
+
+ [ Documentation ]
+ - Document the functions provided in LINQ.pm.
+
+ [ Test Suite ]
+ - Improved test coverage.
+
+ [ Other ]
+ - Make `concat` work on potentially infinite collections.
+ - Make `to_iterator` work on potentially infinite collections.
+
+0.000_003	2021-04-04
+
+ [ Documentation ]
+ - Document the LINQ::Collection interface.
+
+ [ Other ]
+ - Make the callable parameter to `order_by` and `order_by_descending`
+   optional.
+
+0.000_002	2021-03-25
+
+ - Added: Implement `default_if_empty`.
+ - Don't require type constraints passed to `of_type` to have a
+   `has_coercion` method. (Works with Type::Nano.)
+
+0.000_001	2021-03-25	Initial release

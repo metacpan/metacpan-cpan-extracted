@@ -1,6 +1,10 @@
 Revision history for Net-IPAddress-Util
 
-5.000   2018-09-03
+5.001   2021-04-10
+        Fix bug where I was confusing "use bigint" and "use Math::BigInt",
+        which caused issues on 32-bit systems compiled without 64-bit support.
+
+5.000   2021-04-05
         v3.x data is not "broken", just "following a different (and more commonly followed) RFC".
         Go back to v3.x being the default, but allow v4.x to be specified with an option-setting method.
         Make the output of Data::Dumper *not* break certain terminals.

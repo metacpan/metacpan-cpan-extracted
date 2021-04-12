@@ -38,10 +38,10 @@ struct SockAddr {
     bool is_inet4 () const { return family() == AF_INET; }
     bool is_inet6 () const { return family() == AF_INET6; }
 
-    const Inet4& inet4 () const { return *((const Inet4*)this); }
-    const Inet6& inet6 () const { return *((const Inet6*)this); }
-    Inet4&       inet4 ()       { return *((Inet4*)this); }
-    Inet6&       inet6 ()       { return *((Inet6*)this); }
+    const Inet4& as_inet4 () const { return *((const Inet4*)this); }
+    const Inet6& as_inet6 () const { return *((const Inet6*)this); }
+    Inet4&       as_inet4 ()       { return *((Inet4*)this); }
+    Inet6&       as_inet6 ()       { return *((Inet6*)this); }
 
     const sockaddr* get () const { return &sa; }
     sockaddr*       get ()       { return &sa; }
@@ -77,7 +77,7 @@ struct SockAddr {
 
     bool is_unix () const { return family() == AF_UNIX; }
 
-    Unix& unix () const { return *((Unix*)this); }
+    Unix& as_unix () const { return *((Unix*)this); }
   #endif
 
 protected:

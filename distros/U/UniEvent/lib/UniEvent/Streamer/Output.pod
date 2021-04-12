@@ -1,55 +1,110 @@
 =head1 NAME
 
-UniEvent::Streamer::Output - Pure Perl Output stream bridge
+UniEvent::Streamer::Output - base class for custom consumers for streamer
+
+
+
+=head1 SYNOPSYS
+
+    package MyOutput;
+    use parent 'UniEvent::Streamer::Output';
+    use 5.012;
+    
+    sub new {
+        my ($class, ...) = @_;
+        my $self = $class->SUPER::new();
+        ...
+        return $self;
+    }
+    
+    sub start            { ... }
+    sub stop             { ... }
+    sub write            { ... }
+    sub write_queue_size { return length(shift->{buffer}) }
+
+    ...
+    
+    my $output = MyOutput->new(...);
+    my $streamer = UE::Streamer->new($input, $output);
+    ...
+
+
 
 =head1 DESCRIPTION
 
-This is pure perl output stream, meant to be assigned with L<UniEvent::Streamer>.
-It is assumed, that the class will consume data fed by L<UniEvent::Streamer>.
+This is base class for custom output streams, meant to be assigned with L<UniEvent::Streamer>.
+It is assumed, that you will send data, given by L<UniEvent::Streamer>, to some external destination will generate data and eof event, and
 
-For example, it can output the TCP Input stream into terminal, or calculate
-the input stream MD5 checksum.
+C<Streamer> will use output object as follows: it will call C<start()> once and then will periodically call C<write()>. You are expected to write that data somewhere
+and call C<handle_write()> for each corresponding C<write()>. In case of any error you must call C<handle_write()> with error.
+You must implement any kind of dynamic-size buffer (if it's not already implemented by lower level objects that you use to write data) and return summary size
+of all not yet completed writes from method C<write_queue_size()> which will be called by C<Streamer> periodically.
+C<Streamer> will call C<stop()> method once when the process finishes successfully or with error.
 
-It is derived from L<UniEvent::Streamer::IOutput>.
+
 
 =head1 METHODS
 
 =head2 new()
 
-Constructs new pupe perl output stream.
+Constructs new output stream.
+
+If you override this method, you MUST proxy to parent and use return value as C<$self>.
+
 
 =head2 start($loop)
 
-This method is invoked upon underlying L<UniEvent::Streamer> start. Executed
-once per Streamer/Output lifetime.
+This method will be invoked by C<Streamer> upon start. Executed once per object lifetime.
+
+This method should return C<undef> if no error occured or L<XS::ErrorCode> object otherwise.
+
+NOTE: This is a callback, do not call this method by yourself!
+
 
 =head2 stop()
 
-This method is invoked upon underlying L<UniEvent::Streamer> stop. Executed
-once per Streamer/Output lifetime. No any further I/O is expected.
+This method is invoked when C<Streamer> finishes. Executed once per object lifetime. No any further I/O is expected.
+
+In this method you are expected to release all resources.
+
+NOTE: This is a callback, do not call this method by yourself!
+
 
 =head2 write($data)
 
-Consumes the input data. Meant to be overriden in descendant classes to
-do something useful.
+This method is invoked when C<Streamer> receives chunk of data from input.
 
-The method returns L<XS::ErrorCode> to let the L<UniEvent::Streamer> know
-about success or failure of data consumption.
+You are expected to start writing process for that chunk. When the process finishes you must call C<handle_write()>. C<Streamer> may call C<write()> many times
+without waiting for you to call C<handle_write()> for previous requests.
+Regardless of how calls to C<write()> were made you must call C<handle_write()> for each C<write()> when appropriate write request finishes.
+
+This method should return C<undef> if no error occured or L<XS::ErrorCode> object otherwise. If an error occurs later, in async writing process, call
+C<handle_write()> with error. Anyway, regardless of how you return error (in this method or with C<handle_write()>), after that the process will stop immediately
+and C<stop()> will be called. You should not call C<handle_write()> after that.
+
+NOTE: This is a callback, do not call this method by yourself!
+
 
 =head2 write_queue_size()
 
-The method is invoked by the L<UniEvent::Streamer> to determine max size of
-single data chunk.
+This method must return size of data buffered in memory in your output object or in lower-level objects.
 
-=head2 handle_write($error_code)
+If this size will be greater than configured max buffer size in C<Streamer>, it will temporarily suspend input stream, giving you time to complete a part of
+pending writes.
 
-This method can be invoked, to let the L<UniEvent::Streamer> know, that
-something has happend with the output.
+You must implement such buffer by yourself. The reason why this buffer is not implemented in C<Streamer> itself is that many objects already have output buffer.
+For example L<UniEvent::Stream> handles have output buffer and C<write_queue_size()> method. In this case implementing such buffer in C<Streamer> would lead
+to less efficient execution.
 
-=head1 REFERENCES
+NOTE: This is a callback, do not call this method by yourself!
 
-L<UniEvent::Streamer>
 
-L<UniEvent::Streamer::IOutput>
+=head2 handle_write([$error])
+
+You must call this method when one of pending write requests finishes. If any error occured during sending data, pass C<$error> argument.
+
+C<$error> must be L<XS::ErrorCode> object. You can use UniEvent::SystemError::* constants to create errors.
+
+    $self->handle_write(UniEvent::SystemError::timed_out);
 
 =cut

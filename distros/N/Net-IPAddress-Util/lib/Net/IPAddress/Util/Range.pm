@@ -13,7 +13,7 @@ use overload (
 use Net::IPAddress::Util qw( :constr :manip );
 require Net::IPAddress::Util::Collection;
 
-our $VERSION = '5.000';
+our $VERSION = '5.001';
 
 sub new {
   my $class = shift;

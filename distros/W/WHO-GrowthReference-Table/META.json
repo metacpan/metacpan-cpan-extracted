@@ -34,8 +34,8 @@
       "runtime" : {
          "requires" : {
             "Data::Section::Seekable::Reader" : "0",
+            "Data::TableData::Lookup" : "0",
             "Exporter" : "5.57",
-            "TableData::Lookup" : "0",
             "Text::CSV" : "1.91",
             "perl" : "5.010001",
             "strict" : "0",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/perlancar/perl-WHO-GrowthReference-Table"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

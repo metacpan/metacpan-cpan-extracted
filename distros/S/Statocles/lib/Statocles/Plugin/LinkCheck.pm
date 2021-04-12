@@ -1,5 +1,5 @@
 package Statocles::Plugin::LinkCheck;
-our $VERSION = '0.097';
+our $VERSION = '0.098';
 # ABSTRACT: Check links and images for validity during build
 
 use Statocles::Base 'Class';
@@ -138,7 +138,7 @@ Statocles::Plugin::LinkCheck - Check links and images for validity during build
 
 =head1 VERSION
 
-version 0.097
+version 0.098
 
 =head1 SYNOPSIS
 

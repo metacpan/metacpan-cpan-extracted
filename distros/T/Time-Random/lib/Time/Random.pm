@@ -1,5 +1,5 @@
 package Time::Random;
-use 5.006; use strict; use warnings; our $VERSION = '0.07';
+use 5.006; use strict; use warnings; our $VERSION = '1.00';
 use Time::Piece;
 use base 'Import::Export';
 our %EX = (
@@ -30,7 +30,7 @@ Time::Random - Generate a random time in time.
 
 =head1 VERSION
 
-Version 0.07
+Version 1.00
 
 =cut
 
@@ -161,7 +161,7 @@ L<http://search.cpan.org/dist/Time-Random/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 lnation.
+Copyright 2018->2021 lnation.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

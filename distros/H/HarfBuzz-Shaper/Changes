@@ -1,6 +1,10 @@
 Revision history for HarfBuzz::Shaper.
 
-0.023
+0.024 2021-04-12
+
+    - Fix build problem of the fallback library on MacOS Catalina.
+
+0.023 2020-07-11
 
     - Fix language setting.
     - Add set/get script and direction.

@@ -1,5 +1,17 @@
 Revision history for Perl extension Text::Wrap::Smart.
 
+0.8  2021-04-11  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.7_02  2021-04-10  <schubiger@cpan.org>
+
+ - Remove leftover in t/fuzzy_wrap.t.
+
+0.7_01  2021-04-08  <schubiger@cpan.org>
+
+ - Remove deprecated wrap_smart() and related bits.
+
 0.7  2016-10-14  <schubiger@cpan.org>
 
  - Merged development version to stable.

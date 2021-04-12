@@ -32,7 +32,7 @@ void start_server (uint16_t port, int len) {
         });
     });
     
-    auto timer = Timer::start(1000, [](auto) {
+    auto timer = Timer::create(1000, [](auto) {
         printf("server receive reads: %d, pps: %d, bytes: %zu, avg reads per loop: %.2f\n", read_cnt, (int)packets, bytes, (double)read_cnt / loopit_cnt);
         packets = loopit_cnt = read_cnt = bytes = 0;
     });
@@ -60,7 +60,7 @@ void start_client (uint16_t port, string data) {
     
     client->write(data);
     
-    auto timer = Timer::start(1, [client, data](auto) {
+    auto timer = Timer::create(1, [client, data](auto) {
         client->write(data);
     });
     timer->retain();

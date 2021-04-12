@@ -16,7 +16,7 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.19.0
+Version 4.19.1
 
 =head1 SYNOPSIS
 
@@ -214,7 +214,8 @@ use Text::VisualWidth::PP qw(vwidth);
 use Text::ANSI::Fold qw(ansi_fold :constants);
 Text::ANSI::Fold->configure(padding => 1, expand => 1, tabstop => $opt_tabstop);
 
-if ($opt_visible{ht} or $opt_tabstyle) {
+$opt_visible{ht} //= 1 if $opt_tabstyle;
+if ($opt_visible{ht}) {
     Text::ANSI::Fold->configure(
 	tabstyle => $opt_tabstyle,
 	map  { $_->[0] => unicode($_->[1]) }
@@ -1167,20 +1168,45 @@ by default.
 =item B<--tabspace>=I<char>
 
 Visualize characters.  Currently only C<ht> (horizontal tab) is
-supported.  Each tab character is converted to B<tabhead> and
-following B<tabspace> characters.  They can be specified by
-B<--tabhead> and B<--tabspace> option and default value is C<\N{MEDIUM
-SHADE}> and C<\N{LIGHT SHADE}>.  If the option value is longer than
-single characger, it is evaluated as unicode name.
+supported.  Each horizontal tab character is converted to B<tabhead>
+and following B<tabspace> characters.  They can be specified by
+B<--tabhead> and B<--tabspace> option.
+
+    $ sdif --visible ht=1 --tabhead=T --tabspace=.
+
+If the option value is longer than single characger, it is evaluated
+as unicode name.
+
+    $ sdif --visible ht=1 \
+           --tabhead="MEDIUM SHADE" \
+           --tabspace="LIGHT SHADE"
+
+See L<https://www.unicode.org/charts/charindex.html> for Unicode
+names.
 
 B<cdif> shows non-space control characters visible by default. See
 L<cdif/--visible>.
 
-=item B<--tabstyle>=I<dot>|I<symbol>|I<shade>
+=item B<--tabstyle>=I<space>|I<dot>|I<symbol>|I<shade>|I<bar>|I<dash>...
 
 Option B<--tabstyle> allow to set B<--tabhead> and B<--tabspace>
 characters at once according to the given style name.  Select from
-C<dot>, C<symbol> or C<shade>.  See L<Text::ANSI::Fold/tabstyle>.
+C<space>, C<dot>, C<symbol>, C<shade>, C<bar>, C<dash> and others.
+See L<Text::ANSI::Fold/tabstyle> for available styles.
+
+Mutiple styles can be mixed up like C<symbol,space>.  In this case,
+tabhead and tabspace are taken from C<symbol> and C<space> style
+respectively.
+
+Setting tabstyle implies C<ht> being visible.  If you want to set
+tabstyle by default, but don't want to make tab visible always,
+disable it explicitly.
+
+    option default --tabstyle=symbol,space --visible ht=0
+
+Then you can enable it at the time of execution.
+
+    $ sdif --visible ht=1
 
 =item B<--tabstop>=I<n>
 

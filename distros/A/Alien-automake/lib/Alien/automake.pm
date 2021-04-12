@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build or find automake
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 
 
@@ -27,7 +27,7 @@ Alien::automake - Build or find automake
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ In your script or module:
 
  use Alien::automake;
  use Env qw( @PATH );
- 
+
  unshift @PATH, Alien::automake->bin_dir;
 
 =head1 DESCRIPTION
@@ -71,7 +71,11 @@ upstream alien uses the system library so you won't need to install this module.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Roy Storey (KIWIROY)
 
 =head1 COPYRIGHT AND LICENSE
 

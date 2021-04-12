@@ -4,20 +4,19 @@ UniEvent::Idle - runs the given callback once per loop iteration
 
 =head1 SYNOPSIS
 
-    my $loop = UniEvent::Loop->new;
     my $h = UniEvent::Idle->new($loop);
-    $h->event->add(sub { say 'hello' });
+    $h->event->add(sub {
+        my $h = shift;
+        # do some work
+        if (done) { $h->stop;}
+    });
     $h->start;
-    $loop->run_nowait;  # prints 'hello'
-    $loop->run;         # prints 'hello' multiple times... don't do that
 
-    $h->stop;
-    $h->reset;
+
 
 =head1 DESCRIPTION
 
-The handlce causes invocation on added callback(s) to be invoked once
-per loop iteration, before preraing them for I/O.
+Idle handle invokes callbacks once per loop iteration, before preparing them for I/O.
 
 Adding the handle to the event loop causes it the loop to  perform a zero
 timeout poll instead of blocking for I/O. Generally it is rather
@@ -25,70 +24,56 @@ CPU consuming, so you should have a reason to do that.
 
 The handle is inherited from L<UniEvent::Handle>.
 
-=head1 METHOD
 
-=head2 new([$loop = UniEvent::Loop->default_loop])
+
+=head1 METHODS
+
+All methods of L<UniEvent::Handle> also apply.
+
+
+=head2 create($callback, [$loop = default])
+
+    my $handle = UniEvent::Idle->create(sub { say "hi" });
+
+Creates and starts an idle handle. Alias for C<new($loop)> + C<start($callback)>.
+
+
+=head2 new([$loop = default])
 
 Constructs new Idle handle and binds it to the specified event loop
 
-=head2 start([$callback = undef])
+
+=head2 start([$callback])
 
 Starts the Idle handle, i.e. makes it active for the next even loop
 iteration. Optionally it adds the C<$callback> to the event listeners.
 
+
 =head2 stop()
 
-Stops the Idle handle, i.e. makes it inactive for the next event loop
-iteration.
+Stops the Idle handle, i.e. makes it inactive for the next event loop iteration.
 
-=head2 callback($code)
 
-Sets the callback, which will be invoked after loop run. All previously
-set event listeners or callbacks are discarded.
+=head2 callback($sub)
 
 =head2 event()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callbacks will be invoked once per loop iteration
-before preparing other hanlders for I/O. The C++ interface is:
+Callback signature:
 
-    void(const IdleSP&);
+    my $handle = shift; # the "idle" handle itself
 
-i.e. the callback returns nothing and as an argument takes Idle handle
-itself.
+See L<UniEvent/"EVENT CALLBACKS">
 
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
 
-=head2 event_listener($delegate [, $weak = false])
+=head2 event_listener($delegate, [$weak])
 
-Creates and returns wrapper around the C<$delegate> object of arbitrary
-class, having the following methods:
+Method C<on_idle> will be called.
 
-  $delegate->on_idle($handle);
+See L<UniEvent/"EVENT LISTENER">
 
-The delegated object can be seen as alternative of setting indivitual callbacks
-or as a way of groupping them. The C<$delegate> object can optionally be weakened.
 
 =head2 call_now()
 
-Immediately ivokes assigned callbacks and listeners in the caller context
-(i.e. not waiting loop run).
-
-=head1 CONSTANTS
-
-=head2 TYPE
-
-Idle type constant
-
-=head1 REFERENCES
-
-L<UniEvent::Check>
-
-L<UniEvent::Handle>
-
-L<UniEvent::Prepare>
-
-L<XS::Framework::CallbackDispatcher>
+Immediately ivokes assigned callbacks and listeners.
 
 =cut

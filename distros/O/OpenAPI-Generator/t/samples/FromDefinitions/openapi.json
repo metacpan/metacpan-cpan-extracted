@@ -1,0 +1,24 @@
+{
+    "paths": {
+        "/api/route2": {
+            "post": "value2"
+        }
+    },
+    "components": {
+        "schemas": {
+            "c2": {
+                "key2": "value2"
+            }
+        },
+        "parameters": {
+            "p2": {
+                "key2": "value2"
+            }
+        },
+        "securitySchemes": {
+            "s2": {
+                "key2": "value2"
+            }
+        }
+    }
+}

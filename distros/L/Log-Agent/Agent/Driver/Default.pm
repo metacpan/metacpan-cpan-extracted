@@ -82,6 +82,19 @@ sub logconfess {
 }
 
 #
+# ->logcluck		-- redefined
+#
+# Warning, with stack trace
+#
+sub logcluck {
+	my $self = shift;
+	my ($str) = @_;
+	require Carp;
+	my $msg = $self->carpmess(0, $str, \&Carp::longmess);
+	warn $self->prefix_msg("$msg\n");
+}
+
+#
 # ->logxcroak		-- redefined
 #
 # Fatal error, from perspective of caller

@@ -1,0 +1,129 @@
+=head1 NAME
+
+UniEvent::Timer - schedule callbacks to be invoked in future
+
+
+
+=head1 SYNOPSIS
+
+    use UniEvent::Timer;
+
+    my $t = UE::timer 1.5, sub { ... };
+    my $t = UE::timer_once 60, sub { ... };
+    
+    UE::Loop->default->run;
+
+    my $t = UniEvent::Timer->new();
+    $h->start(2.7, sub { ... });
+    $h->again();
+    $h->stop;
+
+
+
+=head1 DESCRIPTION
+
+The Timer handle is used, when needed to run piece of code in future.
+If the code needs to be run once, the I<one-shot> interface of the timer is used, otherwise the I<repeatable> interface methods should be invoked.
+In any case the same callback(s) will be invoked, independently from kind of timer.
+
+The Timer handle is inherited from L<UniEvent::Handle>.
+
+
+
+=head1 METHODS
+
+All methods of L<UniEvent::Handle> also apply.
+
+
+=head2 create($repeat, $callback, [$loop = default])
+
+    my $timer = UniEvent::Timer->create(0.5, sub { say "hi" });
+
+Creates and starts a timer. Alias for C<new($loop)> + C<start($repeat, $callback)>.
+
+
+=head2 create_once($initial, $callback, [$loop = default])
+
+    my $timer = UniEvent::Timer->create_once(0.5, sub { say "hi" });
+
+Creates and starts a one-shot timer. Alias for C<new($loop)> + C<once($initial, $callback)>.
+
+
+=head2 new([$loop = default])
+
+Constructs new Timer handle and binds it to the specified event loop.
+
+
+=head2 start($repeat, [$callback])
+
+=head2 start($repeat, $initial, [$callback])
+
+Starts the repeatable timer handle. The timer callback will fire first time after C<$initial> amount of seconds,
+and then endlessly repeating firing after each C<$repeat> seconds. Both values can be fractional.
+
+In the first form C<$initial> equals to C<$repeat>.
+
+Optionally it adds the C<$callback> as ->event->add($callback).
+
+
+=head2 stop()
+
+Stops the timer handle.
+
+
+=head2 once($initial, [$callback])
+
+Starts the one-shot timer handle. The timer callback will fire time after C<$initial> amount of seconds (can be fractional).
+
+Optionally it adds the C<$callback> as ->event->add($callback).
+
+The C<$initial> value should not be zero. It is unspecified what will happen in this case.
+If you want to execute code "a little later" (on next loop iteration, for example), use L<UniEvent::Loop/"delay($callback)">.
+
+
+=head2 callback($sub)
+
+=head2 event()
+
+Callback signature:
+
+    my $handle = shift; # the timer handle itself
+
+See L<UniEvent/"EVENT CALLBACKS">
+
+
+=head2 event_listener($delegate, [$weak])
+
+Method C<on_timer> will be called.
+
+See L<UniEvent/"EVENT LISTENER">
+
+
+=head2 call_now()
+
+Immediately ivokes assigned callbacks and listeners in the caller context (i.e. not waiting loop run).
+
+
+=head2 again()
+
+Stop the timer, and if it is repeating restart it using the last C<$initial> or C<$repeat> as the timeout.
+
+It's an error to call this method if timer has never been started.
+
+L<May return error|UniEvent/"OPTIONAL ERRORS">
+
+
+=head2 repeat([$new_value])
+
+Sets or gets the repeat interval value in seconds (may be fractional).
+
+
+=head2 due_in()
+
+Returns time in seconds remaining for timer to fire. Returns 0 if timer has expired.
+
+Note that this value is relative to L<UniEvent::Loop/"now()"> so it may be inaccurate in case if you were not returning to the loop for some time.
+
+In such case call L<UniEvent::Loop/"update_time()"> before calling C<due_in()> to get accurate value.
+
+=cut

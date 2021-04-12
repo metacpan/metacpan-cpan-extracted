@@ -1,0 +1,159 @@
+NAME
+    SMS::Send::KR::Aligo - An SMS::Send driver for the smartsms.aligo.in SMS
+    service
+
+VERSION
+    version 0.005
+
+SYNOPSIS
+        use SMS::Send;
+
+        # create the sender object
+        my $sender = SMS::Send->new("KR::Aligo",
+            _id      => "keedi",
+            _api_key => "XXXXXXXX",
+            _from    => "01025116893",
+        );
+
+        # send a message
+        my $sent = $sender->send_sms(
+            text  => "You message may use up to 90 chars and must be utf8",
+            to    => "01012345678",
+        );
+
+        unless ( $sent->{success} ) {
+            warn "failed to send sms: $sent->{reason}\n";
+
+            # if you want to know detail more, check $sent->{detail}
+            use Data::Dumper;
+            warn Dumper $sent->{detail};
+        }
+
+        # Of course you can send LMS
+        my $sender = SMS::Send->new("KR::Aligo",
+            _id      => "keedi",
+            _api_key => "XXXXXXXX",
+            _type    => "lms",
+            _from    => "01025116893",
+        );
+
+        # You can override _from or _type
+
+        #
+        # send a message
+        #
+        my $sent = $sender->send_sms(
+            text     => "You LMS message may use up to 2000 chars and must be utf8",
+            to       => "01025116893",
+            _from    => "02114",             # you can override $self->_from
+            _type    => "LMS",               # you can override $self->_type
+            _subject => "This is a subject", # subject is optional & up to 40 chars
+        );
+
+DESCRIPTION
+    SMS::Send driver for sending SMS messages with the Aligo SMS service
+    <https://smartsms.aligo.in/admin/api/spec.html>.
+
+ATTRIBUTES
+  _url
+    DO NOT change this value except for testing purpose. Default is
+    "https://apis.aligo.in".
+
+  _agent
+    The agent value is sent as the "User-Agent" header in the HTTP requests.
+    Default is "SMS-Send-KR-Aligo/#.###".
+
+  _timeout
+    HTTP request timeout seconds. Default is 3.
+
+  _id
+    Required. Aligo API id for REST API.
+
+  _api_key
+    Required. Aligo API key for REST API.
+
+  _from
+    Required. Source number to send sms.
+
+  _type
+    Type of sms. Currently "SMS" and "LMS" are supported. Default is "SMS".
+
+  _delay
+    Delay second between sending sms. Default is 0.
+
+METHODS
+  new
+    This constructor should not be called directly. See SMS::Send for
+    details.
+
+    Available attributes are:
+
+    *   "_url"
+
+    *   "_agent"
+
+    *   "_timeout"
+
+    *   "_from"
+
+    *   "_type"
+
+    *   "_delay"
+
+    *   "_id"
+
+    *   "_api_key"
+
+  send_sms
+    This method should not be called directly. See SMS::Send for details.
+
+    Available parameters are:
+
+    *   "text": SMS: 0 ~ 90 Byte, LMS/MMS: 1 ~ 2000 Byte
+
+    *   "to": Number of the receiver
+
+    *   "_from": [OPTIONAL] Registered number of the sender. Use this
+        parameter to override the initial attribute value.
+
+    *   "_type": [OPTIONAL] "SMS", "LMS", "MMS". Use this parameter to
+        override the initial attribute value.
+
+    *   "_delay": [OPTIONAL] Delay second between sending sms. Default is 0.
+
+    *   "_subject": [OPTIONAL] 1 ~ 44 Byte only for LMS/MMS. Default is to
+        use the first part of the "text" as a subject.
+
+    *   "_epoch": [OPTIONAL] Reservation scheduling to send sms. Based on
+        Asia/Seoul time zone. Default is to send sms from the fly.
+
+SEE ALSO
+    *   SMS::Send
+
+    *   SMS::Send::Driver
+
+    *   Aligo REST API <https://smartsms.aligo.in/admin/api/spec.html>
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/keedi/p5-SMS-Send-KR-Aligo/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/keedi/p5-SMS-Send-KR-Aligo>
+
+      git clone https://github.com/keedi/p5-SMS-Send-KR-Aligo.git
+
+AUTHOR
+    김도형 - Keedi Kim <keedi@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by Keedi Kim.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -45,7 +45,7 @@ sub Item {
           if ($value =~ /^-[a-zA-Z]([\w])*$/) { # -option1 or -option-1
             return $value;
           } elsif ($value =~ /^-?\d+(\.\d*(e[+-]?\d+)?)?$/) { # -1. or 1.0 or -1.2e+22  or 1.02e+034
-            if ($value =~ /(.*[-+]e)0+(\d+)/) {   # removing the 0 after e+ or e-
+            if ($value =~ /(.*e[-+])0+(\d+)/) {   # removing the 0 after e+ or e-
               return $1.$2;
             } else {
               return $value;

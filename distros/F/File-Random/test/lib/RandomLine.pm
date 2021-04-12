@@ -78,8 +78,12 @@ sub multiple_lines_are_the_expected_ones_random_line_with_sample_size : Test(1) 
 
 sub get_really_lines : Test(8) {
     my $self = shift;
+
+    srand(42);  # Fix random seed to have deterministic tests, see also https://github.com/hanfried/File-Random/issues/6 or https://rt.cpan.org/Public/Bug/Display.html?id=123680
+
     SIZE_IS_KNOWN: {
         my ($line1, $line2, $line3) = random_line($self->{normal_file},3);
+        print STDERR "Lines:", $line1, $line2, $line3, "\n";
         ok defined($line1), "1st returned line of random_line should be defined";
         ok defined($line2), "2nd returned line of random_line should be defined";
         ok defined($line3), "3rd returned line of random_line should be defined";

@@ -23,8 +23,8 @@ Gene
 Intervals
 Music
 Numeric
-Ratio
 Ratios
+dyads
 equalt
 freqs
 gene

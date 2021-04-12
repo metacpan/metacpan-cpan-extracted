@@ -19,7 +19,7 @@ isa_ok $object, $class;
 
 # Non-inherited methods
 can_ok $object, qw( filter_set descr filter mp_filter remarks org tech_c
-    admin_c notify mnt_by mnt_lower changed source);
+    admin_c notify mnt_by mnt_lower source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -85,12 +85,6 @@ is_deeply( $object->mnt_lower(), ['MAINT-EXAMPLECOM'], 'mnt_lower properly parse
 $object->mnt_lower('MAINT2-EXAMPLECOM');
 is( $object->mnt_lower()->[1], 'MAINT2-EXAMPLECOM', 'mnt_lower properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['abc@somewhere.com 20120131'], 'changed properly parsed' );
-$object->changed('abc@somewhere.com 20120228');
-is( $object->changed()->[1], 'abc@somewhere.com 20120228', 'changed properly added' );
-
 # Test 'source'
 $tested{'source'}++;
 is( $object->source(), 'RIPE', 'source properly parsed' );
@@ -117,6 +111,5 @@ admin-c:        ADM-CTCT
 notify:         watcher@somewhere.com
 mnt-by:         MAINT-EXAMPLECOM
 mnt-lower:      MAINT-EXAMPLECOM
-changed:        abc@somewhere.com 20120131
 source:         RIPE
 

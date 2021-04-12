@@ -1,0 +1,73 @@
+=head1 NAME
+
+  Controller2 - example secodn api conroller
+
+=head1 OPENAPI
+
+=over 2
+
+=item POST /api/route3
+
+  parameters:
+    - name: productId
+      in: query
+      schema:
+        type: integer
+    - $ref: "#/components/parameters/TaskId"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: number
+  responses:
+    "200":
+      description: response
+=cut
+
+=item PARAM TaskId
+
+  name: id
+  in: query
+  schema:
+    type: integer
+    minimum: 1
+
+=item SECURITY Cookie
+
+  type: http
+  description: Cookie auth
+  name: auth
+  in: cookie
+  scheme:
+    type: string
+
+=item PUT /api/route2
+
+  parameters:
+    - name: id
+      in: query
+      schema:
+        type: integer
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: number
+  responses:
+    "200":
+      description: response
+
+=item SCHEMA ProductInfo
+
+  type: object
+  properties:
+    name:
+      type: string
+    cost:
+      type: number
+
+=back

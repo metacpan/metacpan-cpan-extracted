@@ -288,7 +288,8 @@ tiff_GetField (tif, tag)
         PPCODE:
 /* See http://www.libtiff.org/man/TIFFGetField.3t.html */
                 switch (tag) {
-                    /* single uint16 */
+                    /* byte single uint8 */
+                    /* short single uint16 */
 		    case TIFFTAG_BITSPERSAMPLE:
 		    case TIFFTAG_COMPRESSION:
 		    case TIFFTAG_FILLORDER:
@@ -298,6 +299,7 @@ tiff_GetField (tif, tag)
 		    case TIFFTAG_ORIENTATION:
 		    case TIFFTAG_PHOTOMETRIC:
 		    case TIFFTAG_PLANARCONFIG:
+                    case TIFFTAG_PREDICTOR:
 		    case TIFFTAG_RESOLUTIONUNIT:
 		    case TIFFTAG_SAMPLESPERPIXEL:
 		    case TIFFTAG_THRESHHOLDING:
@@ -306,7 +308,7 @@ tiff_GetField (tif, tag)
                         }
                         break;
 
-                    /* single float */
+                    /* single 64-bit unsigned fraction float */
 		    case TIFFTAG_XRESOLUTION:
 		    case TIFFTAG_YRESOLUTION:
 		    case TIFFTAG_XPOSITION:
@@ -316,7 +318,7 @@ tiff_GetField (tif, tag)
                         }
                         break;
 
-                    /* two uint16 */
+                    /* two short uint16 */
 		    case TIFFTAG_PAGENUMBER:
 		    case TIFFTAG_HALFTONEHINTS:
                         if (TIFFGetField (tif, tag, &ui16, &ui16_2)) {
@@ -325,7 +327,7 @@ tiff_GetField (tif, tag)
                         }
                         break;
 
-                    /* count + array of uint16 */
+                    /* count + array of short uint16 */
 		    case TIFFTAG_EXTRASAMPLES:
                         if (TIFFGetField (tif, tag, &ui16, &aui16)) {
                             int i;
@@ -334,7 +336,7 @@ tiff_GetField (tif, tag)
                         }
                         break;
 
-                    /* three array of uint16 */
+                    /* three array of short uint16 */
 		    case TIFFTAG_COLORMAP:
                         if (TIFFGetField (tif, tag, &aui16, &aui16_2, &aui16_3)) {
                           if ((aui16 != (uint16 *) NULL)
@@ -408,7 +410,8 @@ tiff_GetFieldDefaulted (tif, tag)
                 int             vector_length;
         PPCODE:
                 switch (tag) {
-                    /* single uint16 */
+                    /* byte single uint8 */
+                    /* short single uint16 */
 		    case TIFFTAG_BITSPERSAMPLE:
 		    case TIFFTAG_COMPRESSION:
 		    case TIFFTAG_FILLORDER:
@@ -418,6 +421,7 @@ tiff_GetFieldDefaulted (tif, tag)
 		    case TIFFTAG_ORIENTATION:
 		    case TIFFTAG_PHOTOMETRIC:
 		    case TIFFTAG_PLANARCONFIG:
+                    case TIFFTAG_PREDICTOR:
 		    case TIFFTAG_RESOLUTIONUNIT:
 		    case TIFFTAG_SAMPLESPERPIXEL:
 		    case TIFFTAG_THRESHHOLDING:
@@ -426,7 +430,7 @@ tiff_GetFieldDefaulted (tif, tag)
                         }
                         break;
 
-                    /* single float */
+                    /* single 64-bit unsigned fraction float */
 		    case TIFFTAG_XRESOLUTION:
 		    case TIFFTAG_YRESOLUTION:
 		    case TIFFTAG_XPOSITION:
@@ -436,7 +440,7 @@ tiff_GetFieldDefaulted (tif, tag)
                         }
                         break;
 
-                    /* two uint16 */
+                    /* two short uint16 */
 		    case TIFFTAG_PAGENUMBER:
 		    case TIFFTAG_HALFTONEHINTS:
                         if (TIFFGetFieldDefaulted (tif, tag, &ui16, &ui16_2)) {
@@ -445,7 +449,7 @@ tiff_GetFieldDefaulted (tif, tag)
                         }
                         break;
 
-                    /* count + array of uint16 */
+                    /* count + array of short uint16 */
 		    case TIFFTAG_EXTRASAMPLES:
                         if (TIFFGetFieldDefaulted (tif, tag, &ui16, &aui16)) {
                             int i;
@@ -454,7 +458,7 @@ tiff_GetFieldDefaulted (tif, tag)
                         }
                         break;
 
-                    /* three array of uint16 */
+                    /* three array of short uint16 */
 		    case TIFFTAG_COLORMAP:
                         if (TIFFGetFieldDefaulted (tif, tag, &aui16, &aui16_2, &aui16_3)) {
                           if ((aui16 != (uint16 *) NULL)

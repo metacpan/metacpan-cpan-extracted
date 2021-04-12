@@ -1,5 +1,11 @@
 Revision history for Perl extension Geo::IP2Location.
 
+8.50  Mon April 12 16:00:00 2021
+      Twentieth release under the Geo::IP2Location
+      Added new function "get_addresstype"
+      Added new function "get_category"
+      Added new function "Geo::IP2Location::get_last_error_message()"
+
 8.40  Fri July 24 16:00:00 2020
       Nineteenth release under the Geo::IP2Location
       Added close() function to close file handle

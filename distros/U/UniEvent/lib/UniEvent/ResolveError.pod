@@ -1,10 +1,14 @@
 =head1 NAME
 
-UniEvent::ResolveError - Perl for UniEvent resolve errors.
+UniEvent::ResolveError - errors constants for resolve error category.
+
+
 
 =head1 DESCRIPTION
 
-The package contains resolver error constants.
+The package contains resolver error constants, used with category C<UniEvent::Error::resolve_category()>.
+
+
 
 =head1 CONSTANTS
 
@@ -46,15 +50,4 @@ The package contains resolver error constants.
 
 =head2 no_get_network_params
 
-=head1 REFERENCES
-
-L<UniEvent::Error>
-
-L<XS::ErrorCode>
-
-L<XS::STL::ErrorCode>
-
-L<XS::STL::ErrorCategory>
-
 =cut
-

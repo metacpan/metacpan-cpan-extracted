@@ -1,0 +1,101 @@
+NAME
+    LINQ - an interpretation of Microsoft's Language Integrated Query
+
+SYNOPSIS
+      use feature qw( say );
+      use LINQ qw( LINQ )';
+  
+      my $double_even_numbers =
+        LINQ( [ 1 .. 100 ] )
+          ->where( sub { $_ % 2 == 0 } )
+          ->select( sub { $_ * 2 } );
+  
+      for my $n ( $double_even_numbers->to_list ) {
+        say $n;
+      }
+
+DESCRIPTION
+    LINQ is basically an application of SQL concepts to arrays and iterators.
+    Hopefully this implementation will eventually cover other data types like
+    SQL tables, XML and JSON data, etc.
+
+    Not much is documented yet, but the test suite includes numerous examples
+    of LINQ's usage.
+
+FUNCTIONS
+    The `LINQ`, `Range`, and `Repeat` functions return LINQ collections,
+    objects implementing the LINQ::Collection interface.
+
+    The `LINQ::END()` and `LINQ::LAST()` functions are used as signals to
+    control LINQ's iterators and loops.
+
+    Additional utility functions can be found in LINQ::Util.
+
+    `LINQ( SOURCE )`
+        Creates a LINQ collection from a source. The source may be an existing
+        LINQ collection, which will be returned as-is, an arrayref of items,
+        or a coderef which will be called in scalar context and expected to
+        return a single item each time it is called. It should return the
+        special value `LINQ::END()` to indicate that the end of the collection
+        has been reached.
+
+        `LINQ` may be exported, but is not exported by default.
+
+    `Range( MIN, MAX )`
+        Returns a LINQ collection containing the range of numbers from MIN to
+        MAX. If MIN is undef, it is treated as 0. If MAX is undef, it is
+        treated as positive infinity.
+
+        If you want a range from 0 to negative infinity, use:
+
+          my $below_zero = Range( 0, undef )->select( sub { -$_ } );
+
+        `Range` may be exported, but is not exported by default.
+
+    `Repeat( VALUE, COUNT )`
+        Returns a LINQ collection containing the same value multiple times. If
+        COUNT is undef, then it is treated as infinity.
+
+        `Repeat` may be exported, but is not exported by default.
+
+    `END()`
+        Returns the special value `LINQ::END()`.
+
+        `END` may be exported, but is not exported by default, and I recommend
+        calling it by its fully qualified name for clarity.
+
+    `LAST()`
+        Used by the `foreach` method of LINQ::Collection. If called otherwise,
+        will die.
+
+HISTORY
+    I wrote this back in 2014, but never released it. After a discussion about
+    how nice it would be to have a programming language which used SQL
+    concepts natively, eliminating the need to "map" between how your
+    application handled data and how your database handled data, I remembered
+    this. So I thought I'd push what I had so far onto CPAN and maybe think
+    about reviving it.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=LINQ>.
+
+SEE ALSO
+    LINQ::Collection, LINQ::Util, LINQ::Exception.
+
+    <https://en.wikipedia.org/wiki/Language_Integrated_Query>
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014, 2021 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -65,4 +65,15 @@ subtest 'event listener' => sub {
     is $cnt, 11, "listener&event called";
 };
 
+subtest 'static ctor' => sub {
+    my $i = 0;
+    my $h = UE::Poll->create($fh, READABLE, sub {$i++; $l->stop});
+    $l->run;
+    is $i, 1;
+    
+    $h = UE::poll $fh, READABLE, sub {$i++; $l->stop};
+    $l->run;
+    is $i, 2;
+};
+
 done_testing();

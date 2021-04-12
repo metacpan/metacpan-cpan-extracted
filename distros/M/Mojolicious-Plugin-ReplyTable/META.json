@@ -1,10 +1,10 @@
 {
    "abstract" : "Easily render rectangular data in many formats using Mojolicious",
    "author" : [
-      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+      "Joel Berger, <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.027",
+   "generated_by" : "App::ModuleBuildTiny version 0.029",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.027"
+            "App::ModuleBuildTiny" : "0.029"
          }
       },
       "runtime" : {
@@ -44,7 +44,7 @@
    "provides" : {
       "Mojolicious::Plugin::ReplyTable" : {
          "file" : "lib/Mojolicious/Plugin/ReplyTable.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -59,7 +59,7 @@
          "url" : "http://github.com/jberger/Mojolicious-Plugin-ReplyTable"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

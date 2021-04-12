@@ -28,14 +28,14 @@ use vars qw($Pwd $Uid $Srv $Db);
 ( $Uid, $Pwd, $Srv, $Db ) = _test::get_info();
 
 my $dbh = DBI->connect(
-    "dbi:Sybase:server=$Srv;database=$Db;charset=utf8", $Uid, $Pwd,
+    "dbi:Sybase:$Srv;database=$Db;charset=utf8", $Uid, $Pwd,
     { PrintError => 1 }
 );
 $dbh->{syb_enable_utf8} = 1;
 
 
 # Don't run this test on MS-SQL ("Unknown") servers...
-unless ($dbh->{syb_server_version} ne 'Unknown' && $dbh->{syb_server_version} ge '15' && $dbh->{syb_enable_utf8}) {
+unless ($dbh->{syb_server_version} ne 'Unknown' && $dbh->{syb_server_version} ne 'MS-SQL' && $dbh->{syb_server_version} ge '15' && $dbh->{syb_enable_utf8}) {
     plan skip_all => 'This test requires ASE 15 or later, and OpenClient 15.x or later';
 }
 
@@ -43,9 +43,16 @@ plan tests => 11;
 
 $dbh->do("create table #utf8test (uv univarchar(510), ut unitext)");
 
+
 my $ascii = 'Some text';
-#my $utf8 = "पट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट";
-my $utf8 = "\x{263A} - smiley1 - \x{263B} - smiley2" x 10;
+# This is a byte string rather than a character string - this means that when using this
+# to compare with the output from the DB we get a failure, even though the strings appear
+# to be the same. So the string needs to be converted to UTF8 characters via Encode::decode()
+# for use in the test. To simplify I've commented this out and use the second sample string
+# instead.
+my $utf8t = 'पट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट्टपट';
+#my $utf8 = Encode::decode('UTF-8', $utf8t);
+my $utf8 = "\x{263A} - smiley1 - \x{263B} - smiley2" x 15;
 
 {
     my $quoted = $dbh->quote($ascii);
@@ -132,7 +139,7 @@ $dbh->{syb_enable_utf8} = 0;
 
 {
     my $dbh2 = DBI->connect(
-        "dbi:Sybase:server=$Srv;database=$Db;charset=utf8",
+        "dbi:Sybase:$Srv;database=$Db;charset=utf8",
         $Uid, $Pwd, {
             PrintError      => 1,
             syb_enable_utf8 => 1
@@ -153,7 +160,7 @@ $dbh->{syb_enable_utf8} = 0;
         $rows,
         [
             {
-                uv => $utf8,
+                uv => substr($utf8, 0, 250),
                 ut => $utf8,
             }
         ],

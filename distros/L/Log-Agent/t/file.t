@@ -14,10 +14,11 @@
 
 use Test::More;
 use Log::Agent;
+use Log::Agent::Priorities qw(:LEVELS);
 require Log::Agent::Driver::File;
 require './t/common.pl';
 
-BEGIN { plan tests => 38 }
+BEGIN { plan tests => 42 }
 
 my $driver = Log::Agent::Driver::File->make();        # take all defaults
 logconfig(-driver => $driver);
@@ -55,7 +56,7 @@ $driver = Log::Agent::Driver::File->make(
     },
     -duperr => 1,
 );
-logconfig(-driver => $driver);
+logconfig(-driver => $driver, -level => DEBUG);
 
 open(ORIGOUT, ">&STDOUT")   or die "can't dup STDOUT: $!\n";
 open(STDOUT, ">t/file.out") or die "can't redirect STDOUT: $!\n";
@@ -65,6 +66,8 @@ select(ORIGERR); $| = 1;
 select(ORIGOUT); $| = 1;
 
 logerr "error";
+logdebug "debug";
+loginfo "info";
 logsay "message";
 logwarn "warning";
 eval { logdie "die" };
@@ -80,7 +83,11 @@ ok($@);
 ok(contains("t/file.err", '^DATE me\[\d+\]: error$'));
 ok(contains("t/file.out", 'ERROR: error'));
 ok(contains("t/file.out", '^DATE me\[\d+\]: message$'));
+ok(contains("t/file.out", '^DATE me\[\d+\]: info$'));
+ok(contains("t/file.out", '^DATE me\[\d+\]: debug$'));
 ok(! contains("t/file.err", 'message'));
+ok(! contains("t/file.err", 'info'));
+ok(! contains("t/file.err", 'debug'));
 ok(contains("t/file.err", '^DATE me\[\d+\]: warning$'));
 ok(contains("t/file.out", 'WARNING: warning'));
 ok(contains("t/file.err", '^DATE me\[\d+\]: die$'));

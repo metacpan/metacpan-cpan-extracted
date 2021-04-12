@@ -1,0 +1,8 @@
+#include <xs/unievent/Work.h>
+
+MODULE = UniEvent                PACKAGE = UniEvent::Work
+PROTOTYPES: DISABLE
+
+bool Work::active ()
+
+bool Work::cancel ()

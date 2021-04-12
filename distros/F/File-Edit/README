@@ -2,7 +2,7 @@ NAME
     File::Edit - A naive, probably buggy, file editor.
 
 VERSION
-    Version 0.01
+    Version 0.0.4
 
 SYNOPSIS
         use File::Edit;

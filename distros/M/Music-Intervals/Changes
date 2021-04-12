@@ -1,5 +1,25 @@
 Revision history for Music-Intervals
 
+0.0603 2021-04-11 15:45:10
+    - Clean-up code a bit.
+    - Improve the numeric test slightly.
+
+0.0602 2021-04-09 21:21:11
+    - Improve documentation.
+
+0.0601 2021-04-09 20:14:18
+    - Fix ABSTRACTs.
+    - Clean-up code slightly.
+
+0.0600 2021-04-09 19:56:35
+    - Lose the redundant Ratio module and compute the numeric ratios.
+    - Make ratio_factorize() a proper method.
+    - Replace the ->process method with ->BUILD.
+    - Use strictures and namespace::clean.
+    - Use builder methods instead of default subs.
+    - Improve documentation.
+    - Improve tests.
+
 0.0507 2019-03-16 15:15:10
     - Made the eg/ Dancer example return JSON, instead of strings.
 

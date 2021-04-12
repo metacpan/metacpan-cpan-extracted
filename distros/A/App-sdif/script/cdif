@@ -927,7 +927,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.19.0
+Version 4.19.1
 
 =head1 SYNOPSIS
 
@@ -1269,11 +1269,11 @@ comma (C<,>) like C<--visible ht=1,sp=1>; or connecting them by equal
 sign (C<=>) like C<--visible ht=sp=1>.  Character name accept
 wildcard; C<--visible '*=1'>.
 
-Colormap name C<VISIBLE> is applied to those characters.  Default
+Colormap label C<VISIBLE> is applied to those characters.  Default
 setting is C<S>, and visible characters are displayed in reverse
 video.  Unlike other colormaps, only special effects can be set to
-this name.  Effect C<D> (double-struck) is exception (see C<~> section
-in L<Getopt::EX::Colormap>).
+this label.  Effect C<D> (double-struck) is exception (See
+L<Getopt::EX::Colormap/~>).
 
 =begin deprecated
 

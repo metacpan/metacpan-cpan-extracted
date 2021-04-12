@@ -1,9 +1,9 @@
 package App::CekBpom;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-13'; # DATE
+our $DATE = '2021-02-19'; # DATE
 our $DIST = 'App-CekBpom'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -385,7 +385,7 @@ App::CekBpom - Check BPOM products/manufacturers ("sarana") via the command-line
 
 =head1 VERSION
 
-This document describes version 0.012 of App::CekBpom (from Perl distribution App-CekBpom), released on 2020-11-13.
+This document describes version 0.013 of App::CekBpom (from Perl distribution App-CekBpom), released on 2021-02-19.
 
 =head1 DESCRIPTION
 
@@ -521,7 +521,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-CekBpom>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-CekBpom/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -537,7 +537,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

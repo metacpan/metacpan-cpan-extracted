@@ -2,6 +2,8 @@ use 5.016;
 use warnings;
 use lib 't/lib'; use MyTest;
 
+test_catch '[loop]';
+
 subtest 'basic' => sub {
     my $loop = UniEvent::Loop->new();
     is ref $loop, 'UniEvent::Loop';
@@ -27,6 +29,9 @@ subtest 'default loop' => sub {
     is(UniEvent::Loop->default, UniEvent::Loop->default, "default loop returns the same");
     is(UniEvent::Loop->global, UniEvent::Loop->global, "global loop returns the same");
     is(UniEvent::Loop->global, UniEvent::Loop->default, "global loop is the same as default loop in main thread");
+    
+    ok(UE::Check->new()->loop->is_default, "no loop in handle ctor is default loop");
+    ok(UE::Check->new(undef)->loop->is_default, "undef loop in handle ctor is default loop");
 };
 
 my $loop = UniEvent::Loop->default;

@@ -27,7 +27,7 @@ requires:
   HTTP::CookieJar::LWP: '0'
   JSON::Encode::TableData: '0'
   LWP::UserAgent::Plugin: '0.004'
-  Log::ger: '0.037'
+  Log::ger: '0.038'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.827'
   Sah::Schema::dirname: '0'
@@ -38,10 +38,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CekBpom
+  bugtracker: https://github.com/perlancar/perl-App-CekBpom/issues
   homepage: https://metacpan.org/release/App-CekBpom
   repository: git://github.com/perlancar/perl-App-CekBpom.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -141,7 +141,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.041'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'

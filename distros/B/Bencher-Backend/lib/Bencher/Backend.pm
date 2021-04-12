@@ -1,9 +1,9 @@
 package Bencher::Backend;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-21'; # DATE
+our $DATE = '2021-04-10'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.052'; # VERSION
+our $VERSION = '1.053'; # VERSION
 
 use 5.010001;
 use strict;
@@ -660,8 +660,8 @@ sub _parse_scenario {
             unless (defined($ds->{name})) {
                 unless ($td_args) {
                     if (all {$_->{args}} @$dss0) {
-                        require TableData::Object::aohos;
-                        $td_args = TableData::Object::aohos->new(
+                        require Data::TableData::Object::aohos;
+                        $td_args = Data::TableData::Object::aohos->new(
                             [map {$_->{args}} @$dss0]);
                         @uniq_args = $td_args->uniq_col_names;
                     } else {
@@ -1326,8 +1326,8 @@ sub _gen_items {
     # permutation (unnecessarily unique, just as a human-readable name)
     {
         last unless @$items;
-        require TableData::Object::aohos;
-        my $td = TableData::Object::aohos->new($items);
+        require Data::TableData::Object::aohos;
+        my $td = Data::TableData::Object::aohos->new($items);
         my @const_cols = $td->const_col_names;
 
         my @name_keys;
@@ -4337,7 +4337,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.052 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2020-09-21.
+This document describes version 1.053 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2021-04-10.
 
 =head1 FUNCTIONS
 
@@ -4876,7 +4876,7 @@ Return value:  (any)
 
 Usage:
 
- format_result($envres, $formatters, $options, $exclude_formatters) -> [status, msg, payload, meta]
+ format_result( [ \%optional_named_args ] , $envres, $formatters, $options) -> [status, msg, payload, meta]
 
 Format bencher result.
 
@@ -4890,7 +4890,7 @@ Arguments ('*' denotes required arguments):
 
 Enveloped result from bencher.
 
-=item * B<$exclude_formatters> => I<any>
+=item * B<exclude_formatters> => I<any>
 
 Exclude Formatters specification.
 
@@ -5029,7 +5029,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

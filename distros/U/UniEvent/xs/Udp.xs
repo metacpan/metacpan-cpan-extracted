@@ -1,5 +1,6 @@
 #include <xs/export.h>
 #include <xs/unievent/Udp.h>
+#include <xs/typemap/expected.h>
 #include <xs/unievent/Listener.h>
 #include <xs/CallbackDispatcher.h>
 
@@ -22,7 +23,7 @@ struct XSUdpListener : IUdpListener, XSListener {
 
     void on_send (const UdpSP& h, const ErrorCode& err, const SendRequestSP& req) override {
         call(cbn.on_send, xs::out(h), xs::out(err), xs::out(req));
-    }    
+    }
 };
 
 
@@ -33,15 +34,18 @@ BOOT {
     Stash s(__PACKAGE__);
     s.inherit("UniEvent::Handle");
     s.add_const_sub("TYPE", Simple(Udp::TYPE.name));
-    
+
     xs::exp::create_constants(s, {
         {"PARTIAL",     Udp::Flags::PARTIAL                   },
         {"IPV6ONLY",    Udp::Flags::IPV6ONLY                  },
         {"REUSEADDR",   Udp::Flags::REUSEADDR                 },
+        {"MMSG_CHUNK",  Udp::Flags::MMSG_CHUNK                },
+        {"MMSG_FREE",   Udp::Flags::MMSG_FREE                 },
+        {"RECVMMSG",    Udp::Flags::RECVMMSG                  },
         {"LEAVE_GROUP", (unsigned)Udp::Membership::LEAVE_GROUP},
         {"JOIN_GROUP",  (unsigned)Udp::Membership::JOIN_GROUP }
     });
-    
+
     xs::at_perl_destroy([]() {
         cbn.on_receive = nullptr;
         cbn.on_send    = nullptr;
@@ -49,30 +53,36 @@ BOOT {
     unievent::register_perl_class(Udp::TYPE, s);
 }
 
-Udp* Udp::new (Loop* loop = Loop::default_loop()) {
-    RETVAL = make_backref<Udp>(loop);
+Udp* Udp::new (Loop* loop = Loop::default_loop(), int domain = AF_UNSPEC, int flags = 0) {
+    RETVAL = make_backref<Udp>(loop, domain, flags);
 }
 
 void Udp::open (Sv sock) {
-    THIS->open(sv2sock(sock), Ownership::SHARE);
+    XSRETURN_EXPECTED(THIS->open(sv2sock(sock), Ownership::SHARE));
 }
 
-void Udp::bind (string_view host, uint16_t port, AddrInfoHints hints = AddrInfoHints(), unsigned flags = 0)
+void Udp::bind (string_view host, uint16_t port, AddrInfoHints hints = AddrInfoHints(), unsigned flags = 0) {
+    XSRETURN_EXPECTED(THIS->bind(host, port, hints, flags));
+}
 
 void Udp::bind_addr (SockAddr addr, unsigned flags = 0) {
-    THIS->bind(addr, flags);
+    XSRETURN_EXPECTED(THIS->bind(addr, flags));
 }
 
 #// connect($host, $port, [$hints])
 #// connect($sockaddr)
 void Udp::connect (Sv host_or_sockaddr, uint16_t port = 0, AddrInfoHints hints = AddrInfoHints()) {
-    if (items < 3) THIS->connect(xs::in<SockAddr>(host_or_sockaddr));
-    else           THIS->connect(xs::in<string_view>(host_or_sockaddr), port, hints);
+    if (items < 3) XSRETURN_EXPECTED(THIS->connect(xs::in<SockAddr>(host_or_sockaddr)));
+    else           XSRETURN_EXPECTED(THIS->connect(xs::in<string_view>(host_or_sockaddr), port, hints));
 }
 
-void Udp::recv_start (Udp::receive_fn cb = nullptr)
+void Udp::recv_start (Udp::receive_fn cb = nullptr) {
+    XSRETURN_EXPECTED(THIS->recv_start(cb));
+}
 
-void Udp::recv_stop ()
+void Udp::recv_stop () {
+    XSRETURN_EXPECTED(THIS->recv_stop());
+}
 
 XSCallbackDispatcher* Udp::receive_event () {
     RETVAL = XSCallbackDispatcher::create(THIS->receive_event);
@@ -96,50 +106,60 @@ Ref Udp::event_listener (Sv lst = Sv(), bool weak = false) {
     RETVAL = event_listener<XSUdpListener>(THIS, ST(0), lst, weak);
 }
 
-void Udp::send (Sv sv, SockAddr sa, Udp::send_fn cb = nullptr) {
+SendRequestSP Udp::send (Sv sv, SockAddr sa, Udp::send_fn cb = nullptr) {
     auto buf = sv2buf(sv);
     if (!buf) XSRETURN(0);
-    
+
     SendRequestSP req = new SendRequest(buf);
     req->addr = sa;
     if (cb) req->event.add(cb);
     THIS->send(req);
+    RETVAL = req;
 }
 
-SockAddr Udp::sockaddr ()
-
-SockAddr Udp::peeraddr ()
+void Udp::sockaddr () : ALIAS(peeraddr=1) {
+    auto res = ix == 0 ? THIS->sockaddr() : THIS->peeraddr();
+    XSRETURN_EXPECTED(res);
+}
 
 void Udp::set_membership (string_view multicast_addr, string_view interface_addr, int membership) {
-    THIS->set_membership(multicast_addr, interface_addr, (Udp::Membership)membership);
+    XSRETURN_EXPECTED(THIS->set_membership(multicast_addr, interface_addr, (Udp::Membership)membership));
+}
+
+void Udp::set_source_membership (string_view multicast_addr, string_view interface_addr, string_view source_addr, int membership) {
+    XSRETURN_EXPECTED(THIS->set_source_membership(multicast_addr, interface_addr, source_addr, (Udp::Membership)membership));
 }
 
 void Udp::set_multicast_loop (bool on) {
-    THIS->set_multicast_loop(on);
+    XSRETURN_EXPECTED(THIS->set_multicast_loop(on));
 }
 
 void Udp::set_multicast_ttl (int ttl) {
-    THIS->set_multicast_ttl(ttl);
+    XSRETURN_EXPECTED(THIS->set_multicast_ttl(ttl));
 }
 
 void Udp::set_multicast_interface (string_view interface_addr) {
-    THIS->set_multicast_interface(interface_addr);
+    XSRETURN_EXPECTED(THIS->set_multicast_interface(interface_addr));
 }
 
 void Udp::set_broadcast (bool on) {
-    THIS->set_broadcast(on);
+    XSRETURN_EXPECTED(THIS->set_broadcast(on));
 }
 
 void Udp::set_ttl (int ttl) {
-    THIS->set_ttl(ttl);
+    XSRETURN_EXPECTED(THIS->set_ttl(ttl));
 }
 
-int Udp::recv_buffer_size (Simple newval = Simple()) {
-    if (newval) THIS->recv_buffer_size(newval);
-    RETVAL = THIS->recv_buffer_size();
+size_t Udp::send_queue_size ()
+
+void Udp::recv_buffer_size (Simple newval = Simple()) {
+    if (newval) XSRETURN_EXPECTED(THIS->recv_buffer_size(newval));
+    else        XSRETURN_EXPECTED(THIS->recv_buffer_size());
 }
 
-int Udp::send_buffer_size (Simple newval = Simple()) {
-    if (newval) THIS->send_buffer_size(newval);
-    RETVAL = THIS->send_buffer_size();
+void Udp::send_buffer_size (Simple newval = Simple()) {
+    if (newval) XSRETURN_EXPECTED(THIS->send_buffer_size(newval));
+    else        XSRETURN_EXPECTED(THIS->send_buffer_size());
 }
+
+bool Udp::using_recvmmsg ()

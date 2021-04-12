@@ -12,7 +12,7 @@
 #
 ##########################################################################
 
-print "1..4\n";
+print "1..6\n";
 
 require './t/code.pl';
 sub ok;
@@ -27,6 +27,8 @@ open(STDERR, ">t/default.err") || die "can't redirect STDERR: $!\n";
 
 logerr "error";
 logsay "message";
+loginfo "info";
+logdebug "debugging";
 logtrc 'debug', "debug";
 
 close STDOUT;
@@ -35,6 +37,8 @@ close STDERR;
 ok 1, contains("t/default.err", '^Error$');
 ok 2, contains("t/default.err", '^Message$');
 ok 3, !contains("t/default.err", '^Debug$');
-ok 4, 0 == -s "t/default.out";
+ok 4, !contains("t/default.err", '^Debugging$');
+ok 5, !contains("t/default.err", '^Info$');
+ok 6, 0 == -s "t/default.out";
 
 unlink 't/default.out', 't/default.err';

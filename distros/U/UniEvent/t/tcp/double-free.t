@@ -23,7 +23,7 @@ $srv->connection_callback(sub {
 my $t = UE::Prepare->new;
 $t->start(sub {
     my $cl = UE::Tcp->new($loop);
-    $cl->connect_addr($srv->sockaddr, sub {
+    $cl->connect_addr(scalar $srv->sockaddr, sub {
         my ($handler, $err) = @_;
         fail $err if $err;
         return if ++$d[1] == $cnt;

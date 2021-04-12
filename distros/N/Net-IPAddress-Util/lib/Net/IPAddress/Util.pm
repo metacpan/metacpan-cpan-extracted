@@ -40,15 +40,13 @@ $EXPORT_TAGS{ all } = [ @EXPORT_OK ];
 
 our $DIE_ON_ERROR = 0;
 our $PROMOTE_N32 = 1;
-our $REPAIR_V3_FORMAT = 0;
-our $WARN_ON_REPAIR = 1;
 
 our @SIIT = (
   [ 0, 0, 0xff, 0xff ], # off
   [ 0xff, 0xff, 0, 0 ], # on
 );
 
-our $VERSION = '5.000';
+our $VERSION = '5.001';
 
 our $siit_fourish = qr/^(?:::ffff:0+:)?(\d+)\.(\d+)\.(\d+)\.(\d+)$/io;
 our $fourish = qr/^(?:::ffff:)?(\d+)\.(\d+)\.(\d+)\.(\d+)$/io;
@@ -255,7 +253,7 @@ sub as_n128 {
   my $rv;
   {
     eval "require Math::BigInt" or return ERROR("Could not load Math::BigInt: $@");
-    my $accum = Math::BigInt->new(hex($self->normal_form));
+    my $accum = Math::BigInt->from_hex($self->normal_form);
     eval "no Math::BigInt" unless $keep;
     $rv = $keep ? $accum : "$accum";
   }
@@ -655,6 +653,25 @@ L<Net::IPAddress::Util::Range> is for working with individual ranges of
 addresses, and L<Net::IPAddress::Util::Collection> is for working with
 collections of addresses and/or ranges.
 
+=head1 COMPATIBILITY NOTICE
+
+Version 4.x of this module B<broke compatibility> with v3.x, specifically in cases
+where IPv4 addresses were formatted as IPv6 addresses (either string or numeric).
+
+Version 5.x can read and write addresses in B<both> legacy v3.x I<and> v4.x formats.
+
+The default output format in v5.x for representing IPv4 addresses as IPv6 is
+compatible with v3.x, and is known as non-SIIT mode. To use v4.x representation,
+either pass in a truthy falue to the C<SIIT> parameter at construction time, or
+calll the C<SIIT()> method on constructed objects. To transform an SIIT formatted
+object to non-SIIT format, call the C<SIIT()> object method with a defined false
+value.
+
+=head2 Rationale
+
+The reason for switching back to the v3.x non-SIIT format is simply that SIIT
+seems to be encountered far less often in the wild.
+
 =head1 GLOBAL VARIABLES
 
 =head2 $Net::IPAddress::Util::DIE_ON_ERROR
@@ -669,20 +686,6 @@ numbers are supposed to represent IPv4 addresses, and promote them
 accordingly (i.e. to do implicitly what n32_to_ipv4() does). Set to a false
 value to make new() treat all bare numbers as 128-bit numbers representing
 IPv6 addresses. Defaults to false.
-
-=head2 $Net::IPAddress::Util::REPAIR_V3_FORMAT
-
-Set to a true value to make new() accept its argument in the "broken" format
-used by module versions prior to v4.000, and automatically "repair" them to the
-format used by v4.x of this module. Defaults to false.
-
-=head2 $Net::IPAddress::Util::WARN_ON_REPAIR
-
-Set to a true value to make any "repairs" undertaken by new() issue a warning
-using the L<Carp> module. Specifically, if set to the number 2 (or higher), then
-new() will cluck() whenever it performs a repair, and if set to any other true
-value, then new() will carp() whenever it performs a repair. If set to a false
-value, then repairs (if any) will occur silently. Defaults to 1.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -978,5 +981,11 @@ May be redistributed and/or modified under terms of the Artistic License v2.0.
 =head1 AUTHOR
 
 PWBENNETT -- paul(dot)w(dot)bennett(at)gmail.com
+
+=head1 THANKS
+
+Thanks to Dave "Autarch" Rolsky for discovering the potential security issue
+that motivated me to finally dust off the v5.x prototype and make the tests work
+(and implement the fix to the discovered security issue).
 
 =cut

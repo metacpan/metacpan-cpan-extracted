@@ -216,3 +216,20 @@ Revision history for StreamFinder
         but returns all episode streams in a list with the first episode the 
         first stream, but the metadata returned is for the Apple podcast page, 
         and left this way for backward compatability.
+1.42    2021/04/11
+        - StreamFinder::Rumble:  Fix failure to find any streams (Rumble 
+        chgd. their html slightly), and Add "-keep" option to limit / order 
+        the streams fetched (default:  mp4,webm,any) - see updated docs.
+        - StreamFinder::Apple:  Remove music.apple.com (music samples no 
+        longer scrapable? (Much more complicated and I never use it - you 
+        only ever could get short sample clips - not full songs anyway!
+        Also, misc. fixes/tweaks, also see last item below:
+        - StreamFinder::Castbox:  Added Album field.
+        - StreamFinder::Spreaker:  Fix failure to fetch anything (Spreaker 
+        chgd. their html a bit!).  Also, added Album field, and additional 
+        check for possible AlbumArtist url.
+        - StreamFinder::Google:  Misc. fixes/tweaks, also see below:
+        - Apple, Castbox, and Google:  Add ability to fetch the first (latest?) 
+        podcast, and return all podcasts as an extended MP3 playlist 
+        (new "-playlist" option to the $station->get() function) - for podcast 
+        author's main page urls.

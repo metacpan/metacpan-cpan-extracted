@@ -1,5 +1,6 @@
 Release history for perl module Music-Note-Role-Operators
 
-0.03 Add subtract overloading, bolt in Music::Interval and changelog
-0.02 Doc fixes
-0.01 Initial version
+00.4 remove 'no_process' arg, so no more lazy process of the M::Interval
+00.3 Add subtract overloading, bolt in Music::Interval and changelog
+00.2 Doc fixes
+00.1 Initial version

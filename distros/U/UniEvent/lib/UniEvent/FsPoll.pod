@@ -1,122 +1,121 @@
 =head1 NAME
 
-UniEvent::FsPoll - periodicall poll for changes in a file metadata
+UniEvent::FsPoll - monitor a given path for changes
+
+
 
 =head1 SYNOPSIS
 
-    use UniEvent::Fs; # import constants
-
-    my $loop = UniEvent::Loop->new;
-    my $h = UniEvent::FsPoll->new($loop);
-    my $file = '/path/to/file';
-    $h->start($file, 5.5); # check every 5.5 seconds
-    $h->poll_callback(sub { # periodical check
-        my ($handle, $prev, $curr, $error_code) = @_;
-        say "The contents of $file has been modified"
-             if (!$error_code && $curr->[STAT_MTIME] != $prev->[STAT_MTIME]);
-    }));
-    $h->start_callback(sub {
-        my ($handle, $init, $error_code) = @_;
-        # do something on the initial call with $init file stats
+    my $h = UniEvent::FsPoll->new;
+    
+    # check every 5.5 seconds
+    $h->start('/path/to/file', 5.5, sub {
+        my ($handle, $prev_stat, $cur_stat, $error) = @_;
+        if (!$error && $cur_stat->[UE::Fs::STAT_MTIME] != $prev_stat->[UE::Fs::STAT_MTIME]) {
+            say "The contents of file has been modified";
+        }
     });
-    $l->run;
+    
+    $h->start_callback(sub {
+        my ($handle, $initial_stat, $error) = @_;
+        # do something on the initial call with $initial_stat
+    });
+
+
 
 =head1 DESCRIPTION
 
-This handle is used to periodically poll filesystem for the specified
-file metadata (i.e. change time, file size etc.) and invoke the
-user-specified callback with the current and previous metadata
-(file stats).
+FsPoll handles allow the user to monitor a given path for changes.
+Unlike L<UniEvent::FsEvent>, fs poll handles use C<stat()> to detect when a file has changed so they can work on file systems where fs event handles can't.
+
+FsPoll periodically polls filesystem for the specified file metadata (i.e. change time, file size etc.) and invoke the
+user-specified callback with the current and previous metadata (file stats).
 
 The C<UniEvent::FsPoll> is inherited from L<UniEvent::Handle>.
 
+
+
 =head1 METHODS
 
-=head2 new([$loop = UniEvent::Loop->default_loop])
+All methods of L<UniEvent::Handle> also apply.
+
+=head2 create($path, $interval, $callback, [$loop = default])
+
+    my $handle = UniEvent::FsPoll->create("my/file", 1, sub { say "hi" });
+
+Creates and starts an fs poll handle. Alias for C<new($loop)> + C<start($path, $interval, $callback)>.
+
+
+=head2 new([$loop = default])
 
 Constructs new FsPoll handle and binds it to the specified event loop.
 
-=head2 start($path [, $interval = 1.0 [, $callback]])
 
-Stars monitoring the specified C<$path> for changes. Each filesystem
-poll would occur every C<$interval> second(s).
+=head2 start($path, [$interval = 1.0], [$callback])
 
-The optional start C<$callback> can be set to invoke it upon
-the first invocation of the handle.
+Stars monitoring the specified C<$path> for changes.
+Each filesystem poll would occur every C<$interval> second(s).
+
+If C<$callback> is present, it is added as poll_event()->add($cb)
+
 
 =head2 stop()
 
 Stops monitoring.
 
+
+=head2 poll_callback($sub)
+
 =head2 poll_event()
 
-=head2 event()
+Callbacks set via these methods will be invoked periodically, on file change.
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callback will be invoked upon timer event.
- The C++ interface is:
+Callback signature:
 
-    void(const FsPollSP&, const opt<Fs::FStat>& prev, const opt<Fs::FStat>& cur, const std::error_code&);
+    my ($handle, $prev_stat, $cur_stat, $error) = @_;
 
-i.e. the callback returns nothing and as an argument takes FsPoll handle
-itself, optionally previous and current file stats and the error code.
+Where C<$handle> is the FsPoll handle object itself.
 
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
+C<$prev_stat> and C<$cur_stat> are arrayrefs with the previous and new file stat data. Format is similar to what perl's C<stat()> returns.
+See L<UniEvent::Fs>'s C<stat()> for more details on stat structure.
 
-=head2 poll_callback($code)
+The C<$err> parameter will be an L<XS::ErrorCode> object if any. If it is present, the contents of C<$prev_stat> and/or C<$cur_stat> may be undefined.
 
-=head2 callback($code)
+Error is considered part of file state.
+File might get deleted or become inaccessible and in this case, callback will be called with defined $prev_stat, with error and with undefined $cur_stat.
+And vice-versa, after that file might get created again in which case callback will be called with undefined $prev_stat, without error and with
+defined $cur_stat.
 
-Sets the callback, which will be invoked periodically on timer. All previously
-set event listeners or callbacks are discarded. For the interface see
-C<event> function.
+See L<UniEvent/"EVENT CALLBACKS">
+
+
+=head2 start_callback($sub)
 
 =head2 start_event()
 
-Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
-can be assigned with. The callback will be invoked once on handle start.
-The C++ interface is:
+Callbacks set via these methods will be invoked once after monitoring starts.
 
-    void(const FsPollSP&, const opt<Fs::FStat>& stat, const std::error_code&);
+Callback signature:
 
-i.e. the callback returns nothing and as an argument takes FsPoll handle
-itself, optionally the current file stats and the error code.
+    my ($handle, $initial_stat, $error) = @_;
 
-Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
-interface.
+Where C<$handle> is the FsPoll handle object itself and C<$initial_stat> is the initial file stat. It may be undefined in case if file does not exist
+or is inaccessible (in which case the error will also be set).
 
-=head2 start_callback($code)
+The C<$err> parameter will be an L<XS::ErrorCode> object if any. If it is present, the contents of C<$initial_stat> may be undefined.
 
-Sets the callback C<$code>, which will be invoked once upon handle start.
-All previously set event listeners or callbacks are discarded. For the
-interface see C<start_event> function.
+See L<UniEvent/"EVENT CALLBACKS">
 
-=head2 event_listener($delegate [, $weak = false])
 
-Creates and returns wrapper around the C<$delegate> object of arbitrary
-class, having the following methods:
+=head2 event_listener($delegate, [$weak])
 
-  $delegate->on_fs_start($init, $error_code);
-  $delegate->on_fs_poll($prev, $curr, $error_code);
+Methods C<on_fs_poll>, C<on_fs_start> will be called.
 
-The delegated object can be seen as alternative of setting indivitual callbacks
-or as a way of groupping them. The C<$delegate> object can optionally be weakened.
+See L<UniEvent/"EVENT LISTENER">
+
 
 =head2 path()
 
 Returns the currently monitored path.
-
-=head1 REFERENCES
-
-L<UniEvent::Handle>
-
-L<UniEvent::Fs>
-
-L<UniEvent::FsEvent>
-
-L<UniEvent::Handle>
-
-L<XS::Framework::CallbackDispatcher>
 
 =cut

@@ -4,7 +4,7 @@ StreamFinder::Rumble - Fetch actual raw streamable URLs from Rumble.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2020 by
+This module is Copyright (C) 2017-2021 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -26,7 +26,8 @@ file.
 
 	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
-	my $video = new StreamFinder::Rumble($ARGV[0]);
+	my $video = new StreamFinder::Rumble($ARGV[0], -keep => 
+			{'mp4', 'webm', 'any'});
 
 	die "Invalid URL or no streams found!\n"  unless ($video);
 
@@ -111,12 +112,20 @@ and the separate application program:  youtube-dl.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, "debug" [ => 0|(1)|2 ]])
+=item B<new>(I<ID>|I<url> [, I<-keep> => I<streamtypes> | [, "debug" [ => 0|(1)|2 ]])
 
 Accepts a rumble.com video ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Rumble video or no streams are found.  
 The URL can be the full URL, ie. https://rumble.com/B<video-id>.html, 
 or just I<video-id>.
+
+I<-keep> specifies a list of one or more I<streamtypes> to include.  The list can be 
+either a comma-separated string or an array reference ([...]) of stream types, in 
+the order they should be returned.  Each stream type in the list can be one of:  
+I<any>, I<mp4>, or I<webm>.
+
+DEFAULT keep list is 'mp4, webm, any', meaning that all mp4 streams followed by all 
+webm streams, then all of any others found.
 
 =item $video->B<get>()
 
@@ -195,6 +204,9 @@ Blank lines and lines starting with a "#" sign are ignored.
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
+Among options valid for IHeartRadio streams are the I<-keep> option 
+described in the B<new()> function.
+
 =item ~/.config/StreamFinder/config
 
 Optional text file for specifying various configuration options.  
@@ -261,7 +273,7 @@ L<http://search.cpan.org/dist/StreamFinder-Rumble/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2020 Jim Turner.
+Copyright 2017-2021 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -332,6 +344,7 @@ sub new
 	my $homedir = $bummer ? $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'} : $ENV{'HOME'};
 	$homedir ||= $ENV{'LOGDIR'}  if ($ENV{'LOGDIR'});
 	$homedir =~ s#[\/\\]$##;
+	my (@okStreams);
 	foreach my $p ("${homedir}/.config/StreamFinder/config", "${homedir}/.config/StreamFinder/Rumble/config") {
 		if (open IN, $p) {
 			my ($atr, $val);
@@ -359,8 +372,18 @@ sub new
 		if ($_[0] =~ /^\-?debug$/o) {
 			shift;
 			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		} elsif ($_[0] =~ /^\-?keep$/o) {
+			shift;
+			if (defined $_[0]) {
+				my $keeporder = shift;
+				@okStreams = (ref($keeporder) =~ /ARRAY/) ? @{$keeporder} : split(/\,\s*/, $keeporder);
+			}
 		}
 	}
+	if (!defined($okStreams[0]) && defined($uops{'keep'})) {
+		@okStreams = (ref($uops{'keep'}) =~ /ARRAY/) ? @{$uops{'keep'}} : split(/\,\s*/, $uops{'keep'});
+	}
+	@okStreams = (qw(mp4 webm any))  unless (defined $okStreams[0]);
 
 	print STDERR "-0(Rumble): URL=$url=\n"  if ($DEBUG);
 	(my $url2fetch = $url);
@@ -398,7 +421,6 @@ sub new
 			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
 		}
 	}
-#x	$html =~ s/\\\"/\&quot\;/gs;
 	if ($html && $html =~ m#\"embedUrl\"\:\"([^\"]+)#s) {
 		my $url2 = $1;
 		$self->{'title'} = ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
@@ -426,6 +448,7 @@ sub new
 
 		#STEP 2:  FETCH THE STREAMS FROM THE "embedUrl":
 		my $response = $ua->get($url2);
+		print STDERR "-2 FETCHING URL2=$url2=\n"  if ($DEBUG);
 		if ($response->is_success) {
 			$html = $response->decoded_content;
 		} else {
@@ -439,16 +462,38 @@ sub new
 		if ($html) {
 			$html =~ s#\\\/#\/#gs;
 			$self->{'title'} ||= ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
-			push @{$self->{'streams'}}, $1  if ($html =~ m#\"u\"\:\"([^\"]+)#s);
-			if ($html =~ m#\"ua\"\:\{(.+)?\}\,\"\w#s) {
-				my $streamjson = $1;
-				while ($streamjson =~ s#\"\d+\"\:\[([^\]]+)\]##s) {
-					my $streamsbybitrate = $1;
-					while ($streamsbybitrate =~ s#\"(https:[^\"]+)\"##s) {
-						push @{$self->{'streams'}}, $1;
+			$html =~ s#^.+\"u\"\:\{##s;
+			my %streamsets;
+			#PARSE OUT ALL STREAMS (CLASS IS EITHER "mp4", "webm", "###" (RESOLUTION) OR OTHER.
+			#SINCE THE STREAMS OF EACH RESOLUTION ARE OFTEN REPEATED UNDER "mp4", "webm", or "<other>"
+			#BASED ON THEIR EXTENSION, WE CONVERT THE NON-RESOLUTION ONES TO VERY LOW NUMBERS
+			#IN ORDER FOR THEM TO BE SORTED LAST (FOR GIVEN CLASS, WE WANT HIGHEST RESOLUTIONS FIRST!:
+			while ($html =~ s#\"(\w+)\"\:\{\"url\"\:\"([^\"]+)\"##s) {
+				my ($class, $stream) = ($1, $2);
+				if ($class =~ /mp4/io) {
+					$class = 30;
+				} elsif ($class =~ /webm/io) {
+					$class = 20;
+				} elsif ($class =~ /\D/io) {
+					$class = 10;
+				}
+				push @{$streamsets{$class}}, $stream;
+			}
+			my %streamHash;  #USE THIS HASH TO PREVENT ANY DUPLICATE STREAM URLS:
+			foreach my $streamtype (@okStreams) {
+				foreach my $class (sort { $b <=> $a } keys %streamsets) { #SORT BY CLASS:
+					print STDERR "\n--class=$class:\n"  if ($DEBUG);
+					foreach my $stream (@{$streamsets{$class}}) {  #THEN BY RESOLUTION:
+						if ($streamtype =~ /^any/io || $stream =~ /${streamtype}$/i) {
+							print STDERR "-----stream=$stream=\n"  if ($DEBUG > 1);
+							unless (defined $streamHash{$stream}) {
+								push @{$self->{'streams'}}, $stream;
+								$streamHash{$stream} = $stream;
+							}
+						}
 					}
 				}
-			}
+			}			
 		}
 		if ($self->{'year'} !~ /\d\d\d\d/ && $html =~ m#\"pubDate\"\:\"([^\"]+)#s) {
 			my $published = $1;

@@ -42,7 +42,7 @@
             "PDF::Imposition" : "0.23",
             "Path::Tiny" : "0",
             "Template::Tiny" : "1.12",
-            "Text::Amuse" : "1.6",
+            "Text::Amuse" : "1.76",
             "Type::Tiny" : "1"
          }
       }
@@ -56,6 +56,6 @@
       "x_IRC" : "irc://chat.freenode.net/#amusewiki",
       "x_WebIRC" : "https://webchat.freenode.net/?channels=#amusewiki"
    },
-   "version" : "1.60",
+   "version" : "1.61",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

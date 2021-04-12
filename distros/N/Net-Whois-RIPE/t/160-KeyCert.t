@@ -19,7 +19,7 @@ isa_ok $object, $class;
 
 # Non-inherited methods
 can_ok $object, qw( key_cert method owner fingerpr remarks org certif notify
-    admin_c tech_c mnt_by changed source);
+    admin_c tech_c mnt_by source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -93,12 +93,6 @@ is_deeply( $object->tech_c(), ['FR123-AP'], 'tech_c properly parsed' );
 $object->tech_c('FR456-AP');
 is( $object->tech_c()->[1], 'FR456-AP', 'tech_c properly added' );
 
-# Test 'changed'
-$tested{'changed'}++;
-is_deeply( $object->changed(), ['abc@somewhere.com 20120131'], 'changed properly parsed' );
-$object->changed('def@somewhere.com 20120228');
-is( $object->changed()->[1], 'def@somewhere.com 20120228', 'changed properly added' );
-
 # Test 'source'
 $tested{'source'}++;
 is( $object->source(), 'RIPE', 'source properly parsed' );
@@ -156,6 +150,5 @@ notify:         watcher@somewhere.com
 mnt-by:         MAINT-EXAMPLECOM
 admin-c:        FR123-AP
 tech-c:         FR123-AP
-changed:        abc@somewhere.com 20120131
 source:         RIPE
 

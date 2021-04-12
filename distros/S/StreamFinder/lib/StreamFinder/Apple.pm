@@ -5,7 +5,7 @@ podcasts on podcasts.apple.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2020 by
+This module is Copyright (C) 2017-2021 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -92,8 +92,7 @@ file.
 =head1 DESCRIPTION
 
 StreamFinder::Apple accepts a valid podcast or episode URL on 
-podcasts.apple.com, or an album or song (free sample clips only) from 
-music.apple.com, and returns the actual stream URL(s), title, and cover 
+podcasts.apple.com, and returns the actual stream URL(s), title, and cover 
 art icon for that podcast.  The purpose is that one needs one of these URLs 
 in order to have the option to stream the station in one's own choice of 
 media player software rather than using their web browser and accepting any / 
@@ -108,9 +107,7 @@ https://podcasts.apple.com/I<country>/podcast/idB<podcast#>
 (returns stream(s) for all "episodes" for that site, OR a specific podcast / 
 "episode" page site, format:  
 https://podcasts.apple.com/I<country>/podcast/idB<podcast#>?i=B<episode#> 
-(returns a single stream for that specific podcast).  Music samples also 
-seem to work using the format (with or without the ?i=B<song#> part):  
-https://music.apple.com/I<country>/album/I<album-description>/idB<album#>?i=B<song#>
+(returns a single stream for that specific podcast).  
 
 =head1 SUBROUTINES/METHODS
 
@@ -118,17 +115,22 @@ https://music.apple.com/I<country>/album/I<album-description>/idB<album#>?i=B<so
 
 =item B<new>(I<ID>|I<url> [, "debug" [ => 0|1|2 ]])
 
-Accepts a podcasts.apple.com ID or URL or music.apple.com URL and creates and 
+Accepts a podcasts.apple.com ID or URL and creates and 
 returns a new podcast object, or I<undef> if the URL is not a valid podcast, 
 album, etc. or no streams are found.  The URL can be the full URL, 
 ie. https://podcasts.apple.com/podcast/idI<podcast-id>, 
 https://podcasts.apple.com/podcast/idB<podcast-id>?i=B<episode-id>, or just 
-I<podcast-id>, or I<podcast-id>/I<episode-id>.  NOTE:  If the ID is an album 
-or song clip, then the full URL must be given, ie. http://music.apple.com/...
+I<podcast-id>, or I<podcast-id>/I<episode-id>.  
 
-=item $podcast->B<get>()
+=item $podcast->B<get>(['playlist'])
 
 Returns an array of strings representing all stream urls found.
+If I<"playlist"> is specified, then an extended m3u playlist is returned 
+instead of stream url(s).  NOTE:  If an author / channel page url is given, 
+rather than an individual podcast episode's url, get() returns the first 
+(latest?) podcast episode found, and get("playlist") returns an extended 
+m3u playlist containing the urls, titles, etc. for all the podcast 
+episodes found on that page url.
 
 =item $podcast->B<getURL>([I<options>])
 
@@ -273,7 +275,7 @@ L<http://search.cpan.org/dist/StreamFinder-Apple/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2020 Jim Turner.
+Copyright 2017-2021 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -374,10 +376,10 @@ sub new
 
 	$self->{'id'} = '';
 	(my $url2fetch = $url);
-	if ($url2fetch =~ m#^https?\:\/\/(?:podcasts|music)\.apple\.#) {
+	if ($url2fetch =~ m#^https?\:\/\/podcasts\.apple\.#) {
 #EXAMPLE1:my $url = 'https://podcasts.apple.com/us/podcast/wnbc-sec-shorts-josh-snead/id1440412195?i=1000448441439';
 #EXAMPLE2:my $url = 'https://podcasts.apple.com/us/podcast/good-bull-hunting-for-texas-a-m-fans/id1440412195';
-#EXAMPLE3:my $url = 'https://music.apple.com/us/album/big-legged-woman/723550112';
+#xxxEXAMPLE3:my $url = 'https://music.apple.com/us/album/big-legged-woman/723550112';
 		$self->{'id'} = ($url =~ m#\/(?:id)?(\d+)(?:\?i\=(\d+))?\/?#) ? $1 : '';
 		$self->{'id'} .= '/'. $2  if (defined $2);
 	} elsif ($url2fetch !~ m#^https?\:\/\/#) {
@@ -414,11 +416,18 @@ sub new
 
 	$self->{'title'} = '';
 	$self->{'artist'} = '';
+	$self->{'album'} = '';
+	$self->{'description'} = '';
 	$self->{'created'} = '';
 	$self->{'year'} = '';
+	$self->{'iconurl'} = '';
 	$self->{'streams'} = [];
 	$self->{'cnt'} = 0;
 	$self->{'Url'} = '';
+	$self->{'playlist'} = '';
+	$self->{'albumartist'} = $url2fetch;
+	$self->{'genre'} = '';
+	my @epiTitles = ();
 	my ($pre, $post) = split(/\"included\"\:/, $html, 2);
 	$html = '';
 	return undef  unless ($pre && $post);
@@ -428,10 +437,13 @@ sub new
 		$self->{'iconurl'} = ($pre =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : '';
 	}
 	$self->{'imageurl'} = $self->{'iconurl'};
-	if ($pre =~ m#\<span\s+class\=\"product\-header\_\_identity(.+)?\<\/span\>#s) {
+	if ($pre =~ m#\<span\s+class\=\"product\-header\_\_identity(.+?)\<\/span\>#s) {
 		my $span = $1;
 		#x $self->{'artist'} = $1  if ($span =~ m#\"\>\s*([^\<]+)\<\/#s);
 		$self->{'artist'} = $1  if ($span =~ m#\>\s*([^\<]+)\<\/a#s);
+		if ($self->{'artist'} !~ /\w/) {
+			$self->{'artist'} = $1  if ($span =~ m#\>\s*([^\<]+)#s);
+		}
 		$self->{'artist'} =~ s/\s+$//;
 		$self->{'albumartist'} = $1  if ($span =~ m#href\=\"([^\"]+)\"\s+class\=\"link#is);
 	}
@@ -444,6 +456,12 @@ sub new
 		$self->{'streams'}->[0] = $1;
 		my $rest = $2;
 		$self->{'title'} = $1  if ($pre =~ m#\"mediaKind\"\:\"[^\"]*\"\,\"name\"\:\"([^\"]+)\"#s);
+		if ($self->{'title'}) {
+			my $title = HTML::Entities::decode_entities($self->{'title'});
+			$title = uri_unescape($title);
+			$title =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+			@epiTitles = ($title);
+		}
 		if ($pre =~ m#episode-description\>(.+?)\<\/section\>#s) {
 			$self->{'description'} = $1;
 			$self->{'description'} =~ s#\<p[^\>]*\>(.+?)\<\/p\>#$1#s;
@@ -459,36 +477,21 @@ sub new
 			$self->{'description'} = $1  if ($json =~ m#\"description\"\:\"([^\"]+)\"#s);
 			$self->{'created'} = $1  if ($json =~ m#\"datePublished\"\:\"([^\"]+)\"#s);
 		}
-		while ($post =~ s#\"assetUrl\"\:\"([^\"]+)\"##s) {
-			push @{$self->{'streams'}}, $1;
-		}
-		if ($url2fetch =~ m#^https?\:\/\/music#) {
-			if ($self->{'id'} =~ m#(\d+)\/(\d+)$#) {
-				my ($albumID, $episodeID) = ($1, $2);
-				if (!defined($self->{'album'}) && $pre =~ m#\/${albumID}\?i\=${episodeID}\"\,\"name\"\:\"([^\"]+)\"#s) {
-					$self->{'album'} = $self->{'title'};
-					$self->{'title'} = $1;
-					$self->{'album'} = HTML::Entities::decode_entities($self->{'album'});
-					$self->{'album'} = uri_unescape($self->{'album'});
-					$self->{'album'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-				}
-				while ($post =~ s#\{\"duration\"\:\d+\,\"url\"\:\"([^\"]+)\".*?salableAdamId\=${episodeID}\D##s) {  #WILL HANDLE iTUNES MUSICK *SAMPLES* FROM (https://music.apple.com/us/album/*):
-					push @{$self->{'streams'}}, $1;
-				}
-			} else {
-				while ($post =~ s#\{\"duration\"\:\d+\,\"url\"\:\"([^\"]+)\"##s) {  #WILL HANDLE iTUNES MUSICK *SAMPLES* FROM (https://music.apple.com/us/album/*):
-					push @{$self->{'streams'}}, $1;
-				}
-			}
-			$self->{'title'} .= ' (-SAMPLE-)';
+		while ($post =~ s#\"assetUrl\"\:\"([^\"]+)\".+?\,\"name\"\:\"([^\"]+)\"##s) {
+			my $stream = $1;
+			my $title = HTML::Entities::decode_entities($2);
+			$title = uri_unescape($title);
+			$title =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+			push @{$self->{'streams'}}, $stream;
+			push @epiTitles, $title;
 		}
 	}
 	$self->{'year'} = $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
-	if ($pre =~ m#\<li\s+class\=\"product\-header\_\_list\_\_item\"\>(.*)?\<\/ul\>#s) {
+	if ($pre =~ m#\<li\s+class\=\"product\-header\_\_list\_\_item\"\>(.*?)\<\/ul\>#s) {
 		my $prodlistitemdata = $1;
-		$self->{'genre'} = $1  if ($prodlistitemdata =~ s#\"\>\s*([^\<]+)\<\/##s);
+		$self->{'genre'} = $1  if ($prodlistitemdata =~ s#genre\"?\>\s*([^\<]+)\<\/##s);
 		$self->{'genre'} =~ s/\s+$//;
-		$self->{'genre'} = HTML::Entities::decode_entities($self->{'genre'});
+		$self->{'genre'} = HTML::Entities::decode_entities($self->{'genre'})  if (defined $self->{'genre'});
 		$self->{'genre'} = uri_unescape($self->{'genre'});
 		$self->{'genre'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 		$self->{'year'} = $1  if ($prodlistitemdata =~ m#\>([\d]+)\D*\<\/time\>#s);
@@ -503,13 +506,22 @@ sub new
 	} else {
 		$self->{'description'} = $self->{'title'};
 	}
-	foreach my $i (qw(title artist description)) {
+	foreach my $i (qw(title artist description genre)) {
 		$self->{$i} = HTML::Entities::decode_entities($self->{$i});
 		$self->{$i} = uri_unescape($self->{$i});
 		$self->{$i} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 	}
 	print STDERR "-SUCCESS: 1st stream=".${$self->{'streams'}}[0]."=\n"  if ($DEBUG);
-#print STDERR "\n***** --ID=".$self->{'id'}."=\n--CNT=".$self->{'cnt'}."=\n--TITLE=".$self->{'title'}."=\n--ARTIST=".$self->{'artist'}."=\n--GENRE=".$self->{'genre'}."=\n--ALBUM=".$self->{'album'}."=\n--YEAR=".$self->{'year'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n*****\n"  if ($DEBUG);
+	if ($self->{'total'} > 0) {
+		$self->{'playlist'} = "#EXTM3U\n";
+		for (my $i=0;$i<$self->{'total'};$i++) {
+			last  if ($i > $#epiTitles);
+			$self->{'playlist'} .= "#EXTINF:-1, " . $epiTitles[$i]
+					. "\n#EXTART:" . $self->{'artist'} . "\n";
+			$self->{'playlist'} .= "#EXTGENRE:" . $self->{'genre'} . "\n"  if ($self->{'genre'});
+			$self->{'playlist'} .= ${$self->{'streams'}}[$i] . "\n";
+		}
+	}
 
 	bless $self, $class;   #BLESS IT!
 
@@ -520,6 +532,7 @@ sub get
 {
 	my $self = shift;
 
+	return wantarray ? ($self->{'playlist'}) : $self->{'playlist'}  if (defined($_[0]) && $_[0] =~ /playlist/i);
 	return wantarray ? @{$self->{'streams'}} : ${$self->{'streams'}}[0];
 }
 

@@ -1,0 +1,11 @@
+=head1 NAME
+
+UniEvent::Backend - registry of UniEvent backends
+
+=head1 CONSTANTS
+
+=head2 UV
+
+L<UniEvent::Backend::UV> UV backend.
+
+=cut
