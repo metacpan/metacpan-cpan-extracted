@@ -4,7 +4,7 @@
       "Pierre Denis <pdenis@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,13 +40,18 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/neilb/Class-Hook",
+      "bugtracker" : {
+         "web" : "https://github.com/cpan-janitor/Class-Hook/issues"
+      },
+      "homepage" : "https://github.com/cpan-janitor/Class-Hook",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/neilb/Class-Hook.git",
-         "web" : "https://github.com/neilb/Class-Hook"
+         "url" : "https://github.com/cpan-janitor/Class-Hook.git",
+         "web" : "https://github.com/cpan-janitor/Class-Hook"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24"
 }
 

@@ -6,13 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'TableData/AOH.pm',
     'TableData/DBI.pm',
     'TableData/Sample/DeNiro.pm',
-    'TableData/Test/Angka.pm',
-    'TableData/Test/Dynamic.pm',
+    'TableData/Test/Source/AOH.pm',
+    'TableData/Test/Source/CSVDATA.pm',
+    'TableData/Test/Source/DBI.pm',
+    'TableData/Test/Source/Iterator.pm',
+    'TableDataRole/Source/AOH.pm',
     'TableDataRole/Source/CSVDATA.pm',
     'TableDataRole/Source/DBI.pm',
     'TableDataRole/Source/Iterator.pm',

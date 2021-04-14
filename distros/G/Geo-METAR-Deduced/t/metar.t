@@ -9,7 +9,7 @@ use 5.014000;
 use Test::More;
 use Test::NoWarnings;
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 use Geo::METAR::Deduced;
 

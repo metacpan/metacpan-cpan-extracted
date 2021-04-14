@@ -37,7 +37,7 @@
    "provides" : {
       "App::Iptables2Dot" : {
          "file" : "lib/App/Iptables2Dot.pm",
-         "version" : "v0.2.5"
+         "version" : "v0.3.0"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "url" : "https://github.com/matwei/perl-App-Iptables2Dot"
       }
    },
-   "version" : "v0.2.5",
+   "version" : "v0.3.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

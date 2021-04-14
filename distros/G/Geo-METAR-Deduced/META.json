@@ -17,7 +17,6 @@
       "build" : {
          "requires" : {
             "Module::Build" : "0.4",
-            "Module::Signature" : "0.22",
             "Test::More" : "0.86",
             "Test::Signature" : "1.04"
          }
@@ -53,7 +52,7 @@
    "provides" : {
       "Geo::METAR::Deduced" : {
          "file" : "lib/Geo/METAR/Deduced.pm",
-         "version" : "v1.0.3"
+         "version" : "v1.0.4"
       }
    },
    "release_status" : "stable",
@@ -68,6 +67,6 @@
          "url" : "https://bitbucket.org/rolandvanipenburg/geo-metar-deduced"
       }
    },
-   "version" : "v1.0.3",
+   "version" : "v1.0.4",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

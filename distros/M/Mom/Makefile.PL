@@ -22,19 +22,21 @@ my $meta = {
                           runtime   => {
                                          recommends => { "Path::Tiny" => 0, "Types::Path::Tiny" => 0 },
                                          requires   => {
+                                                         "Class::XSAccessor" => 0,
                                                          "Import::Into" => 0,
+                                                         "Moo" => 2.004,
                                                          "MooX::Press" => 0,
                                                          "parent" => 0,
                                                          "perl" => 5.008008,
                                                          "Regexp::Common" => 0,
                                                        },
                                        },
-                          test      => { requires => { "Test::More" => 0.96 } },
+                          test      => { requires => { "Test::Fatal" => 0, "Test::More" => 0.96 } },
                         },
-  "provides"         => { Mom => { file => "lib/Mom.pm", version => 0.004 } },
+  "provides"         => { Mom => { file => "lib/Mom.pm", version => 0.005 } },
   "release_status"   => "stable",
   "resources"        => {
-                          bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Mom" },
+                          bugtracker   => { web => "https://github.com/tobyink/p5-mom/issues" },
                           homepage     => "https://metacpan.org/release/Mom",
                           license      => ["http://dev.perl.org/licenses/"],
                           repository   => {
@@ -44,7 +46,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Mom/project",
                         },
-  "version"          => 0.004,
+  "version"          => 0.005,
   "x_contributors"   => ["Brian Greenfield (BRIANG) <briang\@cpan.org>"],
   "x_static_install" => 1,
 };
@@ -120,28 +122,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

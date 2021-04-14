@@ -8,7 +8,7 @@ use 5.014000;
 
 use Test::More;
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 use Test::Kwalitee qw(kwalitee_ok);
 Test::Kwalitee::kwalitee_ok(qw( -has_meta_yml ));

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Minion-Backend-mysql",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Minion::Backend::mysql",
   "PREREQ_PM" => {
     "Minion" => "10.13",
     "Mojo::mysql" => "1.04",
-    "Mojolicious" => 0
+    "Mojolicious" => "9.0"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::mysqld" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "0.23",
+  "VERSION" => "0.24",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,7 +44,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Minion" => "10.13",
   "Mojo::mysql" => "1.04",
-  "Mojolicious" => 0,
+  "Mojolicious" => "9.0",
   "Test::More" => 0,
   "Test::mysqld" => 0,
   "Time::HiRes" => 0

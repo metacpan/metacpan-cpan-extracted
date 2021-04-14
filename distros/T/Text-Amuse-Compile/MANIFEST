@@ -141,6 +141,7 @@ t/testfile/slides.muse
 t/testfile/strike.muse
 t/testfile/test.muse
 t/tex.t
+t/tex/greek.muse
 t/tex/headers.muse
 t/tex/prova.png
 t/tex/testing-no-toc.muse

@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 
 use Test2::API 'intercept';
 use Test::More 0.88;

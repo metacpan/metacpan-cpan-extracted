@@ -1,5 +1,8 @@
 Revision history for Perl extension XML::Perl.
 
+0.10
+	- warnings
+
 0.09
 	- CDATA
 

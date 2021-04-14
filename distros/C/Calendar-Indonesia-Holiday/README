@@ -2,16 +2,19 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.337 of Calendar::Indonesia::Holiday
+    This document describes version 0.340 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2021-03-09.
+    2021-04-12.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
          list_idn_holidays
-         enum_idn_workdays
+         list_idn_workdays
+
          count_idn_workdays
+
          is_idn_holiday
+         is_idn_workday
      );
 
     This lists Indonesian holidays for the year 2011, without the joint
@@ -62,16 +65,22 @@ SYNOPSIS
 
     This checks whether 2011-02-16 is a holiday:
 
-     my $res = is_idn_holidays(date => '2011-02-16');
-     # or: my $res = is_idn_holidays(day => 16, month => 2, year => 2011);
+     my $res = is_idn_holiday(date => '2011-02-16');
      print "2011-02-16 is a holiday\n" if $res->[2];
 
-    This enumerate working days for a certain period:
+    This checks whether 2021-03-11 is a working day:
 
-     my $res = enum_idn_workdays(year=>2011, month=>7);
+     my $res = is_idn_workday(date => '2021-03-11');
+     print "2011-02-16 is a holiday\n" if $res->[2];
 
-    Idem, but returns a number instead. year/month defaults to current
-    year/month:
+    This lists working days for a certain period:
+
+     my $res = list_idn_workdays(start_date=>'2021-01-01', end_date=>'2021-06-30');
+
+    Idem, but returns a number instead. If unspecified, "start_date"
+    defaults to start of current month and "end_date" defaults to end of
+    current month. So this returns the number of working days in the current
+    month:
 
      my $res = count_idn_workdays();
 
@@ -87,58 +96,7 @@ FUNCTIONS
 
      count_idn_workdays(%args) -> [status, msg, payload, meta]
 
-    Count working days for a certain period.
-
-    Working day is defined as day that is not Saturday*/Sunday/holiday/joint
-    leave days*. If work_saturdays is set to true, Saturdays are also
-    counted as working days. If observe_joint_leaves is set to false, joint
-    leave days are also counted as working days.
-
-    Contains data from years 1990 to 2021
-
-    This function is not exported by default, but exportable.
-
-    Arguments ('*' denotes required arguments):
-
-    *   end_date => *str*
-
-        End date.
-
-        Defaults to end of current month. Either a string in the form of
-        "YYYY-MM-DD", or a DateTime object, is accepted.
-
-    *   observe_joint_leaves => *bool* (default: 1)
-
-        If set to 0, do not observe joint leave as holidays.
-
-    *   start_date => *str*
-
-        Starting date.
-
-        Defaults to start of current month. Either a string in the form of
-        "YYYY-MM-DD", or a DateTime object, is accepted.
-
-    *   work_saturdays => *bool* (default: 0)
-
-        If set to 1, Saturday is a working day.
-
-    Returns an enveloped result (an array).
-
-    First element (status) is an integer containing HTTP status code (200
-    means OK, 4xx caller error, 5xx function error). Second element (msg) is
-    a string containing error message, or 'OK' if status is 200. Third
-    element (payload) is optional, the actual result. Fourth element (meta)
-    is called result metadata and is optional, a hash that contains extra
-    information.
-
-    Return value: (any)
-
-  enum_idn_workdays
-    Usage:
-
-     enum_idn_workdays(%args) -> [status, msg, payload, meta]
-
-    Enumerate working days for a certain period.
+    Count working days (non-holiday business days) for a certain period.
 
     Working day is defined as day that is not Saturday*/Sunday/holiday/joint
     leave days*. If work_saturdays is set to true, Saturdays are also
@@ -222,6 +180,51 @@ FUNCTIONS
     *   quiet => *bool*
 
     *   reverse => *bool*
+
+    *   year => *int*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  is_idn_workday
+    Usage:
+
+     is_idn_workday(%args) -> [status, msg, payload, meta]
+
+    Check whether a date is a working day (non-holiday business day).
+
+    Working day is defined as day that is not Saturday*/Sunday/holiday/joint
+    leave days*. If work_saturdays is set to true, Saturdays are also
+    counted as working days. If observe_joint_leaves is set to false, joint
+    leave days are also counted as working days.
+
+    Contains data from years 1990 to 2021
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   date => *str*
+
+    *   day => *int*
+
+    *   month => *int*
+
+    *   observe_joint_leaves => *bool* (default: 1)
+
+        If set to 0, do not observe joint leave as holidays.
+
+    *   work_saturdays => *bool* (default: 0)
+
+        If set to 1, Saturday is a working day.
 
     *   year => *int*
 
@@ -743,19 +746,40 @@ FUNCTIONS
 
      list_idn_workdays(%args) -> [status, msg, payload, meta]
 
-    List Indonesian workdays (non-holidays) in calendar.
+    List working days (non-holiday business days) for a certain period.
 
-    This function is not exported.
+    Working day is defined as day that is not Saturday*/Sunday/holiday/joint
+    leave days*. If work_saturdays is set to true, Saturdays are also
+    counted as working days. If observe_joint_leaves is set to false, joint
+    leave days are also counted as working days.
+
+    Contains data from years 1990 to 2021
+
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
     *   end_date => *str*
 
-    *   month => *int*
+        End date.
+
+        Defaults to end of current month. Either a string in the form of
+        "YYYY-MM-DD", or a DateTime object, is accepted.
+
+    *   observe_joint_leaves => *bool* (default: 1)
+
+        If set to 0, do not observe joint leave as holidays.
 
     *   start_date => *str*
 
-    *   year => *int*
+        Starting date.
+
+        Defaults to start of current month. Either a string in the form of
+        "YYYY-MM-DD", or a DateTime object, is accepted.
+
+    *   work_saturdays => *bool* (default: 0)
+
+        If set to 1, Saturday is a working day.
 
     Returns an enveloped result (an array).
 
@@ -831,6 +855,9 @@ FAQ
     Some religious holidays, especially Vesakha, are not determined yet.
     Joint leave days are also usually decreed by the government in as late
     as October/November in the preceding year.
+
+  How to calculate the difference of two dates in number of working days?
+    Use "count_idn_workdays".
 
 HOMEPAGE
     Please visit the project's homepage at

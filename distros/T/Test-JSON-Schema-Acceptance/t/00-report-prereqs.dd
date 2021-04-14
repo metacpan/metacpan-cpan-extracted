@@ -3,7 +3,7 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
                                         'File::ShareDir::Install' => '0.06',
-                                        'perl' => '5.014'
+                                        'perl' => '5.016'
                                       }
                       },
        'develop' => {
@@ -38,6 +38,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Feature::Compat::Try' => '0',
                                       'File::ShareDir' => '0',
                                       'JSON::MaybeXS' => '1.004001',
                                       'List::Util' => '1.33',
@@ -48,13 +49,13 @@ do { my $x = {
                                       'Test2::API' => '0',
                                       'Test2::Todo' => '0',
                                       'Test2::Tools::Compare' => '0',
-                                      'Try::Tiny' => '0',
                                       'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '1.010002',
                                       'if' => '0',
                                       'namespace::clean' => '0',
-                                      'perl' => '5.014',
+                                      'perl' => '5.016',
                                       'strict' => '0',
+                                      'strictures' => '2',
                                       'warnings' => '0'
                                     },
                       'suggests' => {
@@ -80,7 +81,7 @@ do { my $x = {
                                    'feature' => '0',
                                    'lib' => '0',
                                    'open' => '0',
-                                   'perl' => '5.014',
+                                   'perl' => '5.016',
                                    'utf8' => '0'
                                  }
                  },

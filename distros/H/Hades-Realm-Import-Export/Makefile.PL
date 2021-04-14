@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     TEST_REQUIRES => {
-        'Hades::Realm::Exporter' => '0.03',
+        'Hades::Realm::Exporter' => '0.04',
 	'Import::Export' => '1.00'
     },
     PREREQ_PM => {

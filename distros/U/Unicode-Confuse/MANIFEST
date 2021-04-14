@@ -1,0 +1,13 @@
+Changes
+lib/Unicode/Confuse.pm
+lib/Unicode/Confuse.pod
+lib/Unicode/Confuse/confusables.json
+lib/Unicode/Confuse/Parse.pm
+lib/Unicode/Confuse/Regex.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/unicode-confuse.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

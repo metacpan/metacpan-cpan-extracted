@@ -1,5 +1,5 @@
 package Selenium::Driver::Safari;
-$Selenium::Driver::Safari::VERSION = '1.03';
+$Selenium::Driver::Safari::VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ Selenium::Driver::Safari - Tell Selenium::Client how to spawn safaridriver
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 Mode of Operation
 

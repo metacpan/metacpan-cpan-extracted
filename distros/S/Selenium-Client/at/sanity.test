@@ -99,7 +99,7 @@ foreach my $browser (@browsers) {
             is($session->GetPageSource(),"<html><head></head><body>ZIPPY\n</body></html>","Can get page source");
             is(exception { $session->Back() }, undef, "Can navigate to the last page visited with back()");
 
-            alertify($session) unless $browser eq 'safari';
+            alertify($session) unless $browser eq 'safari' || $browser eq 'firefox';
             is(exception { $session->Forward() }, undef, "Can navigate back to previously visited page with forward()");
 
             $session->Back();
@@ -145,8 +145,8 @@ foreach my $browser (@browsers) {
                 is($rekt, \%erekt, "Can get window rect");
             }
             #Frames
-            my $frame = $session->FindElement( using => 'css selector', value => '#frame' );
-            is( exception { $session->SwitchToFrame( id => $frame->{elementid} ) }, undef, "Can switch into frame");
+            #my $frame = $session->FindElement( using => 'css selector', value => '#frame' );
+            #is( exception { $session->SwitchToFrame( id => $frame->{elementid} ) }, undef, "Can switch into frame");
             #XXX the above actually does not do anything, only switching by window.frames index actually works lol
             $session->SwitchToFrame( id => 0 );
             # Check that the driver yanno *actually did something*

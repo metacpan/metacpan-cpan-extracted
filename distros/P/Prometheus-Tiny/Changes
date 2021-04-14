@@ -1,5 +1,8 @@
 Revision history for Prometheus-Tiny
 
+0.006     2021-04-14 16:25:31+10:00 Australia/Melbourne
+- Add clear method, to remove metric values
+
 0.005     2020-12-03 21:41:43+11:00 Australia/Melbourne
 - Escape special chars in label values (thanks, Danijel Tasov!)
 

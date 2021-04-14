@@ -17,6 +17,7 @@ if (-e 'Build.PL.in') {
 my $class = Module::Build->subclass(
     class => 'Module::Build::Dpkg',
     code => q{
+        require Config;
         require IPC::Cmd;
 
         sub find_command {
@@ -70,6 +71,7 @@ my $class = Module::Build->subclass(
 
             local $ENV{LANG} = 'C';
             local $ENV{LC_ALL} = 'C';
+            local $ENV{PERL} = $Config{perlpath};
             local $ENV{DPKG_TEST_MODE} = 'cpan';
             local $ENV{DPKG_DATADIR} = 'data';
             local $ENV{DPKG_ORIGINS_DIR} = 't/origins';
@@ -83,7 +85,7 @@ my $class = Module::Build->subclass(
 my $build = $class->new(
     dist_name       => 'Dpkg',
     dist_abstract   => 'Debian Package Manager Perl modules',
-    dist_version    => '1.20.7',
+    dist_version    => '1.20.9',
     dist_author     => 'Dpkg Developers <debian-dpkg@lists.debian.org>',
     license         => 'GPL_2',
 

@@ -5,9 +5,9 @@ use warnings;
 use Test::Exception;
 use Test::More 0.98;
 
-use TableData::Test::Angka;
+use TableData::Test::Source::CSVDATA;
 
-my $t = TableData::Test::Angka->new;
+my $t = TableData::Test::Source::CSVDATA->new;
 is($t->as_csv, <<_);
 number,en_name,id_name
 1,one,satu

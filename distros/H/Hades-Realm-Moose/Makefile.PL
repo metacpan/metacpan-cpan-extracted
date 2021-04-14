@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Hades::Realm::OO' => '0.04',
+        'Hades::Realm::OO' => '0.06',
         'Moose' => '1.00',
 	'MooseX::Privacy' => '0.05',
 	'Type::Tiny' => '1.010000',

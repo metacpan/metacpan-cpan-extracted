@@ -332,11 +332,16 @@ sub _add_ring_bond
                               $atom->{index} );
 
         if( $bond && $self->{USER}{RINGBONDS}{$ring_bond}{bond} &&
-            $bond ne $self->{USER}{RINGBONDS}{$ring_bond}{bond} ) {
+            (($bond !~ /^[\\\/]$/ &&
+              $bond ne $self->{USER}{RINGBONDS}{$ring_bond}{bond}) ||
+             ($bond eq '\\' &&
+              $self->{USER}{RINGBONDS}{$ring_bond}{bond} ne '/') ||
+             ($bond eq '/' &&
+              $self->{USER}{RINGBONDS}{$ring_bond}{bond} ne '\\')) ) {
             die "$0: ring bond types for ring bond $ring_bond do not match.\n";
         }
         ( $bond ) = grep { defined }
-                         ( $bond, $self->{USER}{RINGBONDS}{$ring_bond}{bond} );
+                         ( $self->{USER}{RINGBONDS}{$ring_bond}{bond}, $bond );
         if( !$bond &&
             is_aromatic $self->{USER}{RINGBONDS}{$ring_bond}{atom} &&
             is_aromatic $atom ) {

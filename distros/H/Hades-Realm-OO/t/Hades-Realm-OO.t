@@ -16,231 +16,231 @@ subtest 'new' => sub {
 	ok( $obj = Hades::Realm::OO->new(), q{$obj = Hades::Realm::OO->new()} );
 	isa_ok( $obj, 'Hades::Realm::OO' );
 	ok( $obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
-				meta          => {
+			{   is_role => 1,
+				meta    => {
 					'aporia' => {
 						types      => { 'test' => 'test' },
 						attributes => { 'test' => 'test' }
 					}
 				},
-				is_role => 1
+				current_class => 'thanatos'
 			}
 		),
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => [],
-				meta          => {
+			{   is_role => [],
+				meta    => {
 					'aporia' => {
 						types      => { 'test' => 'test' },
 						attributes => { 'test' => 'test' }
 					}
 				},
-				is_role => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => [], meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => [], meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => \1,
-				meta          => {
+			{   is_role => {},
+				meta    => {
 					'aporia' => {
 						types      => { 'test' => 'test' },
 						attributes => { 'test' => 'test' }
 					}
 				},
-				is_role => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => \1, meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => {}, meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
-				meta          => {
+			{   is_role => 1,
+				meta    => {
 					'aporia' =>
 					    { types => [], attributes => { 'test' => 'test' } }
 				},
-				is_role => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => { types => [], attributes => { 'test' => 'test' } } }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => { types => [], attributes => { 'test' => 'test' } } }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
-				meta          => {
+			{   is_role => 1,
+				meta    => {
 					'aporia' => {
-						types      => 'geras',
+						types      => 'thanatos',
 						attributes => { 'test' => 'test' }
 					}
 				},
-				is_role => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => { types => 'geras', attributes => { 'test' => 'test' } } }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => { types => 'thanatos', attributes => { 'test' => 'test' } } }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
-				meta          => {
+			{   is_role => 1,
+				meta    => {
 					'aporia' => {
 						types      => undef,
 						attributes => { 'test' => 'test' }
 					}
 				},
-				is_role => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => { types => undef, attributes => { 'test' => 'test' } } }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => { types => undef, attributes => { 'test' => 'test' } } }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
-				meta          => {
+			{   is_role => 1,
+				meta    => {
 					'aporia' =>
 					    { types => { 'test' => 'test' }, attributes => [] }
 				},
-				is_role => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => [] } }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => [] } }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
-				meta          => {
+			{   is_role => 1,
+				meta    => {
 					'aporia' => {
 						types      => { 'test' => 'test' },
-						attributes => 'geras'
+						attributes => 'gaudia'
 					}
 				},
-				is_role => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => 'geras' } }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => 'gaudia' } }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
-				meta          => {
+			{   is_role => 1,
+				meta    => {
 					'aporia' => {
 						types      => { 'test' => 'test' },
 						attributes => undef
 					}
 				},
-				is_role => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => undef } }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => undef } }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
+			{   is_role       => 1,
 				meta          => { 'aporia' => {} },
-				is_role       => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => {} }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => {} }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
+			{   is_role       => 1,
 				meta          => { 'aporia' => [] },
-				is_role       => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => [] }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => [] }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
-				meta          => { 'aporia' => 'thanatos' },
-				is_role       => 1
+			{   is_role       => 1,
+				meta          => { 'aporia' => 'hypnos' },
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => 'thanatos' }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => 'hypnos' }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
+			{   is_role       => 1,
 				meta          => { 'aporia' => undef },
-				is_role       => 1
+				current_class => 'thanatos'
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => undef }, is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => undef }, current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{ current_class => 'geras', meta => [], is_role => 1 } );
+			{ is_role => 1, meta => [], current_class => 'thanatos' } );
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => [], is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => [], current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{ current_class => 'geras', meta => 'curae', is_role => 1 } );
+			{ is_role => 1, meta => 'penthos', current_class => 'thanatos' } );
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => 'curae', is_role => 1 })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => 'penthos', current_class => 'thanatos' })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
-				meta          => {
+			{   is_role => 1,
+				meta    => {
 					'aporia' => {
 						types      => { 'test' => 'test' },
 						attributes => { 'test' => 'test' }
 					}
 				},
-				is_role => []
+				current_class => []
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } }, is_role => [] })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } }, current_class => [] })}
 	);
 	eval {
 		$obj = Hades::Realm::OO->new(
-			{   current_class => 'geras',
-				meta          => {
+			{   is_role => 1,
+				meta    => {
 					'aporia' => {
 						types      => { 'test' => 'test' },
 						attributes => { 'test' => 'test' }
 					}
 				},
-				is_role => {}
+				current_class => \1
 			}
 		);
 	};
 	like( $@, qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Realm::OO->new({ current_class => 'geras', meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } }, is_role => {} })}
+		q{$obj = Hades::Realm::OO->new({ is_role => 1, meta => { 'aporia' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } }, current_class => \1 })}
 	);
 };
 subtest 'current_class' => sub {
@@ -250,15 +250,15 @@ subtest 'current_class' => sub {
 	);
 	can_ok( $obj, 'current_class' );
 	is( $obj->current_class, undef, q{$obj->current_class} );
-	is_deeply( $obj->current_class('phobos'),
-		'phobos', q{$obj->current_class('phobos')} );
+	is_deeply( $obj->current_class('hypnos'),
+		'hypnos', q{$obj->current_class('hypnos')} );
 	eval { $obj->current_class( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->current_class([])} );
 	eval { $obj->current_class( \1 ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->current_class(\1)} );
-	is_deeply( $obj->current_class, 'phobos', q{$obj->current_class} );
+	is_deeply( $obj->current_class, 'hypnos', q{$obj->current_class} );
 };
 subtest 'meta' => sub {
 	plan tests => 17;
@@ -269,110 +269,112 @@ subtest 'meta' => sub {
 	is( $obj->meta, undef, q{$obj->meta} );
 	is_deeply(
 		$obj->meta(
-			{   'nosoi' => {
+			{   'curae' => {
 					types      => { 'test' => 'test' },
 					attributes => { 'test' => 'test' }
 				}
 			}
 		),
-		{   'nosoi' => {
+		{   'curae' => {
 				types      => { 'test' => 'test' },
 				attributes => { 'test' => 'test' }
 			}
 		},
-		q{$obj->meta({ 'nosoi' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } })}
+		q{$obj->meta({ 'curae' => { types => { 'test' => 'test' }, attributes => { 'test' => 'test' } } })}
 	);
 	eval {
 		$obj->meta(
-			{   'nosoi' => { types => [], attributes => { 'test' => 'test' } }
+			{   'curae' => { types => [], attributes => { 'test' => 'test' } }
 			}
 		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta({ 'nosoi' => { types => [], attributes => { 'test' => 'test' } } })}
+		q{$obj->meta({ 'curae' => { types => [], attributes => { 'test' => 'test' } } })}
 	);
 	eval {
 		$obj->meta(
-			{   'nosoi' =>
-				    { types => 'nosoi', attributes => { 'test' => 'test' } }
+			{   'curae' => {
+					types      => 'thanatos',
+					attributes => { 'test' => 'test' }
+				}
 			}
 		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta({ 'nosoi' => { types => 'nosoi', attributes => { 'test' => 'test' } } })}
+		q{$obj->meta({ 'curae' => { types => 'thanatos', attributes => { 'test' => 'test' } } })}
 	);
 	eval {
 		$obj->meta(
-			{   'nosoi' =>
+			{   'curae' =>
 				    { types => undef, attributes => { 'test' => 'test' } }
 			}
 		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta({ 'nosoi' => { types => undef, attributes => { 'test' => 'test' } } })}
+		q{$obj->meta({ 'curae' => { types => undef, attributes => { 'test' => 'test' } } })}
 	);
 	eval {
 		$obj->meta(
-			{   'nosoi' => { types => { 'test' => 'test' }, attributes => [] }
+			{   'curae' => { types => { 'test' => 'test' }, attributes => [] }
 			}
 		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta({ 'nosoi' => { types => { 'test' => 'test' }, attributes => [] } })}
+		q{$obj->meta({ 'curae' => { types => { 'test' => 'test' }, attributes => [] } })}
 	);
 	eval {
 		$obj->meta(
-			{   'nosoi' =>
-				    { types => { 'test' => 'test' }, attributes => 'hypnos' }
+			{   'curae' =>
+				    { types => { 'test' => 'test' }, attributes => 'gaudia' }
 			}
 		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta({ 'nosoi' => { types => { 'test' => 'test' }, attributes => 'hypnos' } })}
+		q{$obj->meta({ 'curae' => { types => { 'test' => 'test' }, attributes => 'gaudia' } })}
 	);
 	eval {
 		$obj->meta(
-			{   'nosoi' =>
+			{   'curae' =>
 				    { types => { 'test' => 'test' }, attributes => undef }
 			}
 		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta({ 'nosoi' => { types => { 'test' => 'test' }, attributes => undef } })}
+		q{$obj->meta({ 'curae' => { types => { 'test' => 'test' }, attributes => undef } })}
 	);
-	eval { $obj->meta( { 'nosoi' => {} } ) };
+	eval { $obj->meta( { 'curae' => {} } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta({ 'nosoi' => {} })}
+		q{$obj->meta({ 'curae' => {} })}
 	);
-	eval { $obj->meta( { 'nosoi' => [] } ) };
+	eval { $obj->meta( { 'curae' => [] } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta({ 'nosoi' => [] })}
+		q{$obj->meta({ 'curae' => [] })}
 	);
-	eval { $obj->meta( { 'nosoi' => 'aporia' } ) };
+	eval { $obj->meta( { 'curae' => 'penthos' } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta({ 'nosoi' => 'aporia' })}
+		q{$obj->meta({ 'curae' => 'penthos' })}
 	);
-	eval { $obj->meta( { 'nosoi' => undef } ) };
+	eval { $obj->meta( { 'curae' => undef } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta({ 'nosoi' => undef })}
+		q{$obj->meta({ 'curae' => undef })}
 	);
 	eval { $obj->meta( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->meta([])} );
-	eval { $obj->meta('phobos') };
+	eval { $obj->meta('aporia') };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->meta('phobos')} );
+		q{$obj->meta('aporia')} );
 	is_deeply(
 		$obj->meta,
-		{   'nosoi' => {
+		{   'curae' => {
 				types      => { 'test' => 'test' },
 				attributes => { 'test' => 'test' }
 			}
@@ -415,11 +417,11 @@ subtest 'module_generate' => sub {
 	eval { $obj->module_generate( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->module_generate([])} );
-	eval { $obj->module_generate('nosoi') };
+	eval { $obj->module_generate('thanatos') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->module_generate('nosoi')}
+		q{$obj->module_generate('thanatos')}
 	);
 };
 subtest 'build_class_inheritance' => sub {
@@ -442,10 +444,14 @@ subtest 'build_new' => sub {
 		q{$obj->build_new([], { 'test' => 'test' }, { 'test' => 'test' })}
 	);
 	eval {
-		$obj->build_new( 'nosoi', { 'test' => 'test' }, { 'test' => 'test' } );
+		$obj->build_new(
+			'penthos',
+			{ 'test' => 'test' },
+			{ 'test' => 'test' }
+		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_new('nosoi', { 'test' => 'test' }, { 'test' => 'test' })}
+		q{$obj->build_new('penthos', { 'test' => 'test' }, { 'test' => 'test' })}
 	);
 	eval { $obj->build_new( bless( {}, 'Test' ), [], { 'test' => 'test' } ) };
 	like(
@@ -454,10 +460,10 @@ subtest 'build_new' => sub {
 		q{$obj->build_new(bless({}, 'Test'), [], { 'test' => 'test' })}
 	);
 	eval {
-		$obj->build_new( bless( {}, 'Test' ), 'limos', { 'test' => 'test' } );
+		$obj->build_new( bless( {}, 'Test' ), 'nosoi', { 'test' => 'test' } );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_new(bless({}, 'Test'), 'limos', { 'test' => 'test' })}
+		q{$obj->build_new(bless({}, 'Test'), 'nosoi', { 'test' => 'test' })}
 	);
 	eval { $obj->build_new( bless( {}, 'Test' ), { 'test' => 'test' }, [] ) };
 	like(
@@ -466,10 +472,10 @@ subtest 'build_new' => sub {
 		q{$obj->build_new(bless({}, 'Test'), { 'test' => 'test' }, [])}
 	);
 	eval {
-		$obj->build_new( bless( {}, 'Test' ), { 'test' => 'test' }, 'hypnos' );
+		$obj->build_new( bless( {}, 'Test' ), { 'test' => 'test' }, 'gaudia' );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_new(bless({}, 'Test'), { 'test' => 'test' }, 'hypnos')}
+		q{$obj->build_new(bless({}, 'Test'), { 'test' => 'test' }, 'gaudia')}
 	);
 };
 subtest 'build_clearer' => sub {
@@ -500,11 +506,11 @@ subtest 'build_accessor_no_arguments' => sub {
 		q{$obj->build_accessor_no_arguments([], ['test'], { 'test' => 'test' })}
 	);
 	eval {
-		$obj->build_accessor_no_arguments( 'nosoi', ['test'],
+		$obj->build_accessor_no_arguments( 'geras', ['test'],
 			{ 'test' => 'test' } );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_no_arguments('nosoi', ['test'], { 'test' => 'test' })}
+		q{$obj->build_accessor_no_arguments('geras', ['test'], { 'test' => 'test' })}
 	);
 	eval {
 		$obj->build_accessor_no_arguments( bless( {}, 'Test' ),
@@ -515,10 +521,10 @@ subtest 'build_accessor_no_arguments' => sub {
 	);
 	eval {
 		$obj->build_accessor_no_arguments( bless( {}, 'Test' ),
-			'limos', { 'test' => 'test' } );
+			'nosoi', { 'test' => 'test' } );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_no_arguments(bless({}, 'Test'), 'limos', { 'test' => 'test' })}
+		q{$obj->build_accessor_no_arguments(bless({}, 'Test'), 'nosoi', { 'test' => 'test' })}
 	);
 	eval {
 		$obj->build_accessor_no_arguments( bless( {}, 'Test' ), ['test'], [] );
@@ -528,10 +534,10 @@ subtest 'build_accessor_no_arguments' => sub {
 	);
 	eval {
 		$obj->build_accessor_no_arguments( bless( {}, 'Test' ),
-			['test'], 'hypnos' );
+			['test'], 'curae' );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_no_arguments(bless({}, 'Test'), ['test'], 'hypnos')}
+		q{$obj->build_accessor_no_arguments(bless({}, 'Test'), ['test'], 'curae')}
 	);
 };
 subtest 'build_accessor' => sub {
@@ -540,19 +546,17 @@ subtest 'build_accessor' => sub {
 		q{my $obj = Hades::Realm::OO->new({})}
 	);
 	can_ok( $obj, 'build_accessor' );
-	eval { $obj->build_accessor( [], 'thanatos', { 'test' => 'test' } ) };
+	eval { $obj->build_accessor( [], 'limos', { 'test' => 'test' } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor([], 'thanatos', { 'test' => 'test' })}
+		q{$obj->build_accessor([], 'limos', { 'test' => 'test' })}
 	);
-	eval {
-		$obj->build_accessor( 'phobos', 'thanatos', { 'test' => 'test' } );
-	};
+	eval { $obj->build_accessor( 'thanatos', 'limos', { 'test' => 'test' } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor('phobos', 'thanatos', { 'test' => 'test' })}
+		q{$obj->build_accessor('thanatos', 'limos', { 'test' => 'test' })}
 	);
 	eval {
 		$obj->build_accessor( bless( {}, 'Test' ), [], { 'test' => 'test' } );
@@ -566,17 +570,17 @@ subtest 'build_accessor' => sub {
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_accessor(bless({}, 'Test'), \1, { 'test' => 'test' })}
 	);
-	eval { $obj->build_accessor( bless( {}, 'Test' ), 'thanatos', [] ) };
+	eval { $obj->build_accessor( bless( {}, 'Test' ), 'limos', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor(bless({}, 'Test'), 'thanatos', [])}
+		q{$obj->build_accessor(bless({}, 'Test'), 'limos', [])}
 	);
-	eval { $obj->build_accessor( bless( {}, 'Test' ), 'thanatos', 'nosoi' ) };
+	eval { $obj->build_accessor( bless( {}, 'Test' ), 'limos', 'hypnos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor(bless({}, 'Test'), 'thanatos', 'nosoi')}
+		q{$obj->build_accessor(bless({}, 'Test'), 'limos', 'hypnos')}
 	);
 };
 subtest 'build_modify' => sub {
@@ -585,17 +589,17 @@ subtest 'build_modify' => sub {
 		q{my $obj = Hades::Realm::OO->new({})}
 	);
 	can_ok( $obj, 'build_modify' );
-	eval { $obj->build_modify( [], 'limos', { 'test' => 'test' } ) };
+	eval { $obj->build_modify( [], 'thanatos', { 'test' => 'test' } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_modify([], 'limos', { 'test' => 'test' })}
+		q{$obj->build_modify([], 'thanatos', { 'test' => 'test' })}
 	);
-	eval { $obj->build_modify( 'hypnos', 'limos', { 'test' => 'test' } ) };
+	eval { $obj->build_modify( 'algea', 'thanatos', { 'test' => 'test' } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_modify('hypnos', 'limos', { 'test' => 'test' })}
+		q{$obj->build_modify('algea', 'thanatos', { 'test' => 'test' })}
 	);
 	eval {
 		$obj->build_modify( bless( {}, 'Test' ), [], { 'test' => 'test' } );
@@ -613,17 +617,17 @@ subtest 'build_modify' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_modify(bless({}, 'Test'), \1, { 'test' => 'test' })}
 	);
-	eval { $obj->build_modify( bless( {}, 'Test' ), 'limos', [] ) };
+	eval { $obj->build_modify( bless( {}, 'Test' ), 'thanatos', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_modify(bless({}, 'Test'), 'limos', [])}
+		q{$obj->build_modify(bless({}, 'Test'), 'thanatos', [])}
 	);
-	eval { $obj->build_modify( bless( {}, 'Test' ), 'limos', 'geras' ) };
+	eval { $obj->build_modify( bless( {}, 'Test' ), 'thanatos', 'nosoi' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_modify(bless({}, 'Test'), 'limos', 'geras')}
+		q{$obj->build_modify(bless({}, 'Test'), 'thanatos', 'nosoi')}
 	);
 };
 subtest 'after_class' => sub {
@@ -638,11 +642,11 @@ subtest 'after_class' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->after_class([], { 'test' => 'test' })}
 	);
-	eval { $obj->after_class( 'nosoi', { 'test' => 'test' } ) };
+	eval { $obj->after_class( 'aporia', { 'test' => 'test' } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->after_class('nosoi', { 'test' => 'test' })}
+		q{$obj->after_class('aporia', { 'test' => 'test' })}
 	);
 	eval { $obj->after_class( bless( {}, 'Test' ), [] ) };
 	like(
@@ -650,11 +654,11 @@ subtest 'after_class' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->after_class(bless({}, 'Test'), [])}
 	);
-	eval { $obj->after_class( bless( {}, 'Test' ), 'aporia' ) };
+	eval { $obj->after_class( bless( {}, 'Test' ), 'penthos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->after_class(bless({}, 'Test'), 'aporia')}
+		q{$obj->after_class(bless({}, 'Test'), 'penthos')}
 	);
 };
 subtest 'unique_types' => sub {
@@ -675,11 +679,11 @@ subtest 'unique_types' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->unique_types('curae', [])}
 	);
-	eval { $obj->unique_types( 'curae', 'geras' ) };
+	eval { $obj->unique_types( 'curae', 'penthos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->unique_types('curae', 'geras')}
+		q{$obj->unique_types('curae', 'penthos')}
 	);
 };
 subtest 'build_as_class' => sub {
@@ -694,11 +698,11 @@ subtest 'build_as_class' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_as_class([], { 'test' => 'test' })}
 	);
-	eval { $obj->build_as_class( 'aporia', { 'test' => 'test' } ) };
+	eval { $obj->build_as_class( 'curae', { 'test' => 'test' } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_as_class('aporia', { 'test' => 'test' })}
+		q{$obj->build_as_class('curae', { 'test' => 'test' })}
 	);
 	eval { $obj->build_as_class( bless( {}, 'Test' ), [] ) };
 	like(
@@ -725,11 +729,11 @@ subtest 'build_as_role' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_as_role([], { 'test' => 'test' })}
 	);
-	eval { $obj->build_as_role( 'nosoi', { 'test' => 'test' } ) };
+	eval { $obj->build_as_role( 'algea', { 'test' => 'test' } ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_as_role('nosoi', { 'test' => 'test' })}
+		q{$obj->build_as_role('algea', { 'test' => 'test' })}
 	);
 	eval { $obj->build_as_role( bless( {}, 'Test' ), [] ) };
 	like(
@@ -737,11 +741,11 @@ subtest 'build_as_role' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_as_role(bless({}, 'Test'), [])}
 	);
-	eval { $obj->build_as_role( bless( {}, 'Test' ), 'geras' ) };
+	eval { $obj->build_as_role( bless( {}, 'Test' ), 'penthos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_as_role(bless({}, 'Test'), 'geras')}
+		q{$obj->build_as_role(bless({}, 'Test'), 'penthos')}
 	);
 };
 subtest 'build_has_keywords' => sub {
@@ -756,11 +760,11 @@ subtest 'build_has_keywords' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_has_keywords({})}
 	);
-	eval { $obj->build_has_keywords('nosoi') };
+	eval { $obj->build_has_keywords('thanatos') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_has_keywords('nosoi')}
+		q{$obj->build_has_keywords('thanatos')}
 	);
 };
 subtest 'build_has' => sub {
@@ -772,12 +776,9 @@ subtest 'build_has' => sub {
 	eval { $obj->build_has( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_has([])} );
-	eval { $obj->build_has('thanatos') };
-	like(
-		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_has('thanatos')}
-	);
+	eval { $obj->build_has('nosoi') };
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+		q{$obj->build_has('nosoi')} );
 };
 subtest 'build_extends_keywords' => sub {
 	plan tests => 4;
@@ -791,11 +792,11 @@ subtest 'build_extends_keywords' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_extends_keywords({})}
 	);
-	eval { $obj->build_extends_keywords('penthos') };
+	eval { $obj->build_extends_keywords('curae') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_extends_keywords('penthos')}
+		q{$obj->build_extends_keywords('curae')}
 	);
 };
 subtest 'build_extends' => sub {
@@ -807,11 +808,11 @@ subtest 'build_extends' => sub {
 	eval { $obj->build_extends( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_extends([])} );
-	eval { $obj->build_extends('limos') };
+	eval { $obj->build_extends('nosoi') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_extends('limos')}
+		q{$obj->build_extends('nosoi')}
 	);
 };
 subtest 'build_with_keywords' => sub {
@@ -826,11 +827,11 @@ subtest 'build_with_keywords' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_with_keywords({})}
 	);
-	eval { $obj->build_with_keywords('aporia') };
+	eval { $obj->build_with_keywords('phobos') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_with_keywords('aporia')}
+		q{$obj->build_with_keywords('phobos')}
 	);
 };
 subtest 'build_with' => sub {
@@ -842,9 +843,9 @@ subtest 'build_with' => sub {
 	eval { $obj->build_with( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_with([])} );
-	eval { $obj->build_with('algea') };
+	eval { $obj->build_with('hypnos') };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_with('algea')} );
+		q{$obj->build_with('hypnos')} );
 };
 subtest 'build_requires_keywords' => sub {
 	plan tests => 4;
@@ -858,11 +859,11 @@ subtest 'build_requires_keywords' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_requires_keywords({})}
 	);
-	eval { $obj->build_requires_keywords('penthos') };
+	eval { $obj->build_requires_keywords('limos') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_requires_keywords('penthos')}
+		q{$obj->build_requires_keywords('limos')}
 	);
 };
 subtest 'build_requires' => sub {
@@ -874,11 +875,11 @@ subtest 'build_requires' => sub {
 	eval { $obj->build_requires( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_requires([])} );
-	eval { $obj->build_requires('hypnos') };
+	eval { $obj->build_requires('thanatos') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_requires('hypnos')}
+		q{$obj->build_requires('thanatos')}
 	);
 };
 subtest 'build_before_keywords' => sub {
@@ -893,11 +894,11 @@ subtest 'build_before_keywords' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_before_keywords({})}
 	);
-	eval { $obj->build_before_keywords('hypnos') };
+	eval { $obj->build_before_keywords('algea') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_before_keywords('hypnos')}
+		q{$obj->build_before_keywords('algea')}
 	);
 };
 subtest 'build_before' => sub {
@@ -909,11 +910,11 @@ subtest 'build_before' => sub {
 	eval { $obj->build_before( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_before([])} );
-	eval { $obj->build_before('thanatos') };
+	eval { $obj->build_before('nosoi') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_before('thanatos')}
+		q{$obj->build_before('nosoi')}
 	);
 };
 subtest 'build_around_keywords' => sub {
@@ -928,11 +929,11 @@ subtest 'build_around_keywords' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_around_keywords({})}
 	);
-	eval { $obj->build_around_keywords('phobos') };
+	eval { $obj->build_around_keywords('thanatos') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_around_keywords('phobos')}
+		q{$obj->build_around_keywords('thanatos')}
 	);
 };
 subtest 'build_around' => sub {
@@ -944,11 +945,11 @@ subtest 'build_around' => sub {
 	eval { $obj->build_around( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_around([])} );
-	eval { $obj->build_around('penthos') };
+	eval { $obj->build_around('aporia') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_around('penthos')}
+		q{$obj->build_around('aporia')}
 	);
 };
 subtest 'build_after_keywords' => sub {
@@ -963,11 +964,11 @@ subtest 'build_after_keywords' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_after_keywords({})}
 	);
-	eval { $obj->build_after_keywords('limos') };
+	eval { $obj->build_after_keywords('thanatos') };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_after_keywords('limos')}
+		q{$obj->build_after_keywords('thanatos')}
 	);
 };
 subtest 'build_after' => sub {
@@ -979,9 +980,9 @@ subtest 'build_after' => sub {
 	eval { $obj->build_after( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->build_after([])} );
-	eval { $obj->build_after('geras') };
+	eval { $obj->build_after('algea') };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_after('geras')} );
+		q{$obj->build_after('algea')} );
 };
 subtest 'build_accessor_builder' => sub {
 	plan tests => 6;
@@ -989,17 +990,17 @@ subtest 'build_accessor_builder' => sub {
 		q{my $obj = Hades::Realm::OO->new({})}
 	);
 	can_ok( $obj, 'build_accessor_builder' );
-	eval { $obj->build_accessor_builder( [], 'phobos' ) };
+	eval { $obj->build_accessor_builder( [], 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_builder([], 'phobos')}
+		q{$obj->build_accessor_builder([], 'curae')}
 	);
-	eval { $obj->build_accessor_builder( \1, 'phobos' ) };
+	eval { $obj->build_accessor_builder( \1, 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_builder(\1, 'phobos')}
+		q{$obj->build_accessor_builder(\1, 'curae')}
 	);
 	eval { $obj->build_accessor_builder( 'nosoi', [] ) };
 	like(
@@ -1020,29 +1021,29 @@ subtest 'build_accessor_coerce' => sub {
 		q{my $obj = Hades::Realm::OO->new({})}
 	);
 	can_ok( $obj, 'build_accessor_coerce' );
-	eval { $obj->build_accessor_coerce( [], 'gaudia' ) };
+	eval { $obj->build_accessor_coerce( [], 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_coerce([], 'gaudia')}
+		q{$obj->build_accessor_coerce([], 'algea')}
 	);
-	eval { $obj->build_accessor_coerce( \1, 'gaudia' ) };
+	eval { $obj->build_accessor_coerce( \1, 'algea' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_coerce(\1, 'gaudia')}
+		q{$obj->build_accessor_coerce(\1, 'algea')}
 	);
-	eval { $obj->build_accessor_coerce( 'hypnos', [] ) };
+	eval { $obj->build_accessor_coerce( 'gaudia', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_coerce('hypnos', [])}
+		q{$obj->build_accessor_coerce('gaudia', [])}
 	);
-	eval { $obj->build_accessor_coerce( 'hypnos', \1 ) };
+	eval { $obj->build_accessor_coerce( 'gaudia', \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_coerce('hypnos', \1)}
+		q{$obj->build_accessor_coerce('gaudia', \1)}
 	);
 };
 subtest 'build_accessor_trigger' => sub {
@@ -1051,29 +1052,29 @@ subtest 'build_accessor_trigger' => sub {
 		q{my $obj = Hades::Realm::OO->new({})}
 	);
 	can_ok( $obj, 'build_accessor_trigger' );
-	eval { $obj->build_accessor_trigger( [], 'geras' ) };
+	eval { $obj->build_accessor_trigger( [], 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_trigger([], 'geras')}
+		q{$obj->build_accessor_trigger([], 'curae')}
 	);
-	eval { $obj->build_accessor_trigger( \1, 'geras' ) };
+	eval { $obj->build_accessor_trigger( \1, 'curae' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_trigger(\1, 'geras')}
+		q{$obj->build_accessor_trigger(\1, 'curae')}
 	);
-	eval { $obj->build_accessor_trigger( 'limos', [] ) };
+	eval { $obj->build_accessor_trigger( 'curae', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_trigger('limos', [])}
+		q{$obj->build_accessor_trigger('curae', [])}
 	);
-	eval { $obj->build_accessor_trigger( 'limos', \1 ) };
+	eval { $obj->build_accessor_trigger( 'curae', \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_trigger('limos', \1)}
+		q{$obj->build_accessor_trigger('curae', \1)}
 	);
 };
 subtest 'build_accessor_default' => sub {
@@ -1082,29 +1083,29 @@ subtest 'build_accessor_default' => sub {
 		q{my $obj = Hades::Realm::OO->new({})}
 	);
 	can_ok( $obj, 'build_accessor_default' );
-	eval { $obj->build_accessor_default( [], 'geras' ) };
+	eval { $obj->build_accessor_default( [], 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_default([], 'geras')}
+		q{$obj->build_accessor_default([], 'limos')}
 	);
-	eval { $obj->build_accessor_default( \1, 'geras' ) };
+	eval { $obj->build_accessor_default( \1, 'limos' ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_default(\1, 'geras')}
+		q{$obj->build_accessor_default(\1, 'limos')}
 	);
-	eval { $obj->build_accessor_default( 'penthos', [] ) };
+	eval { $obj->build_accessor_default( 'curae', [] ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_default('penthos', [])}
+		q{$obj->build_accessor_default('curae', [])}
 	);
-	eval { $obj->build_accessor_default( 'penthos', \1 ) };
+	eval { $obj->build_accessor_default( 'curae', \1 ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_accessor_default('penthos', \1)}
+		q{$obj->build_accessor_default('curae', \1)}
 	);
 };
 done_testing();

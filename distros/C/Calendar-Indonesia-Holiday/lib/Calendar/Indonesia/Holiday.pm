@@ -1,9 +1,9 @@
 package Calendar::Indonesia::Holiday;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-09'; # DATE
+our $DATE = '2021-04-12'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.337'; # VERSION
+our $VERSION = '0.340'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,19 +18,27 @@ use Perinci::Sub::Util qw(err gen_modified_sub);
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(
-                       list_idn_holidays
-                       enum_idn_workdays
-                       count_idn_workdays
-                       is_idn_holiday
-
-                       list_id_holidays
-                       enum_id_workdays
-                       count_id_workdays
-                       is_id_holiday
-               );
+our @EXPORT_OK = (
+    'list_idn_holidays',
+    'list_idn_workdays',
+    'count_idn_workdays',
+    'is_idn_holiday',
+    'is_idn_workday',
+);
 
 our %SPEC;
+
+our %argspecs_date_or_day_month_year = (
+    day        => {schema=>['int*', between=>[1,31]]},
+    month      => {schema=>['int*', between=>[1, 12]]},
+    year       => {schema=>'int*'},
+    date       => {schema=>'str*', pos=>0},
+);
+
+our %argsrels_date_or_day_month_year = (
+    choose_all => [qw/day month year/],
+    req_one => [qw/day date/],
+);
 
 $SPEC{':package'} = {
     v => 1.1,
@@ -348,6 +356,22 @@ sub _uniquify_holidays {
     }
 
     map { $seen{$_} } sort keys %seen;
+}
+
+sub _get_date_day_month_year {
+    my $args = shift;
+
+    my ($y, $m, $d, $date);
+    if (defined $args->{date}) {
+        $args->{date} =~ /\A(\d{4})-(\d{1,2})-(\d{1,2})\z/
+            or return [400, "Invalid date syntax, please use 'YYYY-MM-DD' format"];
+        ($y, $m, $d) = ($1, $2, $3);
+    } else {
+        ($y = $args->{year}) && ($m = $args->{month}) && ($d = $args->{day})
+            or return [400, "Please specify day/month/year or date"];
+    }
+    $date = sprintf "%04d-%02d-%02d", $y, $m, $d;
+    [200, "OK", [$date, $y, $m, $d]];
 }
 
 my %year_holidays;
@@ -1140,7 +1164,7 @@ my %year_holidays;
         # - labor day
         _h_ascension ({_expand_dm("13-05")}),
         ($eidulf2021 = _h_eidulf    ({_expand_dm("13-05")}, {hyear=>1442, day=>1})),
-        _h_eidulf    ({_expand_dm("14-05")}, {hyear=>1442, day=>1}),
+        _h_eidulf    ({_expand_dm("14-05")}, {hyear=>1442, day=>2}),
         _h_vesakha   ({_expand_dm("26-05")}, {hyear=>2565}),
         # - pancasila day
         _h_eidula ({_expand_dm("20-07")}, {hyear=>1442}),
@@ -1326,6 +1350,13 @@ $SPEC{list_idn_holidays}{args}{month}{pos} = 1;
 
 my $TEXT_AVAILABLE_YEARS = "Contains data from years $min_year to $max_year";
 
+my $TEXT_WORKDAY_DEFINITION = <<'_';
+Working day is defined as day that is not Saturday*/Sunday/holiday/joint leave
+days*. If work_saturdays is set to true, Saturdays are also counted as working
+days. If observe_joint_leaves is set to false, joint leave days are also counted
+as working days.
+_
+
     my $meta = $res->[2]{meta};
 $meta->{summary} = "List Indonesian holidays in calendar";
 $meta->{description} = <<"_";
@@ -1347,15 +1378,12 @@ sub _check_date_arg {
     }
 }
 
-$SPEC{enum_idn_workdays} = {
+$SPEC{list_idn_workdays} = {
     v => 1.1,
-    summary => 'Enumerate working days for a certain period',
+    summary => 'List working days (non-holiday business days) for a certain period',
     description => <<"_",
 
-Working day is defined as day that is not Saturday*/Sunday/holiday/joint leave
-days*. If work_saturdays is set to true, Saturdays are also counted as working
-days. If observe_joint_leaves is set to false, joint leave days are also counted
-as working days.
+$TEXT_WORKDAY_DEFINITION
 
 $TEXT_AVAILABLE_YEARS
 
@@ -1364,6 +1392,7 @@ _
         start_date => {
             summary => 'Starting date',
             schema  => 'str*',
+            pos => 0,
             description => <<'_',
 
 Defaults to start of current month. Either a string in the form of "YYYY-MM-DD",
@@ -1374,6 +1403,7 @@ _
         end_date => {
             summary => 'End date',
             schema  => 'str*',
+            pos => 1,
             description => <<'_',
 
 Defaults to end of current month. Either a string in the form of "YYYY-MM-DD",
@@ -1388,10 +1418,11 @@ _
         observe_joint_leaves => {
             summary => 'If set to 0, do not observe joint leave as holidays',
             schema  => ['bool' => {default => 1}],
+            cmdline_aliases => {j=>{}},
         },
     },
 };
-sub enum_idn_workdays {
+sub list_idn_workdays {
     my %args = @_;
 
     # XXX args
@@ -1439,55 +1470,16 @@ sub enum_idn_workdays {
 
 gen_modified_sub(
     output_name => 'count_idn_workdays',
-    summary     => "Count working days for a certain period",
+    summary     => "Count working days (non-holiday business days) for a certain period",
 
-    base_name   => 'enum_idn_workdays',
+    base_name   => 'list_idn_workdays',
     output_code => sub {
-        my $res = enum_idn_workdays(@_);
+        my $res = list_idn_workdays(@_);
         return $res unless $res->[0] == 200;
         $res->[2] = @{$res->[2]};
         $res;
     },
 );
-
-$SPEC{list_idn_workdays} = {
-    v => 1.1,
-    summary => 'List Indonesian workdays (non-holidays) in calendar',
-    args => {
-        year       => {schema=>'int*'},
-        month      => {schema=>['int*', between=>[1, 12]]},
-        start_date => {schema=>'str*'},
-        end_date   => {schema=>'str*'},
-    },
-};
-sub list_idn_workdays {
-    my %args = @_;
-
-    my %fargs;
-    my $y = $args{year};
-    my $m = $args{month};
-    if ($y) {
-        if ($m) {
-            $fargs{start_date} = DateTime->new(year=>$y, month=>$m, day=>1);
-            $m++; if ($m == 13) { $m=1; $y++ }
-            $fargs{end_date} = DateTime->new(year=>$y, month=>$m, day=>1)
-                ->subtract(days => 1);
-        } else {
-            $fargs{start_date} = DateTime->new(year=>$y, month=>1, day=>1);
-            $fargs{end_date} = DateTime->new(year=>$y+1, month=>1, day=>1)
-                ->subtract(days => 1);
-        }
-    }
-
-    if ($args{start_date}) {
-        $fargs{start_date} = $fargs{start_date};
-    }
-    if ($args{end_date}) {
-        $fargs{end_date} = $fargs{end_date};
-    }
-
-    Calendar::Indonesia::Holiday::enum_idn_workdays(%fargs);
-}
 
 $SPEC{is_idn_holiday} = {
     v => 1.1,
@@ -1510,10 +1502,7 @@ and it offers a few more options.
 
 _
     args => {
-        day        => {schema=>['int*', between=>[1,31]]},
-        month      => {schema=>['int*', between=>[1, 12]]},
-        year       => {schema=>'int*'},
-        date       => {schema=>'str*', pos=>0},
+        %argspecs_date_or_day_month_year,
 
         include_joint_leave => {schema=>'bool*', cmdline_aliases=>{j=>{}}},
         reverse    => {schema=>'bool*', cmdline_aliases=>{r=>{}}},
@@ -1521,23 +1510,15 @@ _
         detail     => {schema=>'bool*', cmdline_aliases=>{l=>{}}},
     },
     args_rels => {
-        choose_all => [qw/day month year/],
-        req_one => [qw/day date/],
+        %argsrels_date_or_day_month_year,
     },
 };
 sub is_idn_holiday {
     my %args = @_;
 
-    my ($y, $m, $d);
-    if (defined $args{date}) {
-        $args{date} =~ /\A(\d{4})-(\d{1,2})-(\d{1,2})\z/
-            or return [400, "Invalid date syntax, please use 'YYYY-MM-DD' format"];
-        ($y, $m, $d) = ($1, $2, $3);
-    } else {
-        ($y = $args{year}) && ($m = $args{month}) && ($d = $args{day})
-            or return [400, "Please specify day/month/year or date"];
-    }
-    my $date = sprintf "%04d-%02d-%02d", $y, $m, $d;
+    my $res = _get_date_day_month_year(\%args);
+    return $res unless $res->[0] == 200;
+    my ($date, $y, $m, $d) = @{ $res->[2] };
 
     for my $e (@fixed_holidays) {
         next if defined $e->{year_start} && $y < $e->{year_start};
@@ -1571,21 +1552,37 @@ sub is_idn_holiday {
     }];
 }
 
-# old deprecated names, undocumented. will be removed in the future
-{
-    no strict 'refs';
-    my %aliases = (
-        list_id_holidays  => 'list_idn_holidays',
-        enum_id_workdays  => 'enum_idn_workdays',
-        count_id_workdays => 'count_idn_workdays',
-        is_id_holiday     => 'is_idn_holiday',
-    );
-    for my $al (keys %aliases) {
-        $SPEC{$al} = { %{ $SPEC{ $aliases{$al} } } };
-        $SPEC{$al}{'x.no_index'} = 1;
-        *{ $al } = \&{ $aliases{$al} };
-    }
-}
+gen_modified_sub(
+    output_name => 'is_idn_workday',
+    summary     => "Check whether a date is a working day (non-holiday business day)",
+    base_name   => 'count_idn_workdays',
+    modify_meta => sub {
+        my $meta = shift;
+        delete $meta->{args}{start_date};
+        delete $meta->{args}{end_date};
+        $meta->{args}{$_} = $argspecs_date_or_day_month_year{$_}
+            for keys %argspecs_date_or_day_month_year;
+        $meta->{args_rels} = {
+            %argsrels_date_or_day_month_year,
+        };
+    },
+    output_code => sub {
+        my %args = @_;
+
+        my $res = _get_date_day_month_year(\%args);
+        return $res unless $res->[0] == 200;
+        my ($date, $y, $m, $d) = @{ $res->[2] };
+
+        delete $args{date};
+        delete $args{day};
+        delete $args{month};
+        delete $args{year};
+
+        $res = count_idn_workdays(%args, start_date=>$date, end_date=>$date);
+        return $res unless $res->[0] == 200;
+        $res;
+    },
+);
 
 1;
 # ABSTRACT: List Indonesian public holidays
@@ -1602,15 +1599,18 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.337 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-03-09.
+This document describes version 0.340 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2021-04-12.
 
 =head1 SYNOPSIS
 
  use Calendar::Indonesia::Holiday qw(
      list_idn_holidays
-     enum_idn_workdays
+     list_idn_workdays
+
      count_idn_workdays
+
      is_idn_holiday
+     is_idn_workday
  );
 
 This lists Indonesian holidays for the year 2011, without the joint leave days
@@ -1661,16 +1661,21 @@ Sample result:
 
 This checks whether 2011-02-16 is a holiday:
 
- my $res = is_idn_holidays(date => '2011-02-16');
- # or: my $res = is_idn_holidays(day => 16, month => 2, year => 2011);
+ my $res = is_idn_holiday(date => '2011-02-16');
  print "2011-02-16 is a holiday\n" if $res->[2];
 
-This enumerate working days for a certain period:
+This checks whether 2021-03-11 is a working day:
 
- my $res = enum_idn_workdays(year=>2011, month=>7);
+ my $res = is_idn_workday(date => '2021-03-11');
+ print "2011-02-16 is a holiday\n" if $res->[2];
 
-Idem, but returns a number instead. year/month defaults to current
-year/month:
+This lists working days for a certain period:
+
+ my $res = list_idn_workdays(start_date=>'2021-01-01', end_date=>'2021-06-30');
+
+Idem, but returns a number instead. If unspecified, C<start_date> defaults to
+start of current month and C<end_date> defaults to end of current month. So this
+returns the number of working days in the current month:
 
  my $res = count_idn_workdays();
 
@@ -1689,66 +1694,7 @@ Usage:
 
  count_idn_workdays(%args) -> [status, msg, payload, meta]
 
-Count working days for a certain period.
-
-Working day is defined as day that is not Saturday*/Sunday/holiday/joint leave
-days*. If work_saturdays is set to true, Saturdays are also counted as working
-days. If observe_joint_leaves is set to false, joint leave days are also counted
-as working days.
-
-Contains data from years 1990 to 2021
-
-This function is not exported by default, but exportable.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<end_date> => I<str>
-
-End date.
-
-Defaults to end of current month. Either a string in the form of "YYYY-MM-DD",
-or a DateTime object, is accepted.
-
-=item * B<observe_joint_leaves> => I<bool> (default: 1)
-
-If set to 0, do not observe joint leave as holidays.
-
-=item * B<start_date> => I<str>
-
-Starting date.
-
-Defaults to start of current month. Either a string in the form of "YYYY-MM-DD",
-or a DateTime object, is accepted.
-
-=item * B<work_saturdays> => I<bool> (default: 0)
-
-If set to 1, Saturday is a working day.
-
-
-=back
-
-Returns an enveloped result (an array).
-
-First element (status) is an integer containing HTTP status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
-
-Return value:  (any)
-
-
-
-=head2 enum_idn_workdays
-
-Usage:
-
- enum_idn_workdays(%args) -> [status, msg, payload, meta]
-
-Enumerate working days for a certain period.
+Count working days (non-holiday business days) for a certain period.
 
 Working day is defined as day that is not Saturday*/Sunday/holiday/joint leave
 days*. If work_saturdays is set to true, Saturdays are also counted as working
@@ -1842,6 +1788,59 @@ Arguments ('*' denotes required arguments):
 =item * B<quiet> => I<bool>
 
 =item * B<reverse> => I<bool>
+
+=item * B<year> => I<int>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 is_idn_workday
+
+Usage:
+
+ is_idn_workday(%args) -> [status, msg, payload, meta]
+
+Check whether a date is a working day (non-holiday business day).
+
+Working day is defined as day that is not Saturday*/Sunday/holiday/joint leave
+days*. If work_saturdays is set to true, Saturdays are also counted as working
+days. If observe_joint_leaves is set to false, joint leave days are also counted
+as working days.
+
+Contains data from years 1990 to 2021
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<date> => I<str>
+
+=item * B<day> => I<int>
+
+=item * B<month> => I<int>
+
+=item * B<observe_joint_leaves> => I<bool> (default: 1)
+
+If set to 0, do not observe joint leave as holidays.
+
+=item * B<work_saturdays> => I<bool> (default: 0)
+
+If set to 1, Saturday is a working day.
 
 =item * B<year> => I<int>
 
@@ -2302,9 +2301,16 @@ Usage:
 
  list_idn_workdays(%args) -> [status, msg, payload, meta]
 
-List Indonesian workdays (non-holidays) in calendar.
+List working days (non-holiday business days) for a certain period.
 
-This function is not exported.
+Working day is defined as day that is not Saturday*/Sunday/holiday/joint leave
+days*. If work_saturdays is set to true, Saturdays are also counted as working
+days. If observe_joint_leaves is set to false, joint leave days are also counted
+as working days.
+
+Contains data from years 1990 to 2021
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -2312,11 +2318,25 @@ Arguments ('*' denotes required arguments):
 
 =item * B<end_date> => I<str>
 
-=item * B<month> => I<int>
+End date.
+
+Defaults to end of current month. Either a string in the form of "YYYY-MM-DD",
+or a DateTime object, is accepted.
+
+=item * B<observe_joint_leaves> => I<bool> (default: 1)
+
+If set to 0, do not observe joint leave as holidays.
 
 =item * B<start_date> => I<str>
 
-=item * B<year> => I<int>
+Starting date.
+
+Defaults to start of current month. Either a string in the form of "YYYY-MM-DD",
+or a DateTime object, is accepted.
+
+=item * B<work_saturdays> => I<bool> (default: 0)
+
+If set to 1, Saturday is a working day.
 
 
 =back
@@ -2401,6 +2421,10 @@ Will be provided if there is demand and data source.
 Some religious holidays, especially Vesakha, are not determined yet. Joint leave
 days are also usually decreed by the government in as late as October/November
 in the preceding year.
+
+=head2 How to calculate the difference of two dates in number of working days?
+
+Use L</count_idn_workdays>.
 
 =head1 HOMEPAGE
 

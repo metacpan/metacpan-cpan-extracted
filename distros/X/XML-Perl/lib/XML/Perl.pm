@@ -7,7 +7,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(perl2xml xmlformat xml2perlbase perlbase2xml xpath);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use HTML::Parser;
 
@@ -124,7 +124,7 @@ sub xmlformat($) {
 		|
 		(\/\s*?>)
 	)
-	/$xmlf->($1, $2, $3)/xeg;
+	/$xmlf->($1, $2, $3)/xeg if defined $xml;
 	return $xml;
 }
 
@@ -177,7 +177,7 @@ sub xml2perlbase {
 		pop @n;
 	}, "self,tagname");
 
-	$prs->parse($xml);
+	$prs->parse($xml) if defined $xml;
 	return $t;
 }
 

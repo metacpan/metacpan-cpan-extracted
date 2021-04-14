@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::METAR::Deduced.
 
+v1.0.4 Wed Apr 14 11:34:13 UTC 2021
+       * build: drop enforced signature testing for users BB#11
+
 v1.0.3 Sun Apr 11 15:28:16 UTC 2021
        * build: properly handle signature matching BB#10
 

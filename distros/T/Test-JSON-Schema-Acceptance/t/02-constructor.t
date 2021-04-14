@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';

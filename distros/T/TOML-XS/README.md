@@ -29,6 +29,11 @@ It is currently implemented as a wrapper around the
 Converts a byte string (i.e., raw, undecoded bytes) that contains a
 serialized TOML document to a [TOML::XS::Document](https://metacpan.org/pod/TOML::XS::Document) instance.
 
+Throws a suitable exception if the TOML document is unparseable. This
+doesn’t necessarily mean that _any_ malformed TOML content triggers such
+an error; for example, if an individual data item is malformed but the
+document is otherwise valid, this may return successful.
+
 # MAPPING TOML TO PERL
 
 Most TOML data items map naturally to Perl. The following details

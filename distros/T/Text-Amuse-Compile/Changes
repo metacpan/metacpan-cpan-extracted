@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.62 2021-04-13
+
+ - Fix missing file in MANIFEST
+
 1.61 2021-04-11
 
  - Improve CSS for HTML on screen

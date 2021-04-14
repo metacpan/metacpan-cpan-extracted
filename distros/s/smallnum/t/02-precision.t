@@ -27,4 +27,5 @@ is(10 + -10, 0);
 is(smallnum::_num(-5), -5);
 is(smallnum::_divide(10, 0), 0);
 is(smallnum::_divide(0, 10), 0);
+is(10 - 15, -5);
 done_testing;

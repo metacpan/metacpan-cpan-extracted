@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.039'; # VERSION
+our $VERSION = '2.040'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -185,6 +185,7 @@ sub _open_common {
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
     weaken $self->{'catalog'};
 
+    $self->{'opened'} = 1;
     if (exists $options{'-compress'}) {
         $self->{'forcecompress'} = $options{'-compress'} ? 1 : 0;
     }
@@ -994,6 +995,9 @@ sub saveas {
         unless ($self->{'pdf'}->{' fname'}) {
             $self->{'pdf'}->out_file($file);
         }
+        elsif ($self->{'pdf'}->{' fname'} eq $file) {
+            $self->update();
+        }
         else {
             $self->{'pdf'}->clone_file($file);
             $self->{'pdf'}->close_file();
@@ -1050,6 +1054,13 @@ sub stringify {
     if ($self->{'opened_scalar'}) {
         $self->{'pdf'}->append_file();
         $str = ${$self->{'content_ref'}};
+    }
+    elsif ($self->{'opened'}) {
+        my $fh = FileHandle->new();
+        CORE::open($fh, '>', \$str) || die "Can't begin scalar IO";
+        $self->{'pdf'}->clone_file($fh);
+        $self->{'pdf'}->close_file();
+        $fh->close();
     }
     else {
         my $fh = FileHandle->new();

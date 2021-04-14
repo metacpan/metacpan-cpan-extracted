@@ -4,7 +4,6 @@ author:
   - 'Roland van Ipenburg <roland@rolandvanipenburg.com>'
 build_requires:
   Module::Build: '0.4'
-  Module::Signature: '0.22'
   Test::More: '0.86'
   Test::NoWarnings: '0'
   Test::Signature: '1.04'
@@ -20,7 +19,7 @@ name: Geo-METAR-Deduced
 provides:
   Geo::METAR::Deduced:
     file: lib/Geo/METAR/Deduced.pm
-    version: v1.0.3
+    version: v1.0.4
 requires:
   Class::Measure::Scientific::FX_992vb: '0'
   English: '0'
@@ -38,5 +37,5 @@ resources:
   bugtracker: https://bitbucket.org/rolandvanipenburg/geo-metar-deduced/issues
   license: http://dev.perl.org/licenses/
   repository: https://bitbucket.org/rolandvanipenburg/geo-metar-deduced
-version: v1.0.3
+version: v1.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

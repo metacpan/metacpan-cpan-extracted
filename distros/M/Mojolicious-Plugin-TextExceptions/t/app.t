@@ -7,7 +7,7 @@ use Mojolicious::Lite;
 plugin 'TextExceptions';
 
 get '/'    => sub { die "horribly" };
-get '/api' => sub { die "horribly" };
+get '/api' => [format => ['json']] => {format => undef} => sub { die "horribly" };
 
 my $t = Test::Mojo->new;
 

@@ -1,5 +1,5 @@
 package Selenium::Driver::Gecko;
-$Selenium::Driver::Gecko::VERSION = '1.03';
+$Selenium::Driver::Gecko::VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ Selenium::Driver::Gecko - Tell Selenium::Client how to spawn geckodriver
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 Mode of Operation
 

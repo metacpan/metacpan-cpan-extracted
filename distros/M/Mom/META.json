@@ -41,7 +41,9 @@
             "Types::Path::Tiny" : "0"
          },
          "requires" : {
+            "Class::XSAccessor" : "0",
             "Import::Into" : "0",
+            "Moo" : "2.004",
             "MooX::Press" : "0",
             "Regexp::Common" : "0",
             "parent" : "0",
@@ -50,6 +52,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Fatal" : "0",
             "Test::More" : "0.96"
          }
       }
@@ -57,13 +60,13 @@
    "provides" : {
       "Mom" : {
          "file" : "lib/Mom.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Mom"
+         "web" : "https://github.com/tobyink/p5-mom/issues"
       },
       "homepage" : "https://metacpan.org/release/Mom",
       "license" : [
@@ -76,7 +79,7 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Mom/project"
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_contributors" : [
       "Brian Greenfield (BRIANG) <briang@cpan.org>"
    ],

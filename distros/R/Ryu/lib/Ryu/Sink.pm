@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '2.008'; # VERSION
+our $VERSION = '2.009'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -74,16 +74,8 @@ sub source {
     };
 }
 
-sub new_future {
-    my $self = shift;
-    (
-        $self->{new_future} //= sub {
-            Future->new->set_label(shift)
-        }
-    )->(@_)
-}
-
 sub completed { shift->source->completed }
+
 sub notify_child_completion { }
 
 1;

@@ -14,7 +14,7 @@ sub difference {
 
 	my ($self, $a, $x, $m, $T, $v, $DiracFunc, $Boltzmann) = @_;
 
-	return ($Boltzmann->funcall($a, $x) - $DiracFunc->funcall($m,$T,$v)); 
+	return ($Boltzmann->funcall($m, $T, $v) - $DiracFunc->funcall($a,$x)); 
 
 }
 

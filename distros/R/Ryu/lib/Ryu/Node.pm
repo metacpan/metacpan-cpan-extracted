@@ -3,7 +3,7 @@ package Ryu::Node;
 use strict;
 use warnings;
 
-our $VERSION = '2.008'; # VERSION
+our $VERSION = '2.009'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -106,7 +106,7 @@ sub unblocked {
     my ($self) = @_;
     $self->{unblocked} //= do {
         $self->is_paused
-        ? $self->{new_future}->()
+        ? $self->new_future
         : Future->done
     };
 }
@@ -137,7 +137,19 @@ sub label { shift->{label} }
 
 sub parent { shift->{parent} }
 
-sub new_future { shift->{new_future}->() }
+=head2 new_future
+
+Used internally to get a L<Future>.
+
+=cut
+
+sub new_future {
+    my $self = shift;
+    (
+        $self->{new_future} //= $Ryu::Source::FUTURE_FACTORY
+    )->($self, @_)
+}
+
 
 1;
 

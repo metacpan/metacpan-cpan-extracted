@@ -1,5 +1,5 @@
 package Selenium::Driver::Edge;
-$Selenium::Driver::Edge::VERSION = '1.03';
+$Selenium::Driver::Edge::VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ Selenium::Driver::Edge - Tell Selenium::Client how to spawn edgedriver
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 Mode of Operation
 

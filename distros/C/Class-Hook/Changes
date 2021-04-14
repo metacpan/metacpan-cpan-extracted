@@ -1,5 +1,9 @@
 Revision history for CPAN module Class::Hook
 
+0.06 2021-04-12 JANITOR
+    - Fixed typo in doc. Thanks to MANWAR for pull request with this.
+    - Set CPAN bug tracker to be github issues
+
 0.05 2016-06-29 NEILB
     - Class::Hook evals some code into UNIVERSAL::, so did the usual
       trick to hide the package line from PAUSE, to prevent warning

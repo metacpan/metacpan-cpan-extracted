@@ -11,40 +11,49 @@ SPVM::List - Continuous dynamic object array
   use SPVM::List;
   
   # Create a object list
-  my $object_list = SPVM::List->new_len;
-
-  # Create a object list with array
   my $object_list = SPVM::List->new([(object)SPVM::Byte->new(1), SPVM::Int->new(2), SPVM::Long->new(3)]);
+
+  # Create a SPVM::Int list
+  my $object_list = SPVM::List->new([SPVM::Byte->new(1), SPVM::Int->new(2), SPVM::Int->new(3)]);
   
+  # Create a object list with length
+  my $object_list = SPVM::List->new_len([], 3);
+
+  # Create a SPVM::Int list with length
+  my $object_list = SPVM::List->new_len(new SPVM::Int[0], 3);
+
   # Get list length
   my $length = $object_list->length;
   
   # Push object value
-  $object_list->push(SPVM::Long->new(3));
+  $object_list->push(SPVM::Int->new(3));
 
   # Pop object value.
   my $object_value = $object_list->pop;
 
   # Unshift object value.
-  $object_list->unshift(SPVM::Long->new(3));
+  $object_list->unshift(SPVM::Int->new(3));
   
   # Shift object value.
   my $object_value = $object_list->shift;
   
   # Set object value.
-  $object_list->set(2, SPVM::Long->new(3));
+  $object_list->set(2, SPVM::Int->new(3));
   
   # Get object value.
   my $object_value = $object_list->get(2);
 
   # Insert object value
-  $object_list->insert(1, SPVM::Long->new(3));
+  $object_list->insert(1, SPVM::Int->new(3));
 
   # Remove object value
   my $object_value = $object_list->remove(1);
 
   # Convert SPVM::List to object array.
-  my $object_array = $object_list->to_array;
+  my $int_array = $object_list->to_array;
+
+  # Convert SPVM::List to SPVM::Int array.
+  my $int_array = (SPVM::Int[])$object_list->to_array;
 
 =head1 DESCRIPTION
 
@@ -54,15 +63,15 @@ L<SPVM::List> is continuous dynamic object array.
 
 =head2 new
 
-    sub new : SPVM::List ($array : object[])
+    sub new : SPVM::List ($objects : oarray)
 
 Create a new L<SPVM::List> object with specific C<object> array.
 
 =head2 new_len
 
-    sub new_len : SPVM::List ($length : int)
+    sub new_len : SPVM::List ($proto_array : oarray, $length : int)
 
-Create a new L<SPVM::List> object with array length.
+Create a new L<SPVM::List> object with prototype array and array length. Prototype array is used to decide the array type of internal values.
 
 =head1 INSTANCE METHODS
 
@@ -125,6 +134,14 @@ Remove and return the element which is specified by the index.
   
 =head2 to_array
 
-  sub to_array : object[] ($self : self)
+  sub to_array : oarray ($self : self)
 
 Convert L<SPVM::List> to object array.
+
+=head2 resize
+
+  sub resize : void ($self : self, $new_length : int)
+
+Resize list.
+
+New length must be more than or equals to 0, otherwise a exception occur.

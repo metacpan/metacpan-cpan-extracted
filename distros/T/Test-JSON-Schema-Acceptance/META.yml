@@ -16,12 +16,12 @@ build_requires:
   feature: '0'
   lib: '0'
   open: '0'
-  perl: '5.014'
+  perl: '5.016'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
-  perl: '5.014'
+  perl: '5.016'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.018, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -39,8 +39,9 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '1.006'
+    version: '1.007'
 requires:
+  Feature::Compat::Try: '0'
   File::ShareDir: '0'
   JSON::MaybeXS: '1.004001'
   List::Util: '1.33'
@@ -51,19 +52,19 @@ requires:
   Test2::API: '0'
   Test2::Todo: '0'
   Test2::Tools::Compare: '0'
-  Try::Tiny: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '1.010002'
   if: '0'
   namespace::clean: '0'
-  perl: '5.014'
+  perl: '5.016'
   strict: '0'
+  strictures: '2'
   warnings: '0'
 resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '1.006'
+version: '1.007'
 x_Dist_Zilla:
   perl:
     version: '5.033008'
@@ -271,7 +272,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       config:
         Dist::Zilla::Plugin::Test::MinimumVersion:
-          max_target_perl: '5.014'
+          max_target_perl: '5.016'
       name: '@Author::ETHER/Test::MinimumVersion'
       version: '2.000010'
     -
@@ -759,7 +760,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.006
+          tag: v1.007
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

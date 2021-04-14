@@ -16,7 +16,9 @@ my $data = [
   [qw/r2c1  r2c2☃ r2c3 /],
 ];
 
-my @format = Mojolicious->VERSION('9.11') ? [format => 1] : ();
+app->log->level('fatal');
+
+my @format = eval { Mojolicious->VERSION('9.11') } ? [format => 1] : ();
 
 any '/table' => @format => sub {
   my $c = shift;

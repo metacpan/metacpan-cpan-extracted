@@ -1,5 +1,24 @@
 # Acme::Embarrasing
 
+#### Include relative image `![](test.png)`
+![](test.png)
+
+#### Include relative image `![](./test.png)`
+![](./test.png)
+
+#### Include absolute internal non versioned image `![](https://metacpan.org/source/CONTRA/Acme-Markdown-Embarrassing/test.png)`
+![](https://metacpan.org/source/CONTRA/Acme-Markdown-Embarrassing/test.png)
+
+#### Include absolute internal image `![](https://metacpan.org/source/CONTRA/Acme-Markdown-Embarrassing-1.6/test.png)`
+![](https://metacpan.org/source/CONTRA/Acme-Markdown-Embarrassing-1.6/test.png)
+
+#### Include absolute fastapi image `![](https://fastapi.metacpan.org/source/CONTRA/Acme-Markdown-Embarrassing-1.6/test.png)`
+![](https://fastapi.metacpan.org/source/CONTRA/Acme-Markdown-Embarrassing-1.6/test.png)
+
+#### Include absolute external image `![](https://raw.githubusercontent.com/thibaultduponchelle/Acme-Markdown-Embarrassing/master/test.png)`
+![](https://raw.githubusercontent.com/thibaultduponchelle/Acme-Markdown-Embarrassing/master/test.png)
+
+
 # Title 1
 ## Title 2
 ### Title 3

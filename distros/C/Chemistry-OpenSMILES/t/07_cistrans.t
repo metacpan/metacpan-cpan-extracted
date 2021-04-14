@@ -13,7 +13,7 @@ my @cases = (
     [ 'C(/Br)=C/F', 'C(/Br)(=C(/F))', 'F(\C(=C(/Br)))' ],
     # Adapted from COD entry 1100225:
     [ 'Cl/C(=C\1COCN1)C',
-      'Cl(/C(=C\1(C(O(C(N\1)))))(C))',
+      'Cl(/C(=C\1(C(O(C(N/1)))))(C))',
       'C(C(=C1(\N(C(O(C1)))))(\Cl))' ],
 );
 

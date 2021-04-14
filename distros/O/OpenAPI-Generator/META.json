@@ -55,6 +55,6 @@
          "web" : "https://github.com/doojonio/OpenAPI-Generator"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

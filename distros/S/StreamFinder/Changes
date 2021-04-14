@@ -233,3 +233,10 @@ Revision history for StreamFinder
         podcast, and return all podcasts as an extended MP3 playlist 
         (new "-playlist" option to the $station->get() function) - for podcast 
         author's main page urls.
+1.43    2021/04/11
+        - StreamFinder::Rumble:  Fix doc glitch in SYNOPSIS section specifying 
+        the "-keep" option as a hash reference (must actually be an array 
+        reference, causing user to not get any streams if using the SYNOPSIS 
+        example as a program.  Also fixed this in StreamFinder::IHeartRadio!
+        - StreamFinder::Spreaker:  Fix failure to fetch icon image for some 
+        podcasts.

@@ -27,7 +27,7 @@ file.
 	die "..usage:  $0 ID|URL\n"  unless ($ARGV[0]);
 
 	my $video = new StreamFinder::Rumble($ARGV[0], -keep => 
-			{'mp4', 'webm', 'any'});
+			['mp4', 'webm', 'any']);
 
 	die "Invalid URL or no streams found!\n"  unless ($video);
 
@@ -385,70 +385,87 @@ sub new
 	}
 	@okStreams = (qw(mp4 webm any))  unless (defined $okStreams[0]);
 
-	print STDERR "-0(Rumble): URL=$url=\n"  if ($DEBUG);
-	(my $url2fetch = $url);
-	#DEPRECIATED (VIDEO-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
-	if ($url2fetch =~ m#^https?\:#) {
-		$url2fetch .= '.html'  unless ($url2fetch =~ /\.html?$/);  #NEEDED FOR Fauxdacious!
-		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\.html?$#);
-		$self->{'id'} =~ s#^\-?([^\-\.]+).*$#$1#;
-	} else {
-		$self->{'id'} = $url;
-		$url2fetch = 'https://rumble.com/' . $url . '.html';
-	}
-	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+	my $ua = LWP::UserAgent->new(@userAgentOps);		
+	$ua->timeout($uops{'timeout'});
+	$ua->cookie_jar({});
+	$ua->env_proxy;
+	my $response;
 	$self->{'iconurl'} = '';
+	$self->{'imageurl'} = '';
 	$self->{'title'} = '';
 	$self->{'description'} = '';
 	$self->{'artist'} = '';
 	$self->{'albumartist'} = '';
 	$self->{'streams'} = [];
 	$self->{'cnt'} = 0;
+	$self->{'year'} = '';
 
-	my $html = '';
-	my $ua = LWP::UserAgent->new(@userAgentOps);		
-	$ua->timeout($uops{'timeout'});
-	$ua->cookie_jar({});
-	$ua->env_proxy;
-	my $response = $ua->get($url2fetch);
-	if ($response->is_success) {
-		$html = $response->decoded_content;
-	} else {
-		print STDERR $response->status_line  if ($DEBUG);
-		my $no_wget = system('wget','-V');
-		unless ($no_wget) {
-			print STDERR "\n..trying wget...\n"  if ($DEBUG);
-			$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+	local *getHtmlPage = sub {
+		my $url = shift;
+		my $url2fetch = $url;
+		my $html = '';
+
+		#DEPRECIATED (VIDEO-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
+		if ($url2fetch =~ m#^https?\:#) {
+#			$url2fetch .= '.html'  unless ($url2fetch =~ /\.html?$/);  #NEEDED FOR Fauxdacious!
+			$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\.html?#);
+			$self->{'id'} =~ s#^\-?([^\-\.]+).*$#$1#;
+		} else {
+			$self->{'id'} = $url;
+			$url2fetch = 'https://rumble.com/' . $url . '.html';
 		}
-	}
-	if ($html && $html =~ m#\"embedUrl\"\:\"([^\"]+)#s) {
-		my $url2 = $1;
-		$self->{'title'} = ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
-		$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+property\=\"?og\:title\"?\s+content\=\"([^\"]+)\"#s);
-		$self->{'artist'} = $1  if ($html =~ m#class\=\"media-heading-name\"\>([^\<]+)\<#s);
-		$self->{'artist'} ||= $1  if ($html =~ m#\<button data-title=\"([^\"]+)#s);
-		$self->{'albumartist'} = 'https://rumble.com' . $1  if ($html =~ m#href\=\"([^\"]+)\" rel=author#s);
-			my $one = $1;
 
+		print STDERR "-FETCHING HTML URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+		$response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+			my $no_wget = system('wget','-V');
+			unless ($no_wget) {
+				print STDERR "\n..trying wget...\n"  if ($DEBUG);
+				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+			}
+		}
+		if ($html && $html =~ m#\"embedUrl\"\:\"([^\"]+)#s) {
+			my $url2 = $1;
 
-		$self->{'description'} = $1  if ($html =~ m#\"description\"\:\"([^\"]+)#s);
-		$self->{'description'} ||= $1  if ($html =~ m#<meta\s+name\=description\"?\s+content\=\"\:\"([^\"]+)#s);
-		$self->{'description'} ||= $1  if ($html =~ m#<meta\s+property\=\"?og\:description\"?\s+content\=\"\:\"([^\"]+)#s);
-		$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"?twitter\:description\"?\s+content\=\"([^\"]+)\"#s);
+			$self->{'title'} = ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
+			$self->{'title'} ||= $1  if ($html =~ m#\<meta\s+property\=\"?og\:title\"?\s+content\=\"([^\"]+)\"#s);
 
-		$self->{'iconurl'} = ($html =~ m#\"thumbnailUrl\"\:\"([^\"]+)#s) ? $1 : '';
-		$self->{'iconurl'} ||= $1  if ($html =~ m#\<meta\s+property\=\"?og\:image\"?\s+content\=\"?([^\<]+)\<#s);
-		$self->{'iconurl'} =~ s/\"$//;
-		$self->{'imageurl'} = $self->{'iconurl'};
+			$self->{'artist'} = $1  if ($html =~ m#class\=\"media-heading-name\"\>([^\<]+)\<#s);
+			$self->{'artist'} ||= $1  if ($html =~ m#\<button data-title=\"([^\"]+)#s);
+			$self->{'artist'} =~ s/\s+$//;
+
+			$self->{'albumartist'} = 'https://rumble.com' . $1  if ($html =~ m#href\=\"([^\"]+)\" rel=author#s);
+
+			$self->{'description'} = $1  if ($html =~ m#\"description\"\:\"([^\"]+)#s);
+			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+name\=description\"?\s+content\=\"\:\"([^\"]+)#s);
+			$self->{'description'} ||= $1  if ($html =~ m#<meta\s+property\=\"?og\:description\"?\s+content\=\"\:\"([^\"]+)#s);
+			$self->{'description'} ||= $1  if ($html =~ m#\<meta\s+name\=\"?twitter\:description\"?\s+content\=\"([^\"]+)\"#s);
+
+			$self->{'iconurl'} = ($html =~ m#\"thumbnailUrl\"\:\"([^\"]+)#s) ? $1 : '';
+			$self->{'iconurl'} ||= $1  if ($html =~ m#\<meta\s+property\=\"?og\:image\"?\s+content\=\"?([^\<]+)\<#s);
+			$self->{'iconurl'} =~ s/\"$//;
+			$self->{'imageurl'} = $self->{'iconurl'};
 		
-		if ($html =~ m#Published(.+?)\<span#s) {
-			my $published = $1;
-			$self->{'year'} = $1  if ($published =~ /(\d\d\d\d)/);
-		}
+			if ($html =~ m#Published(.+?)\<span#s) {
+				my $published = $1;
+				$self->{'year'} = $1  if ($published =~ /(\d\d\d\d)/);
+			}
 
-		#STEP 2:  FETCH THE STREAMS FROM THE "embedUrl":
-		my $response = $ua->get($url2);
-		print STDERR "-2 FETCHING URL2=$url2=\n"  if ($DEBUG);
+			#STEP 2:  FETCH THE STREAMS FROM THE "embedUrl":
+			return $url2;
+		}
+		return undef;
+	};
+
+	local *getEmbedPage = sub {
+		my $url2fetch = shift;
+		my $html = '';
+
+		print STDERR "-FETCHING EMBED URL=$url2fetch=\n"  if ($DEBUG);
+		$response = $ua->get($url2fetch);
 		if ($response->is_success) {
 			$html = $response->decoded_content;
 		} else {
@@ -462,6 +479,7 @@ sub new
 		if ($html) {
 			$html =~ s#\\\/#\/#gs;
 			$self->{'title'} ||= ($html =~ m#\<title\>([^\<]+)\<\/title\>#s) ? $1 : '';
+			my $url2 = ($html =~ m#\<link\s+rel\=\"canonical\"\s+href\=\"([^\"]+)#s) ? $1 : undef;
 			$html =~ s#^.+\"u\"\:\{##s;
 			my %streamsets;
 			#PARSE OUT ALL STREAMS (CLASS IS EITHER "mp4", "webm", "###" (RESOLUTION) OR OTHER.
@@ -481,11 +499,12 @@ sub new
 			}
 			my %streamHash;  #USE THIS HASH TO PREVENT ANY DUPLICATE STREAM URLS:
 			foreach my $streamtype (@okStreams) {
+				print STDERR "\n--keep type=$streamtype:\n"  if ($DEBUG);
 				foreach my $class (sort { $b <=> $a } keys %streamsets) { #SORT BY CLASS:
-					print STDERR "\n--class=$class:\n"  if ($DEBUG);
+					print STDERR "----class=$class:\n"  if ($DEBUG);
 					foreach my $stream (@{$streamsets{$class}}) {  #THEN BY RESOLUTION:
 						if ($streamtype =~ /^any/io || $stream =~ /${streamtype}$/i) {
-							print STDERR "-----stream=$stream=\n"  if ($DEBUG > 1);
+							print STDERR "------found stream=$stream=\n"  if ($DEBUG);
 							unless (defined $streamHash{$stream}) {
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
@@ -494,13 +513,22 @@ sub new
 					}
 				}
 			}			
+			if ($self->{'year'} !~ /\d\d\d\d/ && $html =~ m#\"pubDate\"\:\"([^\"]+)#s) {
+				my $published = $1;
+				$self->{'year'} = $1  if ($published =~ /(\d\d\d\d)/);
+			}
+			return $url2;
 		}
-		if ($self->{'year'} !~ /\d\d\d\d/ && $html =~ m#\"pubDate\"\:\"([^\"]+)#s) {
-			my $published = $1;
-			$self->{'year'} = $1  if ($published =~ /(\d\d\d\d)/);
-		}
+		return undef;
+	};
 
-		print STDERR "\n--ID=".$self->{'id'}."=\n--ARTIST=".$self->{'artist'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--DESC=".$self->{'description'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
+	print STDERR "-0(Rumble): URL=$url=\n"  if ($DEBUG);
+	if ($url =~ m#\/embed\/#i) {
+		my $url2 = &getEmbedPage($url);
+		&getHtmlPage($url2)  if (defined $url2);
+	} else {
+		my $url2 = &getHtmlPage($url);
+		&getEmbedPage($url2)  if (defined $url2);
 	}
 
 	$self->{'cnt'} = scalar @{$self->{'streams'}};

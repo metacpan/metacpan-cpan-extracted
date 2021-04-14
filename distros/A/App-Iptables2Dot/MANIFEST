@@ -13,6 +13,7 @@ t/app-iptables2dot.t
 t/bug-120616.t
 t/github-issue-1.t
 t/iptables-save/bug-120616.txt
+t/iptables-save/dashes.txt
 t/iptables-save/github-issue-1.txt
 t/iptables-save/maiki.txt
 t/iptables-save/test.txt
@@ -22,3 +23,4 @@ t/pod-coverage.t
 t/pod.t
 t/script-iptables2dot.t
 t/unknown.t
+t/use-numbered-nodes.t

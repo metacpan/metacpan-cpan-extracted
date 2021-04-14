@@ -6,9 +6,9 @@ use Test::Exception;
 use Test::More 0.98;
 
 use Role::Tiny;
-use TableData::Test::Angka;
+use TableData::Test::Source::CSVDATA;
 
-my $t = TableData::Test::Angka->new;
+my $t = TableData::Test::Source::CSVDATA->new;
 Role::Tiny->apply_roles_to_object($t, 'TableDataRole::Util::Random');
 
 # minimal for now

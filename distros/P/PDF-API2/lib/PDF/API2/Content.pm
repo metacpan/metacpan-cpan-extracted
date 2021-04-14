@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Dict';
 use strict;
 no warnings qw( deprecated recursion uninitialized );
 
-our $VERSION = '2.039'; # VERSION
+our $VERSION = '2.040'; # VERSION
 
 use Carp;
 use Compress::Zlib ();

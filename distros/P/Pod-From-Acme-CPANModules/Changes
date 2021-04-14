@@ -1,6 +1,14 @@
-0.006   2020-10-19  Released-By: PERLANCAR; Urgency: medium
+0.007   2021-02-18  Released-By: PERLANCAR; Urgency: medium
 
-	- Fix typo.
+	- Add argument: entry_description_code.
+
+
+0.006   2020-12-14  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename sections to be less mouthful: 'Modules Included In This
+	  Acme::CPANModule Module' -> 'Acme::CPANModules Entries', 'Feature
+	  Comparison Matrix of Modules Included In This Acme::CPANModules
+	  Module' -> 'Acme::CPANModules Feature Comparison Matrix'.
 
 
 0.005   2020-09-15  Released-By: PERLANCAR; Urgency: medium

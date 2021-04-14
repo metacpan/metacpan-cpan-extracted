@@ -20,14 +20,7 @@ sub merge_definitions {
     return $definitions[0];
   }
 
-  my %common_def = (
-    paths => {},
-    components => {
-      schemas => {},
-      securitySchemes => {},
-      parameters => {}
-    },
-  );
+  my %common_def;
 
   for my $def (@definitions) {
 

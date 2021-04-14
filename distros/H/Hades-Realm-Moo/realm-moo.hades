@@ -2,14 +2,23 @@ lib lib
 tlib t
 author LNATION
 email email@lnation.org
-version 0.04
+version 0.06
 Hades::Realm::Moo base Hades::Realm::OO {
 	abstract { Hades realm for Moo }
 	synopsis {
 Quick summary of what the module does:
 
 	Hades->run({
-		eval => 'Kosmos { [curae penthos] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(5) { if (£penthos == $nosoi) { return £curae; } } }',
+		eval => q|
+			Kosmos { 
+				[curae penthos] :t(Int) :d(2) :p :pr :c :r
+				geras $nosoi :t(Int) :d(5) { 
+					if (£penthos == $nosoi) {
+						return £curae;
+					} 
+				} 
+			}
+		|,
 		realm => 'Moo',
 	});
 

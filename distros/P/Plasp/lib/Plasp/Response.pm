@@ -309,8 +309,8 @@ the main page is sent.
 =cut
 
 has 'Headers' => (
-    is          => 'rw',
-    isa         => ArrayRef
+    is  => 'rw',
+    isa => ArrayRef
         default => sub { [] },
 );
 
@@ -814,8 +814,8 @@ sub Include {
             perl  => $parsed_object->{data},
         };
         my $caller = [ caller( 1 ) ]->[3] || 'main';
-        my $id    = join( '', '__ASP_', $caller, 'x', $asp->_compile_checksum );
-        my $subid = join( '', $asp->GlobalASA->package, '::', $id, 'xREF' );
+        my $id     = join( '', '__ASP_',                 $caller, 'x', $asp->_compile_checksum );
+        my $subid  = join( '', $asp->GlobalASA->package, '::',    $id, 'xREF' );
         if ( $parsed_object->{is_perl}
             && ( my $code = $asp->compile(
                     $parsed_object->{data},
@@ -880,9 +880,9 @@ sub TrapInclude {
     # In order to "trap" the include, gotta setup local variables so that
     # anthing overwritten under this scope will automatically get restored
     # after this function. local is a real neat feature of Perl.
-    local $self->{Output} = '';
-    local $self->{BinaryRef} = \( $self->{Output} );
-    local $self->{_content_writer} = undef
+    local $self->{Output}          = '';
+    local $self->{BinaryRef}       = \( $self->{Output} );
+    local $self->{_content_writer} = undef;
 
     # Not sure why, but if I set this to zero in one line, it ends up warning
     # of modification of a readonly value

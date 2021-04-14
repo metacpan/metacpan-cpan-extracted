@@ -20,7 +20,7 @@ use namespace::clean;
 
 with 'Plasp::Compiler', 'Plasp::Parser', 'Plasp::State';
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 NAME
 
@@ -28,7 +28,7 @@ Plasp - PerlScript/ASP
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -633,7 +633,7 @@ sub execute {
                 "Could not execute because \$code is a ref, but not CODE or SCALAR!"
             );
         }
-    } else {
+    } elsif ( defined( $code ) && length( $code ) ) {
 
         # Alternatively, execute a function in the ASP context given a string
         # of the subroutine name
@@ -663,8 +663,17 @@ Cleans up objects that are transient. Get ready for the next request
 
 =cut
 
+has '_cleaned_up' => (
+    is      => 'rw',
+    isa     => Bool,
+    default => 0,
+);
+
 sub cleanup {
     my ( $self ) = @_;
+
+    # Don't need to do it if already cleaned up
+    return if $self->_cleaned_up;
 
     # Since cleanup happens at the end of script processing, trigger
     # Script_OnEnd
@@ -695,11 +704,15 @@ sub cleanup {
     $self->clear_req;
     $self->errors( [] );
     $self->log->entries( [] );
+
+    $self->_cleaned_up( 1 );
 }
 
 # Clear remaining global objects in order
 sub DEMOLISH {
     my ( $self ) = @_;
+
+    $self->cleanup;
 
     $self->clear_Application;
     $self->clear_Server;

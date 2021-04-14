@@ -1,3 +1,7 @@
+0.4.6 2021-04-14
+
+    - Fixing reading/writing of cis/trans ring bonds.
+
 0.4.5 2021-03-25
 
     - Fixing a bug in aromatic bond detection.

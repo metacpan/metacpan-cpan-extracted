@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Hades::Realm::OO" : "0.04",
+            "Hades::Realm::OO" : "0.06",
             "Moo" : "2.000000",
             "MooX::Private::Attribute" : "0.01",
             "Type::Tiny" : "1.01000",
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.04,
+   "version" : 0.06,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

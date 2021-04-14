@@ -3,8 +3,8 @@ package SPVM::Hash : precompile {
   use SPVM::Util (INT32_MAX, copy_str);
 
   has bucket_count : int;
-  has count : int;
-  has entries : SPVM::Hash::Entry [];
+  has count : ro int;
+  has entries : SPVM::Hash::Entry[];
 
   private enum {
     _DEFALUT_HASH_TABLE_LENGTH = 16,
@@ -19,9 +19,27 @@ package SPVM::Hash : precompile {
     $self->{count} = 0;
     return $self;
   }
+  
+  sub newa : SPVM::Hash ($key_values : oarray) {
+    my $self = SPVM::Hash->new;
+    
+    my $length = @$key_values;
+    
+    if ($length % 2 != 0) {
+      die "Odd number array is invalid";
+    }
+    
+    for (my $i = 0; $i < @$key_values; $i += 2) {
+      my $key = $key_values->[$i];
+      my $value = $key_values->[$i + 1];
+      unless ($key isa string) {
+        die "Key must be string";
+      }
 
-  sub count : int ($self : self) {
-    return $self->{count};
+      $self->set((string)$key => $value);
+    }
+    
+    return $self;
   }
 
   sub set : void ($self : self, $key : string, $val : object) {

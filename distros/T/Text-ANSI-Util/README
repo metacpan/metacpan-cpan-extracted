@@ -2,8 +2,8 @@ NAME
     Text::ANSI::Util - Routines for text containing ANSI color codes
 
 VERSION
-    This document describes version 0.230 of Text::ANSI::Util (from Perl
-    distribution Text-ANSI-Util), released on 2019-04-22.
+    This document describes version 0.231 of Text::ANSI::Util (from Perl
+    distribution Text-ANSI-Util), released on 2021-01-23.
 
 SYNOPSIS
      use Text::ANSI::Util qw(
@@ -259,6 +259,27 @@ FUNCTIONS
         function will return "[$wrapped, $stats]" where $stats is a hash
         containing some information like "max_word_width", "min_word_width".
 
+    *   keep_trailing_space => BOOL (default: 0)
+
+        If set to true, then trailing space that separates words will be
+        kept at the end of wrapped lines. This option is useful if you want
+        to rejoin the lines later. Without this option set to true, wrapping
+        this line at width=4 (quotes shown):
+
+         "some long   line"
+
+        will result in:
+
+         "some"
+         "long"
+         "line"
+
+        While if this option is set to true, the result will be:
+
+         "some "
+         "long "
+         "line"
+
     Performance: ~500/s on my Core i5 1.7GHz laptop for a ~1KB of text (with
     zero to moderate amount of color codes).
 
@@ -282,19 +303,29 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-Util>
+    <https://github.com/perlancar/perl-Text-ANSI-Util/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Text::ANSI::WideUtil
+    String::Pad provides padding function for strings that do not contain
+    ASCII escape codes nor wide characters.
+
+    Text::NonWideChar::Util provides some other functions for strings that
+    do not contain ASCII escape codes nor wide characters.
+
+    Text::WideChar::Util provides utilities for strings that do not contain
+    ANSI escape codes *but* contain wide characters.
+
+    Text::ANSI::WideUtil provides utilities for strings that contain ANSI
+    escape codes *and* wide characters.
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by
+    This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

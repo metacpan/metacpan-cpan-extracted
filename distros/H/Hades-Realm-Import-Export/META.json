@@ -37,12 +37,12 @@
       },
       "test" : {
          "requires" : {
-            "Hades::Realm::Exporter" : "0.03",
+            "Hades::Realm::Exporter" : "0.04",
             "Import::Export" : "1.00"
          }
       }
    },
    "release_status" : "stable",
-   "version" : 0.03,
+   "version" : 0.04,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

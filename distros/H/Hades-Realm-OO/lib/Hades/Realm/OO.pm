@@ -2,12 +2,12 @@ package Hades::Realm::OO;
 use strict;
 use warnings;
 use base qw/Hades/;
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
 	my $self      = $cls->SUPER::new(%args);
-	my %accessors = ( current_class => {}, meta => {}, is_role => {}, );
+	my %accessors = ( is_role => {}, meta => {}, current_class => {}, );
 	for my $accessor ( keys %accessors ) {
 		my $param
 		    = defined $args{$accessor}

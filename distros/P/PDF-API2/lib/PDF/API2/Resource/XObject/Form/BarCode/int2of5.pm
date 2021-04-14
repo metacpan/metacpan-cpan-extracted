@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::XObject::Form::BarCode';
 use strict;
 use warnings;
 
-our $VERSION = '2.039'; # VERSION
+our $VERSION = '2.040'; # VERSION
 
 # Interleaved 2 of 5 Barcodes
 

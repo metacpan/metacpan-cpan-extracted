@@ -1,32 +1,39 @@
-0.230   2019-04-22 (PERLANCAR)
+0.231   2021-01-23  Released-By: PERLANCAR; Urgency: medium
+
+	- ta_wrap, ta_mbwrap: Add option keep_trailing_space.
+
+	- [doc] Mention some related modules.
+
+
+0.230   2019-04-22  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Spelling [RT#129226].
 
 
-0.22    2016-03-11 (PERLANCAR)
+0.22    2016-03-11  Released-By: PERLANCAR
 
         - [Removed features] Remove Text::ANSI::NonWideUtil (ugly name), but
           remove wide-character supporting functions (ta_mb*()) in
           Text::ANSI::Util.
 
 
-0.21    2015-08-20 (PERLANCAR)
+0.21    2015-08-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Add some description and mention Text::ANSI::WideUtil.
 
 
-0.20    2015-08-20 (PERLANCAR)
+0.20    2015-08-20  Released-By: PERLANCAR
 
         - Split Text::ANSI::WideUtil to its own dist.
 
         - Re-pass tests [RT#106535].
 
 
-0.19    2015-08-13 (PERLANCAR)
+0.19    2015-08-13  Released-By: PERLANCAR
 
         - Adjust abstract and documentation. We now only deal with ANSI color
           codes (SGR, \e[...m) and ignore non-color ANSI escape codes.
@@ -45,12 +52,12 @@
         - Add (currently minimal) bench devscript.
 
 
-0.18    2015-08-12 (PERLANCAR)
+0.18    2015-08-12  Released-By: PERLANCAR
 
 	- Add functions: ta_substr, ta_mbsubstr.
 
 
-0.17    2015-08-12 (PERLANCAR)
+0.17    2015-08-12  Released-By: PERLANCAR
 
         - Make Text::WideChar::Util an optional prereq.
 
@@ -59,14 +66,14 @@
           this if you do not have Unicode/wide characters in your text).
 
 
-0.16    2015-01-03 (PERLANCAR)
+0.16    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.15    2014-02-11 (SHARYANTO)
+0.15    2014-02-11  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -74,39 +81,39 @@
           word was omitted).
 
 
-0.14    2014-02-11 (SHARYANTO)
+0.14    2014-02-11  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - ta_mbwrap(): Long CJK words were not line-broken exhaustively.
 
 
-0.13    2014-02-11 (SHARYANTO)
+0.13    2014-02-11  Released-By: SHARYANTO
 
         - ta_mbwrap(): Add support for wrapping Chinese/CJK text.
 
 
-0.12    2013-10-29 (SHARYANTO)
+0.12    2013-10-29  Released-By: SHARYANTO
 
         - No functional changes. Rebuild to resolve 'nested encoding' problem
           causing MetaCPAN to fail to index the dist (thanks Shantanu Bhadoria).
 
 
-0.11    2013-09-10 (SHARYANTO)
+0.11    2013-09-10  Released-By: SHARYANTO
 
         - Replace Text::CharWidth's mbswidth() with Text::WideChar::Util's
           mbswidth(), which in turn uses Unicode::GCString. It's about 2.5x
           slower but more proper and builds on my Windows installation.
 
 
-0.10    2013-05-17 (SHARYANTO)
+0.10    2013-05-17  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - Add return_stats option to ta_{mb,}wrap.
 
 
-0.09    2013-05-17 (SHARYANTO)
+0.09    2013-05-17  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -114,7 +121,7 @@
           line.
 
 
-0.08    2013-04-19 (SHARYANTO)
+0.08    2013-04-19  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -132,12 +139,12 @@
           for case-insensitive highlighting.
 
 
-0.07    2013-04-10 (SHARYANTO)
+0.07    2013-04-10  Released-By: SHARYANTO
 
         - Add functions: ta_split_codes_single, ta_highlight, ta_highlight_all.
 
 
-0.06    2013-04-09 (SHARYANTO)
+0.06    2013-04-09  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -149,7 +156,7 @@
           character, we need to pad the truncated text to go to $width.
 
 
-0.05    2013-04-09 (SHARYANTO)
+0.05    2013-04-09  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -159,7 +166,7 @@
           by yourself as you see fit.
 
 
-0.04    2013-04-08 (SHARYANTO)
+0.04    2013-04-08  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -167,19 +174,19 @@
           text is sometimes removed, do not remove terminating newline.
 
 
-0.03    2013-04-06 (SHARYANTO)
+0.03    2013-04-06  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - Add functions: ta_split_codes, ta_{,mb}trunc, ta_{,mb}pad.
 
 
-0.02    2013-03-20 (SHARYANTO)
+0.02    2013-03-20  Released-By: SHARYANTO
 
         - Fix failing CT reports by skipping tests on systems without Chinese
           locale support.
 
 
-0.01    2013-03-13 (SHARYANTO)
+0.01    2013-03-13  Released-By: SHARYANTO
 
         - First release.

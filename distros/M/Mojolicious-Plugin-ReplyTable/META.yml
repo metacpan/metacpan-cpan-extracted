@@ -16,7 +16,7 @@ name: Mojolicious-Plugin-ReplyTable
 provides:
   Mojolicious::Plugin::ReplyTable:
     file: lib/Mojolicious/Plugin/ReplyTable.pm
-    version: '0.11'
+    version: '0.12'
 recommends:
   Excel::Writer::XLSX: '0'
   Spreadsheet::WriteExcel: '0'
@@ -28,6 +28,6 @@ resources:
   bugtracker: http://github.com/jberger/Mojolicious-Plugin-ReplyTable/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojolicious-Plugin-ReplyTable
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

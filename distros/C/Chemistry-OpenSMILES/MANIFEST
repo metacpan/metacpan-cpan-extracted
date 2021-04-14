@@ -21,3 +21,4 @@ t/08_tetrahedral_chirality.t
 t/09_tetrahedral_chirality.t
 t/10_validate.t
 t/11_validate_color.t
+t/12_tetrahedral_chirality.t

@@ -216,6 +216,7 @@ share/tests/draft4/definitions.json
 share/tests/draft4/dependencies.json
 share/tests/draft4/enum.json
 share/tests/draft4/format.json
+share/tests/draft4/id.json
 share/tests/draft4/infinite-loop-detection.json
 share/tests/draft4/items.json
 share/tests/draft4/maxItems.json
@@ -263,6 +264,7 @@ share/tests/draft6/enum.json
 share/tests/draft6/exclusiveMaximum.json
 share/tests/draft6/exclusiveMinimum.json
 share/tests/draft6/format.json
+share/tests/draft6/id.json
 share/tests/draft6/infinite-loop-detection.json
 share/tests/draft6/items.json
 share/tests/draft6/maxItems.json
@@ -313,6 +315,7 @@ share/tests/draft7/enum.json
 share/tests/draft7/exclusiveMaximum.json
 share/tests/draft7/exclusiveMinimum.json
 share/tests/draft7/format.json
+share/tests/draft7/id.json
 share/tests/draft7/if-then-else.json
 share/tests/draft7/infinite-loop-detection.json
 share/tests/draft7/items.json

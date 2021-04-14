@@ -1,3 +1,12 @@
+0.008   2021-04-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add role: TableDataRole::Source::AOH.
+
+	- [organization] Rename test modules
+	  TableData::Test::{Angka,Source::CSVDATA},
+	  TableData::Test::{Dynamic,Source::Iterator}.
+
+
 0.007   2021-04-11  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- Rename modules/dist TablesRoles-Standard -> TableDataRoles-Standard.

@@ -1,0 +1,103 @@
+# PODNAME: Lib::PWQuality::Return
+# ABSTRACT: Return values for Lib::PWQuality
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lib::PWQuality::Return - Return values for Lib::PWQuality
+
+=head1 VERSION
+
+version 0.001
+
+=head1 DESCRIPTION
+
+L<Lib::PWQuality> rarely throws exceptions. Instead, it will return error strings
+that tell you what went wrong (and one when nothing goes wrong) so you handle it
+yourself.
+
+=head1 RETURN VALUES
+
+These are the possible returned strings:
+
+=over 4
+
+=item * C<SUCCESS>
+
+=item * C<FATAL_FAILURE>
+
+=item * C<INTEGER>
+
+=item * C<CFGFILE_OPEN>
+
+=item * C<CFGFILE_MALFORMED>
+
+=item * C<UNKNOWN_SETTING>
+
+=item * C<NON_INT_SETTING>
+
+=item * C<NON_STR_SETTING>
+
+=item * C<MEM_ALLOC>
+
+=item * C<TOO_SIMILAR>
+
+=item * C<MIN_DIGITS>
+
+=item * C<MIN_UPPERS>
+
+=item * C<MIN_LOWERS>
+
+=item * C<MIN_OTHERS>
+
+=item * C<MIN_LENGTH>
+
+=item * C<PALINDROME>
+
+=item * C<CASE_CHANGES_ONLY>
+
+=item * C<ROTATED>
+
+=item * C<MIN_CLASSES>
+
+=item * C<MAX_CONSECUTIVE>
+
+=item * C<EMPTY_PASSWORD>
+
+=item * C<SAME_PASSWORD>
+
+=item * C<CRACKLIB_CHECK>
+
+=item * C<RNG>
+
+=item * C<GENERATION_FAILED>
+
+=item * C<USER_CHECK>
+
+=item * C<GECOS_CHECK>
+
+=item * C<MAX_CLASS_REPEAT>
+
+=item * C<BAD_WORDS>
+
+=item * C<MAX_SEQUENCE>
+
+=back
+
+=head1 AUTHOR
+
+Sawyer X
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Sawyer X.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

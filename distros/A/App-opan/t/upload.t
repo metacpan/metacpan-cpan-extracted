@@ -7,7 +7,10 @@ use Mojo::File qw/tempdir path/;
 
 my $tempdir = tempdir(CLEANUP => 1);
 
-BEGIN { $ENV{OPAN_AUTH_TOKENS} = 'abc:bcd'; }
+BEGIN {
+  $ENV{OPAN_AUTH_TOKENS} = 'abc:bcd';
+  $ENV{OPAN_MIRROR} = 'http://www.cpan.org/';
+}
 
 require "$FindBin::Bin/../script/opan";
 

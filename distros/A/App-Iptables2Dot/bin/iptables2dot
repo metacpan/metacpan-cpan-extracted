@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v0.2.5');
+use version; our $VERSION = qv('v0.3.0');
 
 use App::Iptables2Dot;
 use Getopt::Long;
@@ -21,6 +21,7 @@ my @optdefs = qw(
     omittargets=s
     showrules!
     showunusednodes!
+    use-numbered-nodes!
 );
 
 GetOptions(\%opt, @optdefs)

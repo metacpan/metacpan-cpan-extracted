@@ -1,5 +1,12 @@
 Revision history for Ryu
 
+2.009     2021-04-13 13:32:36+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - ->unblocked could fail due to bypassing the default when attempting to use the Future factory
+
 2.008     2021-04-05 12:20:04+08:00 Asia/Kuala_Lumpur
     New features:
 

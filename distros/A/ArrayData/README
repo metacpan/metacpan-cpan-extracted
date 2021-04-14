@@ -1,0 +1,86 @@
+NAME
+    ArrayData - Specification for ArrayData::*, modules that contains array
+    data
+
+SPECIFICATION VERSION
+    0.1
+
+VERSION
+    This document describes version 0.1.0 of ArrayData (from Perl
+    distribution ArrayData), released on 2021-04-11.
+
+SYNOPSIS
+    Use one of the "ArrayData::*" modules.
+
+DESCRIPTION
+    NOTE: EARLY SPECIFICATION; THINGS WILL STILL CHANGE A LOT.
+
+    "ArrayData::*" modules are modules that contain array data. The array
+    can be accessed via a standard interface (see
+    ArrayDataRole::Spec::Basic). Some examples of array data are:
+
+    *   list of country names in English (ArrayData::CountryNames::EN)
+
+    *   list of Indonesian words from KBBI <https://kbbi.kemdikbud.go.id/>
+        dictionary (ArrayData::Words::ID::KBBI)
+
+        Also under WordList::ID::KBBI.
+
+    *   list of CPAN authors' PAUSE ID's (ArrayData::CPAN::PAUSEIDs)
+
+        Also under WordList::CPAN::PAUSEID.
+
+    Why put data in a Perl module, as a Perl distribution? To leverage the
+    Perl/CPAN toolchain and infrastructure: 1) ease of installation, update,
+    and uninstallation; 2) allowing dependency expression and version
+    comparison; 3) ease of packaging further as OS packages, e.g. Debian
+    packages (converted from Perl distribution); 4) testing by CPAN Testers.
+
+    The table data can actually be stored as CSV in the DATA section of a
+    Perl module, or as a CSV file in a shared directory of a Perl
+    distribution, or a Perl structure in the module source code, or from
+    other sources.
+
+    To get started, see ArrayDataRole::Spec::Basic and one of existing
+    "ArrayData::*" modules.
+
+NAMESPACE ORGANIZATION
+    "ArrayData" (this module) is the specification.
+
+    "ArrayDataRole::*" the roles.
+
+    All the modules under "ArrayData::*" will be modules with actual data.
+
+    "ArrayDataCollection-*" is name for distribution that contains several
+    "ArrayData" modules.
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ArrayData>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-ArrayData>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    HashData, TableData are related projects.
+
+    WordList is an older, related project. ArrayData and its sister projects
+    HashData & TableData are a generalization and cleanup of WordList API.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

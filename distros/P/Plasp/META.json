@@ -4,7 +4,7 @@
       "Steven Leung < sleung@cpan.org >"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.12",
    "license" : [
       "gpl_1"
    ],
@@ -93,7 +93,7 @@
    "provides" : {
       "Plasp" : {
          "file" : "lib/Plasp.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Plasp::App" : {
          "file" : "lib/Plasp/App.pm"
@@ -161,10 +161,10 @@
          "web" : "https://github.com/stvleung/Plasp"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_contributors" : [
       "Steven Leung <sleung@turnitin.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

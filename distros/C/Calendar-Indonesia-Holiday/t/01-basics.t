@@ -7,7 +7,7 @@ use Test::More 0.98;
 
 use Calendar::Indonesia::Holiday qw(
                                        list_idn_holidays
-                                       enum_idn_workdays
+                                       list_idn_workdays
                                        count_idn_workdays
                                        is_idn_holiday
                                );

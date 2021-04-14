@@ -3,9 +3,9 @@ NAME
     module
 
 VERSION
-    This document describes version 0.006 of Pod::From::Acme::CPANModules
+    This document describes version 0.007 of Pod::From::Acme::CPANModules
     (from Perl distribution Pod-From-Acme-CPANModules), released on
-    2020-10-19.
+    2021-02-18.
 
 SYNOPSIS
      use Pod::From::Acme::CPANModules qw(gen_pod_from_acme_cpanmodules);
@@ -24,15 +24,17 @@ FUNCTIONS
 
     *   Fill the Description section from the CPANModules' list description
 
-    *   Add an Included Modules section, containing the CPANModules' list
-        entries
+    *   Add an "Acme::CPANModules Entries" section, containing the
+        CPANModules' list entries
 
-    *   Add a Feature Comparison Matrix section, if one or more entries have
-        'features'
+    *   Add an "Acme::CPANModules Feature Comparison Matrix" section, if one
+        or more entries have 'features'
 
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
+
+    *   entry_description_code => *code*
 
     *   list => *hash*
 
@@ -52,8 +54,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-From-Acme-CPANMod
-    ules>
+    <https://github.com/perlancar/perl-Pod-From-Acme-CPANModules/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -62,7 +63,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2018 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

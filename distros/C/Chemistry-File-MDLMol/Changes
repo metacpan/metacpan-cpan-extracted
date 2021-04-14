@@ -1,5 +1,8 @@
 Revision history for Perl extension Chemistry::File::MDLMol.
 
+0.23  Tue Apr 13 2021
+        - Fixed t/pod.t which no longer found any POD files to check.
+
 0.22  Mon Apr 12 2021
         - Implemented reading and writing of isotopes (bug 134837)
         - Fixed typo in documentation.

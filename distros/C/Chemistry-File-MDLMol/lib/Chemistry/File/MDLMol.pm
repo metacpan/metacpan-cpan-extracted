@@ -1,6 +1,6 @@
 package Chemistry::File::MDLMol;
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 # $Id$
 
 use base "Chemistry::File";

@@ -5,7 +5,7 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.4.5'; # VERSION
+our $VERSION = '0.4.6'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -19,6 +19,7 @@ our @EXPORT_OK = qw(
 #
 # CAVEAT: disregards anomers
 # TODO: check other chiral centers
+# TODO: take hcount into consideration, see GH#2
 sub clean_chiral_centers($$)
 {
     my( $moiety, $color_sub ) = @_;
@@ -42,6 +43,7 @@ sub is_aromatic($)
     return $atom->{symbol} ne ucfirst $atom->{symbol};
 }
 
+# CAVEAT: requires output from non-raw parsing due to GH#2
 sub _validate($@)
 {
     my( $moiety, $color_sub ) = @_;

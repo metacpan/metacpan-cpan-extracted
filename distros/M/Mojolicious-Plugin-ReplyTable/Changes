@@ -1,5 +1,8 @@
 Revision history for Perl module Mojolicious::Plugin::ReplyTable
 
+0.12 2021-04-14
+  - Fix test that were broken on 0.11 for Mojolicious < 9.11, sigh
+
 0.11 2021-04-12
   - Fix test when run on Mojolicious 9.11+
 

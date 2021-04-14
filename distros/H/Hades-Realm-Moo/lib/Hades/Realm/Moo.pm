@@ -2,7 +2,7 @@ package Hades::Realm::Moo;
 use strict;
 use warnings;
 use base qw/Hades::Realm::OO/;
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -88,7 +88,16 @@ Version 0.01
 Quick summary of what the module does:
 
 	Hades->run({
-		eval => 'Kosmos { [curae penthos] :t(Int) :d(2) :p :pr :c :r geras $nosoi :t(Int) :d(5) { if (Â£penthos == $nosoi) { return Â£curae; } } }',
+		eval => q|
+			Kosmos { 
+				[curae penthos] :t(Int) :d(2) :p :pr :c :r
+				geras $nosoi :t(Int) :d(5) { 
+					if (£penthos == $nosoi) {
+						return £curae;
+					} 
+				} 
+			}
+		|,
 		realm => 'Moo',
 	});
 
@@ -129,7 +138,7 @@ Quick summary of what the module does:
 			$nosoi = defined $nosoi ? $nosoi : 'undef';
 			die qq{Int: invalid value $nosoi for variable \$nosoi in method geras};
 		}
-		if ( Â£penthos == $nosoi ) { return Â£curae; }
+		if ( £penthos == $nosoi ) { return £curae; }
 	}
 
 	1;

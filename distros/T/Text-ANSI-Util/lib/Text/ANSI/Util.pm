@@ -1,7 +1,9 @@
 package Text::ANSI::Util;
 
-our $DATE = '2019-04-22'; # DATE
-our $VERSION = '0.230'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-23'; # DATE
+our $DIST = 'Text-ANSI-Util'; # DIST
+our $VERSION = '0.231'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -46,7 +48,7 @@ Text::ANSI::Util - Routines for text containing ANSI color codes
 
 =head1 VERSION
 
-This document describes version 0.230 of Text::ANSI::Util (from Perl distribution Text-ANSI-Util), released on 2019-04-22.
+This document describes version 0.231 of Text::ANSI::Util (from Perl distribution Text-ANSI-Util), released on 2021-01-23.
 
 =head1 SYNOPSIS
 
@@ -313,6 +315,26 @@ If set to true, then instead of returning the wrapped string, function will
 return C<< [$wrapped, $stats] >> where C<$stats> is a hash containing some
 information like C<max_word_width>, C<min_word_width>.
 
+=item * keep_trailing_space => BOOL (default: 0)
+
+If set to true, then trailing space that separates words will be kept at the end
+of wrapped lines. This option is useful if you want to rejoin the lines later.
+Without this option set to true, wrapping this line at width=4 (quotes shown):
+
+ "some long   line"
+
+will result in:
+
+ "some"
+ "long"
+ "line"
+
+While if this option is set to true, the result will be:
+
+ "some "
+ "long "
+ "line"
+
 =back
 
 Performance: ~500/s on my Core i5 1.7GHz laptop for a ~1KB of text (with zero to
@@ -340,7 +362,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-ANSI-Util>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-Util>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-ANSI-Util/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -348,7 +370,17 @@ feature.
 
 =head1 SEE ALSO
 
-L<Text::ANSI::WideUtil>
+L<String::Pad> provides padding function for strings that do not contain ASCII
+escape codes nor wide characters.
+
+L<Text::NonWideChar::Util> provides some other functions for strings that do not
+contain ASCII escape codes nor wide characters.
+
+L<Text::WideChar::Util> provides utilities for strings that do not contain ANSI
+escape codes I<but> contain wide characters.
+
+L<Text::ANSI::WideUtil> provides utilities for strings that contain ANSI escape
+codes I<and> wide characters.
 
 =head1 AUTHOR
 
@@ -356,7 +388,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

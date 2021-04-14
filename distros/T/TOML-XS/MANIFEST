@@ -12,6 +12,8 @@ lib/TOML/XS/Document.pm
 lib/TOML/XS/Timestamp.pm
 ppport.h
 t/basic.t
+t/leading_zero.t
+t/timestamp.t
 t/triple_q_in_dbl_quote.t
 toml.c
 toml.h

@@ -1,3 +1,4 @@
+use utf8;
 use Mojo::Base -strict;
 
 BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
@@ -39,7 +40,7 @@ subtest 'Nothing to repair' => sub {
 };
 
 subtest 'Migrate up and down' => sub {
-  is $minion->backend->mysql->migrations->active, 8, 'active version is 8';
+  is $minion->backend->mysql->migrations->active, 9, 'active version is 9';
   is $minion->backend->mysql->migrations->migrate(0)->active, 0, 'active version is 0';
 
   # Test the migration from 6 to 7: This is a dangerous migration that
@@ -70,7 +71,7 @@ subtest 'Migrate up and down' => sub {
     'note is migrated safely';
   $minion->backend->mysql->db->delete( 'minion_jobs' );
 
-  is $minion->backend->mysql->migrations->migrate->active, 8, 'active version is 8';
+  is $minion->backend->mysql->migrations->migrate->active, 9, 'active version is 9';
 };
 
 subtest 'Register and unregister' => sub {
@@ -102,10 +103,10 @@ subtest 'Job results' => sub {
   is_deeply \@finished, [], 'not finished';
   is_deeply \@failed,   [], 'not failed';
   $job->finish({just => 'works!'});
-  $job->note(foo => 'bar');
+  $job->note(foo => "\x{1F92C}");
   $promise->wait;
   is_deeply $finished[0]{result}, {just => 'works!'}, 'right result';
-  is_deeply $finished[0]{notes},  {foo  => 'bar'},    'right note';
+  is_deeply $finished[0]{notes},  {foo  => "\x{1F92C}"},'right note';
   ok !$finished[1], 'no more results';
   is_deeply \@failed, [], 'not failed';
 
@@ -124,7 +125,7 @@ subtest 'Job results' => sub {
   (@finished, @failed) = ();
   $minion->result_p($id)->then(sub { @finished = @_ })->catch(sub { @failed = @_ })->wait;
   is_deeply $finished[0]{result}, {just => 'works!'}, 'right result';
-  is_deeply $finished[0]{notes},  {foo  => 'bar'},    'right note';
+  is_deeply $finished[0]{notes},  {foo  => "\x{1F92C}"},'right note';
   ok !$finished[1], 'no more results';
   is_deeply \@failed, [], 'not failed';
 
@@ -920,7 +921,7 @@ subtest 'Nested data structures' => sub {
 
 subtest 'Perform job in a running event loop' => sub {
   my $id = $minion->enqueue(add => [8, 9]);
-  Mojo::IOLoop->delay(sub { $minion->perform_jobs })->wait;
+  Mojo::Promise->new->resolve->then(sub { $minion->perform_jobs })->wait;
   is $minion->job($id)->info->{state}, 'finished', 'right state';
   is_deeply $minion->job($id)->info->{result}, {added => 17}, 'right result';
 };

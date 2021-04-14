@@ -1,0 +1,121 @@
+# PODNAME: Lib::PWQuality::Settings
+# ABSTRACT: Settings object for Lib::PWQuality
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lib::PWQuality::Settings - Settings object for Lib::PWQuality
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    my $pwq      = Lib::PWQuality->new();
+    my $settings = $pwq->settings();
+    printf "Max repetition: %d\n", $settings->max_repeat();
+
+=head1 DESCRIPTION
+
+This object represents all the settings for an L<Lib::PWQuality> instance.
+
+=head2 METHODS
+
+=head3 C<diff_ok>
+
+Returns integer.
+
+=head3 C<min_length>
+
+Returns integer.
+
+=head3 C<dig_credit>
+
+Returns integer.
+
+=head3 C<up_credit>
+
+Returns integer.
+
+=head3 C<low_credit>
+
+Returns integer.
+
+=head3 C<oth_credit>
+
+Returns integer.
+
+=head3 C<min_class>
+
+Returns integer.
+
+=head3 C<max_repeat>
+
+Returns integer.
+
+=head3 C<max_class_repeat>
+
+Returns integer.
+
+=head3 C<max_sequence>
+
+Returns integer.
+
+=head3 C<gecos_check>
+
+Returns integer.
+
+=head3 C<dict_check>
+
+Returns integer.
+
+=head3 C<user_check>
+
+Returns integer.
+
+=head3 C<user_substr>
+
+Returns integer.
+
+=head3 C<enforcing>
+
+Returns integer.
+
+=head3 C<retry_times>
+
+Returns integer.
+
+=head3 C<enforce_for_root>
+
+Returns integer.
+
+=head3 C<local_users_only>
+
+Returns integer.
+
+=head3 C<bad_words>
+
+Returns string.
+
+=head3 C<dict_path>
+
+Returns string.
+
+=head1 AUTHOR
+
+Sawyer X
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Sawyer X.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

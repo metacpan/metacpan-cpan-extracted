@@ -1,5 +1,9 @@
 Revision history for Perl extension TOML::XS:
 
+0.03
+- Handle cases where tomlc99 doesn’t provide an error message
+  (e.g., leading zeros).
+
 0.02 Sun 11 Apr 2021
 - Fix https://github.com/cktan/tomlc99/issues/52
   (Large TOML documents now decode MUCH faster!)

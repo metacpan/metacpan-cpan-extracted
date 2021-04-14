@@ -1,9 +1,9 @@
 package TableDataRole::Source::Iterator;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-11'; # DATE
+our $DATE = '2021-04-13'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use Role::Tiny;
@@ -148,7 +148,7 @@ TableDataRole::Source::Iterator - Get table data from an iterator
 
 =head1 VERSION
 
-This document describes version 0.007 of TableDataRole::Source::Iterator (from Perl distribution TableDataRoles-Standard), released on 2021-04-11.
+This document describes version 0.008 of TableDataRole::Source::Iterator (from Perl distribution TableDataRoles-Standard), released on 2021-04-13.
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ This document describes version 0.007 of TableDataRole::Source::Iterator (from P
 
  sub new {
      my $class = shift;
-     $class->init(
+     $class->_new(
          gen_iterator => sub {
              return sub {
                  ...
@@ -168,6 +168,11 @@ This document describes version 0.007 of TableDataRole::Source::Iterator (from P
  }
 
 =head1 DESCRIPTION
+
+This role retrieves rows from an iterator. Iterator must return row must return
+hashref row on each call.
+
+C<reset_row_iterator()> will regenerate a new iterator.
 
 =for Pod::Coverage ^(.+)$
 
@@ -181,7 +186,7 @@ L<TableDataRole::Spec::Basic>
 
 Create object. This should be called by a consumer's C<new>. Usage:
 
- my $table = $CLASS->init(%args);
+ my $table = $CLASS->_new(%args);
 
 Arguments:
 
@@ -189,8 +194,7 @@ Arguments:
 
 =item * gen_iterator
 
-Coderef. Required. Must return another coderef which is the iterator. Iterator
-must return row on each call; the row must be a hashref.
+Coderef. Required. Must return another coderef which is the iterator.
 
 =back
 
@@ -200,11 +204,11 @@ Please visit the project's homepage at L<https://metacpan.org/release/TableDataR
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-TablesRoles-Standard>.
+Source repository is at L<https://github.com/perlancar/perl-TableDataRoles-Standard>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataRoles-Standard>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-TableDataRoles-Standard/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -220,7 +224,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

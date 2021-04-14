@@ -1,5 +1,10 @@
 Revision history for Alien-ImageMagick
 
+0.08    2021-04-12
+        Run ldconfig after installation, to be sure the test works.
+        Instruct ImageMagick to build all modules, or library will get unresolved symbols
+        Workout the way data folder for delegations is computed    
+
 0.07    2016-03-02
         Make sure that Alien::Base::ModuleBuild is correctly specified as a configure_requires. Thanks @plicease
         PR #2

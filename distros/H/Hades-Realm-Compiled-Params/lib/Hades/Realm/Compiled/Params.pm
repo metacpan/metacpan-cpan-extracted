@@ -2,7 +2,7 @@ package Hades::Realm::Compiled::Params;
 use strict;
 use warnings;
 use base qw/Hades/;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -162,7 +162,7 @@ Hades::Realm::Compiled::Params - The great new Hades::Realm::Compiled::Params!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -171,7 +171,17 @@ Version 0.02
 	use Hades::Realm::Compiled::Params;
 
 	Hades::Realm::Compiled::Params->run({
-		eval => 'Kosmos { penthos :d(2) :p :pr :c :t(Int) curae :r :t(Any) geras $nosoi :t(Int) { if ($self->penthos == $nosoi) { return $self->curae; } } }',
+		eval => q|
+			Kosmos { 
+				penthos :d(2) :p :pr :c :t(Int) 
+				curae :r :t(Any) 
+				geras $nosoi :t(Int) { 
+					if ($self->penthos == $nosoi) { 
+						return $self->curae; 
+					} 
+				} 
+			}
+		|,
 		lib => 't/lib'
 	});
 
@@ -188,7 +198,7 @@ Version 0.02
 	BEGIN {
 		$VALIDATE = Compiled::Params::OO::cpo(
 			penthos => [ Int, { default => 2 } ],
-			curae   => [Any],
+			curae   => [ Any ],
 			geras   => [ Int, { default => 2 } ]
 		);
 	}

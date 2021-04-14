@@ -131,7 +131,7 @@ sub _parse_ssi {
         $head_data =~ s/\<\%.*?\%\>//sg;
         $is_code_block += $head_data =~ s/\<\%//sg;
         $is_code_block -= $head_data =~ s/\%\>//sg;
-        $is_code_block = $is_code_block > 0; # stray percents like height=100%> kinds of tags
+        $is_code_block = $is_code_block > 0;    # stray percents like height=100%> kinds of tags
 
         # global directory, as well as includes dirs
         $self->error( "Could not find $include in IncludesDir" )
@@ -164,7 +164,7 @@ sub _parse_asp {
     # static file as is instead of executing it as a per subroutine.
     return unless $$scriptref =~ /\<\%.*?\%\>/s;
 
-    $scriptref = \join( '', $$scriptref, '<%;;;%>' ); # always end with some perl code for parsing.
+    $scriptref = \join( '', $$scriptref, '<%;;;%>' );    # always end with some perl code for parsing.
 
     my ( $script, @out, $perl_block, $last_perl_block );
     while ( $$scriptref =~ s/^(.*?)\<\%(.*?)\%\>//so ) {

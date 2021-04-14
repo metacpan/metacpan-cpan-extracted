@@ -127,7 +127,7 @@ sub BUILD {
     no warnings;
     eval $code;            ## no critic (BuiltinFunctions::ProhibitStringyEval)
     if ( $@ ) {
-        $self->error( "Error on compilation of global.asa: $@" ); # don't throw error, so we can throw die later
+        $self->error( "Error on compilation of global.asa: $@" );    # don't throw error, so we can throw die later
     }
 }
 

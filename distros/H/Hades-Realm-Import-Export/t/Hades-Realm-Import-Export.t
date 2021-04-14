@@ -55,57 +55,57 @@ subtest 'build_exporter' => sub {
 	);
 	eval {
 		$obj->build_exporter(
-			'penthos', [],
+			'aporia', [],
 			{ 'test' => 'test' },
 			{ 'test' => 'test' }
 		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_exporter('penthos', [], { 'test' => 'test' }, { 'test' => 'test' })}
+		q{$obj->build_exporter('aporia', [], { 'test' => 'test' }, { 'test' => 'test' })}
 	);
 	eval {
 		$obj->build_exporter(
-			'penthos', 'geras',
+			'aporia', 'phobos',
 			{ 'test' => 'test' },
 			{ 'test' => 'test' }
 		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_exporter('penthos', 'geras', { 'test' => 'test' }, { 'test' => 'test' })}
+		q{$obj->build_exporter('aporia', 'phobos', { 'test' => 'test' }, { 'test' => 'test' })}
 	);
 	eval {
-		$obj->build_exporter( 'penthos', bless( {}, 'Test' ),
+		$obj->build_exporter( 'aporia', bless( {}, 'Test' ),
 			[], { 'test' => 'test' } );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_exporter('penthos', bless({}, 'Test'), [], { 'test' => 'test' })}
+		q{$obj->build_exporter('aporia', bless({}, 'Test'), [], { 'test' => 'test' })}
 	);
 	eval {
-		$obj->build_exporter( 'penthos', bless( {}, 'Test' ),
+		$obj->build_exporter( 'aporia', bless( {}, 'Test' ),
 			'geras', { 'test' => 'test' } );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_exporter('penthos', bless({}, 'Test'), 'geras', { 'test' => 'test' })}
+		q{$obj->build_exporter('aporia', bless({}, 'Test'), 'geras', { 'test' => 'test' })}
 	);
 	eval {
 		$obj->build_exporter(
-			'penthos',
+			'aporia',
 			bless( {}, 'Test' ),
 			{ 'test' => 'test' }, []
 		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_exporter('penthos', bless({}, 'Test'), { 'test' => 'test' }, [])}
+		q{$obj->build_exporter('aporia', bless({}, 'Test'), { 'test' => 'test' }, [])}
 	);
 	eval {
 		$obj->build_exporter(
-			'penthos',
+			'aporia',
 			bless( {}, 'Test' ),
-			{ 'test' => 'test' }, 'curae'
+			{ 'test' => 'test' }, 'penthos'
 		);
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->build_exporter('penthos', bless({}, 'Test'), { 'test' => 'test' }, 'curae')}
+		q{$obj->build_exporter('aporia', bless({}, 'Test'), { 'test' => 'test' }, 'penthos')}
 	);
 };
 subtest 'after_class' => sub {
@@ -117,11 +117,8 @@ subtest 'after_class' => sub {
 	eval { $obj->after_class( [] ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->after_class([])} );
-	eval { $obj->after_class('penthos') };
-	like(
-		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->after_class('penthos')}
-	);
+	eval { $obj->after_class('curae') };
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+		q{$obj->after_class('curae')} );
 };
 done_testing();

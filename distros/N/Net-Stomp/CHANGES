@@ -1,4 +1,9 @@
 Revision history for Perl module Net::Stomp:
+
+0.61 2021-04-13
+ - Avoid referencing $frame if it's undefined (thanks Lee Burton
+   N6UDP)
+
 0.60 2019-07-17
  - switch to Log::Any
  - add trace / debug logging

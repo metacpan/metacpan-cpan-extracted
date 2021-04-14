@@ -1,5 +1,8 @@
 Revision history for App-opan
 
+0.003005 - 2021-04-13
+  - Avoid upload test requiring https
+
 0.003004 - 2021-04-12
   - Switch default cpan URL to https for security
 

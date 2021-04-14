@@ -1,5 +1,5 @@
 package Selenium::Subclass;
-$Selenium::Subclass::VERSION = '1.03';
+$Selenium::Subclass::VERSION = '1.04';
 #ABSTRACT: Generic template for Selenium sugar subclasses like Selenium::Session
 
 use strict;
@@ -95,7 +95,7 @@ Selenium::Subclass - Generic template for Selenium sugar subclasses like Seleniu
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 CONSTRUCTOR
 

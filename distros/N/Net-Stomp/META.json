@@ -7,13 +7,13 @@
       "Ash Berlin <ash_github@firemirror.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Stomp",
    "prereqs" : {
@@ -47,15 +47,15 @@
    "provides" : {
       "Net::Stomp" : {
          "file" : "lib/Net/Stomp.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Net::Stomp::Frame" : {
          "file" : "lib/Net/Stomp/Frame.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Net::Stomp::StupidLogger" : {
          "file" : "lib/Net/Stomp/StupidLogger.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       }
    },
    "release_status" : "stable",
@@ -64,6 +64,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.60",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.61",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

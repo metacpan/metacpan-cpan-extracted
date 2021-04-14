@@ -17,7 +17,7 @@ sub funcall {
 	my ($self, $m, $T, $v) = shift;
 
 	return ( pow( sqrt($m / (2 * $self->{PI} * $self->{k} * $T)), 3) *
-			exp ( - $m*$v*$v / (2 * $k * $T)));	
+			exp ( - $m*$v*$v / (2 * $self->{k} * $T)));	
 
 }
 

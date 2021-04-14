@@ -19,10 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  Hades::Realm::OO: '0.04'
+  Hades::Realm::OO: '0.06'
   Moo: '2.000000'
   MooX::Private::Attribute: '0.01'
   Type::Tiny: '1.01000'
   perl: '5.006'
-version: 0.04
+version: 0.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

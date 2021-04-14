@@ -1,5 +1,9 @@
 Revision history for Plasp
 
+1.04    Mon Apr 12 12:33:13 2021 -0400
+        - Fix error condition when code compilation fails
+        - Throw exception on code compilation error
+        - Ensure cleanup in other areas, and memoize cleanup
 1.03    Tue Sep 22 11:08:24 2020 -0400
         - Don't redefine $Response->Flush
         - Instead, use local variables to "trap" output

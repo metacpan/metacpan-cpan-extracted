@@ -13,7 +13,7 @@ use Time::Piece ();
 
 has 'mysql';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 sub dequeue {
   my ($self, $worker_id, $wait, $options) = @_;
@@ -79,6 +79,10 @@ sub enqueue {
   my $options = shift // {};
 
   my $db = $self->mysql->db;
+  # Use a transaction to commit the entire job at once. Without this,
+  # a job may be started before one of its parents, since the parent
+  # restriction is added after the job itself.
+  my $tx = $db->begin;
 
   $db->query(
     "insert into minion_jobs (`args`, `attempts`, `delayed`, `expires`, `lax`, `priority`, `queue`, `task`)
@@ -89,7 +93,7 @@ sub enqueue {
   );
   my $job_id = $db->dbh->{mysql_insertid};
   if ( my $notes = $options->{notes} ) {
-    $self->note( $job_id, $notes );
+    $self->_note( $job_id, $notes, $db );
   }
 
   if ( my @parents = @{ $options->{parents} || [] } ) {
@@ -100,6 +104,7 @@ sub enqueue {
     );
   }
 
+  $tx->commit;
   $self->mysql->pubsub->notify("minion.job" => $job_id);
 
   return $job_id;
@@ -107,7 +112,11 @@ sub enqueue {
 
 sub note {
   my ($self, $id, $notes) = @_;
-  my $db = $self->mysql->db;
+  return $self->_note( $id, $notes, $self->mysql->db );
+}
+
+sub _note {
+  my ($self, $id, $notes, $db) = @_;
 
   my @replace_keys = grep defined $notes->{ $_ }, keys %$notes;
   my @delete_keys = grep !defined $notes->{ $_ }, keys %$notes;
@@ -540,43 +549,48 @@ sub _try {
   my $qq = join ", ", map({ "?" } @$queues);
   my $qt = join ", ", map({ "?" } @$tasks );
 
-  my $dbh = $self->mysql->db->dbh;
+  my $db = $self->mysql->db;
+  my $tx = $db->begin;
 
-  # Try to update a job and mark it as being active for this worker.
-  # If we succeed, the job_id of the updated job will be stored in
-  # the "@dequeued_job_id" variable:
-  #
-  my $affected_rows = $dbh->do(qq{
-    UPDATE minion_jobs job
-    SET job.started = NOW(), job.state = 'active', job.worker = ?,
-        job.id = \@dequeued_job_id := job.id
-    WHERE job.state = 'inactive' AND job.`delayed` <= NOW()
-      AND NOT EXISTS (
-        SELECT 1 FROM minion_jobs_depends depends
-        LEFT JOIN (
-          SELECT id, state, expires
-          FROM minion_jobs
-        ) AS parent ON parent.id=depends.parent_id
-        WHERE child_id=job.id
-          AND (
-            parent.state = 'active'
-            OR ( parent.state = 'failed' and not job.lax )
-            OR ( parent.state = 'inactive' and (parent.expires is null or parent.expires > now()))
+  my $res = $db->query(
+    qq{
+      SELECT job.id, job.args, job.retries, job.task
+      FROM minion_jobs job
+      WHERE job.state = 'inactive'
+        AND job.`delayed` <= NOW()
+        AND NOT EXISTS (
+          SELECT 1 FROM minion_jobs_depends depends
+          LEFT JOIN (
+            SELECT id, state, expires
+            FROM minion_jobs
+          ) AS parent ON parent.id=depends.parent_id
+          WHERE child_id=job.id
+            AND (
+              parent.state = 'active'
+              OR ( parent.state = 'failed' AND NOT job.lax )
+              OR ( parent.state = 'inactive' AND (parent.expires IS NULL OR parent.expires > NOW()))
+          )
         )
-      )
-      AND job.id = COALESCE(?, job.id) AND job.queue IN ($qq) AND job.task IN ($qt)
-      AND (expires is null or expires > now())
-    ORDER BY job.priority DESC, job.created
-    LIMIT 1
-   },
-   {}, $worker_id, $options->{id}, @$queues, @$tasks
+        AND job.id = COALESCE(?, job.id) AND job.queue IN ($qq) AND job.task IN ($qt)
+        AND (expires IS NULL OR expires > NOW())
+      ORDER BY job.priority DESC, job.created
+      LIMIT 1
+      FOR UPDATE
+    },
+    $options->{id}, @$queues, @$tasks,
   );
 
-  return if $affected_rows == 0;   # DBIC returns 0E0 if no rows
+  my $job = $res->hash;
+  return if !$job || !%$job;
 
-  my $job = $dbh->selectrow_hashref(
-    'SELECT id, args, retries, task FROM minion_jobs where id = @dequeued_job_id'
+  $db->dbh->do(
+    qq{
+      UPDATE minion_jobs SET started = NOW(), state = 'active', worker = ?
+      WHERE id = ?
+    },
+    {}, $worker_id, $job->{id},
   );
+  $tx->commit;
 
   #; use Data::Dumper;
   #; say "Dequeuing job: " . Dumper $job;
@@ -1090,7 +1104,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -1711,3 +1725,13 @@ ALTER TABLE minion_jobs_depends
 -- 8 down
 ALTER TABLE minion_jobs_depends
     DROP PRIMARY KEY;
+
+-- 9 up
+DROP INDEX minion_jobs_state_idx ON minion_jobs;
+CREATE INDEX minion_jobs_state_idx ON minion_jobs (state, priority DESC, created);
+ALTER TABLE minion_notes MODIFY note_value MEDIUMBLOB;
+
+-- 9 down
+DROP INDEX minion_jobs_state_idx ON minion_jobs;
+CREATE INDEX minion_jobs_state_idx ON minion_jobs (state);
+ALTER TABLE minion_notes MODIFY note_value TEXT;

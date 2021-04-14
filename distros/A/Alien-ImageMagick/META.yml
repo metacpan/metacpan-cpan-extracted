@@ -4,12 +4,13 @@ author:
   - 'Jerome Eteve <jerome.eteve@gmail.com>'
 build_requires:
   Alien::Base: '0.009'
+  IO::Socket::SSL: '2.07'
   Test::More: '1.001014'
 configure_requires:
-  Alien::Base::ModuleBuild: '0.009'
+  Alien::Base::ModuleBuild: '1.15'
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +19,12 @@ name: Alien-ImageMagick
 provides:
   Alien::ImageMagick:
     file: lib/Alien/ImageMagick.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Alien::Base: '0.009'
-  File::ShareDir: '1.00'
   perl: '5.006'
 resources:
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/plicease/Alien-ImageMagick
-version: '0.07'
+  repository: https://github.com/jeteve/Alien-ImageMagick
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

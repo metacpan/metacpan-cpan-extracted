@@ -1,5 +1,10 @@
 Revision history for Selenium-Client
 
+1.04 2021-04-12 TEODESIAN
+    [BUG FIXES]
+    - Don't clobber $? in destructor
+    - Use Playwright.pm's more clever DESTROY code
+
 1.03 2021-04-01 TEODESIAN
     [BUG FIXES]
     - Fix issue where child elements found with FindElementFromElement() (and FindElementsFromElement) would use the parent element ID rather than their own

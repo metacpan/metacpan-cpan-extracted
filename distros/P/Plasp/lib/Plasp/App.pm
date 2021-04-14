@@ -199,6 +199,7 @@ sub psgi_app {
             # Reuse cached Plasp object, else create new
             if ( $_asp ) {
                 $_asp->req( $req );
+                $_asp->_cleaned_up( 0 );
             } else {
                 $_asp = Plasp->new( %{ $class->config }, req => $req );
             }
@@ -224,7 +225,7 @@ sub psgi_app {
                             ? 'application code'
                             : 'unknown compilation',
                             $_
-                    ) );
+                    ) ) unless $_asp->has_errors;
 
                     $error_response = _error_response( undef, '500_error' );
                 }
@@ -246,7 +247,11 @@ sub psgi_app {
             return;
         };
 
-        return $error_response unless $success;
+        unless ( $success ) {
+            $_asp->cleanup;
+
+            return $error_response;
+        }
 
         # Define a callback once server is ready to write data to client. The
         # callback is called and passed subroutine called a responder.
@@ -285,7 +290,7 @@ sub psgi_app {
                             skip_frames    => 1,
                             indent         => 1,
                             ignore_package => __PACKAGE__,
-                            )->as_string
+                        )->as_string
                     );
                 };
 

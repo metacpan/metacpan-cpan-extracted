@@ -80,71 +80,72 @@
    "provides" : {
       "Selenium::Capabilities" : {
          "file" : "lib/Selenium/Client.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Client" : {
          "file" : "lib/Selenium/Client.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Driver::Auto" : {
          "file" : "lib/Selenium/Driver/Auto.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Driver::Chrome" : {
          "file" : "lib/Selenium/Driver/Chrome.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Driver::Edge" : {
          "file" : "lib/Selenium/Driver/Edge.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Driver::Gecko" : {
          "file" : "lib/Selenium/Driver/Gecko.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Driver::Safari" : {
          "file" : "lib/Selenium/Driver/Safari.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Driver::SeleniumHQ::Jar" : {
          "file" : "lib/Selenium/Driver/SeleniumHQ/Jar.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Driver::WinApp" : {
          "file" : "lib/Selenium/Driver/WinApp.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Element" : {
          "file" : "lib/Selenium/Client.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Session" : {
          "file" : "lib/Selenium/Client.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Specification" : {
          "file" : "lib/Selenium/Specification.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "Selenium::Subclass" : {
          "file" : "lib/Selenium/Subclass.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/troglodyne-internet-widgets/seleinum-specification-perl/issues"
+         "web" : "https://github.com/troglodyne-internet-widgets/selenium-client-perl/issues"
       },
-      "homepage" : "https://github.com/troglodyne-internet-widgets/seleinum-specification-perl",
+      "homepage" : "https://github.com/troglodyne-internet-widgets/selenium-client-perl",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/troglodyne-internet-widgets/seleinum-specification-perl.git",
-         "web" : "https://github.com/troglodyne-internet-widgets/seleinum-specification-perl"
+         "url" : "https://github.com/troglodyne-internet-widgets/selenium-client-perl.git",
+         "web" : "https://github.com/troglodyne-internet-widgets/selenium-client-perl"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_contributors" : [
+      "Chris Faylor <cgf@realedsolutions.com>",
       "Manni Heumann <heumann@strato.de>"
    ],
    "x_generated_by_perl" : "v5.30.0",

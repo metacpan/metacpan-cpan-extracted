@@ -1,5 +1,5 @@
 package Acme::Backwards; 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use Keyword::Declare;
 sub import {
 	keytype OKAY is m{(?:fisle (?&PerlNWS)(?&PerlExpression).*?;|esle (?&PerlNWS).*?;)?+}xms;
@@ -19,7 +19,7 @@ Acme::Backwards - One line fi, esle, fisle, sselnu
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

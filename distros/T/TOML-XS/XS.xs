@@ -14,12 +14,18 @@
 #define TIMESTAMP_CLASS "TOML::XS::Timestamp"
 #define BOOLEAN_CLASS "TOML::XS"
 
+#define CROAK_ERR_MSG_FN "TOML::XS::_croak_err_message_from_pieces"
+
 #define PERL_TRUE get_sv(BOOLEAN_CLASS "::true", 0)
 #define PERL_FALSE get_sv(BOOLEAN_CLASS "::false", 0)
 
-#define CROAK_BAD_TOML croak("Unrecognized TOML type! (This shouldn’t happen?!?)")
-
 #define UNUSED(x) (void)(x)
+
+#define ERR_PATH_UNSHIFT(err_path_ptr, sv) STMT_START {   \
+    if (NULL == *err_path_ptr) *err_path_ptr = newAV(); \
+    av_unshift(*err_path_ptr, 1); \
+    av_store(*err_path_ptr, 0, sv); \
+} STMT_END
 
 #define _timestamp_to_sv(ts) _ptr_to_svrv(aTHX_ ts, gv_stashpv(TIMESTAMP_CLASS, FALSE))
 
@@ -107,10 +113,10 @@ toml_timestamp_t* _get_toml_timestamp_from_sv(pTHX_ SV *self_sv) {
     return INT2PTR(toml_timestamp_t*, SvUV(referent));
 }
 
-SV* _toml_table_value_to_sv(pTHX_ toml_table_t* curtab, const char* key);
-SV* _toml_array_value_to_sv(pTHX_ toml_array_t* arr, int i);
+SV* _toml_table_value_to_sv(pTHX_ toml_table_t* curtab, const char* key, AV** err_path_ptr);
+SV* _toml_array_value_to_sv(pTHX_ toml_array_t* arr, int i, AV** err_path_ptr);
 
-SV* _toml_table_to_sv(pTHX_ toml_table_t* tab) {
+SV* _toml_table_to_sv(pTHX_ toml_table_t* tab, AV** err_path_ptr) {
     int i;
 
     /* Doesn’t need to be mortal since this should not throw.
@@ -123,7 +129,15 @@ SV* _toml_table_to_sv(pTHX_ toml_table_t* tab) {
         const char* key = toml_key_in(tab, i);
         if (!key) break;
 
-        SV* sv = _toml_table_value_to_sv(aTHX_ tab, key);
+        SV* sv = _toml_table_value_to_sv(aTHX_ tab, key, err_path_ptr);
+
+        if (NULL == sv) {
+            SvREFCNT_dec((SV*)hv);
+            SV* piece = newSVpv(key, 0);
+            sv_utf8_decode(piece);
+            ERR_PATH_UNSHIFT(err_path_ptr, piece);
+            return NULL;
+        }
 
         hv_store(hv, key, strlen(key), sv, 0);
     }
@@ -131,7 +145,7 @@ SV* _toml_table_to_sv(pTHX_ toml_table_t* tab) {
     return newRV_noinc( (SV *) hv );
 }
 
-SV* _toml_array_to_sv(pTHX_ toml_array_t* arr) {
+SV* _toml_array_to_sv(pTHX_ toml_array_t* arr, AV** err_path_ptr) {
     int i;
 
     /* Doesn’t need to be mortal since this should not throw.
@@ -145,23 +159,30 @@ SV* _toml_array_to_sv(pTHX_ toml_array_t* arr) {
     av_extend(av, size - 1);
 
     for (i = 0; i<size; i++) {
-        SV* sv = _toml_array_value_to_sv(aTHX_ arr, i);
+        SV* sv = _toml_array_value_to_sv(aTHX_ arr, i, err_path_ptr);
+
+        if (NULL == sv) {
+            SvREFCNT_dec((SV*)av);
+            ERR_PATH_UNSHIFT(err_path_ptr, newSViv(i));
+            return NULL;
+        }
+
         av_store(av, i, sv);
     }
 
     return newRV( (SV *) av );
 }
 
-SV* _toml_table_value_to_sv(pTHX_ toml_table_t* curtab, const char* key) {
+SV* _toml_table_value_to_sv(pTHX_ toml_table_t* curtab, const char* key, AV** err_path_ptr) {
     toml_array_t* arr;
     toml_table_t* tab;
 
     if (0 != (arr = toml_array_in(curtab, key))) {
-        return _toml_array_to_sv(aTHX_ arr);
+        return _toml_array_to_sv(aTHX_ arr, err_path_ptr);
     }
 
     if (0 != (tab = toml_table_in(curtab, key))) {
-        return _toml_table_to_sv(aTHX_ tab);
+        return _toml_table_to_sv(aTHX_ tab, err_path_ptr);
     }
 
     toml_datum_t d;
@@ -181,20 +202,22 @@ SV* _toml_table_value_to_sv(pTHX_ toml_table_t* curtab, const char* key) {
     d = toml_timestamp_in(curtab, key);
     RETURN_IF_DATUM_IS_TIMESTAMP(d);
 
-    /* This really shouldn’t happen. */
-    CROAK_BAD_TOML;
+    /* This indicates some unspecified parse error that the initial
+       parse didn’t catch.
+    */
+    return NULL;
 }
 
-SV* _toml_array_value_to_sv(pTHX_ toml_array_t* curarr, int i) {
+SV* _toml_array_value_to_sv(pTHX_ toml_array_t* curarr, int i, AV** err_path_ptr) {
     toml_array_t* arr;
     toml_table_t* tab;
 
     if (0 != (arr = toml_array_at(curarr, i))) {
-        return _toml_array_to_sv(aTHX_ arr);
+        return _toml_array_to_sv(aTHX_ arr, err_path_ptr);
     }
 
     if (0 != (tab = toml_table_at(curarr, i))) {
-        return _toml_table_to_sv(aTHX_ tab);
+        return _toml_table_to_sv(aTHX_ tab, err_path_ptr);
     }
 
     toml_datum_t d;
@@ -214,8 +237,10 @@ SV* _toml_array_value_to_sv(pTHX_ toml_array_t* curarr, int i) {
     d = toml_timestamp_at(curarr, i);
     RETURN_IF_DATUM_IS_TIMESTAMP(d);
 
-    /* This really shouldn’t happen. */
-    CROAK_BAD_TOML;
+    /* This indicates some unspecified parse error that the initial
+       parse didn’t catch.
+    */
+    return NULL;
 }
 
 /* for profiling: */
@@ -266,7 +291,33 @@ to_struct (SV* docsv)
     CODE:
         toml_table_t* tab = _get_toml_table_from_sv(aTHX_ docsv);
 
-        RETVAL = _toml_table_to_sv(aTHX_ tab);
+        AV* err_path = NULL;
+
+        RETVAL = _toml_table_to_sv(aTHX_ tab, &err_path);
+
+        if (NULL == RETVAL) {
+            dSP;
+
+            ENTER;
+            SAVETMPS;
+
+            PUSHMARK(SP);
+            EXTEND(SP, 1);
+
+            /* When this mortal reference is reaped it’ll decrement
+               the referent AV’s refcount. */
+            mPUSHs(newRV_noinc( (SV*)err_path ));
+
+            PUTBACK;
+
+            call_pv(CROAK_ERR_MSG_FN, G_DISCARD);
+
+            // Unneeded:
+            // FREETMPS;
+            // LEAVE;
+
+            assert(0);
+        }
     OUTPUT:
         RETVAL
 

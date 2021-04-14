@@ -8,7 +8,7 @@ use Chemistry::OpenSMILES::Parser;
 use Graph::Traversal::DFS;
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.4.5'; # VERSION
+our $VERSION = '0.4.6'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -113,7 +113,9 @@ sub write_SMILES
                     $symbols[$i] .= $rings->{$i}{$j} .
                                     ($ring_ids[0] < 10 ? '' : '%') .
                                      $ring_ids[0];
-                    $symbols[$j] .= $rings->{$i}{$j} .
+                    $symbols[$j] .= ($rings->{$i}{$j} eq '/'  ? '\\' :
+                                     $rings->{$i}{$j} eq '\\' ? '/'  :
+                                     $rings->{$i}{$j}) .
                                     ($ring_ids[0] < 10 ? '' : '%') .
                                      $ring_ids[0];
                     push @{$ring_ends[$j]}, shift @ring_ids;

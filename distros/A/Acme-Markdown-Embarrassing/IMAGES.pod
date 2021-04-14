@@ -1,0 +1,90 @@
+=head1 IMAGES.pod
+
+POD file placed at root of distribution
+
+=head1 IMAGE (RELATIVE test.png)
+
+=begin html
+
+<div style="display: flex">
+<div style="margin: 3px; flex: 1 1 50%">
+<img alt="Test" src="test.png" style="max-width: 100%">
+</div>
+</div>
+
+=end html
+
+=head1 IMAGE (RELATIVE ./test.png)
+
+=begin html
+
+<div style="display: flex">
+<div style="margin: 3px; flex: 1 1 50%">
+<img alt="Test" src="./test.png" style="max-width: 100%">
+</div>
+</div>
+
+=end html
+
+=head1 IMAGE (RELATIVE ../../../test.png)
+
+=begin html
+
+<div style="display: flex">
+<div style="margin: 3px; flex: 1 1 50%">
+<img alt="Test" src="../../../test.png" style="max-width: 100%">
+</div>
+</div>
+
+=end html
+
+=head1 IMAGE (ROOT RELATIVE /test.png)
+
+=begin html
+
+<div style="display: flex">
+<div style="margin: 3px; flex: 1 1 50%">
+<img alt="Test" src="/test.png" style="max-width: 100%">
+</div>
+</div>
+
+=end html
+
+=head1 IMAGE FROM SOURCE (ABSOLUTE)
+
+=begin html
+
+<div style="display: flex">
+<div style="margin: 3px; flex: 1 1 50%">
+<img alt="Test" src="https://metacpan.org/source/CONTRA/Acme-Markdown-Embarrassing-1.6/test.png" style="max-width: 100%"">
+</div>
+</div>
+
+=end html
+
+=head1 IMAGE FROM FASTAPI (ABSOLUTE)
+
+=begin html
+
+<div style="display: flex">
+<div style="margin: 3px; flex: 1 1 50%">
+<img alt="Test" src="https://fastapi.metacpan.org/source/CONTRA/Acme-Markdown-Embarrassing-1.6/test.png" style="max-width: 100%">
+</div>
+</div>
+
+=end html
+
+=head1 IMAGE FROM GITHUB (ABSOLUTE)
+
+=begin html
+
+<div style="display: flex">
+<div style="margin: 3px; flex: 1 1 50%">
+<img alt="Test" src="https://raw.githubusercontent.com/thibaultduponchelle/Acme-Markdown-Embarrassing/master/test.png" style="max-width: 100%">
+</div>
+</div>
+
+=end html
+
+=cut 
+

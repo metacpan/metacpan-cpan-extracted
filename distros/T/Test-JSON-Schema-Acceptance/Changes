@@ -1,5 +1,12 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.007     2021-04-14 00:17:32Z
+        - new "results_text" attribute, containing the textual table printed
+          at the end of the tests
+        - switch from Try::Tiny to Feature::Compat::Try, raising the minimum
+          perl from 5.14 to 5.16
+        - updated test suite to commit dfcd4a19f857b85e344d6d14e37ca7b2e5d11bdf
+
 1.006     2021-04-08 20:05:11Z
         - also list skipped directories in diagnostic output
         - updated test suite to commit fc68499eafa2cdbe52b4ed4d219dbb1c8c99fb2b

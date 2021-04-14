@@ -1,7 +1,7 @@
 package Text::ANSI::BaseUtil;
 
-our $DATE = '2019-04-22'; # DATE
-our $VERSION = '0.230'; # VERSION
+our $DATE = '2021-01-23'; # DATE
+our $VERSION = '0.231'; # VERSION
 
 use 5.010001;
 use strict;
@@ -272,6 +272,7 @@ sub _ta_wrap {
         my $optfliw; $optfliw = Text::WideChar::Util::_get_indent_width($is_mb, $optfli, $tw) if defined $optfli;
         my $optsli  = $opts->{slindent};
         my $optsliw; $optsliw = Text::WideChar::Util::_get_indent_width($is_mb, $optsli, $tw) if defined $optsli;
+        my $optkts  = $opts->{keep_trailing_space} // 0;
         my $pad = $opts->{pad};
         my $x = 0;
         my $y = 0;
@@ -452,6 +453,7 @@ sub _ta_wrap {
                                 push @res, "\e[0m" if $crcode;
                             }
                             push @res, " " x ($width-$x) if $pad;
+                            push @res, " " if $ws_before && $optkts;
                             push @res, "\n";
                             $y++;
                             push @res, $crcode;
@@ -464,6 +466,7 @@ sub _ta_wrap {
                             } else {
                                 # word still too long, break again
                                 $x = $sliw;
+                                $ws_before = 0;
                             }
                         }
                     }
@@ -834,7 +837,7 @@ Text::ANSI::BaseUtil - Base for Text::ANSI::{Util,WideUtil}
 
 =head1 VERSION
 
-This document describes version 0.230 of Text::ANSI::BaseUtil (from Perl distribution Text-ANSI-Util), released on 2019-04-22.
+This document describes version 0.231 of Text::ANSI::BaseUtil (from Perl distribution Text-ANSI-Util), released on 2021-01-23.
 
 =for Pod::Coverage .*
 
@@ -848,7 +851,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-ANSI-Util>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-Util>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-ANSI-Util/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -860,7 +863,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

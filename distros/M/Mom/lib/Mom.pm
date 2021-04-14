@@ -5,7 +5,7 @@ use warnings;
 package Mom;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 use parent qw( MooX::Press );
 use Carp qw();
@@ -15,7 +15,7 @@ use Regexp::Common;
 my $token_re = qr{(?:
 	(?: [^0-9\W]\w* )
 	| \: (?: isa|enum|does|type|handles|with|extends|default|requires|builder|trigger|clearer ) $RE{balanced}
-	| \: (?: rw|ro|rwp|bare|private|lazy|required|clearer|builder|trigger|role|std|common|path )
+	| \: (?: role|ro|rwp|rw|bare|private|lazy|required|clearer|builder|trigger|std|common|path )
 )}x;
 
 sub import {
@@ -71,12 +71,14 @@ sub import {
 		Carp::croak("Unrecognized syntax: $import");
 	}
 	
-	$me->SUPER::import(
+	my @super_args = (
 		factory_package => $me,
 		type_library    => "$me\::Types",
 		prefix          => undef,
 		$kind           => [ $caller => \%opts ],
 	);
+	$me->SUPER::import( @super_args );
+	
 	($kind eq 'role' ? 'Moo::Role' : 'Moo')->_install_subs($caller);
 	'Scalar::Util'->import::into($caller, qw(blessed));
 	'Carp'->import::into($caller, qw(croak confess carp));

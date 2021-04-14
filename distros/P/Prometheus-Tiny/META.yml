@@ -22,7 +22,7 @@ resources:
   bugtracker: https://github.com/robn/Prometheus-Tiny/issues
   homepage: https://github.com/robn/Prometheus-Tiny
   repository: https://github.com/robn/Prometheus-Tiny.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -165,7 +165,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.005'
+          tag: '0.006'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

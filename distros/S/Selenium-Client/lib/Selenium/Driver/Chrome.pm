@@ -1,5 +1,5 @@
 package Selenium::Driver::Chrome;
-$Selenium::Driver::Chrome::VERSION = '1.03';
+$Selenium::Driver::Chrome::VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -49,7 +49,7 @@ Selenium::Driver::Chrome - Tell Selenium::Client how to spawn chromedriver
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 Mode of Operation
 

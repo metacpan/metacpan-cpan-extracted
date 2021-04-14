@@ -1,5 +1,5 @@
 package Playwright;
-$Playwright::VERSION = '0.005';
+$Playwright::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -260,6 +260,9 @@ sub quit ($self) {
     # This should also prevent the waitpid below from deadlocking due to two processes waiting on the same pid.
     return unless $$ == $self->{parent};
 
+    # Make sure we don't mash the exit code of things like prove
+    local $?;
+
     $self->{killed} = 1;
     print "Attempting to terminate server process...\n" if $self->{debug};
     Playwright::Util::request( 'GET', 'shutdown', $self->{port}, $self->{ua} );
@@ -318,7 +321,7 @@ Playwright - Perl client for Playwright
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -363,6 +366,11 @@ All the classes mentioned there will correspond to a subclass of the Playwright 
     my $element = $ctx->select('body');
 
 See example.pl for a more thoroughly fleshed-out display on how to use this module.
+
+=head3 Questions?
+
+Feel free to join the Playwright slack server, as there is a dedicated #playwright-perl channel which I, the module author, await your requests in.
+L<https://aka.ms/playwright-slack>
 
 =head3 Why this documentation does not list all available subclasses and their methods
 
@@ -435,7 +443,7 @@ L<https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/ar
 
 =head2 Asynchronous operations
 
-The waitFor* methods defined on various classes will return an instance of L<AsyncData>, a part of the L<Async> module.
+The waitFor* methods defined on various classes will return an instance of AsyncData, a part of the L<Async> module.
 You will then need to wait on the result of the backgrounded action with the await() method documented below.
 
     # Assuming $handle is a Playwright object

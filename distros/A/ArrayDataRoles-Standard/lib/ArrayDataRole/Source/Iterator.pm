@@ -1,0 +1,155 @@
+package ArrayDataRole::Source::Iterator;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-04-13'; # DATE
+our $DIST = 'ArrayDataRoles-Standard'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use Role::Tiny;
+use Role::Tiny::With;
+with 'ArrayDataRole::Spec::Basic';
+
+sub _new {
+    my ($class, %args) = @_;
+
+    my $gen_iterator = delete $args{gen_iterator} or die "Please specify 'gen_iterator' argument";
+    my $gen_iterator_params = delete $args{gen_iterator_params} // {};
+
+    die "Unknown argument(s): ". join(", ", sort keys %args)
+        if keys %args;
+
+    bless {
+        gen_iterator => $gen_iterator,
+        gen_iterator_params => $gen_iterator_params,
+        iterator => undef,
+        index => 0,
+    }, $class;
+}
+
+sub elem {
+    my $self = shift;
+    $self->reset_iterator unless $self->{iterator};
+    my $elem = $self->{iterator}->();
+    die "Out of range" unless defined $elem;
+    $self->{index}++;
+    $elem;
+}
+
+sub get_elem {
+    my $self = shift;
+    $self->reset_iterator unless $self->{iterator};
+    my $elem = $self->{iterator}->();
+    return undef unless defined $elem;
+    $self->{index}++;
+    $elem;
+}
+
+sub reset_iterator {
+    my $self = shift;
+    $self->{iterator} = $self->{gen_iterator}->(%{ $self->{gen_iterator_params} });
+    $self->{index} = 0;
+}
+
+sub get_iterator_index {
+    my $self = shift;
+    $self->{index};
+}
+
+1;
+# ABSTRACT: Get array data from an iterator
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ArrayDataRole::Source::Iterator - Get array data from an iterator
+
+=head1 VERSION
+
+This document describes version 0.001 of ArrayDataRole::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-13.
+
+=head1 SYNOPSIS
+
+ package ArrayData::YourArray;
+ use Role::Tiny::With;
+ with 'ArrayDataRole::Source::Iterator';
+
+ sub new {
+     my $class = shift;
+     $class->_new(
+         gen_iterator => sub {
+             return sub {
+                 ...
+             };
+         },
+     );
+ }
+
+=head1 DESCRIPTION
+
+This role retrieves elements from an iterator. Iterator must return a non-undef
+element, or undef to signal that all elements have been iterated.
+
+C<reset_iterator()> will regenerate a new iterator.
+
+=for Pod::Coverage ^(.+)$
+
+=head1 ROLES MIXED IN
+
+L<ArrayDataRole::Spec::Basic>
+
+=head1 METHODS
+
+=head2 _new
+
+Create object. This should be called by a consumer's C<new>. Usage:
+
+ my $ary = $CLASS->_new(%args);
+
+Arguments:
+
+=over
+
+=item * gen_iterator
+
+Coderef. Required. Must return another coderef which is the iterator.
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/ArrayDataRoles-Standard>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-ArrayDataRoles-Standard>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-ArrayDataRoles-Standard/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<ArrayData>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

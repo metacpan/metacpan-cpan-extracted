@@ -3,6 +3,7 @@ package Plasp::Compiler;
 
 use Carp;
 use File::Slurp qw(read_file);
+use Plasp::Exception::Code;
 use Plasp::Exception::NotFound;
 
 use Moo::Role;
@@ -87,11 +88,11 @@ sub compile {
     $code = $1;
 
     no warnings;
-    eval $code;    ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    eval $code;                 ## no critic (BuiltinFunctions::ProhibitStringyEval)
     if ( $@ ) {
-        $self->error( "Error on compilation of $subid: $@" ); # don't throw error, so we can throw die later
         $self->_undefine_sub( $subid );
-        return;
+        $self->error( "Error on compilation of $subid: $@" );
+        Plasp::Exception::Code->throw;
     } else {
         $self->register_include( $scriptref );
         return $subid;
@@ -111,7 +112,7 @@ sub compile_include {
     my $file = $self->search_includes_dir( $include );
     unless ( $file ) {
         $self->error( "Error in compilation: $include not found" );
-        return;
+        Plasp::Exception::Code->throw;
     }
 
     return $self->compile_file( $file );

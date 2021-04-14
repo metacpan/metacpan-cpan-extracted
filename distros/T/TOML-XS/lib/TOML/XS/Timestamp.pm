@@ -7,7 +7,8 @@ use warnings;
 
 =head1 NAME
 
-TOML::XS::Document - Object representation of a L<TOML|https://toml.io/> timestamp
+TOML::XS::Document - Object representation of a L<TOML|https://toml.io>
+timestamp
 
 =head1 SYNOPSIS
 
@@ -15,8 +16,9 @@ See L<TOML::XS>.
 
 =head1 DESCRIPTION
 
-This object represents a parse of a TOML timestamp. It is not
-directly instantiable.
+Instances of this class represent a parse of a TOML timestamp.
+
+This class is not directly instantiable.
 
 =head1 ACCESSOR METHODS
 

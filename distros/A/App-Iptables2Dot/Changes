@@ -1,5 +1,9 @@
 Revision history for App-Iptables2Dot
 
+v0.3.0 Tue Apr 13 14:14:37 CEST 2021
+	- new option '--use-numbered-nodes' can help with chains,
+	  that have a dash ('-') in the name.
+
 v0.2.5 Fr 9. Apr 09:54:52 CEST 2021
 	- clarify --add-optdef with/without arguments for option
 	  in documentation

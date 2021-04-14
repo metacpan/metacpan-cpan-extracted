@@ -461,7 +461,7 @@ print STDERR "---failed to fetch!\n";
 	$self->{'iconurl'} = ($html =~ s#\,\"image_url\"\:\"([^\"]+)\"##s) ? $1 : '';
 	$self->{'iconurl'} =~ s#\\##g;
 	unless ($self->{'iconurl'}) {
-		if ($html =~ s#\s+class\=\"track\_head\_image\"\>(.+?)\<\/span\>##s) {
+		if ($html =~ s#\s+class\=\"track\_head\_image(?:\s+right)?\"\>(.+?)\<\/(?:div|span)\>##s) {
 			my $iconhtml = $1;
 			$self->{'iconurl'} = $1  if ($iconhtml =~ m#\s+src\=\"([^\"]+)\"#s);
 		}

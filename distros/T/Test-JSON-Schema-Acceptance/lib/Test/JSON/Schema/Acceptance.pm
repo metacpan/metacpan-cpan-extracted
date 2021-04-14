@@ -1,21 +1,24 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.005-6-g2dc2ec5
+package Test::JSON::Schema::Acceptance; # git description: v1.006-7-ge481571
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.006';
+our $VERSION = '1.007';
 
-use 5.014;
+use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
+no if "$]" >= 5.033006, feature => 'bareword_filehandles';
+use strictures 2;
 use Test2::API ();
 use Test2::Todo;
 use Test2::Tools::Compare ();
-use Try::Tiny;
 use JSON::MaybeXS 1.004001;
 use Storable 3.00 ();
 use File::ShareDir 'dist_dir';
 use Moo;
+use Feature::Compat::Try;
 use MooX::TypeTiny 0.002002;
 use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods Bool Optional);
 use Types::Common::Numeric 'PositiveOrZeroInt';
@@ -74,6 +77,14 @@ has results => (
            file => InstanceOf['Path::Tiny'],
            map +($_ => PositiveOrZeroInt), qw(pass todo_fail fail),
          ]],
+);
+
+has results_text => (
+  is => 'ro',
+  init_arg => undef,
+  isa => Str,
+  lazy => 1,
+  builder => '_build_results_text',
 );
 
 around BUILDARGS => sub {
@@ -175,35 +186,19 @@ sub acceptance {
   $self->_set_results(\@results);
 
   my $diag = $self->verbose ? 'diag' : 'note';
+  $ctx->$diag("\n\n".$self->results_text);
+  $ctx->$diag('');
 
-  $ctx->$diag("\n\n".'Results using '.ref($self).' '.$self->VERSION);
-
-  my $submodule_status = path(dist_dir('Test-JSON-Schema-Acceptance'), 'submodule_status');
-  if ($submodule_status->exists and $submodule_status->parent->subsumes($self->test_dir)) {
-    chomp(my ($commit, $url) = $submodule_status->lines);
-    $ctx->$diag('with commit '.$commit);
-    $ctx->$diag('from '.$url.':');
-  }
-  if ($self->_has_specification) {
-    $ctx->$diag('specification version: '.$self->specification);
+  if ($self->test_dir !~ /optional/
+      and grep +($_->{file} !~ m{^optional/} && $_->{todo_fail} + $_->{fail}), @results) {
+    # non-optional test failures will always be visible, even when not in verbose mode.
+    $ctx->diag('WARNING: some non-optional tests are failing! This implementation is not fully compliant with the specification!');
+    $ctx->diag('');
   }
   else {
-    $ctx->$diag('using custom test directory: '.$self->test_dir);
+    $ctx->$diag('Congratulations, all non-optional tests are passing!');
+    $ctx->$diag('');
   }
-  $ctx->$diag('optional tests included: '.($self->include_optional ? 'yes' : 'no'));
-  $ctx->$diag('skipping directory: '.$_) foreach @{ $self->skip_dir };
-
-  $ctx->$diag('');
-  my $length = max(10, map length $_->{file}, @$tests);
-  $ctx->$diag(sprintf('%-'.$length.'s  pass  todo-fail  fail', 'filename'));
-  $ctx->$diag('-'x($length + 23));
-  $ctx->$diag(sprintf('%-'.$length.'s % 5d       % 4d  % 4d', @{$_}{qw(file pass todo_fail fail)}))
-    foreach @results;
-
-  my $total = +{ map { my $type = $_; $type => sum0(map $_->{$type}, @results) } qw(pass todo_fail fail) };
-  $ctx->$diag('-'x($length + 23));
-  $ctx->$diag(sprintf('%-'.$length.'s % 5d      % 5d % 5d', 'TOTAL', @{$total}{qw(pass todo_fail fail)}));
-  $ctx->$diag('');
 
   $ctx->release;
 }
@@ -243,7 +238,7 @@ sub _run_test {
         my $expected = $test->{valid} ? 'true' : 'false';
         if ($result xor $test->{valid}) {
           my $got = $result ? 'true' : 'false';
-          $ctx->fail('test failed', 'expected '.$expected.'; got '.$got);
+          $ctx->fail('evaluation result is incorrect', 'expected '.$expected.'; got '.$got);
           $pass = 0;
         }
         else {
@@ -258,8 +253,8 @@ sub _run_test {
 
         $ctx->release;
       }
-      catch {
-        chomp(my $exception = $_);
+      catch ($e) {
+        chomp(my $exception = $e);
         my $ctx = Test2::API::context;
         $ctx->fail('died: '.$exception);
         $ctx->release;
@@ -332,6 +327,42 @@ sub _build__test_data {
   ];
 }
 
+sub _build_results_text {
+  my $self = shift;
+
+  my @lines;
+  push @lines, 'Results using '.ref($self).' '.$self->VERSION;
+
+  my $submodule_status = path(dist_dir('Test-JSON-Schema-Acceptance'), 'submodule_status');
+  if ($submodule_status->exists and $submodule_status->parent->subsumes($self->test_dir)) {
+    chomp(my ($commit, $url) = $submodule_status->lines);
+    push @lines, 'with commit '.$commit;
+    push @lines, 'from '.$url.':';
+  }
+  if ($self->_has_specification) {
+    push @lines, 'specification version: '.$self->specification;
+  }
+  else {
+    push @lines, 'using custom test directory: '.$self->test_dir;
+  }
+  push @lines, 'optional tests included: '.($self->include_optional ? 'yes' : 'no');
+  push @lines, map 'skipping directory: '.$_, @{ $self->skip_dir };
+
+  push @lines, '';
+  my $length = max(10, map length $_->{file}, @{$self->results});
+
+  push @lines, sprintf('%-'.$length.'s  pass  todo-fail  fail', 'filename');
+  push @lines, '-'x($length + 23);
+  push @lines, map sprintf('%-'.$length.'s % 5d       % 4d  % 4d', @{$_}{qw(file pass todo_fail fail)}),
+    @{$self->results};
+
+  my $total = +{ map { my $type = $_; $type => sum0(map $_->{$type}, @{$self->results}) } qw(pass todo_fail fail) };
+  push @lines, '-'x($length + 23);
+  push @lines, sprintf('%-'.$length.'s % 5d      % 5d % 5d', 'TOTAL', @{$total}{qw(pass todo_fail fail)});
+
+  return join("\n", @lines, '');
+}
+
 1;
 
 __END__
@@ -348,7 +379,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 SYNOPSIS
 
@@ -608,6 +639,11 @@ todo_fail - the number of fail results for that file that were marked TODO
 fail - the number of fail results for that file (not including TODO tests)
 
 =back
+
+=head2 results_text
+
+After calling L</acceptance>, a text string tabulating the test results are provided here. This is
+the same table that is printed at the end of the test run.
 
 =head1 ACKNOWLEDGEMENTS
 

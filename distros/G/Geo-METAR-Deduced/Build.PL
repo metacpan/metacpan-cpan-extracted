@@ -7,7 +7,7 @@ use utf8;
 use 5.014000;
 use Module::Build;
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 my $class = Module::Build->subclass( 'code' => <<'END_SUBCLASS' );
 
@@ -76,10 +76,9 @@ my %CONFIG = (
     },
     'configure_requires' => { 'Module::Build' => 0.40, },
     'build_requires'     => {
-        'Module::Build'     => 0.40,
-        'Module::Signature' => 0.22,
-        'Test::More'        => 0.86,
-        'Test::Signature'   => 1.04,
+        'Module::Build'   => 0.40,
+        'Test::More'      => 0.86,
+        'Test::Signature' => 1.04,
     },
     'test_requires' => {
         'Test::More'       => 0.86,
@@ -102,6 +101,7 @@ if ( $ENV{'AUTHOR_TESTING'} || $ENV{'RELEASE_TESTING'} ) {
         'ExtUtils::Manifest'         => 0,
         'File::Basename'             => 0,
         'File::Spec'                 => 0,
+        'Module::Signature'          => 0.22,
         'Perl::Critic::Bangs'        => 0,
         'Perl::Critic::StricterSubs' => 0,
         'Test::Kwalitee'             => 0,

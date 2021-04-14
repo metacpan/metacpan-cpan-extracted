@@ -2,7 +2,7 @@ lib lib
 tlib t
 author LNATION
 email email@lnation.org
-version 0.05
+version 0.06
 Hades::Realm::OO base Hades {
 	abstract { Hades realm for object orientation }
 	synopsis {

@@ -2,7 +2,7 @@ package Mojolicious::Plugin::ReplyTable;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 $VERSION = eval $VERSION;
 
 use Mojo::Util;

@@ -44,7 +44,7 @@
          "web" : "https://github.com/perlmol/chemistry-file-mdlmol"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }

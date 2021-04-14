@@ -104,6 +104,7 @@ sub mock_asp {
     my $type        = delete $options{type} || 'get';
 
     if ( $create_new || !$mock_asp{$type} ) {
+        undef $mock_asp{$type};
         $mock_asp{$type} = Plasp->new(
             req           => mock_req( $type ),
             DocumentRoot  => path( __FILE__, '../../TestApp/root' )->realpath,

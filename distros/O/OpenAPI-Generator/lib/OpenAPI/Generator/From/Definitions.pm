@@ -40,11 +40,16 @@ sub generate {
   my($self, $conf) = @_;
 
   my $src = $conf->{src};
-  $self->_check_src($src);
-  my @files = $self->_src_as_files($src);
 
-  if (!@files) {
-    croak "no files found in $src";
+  my @files;
+
+  if ($src) {
+    $self->_check_src($src);
+    @files = $self->_src_as_files($src);
+
+    if (!@files) {
+      croak "no files found in $src";
+    }
   }
 
   my @defs = @{ $conf->{definitions} };

@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use 5.014000;
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 use Test::More;
 use Test::Requires { 'Test::Spelling' => 0 };

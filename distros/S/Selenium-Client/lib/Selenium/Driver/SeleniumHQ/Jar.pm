@@ -1,5 +1,5 @@
 package Selenium::Driver::SeleniumHQ::Jar;
-$Selenium::Driver::SeleniumHQ::Jar::VERSION = '1.03';
+$Selenium::Driver::SeleniumHQ::Jar::VERSION = '1.04';
 use strict;
 use warnings;
 
@@ -135,7 +135,7 @@ Selenium::Driver::SeleniumHQ::Jar - Download the latest version of seleniumHQ's 
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 Mode of Operation
 

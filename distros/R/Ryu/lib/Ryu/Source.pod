@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Ryu::Source
 at lib/Ryu/Source.pm
@@ -727,17 +726,13 @@ emits than a standard L</map> or L</filter> implementation.
   $src->emit('' . reverse $item);
  });
 
-=head2 new_future
-
-Used internally to get a L<Future>.
-
 =head1 INHERITED METHODS
 
 =over 4
 
 =item L<Ryu::Node>
 
-L<describe|Ryu::Node/describe>, L<flow_control|Ryu::Node/flow_control>, L<is_paused|Ryu::Node/is_paused>, L<label|Ryu::Node/label>, L<parent|Ryu::Node/parent>, L<pause|Ryu::Node/pause>, L<resume|Ryu::Node/resume>, L<unblocked|Ryu::Node/unblocked>
+L<describe|Ryu::Node/describe>, L<flow_control|Ryu::Node/flow_control>, L<is_paused|Ryu::Node/is_paused>, L<label|Ryu::Node/label>, L<new_future|Ryu::Node/new_future>, L<parent|Ryu::Node/parent>, L<pause|Ryu::Node/pause>, L<resume|Ryu::Node/resume>, L<unblocked|Ryu::Node/unblocked>
 
 =back
 

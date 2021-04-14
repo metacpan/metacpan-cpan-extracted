@@ -15,7 +15,7 @@ name: Nasm-X86
 provides:
   Nasm::X86:
     file: lib/Nasm/X86.pm
-    version: '202104014'
+    version: '202104015'
 requires:
   Asm::C: '0'
   Carp: '0'
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/philiprbrenan/NasmX86/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/philiprbrenan/NasmX86
-version: '202104014'
+version: '202104015'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

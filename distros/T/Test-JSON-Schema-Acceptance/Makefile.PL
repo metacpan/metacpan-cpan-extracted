@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014;
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -21,9 +21,10 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Test-JSON-Schema-Acceptance",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.014",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Test::JSON::Schema::Acceptance",
   "PREREQ_PM" => {
+    "Feature::Compat::Try" => 0,
     "File::ShareDir" => 0,
     "JSON::MaybeXS" => "1.004001",
     "List::Util" => "1.33",
@@ -34,12 +35,12 @@ my %WriteMakefileArgs = (
     "Test2::API" => 0,
     "Test2::Todo" => 0,
     "Test2::Tools::Compare" => 0,
-    "Try::Tiny" => 0,
     "Types::Common::Numeric" => 0,
     "Types::Standard" => "1.010002",
     "if" => 0,
     "namespace::clean" => 0,
     "strict" => 0,
+    "strictures" => 2,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -58,7 +59,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.006",
+  "VERSION" => "1.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -67,6 +68,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
+  "Feature::Compat::Try" => 0,
   "File::ShareDir" => 0,
   "File::Spec" => 0,
   "JSON::MaybeXS" => "1.004001",
@@ -86,7 +88,6 @@ my %FallbackPrereqs = (
   "Test::More" => "0.88",
   "Test::Simple" => "1.302176",
   "Test::Warnings" => 0,
-  "Try::Tiny" => 0,
   "Types::Common::Numeric" => 0,
   "Types::Standard" => "1.010002",
   "feature" => 0,
@@ -95,6 +96,7 @@ my %FallbackPrereqs = (
   "namespace::clean" => 0,
   "open" => 0,
   "strict" => 0,
+  "strictures" => 2,
   "utf8" => 0,
   "warnings" => 0
 );

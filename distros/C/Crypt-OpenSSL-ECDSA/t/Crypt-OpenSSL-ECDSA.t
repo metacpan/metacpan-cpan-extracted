@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 25;
 BEGIN { use_ok('Crypt::OpenSSL::ECDSA'); use_ok('Crypt::OpenSSL::EC');  };
 
 
@@ -75,6 +75,17 @@ $sig->set_s($s);
 # Verify should succeed
 $ret = Crypt::OpenSSL::ECDSA::ECDSA_do_verify($digest, $sig, $key);
 ok($ret);
+undef $sig;
+
+# Test a signature can be built from scratch
+$sig = Crypt::OpenSSL::ECDSA::ECDSA_SIG->new();
+ok($sig, 'Empty Crypt::OpenSSL::ECDSA::ECDSA_SIG object created');
+eval { $sig->set_r($r); };
+ok(!$@, 'R parameter set');
+eval { $sig->set_s($s); };
+ok(!$@, 'S parameter set');
+$ret = Crypt::OpenSSL::ECDSA::ECDSA_do_verify($digest, $sig, $key);
+ok($ret, 'built-from-scratch signature matches');
 undef $sig;
 
 # Testing signing and verifying with the _ex version

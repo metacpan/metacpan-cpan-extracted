@@ -1,5 +1,5 @@
 package Selenium::Client;
-$Selenium::Client::VERSION = '1.03';
+$Selenium::Client::VERSION = '1.04';
 # ABSTRACT: Module for communicating with WC3 standard selenium servers
 
 use strict;
@@ -186,6 +186,8 @@ sub _wait ($self) {
 sub DESTROY($self) {
     return unless $self->{auto_close};
 
+    local $?; # Avoid affecting the exit status
+
     print "Shutting down active sessions...\n" if $self->{debug};
     #murder all sessions we spawned so that die() cleans up properly
     if ($self->{ua} && @{$self->{sessions}}) {
@@ -211,7 +213,25 @@ sub DESTROY($self) {
     kill $sig, $self->{pid};
 
     print "Issued SIG$sig to $self->{pid}, waiting...\n" if $self->{debug};
-    return waitpid( $self->{pid}, 0 );
+
+    # 0 is always WCONTINUED, 1 is always WNOHANG, and POSIX is an expensive import
+    # When 0 is returned, the process is still active, so it needs more persuasion
+    foreach (0..3) {
+        return unless waitpid( $self->{pid}, 1) == 0;
+        sleep 1;
+    }
+
+    # Advanced persuasion
+    print "Forcibly terminating selenium server process...\n" if $self->{debug};
+    kill('TERM', $self->{pid});
+
+    #XXX unfortunately I can't just do a SIGALRM, because blocking system calls can't be intercepted on win32
+    foreach (0..$self->{timeout}) {
+        return unless waitpid( $self->{pid}, 1 ) == 0;
+        sleep 1;
+    }
+    warn "Could not shut down selenium server!";
+    return;
 }
 
 sub _is_windows {
@@ -345,15 +365,15 @@ sub _objectify($self,$result,$inject) {
 
 
 package Selenium::Capabilities;
-$Selenium::Capabilities::VERSION = '1.03';
+$Selenium::Capabilities::VERSION = '1.04';
 use parent qw{Selenium::Subclass};
 1;
 package Selenium::Session;
-$Selenium::Session::VERSION = '1.03';
+$Selenium::Session::VERSION = '1.04';
 use parent qw{Selenium::Subclass};
 1;
 package Selenium::Element;
-$Selenium::Element::VERSION = '1.03';
+$Selenium::Element::VERSION = '1.04';
 use parent qw{Selenium::Subclass};
 1;
 
@@ -369,7 +389,7 @@ Selenium::Client - Module for communicating with WC3 standard selenium servers
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 CONSTRUCTOR
 

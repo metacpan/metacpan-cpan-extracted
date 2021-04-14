@@ -3,7 +3,7 @@ package PDF::API2::Resource::Font::CoreFont::timesbold;
 use strict;
 use warnings;
 
-our $VERSION = '2.039'; # VERSION
+our $VERSION = '2.040'; # VERSION
 
 sub data { return {
     'fontname' => 'Times-Bold',

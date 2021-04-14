@@ -1,0 +1,28 @@
+---
+abstract: 'Identify and replace Unicode confusables'
+author:
+  - 'Ben Bullock <bkb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Unicode-Confuse
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Slurper: '0.012'
+  JSON::Parse: '0.61'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/benkasminbullock/unicode-confuse/issues
+  repository: git://github.com/benkasminbullock/unicode-confuse.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

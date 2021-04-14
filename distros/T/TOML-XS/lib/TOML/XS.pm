@@ -10,7 +10,7 @@ use Types::Serialiser ();
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.02';
+    $VERSION = '0.03';
     XSLoader::load();
 }
 
@@ -48,6 +48,11 @@ L<tomlc99|https://github.com/cktan/tomlc99> C library.
 
 Converts a byte string (i.e., raw, undecoded bytes) that contains a
 serialized TOML document to a L<TOML::XS::Document> instance.
+
+Throws a suitable exception if the TOML document is unparseable. This
+doesn’t necessarily mean that I<any> malformed TOML content triggers such
+an error; for example, if an individual data item is malformed but the
+document is otherwise valid, this may return successful.
 
 =head1 MAPPING TOML TO PERL
 
@@ -95,6 +100,15 @@ On my system the included (I<very> simple!) benchmark outputs:
 
 *true = *Types::Serialiser::true;
 *false = *Types::Serialiser::false;
+
+sub _croak_err_message_from_pieces {
+    my $path_ar = shift;
+
+    s<~><~0>g for @$path_ar;
+    s</><~1>g for @$path_ar;
+
+    die sprintf "Malformed TOML value found! (JSON pointer: %s)", join('/', q<>, @$path_ar);
+}
 
 #----------------------------------------------------------------------
 

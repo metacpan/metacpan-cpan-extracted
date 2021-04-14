@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use POSIX ();
 
-our $VERSION = '0.06';
+our $VERSION = '1.00';
 
 use overload fallback => 1, 
 	'""' => \&_num,
@@ -48,16 +48,13 @@ sub _multiply {
 
 sub _sref { ref $_[0] ? ${$_[0]} : $_[0] }
 
-# bug on negatives?
-# todo
-
 =head1 NAME
 
 smallnum - Transparent "SmallNumber" support for Perl
 
 =head1 VERSION
 
-Version 0.06
+Version 1.00
 
 =cut
 

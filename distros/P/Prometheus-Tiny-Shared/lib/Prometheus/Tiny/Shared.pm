@@ -1,5 +1,5 @@
 package Prometheus::Tiny::Shared;
-$Prometheus::Tiny::Shared::VERSION = '0.020';
+$Prometheus::Tiny::Shared::VERSION = '0.021';
 # ABSTRACT: A tiny Prometheus client with a shared database behind it
 
 use warnings;
@@ -8,7 +8,7 @@ use strict;
 use Prometheus::Tiny 0.004;
 use parent 'Prometheus::Tiny';
 
-use Hash::SharedMem qw(shash_open shash_get shash_set shash_cset shash_group_get_hash);
+use Hash::SharedMem qw(shash_open shash_get shash_set shash_cset shash_keys_array shash_group_get_hash);
 use JSON::XS qw(encode_json decode_json);
 use File::Temp qw(tempdir);
 use File::Path qw(rmtree);
@@ -68,6 +68,16 @@ sub add {
       $nv = encode_json([$diff]);
     }
   } until shash_cset($self->{_shash}, $key, $ov, $nv);
+
+  return;
+}
+
+sub clear {
+  my ($self, $name) = @_;
+
+  for my $key (grep { substr($_, 0, 1) eq 'k' } @{shash_keys_array($self->{_shash})}) {
+    shash_set($self->{_shash}, $key, undef);
+  }
 
   return;
 }

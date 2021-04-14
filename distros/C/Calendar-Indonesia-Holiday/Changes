@@ -1,3 +1,31 @@
+0.340   2021-04-12  Released-By: PERLANCAR; Urgency: low
+
+	- [bugfix] Fix typo: May 14 2021 is day 2 of Eid Ul-Fitr, not day 1.
+
+
+0.339   2021-03-09  Released-By: PERLANCAR; Urgency: low
+
+	- [doc] Add FAQ item.
+
+	- [ux] list_idn_workdays(): tweak argument metadata for CLI
+	  convenience.
+
+
+0.338   2021-03-09  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+	[INCOMPATIBLE CHANGES]
+
+	- Rename enum_idn_workdays() to list_idn_workdays() for consistency;
+	  Fix/tweak examples in Synopsi sand description.
+
+        - Remove support for old deprecated names: list_id_holidays(),
+	  count_id_workdays(), is_id_holiday().
+
+        [ENHANCEMENTS]
+
+	- Add function: is_idn_workday().
+
+
 0.337   2021-03-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Revise joint leave days for 2021 (reduced from 7 to 2).

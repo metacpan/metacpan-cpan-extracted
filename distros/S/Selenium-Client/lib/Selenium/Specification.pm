@@ -1,5 +1,5 @@
 package Selenium::Specification;
-$Selenium::Specification::VERSION = '1.03';
+$Selenium::Specification::VERSION = '1.04';
 # ABSTRACT: Module for building a machine readable specification for Selenium
 
 use strict;
@@ -256,7 +256,7 @@ Selenium::Specification - Module for building a machine readable specification f
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 SUBROUTINES
 

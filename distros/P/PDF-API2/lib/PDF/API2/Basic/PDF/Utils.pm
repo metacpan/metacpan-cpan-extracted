@@ -10,7 +10,7 @@ package PDF::API2::Basic::PDF::Utils;
 
 use strict;
 
-our $VERSION = '2.039'; # VERSION
+our $VERSION = '2.040'; # VERSION
 
 =head1 NAME
 

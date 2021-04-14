@@ -1,5 +1,5 @@
 package Prometheus::Tiny;
-$Prometheus::Tiny::VERSION = '0.005';
+$Prometheus::Tiny::VERSION = '0.006';
 # ABSTRACT: A tiny Prometheus client
 
 use warnings;
@@ -52,6 +52,12 @@ sub inc {
 sub dec {
   my ($self, $name, $labels) = @_;
   return $self->add($name, -1, $labels);
+}
+
+sub clear {
+  my ($self, $name) = @_;
+  $self->{metrics} = {};
+  return;
 }
 
 sub histogram_observe {
@@ -208,6 +214,12 @@ A shortcut for
 A shortcut for
 
     $prom->add($name, -1, { labels })
+
+=head2 clear
+
+    $prom->clear;
+
+Remove all stored metric values. Metric metadata (set by C<declare>) is preserved.
 
 =head2 histogram_observe
 

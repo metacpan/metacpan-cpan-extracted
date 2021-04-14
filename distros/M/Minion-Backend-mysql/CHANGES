@@ -1,5 +1,30 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+0.24      2021-04-12 19:04:09-04:00 America/Detroit
+
+  [NOTE]
+
+  This release tries to fix some reported deadlocks from job dequeuing
+  by moving the dequeue process into a transaction with a `SELECT ...
+  FOR UPDATE` query. Please make sure to test this release in your
+  environment before moving it to production, and be prepared to roll
+  back to v0.23. Please report any issues you have so they can get
+  fixed!
+
+  [Fixed]
+
+  - Fix compatibility with Mojolicious 9.0: The tests would fail
+    because the `delay` helper is no longer available.
+  - Fix jobs being run before their parents. Thanks @tn-laslov for
+    reporting this issue and providing the solution! [Github #34]
+  - Fix slow job dequeue on very large jobs tables. Thanks @znestor
+    for reporting this issue and providing the solution! [Github #33]
+  - Trying to fix some reported deadlocks in job dequeueing. Thanks
+    @srchulo for reporting and help debugging this issue, and Grant
+    Street Group for additional debugging information. [Github #28]
+  - Fix note values not accepting UTF-8 characters. Thanks @uralm1 for
+    reporting this issue and providing a fix! [Github #32]
+
 0.23      2020-12-19 16:56:40-06:00 America/Chicago
 
   [Fixed]

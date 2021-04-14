@@ -59,4 +59,36 @@ EOF
   is_deeply($got, $expected)
 };
 
+subtest 'no src' => sub {
+  my @definitions = (
+    {
+      paths => {
+        '/api/route' => {
+          get => {}
+        }
+      }
+    },
+    {
+      paths => {
+        '/api/route' => {
+          post => {},
+        }
+      }
+    }
+  );
+
+  my $got = openapi_from(definitions => {
+    definitions => \@definitions
+  });
+
+  is_deeply $got => {
+    paths => {
+      '/api/route' => {
+        post => {},
+        get => {},
+      }
+    }
+  };
+};
+
 done_testing

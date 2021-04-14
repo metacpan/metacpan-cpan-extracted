@@ -263,7 +263,7 @@ sub Mail {
 
     return 0 unless $smtp;
 
-    my ( $from ) = split( /\s*,\s*/, ( $mail->{From} || '' ) ); # just the first one
+    my ( $from ) = split( /\s*,\s*/, ( $mail->{From} || '' ) );    # just the first one
     $smtp->mail( $from || $self->asp->MailFrom || return 0 );
 
     my @to;

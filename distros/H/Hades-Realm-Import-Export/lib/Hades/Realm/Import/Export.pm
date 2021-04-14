@@ -2,18 +2,21 @@ package Hades::Realm::Import::Export;
 use strict;
 use warnings;
 use base qw/Hades::Realm::Exporter/;
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
 	my $self      = $cls->SUPER::new(%args);
 	my %accessors = ();
 	for my $accessor ( keys %accessors ) {
+		my $param
+		    = defined $args{$accessor}
+		    ? $args{$accessor}
+		    : $accessors{$accessor}->{default};
 		my $value
-		    = $self->$accessor(
-			defined $args{$accessor}
-			? $args{$accessor}
-			: $accessors{$accessor}->{default} );
+		    = $self->$accessor( $accessors{$accessor}->{builder}
+			? $accessors{$accessor}->{builder}->( $self, $param )
+			: $param );
 		unless ( !$accessors{$accessor}->{required} || defined $value ) {
 			die "$accessor accessor is required";
 		}
@@ -97,7 +100,7 @@ Quick summary of what the module does:
 	Hades->run({
 		eval => 'Kosmos {
 			[curae penthos] :t(Int) :d(2) :p :pr :c :r :i(1, GROUP)
-			geras $nosoi :t(Int) :d(5) :i { if (Â£penthos == $nosoi) { return Â£curae; } } 
+			geras $nosoi :t(Int) :d(5) :i { if (£penthos == $nosoi) { return £curae; } } 
 		}',
 		realm => 'Import::Export',
 	});

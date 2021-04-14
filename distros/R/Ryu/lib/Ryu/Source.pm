@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '2.008'; # VERSION
+our $VERSION = '2.009'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -2210,19 +2210,6 @@ sub map_source {
     $self->each_while_source(sub {
         $code->($_, $src) for $_;
     }, $src);
-}
-
-=head2 new_future
-
-Used internally to get a L<Future>.
-
-=cut
-
-sub new_future {
-    my $self = shift;
-    (
-        $self->{new_future} //= $FUTURE_FACTORY
-    )->($self, @_)
 }
 
 sub DESTROY {

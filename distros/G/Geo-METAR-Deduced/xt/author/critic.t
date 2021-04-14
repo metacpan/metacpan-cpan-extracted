@@ -8,7 +8,7 @@ use 5.014000;
 
 use Test::More;
 
-our $VERSION = 'v1.0.3';
+our $VERSION = 'v1.0.4';
 
 use Test::Requires {
     'Test::Perl::Critic' => 0,

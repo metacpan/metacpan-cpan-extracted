@@ -7,7 +7,7 @@ use strict;
 use Carp;
 use Getopt::Long qw(GetOptionsFromString);
 
-use version; our $VERSION = qv('v0.2.5');
+use version; our $VERSION = qv('v0.3.0');
 
 # Module implementation here
 
@@ -52,7 +52,7 @@ sub new {
     my ($self) = @_;
     my $type = ref($self) || $self;
 
-    $self = bless {}, $type;
+    $self = bless { nodemap => {}, nn => 0 }, $type;
 
     return $self;
 } # new()
@@ -130,18 +130,24 @@ sub _dot_edges {
         unless ($edge->[1] =~ $re_it) {
             $tp = ":name:w";
         }
+        my $e0 = $edge->[0];
+        my $e1 = $edge->[1];
+        if ($opt->{"use-numbered-nodes"}) {
+            $e0 = $self->{nodemap}->{$edge->[0]} || $edge->[0];
+            $e1 = $self->{nodemap}->{$edge->[1]} || $edge->[1];
+        }
         if ($opt->{showrules}) {
             if (my $ot = $opt->{'omittargets'}) {
                 my %omit = map { $_ => 1, } split(',',$ot);
-                push @edges, "$edge->[0]:R$edge->[3]:e -> $edge->[1]$tp$lbl;"
+                push @edges, "$e0:R$edge->[3]:e -> $e1$tp$lbl;"
                     unless ($omit{$edge->[1]});
             }
             else {
-                push @edges, "$edge->[0]:R$edge->[3]:e -> $edge->[1]$tp$lbl;";
+                push @edges, "$e0:R$edge->[3]:e -> $e1$tp$lbl;";
             }
         }
         else {
-            my $etext = "$edge->[0]:e -> $edge->[1]$tp$lbl";
+            my $etext = "$e0:e -> $e1$tp$lbl";
             unless ($seen{$etext} ++) {
                 push @edges, $etext;
             }
@@ -185,7 +191,12 @@ sub _dot_nodes {
         my $lbl = "<table border=\"0\" cellborder=\"1\" cellspacing=\"0\">"
                 . qq(<tr><td bgcolor="lightgrey" PORT="name">$node</td></tr>\n)
                 . join("\n", @rules, "</table>");
-        push @nodes, "$node [shape=none,margin=0,label=<$lbl>];";
+        if ($opt->{"use-numbered-nodes"}) {
+            push @nodes, $self->{nodemap}->{$node} ." [shape=none,margin=0,label=<$lbl>];";
+        }
+        else {
+            push @nodes, "$node [shape=none,margin=0,label=<$lbl>];";
+        }
     }
     return @nodes;
 } # _dot_nodes()
@@ -257,6 +268,10 @@ sub _read_iptables_line {
     }
     elsif ($line =~ /^:(\S+)\s.+$/) {
         $self->{chains}->{$self->{last_table}}->{$1} = { rules => [] };
+        unless ($self->{nodemap}->{$1}) {
+                $self->{nodemap}->{$1} = "node" . $self->{nn};
+                $self->{nn} += 1;
+        }
     }
     elsif ($line =~ /^-A\s(\S+)\s(.+)$/) {
         my $chain = $1;
@@ -293,7 +308,7 @@ App::Iptables2Dot - turn iptables-save output into graphs for GraphViz
 
 =head1 VERSION
 
-This document describes App::Iptables2Dot version v0.2.5
+This document describes App::Iptables2Dot version v0.3.0
 
 
 =head1 SYNOPSIS
@@ -368,6 +383,14 @@ that chain.
 
 Usually chains with no jumps to other chains or targets will not be shown.
 With a true value these chains show up in the graph.
+
+=item use-numbered-nodes => 0
+
+With a true value the nodes in the dot file will be named I<node0> .. I<noden>
+and provided with a label showing their name from C<iptables-save> output.
+
+This option can help if the filter rules contain chains with a dash (C<->)
+in their name, which is not allowed as input for C<dot>.
 
 =back
 

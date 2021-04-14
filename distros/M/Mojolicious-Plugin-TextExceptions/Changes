@@ -1,4 +1,7 @@
 Revision history for perl distribution Mojolicious-Plugin-TextExceptions
 
+0.02 2020-04-13T07:39:00+0100
+ - Updated for compatibility with Mojolicious 9.11+ (Zak B. Elep)
+
 0.01 2019-03-06T10:44:47+0100
  - Started project

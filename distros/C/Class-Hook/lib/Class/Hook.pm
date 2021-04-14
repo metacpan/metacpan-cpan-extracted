@@ -28,14 +28,14 @@ It will be magically caught by Class::Hook which will call Foo itself.
 You can see Class::Hook as a kind of relay.
 
 You can setup a subroutine to be called before any call to
-C<<Foo->amethod>> and a subroutine to be called after the call. Your subs
-will receive all the information that C<<Foo->amethod>> will receive,
+C<<Foo-E<gt>amethod>> and a subroutine to be called after the call. Your subs
+will receive all the information that C<<Foo-E<gt>amethod>> will receive,
 so you can trace everything between your code and Foo.
 
 =cut
 
 package Class::Hook;
-$Class::Hook::VERSION = '0.05';
+$Class::Hook::VERSION = '0.06';
 use 5.006;
 use strict;
 use warnings;

@@ -1,9 +1,9 @@
 package Pod::From::Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-10-19'; # DATE
+our $DATE = '2021-02-18'; # DATE
 our $DIST = 'Pod-From-Acme-CPANModules'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -28,9 +28,9 @@ Currently what this routine does:
 
 * Fill the Description section from the CPANModules' list description
 
-* Add an Included Modules section, containing the CPANModules' list entries
+* Add an "Acme::CPANModules Entries" section, containing the CPANModules' list entries
 
-* Add a Feature Comparison Matrix section, if one or more entries have 'features'
+* Add an "Acme::CPANModules Feature Comparison Matrix" section, if one or more entries have 'features'
 
 _
     args_rels => {
@@ -46,6 +46,9 @@ _
             summary => 'As an alternative to `module`, you can directly supply $LIST here',
             schema => 'hash*',
         },
+        entry_description_code => {
+            schema => 'code*',
+        },
     },
     result_naked => 1,
 };
@@ -53,6 +56,12 @@ sub gen_pod_from_acme_cpanmodules {
     my %args = @_;
 
     my $res = {};
+    if ($args{entry_description_code}) {
+        if (ref $args{entry_description_code} ne 'CODE') {
+            $args{entry_description_code} = eval "sub { $args{entry_description_code} }";
+            die "Can't compile Perl code in entry_description_code argument: $@" if $@;
+        }
+    }
 
     my $list = $args{list};
     if (my $mod = $args{module}) {
@@ -80,24 +89,33 @@ sub gen_pod_from_acme_cpanmodules {
             $pod .= "=over\n\n";
             for my $ent (@{ $list->{entries} }) {
                 $pod .= "=item * L<$ent->{module}>".($ent->{summary} ? " - $ent->{summary}" : "")."\n\n";
-                $pod .= _markdown_to_pod($ent->{description})."\n\n"
-                    if $ent->{description} && $ent->{description} =~ /\S/;
-                $pod .= "Rating: $ent->{rating}/10\n\n"
-                    if $ent->{rating} && $ent->{rating} =~ /\A[1-9]\z/;
-                $pod .= "Related modules: ".join(", ", map {"L<$_>"} @{ $ent->{related_modules} })."\n\n"
-                    if $ent->{related_modules} && @{ $ent->{related_modules} };
-                $pod .= "Alternate modules: ".join(", ", map {"L<$_>"} @{ $ent->{alternate_modules} })."\n\n"
-                    if $ent->{alternate_modules} && @{ $ent->{alternate_modules} };
+                if ($args{entry_description_code}) {
+                    my $res;
+                    {
+                        local $_ = $ent;
+                        $res = $args{entry_description_code}->($ent);
+                    }
+                    $pod .= $res;
+                } else {
+                    $pod .= _markdown_to_pod($ent->{description})."\n\n"
+                        if $ent->{description} && $ent->{description} =~ /\S/;
+                    $pod .= "Rating: $ent->{rating}/10\n\n"
+                        if $ent->{rating} && $ent->{rating} =~ /\A[1-9]\z/;
+                    $pod .= "Related modules: ".join(", ", map {"L<$_>"} @{ $ent->{related_modules} })."\n\n"
+                        if $ent->{related_modules} && @{ $ent->{related_modules} };
+                    $pod .= "Alternate modules: ".join(", ", map {"L<$_>"} @{ $ent->{alternate_modules} })."\n\n"
+                        if $ent->{alternate_modules} && @{ $ent->{alternate_modules} };
+                }
             }
             $pod .= "=back\n\n";
-            $res->{pod}{'MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE'} .= $pod;
+            $res->{pod}{'ACME::MODULES ENTRIES'} .= $pod;
         }
 
         {
             require Acme::CPANModulesUtil::FeatureMatrix;
             my $fres = Acme::CPANModulesUtil::FeatureMatrix::draw_feature_matrix(_list => $list);
             last if $fres->[0] != 200;
-            $res->{pod}{'FEATURE COMPARISON MATRIX OF MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE'} = $fres->[2];
+            $res->{pod}{'ACME::CPANMODULES FEATURE COMPARISON MATRIX'} = $fres->[2];
         }
 
     }
@@ -120,7 +138,7 @@ Pod::From::Acme::CPANModules - Generate POD from an Acme::CPANModules::* module
 
 =head1 VERSION
 
-This document describes version 0.006 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2020-10-19.
+This document describes version 0.007 of Pod::From::Acme::CPANModules (from Perl distribution Pod-From-Acme-CPANModules), released on 2021-02-18.
 
 =head1 SYNOPSIS
 
@@ -145,9 +163,9 @@ Currently what this routine does:
 
 =item * Fill the Description section from the CPANModules' list description
 
-=item * Add an Included Modules section, containing the CPANModules' list entries
+=item * Add an "Acme::CPANModules Entries" section, containing the CPANModules' list entries
 
-=item * Add a Feature Comparison Matrix section, if one or more entries have 'features'
+=item * Add an "Acme::CPANModules Feature Comparison Matrix" section, if one or more entries have 'features'
 
 =back
 
@@ -156,6 +174,8 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<entry_description_code> => I<code>
 
 =item * B<list> => I<hash>
 
@@ -178,7 +198,7 @@ Source repository is at L<https://github.com/perlancar/perl-Pod-From-Acme-CPANMo
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-From-Acme-CPANModules>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Pod-From-Acme-CPANModules/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -190,7 +210,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
