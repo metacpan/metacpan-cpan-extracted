@@ -1,3 +1,9 @@
+0.105     2021-04-15 12:15:03+01:00 Europe/London
+    - Change author in META. No other code changes
+
+0.104     2021-03-31 12:20:35+01:00 Europe/London
+    - Bump version in WebDriver::Tiny::Elements, which lagged behind.
+
 0.103     2020-06-21 18:49:25+01:00 Europe/London
     - Remove documentation for methods removed previously.
 

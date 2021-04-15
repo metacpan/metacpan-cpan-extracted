@@ -1,5 +1,3 @@
-.circleci/config.yml
-.perlcriticrc
 Build.PL
 CONTRIBUTING.md
 Changes
@@ -8,7 +6,6 @@ MANIFEST
 META.json
 META.yml
 README
-README.md
 cpanfile
 lib/App/Perlbrew/Path.pm
 lib/App/Perlbrew/Path/Installation.pm
@@ -16,7 +13,6 @@ lib/App/Perlbrew/Path/Installations.pm
 lib/App/Perlbrew/Path/Root.pm
 lib/App/Perlbrew/Util.pm
 lib/App/perlbrew.pm
-metamerge.json
 script/perlbrew
 t/00.load.t
 t/01.options.t
@@ -50,6 +46,7 @@ t/bashrc_content.t
 t/builddir.t
 t/command-alias.t
 t/command-available.t
+t/command-clone-modules.t
 t/command-compgen.t
 t/command-display-rc.t
 t/command-env.t

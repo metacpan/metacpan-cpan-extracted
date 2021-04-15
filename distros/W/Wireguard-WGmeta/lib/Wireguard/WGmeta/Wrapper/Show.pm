@@ -34,7 +34,7 @@ use warnings FATAL => 'all';
 use experimental 'signatures';
 
 
-our $VERSION = "0.2.2";
+our $VERSION = "0.2.3";
 
 use constant FALSE => 0;
 use constant TRUE => 1;
@@ -68,6 +68,10 @@ sub new($class, $wg_show_dump) {
     bless $self, $class;
 
     return $self;
+}
+
+sub reload($self, $wg_show_dump){
+    $self->{parsed_show} = wg_show_dump_parser($wg_show_dump);
 }
 
 =head3 get_interface_list()

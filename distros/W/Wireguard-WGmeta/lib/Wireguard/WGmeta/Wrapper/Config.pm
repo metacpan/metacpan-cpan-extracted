@@ -32,7 +32,7 @@ Please refer to L<Wireguard::WGmeta::Wrapper::ConfigT>
  # disable peer (this comments out the peer in the configuration file
  wg_meta->disable_by_alias('wg0', 'some_fancy_alias');
 
- # write config (if parameter is set to True, the config is overwritten, if set to False the resulting file is suffixed with '_not_applied'
+ # write config (if parameter is set to True, the config is overwritten, if set to False the resulting file is suffixed with '.not_applied'
  wg_meta->commit(1);
 
 =head1 METHODS
@@ -49,12 +49,12 @@ use Wireguard::WGmeta::Parser::Config;
 use Wireguard::WGmeta::ValidAttributes;
 use Wireguard::WGmeta::Utils;
 
-our $VERSION = "0.2.2"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.2.3"; # do not change manually, this variable is updated when calling make
 
 use constant FALSE => 0;
 use constant TRUE => 1;
 
-=head3 new($wireguard_home [, $wg_meta_prefix = '#+', $wg_meta_disabled_prefix = '#-'])
+=head3 new($wireguard_home [, $wg_meta_prefix, $wg_meta_disabled_prefix, $custom_attributes])
 
 Creates a new instance of this class.
 
@@ -68,14 +68,34 @@ C<$wireguard_home> Path to Wireguard configuration files. Make sure the path end
 
 =item *
 
-C<[, $wg_meta_prefix]> A custom wg-meta comment prefix, has to begin with either `;` or `#`.
+C<[$wg_meta_prefix]> A custom wg-meta comment prefix, has to begin with either `;` or `#`.
 It is recommended to not change this setting, especially in a already deployed installation.
 
 =item *
 
-C<[, $wg_meta_disabled_prefix]> A custom prefix for the commented out (disabled) sections,
+C<[$wg_meta_disabled_prefix]> A custom prefix for the commented out (disabled) sections,
 has to begin with either `;` or `#` and must not be equal with C<$wg_meta_prefix>! (This is enforced and an exception is thrown if violated)
 It is recommended to not change this setting, especially in an already deployed installation.
+
+=item *
+
+C<[$not_applied_suffix]> Suffix to add if C<commit()> is set to not override an existing config.
+
+=item *
+
+C<[$custom_attributes]> A reference to a hash defining custom attributes. Expects the following structure:
+
+    {
+        'attr_key'     => {
+            'in_config_name' => 'In config name',
+            'validator'      => 'Ref to validation function'
+        },
+        'example'         => {
+            'in_config_name' => 'DNS',
+            'validator'      => \&accept_any
+        },
+        ...
+    }
 
 =back
 
@@ -84,46 +104,42 @@ B<Returns>
 An instance of WGmeta::Wrapper::Config
 
 =cut
-sub new($class, $wireguard_home, $wg_meta_prefix = '#+', $wg_meta_disabled_prefix = '#-') {
+sub new($class, $wireguard_home, $wg_meta_prefix = '#+', $wg_meta_disabled_prefix = '#-', $not_applied_suffix = '.not_applied', $custom_attributes = undef) {
 
     if ($wg_meta_prefix eq $wg_meta_disabled_prefix) {
         die '`$wg_meta_prefix` and `$wg_meta_disabled_prefix` have to be different';
     }
 
-    my ($parsed_config, $count) = _read_configs_from_folder($wireguard_home, $wg_meta_prefix, $wg_meta_disabled_prefix);
+    if (defined $custom_attributes) {
+        for my $attr_key (keys %{$custom_attributes}) {
+            register_custom_attribute($attr_key, $custom_attributes->{$attr_key});
+        }
+    }
+
     my $self = {
-        'wireguard_home'           => $wireguard_home,
-        'wg_meta_prefix'           => $wg_meta_prefix,
-        'wg_meta_disabled_prefix'  => $wg_meta_disabled_prefix,
-        'n_conf_files'             => $count,
-        'parsed_config'            => $parsed_config,
-        'reload_listeners'         => {},
-        'wg_meta_attrs'            => Wireguard::WGmeta::ValidAttributes::WG_META_DEFAULT,
-        'wg_meta_additional_attrs' => Wireguard::WGmeta::ValidAttributes::WG_META_ADDITIONAL,
-        'wg_orig_interface_attrs'  => Wireguard::WGmeta::ValidAttributes::WG_ORIG_INTERFACE,
-        'wg_orig_peer_attrs'       => Wireguard::WGmeta::ValidAttributes::WG_ORIG_PEER,
-        'wg_quick_attrs'           => Wireguard::WGmeta::ValidAttributes::WG_QUICK,
+        'wireguard_home'          => $wireguard_home,
+        'wg_meta_prefix'          => $wg_meta_prefix,
+        'wg_meta_disabled_prefix' => $wg_meta_disabled_prefix,
+        'not_applied_suffix'      => $not_applied_suffix,
+        'n_conf_files'            => {},
+        'parsed_config'           => {},
+        'reload_listeners'        => {},
     };
+
+    _read_configs_from_folder2($self);
+
     bless $self, $class;
     return $self;
 }
 
-sub _read_configs_from_folder($wireguard_home, $wg_meta_prefix, $wg_meta_disabled_prefix) {
-    my $parsed_configs = {};
-    my ($all_dot_conf, $count) = get_all_conf_files($wireguard_home);
+sub _read_configs_from_folder2($self) {
+    my ($all_dot_conf, $count) = get_all_conf_files($self->{wireguard_home});
     for my $possible_config_path (@{$all_dot_conf}) {
         my $contents = read_file($possible_config_path);
         my $interface = $possible_config_path;
         $interface =~ s/^\/|\\|.*\/|.*\\|.conf$//g;
-        my $parsed_config = parse_wg_config($contents, $interface, $wg_meta_prefix, $wg_meta_disabled_prefix);
-        if (defined $parsed_config) {
-            # additional data
-            $parsed_config->{config_path} = $possible_config_path;
-            $parsed_config->{mtime} = get_mtime($possible_config_path);
-            $parsed_configs->{$interface} = $parsed_config;
-        }
+        may_reload_from_disk($self, $interface, TRUE, TRUE, TRUE);
     }
-    return $parsed_configs, $count;
 }
 
 =head3 set($interface, $identifier, $attribute, $value [, $allow_non_meta, $forward_function])
@@ -393,6 +409,16 @@ sub is_valid_interface($self, $interface) {
     return (exists $self->{parsed_config}{$interface});
 }
 
+
+=head3 is_valid_alias($interface, $alias)
+
+Simply checks if an alias is valid for spec
+
+=cut
+sub is_valid_alias($self, $interface, $alias) {
+    return exists $self->{parsed_config}{$interface}{alias_map}{$alias}
+}
+
 =head3 is_valid_identifier($interface, $identifier)
 
 Checks if an identifier is valid for a given interface
@@ -517,6 +543,7 @@ sub get_all_conf_files($wireguard_home) {
     return \@config_files, $count;
 }
 
+
 =head3 commit([$is_hot_config = FALSE, $plain = FALSE])
 
 Writes down the parsed config to the wireguard configuration folder
@@ -527,8 +554,8 @@ B<Parameters>
 
 =item
 
-C<[$is_hot_config = FALSE])> If set to TRUE, the existing configuration is overwritten. Otherwise,
-the suffix '_not_applied' is appended to the filename
+C<[$is_hot_config = FALSE])> If set to TRUE, the existing configuration is overwritten (and possibly existing, not applied configs are deleted). Otherwise,
+the suffix '.not_applied' is appended to the filename
 
 =item
 
@@ -551,16 +578,27 @@ sub commit($self, $is_hot_config = FALSE, $plain = FALSE) {
         if ($self->_has_changed($interface)) {
             my $new_config = create_wg_config($self->{parsed_config}{$interface}, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, $plain);
             my $fh;
+            my $hot_path = $self->{wireguard_home} . $interface . '.conf';
+            my $safe_path = $self->{wireguard_home} . $interface . $self->{not_applied_suffix};
             if ($is_hot_config == TRUE) {
-                open $fh, '>', $self->{wireguard_home} . $interface . '.conf' or die $!;
+                open $fh, '>', $hot_path or die $!;
+                $self->{parsed_config}->{$interface}{is_hot_config} = 1;
             }
             else {
-                open $fh, '>', $self->{wireguard_home} . $interface . '.conf_not_applied' or die $!;
+                open $fh, '>', $safe_path or die $!;
+                $self->{parsed_config}->{$interface}{is_hot_config} = 0;
             }
             # write down to file
             print $fh $new_config;
             $self->_reset_changed($interface);
-            close $fh;
+            close $fh or die $!;
+
+            # if there is an not applied version around delete it (if is_hot_config = True)
+            if (-e $safe_path && $is_hot_config) {
+                unlink $safe_path;
+            }
+            # Notify listeners about a file change
+            $self->_call_reload_listeners($interface);
         }
     }
 }
@@ -932,10 +970,11 @@ sub get_peer_count($self, $interface = undef) {
     }
 }
 
-=head3 reload_from_disk($interface [, $new = FALSE])
+=head3 may_reload_from_disk($interface [, $new = FALSE])
 
 Method to reload an interface configuration from disk. Also useful to add an newly (externally) created
-interface on-the-fly.
+interface on-the-fly. If a config file with a I<.not_applied> suffix is found (and its mtime is newer
+than the original one), it is taken as source for reloading the configuration data.
 
 B<Parameters>
 
@@ -949,6 +988,10 @@ C<$interface> A valid interface name
 
 C<[$new = FALSE]> If set to True, the parser looks at C<$wireguard_home> for this new interface config.
 
+=item *
+
+C<[$force = FALSE]> When set to True, the configuration is reloaded regardless of its mtime.
+
 =back
 
 B<Raises>
@@ -957,28 +1000,44 @@ Exception: If the interface is invalid (or the config file is not found)
 
 B<Returns>
 
-None, or undef if C<$new == True> and the interface in fact not a wg config.
+None, or undef if C<$new == True> and the interface is in fact not a wg config.
 
 =cut
-sub reload_from_disk($self, $interface, $new = FALSE) {
-    my $config_path;
+sub may_reload_from_disk($self, $interface, $new = FALSE, $force = FALSE, $_init = FALSE) {
+    my $config_path = $self->{wireguard_home} . $interface . '.conf';
+    # check if there is a newer, not applied version, if yes prefer this version
+    my $not_applied_path = $self->{wireguard_home} . $interface . $self->{not_applied_suffix};
+    if (-e $not_applied_path) {
+        if (get_mtime($not_applied_path) > get_mtime($config_path)) {
+            $config_path = $not_applied_path;
+        }
+    }
     if ($new == FALSE) {
         # do not use is_valid_interface() here otherwise there is a risk of infinite recursion (in a concurrent environment)
         if (exists $self->{parsed_config}{$interface}) {
-            $config_path = $self->{wireguard_home} . $interface . '.conf';
-            my $contents = read_file($self->{parsed_config}{$interface}{config_path});
-            $self->{parsed_config}{$interface} = parse_wg_config($contents, $interface, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, FALSE);
-            $self->{parsed_config}{$interface}{config_path} = $config_path;
-            $self->{parsed_config}{$interface}{mtime} = get_mtime($config_path);
-            $self->_call_reload_listeners($interface);
+            # we only reload if the on-disk version is newer than our local one
+            # There is however one exception: The local config is based on a not applied version and this file somehow
+            # unexpectedly deleted (e.g by a sysadmin..)
+            my $on_disk_mtime = get_mtime($config_path);
+            my $unexpected_delete = (exists $self->{parsed_config}{$interface}{is_hot_config}
+                && $self->{parsed_config}{$interface}{is_hot_config} == 0
+                && $self->{parsed_config}{$interface}{mtime} > $on_disk_mtime);
+
+            if ($force || $unexpected_delete || $self->{parsed_config}{$interface}{mtime} < $on_disk_mtime) {
+                my $contents = read_file($config_path);
+                $self->{parsed_config}{$interface} = parse_wg_config($contents, $interface, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, FALSE);
+                $self->{parsed_config}{$interface}{config_path} = $config_path;
+                $self->{parsed_config}{$interface}{mtime} = get_mtime($config_path);
+                $self->{parsed_config}{$interface}{is_hot_config} = ($config_path =~ /$self->{not_applied_suffix}/) ? 0 : 1;
+                $self->_call_reload_listeners($interface) if $_init == FALSE;
+            }
         }
         else {
             die "Invalid interface $interface - if this is a new interface, set `\$new` to True";
         }
-
     }
+    # We have a completely new interface
     else {
-        $config_path = $self->{wireguard_home} . $interface . '.conf';
         if (-e $config_path) {
             my $contents = read_file($config_path);
             my $maybe_new_config = parse_wg_config($contents, $interface, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix}, FALSE);
@@ -987,7 +1046,8 @@ sub reload_from_disk($self, $interface, $new = FALSE) {
                 $self->{parsed_config}{$interface} = $maybe_new_config;
                 $self->{parsed_config}{$interface}{config_path} = $config_path;
                 $self->{parsed_config}{$interface}{mtime} = get_mtime($config_path);
-                $self->_call_reload_listeners($interface);
+                $self->{parsed_config}{$interface}{is_hot_config} = ($config_path =~ /$self->{not_applied_suffix}/) ? 0 : 1;
+                $self->_call_reload_listeners($interface) if $_init == FALSE;;
             }
             else {
                 return undef;
@@ -1041,7 +1101,7 @@ B<Parameters>
 
 =item
 
-C<$ref_handler> Reference to a handler function. The followin signature is expected:
+C<$ref_handler> Reference to a handler function. The following signature is expected:
 
     sub my_handler_function($interface, $ref_list_args){
         ...

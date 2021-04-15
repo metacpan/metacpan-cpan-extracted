@@ -1,5 +1,8 @@
 Revision history for Net-DAVTalk
 
+0.20    Thu Apr 15 02:29 2021
+  - add support for setting custom headers, thanks Hernan Lopes
+
 0.19    Wed May  6 12:34 2020
   - fix handling of the UA timeout
 

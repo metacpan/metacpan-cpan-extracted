@@ -24,13 +24,9 @@ use DynaLoader;
 
 =head1 NAME
 
-PDL::Bad - PDL does process bad values
+PDL::Bad - PDL always processes bad values
 
 =head1 DESCRIPTION
-
-PDL has been compiled with WITH_BADVAL set to 1. Therefore,
-you can enter the wonderful world of bad value support in
-PDL.
 
 This module is loaded when you do C<use PDL>,
 C<Use PDL::Lite> or C<PDL::LiteF>.
@@ -868,11 +864,6 @@ The way the PDL handles the various bad value settings depends on your
 compile-time configuration settings, as held in C<perldl.conf>.
 
 =over
-
-=item C<$PDL::Config{WITH_BADVAL}>
-
-Set this configuration option to a true value if you want bad value
-support. The default setting is for this to be true.
 
 =item C<$PDL::Config{BADVAL_USENAN}>
 

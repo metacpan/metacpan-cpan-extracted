@@ -1,5 +1,14 @@
 Revision history for MIDI-Util
 
+0.0902 2021-04-14 15:07:26
+    - Add ppqn handling to dura_size().
+
+0.0901 2021-04-14 14:49:14
+    - Fix documentation!
+
+0.0900 2021-04-14 14:46:10
+    - Add the dura_size() function.
+
 0.0800 2021-01-10 19:02:29
     - Alright. Use Exporter.
     - Rename the dump() fuction to midi_dump().

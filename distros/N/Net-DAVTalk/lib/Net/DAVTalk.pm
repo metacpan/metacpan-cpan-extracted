@@ -21,11 +21,11 @@ Net::DAVTalk - Interface to talk to DAV servers
 
 =head1 VERSION
 
-Version 0.19
+Version 0.20
 
 =cut
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 =head1 SYNOPSIS
 
@@ -42,6 +42,7 @@ Example:
         url => "https://dav.example.com/",
         user => "foo\@example.com",
         password => "letmein",
+        headers => { Cookie => "123", Referer => "456" },
     );
 
     $davtalk->Request(
@@ -82,6 +83,8 @@ Options:
     user and password: if these are set, perform basic authentication.
     user and access_token: if these are set, perform Bearer (OAUTH2)
     authentication.
+
+    headers: a hashref of additional headers to add to every request
 
 =cut
 
@@ -264,6 +267,10 @@ sub Request {
 
   if ($Self->{user}) {
     $Headers{'Authorization'} = $Self->auth_header();
+  }
+
+  if ($Self->{headers}) {
+      $Headers{$_} = $Self->{headers}->{$_} for ( keys %{ $Self->{headers} } );
   }
 
   # XXX - Accept-Encoding for gzip, etc?

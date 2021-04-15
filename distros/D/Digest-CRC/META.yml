@@ -1,7 +1,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Digest-CRC
-version:      0.22
+version:      0.23
 version_from: lib/Digest/CRC.pm
 installdirs:  site
 requires:

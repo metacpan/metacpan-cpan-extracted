@@ -32,3 +32,4 @@ build/
 .base$
 BB-Pass/
 BB-Fail/
+.github/

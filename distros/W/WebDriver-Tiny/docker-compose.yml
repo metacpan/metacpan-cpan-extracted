@@ -1,7 +1,7 @@
 version: '2'
 services:
     geckodriver:
-        image: quay.io/cvlibrary/geckodriver:0.24.0
+        image: quay.io/cvlibrary/geckodriver:0.28.0
         logging:
             driver: none
     httpd:
@@ -20,4 +20,3 @@ services:
             - httpd
         volumes:
             - .:/root
-

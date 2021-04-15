@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 15;
+plan tests => 17;
 
 use Math::Sidef qw(factor composite prime ipow factor_exp is_prime is_composite);
 
@@ -28,6 +28,10 @@ is(join(' * ', factor(ipow(2, 64) + 1)), "274177 * 67280421310721");
 
 # Prime factorization of 5040
 is_deeply([factor_exp(5040)], [[2, 4], [3, 2], [5, 1], [7, 1]]);
+
+# Multiple return values
+is_deeply([123,   4],    [Math::Sidef::divmod(1234, 10)]);
+is_deeply([-1235, 1234], [Math::Sidef::iquadratic_formula(-1, -1, 1524031 - 41)]);
 
 # Iterate over prime numbers in range 1..20
 my @primes;

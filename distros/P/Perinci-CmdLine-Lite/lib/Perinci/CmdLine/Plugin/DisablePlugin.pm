@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Plugin::DisablePlugin;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-30'; # DATE
+our $DATE = '2021-04-15'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.903'; # VERSION
+our $VERSION = '1.904'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -82,15 +82,15 @@ Perinci::CmdLine::Plugin::DisablePlugin
 
 =head1 VERSION
 
-This document describes version 1.903 of Perinci::CmdLine::Plugin::DisablePlugin (from Perl distribution Perinci-CmdLine-Lite), released on 2021-01-30.
+This document describes version 1.904 of Perinci::CmdLine::Plugin::DisablePlugin (from Perl distribution Perinci-CmdLine-Lite), released on 2021-04-15.
 
 =head1 SYNOPSIS
 
-In the environment variable:
+To use, either specify in environment variable:
 
  PERINCI_CMDLINE_PLUGINS='-DisablePlugin,plugins,Foo;/^Bar/'
 
-In code instantiating L<Perinci::CmdLine>:
+or in code instantiating L<Perinci::CmdLine>:
 
  my $app = Perinci::CmdLine::Any->new(
      ...
@@ -111,7 +111,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

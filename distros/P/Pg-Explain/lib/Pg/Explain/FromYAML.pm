@@ -28,11 +28,11 @@ Pg::Explain::FromYAML - Parser for explains in YAML format
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =cut
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 =head1 SYNOPSIS
 
@@ -54,14 +54,21 @@ sub parse_source {
     my $source = shift;
 
     # If this is plan from auto-explain
-    if ( $source =~ s{ \A (\s*) Query \s+ Text [^\n]* \n }{}xms ) {
-        my $prefix = $1;
+    if ( $source =~ s{ \A (\s*) Query \s+ Text : \s+ " ( [^\n]* ) " \n }{}xms ) {
+        my ( $prefix, $query ) = ( $1, $2 );
 
         # Change prefix to two spaces in all lines
         $source =~ s{^$prefix}{  }gm;
 
         # Add - to first line (should be Plan:)
         $source =~ s{ \A \s \s }{- }xms;
+
+        $query =~ s/\\n/\n/g;
+        $query =~ s/\\r/\r/g;
+        $query =~ s/\\t/\t/g;
+        $query =~ s/\\(.)/$1/g;
+        $self->explain->query( $query );
+
     }
 
     unless ( $source =~ s{\A .*? ^ (\s*) ( - \s+ Plan: \s*\n )}{$1$2}xms ) {
@@ -94,6 +101,7 @@ sub parse_source {
         }
     }
     $self->explain->jit( Pg::Explain::JIT->new( 'struct' => $struct->{ 'JIT' } ) ) if $struct->{ 'JIT' };
+
     return $top_node;
 }
 

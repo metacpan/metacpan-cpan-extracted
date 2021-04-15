@@ -1,4 +1,4 @@
-Digest::CRC version 0.22
+Digest::CRC version 0.23
 ========================
 
 NAME
@@ -6,8 +6,8 @@ NAME
 
 DESCRIPTION
     The Digest::CRC module calculates CRC sums of all sorts.  It contains
-    wrapper functions with the correct parameters for CRC-CCITT, CRC-16 and
-    CRC-32.
+    wrapper functions with the correct parameters for CRC-SAE-J1850, CRC-CCITT,
+    CRC-16 and CRC-32.
 
 SYNOPSIS
     # Functional style
@@ -16,6 +16,7 @@ SYNOPSIS
     $crc = crc32("123456789");
     $crc = crc16("123456789");
     $crc = crcccitt("123456789");
+    $crc = crcsaej1850("123456789");
 
     $crc = crc($input,$width,$init,$xorout,$poly,$refin,$refout);
 

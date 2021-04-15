@@ -3,8 +3,8 @@ NAME
     (wide-character functions only)
 
 VERSION
-    This document describes version 0.230 of Text::ANSI::WideUtil (from Perl
-    distribution Text-ANSI-WideUtil), released on 2020-05-19.
+    This document describes version 0.231 of Text::ANSI::WideUtil (from Perl
+    distribution Text-ANSI-WideUtil), released on 2021-01-23.
 
 SYNOPSIS
      use Text::ANSI::WideUtil qw(
@@ -96,14 +96,14 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-WideUtil>
+    <https://github.com/perlancar/perl-Text-ANSI-WideUtil/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Text::ANSI::Util, Text::WideChar::Util, Text::NonWideChar::Util,
-    Text::Wrap
+    Text::Wrap, String::Pad
 
     <http://en.wikipedia.org/wiki/ANSI_escape_code>
 
@@ -114,7 +114,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2015 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

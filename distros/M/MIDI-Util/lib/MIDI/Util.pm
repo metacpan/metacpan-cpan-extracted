@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0800';
+our $VERSION = '0.0902';
 
 use strict;
 use warnings;
@@ -19,6 +19,7 @@ our @EXPORT = qw(
     set_chan_patch
     set_time_sig
     setup_score
+    dura_size
 );
 
 use constant TICKS => 96;
@@ -200,6 +201,20 @@ sub set_time_sig {
     );
 }
 
+
+sub dura_size {
+    my ($duration, $ppqn) = @_;
+    $ppqn ||= TICKS;
+    my $size = 0;
+    if ($duration =~ /^d(\d+)$/) {
+        $size = sprintf '%0.f', $1 / $ppqn;
+    }
+    else {
+        $size = $MIDI::Simple::Length{$duration};
+    }
+    return $size;
+}
+
 1;
 
 __END__
@@ -214,7 +229,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0800
+version 0.0902
 
 =head1 SYNOPSIS
 
@@ -222,6 +237,8 @@ version 0.0800
 
   my $dump = midi_dump('volume'); # length, etc.
   print Dumper $dump;
+
+  my $size = dura_size('dqn');
 
   my $score = setup_score( bpm => 120, etc => '...', );
 
@@ -244,9 +261,9 @@ Nothing is exported by default.
 
 =head2 setup_score
 
-  $score = MIDI::Util::setup_score;  # Use defaults
+  $score = setup_score;  # Use defaults
 
-  $score = MIDI::Util::setup_score(  # Override defaults
+  $score = setup_score(  # Override defaults
     lead_in   => $beats,
     volume    => $volume,
     bpm       => $bpm,
@@ -272,9 +289,9 @@ Named parameters and defaults:
 
 =head2 set_chan_patch
 
-  MIDI::Util::set_chan_patch( $score, $channel );  # Just set the channel
+  set_chan_patch( $score, $channel );  # Just set the channel
 
-  MIDI::Util::set_chan_patch( $score, $channel, $patch );
+  set_chan_patch( $score, $channel, $patch );
 
 Set the MIDI channel and patch.
 
@@ -286,7 +303,7 @@ Positional parameters and defaults:
 
 =head2 midi_dump
 
-  $dump = MIDI::Util::midi_dump($list_name);
+  $dump = midi_dump($list_name);
 
 Return sorted array references of the following L<MIDI>,
 L<MIDI::Simple>, and L<MIDI::Event> internal lists:
@@ -309,16 +326,27 @@ L<MIDI::Simple>, and L<MIDI::Event> internal lists:
 
 =head2 midi_format
 
-  @formatted = MIDI::Util::midi_format(@notes);
+  @formatted = midi_format(@notes);
 
 Change sharp C<#> and flat C<b>, in the list of named notes, to the
 L<MIDI::Simple> C<s> and C<f> respectively.
 
 =head2 set_time_sig
 
-  MIDI::Util::set_time_sig( $score, $signature );
+  set_time_sig( $score, $signature );
 
 Set the B<score> C<time_signature> based on the given string.
+
+=head2 dura_size
+
+  $size = dura_size($duration);
+  $size = dura_size($duration, $ppqn);
+
+Return the B<duration> size based on the L<MIDI::Simple> C<Length>
+value (e.g. C<hn>, C<ten>) or number of ticks (if given as C<d###>).
+
+If a B<ppqn> value is not given, we use the MIDI::Simple value of
+C<96> ticks.
 
 =head1 SEE ALSO
 
@@ -336,7 +364,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2021 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

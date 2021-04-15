@@ -36,7 +36,7 @@
    "provides" : {
       "Math::Sidef" : {
          "file" : "lib/Math/Sidef.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "url" : "https://github.com/trizen/Math-Sidef"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -10,8 +10,8 @@ use Types::Serialiser ();
 use XSLoader ();
 
 BEGIN {
-    $VERSION = '0.03';
-    XSLoader::load();
+    $VERSION = '0.04';
+    XSLoader::load( __PACKAGE__, $VERSION );
 }
 
 =encoding utf8

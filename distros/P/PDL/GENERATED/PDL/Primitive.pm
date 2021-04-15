@@ -724,11 +724,6 @@ of the result piddle.  This follows the Matlab usage.
 See L</uniqind> if you need the indices of the unique
 elements rather than the values.
 
-=cut
-
-
-
-
 =for bad
 
 Bad values are not considered unique by uniq and are ignored.
@@ -739,9 +734,6 @@ Bad values are not considered unique by uniq and are ignored.
  [0 3 6 9]
 
 =cut
-
-
-
 
 *uniq = \&PDL::uniq;
 # return unique elements of array
@@ -792,19 +784,11 @@ piddle is lost.
 See L</uniq> if you want the unique values instead of the
 indices.
 
-=cut
-
-
-
-
 =for bad
 
 Bad values are not considered unique by uniqind and are ignored.
 
 =cut
-
-
-
 
 *uniqind = \&PDL::uniqind;
 # return unique elements of array
@@ -865,11 +849,6 @@ See also L</uniq> for a unique list of scalars; and
 L<qsortvec|PDL::Ufunc/qsortvec> for sorting a list of vectors
 lexicographcally.
 
-=cut
-
-
-
-
 =for bad
 
 If a vector contains all bad values, it is ignored as in L</uniq>.
@@ -878,11 +857,7 @@ example, [1 2 BAD] and [BAD 2 3] could be returned, but [BAD BAD BAD]
 could not.  Vectors containing BAD values will be returned after any
 non-NaN and non-BAD containing vectors, followed by the NaN vectors.
 
-
 =cut
-
-
-
 
 sub PDL::uniqvec {
 
@@ -1030,11 +1005,6 @@ Clip (threshold) a piddle by (optional) upper or lower bounds.
 
  $y = $x->clip(0,3);
  $c = $x->clip(undef, $x);
-
-=cut
-
-
-
 
 =for bad
 
@@ -1274,19 +1244,12 @@ calculated considering the entire input PDL as a single sample, rather
 than as a collection of rows. See L</statsover> for definitions of the
 returned quantities.
 
-=cut
-
-
-
-
 =for bad
 
 Bad values are handled; if all input values are bad, then all of the output
 values are flagged bad.
 
 =cut
-
-
 
 *stats	  = \&PDL::stats;
 sub PDL::stats {

@@ -11,7 +11,7 @@ if (defined $PDL::Config{WITH_HDF} && $PDL::Config{WITH_HDF}==0) {
 }
 
 if (defined $PDL::Config{WITH_HDF} && $PDL::Config{WITH_HDF}==1) {
-    print "Will forcibly try and build PDL::IO::HDF on this system\n";
+    print "Will try and build PDL::IO::HDF on this system\n";
     $forcebuild=1;
 }
 
@@ -35,7 +35,6 @@ if ($msg ne "" && $forcebuild==0) {
     $PDL::Config{WITH_HDF}=0;
 } else {
     $PDL::Config{WITH_HDF}=1;
-    print "Building PDL::IO::HDF. Turn off WITH_HDF if there are any problems\n";
 }
 
 return if $donot;
@@ -50,5 +49,5 @@ WriteMakefile(
         COMPRESS => 'gzip',
         SUFFIX => 'gz',
     },
-    (eval ($ExtUtils::MakeMaker::VERSION) >= 6.57_02 ? ('NO_MYMETA' => 1) : ()),
+    NO_MYMETA => 1,
 );

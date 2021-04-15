@@ -1,5 +1,5 @@
 BEGIN {
-  $tests = 31;
+  $tests = 32;
   if ($ENV{'WITH_CRC64'}) {
     $tests=$tests+2;
   }
@@ -22,11 +22,11 @@ ENDEV
 }
 
 use Digest::CRC qw(crc64 crc32 crc16 crcccitt crc8 crcopenpgparmor
-                   crc64_hex crc32_hex crc16_hex crcccitt_hex crc8_hex crcopenpgparmor_hex);
+                   crc64_hex crc32_hex crc16_hex crcsaej1850 crcccitt_hex crc8_hex crcopenpgparmor_hex);
 ok(1, 'use');
 
 my $input = "123456789";
-my ($crc32,$crc16,$crcccitt,$crc8) = (crc32($input),crc16($input),crcccitt($input),crc8($input));
+my ($crc32,$crc16,$crcsaej1850,$crcccitt,$crc8) = (crc32($input),crc16($input),crcsaej1850($input),crcccitt($input),crc8($input));
 
 if ($ENV{'WITH_CRC64'}) {
   my $crc64 = crc64($input);
@@ -42,6 +42,7 @@ $crc32=$crc32^0xffffffff;
 ok(crc32($input.join('', 
                  map {chr(($crc32>>(8*$_))&0xff)} (0,1,2,3))) == 0xffffffff,
    'crc32 Nulltest');
+ok($crcsaej1850 == 75, 'crcsaej1850'); 
 ok($crcccitt == 10673, 'crcccitt'); 
 ok($crc16 == 47933, 'crc16'); 
 ok($crc8 == 244, 'crc8'); 
@@ -58,7 +59,7 @@ open(F,"<README")||die "Cannot open README";
 $ctx->addfile(F);
 close(F);
 my $y = $ctx->digest;
-ok($y == 4009136024, 'OO crc32 with addfile '.$y); 
+ok($y == 2682625271, 'OO crc32 with addfile '.$y); 
 
 # start at offset >0 with previous checksum result
 $ctx = Digest::CRC->new(type=>"crc32",cont=>1,init=>460478609); 
@@ -68,7 +69,7 @@ seek(F,989,Fcntl::SEEK_SET);
 $ctx->addfile(F);
 close(F);
 $y = $ctx->digest;
-ok($y == 2371909219, 'OO crc32 with init and addfile '.$y); 
+ok($y == 2316035660, 'OO crc32 with init and addfile '.$y); 
 
 $ctx = Digest::CRC->new(type=>"crcccitt"); 
 $ctx->add($input);

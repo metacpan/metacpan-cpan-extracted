@@ -1,9 +1,9 @@
 package Text::ANSI::WideUtil;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-19'; # DATE
+our $DATE = '2021-01-23'; # DATE
 our $DIST = 'Text-ANSI-WideUtil'; # DIST
-our $VERSION = '0.230'; # VERSION
+our $VERSION = '0.231'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -43,7 +43,7 @@ Text::ANSI::WideUtil - Routines for text containing ANSI color codes (wide-chara
 
 =head1 VERSION
 
-This document describes version 0.230 of Text::ANSI::WideUtil (from Perl distribution Text-ANSI-WideUtil), released on 2020-05-19.
+This document describes version 0.231 of Text::ANSI::WideUtil (from Perl distribution Text-ANSI-WideUtil), released on 2021-01-23.
 
 =head1 SYNOPSIS
 
@@ -147,7 +147,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-ANSI-WideUtil>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-ANSI-WideUtil>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-ANSI-WideUtil/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -156,7 +156,7 @@ feature.
 =head1 SEE ALSO
 
 L<Text::ANSI::Util>, L<Text::WideChar::Util>, L<Text::NonWideChar::Util>,
-L<Text::Wrap>
+L<Text::Wrap>, L<String::Pad>
 
 L<http://en.wikipedia.org/wiki/ANSI_escape_code>
 
@@ -169,7 +169,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'         => 'PDL::Doc',
-    'VERSION_FROM' => '../Basic/Core/Version.pm',
+    'VERSION_FROM' => '../Basic/PDL.pm',
     'LIBS'         => [''],   # e.g., '-lm'
     'DEFINE'       => '',     # e.g., '-DHAVE_SOMETHING'
     'INC'          => '',     # e.g., '-I/usr/include/other'
@@ -15,7 +15,7 @@ WriteMakefile(
 			},
     'PL_FILES'     => {q[Doc$(DFSEP)Config.pm.PL]=>q[Doc$(DFSEP)Config.pm]},
      'clean'       => { 'FILES' => q[Doc/Config.pm] },
-    (eval ($ExtUtils::MakeMaker::VERSION) >= 6.57_02 ? ('NO_MYMETA' => 1) : ()),
+    NO_MYMETA => 1,
 );
 
 package MY;

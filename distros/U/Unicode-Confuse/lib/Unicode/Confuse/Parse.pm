@@ -9,7 +9,7 @@ use utf8;
 use Carp;
 use File::Slurper 'read_text';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # A code point
 my $cp = qr!([0-9A-F]{4,5})\s+!;

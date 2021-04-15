@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Syntax/Keyword/Match.pm
+lib/Syntax/Keyword/Match.xs
+MANIFEST			This list of files
+t/00use.t
+t/01match-numeq.t
+t/01match-streq.t
+t/10context.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

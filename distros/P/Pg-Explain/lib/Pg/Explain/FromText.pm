@@ -27,11 +27,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =cut
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 =head1 SYNOPSIS
 
@@ -136,6 +136,8 @@ sub parse_source {
                             )
                         \) }xms;
 
+    my $query        = '';
+    my $plan_started = 0;
     LINE:
     for my $line ( @lines ) {
 
@@ -169,6 +171,8 @@ sub parse_source {
                )
            )
         {
+            $plan_started = 1;
+
             my $new_node = Pg::Explain::Node->new( %+ );
             $new_node->explain( $self->explain );
             if ( defined $+{ 'never_executed' } ) {
@@ -215,7 +219,6 @@ sub parse_source {
                 my $msg = "Bad subelement-type in previous_element - this shouldn't happen - please contact author.\n";
                 croak( $msg );
             }
-
         }
         elsif ( $line =~ m{ \A (\s*) ((?:Sub|Init)Plan) \s* (?: \d+ \s* )? \s* (?: \( returns .* \) \s* )? \z }xms ) {
             my ( $prefix, $type ) = ( $1, $2 );
@@ -284,6 +287,13 @@ sub parse_source {
             $in_jit = 1;
             $jit    = [ $line ];
         }
+        elsif ( $line =~ m{ \A \s* Query \s+ Text: \s+ ( .* ) \z }xms ) {
+            $query        = $1;
+            $plan_started = 0;
+        }
+        elsif ( $plan_started == 0 ) {
+            $query = "$query\n$line";
+        }
         elsif ( $line =~ m{ \A (\s*) ( \S .* \S ) \s* \z }xms ) {
             my ( $infoprefix, $info ) = ( $1, $2 );
             if ( $in_jit ) {
@@ -301,6 +311,7 @@ sub parse_source {
         }
     }
     $self->explain->jit( Pg::Explain::JIT->new( 'lines' => $jit ) ) if defined $jit;
+    $self->explain->query( $query ) if $query;
     return $top_node;
 }
 

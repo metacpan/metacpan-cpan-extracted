@@ -171,10 +171,7 @@ sub report ($$) { print $_[1] if $::PP_VERBOSE; }
 #
 sub new {
     my $class = shift;
-
-    my $self = {};
-    bless $self, $class;
-
+    my $self = bless {}, $class;
     my $usage = "Usage: PDL::PP::Rule->new(\$targets[,\$conditions[,\$doc],] [,\$ref])\n";
 
     # handle arguments
@@ -320,7 +317,7 @@ sub apply {
     my @args = $self->extract_args($pars);
 
     # Run this rule's subroutine:
-    my @retval = $self->{ref}(@args);
+    my @retval = $ref->(@args);
 
     # Check for any inconsistencies:
     confess "Internal error: rule '$self' returned " . (1+$#retval)
@@ -359,9 +356,7 @@ our @CARP_NOT;
 sub new {
     croak('Usage: PDL::PP::Ruel::Croak->new(["incompatible", "arguments"], "Croaking message")')
 		unless @_ == 3;
-    my $class = shift;
-    my $self  = $class->SUPER::new([], @_);
-    return bless $self, $class;
+    shift->SUPER::new([], @_);
 }
 
 sub apply {
@@ -384,18 +379,12 @@ our @ISA = qw (PDL::PP::Rule);
 #
 sub new {
     my $class = shift;
-
     my $value = pop;
-
-    my @args  = @_;
-    my $self  = $class->SUPER::new(@args);
-    bless $self, $class;
+    my $self  = $class->SUPER::new(@_);
     $self->{"returns.value"} = $value;
-
     my $targets = $self->{targets};
     croak "There can only be 1 target for a $self, not " . (1+$#$targets) . "!"
       unless $#$targets == 0;
-
     return $self;
 }
 
@@ -428,11 +417,7 @@ use strict;
 our @ISA = qw (PDL::PP::Rule::Returns);
 
 sub new {
-    my $class = shift;
-    my @args  = @_;
-    my $self  = $class->SUPER::new(@args,0);
-    bless $self, $class;
-    return $self;
+    shift->SUPER::new(@_,0);
 }
 
 package PDL::PP::Rule::Returns::One;
@@ -443,11 +428,7 @@ use strict;
 our @ISA = qw (PDL::PP::Rule::Returns);
 
 sub new {
-    my $class = shift;
-    my @args  = @_;
-    my $self  = $class->SUPER::new(@args,1);
-    bless $self, $class;
-    return $self;
+    shift->SUPER::new(@_,1);
 }
 
 package PDL::PP::Rule::Returns::EmptyString;
@@ -458,11 +439,7 @@ use strict;
 our @ISA = qw (PDL::PP::Rule::Returns);
 
 sub new {
-    my $class = shift;
-    my @args  = @_;
-    my $self  = $class->SUPER::new(@args,"");
-    bless $self, $class;
-    return $self;
+    shift->SUPER::new(@_,"");
 }
 
 package PDL::PP::Rule::Returns::NULL;
@@ -473,11 +450,7 @@ use strict;
 our @ISA = qw (PDL::PP::Rule::Returns);
 
 sub new {
-    my $class = shift;
-    my @args  = @_;
-    my $self  = $class->SUPER::new(@args,"NULL");
-    bless $self, $class;
-    return $self;
+    shift->SUPER::new(@_,"NULL");
 }
 
 package PDL::PP::Rule::InsertName;
@@ -500,7 +473,6 @@ sub new {
 
     my @args  = @_;
     my $self  = $class->SUPER::new(@args);
-    bless $self, $class;
     $self->{"insertname.value"} = $value;
 
     # Generate a defaul doc string
@@ -607,11 +579,8 @@ sub new {
     die "\$target must be a scalar for PDL::PP::Rule->Substitute" if ref $target;
     die "\$condition must be a scalar for PDL::PP::Rule->Substitute" if ref $condition;
 
-    my $self = $class->SUPER::new($target, [$condition, "NewXSSymTab", "Name"],
+    $class->SUPER::new($target, [$condition, "NewXSSymTab", "Name"],
 				  \&dosubst_private);
-    bless $self, $class;
-
-    return $self;
 }
 
 # Poor name. This is the old "dousualsubsts" routine
@@ -652,16 +621,6 @@ my @std_childparent = (
 );
 
 sub get_std_childparent { return @std_childparent; }
-
-sub new {
-    my $class = shift;
-
-    my @args = @_;
-    my $self = $class->SUPER::new(@args);
-    bless $self, $class;
-
-    return $self;
-}
 
 # We modify the arguments from the conditions to include the
 # extra information
@@ -752,7 +711,6 @@ sub new {
 
     my $self = $class->SUPER::new($target, $condition,
 				  \&subst_makecomp_private);
-    bless $self, $class;
     $self->{"makecomp.value"} = $symbol;
 
     return $self;
@@ -987,10 +945,6 @@ END {
 
 use Carp;
 our @CARP_NOT;
-
-# check for bad value support
-use PDL::Config;
-my $bvalflag = $PDL::Config{WITH_BADVAL} || 0;
 
 my $ntypes = $#PDL::Types::names;
 
@@ -1290,7 +1244,6 @@ sub pp_def {
 	my($name,%obj) = @_;
 
 	print "*** Entering pp_def for $name\n" if $::PP_VERBOSE;
-	
 	# See if the 'name' is multiline, in which case we extract the
 	# name and add the FullDoc field
 	if ($name =~ /\n/) {
@@ -1308,11 +1261,13 @@ sub pp_def {
 		}
 		$obj{FullDoc} = $fulldoc;
 	}
-	
 	$obj{Name} = $name;
-	translate(\%obj,$PDL::PP::deftbl);
-
-	print "Output of translate for $name:\n" . Dumper(\%obj) . "\n"
+	croak("ERROR: pp_def=$name given empty GenericTypes!\n")
+	  if exists $obj{GenericTypes} and !@{ $obj{GenericTypes} || [] };
+	foreach my $rule (@$PDL::PP::deftbl) {
+	    $rule->apply(\%obj);
+	}
+	print "Result of translate for $name:\n" . Dumper(\%obj) . "\n"
 	  if exists $obj{Dump} and $obj{Dump} and $::PP_VERBOSE;
 
 	croak("ERROR: No FreeFunc for pp_def=$name!\n")
@@ -2168,7 +2123,6 @@ sub get_badstate {
 #
 sub findbadstatus {
     my ( $badflag, $badcode, $xsargs, $parobjs, $optypes, $symtab, $name ) = @_;
-    return '' unless $bvalflag;
 
     return PDL::PP::pp_line_numbers(__LINE__, $badcode) if defined $badcode;
 
@@ -2248,8 +2202,6 @@ sub findbadstatus {
 #
 sub copybadstatus {
     my ( $badflag, $badcode, $xsargs, $parobjs, $symtab ) = @_;
-##    return '' unless $bvalflag or $badflag == 0;
-    return '' unless $bvalflag;
 
     if (defined $badcode) {
 	# realised in 2.4.3 testing that use of $PRIV at this stage is
@@ -2450,9 +2402,6 @@ sub GenDocs {
   return '' if $doc eq '' && (!defined $doc) && $doc==undef;
   return '' if $doc =~ /^\s*internal\s*$/i;
 
-  # remove any 'bad' documentation if we're not compiling support
-  $baddoc = undef unless $bvalflag;
-
   # If the doc string is one line let's have to for the
   # reference card information as well
   my @splitRes; # temp split variable to get rid of
@@ -2583,7 +2532,7 @@ sub find_datatype {
     # TODO XXX
     #  the check can probably be removed, but left in since I don't know
     #  what I'm doing (DJB)
-    die "ERROR: gentypes != $ntypes with p2child\n"
+    confess "ERROR: gentypes (@$gentypes) != $ntypes with p2child\n"
 	if $hasp2child and $#$gentypes != $ntypes;
 
     return "$dtype = $$parnames[0]\->datatype;\n\$PRIV(has_badvalue) = $$parnames[0]\->has_badvalue;\n\$PRIV(badvalue) = $$parnames[0]\->badvalue;\n"
@@ -2927,7 +2876,7 @@ $PDL::PP::deftbl =
    #
    PDL::PP::Rule->new("BadFlag", "_HandleBad",
 		      "Sets BadFlag based upon HandleBad key and PDL's ability to handle bad values",
-		      sub { return (defined $_[0]) ? ($bvalflag and $_[0]) : undef; }),
+		      sub { return (defined $_[0]) ? ($_[0]) : undef; }),
 
    ####################
    # FullDoc Handling #
@@ -2967,7 +2916,6 @@ $PDL::PP::deftbl =
    PDL::PP::Rule->new("BadDoc", ["BadFlag","Name","_CopyBadStatusCode"],
               'Sets the default documentation for handling of bad values',
       sub {
-         return undef unless $bvalflag;
          my ( $bf, $name, $code ) = @_;
          my $str;
          if ( not defined($bf) ) {
@@ -2994,16 +2942,10 @@ $PDL::PP::deftbl =
    # the docs
    PDL::PP::Rule->new("PdlDoc", "FullDoc", sub {
          my $fulldoc = shift;
-         
-         # Remove bad documentation if bad values are not supported
-         $fulldoc =~ s/=for bad\n\n.*?\n\n//s unless $bvalflag;
-         
          # Append a final cut if it doesn't exist due to heredoc shinanigans
          $fulldoc .= "\n\n=cut\n" unless $fulldoc =~ /\n=cut\n*$/;
-         
          # Make sure the =head1 FUNCTIONS section gets added
          $::DOCUMENTED++;
-         
          return $fulldoc;
       }
    ),
@@ -3198,9 +3140,9 @@ $PDL::PP::deftbl =
 ## rule)
 ##
 ##    PDL::PP::Rule->new("CacheBadFlagInitNS", "_HandleBad",
-##		      sub { return $bvalflag ? "\n  int \$BADFLAGCACHE() = 0;\n" : ""; }),
+##		      sub { return "\n  int \$BADFLAGCACHE() = 0;\n"; }),
     PDL::PP::Rule->new("CacheBadFlagInitNS",
-		      sub { PDL::PP::pp_line_numbers(__LINE__, $bvalflag ? "\n  int \$BADFLAGCACHE() = 0;\n" : "") }),
+		      sub { PDL::PP::pp_line_numbers(__LINE__, "\n  int \$BADFLAGCACHE() = 0;\n") }),
 # The next rule, if done in place of the above, causes Ops.xs to fail to compile
 #    PDL::PP::Rule->new("CacheBadFlagInitNS", "BadFlag",
 #		      sub { return $_[0] ? "\n  int \$BADFLAGCACHE() = 0;\n" : ""; }),
@@ -3523,17 +3465,4 @@ sub printtrans {
 	}
 }
 
-sub translate {
-    my ($pars,$tbl) = @_;
-
-    foreach my $rule (@$tbl) {
-	$rule->apply($pars);
-    }
-
-#	print Dumper($pars);
-    print "GOING OUT!\n" if $::PP_VERBOSE;
-    return $pars;
-} # sub: translate()
-
-## End
-#
+1;

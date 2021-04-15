@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Lite;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-30'; # DATE
+our $DATE = '2021-04-15'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.903'; # VERSION
+our $VERSION = '1.904'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
@@ -371,6 +371,8 @@ sub hook_format_result {
     if ($fmt eq 'html+datatables') {
         $fmt = 'text-pretty';
         $ENV{VIEW_RESULT} //= 1;
+        no warnings 'once';
+        $Perinci::CmdLine::Base::tempfile_opt_suffix = '.html';
         $ENV{FORMAT_PRETTY_TABLE_BACKEND} //= 'Text::Table::HTML::DataTables';
     }
 
@@ -653,7 +655,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.903 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-01-30.
+This document describes version 1.904 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2021-04-15.
 
 =head1 SYNOPSIS
 
@@ -854,7 +856,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

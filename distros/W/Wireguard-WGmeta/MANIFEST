@@ -43,6 +43,7 @@ t/test_data/mini_wg1.conf
 t/test_data/not_a_wg_config.conf
 t/test_data/wg_show_dump
 t/wrapper_test.t
+t/wrapper_custom_attrs.t
 VERSION
 wg-meta_completions.sh
 META.yml                                 Module YAML meta-data (added by MakeMaker)

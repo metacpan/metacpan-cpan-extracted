@@ -13,8 +13,8 @@ Unicode::Confuse - Identify and replace Unicode confusables
 
 =head1 VERSION
 
-This documents version 0.02 of Unicode-Confuse
-corresponding to L<git commit 94f8d8c093e8895fcab012e35f47c4d0a6ff2eb5|https://github.com/benkasminbullock/unicode-confuse/commit/94f8d8c093e8895fcab012e35f47c4d0a6ff2eb5> released on Wed Apr 14 16:47:56 2021 +0900.
+This documents version 0.03 of Unicode-Confuse
+corresponding to L<git commit a5b1eee3cc6e892e7e08bb2d0530b6bfd87017eb|https://github.com/benkasminbullock/unicode-confuse/commit/a5b1eee3cc6e892e7e08bb2d0530b6bfd87017eb> released on Thu Apr 15 09:11:48 2021 +0900.
 
 =head1 DESCRIPTION
 

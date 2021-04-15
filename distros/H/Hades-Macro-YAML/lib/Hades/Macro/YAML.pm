@@ -2,7 +2,7 @@ package Hades::Macro::YAML;
 use strict;
 use warnings;
 use base qw/Hades::Macro/;
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 our ( $YAML_CLASS, $CLASS_LOADED );
 
 BEGIN {
@@ -711,6 +711,45 @@ Quick summary of what the module does:
 	});
 
 	... generates ...
+
+	package Kosmos;
+	use strict;
+	use warnings;
+	use YAML::XS;
+	our $VERSION = 0.01;
+
+	sub new {
+		my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
+		my $self      = bless {}, $cls;
+		my %accessors = ();
+		for my $accessor ( keys %accessors ) {
+			my $param
+			    = defined $args{$accessor}
+			    ? $args{$accessor}
+			    : $accessors{$accessor}->{default};
+			my $value
+			    = $self->$accessor( $accessors{$accessor}->{builder}
+				? $accessors{$accessor}->{builder}->( $self, $param )
+				: $param );
+			unless ( !$accessors{$accessor}->{required} || defined $value ) {
+				die "$accessor accessor is required";
+			}
+		}
+		return $self;
+	}
+
+	sub geras {
+		my ( $self, $file ) = @_;
+		$file = defined $file ? $file : 'path/to/file.yml';
+		if ( !defined($file) || ref $file ) {
+			$file = defined $file ? $file : 'undef';
+			die qq{Str: invalid value $file for variable \$file in method geras};
+		}
+
+		LoadFile($file);
+	}
+
+	1;
 
 =head1 SUBROUTINES/METHODS
 

@@ -1,5 +1,9 @@
 Revision history for Geo::ShapeFile.
 
+3.01 2021-04-15
+    - The type_is method now handles both string and numeric codes.
+      Thanks to @poslfit for reporting (GH#26). 
+
 3.00 2019-05-11
     - Release version handles unicode file names on Windows
 

@@ -1365,18 +1365,11 @@ See the documentation for L</average> for more information.
 
  $x = avg($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *avg = \&PDL::avg;
 sub PDL::avg {
@@ -1399,18 +1392,11 @@ See the documentation for L</sumover> for more information.
 
  $x = sum($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *sum = \&PDL::sum;
 sub PDL::sum {
@@ -1433,18 +1419,11 @@ See the documentation for L</prodover> for more information.
 
  $x = prod($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *prod = \&PDL::prod;
 sub PDL::prod {
@@ -1467,18 +1446,11 @@ See the documentation for L</daverage> for more information.
 
  $x = davg($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *davg = \&PDL::davg;
 sub PDL::davg {
@@ -1501,18 +1473,11 @@ See the documentation for L</dsumover> for more information.
 
  $x = dsum($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *dsum = \&PDL::dsum;
 sub PDL::dsum {
@@ -1535,18 +1500,11 @@ See the documentation for L</dprodover> for more information.
 
  $x = dprod($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *dprod = \&PDL::dprod;
 sub PDL::dprod {
@@ -1569,18 +1527,11 @@ See the documentation for L</zcover> for more information.
 
  $x = zcheck($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *zcheck = \&PDL::zcheck;
 sub PDL::zcheck {
@@ -1603,18 +1554,11 @@ See the documentation for L</andover> for more information.
 
  $x = and($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *and = \&PDL::and;
 sub PDL::and {
@@ -1637,18 +1581,11 @@ See the documentation for L</bandover> for more information.
 
  $x = band($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *band = \&PDL::band;
 sub PDL::band {
@@ -1671,18 +1608,11 @@ See the documentation for L</orover> for more information.
 
  $x = or($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *or = \&PDL::or;
 sub PDL::or {
@@ -1705,18 +1635,11 @@ See the documentation for L</borover> for more information.
 
  $x = bor($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *bor = \&PDL::bor;
 sub PDL::bor {
@@ -1739,18 +1662,11 @@ See the documentation for L</minimum> for more information.
 
  $x = min($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *min = \&PDL::min;
 sub PDL::min {
@@ -1773,18 +1689,11 @@ See the documentation for L</maximum> for more information.
 
  $x = max($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *max = \&PDL::max;
 sub PDL::max {
@@ -1807,18 +1716,11 @@ See the documentation for L</medover> for more information.
 
  $x = median($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *median = \&PDL::median;
 sub PDL::median {
@@ -1841,18 +1743,11 @@ See the documentation for L</modeover> for more information.
 
  $x = mode($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *mode = \&PDL::mode;
 sub PDL::mode {
@@ -1875,18 +1770,11 @@ See the documentation for L</oddmedover> for more information.
 
  $x = oddmedian($data);
 
-=cut
-
-
-
 =for bad
 
 This routine handles bad values.
 
 =cut
-
-
-
 
 *oddmedian = \&PDL::oddmedian;
 sub PDL::oddmedian {
@@ -1909,18 +1797,12 @@ Useful in conditional expressions:
 
  if (any $x>15) { print "some values are greater than 15\n" }
 
-=cut
-
-
-
 =for bad
 
 See L</or> for comments on what happens when all elements
 in the check are bad.
 
 =cut
-
-
 
 *any = \&or;
 *PDL::any = \&PDL::or;
@@ -1937,10 +1819,6 @@ Useful in conditional expressions:
 
  if (all $x>15) { print "all values are greater than 15\n" }
 
-=cut
-
-
-
 =for bad
 
 See L</and> for comments on what happens when all elements
@@ -1948,14 +1826,8 @@ in the check are bad.
 
 =cut
 
-
-
-
 *all = \&and;
 *PDL::all = \&PDL::and;
-
-
-
 
 =head2 minmax
 

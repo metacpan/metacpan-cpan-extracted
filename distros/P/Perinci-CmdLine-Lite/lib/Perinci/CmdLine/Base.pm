@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Base;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-30'; # DATE
+our $DATE = '2021-04-15'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.903'; # VERSION
+our $VERSION = '1.904'; # VERSION
 
 use 5.010001;
 use strict;
@@ -436,6 +436,8 @@ _
 # plugin stuffs
 our @Plugin_Instances;
 our %Handlers; # key=event name, val=[ [$label, $prio, $handler, $epoch], ... ]
+
+our $tempfile_opt_suffix = '';
 
 my $r;
 
@@ -1706,7 +1708,9 @@ sub select_output_handle {
             $r->{viewer} = $viewer;
             require File::Temp;
             my $filename;
-            ($handle, $filename) = File::Temp::tempfile();
+            ($handle, $filename) = File::Temp::tempfile(
+                SUFFIX => $tempfile_opt_suffix,
+            );
             $r->{viewer_temp_path} = $filename;
         }
 
@@ -2113,7 +2117,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.903 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-01-30.
+This document describes version 1.904 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2021-04-15.
 
 =head1 DESCRIPTION
 
@@ -3246,7 +3250,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-CmdLine-Lite/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

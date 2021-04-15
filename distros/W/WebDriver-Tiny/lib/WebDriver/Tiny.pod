@@ -451,9 +451,13 @@ The following sets the current window's size and position, returning C<$self> to
 
 L<Selenium::Remote::Driver>
 
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to James Raspass for the original design and implementation.
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2018 CV-Library Ltd.
+Copyright © 2018-2021 CV-Library Ltd.
 
 This is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.

@@ -8,6 +8,7 @@ t/00-load.t
 t/05-base.t
 t/10-shared.t
 t/15-interval.t
+t/16-once.t
 t/20-restart.t
 t/25-start.t
 t/30-status.t

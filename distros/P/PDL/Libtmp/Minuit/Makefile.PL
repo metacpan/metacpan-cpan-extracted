@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use Config;
+use ExtUtils::MakeMaker::Config;
 use version;
 
 # This mess sorts out the Fortran availability
@@ -17,12 +17,12 @@ my $f77;
 my @minuitfiles;
 
 if (defined $PDL::Config{WITH_MINUIT} && $PDL::Config{WITH_MINUIT}==0) {
-  $msg = "\n   Will skip build of PDL::Minuit on this system   \n";
+  $msg = "Will skip build of PDL::Minuit on this system\n";
   goto skip;
 }
 
 if (defined $PDL::Config{WITH_MINUIT} && $PDL::Config{WITH_MINUIT}==1) {
-  print "\n   Will forcibly try and build PDL::Minuit on this system   \n\n";
+  print "Will try and build PDL::Minuit on this system\n";
   $forcebuild = 1;
 }
 
@@ -41,7 +41,6 @@ if (exists $PDL::Config{F77CONF} && -f $PDL::Config{F77CONF}) {
     goto skip unless $forcebuild;
   } else {
     $f77 = 'ExtUtils::F77';
-    print "(ExtUtils Version $ExtUtils::F77::VERSION)\n";
     if ($ExtUtils::F77::VERSION < 1.03 ) {
       $msg = "Need a version of ExtUtils::F77 >= 1.03. Ought not build PDL::Minuit\n" ;
       goto skip unless $forcebuild;
@@ -63,7 +62,6 @@ if ($msg ne "" && !$forcebuild) {
   $PDL::Config{WITH_MINUIT} = 0;
   $donot = 1;
 } else {
-  print "Building PDL::Minuit. Turn off WITH_MINUIT if there are any problems\n";
   $PDL::Config{WITH_MINUIT} = 1;
 }
 
@@ -73,12 +71,10 @@ my @pack = (["minuit.pd", qw(Minuit PDL::Minuit)]);
 
 if (defined($PDL::Config{MINUIT_LIB})){
     # If libraries are specified, just need to build futils
-    print "Using compiled CERN library: ".$PDL::Config{MINUIT_LIB}."...\n";
     @minuitfiles = ("futils");
 }
 else{
     # Otherwise, we need to build the Minuit library as well
-    print "Stand alone Minuit library will be built...\n";
     @minuitfiles = ("futils", "minuit", "intracfalse");
 }
    
@@ -125,8 +121,8 @@ $hash{DEFINE} .= $f77->trail_ ? "" : "-DNO_TRAILING_USCORE";
 ###       $hash{MYEXTLIB} .= (" ".$PDL::Config{MINUIT_LIB}." ");
 ###   }
 ###   else{
-###       $hash{MYEXTLIB} .= " ./minuitlib/libminuit$Config::Config{lib_ext} ";
-###       $hash{clean}{FILES} .= " ./minuitlib/libminuit$Config::Config{lib_ext} ";
+###       $hash{MYEXTLIB} .= " ./minuitlib/libminuit$Config{lib_ext} ";
+###       $hash{clean}{FILES} .= " ./minuitlib/libminuit$Config{lib_ext} ";
 ###   }
 ### }
 
@@ -147,7 +143,7 @@ minuitlib/$_\$(OBJ_EXT): minuitlib/$_.f
 
 	if (!defined($PDL::Config{MINUIT_LIB})){
           my $libbuild;
-          if($Config::Config{cc} eq 'cl') {
+          if($Config{cc} eq 'cl') {
             $libbuild = "
 
 minuitlib/libminuit\$(LIB_EXT): minuitlib/minuit\$(OBJ_EXT) minuitlib/intracfalse\$(OBJ_EXT)

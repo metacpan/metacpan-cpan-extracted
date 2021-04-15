@@ -19,7 +19,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Import::Export' => '0.04',
-		'Array::Merge::Unique' => '0.02',
+	'Array::Merge::Unique' => '1.00',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Regex-Range-Number-*' },

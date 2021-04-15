@@ -11,6 +11,7 @@ use_ok 'MIDI::Util', qw(
     set_chan_patch
     set_time_sig
     setup_score
+    dura_size
 );
 
 my $score;
@@ -79,5 +80,10 @@ is $x->[-1], 'raw_data', 'nontext_meta_events';
 
 my @notes = midi_format('C','C#','Db','D'); # C, Cs, Df, D
 is_deeply \@notes, [qw/C Cs Df D/], 'midi_format';
+
+is dura_size('qn'), 1, 'dura_size';
+is dura_size('wn'), 4, 'dura_size';
+is dura_size('d96'), 1, 'dura_size';
+is dura_size('d384'), 4, 'dura_size';
 
 done_testing();

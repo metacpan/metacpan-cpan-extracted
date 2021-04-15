@@ -37,7 +37,7 @@
 %type <opval> unary_op binary_op num_comparison_op str_comparison_op isa logical_op
 %type <opval> call_sub opt_vaarg
 %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
-%type <opval> deref ref assign inc dec allow
+%type <opval> deref ref assign inc dec allow refop
 %type <opval> new array_init
 %type <opval> my_var var
 %type <opval> expression opt_expressions expressions opt_expression case_statements
@@ -54,7 +54,7 @@
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
 %left <opval> MULTIPLY DIVIDE REMAINDER
-%right <opval> LOGICAL_NOT BIT_NOT '@' REF DEREF PLUS MINUS CONVERT SCALAR LENGTH ISWEAK REFCNT
+%right <opval> LOGICAL_NOT BIT_NOT '@' CREATE_REF DEREF PLUS MINUS CONVERT SCALAR LENGTH ISWEAK REFCNT REFOP
 %nonassoc <opval> INC DEC
 %left <opval> ARROW
 
@@ -708,6 +708,7 @@ expression
   | assign
   | inc
   | dec
+  | refop
   | '(' expressions ')'
     {
       if ($2->id == SPVM_OP_C_ID_LIST) {
@@ -735,6 +736,12 @@ refcnt
   : REFCNT var
     {
       $$ = SPVM_OP_build_refcnt(compiler, $1, $2);
+    }
+
+refop
+  : REFOP expression
+    {
+      $$ = SPVM_OP_build_refop(compiler, $1, $2);
     }
 
 expressions
@@ -1088,9 +1095,9 @@ deref
     }
 
 ref
-  : REF var
+  : CREATE_REF var
     {
-      SPVM_OP* op_ref = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_REF, $1->file, $1->line);
+      SPVM_OP* op_ref = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CREATE_REF, $1->file, $1->line);
       $$ = SPVM_OP_build_ref(compiler, op_ref, $2);
     }
 

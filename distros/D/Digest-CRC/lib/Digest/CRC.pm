@@ -8,7 +8,7 @@ require Exporter;
 @ISA = qw(Exporter);
 
 @EXPORT_OK = qw(
- crc8 crcccitt crc16 crcopenpgparmor crc32 crc64 crc
+ crc8 crcsaej1850 crcccitt crc16 crcopenpgparmor crc32 crc64 crc
  crc_hex crc_base64
  crcccitt_hex crcccitt_base64
  crc8_hex crc8_base64
@@ -18,7 +18,7 @@ require Exporter;
  crc64_hex crc64_base64
 );
 
-$VERSION    = '0.22';
+$VERSION    = '0.23';
 $XS_VERSION = $VERSION;
 #$VERSION    = eval $VERSION;
 
@@ -125,6 +125,7 @@ ENOXS
 %_typedef = (
 # name,  [width,init,xorout,refout,poly,refin,cont);
   crc8 => [8,0,0,0,0x07,0,0],
+  crcsaej1850 => [8,0xff,0xff,0,0x1D,0,0],
   crcccitt => [16,0xffff,0,0,0x1021,0,0],
   crc16 => [16,0,0,1,0x8005,1,0],
   crcopenpgparmor => [24,0xB704CE,0,0,0x864CFB,0,0],
@@ -285,6 +286,11 @@ sub _cont {
 # poly: 07, width: 8, init: 00, revin: no, revout: no, xorout: no
 
 sub crc8 { _cont($_[0],$_[1],@{$_typedef{crc8}}) }
+
+# CRC-SAE-J1850 standard
+# poly: 1D, width: 8, init: ff, refin: no, refout: no, xorout: FF
+
+sub crcsaej1850 { _cont($_[0],$_[1],@{$_typedef{crcsaej1850}}) }
 
 # CRC-CCITT standard
 # poly: 1021, width: 16, init: ffff, refin: no, refout: no, xorout: no

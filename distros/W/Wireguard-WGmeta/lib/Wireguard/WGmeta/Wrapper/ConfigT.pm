@@ -32,7 +32,7 @@ when the config file on disk is newer than the current (parsed) one. So keep in 
  # thread/process A (alias 'A' is overwritten by 'B')
  wg_metaT->disable_by_alias('wg0', 'A'); # throws exception `invalid alias`!
 
-For more details about the reloading behaviour please refer to L</_may_reload_from_disk([$interface = undef])>.
+For more details about the reloading behaviour please refer to L</may_reload_from_disk([$interface = undef])>.
 
 B<Commit behaviour>
 
@@ -115,7 +115,7 @@ use constant FALSE => 0;
 use constant TRUE => 1;
 use constant INTEGRITY_HASH_SALT => 'wefnwioefh9032ur3';
 
-our $VERSION = "0.2.2"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.2.3"; # do not change manually, this variable is updated when calling make
 
 =head3 is_valid_interface($interface)
 
@@ -127,13 +127,19 @@ sub is_valid_interface($self, $interface) {
     return $self->SUPER::is_valid_interface($interface);
 }
 
+
+sub is_valid_alias($self, $interface, $alias){
+    $self->may_reload_from_disk($interface);
+    return $self->SUPER::is_valid_alias($interface, $alias);
+}
+
 =head3 is_valid_identifier($interface, $identifier)
 
 L<Wireguard::WGmeta::Wrapper::Config/is_valid_identifier($interface, $identifier)>
 
 =cut
 sub is_valid_identifier($self, $interface, $identifier) {
-    $self->_may_reload_from_disk($interface);
+    $self->may_reload_from_disk($interface);
     return $self->SUPER::is_valid_identifier($interface, $identifier);
 }
 
@@ -143,7 +149,7 @@ L<Wireguard::WGmeta::Wrapper::Config/translate_alias($interface, $alias)>
 
 =cut
 sub translate_alias($self, $interface, $alias) {
-    $self->_may_reload_from_disk($interface);
+    $self->may_reload_from_disk($interface);
     return $self->SUPER::translate_alias($interface, $alias);
 }
 
@@ -153,7 +159,7 @@ L<Wireguard::WGmeta::Wrapper::Config/try_translate_alias($interface, $may_alias)
 
 =cut
 sub try_translate_alias($self, $interface, $may_alias) {
-    $self->_may_reload_from_disk($interface);
+    $self->may_reload_from_disk($interface);
     return $self->SUPER::try_translate_alias($interface, $may_alias);
 }
 
@@ -163,7 +169,7 @@ L<Wireguard::WGmeta::Wrapper::Config/get_interface_section($interface, $identifi
 
 =cut
 sub get_interface_section($self, $interface, $identifier) {
-    $self->_may_reload_from_disk($interface);
+    $self->may_reload_from_disk($interface);
     if (exists $self->{parsed_config}{$interface}{$identifier}) {
         my %r = %{$self->{parsed_config}{$interface}{$identifier}};
         return %r;
@@ -179,7 +185,7 @@ L<Wireguard::WGmeta::Wrapper::Config/get_section_list($interface)>
 
 =cut
 sub get_section_list($self, $interface) {
-    $self->_may_reload_from_disk($interface);
+    $self->may_reload_from_disk($interface);
     return $self->SUPER::get_section_list($interface);
 }
 
@@ -189,7 +195,7 @@ L<Wireguard::WGmeta::Wrapper::Config/get_peer_count([$interface = undef])>
 
 =cut
 sub get_peer_count($self, $interface = undef) {
-    $self->_may_reload_from_disk($interface);
+    $self->may_reload_from_disk($interface);
     return $self->SUPER::get_peer_count($interface);
 }
 
@@ -199,7 +205,7 @@ L<Wireguard::WGmeta::Wrapper::Config/get_interface_fqdn($interface)>
 
 =cut
 sub get_interface_fqdn($self, $interface) {
-    $self->_may_reload_from_disk($interface);
+    $self->may_reload_from_disk($interface);
     return $self->SUPER::get_interface_fqdn($interface);
 }
 
@@ -219,7 +225,7 @@ L<Wireguard::WGmeta::Wrapper::Config/get_interface_list()>
 =cut
 sub get_interface_list($self) {
     $self->_scan_for_new_interfaces();
-    $self->_may_reload_from_disk();
+    # $self->may_reload_from_disk();
     return sort keys %{$self->{parsed_config}};
 }
 
@@ -267,10 +273,12 @@ sub commit($self, $is_hot_config = FALSE, $plain = FALSE, $ref_hash_integrity_ke
         if ($self->_has_changed($interface_name)) {
             my $file_name;
             if ($is_hot_config == TRUE) {
-                $file_name = $self->{parsed_config}{$interface_name}{config_path};
+                $file_name = $self->{wireguard_home} . $interface_name . '.conf';
+                $self->{parsed_config}->{$interface_name}{is_hot_config} = 1;
             }
             else {
-                $file_name = $self->{parsed_config}{$interface_name}{config_path} . '_not_applied';
+                $file_name = $self->{wireguard_home} . $interface_name . $self->{not_applied_suffix};
+                $self->{parsed_config}->{$interface_name}{is_hot_config} = 0;
             }
             my $on_disk_config = undef;
             my $is_new = undef;
@@ -278,17 +286,17 @@ sub commit($self, $is_hot_config = FALSE, $plain = FALSE, $ref_hash_integrity_ke
             # --- From here we lock the affected configuration file exclusively ----
             my $fh;
             # check if interface exists - if not, we have a new interface
-            if (-e $self->{parsed_config}{$interface_name}{config_path}) {
+            if (-e $file_name) {
 
                 # in this case open the file for RW
-                open $fh, '+<', $self->{parsed_config}{$interface_name}{config_path};
+                open $fh, '+<', $file_name or die "Could not open $file_name: $!";
                 flock $fh, LOCK_EX;
                 my $config_contents = read_file($fh, TRUE);
                 $on_disk_config = parse_wg_config($config_contents, $interface_name, $self->{wg_meta_prefix}, $self->{wg_meta_disabled_prefix});
                 seek $fh, 0, 0;
             }
             else {
-                open $fh, '>', $self->{parsed_config}{$interface_name}{config_path};
+                open $fh, '>', $file_name;
                 flock $fh, LOCK_EX;
                 $is_new = 1;
             }
@@ -302,9 +310,11 @@ sub commit($self, $is_hot_config = FALSE, $plain = FALSE, $ref_hash_integrity_ke
             # write down to file
             truncate $fh, 0;
             print $fh $new_config;
-            $self->{parsed_config}{$interface_name}{mtime} = get_mtime($self->{parsed_config}{$interface_name}{config_path});
+            $self->{parsed_config}{$interface_name}{mtime} = get_mtime($file_name);
             $self->{n_conf_files}++ if (defined $is_new);
             $self->_reset_changed($interface_name);
+            # Notify listeners about a file change
+            $self->_call_reload_listeners($interface_name);
             close $fh;
         }
     }
@@ -427,7 +437,7 @@ sub _create_section($self, $section_data) {
     return $new_config;
 }
 
-=head3 _may_reload_from_disk([$interface = undef])
+=head3 may_reload_from_disk([$interface = undef])
 
 This method is called before any data is returned from one of the C<get_*()> methods. It behaves as follows:
 
@@ -466,31 +476,31 @@ B<Returns>
 None
 
 =cut
-sub _may_reload_from_disk($self, $interface = undef) {
-    unless (defined $interface) {
-        for my $known_interface (keys %{$self->{parsed_config}}) {
-            # my $s = $self->_get_my_mtime($known_interface);
-            # my $t = get_mtime($self->{parsed_config}{$known_interface}{config_path});
-            if ($self->_get_my_mtime($known_interface) < get_mtime($self->{parsed_config}{$known_interface}{config_path})) {
-                $self->reload_from_disk($known_interface);
-            }
-        }
-    }
-    elsif (exists $self->{parsed_config}{$interface}) {
-        # my $s = $self->_get_my_mtime($interface);
-        # my $t = get_mtime($self->{parsed_config}{$interface}{config_path});
-        if ($self->_get_my_mtime($interface) < get_mtime($self->{parsed_config}{$interface}{config_path})) {
-            $self->reload_from_disk($interface);
-        }
-    }
-    else {
-        # we may have a new interface added in the meantime so we probe if there is actually a config file first
-        if (-e $self->{wireguard_home} . $interface . '.conf') {
-            $self->reload_from_disk($interface, TRUE);
-        }
-    }
-
-}
+# sub may_reload_from_disk($self, $interface = undef) {
+#     unless (defined $interface) {
+#         for my $known_interface (keys %{$self->{parsed_config}}) {
+#             # my $s = $self->_get_my_mtime($known_interface);
+#             # my $t = get_mtime($self->{parsed_config}{$known_interface}{config_path});
+#             if ($self->_get_my_mtime($known_interface) < get_mtime($self->{parsed_config}{$known_interface}{config_path})) {
+#                 $self->may_reload_from_disk($known_interface);
+#             }
+#         }
+#     }
+#     elsif (exists $self->{parsed_config}{$interface}) {
+#         # my $s = $self->_get_my_mtime($interface);
+#         # my $t = get_mtime($self->{parsed_config}{$interface}{config_path});
+#         if ($self->_get_my_mtime($interface) < get_mtime($self->{parsed_config}{$interface}{config_path})) {
+#             $self->may_reload_from_disk($interface);
+#         }
+#     }
+#     else {
+#         # we may have a new interface added in the meantime so we probe if there is actually a config file first
+#         if (-e $self->{wireguard_home} . $interface . '.conf') {
+#             $self->may_reload_from_disk($interface, TRUE);
+#         }
+#     }
+#
+# }
 
 sub _get_my_mtime($self, $interface) {
     if (exists $self->{parsed_config}{$interface}) {
@@ -502,21 +512,27 @@ sub _get_my_mtime($self, $interface) {
 }
 
 sub _is_latest_data($self, $interface) {
-    my $conf_path = $self->{wireguard_home} . $interface . ".conf";
-    my $t = $self->_get_my_mtime($interface);
-    my $s = get_mtime($conf_path);
-    return $self->_get_my_mtime($interface) ge get_mtime($conf_path);
+    my $hot_path = $self->{wireguard_home} . $interface . ".conf";
+    my $safe_path = $self->{wireguard_home} . $interface . $self->{not_applied_suffix};
+    if (-e $safe_path) {
+        return $self->_get_my_mtime($interface) ge get_mtime($hot_path) || $self->_get_my_mtime($interface) ge get_mtime($safe_path);
+    }
+    # my $t = $self->_get_my_mtime($interface);
+    # my $s = get_mtime($conf_path);
+    return $self->_get_my_mtime($interface) ge get_mtime($hot_path);
 }
 
 sub _scan_for_new_interfaces($self) {
-    # check if theres maybe a new interface by comparing the file counts
+    # check if there's maybe a new interface by comparing the file counts
     my ($conf_files, $count) = _get_all_conf_files($self->{wireguard_home});
     if ($self->{n_conf_files} != $count) {
         for my $conf_path (@{$conf_files}) {
             # read interface name
             my $i_name = basename($conf_path);
             $i_name =~ s/\.conf$//;
-            $self->_may_reload_from_disk($i_name);
+            unless (exists $self->{parsed_config}{$i_name}) {
+                $self->may_reload_from_disk($i_name, TRUE);
+            }
         }
     }
 }
@@ -540,7 +556,7 @@ Calculates the sha1 from a section (already parsed).
 B<Caveat>
 
 It is possible that this method does not return the most recent, on-disk version of this section! It returns your current
-parsed state! This method does NOT trigger a C<_may_reload_from_disk()>!
+parsed state! This method does NOT trigger a C<may_reload_from_disk()>!
 
 B<Parameters>
 

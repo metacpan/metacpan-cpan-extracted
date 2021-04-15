@@ -1,0 +1,11 @@
+lib/See.pm
+README
+Changes
+META.yml
+META.json
+Makefile.PL
+pmake.bat
+MANIFEST
+LICENSE
+CONTRIBUTING
+t/9001_podtest.t

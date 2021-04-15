@@ -75,6 +75,7 @@ our @EXPORT = qw(
     ATTR_TYPE_IS_UNKNOWN
     get_attr_config
     decide_attr_type
+    register_custom_attribute
 );
 
 =head1 ATTRIBUTE SETS
@@ -104,7 +105,7 @@ use constant WG_META_DEFAULT => {
         'in_config_name' => 'Disabled',
         'validator'      => \&accept_any
     },
-    'fqdn'    => {
+    'fqdn'        => {
         'in_config_name' => 'FQDN',
         'validator'      => \&accept_any
     }
@@ -112,18 +113,7 @@ use constant WG_META_DEFAULT => {
 
 =head3 WG_META_ADDITIONAL
 
-Define your custom attributes here in the following format (the wg meta prefix can be omitted here):
-
-    'attribute-name-in-lower-case-and-separated-by-dashes' => {
-        'in_config_name' => 'Pretty name as it appear in config',
-        'validator'      => <function-reference to validator function>
-    },
-    'other-attributes' => {
-        'in_config_name' => 'Other name'
-        'validator'      => <function-reference to validator function>,
-    }
-
-Validator functions can be defined in L<Wireguard::WGmeta::Validator>
+Use L</register_custom_attribute($ref_attr_config)> to register your own attributes
 
 =cut
 use constant WG_META_ADDITIONAL => {};
@@ -340,6 +330,54 @@ sub decide_attr_type($attr_name, $allow_unknown = FALSE) {
             die "Attribute `$attr_name` is not known";
         }
     }
+}
+
+=head3 register_custom_attribute($ref_attr_config)
+
+Register your custom attribute names.
+
+B<Parameters>
+
+=over 1
+
+=item
+
+C<$ref_attr_config> A reference to your attribute description. Expected to be in the following format:
+
+    {
+        'in_config_name' => 'in_config_attr_name',
+        'validator'      => 'Function reference to a validator function'
+    },
+
+For the validator function you can either create your own or use one defined in L<Wireguard::WGmeta::Validator>
+
+=back
+
+B<Raises>
+
+Exception if C<$ref_attr_config> is malformed
+
+B<Returns>
+
+1 on success, undef if the attribute is already defined
+
+=cut
+sub register_custom_attribute($attr_key, $ref_attr_config) {
+    unless (decide_attr_type($attr_key, TRUE) != ATTR_TYPE_IS_UNKNOWN) {
+        if (exists $ref_attr_config->{in_config_name} && exists $ref_attr_config->{validator}) {
+            WG_META_ADDITIONAL->{$attr_key} = $ref_attr_config;
+            # update mappings
+            INVERSE_ATTR_TYPE_MAPPING->{$attr_key} = ATTR_TYPE_IS_WG_META_CUSTOM;
+            NAME_2_KEYS_MAPPING->{$ref_attr_config->{in_config_name}} = $attr_key;
+        }
+        else {
+            die "Malformed attribute config";
+        }
+    }
+    else {
+        return undef;
+    }
+    return 1;
 }
 
 1;

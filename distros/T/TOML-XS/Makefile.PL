@@ -45,6 +45,7 @@ WriteMakefile(
 
     PREREQ_PM => {
         'Types::Serialiser' => 0,
+        'XSLoader' => 0,
     },
 
     TEST_REQUIRES => {

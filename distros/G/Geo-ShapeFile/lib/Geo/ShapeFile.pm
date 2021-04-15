@@ -13,7 +13,7 @@ use Tree::R;
 use constant ON_WINDOWS => ($^O eq 'MSWin32');
 use if ON_WINDOWS, 'Win32::LongPath';
 
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 
 my $little_endian_sys = unpack 'b', (pack 'S', 1 );
 
@@ -275,6 +275,10 @@ sub _read_shx_shp_header {
 sub type_is {
     my $self = shift;
     my $type = shift;
+
+    #  numeric code    
+    return $self->shape_type == $type
+      if ($type =~ /^[0-9]+$/);
 
     return (lc $self->type($self->shape_type)) eq (lc $type);
 }
@@ -955,10 +959,13 @@ If specified then data will not be cached in memory and the system will
 read from disk each time you access a shape.
 It will save memory for large files, though.
 
-=item type_is ($numeric_type)
+=item type_is ($type)
 
 Returns true if the major type of this data file is the same as the type
 passed to type_is().
+
+The $type argument can be either the numeric code (see L</shape_type>),
+or the string code (see L</shape_type_text>).
 
 =item get_dbf_record ($record_index)
 

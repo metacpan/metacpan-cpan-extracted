@@ -1259,7 +1259,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       }
       case '\\':
         compiler->bufptr++;
-        return REF;
+        return CREATE_REF;
       default:
         // Variable
         if (ch == '$') {
@@ -1918,7 +1918,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 break;
               case 'r' :
-                if (strcmp(keyword, "refcnt") == 0) {
+                if (strcmp(keyword, "ref") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_REFOP);
+                  return REFOP;
+                }
+                else if (strcmp(keyword, "refcnt") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_REFCNT);
                   return REFCNT;
                 }

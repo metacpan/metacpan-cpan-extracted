@@ -1,10 +1,10 @@
 {
    "abstract" : "Selenium 2.0 bindings for Perl",
    "author" : [
-      "James Raspass <j.raspass@cv-library.co.uk>"
+      "CV-Library Ltd. <cvlibrary@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -38,6 +38,7 @@
             "MIME::Base64" : "0",
             "charnames" : "0",
             "feature" : "0",
+            "overload" : "0",
             "perl" : "5.020",
             "warnings" : "0"
          }
@@ -54,11 +55,11 @@
    "provides" : {
       "WebDriver::Tiny" : {
          "file" : "lib/WebDriver/Tiny.pm",
-         "version" : "0.103"
+         "version" : "0.105"
       },
       "WebDriver::Tiny::Elements" : {
          "file" : "lib/WebDriver/Tiny/Elements.pm",
-         "version" : "0.103"
+         "version" : "0.105"
       }
    },
    "release_status" : "stable",
@@ -72,9 +73,9 @@
          "web" : "https://github.com/cv-library/WebDriver-Tiny"
       }
    },
-   "version" : "0.103",
-   "x_generated_by_perl" : "v5.26.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237",
+   "version" : "0.105",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

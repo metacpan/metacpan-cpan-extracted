@@ -451,7 +451,7 @@ my $libsarg = $libs || $malloclib ? "$libs $malloclib " : ''; # for Win32
  return (
  	%::PDL_OPTIONS,
 	 'NAME'  	=> $mod,
-	 'VERSION_FROM' => "$w/Basic/Core/Version.pm",
+	 'VERSION_FROM' => "$w/Basic/PDL.pm",
 	 'TYPEMAPS'     => [&PDL_TYPEMAP()],
 	 'OBJECT'       => "$pref\$(OBJ_EXT)",
 	 PM 	=> {"$pref.pm" => "\$(INST_LIBDIR)/$pref.pm"},
@@ -459,7 +459,7 @@ my $libsarg = $libs || $malloclib ? "$libs $malloclib " : ''; # for Win32
 	 'INC'          => &PDL_INCLUDE()." $inc $mallocinc",
 	 'LIBS'         => $libsarg ? [$libsarg] : [],
 	 'clean'        => {'FILES'  => "$pref.xs $pref.pm $pref\$(OBJ_EXT) $pref.c"},
-     (eval ($ExtUtils::MakeMaker::VERSION) >= 6.57_02 ? ('NO_MYMETA' => 1) : ()),
+	 NO_MYMETA => 1,
  );
 }
 
@@ -479,7 +479,7 @@ sub pdlpp_stdargs {
 	 'LIBS'         => $libs ? ["$libs "] : [],
 	 'clean'        => {'FILES'  => "$pref.xs $pref.pm $pref\$(OBJ_EXT) $pref.c"},
 	 'dist'         => {'PREOP'  => '$(PERL) "-I$(INST_ARCHLIB)" "-I$(INST_LIB)" -MPDL::Core::Dev -e pdlpp_mkgen $(DISTVNAME)' },
-     (eval ($ExtUtils::MakeMaker::VERSION) >= 6.57_02 ? ('NO_MYMETA' => 1) : ()),
+	 NO_MYMETA => 1,
  );
 }
 
@@ -677,13 +677,7 @@ sub trylink {
   my $HIDE = !$hide ? '' : '>/dev/null 2>&1';
   if($^O =~ /mswin32/i) {$HIDE = '>NUL 2>&1'}
 
-  my $tempd;
-
-  $tempd = File::Temp::tempdir(CLEANUP=>1) || die "trylink: could not make TEMPDIR";
-  ### if($^O =~ /MSWin32/i) {$tempd = File::Spec->tmpdir()}
-  ### else {
-  ###    $tempd = $PDL::Config{TEMPDIR} ||
-  ### }
+  my $tempd = File::Temp::tempdir(CLEANUP=>1) || die "trylink: could not make temp dir";
 
   my ($tc,$te) = map {&$cfile($tempd,"testfile$_")} ('.c','');
   open FILE,">$tc" or die "trylink: couldn't open testfile `$tc' for writing, $!";
@@ -758,7 +752,6 @@ my %flags = (
     dimschgd => { FLAG => "PARENTDIMSCHANGED" },
     tracedebug => { FLAG => "TRACEDEBUG", set => 1},
 );
-#if ( $bvalflag ) { $flags{baddata} = { set => 1, FLAG => "BADVAL" }; }
 
 sub generate_core_flags {
     # access (read, if set is true then write as well; if postset true then
@@ -857,7 +850,7 @@ sub got_complex_version {
     $got_complex_cache{$name} = Devel::CheckLib::check_lib(
         lib => 'm',
         header => 'complex.h',
-        function => sprintf('double num; num = creal(c%s(%s));', $name, $args),
+        function => sprintf('double num; num = creal(c%s(%s)); return 0;', $name, $args),
     );
 }
 

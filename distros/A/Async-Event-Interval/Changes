@@ -1,5 +1,10 @@
 Revision history for Fork-Event-Interval
 
+1.01    2021-04-14
+        - If interval is set to zero, we'll run only once
+        - Added IPC::Shareable as prerequisite
+        - Added waiting(), checks to see if an event is ready to start/restart
+
 1.00    2018-01-23
         - modified t/15-interval.t with some timing changes to prevent CPAN
           Testers failures

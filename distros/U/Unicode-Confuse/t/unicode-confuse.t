@@ -17,6 +17,9 @@ use Unicode::Confuse ':all';
 ok (confusable ('Æ'), "Æ is confusable");
 is (canonical ('Æ'), 'AE', "Got canonical form for Æ");
 
+ok (confusable ('㈝'), "㈝ is confusable");
+is (canonical ('㈝'), '(오전)', "Got canonical form for ㈝");
+
 done_testing ();
 
 # Local variables:

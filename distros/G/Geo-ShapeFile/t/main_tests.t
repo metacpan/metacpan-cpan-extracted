@@ -48,6 +48,8 @@ sub main {
     test_angle_to();
 
     test_shape_indexing();
+    
+    test_type();
 
     done_testing;
     return 0;
@@ -679,3 +681,14 @@ sub test_shape_indexing {
     }
 }
 
+sub test_type {
+    my $poly_file = "$dir/poly_to_check_index";    
+    my $shp = Geo::ShapeFile->new ($poly_file);
+    
+    ok !$shp->type_is(200), 'invalid numeric type returns false';
+    ok !$shp->type_is(5.2), 'floating point numeric type returns false';
+    ok $shp->type_is(5), 'valid numeric type returns true';
+    ok $shp->type_is('polygon'), 'valid text type returns true';
+    ok $shp->type_is('PolygoN'), 'text type is case insensitive';
+    
+}

@@ -7,7 +7,7 @@ use warnings;
 
 use Exporter;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Sidef;
 use Math::AnyNum;
@@ -82,21 +82,28 @@ sub _pack_value {
                   : $sidef_number->new($_)
             } @args;
 
-            my $r = &{$sidef_number . '::' . $name}(@args);
+            my @r = &{$sidef_number . '::' . $name}(@args);
 
-            if (ref($r // return undef) eq $sidef_number) {
-                return Math::AnyNum->new($$r);
+            if (scalar(@r) == 1) {
+
+                my $r = $r[0];
+
+                if (ref($r // return undef) eq $sidef_number) {
+                    return Math::AnyNum->new($$r);
+                }
+
+                if (ref($r) eq $sidef_bool) {
+                    return $$r;
+                }
+
+                if (ref($r) eq $sidef_array) {
+                    return map { ref($r) eq $sidef_number ? Math::AnyNum->new($$_) : _unpack_value($_) } @$r;
+                }
+
+                return _unpack_value($r);
             }
 
-            if (ref($r) eq $sidef_bool) {
-                return $$r;
-            }
-
-            if (ref($r) eq $sidef_array) {
-                return map { ref($r) eq $sidef_number ? Math::AnyNum->new($$_) : _unpack_value($_) } @$r;
-            }
-
-            return _unpack_value($r);
+            map { _unpack_value($_) } @r;
         };
     }
 }
@@ -172,7 +179,7 @@ Daniel "Trizen" Șuteu, E<lt>trizen@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2020 by Daniel "Trizen" Șuteu
+Copyright (C) 2021 by Daniel "Trizen" Șuteu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.32.0 or,

@@ -178,6 +178,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "BREAK",
     "WARN",
     "PRINT",
+    "REFOP",
   };
   
   return id_names;
@@ -1161,7 +1162,7 @@ SPVM_OP* SPVM_OP_get_target_op_var(SPVM_COMPILER* compiler, SPVM_OP* op) {
   else if (op->id == SPVM_OP_C_ID_SEQUENCE) {
     op_var = SPVM_OP_get_target_op_var(compiler, op->last);
   }
-  else if (op->id == SPVM_OP_C_ID_REF) {
+  else if (op->id == SPVM_OP_C_ID_CREATE_REF) {
     op_var = SPVM_OP_get_target_op_var(compiler, op->first);
   }
   else if (op->id == SPVM_OP_C_ID_DEREF) {
@@ -1255,11 +1256,6 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_ISWEAK_FIELD:
     {
       SPVM_OP* op_type = SPVM_OP_new_op_int_type(compiler, op->file, op->line);
-      type = op_type->uv.type;
-      break;
-    }
-    case SPVM_OP_C_ID_CONCAT: {
-      SPVM_OP* op_type = SPVM_OP_new_op_string_type(compiler, op->file, op->line);
       type = op_type->uv.type;
       break;
     }
@@ -1370,7 +1366,10 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
       }
       break;
     }
-    case SPVM_OP_C_ID_EXCEPTION_VAR: {
+    case SPVM_OP_C_ID_CONCAT:
+    case SPVM_OP_C_ID_REFOP:
+    case SPVM_OP_C_ID_EXCEPTION_VAR:
+    {
       SPVM_OP* op_type = SPVM_OP_new_op_string_type(compiler, op->file, op->line);
       type = op_type->uv.type;
       break;
@@ -1412,7 +1411,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
       type = field->type;
       break;
     }
-    case SPVM_OP_C_ID_REF: {
+    case SPVM_OP_C_ID_CREATE_REF: {
       SPVM_TYPE* term_type = SPVM_OP_get_type(compiler, op->first);
       assert(term_type->dimension == 0);
       switch (term_type->basic_type->id) {
@@ -3011,6 +3010,13 @@ SPVM_OP* SPVM_OP_build_refcnt(SPVM_COMPILER* compiler, SPVM_OP* op_refcnt, SPVM_
   SPVM_OP_insert_child(compiler, op_refcnt, op_refcnt->last, op_term);
   
   return op_refcnt;
+}
+
+SPVM_OP* SPVM_OP_build_refop(SPVM_COMPILER* compiler, SPVM_OP* op_refop, SPVM_OP* op_term) {
+  
+  SPVM_OP_insert_child(compiler, op_refop, op_refop->last, op_term);
+  
+  return op_refop;
 }
 
 SPVM_OP* SPVM_OP_build_die(SPVM_COMPILER* compiler, SPVM_OP* op_die, SPVM_OP* op_term) {

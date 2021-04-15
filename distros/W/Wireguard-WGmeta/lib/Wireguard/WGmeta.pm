@@ -8,7 +8,7 @@ An approach to add metadata to the main wireguard config, written in Perl.
 
 =head1 UNDER THE HOOD
 
-Unlike similar projects, this toolkit is not not dependent on any other storage system, metadata is stored dirctly inside the corresponding
+Unlike similar projects, this toolkit is not not dependent on any other storage system, metadata is stored directly inside the corresponding
 C<wgXX.conf> file (Metadata is prefixed with C<#+>):
 
 	[Interface]
@@ -66,6 +66,6 @@ use strict;
 use warnings FATAL => 'all';
 package Wireguard::WGmeta;
 
-our $VERSION = "0.2.2"; # Do not change manually
+our $VERSION = "0.2.3"; # Do not change manually
 
 1;

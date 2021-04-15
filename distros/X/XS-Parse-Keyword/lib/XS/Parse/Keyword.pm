@@ -1,0 +1,321 @@
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+
+package XS::Parse::Keyword 0.01;
+
+use v5.14;
+use warnings;
+
+require XSLoader;
+XSLoader::load( __PACKAGE__, our $VERSION );
+
+=head1 NAME
+
+C<XS::Parse::Keyword> - XS functions to assist in parsing keyword syntax
+
+=head1 DESCRIPTION
+
+This module provides some XS functions to assist in writing syntax modules
+that provide new perl-visible syntax, primarily for authors of keyword plugins
+using the C<PL_keyword_plugin> hook mechanism. It is unlikely to be of much
+use to anyone else; and highly unlikely to be any use when writing perl code
+using these. Unless you are writing a keyword plugin using XS, this module is
+not for you.
+
+This module is also currently experimental, and the design is still evolving
+and subject to change. Later versions may break ABI compatibility, requiring
+changes or at least a rebuild of any module that depends on it.
+
+=head1 XS FUNCTIONS
+
+=head2 boot_xs_parse_keyword
+
+   void boot_xs_parse_keyword(double ver);
+
+Call this function from your C<BOOT> section in order to initialise the module
+and parsing hooks.
+
+I<ver> should either be 0 or a decimal number for the module version
+requirement; e.g.
+
+   boot_xs_parse_keyword(0.01);
+
+=head2 register_xs_parse_keyword
+
+   void register_xs_parse_keyword(const char *keyword,
+     const struct XSParseKeywordHooks *hooks, void *hookdata);
+
+This function installs a set of parsing hooks to be associated with the given
+keyword. Such a keyword will then be handled automatically by a keyword parser
+installed by C<XS::Parse::Keyword> itself.
+
+=head1 PARSE HOOKS
+
+The C<XSParseKeywordHooks> structure provides the following hook stages, which
+are invoked in the given order.
+
+=head2 The C<permit> Stage
+
+   const char *permit_hintkey;
+   bool (*permit) (pTHX_ void *hookdata);
+
+Called by the installed keyword parser hook which is used to handle keywords
+registered by L</register_xs_parse_keyword>. This hook stage should inspect
+whether the keyword is permitted at this time and return true only if the
+keyword is permitted.
+
+As a shortcut for the common case, the C<permit_hintkey> may point to a string
+to look up from the hints hash. If the given key name is not found in the
+hints hash then the keyword is not permitted. If the key is present then the
+C<permit> function is invoked as normal.
+
+=head2 The C<check> Stage
+
+   void (*check)(pTHX_ void *hookdata);
+
+Invoked once the keyword has been permitted. If present, this hook function
+can check the surrounding lexical context, state, or other information and
+throw an exception if it is unhappy that the keyword should apply in this
+position.
+
+=head2 The C<parse> Stage
+
+This stage is invoked once the keyword has been checked, and actually
+parses the incoming text into an optree. It is implemented by calling the
+B<first> of the following function pointers which is not NULL. The invoked
+function may optionally build an optree to represent the parsed syntax, and
+place it into the variable addressed by C<out>. If it does not, then a simple
+C<OP_NULL> will be constructed in its place.
+
+C<lex_read_space()> is called both before and after this stage is invoked, so
+in many simple cases the hook function itself does not need to bother with it.
+
+   int (*parse)(pTHX_ OP **out, void *hookdata);
+
+If present, this should consume text from the parser buffer by invoking
+C<lex_*> or C<parse_*> functions and eventually return a C<KEYWORD_PLUGIN_*>
+result value.
+
+This is the most generic and powerful of the options, but requires the most
+amount of implementation work.
+
+   int (*build)(pTHX_ OP **out, XSParseKeywordPiece *args, size_t npieces, void *hookdata);
+
+If C<parse> is not present, this is called instead after parsing a sequence of
+arguments, of types given by the I<pieces> field; which should be a zero-
+terminated array of piece types.
+
+This alternative is somewhat less generic and powerful than providing C<parse>
+yourself, but involves much less parsing work and is shorter and easier to
+implement.
+
+   int (*build1)(pTHX_ OP **out, XSParseKeywordPiece arg0, void *hookdata);
+
+If neither C<parse> nor C<build> are present, this is called as a simpler
+variant of C<build> when only a single argument is required. It takes its type
+from the C<piece1> field instead.
+
+=head1 PIECES AND PIECE TYPES
+
+When using the C<build> or C<build1> alternatives for the C<parse> phase, the
+actual syntax is parsed automatically by this module, according to the
+specification given by the I<pieces> or I<piece1> field. The result of that
+parsing step is placed into the I<args> or I<arg0> parameter to the invoked
+function, using a C<union> type consisting of the following fields:
+
+   typedef union {
+      OP *op;
+      CV *cv;
+      SV *sv;
+      int i;
+   } XSParseKeywordPiece;
+
+Which field is set depends on the type of the piece.
+
+Some piece types are "atomic", whose definition is self-contained. Others are
+structural, defined in terms of inner pieces. Together these form an entire
+tree-shaped definition of the syntax that the keyword expects to find.
+
+Atomic types generally provide exactly one argument into the list of I<args>
+(with the exception of literal matches, which do not provide anything).
+Structural types may provide an initial argument themselves, followed by a
+list of the values of each sub-piece they contained inside them. Thus, while
+the data structure defining the syntax shape is a tree, the argument values it
+parses into is passed as a flat array to the C<build> function.
+
+Some structural types need to be able to determine whether or not syntax
+relating some optional part of them is present in the incoming source text. In
+this case, the pieces relating to those optional parts must support "probing".
+This ability is also noted below.
+
+The type of each piece should be one of the following macro values:
+
+=head2 XPK_BLOCK
+
+I<atomic, emits op.>
+
+A brace-delimited block of code is expected, passed as an optree in the I<op>
+field. This will be parsed as a block within the current function scope.
+
+=head2 XPK_ANONSUB
+
+I<atomic, emits op.>
+
+A brace-delimited block of code is expected, and assembled into the body of a
+new anonymous subroutine. This will be passed as a protosub CV in the I<cv>
+field.
+
+=head2 XPK_TERMEXPR
+
+I<atomic, emits op.>
+
+A term expression is expected, parsed using C<parse_termexpr()>, and passed as
+an optree in the I<op> field.
+
+=head2 XPK_LISTEXPR
+
+I<atomic, emits op.>
+
+A list expression is expected, parsed using C<parse_listexpr()>, and passed as
+an optree in the I<op> field.
+
+=head2 XPK_IDENT
+
+I<atomic, emits sv.>
+
+A bareword identifier name is expected, and passed as an SV containing a PV
+in the I<sv> field.
+
+=head2 XPK_PACKAGENAME
+
+I<atomic, emits sv.>
+
+A bareword package name is expected, and passed as an SV containing a PV in
+the I<sv> field.
+
+=head2 XPK_COLON
+
+I<atomic, emits nothing.>
+
+A literal colon character (C<:>) is expected. An argument is not passed here.
+
+=head2 XPK_STRING
+
+I<atomic, can probe, emits nothing.>
+
+   XPK_STRING("literal")
+
+A literal string match is expected. An argument is not passed here.
+
+This form should generally be avoided if at all possible, because it is very
+easy to abuse to make syntaxes which confuse humans and code tools alike.
+Generally it is best reserved just for the first component of a
+C<XPK_REPEATED> sequence, to provide a "secondary keyword" that such a
+repeated item can look out for.
+
+=head2 XPK_OPTIONAL
+
+I<structural, emits i.>
+
+   XPK_OPTIONAL(pieces ...)
+
+A structural type which may expects to find its contained pieces, or is happy
+not to. This will pass an argument whose I<i> field contains either 1 or 0,
+depending whether the contents were found. The first piece type within must
+support probe.
+
+=head2 XPK_REPEATED
+
+I<structural, emits i.>
+
+   XPK_REPEATED(pieces ...)
+
+A structural type which expects to find zero or more repeats of its contained
+pieces. This will pass an argument whose I<i> field contains the count of the
+number of repeats it found. The first piece type within must support probe.
+
+=head2 XPK_CHOICE
+
+I<structural, emits i.>
+
+   XPK_CHOICE(choices ...)
+
+A structural type which expects to find one of a number of alternative
+choices. An ordered list of alternatives is provided, all of which must
+support probe. This will pass an argument whose I<i> field gives the index of
+the first choice that was accepted.
+
+It is not an error if no choice matches. At that point, the I<i> field will be
+set to -1.
+
+If you require a failure message in this case, set the final choice to be of
+type C<XPK_FAILURE>. This will cause an error message to be printed instead.
+
+   XPK_FAILURE("message string")
+
+=head2 XPK_TAGGEDCHOICE
+
+I<structural, emits i.>
+
+   XPK_TAGGEDCHOICE(choice, tag, ...)
+
+A structural type similar to C<XPK_CHOICE>, except that each choice type is
+followed by an element of type C<XPK_TAG> which gives an integer. It is that
+integer value, rather than the positional index of the choice within the list,
+which is passed in the I<i> field.
+
+=head2 XPK_PARENSCOPE
+
+I<structural, emits nothing.>
+
+   XPK_PARENSCOPE(pieces ...)
+
+A structural type which expects to find a sequence of pieces, all contained in
+parentheses as C<( ... )>. This will pass no extra arguments.
+
+=head2 XPK_BRACKETSCOPE
+
+I<structural, emits nothing.>
+
+   XPK_BRACKETSCOPE(pieces ...)
+
+A structural type which expects to find a sequence of pieces, all contained in
+square brackets as C<[ ... ]>. This will pass no extra arguments.
+
+=head2 XPK_BRACESCOPE
+
+I<structural, emits nothing.>
+
+   XPK_BRACESCOPE(pieces ...)
+
+A structural type which expects to find a sequence of pieces, all contained in
+braces as C<{ ... }>. This will pass no extra arguments.
+
+Note that this is not necessary to use with C<XPK_BLOCK> or C<XPK_ANONSUB>;
+those will already consume a set of braces. This is intended for special
+constrained syntax that should not just accept an arbitrary block.
+
+=head2 XPK_CHEVRONSCOPE
+
+I<structural, emits nothing.>
+
+   XPK_CHEVRONSCOPE(pieces ...)
+
+A structural type which expects to find a sequence of pieces, all contained in
+angle brackets as C<< < ... > >>. This will pass no extra arguments.
+
+Remember that expressions like C<< a > b >> are valid term expressions, so the
+contents of this scope shouldn't allow arbitrary expressions or the closing
+bracket will be ambiguous.
+
+=cut
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
+
+0x55AA;

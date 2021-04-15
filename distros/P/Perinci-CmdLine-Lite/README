@@ -3,8 +3,8 @@ NAME
     framework
 
 VERSION
-    This document describes version 1.903 of Perinci::CmdLine::Lite (from
-    Perl distribution Perinci-CmdLine-Lite), released on 2021-01-30.
+    This document describes version 1.904 of Perinci::CmdLine::Lite (from
+    Perl distribution Perinci-CmdLine-Lite), released on 2021-04-15.
 
 SYNOPSIS
     In "gen-random-num" script:
@@ -185,7 +185,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
+    <https://github.com/perlancar/perl-Perinci-CmdLine-Lite/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

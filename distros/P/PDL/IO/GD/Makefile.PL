@@ -32,13 +32,13 @@ my $forcebuild=0;
 
 if (defined $PDL::Config{$config_flag} && $PDL::Config{$config_flag}==0)
 {
-    $msg = "\n   Will skip build of $package_name on this system   \n";
+    $msg = "Will skip build of $package_name on this system\n";
     goto skip;
 }
 
 if (defined $PDL::Config{$config_flag} && $PDL::Config{$config_flag}==1)
 {
-    print "\n   Will forcibly try and build $package_name on this system   \n\n";
+    print "Will try and build $package_name on this system\n";
     $forcebuild=1;
 }
 
@@ -100,21 +100,17 @@ $donot = 0 if( $forcebuild );
 
 if ( $donot )
 {
-    $msg .= "\n Skipping build of $package_name.\n";
+    $msg .= "Skipping build of $package_name.\n";
 }
 
 skip:
 
-if ($msg ne "" && $forcebuild==0)
-{
+if ($msg ne "" && $forcebuild==0) {
     write_dummy_make( $msg );
     $donot = 1;
     $PDL::Config{$config_flag}=0;
-}
-else
-{
+} else {
     $PDL::Config{$config_flag}=1;
-    print "\n   Building $package_name. Turn off $config_flag if there are any problems\n\n";
 }
 
 return if $donot;

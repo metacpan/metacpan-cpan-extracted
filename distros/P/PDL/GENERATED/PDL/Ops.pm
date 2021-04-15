@@ -22,6 +22,9 @@ use DynaLoader;
 
 
 
+use strict;
+use warnings;
+
 =head1 NAME
 
 PDL::Ops - Fundamental mathematical operators

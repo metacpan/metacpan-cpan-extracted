@@ -40,14 +40,6 @@ sub typeof_PDL_i64 {
     die "Can not find an integer 64 bit type";
 }
 
-my $bvalflag = 0;
-for (@ARGV) {
-  if(/^BADVALS=(.*)$/)
-    {
-      $bvalflag = $1;
-    }
-}
-
 # Data types *must* be listed in order of complexity!!
 # this is critical for type conversions!!!
 #
@@ -345,7 +337,11 @@ our \@EXPORT = qw( $typeexports
 
 print OUT <<'!NO!SUBS!';
 
-our @EXPORT_OK = (@EXPORT, qw/types ppdefs typesrtkeys mapfld typefld/);
+our @EXPORT_OK = (@EXPORT,
+  qw/types typesrtkeys mapfld typefld
+    ppdefs ppdefs_complex
+  /
+);
 our %EXPORT_TAGS = (
 	All=>[@EXPORT,@EXPORT_OK],
 );
@@ -432,14 +428,29 @@ Returns an array of pp symbols for all known types
 
 =for example
 
- pdl> @ppdefs = PDL::Types::ppdefs
- pdl> print @ppdefs;
- B S U L N Q F D
+ pdl> print PDL::Types::ppdefs
+ B S U L N Q F D G C
 
 =cut
 
 my @PPDEFS = map $_->{ppsym}, @HASHES;
 sub ppdefs { @PPDEFS }
+
+=head2 ppdefs_complex
+
+=for ref
+
+Returns an array of pp symbols for all complex types.
+
+=for example
+
+ pdl> print PDL::Types::ppdefs_complex
+ G C
+
+=cut
+
+my @PPDEFS_CPLX = map $_->{ppsym}, grep !$_->{real}, @HASHES;
+sub ppdefs_complex { @PPDEFS_CPLX }
 
 =head2 typefld
 
@@ -616,65 +627,12 @@ See L<badvalue routine in PDL::Bad|PDL::Bad/badvalue> for more details.
 
 =cut
 
-!NO!SUBS!
-
-=pod
-
-You happen to be reading this on CPAN, but if you were reading this on your
-own machine and your PDL did not have support for bad values, you would see
-a small paragraph saying:
-
-=cut
-
-unless ($bvalflag) {
-  print OUT << '!NO!SUBS!';
-
-=pod
-
-You do not have bad value support enabled, so this returns undef.
-
-=cut
-
-!NO!SUBS!
-
-}
-
-
-print OUT <<'!NO!SUBS!';
-
 =item orig_badvalue
 
 The default special numerical value used to represent bad values for this
 type. (You can change the value that represents bad values for each type
 during runtime.) See the
 L<orig_badvalue routine in PDL::Bad|PDL::Bad/orig_badvalue> for more details.
-
-=cut
-
-!NO!SUBS!
-
-=pod
-
-You happen to be reading this on CPAN, but if you were reading this on your
-own machine and your PDL did not have support for bad values, you would see
-a small paragraph saying:
-
-=cut
-
-unless ($bvalflag) {
-  print OUT << '!NO!SUBS!';
-
-=pod
-
-You do not have bad value support enabled, so this returns undef.
-
-=cut
-
-!NO!SUBS!
-  
-}
-
-print OUT <<'!NO!SUBS!';
 
 =back
 
@@ -725,8 +683,7 @@ foreach my $name ( qw( ctype ppsym convertfunc shortctype
 EOS
 }
 
-if ( $bvalflag ) {
-    print OUT <<'!NO!SUBS!';
+print OUT <<'!NO!SUBS!';
 sub badvalue {
   my $name = "PDL::_badvalue_int$_[0][0]";
   no strict 'refs';
@@ -737,15 +694,6 @@ sub orig_badvalue {
   no strict 'refs';
   $name->()->sclr;
 }
-!NO!SUBS!
-} else {
-    print OUT qq{
-sub badvalue { undef }
-sub orig_badvalue { undef }
-};
-} # if: $bvalflag
-
-print OUT <<'!NO!SUBS!';
 
 # make life a bit easier
 use overload (

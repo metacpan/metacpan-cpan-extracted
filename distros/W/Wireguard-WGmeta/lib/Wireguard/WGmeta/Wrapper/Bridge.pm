@@ -76,7 +76,7 @@ First array of STD_OUT
 
 =cut
 sub get_wg_show() {
-    my $cmd = 'wg show dump';
+    my $cmd = 'wg show all dump';
     my (@out, undef) = run_external($cmd);
     chomp @out;
     return @out;

@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: '0.98'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +21,10 @@ no_index:
     - share
     - t
     - xt
+provides:
+  Dist::Zilla::Plugin::ShareEmbed:
+    file: lib/Dist/Zilla/Plugin/ShareEmbed.pm
+    version: '0.004'
 requires:
   Dist::Zilla: '6.000'
   File::pushd: '0'
@@ -32,6 +36,8 @@ resources:
   bugtracker: https://github.com/skaji/Dist-Zilla-Plugin-ShareEmbed/issues
   homepage: https://github.com/skaji/Dist-Zilla-Plugin-ShareEmbed
   repository: https://github.com/skaji/Dist-Zilla-Plugin-ShareEmbed.git
-version: '0.003'
-x_serialization_backend: 'YAML::Tiny version 1.69'
-x_static_install: '1'
+version: '0.004'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

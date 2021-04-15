@@ -1,3 +1,9 @@
+1.904   2021-04-15  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Give .html suffix to tempfile() to convince Google Chrome to view
+          a temporary file as HTML (for --format=html+datatables).
+
+
 1.903   2021-01-30  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

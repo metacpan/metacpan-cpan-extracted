@@ -355,6 +355,15 @@ t/60-backward-scans.d/xml.is.plan
 t/60-backward-scans.d/yaml.ios.plan
 t/60-backward-scans.d/yaml.is.plan
 t/60-backward-scans.t
+t/61-auto-explain-query-text.d/1-json.plan
+t/61-auto-explain-query-text.d/1-text.plan
+t/61-auto-explain-query-text.d/1-xml.plan
+t/61-auto-explain-query-text.d/1-yaml.plan
+t/61-auto-explain-query-text.d/2-json.plan
+t/61-auto-explain-query-text.d/2-text.plan
+t/61-auto-explain-query-text.d/2-xml.plan
+t/61-auto-explain-query-text.d/2-yaml.plan
+t/61-auto-explain-query-text.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

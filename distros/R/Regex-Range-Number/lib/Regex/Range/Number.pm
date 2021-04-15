@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Array::Merge::Unique qw/unique_array/;
 use base qw/Import::Export/;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our (%helper, %cache);
 BEGIN {
 	%helper = (
@@ -144,7 +144,7 @@ sub helpers {
 }
 
 sub number_range {
-	ref $_[0] eq 'Regex::Range::Number' and shift @_;
+	(ref( $_[0] ) || "") eq 'Regex::Range::Number' and shift @_;
 	my ($start, $max, $options) = @_;
 
 	if (ref $start eq 'ARRAY') {
@@ -207,7 +207,7 @@ Regex::Range::Number - Generate number matching regexes
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

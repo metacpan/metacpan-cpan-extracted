@@ -13,7 +13,6 @@ use strict;
 # check for bad value support
 #
 use PDL::Config;
-my $bvalflag = $PDL::Config{WITH_BADVAL} || 0;
 my $usenan   = $PDL::Config{BADVAL_USENAN} || 0;
 
 sub get_pdls {my($this) = @_; return ($this->{ParNames},$this->{ParObjs});}
@@ -26,9 +25,10 @@ sub new {
 
     die "Error: missing name argument to PDL::PP::Code->new call!\n"
       unless defined $name;
+    confess "Error: empty or undefined GenericTypes!\n"
+      unless @{$generictypes || []};
 
     # simple way of handling bad code check
-    $badcode = undef unless $bvalflag;
     my $handlebad = defined($badcode);
 
     # last two arguments may not be supplied
@@ -476,7 +476,7 @@ sub mypostlude {
     pop @{$parent->{Gencurtype}};  # and clean up the Gentype stack
     $parent->{ftypes_type} = undef if defined $this->[1];
     "\tbreak;}
-	default:barf(\"PP INTERNAL ERROR! PLEASE MAKE A BUG REPORT\\n\");}\n";
+	default:barf(\"PP INTERNAL ERROR in $parent->{Name}! PLEASE MAKE A BUG REPORT\\n\");}\n";
 }
 
 
@@ -620,7 +620,7 @@ my $types = join '', ppdefs; # BSUL....
 
 sub new {
     my($type,$ts,$parent) = @_;
-    $ts =~ /[$types]+/ or confess "Invalid type access with '$ts'!";
+    $ts =~ /^[$types]+$/ or confess "Invalid type access with '$ts', not found in [$types]!";
     bless [$ts],$type; }
 sub myoffs { return 1; }
 sub myprelude {

@@ -3,7 +3,7 @@ package Async::Event::Interval;
 use warnings;
 use strict;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Carp qw(croak);
 use Parallel::ForkManager;
@@ -73,6 +73,11 @@ sub status {
     return -1 if defined $self->_pid && $self->_pid == -99;
     return 0;
 }
+sub waiting {
+    my ($self) = @_;
+    return 1 if ! $self->status || $self->status == -1;
+    return 0;
+}
 sub _event {
     my $self = shift;
     
@@ -85,12 +90,21 @@ sub _event {
         }
 
         # set the child's proc id
+
         $self->_pid($$);
 
-        while(1){
-            $self->{cb}->(@{ $self->{args} });
-            sleep $self->{interval};
+        # if no interval, run only once
+
+        if ($self->{interval}) {
+            while (1) {
+                $self->{cb}->(@{$self->{args}});
+                sleep $self->{interval};
+            }
         }
+        else {
+            $self->{cb}->(@{$self->{args}});
+        }
+
         $self->{pm}->finish;
     }
 }
@@ -101,6 +115,7 @@ sub _pid {
 }
 sub _set {
     my ($self, $interval, $cb, @args) = @_;
+
     $self->{interval} = $interval;
     $self->{cb} = $cb;
     $self->{args} = \@args;
@@ -118,8 +133,9 @@ __END__
 Async::Event::Interval - Extremely simple timed asynchronous events
 
 =for html
-<a href="http://travis-ci.org/stevieb9/async-event-interval"><img src="https://secure.travis-ci.org/stevieb9/async-event-interval.png"/></a>
+<a href="https://github.com/stevieb9/async-event-interval/actions"><img src="https://github.com/stevieb9/async-event-interval/workflows/CI/badge.svg"/></a>
 <a href='https://coveralls.io/github/stevieb9/async-event-interval?branch=master'><img src='https://coveralls.io/repos/stevieb9/async-event-interval/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
 
 =head1 SYNOPSIS
 
@@ -162,7 +178,7 @@ L</EXAMPLES>.
 =head1 DESCRIPTION
 
 Very basic implementation of asynchronous events that are triggered by a timed
-interval.
+interval. If no time is specified, we'll run the event only once.
 
 Variables are not shared between the main application and the event. To do that,
 you'll need to use some form of memory sharing, such as L<IPC::Shareable>. See
@@ -183,7 +199,8 @@ Parameters:
     $delay
 
 Mandatory: The interval on which to trigger your event callback, in seconds.
-Represent partial seconds as a floating point number.
+Represent partial seconds as a floating point number. If zero is specified,
+we'll simply run the event once and stop.
 
     $callback
 
@@ -208,7 +225,27 @@ Alias for C<start()>. Re-starts a C<stop()>ped event.
 Returns the event's process ID (true) if it is running, C<0> (false) if it
 isn't, and C<-1> if the event has crashed.
 
+=head2 waiting
+
+Returns true if the event is dormant and is ready for a C<start()> or C<restart>
+command. Returns false if the event is already running.
+
 =head1 EXAMPLES
+
+=head2 Run Once
+
+Send in an interval of zero (C<0>) to have your event run a single time. Call
+C<start()> repeatedly for numerous runs.
+
+    use Async::Event::Interval
+
+    my $event = Async::Event::Interval->new(0, sub {print "hey\n";});
+
+    $event->start;
+
+    # Do stuff, then run the event again if it's done its previous task
+
+    $event->start if $event->waiting;
 
 =head2 Event Parameters
 
@@ -239,14 +276,14 @@ program.
     use Async::Event::Interval;
     use IPC::Shareable;
 
-    my $href = {a => 0, b => 1};
-    tie $href, 'IPC::Shareable', undef;
+    tie my $scalar, 'IPC::Shareable', undef;
+    $scalar = "hello";
 
     my $event
         = Async::Event::Interval->new(10, \&callback);
 
     sub callback {
-        $h->{a}++;
+        $scalar = "hello, world!";
     }
 
 =head2 Event crash: Restart event
@@ -303,7 +340,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Steve Bertrand.
+Copyright 2021 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

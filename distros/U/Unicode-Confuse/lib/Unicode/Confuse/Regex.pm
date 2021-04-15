@@ -3,7 +3,8 @@
 package Unicode::Confuse::Regex;
 use warnings;
 use strict;
-our $VERSION = '0.02';
+use utf8;
+our $VERSION = '0.03';
 
 # Some people, when faced with a problem, think "I know, I'll use a
 # regular expression". Now they have two problems.

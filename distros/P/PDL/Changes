@@ -1,3 +1,13 @@
+2.035 2021-04-15
+- bad value support now always present, not configurable
+- pthread detection simplified, now enabled for Windows and MacOS
+- remove check in build for ~/.perldl.conf
+- remove TEMPDIR config - all now use File::Temp
+- remove unnecessary PDL::Version (just "require PDL")
+- relocate tests to beside what's tested (helps with any split)
+- incorporate patches from downstream OpenSUSE - thanks @perlpunk
+- add ppdefs_complex
+
 2.034 2021-03-31
 - add "complex" Pars type qualifier, r2C function
 

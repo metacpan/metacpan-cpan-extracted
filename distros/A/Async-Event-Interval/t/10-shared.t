@@ -5,7 +5,7 @@ use Async::Event::Interval;
 use Test::More;
 
 unless ( $ENV{RELEASE_TESTING} ) {
-    plan( skip_all => "This is an author test" );
+    #plan( skip_all => "This is an author test" );
 }
 
 require IPC::Shareable;

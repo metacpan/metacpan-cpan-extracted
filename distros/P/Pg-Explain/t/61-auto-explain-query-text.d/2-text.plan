@@ -1,0 +1,5 @@
+	Query Text: select count(*)
+	from
+	  pg_class;
+	Aggregate  (cost=18.05..18.06 rows=1 width=8)
+	  ->  Seq Scan on pg_class  (cost=0.00..17.04 rows=404 width=0)

@@ -1,3 +1,7 @@
+0.2.3 2021-04-15 Tobias Bossert (tobib at cpan.org)
+- changed: Commit behaviour when set to overwrite = False
+- changed: Adding custom attributes is now possible in code
+
 0.2.2 2021-02-28 Tobias Bossert (tobib at cpan.org)
 - fix: Possible infinite recursion in reload_from_disk()
 

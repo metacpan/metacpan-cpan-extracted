@@ -25,6 +25,7 @@ my $cookie = {
     httpOnly => $JSON::PP::false,
     name     => 'foo',
     path     => '/',
+    sameSite => 'None',
     secure   => $JSON::PP::false,
     value    => 'bar',
 };
@@ -34,6 +35,7 @@ is_deeply $drv->cookie('foo'), $cookie, 'Cookie "foo" exists';
 is_deeply $drv->cookies, {
     foo => $cookie,
     baz => {
+	sameSite => 'None',
         domain   => 'httpd',
         expiry   => $expiry,
         httpOnly => $JSON::PP::false,

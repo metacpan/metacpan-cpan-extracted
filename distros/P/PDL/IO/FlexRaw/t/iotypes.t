@@ -1,0 +1,30 @@
+use strict;
+use PDL::LiteF;
+use PDL::Types ':All';
+use PDL::IO::FlexRaw;
+use PDL::Config;
+use File::Temp;
+use Test::More;
+
+our @types = map { print "making type $_\n";
+		   new PDL::Type typefld($_,'numval') }
+                   grep { ! m/^PDL_IND$/ } typesrtkeys();
+
+my $data = File::Temp::tmpnam();
+
+for my $type (@types) {
+  print "checking type $type...\n";
+  my $pdl = sequence $type, 10;
+  my $hdr = writeflex $data, $pdl;
+  writeflexhdr($data,$hdr);
+  my $npdl = eval {readflex $data};
+  TODO: {
+     local $TODO = "readflex returns index instead of long";
+     ok ($pdl->type == $npdl->type && 
+        all $pdl == $npdl);
+  }
+}
+
+unlink $data, "${data}.hdr";
+
+done_testing;

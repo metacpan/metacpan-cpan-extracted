@@ -1,0 +1,98 @@
+NAME
+
+    Syntax::Keyword::Match - a match/case syntax for perl
+
+SYNOPSIS
+
+       use v5.14;
+       use Syntax::Keyword::Match;
+    
+       my $n = ...;
+    
+       match($n : ==) {
+          case(1) { say "It's one" }
+          case(2) { say "It's two" }
+          case(3) { say "It's three" }
+          default { say "It's something else" }
+       }
+
+DESCRIPTION
+
+    This module provides a syntax plugin that implements a control-flow
+    block called match/case, which executes at most one of a choice of
+    different blocks depending on the value of its controlling expression.
+
+    This is similar to C's switch/case syntax (copied into many other
+    languages), or syntax provided by Switch::Plain.
+
+    This is an initial, experimental implementation. Furthermore, it is
+    built as a non-trivial example use-case on top of XS::Parse::Keyword,
+    which is also experimental. No API or compatbility guarantees are made
+    at this time.
+
+KEYWORDS
+
+ match
+
+       match( EXPR : OP ) {
+          ...
+       }
+
+    A match statement provides the controlling expression, comparison
+    operator, and set of case statements for a match operation. The
+    expression is evaluated to yield a scalar value, which is then
+    compared, using the comparison operator, against each of the case
+    labels. If a match is found then the body of the labelled block is
+    executed. If no label matches but a default block is present, that will
+    be executed instead. After a single inner block has been executed, no
+    further tests are performed and execution continues from the statement
+    following the match statement.
+
+    The comparison operator must be either eq (to compare cases as strings)
+    or == (to compare them as numbers).
+
+    The braces following the match block must only contain case or default
+    statements. Arbitrary code is not supported here.
+
+    Even though a match statement is a full statement and not an
+    expression, it can still yield a value if it appears as the final
+    statment in its containing sub or do block. For example:
+
+       my $result = do {
+          match( $topic : == ) {
+             case(1) { ... }
+          }
+       };
+
+ case
+
+       case(CONST) { STATEMENTS... }
+
+    A case statement must only appear inside the braces of a match. It
+    provides a block of code to run if the controlling expression's value
+    matches the given constant in the case statement, according to the
+    comparison operator.
+
+    The CONST expression must be a compile-time constant giving a single
+    scalar. Runtime expressions (such as variables or function calls) are
+    not supported, nor are lists of values.
+
+ default
+
+    A default statement must only appear inside the braces of a match. If
+    present, it must be the final choice, and there must only be one of
+    them. It provides a block of code to run if the controlling
+    expression's value did not match any of the given case labels.
+
+TODO
+
+    This is clearly an early experimental work. There are many features to
+    add, and design decisions to make. Rather than attempt to list them all
+    here it would be best to check the RT bug queue at
+
+    https://rt.cpan.org/Dist/Display.html?Name=Syntax-Keyword-Match
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

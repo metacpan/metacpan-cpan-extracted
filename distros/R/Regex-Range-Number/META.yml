@@ -18,8 +18,8 @@ no_index:
     - t
     - inc
 requires:
-  Array::Merge::Unique: '0.02'
+  Array::Merge::Unique: '1.00'
   Import::Export: '0.04'
   perl: '5.006'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

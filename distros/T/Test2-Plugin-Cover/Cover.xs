@@ -28,15 +28,10 @@ static OP* my_subhandler(pTHX) {
     OP* out = orig_subhandler(aTHX);
 
     if (out != NULL && (out->op_type == OP_NEXTSTATE || out->op_type == OP_DBSTATE)) {
-//        SV *subpkg  = NULL;
         SV *subname = NULL;
 
         GV *my_gv = sub_to_gv(aTHX_ *SP);
         if (my_gv != NULL) {
-//            HV *stash = GvSTASH(my_gv);
-//            if (stash) {
-//                subpkg = newSVpv(HvNAME(stash), 0);
-//            }
             subname = newSVpv(GvNAME(my_gv), 0);
         }
 
@@ -52,9 +47,6 @@ static OP* my_subhandler(pTHX) {
             hv_store(item, "called_by", 9, from_val, 0);
         }
 
-//        if (subpkg) {
-//            hv_store(item, "sub_package", 11, subpkg, 0);
-//        }
         if (subname) {
             hv_store(item, "sub_name", 8, subname, 0);
         }
@@ -88,7 +80,8 @@ static GV *sub_to_gv(pTHX_ SV *sv) {
                     sym = SvPOKp(sv) ? SvPVX(sv) : Nullch;
                 }
                 else
-                    sym = SvPV_nolen(sv);
+                    // This causes the warnings from issue #2 https://github.com/Test-More/Test2-Plugin-Cover/issues/2
+                    //sym = SvPV_nolen(sv);
                 if (!sym)
                     return NULL;
                 if (PL_op->op_private & HINT_STRICT_REFS)

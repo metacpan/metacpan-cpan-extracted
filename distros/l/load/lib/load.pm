@@ -1,6 +1,6 @@
 package load;
 
-$VERSION= '0.24';
+$VERSION= '0.25';
 
 #-------------------------------------------------------------------------------
 # No, we're NOT using strict here.  There are several reasons, the most
@@ -457,7 +457,7 @@ load - control when subroutines will be loaded
 
 =head1 VERSION
 
-This documentation describes version 0.24.
+This documentation describes version 0.25.
 
 =head1 DESCRIPTION
 

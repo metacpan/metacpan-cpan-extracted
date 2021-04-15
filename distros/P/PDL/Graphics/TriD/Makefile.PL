@@ -15,8 +15,7 @@ my $gl_dir = "";
 my @subdirs = qw( Rout VRML );
 
 if ( $PDL::Config{USE_POGL} ) { # build with OpenGL for GL bindings and compile/link info
-   print "Graphics/TriD/Makefile.PL: using POGL for OpenGL bindings and compile options\n";
-   @subdirs = ( @subdirs, qw( POGL OpenGLQ ) );
+   push @subdirs, qw( POGL OpenGLQ );
    $gl_build = 1;
 } else {
    print "Graphics/TriD/Makefile.PL: skipping build of TriD::OpenGL(Q) modules - no POGL\n";
@@ -26,7 +25,7 @@ $PDL::Config{GL_BUILD} = $gl_build; # record for Config.pm
 
 WriteMakefile (
      'NAME'         => "PDL::Graphics::TriD",
-     'VERSION_FROM' => '../../Basic/Core/Version.pm',
+     'VERSION_FROM' => '../../Basic/PDL.pm',
      'DIR'          => [ @subdirs ],
-    (eval ($ExtUtils::MakeMaker::VERSION) >= 6.57_02 ? ('NO_MYMETA' => 1) : ()),
+     NO_MYMETA => 1,
 );

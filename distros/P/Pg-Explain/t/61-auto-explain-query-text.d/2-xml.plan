@@ -1,0 +1,30 @@
+	<explain xmlns="http://www.postgresql.org/2009/explain">
+	  <Query-Text>select count(*)
+	from
+	  pg_class;</Query-Text>
+	  <Plan>
+	    <Node-Type>Aggregate</Node-Type>
+	    <Strategy>Plain</Strategy>
+	    <Partial-Mode>Simple</Partial-Mode>
+	    <Parallel-Aware>false</Parallel-Aware>
+	    <Async-Capable>false</Async-Capable>
+	    <Startup-Cost>18.05</Startup-Cost>
+	    <Total-Cost>18.06</Total-Cost>
+	    <Plan-Rows>1</Plan-Rows>
+	    <Plan-Width>8</Plan-Width>
+	    <Plans>
+	      <Plan>
+	        <Node-Type>Seq Scan</Node-Type>
+	        <Parent-Relationship>Outer</Parent-Relationship>
+	        <Parallel-Aware>false</Parallel-Aware>
+	        <Async-Capable>false</Async-Capable>
+	        <Relation-Name>pg_class</Relation-Name>
+	        <Alias>pg_class</Alias>
+	        <Startup-Cost>0.00</Startup-Cost>
+	        <Total-Cost>17.04</Total-Cost>
+	        <Plan-Rows>404</Plan-Rows>
+	        <Plan-Width>0</Plan-Width>
+	      </Plan>
+	    </Plans>
+	  </Plan>
+	</explain>

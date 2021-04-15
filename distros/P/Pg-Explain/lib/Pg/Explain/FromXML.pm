@@ -28,11 +28,11 @@ Pg::Explain::FromXML - Parser for explains in XML format
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =cut
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 =head1 SYNOPSIS
 
@@ -129,6 +129,9 @@ sub parse_source {
         }
     }
     $self->explain->jit( Pg::Explain::JIT->new( 'struct' => $struct->{ 'JIT' } ) ) if $struct->{ 'JIT' };
+
+    $self->explain->query( $struct->{ 'Query-Text' } ) if $struct->{ 'Query-Text' };
+
     return $top_node;
 }
 

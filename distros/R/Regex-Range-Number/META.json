@@ -32,13 +32,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Array::Merge::Unique" : "0.02",
+            "Array::Merge::Unique" : "1.00",
             "Import::Export" : "0.04",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

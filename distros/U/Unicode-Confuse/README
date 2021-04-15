@@ -12,7 +12,7 @@
                                        
 
 
-This is the README for Unicode::Confuse version 0.02.
+This is the README for Unicode::Confuse version 0.03.
 
 Unicode::Confuse is a "module" for the Perl computer programming language,
 a library of computer code to install on a computer.  This document
@@ -64,11 +64,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Unicode::Confuse
 
-To install the module from the source file, Unicode-Confuse-0.02.tar.gz,
+To install the module from the source file, Unicode-Confuse-0.03.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Unicode-Confuse-0.02.tar.gz
-    cd Unicode-Confuse-0.02
+    tar xfz Unicode-Confuse-0.03.tar.gz
+    cd Unicode-Confuse-0.03
     perl Makefile.PL
     make
     make install
@@ -93,6 +93,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Wed Apr 14 16:48:18 2021.
+This README was written on Thu Apr 15 09:12:41 2021.
 
 -----------------------------------------------------------------------------

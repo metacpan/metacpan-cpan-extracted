@@ -1,0 +1,34 @@
+NAME
+
+  See - Debug See
+
+SYNOPSIS
+
+  $ set PERL_DEBUG_SEE=1
+  
+  use See;
+  if (see foo($bar)) {
+  }
+  
+  no See;
+  if (see foo($bar)) {
+  }
+  
+  $ set PERL_DEBUG_SEE=
+
+DESCRIPTION
+
+  This software is a debug tool for Perl programming.
+
+  This module helps you debug by logging the results of if and while
+  conditional expressions.
+
+SUPPORTED PERL VERSIONS
+
+  perl version 5.005_03 to newest perl
+
+SEE ALSO
+
+  https://metacpan.org/author/INA
+  http://backpan.cpantesters.org/authors/id/I/IN/INA/
+

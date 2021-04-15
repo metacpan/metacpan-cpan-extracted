@@ -32,11 +32,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =cut
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 =head1 SYNOPSIS
 
@@ -93,6 +93,10 @@ Contains information about JIT timings, as object of Pg::Explain::JIT class.
 
 If there was no JIT info, it will return undef.
 
+=head2 query
+
+What query this explain is for. This is available only for auto-explain plans. If not available, it will be undef.
+
 =cut
 
 sub source_format  { my $self = shift; $self->{ 'source_format' }  = $_[ 0 ] if 0 < scalar @_; return $self->{ 'source_format' }; }
@@ -101,6 +105,7 @@ sub execution_time { my $self = shift; $self->{ 'execution_time' } = $_[ 0 ] if 
 sub total_runtime  { my $self = shift; $self->{ 'total_runtime' }  = $_[ 0 ] if 0 < scalar @_; return $self->{ 'total_runtime' }; }
 sub trigger_times  { my $self = shift; $self->{ 'trigger_times' }  = $_[ 0 ] if 0 < scalar @_; return $self->{ 'trigger_times' }; }
 sub jit            { my $self = shift; $self->{ 'jit' }            = $_[ 0 ] if 0 < scalar @_; return $self->{ 'jit' }; }
+sub query          { my $self = shift; $self->{ 'query' }          = $_[ 0 ] if 0 < scalar @_; return $self->{ 'query' }; }
 
 =head2 add_trigger_time
 
@@ -456,6 +461,8 @@ sub get_struct {
     $reply->{ 'execution_time' } = $self->execution_time if $self->execution_time;
     $reply->{ 'total_runtime' }  = $self->total_runtime if $self->total_runtime;
     $reply->{ 'trigger_times' }  = clone( $self->trigger_times ) if $self->trigger_times;
+    $reply->{ 'query' }          = $self->query if $self->query;
+
     if ( $self->jit ) {
         $reply->{ 'jit' }                  = {};
         $reply->{ 'jit' }->{ 'functions' } = $self->jit->functions;
