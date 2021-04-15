@@ -38,7 +38,7 @@ or some famous examples from Ovid or the perldoc
   print int $f1/$f2;
   # the correct -269, no internal  -268.99999999999994315658
 
-and as of the lates release with unicode support
+and as of the latest release with unicode support
 
   my $f1 = Number::Fraction->new('3½');
   my $f2 = Number::Fraction->new(4.33);
@@ -142,7 +142,7 @@ be negative, prepending it with a minus-sign.
 =head2 Experimental Support for Exponentiation
 
 Version 1.13 of Number::Fraction adds experimental support for exponentiation
-operations. Version 3 has extended support and returns a Number::Fraction
+operations. Version 3 has extended support and returns a Number::Fraction.
 
 It does a lot of cheating, but can give very useful results. And for now will
 try to make a real number into a Number::Fraction if that real does not have a
@@ -150,10 +150,10 @@ power of ten component (like 1.234e45, thes numbers will simply fail). Such that
 
   ('5⅞' ** '1¼') ** '⅘'
 
-will produce stil the right fraction!
+will produce still the right fraction!
 
 In a future version, I might use automatic rounding to a optional accuracy, so
-that it also works for less forged examples as the above. One could still use
+that it also works for less forced examples as the above. One could still use
 C<nearest> to find the nearest fraction to the result of the previous
 computation.
 
@@ -188,7 +188,7 @@ use Carp;
 use Moo;
 use MooX::Types::MooseLike::Base qw/Int/;
 
-our $VERSION = '3.0.3';
+our $VERSION = '3.0.4';
 
 my $_mixed = 0;
 
@@ -356,11 +356,11 @@ around BUILDARGS => sub {
   my $orig = shift;
   my $class = shift;
   if (@_ > 3) {
-    carp "Revise your code: too many arguments will raise an exception";
+    croak "Revise your code: too many arguments will raise an exception";
   }
   if (@_ == 3) {
     if ( $_mixed ) {
-      die "integer, numerator and denominator need to be integers"
+      croak "integer, numerator and denominator need to be integers"
         unless $_[0] =~ /^-?[0-9]+\z/
            and $_[1] =~ /^-?[0-9]+\z/
            and $_[2] =~ /^-?[0-9]+\z/;
@@ -368,11 +368,11 @@ around BUILDARGS => sub {
       return $class->$orig({ num => $_[0] * $_[2] + $_[1], den => $_[2] });
     }
     else {
-      carp "Revise your code: 3 arguments will become mixed-fraction feature!";
+      croak "Revise your code: 3 arguments is a mixed-fraction feature!";
     }
   }
   if (@_ >= 2) {
-    die "numerator and denominator both need to be integers"
+    croak "numerator and denominator both need to be integers"
       unless $_[0] =~ /^-?[0-9]+\z/ and $_[1] =~ /^-?[0-9]+\z/;
     # fix: regex string representation and the real number can be different
     my $num = sprintf( "%.0f", $_[0]);
@@ -383,7 +383,7 @@ around BUILDARGS => sub {
       if (UNIVERSAL::isa($_[0], $class)) {
         return $class->$orig({ num => $_[0]->{num}, den => $_[0]->{den} });
       } else {
-        die "Can't make a $class from a ", ref $_[0];
+        croak "Can't make a $class from a ", ref $_[0];
       }
     }
 
@@ -442,7 +442,7 @@ around BUILDARGS => sub {
     } elsif ($_[0] =~ m|^(-?[0-9]+)(?:/(-?[0-9]+))?\z|) {
         return $class->$orig({ num => $1, den => ( defined $2 ? $2 : 1) });
     } else {
-        die "Can't make fraction out of $_[0]\n";
+        croak "Can't make fraction out of $_[0]\n";
     }
   } else {
     return $class->$orig({ num => 0, den => 1 });
@@ -458,7 +458,7 @@ normalised format.
 
 sub BUILD {
   my $self = shift;
-  die "Denominator can't be equal to zero" if $self->{den} == 0;
+  croak "Denominator can't be equal to zero" if $self->{den} == 0;
   $self->_normalise;
 }
 
@@ -544,7 +544,7 @@ sub to_unicode_mixed {
 
 =head2 to_quarters
 
-=head2 to_eights
+=head2 to_eighths
 
 =head2 to_thirds
 
@@ -567,7 +567,10 @@ sub to_fifths   { return shift->to_simple(5) }
 
 sub to_sixths   { return shift->to_simple(6) }
 
-sub to_eights   { return shift->to_simple(8) }
+sub to_eighths  { return shift->to_simple(8) }
+
+# Typo retained for backwards compatibility
+sub to_eights   { return shift->to_eighths }
 
 =head2 to_simple
 
@@ -576,7 +579,7 @@ possible to any of the above mentioned standard fractions. NB ⅐, ⅑ or ⅒ ar
 being used.
 
 Optionally, one can pass in a list of well-known denominators (2, 3, 4, 5, 6, 8)
-to choose wich fractions can be used.
+to choose which fractions can be used.
 
 =cut
 
@@ -595,7 +598,7 @@ sub to_simple {
   my $key = $abs->fract->to_string;
   my $frc = $_vulgar_codepoints{$key};
   unless ( $frc ) {
-    carp "not a recognize unicode fraction symbol [$key]\n";
+    carp "not a recognised unicode fraction symbol [$key]\n";
     return $near->to_unicode_mixed;
   }
   my $int = int($abs->{num} / $abs->{den}) || '';
@@ -960,13 +963,15 @@ None by default.
 
 perldoc overload
 
+L<Lingua::EN::Fractions>
+
 =head1 AUTHOR
 
 Dave Cross, E<lt>dave@mag-sol.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2002-8 by Dave Cross
+Copyright 2002-20 by Dave Cross
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

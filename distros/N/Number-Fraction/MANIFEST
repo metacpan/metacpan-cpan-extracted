@@ -1,4 +1,4 @@
-Changes
+Changes.md
 lib/Number/Fraction.pm
 MANIFEST			This list of files
 Build.PL
@@ -22,3 +22,4 @@ t/15_zeroes.t
 t/16_decimals.t
 META.yml
 META.json
+Changes.old

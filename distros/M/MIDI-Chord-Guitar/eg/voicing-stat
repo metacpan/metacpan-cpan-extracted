@@ -6,6 +6,7 @@ use Data::Dumper;
 use MIDI::Chord::Guitar;
 use Statistics::Basic qw(median);
 
+#my $mcg = MIDI::Chord::Guitar->new(voicing_file => 'share/midi-guitar-chord-voicings.csv');
 my $mcg = MIDI::Chord::Guitar->new;
 
 for my $spec (

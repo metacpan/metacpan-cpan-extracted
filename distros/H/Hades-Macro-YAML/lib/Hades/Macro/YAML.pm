@@ -2,7 +2,7 @@ package Hades::Macro::YAML;
 use strict;
 use warnings;
 use base qw/Hades::Macro/;
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 our ( $YAML_CLASS, $CLASS_LOADED );
 
 BEGIN {
@@ -318,7 +318,7 @@ sub _yaml_load_file_YAML_XS {
 
 	my $code = q||;
 	$code .= qq|$param = | if $param;
-	$code .= qq|LoadFile($file)|;
+	$code .= qq|YAML::XS::LoadFile($file)|;
 	$code .= $list ? q|,| : q|;|;
 	return $code;
 
@@ -746,7 +746,7 @@ Quick summary of what the module does:
 			die qq{Str: invalid value $file for variable \$file in method geras};
 		}
 
-		LoadFile($file);
+		YAML::XS::LoadFile($file);
 	}
 
 	1;

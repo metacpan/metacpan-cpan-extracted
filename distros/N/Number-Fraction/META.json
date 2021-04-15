@@ -38,7 +38,7 @@
    "provides" : {
       "Number::Fraction" : {
          "file" : "lib/Number/Fraction.pm",
-         "version" : "v3.0.3"
+         "version" : "v3.0.4"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/p5-number-fraction/number-fraction"
       }
    },
-   "version" : "v3.0.3",
+   "version" : "v3.0.4",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

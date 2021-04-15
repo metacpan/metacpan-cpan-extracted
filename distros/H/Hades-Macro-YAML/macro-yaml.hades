@@ -2,7 +2,7 @@ lib lib
 tlib t
 author LNATION
 email email@lnation.org
-version 0.02
+version 0.03
 Hades::Macro::YAML base Hades::Macro {
 	abstract { Hades macro helpers for YAML }
 	synopsis {
@@ -57,7 +57,7 @@ Quick summary of what the module does:
 			die qq{Str: invalid value $file for variable \$file in method geras};
 		}
 
-		LoadFile($file);
+		YAML::XS::LoadFile($file);
 	}
 
 	1;
@@ -130,7 +130,7 @@ Quick summary of what the module does:
 	_yaml_load_file_YAML_XS $mg :t(Object) $file :t(Str) $param :t(Optional[Str]) $list :t(Optional[Bool]) {
 		my $code = q||;
 		$code .= qq|$param = | if $param;
-		$code .= qq|LoadFile($file)|;
+		$code .= qq|YAML::XS::LoadFile($file)|;
 		$code .= $list ? q|,| : q|;|;
 		return $code;
 	}

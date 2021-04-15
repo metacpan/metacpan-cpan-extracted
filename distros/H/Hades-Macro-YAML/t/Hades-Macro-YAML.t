@@ -43,11 +43,11 @@ subtest 'new' => sub {
 		qr/invalid|type|constraint|greater|atleast/,
 		q{$obj = Hades::Macro::YAML->new({ macro => {} })}
 	);
-	eval { $obj = Hades::Macro::YAML->new( { macro => 'hypnos' } ) };
+	eval { $obj = Hades::Macro::YAML->new( { macro => 'limos' } ) };
 	like(
 		$@,
 		qr/invalid|type|constraint|greater|atleast/,
-		q{$obj = Hades::Macro::YAML->new({ macro => 'hypnos' })}
+		q{$obj = Hades::Macro::YAML->new({ macro => 'limos' })}
 	);
 };
 subtest 'macro' => sub {
@@ -60,9 +60,9 @@ subtest 'macro' => sub {
 	eval { $obj->macro( {} ) };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->macro({})} );
-	eval { $obj->macro('curae') };
+	eval { $obj->macro('penthos') };
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->macro('curae')} );
+		q{$obj->macro('penthos')} );
 	is_deeply( $obj->macro, ['test'], q{$obj->macro} );
 };
 subtest 'yaml_load_string' => sub {
@@ -71,17 +71,17 @@ subtest 'yaml_load_string' => sub {
 		q{my $obj = Hades::Macro::YAML->new({})}
 	);
 	can_ok( $obj, 'yaml_load_string' );
-	eval { $obj->yaml_load_string( [], 'aporia', undef, undef ) };
+	eval { $obj->yaml_load_string( [], 'phobos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_string([], 'aporia', undef, undef)}
+		q{$obj->yaml_load_string([], 'phobos', undef, undef)}
 	);
-	eval { $obj->yaml_load_string( 'geras', 'aporia', undef, undef ) };
+	eval { $obj->yaml_load_string( 'hypnos', 'phobos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_string('geras', 'aporia', undef, undef)}
+		q{$obj->yaml_load_string('hypnos', 'phobos', undef, undef)}
 	);
 	eval { $obj->yaml_load_string( bless( {}, 'Test' ), [], undef, undef ) };
 	like(
@@ -96,36 +96,36 @@ subtest 'yaml_load_string' => sub {
 		q{$obj->yaml_load_string(bless({}, 'Test'), \1, undef, undef)}
 	);
 	eval {
-		$obj->yaml_load_string( bless( {}, 'Test' ), 'aporia', [], undef );
+		$obj->yaml_load_string( bless( {}, 'Test' ), 'phobos', [], undef );
 	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_string(bless({}, 'Test'), 'aporia', [], undef)}
+		q{$obj->yaml_load_string(bless({}, 'Test'), 'phobos', [], undef)}
 	);
 	eval {
-		$obj->yaml_load_string( bless( {}, 'Test' ), 'aporia', \1, undef );
+		$obj->yaml_load_string( bless( {}, 'Test' ), 'phobos', \1, undef );
 	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_string(bless({}, 'Test'), 'aporia', \1, undef)}
+		q{$obj->yaml_load_string(bless({}, 'Test'), 'phobos', \1, undef)}
 	);
 	eval {
-		$obj->yaml_load_string( bless( {}, 'Test' ), 'aporia', undef, [] );
+		$obj->yaml_load_string( bless( {}, 'Test' ), 'phobos', undef, [] );
 	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_string(bless({}, 'Test'), 'aporia', undef, [])}
+		q{$obj->yaml_load_string(bless({}, 'Test'), 'phobos', undef, [])}
 	);
 	eval {
-		$obj->yaml_load_string( bless( {}, 'Test' ), 'aporia', undef, {} );
+		$obj->yaml_load_string( bless( {}, 'Test' ), 'phobos', undef, {} );
 	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_string(bless({}, 'Test'), 'aporia', undef, {})}
+		q{$obj->yaml_load_string(bless({}, 'Test'), 'phobos', undef, {})}
 	);
 };
 subtest '_yaml_load_string_YAML' => sub {
@@ -134,17 +134,17 @@ subtest '_yaml_load_string_YAML' => sub {
 		q{my $obj = Hades::Macro::YAML->new({})}
 	);
 	can_ok( $obj, '_yaml_load_string_YAML' );
-	eval { $obj->_yaml_load_string_YAML( [], 'hypnos', undef, undef ) };
+	eval { $obj->_yaml_load_string_YAML( [], 'algea', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML([], 'hypnos', undef, undef)}
+		q{$obj->_yaml_load_string_YAML([], 'algea', undef, undef)}
 	);
-	eval { $obj->_yaml_load_string_YAML( 'aporia', 'hypnos', undef, undef ) };
+	eval { $obj->_yaml_load_string_YAML( 'algea', 'algea', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML('aporia', 'hypnos', undef, undef)}
+		q{$obj->_yaml_load_string_YAML('algea', 'algea', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_load_string_YAML( bless( {}, 'Test' ), [], undef, undef );
@@ -160,31 +160,31 @@ subtest '_yaml_load_string_YAML' => sub {
 	);
 	eval {
 		$obj->_yaml_load_string_YAML( bless( {}, 'Test' ),
-			'hypnos', [], undef );
+			'algea', [], undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML(bless({}, 'Test'), 'hypnos', [], undef)}
+		q{$obj->_yaml_load_string_YAML(bless({}, 'Test'), 'algea', [], undef)}
 	);
 	eval {
 		$obj->_yaml_load_string_YAML( bless( {}, 'Test' ),
-			'hypnos', \1, undef );
+			'algea', \1, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML(bless({}, 'Test'), 'hypnos', \1, undef)}
+		q{$obj->_yaml_load_string_YAML(bless({}, 'Test'), 'algea', \1, undef)}
 	);
 	eval {
 		$obj->_yaml_load_string_YAML( bless( {}, 'Test' ),
-			'hypnos', undef, [] );
+			'algea', undef, [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML(bless({}, 'Test'), 'hypnos', undef, [])}
+		q{$obj->_yaml_load_string_YAML(bless({}, 'Test'), 'algea', undef, [])}
 	);
 	eval {
 		$obj->_yaml_load_string_YAML( bless( {}, 'Test' ),
-			'hypnos', undef, {} );
+			'algea', undef, {} );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML(bless({}, 'Test'), 'hypnos', undef, {})}
+		q{$obj->_yaml_load_string_YAML(bless({}, 'Test'), 'algea', undef, {})}
 	);
 };
 subtest '_yaml_load_string_YAML_XS' => sub {
@@ -193,17 +193,17 @@ subtest '_yaml_load_string_YAML_XS' => sub {
 		q{my $obj = Hades::Macro::YAML->new({})}
 	);
 	can_ok( $obj, '_yaml_load_string_YAML_XS' );
-	eval { $obj->_yaml_load_string_YAML_XS( [], 'gaudia', undef, undef ) };
+	eval { $obj->_yaml_load_string_YAML_XS( [], 'limos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML_XS([], 'gaudia', undef, undef)}
+		q{$obj->_yaml_load_string_YAML_XS([], 'limos', undef, undef)}
 	);
-	eval {
-		$obj->_yaml_load_string_YAML_XS( 'penthos', 'gaudia', undef, undef );
-	};
-	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML_XS('penthos', 'gaudia', undef, undef)}
+	eval { $obj->_yaml_load_string_YAML_XS( 'nosoi', 'limos', undef, undef ) };
+	like(
+		$@,
+		qr/invalid|value|type|constraint|greater|atleast/,
+		q{$obj->_yaml_load_string_YAML_XS('nosoi', 'limos', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_load_string_YAML_XS( bless( {}, 'Test' ),
@@ -221,31 +221,31 @@ subtest '_yaml_load_string_YAML_XS' => sub {
 	);
 	eval {
 		$obj->_yaml_load_string_YAML_XS( bless( {}, 'Test' ),
-			'gaudia', [], undef );
+			'limos', [], undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML_XS(bless({}, 'Test'), 'gaudia', [], undef)}
+		q{$obj->_yaml_load_string_YAML_XS(bless({}, 'Test'), 'limos', [], undef)}
 	);
 	eval {
 		$obj->_yaml_load_string_YAML_XS( bless( {}, 'Test' ),
-			'gaudia', \1, undef );
+			'limos', \1, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML_XS(bless({}, 'Test'), 'gaudia', \1, undef)}
+		q{$obj->_yaml_load_string_YAML_XS(bless({}, 'Test'), 'limos', \1, undef)}
 	);
 	eval {
 		$obj->_yaml_load_string_YAML_XS( bless( {}, 'Test' ),
-			'gaudia', undef, [] );
+			'limos', undef, [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML_XS(bless({}, 'Test'), 'gaudia', undef, [])}
+		q{$obj->_yaml_load_string_YAML_XS(bless({}, 'Test'), 'limos', undef, [])}
 	);
 	eval {
 		$obj->_yaml_load_string_YAML_XS( bless( {}, 'Test' ),
-			'gaudia', undef, {} );
+			'limos', undef, {} );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML_XS(bless({}, 'Test'), 'gaudia', undef, {})}
+		q{$obj->_yaml_load_string_YAML_XS(bless({}, 'Test'), 'limos', undef, {})}
 	);
 };
 subtest '_yaml_load_string_YAML_PP' => sub {
@@ -261,12 +261,10 @@ subtest '_yaml_load_string_YAML_PP' => sub {
 		q{$obj->_yaml_load_string_YAML_PP([], 'hypnos', undef, undef)}
 	);
 	eval {
-		$obj->_yaml_load_string_YAML_PP( 'limos', 'hypnos', undef, undef );
+		$obj->_yaml_load_string_YAML_PP( 'hypnos', 'hypnos', undef, undef );
 	};
-	like(
-		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_string_YAML_PP('limos', 'hypnos', undef, undef)}
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+		q{$obj->_yaml_load_string_YAML_PP('hypnos', 'hypnos', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_load_string_YAML_PP( bless( {}, 'Test' ),
@@ -317,17 +315,17 @@ subtest 'yaml_load_file' => sub {
 		q{my $obj = Hades::Macro::YAML->new({})}
 	);
 	can_ok( $obj, 'yaml_load_file' );
-	eval { $obj->yaml_load_file( [], 'limos', undef, undef ) };
+	eval { $obj->yaml_load_file( [], 'thanatos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_file([], 'limos', undef, undef)}
+		q{$obj->yaml_load_file([], 'thanatos', undef, undef)}
 	);
-	eval { $obj->yaml_load_file( 'gaudia', 'limos', undef, undef ) };
+	eval { $obj->yaml_load_file( 'hypnos', 'thanatos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_file('gaudia', 'limos', undef, undef)}
+		q{$obj->yaml_load_file('hypnos', 'thanatos', undef, undef)}
 	);
 	eval { $obj->yaml_load_file( bless( {}, 'Test' ), [], undef, undef ) };
 	like(
@@ -341,29 +339,37 @@ subtest 'yaml_load_file' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->yaml_load_file(bless({}, 'Test'), \1, undef, undef)}
 	);
-	eval { $obj->yaml_load_file( bless( {}, 'Test' ), 'limos', [], undef ) };
+	eval {
+		$obj->yaml_load_file( bless( {}, 'Test' ), 'thanatos', [], undef );
+	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_file(bless({}, 'Test'), 'limos', [], undef)}
+		q{$obj->yaml_load_file(bless({}, 'Test'), 'thanatos', [], undef)}
 	);
-	eval { $obj->yaml_load_file( bless( {}, 'Test' ), 'limos', \1, undef ) };
+	eval {
+		$obj->yaml_load_file( bless( {}, 'Test' ), 'thanatos', \1, undef );
+	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_file(bless({}, 'Test'), 'limos', \1, undef)}
+		q{$obj->yaml_load_file(bless({}, 'Test'), 'thanatos', \1, undef)}
 	);
-	eval { $obj->yaml_load_file( bless( {}, 'Test' ), 'limos', undef, [] ) };
+	eval {
+		$obj->yaml_load_file( bless( {}, 'Test' ), 'thanatos', undef, [] );
+	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_file(bless({}, 'Test'), 'limos', undef, [])}
+		q{$obj->yaml_load_file(bless({}, 'Test'), 'thanatos', undef, [])}
 	);
-	eval { $obj->yaml_load_file( bless( {}, 'Test' ), 'limos', undef, {} ) };
+	eval {
+		$obj->yaml_load_file( bless( {}, 'Test' ), 'thanatos', undef, {} );
+	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_load_file(bless({}, 'Test'), 'limos', undef, {})}
+		q{$obj->yaml_load_file(bless({}, 'Test'), 'thanatos', undef, {})}
 	);
 };
 subtest '_yaml_load_file_YAML' => sub {
@@ -378,11 +384,11 @@ subtest '_yaml_load_file_YAML' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->_yaml_load_file_YAML([], 'phobos', undef, undef)}
 	);
-	eval { $obj->_yaml_load_file_YAML( 'geras', 'phobos', undef, undef ) };
+	eval { $obj->_yaml_load_file_YAML( 'phobos', 'phobos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_file_YAML('geras', 'phobos', undef, undef)}
+		q{$obj->_yaml_load_file_YAML('phobos', 'phobos', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_load_file_YAML( bless( {}, 'Test' ), [], undef, undef );
@@ -431,17 +437,17 @@ subtest '_yaml_load_file_YAML_XS' => sub {
 		q{my $obj = Hades::Macro::YAML->new({})}
 	);
 	can_ok( $obj, '_yaml_load_file_YAML_XS' );
-	eval { $obj->_yaml_load_file_YAML_XS( [], 'geras', undef, undef ) };
+	eval { $obj->_yaml_load_file_YAML_XS( [], 'hypnos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_file_YAML_XS([], 'geras', undef, undef)}
+		q{$obj->_yaml_load_file_YAML_XS([], 'hypnos', undef, undef)}
 	);
-	eval { $obj->_yaml_load_file_YAML_XS( 'gaudia', 'geras', undef, undef ) };
+	eval { $obj->_yaml_load_file_YAML_XS( 'aporia', 'hypnos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_file_YAML_XS('gaudia', 'geras', undef, undef)}
+		q{$obj->_yaml_load_file_YAML_XS('aporia', 'hypnos', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_load_file_YAML_XS( bless( {}, 'Test' ), [], undef, undef );
@@ -457,31 +463,31 @@ subtest '_yaml_load_file_YAML_XS' => sub {
 	);
 	eval {
 		$obj->_yaml_load_file_YAML_XS( bless( {}, 'Test' ),
-			'geras', [], undef );
+			'hypnos', [], undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_file_YAML_XS(bless({}, 'Test'), 'geras', [], undef)}
+		q{$obj->_yaml_load_file_YAML_XS(bless({}, 'Test'), 'hypnos', [], undef)}
 	);
 	eval {
 		$obj->_yaml_load_file_YAML_XS( bless( {}, 'Test' ),
-			'geras', \1, undef );
+			'hypnos', \1, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_file_YAML_XS(bless({}, 'Test'), 'geras', \1, undef)}
+		q{$obj->_yaml_load_file_YAML_XS(bless({}, 'Test'), 'hypnos', \1, undef)}
 	);
 	eval {
 		$obj->_yaml_load_file_YAML_XS( bless( {}, 'Test' ),
-			'geras', undef, [] );
+			'hypnos', undef, [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_file_YAML_XS(bless({}, 'Test'), 'geras', undef, [])}
+		q{$obj->_yaml_load_file_YAML_XS(bless({}, 'Test'), 'hypnos', undef, [])}
 	);
 	eval {
 		$obj->_yaml_load_file_YAML_XS( bless( {}, 'Test' ),
-			'geras', undef, {} );
+			'hypnos', undef, {} );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_file_YAML_XS(bless({}, 'Test'), 'geras', undef, {})}
+		q{$obj->_yaml_load_file_YAML_XS(bless({}, 'Test'), 'hypnos', undef, {})}
 	);
 };
 subtest '_yaml_load_file_YAML_PP' => sub {
@@ -496,11 +502,13 @@ subtest '_yaml_load_file_YAML_PP' => sub {
 		qr/invalid|value|type|constraint|greater|atleast/,
 		q{$obj->_yaml_load_file_YAML_PP([], 'nosoi', undef, undef)}
 	);
-	eval { $obj->_yaml_load_file_YAML_PP( 'curae', 'nosoi', undef, undef ) };
+	eval {
+		$obj->_yaml_load_file_YAML_PP( 'thanatos', 'nosoi', undef, undef );
+	};
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_load_file_YAML_PP('curae', 'nosoi', undef, undef)}
+		q{$obj->_yaml_load_file_YAML_PP('thanatos', 'nosoi', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_load_file_YAML_PP( bless( {}, 'Test' ), [], undef, undef );
@@ -549,17 +557,17 @@ subtest 'yaml_write_string' => sub {
 		q{my $obj = Hades::Macro::YAML->new({})}
 	);
 	can_ok( $obj, 'yaml_write_string' );
-	eval { $obj->yaml_write_string( [], 'algea', undef, undef ) };
+	eval { $obj->yaml_write_string( [], 'thanatos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_string([], 'algea', undef, undef)}
+		q{$obj->yaml_write_string([], 'thanatos', undef, undef)}
 	);
-	eval { $obj->yaml_write_string( 'geras', 'algea', undef, undef ) };
+	eval { $obj->yaml_write_string( 'penthos', 'thanatos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_string('geras', 'algea', undef, undef)}
+		q{$obj->yaml_write_string('penthos', 'thanatos', undef, undef)}
 	);
 	eval { $obj->yaml_write_string( bless( {}, 'Test' ), [], undef, undef ) };
 	like(
@@ -574,36 +582,28 @@ subtest 'yaml_write_string' => sub {
 		q{$obj->yaml_write_string(bless({}, 'Test'), \1, undef, undef)}
 	);
 	eval {
-		$obj->yaml_write_string( bless( {}, 'Test' ), 'algea', [], undef );
+		$obj->yaml_write_string( bless( {}, 'Test' ), 'thanatos', [], undef );
 	};
-	like(
-		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_string(bless({}, 'Test'), 'algea', [], undef)}
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+		q{$obj->yaml_write_string(bless({}, 'Test'), 'thanatos', [], undef)}
 	);
 	eval {
-		$obj->yaml_write_string( bless( {}, 'Test' ), 'algea', \1, undef );
+		$obj->yaml_write_string( bless( {}, 'Test' ), 'thanatos', \1, undef );
 	};
-	like(
-		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_string(bless({}, 'Test'), 'algea', \1, undef)}
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+		q{$obj->yaml_write_string(bless({}, 'Test'), 'thanatos', \1, undef)}
 	);
 	eval {
-		$obj->yaml_write_string( bless( {}, 'Test' ), 'algea', undef, [] );
+		$obj->yaml_write_string( bless( {}, 'Test' ), 'thanatos', undef, [] );
 	};
-	like(
-		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_string(bless({}, 'Test'), 'algea', undef, [])}
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+		q{$obj->yaml_write_string(bless({}, 'Test'), 'thanatos', undef, [])}
 	);
 	eval {
-		$obj->yaml_write_string( bless( {}, 'Test' ), 'algea', undef, {} );
+		$obj->yaml_write_string( bless( {}, 'Test' ), 'thanatos', undef, {} );
 	};
-	like(
-		$@,
-		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_string(bless({}, 'Test'), 'algea', undef, {})}
+	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
+		q{$obj->yaml_write_string(bless({}, 'Test'), 'thanatos', undef, {})}
 	);
 };
 subtest '_yaml_write_string_YAML' => sub {
@@ -612,19 +612,17 @@ subtest '_yaml_write_string_YAML' => sub {
 		q{my $obj = Hades::Macro::YAML->new({})}
 	);
 	can_ok( $obj, '_yaml_write_string_YAML' );
-	eval { $obj->_yaml_write_string_YAML( [], 'phobos', undef, undef ) };
+	eval { $obj->_yaml_write_string_YAML( [], 'limos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML([], 'phobos', undef, undef)}
+		q{$obj->_yaml_write_string_YAML([], 'limos', undef, undef)}
 	);
-	eval {
-		$obj->_yaml_write_string_YAML( 'penthos', 'phobos', undef, undef );
-	};
+	eval { $obj->_yaml_write_string_YAML( 'hypnos', 'limos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML('penthos', 'phobos', undef, undef)}
+		q{$obj->_yaml_write_string_YAML('hypnos', 'limos', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML( bless( {}, 'Test' ), [], undef, undef );
@@ -640,31 +638,31 @@ subtest '_yaml_write_string_YAML' => sub {
 	);
 	eval {
 		$obj->_yaml_write_string_YAML( bless( {}, 'Test' ),
-			'phobos', [], undef );
+			'limos', [], undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML(bless({}, 'Test'), 'phobos', [], undef)}
+		q{$obj->_yaml_write_string_YAML(bless({}, 'Test'), 'limos', [], undef)}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML( bless( {}, 'Test' ),
-			'phobos', \1, undef );
+			'limos', \1, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML(bless({}, 'Test'), 'phobos', \1, undef)}
+		q{$obj->_yaml_write_string_YAML(bless({}, 'Test'), 'limos', \1, undef)}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML( bless( {}, 'Test' ),
-			'phobos', undef, [] );
+			'limos', undef, [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML(bless({}, 'Test'), 'phobos', undef, [])}
+		q{$obj->_yaml_write_string_YAML(bless({}, 'Test'), 'limos', undef, [])}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML( bless( {}, 'Test' ),
-			'phobos', undef, {} );
+			'limos', undef, {} );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML(bless({}, 'Test'), 'phobos', undef, {})}
+		q{$obj->_yaml_write_string_YAML(bless({}, 'Test'), 'limos', undef, {})}
 	);
 };
 subtest '_yaml_write_string_YAML_XS' => sub {
@@ -673,17 +671,17 @@ subtest '_yaml_write_string_YAML_XS' => sub {
 		q{my $obj = Hades::Macro::YAML->new({})}
 	);
 	can_ok( $obj, '_yaml_write_string_YAML_XS' );
-	eval { $obj->_yaml_write_string_YAML_XS( [], 'geras', undef, undef ) };
+	eval { $obj->_yaml_write_string_YAML_XS( [], 'hypnos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_XS([], 'geras', undef, undef)}
+		q{$obj->_yaml_write_string_YAML_XS([], 'hypnos', undef, undef)}
 	);
 	eval {
-		$obj->_yaml_write_string_YAML_XS( 'penthos', 'geras', undef, undef );
+		$obj->_yaml_write_string_YAML_XS( 'penthos', 'hypnos', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_XS('penthos', 'geras', undef, undef)}
+		q{$obj->_yaml_write_string_YAML_XS('penthos', 'hypnos', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML_XS( bless( {}, 'Test' ),
@@ -701,31 +699,31 @@ subtest '_yaml_write_string_YAML_XS' => sub {
 	);
 	eval {
 		$obj->_yaml_write_string_YAML_XS( bless( {}, 'Test' ),
-			'geras', [], undef );
+			'hypnos', [], undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_XS(bless({}, 'Test'), 'geras', [], undef)}
+		q{$obj->_yaml_write_string_YAML_XS(bless({}, 'Test'), 'hypnos', [], undef)}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML_XS( bless( {}, 'Test' ),
-			'geras', \1, undef );
+			'hypnos', \1, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_XS(bless({}, 'Test'), 'geras', \1, undef)}
+		q{$obj->_yaml_write_string_YAML_XS(bless({}, 'Test'), 'hypnos', \1, undef)}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML_XS( bless( {}, 'Test' ),
-			'geras', undef, [] );
+			'hypnos', undef, [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_XS(bless({}, 'Test'), 'geras', undef, [])}
+		q{$obj->_yaml_write_string_YAML_XS(bless({}, 'Test'), 'hypnos', undef, [])}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML_XS( bless( {}, 'Test' ),
-			'geras', undef, {} );
+			'hypnos', undef, {} );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_XS(bless({}, 'Test'), 'geras', undef, {})}
+		q{$obj->_yaml_write_string_YAML_XS(bless({}, 'Test'), 'hypnos', undef, {})}
 	);
 };
 subtest '_yaml_write_string_YAML_PP' => sub {
@@ -734,17 +732,17 @@ subtest '_yaml_write_string_YAML_PP' => sub {
 		q{my $obj = Hades::Macro::YAML->new({})}
 	);
 	can_ok( $obj, '_yaml_write_string_YAML_PP' );
-	eval { $obj->_yaml_write_string_YAML_PP( [], 'phobos', undef, undef ) };
+	eval { $obj->_yaml_write_string_YAML_PP( [], 'aporia', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_PP([], 'phobos', undef, undef)}
+		q{$obj->_yaml_write_string_YAML_PP([], 'aporia', undef, undef)}
 	);
 	eval {
-		$obj->_yaml_write_string_YAML_PP( 'nosoi', 'phobos', undef, undef );
+		$obj->_yaml_write_string_YAML_PP( 'thanatos', 'aporia', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_PP('nosoi', 'phobos', undef, undef)}
+		q{$obj->_yaml_write_string_YAML_PP('thanatos', 'aporia', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML_PP( bless( {}, 'Test' ),
@@ -762,31 +760,31 @@ subtest '_yaml_write_string_YAML_PP' => sub {
 	);
 	eval {
 		$obj->_yaml_write_string_YAML_PP( bless( {}, 'Test' ),
-			'phobos', [], undef );
+			'aporia', [], undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_PP(bless({}, 'Test'), 'phobos', [], undef)}
+		q{$obj->_yaml_write_string_YAML_PP(bless({}, 'Test'), 'aporia', [], undef)}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML_PP( bless( {}, 'Test' ),
-			'phobos', \1, undef );
+			'aporia', \1, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_PP(bless({}, 'Test'), 'phobos', \1, undef)}
+		q{$obj->_yaml_write_string_YAML_PP(bless({}, 'Test'), 'aporia', \1, undef)}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML_PP( bless( {}, 'Test' ),
-			'phobos', undef, [] );
+			'aporia', undef, [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_PP(bless({}, 'Test'), 'phobos', undef, [])}
+		q{$obj->_yaml_write_string_YAML_PP(bless({}, 'Test'), 'aporia', undef, [])}
 	);
 	eval {
 		$obj->_yaml_write_string_YAML_PP( bless( {}, 'Test' ),
-			'phobos', undef, {} );
+			'aporia', undef, {} );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_string_YAML_PP(bless({}, 'Test'), 'phobos', undef, {})}
+		q{$obj->_yaml_write_string_YAML_PP(bless({}, 'Test'), 'aporia', undef, {})}
 	);
 };
 subtest 'yaml_write_file' => sub {
@@ -795,73 +793,73 @@ subtest 'yaml_write_file' => sub {
 		q{my $obj = Hades::Macro::YAML->new({})}
 	);
 	can_ok( $obj, 'yaml_write_file' );
-	eval { $obj->yaml_write_file( [], 'aporia', 'geras', undef, undef ) };
+	eval { $obj->yaml_write_file( [], 'geras', 'limos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_file([], 'aporia', 'geras', undef, undef)}
+		q{$obj->yaml_write_file([], 'geras', 'limos', undef, undef)}
 	);
-	eval { $obj->yaml_write_file( 'nosoi', 'aporia', 'geras', undef, undef ) };
+	eval { $obj->yaml_write_file( 'geras', 'geras', 'limos', undef, undef ) };
 	like(
 		$@,
 		qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_file('nosoi', 'aporia', 'geras', undef, undef)}
+		q{$obj->yaml_write_file('geras', 'geras', 'limos', undef, undef)}
 	);
 	eval {
 		$obj->yaml_write_file( bless( {}, 'Test' ),
-			[], 'geras', undef, undef );
+			[], 'limos', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_file(bless({}, 'Test'), [], 'geras', undef, undef)}
+		q{$obj->yaml_write_file(bless({}, 'Test'), [], 'limos', undef, undef)}
 	);
 	eval {
 		$obj->yaml_write_file( bless( {}, 'Test' ),
-			\1, 'geras', undef, undef );
+			\1, 'limos', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_file(bless({}, 'Test'), \1, 'geras', undef, undef)}
+		q{$obj->yaml_write_file(bless({}, 'Test'), \1, 'limos', undef, undef)}
 	);
 	eval {
 		$obj->yaml_write_file( bless( {}, 'Test' ),
-			'aporia', [], undef, undef );
+			'geras', [], undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_file(bless({}, 'Test'), 'aporia', [], undef, undef)}
+		q{$obj->yaml_write_file(bless({}, 'Test'), 'geras', [], undef, undef)}
 	);
 	eval {
 		$obj->yaml_write_file( bless( {}, 'Test' ),
-			'aporia', \1, undef, undef );
+			'geras', \1, undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_file(bless({}, 'Test'), 'aporia', \1, undef, undef)}
+		q{$obj->yaml_write_file(bless({}, 'Test'), 'geras', \1, undef, undef)}
 	);
 	eval {
 		$obj->yaml_write_file( bless( {}, 'Test' ),
-			'aporia', 'geras', [], undef );
+			'geras', 'limos', [], undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_file(bless({}, 'Test'), 'aporia', 'geras', [], undef)}
+		q{$obj->yaml_write_file(bless({}, 'Test'), 'geras', 'limos', [], undef)}
 	);
 	eval {
 		$obj->yaml_write_file( bless( {}, 'Test' ),
-			'aporia', 'geras', \1, undef );
+			'geras', 'limos', \1, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_file(bless({}, 'Test'), 'aporia', 'geras', \1, undef)}
+		q{$obj->yaml_write_file(bless({}, 'Test'), 'geras', 'limos', \1, undef)}
 	);
 	eval {
 		$obj->yaml_write_file( bless( {}, 'Test' ),
-			'aporia', 'geras', undef, [] );
+			'geras', 'limos', undef, [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_file(bless({}, 'Test'), 'aporia', 'geras', undef, [])}
+		q{$obj->yaml_write_file(bless({}, 'Test'), 'geras', 'limos', undef, [])}
 	);
 	eval {
 		$obj->yaml_write_file( bless( {}, 'Test' ),
-			'aporia', 'geras', undef, {} );
+			'geras', 'limos', undef, {} );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->yaml_write_file(bless({}, 'Test'), 'aporia', 'geras', undef, {})}
+		q{$obj->yaml_write_file(bless({}, 'Test'), 'geras', 'limos', undef, {})}
 	);
 };
 subtest '_yaml_write_file_YAML' => sub {
@@ -871,73 +869,73 @@ subtest '_yaml_write_file_YAML' => sub {
 	);
 	can_ok( $obj, '_yaml_write_file_YAML' );
 	eval {
-		$obj->_yaml_write_file_YAML( [], 'aporia', 'penthos', undef, undef );
+		$obj->_yaml_write_file_YAML( [], 'thanatos', 'nosoi', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML([], 'aporia', 'penthos', undef, undef)}
+		q{$obj->_yaml_write_file_YAML([], 'thanatos', 'nosoi', undef, undef)}
 	);
 	eval {
-		$obj->_yaml_write_file_YAML( 'algea', 'aporia', 'penthos', undef,
+		$obj->_yaml_write_file_YAML( 'phobos', 'thanatos', 'nosoi', undef,
 			undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML('algea', 'aporia', 'penthos', undef, undef)}
+		q{$obj->_yaml_write_file_YAML('phobos', 'thanatos', 'nosoi', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML( bless( {}, 'Test' ),
-			[], 'penthos', undef, undef );
+			[], 'nosoi', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), [], 'penthos', undef, undef)}
+		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), [], 'nosoi', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML( bless( {}, 'Test' ),
-			\1, 'penthos', undef, undef );
+			\1, 'nosoi', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), \1, 'penthos', undef, undef)}
+		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), \1, 'nosoi', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML( bless( {}, 'Test' ),
-			'aporia', [], undef, undef );
+			'thanatos', [], undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'aporia', [], undef, undef)}
+		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'thanatos', [], undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML( bless( {}, 'Test' ),
-			'aporia', \1, undef, undef );
+			'thanatos', \1, undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'aporia', \1, undef, undef)}
+		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'thanatos', \1, undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML( bless( {}, 'Test' ),
-			'aporia', 'penthos', [], undef );
+			'thanatos', 'nosoi', [], undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'aporia', 'penthos', [], undef)}
+		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'thanatos', 'nosoi', [], undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML( bless( {}, 'Test' ),
-			'aporia', 'penthos', \1, undef );
+			'thanatos', 'nosoi', \1, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'aporia', 'penthos', \1, undef)}
+		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'thanatos', 'nosoi', \1, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML( bless( {}, 'Test' ),
-			'aporia', 'penthos', undef, [] );
+			'thanatos', 'nosoi', undef, [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'aporia', 'penthos', undef, [])}
+		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'thanatos', 'nosoi', undef, [])}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML( bless( {}, 'Test' ),
-			'aporia', 'penthos', undef, {} );
+			'thanatos', 'nosoi', undef, {} );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'aporia', 'penthos', undef, {})}
+		q{$obj->_yaml_write_file_YAML(bless({}, 'Test'), 'thanatos', 'nosoi', undef, {})}
 	);
 };
 subtest '_yaml_write_file_YAML_XS' => sub {
@@ -947,73 +945,73 @@ subtest '_yaml_write_file_YAML_XS' => sub {
 	);
 	can_ok( $obj, '_yaml_write_file_YAML_XS' );
 	eval {
-		$obj->_yaml_write_file_YAML_XS( [], 'curae', 'nosoi', undef, undef );
+		$obj->_yaml_write_file_YAML_XS( [], 'limos', 'algea', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_XS([], 'curae', 'nosoi', undef, undef)}
+		q{$obj->_yaml_write_file_YAML_XS([], 'limos', 'algea', undef, undef)}
 	);
 	eval {
-		$obj->_yaml_write_file_YAML_XS( 'phobos', 'curae', 'nosoi', undef,
+		$obj->_yaml_write_file_YAML_XS( 'thanatos', 'limos', 'algea', undef,
 			undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_XS('phobos', 'curae', 'nosoi', undef, undef)}
+		q{$obj->_yaml_write_file_YAML_XS('thanatos', 'limos', 'algea', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_XS( bless( {}, 'Test' ),
-			[], 'nosoi', undef, undef );
+			[], 'algea', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), [], 'nosoi', undef, undef)}
+		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), [], 'algea', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_XS( bless( {}, 'Test' ),
-			\1, 'nosoi', undef, undef );
+			\1, 'algea', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), \1, 'nosoi', undef, undef)}
+		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), \1, 'algea', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_XS( bless( {}, 'Test' ),
-			'curae', [], undef, undef );
+			'limos', [], undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'curae', [], undef, undef)}
+		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'limos', [], undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_XS( bless( {}, 'Test' ),
-			'curae', \1, undef, undef );
+			'limos', \1, undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'curae', \1, undef, undef)}
+		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'limos', \1, undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_XS( bless( {}, 'Test' ),
-			'curae', 'nosoi', [], undef );
+			'limos', 'algea', [], undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'curae', 'nosoi', [], undef)}
+		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'limos', 'algea', [], undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_XS( bless( {}, 'Test' ),
-			'curae', 'nosoi', \1, undef );
+			'limos', 'algea', \1, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'curae', 'nosoi', \1, undef)}
+		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'limos', 'algea', \1, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_XS( bless( {}, 'Test' ),
-			'curae', 'nosoi', undef, [] );
+			'limos', 'algea', undef, [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'curae', 'nosoi', undef, [])}
+		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'limos', 'algea', undef, [])}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_XS( bless( {}, 'Test' ),
-			'curae', 'nosoi', undef, {} );
+			'limos', 'algea', undef, {} );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'curae', 'nosoi', undef, {})}
+		q{$obj->_yaml_write_file_YAML_XS(bless({}, 'Test'), 'limos', 'algea', undef, {})}
 	);
 };
 subtest '_yaml_write_file_YAML_PP' => sub {
@@ -1023,73 +1021,73 @@ subtest '_yaml_write_file_YAML_PP' => sub {
 	);
 	can_ok( $obj, '_yaml_write_file_YAML_PP' );
 	eval {
-		$obj->_yaml_write_file_YAML_PP( [], 'penthos', 'algea', undef, undef );
+		$obj->_yaml_write_file_YAML_PP( [], 'hypnos', 'curae', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_PP([], 'penthos', 'algea', undef, undef)}
+		q{$obj->_yaml_write_file_YAML_PP([], 'hypnos', 'curae', undef, undef)}
 	);
 	eval {
-		$obj->_yaml_write_file_YAML_PP( 'aporia', 'penthos', 'algea', undef,
+		$obj->_yaml_write_file_YAML_PP( 'hypnos', 'hypnos', 'curae', undef,
 			undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_PP('aporia', 'penthos', 'algea', undef, undef)}
+		q{$obj->_yaml_write_file_YAML_PP('hypnos', 'hypnos', 'curae', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_PP( bless( {}, 'Test' ),
-			[], 'algea', undef, undef );
+			[], 'curae', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), [], 'algea', undef, undef)}
+		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), [], 'curae', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_PP( bless( {}, 'Test' ),
-			\1, 'algea', undef, undef );
+			\1, 'curae', undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), \1, 'algea', undef, undef)}
+		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), \1, 'curae', undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_PP( bless( {}, 'Test' ),
-			'penthos', [], undef, undef );
+			'hypnos', [], undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'penthos', [], undef, undef)}
+		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'hypnos', [], undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_PP( bless( {}, 'Test' ),
-			'penthos', \1, undef, undef );
+			'hypnos', \1, undef, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'penthos', \1, undef, undef)}
+		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'hypnos', \1, undef, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_PP( bless( {}, 'Test' ),
-			'penthos', 'algea', [], undef );
+			'hypnos', 'curae', [], undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'penthos', 'algea', [], undef)}
+		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'hypnos', 'curae', [], undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_PP( bless( {}, 'Test' ),
-			'penthos', 'algea', \1, undef );
+			'hypnos', 'curae', \1, undef );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'penthos', 'algea', \1, undef)}
+		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'hypnos', 'curae', \1, undef)}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_PP( bless( {}, 'Test' ),
-			'penthos', 'algea', undef, [] );
+			'hypnos', 'curae', undef, [] );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'penthos', 'algea', undef, [])}
+		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'hypnos', 'curae', undef, [])}
 	);
 	eval {
 		$obj->_yaml_write_file_YAML_PP( bless( {}, 'Test' ),
-			'penthos', 'algea', undef, {} );
+			'hypnos', 'curae', undef, {} );
 	};
 	like( $@, qr/invalid|value|type|constraint|greater|atleast/,
-		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'penthos', 'algea', undef, {})}
+		q{$obj->_yaml_write_file_YAML_PP(bless({}, 'Test'), 'hypnos', 'curae', undef, {})}
 	);
 };
 done_testing();

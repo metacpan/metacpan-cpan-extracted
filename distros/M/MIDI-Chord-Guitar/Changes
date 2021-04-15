@@ -1,5 +1,17 @@
 Revision history for MIDI-Chord-Guitar
 
+0.0502 2021-04-15 10:19:31
+    - Improve documentation slightly...
+
+0.0501 2021-04-15 10:14:30
+    - Improve documentation.
+
+0.0500 2021-04-15 09:58:46
+    - Add a fingering column to the chord data.
+    - Add missing chords and fix a couple voicings.
+    - Update the eg/ programs.
+    - Improve documentation.
+
 0.0400 2020-11-20 12:13:31
     - Update documentation slightly.
     - Fix-up eg/voicing-stat a bit.

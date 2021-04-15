@@ -31,23 +31,23 @@ $expect = [40, 47, 52, 56, 59, 64];
 is_deeply $got, $expect, 'transform';
 
 $got = $mcg->transform('D3', 'dim7', 0);
-$expect = [41, 47, 50, 56];
+$expect = [50, 53, 60, 62];
 is_deeply $got, $expect, 'transform';
 
 $got = $mcg->transform('D3', 'dim7');
-$expect = [ [41, 47, 50, 56], [50, 56, 59, 65, 68] ];
+$expect = [ [ 50, 53, 60, 62 ], [ 50, 57, 60, 65, 69 ], [ 50, 57, 60, 65, 69, 74 ], [ 50, 57, 60, 65 ] ];
 is_deeply $got, $expect, 'transform';
 
 $got = $mcg->voicings('dim7');
-$expect = [ [51, 57, 60, 66], [48, 54, 57, 63, 66] ];
+$expect = [ [ 48, 51, 58, 60 ], [ 48, 55, 58, 63, 67 ], [ 48, 55, 58, 63, 67, 72 ], [ 60, 67, 70, 75 ] ];
 is_deeply $got, $expect, 'voicings';
 
 $got = $mcg->voicings('dim7', 'ISO');
-$expect = [ ['D#3', 'A3', 'C4', 'F#4'], ['C3', 'F#3', 'A3', 'D#4', 'F#4'] ];
+$expect = [ [ 'C3', 'D#3', 'A#3', 'C4' ], [ 'C3', 'G3', 'A#3', 'D#4', 'G4' ], [ 'C3', 'G3', 'A#3', 'D#4', 'G4', 'C5' ], [ 'C4', 'G4', 'A#4', 'D#5' ] ];
 is_deeply $got, $expect, 'voicings';
 
 $got = $mcg->voicings('dim7', 'midi');
-$expect = [ ['Ds3', 'A3', 'C4', 'Fs4'], ['C3', 'Fs3', 'A3', 'Ds4', 'Fs4'] ];
+$expect = [ [ 'C3', 'Ds3', 'As3', 'C4' ], [ 'C3', 'G3', 'As3', 'Ds4', 'G4' ], [ 'C3', 'G3', 'As3', 'Ds4', 'G4', 'C5' ], [ 'C4', 'G4', 'As4', 'Ds5' ] ];
 is_deeply $got, $expect, 'voicings';
 
 done_testing();

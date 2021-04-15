@@ -71991,3 +71991,6 @@ B/BK/BKB/Unicode-Confuse-0.03.tar.gz
 C/CV/CVLIBRARY/WebDriver-Tiny-0.105.tar.gz
 T/TO/TOBIB/Wireguard-WGmeta-0.2.3.tar.gz
 P/PE/PEVANS/XS-Parse-Keyword-0.01.tar.gz
+L/LN/LNATION/Hades-Macro-YAML-0.03.tar.gz
+G/GE/GENE/MIDI-Chord-Guitar-0.0502.tar.gz
+D/DA/DAVECROSS/Number-Fraction-v3.0.4.tar.gz

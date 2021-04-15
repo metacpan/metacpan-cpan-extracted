@@ -5,10 +5,11 @@ use warnings;
 use Data::Dumper::Compact 'ddc';
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
 use MIDI::Chord::Guitar;
-use MIDI::Util;
+use MIDI::Util qw(setup_score);
 
-my $score = MIDI::Util::setup_score(patch => 24, bpm => 90);
+my $score = setup_score(patch => 24, bpm => 90);
 
+#my $mcg = MIDI::Chord::Guitar->new(voicing_file => 'share/midi-guitar-chord-voicings.csv');
 my $mcg = MIDI::Chord::Guitar->new;
 
 # Inspect the voicings
