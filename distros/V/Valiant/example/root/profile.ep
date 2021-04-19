@@ -78,7 +78,7 @@
 
       % if(my @person_roles = @{ $person->person_roles->get_cache||[] } ) {
         % foreach my $pr (@person_roles) {
-          %= $pr->person_id .'||'. $pr->role_id .'||'. $pr->is_marked_for_deletion;
+          %= $pr->person_id .'||'. $pr->role_id .'||delete: '. $pr->is_marked_for_deletion .'||pruned: '. $pr->is_pruned;
           <br>
         % }
       % }
@@ -86,13 +86,13 @@
       % my @role =();
       % if(@role = @{ $roles_rs->get_cache||[] } ) {
         % foreach my $r (@role) {
-          %= $r->id .'||'. $r->is_marked_for_deletion;
+          %= $r->id .'||delete: '. $r->is_marked_for_deletion .'||pruned: '. $r->is_pruned;
           <br>
         % }
       % }
 
       % my %existing = map { $_->role_id => $_} grep { !$_->is_marked_for_deletion } $person->person_roles->search({},{cache=>1})->all;
-      % #my %existing = map { $_->id => $_} grep { !$_->is_deleted_branch } @role;
+      % #my %existing = map { $_->id => $_} grep { !$_->is_pruned } @role;
       % foreach my $role ($person->roles->result_source->resultset->search({},{cache=>1})->all) {
         <div class='form-check'>
           % my %checked = $existing{$role->id} ? (checked=>1) : ();
@@ -109,17 +109,19 @@
     <legend><%= $person->human_attribute_name('credit_cards') %></legend>
 
     % my $idx = 0;
-    % $person->build_related('credit_cards') if $build_empty_cc; # This would be 
     % my $credit_cards_rs = $person->credit_cards;
     % if(my @ccs = @{ $credit_cards_rs->get_cache||[] } ) {
       % foreach my $cc (@ccs) {
         % my $cc_id = $cc->id ? $cc->id : 'noccid';
-        %= $cc->person_id .'||'. $cc_id .'||'. $cc->is_marked_for_deletion;
+        %= $cc->person_id .'||'. $cc_id .'||'. $cc->is_marked_for_deletion .'||'. $cc->is_pruned;
         <br>
       % }
     % }
 
     % foreach my $credit_card ($credit_cards_rs->search({},{cache=>1})->all) {
+      % if($credit_card->id) {
+        %= input_tag { name=>'credit_cards.'.$idx.'.id', type=>'hidden', value=>$credit_card->id }
+      % }
       <div class='form-row'>
         <div class='col form-group'>
           %= label_tag { for=>'credit_cards.'.$idx.'.card_number' }, 'Card Number'
@@ -129,11 +131,17 @@
           %= label_tag { for=>'credit_cards.'.$idx.'.expiration' }, 'Expiration'
           %= input_tag { name=>'credit_cards.'.$idx.'.expiration', type=>'text', class=>'form-control', value=>$credit_card->read_attribute_for_validation('expiration') }
         </div>
+        <div class='col form-group col-2'>
+          % my %delete_credit_cards_checked = ();
+          %= label_tag { for=>'credit_cards.'.$idx.'._delete', class=>'form-check-label' }, 'Delete';
+          <br>
+          %= input_tag { name=>'credit_cards.'.$idx.'._delete', type=>'checkbox', value=>1, $credit_card->is_marked_for_deletion ? (checked=>1):() }
+        </div>
       </div>
       % $idx++;
     % }
 
-    %= button_tag { class=>'btn btn-lg btn-primary btn-block', name=>'add', value=>1 }, 'Add Credit Card'
+    %= button_tag { class=>'btn btn-lg btn-primary btn-block', name=>'add.credit_cards', value=>1 }, 'Add Credit Card'
   </fieldset>
 
   <fieldset>

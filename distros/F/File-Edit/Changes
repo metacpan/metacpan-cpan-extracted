@@ -1,5 +1,11 @@
 Revision history for File-Edit
 
+0.0.6   18 Apr, 2021
+        Add methods at() and insert() to insert lines at a location
+
+0.0.5   18 Apr, 2021
+        Add swap() method to swap lines.
+
 0.0.4   12 Apr, 2021
         Handle regex meta characters when replacing.
 

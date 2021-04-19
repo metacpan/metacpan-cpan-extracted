@@ -1,5 +1,25 @@
 Revision history for Perl extension NEXT.pm
 
+0.68 2021-04-19 NEILB
+    - Fix for RT#123002, so NEXT works with proxy constants
+    - Made testsuite clean under strict & warnings
+    - Made testsuite pass if running under perls that are already c3.
+
+0.67_03 2021-04-18 NEILB
+    - mro was added in Perl 5.9.5, and it's not dual-life, so Reini's
+      patch (in 0.67_01) failed on earlier versions of Perl.
+      Have now made its use dependent on version, with "use if".
+
+0.67_02 2021-04-18 NEILB
+    - Applied patch from Father C so that NEXT works with proxy constants.
+      RT#123002
+
+0.67_01 2021-04-18 NEILB
+    - Enforced strict and warnings on testsuite. Thanks to ATOOMIC.
+    - Added github CI. Thanks to ATOOMIC.
+    - @ISA fixes for c3, so tests will pass on perls that use c3 as default
+      (for example cperl). Thanks to RURBAN.
+
 0.67 2016-07-30 NEILB
     - Changed class names in SYNOPSIS from A, B, C, D to P, Q, R, S.
       This is avoid potential clash with core B:: namespace. RT#9734

@@ -1,0 +1,242 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::Storage::Implementation::Redis
+at lib/Myriad/Storage/Implementation/Redis.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Myriad::Storage::Redis - microservice storage abstraction
+
+=head1 SYNOPSIS
+
+=head2 apply_prefix
+
+Add the storage prefix to the key before sending it to Redis
+
+=head2 get
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=back
+
+Returns a L<Future> which will resolve to the corresponding value, or C<undef> if none.
+
+=head2 set
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$v> - the scalar value to set
+
+=back
+
+Note that references are currently B<not> supported - attempts to write an arrayref, hashref
+or object will fail.
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 getset
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$v> - the scalar value to set
+
+=back
+
+Note that references are currently B<not> supported - attempts to write an arrayref, hashref
+or object will fail.
+
+Returns a L<Future> which will resolve to the original value on completion.
+
+=head2 observe
+
+Observe a specific key.
+
+Returns a L<Ryu::Source> which will emit the current and all subsequent values.
+
+=head2 push
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$v> - the scalar value to set
+
+=back
+
+Returns a L<Future> which will resolve to .
+
+=head2 unshift
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to .
+
+=head2 pop
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to .
+
+=head2 shift
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to .
+
+=head2 hash_set
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to .
+
+=head2 hash_get
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to the scalar value for this key.
+
+=head2 hash_add
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> indicating success or failure.
+
+=head2 hash_keys
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to a list of the keys in no defined order.
+
+=head2 hash_values
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to a list of the values in no defined order.
+
+=head2 hash_exists
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to true if the key exists in this hash.
+
+=head2 hash_count
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to the count of the keys in this hash.
+
+=head2 hash_as_list
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to a list of key/value pairs,
+suitable for assigning to a hash.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+

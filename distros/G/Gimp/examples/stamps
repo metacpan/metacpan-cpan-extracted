@@ -10,10 +10,10 @@ N_"/Xtns/Render"; # dummy translation for i18n bugs
 podregister {
   Gimp::Context->set_background($paper);
   my $img = Gimp::Image->new($size, $size, RGB);
-  my $layer = $img->layer_new($size, $size, RGB_IMAGE, "Layer 1", 100, NORMAL_MODE);
+  my $layer = $img->layer_new($size, $size, RGB_IMAGE, "Layer 1", 100, LAYER_MODE_NORMAL_LEGACY);
   $img->insert_layer($layer, 0, -1);
   Gimp::Context->set_background($hole);
-  $layer->edit_fill(BACKGROUND_FILL);
+  $layer->edit_fill(FILL_BACKGROUND);
   $img->selection_none;
   my $ncircles = int(($size + $gap) / ($diameter + $gap));
   my $x = 0;
@@ -23,7 +23,7 @@ podregister {
     $x += $diameter + $gap;
   }
   Gimp::Context->set_background($paper);
-  $layer->edit_fill(BACKGROUND_FILL);
+  $layer->edit_fill(FILL_BACKGROUND);
   $img->selection_none;
 # here, at last, comes the clever part! :-)
   $layer->offset(1, 0, -($diameter / 2), -($diameter / 2));

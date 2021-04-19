@@ -14,12 +14,12 @@ sub new_scratchlayer {
     my ($image,$drawable,$length,$gamma,$angle) = @_;
     my $type = $image->layertype(0);
     my $layer = $image->layer_new ($drawable->width, $drawable->height, $image->layertype(0),
-                                  "displace layer ($angle)", 100, NORMAL_MODE);
+                                  "displace layer ($angle)", 100, LAYER_MODE_NORMAL_LEGACY);
     $layer->insert_layer(0, -1);
-    $layer->fill (WHITE_FILL);
+    $layer->fill (FILL_WHITE);
     $layer->noisify (0, 1, 1, 1, 0);
     $layer->mblur (0, $length, $angle, 0, 0);
-    $layer->levels (HISTOGRAM_VALUE, 120, 255, 0.3, 0, 255);
+    $layer->levels(HISTOGRAM_VALUE, 120/255, 1.0, 1, 0.3, 0, 1.0, 1);
     $layer;
 }
 

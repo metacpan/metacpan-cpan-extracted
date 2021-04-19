@@ -1,5 +1,5 @@
 package Test::PDL;
-$Test::PDL::VERSION = '0.14';
+$Test::PDL::VERSION = '0.15';
 # ABSTRACT: Test Perl Data Language arrays (a.k.a. piddles) for equality
 
 
@@ -183,7 +183,7 @@ Test::PDL - Test Perl Data Language arrays (a.k.a. piddles) for equality
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -416,6 +416,11 @@ to support deep comparisons with L<Test::Deep>.
 Special comparison to be used in conjunction with L<Test::Deep> to test piddles
 inside data structures.
 
+B<NB> Due to probably the (as of PDL 2.037, and 0.15 of this module)
+not-yet-complete implementation of native complex numbers, these
+comparisons so far only work reliably on real data types, not
+native-complex ones.
+
 =for usage # PDL
 
 	my $expected = { ..., some_field => test_pdl( 1,2,-7 ), ... };
@@ -479,7 +484,7 @@ test_pdl() will correctly set the type of the expected value to I<short> in the
 above example.
 
 =for Pod::Coverage test_anyval test_byte test_short test_ushort test_long
-test_indx test_longlong test_float test_double
+test_indx test_longlong test_float test_double test_cfloat test_cdouble
 
 =head2 set_options
 
@@ -520,7 +525,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Edward Baudrez.
+This software is copyright (c) 2021 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

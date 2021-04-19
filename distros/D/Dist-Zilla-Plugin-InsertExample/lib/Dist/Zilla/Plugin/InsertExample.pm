@@ -1,12 +1,13 @@
 use strict;
 use warnings;
-use 5.014;
+use 5.024;
 
-package Dist::Zilla::Plugin::InsertExample 0.10 {
+package Dist::Zilla::Plugin::InsertExample 0.11 {
 
   use Moose;
   use Encode qw( encode );
   use List::Util qw( first );
+  use experimental qw( signatures );
 
   # ABSTRACT: Insert example into your POD from a file
 
@@ -19,16 +20,13 @@ package Dist::Zilla::Plugin::InsertExample 0.10 {
   has remove_boiler => (is => 'ro', isa => 'Int');
   has indent        => (is => 'ro', isa => 'Int', default => 1);
 
-  sub munge_files
+  sub munge_files ($self)
   {
-    my($self) = @_;
-    $self->munge_file($_) for @{ $self->found_files };
+    $self->munge_file($_) for $self->found_files->@*;
   }
 
-  sub munge_file
+  sub munge_file ($self, $file)
   {
-    my($self, $file) = @_;
-
     my $content = $file->content;
     if($content =~ s{^#\s*EXAMPLE:\s*(.*)\s*$}{$self->_slurp_example($1)."\n"}meg)
     {
@@ -37,13 +35,11 @@ package Dist::Zilla::Plugin::InsertExample 0.10 {
     }
   }
 
-  sub _slurp_example
+  sub _slurp_example ($self, $filename)
   {
-    my($self, $filename) = @_;
-
     my $fh;
 
-    if(my $file = first { $_->name eq $filename } @{ $self->zilla->files })
+    if(my $file = first { $_->name eq $filename } $self->zilla->files->@*)
     {
       my $content = encode 'UTF-8', $file->content;
       open $fh, '<', \$content
@@ -64,6 +60,7 @@ package Dist::Zilla::Plugin::InsertExample 0.10 {
       {
         next if $line =~ /^\s*$/;
         next if $line =~ /^#!\/usr\/bin\/perl/;
+        next if $line =~ /^#!\/usr\/bin\/env perl/;
         next if $line =~ /^use strict;$/;
         next if $line =~ /^use warnings;$/;
         return '' if eof $fh;
@@ -90,7 +87,7 @@ Dist::Zilla::Plugin::InsertExample - Insert example into your POD from a file
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

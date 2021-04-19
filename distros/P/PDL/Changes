@@ -1,3 +1,16 @@
+2.038 2021-04-19
+- make pdlpp_postamble 4th arg be XS subs destination
+- Inline::Pdlpp can take package param to put XS subs into
+- incorporated GSL CDF functions out of PDL::Stats - thanks @maggiexyz!
+
+2.037 2021-04-16
+- switch obsolete finite() to C99 isfinite()
+- add ppdefs_all
+- make PDL::Types::ppdefs only return non-complex types for back-compat
+
+2.036 2021-04-16
+- fix t/gis_proj.t
+
 2.035 2021-04-15
 - bad value support now always present, not configurable
 - pthread detection simplified, now enabled for Windows and MacOS

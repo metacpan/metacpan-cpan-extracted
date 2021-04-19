@@ -128,7 +128,7 @@ EOF
   # indexed conversion wants a display for some reason
   if ($convert_indexed) {
     $img->convert_indexed(1,            # dither type = fs
-      MAKE_PALETTE, # palette type
+      CONVERT_PALETTE_GENERATE, # palette type
       255,          # number of colors
       0,            # don't dither transparency
       1,            # (ignored)

@@ -1,0 +1,58 @@
+---
+abstract: 'Migrate your tests from Test::More to Test2::V0'
+author:
+  - 'utgwkk <utagawakiki@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-MigrateToTest2V0
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::MigrateToTest2V0:
+    file: lib/App/MigrateToTest2V0.pm
+    version: '0.01'
+  App::MigrateToTest2V0::Rule:
+    file: lib/App/MigrateToTest2V0/Rule.pm
+  App::MigrateToTest2V0::Rule::AvoidNameConflictWithTestDeep:
+    file: lib/App/MigrateToTest2V0/Rule/AvoidNameConflictWithTestDeep.pm
+  App::MigrateToTest2V0::Rule::ReplaceIsDeeplyToIs:
+    file: lib/App/MigrateToTest2V0/Rule/ReplaceIsDeeplyToIs.pm
+  App::MigrateToTest2V0::Rule::ReplaceIsaOkHASHOrArrayToRefOk:
+    file: lib/App/MigrateToTest2V0/Rule/ReplaceIsaOkHASHOrArrayToRefOk.pm
+  App::MigrateToTest2V0::Rule::ReplaceUseTestMoreToUseTest2V0:
+    file: lib/App/MigrateToTest2V0/Rule/ReplaceUseTestMoreToUseTest2V0.pm
+  App::MigrateToTest2V0::Rule::Translate2ndArgumentOfIsaOkWithArrayRef:
+    file: lib/App/MigrateToTest2V0/Rule/Translate2ndArgumentOfIsaOkWithArrayRef.pm
+  Test2::Plugin::Wrap2ndArgumentOfFailedCompareTestWithString:
+    file: lib/Test2/Plugin/Wrap2ndArgumentOfFailedCompareTestWithString.pm
+requires:
+  Carp: '0'
+  List::Util: '0'
+  PPI: '0'
+  PPIx::Utils: '0'
+  Test2::API: '0'
+  Test::Deep: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/utgwkk/App-MigrateToTest2V0/issues
+  homepage: https://github.com/utgwkk/App-MigrateToTest2V0
+  repository: git://github.com/utgwkk/App-MigrateToTest2V0.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -3,7 +3,7 @@ use Test2::V0 -target => 'Test2::Plugin::Cover';
 use Path::Tiny qw/path/;
 use File::Spec();
 
-$CLASS->clear;
+$CLASS->reset_coverage;
 my $fh;
 open($fh, '<', 'aaa.json');
 open($fh, '<bbb.json');
@@ -44,7 +44,7 @@ like(
     "Got list of what callers tried to open the files"
 );
 
-$CLASS->clear;
+$CLASS->reset_coverage;
 
 # The next several are to make sure things do not segv, nothing useful can be captured from them
 my $ref = "";
@@ -60,6 +60,6 @@ close($fh);
 ok(1, "Made it here");
 
 # Final cleanup
-$CLASS->clear;
+$CLASS->reset_coverage;
 
 done_testing;

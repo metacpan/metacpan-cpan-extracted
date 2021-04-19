@@ -1,0 +1,253 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::Storage::Implementation::Perl
+at lib/Myriad/Storage/Implementation/Perl.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Myriad::Storage::Implementation::Perl - microservice storage abstraction
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This is intended for use in tests and standalone local services.
+There is no persistence, and no shared data across multiple
+processes, but the full L<Myriad::Storage> API should be exposed
+correctly.
+
+=head2 get
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=back
+
+Returns a L<Future> which will resolve to the corresponding value, or C<undef> if none.
+
+=head2 set
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$v> - the scalar value to set
+
+=back
+
+Note that references are currently B<not> supported - attempts to write an arrayref, hashref
+or object will fail.
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 getset
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$v> - the scalar value to set
+
+=back
+
+Note that references are currently B<not> supported - attempts to write an arrayref, hashref
+or object will fail.
+
+Returns a L<Future> which will resolve on completion.
+
+=head2 observe
+
+Observe a specific key.
+
+Returns a L<Ryu::Source> which will emit the current and all subsequent values.
+
+=head2 push
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$k> - the relative key in storage
+
+=item * C<$v> - the scalar value to set
+
+=back
+
+Returns a L<Future> which will resolve to .
+
+=head2 unshift
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to .
+
+=head2 pop
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to .
+
+=head2 shift
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to .
+
+=head2 hash_set
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to .
+
+=head2 hash_get
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to the scalar value for this key.
+
+=head2 hash_add
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> indicating success or failure.
+
+=head2 hash_keys
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to a list of the keys in no defined order.
+
+=head2 hash_values
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to a list of the values in no defined order.
+
+=head2 hash_exists
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to true if the key exists in this hash.
+
+=head2 hash_count
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to the count of the keys in this hash.
+
+=head2 hash_as_list
+
+Takes the following parameters:
+
+=over 4
+
+=item *
+
+=back
+
+Returns a L<Future> which will resolve to a list of key/value pairs,
+suitable for assigning to a hash.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=item L<Myriad::Util::Defer>
+
+L<Defer|Myriad::Util::Defer/Defer>
+
+=back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+

@@ -1,0 +1,535 @@
+NAME
+
+    Art::World - Modeling of creative processes
+
+SYNOPSIS
+
+      use Art::World;
+    
+      my $artwork = Art::World->new_artwork(
+        creator => [ $artist, $another_artist ]  ,
+        owner   => 'smonff'
+        title   => 'Corrupted art institutions likes critical art'
+        value   => 100, );
+    
+      my $museum = Art::World->new_museum(
+        money => 1000,
+        name  => 'Contemporary Museum of Art::World'
+      );
+    
+      $museum->acquire( $artwork );
+
+DESCRIPTION
+
+    Art::World is an attempt to model and simulate a system describing the
+    interactions and influences between the various agents of the art
+    world.
+
+    It tries to draw a schematization of the interactions between art,
+    institutions, influences and unexpected parameters during the social
+    processes of artistic creation.
+
+    More informations about the purposes and aims of this project can be
+    found in it's Art::World::Manual. Especially, the HISTORY and the
+    OBJECTIVES section could be very handy to understand how this is an
+    artwork using programming.
+
+MOTIVATIONS
+
+    This project is a self-teaching experiment around the modern Perl
+    object-oriented programming toolkit. In late 2020, I read a bit about
+    Corrina <https://github.com/Ovid/Cor/wiki> and immediatly wanted to
+    restart and experiment my old Art::World project. While searching for
+    something somewhat close to Corrina, since Corrina was only a draft and
+    RFC, I discovered the Zydeco toolkit by Toby Inkster and immediatly
+    felt very enthusiastic to use it to implement my idea. I hope it is a
+    decent example of the possibilities this wonderful framework make
+    possible.
+
+    It is possible that this toolkit may be used by an art management
+    software as it could be needed in an art galery or a museum.
+
+ROLES
+
+ Abstraction
+
+    This is were all kind of weird phenomenons between abstract artistic
+    entities happen. See the Manual about how it works.
+
+ Active
+
+    Is used to dissociate behaviors belonging to performers as opposed to
+    the public. Provide a participate method.
+
+ Buyer
+
+    All those behaviors and attributes are encapsulated in the Buyer role
+    because there is no such thing as somebody in the art world that buy
+    but doesn't sale.
+
+    The aquire method is requiring some money. The money is provided by the
+    Market role.
+
+      $collector->acquire( $artwork );
+
+    Those behaviors are delegated to the change_owner() method, and to the
+    pay() method from the Market role.
+
+    When a Collector acquire() an Artwork, the Artwork ArrayRef of owners
+    is automatically cleared and substituted by the new owner(s). acquire()
+    will remove the value of the Artwork from the owner's money.
+
+      $artwork->change_owner( $self );
+
+    When the paiement occurs, the money is allocated to all the artwork
+    owners involved and removed from the buyer's fortune.
+
+      $self->pay( $artwork );
+
+    It delegate the payment to the pay() method of the Market role. If the
+    payment is provided by an individual Buyer, only one payment is done an
+    the money is dispatched to all the sellers. If a Collective buy the
+    good, each member procede to a paiement from the Co-investors point of
+    view.
+
+ Collectionable
+
+    The collectionnable provide a series of attributes for the ownership
+    and collectionability of artworks.
+
+    If it's collectionable, it can go to a Collector collection or in a
+    Museum. A collectionable item is automatically owned by it's creator.
+
+    Collectionable provides a change_owner() multi method that accepts
+    either Collectors or Coinvestors as an unique parameter. It takes care
+    of setting appropriately the new artwork owners and delegate the
+    removal of the item from the seller's collection.
+
+    A private methode, $remove_from_seller_collection is also available to
+    take care of the removal of the to-be-sold Artwork in the seller
+    collection. Since those can be owned by many persons, and that Artists
+    can own their own artworks, but for now cannot be collectors, they are
+    excluded from this treatment.
+
+ Collective
+
+    They do stuff together. You know, art is not about lonely Artists in
+    their Workshop.
+
+    This has first been designed for collectors, but could be used to
+    activate any kind of collective behavior.
+
+    This is quite a problem because what if a group of people wants to buy?
+    We have a Coinvestor class implementing the Collective role that
+    provide a collective-acquirement method.
+
+    It's acquire() multi method provide a way to collectively buy an item
+    by overriding the Buyer role method. Coinvestor is a class inheriting
+    from Collector that implement the Collective role so it would be able
+    to collectively acquire Works.
+
+    Note that the signatures are different between Buyer and Collective
+    roles:
+
+      $collector->acquire( $artwork );
+        # ==> using the method from the Buyer role
+    
+      $coinvestors->acquire({ art => $artwork, collective => $coinvestors });
+        # ==> using the method from the Collective role
+
+    Just pass a self-reference to the coinvestor object and they will be
+    able to organize and buy together.
+
+ Crud
+
+    The Crud role makes possible to serialize most of the entities. For
+    this to be possible, they need to have a corresponding table in the
+    database, plus they need to not have a unserializable? tag attribute. A
+    Zydeco tag role is a role without behavior that can only be checked
+    using does.
+
+    The Crud role is made possible thanks to Teng, a simple DBI wrapper and
+    O/R Mapper. Teng is used through it's schema loader that directly
+    instanciate an object schema from the database.
+
+    When trying to update a value, it is necessary to pass a table name and
+    a hashref of attributes corresponding to the columns values. The table
+    name is not case sensitive when using Art::World Crud helpers.
+
+      my $row = $self->dbh
+        ->insert( 'agent', {
+          name => $artist->name,
+          reputation => $artist->reputation });
+
+    Note that it is extremely important that the testing of the database
+    should be done in the t/crud.t file. If you want to test database or
+    model functionnalities in other tests, remind to create objects by
+    specifiying the config parameter that use the test.conf file: only the
+    database referenced in test.conf will be available on cpantesters and
+    art.db wont be available there, only t/test.db is available.
+
+ Event
+
+    All the necessary attributes and methodes for having fun between
+    Art::world's Agents.
+
+ Exhibit
+
+    Role for Places that display some Artworks.
+
+ Fame
+
+    Fame role provide ways to control the aura and reputation that various
+    Agents, Places or Works have. Cannot be negative.
+
+    It has an handy bump_fame() method that self-bump the fame count. It
+    can be used in three specific maneers:
+
+    pass a PositiveNum
+
+      The fame will go higher
+
+    pass a NegativeNum
+
+      The fame he fame will go lower
+
+    no parameter
+
+      In that case the value defined by $self->config->{ FAME }->{
+      DEFAULT_BUMP } will be used to increase the reputation.
+
+      my $artist = Art::World->new_artist(
+        reputation => 0.42,
+        name => 'Questular Rontok'
+      );
+    
+      say $artist->bump_fame;               # ==>  1.42
+      say $artist->bump_fame( 0.0042 );     # ==>  1.4242
+
+    If you try to update the fame to a negative value, nothing happens and
+    a nice warning is displayed.
+
+    The fame can be consummed by pretty much everything. A Place or and
+    Agent have a fame through it's reputation, and an Artwork too through
+    it's aura.
+
+    Classes that consume Fame can have two different kind of attributes for
+    storing the Fame:
+
+    aura
+
+      For Works only.
+
+    reputation
+
+      For Agents, Places, etc.
+
+ Identity
+
+    Provide id and a name attributes.
+
+ Invitation
+
+ Language
+
+    Useful when criticizing art or participating to all kind of events,
+    especially fo networking.
+
+ Manager
+
+    A role for those who take care of exhibitions and other organizational
+    matters. See how being a Manager influence an Agent in the CLASSES
+    section.
+
+ Market
+
+    It is all about offer, demand and money. It is possible that a day, the
+    discourse that some people have can influence the Market.
+
+    It provide a pay() method that can be used by entities consumming this
+    role to exchange artworks on the market. This method accept an Artwork
+    as an and a Collector as parameters. It smartly find how many people
+    bought the good and to how many sellers the money should be dispatched.
+
+ Showable
+
+    Only an object that does the Showable role can be exhibited. An object
+    should be exhibited only if it reached the Showable stage.
+
+ Space
+
+    Could limit the number of person attending an event for example
+
+ Underground
+
+    Provide an experiment() method.
+
+ Writing
+
+    This is much more than small talk.
+
+CLASSES
+
+ Agent
+
+    They are the activists of the Art World, previously known as the
+    Wildlife.
+
+      my $agent = Art::World->new_agent(
+        id         => 1,
+        name       => Art::World::Util->new_person->fake_name,
+        reputation => 10 # Would default to zero if none specified
+      );
+    
+      $agent->participate;    # ==>  "That's interesting"
+
+    A generic entity that can be any activist of the Art::World. Provides
+    all kind of Agent classes and roles.
+
+    The Agent got an a networking( $people ) method that makes possible to
+    leverage it's relationships. When it is passed and ArrayRef of various
+    implementation classes of Agents (Artist, Curator, etc.) it bumps the
+    reputation attributes of all of 1/10 of the Agent with the highest
+    reputation. If this reputation is less than 1, it is rounded to the
+    $self->config->{ FAME }->{ DEFAULT_BUMP } constant.
+
+    The bump coefficient can be adjusted in the configuration through {
+    FAME }->{ BUMP_COEFFICIENT }.
+
+    There is also a special way of bumping fame when Managers are in a
+    Networking activity: The influence() method makes possible to apply the
+    special $self->config->{ FAME }->{ MANAGER_BUMP } constant. Then the
+    Agents reputations are bumped by the MANAGER_BUMP value multiplicated
+    by the highest networking Manager reputation. This is what the
+    influence() method returns:
+
+      return $self->config->{ FAME }->{ MANAGER_BUMP } * $reputation;
+
+    The default values can be edited in art.conf.
+
+ Art
+
+    Will be what you decide it to be depending on how you combine all the
+    entities.
+
+    This is where we are waiting to receive some unexpected parameters: in
+    other words, an INI file can be provided.
+
+ Article
+
+    Something in a Magazine of Website about Art, Exhibitions, etc.
+
+ Artist
+
+    In the beginning of their carreer they are usually underground and
+    produce experimental art, but this can change in time.
+
+      my $artist = Art::World->new_artist(
+        name => 'Andy Cassrol',
+      );
+    
+      say $artist->is_homogenic;
+      #==> false
+
+    After getting collected, artists become homogenic.
+
+      $artist->is_underground if not $artist->has_collectors;
+
+    The artist got a lots of wonderful powers:
+
+    create
+
+      When the basic abstractions of Art are articulated, a creation
+      occurs. It doesn't mean that it will create an Artwork, because it
+      requires the intervention of other Agents. The Artist creates through
+      a work concept. This articulation can group the different attributes
+      of the Abstraction role: discourse, file, idea, process, project and
+      time.
+
+    have_idea
+
+      All day long
+
+ Artwork
+
+    The base thing producted by artists. Artwork is subclass of Work that
+    have a Showable and Collectionable role. They are usually considered as
+    goods by the Market but are also subject of appreciation by the Public.
+    A lot of Event happen around them.
+
+    The collectionable role provide their value while they have their own
+    attributes for material and size. The later limits the amount of
+    atworks that can be put in a Place's space during an Event.
+
+ Book
+
+    Where a lot of theory is written by Critics
+
+ Coinvestor
+
+    Coinvestor extend the Collector class by providing an arrayref
+    attribute of members through the Collective role. This role makes also
+    possible to invest in artworks collectively.
+
+ Collector
+
+    A Collector is mostly an Agent that consume the Buyer and Market roles
+    and that have a collection attribute.
+
+      my $collector = Art::World
+        ->new_collector(
+          name => Art::World::Util->new_person->fake_name,
+          money => 10_000,
+          id => 4 );
+    
+      my $artwork = Art::World
+        ->new_artwork(
+          creator => $artist  ,
+          title   => 'Destroy capitalism',
+          value   => 9_999 );
+    
+      $collector->acquire( $artwork ),
+    
+      say $collector->money;
+      #==> 1
+    
+      say $_->title for ( $collector->collection->@* );
+      #==> Destroy capitalism
+
+ Concept
+
+    Concept is an abstract class that does the Abstraction role. It should
+    be extended but cannot be instanciated.
+
+ Critic
+
+ Curator
+
+    A special kind of Agent that can select Artworks, define a thematic,
+    setup everything in the space and write a catalog. They mostly do
+    Exhibition.
+
+ Director
+
+ Exhibition
+
+    An Event that is organised by a Curator.
+
+      my $exhibition = Art::World->new_exhibition(
+        curator => [ $curator ],
+        title   => $title,
+        creator => [ $curator ]);
+
+ Gallery
+
+    Just another kind of Place, mostly commercial.
+
+    Since it implements the Buyer role, a gallery can both acquire() and
+    sell().
+
+    Major place for Agent-networking> activities. Always check it's space
+    though!
+
+ Idea
+
+    When some abstractions starts to become something in the mind of an
+    Agent.
+
+      my $art_concept = Art::World->new_idea(
+        discourse => 'I have idead. Too many ideas. I store them in a file.',
+        file => [ $another_concept, $weird_idea ],
+        idea => 'idea',
+        name => 'Yet Another Idea',
+        process => [],
+        project => 'My project',
+        time => 5,
+       );
+
+ Institution
+
+    A Place that came out of the Underground.
+
+ Magazine
+
+ Museum
+
+    Yet another kind of Place, an institution with a lot of Artworks in the
+    basement.
+
+ Opening
+
+    An Event where you can consume free treats and speak with other
+    networkers from the art world.
+
+      my $t = Art::World::Util->new_time( source => '2020-02-16T08:18:43' );
+      my $opening_event = Art::World->new_opening(
+        place     => $place,
+        datetime => $t->datetime,
+        name => 'Come See Our Stuff',
+        smalltalk => $chat,
+        treat     => [ 'Red wine', 'White wine', 'Peanuts', 'Candies' ]);
+
+ Place
+
+    A Place must invite() all kind of Agents that produce Work or other
+    kind of valuable social interactions. Depending of the total reputation
+    of the Place it will determine it's underground status: when going out
+    of the underground, it will become an institution.
+
+ Playground
+
+    A generic space where Art::World Agents can do all kind of weird
+    things.
+
+ Public
+
+    They participate and visit events.
+
+ School
+
+ Sex
+
+ Squat
+
+    A place were art world agents are doing things. A squat that is not
+    underground anymore become an institution.
+
+ Theory
+
+    When some abstract concept turns to some said or written stuff.
+
+ Website
+
+ Work
+
+    There are not only Artworks. All Agents produce various kind of work or
+    help consuming or implementing Art.
+
+    It got an aura attribute, see the Fame about it or read about Walter
+    Benjamin
+    <https://en.wikipedia.org/wiki/Walter_Benjamin#%22The_Work_of_Art_in_the_Age_of_Mechanical_Reproduction%22>.
+
+ Workshop
+
+    A specific kind of Playground where you can build things tranquilly.
+
+AUTHOR
+
+    Sébastien Feugère <sebastien@feugere.net>
+
+ACKNOWLEDGEMENTS
+
+    Thanks to everyone who has contributed to ack in any way, including
+    Adrien Lucca, Toby Inkster, Ezgi Göç, Pierre Aubert, Seb.
+    Hu-Rillettes, Joseph Balicki, Nicolas Herubel and Nadia Boursin-Piraud.
+
+    This project was made possible by the greatness of the Zydeco
+    <https://zydeco.toby.ink/> toolkit.
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2006-2021 Sebastien Feugère
+
+    This library is free software; you can redistribute it and/or modify it
+    under the Artistic License 2.0.
+

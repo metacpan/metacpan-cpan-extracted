@@ -1,18 +1,20 @@
-use Test::More tests => 6;
+use Test::More;
 use Art::World;
 use feature qw( postderef );
+no warnings qw( experimental::postderef );
 
-my $aw = Art::World->new_playground;
+my $aw = Art::World->new_playground( name => 'World' );
 ok $aw, 'The world is created';
 
 my $art_concept = Art::World->new_idea(
   discourse => 'I have idead. Too many ideas. I store them in a file.',
   file => [],
   idea => 'idea',
+  name => 'Yet Another Idea',
   process => [],
   project => 'project',
   time => 5,
-);
+ );
 
 
 ok $art_concept->does('Art::World::Abstraction'), 'Art does role Abstraction';

@@ -1,6 +1,6 @@
 package Dancer2::Core::Hook;
 # ABSTRACT: Manipulate hooks with Dancer2
-$Dancer2::Core::Hook::VERSION = '0.301001';
+$Dancer2::Core::Hook::VERSION = '0.301002';
 use Moo;
 use Dancer2::Core::Types;
 use Carp;
@@ -51,7 +51,7 @@ Dancer2::Core::Hook - Manipulate hooks with Dancer2
 
 =head1 VERSION
 
-version 0.301001
+version 0.301002
 
 =head1 SYNOPSIS
 
@@ -61,23 +61,11 @@ version 0.301001
 
 =head1 METHODS
 
-=head2 register_hook ($hook_name, [$properties], $code)
-
-    hook 'before', {apps => ['main']}, sub {...};
+=head2 register_hook ($hook_name, $code)
 
     hook 'before' => sub {...};
 
-Attaches a hook at some point, with a possible list of properties.
-
-Currently supported properties:
-
-=over 4
-
-=item apps
-
-    an array reference containing apps name
-
-=back
+Attaches a hook at some point.
 
 =head2 register_hooks_name
 
@@ -88,7 +76,7 @@ Add a new hook name, so application developers can insert some code at this poin
 
 =head2 execute_hook
 
-Execute a hooks
+Execute a hook
 
 =head2 get_hooks_for
 

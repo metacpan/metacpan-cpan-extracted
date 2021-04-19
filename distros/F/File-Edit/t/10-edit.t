@@ -1,6 +1,6 @@
 #!perl
 use strict; use warnings; use utf8; use 5.10.0;
-use Test::More tests => 11;
+use Test::More tests => 14;
 use Data::Dumper;
 
 use lib qw(./lib);
@@ -97,5 +97,36 @@ $got = join '', @{$ed->_lines};
 $exp = "  minSdkVersion 16\n  targetSdkVersion 30";
 is($got, $exp, $msg);
 }
+
+{ ## swap() swaps correctly #1
+$msg = 'swap() swaps correctly #1';
+$tmp = File::Edit->new()
+                 ->text("  Do this first\n  Now do that\n  Don't do this")
+                 ->swap('Do this', 'do that');
+$got = $tmp->_lines->[0];
+$exp = "  Now do that\n";
+is($got, $exp, $msg);
+}
+{ ## swap() swaps correctly #2
+$msg = 'swap() swaps correctly #2';
+$tmp = File::Edit->new()
+                 ->text("  Do this first\n  Now do that\n  Don't do this")
+                 ->swap('Do this', 'do that');
+$got = $tmp->_lines->[1];
+$exp = "  Do this first\n";
+is($got, $exp, $msg);
+}
+
+{ ## insert_line_at("  Inserted line\n", 1) inserts correctly
+$msg = 'insert_line_at("  Inserted line\n", 1) inserts correctly';
+$tmp = File::Edit->new()
+                 ->text("  Line index 0\n  Line index 1\n  Line index 2")
+                 ->at(1)->insert("  Inserted line\n")
+                 ;
+$got = $tmp->_lines->[1];
+$exp = "  Inserted line\n";
+is($got, $exp, $msg);
+}
+
 diag( "Testing File::Edit $File::Edit::VERSION, Perl $], $^X" );
 

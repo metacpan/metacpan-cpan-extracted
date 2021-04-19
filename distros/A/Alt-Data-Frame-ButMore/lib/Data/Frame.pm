@@ -377,7 +377,7 @@ method column_names(@rest) {
         # rename column names
         my @values = $self->_columns->values;
         $self->_columns->clear;
-        $self->_columns->push( List::AllUtils::zip( @colnames, @values ) );
+        $self->_columns->push( List::MoreUtils::zip( @colnames, @values ) );
 	}
 	return [ $self->_columns->keys ];
 }
@@ -1092,7 +1092,7 @@ Data::Frame - data frame implementation
 
 =head1 VERSION
 
-version 0.0053
+version 0.0056
 
 =head1 STATUS
 
@@ -1717,7 +1717,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014, 2019 by Zakariyya Mughal, Stephan Loyd.
+This software is copyright (c) 2014, 2019-2020 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-use Test::More tests => 3;
+use Test::More;
 use Art::World;
 
 my $concept = Art::World->new_idea(

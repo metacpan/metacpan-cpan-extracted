@@ -64,7 +64,7 @@ sub _dir {
 		
 		return @results if $wantarray
 	} else {
-		warn "Cannot read path $path: $!";
+		carp "Cannot read path $path: $!";
 	}
 	return;
 }

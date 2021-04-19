@@ -347,7 +347,6 @@ Graphics/TriD/TriD/Window.pm
 Graphics/TriD/VRML/Makefile.PL
 Graphics/TriD/VRML/VRML.pm
 Graphics/TriD/VRML/VRML/Protos.pm
-inc/Alien/Proj4.pm
 INSTALL
 INTERNATIONALIZATION
 IO/Browser/browse.c
@@ -437,12 +436,14 @@ Libtmp/Fit/Polynomial.pm
 Libtmp/Fit/t/poly.t
 Libtmp/Func.pm
 Libtmp/GIS/Makefile.PL
-Libtmp/GIS/Proj/include/projects.h
 Libtmp/GIS/Proj/Makefile.PL
 Libtmp/GIS/Proj/Proj.pd
 Libtmp/GIS/Proj/README
 Libtmp/GIS/Proj/t/gis_proj.t
 Libtmp/GIS/Proj/TODO
+Libtmp/GSL/CDF/gsl_cdf.pd
+Libtmp/GSL/CDF/Makefile.PL
+Libtmp/GSL/CDF/t/cdf.t
 Libtmp/GSL/DIFF/FUNC.c
 Libtmp/GSL/DIFF/gsl_diff.pd
 Libtmp/GSL/DIFF/Makefile.PL
@@ -749,8 +750,6 @@ t/pp_line_numbers.t
 t/pptest.t
 t/primitive.t
 t/pthread.t
-t/pthread_auto.t
-t/pthreadBarf.t
 t/reduce.t
 t/scope.t
 t/slice.t
@@ -773,6 +772,7 @@ GENERATED/PDL/GIS/Proj.pm                mod=PDL::GIS::Proj pd=Libtmp/GIS/Proj/P
 GENERATED/PDL/Graphics/IIS.pm            mod=PDL::Graphics::IIS pd=Graphics/IIS/iis.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Graphics/OpenGLQ.pm        mod=PDL::Graphics::OpenGLQ pd=Graphics/TriD/OpenGLQ/openglq.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Graphics/TriD/Rout.pm      mod=PDL::Graphics::TriD::Rout pd=Graphics/TriD/Rout/rout.pd (added by pdlpp_mkgen)
+GENERATED/PDL/GSL/CDF.pm                 mod=PDL::GSL::CDF pd=Libtmp/GSL/CDF/gsl_cdf.pd (added by pdlpp_mkgen)
 GENERATED/PDL/GSL/DIFF.pm                mod=PDL::GSL::DIFF pd=Libtmp/GSL/DIFF/gsl_diff.pd (added by pdlpp_mkgen)
 GENERATED/PDL/GSL/INTEG.pm               mod=PDL::GSL::INTEG pd=Libtmp/GSL/INTEG/gsl_integ.pd (added by pdlpp_mkgen)
 GENERATED/PDL/GSL/INTERP.pm              mod=PDL::GSL::INTERP pd=Libtmp/GSL/INTERP/gsl_interp.pd (added by pdlpp_mkgen)

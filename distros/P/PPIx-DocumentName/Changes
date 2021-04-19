@@ -1,5 +1,16 @@
 Release history for PPIx-ModuleName
 
+1.01      2021-04-18 15:18:27 -0600
+  - Documentation fixes (gh#2)
+
+1.00_01   2021-04-16 11:32:50 -0600
+  - New maintainer, new GitHub repository.  Note the new repository is not
+    a fork of the old repository https://github.com/kentnl/PPIx-DocumentName
+    because it makes PRs against itself painful, sorry for the inconvenience
+  - New API level 1.  The default API level 0 maintains the behavnior from the
+    previous releases. (gh#1)
+  - New class PPIx::DocumentName::Result for use with new API level 1. (gh#1)
+
 0.001003 2017-03-06T03:29:51Z edb00ab
  [Bugfix]
  - Fix tooling issues with -Ddefault_inc_excludes_dot

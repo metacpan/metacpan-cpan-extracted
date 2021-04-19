@@ -1,12 +1,30 @@
 Revision history for XML-Sig
 
+0.50 - 2021-04-18
+
+  [Significant features implemented since 0.47]
+
+  - Add ripemd160 support for signature and digests
+  - Improved tests
+
+  [Change Log]
+
+  - TBD     Update Changes and Increment version
+  - c1d7ecb Add generated README to repo
+  - 73cc529 Add HMAC and RIPEMD160 dependencies
+  - 92fa091 Test dsa with nox509
+  - eb3f912 Move signature calculation to subroutines
+  - 04c8def hmac-ripemd160 support
+  - 8b6053a ripemd160 signature support
+  - 7fdd133 ripemd160 digest support
+
 0.49 - 2021-04-10
 
   [Significant features implemented since 0.47]
   - HMAC support for signatures
 
   [Change Log]
-  - TBD     Update Changes and Increment version
+  - bd19f48 Update Changes and Increment version
 
 0.48-TRIAL - 2021-04-09
 

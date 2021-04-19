@@ -66,7 +66,7 @@ podregister {
     $clayer->brightness_contrast($bright, $contrast)
       if $bright != 0 or $contrast != 0;
     if ($label ne "") {
-      my $newlayer = $img->layer_new(200, 100, RGB_IMAGE, "newlayer", 100, NORMAL_MODE);
+      my $newlayer = $img->layer_new(200, 100, RGB_IMAGE, "newlayer", 100, LAYER_MODE_NORMAL_LEGACY);
       Gimp::Context->set_foreground($labelcolor);
       my $txtlayer = $img->text_fontname(-1, 1, 1, $label, 0, 0, 16, 0, $font);
       if ($twidthEval == 0) {

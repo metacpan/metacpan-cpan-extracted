@@ -1,6 +1,6 @@
 package Pod::Weaver;
 # ABSTRACT: weave together a Pod document from an outline
-$Pod::Weaver::VERSION = '4.015';
+$Pod::Weaver::VERSION = '4.017';
 use Moose;
 use namespace::autoclean;
 
@@ -165,7 +165,7 @@ sub new_with_default_config {
 
 sub new_from_config {
   my ($class, $arg, $new_arg) = @_;
-  
+
   my $root = $arg->{root} || '.';
   my $name = File::Spec->catfile($root, 'weaver');
   my ($sequence) = Pod::Weaver::Config::Finder->new->read_config($name);
@@ -232,7 +232,7 @@ Pod::Weaver - weave together a Pod document from an outline
 
 =head1 VERSION
 
-version 4.015
+version 4.017
 
 =head1 SYNOPSIS
 
@@ -310,7 +310,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Peters Apocalypse Blabos de Blebe Caleb Cushing Christian Walde Christopher J. Madsen Chris Weyl Dave Houston Rolsky David E. Wheeler Golden Zurborg Doug Bell Florian Ragwitz Jonathan "Duke" Leto Joshua Keroes Karen Etheridge Kent Fredric Marcel Gruenauer Randy Stauner Sam Graham Shlomi Fish
+=for stopwords Alex Peters Apocalypse Blabos de Blebe Caleb Cushing Christian Walde Christopher J. Madsen Chris Weyl Dave Houston Rolsky David E. Wheeler Golden Miguel Susano Pinto Zurborg Doug Bell Florian Ragwitz Jonathan "Duke" Leto Joshua Keroes Karen Etheridge Kent Fredric Kivanc Yazan Marcel Gruenauer Randy Stauner Ricardo Signes Sam Graham Shlomi Fish
 
 =over 4
 
@@ -360,6 +360,10 @@ David Golden <dagolden@cpan.org>
 
 =item *
 
+David Miguel Susano Pinto <carandraug+dev@gmail.com>
+
+=item *
+
 David Zurborg <post@david-zurb.org>
 
 =item *
@@ -388,11 +392,19 @@ Kent Fredric <kentfredric@gmail.com>
 
 =item *
 
+Kivanc Yazan <kyzn@cpan.org>
+
+=item *
+
 Marcel Gruenauer <hanekomu@gmail.com>
 
 =item *
 
 Randy Stauner <randy@magnificent-tears.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 
@@ -406,7 +418,7 @@ Shlomi Fish <shlomif@shlomifish.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

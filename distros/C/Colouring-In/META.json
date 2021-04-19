@@ -34,13 +34,13 @@
          "requires" : {
             "overload" : "0",
             "perl" : "5.006",
-            "smallnum" : "0.05",
+            "smallnum" : "1.00",
             "strict" : "0",
             "warnings" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.23",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

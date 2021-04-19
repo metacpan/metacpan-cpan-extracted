@@ -1,5 +1,15 @@
 Revision history for Perl extension Lingua::StopWords
 
+0.12  2021-04-18 10:30:55 CEST
+    * Release 0.12
+
+0.11  2021-04-17 21:58:55 CEST
+    * added Romanian and Indonesian stoplists
+    * encoding of Hungarian corrected to ISO-8859-2
+
+0.10  2021-04-14 23:26:39 CEST
+    * Port source to UTF-8
+
 0.09  2008-08-22
     * Update Spanish stoplist to latest Snowball version.  This is a
       backwards-incompatible change, but the old list was broken, containing

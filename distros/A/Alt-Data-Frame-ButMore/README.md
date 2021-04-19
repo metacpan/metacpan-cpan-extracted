@@ -7,7 +7,7 @@ Alt::Data::Frame::ButMore - Alternative implementation of Data::Frame with more 
 
 # VERSION
 
-version 0.0053
+version 0.0056
 
 # STATUS
 
@@ -71,7 +71,7 @@ As such, it supports marking missing values (`BAD` values).
 ## Document Conventions
 
 Function signatures in docs of this library follow the
-[Function::Parameters](https://metacpan.org/pod/Function::Parameters) conventions, for example,
+[Function::Parameters](https://metacpan.org/pod/Function%3A%3AParameters) conventions, for example,
 
 ```perl
 myfunc(Type1 $positional_parameter, Type2 :$named_parameter)
@@ -368,7 +368,7 @@ select_rows( ArrayRef $which )
 select_rows( Piddle $which )
 ```
 
-The argument `$indexer` is an "Indexer", as defined in [Data::Frame::Types](https://metacpan.org/pod/Data::Frame::Types).
+The argument `$indexer` is an "Indexer", as defined in [Data::Frame::Types](https://metacpan.org/pod/Data%3A%3AFrame%3A%3ATypes).
 `select_rows` returns a new `Data::Frame` that contains rows that match
 the indices specified by `$indexer`.
 
@@ -447,7 +447,7 @@ which(:$bad_to_val=undef, :$ignore_both_bad=true)
 ```
 
 Returns a pdl of `[[col_idx, row_idx], ...]`, like the output of
-["whichND" in PDL::Primitive](https://metacpan.org/pod/PDL::Primitive#whichND).
+["whichND" in PDL::Primitive](https://metacpan.org/pod/PDL%3A%3APrimitive#whichND).
 
 # METHODS / MERGE
 
@@ -631,17 +631,17 @@ Returns a new data frame with rows with BAD values dropped.
 
 ## Serialization
 
-See [Data::Frame::IO::CSV](https://metacpan.org/pod/Data::Frame::IO::CSV)
+See [Data::Frame::IO::CSV](https://metacpan.org/pod/Data%3A%3AFrame%3A%3AIO%3A%3ACSV)
 
 ## Syntax Sugar
 
-See [Data::Frame::Partial::Sugar](https://metacpan.org/pod/Data::Frame::Partial::Sugar)
+See [Data::Frame::Partial::Sugar](https://metacpan.org/pod/Data%3A%3AFrame%3A%3APartial%3A%3ASugar)
 
 ## Tidy Evaluation
 
 This feature is somewhat similar to R's tidy evaluation.
 
-See [Data::Frame::Partial::Eval](https://metacpan.org/pod/Data::Frame::Partial::Eval).
+See [Data::Frame::Partial::Eval](https://metacpan.org/pod/Data%3A%3AFrame%3A%3APartial%3A%3AEval).
 
 # VARIABLES
 
@@ -661,11 +661,11 @@ $Data::Frame::TOLERANCE_REL = 1e-8;
 
 # SEE ALSO
 
-- [Data::Frame::Examples](https://metacpan.org/pod/Data::Frame::Examples)
+- [Data::Frame::Examples](https://metacpan.org/pod/Data%3A%3AFrame%3A%3AExamples)
 - [Alt](https://metacpan.org/pod/Alt)
 - [PDL](https://metacpan.org/pod/PDL)
 - [R manual: data.frame](https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html).
-- [Statistics::NiceR](https://metacpan.org/pod/Statistics::NiceR)
+- [Statistics::NiceR](https://metacpan.org/pod/Statistics%3A%3ANiceR)
 
 # AUTHORS
 
@@ -674,7 +674,7 @@ $Data::Frame::TOLERANCE_REL = 1e-8;
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014, 2019 by Zakariyya Mughal, Stephan Loyd.
+This software is copyright (c) 2014, 2019-2020 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

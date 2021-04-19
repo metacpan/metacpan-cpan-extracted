@@ -169,9 +169,11 @@ get_r(ecdsa_sig)
         const BIGNUM *r;
         unsigned char *to;
         STRLEN len;
+        int bnlen;
     CODE:
-        to = malloc(sizeof(char) * 128);
         ECDSA_SIG_get0(ecdsa_sig, &r, NULL);
+        bnlen = BN_num_bytes(r);
+        to = malloc(sizeof(char) * bnlen);
         len = BN_bn2bin(r, to);
         RETVAL = newSVpvn((const char*)to, len);
         free(to);
@@ -185,9 +187,11 @@ get_s(ecdsa_sig)
         const BIGNUM *s;
         unsigned char *to;
         STRLEN len;
+        int bnlen;
     CODE:
-        to = malloc(sizeof(char) * 128);
         ECDSA_SIG_get0(ecdsa_sig, NULL, &s);
+        bnlen = BN_num_bytes(s);
+        to = malloc(sizeof(char) * bnlen);
         len = BN_bn2bin(s, to);
         RETVAL = newSVpvn((const char*)to, len);
         free(to);

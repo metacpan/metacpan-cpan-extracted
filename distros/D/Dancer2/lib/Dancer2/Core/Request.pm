@@ -1,6 +1,6 @@
 package Dancer2::Core::Request;
 # ABSTRACT: Interface for accessing incoming requests
-$Dancer2::Core::Request::VERSION = '0.301001';
+$Dancer2::Core::Request::VERSION = '0.301002';
 use strict;
 use warnings;
 use parent 'Plack::Request';
@@ -631,7 +631,7 @@ Dancer2::Core::Request - Interface for accessing incoming requests
 
 =head1 VERSION
 
-version 0.301001
+version 0.301002
 
 =head1 SYNOPSIS
 

@@ -871,7 +871,7 @@ sub PDL::uniqvec {
 
    my $ngood = null;
    $ngood = $pdl2d->ones->sumover;
-   $ngood = $pdl2d->ngoodover if  ($PDL::Bad::Status && $pdl->badflag);  # number of good values each vector
+   $ngood = $pdl2d->ngoodover if $pdl->badflag;  # number of good values each vector
    my $ngood2 = null;
    $ngood2 = $ngood->where($ngood);                                      # number of good values with no all-BADs
 
@@ -895,7 +895,7 @@ sub PDL::uniqvec {
    $srt = $presrt->qsortvec->mv(0,-1);                                   # BADs are sorted by qsortvec
    my $srtdice = $srt;
    my $somebad = null;
-   if  ($PDL::Bad::Status && $srt->badflag) {
+   if ($srt->badflag) {
       $srtdice = $srt->dice($srt->mv(0,-1)->nbadover->not->which);
       $somebad = $srt->dice($srt->mv(0,-1)->nbadover->which);
    }
@@ -2734,7 +2734,7 @@ sub PDL::interpND {
     my $out = ($out0 * $samp)->sumover; # ith, sth
 
     # Work around BAD-not-being-contagious bug in PDL <= 2.6 bad handling code  --CED 3-April-2013
-    if($PDL::Bad::Status and $source->badflag) {
+    if ($source->badflag) {
 	my $baddies = $samp->isbad->orover;
 	$out = $out->setbadif($baddies);
     }

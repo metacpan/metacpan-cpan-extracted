@@ -1,5 +1,5 @@
 use Perlmazing;
-use List::Util;
+use List::Util ();
 
 sub main {
 	my @call = caller(0);

@@ -1,3 +1,17 @@
+0.000018  2021-04-16 13:54:00-07:00 America/Los_Angeles
+
+    - Make it possible to set root
+
+0.000017  2021-04-16 12:53:22-07:00 America/Los_Angeles
+
+    - Correct some documentation issues
+
+0.000016  2021-04-15 15:12:19-07:00 America/Los_Angeles
+
+    - Add 'from_manager' metadata
+    - Add 'test type' metadata
+    - General improvements to available data
+
 0.000015  2021-04-14 10:46:14-07:00 America/Los_Angeles
 
     - Fix weird warning from Encode.pm (Issue #2)

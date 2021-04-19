@@ -1,7 +1,9 @@
 package Text::WideChar::Util;
 
-our $DATE = '2019-05-17'; # DATE
-our $VERSION = '0.170'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-23'; # DATE
+our $DIST = 'Text-WideChar-Util'; # DIST
+our $VERSION = '0.171'; # VERSION
 
 use 5.010001;
 use locale;
@@ -427,7 +429,7 @@ Text::WideChar::Util - Routines for text containing wide characters
 
 =head1 VERSION
 
-This document describes version 0.170 of Text::WideChar::Util (from Perl distribution Text-WideChar-Util), released on 2019-05-17.
+This document describes version 0.171 of Text::WideChar::Util (from Perl distribution Text-WideChar-Util), released on 2021-01-23.
 
 =head1 SYNOPSIS
 
@@ -583,7 +585,7 @@ Source repository is at L<https://github.com/perlancar/perl-Text-WideChar-Util>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Text-WideChar-Util>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Text-WideChar-Util/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -607,13 +609,15 @@ L<Text::NonWideChar::Util> contains non-wide version of some of the
 abovementioned routines (the non-wide version of the routines will eventually be
 moved here).
 
+L<String::Pad>, L<Text::Wrap>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2019, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

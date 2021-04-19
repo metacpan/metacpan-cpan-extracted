@@ -48,7 +48,7 @@ sub spin_layer { # the function for actually spinning the layer
       $x[1]-$saw_prp_width,$y3,
       $x[3]+$saw_prp_width,$y3,
     );
-    $framelay->fill(BACKGROUND_FILL);
+    $framelay->fill(FILL_BACKGROUND);
     # merge the two layers together before we continue
     $img->set_visible($floater, $framelay); # all others invis
     $framelay = $img->merge_visible_layers(EXPAND_AS_NECESSARY);
@@ -93,7 +93,7 @@ podregister {
   my @all_layers = $img->get_layers;
   $all_layers[$frames/2-1]->set_name(__"Spin Layer DEST (250ms)") if $spinback;
   $all_layers[$frames-1]->set_name(__"Spin Layer SRC (250ms)");
-  $img->convert_indexed(1,MAKE_PALETTE,255,0,1,"buffy") if $indexed;
+  $img->convert_indexed(1,CONVERT_PALETTE_GENERATE,255,0,1,"buffy") if $indexed;
   Gimp::Context->pop;
   return $img;
 };

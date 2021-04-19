@@ -155,11 +155,11 @@ sub decoration_drop_shadow {
     # Put them on a row
     $tiled_img = gimp_image_new($total_width, $total_height, RGB);
     $tiled_drw = gimp_layer_new($tiled_img, $total_width, $total_height,
-				RGB_IMAGE, "Tiled", 100, NORMAL_MODE);
+				RGB_IMAGE, "Tiled", 100, LAYER_MODE_NORMAL_LEGACY);
     $tiled_shadow = gimp_layer_new($tiled_img, $total_width, $total_height,
-				   RGB_IMAGE, "Shadow", 50, NORMAL_MODE);
+				   RGB_IMAGE, "Shadow", 50, LAYER_MODE_NORMAL_LEGACY);
     $tiled_background = gimp_layer_new($tiled_img, $total_width, $total_height,
-				       RGB_IMAGE, "Background", 100, NORMAL_MODE);
+				       RGB_IMAGE, "Background", 100, LAYER_MODE_NORMAL_LEGACY);
 
     # Create masks
     $tiled_drw_msk = $tiled_drw->create_mask(1);
@@ -175,18 +175,18 @@ sub decoration_drop_shadow {
 
     # Fill all the layers with some contents
     gimp_context_set_background([128,128,128]);
-    $tiled_drw->edit_fill(BACKGROUND_FILL);
+    $tiled_drw->edit_fill(FILL_BACKGROUND);
 
     gimp_context_set_background($bgcolor);
-    $tiled_background->edit_fill(BACKGROUND_FILL);
+    $tiled_background->edit_fill(FILL_BACKGROUND);
     if ($bgpattern) {
 	print "Setting pattern\n";
 	gimp_context_set_pattern($bgpattern);
-	$tiled_background->edit_bucket_fill(PATTERN_BUCKET_FILL,
+	$tiled_background->edit_bucket_fill(FILL_PATTERN,
 				       NORMAL, 100, 0, FALSE, 0,0);
     }
     gimp_context_set_background([0, 0, 0]);  # Shadow color
-    $tiled_shadow->edit_fill(BACKGROUND_FILL);
+    $tiled_shadow->edit_fill(FILL_BACKGROUND);
 
     # Add all the layers to the image
     $tiled_img->insert_layer($tiled_background,0,-1);
@@ -211,12 +211,12 @@ sub decoration_drop_shadow {
 
 	# why is the selection cleared?
 	$tiled_img->select_rectangle(0, $xpos, $ypos, $w, $h);
-	$tiled_drw_msk->edit_fill(BACKGROUND_FILL);
+	$tiled_drw_msk->edit_fill(FILL_BACKGROUND);
 
 	# why is the selection cleared?
 	$tiled_img->select_rectangle(0, $xpos+$shadow_xoffs,
 				$ypos+$shadow_yoffs, $w, $h);
-	$tiled_shadow_msk->edit_fill(BACKGROUND_FILL);
+	$tiled_shadow_msk->edit_fill(FILL_BACKGROUND);
 
 	$tiled_img->selection_none();
 
@@ -238,11 +238,11 @@ sub decoration_sunken_windows {
     # Create needed image and layers
     $tiled_img = gimp_image_new($total_width, $total_height, RGB);
     $tiled_drw = gimp_layer_new($tiled_img, $total_width, $total_height,
-				RGB_IMAGE, "Tiled", 100, NORMAL_MODE);
+				RGB_IMAGE, "Tiled", 100, LAYER_MODE_NORMAL_LEGACY);
     $tiled_punch_layer = gimp_layer_new($tiled_img, $total_width, $total_height,
-				RGB_IMAGE, "Punched", 100, NORMAL_MODE);
+				RGB_IMAGE, "Punched", 100, LAYER_MODE_NORMAL_LEGACY);
     $tiled_punch_stencil = gimp_layer_new($tiled_img, $total_width, $total_height,
-				RGB_IMAGE, "Punch mask", 100, NORMAL_MODE);
+				RGB_IMAGE, "Punch mask", 100, LAYER_MODE_NORMAL_LEGACY);
     # Create masks
     $tiled_punch_mask = $tiled_punch_layer->create_mask(0);
 
@@ -254,18 +254,18 @@ sub decoration_sunken_windows {
 
     # Fill all the layers with some contents
     gimp_context_set_background([128,128,128]);
-    $tiled_drw->edit_fill(BACKGROUND_FILL);
+    $tiled_drw->edit_fill(FILL_BACKGROUND);
 
     gimp_context_set_background($bgcolor);
-    $tiled_punch_layer->edit_fill(BACKGROUND_FILL);
+    $tiled_punch_layer->edit_fill(FILL_BACKGROUND);
     if ($bgpattern) {
 	print "Setting pattern\n";
 	gimp_context_set_pattern($bgpattern);
-	$tiled_punch_layer->edit_bucket_fill(PATTERN_BUCKET_FILL,
+	$tiled_punch_layer->edit_bucket_fill(FILL_PATTERN,
 				NORMAL, 100, 0, FALSE, 0,0);
     }
     gimp_context_set_background([255, 255, 255]);  # Punch stencil
-    $tiled_punch_stencil->edit_fill(BACKGROUND_FILL);
+    $tiled_punch_stencil->edit_fill(FILL_BACKGROUND);
 
     # Add all the layers to the image
     $tiled_img->insert_layer($tiled_punch_stencil,0,-1);
@@ -292,7 +292,7 @@ sub decoration_sunken_windows {
 	$bw = 3;
 	$tiled_img->select_rectangle(0, $xpos-$bw,
 				$ypos-$bw, $w+2*$bw, $h+2*$bw);
-	$tiled_punch_stencil->edit_fill(BACKGROUND_FILL);
+	$tiled_punch_stencil->edit_fill(FILL_BACKGROUND);
 
 	# why is the selection cleared?
 	$tiled_img->selection_none();

@@ -1,30 +1,25 @@
-use Test::More tests => 7;
+use Test::More;
 use Art::World;
-use Faker;
+use Art::World::Util;
 
-my $f = Faker->new;
+my $p = Art::World::Util->new_person;
 
-use_ok 'Art::World::Gallery';
-
-my $gallerist = $f->person_name;
+my $gallerist = $p->fake_name;
 
 my $gallery = Art::World->new_gallery(
-  space => 1000,
   exhibition => [ 1, 2 ],
   owner => $gallerist,
-  money => 10_000_000 );
+  money => 10_000_000,
+  name => 'Richer Gallery',
+  space => 1000 );
 
 ok $gallery->does('Art::World::Exhibit'), 'Gallery does role Exhibit';
 ok $gallery->exhibition, 'Gallery got an exhibition attribute';
 ok $gallery->owner, 'Gallery got an owner';
 
-$gallery->serve;
-
 #ok $gallery->does('Art::Collectionable');
 can_ok $gallery, 'acquire';
-can_ok $gallery, 'serve';
-can_ok $gallery, 'sale';
+#can_ok $gallery, 'serve';
+can_ok $gallery, 'pay';
 
-
-
-done_testing();
+done_testing;

@@ -1,18 +1,18 @@
 use strict;
 use warnings;
 
-use Test::More tests => 115;
+use Test::More tests => 138;
 use XML::Sig;
 use File::Which;
 
-my @hash_alg = qw/sha1 sha224 sha256 sha384 sha512/;
+my @hash_alg = qw/sha1 sha224 sha256 sha384 sha512 ripemd160/;
 foreach my $alg (@hash_alg) {
     my $sig = XML::Sig->new( {
         digest_hash    => $alg,
         x509        => 1,
         key         => 't/dsa.private.key',
     } );
-    isa_ok( $sig, 'XML::Sig' );
+    isa_ok( $sig, "XML::Sig", "XML::Sig Digest: $alg" );
 
     my $signed = $sig->sign('<foo ID="123"></foo>');
     ok($signed, "XML Signed Sucessfully using dsa key");
@@ -40,7 +40,7 @@ foreach my $alg (@hash_alg) {
         digest_hash    => $alg,
         key         => 't/rsa.private.key',
     } );
-    isa_ok( $sig, 'XML::Sig' );
+    isa_ok( $sig, "XML::Sig", "XML::Sig Digest: $alg" );
 
     my $signed = $sig->sign('<foo ID="123"></foo>');
     ok($signed, "XML Signed Sucessfully using rsa key - no X509");
@@ -71,7 +71,7 @@ foreach my $alg (@hash_alg) {
         key         => 't/rsa.private.key',
         cert        => 't/rsa.cert.pem'
     } );
-    isa_ok( $sig, 'XML::Sig' );
+    isa_ok( $sig, "XML::Sig", "XML::Sig Digest: $alg" );
 
     my $signed = $sig->sign('<foo ID="123"></foo>');
     ok($signed, "XML Signed Sucessfully using rsa key");
@@ -98,7 +98,7 @@ SKIP: {
 # Signatures for ECDSA based keys
 foreach my $alg (@hash_alg) {
     my $sig = XML::Sig->new( { x509 => 1 , digest_hash => $alg, key => 't/ecdsa.private.pem', cert => 't/ecdsa.public.pem' } );
-    isa_ok( $sig, 'XML::Sig' );
+    isa_ok( $sig, "XML::Sig", "XML::Sig Digest: $alg" );
 
     my $signed = $sig->sign('<foo ID="123"></foo>');
     ok($signed, "XML Signed Sucessfully using ecdsa key");
@@ -126,7 +126,7 @@ foreach my $alg (@hash_alg) {
     }
 
     $sig = XML::Sig->new( { key => 't/ecdsa.private.pem' } );
-    isa_ok( $sig, 'XML::Sig' );
+    isa_ok( $sig, "XML::Sig", "XML::Sig Digest: $alg" );
 
     $signed = $sig->sign('<foo ID="123"></foo>');
     ok($signed, "XML Signed Sucessfully using ecdsa key");

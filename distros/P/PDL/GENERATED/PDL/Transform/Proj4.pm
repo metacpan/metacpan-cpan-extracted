@@ -3026,8 +3026,7 @@ sub t_proj_wintri
 #    aea
 #
 package PDL::Transform::Proj4::aea;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3079,8 +3078,7 @@ sub new
 #    aeqd
 #
 package PDL::Transform::Proj4::aeqd;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3132,8 +3130,7 @@ sub new
 #    airy
 #
 package PDL::Transform::Proj4::airy;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3185,8 +3182,7 @@ sub new
 #    aitoff
 #
 package PDL::Transform::Proj4::aitoff;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3238,8 +3234,7 @@ sub new
 #    alsk
 #
 package PDL::Transform::Proj4::alsk;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3291,8 +3286,7 @@ sub new
 #    apian
 #
 package PDL::Transform::Proj4::apian;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3344,8 +3338,7 @@ sub new
 #    august
 #
 package PDL::Transform::Proj4::august;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3397,8 +3390,7 @@ sub new
 #    bacon
 #
 package PDL::Transform::Proj4::bacon;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3450,8 +3442,7 @@ sub new
 #    bipc
 #
 package PDL::Transform::Proj4::bipc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3503,8 +3494,7 @@ sub new
 #    boggs
 #
 package PDL::Transform::Proj4::boggs;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3556,8 +3546,7 @@ sub new
 #    bonne
 #
 package PDL::Transform::Proj4::bonne;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3609,8 +3598,7 @@ sub new
 #    calcofi
 #
 package PDL::Transform::Proj4::calcofi;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3662,8 +3650,7 @@ sub new
 #    cass
 #
 package PDL::Transform::Proj4::cass;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3715,8 +3702,7 @@ sub new
 #    cc
 #
 package PDL::Transform::Proj4::cc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3768,8 +3754,7 @@ sub new
 #    cea
 #
 package PDL::Transform::Proj4::cea;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3821,8 +3806,7 @@ sub new
 #    chamb
 #
 package PDL::Transform::Proj4::chamb;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3874,8 +3858,7 @@ sub new
 #    collg
 #
 package PDL::Transform::Proj4::collg;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3927,8 +3910,7 @@ sub new
 #    comill
 #
 package PDL::Transform::Proj4::comill;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -3980,8 +3962,7 @@ sub new
 #    crast
 #
 package PDL::Transform::Proj4::crast;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4033,8 +4014,7 @@ sub new
 #    denoy
 #
 package PDL::Transform::Proj4::denoy;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4086,8 +4066,7 @@ sub new
 #    eck1
 #
 package PDL::Transform::Proj4::eck1;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4139,8 +4118,7 @@ sub new
 #    eck2
 #
 package PDL::Transform::Proj4::eck2;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4192,8 +4170,7 @@ sub new
 #    eck3
 #
 package PDL::Transform::Proj4::eck3;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4245,8 +4222,7 @@ sub new
 #    eck4
 #
 package PDL::Transform::Proj4::eck4;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4298,8 +4274,7 @@ sub new
 #    eck5
 #
 package PDL::Transform::Proj4::eck5;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4351,8 +4326,7 @@ sub new
 #    eck6
 #
 package PDL::Transform::Proj4::eck6;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4404,8 +4378,7 @@ sub new
 #    eqc
 #
 package PDL::Transform::Proj4::eqc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4457,8 +4430,7 @@ sub new
 #    eqdc
 #
 package PDL::Transform::Proj4::eqdc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4510,8 +4482,7 @@ sub new
 #    etmerc
 #
 package PDL::Transform::Proj4::etmerc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4563,8 +4534,7 @@ sub new
 #    euler
 #
 package PDL::Transform::Proj4::euler;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4616,8 +4586,7 @@ sub new
 #    fahey
 #
 package PDL::Transform::Proj4::fahey;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4669,8 +4638,7 @@ sub new
 #    fouc
 #
 package PDL::Transform::Proj4::fouc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4722,8 +4690,7 @@ sub new
 #    fouc_s
 #
 package PDL::Transform::Proj4::fouc_s;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4775,8 +4742,7 @@ sub new
 #    gall
 #
 package PDL::Transform::Proj4::gall;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4828,8 +4794,7 @@ sub new
 #    geocent
 #
 package PDL::Transform::Proj4::geocent;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4881,8 +4846,7 @@ sub new
 #    geos
 #
 package PDL::Transform::Proj4::geos;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4934,8 +4898,7 @@ sub new
 #    gins8
 #
 package PDL::Transform::Proj4::gins8;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -4987,8 +4950,7 @@ sub new
 #    gn_sinu
 #
 package PDL::Transform::Proj4::gn_sinu;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5040,8 +5002,7 @@ sub new
 #    gnom
 #
 package PDL::Transform::Proj4::gnom;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5093,8 +5054,7 @@ sub new
 #    goode
 #
 package PDL::Transform::Proj4::goode;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5146,8 +5106,7 @@ sub new
 #    gs48
 #
 package PDL::Transform::Proj4::gs48;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5199,8 +5158,7 @@ sub new
 #    gs50
 #
 package PDL::Transform::Proj4::gs50;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5252,8 +5210,7 @@ sub new
 #    gstmerc
 #
 package PDL::Transform::Proj4::gstmerc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5305,8 +5262,7 @@ sub new
 #    hammer
 #
 package PDL::Transform::Proj4::hammer;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5358,8 +5314,7 @@ sub new
 #    hatano
 #
 package PDL::Transform::Proj4::hatano;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5411,8 +5366,7 @@ sub new
 #    healpix
 #
 package PDL::Transform::Proj4::healpix;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5464,8 +5418,7 @@ sub new
 #    igh
 #
 package PDL::Transform::Proj4::igh;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5517,8 +5470,7 @@ sub new
 #    imw_p
 #
 package PDL::Transform::Proj4::imw_p;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5570,8 +5522,7 @@ sub new
 #    isea
 #
 package PDL::Transform::Proj4::isea;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5623,8 +5574,7 @@ sub new
 #    kav5
 #
 package PDL::Transform::Proj4::kav5;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5676,8 +5626,7 @@ sub new
 #    kav7
 #
 package PDL::Transform::Proj4::kav7;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5729,8 +5678,7 @@ sub new
 #    krovak
 #
 package PDL::Transform::Proj4::krovak;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5782,8 +5730,7 @@ sub new
 #    labrd
 #
 package PDL::Transform::Proj4::labrd;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5835,8 +5782,7 @@ sub new
 #    laea
 #
 package PDL::Transform::Proj4::laea;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5888,8 +5834,7 @@ sub new
 #    lagrng
 #
 package PDL::Transform::Proj4::lagrng;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5941,8 +5886,7 @@ sub new
 #    larr
 #
 package PDL::Transform::Proj4::larr;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -5994,8 +5938,7 @@ sub new
 #    lask
 #
 package PDL::Transform::Proj4::lask;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6047,8 +5990,7 @@ sub new
 #    latlon
 #
 package PDL::Transform::Proj4::latlon;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6100,8 +6042,7 @@ sub new
 #    latlong
 #
 package PDL::Transform::Proj4::latlong;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6153,8 +6094,7 @@ sub new
 #    lcc
 #
 package PDL::Transform::Proj4::lcc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6206,8 +6146,7 @@ sub new
 #    lcca
 #
 package PDL::Transform::Proj4::lcca;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6259,8 +6198,7 @@ sub new
 #    leac
 #
 package PDL::Transform::Proj4::leac;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6312,8 +6250,7 @@ sub new
 #    lee_os
 #
 package PDL::Transform::Proj4::lee_os;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6365,8 +6302,7 @@ sub new
 #    longlat
 #
 package PDL::Transform::Proj4::longlat;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6418,8 +6354,7 @@ sub new
 #    lonlat
 #
 package PDL::Transform::Proj4::lonlat;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6471,8 +6406,7 @@ sub new
 #    loxim
 #
 package PDL::Transform::Proj4::loxim;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6524,8 +6458,7 @@ sub new
 #    lsat
 #
 package PDL::Transform::Proj4::lsat;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6577,8 +6510,7 @@ sub new
 #    mbt_fps
 #
 package PDL::Transform::Proj4::mbt_fps;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6630,8 +6562,7 @@ sub new
 #    mbt_s
 #
 package PDL::Transform::Proj4::mbt_s;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6683,8 +6614,7 @@ sub new
 #    mbtfpp
 #
 package PDL::Transform::Proj4::mbtfpp;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6736,8 +6666,7 @@ sub new
 #    mbtfpq
 #
 package PDL::Transform::Proj4::mbtfpq;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6789,8 +6718,7 @@ sub new
 #    mbtfps
 #
 package PDL::Transform::Proj4::mbtfps;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6842,8 +6770,7 @@ sub new
 #    merc
 #
 package PDL::Transform::Proj4::merc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6895,8 +6822,7 @@ sub new
 #    mil_os
 #
 package PDL::Transform::Proj4::mil_os;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -6948,8 +6874,7 @@ sub new
 #    mill
 #
 package PDL::Transform::Proj4::mill;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7001,8 +6926,7 @@ sub new
 #    misrsom
 #
 package PDL::Transform::Proj4::misrsom;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7054,8 +6978,7 @@ sub new
 #    moll
 #
 package PDL::Transform::Proj4::moll;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7107,8 +7030,7 @@ sub new
 #    murd1
 #
 package PDL::Transform::Proj4::murd1;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7160,8 +7082,7 @@ sub new
 #    murd2
 #
 package PDL::Transform::Proj4::murd2;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7213,8 +7134,7 @@ sub new
 #    murd3
 #
 package PDL::Transform::Proj4::murd3;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7266,8 +7186,7 @@ sub new
 #    natearth
 #
 package PDL::Transform::Proj4::natearth;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7319,8 +7238,7 @@ sub new
 #    natearth2
 #
 package PDL::Transform::Proj4::natearth2;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7372,8 +7290,7 @@ sub new
 #    nell
 #
 package PDL::Transform::Proj4::nell;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7425,8 +7342,7 @@ sub new
 #    nell_h
 #
 package PDL::Transform::Proj4::nell_h;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7478,8 +7394,7 @@ sub new
 #    nicol
 #
 package PDL::Transform::Proj4::nicol;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7531,8 +7446,7 @@ sub new
 #    nsper
 #
 package PDL::Transform::Proj4::nsper;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7584,8 +7498,7 @@ sub new
 #    nzmg
 #
 package PDL::Transform::Proj4::nzmg;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7637,8 +7550,7 @@ sub new
 #    ob_tran
 #
 package PDL::Transform::Proj4::ob_tran;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7690,8 +7602,7 @@ sub new
 #    ocea
 #
 package PDL::Transform::Proj4::ocea;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7743,8 +7654,7 @@ sub new
 #    oea
 #
 package PDL::Transform::Proj4::oea;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7796,8 +7706,7 @@ sub new
 #    omerc
 #
 package PDL::Transform::Proj4::omerc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7849,8 +7758,7 @@ sub new
 #    ortel
 #
 package PDL::Transform::Proj4::ortel;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7902,8 +7810,7 @@ sub new
 #    ortho
 #
 package PDL::Transform::Proj4::ortho;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -7955,8 +7862,7 @@ sub new
 #    patterson
 #
 package PDL::Transform::Proj4::patterson;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8008,8 +7914,7 @@ sub new
 #    pconic
 #
 package PDL::Transform::Proj4::pconic;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8061,8 +7966,7 @@ sub new
 #    poly
 #
 package PDL::Transform::Proj4::poly;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8114,8 +8018,7 @@ sub new
 #    putp1
 #
 package PDL::Transform::Proj4::putp1;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8167,8 +8070,7 @@ sub new
 #    putp2
 #
 package PDL::Transform::Proj4::putp2;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8220,8 +8122,7 @@ sub new
 #    putp3
 #
 package PDL::Transform::Proj4::putp3;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8273,8 +8174,7 @@ sub new
 #    putp3p
 #
 package PDL::Transform::Proj4::putp3p;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8326,8 +8226,7 @@ sub new
 #    putp4p
 #
 package PDL::Transform::Proj4::putp4p;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8379,8 +8278,7 @@ sub new
 #    putp5
 #
 package PDL::Transform::Proj4::putp5;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8432,8 +8330,7 @@ sub new
 #    putp5p
 #
 package PDL::Transform::Proj4::putp5p;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8485,8 +8382,7 @@ sub new
 #    putp6
 #
 package PDL::Transform::Proj4::putp6;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8538,8 +8434,7 @@ sub new
 #    putp6p
 #
 package PDL::Transform::Proj4::putp6p;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8591,8 +8486,7 @@ sub new
 #    qsc
 #
 package PDL::Transform::Proj4::qsc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8644,8 +8538,7 @@ sub new
 #    qua_aut
 #
 package PDL::Transform::Proj4::qua_aut;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8697,8 +8590,7 @@ sub new
 #    rhealpix
 #
 package PDL::Transform::Proj4::rhealpix;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8750,8 +8642,7 @@ sub new
 #    robin
 #
 package PDL::Transform::Proj4::robin;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8803,8 +8694,7 @@ sub new
 #    rouss
 #
 package PDL::Transform::Proj4::rouss;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8856,8 +8746,7 @@ sub new
 #    rpoly
 #
 package PDL::Transform::Proj4::rpoly;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8909,8 +8798,7 @@ sub new
 #    sch
 #
 package PDL::Transform::Proj4::sch;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -8962,8 +8850,7 @@ sub new
 #    sinu
 #
 package PDL::Transform::Proj4::sinu;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9015,8 +8902,7 @@ sub new
 #    somerc
 #
 package PDL::Transform::Proj4::somerc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9068,8 +8954,7 @@ sub new
 #    stere
 #
 package PDL::Transform::Proj4::stere;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9121,8 +9006,7 @@ sub new
 #    sterea
 #
 package PDL::Transform::Proj4::sterea;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9174,8 +9058,7 @@ sub new
 #    tcc
 #
 package PDL::Transform::Proj4::tcc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9227,8 +9110,7 @@ sub new
 #    tcea
 #
 package PDL::Transform::Proj4::tcea;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9280,8 +9162,7 @@ sub new
 #    times
 #
 package PDL::Transform::Proj4::times;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9333,8 +9214,7 @@ sub new
 #    tissot
 #
 package PDL::Transform::Proj4::tissot;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9386,8 +9266,7 @@ sub new
 #    tmerc
 #
 package PDL::Transform::Proj4::tmerc;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9439,8 +9318,7 @@ sub new
 #    tpeqd
 #
 package PDL::Transform::Proj4::tpeqd;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9492,8 +9370,7 @@ sub new
 #    tpers
 #
 package PDL::Transform::Proj4::tpers;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9545,8 +9422,7 @@ sub new
 #    ups
 #
 package PDL::Transform::Proj4::ups;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9598,8 +9474,7 @@ sub new
 #    urm5
 #
 package PDL::Transform::Proj4::urm5;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9651,8 +9526,7 @@ sub new
 #    urmfps
 #
 package PDL::Transform::Proj4::urmfps;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9704,8 +9578,7 @@ sub new
 #    utm
 #
 package PDL::Transform::Proj4::utm;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9757,8 +9630,7 @@ sub new
 #    vandg
 #
 package PDL::Transform::Proj4::vandg;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9810,8 +9682,7 @@ sub new
 #    vandg2
 #
 package PDL::Transform::Proj4::vandg2;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9863,8 +9734,7 @@ sub new
 #    vandg3
 #
 package PDL::Transform::Proj4::vandg3;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9916,8 +9786,7 @@ sub new
 #    vandg4
 #
 package PDL::Transform::Proj4::vandg4;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -9969,8 +9838,7 @@ sub new
 #    vitk1
 #
 package PDL::Transform::Proj4::vitk1;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10022,8 +9890,7 @@ sub new
 #    wag1
 #
 package PDL::Transform::Proj4::wag1;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10075,8 +9942,7 @@ sub new
 #    wag2
 #
 package PDL::Transform::Proj4::wag2;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10128,8 +9994,7 @@ sub new
 #    wag3
 #
 package PDL::Transform::Proj4::wag3;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10181,8 +10046,7 @@ sub new
 #    wag4
 #
 package PDL::Transform::Proj4::wag4;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10234,8 +10098,7 @@ sub new
 #    wag5
 #
 package PDL::Transform::Proj4::wag5;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10287,8 +10150,7 @@ sub new
 #    wag6
 #
 package PDL::Transform::Proj4::wag6;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10340,8 +10202,7 @@ sub new
 #    wag7
 #
 package PDL::Transform::Proj4::wag7;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10393,8 +10254,7 @@ sub new
 #    weren
 #
 package PDL::Transform::Proj4::weren;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10446,8 +10306,7 @@ sub new
 #    wink1
 #
 package PDL::Transform::Proj4::wink1;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10499,8 +10358,7 @@ sub new
 #    wink2
 #
 package PDL::Transform::Proj4::wink2;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {
@@ -10552,8 +10410,7 @@ sub new
 #    wintri
 #
 package PDL::Transform::Proj4::wintri;
-use PDL::Transform::Proj4;
-@ISA = ( 'PDL::Transform::Proj4' );
+our @ISA = ( 'PDL::Transform::Proj4' );
 
 sub new
 {

@@ -1,0 +1,30 @@
+---
+abstract: 'Simple installation and compatibility for FFTW3'
+author:
+  - 'Craig DeForest <deforest@boulder.swri.edu>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.002'
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-FFTW3
+provides:
+  Alien::FFTW3:
+    file: lib/Alien/FFTW3.pm
+    version: '0.04'
+requires:
+  Alien::Base: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/drzowie/Alien-FFTW3/issues
+  homepage: https://github.com/drzowie/Alien-FFTW3
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ddrzowie/Alien-FFTW3.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -11,46 +11,9 @@ my $bvalPerPdl = $PDL::Config{BADVAL_PER_PDL} || 0;
 
 #########################################################
 
-# _finite in VC++
-if ($^O =~ /MSWin/) {
-    pp_addhdr('
-#define finite _finite
-#include <float.h>
+pp_addhdr('
+#include <math.h>
 ');
-} else
-{ #taken from pdlcore.c.PL. Probably overkill here: could we just do '#define finite isfinite' ?
-    my $finite_inc;
-    my $use_isfinite = 0;
-    foreach my $inc ( qw/ math.h ieeefp.h / )
-    {
-        if ( trylink ('', "#include <$inc>", 'isfinite(3.2);', '' ) ) {
-            $finite_inc = $inc;
-            $use_isfinite = 1;
-            last;
-        }
-        if ( (!defined($finite_inc))  and  trylink ("finite: $inc", "#include <$inc>", 'finite(3.2);','') ) {
-            $finite_inc = $inc;
-        }
-    }
-
-    if ( defined $finite_inc ) {
-	pp_addhdr("
-#include <$finite_inc>
-#define finite(a) (isfinite(a))
-");
-    } else {
-	pp_addhdr('
-            /* Kludgy finite/isfinite because bad.pd was unable to find one in your math library */
-#ifndef finite
-#ifdef isfinite
-#define finite isfinite
-#else
-#define finite(a) (((a) * 0) == (0))
-#endif
-#endif
-');
-    }
-}
 
 pp_add_exported( '',
 		 'badflag check_badflag badvalue orig_badvalue nbad nbadover ngood ngoodover ' .
@@ -90,23 +53,12 @@ L<PDL::BadValues>.
 =head1 SYNOPSIS
 
  use PDL::Bad;
- print "\nBad value support in PDL is turned " .
-     $PDL::Bad::Status ? "on" : "off" . ".\n";
-
- Bad value support in PDL is turned on.
-
- and some other things
+ print "\nBad value per PDL support in PDL is turned " .
+     $PDL::Bad::PerPdl ? "on" : "off" . ".\n";
 
 =head1 VARIABLES
 
-There are currently three variables that this module defines
-which may be of use.
-
 =over 4
-
-=item $PDL::Bad::Status
-
-Set to 1
 
 =item $PDL::Bad::UseNaN
 
@@ -1061,7 +1013,7 @@ bad flag is set, it will no
     Code => q{
         int flag = 0;
         threadloop %{
-            if ( ! finite($a()) ) {
+            if ( ! isfinite($a()) ) {
                 $SETBAD(b());
                 flag = 1;
             }

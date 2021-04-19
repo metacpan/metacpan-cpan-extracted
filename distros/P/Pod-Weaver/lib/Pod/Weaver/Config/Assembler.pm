@@ -1,6 +1,6 @@
 package Pod::Weaver::Config::Assembler;
 # ABSTRACT: Pod::Weaver-specific subclass of Config::MVP::Assembler
-$Pod::Weaver::Config::Assembler::VERSION = '4.015';
+$Pod::Weaver::Config::Assembler::VERSION = '4.017';
 use Moose;
 extends 'Config::MVP::Assembler';
 with 'Config::MVP::Assembler::WithBundles';
@@ -38,7 +38,7 @@ Pod::Weaver::Config::Assembler - Pod::Weaver-specific subclass of Config::MVP::A
 
 =head1 VERSION
 
-version 4.015
+version 4.017
 
 =head1 AUTHOR
 
@@ -46,7 +46,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

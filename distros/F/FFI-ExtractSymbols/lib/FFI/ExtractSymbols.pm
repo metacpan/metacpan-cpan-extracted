@@ -9,7 +9,7 @@ my $config = File::ShareDir::Dist::dist_config('FFI-ExtractSymbols');
 our @EXPORT = qw( extract_symbols );
 
 # ABSTRACT: Extract symbol names from a shared object or DLL
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 $FFI::ExtractSymbols::mode = '';
@@ -45,7 +45,7 @@ FFI::ExtractSymbols - Extract symbol names from a shared object or DLL
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

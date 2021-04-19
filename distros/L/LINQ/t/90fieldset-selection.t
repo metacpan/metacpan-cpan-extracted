@@ -115,27 +115,9 @@ object_ok(
 );
 
 is(
-	fields( "foo", "bar", -as => "barr", "baz" )->_sql_selection,
-	'"foo", "bar" AS "barr", "baz"',
-	'Simple SQL generation',
-);
-
-is(
-	fields( "foo", "bar", -as => "barr", "baz" )->_sql_selection( sub { uc($_[0]) } ),
-	'FOO, BAR AS BARR, BAZ',
-	'Simple SQL generation with custom quoter',
-);
-
-is(
-	fields( "foo", "bar", -as => "barr", "baz", "*" )->_sql_selection,
-	undef,
-	'Simple SQL generation with asterisk',
-);
-
-is(
-	fields( "foo", sub { }, "bar", -as => "barr", "baz" )->_sql_selection,
-	undef,
-	'Simple SQL generation with coderef',
+	fields( "foo", "bar", -as => "barr", "baz" ) . '',
+	'fields(foo, barr, baz)',
+	'Stringification',
 );
 
 my $selector = fields(

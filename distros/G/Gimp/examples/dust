@@ -62,9 +62,9 @@ podregister {
   Gimp::Context->set_brush($brush);
   Gimp::Brushes->set_spacing($brush, 100);
   Gimp::Context->set_opacity(50);
-  Gimp::Context->set_paint_mode(NORMAL_MODE);
-  $drawable = $image->add_new_layer (0, TRANSPARENT_FILL, 1);
-  $drawable->set_mode (DIFFERENCE_MODE);
+  Gimp::Context->set_paint_mode(LAYER_MODE_NORMAL_LEGACY);
+  $drawable = $image->add_new_layer (0, FILL_TRANSPARENT, 1);
+  $drawable->set_mode (LAYER_MODE_DIFFERENCE_LEGACY);
   for (1..($w*$h*$density)) {
     my ($x, $y) = (rand $w, rand $h);
     my $l = int($length + rand $length);

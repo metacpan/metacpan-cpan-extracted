@@ -35,8 +35,8 @@ sub iter
 	PDL::NDBin::Iterator->new( bins => [ $N ], array => [ $var ], idx => $idx );
 }
 
-# systematically list all types used by PDL
-my @all_types = PDL::Types::types;
+# systematically list all real types used by PDL
+my @all_types = grep $_->real, PDL::Types::types();
 plan tests => 117 + (8 + __PACKAGE__->actions) * @all_types;
 
 # variable declarations

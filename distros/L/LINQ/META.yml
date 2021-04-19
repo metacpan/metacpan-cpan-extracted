@@ -25,79 +25,82 @@ optional_features: {}
 provides:
   LINQ:
     file: lib/LINQ.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Array:
     file: lib/LINQ/Array.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Collection:
     file: lib/LINQ/Collection.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::END:
     file: lib/LINQ.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Exception:
     file: lib/LINQ/Exception.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Exception::CallerError:
     file: lib/LINQ/Exception.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Exception::Cast:
     file: lib/LINQ/Exception.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Exception::CollectionError:
     file: lib/LINQ/Exception.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Exception::InternalError:
     file: lib/LINQ/Exception.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Exception::MultipleFound:
     file: lib/LINQ/Exception.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Exception::NotFound:
     file: lib/LINQ/Exception.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Exception::Unimplemented:
     file: lib/LINQ/Exception.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Field:
     file: lib/LINQ/Field.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::FieldSet:
     file: lib/LINQ/FieldSet.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::FieldSet::Assertion:
     file: lib/LINQ/FieldSet/Assertion.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::FieldSet::Assertion::AND:
     file: lib/LINQ/FieldSet/Assertion.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::FieldSet::Assertion::Combination:
     file: lib/LINQ/FieldSet/Assertion.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::FieldSet::Assertion::NOT:
     file: lib/LINQ/FieldSet/Assertion.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::FieldSet::Assertion::OR:
     file: lib/LINQ/FieldSet/Assertion.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::FieldSet::Selection:
     file: lib/LINQ/FieldSet/Selection.pm
-    version: '0.001'
+    version: '0.002'
+  LINQ::FieldSet::Single:
+    file: lib/LINQ/FieldSet/Single.pm
+    version: '0.002'
   LINQ::Grouping:
     file: lib/LINQ/Grouping.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Iterator:
     file: lib/LINQ/Iterator.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::LAST:
     file: lib/LINQ.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Util:
     file: lib/LINQ/Util.pm
-    version: '0.001'
+    version: '0.002'
   LINQ::Util::Internal:
     file: lib/LINQ/Util/Internal.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Class::Tiny: '0.005'
   Exporter::Shiny: '0'
@@ -114,5 +117,5 @@ resources:
   homepage: https://metacpan.org/release/LINQ
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-linq.git
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

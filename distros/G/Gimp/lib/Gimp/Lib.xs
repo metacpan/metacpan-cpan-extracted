@@ -5,7 +5,6 @@
 
 #include <libgimp/gimp.h>
 
-#define PDL_clean_namespace
 #include <pdlcore.h>
 
 /* various functions allocate static buffers, STILL.  */
@@ -67,7 +66,7 @@ static void need_pdl (void)
 
 static pdl *new_pdl (int a, int b, int c)
 {
-  pdl *p = PDL->new();
+  pdl *p = PDL->pdlnew();
   PDL_Indx dims[3];
   int ndims = 0;
 
@@ -1646,6 +1645,16 @@ CODE:
   GimpParamDef *rpd; int nreturn_vals;
   nparams      = convert_array2paramdef ((AV *)SvRV(params)     , &apd);
   nreturn_vals = convert_array2paramdef ((AV *)SvRV(return_vals), &rpd);
+  /* 3 cases: no path, no slash, yes slash */
+  char *menu_location = SvPv(menu_path) ? g_strdup(SvPv(menu_path)) : NULL;
+  char *slash_ptr = menu_location ? g_strrstr(menu_location, "/") : NULL;
+  char *menu_name;
+  if (slash_ptr) {
+    *slash_ptr++ = '\0';
+    menu_name = slash_ptr;
+  } else {
+    menu_name = menu_location;
+  }
   if (ix)
     gimp_install_temp_proc(
       name,
@@ -1654,7 +1663,7 @@ CODE:
       author,
       copyright,
       date,
-      SvPv(menu_path),
+      menu_name,
       SvPv(image_types),
       type,
       nparams,
@@ -1672,7 +1681,7 @@ CODE:
       author,
       copyright,
       date,
-      SvPv(menu_path),
+      menu_name,
       SvPv(image_types),
       type,
       nparams,
@@ -1683,6 +1692,8 @@ CODE:
   }
   g_free (rpd);
   g_free (apd);
+  if (slash_ptr) gimp_plugin_menu_register(name, menu_location);
+  if (menu_location) g_free(menu_location);
 
 void
 gimp_uninstall_temp_proc(name)
@@ -2184,7 +2195,7 @@ gimp_pixel_rgn_data(pr,newdata=0)
 	  }
 	else
 	  {
-	    pdl *p = PDL->new();
+	    pdl *p = PDL->pdlnew();
 	    PDL_Indx dims[3];
 
 	    dims[0] = pr->bpp;

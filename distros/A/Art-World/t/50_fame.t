@@ -1,21 +1,16 @@
-use Test::More tests => 14;
+use Test::More;
 use Art::World;
-use Faker;
-
-my $f = Faker->new;
-my $artist_name = $f->person_first_name . ' ' . $f->person_last_name;
+use Art::World::Util;
 
 my $rep = 1.7;
 
 my $artist = Art::World->new_artist(
   reputation => $rep,
-  name => $artist_name
+  name => Art::World::Util->new_person->fake_name,
 );
 
 ok $artist->does('Art::World::Fame'), 'Artist does the Fame role';
 can_ok $artist, 'bump_fame';
-
-use Data::Printer;
 
 diag 'Error messages displayed during tests are part of the testing process';
 
@@ -51,30 +46,29 @@ diag $@;
 like $@, qr/Can't locate object method "aura" via package "Art::World::Artist"/,
   'Artists don\'t have an aura attribute';
 
-
-my $artist_name_2 = $f->person_first_name . ' ' . $f->person_last_name;
 my $artist_2 = Art::World->new_artist(
-    name => $artist_name_2, id => 1
-  );
+  id => 1,
+  name => Art::World::Util->new_person->fake_name,
+ );
 
 my $munnies= 100;
 
 my $collector1 = Art::World
         ->new_collector(
-            name => $f->person_name,
+            name => Art::World::Util->new_person->fake_name,
             money => $munnies,
             id => 3
           );
 
 my $collector2 = Art::World
         ->new_collector(
-            name => $f->person_name,
+            name => Art::World::Util->new_person->fake_name,
             money => $munnies + 1000,
             id => 4
           );
 
 my $homogenic_artist = Art::World->new_artist(
-    name => $f->person_name,
+    name => Art::World::Util->new_person->fake_name,
     collectors => [ $collector1, $collector2 ]
   );
 

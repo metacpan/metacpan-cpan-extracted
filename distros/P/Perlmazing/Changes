@@ -1,28 +1,49 @@
 Revision history for Perlmazing
 
 1.2     2016-01-16
-        First public version, released after several years of private use and development.
+	First public version, released after several years of private use and development.
 1.22 .. 1.2802
-        Minor adjustments for PAUSE
+	Minor adjustments for PAUSE
 1.2804  2016-02-24
-        Bugfix for older Perl versions
+	Bugfix for older Perl versions
 1.2806  2016-02-25
-        Bugfix for older Perl versions
+	Bugfix for older Perl versions
 1.2808  2016-02-25
-        Bugfix in function dir affecting Linux
+	Bugfix in function dir affecting Linux
 1.2810  2016-02-26
-        Fix in Perlmazing::Engine POD markup, improperly scaped -> sequences
-		Fix in test case causing an error in rare cases like http://www.cpantesters.org/cpan/report/db62e0b6-dc2a-11e5-ad39-220c874cb8f0
+	Fix in Perlmazing::Engine POD markup, improperly scaped -> sequences
+	Fix in test case causing an error in rare cases like http://www.cpantesters.org/cpan/report/db62e0b6-dc2a-11e5-ad39-220c874cb8f0
 1.2812	2018-02-01
-		Made Perl::Critic happy
-		Added weaken and unweaken (from Scalar::Util) to Perlmazing
-		Prevent on-cleanup-during-global-destruction warnings for Perlmazing::Engine on newer versions of Perl
-		Bugfix, Perlmazing wasn't doing the correct thing with specified symbols to import/skip
-		Bugfix, remove_duplicates was failing when an element of the array was undef
-		Bugfix, appeared with Perl 5.26, causing warnings on cleanup under certain circumstances.
+	Made Perl::Critic happy
+	Added weaken and unweaken (from Scalar::Util) to Perlmazing
+	Prevent on-cleanup-during-global-destruction warnings for Perlmazing::Engine on newer versions of Perl
+	Bugfix, Perlmazing wasn't doing the correct thing with specified symbols to import/skip
+	Bugfix, remove_duplicates was failing when an element of the array was undef
+	Bugfix, appeared with Perl 5.26, causing warnings on cleanup under certain circumstances.
 1.2814  2019-02-09
-		Removed warnings fatal all. Now its only fatal with qw(closed unopened numeric recursion syntax uninitialized)
-		Updated required version for Taint::Util.
-		Added move function from File::Copy::Recursive::rmove, as we are already using rcopy from the same module.
-		Added functions to_string and to_number.
-		slurp function now doesn't force binary mode on non binary files, unless a true value is passed as second argument.
+	Removed warnings fatal all. Now its only fatal with qw(closed unopened numeric recursion syntax uninitialized)
+	Updated required version for Taint::Util.
+	Added move function from File::Copy::Recursive::rmove, as we are already using rcopy from the same module.
+	Added functions to_string and to_number.
+	slurp function now doesn't force binary mode on non binary files, unless a true value is passed as second argument.
+1.2815  2021-04-17
+	Fixed - some times objects from Submodules could get DESTROYed before than we wanted it to.
+	Renamed (for consistency) quote_escape and quotes_escape into
+		escape_quote and escape_quotes. There's no evidence of these functions
+		being a dependency of another module. If this breaks something for you,
+		email me.Added eval_string (code, documentation, tests)
+	Added File::Basename related functions: basename, basedir
+	Added File::Spec related functions: catdir, catfile, devnull, splitpath, catpath, abs2rel, rel2abs
+	Added Cwd related function: abs_path
+	Added function commify.
+	Added missing isa_filehandle, complementary to is_filehandle.
+	Minor fixes in POD.
+	All is_* and isa_* functions now return a defined value. This helps with comparisons like "if (is_blessed $obj eq 'FOO').
+	Added missing confess, complementary to the rest of Carp functions.
+	Perlmazing::Engine now gives more useful information on unhandled loading symbol errors.
+	Fixed issue in is_number where the symbol "_" was not always handled correctly (which is valid in Perl numbers).
+	Fixed issue in to_number, where numbers could be interpreted as octal formated numbers, causing errors when invalid.
+		This fix will take legitimage octal declarations as decimal intended. Noted in POD.
+	Fixed warning in dir, which pointed to the dir file instad of the user file.
+1.2816  2021-04-18
+	Updated Makefile.PL to require Submodules 1.0015, which resolves issues with this update.

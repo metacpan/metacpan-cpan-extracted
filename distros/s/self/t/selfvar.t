@@ -1,7 +1,8 @@
 #!/usr/bin/env perl -w
 use strict;
 use lib 't/lib2';
-use Test::More tests => 5;
+use Test2::V0;
+plan tests => 5;
 
 use Selfvar;
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env perl -w
 use strict;
-use Test::More tests => 2;
+use Test2::V0;
+plan tests => 2;
 
 use self;
 

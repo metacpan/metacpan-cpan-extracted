@@ -4,7 +4,7 @@ our ($dir, $DEBUG);
 BEGIN {
 #  $Gimp::verbose = 3;
   $DEBUG = 0;
-  require 't/gimpsetup.pl';
+  require './t/gimpsetup.pl';
 }
 use Gimp qw(:DEFAULT net_init=spawn/);
 use Gimp::Data;

@@ -1,50 +1,45 @@
 ---
-abstract: 'Agents interactions modeling  🎨'
+abstract: 'Modeling of creative processes'
 author:
   - 'Sébastien Feugère <sebastien@feugere.net>'
 build_requires:
+  Path::Tiny: '== 0.118'
   Test::Pod: '== 1.52'
 configure_requires:
-  Module::Build::Tiny: '0.035'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.029, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Art-World
-no_index:
-  directory:
-    - t
-    - xt
-    - inc
-    - share
-    - eg
-    - examples
-    - author
-    - builder
 provides:
   Art::World:
     file: lib/Art/World.pm
-    version: '0.18'
+    version: '0.19'
+  Art::World::Util:
+    file: lib/Art/World/Util.pm
 requires:
-  Config::Tiny: '== 2.24'
-  Data::Printer: '== 0.40'
-  Faker: '== 1.03'
-  Math::Round: '0.07'
-  PadWalker: '0'
+  Config::Tiny: '== 2.26'
+  DBD::SQLite: '== 1.66'
+  DBI: '== 1.643'
+  Data::Printer: '== 1.000004'
+  Faker: '== 1.04'
+  Math::Round: '== 0.07'
+  Moo: '== 2.005004'
+  PadWalker: '== 2.5'
+  Teng: '== 0.32'
+  Time::Moment: '== 0.44'
+  Try::Tiny: '== 0.30'
   Type::Tiny: '== 1.012001'
   Type::Tiny::XS: '== 0.022'
   Zydeco: '== 0.613'
-  perl: v5.24.1
+  perl: v5.20.0
 resources:
-  bugtracker: https://gitlab.com/smonff/art-world/issues
-  homepage: https://gitlab.com/smonff/art-world
-  repository: git://gitlab.com/smonff/art-world.git
-version: '0.18'
-x_authority: cpan:SMONFF
-x_contributors:
-  - 'Seb Hu-Rillettes <shr@balik.network>'
-  - 'Sébastien Feugère <smonff@riseup.net>'
+  bugtracker: https://codeberg.org/smonff/art-world/issues
+  homepage: https://codeberg.org/smonff/art-world
+  repository: https://codeberg.org/smonff/art-world.git
+version: '0.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1
+x_spdx_expression: Artistic-2.0

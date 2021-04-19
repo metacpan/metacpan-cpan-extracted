@@ -1,7 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <db:article xmlns:db="http://docbook.org/ns/docbook" xmlns:vrd="http://www.shlomifish.org/open-source/projects/XML-Grammar/Vered/" xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="index" xml:lang="en-GB" version="5.0">
-  <db:info>
+  <db:info xml:id="main_document_id">
     <db:title>Perl Elements to Avoid</db:title>
+    <db:authorgroup>
+        <db:author>
+            <db:personname>
+                <db:firstname>Unknown</db:firstname>
+                <db:surname>Unknown</db:surname>
+            </db:personname>
+            <db:affiliation>
+                <db:address>
+                    <db:email>me@example.com</db:email>
+                    <db:uri type="homepage" xlink:href="https://www.shlomifish.org/">Shlomi Fish’s Homepage</db:uri>
+                </db:address>
+            </db:affiliation>
+        </db:author>
+    </db:authorgroup>
+    <db:copyright>
+        <db:year>2021</db:year>
+        <db:holder>Unknown</db:holder>
+    </db:copyright>
+    <db:legalnotice xml:id="main_legal_notice">
+        <db:para>
+            This document is copyrighted by Unknown.
+        </db:para>
+    </db:legalnotice>
+
+    <db:revhistory>
+
+        <db:revision>
+            <db:revnumber>4902</db:revnumber>
+            <db:date>2011-06-05</db:date>
+            <db:authorinitials>shlomif</db:authorinitials>
+            <db:revremark>
+                Change ASCII double quotes and single quotes to Unicode.
+            </db:revremark>
+        </db:revision>
+    </db:revhistory>
   </db:info>
   <db:section role="introduction" xml:id="intro">
     <db:info>

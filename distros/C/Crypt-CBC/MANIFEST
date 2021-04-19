@@ -23,6 +23,7 @@ t/DES.t
 t/func.t
 t/IDEA.t
 t/null_data.t
+t/nopadding.t
 t/OFB.t
 t/onezeropadding.t
 t/parameters.t

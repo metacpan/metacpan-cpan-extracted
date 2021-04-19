@@ -263,4 +263,17 @@ subtest string => sub {
     );
 };
 
+subtest dotassign => sub {
+    my $p = PDL::SV->new([qw(a b c)]);
+
+    $p .= PDL::SV->new([qw(foo bar baz)]);
+    pdl_is( $p, PDL::SV->new([qw(foo bar baz)]), '.= pdlsv(len > 1)');
+
+    $p .= PDL::SV->new(["foo"]);
+    pdl_is( $p, PDL::SV->new([qw(foo foo foo)]), '.= pdlsv(len == 1)');
+
+    $p->slice([1,2]) .= "bar";
+    pdl_is( $p, PDL::SV->new([qw(foo bar bar)]), '.= non-piddle');
+};
+
 done_testing;

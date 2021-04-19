@@ -17,7 +17,7 @@ podregister {
 
    # Erzeuge die erste Ebene für das Bild
    my $layer = $image->layer_new($width,$height,RGB_IMAGE,
-		   "Random Art #1",100,NORMAL_MODE);
+		   "Random Art #1",100,LAYER_MODE_NORMAL_LEGACY);
 
    # Füge sie in das Bild ein
    $image->insert_layer($layer,0,0);
@@ -26,7 +26,7 @@ podregister {
    Gimp::Context->set_background('white');
 
    # ...und lösche die Ebene damit
-   $layer->fill(BACKGROUND_FILL);
+   $layer->fill(FILL_BACKGROUND);
 
    # Jetzt wurde ein neues, leeres Bild erzeugt, und
    # das Zeichnen kann beginnen.
@@ -51,16 +51,12 @@ podregister {
       Gimp::Context->set_background([rand(256)/256.0,rand(256)/256.0,rand(256)/256.0]);
 
       # Und erzeuge einen Farbverlauf über das Bild
-      $layer->edit_blend (FG_BG_HSV_MODE,
-		     DIFFERENCE_MODE,
+      $layer->edit_gradient_fill(
 		     GRADIENT_LINEAR,         # gradient type
-		     100,                     # opacity
 		     0,                       # offset
-		     REPEAT_TRIANGULAR,       # repeat
-		     0,                       # reverse
 		     $super,                  # supersampling
-		     2,
-		     3,
+		     2, # supersample offset
+		     3, # supersample threshold
 		     0,                       # no dithering
 		     $width/2,                    # x1
 		     $height/2,                    # y1

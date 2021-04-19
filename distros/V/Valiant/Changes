@@ -1,5 +1,16 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001005  2021 April 18
+          - Declare column validations inside a column definition for DBIC
+          - lots of tweaks and fixes to now nested validations for DBIC work
+          - Start on having CCI for Windows and MacOS
+          - Stubbed out a lot of the docs needed for Valiant::DBIC
+          - improved the Catalyst example using DBIC with Valiant
+          - Allowed one to set a context on a model before running the validation
+          - enabled some debugging for test cases to help me fix the Windows issue.  If 
+            anyone has access to Strawberry Perl on Windows and wants to help me make 
+            this work on Windows please give me a shout!
+
 0.001004  2021 April 07
           - Specify more exact dependency versions in cpanfile.
           - lots of updates to nested DBIC support and improved example application

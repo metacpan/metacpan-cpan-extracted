@@ -1,5 +1,8 @@
 Revision history for FFI-Platypus-Type-PtrObject},
 
+0.03      2021-04-17 02:55:35 -0600
+  - Workarounds for macOS Big Sur (gh#6)
+
 0.02      2020-04-24 13:43:19 -0600
   - Convert NULL => undef for return from C land (gh#2)
 

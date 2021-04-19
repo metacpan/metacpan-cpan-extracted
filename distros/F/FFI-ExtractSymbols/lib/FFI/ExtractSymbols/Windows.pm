@@ -8,7 +8,7 @@ use File::Which qw( which );
 my $config = File::ShareDir::Dist::dist_config('FFI-ExtractSymbols');
 
 # ABSTRACT: Windows (and Cygwin) implementation for FFI::ExtractSymbols
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 return 1 if FFI::ExtractSymbols->can('extract_symbols') || $^O !~ /^(MSWin32|cygwin)$/;
@@ -81,7 +81,7 @@ FFI::ExtractSymbols::Windows - Windows (and Cygwin) implementation for FFI::Extr
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

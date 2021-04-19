@@ -96,20 +96,38 @@ This component adds the following methods to your resultset classes.
 This just wraps C<new_result> to provide a new result object, optionally
 with fields set, that is not yet in storage.  
 
+=head2 skip_validation
+
+    $schema->resultset('User')->skip_validation(1)->...
+
+Turns off automatic validation on any creates / updates / etc going forward 
+in this chain if arg is true
+
+=head2 skip_validate
+
+=head2 do_validate
+
+Skip validations or reenable validations
+
+  $schema->resultset('User')
+    ->skip_validate
+    ->create(\%user_args);
+
 =head1 AUTHOR
  
 John Napiorkowski L<email:jjnapiork@cpan.org>
-  
+ 
 =head1 SEE ALSO
  
-L<Valiant>, L<DBIx::Class>
+L<Valiant>, L<DBIx::Class>, L<DBIx::Class::Valiant>
+
+=head1 AUTHOR
+
+See L<Valiant>.
 
 =head1 COPYRIGHT & LICENSE
- 
-Copyright 2020, John Napiorkowski L<email:jjnapiork@cpan.org>
- 
-This library is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+
+See L<Valiant>.
 
 =cut
 

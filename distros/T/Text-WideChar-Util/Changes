@@ -1,4 +1,11 @@
-0.170   2019-05-17 (PERLANCAR)
+0.171   2021-01-23  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention some other related modules.
+
+
+0.170   2019-05-17  Released-By: PERLANCAR
 
 	- Add Hiragana, Katakana, and Hangul to CJK regex (suggested by Jacques
 	  Deguest).
@@ -9,7 +16,7 @@
 	- [doc] Mention Text::NonWideChar::Util.
 
 
-0.16    2015-07-29 (PERLANCAR)
+0.16    2015-07-29  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -17,7 +24,7 @@
 	  older perls [CT].
 
 
-0.15    2015-07-27 (PERLANCAR)
+0.15    2015-07-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -26,33 +33,33 @@
 	  App::depak.
 
 
-0.14    2015-01-03 (PERLANCAR)
+0.14    2015-01-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Rebuild (Generate TODO.md).
 
 
-0.13    2014-02-17 (SHARYANTO)
+0.13    2014-02-17  Released-By: SHARYANTO
 
         - Add function length_height().
 
 
-0.12    2014-02-11 (SHARYANTO)
+0.12    2014-02-11  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - mbwrap(): Whitespace before broken CJK word was omitted.
 
 
-0.11    2014-02-11 (SHARYANTO)
+0.11    2014-02-11  Released-By: SHARYANTO
 
         [BUG FIXES]
 
         - mbwrap(): Long CJK word should not be truncated before line-broken.
 
 
-0.10    2014-02-08 (SHARYANTO)
+0.10    2014-02-08  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -60,7 +67,7 @@
           (namely, Text::ANSI::Util).
 
 
-0.09    2014-02-08 (SHARYANTO)
+0.09    2014-02-08  Released-By: SHARYANTO
 
         - mbwrap(): Fix bug when truncating long word.
 
@@ -70,35 +77,35 @@
         - Mention Text::WrapI18N.
 
 
-0.08    2013-10-29 (SHARYANTO)
+0.08    2013-10-29  Released-By: SHARYANTO
 
         - No functional changes. Rebuild to resolve 'nested encoding' problem
           causing MetaCPAN to fail to index the dist (thanks Shantanu Bhadoria).
 
 
-0.07    2013-09-10 (SHARYANTO)
+0.07    2013-09-10  Released-By: SHARYANTO
 
         - Replace Text::CharWidth with Unicode::GCString. It's about 2.5x slower
           but it is more proper and builds on Windows.
 
 
-0.06    2013-05-18 (SHARYANTO)
+0.06    2013-05-18  Released-By: SHARYANTO
 
         - Provide pad() and trunc() which are respectively the non-wide version
           of mbpad() and mbtrunc().
 
 
-0.05    2013-05-17 (SHARYANTO)
+0.05    2013-05-17  Released-By: SHARYANTO
 
         - Add return_stats option to {mb,}wrap.
 
 
-0.04    2013-04-19 (SHARYANTO)
+0.04    2013-04-19  Released-By: SHARYANTO
 
         - Fix bug in mbtrunc().
 
 
-0.03    2013-04-18 (SHARYANTO)
+0.03    2013-04-18  Released-By: SHARYANTO
 
         - Reimplement mbwrap() to be more like Emacs and Text::ANSI::Util's
           behavior.
@@ -106,7 +113,7 @@
         - Provide wrap() as an alternative for Text::Wrap's wrap().
 
 
-0.02    2013-04-09 (SHARYANTO)
+0.02    2013-04-09  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -115,6 +122,6 @@
         to pad again to get to $width.
 
 
-0.01    2013-04-09 (SHARYANTO)
+0.01    2013-04-09  Released-By: SHARYANTO
 
         - First release.

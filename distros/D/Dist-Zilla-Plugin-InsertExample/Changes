@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-Plugin-InsertExample
 
+0.11      2021-04-19 03:34:12 -0600
+  - Perl 5.24 is now required (gh#6)
+  - Fix tests that were commented out by mistake in 0.10 (gh#6)
+  - Also recognize "/usr/bin/env perl" in the shebang when using
+    remove_boiler (gh#6)
+  - Move to new GitHub org
+
 0.10      2021-02-28 06:36:57 -0700
   - Fix bug where utf8 scripts would not be inserted with
     strange diagnostic (gh#5)

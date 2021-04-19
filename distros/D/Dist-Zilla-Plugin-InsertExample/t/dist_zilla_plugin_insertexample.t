@@ -1,9 +1,7 @@
-use 5.014;
+use 5.024;
 use Test2::V0 -no_srand => 1;
 use lib '.';
 use Test::DZil;
-
-=pod
 
 subtest basics => sub {
 
@@ -46,8 +44,6 @@ subtest 'basics file not in gather but on disk' => sub {
   my($pm) = grep { $_->name eq 'lib/DZT.pm' } @{ $tzil->files };
   ok $pm->content =~ m{^ say 'hello world';$}m, "module contains example file";
 };
-
-=cut
 
 subtest 'utf8 script' => sub {
 

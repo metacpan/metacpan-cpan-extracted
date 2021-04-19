@@ -4,5 +4,6 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	NAME    => 'PDL::NDBin::Iterator',
-	VERSION => '0.020',
+	VERSION_FROM => '../lib/PDL/NDBin/Iterator.pm', # dzil inserts version in there, so this works right when built/released, despite warnings in clean repo
+	NO_MYMETA => 1,
 );

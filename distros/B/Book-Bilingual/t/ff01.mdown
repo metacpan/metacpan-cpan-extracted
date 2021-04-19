@@ -1,0 +1,327 @@
+# Five on a Treasure Island
+
+## Contents
+[
+1. Chapter One
+2. Chapter Two
+]
+
+## Details
+
+----
+<a id="1"></a>
+## 1. Chapter One
+__ Chapter One
+    #chapter-number
+
+    บทที่หนึ่ง /
+    บทที่ /One
+     /Chapter One
+..
+__   A Great Surprise
+    #chapter-title
+
+    ความประหลาดใจที่ยอดเยี่ยม /
+    ความประหลาดใจที่ /Great
+     /A Great Surprise
+..
+__   "Mother, have you heard ...
+    #paragraph-start
+
+    "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" จูเลียนพูด, ที่โต๊ะอาหารเช้า. /
+    "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" จูเลียนพูด, ที่โต๊ะ /breakfast.
+    "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" จูเลียนพูด, ที่ /breakfast-table.
+    "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" จูเลียนพูด, /at the breakfast-table.
+    "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" จูเลียน /said, at the breakfast-table.
+    "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" /said Julian, at the breakfast-table.
+    "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเรา /yet?" said Julian, at the breakfast-table.
+    "แม่คุณได้ยินเรื่องวันหยุด /summer /ของเรา /yet?" said Julian, at the breakfast-table.
+    "แม่คุณได้ยินเรื่อง /summer holidays /ของเรา /yet?" said Julian, at the breakfast-table.
+    "แม่คุณได้ยินเรื่อง /our summer holidays yet?" said Julian, at the breakfast-table.
+    "แม่คุณได้ยิน /about our summer holidays yet?" said Julian, at the breakfast-table.
+    "แม่คุณ /heard about our summer holidays yet?" said Julian, at the breakfast-table.
+    "แม่ /have you heard about our summer holidays yet?" said Julian, at the breakfast-table.
+     /"Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table.
+..
+__     "Can we go to Polseath as usual?"
+
+    "เราไปชายหาดตามปกติได้ไหม" /
+     /"Can /เราไปชายหาดตามปกติ?"
+     /"Can /เราไป /beach as usual?"
+     /"Can /เรา /go to the beach as usual?"
+     /"Can we go to the beach as usual?"
+..
+__   "I'm afraid not," said ...
+    #paragraph-start
+
+    "ฉันคิดว่าไม่" แม่ของเขาพูด /
+    "ฉันคิดว่าไม่" แม่ของเขา /said.
+    "ฉันคิดว่าไม่" /mother /ของเขา /said.
+    "ฉันคิดว่าไม่" /his mother said.
+    "ฉันคิดว่า /not" his mother said.
+     /"I /คิดว่า /not" his mother said.
+     /"I'm afraid not" his mother said.
+..
+__      "They are quite full this year."
+
+    "พวกเขาค่อนข้างเต็มในปีนี้" /
+    "พวกเขาค่อนข้างเต็มใน /year /นี้."
+    "พวกเขาค่อนข้างเต็มใน /this year."
+    "พวกเขา /quite /เต็มใน /this year."
+    "พวกเขา /quite full this year."
+     /"They are quite full this year."
+..
+__ #Output: c0l0s0
+
+    บทที่หนึ่ง
+
+    A Great Surprise
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l0s1
+
+    บทที่ One
+
+    A Great Surprise
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l0s2
+
+    Chapter One
+
+    A Great Surprise
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l1s0
+
+    Chapter One
+
+    ความประหลาดใจที่ยอดเยี่ยม
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l1s1
+
+    Chapter One
+
+    ความประหลาดใจที่ Great
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l1s2
+
+    Chapter One
+
+    A Great Surprise
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s0
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" จูเลียนพูด, ที่โต๊ะอาหารเช้า. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s1
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" จูเลียนพูด, ที่โต๊ะ breakfast. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s2
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" จูเลียนพูด, ที่ breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s3
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" จูเลียนพูด, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s4
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" จูเลียน said, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s5
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเราหรือยัง?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s6
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยินเรื่องวันหยุดฤดูร้อนของเรา yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s7
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยินเรื่องวันหยุด summer ของเรา yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s8
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยินเรื่อง summer holidays ของเรา yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s9
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยินเรื่อง our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s10
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณได้ยิน about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s11
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่คุณ heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s12
+
+    Chapter One
+
+    A Great Surprise
+
+        "แม่ have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l2s13
+
+    Chapter One
+
+    A Great Surprise
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l3s0
+
+    Chapter One
+
+    A Great Surprise
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "เราไปชายหาดตามปกติได้ไหม"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l3s1
+
+    Chapter One
+
+    A Great Surprise
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can เราไปชายหาดตามปกติ?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l3s2
+
+    Chapter One
+
+    A Great Surprise
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can เราไป beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l3s3
+
+    Chapter One
+
+    A Great Surprise
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can เรา go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+__ #Output: c0l3s4
+
+    Chapter One
+
+    A Great Surprise
+
+        "Mother, have you heard about our summer holidays yet?" said Julian, at the breakfast-table. "Can we go to the beach as usual?"
+        "I'm afraid not" his mother said. "They are quite full this year."
+..
+
+----
+<a id="2"></a>
+## 2. Chapter Two
+__ Chapter Two
+    #chapter-number
+
+    บทที่สอง /
+    บทที่ /Two
+    Chapter Two
+..
+__   The Strange Cousin
+    #chapter-title
+
+    ลูกพี่ลูกน้องที่แปลกประหลาด /
+    ลูกพี่ลูกน้องที่ /Strange
+     /The Strange Cousin
+..
+__   The children's aunt had been ...
+
+    ป้าของเด็ก ๆ คอยเฝ้ารถ /
+    ป้าของเด็ก ๆ คอยเฝ้า/ the car.
+    ป้าของเด็ก ๆ คอย/ watching for the car.
+    ป้าของเด็ก ๆ /had been watching for the car.
+    ป้าของ /the children had been watching for the car.
+     /aunt /ของ /the children had been watching for the car.
+     /The children's aunt had been watching for the car.
+..
+

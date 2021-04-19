@@ -22,7 +22,7 @@ podregister {
   $image->insert_layer($edge_layer,0,-1);
 
   # 2) convert the copy to grayscale
-  $edge_layer->desaturate;
+  $edge_layer->desaturate(DESATURATE_LIGHTNESS);
 
   # 3) run edge detect to the gray layer (default works)
   $edge_layer->edge(2.0, 2, 0);

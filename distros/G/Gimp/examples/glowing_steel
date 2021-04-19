@@ -30,7 +30,7 @@ sub perl_fu_glowing_steel {
   my $height = $textlayer->height+$radius*4;
   $image->resize($width, $height, 0, 0);
   my $backlayer = $image->layer_new($width, $height, RGBA_IMAGE,
-				 "Background", 100, NORMAL_MODE);
+				 "Background", 100, LAYER_MODE_NORMAL_LEGACY);
   $image->insert_layer($backlayer, 0, 1);
 
   $textlayer->set_lock_alpha(1);
@@ -49,7 +49,7 @@ sub perl_fu_glowing_steel {
   # Fill the background
   $image->selection_all;
   Gimp::Context->set_foreground($background);
-  $backlayer->edit_bucket_fill(FG_BUCKET_FILL, NORMAL_MODE, 100, 0, 1, 0, 0);
+  $backlayer->edit_bucket_fill(BUCKET_FILL_FG, 0, 0);
 
   # Make the glow:
   perl_fu_add_glow($image, $textlayer, $glow, $radius);
@@ -84,7 +84,7 @@ sub perl_fu_add_glow {
 
   my $type = $drawable->type;
   my $glow = $image->layer_new(
-    $image->width, $image->height, $type, "Glow layer", 100, NORMAL_MODE
+    $image->width, $image->height, $type, "Glow layer", 100, LAYER_MODE_NORMAL_LEGACY
   );
   my $lnum = $image->get_item_position($drawable);
   $image->insert_layer($glow, 0, $lnum);
@@ -100,7 +100,7 @@ sub perl_fu_add_glow {
   $image->select_item(CHANNEL_OP_REPLACE, $drawable);
   $image->selection_grow($radius);
   $image->selection_feather($radius*1.5);
-  $glow->edit_bucket_fill(FG_BUCKET_FILL, NORMAL_MODE, 100, 255, 0, 0, 0);
+  $glow->edit_bucket_fill(BUCKET_FILL_FG, 0, 0);
   $image->select_item(CHANNEL_OP_REPLACE, $drawable);
   $glow->edit_clear;
   $image->select_item(CHANNEL_OP_REPLACE, $old_sel);
@@ -140,7 +140,7 @@ sub perl_fu_brushed_metal {
   my $width = abs($x2-$x1);
   my $height = abs($y2-$y1);
   my $templ = $image->layer_new($width, $height, RGBA_IMAGE, "Temp",
-			     100, NORMAL_MODE);
+			     100, LAYER_MODE_NORMAL_LEGACY);
   $image->insert_layer($templ, 0, 0);
   $templ->set_offsets($x1+$length, $y1+$length);
   my $target_select = $image->selection_save;
@@ -152,7 +152,7 @@ sub perl_fu_brushed_metal {
   $image->map_to_gradient($templ, $gradient)
     if $use_gradient && defined($gradient) && $gradient ne '';
 
-  $templ->brightness_contrast(50, 0);
+  $templ->brightness_contrast(50/255, 0);
   $image->noisify($templ, 0, 0.3, 0.3, 0.3, 0);
   $image->mblur($templ, 0, $length, $angle, 0.0, 0.0);
 
@@ -199,11 +199,12 @@ sub perl_fu_highlight_edges {
   Gimp::Context->push();
 
   Gimp::Context->set_foreground([255,255,255]);
-  $white->edit_bucket_fill(FG_BUCKET_FILL, NORMAL_MODE, 100, 255, 0, 0, 0);
+  $white->edit_bucket_fill(BUCKET_FILL_FG, 0, 0);
   Gimp::Context->set_foreground([0,0,0]);
-  $black->edit_bucket_fill(FG_BUCKET_FILL, NORMAL_MODE, 100, 255, 0, 0, 0);
-  $white->translate(-1*$pixels, -1*$pixels);
-  $black->translate(1*$pixels, 1*$pixels);
+  $black->edit_bucket_fill(BUCKET_FILL_FG, 0, 0);
+  $pixels /= $image->width; # make into a float
+  $white->transform_translate(-1*$pixels, -1*$pixels);
+  $black->transform_translate(1*$pixels, 1*$pixels);
   $white = $image->merge_down($white, EXPAND_AS_NECESSARY);
   $white->set_name("Edge Highlight");
   $image->select_item(CHANNEL_OP_REPLACE, $drawable);

@@ -1,4 +1,4 @@
-use Test::More tests => 1;
+use Test::More;
 SKIP: {
     ok "Not implemented";
 # use Data::Dump::Tree;

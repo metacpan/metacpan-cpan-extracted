@@ -23,5 +23,5 @@ requires:
   Mojolicious: '8.33'
   Path::Tiny: '0.108'
   perl: '5.006'
-version: v0.0.4
+version: v0.0.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

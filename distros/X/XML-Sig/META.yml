@@ -19,10 +19,12 @@ name: XML-Sig
 provides:
   XML::Sig:
     file: lib/XML/Sig.pm
-    version: '0.49'
+    version: '0.50'
 requires:
   Carp: '0'
   Class::Accessor: '0'
+  Crypt::Digest::RIPEMD160: '0'
+  Crypt::Mac::HMAC: '0'
   Crypt::OpenSSL::Bignum: '0'
   Crypt::OpenSSL::DSA: '0.20'
   Crypt::OpenSSL::RSA: '0'
@@ -42,7 +44,7 @@ requires:
 resources:
   bugtracker: https://github.com/perl-net-saml2/perl-XML-Sig/issues
   repository: git://github.com/perl-net-saml2/perl-XML-Sig.git
-version: '0.49'
+version: '0.50'
 x_contributors:
   - 'Byrne Reese <byrne@cpan.org>'
   - 'Chris Andrews <chris@nodnol.org>'

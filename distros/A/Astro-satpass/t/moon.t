@@ -301,6 +301,24 @@ SKIP: {
 	\&format_time );
 }
 
+{
+    my $moon = Astro::Coord::ECI::Moon->new();
+
+    {
+	local $Astro::Coord::ECI::Moon::Singleton = 1;
+	my $dup = $moon->clone();
+	cmp_ok $dup, '==', $moon, 'Clone returns same object if $Singleton set';
+    }
+
+    {
+	local $Astro::Coord::ECI::Moon::Singleton = 0;
+	my $dup = $moon->clone();
+	cmp_ok $dup, '!=', $moon,
+	    'Clone returns different object if $Singleton not set';
+    }
+
+}
+
 done_testing;
 
 1;

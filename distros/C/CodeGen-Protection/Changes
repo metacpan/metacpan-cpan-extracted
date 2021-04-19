@@ -1,0 +1,25 @@
+0.05      2021-04-19 10:54:54 CEST
+
+          - Added CodeGen::Protection::Tutorial
+          - Added Test::CodeGen::Protection
+
+0.04      2021-04-18 11:10:14 CEST
+
+          - Add Perl::Tidy to the prereqs. Thanks for eserte for spotting
+            this. This fixes https://github.com/Ovid/codegen-protection/issues/1
+          - Update dist.ini to produce proper Github flavored markdown
+
+0.03      2021-04-18 10:39:31 CEST
+
+          - Main docs rewritten to remove OO interface references
+          - Credit MST's schema loader work as the original inspiration
+
+0.02      2021-04-18 10:22:06 CEST
+
+          - Update the main docs to explain create_protected_code()
+          - Tests are no longer as sensitive to version number changes
+
+0.01      2021-04-18 10:01:29 CEST
+
+          -  Allows devs to create rewritable auto-generated documents in Perl
+             and HTML. Other formats will be supported later.

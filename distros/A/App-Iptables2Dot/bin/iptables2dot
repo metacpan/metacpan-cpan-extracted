@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v0.3.0');
+use version; our $VERSION = qv('v0.3.1');
 
 use App::Iptables2Dot;
 use Getopt::Long;
@@ -123,6 +123,14 @@ The tables in I<< tablelist >> are separated by comma.
 
 Possible tables are C<< nat >>, C<< raw >>, C<< mangle >> and C<< filter >>.
 Defaults to table C<< filter >>.
+
+=item B<< --use-numbered-nodes >>
+
+With a true value the nodes in the dot file will be named I<node0> .. I<noden>
+and provided with a label showing their name from C<iptables-save> output.
+
+This option can help if the filter rules contain chains with a dash (C<->)
+in their name, which is not allowed as input for C<< dot >>.
 
 =back
 

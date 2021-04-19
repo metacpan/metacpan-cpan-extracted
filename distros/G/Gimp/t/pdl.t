@@ -5,7 +5,7 @@ my $pdl_operations;
 BEGIN {
 #  $Gimp::verbose = 1;
   $DEBUG = 0;
-  require 't/gimpsetup.pl';
+  require './t/gimpsetup.pl';
   $pdl_operations = <<'EOF';
 use PDL;
 
@@ -107,7 +107,7 @@ use Gimp qw(:DEFAULT net_init=spawn/);
 
 ok((my $i = Gimp::Image->new(10,10,RGB)), 'new image');
 ok(
-  (my $l = $i->layer_new(10,10,RGB_IMAGE,"new layer",100,VALUE_MODE)),
+  (my $l = $i->layer_new(10,10,RGB_IMAGE,"new layer",100,LAYER_MODE_HSV_VALUE_LEGACY)),
   'make layer',
 );
 ok(!$i->insert_layer($l,0,0), 'insert layer');
@@ -118,7 +118,7 @@ my $setcolour = [ 16, 16, 16 ];
 Gimp::Context->push;
 Gimp::Context->set_foreground($fgcolour);
 
-$l->fill(FOREGROUND_FILL);
+$l->fill(FILL_FOREGROUND);
 ok(
   cmp_colour(
     [ @{$l->test_pdl_getpixel(@setcoords)}[0..2] ],
@@ -151,7 +151,7 @@ ok(
 );
 
 eval $pdl_operations;
-$l->fill(FOREGROUND_FILL);
+$l->fill(FILL_FOREGROUND);
 ok(
   cmp_colour(
     Gimp::canonicalize_color(getpixel($i, $l, @setcoords)),

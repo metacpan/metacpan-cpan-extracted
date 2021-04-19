@@ -1,7 +1,9 @@
-BEGIN { print "1..26\n"; }
 
+use strict;
+use warnings;
 use NEXT;
 
+print "1..27\n";
 print "ok 1\n";
 
 package A;
@@ -11,32 +13,33 @@ sub A::evaled   { eval { $_[0]->NEXT::evaled(); return 'evaled' } }
 
 package B;
 use base qw( A );
+our $AUTOLOAD;
 sub B::AUTOLOAD { return ( 9, $_[0]->NEXT::AUTOLOAD() )
 			if $AUTOLOAD =~ /.*(missing_method|secondary)/ }
 sub B::DESTROY  { $_[0]->NEXT::DESTROY() }
 
 package C;
-sub C::DESTROY  { print "ok 24\n"; $_[0]->NEXT::DESTROY() }
+sub C::DESTROY  { print "ok 25\n"; $_[0]->NEXT::DESTROY() }
 
 package D;
-@D::ISA = qw( B C E );
+our @ISA = qw( B C E );
 sub D::method   { return ( 2, $_[0]->NEXT::method() ) }
 sub D::AUTOLOAD { return ( 8, $_[0]->NEXT::AUTOLOAD() ) }
-sub D::DESTROY  { print "ok 23\n"; $_[0]->NEXT::DESTROY() }
+sub D::DESTROY  { print "ok 24\n"; $_[0]->NEXT::DESTROY() }
 sub D::oops     { $_[0]->NEXT::method() }
 sub D::secondary { return ( 17, 18, map { $_+10 } $_[0]->NEXT::secondary() ) }
 
 package E;
-@E::ISA = qw( F G );
+our @ISA = qw( F G );
 sub E::method   { return ( 4,  $_[0]->NEXT::method(), $_[0]->NEXT::method() ) }
-sub E::AUTOLOAD { return ( 10, $_[0]->NEXT::AUTOLOAD() ) 
+sub E::AUTOLOAD { return ( 10, $_[0]->NEXT::AUTOLOAD() )
 			if $AUTOLOAD =~ /.*(missing_method|secondary)/ }
-sub E::DESTROY  { print "ok 25\n"; $_[0]->NEXT::DESTROY() }
+sub E::DESTROY  { print "ok 26\n"; $_[0]->NEXT::DESTROY() }
 
 package F;
 sub F::method   { return ( 5  ) }
 sub F::AUTOLOAD { return ( 11 ) if $AUTOLOAD =~ /.*(missing_method|secondary)/ }
-sub F::DESTROY  { print "ok 26\n" }
+sub F::DESTROY  { print "ok 27\n" }
 
 package G;
 sub G::method   { return ( 6 ) }
@@ -76,7 +79,7 @@ eval {
 print "ok 13\n";
 
 # NAMED METHOD CAN'T REDISPATCH TO AUTOLOAD'ED METHOD (ok 14)
-eval { 
+eval {
 	*C::method = sub{ $_[0]->NEXT::AUTOLOAD() };
 	*C::method = *C::method;
 	eval { $obj->method(); } && print "not ";
@@ -85,11 +88,11 @@ print "ok 14\n";
 
 # BASE CLASS METHODS ONLY REDISPATCHED WITHIN HIERARCHY (ok 15..16)
 my $ob2 = bless {}, "B";
-@val = $ob2->method();         
+my @val = $ob2->method();
 print "not " unless @val==1 && $val[0]==3;
 print "ok 15\n";
 
-@val = $ob2->missing_method(); 
+@val = $ob2->missing_method();
 print "not " unless @val==1 && $val[0]==9;
 print "ok 16\n";
 
@@ -103,5 +106,17 @@ eval {
 	$@ && print "not ";
 };
 print "ok 22\n";
+
+# TEST WITH CONSTANTS (23)
+
+package Hay;
+our @ISA = 'Bee';
+sub foo { return shift->NEXT::foo }
+package Bee;
+use constant foo => 3;
+package main;
+print "not " unless Hay->foo eq '3';
+print "ok 23\n";
+
 
 # CAN REDISPATCH DESTRUCTORS (ok 23..26)

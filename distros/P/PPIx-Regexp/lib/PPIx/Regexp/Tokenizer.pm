@@ -57,7 +57,7 @@ use PPIx::Regexp::Util qw{
 
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.079';
+our $VERSION = '0.080';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -775,7 +775,7 @@ sub tokens {
 
     my %deprecate = (
 	attribute => {
-	    postderef	=> 1,
+	    postderef	=> 2,
 	},
     );
 

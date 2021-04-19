@@ -506,6 +506,24 @@ EOD
 	'ECI object now has non-default Sun object';
 }
 
+{
+    my $sun = Astro::Coord::ECI::Sun->new();
+
+    {
+	local $Astro::Coord::ECI::Sun::Singleton = 1;
+	my $dup = $sun->clone();
+	cmp_ok $dup, '==', $sun, 'Clone returns same object if $Singleton set';
+    }
+
+    {
+	local $Astro::Coord::ECI::Sun::Singleton = 0;
+	my $dup = $sun->clone();
+	cmp_ok $dup, '!=', $sun,
+	    'Clone returns different object if $Singleton not set';
+    }
+
+}
+
 done_testing;
 
 sub format_dyn {

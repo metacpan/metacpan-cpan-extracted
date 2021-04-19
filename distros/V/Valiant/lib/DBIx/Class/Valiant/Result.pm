@@ -129,7 +129,6 @@ sub update {
   debug 1, "Found related for @{[ $self ]} of @{[ join ',', @rel_names ]}";
 
   my %found = map { $_ => delete($upd->{$_})  } @rel_names, @m2m_names; # backcompat with old perl
-  #my %found = delete(%{$upd}{@rel_names});
 
   if(grep { defined $_ } values %found) {
     my $related = join(', ', grep { $found{$_} } keys %found);
@@ -185,10 +184,20 @@ sub update {
 }
 
 sub register_column {
-  my $self = shift;
+  my $class = shift;
   my ($column, $info) = @_;
-  $self->next::method(@_);
-  # TODO future home of validations declares inside the register column call
+
+  if(my $validates = delete($info->{validates})) {
+    debug 1, "Found validation info inside column '$column' definition";
+    $class->validates($column, @$validates);
+  }
+
+  if(my $filters = delete($info->{filters})) {
+    debug 1, "Found filter info inside column '$column' definition";
+    $class->filters($column, @$filters);
+  }
+
+  $class->next::method(@_);
 }
 
 # Gotta jump thru these hoops because of the way the Catalyst
@@ -232,7 +241,8 @@ sub inject_attribute {
 
 # We override here because we really want the uninflated values for the columns.
 # Otherwise if we try to inflate first we can get an error since the value has not
-# been validated and may not inflate.
+# been validated and may not inflate.  We see this very commonly on date type columns
+# when the developer is using the DateTime inflation components.
 
 sub read_attribute_for_validation {
   my ($self, $attribute) = @_;
@@ -271,7 +281,6 @@ sub is_unique {
   return $found ? 0:1;
 }
 
-#### these next few might go away
 sub mark_for_deletion {
   my ($self) = @_;
   $self->{__valiant_kiss_of_death} = 1;
@@ -361,7 +370,7 @@ sub set_from_params_recursively {
     } elsif($self->can($param)) {
       # Right now this is only used by confirmation stuff
       $self->$param($params{$param});
-    } elsif($param eq '_destroy' && $params{$param}) {
+    } elsif($param eq '_delete' && $params{$param}) {
       if($self->in_storage) {
         debug 2, "Marking record @{[ ref $self ]}, id @{[ $self->id ]} for deletion";
         $self->mark_for_deletion;
@@ -427,9 +436,8 @@ sub set_m2m_related_from_params {
 }
 
 ## TODO
-sub is_in_deleted_branch {
-  ## This will be true if the result is marked for deletion OR if any parent relation (via belongs to)
-  ## is marked for deletion.
+sub is_pruned {
+  return shift->{__valiant_is_pruned} ? 1:0;
 }
 
 sub set_multi_related_from_params {
@@ -449,16 +457,32 @@ sub set_multi_related_from_params {
     die "We expect '$params' to be some sort of reference but its not!";
   }
 
+  # introspect $related
+  my %uniques = $self->related_resultset($related)->result_source->unique_constraints;
+
   my @related_models = ();
   foreach my $param_row (@param_rows) {
+    delete $param_row->{_add};
     my $related_model;
     if(blessed $param_row) {
       $related_model = $param_row;
-    } else {
-      $related_model = $self->find_or_new_related($related, $param_row) if (ref($param_row)||'') eq 'HASH';
-      $related_model->set_from_params_recursively(%$param_row);
-    }
+    } elsif( (ref($param_row)||'') eq 'HASH') {
 
+      foreach my $key (keys %uniques) {
+        my %possible = map { $_ => $param_row->{$_} } grep { exists $param_row->{$_} } @{ $uniques{$key}};
+        $related_model = $self->find_related($related, \%possible, {key=>$key}) if %possible;
+        if($related_model) {
+          debug 2, "Found related model '$related' for @{[ ref $self]} using key '$key'";
+          last;
+        }
+      }
+
+      $related_model = $self->find_related($related, $param_row) unless $related_model || !%{$param_row}; # last resort, probably broken code but m2m seems to need it
+      $related_model = $self->new_related($related,+{}) unless $related_model;
+      $related_model->set_from_params_recursively(%$param_row);
+    } else {
+      die "Not sure what to do with $param_row";
+    }
     push @related_models, $related_model;
   }
 
@@ -483,6 +507,22 @@ sub set_multi_related_from_params {
       scalar(@matches) == keys %fields ? 1 : 0;
     } @new_pks;
     $current->mark_for_deletion if $current->in_storage; #Don't mark to delete if not already stored
+
+    if($current->in_storage) {
+      my $cb; $cb = sub {
+        my $row = shift;
+        $row->{__valiant_is_pruned} = 1;
+        my @related = keys %{$row->{_relationship_data}||+{}};
+        # TODO only do this for has_one, might_have, has_many
+        foreach $related(@related) {
+          my @rows = @{$row->related_resultset($related)->get_cache||[]};
+          foreach my $inner_row (@rows) {
+            $cb->($inner_row);
+          }
+        }
+      };
+      $cb->($current);
+    }
 
     ## TODO to solve the 'is in a deleted branch' issue either when we mark for deletion
     # we immediately recursively look into its related caches and mark all children as 'in a deleted branch
@@ -572,6 +612,7 @@ sub set_single_related_from_params {
                 debug 4, "checking key $unique_key for related $related";
                 my %keys_found = map { $_=>$params->{$_} } grep { exists $params->{$_} } @{$uniques{$unique_key}};
                 #$related_result = $self->find_related($related, \%keys_found);
+                next unless %keys_found;
                 $related_result = $self->result_source->related_source($related)->resultset->find(\%keys_found);
                 if($related_result) {
                   debug 4, "found result with unique key $unique_key";
@@ -763,7 +804,6 @@ sub _mutate_single_related {
   $related_result->mutate_recursively;
 }
 
-
 1;
 
 =head1 NAME
@@ -791,11 +831,48 @@ Or just add to your base Result class
 
 =head1 DESCRIPTION
 
+=head1 CONTEXTS
+
+When doing an insert / create on a result, we automatically add a 'create' context which you
+can use to limit validations to create events.  Additionally for an update we add an 'update'
+context.
+
+=head1 CLASS METHODS
+
+This component adds the following class or package methods to your result classes.  Please note
+this is only class methods added by this package, it does not cover those which are aggregated
+from the L<Valiant::Validates> role.
+
+=head2 auto_validation (Boolean)
+
+Defaults to true.  When true Valiant will first perform a validation on the existing result
+object (and any related objects nested under it which have been loaded from the DB or created)
+and if there are validation errors will skip persisting the data to the database.  You can use
+this to disable this behavior globally.  Please not there are features to enable skipping auto
+validation on a per result/set basis as well.
+
+=head2 accept_nested_for (field => \%options)
+
+Allows you to update / create related objected which are nested under the parent (via has_one,
+might_have or has_many defined relationships).
+
 =head1 METHODS
 
-This component adds the following methods to your result classes.
+This component adds the following object methods. Please note
+this is only class methods added by this package, it does not cover those which are aggregated
+from the L<Valiant::Validates> role.
 
-=head2 
+=head2 is_marked_for_deletion
+
+Will be true if the result has been marked for deletion.   You might see this in a related result
+nested under a parent when an update calls for the record to be deleted but validation errors prevented
+the deletion from occuring.
+
+=head2 build
+
+=head2 build_related
+
+=head2 build_related_if_empty
 
 =head1 AUTHOR
  

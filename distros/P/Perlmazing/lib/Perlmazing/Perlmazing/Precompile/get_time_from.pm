@@ -1,3 +1,3 @@
-use Time::Precise 'get_time_from';
+use Time::Precise ();
 
-*main = \&get_time_from;
+*main = \&Time::Precise::get_time_from;

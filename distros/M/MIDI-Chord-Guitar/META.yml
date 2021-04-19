@@ -6,7 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  List::Util: '1.44'
+  List::Util: '1.56'
   Moo: '2'
   Test::More: '0.88'
   perl: '5.010'
@@ -23,7 +23,7 @@ meta-spec:
 name: MIDI-Chord-Guitar
 requires:
   File::ShareDir: '0'
-  List::Util: '1.44'
+  List::Util: '1.56'
   Moo: '2'
   Music::Note: '0'
   Text::CSV_XS: '0'
@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Chord-Guitar
   repository: https://github.com/ology/MIDI-Chord-Guitar.git
-version: '0.0502'
+version: '0.0603'
 x_Dist_Zilla:
   perl:
     version: '5.033006'

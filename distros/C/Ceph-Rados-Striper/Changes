@@ -1,5 +1,8 @@
 Revision history for Perl extension Ceph::Rados::Striper.
 
+0.08  Wed 14 Apr 16:19:59 BST 2021
+  - read to handle now supports pseudo-handles (objects with a 'write' method)
+
 0.07  Thu  1 Apr 17:03:13 BST 2021
   - fixes range buffer legth bug
 

@@ -1,34 +1,28 @@
 ---
 abstract: "provides '$self' in OO code."
 author:
-  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+  - 'Kang-min Liu <gugod@gugod.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  Test::More: '0.42'
+  Test2::V0: '0.000139'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
-license: mit
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: self
+  version: '1.4'
 name: self
 no_index:
   directory:
-    - examples
-    - inc
     - t
-    - xt
+    - inc
 requires:
-  B::Hooks::Parser: '0.08'
+  B::Hooks::Parser: '0.21'
   B::OPCheck: '0.27'
-  Devel::Declare: '0.003004'
   PadWalker: '1.93'
-  Sub::Exporter: 0
-  perl: 5.6.0
+  Sub::Exporter: '0'
 resources:
-  license: http://opensource.org/licenses/mit-license.php
-version: '0.35'
+  repository: git://github.com/gugod/self.git
+version: '0.36'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

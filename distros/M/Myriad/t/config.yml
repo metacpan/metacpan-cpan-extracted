@@ -1,0 +1,14 @@
+multi_option:
+  opt1: 1
+  opt2: 2
+transport_redis: 'config_test'
+log_level: 'config_test'
+library_path: 'config_test'
+opentracing_host: 'config_test'
+opentracing_port: 'config_test'
+subscription_transport: 'config_test'
+rpc_transport: 'config_test'
+storage_transport: 'config_test'
+transport_cluster: 1
+transport: 'config_test'
+service_name: 'config_test'

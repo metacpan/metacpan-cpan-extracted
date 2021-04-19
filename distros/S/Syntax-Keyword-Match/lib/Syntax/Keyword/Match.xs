@@ -9,6 +9,21 @@
 
 #include "XSParseKeyword.h"
 
+#define HAVE_PERL_VERSION(R, V, S) \
+    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+
+#if HAVE_PERL_VERSION(5,32,0)
+#  define HAVE_OP_ISA
+#endif
+
+#ifndef block_start
+#  define block_start(flags)  Perl_block_start(aTHX_ flags)
+#endif
+
+#ifndef block_end
+#  define block_end(floor, op)  Perl_block_end(aTHX_ floor, op)
+#endif
+
 static OP *newPADSVOP(I32 type, I32 flags, PADOFFSET padix)
 {
   OP *op = newOP(type, flags);
@@ -28,15 +43,9 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, 
    *   [LAST]: default case if present
    */
   OP *topic = args[0].op;
-  OPCODE matchtype;
+  OPCODE matchtype = args[1].i;
   int ncases = args[2].i;
   bool with_default = args[3 + 2*ncases].i;
-
-  switch(args[1].i) {
-    case 0: matchtype = OP_SEQ; break;
-    case 1: matchtype = OP_EQ;  break;
-    /* TODO: consider isa, =~, equ, === */
-  }
 
   I32 floor_ix = block_start(0);
   /* The name is totally meaningless and never used, but if we don't set a
@@ -57,14 +66,44 @@ static int build_match(pTHX_ OP **out, XSParseKeywordPiece *args, size_t nargs, 
   int idx;
   for (idx = 1 + 2*ncases; idx > 2; idx -= 2) {
     /* TODO: forbid the , operator in the case label */
-    OP *caseop = op_contextualize(args[idx].op, G_SCALAR);
+    OP *caseop = args[idx].op;
     OP *block  = op_scope(args[idx+1].op);
 
-    if(caseop->op_type != OP_CONST)
-      croak("case expressions must be constant");
+    OP *testop = NULL;
 
-    OP *testop = newBINOP(matchtype, 0,
-      newPADSVOP(OP_PADSV, 0, padix), caseop);
+    switch(matchtype) {
+#ifdef HAVE_OP_ISA
+      case OP_ISA:
+        /* bareword class names are permitted */
+        if(caseop->op_type == OP_CONST && caseop->op_private & OPpCONST_BARE)
+          caseop->op_private &= ~(OPpCONST_BARE|OPpCONST_STRICT);
+        /* FALLTHROUGH */
+#endif
+      case OP_SEQ:
+      case OP_EQ:
+        caseop = op_contextualize(caseop, G_SCALAR);
+        /* TODO:
+         * if(caseop->op_type != OP_CONST) then turn sections of cases into DISPATCHOP
+         */
+
+        testop = newBINOP(matchtype, 0,
+          newPADSVOP(OP_PADSV, 0, padix), caseop);
+        break;
+
+      case OP_MATCH:
+        if(caseop->op_type != OP_MATCH || cPMOPx(caseop)->op_first)
+          croak("Expected a regexp match");
+        testop = caseop;
+#if HAVE_PERL_VERSION(5,22,0)
+        testop->op_targ = padix;
+#else
+        cPMOPx(testop)->op_first = newPADSVOP(OP_PADSV, 0, padix);
+        testop->op_flags |= OPf_KIDS|OPf_STACKED;
+#endif
+        break;
+    }
+
+    assert(testop);
 
     if(o)
       o = newCONDOP(0, testop, block, o);
@@ -84,10 +123,14 @@ static const struct XSParseKeywordHooks hooks_match = {
     XPK_PARENSCOPE( /* ( EXPR : OP ) */
       XPK_TERMEXPR,
       XPK_COLON,
-      XPK_CHOICE(   /* TODO: relop ? */
-        XPK_STRING("eq"),
-        XPK_STRING("=="),
-        XPK_FAILURE("Expected an equality operator")
+      XPK_TAGGEDCHOICE(   /* TODO: relop ? */
+        XPK_STRING("eq"), XPK_TAG(OP_SEQ),
+        XPK_STRING("=="), XPK_TAG(OP_EQ),
+        XPK_STRING("=~"), XPK_TAG(OP_MATCH),
+#ifdef HAVE_OP_ISA
+        XPK_STRING("isa"), XPK_TAG(OP_ISA),
+#endif
+        XPK_FAILURE("Expected a comparison operator")
       )
     ),
     XPK_BRACESCOPE( /* { cases... } */

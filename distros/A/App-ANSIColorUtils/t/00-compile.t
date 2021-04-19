@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ANSIColorUtils.pm'
@@ -28,6 +28,7 @@ my @scripts = (
     'script/show-ansi-color-table',
     'script/show-assigned-rgb-colors',
     'script/show-colors',
+    'script/show-rand-rgb-colors',
     'script/show-text-using-color-gradation'
 );
 

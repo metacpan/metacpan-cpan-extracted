@@ -1,0 +1,289 @@
+# PODNAME: CodeGen::Protection::Tutorial — What the heck is this thing for?
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+CodeGen::Protection::Tutorial — What the heck is this thing for?
+
+=head1 VERSION
+
+version 0.05
+
+=head1 RATIONALE
+
+Sometimes you write code that writes code, but other people might change that
+code, breaking it. You don't want that. You also want to be able to regenerate
+your code so that others can use it after it's upgraded. So we'll walk through
+the process. If you've already used
+L<DBIx::Class::Schema::Loader|https://metacpan.org/pod/DBIx::Class::Schema::Loader>,
+you probably have a pretty good idea of what's going on here.
+
+=head1 OpenAPI EXAMPLE
+
+For this example, imagine you're writing code to autogenerate
+L<OpenAPI|https://swagger.io/> server code. In OpenAPI, you have a JSON or
+YAML document that specifies OpenAPI routes. Ignoring the rest of the
+document, let's just look at a couple of paths that might be listed:
+
+    paths:
+      /users:
+        get:
+          summary: Returns a list of users.
+          description: Get a list of users
+          responses:
+            '200':    # status code
+              description: A JSON array of user names
+              content:
+                application/json:
+                  schema: 
+                    type: array
+                    items: 
+                      type: string
+
+Without getting into detail, the above describes an HTTP request which might
+be made to your server:
+
+    GET /users
+
+In OpenAPI, you don't want to manually write a bunch of repetitive code. You
+want code to read a spec and have most of that code written for you. In fact,
+the L<openapi-generator|https://github.com/OpenAPITools/openapi-generator>
+will write out most of the code for you, but sadly, it only writes client code
+for Perl, not server code. So you want to read the above JSON document and
+autogenerate code that looks like this:
+
+    package My::OpenAPI::Controller::Users;
+
+    use strict;
+    use warnings;
+    use My::OpenAPI::Server;
+
+    use My::OpenAPI::Handler qw(declare_routes);
+
+    declare_routes(
+        route => 'GET /users', to => 'get',
+    );
+
+    1;
+
+And then you turn that over to a developer and all they have to do is write
+the C<get> function. Later on, your OpenAPI definition is expanded to add the
+ability to fetch a single user:
+
+      /users/{userId}:
+        get:
+          summary: Returns a user.
+          description: Returns a User
+          responses:
+            '200':    # status code
+              description: A JSON object describing a user
+              content:
+                application/json:
+                  schema: 
+                    type: object
+                    ... more stuff here
+
+And you have a new route added:
+
+    GET /users/$user_id
+
+If you simply regenerate your C<My::OpenAPI::Controller::Users> module to add
+the new route, you overwrite the code your developer added. But if you manually
+add all of the code, you lose the power of code generation and you're more
+likely to make mistakes (and your author has previously done this with huge
+OpenAPI documents; it's not fun). So instead, you decide to use
+L<CodeGen::Protection|https://metacpan.org/pod/CodeGen::Protection>.
+
+=head1 CREATING A NEW DOCUMENT
+
+Let's create a new document using the example above. We will assume
+you have a module named C<My::OpenAPI::CodeGen> that generates the following
+routes if you have a single path of C<GET /users>:
+
+    use My::OpenAPI::Handler qw(declare_routes);
+
+    declare_routes(
+        route => 'GET /users', method => 'get',
+    );
+
+And using that in your code generator:
+
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+    use My::OpenAPI::CodeGen qw(generate_route_code);
+    use CodeGen::Protection qw(create_protected_code);
+
+    my $code      = generate_route_code('path/to/openapi.json');
+    my $protected = create_protected_code(
+        type           => 'Perl',
+        protected_code => $code,
+    );
+
+    print <<"END";
+    package My::OpenAPI::Controller::Users;
+
+    use strict;
+    use warnings;
+    use My::OpenAPI::Server;
+
+    $protected
+
+    1;
+    END
+
+And that prints out something similar to the following:
+
+    package My::OpenAPI::Controller::Users;
+
+    use strict;
+    use warnings;
+    use My::OpenAPI::Server;
+
+    #<<< CodeGen::Protection::Format::Perl 0.05. Do not touch any code between this and the end comment. Checksum: cb12361766d6729093553d38122d8aba
+    
+    use My::OpenAPI::Handler qw(declare_routes);
+    
+    declare_routes(
+        route => 'GET /users', method => 'get',
+    );
+    
+    #>>> CodeGen::Protection::Format::Perl 0.05. Do not touch any code between this and the start comment. Checksum: cb12361766d6729093553d38122d8aba
+
+    1;
+
+In the above, the lines beginning with C<< #<<< >> and C<< #>>> >> are the
+"start and end markers" for the protected code. Do not change I<anything> in or
+between those lines. If you do, code regeneration will fail.
+
+Now you can write that document to a file and safely hand it to a developer.
+They just need to write the C<get> method and you're good. Let's pretend that
+this is what the developer has added to the end of that file:
+
+    sub get {
+        my ($request) = @_;
+        return My::OpenAPI::Server->list('users');
+    }
+
+=head1 REWRITING A DOCUMENT
+
+Later, someone has added the path for C<GET /users/{userId}> to the OpenAPI
+specification document, so you want to regenerate your code. Now, however, you
+need to read and write the C<lib/My/OpenAPI/Controller/Users.pm> file.
+
+    #!/usr/bin/env perl
+
+    use strict;
+    use warnings;
+    use My::OpenAPI::CodeGen qw(generate_route_code);
+    use CodeGen::Protection qw(rewrite_code);
+
+    my $controller = 'lib/My/OpenAPI/Controller/Users.pm';
+
+    # open our file in read/write mode
+    open my $fh, '+<', $controller
+      or die "Cannot open $controller in read-write mode: $!";
+    my $existing = do { local $/; <$fh> };
+
+    # generate our protected "route" code
+    my $code      = generate_route_code('path/to/openapi.json');
+
+    # rewrite the protected section of the $existing code with
+    # our regenerated route code
+    my $rewritten = rewrite_code(
+        type           => 'Perl',
+        protected_code => $code,
+        existing_code  => $existing,
+    );
+
+    # write it back to the file
+    seek $fh, 0,0;
+    print {$fh} $rewritten;
+
+And now your C<lib/My/OpenAPI/Controller/Users.pm> file will resemble:
+
+    package My::OpenAPI::Controller::Users;
+    
+    use strict;
+    use warnings;
+    use My::OpenAPI::Server;
+    
+    #<<< CodeGen::Protection::Format::Perl 0.05. Do not touch any code between this and the end comment. Checksum: ebb0ca5eaea8c69ef08bddc39a27272a
+    
+    use My::OpenAPI::Handler qw(declare_routes);
+    
+    declare_routes(
+        route => 'GET /users',          method => 'get',
+        route => 'GET /users/{userID}', method => 'get_userId',
+    );
+    
+    #>>> CodeGen::Protection::Format::Perl 0.05. Do not touch any code between this and the start comment. Checksum: ebb0ca5eaea8c69ef08bddc39a27272a
+    
+    sub get {
+        my ($request) = @_;
+        return My::OpenAPI::Server->list('users');
+    }
+
+    1;
+
+Note that we have I<rewritten> the protected part of this document, but the
+C<sub get {...}> code the developer added has remained. This allows you to
+keep regenerating these documents, but without breaking the existing code.
+
+=head2 Why rewrite_code() might fail
+
+If you run C<rewrite_code()>, it can fail for several reason:
+
+=over 4
+
+=item * The checksums were not found in the C<$existing> document
+
+=item * The start and end checksums are not identical
+
+=item * The checksum generated doesn't match the text between the start and end markers
+
+=item * There is no valid C<CodeGen::Protection::Format::$type> module for C<$type>
+
+=back
+
+In short, C<rewrite_code()> will generally fail if anythign about the
+protected code has been changed. This will stop a developer from thinking
+"hey, I want to change C<get_userId> to C<get_user_id>" and thus breaking your
+code.
+
+=head1 TESTING
+
+Note that C<CodeGen::Protection> manipulates documents (e.g., strings), but
+does no I/O. So let's assume we've written the above document to
+C<lib/My/OpenAPI/Controller/Users.pm>.  If you want to write a test to verify
+that it's good, you use
+L<Test::CodeGen::Protection|https://metacpan.org/pod/Test::CodeGen::Protection>:
+
+    #!/usr/bin/env perl
+
+    use Test::Most;
+    use Test::CodeGen::Protection;
+
+    is_protected_file_ok 'Perl', 'lib/My/OpenAPI/Controller/Users.pm',
+        'Protected code in Users.pm controller has not been touched';
+
+    done_testing;
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe <ovid@allaroundtheworld.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2021 by Curtis "Ovid" Poe.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

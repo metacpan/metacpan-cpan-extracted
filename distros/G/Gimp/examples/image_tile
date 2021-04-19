@@ -113,7 +113,7 @@ podregister {
   # Now store color info for target image
   my $dup = Gimp::Image->new($imgwidth,$imgheight,RGB_IMAGE);
   $drawable->edit_copy;
-  my $back = $dup->layer_new($imgwidth, $imgheight, RGB_IMAGE, "Target", 100, NORMAL_MODE);
+  my $back = $dup->layer_new($imgwidth, $imgheight, RGB_IMAGE, "Target", 100, LAYER_MODE_NORMAL_LEGACY);
   $dup->insert_layer($back, 0, 0);
   $back->edit_paste(FALSE)->floating_sel_anchor;
   my $oimage = get_image_cells($dup, $xtiles*$xcells, $ytiles*$ycells, $imgwidth/$imgheight, 40, 60);

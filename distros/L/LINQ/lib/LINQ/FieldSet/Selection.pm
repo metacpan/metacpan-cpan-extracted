@@ -5,12 +5,17 @@ use warnings;
 package LINQ::FieldSet::Selection;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use Class::Tiny;
 use parent qw( LINQ::FieldSet );
 
-use overload q[&{}] => 'coderef';
+use overload (
+	'fallback' => !!1,
+	q[bool]    => sub { !! 1 },
+	q[""]      => 'to_string',
+	q[&{}]     => 'coderef',
+);
 
 sub _known_parameter_names {
 	my ( $self ) = ( shift );
@@ -54,35 +59,10 @@ sub _build_coderef {
 	};
 } #/ sub _build_coderef
 
-sub _sql_selection {
-	my ( $self, $name_quoter ) = ( shift, @_ );
-	$name_quoter ||= sub {
-		my $name = shift;
-		return sprintf( '"%s"', quotemeta( $name ) );
-	};
-	return if $self->seen_asterisk;
-	
-	my @cols;
-	for my $field ( @{ $self->fields } ) {
-		my $orig_name = $field->value;
-		my $aliased   = $field->name;
-		return if ref( $orig_name );
-		# uncoverable branch true
-		return if !defined( $aliased );
-		
-		if ( $aliased eq $orig_name ) {
-			push @cols, $name_quoter->( $orig_name );
-		}
-		else {
-			push @cols, sprintf(
-				'%s AS %s',
-				$name_quoter->( $orig_name ),
-				$name_quoter->( $aliased ),
-			);
-		}
-	} #/ for my $field ( @{ $self...})
-	return join( q[, ], @cols );
-} #/ sub _sql_selection
+sub to_string {
+	my ( $self ) = ( shift );
+	sprintf 'fields(%s)', join q[, ], map $_->name, @{ $self->fields };
+}
 
 1;
 
@@ -134,11 +114,16 @@ The class data selected by this selection will be blessed into.
 
 Gets a coderef for this assertion; the coderef operates on C<< $_ >>.
 
+=item C<to_string>
+
+Basic string representation of the fieldset.
+
 =back
 
 =head1 OVERLOADING
 
 This class overloads
+C<< "" >> to call the C<< to_string >> method and
 C<< &{} >> to call the C<< coderef >> method.
 
 =head1 BUGS

@@ -10,7 +10,7 @@ if ( $] < 5.010000 ) {
 
 	package LINQ::Exception;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	
 	use Class::Tiny qw( package file line );
 	use overload q[""] => sub { shift->to_string };
@@ -42,7 +42,7 @@ if ( $] < 5.010000 ) {
 
 	package LINQ::Exception::Unimplemented;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use parent -norequire, qw( LINQ::Exception );
 	use Class::Tiny qw( method );
 	
@@ -57,7 +57,7 @@ if ( $] < 5.010000 ) {
 
 	package LINQ::Exception::InternalError;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use parent -norequire, qw( LINQ::Exception );
 	use Class::Tiny qw( message );
 }
@@ -66,7 +66,7 @@ if ( $] < 5.010000 ) {
 
 	package LINQ::Exception::CallerError;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use parent -norequire, qw( LINQ::Exception );
 	use Class::Tiny qw( message );
 	
@@ -82,7 +82,7 @@ if ( $] < 5.010000 ) {
 
 	package LINQ::Exception::CollectionError;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use parent -norequire, qw( LINQ::Exception );
 	use Class::Tiny qw( collection );
 	
@@ -98,7 +98,7 @@ if ( $] < 5.010000 ) {
 
 	package LINQ::Exception::NotFound;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use parent -norequire, qw( LINQ::Exception::CollectionError );
 	sub message { "Item not found" }
 }
@@ -107,7 +107,7 @@ if ( $] < 5.010000 ) {
 
 	package LINQ::Exception::MultipleFound;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use parent -norequire, qw( LINQ::Exception::CollectionError );
 	use Class::Tiny qw( found );
 	sub message { "Item not found" }
@@ -117,7 +117,7 @@ if ( $] < 5.010000 ) {
 
 	package LINQ::Exception::Cast;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use parent -norequire, qw( LINQ::Exception::CollectionError );
 	use Class::Tiny qw( type );
 	

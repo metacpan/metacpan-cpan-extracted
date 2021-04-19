@@ -1,2 +1,27 @@
-0.2 - Drop unecessary requirement for perl 5.8.8
-0.1 - Initial Revision
+Revision history for DateTime-Format-XSD
+
+0.4 - 2021-04-18
+
+  [Release Official Version]
+
+  - acce22d Update Changes and Increment version
+
+0.3 - 2021-04-06
+
+  [New Maintainer TIMLEGGE]
+
+  Thanks to Daniel Ruoso for transfering maintaineship to TIMLEGGE.  This
+  release just repackages the module and dumps the version.
+
+  - 5c77d35 Update Changes and Increment version
+  - 97198c5 Remove braces to silence perl critic
+  - f68bd32 Update packaging to Dist::Zilla
+  - cbf2667 Initial import DateTime::Format::XSD version 0.2
+
+0.2 - 2011-02-07
+
+  - Drop unecessary requirement for perl 5.8.8
+
+0.1 - 2008-04-30
+
+  - Initial Revision

@@ -1,0 +1,244 @@
+---
+abstract: 'async microservice framework'
+author:
+  - 'Deriv Services Ltd <DERIV@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Log::Any::Adapter::TAP: '0'
+  Log::Any::Test: '0'
+  Test::CheckDeps: '0.010'
+  Test::Deep: '1.130'
+  Test::Fatal: '0.014'
+  Test::MemoryGrowth: '0.03'
+  Test::MockModule: '0'
+  Test::MockObject: '0'
+  Test::More: '0.98'
+  Test::NoTabs: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Myriad
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Myriad:
+    file: lib/Myriad.pm
+    version: '0.001'
+  Myriad::API:
+    file: lib/Myriad/API.pm
+    version: '0.001'
+  Myriad::Bootstrap:
+    file: lib/Myriad/Bootstrap.pm
+    version: '0.001'
+  Myriad::Class:
+    file: lib/Myriad/Class.pm
+    version: '0.001'
+  Myriad::Commands:
+    file: lib/Myriad/Commands.pm
+    version: '0.001'
+  Myriad::Config:
+    file: lib/Myriad/Config.pm
+    version: '0.001'
+  Myriad::Exception:
+    file: lib/Myriad/Exception.pm
+    version: '0.001'
+  Myriad::Exception::Base:
+    file: lib/Myriad/Exception/Base.pm
+    version: '0.001'
+  Myriad::Exception::Builder:
+    file: lib/Myriad/Exception/Builder.pm
+    version: '0.001'
+  Myriad::Exception::General:
+    file: lib/Myriad/Exception/General.pm
+    version: '0.001'
+  Myriad::Exception::InternalError:
+    file: lib/Myriad/Exception/InternalError.pm
+    version: '0.001'
+  Myriad::Plugin:
+    file: lib/Myriad/Plugin.pm
+    version: '0.001'
+  Myriad::RPC:
+    file: lib/Myriad/RPC.pm
+    version: '0.001'
+  Myriad::RPC::Client:
+    file: lib/Myriad/RPC/Client.pm
+    version: '0.001'
+  Myriad::RPC::Client::Implementation::Perl:
+    file: lib/Myriad/RPC/Client/Implementation/Perl.pm
+    version: '0.001'
+  Myriad::RPC::Client::Implementation::Redis:
+    file: lib/Myriad/RPC/Client/Implementation/Redis.pm
+    version: '0.001'
+  Myriad::RPC::Implementation::Perl:
+    file: lib/Myriad/RPC/Implementation/Perl.pm
+    version: '0.001'
+  Myriad::RPC::Implementation::Redis:
+    file: lib/Myriad/RPC/Implementation/Redis.pm
+    version: '0.001'
+  Myriad::RPC::Message:
+    file: lib/Myriad/RPC/Message.pm
+    version: '0.001'
+  Myriad::Redis::Pending:
+    file: lib/Myriad/Redis/Pending.pm
+    version: '0.001'
+  Myriad::Registry:
+    file: lib/Myriad/Registry.pm
+    version: '0.001'
+  Myriad::Role::RPC:
+    file: lib/Myriad/Role/RPC.pm
+    version: '0.001'
+  Myriad::Role::Storage:
+    file: lib/Myriad/Role/Storage.pm
+    version: '0.001'
+  Myriad::Role::Subscription:
+    file: lib/Myriad/Role/Subscription.pm
+    version: '0.001'
+  Myriad::Service:
+    file: lib/Myriad/Service.pm
+    version: '0.001'
+  Myriad::Service::Attributes:
+    file: lib/Myriad/Service/Attributes.pm
+    version: '0.001'
+  Myriad::Service::Implementation:
+    file: lib/Myriad/Service/Implementation.pm
+    version: '0.001'
+  Myriad::Service::Remote:
+    file: lib/Myriad/Service/Remote.pm
+    version: '0.001'
+  Myriad::Service::Storage:
+    file: lib/Myriad/Service/Storage.pm
+    version: '0.001'
+  Myriad::Service::Storage::Remote:
+    file: lib/Myriad/Service/Storage/Remote.pm
+    version: '0.001'
+  Myriad::Storage:
+    file: lib/Myriad/Storage.pm
+    version: '0.001'
+  Myriad::Storage::Implementation::Perl:
+    file: lib/Myriad/Storage/Implementation/Perl.pm
+    version: '0.001'
+  Myriad::Storage::Implementation::Redis:
+    file: lib/Myriad/Storage/Implementation/Redis.pm
+    version: '0.001'
+  Myriad::Subscription:
+    file: lib/Myriad/Subscription.pm
+    version: '0.001'
+  Myriad::Subscription::Implementation::Perl:
+    file: lib/Myriad/Subscription/Implementation/Perl.pm
+    version: '0.001'
+  Myriad::Subscription::Implementation::Redis:
+    file: lib/Myriad/Subscription/Implementation/Redis.pm
+    version: '0.001'
+  Myriad::Transport::HTTP:
+    file: lib/Myriad/Transport/HTTP.pm
+    version: '0.001'
+  Myriad::Transport::Perl:
+    file: lib/Myriad/Transport/Perl.pm
+    version: '0.001'
+  Myriad::Transport::PostgreSQL:
+    file: lib/Myriad/Transport/PostgreSQL.pm
+    version: '0.001'
+  Myriad::Transport::Redis:
+    file: lib/Myriad/Transport/Redis.pm
+    version: '0.001'
+  Myriad::UI::Readline:
+    file: lib/Myriad/UI/Readline.pm
+    version: '0.001'
+  Myriad::Util::Defer:
+    file: lib/Myriad/Util/Defer.pm
+    version: '0.001'
+  Myriad::Util::Secret:
+    file: lib/Myriad/Util/Secret.pm
+    version: '0.001'
+  Myriad::Util::UUID:
+    file: lib/Myriad/Util/UUID.pm
+    version: '0.001'
+  Test::Myriad:
+    file: lib/Test/Myriad.pm
+    version: '0.001'
+  Test::Myriad::Service:
+    file: lib/Test/Myriad/Service.pm
+    version: '0.001'
+  yriad:
+    file: lib/yriad.pm
+    version: '0.001'
+recommends:
+  Linux::Inotify2: '0'
+  Term::ReadLine: '0'
+requires:
+  Check::UnitCheck: '0'
+  Class::Method::Modifiers: '0'
+  Config::Any: '0.32'
+  Database::Async: '0.013'
+  Database::Async::Engine::PostgreSQL: '0.010'
+  Devel::MAT::Dumper: '0'
+  Future: '0.47'
+  Future::AsyncAwait: '0.49'
+  Future::Queue: '0'
+  Getopt::Long: '0'
+  Heap: '0.80'
+  IO::Async::Notifier: '0.78'
+  IO::Async::SSL: '0.22'
+  IO::Async::Test: '0.78'
+  JSON::MaybeUTF8: '1.002'
+  Log::Any: '1.709'
+  Log::Any::Adapter: '1.709'
+  Log::Any::Adapter::OpenTracing: '0.001'
+  Math::Random::Secure: '0'
+  Metrics::Any: '0.06'
+  Metrics::Any::Adapter::DogStatsd: '0.02'
+  Module::Load: '0'
+  Module::Pluggable::Object: '0'
+  Module::Runtime: '0'
+  Net::Async::HTTP: '0.48'
+  Net::Async::HTTP::Server: '0.13'
+  Net::Async::OpenTracing: '1.000'
+  Net::Async::Redis: '3.011'
+  Net::Async::SMTP: '0.002'
+  Object::Pad: '0.37'
+  OpenTracing::Any: '1.003'
+  Pod::Simple::Text: '0'
+  Pod::Usage: '0'
+  Role::Tiny: '2.002004'
+  Ryu: '2.009'
+  Ryu::Async: '0.019'
+  Scope::Guard: '0'
+  Syntax::Keyword::Dynamically: '0.07'
+  Syntax::Keyword::Try: '0.23'
+  Sys::Hostname: '0'
+  Time::Moment: '0.44'
+  Unicode::UTF8: '0'
+  YAML::XS: '0.82'
+  bareword::filehandles: '0'
+  curry: '1.001'
+  indirect: '0'
+  mro: '0'
+  multidimensional: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Myriad/issues
+  homepage: https://github.com/binary-com/perl-Myriad
+  repository: https://github.com/binary-com/perl-Myriad.git
+version: '0.001'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Tom Molesworth <tom@binary.com>'
+  - 'Eyad Arnabeh <eyadof@gmail.com>'
+  - 'Nael Alolwani <nael@binary.com>'
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+  - 'ea-binary <52806974+ea-binary@users.noreply.github.com>'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

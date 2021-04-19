@@ -28,11 +28,11 @@ podregister {
   my $draw = new Gimp::Layer(
     $copy, $w, $h,
     $imagetype2layertype{$image->base_type},
-    "temporary layer", 100, NORMAL_MODE
+    "temporary layer", 100, LAYER_MODE_NORMAL_LEGACY
   );
   $copy->insert_layer ($draw, 0, 1);
   $draw->edit_paste(0)->anchor;
-  $copy->convert_indexed ($dither_type, MAKE_PALETTE, $colours, 1, 1, "");
+  $copy->convert_indexed ($dither_type, CONVERT_PALETTE_GENERATE, $colours, 1, 1, "");
   $draw->edit_copy;
   $drawable->edit_paste(1)->anchor;
   $copy->delete;

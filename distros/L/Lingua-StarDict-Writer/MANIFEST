@@ -1,0 +1,25 @@
+Changes
+lib/Lingua/StarDict/Writer.pm
+lib/Lingua/StarDict/Writer/Entry.pm
+lib/Lingua/StarDict/Writer/Entry/Part.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+doc/StarDictFileFormat
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/main.t
+'t/expected/Dictionary written from Latin1 source/Dictionary written from Latin1 source.dict'
+'t/expected/Dictionary written from Latin1 source/Dictionary written from Latin1 source.idx'
+'t/expected/Dictionary written from Latin1 source/Dictionary written from Latin1 source.ifo'
+'t/expected/Index Order Test Dict/Index Order Test Dict.dict'
+'t/expected/Index Order Test Dict/Index Order Test Dict.idx'
+'t/expected/Index Order Test Dict/Index Order Test Dict.ifo'
+'t/expected/Test Star Dict/Test Star Dict.dict'
+'t/expected/Test Star Dict/Test Star Dict.idx'
+'t/expected/Test Star Dict/Test Star Dict.ifo'
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

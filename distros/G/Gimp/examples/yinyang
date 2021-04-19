@@ -6,7 +6,7 @@ use strict;
 use warnings;
 #$Gimp::verbose = 1;
 
-my @BUCKET_ARGS = (FG_BUCKET_FILL,NORMAL_MODE,100,0,0,0,0);
+my @BUCKET_ARGS = (BUCKET_FILL_FG,0,0);
 
 podregister {
   # Create new image

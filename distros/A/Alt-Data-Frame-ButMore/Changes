@@ -1,5 +1,12 @@
 Revision history of Alt-Data-Frame-ButMore
 
+0.0056      2021-04-17
+    - Fix a call to List::AllUtils::zip(). See also
+      https://github.com/houseabsolute/List-AllUtils/issues/12
+
+0.0055      2021-04-16
+    - Improve PDL::SV's dotassign operator.
+
 0.0053      2019-09-15
     - Breaking change: Dropped Moose::Autobox and instead use a custom
       Data::Frame::Autobox module for limited autoboxing on array and hash.

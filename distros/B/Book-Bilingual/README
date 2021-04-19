@@ -1,0 +1,42 @@
+NAME
+
+    Book::Bilingual - A crappy model for bilingual books
+
+SYNOPSIS
+
+        use Book::Bilingual::Reader;
+    
+        my $file = 't/ff01.mdown';
+        my $reader = Book::Bilingual::Reader->new($file);
+    
+        print $reader->html();
+
+DESCRIPTION
+
+    Book::Bilingual is a model for bilingual books written in Markdown
+    format. The Book::Bilingual::Reader module reads the file and generates
+    HTML.
+
+METHODS
+
+ chapter_dlineset_count($chapter_idx:>Int) :> Int
+
+    Returns the number of dlinesets in the given Chapter.
+
+ num_dline_in_dlineset($chapter_idx:Int, $dlineset_idx:Int) :> Int
+
+    Returns the number of dlines in the given Chapter and Dlineset.
+
+AUTHOR
+
+    Hoe Kit CHEW <hoekit at gmail.com>
+
+COPYRIGHT
+
+    Copyright (C) 2021 Hoe Kit CHEW
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

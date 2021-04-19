@@ -1,6 +1,9 @@
 NAME
     DateTime::Format::XSD - Format DateTime according to xsd:dateTime
 
+VERSION
+    version 0.4
+
 SYNOPSIS
       my $str = DateTime::Format::XSD->format_datetime($dt);
 
@@ -18,14 +21,25 @@ DESCRIPTION
 SEE ALSO
     DateTime, DateTime::Format::ISO8601, The XML Schema speficitation.
 
-AUTHORS
-    Daniel Ruoso "daniel@ruoso.com"
-
 BUG REPORTS
     Please submit all bugs regarding "DateTime::Format::XSD" to
     "bug-datetime-format-xsd@rt.cpan.org"
 
+COPYRIGHT
+        This software is copyright (c) 2004 by Daniel Ruoso.
+
 LICENSE
     This library is free software, you can redistribute it and/or modify it
     under the same terms as Perl itself.
+
+AUTHORS
+    *   Daniel Ruoso <daniel@ruoso.com>
+
+    *   Timothy Legge <timlegge@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by Daniel Ruoso.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

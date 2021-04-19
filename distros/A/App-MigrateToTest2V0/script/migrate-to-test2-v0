@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::MigrateToTest2V0;
+use PPI;
+
+process($_) for @ARGV;
+
+sub process {
+    my $filename = shift;
+    die "$filename not found" unless -e $filename;
+
+    my $doc = PPI::Document->new($filename);
+    App::MigrateToTest2V0->apply($doc);
+}
+
+1;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+migrate-to-test2-v0 - Migrate your tests from Test::More to Test2::V0
+
+=head1 SYNOPSIS
+
+    migrate-to-test2-v0 path/to/your/test.t
+
+=head1 DESCRIPTION
+
+migrate-to-test2-v0 makes test codes written with L<Test::More> and L<Test::Deep> (and so on)
+compatible with L<Test2::V0>.
+
+=head1 LICENSE
+
+Copyright (C) utgwkk.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+utgwkk E<lt>utagawakiki@gmail.comE<gt>
+
+=cut

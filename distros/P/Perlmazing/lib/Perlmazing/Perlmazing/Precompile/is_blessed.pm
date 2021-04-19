@@ -1,5 +1,7 @@
 use Perlmazing;
 use Scalar::Util;
 
-*main = \&Scalar::Util::blessed;
+sub main ($) {
+	define Scalar::Util::blessed($_[0]);
+}
 

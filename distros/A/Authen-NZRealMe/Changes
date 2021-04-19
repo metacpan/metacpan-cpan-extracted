@@ -1,5 +1,8 @@
 Revision history for Authen-NZRealMe
 
+1.23      2021-04-19 11:35:58+12:00 Pacific/Auckland
+    - Add fix for back channel connections via HTTPS proxy
+
 1.22      2021-02-24 16:03:38+13:00 Pacific/Auckland
     - require JSON::XS
     - updates to documentation

@@ -1,13 +1,84 @@
---- #YAML:1.0
-name:                Lingua-StopWords
-version:             0.09
-abstract:            Stop words for several languages.
-license:             ~
-generated_by:        ExtUtils::MakeMaker version 6.33
-distribution_type:   module
-requires:     
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+---
+abstract: 'Stop words for several languages.'
 author:
-    - Marvin Humphrey <marvin at rectangular dot com>
+  - 'Maintained by Helmut Wollmersdorfer <helmut@wollmersdorfer.at>'
+build_requires:
+  Test::More: '0.88'
+  Test::More::UTF8: '0.00'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-StopWords
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Lingua::StopWords:
+    file: lib/Lingua/StopWords.pm
+    version: '0.12'
+  Lingua::StopWords::DA:
+    file: lib/Lingua/StopWords/DA.pm
+    version: '0.12'
+  Lingua::StopWords::DE:
+    file: lib/Lingua/StopWords/DE.pm
+    version: '0.12'
+  Lingua::StopWords::EN:
+    file: lib/Lingua/StopWords/EN.pm
+    version: '0.12'
+  Lingua::StopWords::ES:
+    file: lib/Lingua/StopWords/ES.pm
+    version: '0.12'
+  Lingua::StopWords::FI:
+    file: lib/Lingua/StopWords/FI.pm
+    version: '0.12'
+  Lingua::StopWords::FR:
+    file: lib/Lingua/StopWords/FR.pm
+    version: '0.12'
+  Lingua::StopWords::HU:
+    file: lib/Lingua/StopWords/HU.pm
+    version: '0.12'
+  Lingua::StopWords::ID:
+    file: lib/Lingua/StopWords/ID.pm
+    version: '0.12'
+  Lingua::StopWords::IT:
+    file: lib/Lingua/StopWords/IT.pm
+    version: '0.12'
+  Lingua::StopWords::NL:
+    file: lib/Lingua/StopWords/NL.pm
+    version: '0.12'
+  Lingua::StopWords::NO:
+    file: lib/Lingua/StopWords/NO.pm
+    version: '0.12'
+  Lingua::StopWords::PT:
+    file: lib/Lingua/StopWords/PT.pm
+    version: '0.12'
+  Lingua::StopWords::RO:
+    file: lib/Lingua/StopWords/RO.pm
+    version: '0.12'
+  Lingua::StopWords::RU:
+    file: lib/Lingua/StopWords/RU.pm
+    version: '0.12'
+  Lingua::StopWords::SV:
+    file: lib/Lingua/StopWords/SV.pm
+    version: '0.12'
+requires:
+  Encode: '0.00'
+  Exporter: '0.00'
+  perl: '5.00600'
+resources:
+  bugtracker: https://github.com/wollmers/Lingua-StopWords/issues
+  homepage: https://github.com/wollmers/Lingua-StopWords
+  repository: https://github.com/wollmers/Lingua-StopWords.git
+version: '0.12'
+x_serialization_backend: 'YAML::Tiny version 1.66'
+x_static_install: 1

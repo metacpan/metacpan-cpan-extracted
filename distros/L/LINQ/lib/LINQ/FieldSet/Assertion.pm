@@ -19,7 +19,7 @@ my $_process_args = sub {
 };
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use Class::Tiny;
 use parent qw( LINQ::FieldSet );
@@ -27,10 +27,13 @@ use parent qw( LINQ::FieldSet );
 use LINQ::Util::Internal ();
 
 use overload (
-	q[&{}] => 'coderef',
-	q[|]   => 'or',
-	q[&]   => 'and',
-	q[~]   => 'not',
+	'fallback' => !!1,
+	q[bool]    => sub { !! 1 },
+	q[""]      => 'to_string',
+	q[&{}]     => 'coderef',
+	q[|]       => 'or',
+	q[&]       => 'and',
+	q[~]       => 'not',
 );
 
 sub _known_parameter_names {
@@ -359,10 +362,15 @@ sub or {
 	);
 }
 
+sub to_string {
+	my ( $self ) = ( shift );
+	sprintf 'check_fields(%s)', join q[, ], map $_->name, @{ $self->fields };
+}
+
 package LINQ::FieldSet::Assertion::Combination;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use Role::Tiny;
 requires( qw/ left right _build_coderef / );
@@ -398,7 +406,7 @@ sub or {
 package LINQ::FieldSet::Assertion::NOT;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use Class::Tiny qw( left );
 use Role::Tiny::With ();
@@ -433,7 +441,7 @@ sub right {
 package LINQ::FieldSet::Assertion::AND;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use Class::Tiny qw( left right );
 use Role::Tiny::With ();
@@ -457,7 +465,7 @@ sub _build_coderef {
 package LINQ::FieldSet::Assertion::OR;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 use Class::Tiny qw( left right );
 use Role::Tiny::With ();
@@ -554,6 +562,10 @@ assertion.
 
 Gets a coderef for this assertion; the coderef operates on C<< $_ >>.
 
+=item C<to_string>
+
+Basic string representation of the fieldset.
+
 =back
 
 The LINQ::FieldSet::Assertion::{AND,OR,NOT} classes are lightweight classes
@@ -564,6 +576,7 @@ from it.
 =head1 OVERLOADING
 
 This class overloads
+C<< "" >> to call the C<< to_string >> method;
 C<< & >> to call the C<< and >> method;
 C<< | >> to call the C<< or >> method;
 C<< ~ >> to call the C<< not >> method; and

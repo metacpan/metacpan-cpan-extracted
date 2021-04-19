@@ -18,7 +18,7 @@ podregister {
   Gimp::Context->set_pattern($pattern);
   my $layerpat = $image->add_new_layer(0,0,0);
   $image->selection_all;
-  $layerpat->edit_bucket_fill(2,0,100,0,0,1,1);
+  $layerpat->edit_bucket_fill(FILL_WHITE,0,0);
   # make border lines
   Gimp::Context->set_foreground ([1,1,1]);
   my $layer = $image->add_new_layer(0,0,0);
@@ -28,12 +28,12 @@ podregister {
   $image->undo_group_start;
   while ($h < $imageh) {
     $image->select_rectangle(2,0,$h,$imagew,$borderwidth);
-    $layer->edit_bucket_fill(0,0,100,0,0,0,0);
+    $layer->edit_bucket_fill(FILL_FOREGROUND,0,0);
     $w = 1;
     $wo = 0; $wo = ($brickw / 2) if ($j == 1);
     while ($w < $imagew) {
       $image->select_rectangle(2,$w+$wo,$h,$borderwidth,$brickh+1);
-      $layer->edit_bucket_fill(0,0,100,0,0,1,1);
+      $layer->edit_bucket_fill(FILL_FOREGROUND,0,0);
 #      print "$h $w\n";
       $w += $brickw;
     }
@@ -62,11 +62,11 @@ podregister {
 	Gimp::Context->set_foreground ("#ffffff") if ($r > 0);
 	Gimp::Context->set_foreground ("#000000") if ($r < 0);
 	$image->select_rectangle(2,$w+$wo,$h,$brickw,$brickh);
-	$layerpat->edit_bucket_fill(0,0,4*abs($r),0,0,1,1);
+	$layerpat->edit_bucket_fill(FILL_FOREGROUND,0,0);
 	# halves
 	if (($j == 1) && ($w+$wo+$brickw > $imagew)) {
 	  $image->select_rectangle(2,0,$h,$brickw/2,$brickh);
-	  $layerpat->edit_bucket_fill(0,0,4*abs($r),0,0,1,1);
+	  $layerpat->edit_bucket_fill(FILL_FOREGROUND,0,0);
 	}
       }
       $w += $brickw;
@@ -76,11 +76,11 @@ podregister {
   }
   $image->undo_group_end;
   Gimp::Context->set_background ($color);
-  my $layerb = $image->image_add_new_layer(1,BACKGROUND_FILL,0);
+  my $layerb = $image->image_add_new_layer(1,FILL_BACKGROUND,0);
   $image->selection_all;
   if ($borderpatuse) {
     Gimp::Context->set_pattern($borderpattern);
-    $layerb->edit_bucket_fill(2,0,100,0,0,1,1);
+    $layerb->edit_bucket_fill(FILL_WHITE,0,0);
   }
   $border->edit_copy();
   $layerb->add_alpha;

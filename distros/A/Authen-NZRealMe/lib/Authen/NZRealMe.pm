@@ -1,5 +1,5 @@
 package Authen::NZRealMe;
-$Authen::NZRealMe::VERSION = '1.22';
+$Authen::NZRealMe::VERSION = '1.23';
 use warnings;
 use strict;
 

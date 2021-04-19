@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 26;
+use Test::More tests => 31;
 use File::Which;
 
 
@@ -17,7 +17,7 @@ yl5pRE67PP9+f9og/JIg3TdJBbzMR/XVjowRQWY4tM4iufz+TIcgjLtPGgriQ+vk
 1ABik1RrS9rZzxgCSvizfUmDaNsS/oIHhyVXoc2JXTM=
 HMAC
 
-my @hash_alg = qw/sha1 sha224 sha256 sha384 sha512/;
+my @hash_alg = qw/sha1 sha224 sha256 sha384 sha512 ripemd160/;
 foreach my $alg (@hash_alg) {
     my $xml = '<?xml version="1.0"?>'."\n".'<foo ID="XML-SIG_1">'."\n".'    <bar>123</bar>'."\n".'</foo>';
     my $sig = XML::Sig->new( { hmac_key => $hmac_key, sig_hash => $alg } );
@@ -39,8 +39,13 @@ foreach my $alg (@hash_alg) {
         my $verify_response = `xmlsec1 --verify --keys-file t/xmlsec-keys.xml --id-attr:ID "foo" tmp-$alg.xml 2>&1`;
         ok( $verify_response =~ m/^OK/, "Response is OK for xmlsec1" )
             or warn "calling xmlsec1 failed: '$verify_response'\n";
+        if ($verify_response =~ m/^OK/) {
+            unlink "tmp-$alg.xml";
+        } else{
+            print $signed;
+            die;
+        }
 
-        unlink "tmp-$alg.xml";
     }
 
     my $sig2 = XML::Sig->new( { hmac_key => $hmac_key, sig_hash => $alg } );

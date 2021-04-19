@@ -1,4 +1,8 @@
 Revision history for Perl extension Crypt::CBC.
+3.03    Sun 18 Apr 2021 10:54:19 PM EDT
+	- Fixed bug which caused an extraneous block of garbage data to be appended to encrypted
+	  string when "nopadding" specified and plaintext is even multiple of blocksize.
+	
 3.02
 	- CTR mode now requires the Math::Int128 module, which gives a ~5x performance
 	  boost over Math::BigInt.

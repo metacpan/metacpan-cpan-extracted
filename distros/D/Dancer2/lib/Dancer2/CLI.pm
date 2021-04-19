@@ -1,34 +1,32 @@
 package Dancer2::CLI;
-# ABSTRACT: Dancer2 cli application
-$Dancer2::CLI::VERSION = '0.301001';
-use strict;
-use warnings;
+# ABSTRACT: Dancer2 CLI application
+$Dancer2::CLI::VERSION = '0.301002';
+use Moo;
+use CLI::Osprey;
+use File::Share 'dist_dir';
+use Module::Runtime 'use_module';
 
-BEGIN {
-    eval {
-        require App::Cmd::Setup;
-        1; 
-    } or do {
-        warn <<INSTALLAPPCMD;
-ERROR: You need to install App::Cmd first to use this tool.
+subcommand gen => 'Dancer2::CLI::Gen';
 
-You can do so using your preferred module installation method, for instance;
+# Could have done this one inline, but wanted to remain consistent
+# across subcommands.
+subcommand version => 'Dancer2::CLI::Version';
 
-  # using cpanminus
-  cpanm App::Cmd
-  # or using CPAN.pm
-  cpan App::Cmd
-  
-For more detailed instructions, see http://www.cpan.org/modules/INSTALL.html
+# Thinking ahead, these might be useful in future subcommands
+has _dancer2_version => (
+    is      => 'lazy',
+    builder => sub { use_module( 'Dancer2' )->VERSION },
+);
 
-Without App::Cmd, the `dancer2` app minting tool cannot be used, but Dancer2
-can still be used for existing apps.
-INSTALLAPPCMD
-        exit;
-    }
+has _dist_dir => (
+    is      => 'lazy',
+    builder => sub{ dist_dir('Dancer2') },
+);
+
+sub run {
+    my $self = shift;
+    return $self->osprey_usage;
 }
-
-use App::Cmd::Setup -app;
 
 1;
 
@@ -40,11 +38,11 @@ __END__
 
 =head1 NAME
 
-Dancer2::CLI - Dancer2 cli application
+Dancer2::CLI - Dancer2 CLI application
 
 =head1 VERSION
 
-version 0.301001
+version 0.301002
 
 =head1 AUTHOR
 

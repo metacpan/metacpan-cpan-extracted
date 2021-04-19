@@ -23,36 +23,30 @@ EOD
 
 # note that version numbers with trailing zeroes (e.g, 0.010) created problems
 # in some of the tests
-pp_setversion( '0.020' );
-
-# check for indx/PDL_Indx support
-use PDL::Lite; # load PDL to check definedness of &PDL::indx
-my $indx_type = defined( &PDL::indx ) ? 'indx' : 'int';
-my $PDL_Indx_type = defined( &PDL::indx ) ? 'PDL_Indx' : 'int';
+our $VERSION = '0.020';
+pp_setversion( $VERSION );
 
 # ensure that a grid is monotonically increasing or decreasing
-
-my %MAP = ( PDL_Indx_type => $PDL_Indx_type );
 
 pp_def( '_validate_grid',
 	Pars => "grid(n)",
 	Doc => 'Validate a grid.
 
 This function throws an exception if a grid is not monotonically increasing or decreasing.',
-	Code => ( map { my $p = $_; $p =~ s/%([^%]+)%/$MAP{$1}/eg; $p } '
-	        %PDL_Indx_type% n = $SIZE(n);
-	        %PDL_Indx_type% nm1 = n - 1;
-		%PDL_Indx_type% idx;
+	Code => '
+	        PDL_Indx n = $SIZE(n);
+	        PDL_Indx nm1 = n - 1;
+		PDL_Indx idx;
 	        if ( $grid(n => 0 ) < $grid(n => nm1) ) {
 		  for ( idx = 0 ; idx < n - 1; idx++ ) {
-		      %PDL_Indx_type% idx1 = idx + 1;
+		      PDL_Indx idx1 = idx + 1;
 		      if ( $grid(n => idx ) >= $grid( n => idx1 ) )
 		        barf( "grid is not monotonically increasing\n" );
 		  }
 		}
 	        else if ( $grid(n => 0 ) > $grid(n => nm1) ) {
 		  for ( idx = 0 ; idx < n - 1; idx++ ) {
-		      %PDL_Indx_type% idx1 = idx + 1;
+		      PDL_Indx idx1 = idx + 1;
 		      if ( $grid(n => idx ) <= $grid( n => idx1 ) )
 		        barf( "grid is not monotonically decreasing\n" );
 		  }
@@ -60,7 +54,7 @@ This function throws an exception if a grid is not monotonically increasing or d
 		else {
 	          barf( "grid is not monotonically increasing or decreasing\n" );
 		}
-	' ),
+	',
 );
 
 pp_done();

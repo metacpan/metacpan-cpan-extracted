@@ -11,7 +11,7 @@ podregister {
   my $ysize = $drawable->height;
   my $out = Gimp::Image->new($xsize,$ysize,0);
   Gimp::Context->set_background([128,128,128]);
-  my $windlayer = $out->layer_new($xsize,$ysize,RGB_IMAGE,"Windlayer",100,NORMAL_MODE);
+  my $windlayer = $out->layer_new($xsize,$ysize,RGB_IMAGE,"Windlayer",100,LAYER_MODE_NORMAL_LEGACY);
   $windlayer->fill(0);
   $out->insert_layer($windlayer,0,0);
   my $windlayercopy = $windlayer->copy(1);

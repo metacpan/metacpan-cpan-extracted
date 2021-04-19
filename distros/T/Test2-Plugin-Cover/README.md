@@ -113,8 +113,9 @@ You can tell prove to use the module this way:
 
     HARNESS_PERL_SWITCHES=-MTest2::Plugin::Cover prove ...
 
-This also works for [Test2::Harness](https://metacpan.org/pod/Test2%3A%3AHarness) aka `yath`, but yath may have a flag to
-enable this for you by the time you are reading these docs.
+For yath:
+
+    yath test --cover-files ...
 
 ## SUPPRESS REPORT
 
@@ -159,7 +160,71 @@ for me to link to it here.
 Once you have these hooks in place the data will not only show files and subs
 that were called, but what called them.
 
+Please see the `set_from()` documentation for details on values.
+
 # CLASS METHODS
+
+- $val = $class->get\_from()
+
+    Get the current 'from' value. The default is `'*'` when nothing has set a from
+    value.
+
+- $class->set\_from($val)
+
+    Set a 'from' value. This can be anything, a string, a hashref, etc. Be advised
+    though that it will usually be serialized to JSON, so make sure anything you
+    put in it will be serializable as json.
+
+- $class->clear\_from()
+
+    Resets the clear value to `'*'`
+
+- $bool = $class->was\_from\_modified()
+
+    This will return true if anything has called `set_from()` or
+    `set_from_manager`. This can be reset back to false using `reset_from()`,
+    which also clears the 'from' and 'from\_manager' values.
+
+- $class->set\_from\_manager($module)
+
+    This should be set to a module that implements the following method:
+
+        sub test_parameters {
+            my $class = shift;
+            my ($test_file, \@from_values) = @_;
+
+            ...
+
+            return {
+                # If true - run the test
+                # If false - skip the test
+                # If not present or undef - run the test
+                run => $bool,
+
+                # The following are optional
+                argv  => [ ... ],
+                env   => { ... },
+                stdin => "...",
+            };
+
+            # OR
+            # If true - run the test
+            # If false - skip the test
+            # If undef or empty list - run the test
+            return $bool;
+        }
+
+    This will be used by [Test2::Harness](https://metacpan.org/pod/Test2%3A%3AHarness) to determine what data needs to be
+    passed to a test given a set of 'from' values to instruct the test to run the
+    necessary parts/subtests/groups/methods/etc.
+
+    The 'argv' data will be prepended befor any other arguments provided to the
+    test.
+
+    The 'env' hashref will be merged with any other env vars needed, with these
+    taking priority.
+
+    The 'stdin' string will be used as STDIN for the test.
 
 - $arrayref = $class->files()
 - $arrayref = $class->files(root => $path)
@@ -244,9 +309,18 @@ that were called, but what called them.
         This is used ONLY when the [Test2::API](https://metacpan.org/pod/Test2%3A%3AAPI) is doing its final book-keeping. Most
         users will never want to use this.
 
-- $class->clear()
+- $class->reset\_coverage()
 
     This will completely clear all coverage data so far.
+
+- $class->reset\_from()
+
+    This will clear the 'from' value, as well as reset the 'was\_from\_modified'
+    state to false.
+
+- $class->full\_reset()
+
+    Calls both `reset_coverage()` and `reset_from()`.
 
 - $file\_or\_undef = $class->filter($file)
 - $file\_or\_undef = $class->filter($file, root => Path::Tiny->new('...'))

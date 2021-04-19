@@ -13,8 +13,10 @@ $dg = $i2d->dot_graph( {'use-numbered-nodes' => 1}, 'filter' );
 
 like($dg, qr/node0 \[shape=none,margin=0,label=/ms, 'used numbered nodes');
 like($dg, qr/node1 \[shape=none,margin=0,label=/ms, 'used numbered nodes');
-like($dg, qr/node0:e -> node1:name:w/ms, 'used numbered nodes');
-like($dg, qr/node1:e -> LOG:name:w/ms, 'used numbered nodes');
+like($dg, qr/node2 \[shape=none,margin=0,label=/ms, 'used numbered nodes');
+like($dg, qr/node0:e -> RETURN:w/ms, 'used numbered nodes');
+like($dg, qr/node1:e -> node2:name:w/ms, 'used numbered nodes');
+like($dg, qr/node2:e -> LOG:name:w/ms, 'used numbered nodes');
 
 done_testing();
 

@@ -1,5 +1,13 @@
 Revision history for Pod-Weaver
 
+4.017     2021-04-17 17:51:31-04:00 America/New_York
+        - no changes from previous trial release
+
+4.016     2021-04-06 22:22:59-04:00 America/New_York (TRIAL RELEASE)
+        - GenerateSection by David Miguel Susano Pinto has been bundled with
+          Pod::Weaver.  Although it has been fairly heavily edited, it should
+          be entirely compatible with previous versions.  Thanks, David!
+
 4.015     2016-10-14 20:48:13-04:00 America/New_York
         - fix bugs introduced in 4.014 that would cause [Bugs] and [Legal]
           to run even when they should've skipped

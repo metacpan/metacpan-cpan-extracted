@@ -1,0 +1,60 @@
+---
+abstract: 'Safely rewrite parts of generated code'
+author:
+  - 'Curtis "Ovid" Poe <ovid@allaroundtheworld.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::Most: '0.37'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CodeGen-Protection
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  CodeGen::Protection:
+    file: lib/CodeGen/Protection.pm
+    version: '0.05'
+  CodeGen::Protection::Format::HTML:
+    file: lib/CodeGen/Protection/Format/HTML.pm
+    version: '0.05'
+  CodeGen::Protection::Format::Perl:
+    file: lib/CodeGen/Protection/Format/Perl.pm
+    version: '0.05'
+  CodeGen::Protection::Role:
+    file: lib/CodeGen/Protection/Role.pm
+    version: '0.05'
+  CodeGen::Protection::Types:
+    file: lib/CodeGen/Protection/Types.pm
+    version: '0.05'
+  Test::CodeGen::Protection:
+    file: lib/Test/CodeGen/Protection.pm
+    version: '0.05'
+requires:
+  Carp: '0'
+  Digest::MD5: '2.55'
+  Module::Runtime: '0.016'
+  Moo: '2.005003'
+  Perl::Tidy: '20190601'
+  Type::Tiny: '1.012001'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/Ovid/codegen-protection/issues
+  homepage: https://metacpan.org/pod/CodeGen::Protection
+  repository: https://github.com/Ovid/codegen-protection.git
+version: '0.05'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

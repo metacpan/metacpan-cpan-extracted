@@ -20,7 +20,7 @@ podregister {
   # i.e. create a text layer on transparent only...
 
   # -- step 2 --
-  $img->add_new_layer(0,TRANSPARENT_FILL);
+  $img->add_new_layer(0,FILL_TRANSPARENT);
   $img->text_fontname(-1, 10, 10, $text, 0, 1, $fontsize, PIXELS, $font);
   eval { Gimp::Display->new($img); }; # display the image early
   my $layer = $img->merge_visible_layers(EXPAND_AS_NECESSARY);
@@ -28,7 +28,16 @@ podregister {
   my @pt2 = ($layer->width * 0.5 +1, $layer->height);
   # -- step 3 --
   $layer->set_lock_alpha(1);
-  $layer->edit_blend(FG_BG_RGB_MODE, NORMAL_MODE, GRADIENT_LINEAR, 100, 0, REPEAT_NONE, 0, 0, 0, 3, 0.20, @pt1, @pt2);
+  $layer->edit_gradient_fill(
+    GRADIENT_LINEAR,
+    0, # offset
+    0, # supersample
+    0, # supersample
+    3, # supersample
+    0, # dither
+    @pt1,
+    @pt2,
+  );
   # -- step 4 --
   my $layer2 = $layer->copy(0);     # Can you override these to have a default? (would be nice)
   $img->insert_layer($layer2, 0, 0);
@@ -36,17 +45,17 @@ podregister {
   $layer2->set_lock_alpha(1);
   $img->selection_all;
   Gimp::Context->set_background([1.0,1.0,1.0]);
-  $layer2->edit_fill(BACKGROUND_FILL);
+  $layer2->edit_fill(FILL_BACKGROUND);
   # -- step 6 --
   $layer2->set_lock_alpha(0);
   $layer2->gauss_rle(6,1,1);
   # -- step 7 --
   $layer->plug_in_bump_map($layer2, $azimuth, $elevation, $depth, 0,0,0,0,1,0,$maptype);
   # -- step 8 --
-  $layer2->invert;
+  $layer2->invert(1);
   $img->lower_item($layer2);
   # -- step 9 --
-  $layer2->translate(2, 3);
+  $layer2->transform_translate(2/$img->width, 3/$img->height);
   # extra stuff
   $img->add_new_layer(2);
   $img->gimp_selection_none();

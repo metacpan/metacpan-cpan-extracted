@@ -1,4 +1,10 @@
 Revision history for Syntax-Keyword-Match
 
+0.02    2021-04-17
+        [CHANGES]
+         * Support `isa` and `=~` operator
+         * Support non-constant case() expressions
+         * Back-compatbility to perl 5.16
+
 0.01    2021-04-15
         First version, released on an unsuspecting world.

@@ -1,5 +1,11 @@
 Revision history for Sub-Exporter-ForMethods
 
+0.100054  2021-04-17 17:59:05-04:00 America/New_York
+        - no change since last trial release
+
+0.100053  2021-04-04 12:59:57-04:00 America/New_York (TRIAL RELEASE)
+        - replace Sub::Name with Sub::Util, which has been core since 2015
+
 0.100052  2015-07-17 19:27:36-04:00 America/New_York
         - add the ability to bless the wrapper into the wrapped sub's class,
           if requested

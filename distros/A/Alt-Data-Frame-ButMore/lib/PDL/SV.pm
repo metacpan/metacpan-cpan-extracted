@@ -48,16 +48,31 @@ use overload
   '.=' => sub {
     my ( $self, $other, $swap ) = @_;
 
-    unless ( $other->$_DOES('PDL::SV') ) {
+    if ( $other->$_DOES('PDL::SV') ) {
+        my $internal = $self->_internal;
+        if ($other->dim(0) == 1) {
+            for my $i ( 0 .. $self->dim(0) - 1 ) {
+                my $idx = PDL::Core::at( $self, $i );
+                $internal->[$idx] = $other->at(0);
+            }
+        } else {
+            for my $i ( 0 .. $self->dim(0) - 1 ) {
+                my $idx = PDL::Core::at( $self, $i );
+                $internal->[$idx] = $other->at($i);
+            }
+        }
+        return $self;
+    }
+    elsif ($other->$_DOES('PDL')) {
         return $super_dotassign->( $self, $other, $swap );
     }
-
-    my $internal = $self->_internal;
-    for my $i ( 0 .. $other->dim(0) - 1 ) {
-        my $idx = PDL::Core::at( $self, $i );
-        $internal->[$idx] = $other->at($i);
+    else {  # non-piddle
+        my $internal = $self->_internal;
+        for my $i ( 0 .. $self->dim(0) - 1 ) {
+            my $idx = PDL::Core::at( $self, $i );
+            $internal->[$idx] = $other;
+        }
     }
-    return $self;
   },
   fallback => 1;
 
@@ -429,7 +444,7 @@ PDL::SV - PDL subclass for keeping scalar data (like strings)
 
 =head1 VERSION
 
-version 0.0053
+version 0.0056
 
 =head1 SYNOPSIS
 
@@ -570,7 +585,7 @@ Stephan Loyd <sloyd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014, 2019 by Zakariyya Mughal, Stephan Loyd.
+This software is copyright (c) 2014, 2019-2020 by Zakariyya Mughal, Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -108,7 +108,14 @@ sub has_errors {
 
 has 'validated' => (is=>'rw', required=>1, init_args=>undef, default=>0);
 has 'skip_validation' =>  (is=>'rw', required=>1, init_args=>undef, default=>0);
+has '_context' => (is=>'rw', required=>0, predicate=>'has_context');
 
+sub context {
+  my ($self, $args) = @_;
+  $args = ref($args) ? $args : [$args];
+  $self->_context($args);
+  return $self;
+}
 
 sub skip_validate {
   my ($self) = @_;
@@ -356,6 +363,13 @@ sub clear_validated {
 
 sub validate {
   my ($self, %args) = @_;
+
+  my $existing_context = $args{context} ? $args{context} : [];
+  my @existing_context = ref($existing_context) ? @$existing_context : ($existing_context);
+  push @existing_context, @{$self->_context} if $self->has_context;
+
+  $args{context} = \@existing_context if @existing_context;
+
   return $self if $self->skip_validation;
   return $self if $self->{_inprocess};
   $self->{_inprocess} =1;
@@ -540,6 +554,10 @@ Sets C<skip_validation> to true and returns C<$self>
 =head2 skip_validate
 
 Sets C<skip_validation> to false and returns C<$self>
+
+=head2 context
+
+Set a validation context (or arrayref of contexts) that will be used on an following validations.ß
 
 =head1 ATTRIBUTES
 

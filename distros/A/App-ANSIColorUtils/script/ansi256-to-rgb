@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Color/ANSI/Util/ansi256_to_rgb
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2021-01-19'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ ansi256-to-rgb - Convert ANSI-256 color to RGB
 
 =head1 VERSION
 
-This document describes version 0.007 of ansi256-to-rgb (from Perl distribution App-ANSIColorUtils), released on 2020-06-09.
+This document describes version 0.008 of ansi256-to-rgb (from Perl distribution App-ANSIColorUtils), released on 2021-01-19.
 
 =head1 SYNOPSIS
 
@@ -164,7 +164,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ANSIColorUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ANSIColorUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ANSIColorUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -176,7 +176,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

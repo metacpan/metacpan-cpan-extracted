@@ -1,3 +1,3 @@
-use Time::Precise 'timelocal';
+use Time::Precise ();
 
-*main = \&timelocal;
+*main = \&Time::Precise::timelocal;

@@ -1,5 +1,11 @@
 Revision history for App-TemplateCMD
 
+0.6.11   2021-04-18
+        Updating for release of version 0.6.11
+        Adding missing files to manifest (Ivan Wills)
+        Updated date (Ivan Wills)
+        Adding new node.js cli template (Ivan Wills)
+
 0.6.10   2019-09-04
         Updating for release of version 0.6.10
         Adding newer perl version (Ivan Wills)

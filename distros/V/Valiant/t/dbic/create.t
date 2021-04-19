@@ -1,3 +1,5 @@
+BEGIN { $ENV{VALIANT_DEBUG} = 2; }
+
 use Test::Most;
 use Test::Lib;
 use DateTime;

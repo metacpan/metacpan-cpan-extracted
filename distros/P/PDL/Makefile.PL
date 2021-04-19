@@ -1,10 +1,6 @@
 use strict;
 use warnings;
 
-# using absolute path to make it valid also for Makefile.PL files in subdirectories
-use Cwd;
-use lib Cwd::abs_path('inc');
-
 eval { require Devel::CheckLib; Devel::CheckLib->import; };
 use 5.010_000;
 use ExtUtils::MakeMaker;
@@ -217,7 +213,6 @@ if (!defined($PDL::Config{USE_POGL}) or +$PDL::Config{USE_POGL}) {
       }
    } else {
       # Have OpenGL so set USE_POGL option if needed
-      warn "Makefile.PL: Found required OpenGL version, setting USE_POGL => 1\n" unless defined($PDL::Config{USE_POGL});
       $PDL::Config{USE_POGL} ||= 1;
    }
 } else {

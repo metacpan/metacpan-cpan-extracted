@@ -3,7 +3,7 @@ use Encode;
 
 sub main ($) {
 	my $str = shift;
-	return unless not is_empty $str;
+	return '' unless not is_empty $str;
 	my $str2 = $str;
 	eval {
 		$str = Encode::decode('utf8', $str, Encode::FB_CROAK);

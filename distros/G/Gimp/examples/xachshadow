@@ -17,14 +17,14 @@ podregister {
   $drawable->pixelize($blocksize);
   my $shadowlayer = $drawable->copy(FALSE);
   $image->insert_layer($shadowlayer,0,0);
-  my $checkmask = $shadowlayer->create_mask(ADD_WHITE_MASK);
+  my $checkmask = $shadowlayer->create_mask(ADD_MASK_WHITE);
   $shadowlayer->add_mask($checkmask);
   $image->checkerboard($checkmask, 0, $blocksize);
 
   my $frontlayer = $shadowlayer->copy(0);
   $image->insert_layer($frontlayer,0,0);
   Gimp::Context->set_background([0,0,0]);
-  $shadowlayer->fill(BACKGROUND_FILL);
+  $shadowlayer->fill(FILL_BACKGROUND);
   $checkmask->gauss_iir(0.3*$blocksize, 1, 1);
   $checkmask->offset (1, 0, 0.2*$blocksize, 0.2*$blocksize);
 
@@ -33,7 +33,7 @@ podregister {
   $image->selection_all;
   $gridlayer->edit_clear;
   Gimp::Context->set_background([255,255,255]);
-  $gridlayer->edit_fill(BACKGROUND_FILL);
+  $gridlayer->edit_fill(FILL_BACKGROUND);
   $gridlayer->grid((1, $blocksize, 0, [0,0,0], 255) x 3);
 
   $gridlayer->set_mode(3);

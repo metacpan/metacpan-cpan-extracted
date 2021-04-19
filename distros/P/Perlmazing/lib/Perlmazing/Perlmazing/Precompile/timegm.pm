@@ -1,3 +1,3 @@
-use Time::Precise 'timegm';
+use Time::Precise ();
 
-*main = \&timegm;
+*main = \&Time::Precise::timegm;

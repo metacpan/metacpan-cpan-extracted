@@ -1,0 +1,28 @@
+---
+abstract: 'Encapsulate system info for OpenMP'
+author:
+  - 'OODLER 577 <oodler@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.10'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-OpenMP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010001'
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  bugtracker: https://github.com/oodler577/p5-Alien-OpenMP/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/oodler577/p5-Alien-OpenMP
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

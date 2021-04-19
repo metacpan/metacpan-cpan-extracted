@@ -101,6 +101,7 @@ Files: lib/LINQ/Array.pm
  lib/LINQ/FieldSet.pm
  lib/LINQ/FieldSet/Assertion.pm
  lib/LINQ/FieldSet/Selection.pm
+ lib/LINQ/FieldSet/Single.pm
  lib/LINQ/Iterator.pm
  lib/LINQ/Util.pm
  lib/LINQ/Util/Internal.pm
@@ -130,6 +131,7 @@ Files: lib/LINQ/Array.pm
  t/21iter-to_iterator.t
  t/90fieldset-assertion.t
  t/90fieldset-selection.t
+ t/90fieldset-single.t
 Copyright: This software is copyright (c) 2021 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -143,14 +145,6 @@ Files: Changes
 Copyright: Copyright 2021 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
- LICENSE
- Makefile.PL
- TODO
- t/1020.pl
-Copyright: Unknown
-License: Unknown
-
 Files: README
  lib/LINQ.pm
  lib/LINQ/Collection.pm
@@ -158,6 +152,14 @@ Files: README
  lib/LINQ/Grouping.pm
 Copyright: This software is copyright (c) 2014, 2021 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ TODO
+ t/1020.pl
+Copyright: Unknown
+License: Unknown
 
 Files: COPYRIGHT
  CREDITS

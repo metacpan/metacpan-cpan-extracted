@@ -12,14 +12,14 @@ Gimp::on_lib {
 # spawning a GIMP without an interface to run on.
 Gimp::on_net {
   my $img=Gimp::Image->new(600,300,RGB);
-  my $bg=$img->layer_new(30,20,RGB_IMAGE,"Background",100,NORMAL_MODE);
+  my $bg=$img->layer_new(30,20,RGB_IMAGE,"Background",100,LAYER_MODE_NORMAL_LEGACY);
   $img->insert_layer($bg,0,1); # you have to add a layer after you create it
   eval { Gimp::Display->new($img); }; # Show it (this slows things down)
 # do a bunch of operations just as a speed test, flushing in between
   Gimp::Context->push;
   for $i (0..255) {
      Gimp::Context->set_background([$i,255-$i,$i]);
-     $bg->edit_fill(BACKGROUND_FILL);
+     $bg->edit_fill(FILL_BACKGROUND);
      Gimp::Display->displays_flush();
   }
   Gimp::Context->pop;

@@ -1,0 +1,191 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::Transport::Perl
+at lib/Myriad/Transport/Perl.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Myriad::Transport::Perl - In-Memory data layer that mimics Redis behaviour..
+
+=head1 SYNOPSIS
+
+  my $transport = Myriad::Transport::Perl->new();
+
+  $transport->publish('channel_name', 'event...');
+
+=head1 DESCRIPTION
+
+=head2 Exceptions
+
+=head2 StreamNotFound
+
+Thrown when the operation requires the stream to be
+created beforehand but the stream is not currently available.
+
+=head2 GroupExists
+
+Thrown when the user is trying to re-create a group
+but the operation doesn't allow that.
+
+=head2 GroupNotFound
+
+Thrown when the operation requires the group to be
+exist but it's not.
+
+=head2 create_stream
+
+Creats an empty stream.
+
+=over 4
+
+=item * C<stream_name> - The name of the stream.
+
+=back
+
+=head2 add_to_stream
+
+Adds a new item to a stream, if the stream doesn't exist it'll be created.
+
+=over 4
+
+=item * C<stream_name> - The name of the stream.
+
+=item * C<data> - A perl hash that contains the user data.
+
+=back
+
+=head2 create_consumer_group
+
+Creates a consumer group for a given stream.
+
+=over 4
+
+=item * C<stream_name> - The name of the stream.
+
+=item * C<group_name> - The name of the group that is going to be created.
+
+=item * C<offset> - If set the group will see this value as the first message in the stream.
+
+=item * C<make_stream> - If set and the stream doesn't exist it'll be created.
+
+=back
+
+=head2 read_from_stream
+
+Read elements from the stream.
+
+This operation is stateless you can re-read the same message
+as long as it exists in the stream.
+
+=over 4
+
+=item * C<stream_name> - The name of the stream.
+
+=item * C<offset> - The number of messages to skip.
+
+=item * C<count> - The limit of messages to be received.
+
+=back
+
+=head2 read_from_stream_by_consumer
+
+Read elements from the stream for the given group.
+
+This operation is stateful if the message read by a consumer "A"
+it won't be available for consumer "B" also consumer "A" won't be able
+to re-read the message using this call.
+
+This is not exaclty how Redis works but it covers our need at the moment.
+
+=over 4
+
+=item * C<stream_name> - The name of the stream should exist before calling this sub.
+
+=item * C<group_name> - The name of the group should exist before callingg this sub.
+
+=item * C<consumer_name> - The current consumer name, will be used to keep tracking of pendign messages.
+
+=item * C<offset> - If given the consumer can skip the given number of messages.
+
+=item * C<count> - The limit of messages to be received.
+
+=back
+
+=head2 ack_message
+
+Remove a message from the pending list.
+
+It's safe to call this method multiple time even if the message doesn't exist.
+
+=over 4
+
+=item * C<stream_name> - The name of the stream.
+
+=item * C<group_name> - The name of group that has this message as pending.
+
+=item * C<message_id> - The Id of the message that we want to acknowledge.
+
+=back
+
+=head2 claim_message
+
+Re-assign a message to another consumer.
+
+It'll return the full message.
+
+=over 4
+
+=item * C<stream_name> - The name of the stream.
+
+=item * C<group_name> - The name of the group that has the message as pending.
+
+=item * C<consumer_name> - The name of the new consumer.
+
+=item * C<message_id> - The id of the message to be claimed.
+
+=back
+
+=head2 publish
+
+Publish a message, if no consumer exists the message will be lost.
+
+=over 4
+
+=item * C<channel_name> - The name of the channel that the message will be published to.
+
+=item * C<message> - A scalar that is going to be published.
+
+=back
+
+=head2 subscribe
+
+Subscribe to a channel by optaining a L<Ryu::Source> that'll receive events.
+
+=over 4
+
+=item * C<channel_name> - The name of the channel.
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+

@@ -33,6 +33,8 @@ sub root :Chained(/) PathPart('') CaptureArgs(0) { }
     sub profile :Chained(auth) PathPart('profile') Args(0) {
       my ($self, $c) = @_;
       my %params = %{$c->req->body_data||+{}};
+      
+      Dwarn \%params;
 
       $c->stash(person => my $model = $c->model('Schema::Person')
         ->find(
@@ -41,12 +43,12 @@ sub root :Chained(/) PathPart('') CaptureArgs(0) { }
         )
       );
 
-      $c->stash(build_empty_cc => delete($params{add}));
-
       if($c->req->method eq 'POST') {
-        $params{roles} = [] unless exists $params{roles}; # Handle the delete case
-        Dwarn \%params;
-        $model->update({%params, __context=>'profile'}) 
+        $params{roles} = [] unless exists $params{roles}; # Handle the delete all case
+        my $add = delete $params{add};
+
+        $model->context('profile')->update(\%params);
+        $model->build_related('credit_cards') if $add->{credit_cards};
       }
     }
 

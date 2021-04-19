@@ -1,0 +1,58 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::API
+at lib/Myriad/API.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Myriad::API - provides an API for Myriad services
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+Used internally within L<Myriad> services for providing access to
+storage, subscription and RPC behaviour.
+
+=head2 storage
+
+Returns a L<Myriad::Role::Storage>-compatible instance for interacting with storage.
+
+=head2 service_by_name
+
+Returns a service proxy instance for the given service name.
+
+This can be used to call RPC methods and act on subscriptions.
+
+=head2 config
+
+Returns a L<Ryu::Observable> that hold the value of the configuration.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+

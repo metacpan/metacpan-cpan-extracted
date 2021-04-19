@@ -20,8 +20,8 @@ no_index:
 requires:
   overload: '0'
   perl: '5.006'
-  smallnum: '0.05'
+  smallnum: '1.00'
   strict: '0'
   warnings: '0'
-version: '0.23'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

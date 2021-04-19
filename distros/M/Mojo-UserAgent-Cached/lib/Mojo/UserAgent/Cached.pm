@@ -5,7 +5,7 @@ use strict;
 use v5.10;
 use Algorithm::LCSS;
 use CHI;
-use Cwd;
+use Cwd ();
 use Devel::StackTrace;
 use English qw(-no_match_vars);
 use File::Basename;
@@ -18,7 +18,7 @@ use Mojo::URL;
 use Mojo::Log;
 use Mojo::Base 'Mojo::UserAgent';
 use Mojo::File;
-use POSIX;
+use POSIX qw/O_WRONLY O_APPEND O_CREAT/;
 use Readonly;
 use String::Truncate;
 use Time::HiRes qw/time/;
@@ -26,7 +26,7 @@ use Time::HiRes qw/time/;
 Readonly my $HTTP_OK => 200;
 Readonly my $HTTP_FILE_NOT_FOUND => 404;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 # TODO: Timeout, fallback
 # TODO: Expected result content (json etc)

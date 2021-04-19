@@ -10,7 +10,7 @@ use Fake2;
 
 subtest simple_coverage => sub {
     # Start fresh
-    $CLASS->clear;
+    $CLASS->reset_coverage;
 
     Fake1->fake;
     Fake2->fake;
@@ -56,7 +56,7 @@ subtest simple_coverage => sub {
         "Got expected submap"
     );
 
-    $CLASS->clear;
+    $CLASS->reset_coverage;
 
     is(
         $CLASS->files(root => path('t/lib')),
@@ -72,15 +72,15 @@ subtest simple_coverage => sub {
 };
 
 subtest goto_and_lvalue => sub {
-    $CLASS->clear;
+    $CLASS->reset_coverage;
     Fake1->gfake;
     is($CLASS->files(root => path('t/lib')), ['Fake1.pm'], "Found with a goto");
 
-    $CLASS->clear;
+    $CLASS->reset_coverage;
     Fake1->lfake = 'xxx';
     is($CLASS->files(root => path('t/lib')), ['Fake1.pm'], "Found with an lvalue");
 };
 
-$CLASS->clear;
+$CLASS->reset_coverage;
 
 done_testing;

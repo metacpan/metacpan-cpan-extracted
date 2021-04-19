@@ -1,9 +1,19 @@
-requires 'Config::Tiny', '== 2.24';
-requires 'Data::Printer', '== 0.40';
-requires 'Faker', '== 1.03';
-requires 'Math::Round', '0.07';
-# Needed by Zydeco see
-requires 'PadWalker', '';
+my $minperl = '5.20.0';
+
+requires 'Config::Tiny', '== 2.26';
+requires 'Data::Printer', '== 1.000004';
+requires 'DBI', '== 1.643';
+requires 'DBD::SQLite', '== 1.66';
+requires 'Faker', '== 1.04';
+requires 'Math::Round', '== 0.07';
+requires 'Moo', '== 2.005004';
+# Needed by Zydeco
+requires 'PadWalker', '== 2.5';
+requires 'perl', '>= ' . $minperl;
+# requires 'Sub::Identify', '';
+requires 'Try::Tiny', '== 0.30';
+requires 'Teng', '== 0.32';
+requires 'Time::Moment', '== 0.44';
 requires 'Type::Tiny',  '== 1.012001';
 # It's supposed to accelerate some stuff
 # https://typetiny.toby.ink/Optimization.html
@@ -11,9 +21,13 @@ requires 'Type::Tiny::XS', '== 0.022';
 requires 'Zydeco', '== 0.613';
 
 on 'test' => sub {
-    requires 'Test::Pod', '== 1.52';
+  requires 'Path::Tiny', '== 0.118';
+  requires 'perl', '>= ' . $minperl;
+  requires 'Test::Pod', '== 1.52';
 };
 
 on 'develop' => sub {
-  recommends 'Devel::NYTProf', '== 6.06';
+  requires 'Devel::NYTProf', '== 6.07';
+  requires 'Pod::Readme', '== v1.2.3';
+  requires 'Mojolicious::Plugin::PODViewer', '== 0.006';
 };

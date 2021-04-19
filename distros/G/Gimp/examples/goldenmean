@@ -14,10 +14,10 @@ podregister {
     $height = $short;
   }
   my $img = Gimp::Image->new($width, $height, RGB_IMAGE);
-  my $layer = $img->layer_new($width, $height, RGB_IMAGE, "Layer 1", 100, NORMAL_MODE);
+  my $layer = $img->layer_new($width, $height, RGB_IMAGE, "Layer 1", 100, LAYER_MODE_NORMAL_LEGACY);
   $img->insert_layer($layer, 0, -1);
   Gimp::Context->push();
-  $layer->edit_fill(BACKGROUND_FILL);
+  $layer->edit_fill(FILL_BACKGROUND);
   Gimp::Context->pop();
   eval { Gimp::Display->new($img); };
   return $img;

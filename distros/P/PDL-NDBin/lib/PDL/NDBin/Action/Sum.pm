@@ -1,6 +1,6 @@
 package PDL::NDBin::Action::Sum;
 # ABSTRACT: Action for PDL::NDBin that computes sum
-$PDL::NDBin::Action::Sum::VERSION = '0.020';
+$PDL::NDBin::Action::Sum::VERSION = '0.021';
 
 use strict;
 use warnings;
@@ -61,7 +61,7 @@ PDL::NDBin::Action::Sum - Action for PDL::NDBin that computes sum
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 DESCRIPTION
 
@@ -99,7 +99,7 @@ Edward Baudrez <ebaudrez@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Edward Baudrez.
+This software is copyright (c) 2021 by Edward Baudrez.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

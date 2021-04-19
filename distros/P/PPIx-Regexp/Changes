@@ -1,3 +1,6 @@
+0.080		2021-04-16	T. R. Wyant
+    All uses of the postderef argument to new() now warn.
+
 0.079		2021-03-26	T. R. Wyant
     Get prerequisites up to snuff, and add xt/author/prereq.t to ensure
     they stay that way.

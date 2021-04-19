@@ -1,228 +1,302 @@
-0.18 2021-01-27T17:56:41Z
+Revision history for Art-World
 
-        - The great Manager->influence() reputation bump!
-        - Add some attributes to the Manager role
-        - Proper abstract Concept class that can be inherited by some sub classes
-        - Updated Zydeco to 0.613 and Type::Tiny to 1.012001
-        - Testing properly the Manager role
-        - Move some fame constants to configuration
+{{$NEXT}}
+  - WIP Crud
+  - WIP Imagining the way an Underground place could become homogenic
+  - WIP Working on the Opening testing
+  - WIP Working on the Invitation role that provides an invite method for all kind of places
+
+0.19
+  - Major documentation bump and code examples
+
+0.18_18
+  - Add all the functionnalities for an artwork to be bought by a collective of investors with appropriate paiement and funds repartition
+  - Collective became a role with members, not a class
+  - Fixing #84 using a proper clearer and a writer for setting up the Artwork's owner properly when selling
+  - Fixing all kind of issues related to artwork buying and selling
+  - Fixing a bug in artwork selling transaction where the seller was taken the price they should be given
+  - Moved the postderef feature imports inside of Art::World::Util package
+  - Fixing POD headers levels in Art::World::Util
+  - Updating cpanfile snapshot
+  - Adding detailed documentation about the methods
+  - Adding a Test::Art::World utility Moo class
+  - Suppressing tests plans
+
+0.18_17
+  - Creating a Art::World::Util::Time class based on Time::Moment for time manipulation matters
+  - Removing the repetitive Faker use from the tests and using the Art::World::Util::Person class
+  - Replacing Types::XSD DateTime's by Time::Moment for performances reasons
+  - Transfering the Meta utils doc to the appropriate module
+  - Missing postderef feature in Art::World::Util and tests
+  - Fixing documentation syntax
+
+0.18_16
+  - Fixing forgotten dependency
+
+0.18_15
+  - Collection and buying of artworks now got a clearer behavior
+  - Working on the Buyer role
+  - Working on the Market role
+  - Market documentation
+  - Geologic analogy documentation
+  - Moving all the utils that are not directly related to Art::World entities to Art::World::Util
+  - Adding an Identity role with name and id attributes
+  - Using Try::Tiny, not Syntax::Keyword::Try
+  - Adding the Geologic Comparision documentation
+
+0.18_14
+  - Adding a default owner for Artworks
+  - An Artwork can now properly have an owner change
+  - Properly importing Syntax::Keyword::Try and listing DBD::SQLite as a dependency
+  - Fixing a typo in the Art::World::Util documentation
+
+0.18_13
+  - Improving tests by explicitely importing the lib directory and suppression some non-sense modules "use"
+
+0.18_12
+  - Fixing imports of postderef feature for oldest Perls
+  - removing Data::Printing stuff
+
+0.18_11
+  - Trying to downgrade more
+
+0.18_10
+  - Trying to downgrade minimum Perl version to 5.20.0
+
+0.18_09
+  - Adding more code examples
+  - Add links to the news from perlmonks.org
+  - Refactoring the links to images on main branch since it got renamed
+  - Adding missing test dependencies to cpanfile
+
+0.18_08
+  - Better MANIFEST.SKIF rules
+  - Adding minimum Perl version in cpanfile
+
+0.18_07
+  - Working on table of entities diagram in the Art::World::Manual
+  - Fixing POD errors
+  - Renamed master branch to main because fuck that shit
+  - Updating the description of the project
+  - Did a lot of cleaning in MANIFEST, skipped files and .gitignore
+
+0.18_06
+  - Testing the Crud role
+  - Adding some useful Util methods like generating fake names or random int in a range
+  - Renaming CONTRIBUTORS section to ACKNOWLEDGEMENTS and sorting people by contribution date
+  - Upgrading the awesome Data::Printer module to the v1.0 version
+
+0.18_05
+  - Adding a test database
+  - Generating a proper markdown README
+  - Add Documentation about how to regenerate the distribution
+  - Adding a MOTIVATIONS section in the documentation
+
+0.18_04
+  - Expanding bump_fame with polymorphism thanks to the multi method technic (agl)
+
+0.18_03
+  - Adding homepage in metadata
+
+0.18_02
+  - Trying App::ModuleBuildTiny
+  - Removing Minilla
+
+0.18_01 2021-02-02T17:55:30Z
+  - Writing documentation about the Artist
+  - Editing the project repository metadata
+
+0.18 2021-01-27T17:56:41Z
+  - The great Manager->influence() reputation bump!
+  - Add some attributes to the Manager role
+  - Proper abstract Concept class that can be inherited by some sub classes
+  - Updated Zydeco to 0.613 and Type::Tiny to 1.012001
+  - Testing properly the Manager role
+  - Move some fame constants to configuration
 
 0.17_13 2020-12-24T23:35:29Z
-
-        - Supporting only 5.24.1+ because why not
-        - Fixing postderef feature import in a test
+  - Supporting only 5.24.1+ because why not
+  - Fixing postderef feature import in a test
 
 0.17_12 2020-12-24T10:45:14Z
-
-        - Simplification of the enabling of postderef feature
+  - Simplification of the enabling of postderef feature
 
 0.17_11 2020-12-23T12:33:13Z
-
-        - Requiring Perl 5.20
-        - Use feature postderef if 5.20 < $] < 5.24
-        - Declaring tests plans
+  - Requiring Perl 5.20
+  - Use feature postderef if 5.20 < $] < 5.24
+  - Declaring tests plans
 
 0.17_10 2020-12-22T12:45:48Z
-
-        - Making event a role since otherwise I would have to do multiple inheritance for Exhibition
-        - Updating synopsis
-        - Fixing an issue with required Perl versions
-        - Adding Meta->generate_discourse and Meta->titlify methods
-
+  - Making event a role since otherwise I would have to do multiple inheritance for Exhibition
+  - Updating synopsis
+  - Fixing an issue with required Perl versions
+  - Adding Meta->generate_discourse and Meta->titlify methods
 0.17_09 2020-12-18T21:26:57Z
-
-        - The Abstraction role provide all kind of abstract concepts
-        - We are now able to bump agents reputation who are networking
-        - Exchanging order of classes and roles and nesting all classes in a Parent Art class so we can use shared attributes
-        - Introducing Conf::Tiny and replacing some hardcoded values to conf
-        - Use Type::Tiny 1.012000 (again) that allow the use of non quoted attributes types constraints of custom Zydeco classes.. See Gitlab #37
-        - Adding Makefile to  the project
-        - Lots of tidying up and formatting
+  - The Abstraction role provide all kind of abstract concepts
+  - We are now able to bump agents reputation who are networking
+  - Exchanging order of classes and roles and nesting all classes in a Parent Art class so we can use shared attributes
+  - Introducing Conf::Tiny and replacing some hardcoded values to conf
+  - Use Type::Tiny 1.012000 (again) that allow the use of non quoted attributes types constraints of custom Zydeco classes.. See Gitlab #37
+  - Adding Makefile to  the project
+  - Lots of tidying up and formatting
 
 0.17_08 2020-10-21T12:11:50Z
-
-        - A more robust test of the dynamic Fame attribut
-        - Reverting the use of Type::Tiny dev versions for the use of non quoted attributes types constraints of custom Zydeco classes.. See Gitlab #37
-        - Extensive tests of all the dynamic Fame aura/reputation attributes thingy
+  - A more robust test of the dynamic Fame attribut
+  - Reverting the use of Type::Tiny dev versions for the use of non quoted attributes types constraints of custom Zydeco classes.. See Gitlab #37
+  - Extensive tests of all the dynamic Fame aura/reputation attributes thingy
 
 0.17_07 2020-10-21T11:11:05Z
-
-        - Updating to Type::tiny 1.011_011
+  - Updating to Type::tiny 1.011_011
 
 0.17_06 2020-10-21T08:58:05Z
-
-        - Changing the way the dynamic Fame attribute is generated
+  - Changing the way the dynamic Fame attribute is generated
 
 0.17_05 2020-10-19T21:18:54Z
-
-        - Fame can now adapt to the class that consume it by deciding if it is a Work or an Agent
-        - Adding 3 methods in the Meta class for simple manipulation of objects
-        - Working on the Artwork aura: guess this is something different of the Fame's reputation
-        - Introducing some Meta class to work on the objects themselves
-        - Working on Curators and Manager role
-        - Update to Type::Tiny 1.011_009 so we can use non quoted types constraints for attributes (see RT #133448)
+  - Fame can now adapt to the class that consume it by deciding if it is a Work or an Agent
+  - Adding 3 methods in the Meta class for simple manipulation of objects
+  - Working on the Artwork aura: guess this is something different of the Fame's reputation
+  - Introducing some Meta class to work on the objects themselves
+  - Working on Curators and Manager role
+  - Update to Type::Tiny 1.011_009 so we can use non quoted types constraints for attributes (see RT #133448)
 
 0.17_04 2020-10-07T20:39:25Z
-
-        - A more complete Buyer role
-        - aquire() add an Artwork to the Collector->collection (an take the Artwork->value)
-        - sale() remove and Artwork from the collection (and add some money)
-        - Force the Collector->collection to be composed of Artwork
-        - Add a title attribute to the works
-        - Complete the contributors list with a good friend
-        - More tests!
+  - A more complete Buyer role
+  - aquire() add an Artwork to the Collector->collection (an take the Artwork->value)
+  - sale() remove and Artwork from the collection (and add some money)
+  - Force the Collector->collection to be composed of Artwork
+  - Add a title attribute to the works
+  - Complete the contributors list with a good friend
+  - More tests!
 
 0.17_03 2020-10-04T20:04:31Z
-
-        - Adding some documentation for the Fame
-        - If you try to bump_fame to a negative value, nothing happens properly, and a warning is showed, fix #31
-        - Extensive testing of the Fame because I experienced weird floating point issues
+  - Adding some documentation for the Fame
+  - If you try to bump_fame to a negative value, nothing happens properly, and a warning is showed, fix #31
+  - Extensive testing of the Fame because I experienced weird floating point issues
 
 0.17_02 2020-10-01T21:44:06Z
-
-	- Adding a Fame role, and moving the Agent reputation attribute there
-        - Testing Fame
+  - Adding a Fame role, and moving the Agent reputation attribute there
+  - Testing Fame
 
 0.17_01 2020-09-30T20:55:36Z
-
-        - Removing duplicated declaration of attributes in nested classes (tobyink)
-        - Listing contributors
-        - Removed the Wildlife class since it is redundant with Agent
-        - Applying Collector type constraints on class Artist and role Collectionable
-        - Fixed some example code that was using the old code structure
+  - Removing duplicated declaration of attributes in nested classes (tobyink)
+  - Listing contributors
+  - Removed the Wildlife class since it is redundant with Agent
+  - Applying Collector type constraints on class Artist and role Collectionable
+  - Fixed some example code that was using the old code structure
 
 0.17 2020-09-29T20:15:04Z
-
-        - Adding Space and Market role
-        - Adding Event, Opening, Sex, Collective, Magazine, Institution, Squat, Workshop, Website, Critic, Article, and Book classes
-        - Nesting Plaground and Place classes
+  - Adding Space and Market role
+  - Adding Event, Opening, Sex, Collective, Magazine, Institution, Squat, Workshop, Website, Critic, Article, and Book classes
+  - Nesting Plaground and Place classes
 
 0.16_05 2020-09-28T21:38:22Z
-
-        - More documentation experimentations and details
-        - Preparing an underground role
+  - More documentation experimentations and details
+  - Preparing an underground role
 
 0.16_04 2020-09-28T20:40:48Z
-
-        - Separating the non-programming documentation to a separate .pod
+  - Separating the non-programming documentation to a separate .pod
 
 0.16_03 2020-09-28T07:55:39Z
-
-        - Fixing the Art import to an Art::World in tests
-        - Tests files names convention update
+  - Fixing the Art import to an Art::World in tests
+  - Tests files names convention update
 
 0.16_02 2020-09-27T20:18:52Z
-
-        - Major refactoring of all the modules in only one
+  - Major refactoring of all the modules in only one
 
 0.16_01 2020-09-19T18:30:52Z
-
-        - Adding the Place::Gallery class
-        - Adding the Agent::Public class
-        - Adding The Place::Behavior::Exhibit role
-        - Adding a sale() method to the Wildlife::Behavior::Buyer role
-        - Added Type::Tiny::XS as a dependency for some optimization
+  - Adding the Place::Gallery class
+  - Adding the Agent::Public class
+  - Adding The Place::Behavior::Exhibit role
+  - Adding a sale() method to the Wildlife::Behavior::Buyer role
+  - Added Type::Tiny::XS as a dependency for some optimization
 
 0.16 2020-09-18T20:14:16Z
-
-        - Renaming Buyable to Collectionable
-        - Added is_for_sale() / is_sold() to Collectionable
-        - Adding belongs_to() method on Collectionable role
-        - Moved Test::Pod to test only dependencies
-        - Modularizing tests
-        - Fixing documentation typos
+  - Renaming Buyable to Collectionable
+  - Added is_for_sale() / is_sold() to Collectionable
+  - Adding belongs_to() method on Collectionable role
+  - Moved Test::Pod to test only dependencies
+  - Modularizing tests
+  - Fixing documentation typos
 
 0.15_05 2020-09-16T22:05:25Z
-
-        - An Abstract Work class
-        - Reintroducing the Behavior namespace for roles
-        - Adding more documentation about the 2007 residency
-        - Fixing bugs with the build tools
+  - An Abstract Work class
+  - Reintroducing the Behavior namespace for roles
+  - Adding more documentation about the 2007 residency
+  - Fixing bugs with the build tools
 
 0.15_04 2020-09-13T20:20:55Z
-
-        - Working on Artwork class
-        - Writing the story of the project in the documentation
-        - Fixing some pod formatting
-        - More tests
+  - Working on Artwork class
+  - Writing the story of the project in the documentation
+  - Fixing some pod formatting
+  - More tests
 
 0.15_03 2020-09-13T12:22:15Z
-
-        - This is not a game but only a modelisation
-        - Adding a picture of the general specifications in documentation
+  - This is not a game but only a modelisation
+  - Adding a picture of the general specifications in documentation
 
 0.15_02 2020-09-13T10:08:16Z
-
-        - The Agent class is now isolated
-        - The Artist class is now isolated
-        - Active role for very insipred agents
-        - Art::World got a Playground
-        - If Artists have > 1 collector, they are not underground anymore
-        - Minimum Perl version 5.16, not 5.32
+  - The Agent class is now isolated
+  - The Artist class is now isolated
+  - Active role for very insipred agents
+  - Art::World got a Playground
+  - If Artists have > 1 collector, they are not underground anymore
+  - Minimum Perl version 5.16, not 5.32
 
 0.15 2020-09-12T23:30:28Z
-
-        - Removed more old files
-        - Preparation for release to CPAN
+  - Removed more old files
+  - Preparation for release to CPAN
 
 0.13 2020-09-12T23:13:43Z
-
-        - The POD got finaly fixed, needed UTF-8 and a better structure
+  - The POD got finaly fixed, needed UTF-8 and a better structure
 
 0.08 2020-09-12T22:31:07Z
-
+  - The mysterious release
 
 0.07 2020-09-12T22:23:30Z
-
-	- Porting basic entities to Perl5
-	- Removing most of the old Raku code
-	- Setting up Zydeco as an OO system
-	- Setting up Minilla
-	- Adding missing dependency
-	- Fix gitlab-ci
-	- Updating gitlac-ci for Perl5
+  - Porting basic entities to Perl5
+  - Removing most of the old Raku code
+  - Setting up Zydeco as an OO system
+  - Setting up Minilla
+  - Adding missing dependency
+  - Fix gitlab-ci
+  - Updating gitlac-ci for Perl5
 
 0.05 2017-10-22T20:23:32Z
-
-	- Skip MongoDB tests properly if on Gitlab-CI env
-	- Update Gitlab-CI commands
-	- Implement Crudable on more classes
-	- Add the db tests to version control but skip it if not in dev env
-	- Update makefile after files renaming
-	- Tidying the code and write some documentation
-	- Regenerate the README documentation. Fix #4
-	- Remove unnecessary code
-	- Implementation, test and doc of crudable role and is trait. Close #10
+  - Skip MongoDB tests properly if on Gitlab-CI env
+  - Update Gitlab-CI commands
+  - Implement Crudable on more classes
+  - Add the db tests to version control but skip it if not in dev env
+  - Update makefile after files renaming
+  - Tidying the code and write some documentation
+  - Regenerate the README documentation. Fix #4
+  - Remove unnecessary code
+  - Implementation, test and doc of crudable role and is trait. Close #10
 
 0.04 2017-10-18T15:47:57Z
-
-	- Finally a 'is crud' trait prototype that works!
-	- Add a bit of doc and decoration
-	- Remove tests that cannot be run on the integration server because Mongo
-	- Adding a missing dependency https://github.com/nkh/P6-Data-Dump-Tree/issues/39
-	- Test of the Gitlab-CI functionalities.
-	- Here are the Gitlab-CI badges
+  - Finally a 'is crud' trait prototype that works!
+  - Add a bit of doc and decoration
+  - Remove tests that cannot be run on the integration server because Mongo
+  - Adding a missing dependency https://github.com/nkh/P6-Data-Dump-Tree/issues/39
+  - Test of the Gitlab-CI functionalities.
+  - Here are the Gitlab-CI badges
 
 0.03 2017-10-14T02:21:23Z
-
-	- Working on the CRUD trait.
-	- Makes tests pass with a CrudStr Str type extension and not a trait. See #10
-	- Add build-essential to CI
-	- Update Docker image
-	- Test of a .gitlab-ci.yml for the Raku image
-	- Try many many things about traits
+  - Working on the CRUD trait.
+  - Makes tests pass with a CrudStr Str type extension and not a trait. See #10
+  - Add build-essential to CI
+  - Update Docker image
+  - Test of a .gitlab-ci.yml for the Raku image
+  - Try many many things about traits
 
 0.02 2017-10-14T00:27:12Z
-
-	- Crudable functionnalities and first DB inserts
-	- Rename the DB class to ODM because it is an Object Document Mapper
-	- Create a very simple generic access for the entities to MongoDB
-	- Tiny Entities changes
-	- Test multi-identities
+  - Crudable functionnalities and first DB inserts
+  - Rename the DB class to ODM because it is an Object Document Mapper
+  - Create a very simple generic access for the entities to MongoDB
+  - Tiny Entities changes
+  - Test multi-identities
 
 0.01 2017-10-05T23:28:10Z
-
-	- A basic Art World module.
-	- Starting to model the Art::World and discover Raku object system in the same time
-	- Translation of the Ecosystem text
-	- Add the Art::World Ecosystem text translation
+  - A basic Art World module.
+  - Starting to model the Art::World and discover Raku object system in the same time
+  - Translation of the Ecosystem text
+  - Add the Art::World Ecosystem text translation

@@ -2,7 +2,7 @@ NAME
     XML::Sig
 
 VERSION
-    version 0.49
+    version 0.50
 
 SYNOPSIS
        my $xml = '<foo ID="abc">123</foo>';
@@ -116,7 +116,7 @@ USAGE
         Passing digest_hash to new allows you to specify the DigestMethod
         hashing algorithm used when calculating the hash of the XML being
         signed. Supported hashes can be specified sha1, sha224, sha256,
-        sha384, and sha512
+        sha384, sha512, ripemd160
 
     hmac_key
         Base64 encoded hmac_key

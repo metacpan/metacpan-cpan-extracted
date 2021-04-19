@@ -701,12 +701,11 @@ Maybe that someone is you.
 
 BAD VALUES:
 
-If your PDL was compiled with bad value support, C<map()> supports
-bad values in the data array.  Bad values in the input array are
-propagated to the output array.  The 'g' and 'h' methods will do some
-smoothing over bad values:  if more than 1/3 of the weighted input-array
-footprint of a given output pixel is bad, then the output pixel gets marked
-bad.
+C<map()> supports bad values in the data array. Bad values in the input
+array are propagated to the output array.  The 'g' and 'h' methods will
+do some smoothing over bad values:  if more than 1/3 of the weighted
+input-array footprint of a given output pixel is bad, then the output
+pixel gets marked bad.
 
 
 
@@ -801,10 +800,8 @@ sub map {
   $out = PDL::new_from_specification('PDL',$in->type,@odims);
   $out->sethdr($ohdr) if defined($ohdr);
 
-  if($PDL::Bad::Status) {
-    # set badflag on output all the time if possible, to account for boundary violations
-    $out->badflag(1);
-  }
+  # set badflag on output all the time if possible, to account for boundary violations
+  $out->badflag(1);
 
   ##############################
   ## Figure out the dimensionality of the
@@ -1135,12 +1132,7 @@ sub map {
   $blur = $blur->at(0) if(ref $blur);
   $svmin =  $svmin->at(0)  if(ref $svmin);
 
-  my $bv;
-  if($PDL::Bad::Status  and $in->badflag){
-      $bv = $in->badvalue;
-  } else {
-      $bv = 0;
-  }
+  my $bv = $in->badflag ? $in->badvalue : 0;
 
   ### The first argument is a dummy to set $GENERIC.
   $idx = double($idx) unless($idx->type == double);

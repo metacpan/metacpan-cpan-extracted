@@ -1,5 +1,8 @@
 Revision history for FFI-ExtractSymbols
 
+0.05      2021-04-17 05:33:44 -0600
+  - Use -D to gather dynamic symbols with recent Gnu nm (and compatible) (gh#7, gh#3)
+
 0.04      2020-07-05 08:46:43 -0600
   - Migrate from Module::Build::FFI to FFI::Build (gh#6)
 

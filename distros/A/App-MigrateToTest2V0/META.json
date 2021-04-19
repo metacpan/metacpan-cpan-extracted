@@ -1,0 +1,101 @@
+{
+   "abstract" : "Migrate your tests from Test::More to Test2::V0",
+   "author" : [
+      "utgwkk <utagawakiki@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.11",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-MigrateToTest2V0",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::Util" : "0",
+            "PPI" : "0",
+            "PPIx::Utils" : "0",
+            "Test2::API" : "0",
+            "Test::Deep" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::MigrateToTest2V0" : {
+         "file" : "lib/App/MigrateToTest2V0.pm",
+         "version" : "0.01"
+      },
+      "App::MigrateToTest2V0::Rule" : {
+         "file" : "lib/App/MigrateToTest2V0/Rule.pm"
+      },
+      "App::MigrateToTest2V0::Rule::AvoidNameConflictWithTestDeep" : {
+         "file" : "lib/App/MigrateToTest2V0/Rule/AvoidNameConflictWithTestDeep.pm"
+      },
+      "App::MigrateToTest2V0::Rule::ReplaceIsDeeplyToIs" : {
+         "file" : "lib/App/MigrateToTest2V0/Rule/ReplaceIsDeeplyToIs.pm"
+      },
+      "App::MigrateToTest2V0::Rule::ReplaceIsaOkHASHOrArrayToRefOk" : {
+         "file" : "lib/App/MigrateToTest2V0/Rule/ReplaceIsaOkHASHOrArrayToRefOk.pm"
+      },
+      "App::MigrateToTest2V0::Rule::ReplaceUseTestMoreToUseTest2V0" : {
+         "file" : "lib/App/MigrateToTest2V0/Rule/ReplaceUseTestMoreToUseTest2V0.pm"
+      },
+      "App::MigrateToTest2V0::Rule::Translate2ndArgumentOfIsaOkWithArrayRef" : {
+         "file" : "lib/App/MigrateToTest2V0/Rule/Translate2ndArgumentOfIsaOkWithArrayRef.pm"
+      },
+      "Test2::Plugin::Wrap2ndArgumentOfFailedCompareTestWithString" : {
+         "file" : "lib/Test2/Plugin/Wrap2ndArgumentOfFailedCompareTestWithString.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/utgwkk/App-MigrateToTest2V0/issues"
+      },
+      "homepage" : "https://github.com/utgwkk/App-MigrateToTest2V0",
+      "repository" : {
+         "url" : "git://github.com/utgwkk/App-MigrateToTest2V0.git",
+         "web" : "https://github.com/utgwkk/App-MigrateToTest2V0"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

@@ -39,17 +39,15 @@ KEYWORDS
        }
 
     A match statement provides the controlling expression, comparison
-    operator, and set of case statements for a match operation. The
+    operator, and sequence of case statements for a match operation. The
     expression is evaluated to yield a scalar value, which is then
     compared, using the comparison operator, against each of the case
-    labels. If a match is found then the body of the labelled block is
-    executed. If no label matches but a default block is present, that will
-    be executed instead. After a single inner block has been executed, no
-    further tests are performed and execution continues from the statement
-    following the match statement.
-
-    The comparison operator must be either eq (to compare cases as strings)
-    or == (to compare them as numbers).
+    labels in the order they are written, topmost first. If a match is
+    found then the body of the labelled block is executed. If no label
+    matches but a default block is present, that will be executed instead.
+    After a single inner block has been executed, no further tests are
+    performed and execution continues from the statement following the
+    match statement.
 
     The braces following the match block must only contain case or default
     statements. Arbitrary code is not supported here.
@@ -64,18 +62,59 @@ KEYWORDS
           }
        };
 
+  Comparison Operators
+
+    The comparison operator must be either eq (to compare cases as strings)
+    or == (to compare them as numbers), or =~ (to compare cases using
+    regexps).
+
+    On Perl versions 5.32 onwards, the isa operator is also supported,
+    allowing dispatch based on what type of object the controlling
+    expression gives.
+
+       match( $obj : isa ) {
+          case(A::Package)       { ... }
+          case(Another::Package) { ... }
+       }
+
+    Remember that comparisons are made in the order they are written, from
+    the top downwards. Therefore, if you list a derived class as well as a
+    base class, make sure to put the derived class before the base class,
+    or instances of that type will also match the base class case block and
+    the derived one will never match.
+
+       class TheBase {}
+       class Derived extends TheBase {}
+    
+       match( $obj : isa ) {
+          case(TheBase) { ... }
+          case(Derived) {
+             # This case will never match as the one above will always happen first
+          }
+       }
+
  case
 
-       case(CONST) { STATEMENTS... }
+       case(VAL) { STATEMENTS... }
 
     A case statement must only appear inside the braces of a match. It
     provides a block of code to run if the controlling expression's value
-    matches the given constant in the case statement, according to the
+    matches the value given in the case statement, according to the
     comparison operator.
 
-    The CONST expression must be a compile-time constant giving a single
-    scalar. Runtime expressions (such as variables or function calls) are
-    not supported, nor are lists of values.
+    If the value is a non-constant expression, such as a variable or
+    function call, it will be evaluated as part of performing the
+    comparison every time the match statement is executed. For best
+    performance it is advised to extract values that won't need computing
+    again into a variable that can be calculated just once at program
+    startup; for example:
+
+       my $condition = a_function("with", "arguments");
+    
+       match( $var : eq ) {
+          case($condition) { ... }
+          ...
+       }
 
  default
 

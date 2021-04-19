@@ -1,5 +1,5 @@
 package Authen::NZRealMe::ServiceProvider;
-$Authen::NZRealMe::ServiceProvider::VERSION = '1.22';
+$Authen::NZRealMe::ServiceProvider::VERSION = '1.23';
 use strict;
 use warnings;
 use autodie;
@@ -697,6 +697,7 @@ sub _https_post {
     my $resp;
     my $retcode = $curl->perform;
     if($retcode == 0) {
+        $resp_head =~ s/\A(?:HTTP\/1\.1\s+200\s+Connection\s+established).*?\r?\n\r?\n//is; # Remove any '200' response from a proxy
         $resp_head =~ s/\A(?:HTTP\/1\.1 100 Continue)?[\r\n]*//; # Remove any '100' responses and/or leading newlines
         my($status, @head_lines) = split(/\r?\n/, $resp_head);
         my($protocol, $code, $message) = split /\s+/, $status, 3;

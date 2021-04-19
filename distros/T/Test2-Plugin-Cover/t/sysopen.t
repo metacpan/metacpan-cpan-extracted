@@ -5,7 +5,7 @@ use Fcntl qw/O_RDONLY/;
 
 skip_all 'disabled';
 
-$CLASS->clear;
+$CLASS->reset_coverage;
 my $fh;
 
 print STDERR "\nDEBUG A\n";
@@ -43,6 +43,6 @@ like(
 );
 
 # Final cleanup
-$CLASS->clear;
+$CLASS->reset_coverage;
 
 done_testing;

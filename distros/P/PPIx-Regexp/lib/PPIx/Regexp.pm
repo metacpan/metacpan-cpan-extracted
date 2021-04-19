@@ -17,9 +17,9 @@ put through a deprecation cycle and retracted. After the retraction,
 postfix dereferences will always be recognized. This is the default
 behaviour now.
 
-Starting with version 0.074_01, the first use of this argument will
-warn. With the first release after April 1 2021, all uses will warn.
-After a further six months, all uses will become fatal.
+Starting with version 0.074_01, the first use of this argument warned.
+warn. With version 0.079_01, all uses will warn. With the first release
+after October 15 2021, all uses will become fatal.
 
 =head1 INHERITANCE
 
@@ -197,7 +197,7 @@ use PPIx::Regexp::Util qw{
 use Scalar::Util qw{ refaddr };
 use Text::Tabs ();
 
-our $VERSION = '0.079';
+our $VERSION = '0.080';
 
 =head2 new
 

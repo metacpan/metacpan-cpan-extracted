@@ -1,5 +1,10 @@
 Revision history for XML-Grammar-Vered
 
+0.0.13      2021-04-17
+    - Generete epubcheck-friendlier docbook 5/xml:
+        - https://github.com/w3c/epubcheck
+        - Without the "db:" XML namespace prefix.
+
 0.0.12      2020-07-02
     - Remove mismatching $VERSION from lib/XML/Grammar/Vered.pm .
         - From the "I'm still an idiot" department.

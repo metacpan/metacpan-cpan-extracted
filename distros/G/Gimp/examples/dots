@@ -33,13 +33,13 @@ podregister {
   my $opc = Gimp::Channel->new($image,$image->width,$image->height,"OPC", 50, [0,0,0]);
   $image->insert_channel($opc,0,0);
   Gimp::Context->set_foreground([($opacity/100.0)x3]);
-  $opc->fill(FOREGROUND_FILL);
+  $opc->fill(FILL_FOREGROUND);
   $image->select_item(CHANNEL_OP_INTERSECT, $opc);
 # And mask off with original selection
   $image->select_item(CHANNEL_OP_INTERSECT, $selchannel);
 # Make the dots
   Gimp::Context->set_foreground($dotcolor);
-  $drawable->edit_fill(FOREGROUND_FILL);
+  $drawable->edit_fill(FILL_FOREGROUND);
 # Cleanup to state before plugin was called
   if ($has_noselection) {
     $image->selection_none;

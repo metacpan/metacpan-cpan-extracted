@@ -1,0 +1,22 @@
+--- a/Pod/Inherit.pm  2020-04-03 21:58:36.470197738 +0800
++++ b/Pod/Inherit.pm  2014-06-13 10:45:18.000000000 +0800
+@@ -909,7 +909,7 @@
+   unless (exists $INC{$class_as_filename}) {
+     # Still no source?  Great... we'll have to pray that require will work...
+     print "Still no source found for $classname; forced to use 'require'\n" if ($DEBUG && !$src);
+-    my $did_it = $src ? do $src : Class::Load::load_optional_class($classname);
++    my $did_it = $src ? do "./$src" : Class::Load::load_optional_class($classname);
+     unless ($did_it) {
+       my $err = $@;
+       $err =~ s/ \(\@INC contains: .*\)//;
+@@ -994,7 +994,10 @@
+     $src = Path::Class::File->new($src)->as_foreign('Unix');
+ 
+ return  <<__END_HEADER__;
++=encoding utf8
++
+ =for comment POD_DERIVED_INDEX_GENERATED
++
+ The following documentation is automatically generated.  Please do not edit
+ this file, but rather the original, inline with $classname
+ at $src

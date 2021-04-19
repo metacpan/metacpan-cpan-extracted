@@ -1,0 +1,41 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::Exception::InternalError
+at lib/Myriad/Exception/InternalError.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Myriad::Exception::InternalError - common exception when the error is not relevant to the client.
+
+=head1 DESCRIPTION
+
+See L<Myriad::Exception> for the rôle that defines the exception API.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Myriad::Exception::Base>
+
+L<< I<< E<34>E<34> overloading >>|Myriad::Exception::Base/I<< E<34>E<34> overloading >> >>, L<< I<< E<98>E<111>E<111>E<108> overloading >>|Myriad::Exception::Base/I<< E<98>E<111>E<111>E<108> overloading >> >>, L<as_string|Myriad::Exception::Base/as_string>, L<new|Myriad::Exception::Base/new>, L<reason|Myriad::Exception::Base/reason>
+
+=back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+

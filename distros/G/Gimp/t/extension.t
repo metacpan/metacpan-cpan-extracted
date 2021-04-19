@@ -5,7 +5,7 @@ my $tpf_name;
 BEGIN {
 #  $Gimp::verbose = 3;
   $DEBUG = 0;
-  require 't/gimpsetup.pl';
+  require './t/gimpsetup.pl';
   use Config;
   $tpf_name = "test_perl_extension";
   write_plugin($DEBUG, $tpf_name, $Config{startperl}.

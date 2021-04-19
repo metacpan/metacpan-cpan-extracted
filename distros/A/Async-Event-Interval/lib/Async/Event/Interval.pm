@@ -3,7 +3,7 @@ package Async::Event::Interval;
 use warnings;
 use strict;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Carp qw(croak);
 use Parallel::ForkManager;
@@ -270,13 +270,13 @@ event itself.
 
 =head2 Shared Data
 
-A timed event where the event callback shares a hash reference with the main
+A timed event where the event callback shares a scalar variable with the main
 program.
 
     use Async::Event::Interval;
     use IPC::Shareable;
 
-    tie my $scalar, 'IPC::Shareable', undef;
+    tie my $scalar, 'IPC::Shareable', 'KEY', {create => 1, destroy => 1};
     $scalar = "hello";
 
     my $event

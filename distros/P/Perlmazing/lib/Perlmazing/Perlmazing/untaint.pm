@@ -1,7 +1,7 @@
 use Perlmazing::Feature;
-use Taint::Util 'untaint';
+use Taint::Util ();
 our @ISA = qw(Perlmazing::Listable);
 
 sub main {
-	untaint $_[0];
+	Taint::Util::untaint($_[0]);
 }

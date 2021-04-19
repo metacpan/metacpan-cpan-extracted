@@ -8,7 +8,7 @@ use Test::Exception;
 use PDL;
 use PDL::Types;
 
-my @types = PDL::Types::types;
+my @types = grep $_->real, PDL::Types::types;
 plan tests => 15 + 10 * @types;
 
 isa_ok test_pdl( 1,2,3 ), 'Test::Deep::PDL';

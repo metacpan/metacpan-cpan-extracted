@@ -146,3 +146,5 @@ templates/html.html
 templates/css/file.css
 templates/xml/cdata.xml
 templates/css.css
+templates/bash.sh
+templates/node.js

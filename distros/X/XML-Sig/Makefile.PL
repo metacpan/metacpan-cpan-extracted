@@ -19,6 +19,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Class::Accessor" => 0,
+    "Crypt::Digest::RIPEMD160" => 0,
+    "Crypt::Mac::HMAC" => 0,
     "Crypt::OpenSSL::Bignum" => 0,
     "Crypt::OpenSSL::DSA" => "0.20",
     "Crypt::OpenSSL::RSA" => 0,
@@ -40,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.49",
+  "VERSION" => "0.50",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +52,8 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Accessor" => 0,
+  "Crypt::Digest::RIPEMD160" => 0,
+  "Crypt::Mac::HMAC" => 0,
   "Crypt::OpenSSL::Bignum" => 0,
   "Crypt::OpenSSL::DSA" => "0.20",
   "Crypt::OpenSSL::RSA" => 0,

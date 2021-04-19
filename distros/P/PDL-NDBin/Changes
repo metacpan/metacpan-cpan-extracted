@@ -1,5 +1,9 @@
 Revision history for PDL::NDBin
 
+0.021     2021-04-17 23:12:26+01:00 Europe/London
+
+ - updated to work with PDL 2.037
+
 0.020     2020-04-01 14:11:44+02:00 Europe/Brussels
 
  - fixed the test suite breaking on some, but not all, versions of PDL, due to

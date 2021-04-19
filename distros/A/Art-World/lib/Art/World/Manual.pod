@@ -4,23 +4,198 @@
 
 =head1 NAME
  
-Art::World::Manual - The clay of programming
+Art::World::Manual - A programming clay
  
-=head1 MANUAL
+=head1 Manual
 
 =head2 Objectives
 
-C<Art::World> is an attempt to model and simulate a system describing the interactions and influences between the various I<agents> of the art world.
+C<Art::World> is an attempt to model and simulate a system describing the
+interactions and influences between the various I<agents> of the Art World.
 
-If a correct API is reached, we'll try to build a I<"game of art"> frontend.
+If a correct API is reached, we'll try to build a I<"game of art"> frontend. It
+is also possible that an art galery or a museum could enjoy this toolkit to use
+it in a larger business software.
 
+=head2 Interactions
 
 =begin html
 
-<p>
-  <img alt="Some illustrations sticked on a wall" src="https://gitlab.com/smonff/art-world/-/raw/master/spec/schema_v2.png"
-    width="600px">
-</p>
+  <style>
+   td img { width: 100px; }
+   table { border: 2px solid rgb(200,200,200); border-collapse: collapse; }
+   th { background-color: rgb(235,235,235); }
+   td, th { border: 1px solid rgb(190,190,190); padding: 10px 20px; }
+   tr:nth-child(2n+1) td { background-color: rgb(245,245,245); }
+   tr:nth-child(2n) td { background-color: rgb(250,250,250); }
+   span { vertical-align: top; color: #6a6a6a; };
+  </style>
+  <table>
+    <caption>Art::World entities</caption>
+    <thead>
+      <tr>
+        <th>
+        </th>
+        <th>idea</th>
+        <th>process</th>
+        <th>file</th>
+        <th>discourse</th>
+        <th>time</th>
+        <th>project</th>
+      </tr>
+    </thead>
+    <tbody style="background-color: #eee;">
+      <tr>
+        <td>idea</td>
+        <td></td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/idea/idea_project.png">
+          <span>01</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/idea/idea_file.png">
+          <span>02</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/idea/idea_discourse.png">
+          <span>03</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/idea/idea_time.png">
+          <span>04</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/idea/idea_process.png">
+          <span>05</span>
+        </td>
+      </tr>
+      <tr>
+        <td>process</td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/process/process_idea.png">
+          <span>06</span>
+        </td>
+        <td></td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/process/process_file.png">
+          <span>07</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/process/process_discourse.png">
+          <span>08</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/process/process_time.png">
+          <span>09</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/process/process_project.png">
+          <span>10</span>
+        </td>
+      </tr>
+      <tr>
+        <td>file</td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/file/file_idea.png">
+          <span>11</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/file/file_process.png">
+          <span>12</span>
+        </td>
+        <td></td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/file/file_discourse.png">
+          <span>13</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/file/file_time.png">
+          <span>14</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/file/file_project.png">
+          <span>15</span>
+        </td>
+      </tr>
+      <tr>
+        <td>discourse</td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/discourse/discourse_idea.png">
+          <span>16</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/discourse/discourse_process.png">
+          <span>17</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/discourse/discourse_file.png">
+          <span>18</span>
+        </td>
+        <td></td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/discourse/discourse_time.png">
+          <span>19</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/discourse/discourse_project.png">
+          <span>20</span>
+        </td>
+      </tr>
+      <tr>
+        <td>time</td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/time/time_idea.png">
+          <span>21</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/time/time_process.png">
+          <span>22</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/time/time_file.png">
+          <span>23</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/time/time_discourse.png">
+          <span>24</span>
+        </td>
+        <td>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/time/time_project.png">
+          <span>25</span>
+        </td>
+      </tr>
+      <tr>
+        <td>project</td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/project/project_idea.png">
+          <span>26</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/project/project_process.png">
+          <span>27</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/project/project_file.png">
+          <span>28</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/project/project_discourse.png">
+          <span>29</span>
+        </td>
+        <td>
+          <img src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/entities/project/project_time.png">
+          <span>30</span>
+        </td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>
+    <img alt="Some illustrations sticked on a wall" src="https://codeberg.org/smonff/art-world/raw/branch/main/spec/schema_v2.png" width="600px">
+  </p>
 
 =end html
 
@@ -108,7 +283,43 @@ If a correct API is reached, we'll try to build a I<"game of art"> frontend.
 
 =back
 
-=head2 HISTORY
+=head2 M.A.G.M.A
+
+Movement of Attitudes and Gestures Making the Art::World
+
+More or less viscous crystalline slurry having in general subsidies and which,
+by cooling and passing to the state of project gives rise to different states of
+the art, called M.A.G.M.A.-states. The M.A.G.M.A.s are enclosed in various
+M.A.G.M.A.-tic pockets and spread over the earth's crust during eruptions of
+various violences.
+
+=begin html
+
+<p>
+  <img alt="Person posing in front of a schema with a lot of writing on a wall" src="https://codeberg.org/attachments/51153d1d-102b-4a06-a12e-3fd8e51e468f">
+</p>
+
+=end html
+
+=over 2
+
+=item Primary M.A.G.M.A
+
+Common work basis of artists research
+
+=item Secondary M.A.G.M.A.
+
+Cliché of the specialized art world
+
+=item Tertiary M.A.G.M.A.
+
+Component of artistic cultures generalist foundations
+
+=back
+
+You can consult a L<detailed version of this geologic-artistic theory|https://files.balik.network/art/schema_4.4.pdf> (FR language though).
+
+=head2 History
 
 This is a long term continuation of an art project started circa 2006.
 
@@ -147,7 +358,7 @@ describe social interactions that were not described in the art sociology field.
 
 =end html
 
-The residency ended up with L<the redaction of a rather precise documentation|https://files.balik.network/art/schema_v4_presentation.pdf> (maybe my first specification).
+The residency ended up with L<the redaction of a rather precise documentation|https://files.balik.network/art/schema_v4_presentation.pdf> (FR) and maybe the first specification I ever wrote.
 
 Then I almost got beaten by a fellow artist who was participating in a collective
 exhibition mostly for the money and not for the fun. I guess he felt a bit provoked by my situationist theory.
@@ -169,11 +380,38 @@ I restarted my project while getting into Raku
 (it was still Perl6 at this time), but learning Raku was too much effort and I
 abandonned again.
 
+=back
+
 Ten years later I am still on it. This project is L<following me in my
 dreams|https://smonff.gitlab.io/art-school-story/>. I'll give it another try.
 
-=back
+=head2 News on perlmonks.org
 
+A series of posts exist on the
+L<perlmonks.org|https://perlmonks.org/?node_id=11121551>, called the I<Diary of
+a Zydeco experiment>. They are supposed to explain in details the motivations of
+the project B<and> give some useful technical informations about some shiny
+discoveries.
+
+=over 2
+
+=item C<E01>
+
+L<< I<Introduction>|https://perlmonks.org/?node_id=11121551 >>
+
+=item C<E02>
+
+L<< I<History>|https://perlmonks.org/?node_id=11121784 >>
+
+=item C<E03>
+
+L<< I<Errors for fun and success>|https://perlmonks.org/?node_id=11122095 >>
+
+=item C<E04>
+
+L<< I<Renaming>|https://perlmonks.org/?node_id=11126613 >>
+
+=back
 
 =head1 AUTHOR
 

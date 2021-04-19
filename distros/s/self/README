@@ -14,14 +14,9 @@ To install this module, run the following commands:
     make test
     make install
 
-DEPENDENCIES
-
-None.
-
-
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2007, Kang-min Liu
+Copyright (C) 2021 Kang-min Liu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

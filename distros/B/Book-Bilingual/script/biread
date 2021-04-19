@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Sneak a parameter into the app
+perl -Ilib -MBook::Bilingual::App -e "run('$1')" daemon

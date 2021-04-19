@@ -1,5 +1,5 @@
 package Authen::NZRealMe::XMLSig;
-$Authen::NZRealMe::XMLSig::VERSION = '1.22';
+$Authen::NZRealMe::XMLSig::VERSION = '1.23';
 use strict;
 use warnings;
 

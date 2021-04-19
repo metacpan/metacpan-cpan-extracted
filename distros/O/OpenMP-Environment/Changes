@@ -20,3 +20,6 @@ Revision history for Perl extension OpenMP::Environment.
          - added more examples pertaining to programs included in
            perl scripts via Inline::C.
          - added example benchmark driver and public domain benchmark
+
+1.0.4 Fri Apr 16 23:12:00 2021
+         - non-impactful, updated repo for cpan

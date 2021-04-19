@@ -1,0 +1,192 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::Transport::Redis
+at lib/Myriad/Transport/Redis.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+We expect to expose:
+
+- stream handling functionality, including claiming/pending
+- get/set and observables
+- sorted sets
+- hyperloglog existence
+- simple queues via lists
+- pub/sub
+
+This module is responsible for namespacing, connection handling and clustering.
+It should also cover retry for stateless calls.
+
+=head2 wait_time
+
+Time to wait for items, in milliseconds.
+
+=head2 batch_count
+
+Number of items to allow per batch (pending / readgroup calls).
+
+=head2 apply_prefix
+
+=head2 remove_prefix
+
+=head2 oldest_processed_id
+
+Check the last id that has been processed
+by B<all> the consumer groups in the given stream.
+
+=head2 compare_id
+
+Given two IDs, compare them as if doing a C<< <=> >> numeric
+comparison.
+
+=head2 next_id
+
+Given a stream ID, returns the next ID after it.
+This is managed by the simple expedient of incrementing
+the right-hand part of the identifier.
+
+=head2 iterate
+
+Deal with incoming requests via a stream.
+
+Returns a L<Ryu::Source> which emits L<Myriad::Redis::Pending> items.
+
+=head2 cleanup
+
+Clear up old entries from a stream when it grows too large.
+
+=head2 pending
+
+Check for any pending items, claiming them for reprocessing as required.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<stream> - the stream name
+
+=item * C<group> - which consumer group to check
+
+=item * C<client> - the name of the client to check
+
+=back
+
+Returns a L<Ryu::Source> for the pending items in this stream.
+
+=head2 create_group
+
+Create a Redis consumer group if it does NOT exist.
+
+It'll also send the MKSTREAM option to create the stream if it doesn't exist.
+
+=over 4
+
+=item * C<stream> - The name of the stream we want to attach the group to.
+
+=item * C<group> - The group name.
+
+=item * C<start_from> - The id of the message that is going to be considered the start of the stream for this group's point of view
+by default it's `$` which means the last message.
+
+=back
+
+=head2 pending_messages_info
+
+Return information about the pending messages for a stream and a consumer group.
+
+This currently just execute C<XPENDING> without any filtering.
+
+=over 4
+
+=item * C<stream> - The name of the stream we want to check.
+
+=item * C<group> - The consumers group name that we want to check.
+
+=back
+
+=head2 stream_length
+
+Return the length of a given stream
+
+=head2 borrow_instance_from_pool
+
+Returns a Redis connection either from a pool of connection or a new one.
+With the possibility of waiting to get one, if all connection were busy and we maxed out our limit.
+
+=head2 return_instance_to_pool
+
+This puts back a redis connection into Redis pool, so it can be used by other called.
+It should be called at the end of every usage, as on_ready.
+
+It should also be possible with a try/finally combination..
+but that's currently failing with the $redis_pool slot not being defined.
+
+=over 4
+
+=item * C<$instance> - Redis connection, to be returned.
+
+=back
+
+=head2 redis
+
+Resolves to a new L<Net::Async::Redis> or L<Net::Async::Redis::Cluster>
+instance, depending on the setting of C<$use_cluster>.
+
+=head2 ack
+
+Acknowledge a message from a Redis stream.
+
+=over 4
+
+=item * C<stream> - The stream name.
+
+=item * C<group> - The group name.
+
+=item * C<message_id> - The id of the message we want to acknowledge.
+
+=back
+
+=head2 publish
+
+Publish a message through a Redis channel (pub/sub system)
+
+=over 4
+
+=item * C<channel> - The channel name.
+
+=item * C<message> - The message we want to publish (string).
+
+=back
+
+=head2 subscribe
+
+Subscribe to a redis channel.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+

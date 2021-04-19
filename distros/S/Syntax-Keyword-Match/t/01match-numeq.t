@@ -17,6 +17,18 @@ use Syntax::Keyword::Match;
    ok( $ok, 'Literal match' );
 }
 
+# case expressions
+{
+   my $ok;
+   my $twenty = 20;
+   match(20 : ==) {
+      case(10)      { fail("Not 10") }
+      case($twenty) { $ok++ }
+      case(30)      { fail("Not 30") }
+   }
+   ok( $ok, 'Expression match' );
+}
+
 # default
 {
    my $ok;

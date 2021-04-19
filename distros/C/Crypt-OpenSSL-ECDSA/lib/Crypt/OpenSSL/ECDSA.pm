@@ -51,7 +51,7 @@ our @EXPORT = qw(
 	ECDSA_R_SIGNATURE_MALLOC_FAILED
 );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

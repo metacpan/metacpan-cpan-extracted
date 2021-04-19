@@ -1,4 +1,5 @@
-use Test::More tests => 1;
+use Test2::V0;
+plan tests => 1;
 
 use self;
 

@@ -1,4 +1,4 @@
 use Perlmazing::Feature;
-use Taint::Util 'tainted';
+use Taint::Util ();
 
-*main = *tainted;
+*main = *Taint::Util::tainted;

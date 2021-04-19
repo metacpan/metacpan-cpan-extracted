@@ -2,7 +2,7 @@ package Perlmazing;
 use Perlmazing::Engine;
 use Perlmazing::Engine::Exporter;
 use Perlmazing::Feature;
-our $VERSION = '1.2814';
+our $VERSION = '1.2816';
 our @EXPORT;
 our @found_symbols = Perlmazing::Engine->found_symbols;
 
@@ -139,13 +139,18 @@ specifying C<Listable> functions, in which case you now know how you can use the
 of that.
 =cut
 
-# Get list of current Perlmazing functions and its type:
+	# Get list of current Perlmazing functions and its type:
 
-for my $i (@Perlmazing::EXPORT) {
-	Perlmazing::Engine::_load_symbol('Perlmazing', $i);
-	my $is_listable = "Perlmazing::Perlmazing::$i"->isa('Perlmazing::Listable') ? '(listable)' : '';
-	pl "$i $is_listable";
-}
+	for my $i (@Perlmazing::EXPORT) {
+		Perlmazing::Engine::_load_symbol('Perlmazing', $i);
+		my $is_listable = "Perlmazing::Perlmazing::$i"->isa('Perlmazing::Listable') ? '(listable)' : '';
+		pl "$i $is_listable";
+	}
+
+
+=head2 abs2rel
+
+Same as L<File::Spec->abs2rel()|File::Spec>. Just much more readable and easier/shorter to type.
 
 
 =head2 aes_decrypt
@@ -162,14 +167,116 @@ C<aes_encrypt($plain_data, $key)>
 Equivalent to MySQL's AES_ENCRYPT function, 100% compatible with MySQL. Returns encrypted (binary) data.
 
 
+=head2 basename
+
+I<Listable function>
+
+Same as L<File::Basename::basename()|File::Basename>, but it is a listable function.
+
+    use Perlmazing;
+    my @file_names = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
+    
+    my @paths = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
+	# Alter all in @paths to become just file names:
+	basename @file_names;
+
+    
+
 =head2 carp
 
 Same as L<Carp::carp()|Carp>.
 
 
+=head2 catdir
+
+Same as L<File::Spec->catdir()|File::Spec>. Just much more readable and easier/shorter to type.
+
+
+=head2 catfile
+
+Same as L<File::Spec->catfile()|File::Spec>. Just much more readable and easier/shorter to type.
+
+
+=head2 catpath
+
+Same as L<File::Spec->catpath()|File::Spec>. Just much more readable and easier/shorter to type.
+
+
 =head2 cluck
 
 Same as L<Carp::cluck()|Carp>.
+
+
+=head2 commify
+
+C<my @result = commify(@values)>
+C<commify(@values)>
+
+I<Listable function>
+
+This function will format any received number into a grouped by comma number. It uses the US format (e.g. 123,456.78). If you need a different locale, look at L<CLDR::Number>,
+which is the module this function is using with a fixed locale - except C<commify> handles more cases than just numbers, contrary to L<CLDR::Number>.
+
+In the received values, any existing grouping (even broken grouping) will be removed and changed into the right grouping. Also, decimal numbers will be left alone as
+they are received (e.g. 1234.00 will become 1,234.00 and 1234.001230 will become 1,234.001230). This behavior is intentional to help with any numbers you may preformat
+with C<sprintf>, like money values or any other values that you are puposedly setting to a specific number of decimals before applying grouping commas.
+
+This is a listable function, so any of the following examples will work:
+
+	use Perlmazing;
+	
+	my @numbers = qw(
+		123
+		12345
+		1234.56
+		-90120
+		Not_a_number
+	);
+	# More extreme cases:
+	push @numbers, (
+		'123,,456.01',
+		'12,34,56',
+		'12,,3,4,5.010',
+		'123.456.789',
+	);
+	
+	pl @numbers;
+	# Output:
+	# 123
+	# 12345
+	# 1234.56
+	# -90120
+	# Not_a_number
+	# 123,,456.01
+	# 12,34,56
+	# 12,,3,4,5.010
+	# 123.456.789
+	
+	pl commify @numbers;
+	# Output:
+	# 123
+	# 12,345
+	# 1,234.56
+	# -90,120
+	# Not_a_number
+	# 123,456.01
+	# 123,456
+	# 12,345.010
+	# 123.456.789
+	
+	my @copy = commify @numbers;
+	pl @copy;
+	# Output: Same as "pl commify @numbers". @numbers remains unchanged.
+	
+	# Directly affect the elements of @numbers
+	commify @numbers;
+	pl @numbers;
+	# Output: Same as "pl commify @numbers", but this time all values in @numbers where changed.
+
+
+=head2 confess
+
+Same as L<Carp::confess()|Carp>.
 
 
 =head2 copy
@@ -194,8 +301,7 @@ I<Listable function>
 
 Converts any undefined element into an empty string. Useful when purposely avoiding warnings on certain operations.
 
-    use strict;
-    use warnings;
+    use Perlmazing;
     my @array = (1, 2, 3, undef, undef, 6);
     
     define @array;
@@ -211,6 +317,11 @@ Converts any undefined element into an empty string. Useful when purposely avoid
     }
     
 
+=head2 devnull
+
+Same as L<File::Spec->devnull()|File::Spec>. Just much more readable and easier/shorter to type.
+
+
 =head2 dir
 
 C<dir>
@@ -223,9 +334,24 @@ C<dir($path, $recursive, $callback)>
 
 This function will return an array with the contents of the directory given in C<$path>. If C<$path> is omited,
 then the current working directory is used. C<$recursive> is a boolean value, is optional and defaults to 0.
-When true, then the contents of subdirectories are returned too. C<$callback> is also optional and most be a coderef.
+When true, then the contents of subdirectories are returned too. C<$callback> is also optional and must be a coderef.
 If provided, then it will be called on each element found in real time. It receives the current element as argument.
 
+
+=head2 dirname
+
+I<Listable function>
+
+Same as L<File::Basename::dirname()|File::Basename>, but it is a listable function.
+
+    use Perlmazing;
+    my @dirs = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
+    
+    my @files = ($path_to_file_1, $path_to_file_2, $path_to_file_3);
+	# Alter all in @files to become just directory names:
+	dirname @files;
+
+    
 
 =head2 dumped
 
@@ -234,7 +360,7 @@ Same as L<Data::Dump::dump()|Data::Dump>. It will return a code dump of whatever
 For example:
 
     print dumped @array;
-    print dumped \@array; # Better
+    print dumped \@array; # Maybe better
     print dumped \%hash;
     print dumped $some_object;
 
@@ -243,7 +369,7 @@ For example:
 
 C<empty_dir($path)>
 
-This is almost the same as L<File::Path::remove_tree()|File::Path>, except it will make the folder privided in C<$path>
+This is almost the same as L<File::Path::remove_tree()|File::Path>, except it will make the folder provided in C<$path>
 empty without removing C<$path> too.
 
 
@@ -256,12 +382,33 @@ C<< < >> with C<&lt;>. It is a I<Listable function>.
 
 Examples:
 
-    print escape_html $some_text;
+    use Perlmazing;
+	
+	print escape_html $some_text;
     
     escape_html @array_A;
     
     my @array_B = escape_html @array_C;
     
+
+=head2 escape_quote
+
+C<escape_quote($value)>
+
+C<escape_quote(@values)>
+
+C<my @result = escape_quote(@values)>
+
+I<Listable function>
+
+This is a very simple function that escapes with a backslash any match of the symbol C<'>. Works as any other I<listable> function from this module.
+
+
+
+=head2 escape_quotes
+
+Exactly the same as <escape_quote|Perlmazing/escape_quote>, except it escapes the symbol C<"> instead of the symbol C<'>.
+
 
 =head2 escape_uri
 
@@ -272,7 +419,9 @@ C<=> with C<%3D>. It is a I<Listable function>.
 
 Examples:
 
-    my $url = 'https://www.google.com.mx/search?q=';
+    use Perlmazing;
+	
+	my $url = 'https://www.google.com.mx/search?q=';
     my $query = escape_uri 'how are &, < and > escaped in html';
     my $final_url = $url.$query;
     
@@ -282,6 +431,13 @@ Examples:
 
 See also L<unescape_uri|Perlmazing/unescape_uri>.
 
+
+=head2 eval_string
+
+C<eval_string($string_with_perl_code)>
+
+This function acts exactly like native C<eval> - except it shows you the file and line number on errors captured in C<$@>,
+in addition to the regular uninformative and unhelpful C<...error at (eval n)> message that the native C<eval> sets.
 
 =head2 find_parent_classes
 
@@ -333,7 +489,9 @@ This function will tell you if C<@array> contains an element identical to C<$som
 the index number for that element. For effective boolean effect, it will return the string C<00> when the index is actually
 C<0>. So, the following is a safe case:
 
-    my @array = ('first', 'second', 'third');
+    use Perlmazing;
+	
+	my @array = ('first', 'second', 'third');
     
     if (my $index = in_array @array, 'first') {
         print "Found $array[$index]";
@@ -489,6 +647,14 @@ Works just like L<is_array|Perlmazing/is_array>, except it will return true even
 C<isa_code($object)>
 
 Works just like L<is_code|Perlmazing/is_code>, except it will return true even if the reference is not pure
+(e.g. it's blessed into something).
+
+
+=head2 isa_filehandle
+
+C<isa_filehandle($object)>
+
+Works just like L<is_filehandle|Perlmazing/is_filehandle>, except it will return true even if the reference is not pure
 (e.g. it's blessed into something).
 
 
@@ -841,23 +1007,9 @@ Examples:
     # An element in @r is created for each line that would be printed, including a trailing "\n" in each element
 
 
-=head2 quotes_escape
+=head2 rel2abs
 
-C<quotes_escape($value)>
-
-C<quotes_escape(@values)>
-
-C<my @result = quotes_escape(@values)>
-
-I<Listable function>
-
-This is a very simple function that escapes with a backslash any match of the symbol C<">. Works as any other I<listable> function from this module.
-
-
-
-=head2 quote_escape
-
-Exactly the same as <quotes_escape|Perlmazing/quotes_escape>, except it escapes single quotes instead of double quotes.
+Same as L<File::Spec->rel2abs()|File::Spec>. Just much more readable and easier/shorter to type.
 
 
 =head2 remove_duplicates
@@ -980,7 +1132,17 @@ Otherwise it will return a series of key-value pairs if called in list context, 
 
 =head2 sort_by_value
 
-This is the same as the previously explained <sort_by_key|Perlmazing/sort_by_key> function, except it will sort its argument by value instead of by key.
+This is the same as the previously explained L<sort_by_key|Perlmazing/sort_by_key> function, except it will sort its argument by value instead of by key.
+
+
+=head2 splitidir
+
+Same as L<File::Spec->splitdir()|File::Spec>. Just much more readable and easier/shorter to type.
+
+
+=head2 splitpath
+
+Same as L<File::Spec->splitpath()|File::Spec>. Just much more readable and easier/shorter to type.
 
 
 =head2 taint
@@ -1052,6 +1214,8 @@ I<Listable function>
 
 It makes any valid numeric value that is currently treated as string, a valid number. It works with any value that, if it wasn't treated as string, Perl would see as a number (e.g. 123_456), but that when treated as string, fails to to something like $value +=0. The value becomes a real numeric representation. It becomes zero when the value has no numeric interpretation. It is a I<listable> function and will behave like any other
 I<listable> function from this module.
+
+Note: Octal formated numbers will become decimal, because of the way this function treats strings that should become numbers.
 
 
 =head2 to_string

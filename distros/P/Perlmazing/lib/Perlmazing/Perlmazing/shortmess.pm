@@ -1,8 +1,7 @@
-use Perlmazing;
-use Carp 'shortmess';
+use Carp ();
 
 sub main {
-	goto &shortmess;
+	goto &Carp::shortmess;
 }
 
 1;

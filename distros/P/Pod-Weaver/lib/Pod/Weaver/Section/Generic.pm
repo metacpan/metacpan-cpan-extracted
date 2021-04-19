@@ -1,8 +1,11 @@
 package Pod::Weaver::Section::Generic;
 # ABSTRACT: a generic section, found by lifting sections
-$Pod::Weaver::Section::Generic::VERSION = '4.015';
+$Pod::Weaver::Section::Generic::VERSION = '4.017';
 use Moose;
 with 'Pod::Weaver::Role::Section';
+
+use v5.20.0;
+use experimental 'postderef'; # this experiment succeeded -- rjbs, 2021-04-02
 
 #pod =head1 OVERVIEW
 #pod
@@ -87,7 +90,7 @@ sub weave_section {
 
   $self->log_debug('adding ' . $self->header . ' back into pod');
 
-  push @{ $document->children }, map { splice @$in_node, $_, 1 } reverse @found;
+  push $document->children->@*, map { splice @$in_node, $_, 1 } reverse @found;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -105,7 +108,7 @@ Pod::Weaver::Section::Generic - a generic section, found by lifting sections
 
 =head1 VERSION
 
-version 4.015
+version 4.017
 
 =head1 OVERVIEW
 
@@ -149,7 +152,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

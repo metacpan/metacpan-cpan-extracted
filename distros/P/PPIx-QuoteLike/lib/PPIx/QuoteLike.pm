@@ -40,7 +40,7 @@ use PPIx::QuoteLike::Utils qw{
 use Scalar::Util ();
 use Text::Tabs ();
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use constant CLASS_CONTROL       => 'PPIx::QuoteLike::Token::Control';
 use constant CLASS_DELIMITER     => 'PPIx::QuoteLike::Token::Delimiter';
@@ -334,7 +334,7 @@ sub delimiters {
 
     my %deprecate = (
 	attribute => {
-	    postderef	=> 1,
+	    postderef	=> 2,
 	},
     );
 
@@ -988,7 +988,7 @@ object initialized from such a
 L<PPI::Token::HereDoc|PPI::Token::HereDoc> will be seen as having an
 indentation of C<''> regardless of the actual indentation in the source.
 I believe this restriction will go away when
-L<https://github.com/adamkennedy/PPI/issues/251> is resolved.
+L<https://github.com/Perl-Critic/PPI/issues/251> is resolved.
 
 =head1 DEPRECATION NOTICE
 
@@ -997,9 +997,9 @@ through a deprecation cycle and retracted. After the retraction, postfix
 dereferences will always be recognized. This is the default behaviour
 now.
 
-Starting with version 0.012_01, the first use of this argument will
-warn. With the first release after April 8 2020, all uses will warn.
-After a further six months, all uses will become fatal.
+Starting with version 0.012_01, the first use of this argument warned.
+With version 0.016_01, all uses will warn. With the first release after
+October 15 2021, all uses will become fatal.
 
 =head1 INHERITANCE
 

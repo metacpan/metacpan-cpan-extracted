@@ -15,13 +15,15 @@ my %dependencies = (
 	'File::Path' => '2.08',
 	'List::Util' => 0,
 	'Scalar::Util' => 0,
-	'Submodules' => '1.0014',
+	'Submodules' => '1.0015',
 	'Taint::Util' => '0.08',
 	'Time::Precise' => '1.0010',
 	'URI::Escape' => 0,
 	'strict' => 0,
 	'version' => 0,
 	'warnings' => 0,
+	'CLDR::Number' => '0.19',
+	'Devel::Caller' => '2.06',
 );
 
 my %params = (

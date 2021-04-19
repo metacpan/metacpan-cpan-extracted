@@ -3,6 +3,8 @@
 
 requires "Carp" => "0";
 requires "Class::Accessor" => "0";
+requires "Crypt::Digest::RIPEMD160" => "0";
+requires "Crypt::Mac::HMAC" => "0";
 requires "Crypt::OpenSSL::Bignum" => "0";
 requires "Crypt::OpenSSL::DSA" => "0.20";
 requires "Crypt::OpenSSL::RSA" => "0";

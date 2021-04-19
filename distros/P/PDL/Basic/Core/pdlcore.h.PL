@@ -27,7 +27,7 @@ PDL::Core::Dev::loadmod_Types();
 # version 12 for PDL_Anyval union data type (full 64bit support)
 # version 13 for complex data types (native complex support)
 use vars qw( $pdl_core_version );
-$pdl_core_version = 12;
+$pdl_core_version = 13;
 
 # List explicitly here the variables you want Configure to
 # generate.  Metaconfig only looks for shell variables, so you
@@ -80,13 +80,6 @@ print OUT <<'!NO!SUBS!';
 !NO!SUBS!
 
 print OUT "#define PDL_CORE_VERSION $pdl_core_version\n";
-
-print OUT <<'!NO!SUBS!' if ($^O =~ /MSWin/);
- 
-#define finite _finite
-#include <float.h>
-
-!NO!SUBS!
 
 print OUT <<'!NO!SUBS!';
 
@@ -265,15 +258,15 @@ void pdl_axisvals( pdl* a, int axis );               /* Fill with axis values */
 
 /* Structure to hold pointers core PDL routines so as to be used by many modules */
 
+#if defined(PDL_clean_namespace) || defined(PDL_OLD_API)
+#error PDL_clean_namespace and PDL_OLD_API defines have been removed. Use PDL->pdlnew() instead of PDL->new().
+#endif
+
 struct Core {
     I32    Version;
     pdl*   (*SvPDLV)      ( SV*  );
     void   (*SetSV_PDL)   ( SV *sv, pdl *it );
-#if defined(PDL_clean_namespace) || defined(PDL_OLD_API)
-    pdl*   (*new)      ( );     /* make it work with gimp-perl */
-#else
-    pdl*   (*pdlnew)      ( );  /* renamed because of C++ clash */
-#endif
+    pdl*   (*pdlnew)      ( );
     pdl*   (*tmp)         ( );
     pdl*   (*create)      (int type);
     void   (*destroy)     (pdl *it);

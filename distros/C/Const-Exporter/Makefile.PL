@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Const::Fast" => 0,
     "Exporter" => 0,
-    "List::AllUtils" => "0.10",
+    "List::Util" => "1.56",
     "Package::Stash" => 0,
     "Ref::Util" => 0,
     "strict" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "if" => 0,
     "lib" => 0
   },
-  "VERSION" => "v1.1.2",
+  "VERSION" => "v1.2.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +49,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "File::Spec" => 0,
   "Hash::Objectify" => 0,
-  "List::AllUtils" => "0.10",
+  "List::Util" => "1.56",
   "Module::Metadata" => 0,
   "Package::Stash" => 0,
   "Ref::Util" => 0,

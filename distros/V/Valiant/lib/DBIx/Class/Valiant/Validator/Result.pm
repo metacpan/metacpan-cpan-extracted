@@ -89,7 +89,8 @@ DBIx::Class::Valiant::Validator::Result - Verify a DBIC related result
 
 =head1 DESCRIPTION
 
-Trigger validations on a related result.
+Trigger validations on a related result and aggregates any errors as nested errors
+on the parent class.
 
 =head1 ATTRIBUTES
 
@@ -104,7 +105,8 @@ object.
 
 =head2 invalid_msg
 
-String or translation tag of the error when the result is not valid.
+String or translation tag of the error when the result is not valid.  This will be in addition
+to any errors nested from the related result.
 
 =head1 SHORTCUT FORM
 

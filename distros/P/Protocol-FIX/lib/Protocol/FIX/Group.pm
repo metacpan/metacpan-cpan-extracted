@@ -5,7 +5,7 @@ use warnings;
 
 use Protocol::FIX;
 
-our $VERSION = '0.05';    ## VERSION
+our $VERSION = '0.06';    ## VERSION
 
 =head1 NAME
 

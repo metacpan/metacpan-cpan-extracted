@@ -81,7 +81,7 @@ register "pixelgen",
    my $image = new Gimp::Image $w, $h, Gimp->layer2imagetype($type);
    my $layername = $expr;
    $layername =~ s/\n//g;
-   my $layer = new Gimp::Layer $image, $w, $h, $type, $layername, 100, NORMAL_MODE;
+   my $layer = new Gimp::Layer $image, $w, $h, $type, $layername, 100, LAYER_MODE_NORMAL_LEGACY;
    $image->insert_layer($layer, 0, 0);
    eval { pixelmap($image, $layer, $expr) };
    if ($@) {

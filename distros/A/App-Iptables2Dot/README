@@ -47,6 +47,15 @@ OPTIONS
             Possible tables are "nat", "raw", "mangle" and "filter".
             Defaults to table "filter".
 
+    -- se-numbered-nodes
+
+            With a true value the nodes in the dot file will be named node0,
+            node1, .. noden and provided with a label showing their name froms
+            iptables-save output.
+
+            This option can help if the filter rules contain chains with a dash
+            in their name, which is not allowed as input for dot.
+
 DESCRIPTION
     This program takes the output from the command "iptables-save" on Linux
     and turns into input suitable for the "dot" program from GraphViz.

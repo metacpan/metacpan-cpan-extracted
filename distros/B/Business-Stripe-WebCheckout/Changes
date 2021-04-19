@@ -1,0 +1,15 @@
+Revision history for Business-Stripe-WebCheckout
+
+1.0       17th April 2021 / 18:00
+          First production release.
+          Removed debugging code.
+          Corrected typos in documentation and increased clarity slightly.
+
+0.01_2    16th April 2021 / 22.08
+          Fixed bug when Stripe server doesn't return clean response object.
+          Split tests into separate files and added more tests.
+          Corrected typos in documentation.
+
+0.01_1    15th April 2021 / 18:44
+          Initial developer version, released on an unsuspecting world.
+

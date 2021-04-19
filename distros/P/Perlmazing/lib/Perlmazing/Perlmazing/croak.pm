@@ -1,8 +1,8 @@
 use Perlmazing;
-use Carp 'croak';
+use Carp ();
 
 sub main {
-	goto &croak;
+	goto &Carp::croak;
 }
 
 1;

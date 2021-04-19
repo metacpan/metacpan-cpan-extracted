@@ -1,9 +1,9 @@
 package App::ANSIColorUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2021-01-19'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -147,6 +147,48 @@ sub show_assigned_rgb_colors {
     [200, "OK", \@rows, {"table.fields" => [qw/number string color light?/]}];
 }
 
+$SPEC{show_rand_rgb_colors} = {
+    v => 1.1,
+    summary => 'Produce N random RGB colors using rand_rgb_colors() and show the results',
+    args => {
+        n => {
+            schema => 'posint*',
+            req => 1,
+            pos => 0,
+        },
+        light_color => {
+            schema => 'bool',
+            default => 1,
+            cmdline_aliases => {
+                light_or_dark_color => {is_flag=>1, code=>sub { $_[0]{light_color} = undef }},
+                dark_color          => {is_flag=>1, code=>sub { $_[0]{light_color} = 0 }},
+            },
+        },
+    },
+};
+sub show_rand_rgb_colors {
+    require Color::RGB::Util;
+
+    my %args = @_;
+    my $n = $args{n};
+
+    my @colors = Color::RGB::Util::rand_rgb_colors({
+        light_color => $args{light_color},
+    }, $n);
+    my @rows;
+    for (1 .. $n) {
+        my $color = $colors[$_-1];
+        push @rows, {
+            number => $_,
+            color  => sprintf("%s      %s      \e[0m",
+                              Color::ANSI::Util::ansifg(Color::RGB::Util::rgb_is_dark($color) ? "ffffff" : "000000").
+                                    Color::ANSI::Util::ansibg($color),
+                              "#".$color),
+        };
+    }
+    [200, "OK", \@rows, {"table.fields" => [qw/number color/]}];
+}
+
 $SPEC{show_text_using_color_gradation} = {
     v => 1.1,
     summary => 'Print text using gradation between two colors',
@@ -224,7 +266,7 @@ App::ANSIColorUtils - Utilities related to ANSI color
 
 =head1 VERSION
 
-This document describes version 0.007 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2020-06-09.
+This document describes version 0.008 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2021-01-19.
 
 =head1 DESCRIPTION
 
@@ -261,6 +303,8 @@ This distributions provides the following command-line utilities:
 =item * L<show-assigned-rgb-colors>
 
 =item * L<show-colors>
+
+=item * L<show-rand-rgb-colors>
 
 =item * L<show-text-using-color-gradation>
 
@@ -370,6 +414,40 @@ Return value:  (any)
 
 
 
+=head2 show_rand_rgb_colors
+
+Usage:
+
+ show_rand_rgb_colors(%args) -> [status, msg, payload, meta]
+
+Produce N random RGB colors using rand_rgb_colors() and show the results.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<light_color> => I<bool> (default: 1)
+
+=item * B<n>* => I<posint>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 show_text_using_color_gradation
 
 Usage:
@@ -384,7 +462,11 @@ Examples:
 
 =item * Example #1:
 
- show_text_using_color_gradation(text => "Hello, world", color1 => "blue", color2 => "pink"); # -> undef
+ show_text_using_color_gradation(text => "Hello, world", color1 => "blue", color2 => "pink");
+
+Result:
+
+ [undef, "0000ff", undef, {}]
 
 =back
 
@@ -428,7 +510,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-ANSIColorUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ANSIColorUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-ANSIColorUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -442,7 +524,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

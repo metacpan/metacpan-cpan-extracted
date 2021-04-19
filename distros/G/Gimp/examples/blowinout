@@ -21,7 +21,7 @@ podregister {
   my $dm = Gimp::Image->new($xsize, $ysize, 1);
   # It needs to have 2 layers
   my $dmlayer = Gimp::Layer->new($dm, $xsize, $ysize, GRAY_IMAGE, "newlayer",
-    100, NORMAL_MODE);
+    100, LAYER_MODE_NORMAL_LEGACY);
   $dm->insert_layer($dmlayer, 0, 0);
 
   # Create the layers, one-by-one
@@ -33,8 +33,8 @@ podregister {
     $i * $distance / $nsteps * sin($angle * 3.14159 / 180) :
     $distance ** ($i/$nsteps) * sin($angle * 3.14159 / 180);
   $dmlayer->edit_clear;
-  $dmlayer->noisify(0, 255, 255, 255, 0);
-  $dmlayer->levels(0, 0, 255, 1.0, 128, 255);
+  $dmlayer->noisify(0, 1.0, 1.0, 1.0, 0);
+  $dmlayer->levels(0, 0, 1.0, 1, 1.0, 0.5, 1.0, 1);
   $drawable = $drawable->copy(0);
   $image->insert_layer($drawable, 0, -1);
   $drawable->displace($xdist, $ydist, 1, 1, $dmlayer, $dmlayer, 1);
@@ -47,8 +47,8 @@ podregister {
       $i * $distance / $nsteps * sin($angle * 3.14159 / 180) :
       $distance ** ($i/$nsteps) * sin($angle * 3.14159 / 180);
     $dmlayer->edit_clear;
-    $dmlayer->noisify(0, 255, 255, 255, 0);
-    $dmlayer->levels(0, 0, 255, 1.0, 128, 255);
+    $dmlayer->noisify(0, 1.0, 1.0, 1.0, 0);
+    $dmlayer->levels(0, 0, 1.0, 1, 1.0, 0.5, 1.0, 1);
     $drawable = $drawable->copy(0);
     $image->insert_layer($drawable, 0, -1);
     $drawable->displace($xdist, $ydist, 1, 1, $dmlayer, $dmlayer, 1);

@@ -1,5 +1,7 @@
-use Test::More tests => 1;
+use Test::More;
 
-use_ok 'Art::World';
+BEGIN {
+  use_ok 'Art::World';
+}
 
 done_testing;

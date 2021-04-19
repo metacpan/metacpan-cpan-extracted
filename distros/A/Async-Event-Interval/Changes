@@ -1,41 +1,45 @@
 Revision history for Fork-Event-Interval
 
+1.02    2021-04-15
+    - Updated shared data example to be a scalar
+    - Update t/10-shared.t as it was failing under MacOS/FreeBSD
+
 1.01    2021-04-14
-        - If interval is set to zero, we'll run only once
-        - Added IPC::Shareable as prerequisite
-        - Added waiting(), checks to see if an event is ready to start/restart
+    - If interval is set to zero, we'll run only once
+    - Added IPC::Shareable as prerequisite
+    - Added waiting(), checks to see if an event is ready to start/restart
 
 1.00    2018-01-23
-        - modified t/15-interval.t with some timing changes to prevent CPAN
-          Testers failures
-        - added t/45-params.t to cover cases where we send in parameters to the
-          event
-        - added an EXAMPLE to display how to send in params to the event
-          callback
+    - modified t/15-interval.t with some timing changes to prevent CPAN
+      Testers failures
+    - added t/45-params.t to cover cases where we send in parameters to the
+      event
+    - added an EXAMPLE to display how to send in params to the event
+      callback
 
 0.05    2017-10-20
-        - POD fix (indenting examples)
-        - bump copyright to 2017
+    - POD fix (indenting examples)
+    - bump copyright to 2017
 
 0.04    2017-10-19
-        - added examples/shared.pl, shared variable between all events and
-          the parent
-        - major overhaul on PID handling which provided the ability to rework
-          status() to be much more reliable (and effective)
-        - we now set $SIG{CHLD}="IGNORE" to avoid defunct processes
-        - added Carp (croak) for all fatal errors
-        - status() now returns -1 if an event has crashed, providing the user
-          with the ability to restart the event, or take other action
-        - added examples/timeout.pl and examples/event_crash.pl
+    - added examples/shared.pl, shared variable between all events and
+      the parent
+    - major overhaul on PID handling which provided the ability to rework
+      status() to be much more reliable (and effective)
+    - we now set $SIG{CHLD}="IGNORE" to avoid defunct processes
+    - added Carp (croak) for all fatal errors
+    - status() now returns -1 if an event has crashed, providing the user
+      with the ability to restart the event, or take other action
+    - added examples/timeout.pl and examples/event_crash.pl
 
 0.03    2016-10-16
-        - removed restart(), and aliased it instead to start()
-        - fixed issue in an already-running warn on start(), and added status()
-          to check the running status of an event (closes #1)
+    - removed restart(), and aliased it instead to start()
+    - fixed issue in an already-running warn on start(), and added status()
+      to check the running status of an event (closes #1)
 
 0.02    2016-09-24
-        - POD fixes
+    - POD fixes
 
 0.01    Date/time
-        First version, released on an unsuspecting world.
+    - First version, released on an unsuspecting world.
 

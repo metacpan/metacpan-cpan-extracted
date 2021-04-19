@@ -13,7 +13,6 @@
 #undef CONTEXT
 #endif
 
-#define PDL_CORE      /* For certain ifdefs */
 #include "pdl.h"      /* Data structure declarations */
 #include "pdlcore.h"  /* Core declarations */
 
@@ -22,7 +21,7 @@
 #endif
 #include <limits.h>
 
-/* Return a integer or numeric scalar as approroate */
+/* Return a integer or numeric scalar as appropriate */
 
 #define setflag(reg,flagval,val) (val?(reg |= flagval):(reg &= ~flagval))
 
@@ -694,25 +693,21 @@ at_bad_c(x,position)
         (PDL_VAFFOK(x) ? x->vafftrans->incs : x->dimincs), PDL_REPROFFS(x),
 	x->ndims);
    badflag = (x->state & PDL_BADVAL) > 0;
+   if ( badflag &&
 #if BADVAL_USENAN
    /* do we have to bother about NaN's? */
-   if ( badflag &&
         ( ( x->datatype < PDL_F && ANYVAL_EQ_ANYVAL(result, pdl_get_badvalue(x->datatype)) ) ||
-          ( x->datatype == PDL_CF && finite(result.value.C) == 0 ) ||
-          ( x->datatype == PDL_CD && finite(result.value.G) == 0 ) ||
-          ( x->datatype == PDL_F && finite(result.value.F) == 0 ) ||
-          ( x->datatype == PDL_D && finite(result.value.D) == 0 )
+          ( x->datatype == PDL_CF && !(isfinite(crealf(result.value.G)) || isfinite(cimagf(result.value.G))) ) ||
+          ( x->datatype == PDL_CD && !(isfinite(creal(result.value.C)) || isfinite(cimag(result.value.C))) ) ||
+          ( x->datatype == PDL_F && !isfinite(result.value.F) ) ||
+          ( x->datatype == PDL_D && !isfinite(result.value.D) )
         )
-      ) {
-	 RETVAL = newSVpvn( "BAD", 3 );
-   } else
-#  else
-   if ( badflag &&
+#else
         ANYVAL_EQ_ANYVAL( result, pdl_get_badvalue( x->datatype ) )
+#endif
       ) {
 	 RETVAL = newSVpvn( "BAD", 3 );
    } else
-#endif
 
     ANYVAL_TO_SV(RETVAL, result);
 
@@ -779,16 +774,16 @@ listref_c(x)
     */
 
    int badflag = (x->state & PDL_BADVAL) > 0;
+   if (
 #if BADVAL_USENAN
     /* do we have to bother about NaN's? */
-   if ( badflag && x->datatype < PDL_F ) {
-      pdl_badval = pdl_get_pdl_badvalue( x );
-   }
+      badflag && x->datatype < PDL_F
 #else
-   if ( badflag ) {
+      badflag
+#endif
+   ) {
       pdl_badval = pdl_get_pdl_badvalue( x );
    }
-#endif
 
    pdl_make_physvaffine( x );
    inds = pdl_malloc(sizeof(PDL_Indx) * x->ndims); /* GCC -> on stack :( */
@@ -803,9 +798,11 @@ listref_c(x)
       pdl_val = pdl_at( data, x->datatype, inds, x->dims, incs, offs, x->ndims );
       if ( badflag && 
 #if BADVAL_USENAN
-        ( (x->datatype < PDL_F && ANYVAL_EQ_ANYVAL(pdl_val, pdl_badval)) ||
-          (x->datatype == PDL_F && finite(pdl_val.value.F) == 0) ||
-          (x->datatype == PDL_D && finite(pdl_val.value.D) == 0) )
+        ( ( x->datatype < PDL_F && ANYVAL_EQ_ANYVAL(pdl_val, pdl_badval) ) ||
+          ( x->datatype == PDL_CF && !(isfinite(crealf(pdl_val.value.G)) || isfinite(cimagf(pdl_val.value.G))) ) ||
+          ( x->datatype == PDL_CD && !(isfinite(creal(pdl_val.value.C)) || isfinite(cimag(pdl_val.value.C))) ) ||
+          ( x->datatype == PDL_F && !isfinite(pdl_val.value.F) ) ||
+          ( x->datatype == PDL_D && !isfinite(pdl_val.value.D) ) )
 #else
         ANYVAL_EQ_ANYVAL(pdl_val, pdl_badval)
 #endif

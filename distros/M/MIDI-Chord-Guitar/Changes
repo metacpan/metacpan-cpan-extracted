@@ -1,5 +1,18 @@
 Revision history for MIDI-Chord-Guitar
 
+0.0603 2021-04-16 01:00:41
+    - Add and test for missing else-if clause!
+
+0.0602 2021-04-16 00:46:08
+    - "Decrement" the fingering when the neck position is zero.
+    - "Increment" the fingering when the original has open strings.
+
+0.0601 2021-04-15 23:59:16
+    - Improve documentation.
+
+0.0600 2021-04-15 23:37:55
+    - Add the ->fingering method.
+
 0.0502 2021-04-15 10:19:31
     - Improve documentation slightly...
 

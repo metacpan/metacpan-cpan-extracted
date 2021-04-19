@@ -1,3 +1,6 @@
+1.17 (2021-04-18)
+    (nicomen) Avoid redifinitions (and their warnings) #3, thanks @anirvan
+
 1.16 (2021-02-22)
     (nicomen) Be compatible with Mojolicious 9.x, bumped required version to be at least 8.72
 

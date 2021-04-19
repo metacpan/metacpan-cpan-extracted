@@ -11,7 +11,7 @@ build_requires:
   HTML::Entities: '0'
   IO::All: '0'
   IO::Scalar: '0'
-  PDL: 2.007_04
+  PDL: '2.037'
   Test::More: '0.88'
   Web::Scraper: '0'
 configure_requires:
@@ -22,7 +22,7 @@ configure_requires:
   IO::All: '0'
   PDL: 2.007_04
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,11 +40,11 @@ requires:
   HTML::Entities: '0'
   IO::All: '0'
   IO::Scalar: '0'
-  PDL: 2.007_04
+  PDL: '2.037'
   Web::Scraper: '0'
   perl: '5.014001'
 resources:
   IRC: irc://irc.gnome.org/#gimp
   repository: https://gitlab.gnome.org/GNOME/gimp-perl/
-version: '2.33'
+version: '2.34'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

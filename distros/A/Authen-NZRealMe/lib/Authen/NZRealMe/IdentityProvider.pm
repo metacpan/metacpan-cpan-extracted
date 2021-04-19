@@ -1,5 +1,5 @@
 package Authen::NZRealMe::IdentityProvider;
-$Authen::NZRealMe::IdentityProvider::VERSION = '1.22';
+$Authen::NZRealMe::IdentityProvider::VERSION = '1.23';
 use strict;
 use warnings;
 

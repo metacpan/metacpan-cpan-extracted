@@ -1,14 +1,12 @@
-use Test::More tests => 9;
+use Test::More;
 use Art::World;
-use Faker;
+use Art::World::Util;
 
-my $f = Faker->new;
+my $artist_name = Art::World::Util->new_person->fake_name;
 
-use_ok 'Art::World::Artist';
-
-my $artist_name = $f->person_first_name . ' ' . $f->person_last_name;
 my $artist = Art::World->new_artist(
-  name => $artist_name, id => 1
+  id => 1,
+  name => $artist_name,
 );
 
 isa_ok $artist, 'Art::World::Agent';
@@ -25,4 +23,4 @@ ok $artist->is_underground, 'Artist status not homogenic yet';
 # Provided by crudable
 # can-ok $artist, 'save';
 
-done_testing();
+done_testing;

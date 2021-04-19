@@ -849,6 +849,18 @@ ok( ! Astro::Coord::ECI->represents( 'Astro::Coord::ECI::TLE' ),
     }
 }
 
+{
+    my $eci = Astro::Coord::ECI->new(
+	name	=> 'Me',
+    );
+    local $@ = undef;
+    if ( my $two = eval { $eci->clone() } ) {
+	is $two->get( 'name' ), 'Me', q<Cloned 'Me'>;
+    } else {
+	fail "Clone failed: $@";
+    }
+}
+
 done_testing;
 
 # need to test:

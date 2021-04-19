@@ -5,13 +5,13 @@ our ($dir, $DEBUG);
 BEGIN {
 #  $Gimp::verbose = 1;
   $DEBUG = 0;
-  require 't/gimpsetup.pl';
+  require './t/gimpsetup.pl';
 }
 use Gimp qw(:DEFAULT net_init=spawn/);
 
 ok((my $i = new Gimp::Image(10,10,RGB)), 'OO Syntax for new image');
 ok(
-  (my $l = $i->layer_new(10,10,RGBA_IMAGE,"new layer",100,VALUE_MODE)),
+  (my $l = $i->layer_new(10,10,RGBA_IMAGE,"new layer",100,LAYER_MODE_HSV_VALUE_LEGACY)),
   'Different OO syntax for creating a layer',
 );
 ok(!Gimp->image_insert_layer($l,0,0), 'Yet another OO syntax');

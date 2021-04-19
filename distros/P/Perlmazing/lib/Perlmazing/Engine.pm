@@ -74,14 +74,15 @@ sub _find_symbols {
 	for my $i (Submodules->find("${package}::Perlmazing")) {
 		next if $i->{Clobber};
 		_debug("Found file $i->{AbsPath} for symbol $i->{Name}", $package);
-		$found_symbols->{$package}->{$i->Name} = $i;
+		$found_symbols->{$package}->{$i->Name} = {%$i};
 		if ($i->Module eq "${package}::Perlmazing::Precompile::$i->{Name}") {
 			$precompile_symbols->{$package}->{$i->Name} = $i;
 		}
 		no strict 'refs';
 		no warnings; # prevents during-cleanup warnings when Submodules was destroyed and $i is undefined
+		my $name = $i->Name;
 		*{"${package}::$i->{Name}"} = sub {
-			unshift @_, $package, $i->Name;
+			unshift @_, $package, $name;
 			goto &_autoload;
 		};
 	}
@@ -125,7 +126,7 @@ sub _load_symbol {
 	return $loaded_symbols->{$package}->{$symbol} if exists $loaded_symbols->{$package} and exists $loaded_symbols->{$package}->{$symbol};
 	croak "File $package/Perlmazing/$symbol.pm cannot be found in \@INC for symbol \&${package}::$symbol - \@INC contains: @INC" unless exists $found_symbols->{$package} and exists $found_symbols->{$package}->{$symbol};
 	_debug("Reading file $found_symbols->{$package}->{$symbol}", $package);
-	my $code = $found_symbols->{$package}->{$symbol}->read;
+	my $code = Submodules::Result::read($found_symbols->{$package}->{$symbol});
 	_debug("Parsing contents of $found_symbols->{$package}->{$symbol}->{AbsPath}", $package);
 	my $stderr = '';
 	my $eval_string = "\n#line 1 $found_symbols->{$package}->{$symbol}->{AbsPath}\npackage ${package}::Perlmazing::$symbol; $code";
@@ -175,7 +176,7 @@ sub _load_symbol {
 				if ($e =~ /^Modification of a read\-only value attempted/) {
 					die "Modification of a read-only value attempted at $call[1] line $call[2]\n";
 				} else {
-					die "Unhandled error in listable function: $e\n";
+					die "Unhandled error in listable function ${package}::$symbol: $e\n";
 				}
 			}
 			return @res if $wantarray;
@@ -196,7 +197,8 @@ sub _load_symbol {
 			my $proto_old = prototype \&{"${i}::$symbol"};
 			my $proto_new = prototype $loaded_symbols->{$package}->{$symbol};
 			if ((defined $proto_new and defined $proto_old and $proto_old ne $proto_new) or (defined $proto_old and not defined $proto_new) or (defined $proto_new and not defined $proto_old)) {
-				carp "Warning: Too late to apply prototype ($proto_new) to symbol &${i}::$symbol - perl compilation phase has passed already" unless _is_compile_phase();
+				# Disabling this as it is noisy and seems to be somewhat unimportant for general use. Leaving it commented in case I change my mind in a future version.
+				#carp "Warning: Too late to apply prototype ($proto_new) to symbol &${i}::$symbol - perl compilation phase has passed already" unless _is_compile_phase();
 				set_prototype \&{"${i}::$symbol"}, $proto_new;
 			}
 			*{"${i}::$symbol"} = $loaded_symbols->{$package}->{$symbol} if $ref eq $skeleton;

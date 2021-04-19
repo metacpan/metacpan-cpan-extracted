@@ -2,16 +2,17 @@
 abstract: 'Utility to extract a name from a PPI Document'
 author:
   - 'Kent Fredric <kentnl@cpan.org>'
+  - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Test::More: '0'
+  Test::More: '0.98'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,15 +21,463 @@ name: PPIx-DocumentName
 provides:
   PPIx::DocumentName:
     file: lib/PPIx/DocumentName.pm
-    version: '0.001003'
+    version: '1.01'
+  PPIx::DocumentName::Result:
+    file: lib/PPIx/DocumentName/Result.pm
+    version: '1.01'
 requires:
   Carp: '0'
   PPI::Util: '0'
+  overload: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/kentnl/PPIx-DocumentName/issues
-  homepage: https://github.com/kentnl/PPIx-DocumentName
-  repository: https://github.com/kentnl/PPIx-DocumentName.git
-version: '0.001003'
+  bugtracker: https://github.com/uperl/PPIx-DocumentName/issues
+  homepage: https://metacpan.org/pod/PPIx::DocumentName
+  repository: git://github.com/uperl/PPIx-DocumentName.git
+version: '1.01'
+x_BuiltWith:
+  external_file: misc/built_with.json
+x_Dist_Zilla:
+  perl:
+    version: '5.033008'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename:
+            - Build.PL
+            - Makefile.PL
+            - xt/release/changes.t
+            - xt/release/fixme.t
+          exclude_match:
+            - ^_build/
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: '@Author::Plicease/GatherDir'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::Plicease/PruneCruft'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::Plicease/ManifestSkip'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::Plicease/MetaYAML'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::Plicease/License'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::Plicease/ExecDir'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::Plicease/ShareDir'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::Author::Plicease::MakeMaker
+      name: '@Author::Plicease/Author::Plicease::MakeMaker'
+      version: '2.62'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::Plicease/Manifest'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::Plicease/TestRelease'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: -SingleEncoding
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Name
+              name: Name
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Version
+              name: Version
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Region
+              name: prelude
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: PRIVATE_ATTRIBUTES
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: PRIVATE_METHODS
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: Leftovers
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Region
+              name: postlude
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: Authors
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: Legal
+              version: '4.015'
+      name: '@Author::Plicease/PodWeaver'
+      version: '4.008'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Author::Plicease/NextRelease'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Author::Plicease/AutoPrereqs'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@Author::Plicease/OurPkgVersion'
+      version: '0.21'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::Plicease/MetaJSON'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - README.md
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.20.1
+          repo_root: .
+      name: '@Author::Plicease/Git::Check'
+      version: '2.047'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%V%n%n%c
+          signoff: '0'
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - README.md
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.20.1
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::Plicease/Git::Commit'
+      version: '2.047'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: v1.01
+          tag_format: v%V
+          tag_message: v%V
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.20.1
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::Plicease/Git::Tag'
+      version: '2.047'
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - origin
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.20.1
+          repo_root: .
+      name: '@Author::Plicease/Git::Push'
+      version: '2.047'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@Author::Plicease/MetaResources'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::Author::Plicease::Tests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Author::Plicease/Author::Plicease::Tests'
+      version: '2.62'
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::Plicease/InstallGuide'
+      version: '1.200013'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::Plicease/ConfirmRelease'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@Author::Plicease/MinimumPerl'
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: '@Author::Plicease/Author::Plicease::ReadmeAnyFromPod'
+      version: '2.62'
+    -
+      class: Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: '@Author::Plicease/ReadMePodInRoot'
+      version: '2.62'
+    -
+      class: Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs
+      name: '@Author::Plicease/Author::Plicease::SpecialPrereqs'
+      version: '2.62'
+    -
+      class: Dist::Zilla::Plugin::Author::Plicease::NoUnsafeInc
+      name: '@Author::Plicease/Author::Plicease::NoUnsafeInc'
+      version: '2.62'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
+              version: '6.017'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: MetaProvides::Package
+      version: '2.004003'
+    -
+      class: Dist::Zilla::Plugin::MetaData::BuiltWith
+      config:
+        Dist::Zilla::Plugin::MetaData::BuiltWith:
+          $Module::Metadata::VERSION: '1.000037'
+          _stash_key: x_BuiltWith
+          external_file_name: misc/built_with.json
+          show_config: '1'
+          show_uname: '1'
+          uname:
+            uname_args:
+              - -s
+              - -o
+              - -r
+              - -m
+              - -i
+            uname_call: uname
+          use_external_file: only
+      name: MetaData::BuiltWith
+      version: '1.004005'
+    -
+      class: Dist::Zilla::Plugin::Git::Contributors
+      config:
+        Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.20.1
+          include_authors: 0
+          include_releaser: 0
+          order_by: name
+          paths: []
+      name: Git::Contributors
+      version: '0.036'
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: MetaTests
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: PodCoverageTests
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: Test::ReportPrereqs
+      version: '0.028'
+    -
+      class: Dist::Zilla::Plugin::Test::Kwalitee
+      config:
+        Dist::Zilla::Plugin::Test::Kwalitee:
+          filename: xt/release/kwalitee.t
+          skiptest: []
+      name: Test::Kwalitee
+      version: '2.12'
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      config:
+        Dist::Zilla::Plugin::Test::MinimumVersion:
+          max_target_perl: ~
+      name: Test::MinimumVersion
+      version: '2.000010'
+    -
+      class: Dist::Zilla::Plugin::Prereqs::AuthorDeps
+      name: Prereqs::AuthorDeps
+      version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      config:
+        Dist::Zilla::Plugin::Test::CPAN::Changes:
+          changelog: Changes
+      name: Test::CPAN::Changes
+      version: '0.012'
+    -
+      class: Dist::Zilla::Plugin::Author::Plicease::Upload
+      name: Author::Plicease::Upload
+      version: '2.62'
+    -
+      class: Dist::Zilla::Plugin::Prereqs::Upgrade
+      config:
+        Dist::Zilla::Plugin::Prereqs::Upgrade:
+          modules:
+            Dist::Zila::Plugin::MetaProvides::Package: '2.000000'
+            Dist::Zilla: '5'
+            ExtUtils::MakeMaker: '7.00'
+            File::ShareDir::Install: '0.10'
+            Moo: '1.000008'
+            Moose: '2.000'
+            Path::Tiny: '0.058'
+            Test::File::ShareDir: '1.000000'
+            Test::More: '0.99'
+      name: Prereqs::Upgrade
+      version: '0.001001'
+    -
+      class: Dist::Zilla::Plugin::RemovePrereqs::Provided
+      name: RemovePrereqs::Provided
+      version: '0.001001'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '6.017'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
+      version: '6.017'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '6.017'
+x_generated_by_perl: v5.33.8
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

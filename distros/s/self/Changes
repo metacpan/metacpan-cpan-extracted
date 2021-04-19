@@ -1,5 +1,9 @@
 Revision history for self
 
+0.36 2021-04-19T22:19:41+0900
+- No longer depends on Devel::Declare
+- Migrate test code to Test::V2
+
 0.35 2016-02-01T08:20:44+0100
 - remove self::implicit -- "self" already has the functionality.
 - Fix code injection under perl 5.18, 5.20, and 5.22.

@@ -8,7 +8,7 @@ sub main ($) {
 	return 0 if $i =~ /[;:\s\n&=\$%\@\(\)\*]/;
 	return 0 if $i =~ /[^e][\+\-]/;
 	return 1 if $i =~ /^0x\d+$/i; # Not detected by Scalar::Util
-	$i =~ s/_//g; # Also not accepted by Scalar::Util
-	looks_like_number $i;;
+	$i =~ s/(\d)_(\d)/$1$2/g; # Also not accepted by Scalar::Util
+	define looks_like_number $i;;
 }
 

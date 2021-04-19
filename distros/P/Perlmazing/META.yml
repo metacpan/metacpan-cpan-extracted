@@ -3,10 +3,12 @@ abstract: A collection of helper functions powered by Perlmazing::Engine.
 author:
 - Francisco Zarabozo <zarabozo@cpan.org>
 build_requires:
+  CLDR::Number: '0.19'
   Carp: '0'
   Crypt::Rijndael: '0'
   Cwd: '0'
   Data::Dump: '0'
+  Devel::Caller: '2.06'
   Digest::MD5: '0'
   Encode: '0'
   ExtUtils::MakeMaker: '0'
@@ -14,7 +16,7 @@ build_requires:
   File::Path: '2.08'
   List::Util: '0'
   Scalar::Util: '0'
-  Submodules: '1.0014'
+  Submodules: '1.0015'
   Taint::Util: '0.08'
   Time::Precise: '1.0010'
   URI::Escape: '0'
@@ -22,10 +24,12 @@ build_requires:
   version: '0'
   warnings: '0'
 configure_requires:
+  CLDR::Number: '0.19'
   Carp: '0'
   Crypt::Rijndael: '0'
   Cwd: '0'
   Data::Dump: '0'
+  Devel::Caller: '2.06'
   Digest::MD5: '0'
   Encode: '0'
   ExtUtils::MakeMaker: '0'
@@ -33,7 +37,7 @@ configure_requires:
   File::Path: '2.08'
   List::Util: '0'
   Scalar::Util: '0'
-  Submodules: '1.0014'
+  Submodules: '1.0015'
   Taint::Util: '0.08'
   Time::Precise: '1.0010'
   URI::Escape: '0'
@@ -41,7 +45,7 @@ configure_requires:
   version: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010
+generated_by: ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -52,10 +56,12 @@ no_index:
   - t
   - inc
 requires:
+  CLDR::Number: '0.19'
   Carp: '0'
   Crypt::Rijndael: '0'
   Cwd: '0'
   Data::Dump: '0'
+  Devel::Caller: '2.06'
   Digest::MD5: '0'
   Encode: '0'
   ExtUtils::MakeMaker: '0'
@@ -63,7 +69,7 @@ requires:
   File::Path: '2.08'
   List::Util: '0'
   Scalar::Util: '0'
-  Submodules: '1.0014'
+  Submodules: '1.0015'
   Taint::Util: '0.08'
   Time::Precise: '1.0010'
   URI::Escape: '0'
@@ -71,5 +77,5 @@ requires:
   strict: '0'
   version: '0'
   warnings: '0'
-version: '1.2814'
-x_serialization_backend: YAML::XS version 0.67
+version: '1.2816'
+x_serialization_backend: YAML::XS version 0.82

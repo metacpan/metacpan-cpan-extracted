@@ -14,14 +14,14 @@ podregister {
   $drawable->edit_copy;
   $image->selection_none;
   if ($transparency == 0) {
-    my $bg_layer=$new_image->layer_new($drawable->width,$drawable->height,$image->layertype(1), "Background", 100, NORMAL_MODE);
+    my $bg_layer=$new_image->layer_new($drawable->width,$drawable->height,$image->layertype(1), "Background", 100, LAYER_MODE_NORMAL_LEGACY);
     Gimp::Context->set_background ($bg_col);
-    $bg_layer->drawable_fill(BACKGROUND_FILL);
+    $bg_layer->drawable_fill(FILL_BACKGROUND);
     $new_image->insert_layer($bg_layer,0,0);
   }
   my $text1_lay = $new_image->layer_new(
     $drawable->width,$drawable->height,
-    $image->layertype(1), "Text -1-", 100, NORMAL_MODE
+    $image->layertype(1), "Text -1-", 100, LAYER_MODE_NORMAL_LEGACY
   );
   $new_image->insert_layer($text1_lay,0,-1);
   $text1_lay->edit_clear;
@@ -32,8 +32,8 @@ podregister {
   my @start = ($text1_lay->width / 2 - 5, 0);
   my @end = ($text1_lay->width / 2 + 5, $text1_lay->height);
   $text1_lay->edit_blend(
-		   FG_BG_RGB_MODE,
-		   NORMAL_MODE,
+		   BLEND_FG_BG_RGB,
+		   LAYER_MODE_NORMAL_LEGACY,
 		   GRADIENT_LINEAR,
 		   100,
 		   FALSE,
@@ -48,7 +48,7 @@ podregister {
   $text2_lay->add_alpha;
   $new_image->insert_layer($text2_lay, 0, -1);
   Gimp::Context->set_background ([255, 255, 255]);
-  $text2_lay->edit_fill(BACKGROUND_FILL);
+  $text2_lay->edit_fill(FILL_BACKGROUND);
   $text1_lay->set_lock_alpha(0);
   $text2_lay->set_lock_alpha(0);
   $text2_lay->gauss_rle( 6, 1, 1);
@@ -59,7 +59,7 @@ podregister {
   $text2_lay->set_opacity(75);
   $new_image->flatten;
   if ($transparency == 1) {
-    $new_image->convert_indexed(0, MAKE_PALETTE, 256, 0, 0, "");
+    $new_image->convert_indexed(0, CONVERT_PALETTE_GENERATE, 256, 0, 0, "");
     my $new_layer = $new_image->get_active_layer;
     $new_layer->add_alpha;
     Gimp::Context->set_sample_threshold(0.55);

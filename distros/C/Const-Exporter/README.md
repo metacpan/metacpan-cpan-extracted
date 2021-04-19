@@ -4,7 +4,7 @@ Const::Exporter - Declare constants for export.
 
 # VERSION
 
-version v1.1.2
+version v1.2.0
 
 # SYNOPSIS
 
@@ -341,9 +341,10 @@ feature.
 
 Robert Rothenberg <rrwo@cpan.org>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-B. Estrade <estrabd@cpan.org>
+- Slaven Rezić <slaven@rezic.de>
+- B. Estrade <estrabd@cpan.org>
 
 # COPYRIGHT AND LICENSE
 

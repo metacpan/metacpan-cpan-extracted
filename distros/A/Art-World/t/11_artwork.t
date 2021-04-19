@@ -1,40 +1,36 @@
-use Test::More tests => 11;
+use Test::More;
 use Art::World;
-use Faker;
-use List::Util qw/any/;
+use Art::World::Util;
+use lib 't/lib';
+use Test::Art::World;
 
-my $f = Faker->new;
-
-use_ok 'Art::World::Artwork';
-
-my $artist_name = $f->person_first_name . ' ' . $f->person_last_name;
 my $artist = Art::World->new_artist(
-  name => $artist_name, id => 1
+  name => Art::World::Util->new_person->fake_name, id => 1
 );
 
 my $munnies= 100;
 
 my $collector1 = Art::World
    ->new_collector(
-     name => $f->person_name,
+     name => Art::World::Util->new_person->fake_name,
      money => $munnies,
      id => 3
    );
 
 my $collector2 = Art::World
   ->new_collector(
-    name => $f->person_name,
+    name => Art::World::Util->new_person->fake_name,
     money => $munnies + 1000,
     id => 4
   );
 
 my $homogenic_artist = Art::World->new_artist(
-  name => $f->person_name,
+  name => Art::World::Util->new_person->fake_name,
   collectors => [ $collector1, $collector2 ]
 );
 
 my $artwork = Art::World->new_artwork(
-  creator => [ $artist, $homogenic_artist ]  ,
+  creator => [ $artist, $homogenic_artist ],
   title => 'Naked City',
   value => 10_000,
   owner => [ $collector1, $collector2 ]
@@ -48,12 +44,25 @@ ok $artwork->does('Art::World::Collectionable'), 'Artwork does role Collectionab
 ok $artwork->value, 'Artwork got a value attribute';
 ok $artwork->owner, 'Artwork got a value attribute';
 
-can_ok $artwork, 'belongs_to';
 can_ok $artwork, 'is_for_sale';
 can_ok $artwork, 'is_sold';
 
-my $bool = any { $_ eq $artist_name } map { $_->name } @{ $artwork->creator };
-ok $bool, 'One of the artwork creator is ' . $artist_name;
+my $taw = Test::Art::World->new;
 
+ok $taw->is_artist_creator( $homogenic_artist, $artwork ),
+  'One of the artwork creator is ' . $homogenic_artist->name;
 
-done_testing();
+my $collector3 = Art::World
+   ->new_collector(
+     name => Art::World::Util->new_person->fake_name,
+     money => $munnies + 2000,
+     id => 4
+   );
+
+$collector3->acquire( $artwork );
+
+ok $taw->is_artist_creator( $homogenic_artist, $artwork ),
+  'One of the artwork creator is ' . $homogenic_artist->name . ' even after it got acquired by a collector';
+
+done_testing;
+

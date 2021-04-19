@@ -3,7 +3,7 @@ package Protocol::FIX::MessageInstance;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';    ## VERSION
+our $VERSION = '0.06';    ## VERSION
 
 =head1 NAME
 

@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 efd1dab74e2d4dfd4cc885397661124ca22a4cadcd5f693b7867648e4504935e Changes
+SHA256 47b63865126297c35e0547ccb5743f76e1081185a3c6f4d589378dc604629822 LICENSE
+SHA256 6a9ceddae9af0c48f0c76da2dcb822c41e8f6d7e71fc1701c96cde774f347701 MANIFEST
+SHA256 08e0950bd38c2077bcd55e210e1a1102a52db38b251c29ce6f2404036a08f21f META.json
+SHA256 40db3a3e3e32b098b4a06b61059ed844900b0ec0a84313996942954d9c5ab747 META.yml
+SHA256 1efc2cada7c27aad78c5db29811c17cce537e18522d80b9520b8fd5848d74333 Makefile.PL
+SHA256 87701e04235440aef7c5567c928b52994f20895035cf296d5823e8c8a8536341 README
+SHA256 30845d0bff1fce63413944f1f8f2e4369ae025c89933f9158bb7b27cca918c84 cpanfile
+SHA256 e51ea8176f593f645077654385b013ad49f70853ed51be447a6ff025d05e75af dist.ini
+SHA256 aa5ab4340d04bdbbbb5ddd64b27694f20c61710a615231853ce22a33f92f3835 lib/DateTime/Format/XSD.pm
+SHA256 1fb871e301a8ae59dd0f8eb949cb02c545ea5ca5b17448b5b39e48e0a14540e9 t/01-basics.t
+SHA256 d58e5c4f2e2d61f37b23600a075825ae1c125754dd16408f827f415d4b35912a t/author-critic.t
+SHA256 fbe6cdd54a8c2e95b5eb624cdc1799f9ea3d28e4fca551e23738cf9a0a829e32 t/author-eof.t
+SHA256 4ba749bfd7de89760b5a7290398f4537b4efd36ae425113103f1b86ac4872e50 t/author-eol.t
+SHA256 7c796c1ee8be74e083b6152a59dbedbf0fd8b2144b00bbc4120a88efdc0a3d44 t/author-no-tabs.t
+SHA256 8a96a1b54dca225db0ffc545d4e0d58b3fd1605bece1d3e434ba1d988d479473 t/author-pod-coverage.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 e9c0590dd612df3c272d9267485013c2efeb641e4c44c00eaecf41fc442bd8d2 t/release-trailing-space.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmB8OPQACgkQ1fh7LgYG
+pfm3pw//dJ/cyH8XgdwR4tV8GJg1s+zcg87aNrssJGuN1byRYG1HrwNU9ftADrxC
+QfHwjqebem2W7oF9/quinISvE36tQwGSKD1Llrhw2v4WTU/0HXdl9aS8EW4D/1ff
+frNA6eUA3KS/Zzak88zm4F5QeTIoP0/HjQ+RX9wo2FLo4fqyNL+sxBnZUTxjzjkG
+LN4V7WflkT3CdThAbXgv7AyUyXa41AdTT9gl+O5/Mes1TaX8mmy0t1wTDNa9Gy49
+Z38VvckBG0QAjBkRrP5VT1m/oTt1E2WgowTFwGRYrHdPegCR+midO0cE3JaPwTMt
+J51tS85FqQrRFT+5yqpZLguVFqDwCfjJlI1/GIUJzZXafML6Wdvjf2idhG5CwDoA
+MRzfFzLqg67cubmHniQIOYjDH/zHK22+9jsFw/NrrTPCbVXuH15TS79cKI3z7u5C
+lY4/3rkF6jq4mwd7CdkabvC5T4mfPA0aBIgEuyFLJBynPgx2K4g9HArgc361L0kU
+vV1SD+l5N/6Z+RYHxkQil4gVf9cwavk0QolPODKema4SvUYfTHiegX+Pjm3z4vV0
+V/RPsBbW+BWsQ6QCDjFdGfA1VWeHLhPMIiQQeFWthL3yIhBsG44mLIxQC4raxjqJ
+JOtRdUlEpcYb894ZBfod7ul1ehfjVVzKUGbdl5/TXxCG0emDiP0=
+=lI8g
+-----END PGP SIGNATURE-----

@@ -1,0 +1,147 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::Config
+at lib/Myriad/Config.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Myriad::Config
+
+=head1 DESCRIPTION
+
+Configuration support.
+
+=head1 PACKAGE VARIABLES
+
+=head2 DEFAULTS
+
+The C<%DEFAULTS> hash provides base values that will be used if no other
+configuration file, external storage or environment variable provides an
+alternative.
+
+=head2 FULLNAME_FOR
+
+The C<%FULLNAME_FOR> hash maps commandline shortcuts for common parameters.
+
+=head2 SERVICES_CONFIG
+
+A registry of configs defined by the services using the C<config > helper.
+
+=head2 parse_subargs
+
+A helper to resolve the correct service config
+
+input is expected to look like <service_name>_[configs|instances].<key>
+
+and this sub will set the correct path to key with the provided value.
+
+Example:
+
+dummy_service.configs.password
+
+will end up in
+
+$config->{services}->{dummy_service}->{configs}->{password}
+
+it takes:
+
+=over 4
+
+=item * C<subarg> - the arguments as passed by the user.
+
+=item * C<root> - the level in which we should add the sub arg, we start from $config->{services}.
+
+=item * C<value> - the value that we should assign after resolving the config path.
+
+=back
+
+=head2 lookup_from_args
+
+Parse the arguments provided from the command line.
+
+There are many modules that can parse command lines arguments
+but in our case we have unknown arguments - the services configs - that
+might be passed by the user or might not and they are on top of that nested.
+
+This sub simply start looking for a match for the arg at hand in C<%DEFAULTS>
+then it searches in the shortcuts map and lastly it tries to parse it as a subarg.
+
+Currently this sub takes into account flags (0|1) configs and config written as:
+config=value
+
+=head2 lookup_from_env
+
+Tries to find environments variables that start with MYRIAD_* and parse them.
+
+=head2 lookup_from_file
+
+Fill the config from the config file
+
+this sub doesn't do much currently since the config
+structure is modelled exactly like how it should be in the file
+so it just read the file.
+
+=head2 service_config
+
+Takes a service base package and its current name
+and tries to resolve its config from:
+
+1. The framework storage itself (i.e Redis or Postgres ..etc).
+2. From the config parsed earlier (cmd, env, file).
+
+and if it fails to find a required config it will throw an error.
+
+it takes
+
+=over 4
+
+=item * C<pkg> - The package name of the service, will be used to lookup for generic config
+
+=item * C<service_name> - The current service name either from the registry or as it bassed by the user, useful for instances config
+
+=back
+
+=head2 from_storage
+
+Tries to find the config key in the storage using L<Myriad::Storage>.
+
+it takes
+
+=over 4
+
+=item * C<service_name> - The service name.
+
+=item * C<instance> - If the service has many instances (e.g demo, production) this should the identifier.
+
+=item * C<key> - The required config key (e.g password, username ..etc).
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+

@@ -225,12 +225,12 @@ specified with the C<type> option flag.
 
 =head1 SEE ALSO
 
-This module is part of MIME-Types distribution version 2.18,
-built on December 09, 2020. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of MIME-Types distribution version 2.19,
+built on April 16, 2021. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 1999-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 1999-2021 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

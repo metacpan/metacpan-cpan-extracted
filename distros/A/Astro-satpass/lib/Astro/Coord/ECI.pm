@@ -92,12 +92,12 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.118';
+our $VERSION = '0.119';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
+use Clone ();
 use POSIX qw{floor strftime};
-use Storable ();
 
 use constant NO_CASCADING_STATIONS =>
     q{Cascading 'station' attributes are not supported};
@@ -165,9 +165,11 @@ Telescope, volume 68, number 2, 1984, page 159.
 Unfortunately, as of early 2021 the National Council of Teachers of
 Mathematics restricted the Dr. Math content to their members. The Math
 Doctors (L<https://www.themathdoctors.org/>) are trying to recover and
-expand the archive, but they have not yet gotten to this. If you are
-trying to recover this using the Wayback Machine, the URL while Drexel
-hosted this was C<http://mathforum.org/library/drmath/view/51879.html>.
+expand the archive, and a recovered article on haversines is at
+L<https://www.themathdoctors.org/distances-on-earth-2-the-haversine-formula/>.
+If you want the original article, you can feed the URL
+C<http://mathforum.org/library/drmath/view/51879.html> to the Wayback
+Machine.
 
 Prior to version 0.011_03 the law of cosines was used, but this produced
 errors on extremely small angles. The haversine law was selected based
@@ -398,13 +400,13 @@ sub azel_offset {
 This method does a deep clone of an object, producing a different
 but identical object.
 
-At the moment, it's really just a wrapper for Storable::dclone.
+At the moment, it's really just a wrapper for Clone::clone.
 
 =cut
 
 sub clone {
     my ( $self ) = @_;
-    return Storable::dclone( $self );
+    return Clone::clone( $self );
 }
 
 =item $elevation = $coord->correct_for_refraction ($elevation);

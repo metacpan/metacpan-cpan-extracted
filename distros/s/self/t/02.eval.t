@@ -1,6 +1,7 @@
 use lib 't/lib';
 use EvalTest;
-use Test::More tests => 8;
+use Test2::V0;
+plan tests => 8;
 
 
 {

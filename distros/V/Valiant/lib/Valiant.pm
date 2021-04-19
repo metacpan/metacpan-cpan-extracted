@@ -1,6 +1,6 @@
 package Valiant;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001005';
 $VERSION = eval $VERSION;
 
 1;
@@ -12,6 +12,8 @@ Valiant - Ruby on Rails-like validation framework.
 =begin html
 
 <a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/linux/badge.svg"></a>
+<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/macos/badge.svg"></a>
+<a href="https://github.com/jjn1056/valiant/actions"><img src="https://github.com/jjn1056/valiant/workflows/windows/badge.svg"></a>
 <a href="https://metacpan.org/pod/Valiant"><img src="https://badge.fury.io/pl/Valiant.svg"></a>
 <a href="https://codecov.io/github/jjn1056/Valiant/?branch=master"><img alt="Coverage" src="https://codecov.io/github/jjn1056/Valiant/coverage.svg?branch=master"></a>
 
@@ -87,7 +89,7 @@ When we say domain level or business logic validation, what we mean is that
 invalid data is a possible and expected state that needs to be evaluated and reported to
 the end user for correction.  For example when writing a web application you might have
 a form that requests user profile information (such as name, DOB, address, etc).  Its an
-expected condition that the user might submit form data that invalid in some way (such
+expected condition that the user might submit form data that is invalid in some way (such
 as a DOB that is in the future) but is still 'well formed' and is able to be processed.
 In these cases your business logic would be to inform the user of the incorrect data and
 request fixes (rather than simply throw a 500 server error and giving up).  
@@ -615,6 +617,7 @@ Example:
     use Moo;
     use Valiant::Validations;
 
+    extends 'Person';
     with 'IsRetirementAge';
 
     1;

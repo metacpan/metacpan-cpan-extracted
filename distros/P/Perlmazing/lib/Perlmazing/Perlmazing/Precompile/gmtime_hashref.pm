@@ -1,3 +1,3 @@
-use Time::Precise 'gmtime_hashref';
+use Time::Precise ();
 
-*main = \&gmtime_hashref;
+*main = \&Time::Precise::gmtime_hashref;

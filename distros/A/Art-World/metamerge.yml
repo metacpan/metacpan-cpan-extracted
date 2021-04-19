@@ -1,0 +1,9 @@
+
+resources:
+    homepage: https://codeberg.org/smonff/art-world
+    repository:
+        type: git
+        url: https://codeberg.org/smonff/art-world.git
+        web: https://codeberg.org/smonff/art-world
+    bugtracker:
+        web: https://codeberg.org/smonff/art-world/issues

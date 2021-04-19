@@ -24,7 +24,7 @@ podregister {
   my $layer = $newimage->layer_new(
     $width, $height,
     $alpha ? RGBA_IMAGE : RGB_IMAGE,
-    "L1", 100, NORMAL_MODE
+    "L1", 100, LAYER_MODE_NORMAL_LEGACY
   );
   $newimage->insert_layer($layer, 0, -1);
   my $newdrawable = $newimage->get_active_drawable;
@@ -33,7 +33,7 @@ podregister {
   my $destdata = $srcdata->zeroes;
   Gimp::Progress->init("Rendering...");
   my $relord = $width / 255;
-  $newdrawable->fill(FOREGROUND_FILL);
+  $newdrawable->fill(FILL_FOREGROUND);
   $delta = 1 if $delta < 1;
   for (my $y = 0; $y < $height; $y++){
     my $row = $srcdata->slice('', '', "($y)");

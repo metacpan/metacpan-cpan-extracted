@@ -1,6 +1,6 @@
 package Pod::Weaver::Section::Collect;
 # ABSTRACT: a section that gathers up specific commands
-$Pod::Weaver::Section::Collect::VERSION = '4.015';
+$Pod::Weaver::Section::Collect::VERSION = '4.017';
 use Moose;
 with 'Pod::Weaver::Role::Section';
 with 'Pod::Weaver::Role::Transformer';
@@ -162,7 +162,7 @@ Pod::Weaver::Section::Collect - a section that gathers up specific commands
 
 =head1 VERSION
 
-version 4.015
+version 4.017
 
 =head1 OVERVIEW
 
@@ -205,7 +205,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2021 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

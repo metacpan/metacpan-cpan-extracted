@@ -17,7 +17,7 @@ use Protocol::FIX::Parser;
 use Exporter qw/import/;
 
 our @EXPORT_OK = qw/humanize/;
-our $VERSION   = '0.05';
+our $VERSION   = '0.06';
 
 =head1 NAME
 

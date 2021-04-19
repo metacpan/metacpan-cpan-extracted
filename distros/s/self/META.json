@@ -1,0 +1,52 @@
+{
+   "abstract" : "provides '$self' in OO code.",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "self",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test2::V0" : "0.000139"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::Parser" : "0.21",
+            "B::OPCheck" : "0.27",
+            "PadWalker" : "1.93",
+            "Sub::Exporter" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/self.git",
+         "web" : "https://github.com/gugod/self"
+      }
+   },
+   "version" : "0.36",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

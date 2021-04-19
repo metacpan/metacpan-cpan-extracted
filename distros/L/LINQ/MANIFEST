@@ -20,6 +20,7 @@ lib/LINQ/Field.pm
 lib/LINQ/FieldSet.pm
 lib/LINQ/FieldSet/Assertion.pm
 lib/LINQ/FieldSet/Selection.pm
+lib/LINQ/FieldSet/Single.pm
 lib/LINQ/Grouping.pm
 lib/LINQ/Iterator.pm
 lib/LINQ/Util.pm
@@ -141,6 +142,7 @@ t/21iter-take_while.t
 t/21iter-to_iterator.t
 t/90fieldset-assertion.t
 t/90fieldset-selection.t
+t/90fieldset-single.t
 t/docs/group-join-example.t
 t/docs/join-example.t
 t/lib/DisneyData.pm

@@ -7,7 +7,7 @@ Gimp::PixelRgn - Operate on raw pixels in powerful, efficient way.
   use Gimp;
   use PDL; # to do sensible things with the pixels
   my $i = Gimp::Image->new(10,10,RGB);
-  my $l = $i->layer_new(10,10,RGBA_IMAGE,"new layer",100,VALUE_MODE);
+  my $l = $i->layer_new(10,10,RGBA_IMAGE,"new layer",100,LAYER_MODE_HSV_VALUE_LEGACY);
   $i->insert_layer($l,0,0);
   my $gd = $l->get;
   my $region = $gd->pixel_rgn(0,0,10,10,0,0);

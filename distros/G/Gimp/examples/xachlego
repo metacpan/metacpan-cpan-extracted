@@ -28,7 +28,7 @@ podregister {
   $image->selection_all;
   $gridlayer->edit_clear;
   Gimp::Context->set_background([255,255,255]);
-  $gridlayer->edit_fill(BACKGROUND_FILL);
+  $gridlayer->edit_fill(FILL_BACKGROUND);
   $gridlayer->grid(1, $blocksize, 0, [0,0,0], 255, 1, $blocksize, 0, [0,0,0], 255, 0, 0, 0, [0,0,0], 0);
   $gridlayer->gauss_iir(0.7*$blocksize, 1, 1);
 
@@ -36,7 +36,7 @@ podregister {
 #   grid until you get a roundish blob in the center of each square (you
 #   may need to repeat a few times).
 
-  $gridlayer->levels(0, 196, 234, $knobfactor/100.0 , 0, 255);
+  $gridlayer->levels(0, 196/255, 234/255, 1, $knobfactor/100.0 , 0, 1.0, 1);
 
 # <Xach> sjburges: meanwhile, back at the pixelized image, bumpmap it with
 # itself and a depth of about 5. do this twice.
@@ -50,7 +50,7 @@ podregister {
   my $cleangrid = $image->layer_new($image->width, $image->height,
 			   RGBA_IMAGE, "Grid 2", 100, 0);
   $image->insert_layer($cleangrid,0,0);
-  $cleangrid->edit_fill(BACKGROUND_FILL);
+  $cleangrid->edit_fill(FILL_BACKGROUND);
   $cleangrid->grid(1, $blocksize, 0, [0,0,0], 255, 1, $blocksize, 0, [0,0,0], 255, 0, 0, 0, [0,0,0], 0);
   $image->select_item(CHANNEL_OP_REPLACE, $selection);
   $drawable->bump_map($cleangrid, 135, 45, 3, 0, 0, 0, 0, 1, 0, 0);

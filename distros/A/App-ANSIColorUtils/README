@@ -2,8 +2,8 @@ NAME
     App::ANSIColorUtils - Utilities related to ANSI color
 
 VERSION
-    This document describes version 0.007 of App::ANSIColorUtils (from Perl
-    distribution App-ANSIColorUtils), released on 2020-06-09.
+    This document describes version 0.008 of App::ANSIColorUtils (from Perl
+    distribution App-ANSIColorUtils), released on 2021-01-19.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -37,6 +37,8 @@ DESCRIPTION
     *   show-assigned-rgb-colors
 
     *   show-colors
+
+    *   show-rand-rgb-colors
 
     *   show-text-using-color-gradation
 
@@ -118,6 +120,33 @@ FUNCTIONS
 
     Return value: (any)
 
+  show_rand_rgb_colors
+    Usage:
+
+     show_rand_rgb_colors(%args) -> [status, msg, payload, meta]
+
+    Produce N random RGB colors using rand_rgb_colors() and show the
+    results.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   light_color => *bool* (default: 1)
+
+    *   n* => *posint*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   show_text_using_color_gradation
     Usage:
 
@@ -129,7 +158,11 @@ FUNCTIONS
 
     *   Example #1:
 
-         show_text_using_color_gradation(text => "Hello, world", color1 => "blue", color2 => "pink"); # -> undef
+         show_text_using_color_gradation(text => "Hello, world", color1 => "blue", color2 => "pink");
+
+        Result:
+
+         [undef, "0000ff", undef, {}]
 
     This can be used to demonstrate 24bit color support in terminal
     emulators.
@@ -167,7 +200,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ANSIColorUtils>
+    <https://github.com/perlancar/perl-App-ANSIColorUtils/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -177,7 +210,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2020, 2019, 2017 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

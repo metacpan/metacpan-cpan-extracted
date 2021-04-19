@@ -9,6 +9,9 @@
 #define NEED_vnewSVpvf
 #define NEED_newSVpvn_flags_GLOBAL
 #define NEED_warner
+#define NEED_ck_warner
+#define NEED_croak_xs_usage
+
 /* end vutil.c */
 #include "ppport.h"
 #include "vutil.h"
@@ -54,6 +57,6 @@ BOOT:
         /* register the overloading (type 'A') magic */
         PL_amagic_generation++;
 	do {
-	    newXS(xsub->name, xsub->xsub, file);
+	    newXS((char*)xsub->name, xsub->xsub, file);
 	} while (++xsub < end);
     }

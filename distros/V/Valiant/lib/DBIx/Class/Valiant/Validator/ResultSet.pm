@@ -119,6 +119,7 @@ DBIx::Class::Valiant::Validator::ResultSet - Verify a DBIC related resultset
 
 Validations on related resultsets. Used to apply constraints on the resultset as a whole
 (such as total number of rows) or to trigger running validations on any related row objects.
+Any errors from related resultsets will be added as sub errors on the parent result.
 
 =head1 ATTRIBUTES
 

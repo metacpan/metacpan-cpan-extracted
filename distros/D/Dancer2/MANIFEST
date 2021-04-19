@@ -12,8 +12,8 @@ examples/single/hello_world.psgi
 examples/single/simple_calculator.psgi
 lib/Dancer2.pm
 lib/Dancer2/CLI.pm
-lib/Dancer2/CLI/Command/gen.pm
-lib/Dancer2/CLI/Command/version.pm
+lib/Dancer2/CLI/Gen.pm
+lib/Dancer2/CLI/Version.pm
 lib/Dancer2/Config.pod
 lib/Dancer2/Cookbook.pod
 lib/Dancer2/Core.pm
@@ -111,6 +111,8 @@ t/app/t1/lib/Sub/App2.pm
 t/app/t2/.dancer
 t/app/t2/config.yml
 t/app/t2/lib/App3.pm
+t/app/t3/lib/App4.pm
+t/app/t3/lib/config.yml
 t/app_alone.t
 t/author-distmeta.t
 t/author-no-tabs.t
@@ -143,7 +145,7 @@ t/classes/Dancer2-Core-Runner/psgi_app.t
 t/classes/Dancer2-Core/camelize.t
 t/classes/Dancer2/import-pragmas.t
 t/classes/Dancer2/import.t
-t/cli.t
+t/config-files-logged.t
 t/config.yml
 t/config/config.yml
 t/config/environments/failure.yml

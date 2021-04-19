@@ -1,0 +1,64 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::Plugin
+at lib/Myriad/Plugin.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Myriad::Plugin
+
+=head1 DESCRIPTION
+
+The plugin system allows sharing of various features between service implementations.
+Examples might include database or API access.
+
+Plugins will be loaded automatically if an as-yet-unknown attribute is used.
+
+For example, a hypothetical C<async method example : Reverse() { }> service method
+definition would attempt to use the registered C<Reverse> handler, and if none was found
+would proceed to load C<Myriad::Plugin::Reverse> and try again.
+
+=head1 METHODS
+
+=head2 register
+
+Example:
+
+ has $db;
+ register SQL => async method ($code, %args) {
+  return sub ($srv, @args) {
+   my ($sql, @bind) = $srv->$code(@args);
+   return $db->query(
+    $sql => @bind
+   )->row_hashrefs
+  }
+ };
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+

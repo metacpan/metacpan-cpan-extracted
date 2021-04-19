@@ -1,5 +1,5 @@
 package Authen::NZRealMe::XMLEnc;
-$Authen::NZRealMe::XMLEnc::VERSION = '1.22';
+$Authen::NZRealMe::XMLEnc::VERSION = '1.23';
 use strict;
 use warnings;
 

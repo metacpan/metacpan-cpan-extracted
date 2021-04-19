@@ -22,5 +22,5 @@ requires:
   Crypt::PBKDF2: '0'
   Digest::MD5: '0'
   Digest::SHA: '0'
-version: '3.02'
+version: '3.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

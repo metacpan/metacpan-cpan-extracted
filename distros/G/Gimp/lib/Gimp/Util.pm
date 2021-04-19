@@ -14,7 +14,7 @@ our @EXPORT_OK = qw(
 
 sub __ ($); # declare - defined in Gimp
 
-our $VERSION = "2.33";
+our $VERSION = "2.34";
 
 sub get_state() {
    [
@@ -44,10 +44,10 @@ sub layer_create {
   # create a colored layer
   $layer = Gimp::Layer->new ($image,Gimp->image_width($image),
                            Gimp->image_height($image),
-                           &RGB_IMAGE,$name,100,&NORMAL_MODE);
+                           &RGB_IMAGE,$name,100,&LAYER_MODE_NORMAL_LEGACY);
   $tcol = Gimp->palette_get_background ();
   Gimp->palette_set_background ($color);
-  Gimp->drawable_fill ($layer,&BACKGROUND_FILL);
+  Gimp->drawable_fill ($layer,&FILL_BACKGROUND);
   Gimp->image_insert_layer($image, $layer, 0, $pos);
   Gimp->palette_set_background ($tcol); # reset
   $layer;
@@ -158,9 +158,9 @@ sub gimp_image_add_new_layer {
       $image, $image->width, $image->height,
       $image->layertype (defined $alpha ? $alpha : 1),
       join(':', map { basename($_) } (caller 2)[1,2]),
-      100, &NORMAL_MODE
+      100, &LAYER_MODE_NORMAL_LEGACY
    );
-   $layer->fill (defined $filltype ? $filltype : &BACKGROUND_FILL);
+   $layer->fill (defined $filltype ? $filltype : &FILL_BACKGROUND);
    $image->insert_layer ($layer, 0, $index*1);
    $layer;
 }

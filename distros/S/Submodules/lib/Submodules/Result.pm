@@ -8,7 +8,7 @@ use overload (
 	'""'		=> 'SCALAR',
 );
 our $AUTOLOAD;
-our $VERSION = '1.0014';
+our $VERSION = '1.0015';
 our @CARP_NOT = qw(Submodules);
 our $default_property = 'Module';
 our $SCALAR = sub {
@@ -69,7 +69,7 @@ sub use {
 sub read {
 	my $self = shift;
 	undef local $/;
-	open my $in, '<', $self->AbsPath or croak "Failed to open $self->{AbsPath} for reading: $!";
+	open my $in, '<', $self->{AbsPath} or croak "Failed to open $self->{AbsPath} for reading: $!";
 	binmode $in;
 	my $data = <$in>;
 	close $in;

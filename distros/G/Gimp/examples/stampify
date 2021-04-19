@@ -9,11 +9,11 @@ podregister {
   my $nw = int($image->width + 2 * $marg + $diameter);
   my $nh = int($image->height + 2 * $marg + $diameter);
   my $img2 = Gimp::Image->new($nw, $nh, RGB);
-  my $layer1 = $img2->layer_new($nw, $nh, RGBA_IMAGE, "Layer 1", 100, NORMAL_MODE);
+  my $layer1 = $img2->layer_new($nw, $nh, RGBA_IMAGE, "Layer 1", 100, LAYER_MODE_NORMAL_LEGACY);
   $img2->insert_layer($layer1, 0, 0);
   $img2->set_active_layer($layer1);
   Gimp::Context->set_background($paper);
-  $layer1->edit_fill(BACKGROUND_FILL);
+  $layer1->edit_fill(FILL_BACKGROUND);
 # create horisontal holes
   $img2->selection_none;
   my $nholes = int (($nw + $gap) / ($diameter + $gap) + 0.5);
@@ -32,7 +32,7 @@ podregister {
     $pos = $pos + $diameter + $gap;
   }
   Gimp::Context->set_background($hole);
-  $layer1->edit_fill(BACKGROUND_FILL);
+  $layer1->edit_fill(FILL_BACKGROUND);
   $img2->selection_none;
 # here comes the clever part! :-)
 # offset horis and vert holes by half the diameter

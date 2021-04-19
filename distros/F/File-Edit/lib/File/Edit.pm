@@ -2,12 +2,13 @@ package File::Edit;
 use Mojo::Base -base;
 use Path::Tiny qw/path/;
 use Carp;
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.6';
 
 has 'file';
 has 'found';        # Line numbers of found lines. ArrayRef.
 has '_lines';       # Text in the form of lines. ArrayRef.
 has '_line_re';     # Regex for _find_one
+has 'at';           # Index into _lines for actions such as insert
 
 sub new {
     @_ > 1
@@ -126,14 +127,32 @@ sub _qre {  ## ($string) :> regex
     return qr/$quoted/;
 }
 
+sub swap { ## ($s1 :>STRING, $s2 :>STRING) :> SELF
+    my ($self,$s1,$s2) = @_;
+
+    # Find the line indexes
+    my $idx_1 = $self->_find_one($s1)->found->[0];
+    my $idx_2 = $self->_find_one($s2)->found->[0];
+
+    # Swap the lines
+    my $tmp = $self->_lines->[$idx_1];
+    $self->_lines->[$idx_1] = $self->_lines->[$idx_2];
+    $self->_lines->[$idx_2] = $tmp;
+
+    return $self;
+}
+sub insert { ## ($line :>STRING) :> SELF
+    my ($self,$line) = @_;
+
+    croak "Location to insert not defined" unless defined $self->at;
+    splice @{$self->_lines}, $self->at, 0, $line;
+
+    return $self;
+}
 
 =head1 NAME
 
 File::Edit - A naive, probably buggy, file editor.
-
-=head1 VERSION
-
-Version 0.0.4
 
 =cut
 =head1 SYNOPSIS
@@ -153,10 +172,21 @@ Version 0.0.4
               ->save('build.gradle')
               ;
 
-=head1 EXPORT
+    # Swap lines, save to file
+    File::Edit->new()
+              ->text("  Do this first\n  Now do that\n  Don't do this")
+              ->swap('Do this', 'do that')
+              ->save('todo.txt')
+              ;
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+    # Insert at line index, save to file
+    File::Edit->new()
+              ->text("  Line index 0\n  Line index 1\n  Line index 2")
+              ->at(1)->insert('  Inserted line\n')
+              ->save('todo.txt')
+              ;
+
+=cut
 
 =head1 METHODS
 
@@ -166,23 +196,49 @@ if you don't export anything, such as for a purely object-oriented module.
 
     Reads in a file for editing.
 
-=head2 text
+=cut
+=head2   text
 
     my $fe = File::Edit->new()->text(some_text);
 
     Reads in some text for editing.
 
-=head2 replace
+=cut
+=head2   replace
 
     $fe->replace($old, $new);
 
     Replace the $old portion of a single line with $new.
 
-=head2 save
+=cut
+=head2   save
 
     my $fe = File::Edit->new("some_file.txt");
     $fe->save();                # Saves to "some_file.txt"
     $fe->save("other.txt")      # Saves to "other.txt"
+
+=cut
+=head2   swap( $text_1, $text_2 )
+
+The swap($s1, $s2) method finds the line containing string $s1 and finds
+the line containg string $s2 and swaps both lines.
+
+=cut
+=head2   at( $idx )
+
+The at($idx) sets the index for which actions such as insert($line) will
+take place.
+
+=cut
+=head2   insert( $line )
+
+The insert( $line ) method inserts the $line at the index location
+specified. The index location is typically by an earlier call to
+at($idx). For example:
+
+    $self->at(0)->insert('Start of file')
+
+=cut
 
 =head1 AUTHOR
 

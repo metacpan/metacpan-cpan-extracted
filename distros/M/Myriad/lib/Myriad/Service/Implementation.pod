@@ -1,0 +1,138 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::Service::Implementation
+at lib/Myriad/Service/Implementation.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Myriad::Service - microservice coördination
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 ATTRIBUTES
+
+These methods return instance variables.
+
+=head2 ryu
+
+Provides a common L<Ryu::Async> instance.
+
+=head2 myriad
+
+The L<Myriad> instance which owns this service. Stored internally as a weak reference.
+
+=head2 rpc
+
+=head2 subscription
+
+=head2 service_name
+
+The name of the service, defaults to the package name.
+
+=head1 METRICS
+
+General metrics that any service is assumed to have
+
+=head2 myriad.service.rpc
+
+Timing information about RPC calls tagged by service, status and method name
+
+=head2 myriad.service.batch
+
+Timing information about the batch subscriptions tagged by service, status and method name
+
+=head2 myriad.service.receiver
+
+Timing information about events receivers tagged by service, status and method name
+
+=head2 myriad.service.emitter
+
+A counter for the events emitted by emitters tagged by service and method name
+
+=head1 METHODS
+
+=head2 configure
+
+Populate internal configuration.
+
+=head2 _add_to_loop
+
+Apply this service to the current event loop.
+
+This will trigger a number of actions:
+
+=over 4
+
+=item * initial startup
+
+=item * first diagnostics check
+
+=item * if successful, batch and subscription registration will occur
+
+=back
+
+=head1 ASYNC METHODS
+
+=head2 load
+
+To wire the service with Myriad's component
+before it actually starts work
+
+=head2 start
+
+Perform the diagnostics check and start the service
+
+=head2 startup
+
+Initialize the service internal status it will be called when the service is added to the L<IO::Async::Loop>.
+
+The method here is just a placeholder it should be reimplemented by the service code.
+
+=head2 diagnostics
+
+Runs any internal diagnostics.
+
+The method here is just a placeholder it should be reimplemented by the service code.
+
+=head2 shutdown
+
+Gracefully shut down the service by
+
+- stop accepting more requests
+
+- finish the pending requests
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+

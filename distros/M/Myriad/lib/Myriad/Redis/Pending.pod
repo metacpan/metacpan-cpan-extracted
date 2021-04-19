@@ -1,0 +1,34 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Myriad::Redis::Pending
+at lib/Myriad/Redis/Pending.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head2 finished
+
+Returns a L<Future> representing the state of this message - C<done> means that
+it has been acknowledged.
+
+=head2 finish
+
+Should be called once processing is complete.
+
+This is probably in the wrong place - better to have this as a simple abstract class.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+

@@ -1,3 +1,8 @@
+0.008   2021-01-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: show-rand-rgb-colors.
+
+
 0.007   2020-06-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utility: show-colors.

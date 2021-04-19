@@ -1,0 +1,15 @@
+Alien::FFTW3 - Easy installation of FFTW3
+=========================================
+
+COPYRIGHT AND LICENSE
+
+Copyright 2013 Craig DeForest
+
+This module is free software; you can redistribute 
+it and/or modify it under the same terms as Perl 
+5.10-5.16.  For more details, see the full text of the
+licenses in the directory LICENSES.
+
+Thanks to Joel Berger for writing Alien::Base.
+
+

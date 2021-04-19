@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '0.301001';
+$Dancer2::Core::App::VERSION = '0.301002';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -1109,6 +1109,8 @@ sub BUILD {
     my $self = shift;
     $self->init_route_handlers();
     $self->_init_hooks();
+
+    $self->log(core => 'Built config from files: ' . join(' ', @{$self->config_files}));
 }
 
 sub finish {
@@ -1693,7 +1695,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 0.301001
+version 0.301002
 
 =head1 DESCRIPTION
 

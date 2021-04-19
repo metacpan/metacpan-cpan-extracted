@@ -1,6 +1,7 @@
 #include <string.h>
+#include <stdlib.h>
 
-typedef struct { char buffer[100] } foo_t;
+typedef struct { char buffer[100]; } foo_t;
 
 void
 set(foo_t *self, const char *value)

@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     "Test::Needs" => "0.002006",
     "Type::Tiny" => "1.012001"
   },
-  "VERSION" => "0.001004",
+  "VERSION" => "0.001005",
   "test" => {
     "TESTS" => "t/*.t t/dbic/*.t t/examples/*.t t/filters/*.t t/validator/*.t"
   }

@@ -1,7 +1,8 @@
 
 use lib 't/lib';
 use Counter;
-use Test::More tests => 9;
+use Test2::V0;
+plan tests => 9;
 
 {
     my $o = Counter->new;

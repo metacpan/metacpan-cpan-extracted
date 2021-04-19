@@ -10,7 +10,7 @@ our (
 use subs qw(init end lock unlock);
 
 BEGIN {
-   $VERSION = '2.33'; # going forward: 2.xx, or 2.xx_yy for dev
+   $VERSION = '2.34'; # going forward: 2.xx, or 2.xx_yy for dev
    eval {
       require XSLoader;
       XSLoader::load Gimp $VERSION;
@@ -451,10 +451,10 @@ Gimp - Write GIMP extensions/plug-ins/load- and save-handlers in Perl
     # your code
     my $image = new Gimp::Image (600, 300, RGB);
     my $bg = $image->layer_new(
-      600,300,RGB_IMAGE,"Background",100,NORMAL_MODE
+      600,300,RGB_IMAGE,"Background",100,LAYER_MODE_NORMAL_LEGACY
     );
     $image->insert_layer($bg, 1, 0);
-    $image->edit_fill($bg, FOREGROUND_FILL);
+    $image->edit_fill($bg, FILL_FOREGROUND);
     eval { Gimp::Display->new($image); };
     $image;
   };
@@ -544,7 +544,7 @@ available to your plug-in.
 =head2 :consts
 
 All constants found by querying GIMP (BG_IMAGE_FILL, RUN_NONINTERACTIVE,
-NORMAL_MODE, PDB_INT32 etc.).
+LAYER_MODE_NORMAL_LEGACY, PDB_INT32 etc.).
 
 =head2 :param
 
@@ -958,6 +958,9 @@ C<[PARAM_TYPE, "NAME", "DESCRIPTION"]>, e.g.:
 	[],
      );
   };
+
+This will remove the full menu path (up to the last C</>) and call
+C<gimp_plugin_menu_register> with it behind the scenes.
 
 =head3 Gimp::Progress->init(message,[display])
 

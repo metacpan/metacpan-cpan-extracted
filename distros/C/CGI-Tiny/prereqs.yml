@@ -1,0 +1,14 @@
+runtime:
+  requires:
+    perl: '5.008001'
+    Carp: 0
+    Encode: 0
+    Exporter: '5.57'
+    IO::Handle: 0
+    JSON::PP: 0
+  recommends:
+    Cpanel::JSON::XS: '4.09'
+test:
+  requires:
+    Test::More: '0.96'
+    MIME::Base64: 0

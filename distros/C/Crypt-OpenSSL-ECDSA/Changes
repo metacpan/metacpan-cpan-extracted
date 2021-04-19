@@ -1,5 +1,12 @@
 Revision history for Perl extension Crypt::OpenSSL::ECDSA.
 
+0.10 21-04-17
+     - Patch from Timothy Legge to improve allocation of bignums according to their actual length
+     
+0.09 2021-04-14
+     - Updates for OpenSSL 1.1.0 changes from to fix https://rt.cpan.org/Public/Bug/Display.html?id=134418
+     reported by Timothy Legge.
+     
 0.08 2016-07-30
      - Changed Makefile.PL perl version to 5.008
 

@@ -12,6 +12,8 @@ use AutoLoader;
 
 our @ISA = qw(Exporter);
 
+our $VERSION = '0.08';
+
 # Preloaded methods go here.
 
 my $STRIPE_UNIT  = 64 * 1024;
@@ -109,28 +111,44 @@ sub append {
 }
 
 sub read_handle_perl {
-    my ($self, $soid, $handle) = @_;
-    (my $length, undef) = $self->_stat($soid);
+    my ($self, $soid, $handle, $len, $off) = @_;
+    my $is_filehandle = openhandle($handle);
+    my $is_writable_object = blessed($handle) and $handle->can('write');
+    Carp::confess "Called with neither an open filehandle equivalent nor an object with a \`write\` method"
+        unless $is_filehandle or $is_writable_object;
+    $off //= 0;
+    if (!$len) {
+        ($len, undef) = $self->_stat($soid);
+    }
+    my $count = 0;
     #
-    for (my $offset = 0; $offset <= $length; $offset += $CHUNK_SIZE) {
+    for (my $pos = 0; $pos <= $len; $pos += $CHUNK_SIZE) {
         my $chunk;
-        if ($offset + $CHUNK_SIZE > $length) {
-            $chunk = $length % $CHUNK_SIZE;
+        if ($pos + $CHUNK_SIZE > $len) {
+            $chunk = $len % $CHUNK_SIZE;
         } else {
             $chunk = $CHUNK_SIZE;
         }
-        printf "writing %i - %i of %i\n", $offset, $offset+$chunk, $length;
-        my $data = $self->_read($soid, $chunk, $offset);
-        syswrite $handle, $data;
+        my $data = $self->_read($soid, $chunk, $pos);
+        if ($is_filehandle) {
+            syswrite $handle, $data;
+        } else {
+            $handle->write($data)
+        }
+        $count += length $data;
     }
-    return 1;
+    return $count;
 }
 
 sub read_handle {
-    my ($self, $soid, $handle, $offset, $length, $debug) = @_;
-    Carp::confess "Called with not an open handle"
-        unless openhandle $handle;
-    &_read_to_fh
+    my ($self, $soid, $handle, $len, $off, $debug) = @_;
+    if (blessed($handle) and $handle->can('write')) {
+        &read_handle_perl;
+    } elsif (openhandle $handle) {
+        $self->_read_to_fh($soid, $handle, $len||0, $off||0);
+    } else {
+        Carp::confess "Called with neither an open filehandle equivalent nor an object with a \`write\` method";
+    }
 }
 
 sub read {
@@ -188,8 +206,6 @@ our @EXPORT = qw(
 	LIBRADOSSTRIPER_VER_MAJOR
 	LIBRADOSSTRIPER_VER_MINOR
 );
-
-our $VERSION = '0.07';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

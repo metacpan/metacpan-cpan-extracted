@@ -8,7 +8,7 @@ BEGIN {
   @PLUGINS = qw(dots glowing_steel map_to_gradient redeye);
   $LIKE_RX = qr/^(Xlib:\s*extension "RANDR" missing.*|)$/m;
   $DEBUG = 0;
-  require 't/gimpsetup.pl';
+  require './t/gimpsetup.pl';
   # most minimal and elegant would be to symlink sandbox gimp-dir's
   # plug-ins to our blib/plugins dir, but not portable to windows
   my $blibdir = 'blib/plugins';
@@ -29,7 +29,7 @@ use Symbol 'gensym';
 use IO::Select; # needed because output can be big and it can block!
 
 our (@testbench, %proc2file, %file2procs);
-require 't/examples-api.pl';
+require './t/examples-api.pl';
 
 my %plug2yes = map { ($_=>1) } @PLUGINS;
 @testbench = grep { $plug2yes{$_->[0]} } @testbench;

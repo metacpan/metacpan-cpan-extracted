@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/LINQ>
 Bug tracker:  <https://github.com/tobyink/p5-linq/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.002	2021-04-19
+
+ - Added: Add `field()` to LINQ::Util, and a LINQ::FieldSet::Single class.
+ - Added: LINQ::FieldSet::Single, LINQ::FieldSet::Selection, and
+   LINQ::FieldSet::Assertion all now overload stringification and have a
+   `to_string()` method.
+ - Added: LINQ::FieldSet::Single, LINQ::FieldSet::Selection, and
+   LINQ::FieldSet::Assertion all overload boolification to return true, and
+   set fallback=>true for overloading.
+
 0.001	2021-04-11
 
  [ Packaging ]

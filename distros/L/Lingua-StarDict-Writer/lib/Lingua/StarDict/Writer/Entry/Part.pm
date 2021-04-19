@@ -1,0 +1,77 @@
+package Lingua::StarDict::Writer::Entry::Part;
+
+use 5.006;
+use strict;
+use warnings;
+use Moo;
+
+
+=encoding utf8
+=cut
+
+=head1 NAME
+
+Lingua::StarDict::Writer::Entry::Part - an internal module for Lingua::StarDict::Writer. Please read L<Lingua::StarDict::Writer> manual.
+
+=cut
+
+has 'type' => (
+    is => 'rw',
+    default => "m",
+    isa => sub {
+                 my $type = shift;
+                 die "Error setting part type ". (defined $type ? "'type'": "undef") .": Part type should be one latin letter" unless defined $type && $type =~ /^[a-zA-Z]$/;
+                 die "Error setting part type '$type': Binary (upper case) part types are not supported" unless $type =~ /^[a-z]$/;
+               }
+);
+
+has 'data' => (
+    is => 'rw',
+    required => 1,
+);
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2021 Nikolay Shaplov.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut
+
+1;

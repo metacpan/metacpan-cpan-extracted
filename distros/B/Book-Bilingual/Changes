@@ -1,0 +1,11 @@
+Revision history for Book-Bilingual
+
+0.003   17 Apr, 2021
+        Add method to convert book to JSON
+
+0.002   16 Apr, 2021
+        Add script biread in place of non-functioning Reader.pl
+
+0.001   16 Apr, 2021
+        First version, released on an unsuspecting world.
+

@@ -2,7 +2,7 @@ sub newimage {
   my $numlayers = shift;
   my $i = Gimp::Image->new(200,200,RGB);
   for my $layernum (1..$numlayers) {
-    my $l0 = $i->layer_new(200,200,RGBA_IMAGE,"layer $layernum",100,VALUE_MODE);
+    my $l0 = $i->layer_new(200,200,RGBA_IMAGE,"layer $layernum",100,LAYER_MODE_HSV_VALUE_LEGACY);
     $i->insert_layer($l0,0,0);
   }
   $i;

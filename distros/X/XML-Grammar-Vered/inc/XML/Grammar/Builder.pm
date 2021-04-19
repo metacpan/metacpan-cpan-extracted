@@ -3,7 +3,7 @@ package XML::Grammar::Builder;
 use strict;
 use warnings;
 
-use base 'Test::Run::Builder';
+use parent 'Test::Run::Builder';
 
 our $VERSION = '0.0200';
 

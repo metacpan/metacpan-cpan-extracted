@@ -4,10 +4,9 @@ use warnings;
 package self;
 use 5.006;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 use Sub::Exporter;
 
-use Devel::Declare ();
 use B::Hooks::Parser;
 
 my $NO_SELF;
@@ -75,7 +74,7 @@ sub _check {
     # ...
     # }
     elsif (index($linestr, 'sub') >= 0) {
-        $offset += Devel::Declare::toke_skipspace($offset);
+        $offset += B::Hooks::Toke::skipspace($offset);
         if ($linestr =~ /(sub.*?\n\s*{)/) {
             my $pos = index($linestr, $1);
             if ($pos + length($1) - 1 == $offset) {
@@ -153,8 +152,7 @@ always the same as saying:
 ... in the first line of sub.
 
 However it is not source filtering, but compile-time code
-injection. For more info about code injection, see L<B::Hooks::Parser>
-or L<Devel::Declare>.
+injection. For more info about code injection, see L<B::Hooks::Parser>.
 
 It also exports a C<self> and a C<args> functions. Basically C<self> is just
 equal to C<$_[0]>, and C<args> is just C<$_[1..$#_]>.
@@ -201,7 +199,7 @@ self.pm requires no configuration files or environment variables.
 
 =head1 DEPENDENCIES
 
-C<B::OPCheck>, C<Devel::Declare>, C<Sub::Exporter>
+C<B::OPCheck>, C<B::Hooks::Parser>, C<Sub::Exporter>
 
 =head1 INCOMPATIBILITIES
 
@@ -232,7 +230,7 @@ Extra spaces around sub declarations are handled as much as possible,
 if you found any cases that it failed to work, please send me bug
 reports with your test cases.
 
-It does it work on methods generated in runtime. Remember, it's a
+It does not work on methods generated in runtime. Remember, it's a
 compile-time code injection. For those cases, use C<self> function
 instead.
 
@@ -246,7 +244,7 @@ Kang-min Liu  C<< <gugod@gugod.org> >>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2007, 2008, 2009, Kang-min Liu C<< <gugod@gugod.org> >>.
+Copyright (c) 2021 Kang-min Liu C<< <gugod@gugod.org> >>.
 
 This is free software, licensed under:
 

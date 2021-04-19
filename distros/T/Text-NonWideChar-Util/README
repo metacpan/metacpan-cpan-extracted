@@ -1,24 +1,57 @@
-SYNOPSIS
+NAME
+    Text::NonWideChar::Util - Utility routines for text
 
+VERSION
+    This document describes version 0.003 of Text::NonWideChar::Util (from
+    Perl distribution Text-NonWideChar-Util), released on 2021-04-14.
+
+SYNOPSIS
      use Text::NonWideChar::Util qw(
          length_height);
-    
+
      # get length as well as number of lines
      say mbswidth_height("one\ntwo\nthree"); # => [5, 3]
 
 DESCRIPTION
-
     This module provides the non-wide version of some of the routines in
     Text::WideChar::Util.
 
 FUNCTIONS
-
- length_height($text) => [INT, INT]
-
-    This is the non-wide version of mbswidth_height() and can be used if
+  length_height($text) => [INT, INT]
+    This is the non-wide version of "mbswidth_height()" and can be used if
     your text only contains printable ASCII characters and newlines.
 
-SEE ALSO
+FAQ
+    # INSERT_BLOCK: Text::ANSI::Util why_split
 
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-NonWideChar-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-NonWideChar-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Text-NonWideChar-Util/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Text::WideChar::Util
+
+    String::Pad, Text::Wrap
+
+    Text::ANSI::Util, Text::ANSI::WideUtil
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

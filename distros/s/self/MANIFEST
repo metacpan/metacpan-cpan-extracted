@@ -1,21 +1,12 @@
 Changes
+cpanfile
 examples/benchmark.pl
 examples/Counter.pm
 examples/play_counter.pl
-inc/Module/Install.pm
-inc/Module/Install/AuthorTests.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/self.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.yml
 README
 t/00.load.t
 t/02.eval.t
@@ -45,3 +36,5 @@ t/space06.t
 t/space07.t
 xt/pod-coverage.t
 xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

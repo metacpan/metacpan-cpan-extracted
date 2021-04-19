@@ -3,13 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI pitches for guitar chord voicings
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0603';
 
 use strict;
 use warnings;
 
 use File::ShareDir qw(dist_dir);
-use List::Util qw(any);
+use List::Util qw(any zip);
 use Music::Note;
 use Text::CSV_XS ();
 use Moo;
@@ -132,6 +132,71 @@ sub voicings {
     return $voicings;
 }
 
+
+sub fingering {
+    my ($self, $target, $chord_name, $variation) = @_;
+
+    $target = Music::Note->new($target, 'ISO')->format('midinum');
+
+    $chord_name //= '';
+
+    my @fingering;
+
+    if (defined $variation) {
+        my $fingering = $self->chords->{ 'C' . $chord_name }{fingering}[$variation];
+
+        my $pitches = $self->chords->{ 'C' . $chord_name }{notes}[$variation];
+        my $diff = $target - _lowest_c($pitches);
+
+        my ($str, $pos) = split /-/, $fingering;
+        my $p = $pos + $diff;
+        if ($p == 0 && $str !~ /0/) {
+            $str = _decrement_fingering($str);
+            $p++;
+        }
+        elsif ($p != 0 && $str =~ /0/) {
+            $str = _increment_fingering($str);
+        }
+        push @fingering, $str . '-' . $p;
+    }
+    else {
+        for (zip $self->chords->{ 'C' . $chord_name }{notes}, $self->chords->{ 'C' . $chord_name }{fingering}) {
+            my ($pitches, $fingering) = @$_;
+            my $diff = $target - _lowest_c($pitches);
+            my ($str, $pos) = split /-/, $fingering;
+            my $p = $pos + $diff;
+            if ($p == 0 && $str !~ /0/) {
+                $str = _decrement_fingering($str);
+                $p++;
+            }
+            elsif ($p != 0 && $str =~ /0/) {
+                $str = _increment_fingering($str);
+            }
+            push @fingering, $str . '-' . $p;
+        }
+    }
+
+    return \@fingering;
+}
+
+sub _increment_fingering {
+    my ($fingering) = @_;
+    my $incremented = '';
+    for my $char (split //, $fingering) {
+        $incremented .= $char =~ /\d/ ? $char + 1 : $char;
+    }
+    return $incremented;
+}
+
+sub _decrement_fingering {
+    my ($fingering) = @_;
+    my $decremented = '';
+    for my $char (split //, $fingering) {
+        $decremented .= $char =~ /\d/ ? $char - 1 : $char;
+    }
+    return $decremented;
+}
+
 1;
 
 __END__
@@ -146,7 +211,7 @@ MIDI::Chord::Guitar - MIDI pitches for guitar chord voicings
 
 =head1 VERSION
 
-version 0.0502
+version 0.0603
 
 =head1 SYNOPSIS
 
@@ -155,11 +220,12 @@ version 0.0502
   my $mcg = MIDI::Chord::Guitar->new;
 
   my $chords = $mcg->transform('D3', 'dim7');
-
   my $chord = $mcg->transform('D3', 'dim7', 0);
-
   # MIDI:
   #$score->n('wn', @$chord);
+
+  my $fingerings = $mcg->fingering('D3', 'dim7');
+  my $fingering = $mcg->fingering('D3', 'dim7', 0);
 
   my $voicings = $mcg->voicings('dim7');
 
@@ -231,8 +297,7 @@ The default B<format> is C<midinum> but can be given as C<ISO> or
 C<midi> to return named notes with octaves.
 
 The order of the voicing variations of a chord is by fret position.
-So, the first variations are at lower frets.  Please use the above
-diagrams to figure out the exact neck positions.
+So, the first variations are at lower frets.
 
 Here is an example of the voicing CSV file which can be found with the
 B<voicing_file> attribute:
@@ -249,8 +314,16 @@ B<voicing_file> attribute:
   C7,xx1323-10,60,67,70,76,,
   ...
 
-Check out the link in the L</"SEE ALSO"> section for the chord shapes
+Check out the links in the L</"SEE ALSO"> section for the chord shapes
 used to create this.
+
+=head2 fingering
+
+  $fingering = $mcg->fingering($target, $chord_name, $variation);
+  $fingerings = $mcg->fingering($target, $chord_name);
+
+As with the C<transform> method, but for neck position, finger
+placement.
 
 =head1 SEE ALSO
 

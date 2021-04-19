@@ -118,12 +118,12 @@ sub requires {
 ##  }
     return +{
 	'Carp'		=> 0,
+	'Clone'		=> 0,
 	'Data::Dumper'	=> 0,
 	'Exporter'	=> 5.64,
 	'IO::File'	=> 0,
 	'POSIX'		=> 0,
 	'Scalar::Util'	=> 1.22,	# For looks_like_number
-	'Storable'	=> 0,
 	'Time::Local'	=> 0,
 	base		=> 0,
 	constant	=> 0,

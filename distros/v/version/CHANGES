@@ -4,6 +4,13 @@ This is not a complete list of changes.  See repository for full details:
 
     https://github.com/Perl/version.pm
 
+0.9929
+  * Upgrade to ppport 3.62
+  * Import fix for core build warning
+
+0.9928
+  * silence warning for our LC_NUMERIC_LOCK macro
+
 0.9927
   * Released 0.99_26 as 0.9927
 

@@ -13,12 +13,15 @@ __PACKAGE__->add_columns(
     data_type => 'varchar',
     is_nullable => 0,
     size => 64,
+    validates => [
+      presence => 1, 
+      length => [8,24], 
+      confirmation => { on=>'registration'},
+    ],
   },
 );
 
 __PACKAGE__->validates(username => presence=>1, length=>[3,24], format=>'alpha_numeric', unique=>{skip_if_undef=>1});
-__PACKAGE__->validates(password => presence=>1, length=>[8,24], confirmation=> { on=>'registration'} );
-
 __PACKAGE__->validates(first_name => (presence=>1, length=>[2,24]));
 __PACKAGE__->validates(last_name => (presence=>1, length=>[2,48]));
 

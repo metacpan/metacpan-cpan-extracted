@@ -5,13 +5,18 @@ use warnings;
 package LINQ::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
-use Exporter::Shiny qw( fields check_fields );
+use Exporter::Shiny qw( field fields check_fields );
 
 sub fields {
 	require LINQ::FieldSet::Selection;
 	'LINQ::FieldSet::Selection'->new( @_ );
+}
+
+sub field {
+	require LINQ::FieldSet::Single;
+	'LINQ::FieldSet::Single'->new( @_ );
 }
 
 sub check_fields {
@@ -102,6 +107,46 @@ An asterisk field selects all the input fields:
 The aim of the C<fields> function is to allow the LINQ C<select> method to
 function more like an SQL SELECT, where you give a list of fields you wish
 to select.
+
+=item C<< field( NAME ) >>
+
+Conceptually similar to C<< fields() >> but for a single field. Returns the
+field value instead of a hashref of field values.
+
+  my $field = field('name');
+  say $field->( $_ ) for (
+    { name => 'Alice' },
+    { name => 'Bob' },
+  );
+
+If called in list context with extra arguments after the field name, a list
+will be returned, including the extra arguments unchanged.
+
+  my $people = LINQ( [
+    { name => 'Alice', age => 30, dept => 3 },
+    { name => 'Bob'  , age => 29, dept => 3 },
+    { name => 'Carol', age => 32, dept => 4 },
+    { name => 'Dave',  age => 33, dept => 1 },
+  ] );
+  
+  my $depts = LINQ( [
+    { id => 3, name => 'IT'        },
+    { id => 4, name => 'Marketing' },
+    { id => 1, name => 'Accounts'  },
+  ] );
+  
+  my $joiner = sub {
+    my ( $person, $dept ) = @_;
+    return {
+      person_name => $person->{name},
+      person_age  => $person->{age},
+      dept_name   => $dept->{name},
+    };
+  };
+  
+  my $joined = $people->join( $depts, field 'dept', field 'id', $joiner );
+  
+  print Dumper( $joined->to_array );
 
 =item C<< check_fields( SPEC ) >>
 

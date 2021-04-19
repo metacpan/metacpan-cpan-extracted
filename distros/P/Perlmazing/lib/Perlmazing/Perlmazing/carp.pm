@@ -1,8 +1,7 @@
-use Perlmazing;
-use Carp 'carp';
+use Carp ();
 
 sub main {
-	goto &carp;
+	goto &Carp::carp;
 }
 
 1;

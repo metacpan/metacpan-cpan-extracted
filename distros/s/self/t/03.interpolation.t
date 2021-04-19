@@ -3,7 +3,8 @@ use warnings;
 use lib 't/lib';
 use InterpolationTest;
 
-use Test::More tests => 2;
+use Test2::V0;
+plan tests => 2;
 
 my $t = InterpolationTest->new;
 

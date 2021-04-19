@@ -10,10 +10,10 @@ SYNOPSIS
            # your code
 	   my $image = new Gimp::Image (600, 300, RGB);
 	   my $bg = $image->layer_new(
-	     600,300,RGB_IMAGE,"Background",100,NORMAL_MODE
+	     600,300,RGB_IMAGE,"Background",100,LAYER_MODE_NORMAL_LEGACY
 	   );
 	   $image->insert_layer($bg, 1, 0);
-	   $image->edit_fill($bg, FOREGROUND_FILL);
+	   $image->edit_fill($bg, FILL_FOREGROUND);
 	   Gimp::Display->new($image);
 	   $image;
          };
@@ -107,12 +107,12 @@ podregister {
   my $img = Gimp::Image->new($width, $height, RGB);
   $img->undo_group_start; # so all actions can be undone in one step
   # the __ before the string will translate it if available
-  my $l = Gimp::Layer->new($img, $width, $height, RGB, __"Background", 100, NORMAL_MODE);
+  my $l = Gimp::Layer->new($img, $width, $height, RGB, __"Background", 100, LAYER_MODE_NORMAL_LEGACY);
   $l->insert_layer(0, 0); # required!
   # now a few syntax examples
   Gimp::Context->set_foreground($text_colour) unless $ignore_cols;
   Gimp::Context->set_background($bg_colour) unless $ignore_cols;
-  fill $l BACKGROUND_FILL;
+  fill $l FILL_BACKGROUND;
   my $text_layer = $img->text_fontname(-1, 10, 10, $text, 5, 1, 10, PIXELS, $font);
   Gimp::Context->set_foreground("green");
   $img->undo_group_end; # close the undo group

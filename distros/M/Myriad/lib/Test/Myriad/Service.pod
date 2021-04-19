@@ -1,0 +1,114 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Test::Myriad::Service
+at lib/Test/Myriad/Service.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Test::Myriad::Service - an abstraction to mock microservices.
+
+=head1 SYNOPSIS
+
+ my $service = Myriad::Test::Service->new(..);
+ $service->add_rpc('rpc_name', %default_response);
+
+=head1 DESCRIPTION
+
+=head1 Methods
+
+=head2 add_rpc
+
+Attaches a new RPC to the service with a defaultt response.
+
+=over 4
+
+=item * C<name> - The name of the RPC.
+
+=item * C<response> - A hash that will be sent as the response.
+
+=back
+
+=head2 mock_rpc
+
+Override the original RPC response for a single call.
+
+=over 4
+
+=item * C<name> - The name of the RPC to be mocked.
+
+=item * C<response> - A hash that will be sent as the response.
+
+=back
+
+=head2 call_rpc
+
+A shortcut to call an RPC in the current service.
+
+The call will be conducted over Myriad Transport and not
+as a method invocation.
+
+=over 4
+
+=item * C<method> - The RPC method name.
+
+=item * C<args> - A hash of the method arguments.
+
+=back
+
+=head2 add_subscription
+
+Creats a new subscription in the service.
+
+This sub takes the source of the data in multiple ways
+described in the parameters section, only one of them required.
+
+=over 4
+
+=item * C<channel> - The channel name that the events will be emitted to.
+
+=item * C<array> - A perl arrayref that its content is going to be emitted as events.
+
+=back
+
+=head2 add_receiver
+
+Adds a new receiver in the given service.
+
+=over 4
+
+=item * C<from> - The source service name.
+
+=item * C<channel> - The source of the events channel name.
+
+=item * C<handler> - A coderef that will handle the events.
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Object::Pad::UNIVERSAL>
+
+L<BUILDARGS|Object::Pad::UNIVERSAL/BUILDARGS>
+
+=back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>.
+
+See L<Myriad/CONTRIBUTORS> for full details.
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020. Licensed under the same terms as Perl itself.
+

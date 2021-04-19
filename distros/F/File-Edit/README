@@ -1,9 +1,6 @@
 NAME
     File::Edit - A naive, probably buggy, file editor.
 
-VERSION
-    Version 0.0.4
-
 SYNOPSIS
         use File::Edit;
 
@@ -20,9 +17,19 @@ SYNOPSIS
                   ->save('build.gradle')
                   ;
 
-EXPORT
-    A list of functions that can be exported. You can delete this section if
-    you don't export anything, such as for a purely object-oriented module.
+        # Swap lines, save to file
+        File::Edit->new()
+                  ->text("  Do this first\n  Now do that\n  Don't do this")
+                  ->swap('Do this', 'do that')
+                  ->save('todo.txt')
+                  ;
+
+        # Insert at line index, save to file
+        File::Edit->new()
+                  ->text("  Line index 0\n  Line index 1\n  Line index 2")
+                  ->at(1)->insert('  Inserted line\n')
+                  ->save('todo.txt')
+                  ;
 
 METHODS
   new
@@ -44,6 +51,21 @@ METHODS
         my $fe = File::Edit->new("some_file.txt");
         $fe->save();                # Saves to "some_file.txt"
         $fe->save("other.txt")      # Saves to "other.txt"
+
+  swap( $text_1, $text_2 )
+    The swap($s1, $s2) method finds the line containing string $s1 and finds
+    the line containg string $s2 and swaps both lines.
+
+  at( $idx )
+    The at($idx) sets the index for which actions such as insert($line) will
+    take place.
+
+  insert( $line )
+    The insert( $line ) method inserts the $line at the index location
+    specified. The index location is typically by an earlier call to
+    at($idx). For example:
+
+        $self->at(0)->insert('Start of file')
 
 AUTHOR
     Hoe Kit CHEW, "<hoekit at gmail.com>"

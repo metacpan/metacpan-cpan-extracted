@@ -4,20 +4,17 @@ use warnings;
 
 package PPIx::DocumentName;
 
-our $VERSION = '0.001003';
-
 # ABSTRACT: Utility to extract a name from a PPI Document
-
-our $AUTHORITY = 'cpan:KENTNL'; # AUTHORITY
+our $VERSION = '1.01'; # VERSION
 
 use PPI::Util qw( _Document );
-
-
 
 
 sub log_info(&@);
 sub log_debug(&@);
 sub log_trace(&@);
+
+my %callers;
 
 BEGIN {
   if ( $INC{'Log/Contextual.pm'} ) {
@@ -34,41 +31,59 @@ BEGIN {
   }
 }
 
+sub import {
+  my(undef, %args) = @_;
+  if(defined $args{'-api'}) {
+    if($args{'-api'} != 0 && $args{'-api'} != 1) {
+      Carp::croak("illegal api level: $args{'-api'}");
+    }
+    if($] < 5.010) {
+      my($package) = caller;
+      $callers{$package} = $args{'-api'};
+      require Carp;
+      Carp::carp("Because of the age of your Perl, -api $args{'-api'} " .
+                 'will be package scoped instead of block scoped. ' .
+                 'Please upgrade to 5.10 or better.');
+    } else {
+      $^H{'PPIx::DocumentName/api'} = $args{'-api'};  ## no critic (Variables::RequireLocalizedPunctuationVars)
+    }
+  }
+}
+
+sub _api {
+  my ( $api ) = @_;
+  if($] < 5.010) {
+    my($package) = caller 1;
+    $api = $callers{$package} unless defined $api;
+  } else {
+    my $hh = (caller 1)[10];
+    $api = $hh->{'PPIx::DocumentName/api'} if defined $hh && !defined $api;
+  }
+  $api = 0 unless defined $api;
+  return $api;
+}
+
+sub _result {
+  my($name, $ppi_document, $node) = @_;
+  require PPIx::DocumentName::Result;
+  PPIx::DocumentName::Result->_new($name, $ppi_document, $node);  ## no critic (Subroutines::ProtectPrivateSubs)
+}
+
 ## OO
-
-
-
-
-
-
-
-
-
-
-
 
 
 sub extract {
   my ( $self, $ppi_document ) = @_;
-  my $docname = $self->extract_via_comment($ppi_document)
-    || $self->extract_via_statement($ppi_document);
-
-  return $docname;
+  my $api = _api(undef);
+  my $result = $self->extract_via_comment($ppi_document, $api) || $self->extract_via_statement($ppi_document, $api);
+  return $result;
 }
 
 
-
-
-
-
-
-
-
-
-
-
 sub extract_via_statement {
-  my ( undef, $ppi_document ) = @_;
+  my ( undef, $ppi_document, $api ) = @_;
+
+  $api = _api($api);
 
   # Keep alive until done
   # https://github.com/adamkennedy/PPI/issues/112
@@ -76,36 +91,35 @@ sub extract_via_statement {
   my $pkg_node = $dom->find_first('PPI::Statement::Package');
   if ( not $pkg_node ) {
     log_debug { "No PPI::Statement::Package found in <<$ppi_document>>" };
-    return;
+    # The old API was inconsistant here, for just this method, returns
+    # empty list on failure.  This is unfortunately different from
+    # extract_via_comment.
+    return 1 == $api ? undef : ();
   }
   if ( not $pkg_node->namespace ) {
     log_debug { "PPI::Statement::Package $pkg_node has empty namespace in <<$ppi_document>>" };
-    return;
+    return 1 == $api ? undef : ();
   }
-  return $pkg_node->namespace;
+  my $name = $pkg_node->namespace;
+  return 1 == $api ? _result($name, $dom, $pkg_node) : $name;
 }
 
 
-
-
-
-
-
-
-
-
-
-
 sub extract_via_comment {
-  my ( undef, $ppi_document ) = @_;
+  my ( undef, $ppi_document, $api ) = @_;
+
+  $api = _api($api);
+  my $node;
+
   my $regex = qr{ ^ \s* \#+ \s* PODNAME: \s* (.+) $ }x;    ## no critic (RegularExpressions)
   my $content;
   my $finder = sub {
-    my $node = $_[1];
-    return 0 unless $node->isa('PPI::Token::Comment');
-    log_trace { "Found comment node $node" };
-    if ( $node->content =~ $regex ) {
+    my $maybe = $_[1];
+    return 0 unless $maybe->isa('PPI::Token::Comment');
+    log_trace { "Found comment node $maybe" };
+    if ( $maybe->content =~ $regex ) {
       $content = $1;
+      $node = $maybe;
       return 1;
     }
     return 0;
@@ -118,7 +132,7 @@ sub extract_via_comment {
 
   log_debug { "<<$ppi_document>> has no PODNAME comment" } if not $content;
 
-  return $content;
+  return 1 == $api && defined $content ? _result($content, $dom, $node) : $content;
 }
 
 1;
@@ -135,7 +149,31 @@ PPIx::DocumentName - Utility to extract a name from a PPI Document
 
 =head1 VERSION
 
-version 0.001003
+version 1.01
+
+=head1 SYNOPSIS
+
+New API:
+
+ use PPIx::DocumentName 1.00 -api => 1;
+ my $result = PPIx::DocumentName->extract( $ppi_document );
+ 
+ # say the "name" of the document
+ say $result->name;
+ 
+ # the result object can also be stringified into the name found:
+ say "$result";
+ 
+ # the line number, column, filename etc. where the name was found
+ my $location = $result->node->location;
+
+Old API:
+
+ use PPIx::DocumentName;  # assumes -api => 0
+ my $name = PPIx::DocumentName->extract( $ppi_document );
+ 
+ # say the "name" of the document
+ say $name;
 
 =head1 DESCRIPTION
 
@@ -153,20 +191,11 @@ Which may be more applicable for documents that lack a C<package> statement, or 
 statement may be "wrong", but they still need the document parsed under the guise of having a name
 ( for purposes such as POD )
 
-=head1 USAGE
-
-The recommended approach is simply:
-
-  use PPIx::DocumentName;
-
-  # Get a PPI Document Somehow
-  return PPIx::DocumentName->extract( $ppi_document );
-
 =head1 METHODS
 
 =head2 extract
 
-  my $docname = PPIx::DocumentName->extract( $ppi_document );
+ my $result = PPIx::Document->extract( $ppi_document);
 
 This will first attempt to extract a name via the C<PODNAME: > comment notation,
 and then fall back to using a C<package Package::Name> statement.
@@ -174,25 +203,48 @@ and then fall back to using a C<package Package::Name> statement.
 C<$ppi_document> is ideally a C<PPI::Document>, but will be auto-up-cast if it is
 any of the parameters C<< PPI::Document->new() >> understands.
 
+The C<$result> is the found name as a string under C<< -api => 0 >> and a L<PPIx::DocumentName::Result> object
+under C<< -api => 1 >>.  If the name is not found, then it will be C<undef> (with either API).
+Note that L<PPIx::DocumentName::Result> is stringified to the found name, so in many circumstances
+the new API can be used in the same way as the old.
+
 =head2 extract_via_statement
 
-  my $docname = PPIx::DocumentName->extract_via_statement( $ppi_document );
+  my $result = PPIx::DocumentName->extract_via_statement( $ppi_document );
 
 This only extract C<package Package::Name> statement based document names.
 
 C<$ppi_document> is ideally a C<PPI::Document>, but will be auto-up-cast if it is
 any of the parameters C<< PPI::Document->new() >> understands.
 
+The C<$result> is the found name as a string under C<< -api => 0 >> and a L<PPIx::DocumentName::Result> object
+under C<< -api => 1 >>.  If the name is not found, then it will be C<undef> (with either API).
+
 =head2 extract_via_comment
 
-  my $docname = PPIx::DocumentName->extract_via_comment( $ppi_document );
+  my $result = PPIx::DocumentName->extract_via_comment( $ppi_document );
 
 This will only extract C<PODNAME: > comment based document names.
 
 C<$ppi_document> is ideally a C<PPI::Document>, but will be auto-up-cast if it is
 any of the parameters C<< PPI::Document->new() >> understands.
 
+The C<$result> is the found name as a string under C<< -api => 0 >> and a L<PPIx::DocumentName::Result> object
+under C<< -api => 1 >>.  If the name is not found, then it will be C<undef> (with either API).
+
 =for Pod::Coverage log_info log_debug log_trace
+
+=head1 CAVEATS
+
+The newer API (C<< -api => 1 >>) is packaged scoped in Perl 5.6 and 5.8.  In newer Perls the API is block
+scoped as it should be.  Because this can cause bugs if you are using an older version of Perl this module
+will complain loudly if you are using an older Perl with the newer API.  If you don't like the warning,
+then either use the old API or upgrade to Perl 5.10+.
+
+Under the older API (C<< -api => 0 >>; the default), C<extract_via_statement>, unlike the other
+methods in this module, returns empty list instead of undef when it does find a name.  When
+using the newer API (C<< -api => 1 >>), calls are consistent in scalar and list context.  New
+code should therefore use the newer API.
 
 =head1 ALTERNATIVE NAMES
 
@@ -208,7 +260,7 @@ C<POD>
 
 =back
 
-=head1 SIMILAR MODULES
+=head1 SEE ALSO
 
 Modules that are perceptibly similar to this ones tasks ( but are subtly different in important ways ) are as follows:
 
@@ -247,6 +299,9 @@ It will also not be flexible enough to support other name extraction features we
 And like C<Module::Metadata>, it also focuses on extracting I<many> C<package> declarations where this module prefers
 to extract only the I<first>.
 
+=item * L<< C<PPIx::DocumentName::Result>|PPIx::DocumentName::Result >> - comes with this module, and contains the results of
+this module, when using the newer C<< -api => 1 >> API.
+
 =back
 
 =head1 ACKNOWLEDGEMENTS
@@ -256,13 +311,23 @@ and a related role, L<< C<Pod::Weaver::Role::StringFromComment>|Pod::Weaver::Rol
 
 Thanks to L<< C<RJBS>|cpan:///author/RJBS >> for the initial implementation and L<< C<DROLSKY>|cpan:///author/DROLSKY >> for some of the improvement patches.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Kent Fredric <kentnl@cpan.org>
 
+=item *
+
+Graham Ollis <plicease@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Kent Fredric <kentfredric@gmail.com>.
+This software is copyright (c) 2015-2021 by Kent Fredric <kentfredric@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

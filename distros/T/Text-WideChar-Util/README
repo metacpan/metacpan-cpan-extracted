@@ -2,8 +2,8 @@ NAME
     Text::WideChar::Util - Routines for text containing wide characters
 
 VERSION
-    This document describes version 0.170 of Text::WideChar::Util (from Perl
-    distribution Text-WideChar-Util), released on 2019-05-17.
+    This document describes version 0.171 of Text::WideChar::Util (from Perl
+    distribution Text-WideChar-Util), released on 2021-01-23.
 
 SYNOPSIS
      use Text::WideChar::Util qw(
@@ -147,7 +147,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-WideChar-Util>
+    <https://github.com/perlancar/perl-Text-WideChar-Util/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -169,11 +169,13 @@ SEE ALSO
     abovementioned routines (the non-wide version of the routines will
     eventually be moved here).
 
+    String::Pad, Text::Wrap
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2015, 2014, 2013 by
+    This software is copyright (c) 2021, 2019, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

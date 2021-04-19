@@ -1,6 +1,7 @@
 use lib 't/lib';
 use AutoloadTest;
-use Test::More tests => 1;
+use Test2::V0;
+plan tests => 1;
 
 {
     my $o = AutoloadTest->new;

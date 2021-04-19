@@ -9,10 +9,17 @@ use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000015';
+our $VERSION = '0.000018';
+
+# Directly modifying this is a bad idea, but for the XS to work it needs to be
+# a package var, not a lexical.
+our $FROM = '*';
+my $FROM_MODIFIED = 0;
+my $FROM_MANAGER;
+
+my $ROOT;
 
 my %REPORT;
-our $FROM;
 our @TOUCHED;
 our @OPENED;
 
@@ -34,8 +41,9 @@ sub import {
     }
 
     my $ran = 0;
-    my $root = path('.')->realpath;
-    my $callback = sub { return if $ran++; $class->report(%params, ctx => $_[0], root => $root) };
+    $ROOT = $params{root} if $params{root};
+    $ROOT //= path('.')->realpath;
+    my $callback = sub { return if $ran++; $class->report(%params, ctx => $_[0], root => $ROOT) };
 
     test2_add_callback_exit($callback);
 
@@ -43,15 +51,30 @@ sub import {
     eval 'END { local $?; $callback->() }; 1' or die $@;
 }
 
-sub clear {
+sub full_reset {
+    reset_from();
+    reset_coverage();
+}
+
+sub reset_from {
+    $FROM = '*';
+    $FROM_MODIFIED = 0;
+    $FROM_MANAGER = undef;
+}
+
+sub reset_coverage {
     @TOUCHED = ();
     @OPENED  = ();
     %REPORT  = ();
 }
 
+sub set_root { $ROOT = pop };
+
 sub get_from   { $FROM }
-sub set_from   { $FROM = pop }
-sub clear_from { $FROM = undef }
+sub set_from   { $FROM_MODIFIED++; $FROM = pop }
+sub clear_from { $FROM = '*' }
+sub was_from_modified { $FROM_MODIFIED ? 1 : 0 }
+sub set_from_manager  { $FROM_MODIFIED++; $FROM_MANAGER = pop }
 
 sub filter {
     my $class = shift;
@@ -249,19 +272,28 @@ sub report {
     my $files   = $REPORT{files};
     my $submap  = $REPORT{submap};
     my $openmap = $REPORT{openmap};
+    my $type    = $FROM_MODIFIED ? 'split' : 'flat';
 
     my $details = "This test covered " . @$files . " source files.";
 
-    my $ctx = $params{ctx} // context();
+    my $ctx   = $params{ctx} // context();
     my $event = $ctx->send_ev2(
-        about    => {package => __PACKAGE__, details => $details},
-        coverage => {files => $files, submap => $submap, openmap => $openmap, details => $details},
+        about => {package => __PACKAGE__, details => $details},
+
+        coverage => {
+            files        => $files,
+            submap       => $submap,
+            openmap      => $openmap,
+            details      => $details,
+            test_type    => $type,
+            from_manager => $FROM_MANAGER,
+        },
 
         info => [{tag => 'COVERAGE', details => $details, debug => $params{verbose}}],
 
         harness_job_fields => [
-            {name => "files_covered", details => $details, data => $files},
-        ]
+            {name => "files_covered", details => $details, data => {files => $files, submap => $submap, openmap => $openmap}},
+        ],
     );
     $ctx->release unless $params{ctx};
 
@@ -391,8 +423,9 @@ You can tell prove to use the module this way:
 
     HARNESS_PERL_SWITCHES=-MTest2::Plugin::Cover prove ...
 
-This also works for L<Test2::Harness> aka C<yath>, but yath may have a flag to
-enable this for you by the time you are reading these docs.
+For yath:
+
+    yath test --cover-files ...
 
 =head2 SUPPRESS REPORT
 
@@ -437,9 +470,73 @@ for me to link to it here.
 Once you have these hooks in place the data will not only show files and subs
 that were called, but what called them.
 
+Please see the C<set_from()> documentation for details on values.
+
 =head1 CLASS METHODS
 
 =over 4
+
+=item $val = $class->get_from()
+
+Get the current 'from' value. The default is C<'*'> when nothing has set a from
+value.
+
+=item $class->set_from($val)
+
+Set a 'from' value. This can be anything, a string, a hashref, etc. Be advised
+though that it will usually be serialized to JSON, so make sure anything you
+put in it will be serializable as json.
+
+=item $class->clear_from()
+
+Resets the clear value to C<'*'>
+
+=item $bool = $class->was_from_modified()
+
+This will return true if anything has called C<set_from()> or
+C<set_from_manager>. This can be reset back to false using C<reset_from()>,
+which also clears the 'from' and 'from_manager' values.
+
+=item $class->set_from_manager($module)
+
+This should be set to a module that implements the following method:
+
+    sub test_parameters {
+        my $class = shift;
+        my ($test_file, \@from_values) = @_;
+
+        ...
+
+        return {
+            # If true - run the test
+            # If false - skip the test
+            # If not present or undef - run the test
+            run => $bool,
+
+            # The following are optional
+            argv  => [ ... ],
+            env   => { ... },
+            stdin => "...",
+        };
+
+        # OR
+        # If true - run the test
+        # If false - skip the test
+        # If undef or empty list - run the test
+        return $bool;
+    }
+
+This will be used by L<Test2::Harness> to determine what data needs to be
+passed to a test given a set of 'from' values to instruct the test to run the
+necessary parts/subtests/groups/methods/etc.
+
+The 'argv' data will be prepended befor any other arguments provided to the
+test.
+
+The 'env' hashref will be merged with any other env vars needed, with these
+taking priority.
+
+The 'stdin' string will be used as STDIN for the test.
 
 =item $arrayref = $class->files()
 
@@ -531,9 +628,18 @@ users will never want to use this.
 
 =back
 
-=item $class->clear()
+=item $class->reset_coverage()
 
 This will completely clear all coverage data so far.
+
+=item $class->reset_from()
+
+This will clear the 'from' value, as well as reset the 'was_from_modified'
+state to false.
+
+=item $class->full_reset()
+
+Calls both C<reset_coverage()> and C<reset_from()>.
 
 =item $file_or_undef = $class->filter($file)
 

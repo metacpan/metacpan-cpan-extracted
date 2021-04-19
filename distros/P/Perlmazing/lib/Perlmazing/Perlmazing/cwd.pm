@@ -1,8 +1,8 @@
 use Perlmazing;
-use Cwd 'cwd';
+use Cwd ();
 
 sub main {
-	cwd;
+	Cwd::cwd();
 }
 
 1;

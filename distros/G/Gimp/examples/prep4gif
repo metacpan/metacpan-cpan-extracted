@@ -23,9 +23,9 @@ podregister {
     $foreground = $layers[0];
   }
 
-  my $layer_mask = $foreground->create_mask(ADD_ALPHA_MASK);
+  my $layer_mask = $foreground->create_mask(ADD_MASK_ALPHA);
   $foreground->add_mask ($layer_mask);
-  $layer_mask->threshold($threshold, 255);
+  $layer_mask->threshold(HISTOGRAM_VALUE, $threshold/255, 1.0);
 
 # Transfer layer mask to selection, and grow the selection
   $out->select_item(CHANNEL_OP_REPLACE, $foreground);
@@ -42,7 +42,7 @@ podregister {
   my $outlayer = $out->merge_visible_layers(EXPAND_AS_NECESSARY);
 
 # Convert to indexed
-  $out->convert_indexed(FS_DITHER, MAKE_PALETTE, $colors, $dither, TRUE, "")
+  $out->convert_indexed(CONVERT_DITHER_FS, CONVERT_PALETTE_GENERATE, $colors, $dither, TRUE, "")
     if $index;
   ();
 };

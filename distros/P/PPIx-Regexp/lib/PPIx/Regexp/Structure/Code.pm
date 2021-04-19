@@ -41,7 +41,7 @@ use base qw{ PPIx::Regexp::Structure };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.079';
+our $VERSION = '0.080';
 
 # The only child of this structure should be a single
 # PPIx::Regexp::Token::Code. Anything else gets turned into the

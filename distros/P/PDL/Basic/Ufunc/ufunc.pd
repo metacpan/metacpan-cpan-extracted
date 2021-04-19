@@ -1,4 +1,5 @@
-use strict; # be careful
+use strict;
+use PDL::Types qw(types ppdefs_complex);
 
 pp_addpm({At=>'Top'},<<'EOD');
 
@@ -29,9 +30,6 @@ use PDL::Slices;
 use Carp;
 EOD
 
-# should we use the finite() routine in libm ?
-# (is the Windows version _finite() ?)
-#
 pp_addhdr(<<'EOD');
 #define IsNaN(x) (x*0 != 0)
 EOD
@@ -104,10 +102,9 @@ EOD
 
 } # sub: cumuprojectdocs()
 
-# type classes to pass to GenericTypes. Should use the new attributes in Types.pm.
-my $R=[qw/B S U L Q N F D/];
-my $INT=[qw/B S U L Q N /];
-my $C=[qw/C G/];
+my $R = [map $_->ppsym, grep $_->real, types];
+my $T = [map $_->ppsym, grep $_->integer, types];
+my $C = [ppdefs_complex];
 
 # it's a bit unclear what to do with the comparison operators,
 # since the return value could be bad because all elements are bad,
@@ -303,7 +300,7 @@ foreach my $func ( sort keys %over ) {
 
     my %extra = {};
     unless ( defined $over{$func}{alltypes} and $over{$func}{alltypes} ) {
-	$extra{GenericTypes} = $INT,
+	$extra{GenericTypes} = $T,
     }
 
     pp_def(
@@ -771,7 +768,7 @@ some circumstances.
 pp_def('modeover',
        HandleBad=>undef,
        Pars => 'data(n); [o]out(); [t]sorted(n);',
-       GenericTypes=>$INT,
+       GenericTypes=>$T,
        Doc=>projectdocs('mode','modeover','
 
 The mode is the single element most frequently found in a 
@@ -1362,7 +1359,7 @@ for my $which (
 	    '$GENERIC() cur;
 	     int flag = 0;
 	     loop(n) %{
-	 	if( !flag || ($a() '.$op.' cur ) || IsNaN(cur) ) { cur = $a(); flag = 1;}
+		if( !flag || ($a() '.$op.' cur ) || IsNaN(cur) ) { cur = $a(); flag = 1;}
 	     %}
 	     if(flag && !IsNaN(cur)) {
 	     	     $c() = cur;
@@ -1401,7 +1398,7 @@ for ways of masking NaNs.
              PDL_Indx curind;
 	     int flag = 0;
 	     loop(n) %{
-	 	if(!flag || $a() '.$op.' cur || IsNaN(cur))
+		if(!flag || $a() '.$op.' cur || IsNaN(cur))
 		   {cur = $a(); curind = n;flag=1;}
 	     %}
 	     if(flag && !IsNaN(cur)) {
@@ -1544,14 +1541,6 @@ pp_addpm(<<'EOD');
 
 EOD
 
-# removed IsNaN handling, even from Code section
-# I think it was wrong, since it was
-#
-#   if (!n || ($a() < curmin) || IsNaN(curmin)) {curmin = $a(); curmin_ind = n;};
-#   if (!n || ($a() > curmax) || IsNaN(curmax)) {curmax = $a(); curmax_ind = n;};
-#
-# surely this succeeds if cur... is a NaN??
-#
 pp_def( 
 	'minmaximum',
 	HandleBad => 1,

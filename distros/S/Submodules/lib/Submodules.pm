@@ -6,7 +6,7 @@ use File::Spec;
 use File::Find qw();
 use Carp;
 use File::Basename;
-our $VERSION = '1.0014';
+our $VERSION = '1.0015';
 
 my $names;
 
@@ -43,7 +43,7 @@ sub submodules (;*) {
 		seen_paths	=> {},
 	};
 	bless $self, __PACKAGE__;
-	my @members = split/(?:::|')/, $query;
+	my @members = split /(?:::|')/, $query;
 	my @inc;
 	for my $i (@INC) {
 		my $abs = File::Spec->rel2abs($i);
@@ -79,6 +79,9 @@ sub process_path {
 	File::Find::find (
 		{
 			no_chdir	=> 1,
+			preprocess	=> sub { # Introduced after seeing the directory contents order behave unexpectedly on some file systems
+				my @items = sort {$a cmp $b} @_;
+			},
 			wanted		=> sub {
 				$self->process_file($path_abs, $File::Find::name)
 			},

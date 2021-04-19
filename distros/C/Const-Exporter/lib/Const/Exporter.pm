@@ -7,12 +7,12 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.1.2';
+our $VERSION = 'v1.2.0';
 
 use Carp;
 use Const::Fast;
 use Exporter ();
-use List::AllUtils '0.10' => qw/ pairs zip /;
+use List::Util '1.56' => qw/ pairs mesh /;
 use Package::Stash;
 use Ref::Util qw/ is_blessed_ref is_arrayref is_coderef is_hashref is_ref /;
 
@@ -76,7 +76,7 @@ sub import {
                         $values[1] = undef;
                     }
 
-                    foreach my $pair ( pairs zip @enums, @values ) {
+                    foreach my $pair ( pairs mesh \@enums, \@values ) {
                         my $value = $pair->value // $fn->($last);
                         $last = $value;
                         my $symbol = $pair->key // next;
@@ -243,7 +243,7 @@ Const::Exporter - Declare constants for export.
 
 =head1 VERSION
 
-version v1.1.2
+version v1.2.0
 
 =head1 SYNOPSIS
 
@@ -560,11 +560,21 @@ feature.
 
 Robert Rothenberg <rrwo@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords B. Estrade
+=for stopwords Slaven Rezić B. Estrade
+
+=over 4
+
+=item *
+
+Slaven Rezić <slaven@rezic.de>
+
+=item *
 
 B. Estrade <estrabd@cpan.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
