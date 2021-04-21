@@ -377,6 +377,7 @@ sub new
 	$self->{'description'} = '';
 	$self->{'created'} = '';
 	$self->{'year'} = '';
+	$self->{'genre'} = 'Podcast';
 	$self->{'iconurl'} = '';
 	$self->{'streams'} = [];
 	$self->{'cnt'} = 0;

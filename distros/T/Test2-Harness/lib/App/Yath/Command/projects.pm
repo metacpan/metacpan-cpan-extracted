@@ -2,7 +2,7 @@ package App::Yath::Command::projects;
 use strict;
 use warnings;
 
-our $VERSION = '1.000044';
+our $VERSION = '1.000047';
 
 use parent 'App::Yath::Command::test';
 use Test2::Harness::Util::HashBase;
@@ -277,13 +277,6 @@ Can be specified multiple times
 =item --no-coverage-from
 
 Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
-
-
-=item --coverage-url-use-post
-
-=item --no-coverage-url-use-post
-
-If coverage_from is a url, use the http POST method with a list of changed files. This allows the server to tell us what tests to run instead of downloading all the coverage data and determining what tests to run from that.
 
 
 =item --default-at-search ARG

@@ -67,6 +67,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
         selection: {}
     },
     members: {
+        _timerId : null,
         _cfg: null,
         _tableMenu: null,
         _defaultAction: null,
@@ -149,8 +150,8 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         var timer = qx.util.TimerManager.getInstance();
                         var timerId;
                         this.addListener('appear',function(){
-                            timerId = timer.start(function(){
-                                this.fireDataEvent('actionResponse',{action: 'reloadStatus'});
+                            timerId = this._timerId = timer.start(function(){
+                                this.fireDataEvent('actionResponse', {action: 'reloadStatus'});
                             }, btCfg.interval * 1000, this);
                         }, this);
                         this.addListener('disappear',function(){
@@ -163,7 +164,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         this.addListener('appear',function(){
                             var key = btCfg.key;
                             var that = this;
-                            autoTimerId = autoTimer.start(function(){
+                            autoTimerId = this._timerId = autoTimer.start(function(){
                                 var formData = getFormData();
                                 callbackery.data.Server.getInstance().callAsyncSmartBusy(function(ret){
                                     that.fireDataEvent('actionResponse',ret || {});
@@ -267,6 +268,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                             },'getSessionCookie');
                             break;
                         case 'cancel':
+                            if (this._timerId) {
+                                qx.util.TimerManager.getInstance().stop(this._timerId);
+                            }
                             this.fireDataEvent('actionResponse',{action: 'cancel'});
                             break;
                         case 'wizzard':

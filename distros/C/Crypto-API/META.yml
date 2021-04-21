@@ -15,6 +15,6 @@ name: Crypto-API
 requires:
   HTTP::API::Client: '0'
   Moo: '0'
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

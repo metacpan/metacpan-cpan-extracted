@@ -1,11 +1,12 @@
 ---
 abstract: 'Pyzor spam filtering in Perl'
 author:
-  - 'cPanel, LLC (CPANEL)'
+  - 'cPanel, LLC <contact@cpanel.org>'
 build_requires:
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
   File::Slurp: '0'
+  File::Spec: '0'
   File::Which: '0'
   IO::Pty: '0'
   JSON: '0'
@@ -15,10 +16,12 @@ build_requires:
   Test::FailWarnings: '0'
   Test::More: '0'
   autodie: '0'
+  perl: '5.014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+  perl: '5.014'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,8 +29,40 @@ meta-spec:
 name: Mail-Pyzor
 no_index:
   directory:
-    - t
+    - eg
+    - examples
     - inc
+    - share
+    - t
+    - xt
+provides:
+  Mail::Pyzor:
+    file: lib/Mail/Pyzor.pm
+    version: '0.06'
+  Mail::Pyzor::Client:
+    file: lib/Mail/Pyzor/Client.pm
+    version: '0.06'
+  Mail::Pyzor::Digest:
+    file: lib/Mail/Pyzor/Digest.pm
+    version: '0.06'
+  Mail::Pyzor::Digest::Pieces:
+    file: lib/Mail/Pyzor/Digest/Pieces.pm
+    version: '0.06'
+  Mail::Pyzor::Digest::StripHtml:
+    file: lib/Mail/Pyzor/Digest/StripHtml.pm
+    version: '0.06'
+  Mail::Pyzor::SHA:
+    file: lib/Mail/Pyzor/SHA.pm
+    version: '0.06'
+  Mail::Pyzor::X:
+    file: lib/Mail/Pyzor/X.pm
+    version: '0.06'
+  Mail::Pyzor::X::Base:
+    file: lib/Mail/Pyzor/X/Base.pm
+    version: '0.06'
+  Mail::Pyzor::X::Timeout:
+    file: lib/Mail/Pyzor/X/Timeout.pm
+    version: '0.06'
 requires:
   Digest::SHA: '0'
   Email::MIME: '0'
@@ -40,6 +75,15 @@ requires:
   parent: '0'
   perl: '5.014'
 resources:
-  repository: git://github.com/CpanelInc/p5-Mail-Pyzor.git
-version: '0.05'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/Dual-Life/p5-Mail-Pyzor/issues
+  homepage: https://github.com/Dual-Life/p5-Mail-Pyzor
+  repository: https://github.com/Dual-Life/p5-Mail-Pyzor.git
+version: '0.06'
+x_contributors:
+  - 'Andrew Colin Kissa <andrew@topdog.za.net>'
+  - 'Felipe Gasper <felipe@cpanel.net>'
+  - 'Nicolas R <nicolas@atoomic.org>'
+  - 'Stephen Bee <stephen@cpanel.net>'
+  - 'Tim Mullin <tim@cpanel.net>'
+x_generated_by_perl: v5.26.3
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,13 +1,14 @@
+use lib '.';
 use inc::Module::Install;
 RTx('RT-Extension-RepeatTicket');
 
 requires('DateTime::Event::ICal');
 
-requires_rt('4.0.6');
+requires_rt('5.0.0');
 
 my ($lp) = ($INC{'RT.pm'} =~ /^(.*)[\\\/]/);
 my $lib_path = join( ' ', "$RT::LocalPath/lib", $lp );
-my $bin_path = $RT::BinPath || "$RT::BasePath/bin" || "/opt/rt4/bin";
+my $bin_path = $RT::BinPath || "$RT::BasePath/bin" || "/opt/rt5/bin";
 
 # Straight from perldoc perlvar
 use Config;

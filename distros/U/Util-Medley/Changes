@@ -1,20 +1,28 @@
 ==================================================
-Changes from 2020-02-20 00:00:00 +0000 to present.
+Changes from 2020-04-20 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.058 at 2021-02-19 22:46:07 +0000
+version 0.059 at 2021-04-20 22:08:41 +0000
 ------------------------------------------
+
+  Change: 9ef385d0ae2de19ed5db05e2997ecb06e1c4738c
+  Author: John Gravatt <john.gravatt@act.org>
+  Date : 2021-04-20 17:08:23 +0000
+
+    ignore - moved everything up one dir in the repo 
+
+  Change: 792291d84771086aaa9412f9755edf9c4c0da0c8
+  Author: John Gravatt <john.gravatt@act.org>
+  Date : 2021-04-20 17:05:23 +0000
+
+    added expire_epoch option to Util::Medley::Cache::set method 
 
   Change: 95f7dd7f038f5715c7db242707c21c7e82e56de2
   Author: John Gravatt <john@gravatt.org>
   Date : 2021-02-19 16:45:57 +0000
 
     fixed bug in Util::Medley::Cache::delete() 
-
-------------------------------------------
-version 0.057 at 2021-02-16 21:38:24 +0000
-------------------------------------------
 
   Change: 3e22a775a248c60d9e87b7eb257d9c5810828b27
   Author: John Gravatt <john@gravatt.org>
@@ -28,19 +36,11 @@ version 0.057 at 2021-02-16 21:38:24 +0000
 
     added lib/Util/Medley/Simple/* and new YAML class 
 
-------------------------------------------
-version 0.056 at 2021-02-16 21:36:18 +0000
-------------------------------------------
-
   Change: e1c57228af5b199d59f0ada87300cd33a425f17c
   Author: John Gravatt <john@gravatt.org>
   Date : 2021-02-16 15:36:18 +0000
 
     v0.056 
-
-------------------------------------------
-version 0.055 at 2020-11-30 16:50:00 +0000
-------------------------------------------
 
   Change: da94d9b658b3086c321b3f21c503c5a7922e0035
   Author: John Gravatt <john@gravatt.org>
@@ -48,19 +48,11 @@ version 0.055 at 2020-11-30 16:50:00 +0000
 
     removed PkgMgmt modules (moved to Linux-Utils) 
 
-------------------------------------------
-version 0.054 at 2020-11-25 22:08:57 +0000
-------------------------------------------
-
   Change: 4ad7ca4fdc396ac34ab300a38d1edae29c8d3912
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-11-25 16:08:57 +0000
 
     moved PkgManager::* namespace to Linux::PkgMgmt::* 
-
-------------------------------------------
-version 0.053 at 2020-10-30 16:56:22 +0000
-------------------------------------------
 
   Change: 7ae52d86b2b12608337be8646329fdb19685dee8
   Author: John Gravatt <john@gravatt.org>
@@ -74,19 +66,11 @@ version 0.053 at 2020-10-30 16:56:22 +0000
 
     added Util::Medley::Hash 
 
-------------------------------------------
-version 0.052 at 2020-10-22 19:42:18 +0000
-------------------------------------------
-
   Change: 9a1b40fce8775c7b35c39cd7ce3d473380744503
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-10-22 14:42:18 +0000
 
     added action 'snakeize-in-place' 
-
-------------------------------------------
-version 0.051 at 2020-10-21 18:07:36 +0000
-------------------------------------------
 
   Change: 798d4a140ab3d88e815c72779d33da9623a23bbc
   Author: John Gravatt <john@gravatt.org>
@@ -100,19 +84,11 @@ version 0.051 at 2020-10-21 18:07:36 +0000
 
     updated lib/Util/Medley.pm to include new PkgManager roles 
 
-------------------------------------------
-version 0.050 at 2020-10-20 20:50:41 +0000
-------------------------------------------
-
   Change: 7e7da9ab044dc09e4b1bbd83642125f7c9ac21fa
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-10-20 15:50:41 +0000
 
     modified Util::Medley::PkgManager::RPM::queryAll to allow for rpmName arg 
-
-------------------------------------------
-version 0.049 at 2020-10-19 22:04:18 +0000
-------------------------------------------
 
   Change: 3a2348f5354e393d0655cc5ae10a91cd354c8482
   Author: John Gravatt <john@gravatt.org>
@@ -140,19 +116,11 @@ version 0.049 at 2020-10-19 22:04:18 +0000
     - fixes for ::Linux::Yum - changed namespace for Util::Medley::Linux::Yum
     to Util::Medley::PkgManager::YUM - added Util::Medley::PkgManager::RPM 
 
-------------------------------------------
-version 0.047 at 2020-10-15 20:12:53 +0000
-------------------------------------------
-
   Change: b940409eb67d0c24b301b1700d9d6b1e4e0908cb
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-10-15 15:12:53 +0000
 
     fixed bug in Util::Medley::File::dirname() (thanks Marty Sandidge) 
-
-------------------------------------------
-version 0.046 at 2020-10-15 20:09:50 +0000
-------------------------------------------
 
   Change: 526c8051ccb94d612c975bee115af55d39ac4d1d
   Author: John Gravatt <john@gravatt.org>
@@ -167,19 +135,11 @@ version 0.046 at 2020-10-15 20:09:50 +0000
     renamed: lib/Util/Medley/Roles/Attributes/Linux/Zip.pm ->
     lib/Util/Medley/Roles/Attributes/Linux/Yum.pm 
 
-------------------------------------------
-version 0.045 at 2020-10-15 19:00:13 +0000
-------------------------------------------
-
   Change: 68f6b66b010b42ab734b253f350a42c63db26a75
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-10-15 14:00:13 +0000
 
     added Util::Medley::Linux::Yum 
-
-------------------------------------------
-version 0.044 at 2020-09-28 18:45:43 +0000
-------------------------------------------
 
   Change: 9d9f0cbd3df56d3842cbd2815d45ea3271ab88de
   Author: John Gravatt <john@gravatt.org>
@@ -193,19 +153,11 @@ version 0.044 at 2020-09-28 18:45:43 +0000
 
     added some verbose logging to Util-Medley/lib/Util/Medley/Cache.pm 
 
-------------------------------------------
-version 0.043 at 2020-09-16 18:44:30 +0000
-------------------------------------------
-
   Change: fac5c9f0a3d2cde0bfcb39f08a91d513e386f016
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-09-16 13:44:30 +0000
 
     fixed a bug in lib/Util/Medley/Exec.pm 
-
-------------------------------------------
-version 0.042 at 2020-09-16 18:32:54 +0000
-------------------------------------------
 
   Change: 1b551fa057b6ebc690aaed1a402344aadeda0010
   Author: John Gravatt <john@gravatt.org>
@@ -213,19 +165,11 @@ version 0.042 at 2020-09-16 18:32:54 +0000
 
     added isUpper() method to String.pm 
 
-------------------------------------------
-version 0.041 at 2020-09-15 18:16:52 +0000
-------------------------------------------
-
   Change: e257ce4ab54126d8b33153e8cc15f8fc05566722
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-09-15 13:16:52 +0000
 
     fixed bug in ::Logger::_isLogLevelValid() 
-
-------------------------------------------
-version 0.040 at 2020-09-15 15:47:52 +0000
-------------------------------------------
 
   Change: 60bf9041f62e8948d68f0983f6f07476e1c5443c
   Author: John Gravatt <john@gravatt.org>
@@ -233,29 +177,17 @@ version 0.040 at 2020-09-15 15:47:52 +0000
 
     fixed bug in File::write() 
 
-------------------------------------------
-version 0.039 at 2020-09-15 15:18:03 +0000
-------------------------------------------
-
   Change: dbaffddf3531684c3106f54b3e4c3ec342922841
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-09-15 10:18:03 +0000
 
     added read/write methods to File.pm 
 
-------------------------------------------
-version 0.038 at 2020-09-15 14:25:43 +0000
-------------------------------------------
-
   Change: 91ccf3272f2560359252fe71f826258bc84b1a46
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-09-15 09:25:43 +0000
 
     added YAML.pm and exec actions 
-
-------------------------------------------
-version 0.037 at 2020-05-18 21:16:51 +0000
-------------------------------------------
 
   Change: 5ab112f3bed40a70267a683ef8b806b5c67c08a0
   Author: John Gravatt <john@gravatt.org>
@@ -275,29 +207,17 @@ version 0.037 at 2020-05-18 21:16:51 +0000
 
     improvements to lib/Util/Medley/Module/Overview.pm 
 
-------------------------------------------
-version 0.036 at 2020-05-15 22:35:47 +0000
-------------------------------------------
-
   Change: 57f080316da7f7210a2bcf0e4785f77f77822b62
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-05-15 17:35:47 +0000
 
     undo of scrubParens snafu in lib/Util/Medley/Module/Overview.pm 
 
-------------------------------------------
-version 0.035 at 2020-05-15 22:30:00 +0000
-------------------------------------------
-
   Change: c23e8f931e44d36502468dcd0734e57b76a88b2e
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-05-15 17:30:00 +0000
 
     added view-clean option to module-overview action 
-
-------------------------------------------
-version 0.034 at 2020-05-14 13:36:32 +0000
-------------------------------------------
 
   Change: f61c7e7d9fb7bef9d72a546f83acf62f33ffb32a
   Author: John Gravatt <john@gravatt.org>
@@ -306,19 +226,11 @@ version 0.034 at 2020-05-14 13:36:32 +0000
     fixed issue with parseHostname() returning undef instead of empty string
     when passed an empty string 
 
-------------------------------------------
-version 0.033 at 2020-05-13 21:52:08 +0000
-------------------------------------------
-
   Change: 1e3f5e734d961aadae1dc16969219c25b633eb4c
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-05-13 16:52:08 +0000
 
     added Hostname module to lib/Util/Medley.pm 
-
-------------------------------------------
-version 0.032 at 2020-05-13 21:48:40 +0000
-------------------------------------------
 
   Change: 1197ab6c07d8c05372e99033ad713efc397486e8
   Author: John Gravatt <john@gravatt.org>
@@ -326,19 +238,11 @@ version 0.032 at 2020-05-13 21:48:40 +0000
 
     added stripDomain() to Hostname module 
 
-------------------------------------------
-version 0.031 at 2020-05-13 21:35:32 +0000
-------------------------------------------
-
   Change: 4aadd68b5e4c4c24f14e8e1aa7306d7ffeb31ac8
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-05-13 16:35:03 +0000
 
     added Hostname module 
-
-------------------------------------------
-version 0.030 at 2020-04-24 23:14:11 +0000
-------------------------------------------
 
   Change: 776c338aa3b1be99a0f3ca62305a27cb393eed6f
   Author: John Gravatt <john@gravatt.org>
@@ -365,10 +269,6 @@ version 0.030 at 2020-04-24 23:14:11 +0000
     - switched from Test2::Suite to Test::More for simplicity. - added
     Util::Medley::Module::Overview - added cli action module-overview 
 
-------------------------------------------
-version 0.029 at 2020-04-22 18:54:58 +0000
-------------------------------------------
-
   Change: b21f2090e77abbf4c1a437968f0997f1f38d33cf
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-04-22 13:54:58 +0000
@@ -380,10 +280,6 @@ version 0.029 at 2020-04-22 18:54:58 +0000
   Date : 2020-03-27 13:28:38 +0000
 
     updated some pod 
-
-------------------------------------------
-version 0.028 at 2020-03-27 18:24:00 +0000
-------------------------------------------
 
   Change: 320e5163f7c25db4dfccf76ed463f3f887965562
   Author: John Gravatt <john@gravatt.org>
@@ -397,19 +293,11 @@ version 0.028 at 2020-03-27 18:24:00 +0000
 
     added iso8601 methods to Datetime 
 
-------------------------------------------
-version 0.027 at 2020-03-20 13:54:42 +0000
-------------------------------------------
-
   Change: 7963cafe1426ca5608aa0378795719414cb95cc4
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-03-20 08:54:42 +0000
 
     minor tweak to Logger so it trims the msg 
-
-------------------------------------------
-version 0.026 at 2020-03-18 18:57:01 +0000
-------------------------------------------
 
   Change: 49bcf67eaf464c378f19ada28d8d29d55ca6e686
   Author: John Gravatt <john@gravatt.org>
@@ -417,16 +305,242 @@ version 0.026 at 2020-03-18 18:57:01 +0000
 
     added Util::Medley::DateTime::timeMs() method 
 
-------------------------------------------
-version 0.025 at 2020-03-06 22:27:55 +0000
-------------------------------------------
-
   Change: c19ced94cbc24b54c04e909be0236096a55071f5
   Author: John Gravatt <john@gravatt.org>
   Date : 2020-03-06 16:27:55 +0000
 
     added Util::Medley::Number 
 
-=================================================
-Plus 20 releases after 2020-02-20 00:00:00 +0000.
-=================================================
+  Change: 0ccfdcfee4afb1858a62e8bae37d5ea9e7c6d59e
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-21 13:01:52 +0000
+
+    added lib/Util/Medley/Package.pm 
+
+  Change: 116f9fe923de47eed528841848b063e68e2e1d67
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-17 15:55:37 +0000
+
+    added which method to Util-Medley/lib/Util/Medley/File.pm 
+
+  Change: 86b74ab5833e8aa78422a783f9c4044dc74cc548
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-10 10:12:03 +0000
+
+    updated pod in lib/Util/Medley/File.pm 
+
+  Change: 4673cb91f26daccfb9449f854b36a2095363076e
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-09 09:05:17 +0000
+
+    added workaround to assist getting Kavorka dep installed 
+
+  Change: bd611c47c5d3b7b5b7c5e396429534bdfce8d52a
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-01-07 08:34:25 +0000
+
+    added methods:
+
+    File::slurp()
+
+    List::diff()
+
+    List::differ() 
+
+  Change: 6f57c1936f10ad25d39ce87838a96a6ca6e8cb8a
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-12-05 14:33:45 +0000
+
+    - fixed pod for findFiles - modified nsort to sort without regard to
+    locale 
+
+  Change: 21635abd849d7ee47cd8f1ec6fd49e91599b3a39
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-12-02 15:00:33 +0000
+
+    fixed bug in File::findFiles method 
+
+  Change: fe1c534c65990924402aa1277d91eb3da2c7a346
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-12-02 14:52:21 +0000
+
+    added File::touch method 
+
+  Change: e605c6d9c68ed09b6dc2ebc0e0859562a12e9eb0
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-12-02 13:45:11 +0000
+
+    updated find perldoc 
+
+  Change: 5ce8ee03c041921bdeeab759744b6153d7019553
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-12-02 13:42:40 +0000
+
+    added maxDepth option to find* methods 
+
+  Change: b5ffab2061337f9129ef0880f3e9c21ff01eddfc
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-26 13:58:19 +0000
+
+    added wantArrayRefs option to Spawn::capture() 
+
+  Change: 06e39675f1022ae72b138f51e18fc477e8f77fcf
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-26 13:50:41 +0000
+
+    - added more POD - other small tweaks 
+
+  Change: d1464dd53898b1186fb786648daf246d4a9cd419
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-26 13:46:39 +0000
+
+    modified File::find() to exclude the search dir from the results 
+
+  Change: 385915d304e5f2312669497c7d35c7d081d5dc02
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-21 14:46:22 +0000
+
+    added medley cli 
+
+  Change: 5c1d61cb61f170491f09db3ddef534a64da5a22a
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-21 09:01:42 +0000
+
+    added more test cases for DateTime.pm 
+
+  Change: 5225709e77821f254edcaee0f4bf8fa2d15d1e11
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-21 08:59:58 +0000
+
+    added nsort to List.pm 
+
+  Change: 2bd01c4aeb344099f740bb90e22469a7929cffc5
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-19 13:48:57 +0000
+
+    pod cleanup on XML.pm 
+
+  Change: 97f704f93ddae7f2f8f57d9787594ac4d660be9d
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-19 13:47:53 +0000
+
+    added methods to DateTime.pm and one method to String.pm. also, cleaned
+    up some pod errors. 
+
+  Change: 225fa2f4549cb82211c7b5a229ba5834a0ffab38
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-19 09:47:42 +0000
+
+    fixed test case in t/99-medley.t 
+
+  Change: 6af8abef8831adaa8357b0049fec34a1887a4214
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-19 09:46:11 +0000
+
+    modified DateTime.pm to follow camel-case convention. added
+    localDateTimeIsValid method 
+
+  Change: 4f6e5e6df5e836dfc333814ad2ef5c93905abaf5
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-14 13:26:12 +0000
+
+    updated README.build 
+
+  Change: 994b111a993fd242d04b1cfe4e079d41ac1a9628
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-14 13:25:14 +0000
+
+    v0.008 
+
+  Change: b8b48975b40c761618b795f438e5b6a5fc0c3c4b
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-14 13:23:54 +0000
+
+    refactored to use Kavorka 
+
+  Change: 3d95b3e3a0dab29e6f3616b2c9a3edb731be50e2
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 11:30:54 +0000
+
+    updated documentation for lib/Util/Medley/DateTime.pm 
+
+  Change: a2b2616f4f973045caa3a7ae2b1bfdef0df0f423
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 11:25:15 +0000
+
+    v0.006 
+
+  Change: f1c6622bbde22b40531f20aa9a0d246b42f14a4b
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 11:24:37 +0000
+
+    refactored named pair args to use shorter ns 
+
+  Change: 1256ee8ccc4aeac368fdd6072a90c4c1f8fc5291
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 11:24:04 +0000
+
+    updated documentation for Util::Medley::Crypt 
+
+  Change: 8216f878748b22e6780895704eea2313c74c2e4d
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 10:40:52 +0000
+
+    removed Changes file 
+
+  Change: 125ad803228b1ad8c7141f871a0a63f63c900b5e
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-04 10:35:17 +0000
+
+    fixed pod formatting in Util::Medley::File 
+
+  Change: 4e285de2edf3df97d6882c0f7118561242f0866e
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-01 16:44:58 +0000
+
+    fixed pod format in lib/Util/Medley/File.pm 
+
+  Change: 3b74d17aa96de44c4384588d756100817eac2874
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-11-01 16:41:52 +0000
+
+
+  Change: 3cbd88454cef49104a83b4cbd9c7de71b5780514
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-30 15:25:26 +0000
+
+    first release 
+
+  Change: 834d6d182e30064bc2c7ee3a5331a8860a9dd5be
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 16:40:07 +0000
+
+    checkpoint 
+
+  Change: 3089c5c181d84148ef7e1bcd3b216c256362b876
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 12:05:56 +0000
+
+    no msg 
+
+  Change: 6b4cdd16bd20989fbd1892742824af92295db93a
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 11:59:35 +0000
+
+    more files 
+
+  Change: d6b914d578231a3eb8ee18ddef54eead1bcc61f4
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 11:58:17 +0000
+
+    more files 
+
+  Change: 069b34e6c84a73ddc0c32f8258057214aa672de2
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2019-10-28 11:57:42 +0000
+
+    first 
+
+================
+End of releases.
+================

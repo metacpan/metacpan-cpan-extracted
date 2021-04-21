@@ -1,5 +1,11 @@
 Revision history for Perl extension Test::Vars
 
+0.015 2021-04-20T13:52:33Z
+
+    - Support use of lexical subroutines (#41)
+    - Account for subroutines stored directly in the stash in 5.27.6+. Fixed
+      by sprout. (#34).
+
 0.014 2017-04-11T23:02:41Z
 
     - Fixed a bug where false positives were reported for some code constructs

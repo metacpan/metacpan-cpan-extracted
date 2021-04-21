@@ -1,0 +1,9 @@
+Revision history for Perl extension Perl::Oberon.
+
+0.1.1
+	first version, non-complete
+
+0.01  Tue Apr 20 11:49:10 2021
+	- original version; created by h2xs 1.23 with options
+		-X -n Perl::Oberon
+

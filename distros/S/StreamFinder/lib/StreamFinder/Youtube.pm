@@ -105,7 +105,7 @@ general StreamFinder module.
 
 Depends:  
 
-L<I::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
 and the separate application program:  youtube-dl.
 
 =head1 SUBROUTINES/METHODS
@@ -387,10 +387,19 @@ $url2fetch =~ s/www\.youtube\.com/youtube\.be/;  #WWW.YOUTUBE.COM SEEMS TO NOW B
 		$url2fetch = 'https://youtube.be/watch?v=' . $url;
 	}
 	print STDERR "-1 FETCHING URL=$url= VIA youtube-dl: ID=".$self->{'id'}."=\n"  if ($DEBUG);
-	$self->{'iconurl'} = '';
 	$self->{'title'} = '';
 	$self->{'artist'} = '';
-	$self->{'albumartist'} = '';
+	$self->{'album'} = '';
+	$self->{'description'} = '';
+	$self->{'created'} = '';
+	$self->{'year'} = '';
+	$self->{'genre'} = 'Video';
+	$self->{'iconurl'} = '';
+	$self->{'streams'} = [];
+	$self->{'cnt'} = 0;
+	$self->{'Url'} = '';
+	$self->{'playlist'} = '';
+	$self->{'albumartist'} = $url2fetch;
 
 	#FIRST:  GET STREAMS, THUMBNAIL, ETC. FROM youtube-dl:
 

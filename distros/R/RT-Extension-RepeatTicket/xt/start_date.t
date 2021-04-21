@@ -10,11 +10,7 @@ my ( $baseurl, $m ) = RT::Test->started_ok();
 
 ok( $m->login( 'root', 'password' ), 'logged in' );
 
-$m->submit_form_ok({
-    form_name => 'CreateTicketInQueue',
-    fields    => {
-       'Queue' => 'General' },
-    }, 'Click to create ticket');
+$m->submit_form_ok( { form_name => 'CreateTicketInQueue', }, 'Click to create ticket' );
 
 $m->content_contains('Enable Recurrence');
 
@@ -23,20 +19,24 @@ diag "Create a ticket with a recurrence in the General queue.";
 my $day = DateTime->now->add( days => 14 ); # Start in two weeks
 diag "Repeat start date is: " . $day->ymd;
 
-$m->submit_form_ok({
-    form_name => 'TicketCreate',
-    fields    => {
-        'Subject' => 'Set up recurring aperture maintenance',
-        'Content' => 'Perform work on portals on Thursday',
-        'repeat-lead-time' => 7,
-        'repeat-coexistent-number' => 2,
-        'repeat-enabled' => 1,
-        'repeat-type' => 'weekly',
-        'repeat-details-weekly' => 'week',
-        'repeat-details-weekly-week' => 1,
-        'repeat-details-weekly-weeks' => 'th',
-        'repeat-start-date' => $day->ymd,
-     },}, 'Create');
+$m->submit_form_ok(
+    {   form_name => 'TicketCreate',
+        fields    => {
+            'Subject'                     => 'Set up recurring aperture maintenance',
+            'Content'                     => 'Perform work on portals on Thursday',
+            'repeat-lead-time'            => 7,
+            'repeat-coexistent-number'    => 2,
+            'repeat-enabled'              => 1,
+            'repeat-type'                 => 'weekly',
+            'repeat-details-weekly'       => 'week',
+            'repeat-details-weekly-week'  => 1,
+            'repeat-details-weekly-weeks' => 'th',
+            'repeat-start-date'           => $day->ymd,
+        },
+        button => 'SubmitTicket',
+    },
+    'Create'
+);
 
 $m->text_like( qr/Ticket\s(\d+)\screated in queue/);
 

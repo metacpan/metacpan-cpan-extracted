@@ -388,6 +388,7 @@ print STDERR "---failed to fetch!\n";
 	$self->{'description'} = '';
 	$self->{'created'} = '';
 	$self->{'year'} = '';
+	$self->{'genre'} = 'Podcast';
 	$self->{'iconurl'} = '';
 	$self->{'streams'} = [];
 	$self->{'cnt'} = 0;

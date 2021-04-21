@@ -91,22 +91,22 @@ file.
 
 =head1 DESCRIPTION
 
-StreamFinder::Rumble accepts a valid full Rumble video ID or URL on 
-rumble.com and returns the actual stream URL, title, and cover art icon 
-for that video.  The purpose is that one needs this URL in order to have 
-the option to stream the video in one's own choice of media player 
-software rather than using their web browser and accepting any / all flash, 
-ads, javascript, cookies, trackers, web-bugs, and other crapware that can 
-come with that method of play.  The author uses his own custom all-purpose 
-media player called "fauxdacious" (his custom hacked version of the 
-open-source "audacious" audio player).  "fauxdacious" incorporates this 
-module to decode and play rumble.com videos.  This is a submodule of the 
-general StreamFinder module.
+StreamFinder::Rumble accepts a valid full Rumble video ID or page URL 
+(either one of their ".html" or "embed" URL) on rumble.com and returns 
+the actual stream URL, title, and cover art icon for that video.  
+The purpose is that one needs this URL in order to have the option to 
+stream the video in one's own choice of media player software rather than 
+using their web browser and accepting any / all flash, ads, javascript, 
+cookies, trackers, web-bugs, and other crapware that can come with that 
+method of play.  The author uses his own custom all-purpose media player 
+called "fauxdacious" (his custom hacked version of the open-source 
+"audacious" audio player).  "fauxdacious" incorporates this module to 
+decode and play rumble.com videos.  This is a submodule of the general 
+StreamFinder module.
 
 Depends:  
 
-L<I::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
-and the separate application program:  youtube-dl.
+L<URI::Escape>, L<HTML::Entities>, and L<LWP::UserAgent>.
 
 =head1 SUBROUTINES/METHODS
 
@@ -117,7 +117,8 @@ and the separate application program:  youtube-dl.
 Accepts a rumble.com video ID or URL and creates and returns a new video object, 
 or I<undef> if the URL is not a valid Rumble video or no streams are found.  
 The URL can be the full URL, ie. https://rumble.com/B<video-id>.html, 
-or just I<video-id>.
+https://rumble.com/embed/B<video-id>
+or just B<video-id>.
 
 I<-keep> specifies a list of one or more I<streamtypes> to include.  The list can be 
 either a comma-separated string or an array reference ([...]) of stream types, in 
@@ -232,8 +233,6 @@ rumble
 L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 RECCOMENDS
-
-youtube-dl
 
 wget
 
@@ -390,15 +389,20 @@ sub new
 	$ua->cookie_jar({});
 	$ua->env_proxy;
 	my $response;
+	$self->{'title'} = '';
+	$self->{'artist'} = '';
+	$self->{'album'} = '';
+	$self->{'description'} = '';
+	$self->{'created'} = '';
+	$self->{'year'} = '';
+	$self->{'genre'} = '';
 	$self->{'iconurl'} = '';
 	$self->{'imageurl'} = '';
-	$self->{'title'} = '';
-	$self->{'description'} = '';
-	$self->{'artist'} = '';
-	$self->{'albumartist'} = '';
 	$self->{'streams'} = [];
 	$self->{'cnt'} = 0;
-	$self->{'year'} = '';
+	$self->{'Url'} = '';
+	$self->{'playlist'} = '';
+	$self->{'albumartist'} = '';
 
 	local *getHtmlPage = sub {
 		my $url = shift;
@@ -522,6 +526,7 @@ sub new
 		return undef;
 	};
 
+	$url = "https://rumble.com/embed/${url}/"  if ($url !~ m#http# && $url !~ m#\-#);
 	print STDERR "-0(Rumble): URL=$url=\n"  if ($DEBUG);
 	if ($url =~ m#\/embed\/#i) {
 		my $url2 = &getEmbedPage($url);
@@ -532,10 +537,11 @@ sub new
 	}
 
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
-	$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
-	$self->{'description'} = uri_unescape($self->{'description'});
-	$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
-	$self->{'title'} = uri_unescape($self->{'title'});
+	foreach my $field (qw(description artist title)) {
+		$self->{$field} = HTML::Entities::decode_entities($self->{$field});
+		$self->{$field} = uri_unescape($self->{$field});
+	}
+	$self->{'title'} =~ s/\s+\-\s+$self->{'artist'}\s*$//;  #CONVERT "Title - Artist" => "Title"
 	$self->{'imageurl'} = $self->{'iconurl'};
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';

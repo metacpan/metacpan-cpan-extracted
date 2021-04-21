@@ -13,11 +13,7 @@ my ( $baseurl, $m ) = RT::Test->started_ok();
 
 ok( $m->login( 'root', 'password' ), 'logged in' );
 
-$m->submit_form_ok({
-    form_name => 'CreateTicketInQueue',
-    fields    => {
-       'Queue' => 'General' },
-    }, 'Click to create ticket');
+$m->submit_form_ok( { form_name => 'CreateTicketInQueue' }, 'Click to create ticket' );
 
 $m->content_contains('Enable Recurrence');
 
@@ -38,6 +34,7 @@ $m->submit_form_ok(
             'repeat-details-daily'                                 => 'day',
             'repeat-details-daily-day'                             => 1,
         },
+        button => 'SubmitTicket',
     },
     'Create'
 );
@@ -73,5 +70,4 @@ ok( RT::Extension::RepeatTicket::SetRepeatAttribute(
 is( $ticket->FirstCustomFieldValue('Original Ticket'),
     undef, 'Original Ticket is unset' );
 
-undef $m;
 done_testing;

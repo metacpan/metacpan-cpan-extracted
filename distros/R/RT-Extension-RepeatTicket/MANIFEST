@@ -3,6 +3,7 @@ Changes
 etc/initialdata
 html/Callbacks/RepeatTicket/Elements/Tabs/Privileged
 html/Callbacks/RepeatTicket/Ticket/Create.html/AfterBasics
+html/Callbacks/RepeatTicket/Ticket/Display.html/BeforeDisplay
 html/Callbacks/RepeatTicket/Ticket/Elements/ShowSummary/LeftColumn
 html/Ticket/Elements/EditRecurrence
 html/Ticket/ModifyRecurrence.html
@@ -28,6 +29,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml
+patches/0001-Fix-radio-checkbox-inputs-for-click-panel-behavior-o.patch
 po/repeatticket.pot
 README
 static/css/repeat-ticket.css

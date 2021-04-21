@@ -1,0 +1,31 @@
+From 4e9be8a391a75e68d137ed58072ed75c82d1b185 Mon Sep 17 00:00:00 2001
+From: sunnavy <sunnavy@bestpractical.com>
+Date: Fri, 14 Aug 2020 02:18:31 +0800
+Subject: [PATCH] Fix radio/checkbox inputs for "click" panel behavior of
+ inline edit
+
+Previously these inputs were wrongly intercepted by inline edit and
+couldn't be actually checked.
+---
+ share/static/js/util.js | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/share/static/js/util.js b/share/static/js/util.js
+index 34dd5ec92..5ad1b9300 100644
+--- a/share/static/js/util.js
++++ b/share/static/js/util.js
+@@ -964,6 +964,11 @@ jQuery(function () {
+             return;
+         }
+ 
++        // Bypass radio/checkbox controls too
++        if (jQuery(e.target).closest('div.custom-radio, div.custom-checkbox').length) {
++            return;
++        }
++
+         e.preventDefault();
+         var container = jQuery(this).closest('.titlebox');
+         if (container.hasClass('editing')) {
+-- 
+2.24.3 (Apple Git-128)
+

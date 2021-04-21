@@ -1,9 +1,9 @@
 package App::ANSIColorUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-19'; # DATE
+our $DATE = '2021-01-20'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -94,6 +94,27 @@ sub show_colors {
         };
     }
     [200, "OK", \@rows];
+}
+
+$SPEC{show_colors_from_scheme} = {
+    v => 1.1,
+    summary => 'Show colors from a Graphics::ColorNames scheme',
+    args => {
+        scheme => {
+            schema => 'perl::colorscheme::modname*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub show_colors_from_scheme {
+    my %args = @_;
+    my $mod = "Graphics::ColorNames::$args{scheme}";
+    (my $modpm = "$mod.pm") =~ s!::!/!g;
+    require $modpm;
+
+    my $table = $mod->NamesRgbTable;
+    show_colors(colors => [sort keys %$table]);
 }
 
 $SPEC{show_assigned_rgb_colors} = {
@@ -266,7 +287,7 @@ App::ANSIColorUtils - Utilities related to ANSI color
 
 =head1 VERSION
 
-This document describes version 0.008 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2021-01-19.
+This document describes version 0.009 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2021-01-20.
 
 =head1 DESCRIPTION
 
@@ -303,6 +324,8 @@ This distributions provides the following command-line utilities:
 =item * L<show-assigned-rgb-colors>
 
 =item * L<show-colors>
+
+=item * L<show-colors-from-scheme>
 
 =item * L<show-rand-rgb-colors>
 
@@ -397,6 +420,38 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<colors>* => I<array[str]>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 show_colors_from_scheme
+
+Usage:
+
+ show_colors_from_scheme(%args) -> [status, msg, payload, meta]
+
+Show colors from a Graphics::ColorNames scheme.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<scheme>* => I<perl::colorscheme::modname>
 
 
 =back

@@ -4,8 +4,8 @@
 #
 package PDL::Stats::GLM;
 
-@EXPORT_OK  = qw(  ols_t anova anova_rptd dummy_code effect_code effect_code_w interaction_code ols ols_rptd r2_change logistic pca pca_sorti plot_means plot_residuals plot_screes PDL::PP fill_m PDL::PP fill_rand PDL::PP dev_m PDL::PP stddz PDL::PP sse PDL::PP mse PDL::PP rmse PDL::PP pred_logistic PDL::PP d0 PDL::PP dm PDL::PP dvrs );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw( ols_t anova anova_rptd dummy_code effect_code effect_code_w interaction_code ols ols_rptd r2_change logistic pca pca_sorti plot_means plot_residuals plot_screes PDL::PP fill_m PDL::PP fill_rand PDL::PP dev_m PDL::PP stddz PDL::PP sse PDL::PP mse PDL::PP rmse PDL::PP pred_logistic PDL::PP d0 PDL::PP dm PDL::PP dvrs );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Stats::GLM ;
 

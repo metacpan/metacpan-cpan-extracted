@@ -6,7 +6,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 README.build
 autogen.pl
 bin/medley
@@ -67,6 +66,7 @@ t/10-list.t
 t/10-module-overview.t
 t/10-package.t
 t/10-string.t
+t/11-cache-expire.t
 t/12-simple-list.t
 t/20-logger.t
 t/30-spawn.t

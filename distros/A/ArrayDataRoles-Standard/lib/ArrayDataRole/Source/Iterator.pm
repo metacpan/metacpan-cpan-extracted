@@ -1,9 +1,9 @@
 package ArrayDataRole::Source::Iterator;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-13'; # DATE
+our $DATE = '2021-04-20'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use Role::Tiny;
@@ -23,37 +23,46 @@ sub _new {
         gen_iterator => $gen_iterator,
         gen_iterator_params => $gen_iterator_params,
         iterator => undef,
-        index => 0,
+        pos => 0,
+        # buf => '', # exists when there is a buffer
     }, $class;
 }
 
-sub elem {
+sub get_next_item {
     my $self = shift;
     $self->reset_iterator unless $self->{iterator};
-    my $elem = $self->{iterator}->();
-    die "Out of range" unless defined $elem;
-    $self->{index}++;
-    $elem;
+    if (exists $self->{buf}) {
+        $self->{pos}++;
+        return delete $self->{buf};
+    } else {
+        my $elem = $self->{iterator}->();
+        die "StopIteration" unless defined $elem;
+        $self->{pos}++;
+        return $elem;
+    }
 }
 
-sub get_elem {
+sub has_next_item {
     my $self = shift;
+    if (exists $self->{buf}) {
+        return 1;
+    }
     $self->reset_iterator unless $self->{iterator};
     my $elem = $self->{iterator}->();
-    return undef unless defined $elem;
-    $self->{index}++;
-    $elem;
+    return 0 unless defined $elem;
+    $self->{buf} = $elem;
+    1;
 }
 
 sub reset_iterator {
     my $self = shift;
     $self->{iterator} = $self->{gen_iterator}->(%{ $self->{gen_iterator_params} });
-    $self->{index} = 0;
+    $self->{pos} = 0;
 }
 
-sub get_iterator_index {
+sub get_iterator_pos {
     my $self = shift;
-    $self->{index};
+    $self->{pos};
 }
 
 1;
@@ -71,7 +80,7 @@ ArrayDataRole::Source::Iterator - Get array data from an iterator
 
 =head1 VERSION
 
-This document describes version 0.001 of ArrayDataRole::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-13.
+This document describes version 0.002 of ArrayDataRole::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-20.
 
 =head1 SYNOPSIS
 
@@ -92,8 +101,9 @@ This document describes version 0.001 of ArrayDataRole::Source::Iterator (from P
 
 =head1 DESCRIPTION
 
-This role retrieves elements from an iterator. Iterator must return a non-undef
-element, or undef to signal that all elements have been iterated.
+This role retrieves elements from a simplistic iterator (a coderef). When
+called, the iterator must return a non-undef element or undef to signal that all
+elements have been iterated.
 
 C<reset_iterator()> will regenerate a new iterator.
 

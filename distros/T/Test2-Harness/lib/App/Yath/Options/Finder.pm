@@ -2,7 +2,7 @@ package App::Yath::Options::Finder;
 use strict;
 use warnings;
 
-our $VERSION = '1.000044';
+our $VERSION = '1.000047';
 
 use Test2::Harness::Util qw/mod2file/;
 
@@ -77,10 +77,6 @@ option_group {prefix => 'finder', category => "Finder Options", builds => 'Test2
         type => 's',
         description => "Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.",
         long_examples => [' path/to/log.jsonl', ' http://example.com/coverage', ' path/to/coverage.json']
-    );
-
-    option coverage_url_use_post => (
-        description => 'If coverage_from is a url, use the http POST method with a list of changed files. This allows the server to tell us what tests to run instead of downloading all the coverage data and determining what tests to run from that.',
     );
 
     option durations => (
@@ -293,13 +289,6 @@ What plugin should be used to detect changed files.
 =item --no-coverage-from
 
 Where to fetch coverage data. Can be a path to a .jsonl(.bz|.gz)? log file. Can be a path or url to a json file containing a hash where source files are key, and value is a list of tests to run.
-
-
-=item --coverage-url-use-post
-
-=item --no-coverage-url-use-post
-
-If coverage_from is a url, use the http POST method with a list of changed files. This allows the server to tell us what tests to run instead of downloading all the coverage data and determining what tests to run from that.
 
 
 =item --default-at-search ARG

@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::RepeatTicket;
 
-our $VERSION = "1.11";
+our $VERSION = "2.00";
 
 use RT::Interface::Web;
 use DateTime;
@@ -48,6 +48,10 @@ sub SetRepeatAttribute {
         'repeat-details-weekly-weeks' => undef,
         %args
     );
+
+    # Drop unrelated params from inline edit, UpdateContent is from core,
+    # SubmitRecurrence is the submit button.
+    delete $repeat_args{$_} for qw/UpdateContent SubmitRecurrence/;
 
     my ($valid, $message) = ValidateArgs(\%repeat_args);
 
@@ -782,6 +786,10 @@ New tickets are created when you initially save the recurrence, if new
 tickets are needed, and when your daily cron job runs the rt-repeat-ticket
 script.
 
+=head1 RT VERSION
+
+Works with RT 5.0. Check out 1.* versions if you are still using RT 4.
+
 =head1 INSTALLATION
 
 =over
@@ -804,21 +812,21 @@ in your database.
 If you are upgrading this module, check for upgrading instructions
 in case changes need to be made to your database.
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item C<patch RT>
 
-If you are using RT 4.2 or greater, add this line:
+Apply for 5.0.0:
+
+    patch -p1 -d /opt/rt5 < patches/0001-Fix-radio-checkbox-inputs-for-click-panel-behavior-o.patch
+
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+
+Add this line:
 
     Plugin('RT::Extension::RepeatTicket');
 
-For RT 4.0, add this line:
-
-    Set(@Plugins, qw(RT::Extension::RepeatTicket));
-
-or add C<RT::Extension::RepeatTicket> to your existing C<@Plugins> line.
-
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Add F<bin/rt-repeat-ticket> to the daily cron job.
 
@@ -1021,7 +1029,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014 by Best Practical Solutions
+This software is Copyright (c) 2014-2020 by Best Practical Solutions
 
 This is free software, licensed under:
 

@@ -4,12 +4,17 @@
 <& /Elements/ListActions, actions => \@results &>
 
 % unless ( $skip ) {
-<form method="post" name="ModifyRecurrence" action="ModifyRecurrence.html">
+<form method="post" name="ModifyRecurrence" action="ModifyRecurrence.html" class="mx-auto max-width-lg">
 <input type="hidden" class="hidden" name="id" value="<%$TicketObj->Id%>" />
 <&| /Widgets/TitleBox,title => loc('Modify recurrence for ticket # [_1]', $TicketObj->Id), class=> 'ticket-info-repeat' &>
 <& Elements/EditRecurrence, Ticket => $TicketObj, ARGSRef => $ARGSRef &>
 </&>
-<& /Elements/Submit, Name => 'SubmitTicket', Label => loc('Save Changes') &>
+
+  <div class="form-row">
+    <div class="col-12">
+      <& /Elements/Submit, Name => 'SubmitTicket', Label => loc('Save Changes') &>
+    </div>
+  </div>
 </form>
 % }
 
@@ -27,9 +32,14 @@ unless( $cf->id && ( $cf->can('IsAdded') ? ( $cf->IsAdded(0) || $cf->IsAdded($Ti
 }
 
 if ( $ARGS{SubmitTicket} ) {
-    my ( $ret, $message ) = RT::Extension::RepeatTicket::SetRepeatAttribute( $TicketObj, %ARGS );
-    $ARGSRef = \%ARGS if not $ret; # Save params on failure
-    push @results, $message;
+    if ( $TicketObj->CurrentUserHasRight('ModifyTicket') ) {
+        my ( $ret, $message ) = RT::Extension::RepeatTicket::SetRepeatAttribute( $TicketObj, %ARGS );
+        $ARGSRef = \%ARGS if not $ret; # Save params on failure
+        push @results, $message;
+    }
+    else {
+        push @results, loc('Permission Denied');
+    }
 }
 
 </%INIT>

@@ -1,9 +1,8 @@
 # PDL-Stats
 
-| OS      |  Build status |
-|:-------:|--------------:|
-| Linux   | [![Build Status](https://travis-ci.org/PDLPorters/PDL-Stats.png?branch=master)](https://travis-ci.org/PDLPorters/PDL-Stats) |
-| Windows | [![Build status](https://ci.appveyor.com/api/projects/status/0vyo5c507j1ig690/branch/master?svg=true)](https://ci.appveyor.com/project/zmughal/pdl-stats/branch/master) |
+|  Build status |
+| ------------- |
+| ![Build Status](https://github.com/PDLPorters/PDL-Stats/workflows/perl/badge.svg?branch=master) |
 
 [![Coverage Status](https://coveralls.io/repos/PDLPorters/PDL-Stats/badge.svg?branch=master&service=github)](https://coveralls.io/github/PDLPorters/PDL-Stats?branch=master)
 [![CPAN version](https://badge.fury.io/pl/PDL-Stats.svg)](https://metacpan.org/pod/PDL::Stats)

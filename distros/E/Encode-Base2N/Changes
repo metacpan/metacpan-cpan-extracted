@@ -1,3 +1,5 @@
+1.0.4    19.04.2021
+          - add MANIFEST.SKIP
 1.0.3    08.04.2021
           - move C codes to own lib with cmake
           - add C tests

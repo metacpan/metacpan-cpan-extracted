@@ -1,3 +1,5 @@
+1.5.1    19.04.2021
+            - change MANIFEST.SKIP
 1.5.0    08.04.2021
             - exceptions, give libunwind priority (needed for *bsd)
             - exceptions, libunwind: with fake 1st frame with IP = 0

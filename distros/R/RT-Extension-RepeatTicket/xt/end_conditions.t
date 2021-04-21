@@ -101,26 +101,26 @@ sub run_tests{
 
     ok( $m->login( 'root', 'password' ), 'logged in' );
 
-    $m->submit_form_ok({
-                        form_name => 'CreateTicketInQueue',
-                        fields    => {
-                                      'Queue' => 'General' },
-                       }, 'Click to create ticket');
+    $m->submit_form_ok( { form_name => 'CreateTicketInQueue', }, 'Click to create ticket' );
 
     $m->content_contains('Enable Recurrence');
 
     diag "Create a ticket with a recurrence in the General queue.";
 
-    $m->submit_form_ok({
-                        form_name => 'TicketCreate',
-                        fields    => {
-                                      'Subject' => 'Set up recurring aperture maintenance',
-                                      'Content' => 'Perform work on portals once per day',
-                                      'repeat-enabled' => 1,
-                                      'repeat-type' => 'daily',
-                                      'repeat-details-daily' => 'day',
-                                      'repeat-details-daily-day' => 1,
-                                     },}, 'Create');
+    $m->submit_form_ok(
+        {   form_name => 'TicketCreate',
+            fields    => {
+                'Subject'                  => 'Set up recurring aperture maintenance',
+                'Content'                  => 'Perform work on portals once per day',
+                'repeat-enabled'           => 1,
+                'repeat-type'              => 'daily',
+                'repeat-details-daily'     => 'day',
+                'repeat-details-daily-day' => 1,
+            },
+            button => 'SubmitTicket',
+        },
+        'Create'
+    );
 
     $m->text_like( qr/Ticket\s(\d+)\screated in queue/);
 

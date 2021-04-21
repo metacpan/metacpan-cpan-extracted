@@ -2,9 +2,10 @@ To perform a release, do the following:
 
 1. ./autogen.pl (if necessary)
 2. update version in dist.ini
-3. git commit
-4. dzil release  (versions will be stamped to all the pm files for you)
-5. git push
+3. run dzil build to generate a LICENSE and updated README.md in the root dir
+4. git commit
+5. dzil release  (versions will be stamped to all the pm files for you)
+6. git push
 
 
 To generate coverage:

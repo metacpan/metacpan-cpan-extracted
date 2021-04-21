@@ -10,38 +10,28 @@ use ArrayData::Test::Spec::Basic;
 
 my $ary = ArrayData::Test::Spec::Basic->new;
 
-subtest "elem, reset_iterator" => sub {
+subtest "has_next_item, get_next_item, reset_iterator" => sub {
     #$ary->reset_iterator;
-    is_deeply($ary->elem, 1);
-    is_deeply($ary->elem, 2);
+    ok($ary->has_next_item);
+    is_deeply($ary->get_next_item, 1);
+    is_deeply($ary->get_next_item, 2);
     $ary->reset_iterator;
-    is_deeply($ary->elem, 1);
-    is_deeply($ary->elem, 2);
-    is_deeply($ary->elem, undef);
-    is_deeply($ary->elem, 4);
-    dies_ok { $ary->elem };
+    is_deeply($ary->get_next_item, 1);
+    is_deeply($ary->get_next_item, 2);
+    is_deeply($ary->get_next_item, undef);
+    is_deeply($ary->get_next_item, 4);
+    ok(!$ary->has_next_item);
+    dies_ok { $ary->get_next_item };
 };
 
-subtest "get_elem, reset_iterator" => sub {
+subtest "get_item_count, get_iterator_pos" => sub {
     $ary->reset_iterator;
-    is_deeply($ary->get_elem, 1);
-    is_deeply($ary->get_elem, 2);
-    $ary->reset_iterator;
-    is_deeply($ary->get_elem, 1);
-    is_deeply($ary->get_elem, 2);
-    is_deeply($ary->get_elem, undef);
-    is_deeply($ary->get_elem, 4);
-    is_deeply($ary->get_elem, undef);
+    is($ary->get_iterator_pos, 0);
+    is($ary->get_item_count, 4);
 };
 
-subtest "get_elem_count, get_iterator_index" => sub {
-    $ary->reset_iterator;
-    is($ary->get_iterator_index, 0);
-    is($ary->get_elem_count, 4);
-};
-
-subtest get_all_elems => sub {
-    is_deeply($ary->get_all_elems, [
+subtest get_all_items => sub {
+    is_deeply([$ary->get_all_items], [
         1,
         2,
         undef,
@@ -49,9 +39,9 @@ subtest get_all_elems => sub {
     ]);
 };
 
-subtest each_elem => sub {
+subtest each_item => sub {
     my $row;
-    $ary->each_elem(sub { $row //= $_[0] });
+    $ary->each_item(sub { $row //= $_[0] });
     is_deeply($row, 1);
 };
 

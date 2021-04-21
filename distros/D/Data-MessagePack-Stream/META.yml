@@ -6,10 +6,11 @@ build_requires:
   Test::More: '0.98'
 configure_requires:
   Devel::PPPort: '3.42'
+  File::Which: '0'
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +29,7 @@ no_index:
 provides:
   Data::MessagePack::Stream:
     file: lib/Data/MessagePack/Stream.pm
-    version: '1.04'
+    version: '1.05'
 requires:
   Data::MessagePack: '0'
   perl: '5.008001'
@@ -36,14 +37,14 @@ resources:
   bugtracker: https://github.com/typester/Data-MessagePack-Stream/issues
   homepage: https://github.com/typester/Data-MessagePack-Stream
   repository: git://github.com/typester/Data-MessagePack-Stream.git
-version: '1.04'
+version: '1.05'
 x_authority: cpan:TYPESTER
 x_contributors:
   - 'Daisuke Murase <typester@gmail.com>'
   - 'Kang-min Liu <gugod@gugod.org>'
   - 'Olivier Mengué <dolmen@cpan.org>'
   - 'Sergey Zhuravlev <zhur@yandex-team.ru>'
+  - 'Shohei YOSHIDA <syohex@gmail.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

@@ -1,2 +1,0 @@
-/usr/bin/ar qc libpanda-uri.a  CMakeFiles/panda-uri.dir/src/panda/uri/URI.cc.o CMakeFiles/panda-uri.dir/src/panda/uri/encode.cc.o CMakeFiles/panda-uri.dir/src/panda/uri/parser.cc.o CMakeFiles/panda-uri.dir/src/panda/uri/parser_ext.cc.o
-/usr/bin/ranlib libpanda-uri.a

@@ -2,7 +2,7 @@ package App::Yath::Options::Logging;
 use strict;
 use warnings;
 
-our $VERSION = '1.000044';
+our $VERSION = '1.000047';
 
 use POSIX qw/strftime/;
 use Test2::Harness::Util qw/clean_path/;
@@ -60,7 +60,7 @@ option_group {prefix => 'logging', category => "Logging Options"} => sub {
         action      => sub {
             my ($prefix, $field, $raw, $norm, $slot, $settings) = @_;
 
-            $settings->runner->field('cover_files' => 1) if $settings->check_prefix('runner');
+            $settings->run->field('cover_files' => 1) if $settings->check_prefix('runner');
 
             return $$slot = clean_path("coverage.json") if $raw eq '1';
             return $$slot = $norm;

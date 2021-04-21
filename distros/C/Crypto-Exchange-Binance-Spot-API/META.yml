@@ -14,6 +14,6 @@ meta-spec:
 name: Crypto-Exchange-Binance-Spot-API
 requires:
   Crypto::Exchange::API: '0'
-version: '0.01'
+version: '0.02'
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

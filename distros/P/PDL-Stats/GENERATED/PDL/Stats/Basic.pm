@@ -4,8 +4,8 @@
 #
 package PDL::Stats::Basic;
 
-@EXPORT_OK  = qw(  binomial_test rtable which_id PDL::PP stdv PDL::PP stdv_unbiased PDL::PP var PDL::PP var_unbiased PDL::PP se PDL::PP ss PDL::PP skew PDL::PP skew_unbiased PDL::PP kurt PDL::PP kurt_unbiased PDL::PP cov PDL::PP cov_table PDL::PP corr PDL::PP corr_table PDL::PP t_corr PDL::PP n_pair PDL::PP corr_dev PDL::PP t_test PDL::PP t_test_nev PDL::PP t_test_paired );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw( binomial_test rtable which_id PDL::PP stdv PDL::PP stdv_unbiased PDL::PP var PDL::PP var_unbiased PDL::PP se PDL::PP ss PDL::PP skew PDL::PP skew_unbiased PDL::PP kurt PDL::PP kurt_unbiased PDL::PP cov PDL::PP cov_table PDL::PP corr PDL::PP corr_table PDL::PP t_corr PDL::PP n_pair PDL::PP corr_dev PDL::PP t_test PDL::PP t_test_nev PDL::PP t_test_paired );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Stats::Basic ;
 

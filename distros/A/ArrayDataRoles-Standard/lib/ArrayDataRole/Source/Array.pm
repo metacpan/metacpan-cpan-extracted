@@ -1,9 +1,9 @@
 package ArrayDataRole::Source::Array;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-13'; # DATE
+our $DATE = '2021-04-20'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use Role::Tiny;
@@ -20,30 +20,29 @@ sub new {
 
     bless {
         array => $ary,
-        index => 0,
+        pos => 0,
     }, $class;
 }
 
-sub elem {
+sub get_next_item {
     my $self = shift;
-    die "Out of range" unless $self->{index} < @{ $self->{array} };
-    $self->{array}->[ $self->{index}++ ];
+    die "StopIteration" unless $self->{pos} < @{ $self->{array} };
+    $self->{array}->[ $self->{pos}++ ];
 }
 
-sub get_elem {
+sub has_next_item {
     my $self = shift;
-    return undef unless $self->{index} < @{ $self->{array} };
-    $self->{array}->[ $self->{index}++ ];
+    $self->{pos} < @{ $self->{array} };
 }
 
 sub reset_iterator {
     my $self = shift;
-    $self->{index} = 0;
+    $self->{pos} = 0;
 }
 
-sub get_iterator_index {
+sub get_iterator_pos {
     my $self = shift;
-    $self->{index};
+    $self->{pos};
 }
 
 1;
@@ -61,7 +60,7 @@ ArrayDataRole::Source::Array - Get array data from a Perl array
 
 =head1 VERSION
 
-This document describes version 0.001 of ArrayDataRole::Source::Array (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-13.
+This document describes version 0.002 of ArrayDataRole::Source::Array (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-20.
 
 =head1 SYNOPSIS
 

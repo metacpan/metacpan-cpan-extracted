@@ -104,7 +104,7 @@ general StreamFinder module.
 
 Depends:  
 
-L<I::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
 and the separate application program:  youtube-dl.
 
 =head1 SUBROUTINES/METHODS
@@ -409,13 +409,19 @@ sub new
 		$url2fetch = 'https://www.bitchute.com/video/' . $url;
 	}
 	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
-	$self->{'iconurl'} = '';
 	$self->{'title'} = '';
-	$self->{'description'} = '';
 	$self->{'artist'} = '';
-	$self->{'albumartist'} = '';
+	$self->{'album'} = '';
+	$self->{'description'} = '';
+	$self->{'created'} = '';
+	$self->{'year'} = '';
+	$self->{'genre'} = 'Video';
+	$self->{'iconurl'} = '';
 	$self->{'streams'} = [];
 	$self->{'cnt'} = 0;
+	$self->{'Url'} = '';
+	$self->{'playlist'} = '';
+	$self->{'albumartist'} = '';
 
 	#FIRST TRY SCANNING MANUALLY!:
 

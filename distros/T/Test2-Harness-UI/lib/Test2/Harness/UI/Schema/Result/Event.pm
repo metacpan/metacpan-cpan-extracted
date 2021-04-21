@@ -10,7 +10,7 @@ use Carp qw/confess/;
 confess "You must first load a Test2::Harness::UI::Schema::NAME module"
     unless $Test2::Harness::UI::Schema::LOADED;
 
-our $VERSION = '0.000056';
+our $VERSION = '0.000058';
 
 __PACKAGE__->parent_column('parent_id');
 
@@ -42,6 +42,7 @@ sub TO_JSON {
 
     # Inflate
     $cols{facets} = $self->facets;
+    $cols{orphan} = $self->orphan;
     $cols{lines}  = Test2::Formatter::Test2::Composer->render_super_verbose($cols{facets});
 
     return \%cols;

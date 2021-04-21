@@ -78,6 +78,7 @@ t/18_parse_pe_bad_names.t
 t/19_parse_pe_rev.t
 t/20_parse_pe_bad_interleaved.t
 t/30_helper.t
+t/31_help_fun.t
 t/40_two_fastas.t
 t/40_two_files.t
 t/release-00-pod.t

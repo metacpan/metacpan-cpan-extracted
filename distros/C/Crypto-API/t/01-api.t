@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Crypto::API;
 
-package foo {
+{package foo;
     use Moo;
     extends 'Crypto::API';
 

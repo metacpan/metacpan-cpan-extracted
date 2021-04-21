@@ -1,4 +1,4 @@
-API-INSEE-Sirene version 3.508
+API-INSEE-Sirene version 4.03
 =============================
 
 API::INSEE::Sirene - An interface for the Sirene API of INSEE
@@ -16,13 +16,16 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
+HTTP::Request::Common
+HTTP::Status
 JSON
 LWP::UserAgent
 POSIX
+Switch
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2018-2020 by Les Nouveaux Constructeurs
+Copyright (C) 2018-2021 by Les Nouveaux Constructeurs
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.1 or,

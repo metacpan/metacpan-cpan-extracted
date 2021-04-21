@@ -1,1 +1,21 @@
-.ticket-info-repeat-recurrence .titlebox .titlebox-title .left { background-color: #B23 }
+.ticket-info-repeat-recurrence .titlebox.card {
+  border-top: 3px solid #B23;
+}
+
+.repeat .form-row .form-check {
+  margin-top: 5px;
+}
+
+.repeat .custom-control-label.has-text-input::before,
+.repeat .custom-control-label.has-text-input::after {
+  top: 0.5rem;
+}
+
+.repeat .form-control {
+  display: inline;
+  width: auto;
+}
+
+.repeat .bootstrap-select > .dropdown-toggle {
+  width: auto;
+}

@@ -1,9 +1,9 @@
 package ArrayDataRole::Source::LinesDATA;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-13'; # DATE
+our $DATE = '2021-04-20'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Role::Tiny;
 use Role::Tiny::With;
@@ -20,35 +20,32 @@ sub new {
     bless {
         fh => $fh,
         fhpos_data_begin => $fhpos_data_begin,
-        index => 0, # iterator
+        pos => 0, # iterator
     }, $class;
 }
 
-sub elem {
+sub get_next_item {
     my $self = shift;
-    die "Out of range" if eof($self->{fh});
+    die "StopIteration" if eof($self->{fh});
     chomp(my $elem = readline($self->{fh}));
-    $self->{index}++;
+    $self->{pos}++;
     $elem;
 }
 
-sub get_elem {
+sub has_next_item {
     my $self = shift;
-    return undef if eof($self->{fh});
-    chomp(my $elem = readline($self->{fh}));
-    $self->{index}++;
-    $elem;
+    !eof($self->{fh});
 }
 
-sub get_iterator_index {
+sub get_iterator_pos {
     my $self = shift;
-    $self->{index};
+    $self->{pos};
 }
 
 sub reset_iterator {
     my $self = shift;
     seek $self->{fh}, $self->{fhpos_data_begin}, 0;
-    $self->{index} = 0;
+    $self->{pos} = 0;
 }
 
 1;
@@ -66,7 +63,7 @@ ArrayDataRole::Source::LinesDATA - Role to access array data from DATA section, 
 
 =head1 VERSION
 
-This document describes version 0.001 of ArrayDataRole::Source::LinesDATA (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-13.
+This document describes version 0.002 of ArrayDataRole::Source::LinesDATA (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-20.
 
 =head1 DESCRIPTION
 

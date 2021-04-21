@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Perl-Oberon.t
+lib/Perl/Oberon.pm

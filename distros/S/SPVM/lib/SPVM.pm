@@ -20,7 +20,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0942';
+our $VERSION = '0.0943';
 
 my $SPVM_INITED;
 my $BUILDER;
@@ -480,7 +480,19 @@ SPVM Core Modules.
 
 =item * L<SPVM::Cloner>
 
-=item * L<SPVM::Comparator>
+=item * L<SPVM::Comparator::Byte>
+
+=item * L<SPVM::Comparator::Short>
+
+=item * L<SPVM::Comparator::Int>
+
+=item * L<SPVM::Comparator::Long>
+
+=item * L<SPVM::Comparator::Float>
+
+=item * L<SPVM::Comparator::Double>
+
+=item * L<SPVM::Comparator::Object>
 
 =item * L<SPVM::Complex_2d>
 

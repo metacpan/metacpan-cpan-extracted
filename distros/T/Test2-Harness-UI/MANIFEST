@@ -11,8 +11,7 @@ README.md
 TODO
 cpanfile
 dist.ini
-json-view.LICENSE
-json-view.README.md
+json-formatter.LICENSE
 lib/App/Yath/Command/ui.pm
 lib/App/Yath/Plugin/YathUIDB.pm
 lib/Test2/Harness/Renderer/UI.pm
@@ -67,7 +66,7 @@ share/css/dashboard.css
 share/css/datatables.min.css
 share/css/fieldtable.css
 share/css/job.css
-share/css/jquery.json-view.min.css
+share/css/json-formatter.css
 share/css/main.css
 share/css/theme.css
 share/css/upload.css
@@ -75,6 +74,7 @@ share/css/user.css
 share/css/view.css
 share/img/close.png
 share/img/close_red.png
+share/img/coverage.png
 share/img/data.png
 share/img/dotdotdot.png
 share/img/download.png
@@ -92,7 +92,7 @@ share/js/jobtable.js
 share/js/jquery-ui.js
 share/js/jquery-ui.min.js
 share/js/jquery.js
-share/js/jquery.json-view.min.js
+share/js/json-formatter.umd.js
 share/js/main.js
 share/js/runtable.js
 share/js/upload.js

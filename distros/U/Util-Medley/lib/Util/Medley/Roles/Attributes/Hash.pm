@@ -1,5 +1,5 @@
 package Util::Medley::Roles::Attributes::Hash;
-$Util::Medley::Roles::Attributes::Hash::VERSION = '0.058';
+$Util::Medley::Roles::Attributes::Hash::VERSION = '0.059';
 use Modern::Perl;
 use Moose::Role;
 use Util::Medley::Hash;
@@ -10,7 +10,7 @@ Util::Medley::Roles::Attributes::Hash
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =cut
 

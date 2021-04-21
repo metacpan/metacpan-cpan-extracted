@@ -3,7 +3,7 @@ use 5.010_000;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 
 our @EXPORT = qw(all_vars_ok test_vars vars_ok);
 
@@ -169,6 +169,15 @@ sub _check_into_stash {
     foreach my $key(sort keys %{$stash}){
         my $ref = \$stash->{$key};
 
+        if (ref ${$ref} eq 'CODE') {
+            # Reify the glob and let perl figure out what to put in
+            # GvFILE. This is needed for the optimization added in 5.27.6 that
+            # stores coderefs directly in the stash instead of in a typeglob
+            # in the stash.
+            no strict 'refs';
+            () = *{B::svref_2object($stash)->NAME . "::$key"};
+        }
+
         next if ref($ref) ne 'GLOB';
 
         my $gv = B::svref_2object($ref);
@@ -252,7 +261,7 @@ my $op_entereval; # string eval
 my $op_null;
 my @op_svusers;
 BEGIN{
-    foreach my $op(qw(padsv padav padhv match multideref subst)){
+    foreach my $op(qw(padsv padav padhv padcv match multideref subst)){
         $padops[B::opnumber($op)]++;
     }
     # blead commit 93bad3fd55489cbd split aelemfast into two ops.
@@ -462,7 +471,7 @@ Test::Vars - Detects unused variables in perl modules
 
 =head1 VERSION
 
-This document describes Test::Vars version 0.014.
+This document describes Test::Vars version 0.015.
 
 =head1 SYNOPSIS
 
@@ -545,7 +554,7 @@ indicative of an error.
 
 =head1 MECHANISM
 
-C<Test::Vars> is similar to a part of C<Test::Perl::Critic>,but the mechanism
+C<Test::Vars> is similar to a part of C<Test::Perl::Critic>, but the mechanism
 is different.
 
 While C<Perl::Critic>, the backend of C<Test::Perl::Critic>, scans the source

@@ -78,12 +78,6 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "POST_DEC",
     "MINUS",
     "PLUS",
-    "EQ",
-    "NE",
-    "LT",
-    "LE",
-    "GT",
-    "GE",
     "ADD",
     "SUBTRACT",
     "MULTIPLY",
@@ -150,12 +144,20 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "LOOP_INCREMENT",
     "SELF",
     "CHECK_CONVERT",
+    "NUMERIC_EQ",
+    "NUMERIC_NE",
+    "NUMERIC_LT",
+    "NUMERIC_LE",
+    "NUMERIC_GT",
+    "NUMERIC_GE",
+    "NUMERIC_CMP",
     "STRING_EQ",
     "STRING_NE",
     "STRING_GT",
     "STRING_GE",
     "STRING_LT",
     "STRING_LE",
+    "STRING_CMP",
     "ISA",
     "SEQUENCE",
     "PRECOMPILE",
@@ -243,20 +245,6 @@ SPVM_OP* SPVM_OP_new_op_type(SPVM_COMPILER* compiler, SPVM_TYPE* type, const cha
   return op_type;
 }
 
-SPVM_OP* SPVM_OP_build_deref(SPVM_COMPILER* compiler, SPVM_OP* op_deref, SPVM_OP* op_var) {
-  
-  SPVM_OP_insert_child(compiler, op_deref, op_deref->last, op_var);
-
-  return op_deref;
-}
-
-SPVM_OP* SPVM_OP_build_ref(SPVM_COMPILER* compiler, SPVM_OP* op_ref, SPVM_OP* op_var) {
-  
-  SPVM_OP_insert_child(compiler, op_ref, op_ref->last, op_var);
-  
-  return op_ref;
-}
-
 int32_t SPVM_OP_is_mutable(SPVM_COMPILER* compiler, SPVM_OP* op) {
   (void)compiler;
   
@@ -284,12 +272,14 @@ int32_t SPVM_OP_is_rel_op(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_NUMERIC_GE:
     case SPVM_OP_C_ID_NUMERIC_LT:
     case SPVM_OP_C_ID_NUMERIC_LE:
+    case SPVM_OP_C_ID_NUMERIC_CMP:
     case SPVM_OP_C_ID_STRING_EQ:
     case SPVM_OP_C_ID_STRING_NE:
     case SPVM_OP_C_ID_STRING_GT:
     case SPVM_OP_C_ID_STRING_GE:
     case SPVM_OP_C_ID_STRING_LT:
     case SPVM_OP_C_ID_STRING_LE:
+    case SPVM_OP_C_ID_STRING_CMP:
     case SPVM_OP_C_ID_ISA:
       return 1;
   }
@@ -466,7 +456,7 @@ SPVM_OP* SPVM_OP_new_op_deref_clone(SPVM_COMPILER* compiler, SPVM_OP* original_o
   
   SPVM_OP* op_var = SPVM_OP_new_op_var_clone_var_or_assign(compiler, original_op_deref->first);
   
-  SPVM_OP_build_deref(compiler, op_deref, op_var);
+  SPVM_OP_build_unary_op(compiler, op_deref, op_var);
   
   return op_deref;
 }
@@ -1134,7 +1124,24 @@ SPVM_OP* SPVM_OP_build_new(SPVM_COMPILER* compiler, SPVM_OP* op_new, SPVM_OP* op
   return op_new;
 }
 
-SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_init, SPVM_OP* op_list_elements) {
+SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_init, SPVM_OP* op_list_elements, int32_t is_key_values) {
+
+  // Check key value pairs count when {} array init syntax
+  if (is_key_values) {
+    if (op_list_elements) {
+      int32_t element_index = 0;
+      SPVM_OP* op_term_element = op_list_elements->first;
+      while ((op_term_element = SPVM_OP_sibling(compiler, op_term_element))) {
+        op_term_element->no_need_check = 1;
+        element_index++;
+      }
+      int32_t is_odd = element_index % 2 == 1;
+      if (is_odd) {
+        SPVM_COMPILER_error(compiler, "Odd number of elements in {} array init syntax\n");
+      }
+    }
+    op_array_init->flag |= SPVM_OP_C_FLAG_ARRAY_INIT_IS_KEY_VALUES;
+  }
   
   SPVM_OP_insert_child(compiler, op_array_init, op_array_init->last, op_list_elements);
   
@@ -1189,12 +1196,14 @@ int32_t SPVM_OP_get_mem_id(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_NUMERIC_GE:
     case SPVM_OP_C_ID_NUMERIC_LT:
     case SPVM_OP_C_ID_NUMERIC_LE:
+    case SPVM_OP_C_ID_NUMERIC_CMP:
     case SPVM_OP_C_ID_STRING_EQ:
     case SPVM_OP_C_ID_STRING_NE:
     case SPVM_OP_C_ID_STRING_GT:
     case SPVM_OP_C_ID_STRING_GE:
     case SPVM_OP_C_ID_STRING_LT:
     case SPVM_OP_C_ID_STRING_LE:
+    case SPVM_OP_C_ID_STRING_CMP:
     case SPVM_OP_C_ID_ISA:
     case SPVM_OP_C_ID_ISWEAK_FIELD:
       return 0;
@@ -1244,6 +1253,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_NUMERIC_GE:
     case SPVM_OP_C_ID_NUMERIC_LT:
     case SPVM_OP_C_ID_NUMERIC_LE:
+    case SPVM_OP_C_ID_NUMERIC_CMP:
     case SPVM_OP_C_ID_BOOL:
     case SPVM_OP_C_ID_STRING_EQ:
     case SPVM_OP_C_ID_STRING_NE:
@@ -1251,6 +1261,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_STRING_GE:
     case SPVM_OP_C_ID_STRING_LT:
     case SPVM_OP_C_ID_STRING_LE:
+    case SPVM_OP_C_ID_STRING_CMP:
     case SPVM_OP_C_ID_ISA:
     case SPVM_OP_C_ID_IF:
     case SPVM_OP_C_ID_ISWEAK_FIELD:
@@ -2051,12 +2062,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     
     // Subroutine declarations
     {
-      if (package->category == SPVM_PACKAGE_C_CATEGORY_CALLBACK) {
-        if (package->subs->length != 1) {
-          SPVM_COMPILER_error(compiler, "Callback type must have only one method at %s line %d\n", package->op_package->file, package->op_package->line);
-        }
-      }
-
       int32_t i;
       for (i = 0; i < package->subs->length; i++) {
         SPVM_SUB* sub = SPVM_LIST_fetch(package->subs, i);
@@ -2763,6 +2768,21 @@ SPVM_OP* SPVM_OP_build_comparison_op(SPVM_COMPILER* compiler, SPVM_OP* op_compar
   return op_assign;
 }
 
+SPVM_OP* SPVM_OP_build_isa(SPVM_COMPILER* compiler, SPVM_OP* op_isa, SPVM_OP* op_term, SPVM_OP* op_type) {
+  
+  // Build op
+  SPVM_OP_insert_child(compiler, op_isa, op_isa->last, op_term);
+  SPVM_OP_insert_child(compiler, op_isa, op_isa->last, op_type);
+
+  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "@condition_flag", op_isa->file, op_isa->line);
+  SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
+  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_isa->file, op_isa->line);
+  SPVM_OP_build_assign(compiler, op_assign, op_var, op_isa);
+  
+  return op_assign;
+}
+
+
 SPVM_OP* SPVM_OP_build_binary_op(SPVM_COMPILER* compiler, SPVM_OP* op_bin, SPVM_OP* op_first, SPVM_OP* op_last) {
   
   // Build op
@@ -2796,29 +2816,6 @@ SPVM_OP* SPVM_OP_build_dec(SPVM_COMPILER* compiler, SPVM_OP* op_dec, SPVM_OP* op
   return op_dec;
 }
 
-
-SPVM_OP* SPVM_OP_build_isa(SPVM_COMPILER* compiler, SPVM_OP* op_isa, SPVM_OP* op_term, SPVM_OP* op_type) {
-  
-  // Build op
-  SPVM_OP_insert_child(compiler, op_isa, op_isa->last, op_term);
-  SPVM_OP_insert_child(compiler, op_isa, op_isa->last, op_type);
-
-  SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, "@condition_flag", op_isa->file, op_isa->line);
-  SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name_var);
-  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_isa->file, op_isa->line);
-  SPVM_OP_build_assign(compiler, op_assign, op_var, op_isa);
-  
-  return op_assign;
-}
-
-SPVM_OP* SPVM_OP_build_concat(SPVM_COMPILER* compiler, SPVM_OP* op_cancat, SPVM_OP* op_first, SPVM_OP* op_last) {
-  
-  // Build op
-  SPVM_OP_insert_child(compiler, op_cancat, op_cancat->last, op_first);
-  SPVM_OP_insert_child(compiler, op_cancat, op_cancat->last, op_last);
-  
-  return op_cancat;
-}
 
 SPVM_OP* SPVM_OP_build_and(SPVM_COMPILER* compiler, SPVM_OP* op_and, SPVM_OP* op_first, SPVM_OP* op_last) {
   
@@ -3003,20 +3000,6 @@ SPVM_OP* SPVM_OP_build_expression_statement(SPVM_COMPILER* compiler, SPVM_OP* op
   SPVM_OP_insert_child(compiler, op_free_tmp, op_free_tmp->last, op_expression);
   
   return op_free_tmp;
-}
-
-SPVM_OP* SPVM_OP_build_refcnt(SPVM_COMPILER* compiler, SPVM_OP* op_refcnt, SPVM_OP* op_term) {
-  
-  SPVM_OP_insert_child(compiler, op_refcnt, op_refcnt->last, op_term);
-  
-  return op_refcnt;
-}
-
-SPVM_OP* SPVM_OP_build_refop(SPVM_COMPILER* compiler, SPVM_OP* op_refop, SPVM_OP* op_term) {
-  
-  SPVM_OP_insert_child(compiler, op_refop, op_refop->last, op_term);
-  
-  return op_refop;
 }
 
 SPVM_OP* SPVM_OP_build_die(SPVM_COMPILER* compiler, SPVM_OP* op_die, SPVM_OP* op_term) {

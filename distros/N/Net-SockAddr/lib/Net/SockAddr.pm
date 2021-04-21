@@ -3,7 +3,7 @@ use 5.012;
 use XS::Framework;
 use Export::XS();
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 
 XS::Loader::bootstrap();
 

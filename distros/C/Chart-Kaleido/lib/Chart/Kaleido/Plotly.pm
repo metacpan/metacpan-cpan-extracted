@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use Moo;
 extends 'Chart::Kaleido';
@@ -157,7 +157,7 @@ sub save {
         height => $arg->height,
         scale  => $arg->scale
     );
-    path($file)->spew_raw($img);
+    path($file)->append_raw( { truncate => 1 }, $img );
 }
 
 1;
@@ -174,7 +174,7 @@ Chart::Kaleido::Plotly - Export static images of Plotly charts using Kaleido
 
 =head1 VERSION
 
-version 0.008
+version 0.010
 
 =head1 SYNOPSIS
 

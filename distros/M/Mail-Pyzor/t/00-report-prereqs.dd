@@ -1,0 +1,55 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.014'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Version' => '2.00'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Digest::SHA' => '0',
+                                      'Email::MIME' => '0',
+                                      'Email::MIME::ContentType' => '0',
+                                      'Encode' => '0',
+                                      'HTML::Parser' => '0',
+                                      'IO::SigGuard' => '0.12',
+                                      'IPC::Run' => '0',
+                                      'X::Tiny' => '0',
+                                      'parent' => '0',
+                                      'perl' => '5.014'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Data::Dumper' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Slurp' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Which' => '0',
+                                   'IO::Pty' => '0',
+                                   'JSON' => '0',
+                                   'Test::Class' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::Exception' => '0',
+                                   'Test::FailWarnings' => '0',
+                                   'Test::More' => '0',
+                                   'autodie' => '0',
+                                   'perl' => '5.014'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,5 +1,8 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001006  2021 April 19
+          - Possible fix for issue where windows doesn't find locale paths
+
 0.001005  2021 April 18
           - Declare column validations inside a column definition for DBIC
           - lots of tweaks and fixes to now nested validations for DBIC work

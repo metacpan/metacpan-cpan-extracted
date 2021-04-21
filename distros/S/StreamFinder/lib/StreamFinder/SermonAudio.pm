@@ -370,9 +370,16 @@ sub new
 	$self->{'cnt'} = 0;
 	$self->{'title'} = '';
 	$self->{'artist'} = '';
+	$self->{'album'} = '';
+	$self->{'description'} = '';
 	$self->{'created'} = '';
 	$self->{'year'} = '';
+	$self->{'genre'} = 'Podcast';
+	$self->{'iconurl'} = '';
 	$self->{'streams'} = [];
+	$self->{'Url'} = '';
+	$self->{'playlist'} = '';
+	$self->{'albumartist'} = $url2fetch;
 	my %dups = ();
 	foreach my $tag ('og:audio:secure_url" content=', 'og:audio:url" content=', 'og:audio" content=') {
 		if ($html =~ s#\"$tag\"([^\"]+)\"##gso) {

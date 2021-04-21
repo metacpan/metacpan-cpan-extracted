@@ -4,8 +4,23 @@ package Mail::Pyzor::Client;
 # All rights reserved.
 # http://cpanel.net
 #
-# This is free software; you can redistribute it and/or modify it under the
-# Apache 2.0 license.
+# <@LICENSE>
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to you under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at:
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# </@LICENSE>
+#
 
 use strict;
 use warnings;
@@ -70,6 +85,8 @@ are represented as thrown instances of L<Mail::Pyzor::X::Timeout>.
 =cut
 
 #----------------------------------------------------------------------
+
+our $VERSION = '0.06';
 
 our $DEFAULT_SERVER_HOST    = 'public.pyzor.org';
 our $DEFAULT_SERVER_PORT    = 24441;
@@ -141,7 +158,7 @@ sub new {
         '_username'    => $OPTS{'username'}    || $DEFAULT_USERNAME,
         '_password'    => $OPTS{'password'}    || $DEFAULT_PASSWORD,
         '_op_spec'     => $DEFAULT_OP_SPEC,
-        '_timeout'     => $OPTS{'timeout'}     || $DEFAULT_TIMEOUT,
+        '_timeout'     => $OPTS{'timeout'} || $DEFAULT_TIMEOUT,
     }, $class;
 }
 
@@ -348,15 +365,20 @@ sub _send_packet {
 
 sub _get_connection_or_die {
     my ($self) = @_;
-    $self->{'_sock'} ||= IO::Socket::INET->new(
+
+    # clear the socket if the PID changes
+    if ( defined $self->{'_sock_pid'} && $self->{'_sock_pid'} != $$ ) {
+        undef $self->{'_sock_pid'};
+        undef $self->{'_sock'};
+    }
+
+    $self->{'_sock_pid'} ||= $$;
+    $self->{'_sock'}     ||= IO::Socket::INET->new(
         'PeerHost' => $self->{'_server_host'},
         'PeerPort' => $self->{'_server_port'},
         'Proto'    => 'udp'
-    );
+    ) or die "Cannot connect to $self->{'_server_host'}:$self->{'_server_port'}: $@ $!";
 
-    if ( !$self->{'_sock'} ) {
-        die "Cannot connect to $self->{'_server_host'}:$self->{'_server_port'}: $@ $!";
-    }
     return $self->{'_sock'};
 }
 

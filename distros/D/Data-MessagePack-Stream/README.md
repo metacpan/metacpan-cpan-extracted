@@ -20,7 +20,7 @@ Data::MessagePack::Stream - yet another messagepack streaming deserializer
 
 Data::MessagePack::Stream is streaming deserializer for MessagePack.
 
-This module is alternate for [Data::MessagePack::Unpacker](https://metacpan.org/pod/Data::MessagePack::Unpacker).
+This module is alternate for [Data::MessagePack::Unpacker](https://metacpan.org/pod/Data%3A%3AMessagePack%3A%3AUnpacker).
 Unlike original unpacker, this module support internal buffer and it's possible to handle streaming data correctly.
 
 # METHODS

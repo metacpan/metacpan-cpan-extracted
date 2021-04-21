@@ -1,4 +1,4 @@
-<&| /Widgets/TitleBox, title => loc("Recurrence"), class=>'ticket-info-repeat-recurrence', title_class => 'inverse' &>
+<&| /Widgets/TitleBox, title => loc("Recurrence"), class=>'ticket-info-repeat-recurrence' &>
 <& /Ticket/Elements/EditRecurrence, ARGSRef => $ARGSRef, Initial => 1 &>
 </&>
 <%init>

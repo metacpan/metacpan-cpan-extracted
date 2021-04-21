@@ -1,0 +1,20 @@
+<%INIT>
+return unless $ARGSRef->{SubmitRecurrence};
+
+if ( $$TicketObj->CurrentUserHasRight('ModifyTicket') ) {
+    my ( $ret, $msg ) = RT::Extension::RepeatTicket::SetRepeatAttribute( $$TicketObj, %$ARGSRef );
+    if ( !$ret ) {
+        RT->Logger->warning("Couldn't update recurrence: $msg");
+    }
+    push @$Actions, $msg;
+}
+else {
+    push @$Actions, loc("Permission Denied");
+}
+</%INIT>
+
+<%ARGS>
+$TicketObj
+$ARGSRef
+$Actions
+</%ARGS>

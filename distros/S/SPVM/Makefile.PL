@@ -92,7 +92,7 @@ WriteMakefile(
     OBJECT            => '$(O_FILES)', # link all the C files too
     INC => $inc,
     test => {TESTS => 't/*.t t/*/*.t t/*/*/*.t'},
-    clean => {FILES => "SPVM.o lib/SPVM/Builder/src/*.o .spvm_build t/default/.spvm_build t/precompile t/test_files_tmp "},
+    clean => {FILES => "SPVM.o lib/SPVM/Builder/src/*.o .spvm_build t/default/.spvm_build t/precompile t/test_files_tmp t/exe/.spvm_build"},
     DEFINE => "@defines -o \$@",
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -124,7 +124,6 @@ sub MY::postamble {
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::Hash');
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::Time');
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::Unicode');
-    $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::Sort');
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::IO::Stdout');
     $make_rule .= SPVM::Builder::Util::create_make_rule_native('SPVM::IO::Stderr');
     

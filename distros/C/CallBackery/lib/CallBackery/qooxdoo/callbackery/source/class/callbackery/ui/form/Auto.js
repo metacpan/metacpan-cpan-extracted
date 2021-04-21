@@ -28,7 +28,7 @@
  *     selectBox: { cfg { structure: [ {key: x, title: y}, ...] } },
  *     date: { },                    // following unix tradition, dates are represented in epoc seconds
  *
- * Populate the new form using the setDate method, providing a map
+ * Populate the new form using the setData method, providing a map
  * with the required data.
  *
  */
@@ -50,6 +50,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
         this._boxCtrl = {};
         this._keyToFormKey = {};
         this._formKeyToKey = {};
+        this._selectBoxKeyToItem = {};
         var tm = this._typeMap = {};
         var that = this;
         var formKeyIdx = 0;
@@ -138,11 +139,18 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     break;
 
                 case 'selectBox':
-                    control = new qx.ui.form.SelectBox();
-                    var ctrl = this._boxCtrl[s.key] = new qx.data.controller.List(null, control, 'title');
-                    ctrl.setDelegate({
+                    tm[s.key] = 'selectBox';
+                    console.warn('Using callbackery.ui.form.VirtualSelectBox');
+                    control = new callbackery.ui.form.VirtualSelectBox().set({
+                        // defaults
+                        incrementalSearch : true,
+                        highlightMode     : 'html',
+                    });
+                    this._boxCtrl[s.key] = control;
+                    control.setLabelPath("title");
+                    control.setDelegate({
                         bindItem : function(controller, item, index) {
-                            controller.bindProperty('key', 'model', null, item, index);
+                            controller.bindProperty('key',   'model', null, item, index);
                             controller.bindProperty('title', 'label', null, item, index);
                         }
                     });
@@ -154,8 +162,20 @@ qx.Class.define("callbackery.ui.form.Auto", {
                         title : '',
                         key   : null
                     } ]);
-
-                    ctrl.setModel(sbModel);
+                    var lookup = {};
+                    sbModel.forEach(function(item, index, model) {
+                        lookup[item.getKey()] = item;
+                    }, this);
+                    this._selectBoxKeyToItem[s.key] = lookup;
+                    control.setModel(sbModel);
+                    // set initial selection
+                    let sel = s.set.modelSelection;
+                    delete s.set.modelSelection;
+                    if (sel !== null && sel !== undefined) {
+                        // next two lines are equivalent
+                        control.setValue(lookup[sel]);
+                        // control.getSelection().setItem(0, lookup[sel]);
+                    }
                     break;
 
                 case 'comboBox':
@@ -285,6 +305,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
         _typeMap : null,
         _keyToFormKey: null,
         _formKeyToKey: null,
+        _selectBoxKeyToItem: null,
 
 
         /**
@@ -345,26 +366,35 @@ qx.Class.define("callbackery.ui.form.Auto", {
          * @param data {var} TODOC
          */
         setSelectBoxData : function(box, data) {
-            var model;
+            let model;
+            let settingData = this._settingData;
             this._settingData = true;
-            var ctrl = this._boxCtrl[box];
-            var value = ctrl.getSelection().toArray()[0];
+            let ctrl  = this._boxCtrl[box];
+            let selectionKey = ctrl.getValue().getKey();
+            let newSelectionIndex;
             if (data.length == 0) {
-                
                 model = qx.data.marshal.Json.createModel([ {
                     title : '',
                     key   : null
                 } ]);
             }
             else {
+                let i = 0;
                 data.forEach(function(item){
+                    if (item.key == selectionKey) {
+                        newSelectionIndex = i;
+                    }
                     item.title = item.title != null ? this.xtr(item.title) : null;
+                    i++;
                 },this);
                 model = qx.data.marshal.Json.createModel(data);
             }
+            let newSelection = model.getItem(newSelectionIndex);
             ctrl.setModel(model);
-            ctrl.setSelection(new qx.data.Array([value]));
-            this._settingData = false;
+            // next two lines are equivalent
+            ctrl.setValue(newSelection);
+            // ctrl.getSelection().setItem(0, newSelection);
+            this._settingData = settingData;
         },
 
 
@@ -378,7 +408,6 @@ qx.Class.define("callbackery.ui.form.Auto", {
          */
         _setData : function(model, data, relax) {
             this._settingData = true;
-
             for (var key in data) {
                 var formKey = this._keyToFormKey[key];
                 if (!formKey) {
@@ -412,13 +441,31 @@ qx.Class.define("callbackery.ui.form.Auto", {
                      case 'dateTime':
                         model[setter](value);
                         break;
+                     case 'selectBox':
+                        let sbModel = this._boxCtrl[key].getModel();
+                        let newSelectionIndex,  i = 0;
+                        sbModel.forEach(function(item){
+                            if (item.getKey() == value) {
+                                newSelectionIndex = i;
+                            }
+                            item.title = item.title != null ? this.xtr(item.title) : null;
+                            i++;
+                        },this);
+                        let newSelection = sbModel.getItem(newSelectionIndex);
+                        // TODO: why do we need both variants?
+                        if (newSelection) {
+                            this._boxCtrl[key].getSelection().setItem(0, newSelection);
+                        }
+                        else {
+                            this._boxCtrl[key].getSelection().setItem(0, this._selectBoxKeyToItem[key][value]);
+                        }
+                        break;
 
-                      default:
+                    default:
                         model[setter](qx.lang.Type.isNumber(model[getter]()) ? parseInt(value) : value);
                         break;
                 }
             }
-
             this._settingData = false;
 
             /* only fire ONE if there was an attempt at change */
@@ -441,6 +488,10 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 var key = this._formKeyToKey[formKey];
                 var getter = 'get' + qx.lang.String.firstUp(formKey);
                 data[key] = model[getter]();
+                // extract selectbox keys
+                if (data[key] && data[key].getKey) {
+                    data[key] = data[key].getKey();
+                }
             }
 
             return data;

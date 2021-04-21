@@ -1,2 +1,0 @@
-/usr/bin/ar qc libpanda-net-sockaddr.a  CMakeFiles/panda-net-sockaddr.dir/src/panda/net/sockaddr.cc.o
-/usr/bin/ranlib libpanda-net-sockaddr.a

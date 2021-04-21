@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "JSON::PP" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "1.0.2",
+  "VERSION" => "1.0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

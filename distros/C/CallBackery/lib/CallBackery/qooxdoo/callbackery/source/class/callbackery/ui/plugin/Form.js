@@ -64,7 +64,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     //},0);
                     break;
                 }
-                this.fireDataEvent('actionResponse',e.getData());
+                this.fireDataEvent('actionResponse', e.getData());
             },this);
         }
     },
@@ -90,7 +90,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 cfg.form,null,callbackery.ui.form.renderer.NoteForm
             );
             if (cfg['options'] && cfg.options['warnAboutUnsavedData']){
-                form.addListener('changeData',function(){
+                form.addListener('changeData',function(e){
                     if (this._loading == 0){ // only notify when update comes from human interaction
                         this.fireDataEvent('actionResponse',{action: 'dataModified'});
                     }
@@ -192,7 +192,9 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 this._reconfPending.set(triggerField, 1);
                 return;
             }
-            if (!this._form) return;
+            if (!this._form) {
+                return;
+            }
 
             var that = this;
             var rpc = callbackery.data.Server.getInstance();

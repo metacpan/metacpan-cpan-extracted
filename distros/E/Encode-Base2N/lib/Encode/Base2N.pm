@@ -3,7 +3,7 @@ use 5.012;
 use XS::libpanda;
 use Export::XS::Auto;
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.0.4';
 
 XS::Loader::bootstrap();
 

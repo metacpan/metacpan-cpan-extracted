@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "script/show-ansi-color-table",
     "script/show-assigned-rgb-colors",
     "script/show-colors",
+    "script/show-colors-from-scheme",
     "script/show-rand-rgb-colors",
     "script/show-text-using-color-gradation"
   ],
@@ -39,6 +40,7 @@ my %WriteMakefileArgs = (
     "Color::ANSI::Util" => "0.164",
     "Color::RGB::Util" => "0.600",
     "Data::Dmp" => "0.240",
+    "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
     "Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
@@ -52,6 +54,7 @@ my %WriteMakefileArgs = (
     "Sah::Schema::color::ansi16" => 0,
     "Sah::Schema::color::ansi256" => 0,
     "Sah::Schema::color::rgb24" => 0,
+    "Sah::Schema::perl::colorscheme::modname" => 0,
     "Sah::Schema::posint" => 0,
     "Term::Size" => 0,
     "strict" => 0,
@@ -63,7 +66,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.008",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +77,7 @@ my %FallbackPrereqs = (
   "Color::ANSI::Util" => "0.164",
   "Color::RGB::Util" => "0.600",
   "Data::Dmp" => "0.240",
+  "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
   "Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
@@ -90,6 +94,7 @@ my %FallbackPrereqs = (
   "Sah::Schema::color::ansi16" => 0,
   "Sah::Schema::color::ansi256" => 0,
   "Sah::Schema::color::rgb24" => 0,
+  "Sah::Schema::perl::colorscheme::modname" => 0,
   "Sah::Schema::posint" => 0,
   "Term::Size" => 0,
   "Test::More" => 0,

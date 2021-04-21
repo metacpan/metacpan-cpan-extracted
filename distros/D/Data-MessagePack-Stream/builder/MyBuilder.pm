@@ -4,42 +4,41 @@ use warnings;
 use base 'Module::Build::XSUtil';
 
 use File::Spec::Functions qw(catfile catdir);
+use File::Which qw(which);
 use Config;
+
+my $MSGPACK_VERSION = '3.3.0';
+
+__PACKAGE__->add_property(_cmake => undef);
 
 sub new {
     my ($class, %argv) = @_;
-    $class->SUPER::new(
+
+    my $cmake = which 'cmake';
+    if (!$cmake) {
+        die "Need 'cmake' command for building Data::MessagePack::Stream\n";
+    }
+    my $self = $class->SUPER::new(
         %argv,
-        include_dirs => [catdir('msgpack-1.4.2', 'include')],
+        include_dirs => [catdir("msgpack-$MSGPACK_VERSION", 'include')],
         generate_ppport_h => catfile('lib', 'Data', 'MessagePack', 'ppport.h'),
         cc_warnings => 1,
     );
-}
-
-sub _set_mtime {
-    my $self = shift;
-    open my $fh, "<", "builder/mtime.txt" or die;
-    while (my $line = <$fh>) {
-        next if $line =~ /^#/ || $line !~ /\S/;
-        chomp $line;
-        my ($file, $mtime) = split /\t/, $line, 2;
-        $file = catfile(split /\//, $file);
-        die "miss $file" if !-e $file;
-        utime $mtime, $mtime, $file or die "utime $mtime, $mtime, $file: $!";
-    }
+    $self->_cmake($cmake);
+    $self;
 }
 
 sub _build_msgpack {
     my $self = shift;
 
-    # We should restore original mtime in msgpack-1.4.2.tar.gz; otherwise end-users might be asked for having automake tools.
-    $self->_set_mtime;
-
-    my @opt = ('--disable-shared');
-    push @opt, '--with-pic' if Config->myconfig =~ /(amd64|x86_64)/i;
-
-    chdir "msgpack-1.4.2";
-    my $ok = $self->do_system("./configure", @opt);
+    my @opt = qw(
+        -DMSGPACK_ENABLE_SHARED=OFF
+        -DMSGPACK_ENABLE_CXX=OFF
+        -DMSGPACK_BUILD_EXAMPLES=OFF
+        -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    );
+    chdir "msgpack-$MSGPACK_VERSION";
+    my $ok = $self->do_system($self->_cmake, @opt, ".");
     $ok &&= $self->do_system($Config{make});
     chdir "..";
     $ok;
@@ -49,7 +48,7 @@ sub ACTION_code {
     my ($self, @argv) = @_;
 
     my $spec = $self->_infer_xs_spec(catfile("lib", "Data", "MessagePack", "Stream.xs"));
-    my $archive = catfile("msgpack-1.4.2", "src", ".libs", "libmsgpackc.a");
+    my $archive = catfile("msgpack-$MSGPACK_VERSION", "libmsgpackc.a");
     if (!$self->up_to_date($archive, $spec->{lib_file})) {
         $self->_build_msgpack or die;
         push @{$self->{properties}{objects}}, $archive; # XXX

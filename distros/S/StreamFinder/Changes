@@ -240,3 +240,14 @@ Revision history for StreamFinder
         example as a program.  Also fixed this in StreamFinder::IHeartRadio!
         - StreamFinder::Spreaker:  Fix failure to fetch icon image for some 
         podcasts.
+1.44    2021/04/19
+        - StreamFinder::Rumble:  If only a podcast "ID" is given, check to see 
+        if it's either the long ID for the html page or the short one used for 
+        the embed page and append the appropriate url (prev. only the long 
+        html page ID string was supported.  Either way, the correct Rumble ID 
+        will be returned.
+        - Add some default values for "genre", such as "Podcast" for Spreaker, 
+        Castbox, Apple, and "Video" for Youtube, Vimeo, Brighteon and Bitchute.
+        - Initialize some variables that should be.
+        - StreamFinder::Apple:  Better checks for album, genre and year.
+        - Misc. doc-fixes all over.

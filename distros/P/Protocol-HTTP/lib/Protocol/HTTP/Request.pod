@@ -48,11 +48,21 @@ Protocol::HTTP::Request - HTTP request class
         },
     });
 
-    # migrate from URI to form
+    # populate form from URI
     my $req = Protocol::HTTP::Request->new({
         uri  => '/path?login=user&pass=secret',
-        form => ENCODING_URL
+        form => ENCODING_MULTIPART
     });
+
+    # populate URI from form
+    my $req = Protocol::HTTP::Request->new({
+        uri  => '/path',
+        form => {
+            enc_type => ENCODING_MULTIPART,
+            fields   => [login => 'user', pass => 'secret'],
+        },
+    });
+
 
 
 =head1 DESCRIPTION
@@ -69,7 +79,12 @@ C<Accept-Encoding> header in a request.
 When a new request is ready it can be serialized via C<to_string> method into
 byte octets.
 
+
+
 =head1 METHODS
+
+All methods of L<Protocol::HTTP::Message> also apply.
+
 
 =head2 new([\%params])
 
@@ -80,6 +95,67 @@ C<compress>, C<form>.
 See corresponding methods documentation below and in L<Protocol::HTTP::Message> to find out what these parameters support.
 
 C<allow_compression> should be an array ref if multiple values are passed.
+
+Parameter C<form> allows to post request data as C<multipart/form-data> (default) or as
+C<application/x-www-form-urlencoded>.
+
+In the simplest form it is just an array of fields and values, i.e.
+
+    Protocol::HTTP::Request->new({
+        form => [key1 => 'value1', key2 => 'value2'],
+    });
+
+A form field value can be also be specified as array; this might be needed
+for file posting to specify filename and content type additionally, i.e.
+
+    Protocol::HTTP::Request->new({
+        fields   => [photo => ['sample.jpg' => $jpeg_content, 'image/jpeg']],
+    });
+
+
+It is possible, however, to explicitly specify the type of encoding.
+
+=over
+
+=item ENCODING_MULTIPART
+
+=item ENCODING_URL
+
+=back
+
+For example:
+
+    Protocol::HTTP::Request->new({
+        form => {
+            enc_type => ENCODING_MULTIPART,
+            fields   => [key1 => 'value1', key2 => 'value2'],
+        }
+    });
+
+When it is encoded as C<multipart/form-data>, the request will use
+the right method, e.g. if it is set to C<GET> it will be switched to C<POST>.
+
+Sometimes it can be handy to use pseudo-URI to populate form (posted as
+C<multipart/form-data>) from uri params, or populate URI from form.
+
+    # GET /path?login=user&pass=secret
+    my $req = Protocol::HTTP::Request->new({
+        uri    => '/path',
+        method => METHOD_GET,
+        form   => {
+            enc_type => ENCODING_URL,
+            fields   => [login => 'user', pass => 'secret'],
+        },
+    });
+
+    # POST with multipart/form-data via '/path' URI
+    my $req = Protocol::HTTP::Request->new({
+        uri  => '/path?login=user&pass=secret',
+        form => ENCODING_MULTIPART,
+    });
+
+To let the URI population work C<form> should be empty, as in the example above.
+
 
 =head2 method_raw([$method])
 
@@ -111,6 +187,7 @@ The special value to distinguish the case, when client developer did not specify
 the desired method
 
 =back
+
 
 =head2 method([$method])
 
@@ -170,34 +247,6 @@ was requested (see L<Protocol::HTTP::Message>), then it will be applied here.
 =head2 method_str()
 
 Returns stringified HTTP request method, e.g. C<"GET">, C<"POST"> etc.
-
-=head2 form()
-
-Allows to post data as C<multipart/form-data> (default) or as
-C<application/x-www-form-urlencoded>.
-
-When it is encoded as C<multipart/form-data>, the request will use
-the right method, e.g. if it is set to C<GET> it will be switched to C<POST>.
-
-When form is empty, and it is encoded as C<multipart/form-data>, it
-will B<move> the parameters from the query part of the request URI into
-tht form. And vise versa, if it is encoded as C<application/x-www-form-urlencoded>,
-it will B<add> the form fields into the request URI.
-
-Possible values for form C<encoding>:
-
-=over
-
-=item ENCODING_MULTIPART
-
-=item ENCODING_URL
-
-=back
-
-There is no perl API for form files B<streaming>, i.e. uploading large files.
-With the existing API all form files have to be available upfront, i.e. be in
-memory. As the file streaming capabilities require I/O, they should be available
-in the L<Protocol::HTTP> derivatives, e.g. in L<UniEvent::HTTP>.
 
 =head1 FUNCTIONS
 

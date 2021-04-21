@@ -1,5 +1,5 @@
 package Util::Medley::Cache;
-$Util::Medley::Cache::VERSION = '0.058';
+$Util::Medley::Cache::VERSION = '0.059';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -19,7 +19,7 @@ Util::Medley::Cache - Simple caching mechanism.
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =cut
 
@@ -27,30 +27,29 @@ version 0.058
 
 =head1 SYNOPSIS
 
+  my $cache = Util::Medley::Cache->new; # see ATTRIBUTES for options 
+  
   #
   # positional
   #
-  $self->set('unittest', 'test1', {foo => bar});
-  
-  my $data = $self->get('unitest', 'test1');
- 
-  my @keys = $self->getKeys('unittest');
-
-  $self->delete('unittest', 'test1');
+  $cache->set('unittest', 'test1', {foo => bar});
+  my $data = $cache->get('test', 'unittest');
+  my @keys = $cache->getKeys('unittest');
+  $cache->delete('unittest', 'test1');
                 
   # 
   # named pair 
   #
-  $self->set(ns   => 'unittest', 
-             key  => 'test1', 
-             data => { foo => 'bar' });
+  $cache->set(ns   => 'unittest', 
+              key  => 'test1', 
+              data => { foo => 'bar' });
 
-  my $data = $self->get(ns  => 'unittest', 
-                        key => 'test1');
+  my $data = $cache->get(ns  => 'unittest', 
+                         key => 'test1');
 
-  my @keys = $self->getKeys(ns => 'unittest');
+  my @keys = $cache->getKeys(ns => 'unittest');
 
-  $self->delete(ns  => 'unittest', 
+  $cache->delete(ns  => 'unittest', 
                 key => 'test1');
 
 =cut
@@ -514,9 +513,13 @@ Commits the data object to the cache.
 
 =item usage:
 
- set($key, $data, [$ns])
+ set($key, $data, [$ns], [$expire_epoch])
  
- set(key => $key, data => $data, [ns => $ns])
+ set(key => $key, 
+     data => $data, 
+     [ns => $ns], 
+     [expire_epoch => $expire_epoch]
+ );
    
 =item args:
 
@@ -534,6 +537,10 @@ An object, reference, or string.
 
 The cache namespace.  
 
+=item expire_epoch [Int]
+
+The epoch to expire the cache item at.  This overrides the expireSecs attribute.
+
 =back
 
 =back
@@ -542,7 +549,8 @@ The cache namespace.
 
 multi method set (Str :$key!,
             	  Any :$data!,
-            	  Str :$ns) {
+            	  Str :$ns,
+            	  Int :$expire_epoch) {
 
     $ns = $self->_getNamespace($ns) if !$ns;
     $self->Logger->verbose("cache set ('$ns', '$key')");
@@ -555,13 +563,15 @@ multi method set (Str :$key!,
 
 multi method set (Str $key,
             	  Any $data,
-            	  Str $ns?) {
+            	  Str $ns?,
+            	  Int $expire_epoch?) {
             	
 	my %a;
 	$a{key} = $key;
 	$a{data} = $data;
 	$a{ns} = $ns if $ns;
-	
+    $a{expire_epoch} = $expire_epoch if defined $expire_epoch;
+    	
 	return $self->set(%a);            	
 }
             	
@@ -717,21 +727,25 @@ method _l2Clear (Str :$ns) {
 
 method _l1Set (Str :$ns,
                Str :$key!,
-               Any :$data!) {
+               Any :$data!,
+               Int :$expire_epoch) {
 	
 	$ns = $self->_getNamespace($ns);
 
-	my $node = {
-		data         => $data,
-		expire_epoch => 0,
-	};
-
-	if ( $self->expireSecs ) {    # defined and greater than zero
-		$node->{expire_epoch} = time + int( $self->expireSecs );
-	}
+    my %node = (
+        data => $data,
+        expire_epoch => 0
+               );
+    
+    if (defined $expire_epoch) {
+    	$node{expire_epoch} = $expire_epoch;
+    }
+    elsif ($self->expireSecs) {
+        $node{expire_epoch} = time + int($self->expireSecs);	
+    } 
 
 	my $l1 = $self->_l1Cache;
-	$l1->{$ns}->{$key} = $node;
+	$l1->{$ns}->{$key} = \%node;
 
 	return;
 }
@@ -757,13 +771,22 @@ method _getExpireSecsForChi {
 
 method _l2Set (Str :$ns,
                Str :$key!,
-               Any :$data!) {
+               Any :$data!,
+               Int :$expire_epoch) {
 
 	$ns = $self->_getNamespace($ns);
 
 	my $chi = $self->_getChiObject( ns => $ns );
 
-	return $chi->set( $key, $data, $self->_getExpireSecsForChi );
+    my $expire;
+    if (defined $expire_epoch) {
+        $expire = { expires_at => $expire_epoch },	
+    } 
+    else {
+        $expire = $self->_getExpireSecsForChi; 	
+    }
+           
+	return $chi->set( $key, $data, $expire);
 }
 
 method _l2Delete (Str :$ns,
@@ -812,5 +835,7 @@ method _getNamespace (Str|Undef $ns) {
 
 	return $ns;
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;

@@ -1,9 +1,9 @@
 package ArrayData::Test::Source::Iterator;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-13'; # DATE
+our $DATE = '2021-04-20'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -43,7 +43,7 @@ ArrayData::Test::Source::Iterator - A test ArrayData module
 
 =head1 VERSION
 
-This document describes version 0.001 of ArrayData::Test::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-13.
+This document describes version 0.002 of ArrayData::Test::Source::Iterator (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-20.
 
 =head1 SYNOPSIS
 

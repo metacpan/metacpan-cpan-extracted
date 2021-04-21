@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Job;
 use strict;
 use warnings;
 
-our $VERSION = '1.000044';
+our $VERSION = '1.000047';
 
 use Carp qw/confess croak/;
 use Config qw/%Config/;
@@ -363,12 +363,16 @@ sub in_file {
     my $self = shift;
     return $self->{+IN_FILE} if $self->{+IN_FILE};
 
-    my $from_run = $self->run->input_file;
-    return $self->{+IN_FILE} = $from_run if $from_run;
+    my $task = $self->{+TASK};
+
+    unless ($task->{input}) {
+        my $from_run = $self->run->input_file;
+        return $self->{+IN_FILE} = $from_run if $from_run;
+    }
 
     my $stdin = File::Spec->catfile($self->job_dir, 'stdin');
 
-    my $content = $self->run->input // '';
+    my $content = $task->{input} // $self->run->input // '';
     write_file($stdin, $content);
 
     return $self->{+IN_FILE} = $stdin;

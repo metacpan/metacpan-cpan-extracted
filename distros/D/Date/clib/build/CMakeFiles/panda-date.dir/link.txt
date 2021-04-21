@@ -1,2 +1,0 @@
-/usr/bin/ar qc libpanda-date.a  CMakeFiles/panda-date.dir/src/panda/date/Date.cc.o CMakeFiles/panda-date.dir/src/panda/date/DateRel.cc.o CMakeFiles/panda-date.dir/src/panda/date/error.cc.o CMakeFiles/panda-date.dir/src/panda/date/parse-date.cc.o CMakeFiles/panda-date.dir/src/panda/date/parse-relative.cc.o CMakeFiles/panda-date.dir/src/panda/time/strftime.cc.o CMakeFiles/panda-date.dir/src/panda/time/time.cc.o CMakeFiles/panda-date.dir/src/panda/time/timezone.cc.o CMakeFiles/panda-date.dir/src/panda/time/tzparse.cc.o
-/usr/bin/ranlib libpanda-date.a

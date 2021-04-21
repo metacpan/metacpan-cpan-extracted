@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Crypto::Exchange::Binance::Spot::API;
 
-package Binance {
+{package Binance;
     use Moo;
     extends 'Crypto::Exchange::Binance::Spot::API';
     sub send {}

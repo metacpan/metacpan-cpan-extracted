@@ -1,0 +1,16 @@
+NAME
+    Mail::Pyzor - Pyzor spam filtering in Perl
+
+DESCRIPTION
+    This distribution contains Perl implementations of parts of Pyzor
+    <http://pyzor.org>, a tool for use in spam email filtering. It is
+    intended for use with Mail::SpamAssassin but may be useful in other
+    contexts.
+
+    See the following modules for information on specific tools that the
+    distribution includes:
+
+    *   Mail::Pyzor::Client
+
+    *   Mail::Pyzor::Digest
+

@@ -5,10 +5,12 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.59'
   Test::More: '0.88'
+  Test::Output: '0'
+  Test::Tester: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +29,7 @@ no_index:
 provides:
   Test::Vars:
     file: lib/Test/Vars.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   B: '0'
   List::Util: '1.33'
@@ -37,17 +39,19 @@ resources:
   bugtracker: https://github.com/houseabsolute/p5-Test-Vars/issues
   homepage: https://github.com/houseabsolute/p5-Test-Vars
   repository: git://github.com/houseabsolute/p5-Test-Vars.git
-version: '0.014'
+version: '0.015'
 x_contributors:
-  - 'Nicholas Clark <nick@ccl4.org>'
-  - 'Olivier Mengué <dolmen@cpan.org>'
-  - 'Fuji, Goro <gfuji@cpan.org>'
-  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Dave Rolsky <autarch@urth.org>'
   - 'Dmitry Matrosov <amidos@amidos.ru>'
-  - 'Ran Eilam <ran.eilam@gmail.com>'
+  - 'FUJI Goro <gfuji@cpan.org>'
   - 'FUJI Goro <gfx@users.noreply.github.com>'
   - 'FUJI Goro <goro.fuji@ebookjapan.co.jp>'
-  - 'Michael G. Schwern <schwern@pobox.com>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
   - 'Gregory Oschwald <goschwald@maxmind.com>'
-  - 'Dave Rolsky <autarch@urth.org>'
+  - 'Michael G. Schwern <schwern@pobox.com>'
+  - 'Nicholas Clark <nick@ccl4.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Ran Eilam <ran.eilam@gmail.com>'
+  - 'cpansprout <cpansprout@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

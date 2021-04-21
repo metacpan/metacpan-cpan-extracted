@@ -1,3 +1,5 @@
+1.2.1    19.04.2021
+           - add MANIFEST.SKIP
 1.2.0    08.04.2021
            - revert "can't start message: previous message wasn't finished"
            - move C++ codes to its own library with cmake

@@ -23,7 +23,7 @@ WriteMakefile(
       ? ('LICENSE'=> 'perl')
       : ()),
     PREREQ_PM => {
-        'PDL::Core'  => 2.008,
+        'PDL'  => '2.038', # has PDL::GSL::CDF
     },
     CONFIGURE_REQUIRES => {
         'PDL::Core'  => 2.008,
@@ -62,15 +62,3 @@ WriteMakefile(
       },
     },
 );
-
-sub MY::postamble {
-    my $text =
-'
-install ::
-	@echo "Updating PDL documentation database ..."
-	@$(PERL) add_doc.pl
-
-';
-
-    return $text;
-}

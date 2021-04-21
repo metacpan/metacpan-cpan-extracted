@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+# Run this to auto generate the Util::Medley::Simple packages
+
 use Modern::Perl;
 use Data::Printer alias => 'pdump';
 use Module::Load;

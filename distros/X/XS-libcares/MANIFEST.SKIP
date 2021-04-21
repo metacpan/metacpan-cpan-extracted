@@ -1,4 +1,5 @@
-libcares/build/
+clib/build/
+clib/cmake_props/
 
 #!start included /home/syber/perl5/perlbrew/perls/5.32.1g/lib/5.32.1/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.

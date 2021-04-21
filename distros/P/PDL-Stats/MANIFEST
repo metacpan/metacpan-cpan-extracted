@@ -7,9 +7,6 @@ Distr/Makefile.PL
 Distr/t/stats_distr.t
 GLM/glm.pd
 GLM/Makefile.PL
-GSL/gsl_cdf.pd
-GSL/Makefile.PL
-GSL/t/cdf.t
 Kmeans/kmeans.pd
 Kmeans/Makefile.PL
 Makefile.PL
@@ -26,7 +23,6 @@ TS/Makefile.PL
 TS/ts.pd
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
-GENERATED/PDL/GSL/CDF.pm                 mod=PDL::GSL::CDF pd=GSL/gsl_cdf.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Stats/Basic.pm             mod=PDL::Stats::Basic pd=Basic/stats_basic.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Stats/Distr.pm             mod=PDL::Stats::Distr pd=Distr/distr.pd (added by pdlpp_mkgen)
 GENERATED/PDL/Stats/GLM.pm               mod=PDL::Stats::GLM pd=GLM/glm.pd (added by pdlpp_mkgen)

@@ -1,5 +1,5 @@
 package Crypto::API;
-$Crypto::API::VERSION = '0.01';
+$Crypto::API::VERSION = '0.02';
 =head1 NAME
 
 Crypto::API - Universal Plug & Play API

@@ -5,7 +5,12 @@ requires 'List::Util', '1.33';
 
 on build => sub {
     requires 'ExtUtils::MakeMaker', '6.59';
+};
+
+on test => sub {
     requires 'Test::More', '0.88';
+    requires 'Test::Tester';
+    requires 'Test::Output';
 };
 
 on develop => sub {

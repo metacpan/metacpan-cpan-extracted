@@ -23,10 +23,10 @@ $dbh->do("INSERT INTO t VALUES (3, 'three')");
 my $t = ArrayData::DBI->new(dbh=>$dbh, table=>'t', column=>'t');
 
 $t->reset_iterator;
-is_deeply($t->get_elem, 'one');
-is_deeply($t->get_elem, 'two');
+is_deeply($t->get_next_item, 'one');
+is_deeply($t->get_next_item, 'two');
 $t->reset_iterator;
-is_deeply($t->get_elem, 'one');
-is($t->get_elem_count, 3);
+is_deeply($t->get_next_item, 'one');
+is($t->get_item_count, 3);
 
 done_testing;

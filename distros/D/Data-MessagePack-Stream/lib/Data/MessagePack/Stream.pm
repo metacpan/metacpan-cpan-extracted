@@ -4,7 +4,7 @@ use warnings;
 use Data::MessagePack;
 use XSLoader;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 XSLoader::load __PACKAGE__, $VERSION;
 

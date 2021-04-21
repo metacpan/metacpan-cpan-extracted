@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/runtests.dir/tests/base.cc.o CMakeFiles/runtests.dir/tests/inet4.cc.o CMakeFiles/runtests.dir/tests/inet6.cc.o CMakeFiles/runtests.dir/tests/lib/test.cc.o CMakeFiles/runtests.dir/tests/unix.cc.o CMakeFiles/runtests.dir/tests/main.cc.o  -o runtests libpanda-net-sockaddr.a libtests.a libpanda-net-sockaddr.a 

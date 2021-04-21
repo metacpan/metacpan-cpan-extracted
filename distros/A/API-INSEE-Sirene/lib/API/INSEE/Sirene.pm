@@ -12,9 +12,7 @@ use LWP::UserAgent;
 use POSIX 'strftime';
 use Switch;
 
-use Data::Dumper;
-
-our $VERSION = 4.02;
+our $VERSION = 4.03;
 
 use constant {
     API_AUTH_URL        => 'https://api.insee.fr/token',
@@ -461,7 +459,7 @@ API::INSEE::Sirene - An interface for the Sirene API of INSEE
 
 =head1 VERSION
 
-Version 4.02
+Version 4.03
 
 =head1 SYNOPSIS
 
@@ -592,7 +590,7 @@ You can choose between three search modes: 'exact', 'begin' or 'approximate' mat
 
   my $criteria2 = $sirene->getCustomCriteria('libelleVoieEtablissement', 'avenue', undef, 'exact');
 
-B<< Important: >> You must specify the endpoint reached B<< before >> calling the C<< getCustomCriteria >> method using the C<< setCurrentEndpoint >>
+B<< Important: >> You must specify the endpoint to be reached B<< before >> calling the C<< getCustomCriteria >> method using C<< setCurrentEndpoint >>
 
   $sirene->setCurrentEndpoint('siret');
 

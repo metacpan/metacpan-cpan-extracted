@@ -17,15 +17,14 @@ lib/ArrayDataRole/Source/Array.pm
 lib/ArrayDataRole/Source/DBI.pm
 lib/ArrayDataRole/Source/Iterator.pm
 lib/ArrayDataRole/Source/LinesDATA.pm
-lib/ArrayDataRole/Util/Random.pm
 lib/ArrayDataRoles/Standard.pm
 t/00-compile.t
 t/Source-Array.t
 t/Source-DBI.t
 t/Source-Iterator.t
 t/Source-LinesDATA.t
-t/Util-Random.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/with-PickItems-Iterator.t
 weaver.ini

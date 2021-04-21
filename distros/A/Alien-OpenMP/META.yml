@@ -4,8 +4,10 @@ author:
   - 'OODLER 577 <oodler@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '7.10'
+  Devel::CheckLib: '0'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -18,11 +20,12 @@ no_index:
     - t
     - inc
 requires:
-  perl: '5.010001'
+  Devel::CheckLib: '0'
+  perl: '5.008009'
 resources:
   IRC: irc://irc.perl.org/#pdl
   bugtracker: https://github.com/oodler577/p5-Alien-OpenMP/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/oodler577/p5-Alien-OpenMP
-version: '0.001'
+version: '0.002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

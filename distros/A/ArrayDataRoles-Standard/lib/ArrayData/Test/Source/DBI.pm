@@ -1,9 +1,9 @@
 package ArrayData::Test::Source::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-13'; # DATE
+our $DATE = '2021-04-20'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use alias::module 'ArrayData::DBI';
 
@@ -22,7 +22,7 @@ ArrayData::Test::Source::DBI - Alias package for ArrayData::DBI
 
 =head1 VERSION
 
-This document describes version 0.001 of ArrayData::Test::Source::DBI (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-13.
+This document describes version 0.002 of ArrayData::Test::Source::DBI (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-20.
 
 =head1 HOMEPAGE
 

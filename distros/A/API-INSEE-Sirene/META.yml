@@ -25,5 +25,5 @@ requires:
   POSIX: '1.65'
   Switch: '2.17'
   perl: '5.024001'
-version: 4.02
+version: 4.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

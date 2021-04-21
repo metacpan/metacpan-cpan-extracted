@@ -3,11 +3,11 @@ NAME
     data
 
 SPECIFICATION VERSION
-    0.1
+    0.2
 
 VERSION
-    This document describes version 0.1.0 of ArrayData (from Perl
-    distribution ArrayData), released on 2021-04-11.
+    This document describes version 0.2.0 of ArrayData (from Perl
+    distribution ArrayData), released on 2021-04-20.
 
 SYNOPSIS
     Use one of the "ArrayData::*" modules.
@@ -36,10 +36,9 @@ DESCRIPTION
     comparison; 3) ease of packaging further as OS packages, e.g. Debian
     packages (converted from Perl distribution); 4) testing by CPAN Testers.
 
-    The table data can actually be stored as CSV in the DATA section of a
-    Perl module, or as a CSV file in a shared directory of a Perl
-    distribution, or a Perl structure in the module source code, or from
-    other sources.
+    The array data can actually be stored as Perl array in the Perl module
+    source code, or as lines in the DATA section of the Perl module, or in a
+    shared file of the distribution.
 
     To get started, see ArrayDataRole::Spec::Basic and one of existing
     "ArrayData::*" modules.
@@ -51,7 +50,7 @@ NAMESPACE ORGANIZATION
 
     All the modules under "ArrayData::*" will be modules with actual data.
 
-    "ArrayDataCollection-*" is name for distribution that contains several
+    "ArrayDataBundle-*" is name for distribution that contains several
     "ArrayData" modules.
 
 FAQ
@@ -64,7 +63,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData>
+    <https://github.com/perlancar/perl-ArrayData/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -73,7 +72,8 @@ SEE ALSO
     HashData, TableData are related projects.
 
     WordList is an older, related project. ArrayData and its sister projects
-    HashData & TableData are a generalization and cleanup of WordList API.
+    HashData & TableData are a generalization and cleanup of the WordList
+    API.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

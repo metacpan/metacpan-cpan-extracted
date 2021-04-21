@@ -4,7 +4,7 @@ Test::Vars - Detects unused variables in perl modules
 
 # VERSION
 
-This document describes Test::Vars version 0.014.
+This document describes Test::Vars version 0.015.
 
 # SYNOPSIS
 
@@ -68,7 +68,7 @@ The `$result_handler` sub will be called once, with the following arguments:
 - $results
 
     This is an array reference which in turn contains zero or more array
-    references. Each of those references contains two elements, a [Test::Builder](https://metacpan.org/pod/Test::Builder)
+    references. Each of those references contains two elements, a [Test::Builder](https://metacpan.org/pod/Test%3A%3ABuilder)
     method, either `diag` or `note`, and a message.
 
     If the method is `diag`, the message contains an actual error. If the method
@@ -77,7 +77,7 @@ The `$result_handler` sub will be called once, with the following arguments:
 
 # MECHANISM
 
-`Test::Vars` is similar to a part of `Test::Perl::Critic`,but the mechanism
+`Test::Vars` is similar to a part of `Test::Perl::Critic`, but the mechanism
 is different.
 
 While `Perl::Critic`, the backend of `Test::Perl::Critic`, scans the source
@@ -106,13 +106,13 @@ to cpan-RT.
 
 # SEE ALSO
 
-[Perl::Critic](https://metacpan.org/pod/Perl::Critic)
+[Perl::Critic](https://metacpan.org/pod/Perl%3A%3ACritic)
 
-[warnings::unused](https://metacpan.org/pod/warnings::unused)
+[warnings::unused](https://metacpan.org/pod/warnings%3A%3Aunused)
 
 [B](https://metacpan.org/pod/B)
 
-[Test::Builder::Module](https://metacpan.org/pod/Test::Builder::Module)
+[Test::Builder::Module](https://metacpan.org/pod/Test%3A%3ABuilder%3A%3AModule)
 
 # AUTHOR
 

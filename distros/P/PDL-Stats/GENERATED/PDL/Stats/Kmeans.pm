@@ -4,8 +4,8 @@
 #
 package PDL::Stats::Kmeans;
 
-@EXPORT_OK  = qw(  random_cluster iv_cluster PDL::PP _random_cluster PDL::PP which_cluster PDL::PP assign PDL::PP centroid PDL::PP _d_p2l );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw( random_cluster iv_cluster PDL::PP _random_cluster PDL::PP which_cluster PDL::PP assign PDL::PP centroid PDL::PP _d_p2l );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Stats::Kmeans ;
 

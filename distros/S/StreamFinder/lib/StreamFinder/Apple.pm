@@ -447,8 +447,9 @@ sub new
 		$self->{'artist'} =~ s/\s+$//;
 		$self->{'albumartist'} = $1  if ($span =~ m#href\=\"([^\"]+)\"\s+class\=\"link#is);
 	}
-	if ($pre =~ m#\s+Copyright\s+([^\<]+)#s) {
+	if ($pre =~ m#\<li\s+class\=\"tracklist\-footer\_\_item\"\>([^\<]+)#) {
 		$self->{'album'} = $1;
+		$self->{'album'} =~ s/^\s+//s;
 		$self->{'album'} =~ s/\s+$//s;
 	}
 	if ($pre =~ m#\"assetUrl\"\:\"([^\"]+)\"#s) {   #INVIDUAL EPISODE:
@@ -490,11 +491,17 @@ sub new
 	if ($pre =~ m#\<li\s+class\=\"product\-header\_\_list\_\_item\"\>(.*?)\<\/ul\>#s) {
 		my $prodlistitemdata = $1;
 		$self->{'genre'} = $1  if ($prodlistitemdata =~ s#genre\"?\>\s*([^\<]+)\<\/##s);
+		$self->{'year'} = $1  if ($prodlistitemdata =~ m#\>([\d]+)\D*\<\/time\>#s);
+	}
+	$self->{'genre'} ||= $1  if ($pre =~ m#\<li\s+class\=\"inline\-list\_\_item[^\>]+\>(.*?)\<\/li\>#s);
+	if ($self->{'genre'})	{
+		$self->{'genre'} =~ s/^\s+//;
 		$self->{'genre'} =~ s/\s+$//;
 		$self->{'genre'} = HTML::Entities::decode_entities($self->{'genre'})  if (defined $self->{'genre'});
 		$self->{'genre'} = uri_unescape($self->{'genre'});
 		$self->{'genre'} =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-		$self->{'year'} = $1  if ($prodlistitemdata =~ m#\>([\d]+)\D*\<\/time\>#s);
+	} else {
+		$self->{'genre'} = 'Podcast';
 	}
 	$self->{'cnt'} = scalar @{$self->{'streams'}};
 	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';

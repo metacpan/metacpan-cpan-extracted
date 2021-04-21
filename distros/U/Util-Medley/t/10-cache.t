@@ -6,7 +6,7 @@ use Data::Printer alias => 'pdump';
 $SIG{__WARN__} = sub { die @_ };
 
 #####################################
-# coNstructor
+# constructor
 #####################################
 
 my $Ns   = 'unittest';
@@ -92,8 +92,7 @@ ok( $c->clear );
 @keys = $c->getKeys;
 ok( @keys == 0 );
 
-# Note: is does deep checking, unlike the 'is' from Test::More.
-#is(...);
+
 
 done_testing;
 

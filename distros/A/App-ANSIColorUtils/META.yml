@@ -20,6 +20,7 @@ requires:
   Color::ANSI::Util: '0.164'
   Color::RGB::Util: '0.600'
   Data::Dmp: '0.240'
+  Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname: '0'
   Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
@@ -33,6 +34,7 @@ requires:
   Sah::Schema::color::ansi16: '0'
   Sah::Schema::color::ansi256: '0'
   Sah::Schema::color::rgb24: '0'
+  Sah::Schema::perl::colorscheme::modname: '0'
   Sah::Schema::posint: '0'
   Term::Size: '0'
   perl: '5.010001'
@@ -42,7 +44,7 @@ resources:
   bugtracker: https://github.com/perlancar/perl-App-ANSIColorUtils/issues
   homepage: https://metacpan.org/release/App-ANSIColorUtils
   repository: git://github.com/perlancar/perl-App-ANSIColorUtils.git
-version: '0.008'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -110,6 +112,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript show-colors'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript show-colors-from-scheme'
       version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript

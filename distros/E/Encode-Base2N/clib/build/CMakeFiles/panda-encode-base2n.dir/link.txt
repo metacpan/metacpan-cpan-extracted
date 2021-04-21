@@ -1,2 +1,0 @@
-/usr/bin/ar qc libpanda-encode-base2n.a  CMakeFiles/panda-encode-base2n.dir/src/panda/encode/base16.cc.o CMakeFiles/panda-encode-base2n.dir/src/panda/encode/base32.cc.o CMakeFiles/panda-encode-base2n.dir/src/panda/encode/base64.cc.o
-/usr/bin/ranlib libpanda-encode-base2n.a

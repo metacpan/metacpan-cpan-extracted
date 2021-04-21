@@ -7,13 +7,13 @@ build_requires:
   Test::Deep: '0'
   Test::More: '0'
   Test::Simple: '0.96'
-  XS::libcatch: v2.13.4.0
-  XS::libpanda: v1.5.0
+  XS::libcatch: v2.13.4.1
+  XS::libpanda: v1.5.1
 configure_requires:
   Test::Catch: v1.0.15
   XS::Install: v1.3.2
-  XS::libcatch: v2.13.4.0
-  XS::libpanda: v1.5.0
+  XS::libcatch: v2.13.4.1
+  XS::libpanda: v1.5.1
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
 license: unknown
@@ -28,6 +28,6 @@ no_index:
 requires:
   Export::XS: '0'
   XS::Install: v1.3.2
-  XS::libpanda: v1.5.0
-version: v1.0.3
+  XS::libpanda: v1.5.1
+version: v1.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

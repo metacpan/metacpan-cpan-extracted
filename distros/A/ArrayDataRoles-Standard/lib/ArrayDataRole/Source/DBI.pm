@@ -1,9 +1,9 @@
 package ArrayDataRole::Source::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-13'; # DATE
+our $DATE = '2021-04-20'; # DATE
 our $DIST = 'ArrayDataRoles-Standard'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use Role::Tiny;
@@ -71,27 +71,36 @@ sub new {
         sth_bind_params => $sth_bind_params,
         row_count_sth => $row_count_sth,
         row_count_sth_bind_params => $row_count_sth_bind_params,
-        index => 0, # iterator index
+        pos => 0, # iterator pos
+        #buf => '', # exists when there is a buffer
     }, $class;
 }
 
-sub elem {
+sub get_next_item {
     my $self = shift;
-    my $row = $self->{sth}->fetchrow_array;
-    die "No more elements" unless $row;
-    $self->{index}++;
-    $row->[0];
+    if (exists $self->{buf}) {
+        $self->{pos}++;
+        return delete $self->{buf};
+    } else {
+        my $row = $self->{sth}->fetchrow_arrayref;
+        die "StopIteration" unless $row;
+        $self->{pos}++;
+        $row->[0];
+    }
 }
 
-sub get_elem {
+sub has_next_item {
     my $self = shift;
+    if (exists $self->{buf}) {
+        return 1;
+    }
     my $row = $self->{sth}->fetchrow_arrayref;
-    return undef unless $row;
-    $self->{index}++;
-    $row->[0];
+    return 0 unless $row;
+    $self->{buf} = $row->[0];
+    1;
 }
 
-sub get_elem_count {
+sub get_item_count {
     my $self = shift;
     $self->{row_count_sth}->execute(@{ $self->{row_count_sth_bind_params} // [] });
     my ($row_count) = $self->{row_count_sth}->fetchrow_array;
@@ -101,12 +110,12 @@ sub get_elem_count {
 sub reset_iterator {
     my $self = shift;
     $self->{sth}->execute(@{ $self->{sth_bind_params} // [] });
-    $self->{index} = 0;
+    $self->{pos} = 0;
 }
 
-sub get_iterator_index {
+sub get_iterator_pos {
     my $self = shift;
-    $self->{index};
+    $self->{pos};
 }
 
 1;
@@ -124,7 +133,7 @@ ArrayDataRole::Source::DBI - Role to access elements from DBI
 
 =head1 VERSION
 
-This document describes version 0.001 of ArrayDataRole::Source::DBI (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-13.
+This document describes version 0.002 of ArrayDataRole::Source::DBI (from Perl distribution ArrayDataRoles-Standard), released on 2021-04-20.
 
 =head1 DESCRIPTION
 

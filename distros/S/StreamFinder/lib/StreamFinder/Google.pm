@@ -385,6 +385,7 @@ sub new
 	$self->{'artist'} = '';
 	$self->{'created'} = '';
 	$self->{'year'} = '';
+	$self->{'genre'} = 'Podcast';
 	$self->{'description'} = '';
 	$self->{'iconurl'} = '';
 	$self->{'streams'} = [];

@@ -1,9 +1,9 @@
 package ArrayData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-11'; # DATE
+our $DATE = '2021-04-20'; # DATE
 our $DIST = 'ArrayData'; # DIST
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 1;
 # ABSTRACT: Specification for ArrayData::*, modules that contains array data
@@ -20,11 +20,11 @@ ArrayData - Specification for ArrayData::*, modules that contains array data
 
 =head1 SPECIFICATION VERSION
 
-0.1
+0.2
 
 =head1 VERSION
 
-This document describes version 0.1.0 of ArrayData (from Perl distribution ArrayData), released on 2021-04-11.
+This document describes version 0.2.0 of ArrayData (from Perl distribution ArrayData), released on 2021-04-20.
 
 =head1 SYNOPSIS
 
@@ -58,9 +58,9 @@ uninstallation; 2) allowing dependency expression and version comparison; 3)
 ease of packaging further as OS packages, e.g. Debian packages (converted from
 Perl distribution); 4) testing by CPAN Testers.
 
-The table data can actually be stored as CSV in the DATA section of a Perl
-module, or as a CSV file in a shared directory of a Perl distribution, or a Perl
-structure in the module source code, or from other sources.
+The array data can actually be stored as Perl array in the Perl module source
+code, or as lines in the DATA section of the Perl module, or in a shared file of
+the distribution.
 
 To get started, see L<ArrayDataRole::Spec::Basic> and one of existing
 C<ArrayData::*> modules.
@@ -73,8 +73,8 @@ C<ArrayDataRole::*> the roles.
 
 All the modules under C<ArrayData::*> will be modules with actual data.
 
-C<ArrayDataCollection-*> is name for distribution that contains several
-C<ArrayData> modules.
+C<ArrayDataBundle-*> is name for distribution that contains several C<ArrayData>
+modules.
 
 =head1 FAQ
 
@@ -88,7 +88,7 @@ Source repository is at L<https://github.com/perlancar/perl-ArrayData>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-ArrayData/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -99,7 +99,7 @@ feature.
 L<HashData>, L<TableData> are related projects.
 
 L<WordList> is an older, related project. ArrayData and its sister projects
-HashData & TableData are a generalization and cleanup of WordList API.
+HashData & TableData are a generalization and cleanup of the WordList API.
 
 =head1 AUTHOR
 

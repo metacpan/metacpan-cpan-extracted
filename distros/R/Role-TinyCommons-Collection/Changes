@@ -1,0 +1,14 @@
+0.003   2021-04-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add roles:
+	  Role::TinyCommons::Collection::PickItems::{Iterator,RandomSeek}.
+
+
+0.002   2021-04-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add role: Role::TinyCommons::Collection::PickItems.
+
+
+0.001   2021-04-20  Released-By: PERLANCAR
+
+        - First release.

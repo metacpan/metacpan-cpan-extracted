@@ -10,29 +10,29 @@ my ( $baseurl, $m ) = RT::Test->started_ok();
 
 ok( $m->login( 'root', 'password' ), 'logged in' );
 
-$m->submit_form_ok({
-    form_name => 'CreateTicketInQueue',
-    fields    => {
-       'Queue' => 'General' },
-    }, 'Click to create ticket');
+$m->submit_form_ok( { form_name => 'CreateTicketInQueue', }, 'Click to create ticket' );
 
 $m->content_contains('Enable Recurrence');
 
 diag "Create a ticket with a recurrence in the General queue.";
 
 my $day = DateTime->now;
-$m->submit_form_ok({
-    form_name => 'TicketCreate',
-    fields    => {
-        'Subject' => 'Set up monthly aperture maintenance',
-        'Content' => 'Perform work on portals on the first of each month',
-        'repeat-lead-time' => 21,
-        'repeat-coexistent-number' => 1,
-        'repeat-enabled' => 1,
-        'repeat-type' => 'yearly',
-        'repeat-details-yearly-day-month' => $day->month,
-        'repeat-details-yearly-day-day' => $day->day,
-     },}, 'Create');
+$m->submit_form_ok(
+    {   form_name => 'TicketCreate',
+        fields    => {
+            'Subject'                         => 'Set up monthly aperture maintenance',
+            'Content'                         => 'Perform work on portals on the first of each month',
+            'repeat-lead-time'                => 21,
+            'repeat-coexistent-number'        => 1,
+            'repeat-enabled'                  => 1,
+            'repeat-type'                     => 'yearly',
+            'repeat-details-yearly-day-month' => $day->month,
+            'repeat-details-yearly-day-day'   => $day->day,
+        },
+        button => 'SubmitTicket',
+    },
+    'Create'
+);
 
 $m->text_like( qr/Ticket\s(\d+)\screated in queue/);
 

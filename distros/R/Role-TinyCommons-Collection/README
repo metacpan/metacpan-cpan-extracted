@@ -1,0 +1,34 @@
+NAME
+    Role::TinyCommons::Collection - Roles related to collections
+
+VERSION
+    This document describes version 0.003 of Role::TinyCommons::Collection
+    (from Perl distribution Role-TinyCommons-Collection), released on
+    2021-04-20.
+
+DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Role-TinyCommons-Collection>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Role-TinyCommons-Collection>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-Role-TinyCommons-Collection/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,5 +1,10 @@
 Revision history for Perl extension API::INSEE::Sirene.
 
+4.03
+        - Removed unused import
+        - Updated README
+        - Updated documentation
+
 4.02
         - The getCustomCriteria method doesn't take $use_historized_field parameter anymore
           The module will now auto-detect historized fields

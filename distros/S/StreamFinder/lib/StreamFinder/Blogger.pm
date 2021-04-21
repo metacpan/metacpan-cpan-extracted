@@ -104,7 +104,7 @@ general StreamFinder module.
 
 Depends:  
 
-L<I::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
 and the separate application program:  youtube-dl.
 
 =head1 SUBROUTINES/METHODS

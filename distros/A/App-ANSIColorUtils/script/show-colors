@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-01-19'; # DATE
+our $DATE = '2021-01-20'; # DATE
 our $DIST = 'App-ANSIColorUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ show-colors - Show colors specified in argument as text with ANSI colors
 
 =head1 VERSION
 
-This document describes version 0.008 of show-colors (from Perl distribution App-ANSIColorUtils), released on 2021-01-19.
+This document describes version 0.009 of show-colors (from Perl distribution App-ANSIColorUtils), released on 2021-01-20.
 
 =head1 SYNOPSIS
 

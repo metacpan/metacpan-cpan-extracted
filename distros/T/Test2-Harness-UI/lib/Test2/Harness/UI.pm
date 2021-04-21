@@ -2,7 +2,7 @@ package Test2::Harness::UI;
 use strict;
 use warnings;
 
-our $VERSION = '0.000056';
+our $VERSION = '0.000058';
 
 use Router::Simple;
 use Text::Xslate(qw/mark_raw/);
@@ -60,7 +60,7 @@ sub init {
     $router->connect('/durations/:project/median'         => {controller => 'Test2::Harness::UI::Controller::Durations', median => 1});
     $router->connect('/durations/:project/:short/:medium' => {controller => 'Test2::Harness::UI::Controller::Durations'});
 
-    $router->connect('/coverage/:project' => {controller => 'Test2::Harness::UI::Controller::Coverage'});
+    $router->connect('/coverage/:source' => {controller => 'Test2::Harness::UI::Controller::Coverage'});
 
     $router->connect('/download/:id' => {controller => 'Test2::Harness::UI::Controller::Download'});
 

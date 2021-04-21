@@ -4,8 +4,8 @@
 #
 package PDL::Stats::TS;
 
-@EXPORT_OK  = qw( PDL::PP _acf PDL::PP _acvf PDL::PP diff PDL::PP inte PDL::PP dseason PDL::PP _fill_ma PDL::PP filter_exp PDL::PP filter_ma PDL::PP mae PDL::PP mape PDL::PP wmape PDL::PP portmanteau PDL::PP _pred_ar );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw(PDL::PP _acf PDL::PP _acvf PDL::PP diff PDL::PP inte PDL::PP dseason PDL::PP _fill_ma PDL::PP filter_exp PDL::PP filter_ma PDL::PP mae PDL::PP mape PDL::PP wmape PDL::PP portmanteau PDL::PP _pred_ar );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Stats::TS ;
 

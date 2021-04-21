@@ -4,8 +4,8 @@
 #
 package PDL::Stats::Distr;
 
-@EXPORT_OK  = qw(  PDL::PP mme_beta PDL::PP pdf_beta PDL::PP mme_binomial PDL::PP pmf_binomial PDL::PP mle_exp PDL::PP pdf_exp PDL::PP mme_gamma PDL::PP pdf_gamma PDL::PP mle_gaussian PDL::PP pdf_gaussian PDL::PP mle_geo PDL::PP pmf_geo PDL::PP mle_geosh PDL::PP pmf_geosh PDL::PP mle_lognormal PDL::PP mme_lognormal PDL::PP pdf_lognormal PDL::PP mme_nbd PDL::PP pmf_nbd PDL::PP mme_pareto PDL::PP pdf_pareto PDL::PP mle_poisson PDL::PP pmf_poisson PDL::PP pmf_poisson_stirling PDL::PP _pmf_poisson_factorial );
-%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+our @EXPORT_OK = qw( PDL::PP mme_beta PDL::PP pdf_beta PDL::PP mme_binomial PDL::PP pmf_binomial PDL::PP mle_exp PDL::PP pdf_exp PDL::PP mme_gamma PDL::PP pdf_gamma PDL::PP mle_gaussian PDL::PP pdf_gaussian PDL::PP mle_geo PDL::PP pmf_geo PDL::PP mle_geosh PDL::PP pmf_geosh PDL::PP mle_lognormal PDL::PP mme_lognormal PDL::PP pdf_lognormal PDL::PP mme_nbd PDL::PP pmf_nbd PDL::PP mme_pareto PDL::PP pdf_pareto PDL::PP mle_poisson PDL::PP pmf_poisson PDL::PP pmf_poisson_stirling PDL::PP _pmf_poisson_factorial );
+our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDL::Core;
 use PDL::Exporter;
@@ -14,7 +14,7 @@ use DynaLoader;
 
 
    
-   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Stats::Distr ;
 

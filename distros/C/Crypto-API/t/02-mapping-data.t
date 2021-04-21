@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Crypto::API;
 
-package mocker {
+{package mocker;
     use Moo::Role;
     sub get {}
     sub json_response {
@@ -17,7 +17,7 @@ package mocker {
     }
 }
 
-package foo {
+{package foo;
     use Moo;
     extends 'Crypto::API';
     with 'mocker';

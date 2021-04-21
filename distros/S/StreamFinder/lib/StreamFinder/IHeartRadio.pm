@@ -489,13 +489,19 @@ TRYIT:
 	my $html2 = '';
 	my $streamhtml0 = ($html =~ /\"streams\"\s*\:\s*\{([^\}]+)\}/) ? $1 : '';
 	print STDERR "-2: streamhtml=$streamhtml0=\n"  if ($DEBUG);
-	$self->{'cnt'} = 0;
 	$self->{'title'} = '';
-	$self->{'description'} = '';
 	$self->{'artist'} = '';
+	$self->{'album'} = '';
+	$self->{'description'} = '';
 	$self->{'created'} = '';
 	$self->{'year'} = '';
+	$self->{'genre'} = '';
+	$self->{'iconurl'} = '';
 	$self->{'streams'} = [];
+	$self->{'cnt'} = 0;
+	$self->{'Url'} = '';
+	$self->{'playlist'} = '';
+	$self->{'albumartist'} = '';
 	unless ($streamhtml0) {  #NO STREAMS (PODCAST?) - LOOK FOR MEDIAURL:
 		while ($html =~ s#\"mediaUrl\"\:\"([^\"]+)\"##gso) {
 			push @{$self->{'streams'}}, $1;
@@ -548,6 +554,7 @@ TRYIT:
 		}
 		$self->{'year'} = ($html =~ m#\<p\>©\s*(\d\d\d\d)#s) ? $1 : '';
 		$self->{'year'} ||= $1  if ($html =~ m#(\d\d\d\d)\<\!\-\-#s);
+		$self->{'genre'} = 'Podcast';
 		$self->{'imageurl'} = ($html =~ s#\"imageUrl\"\:\"([^\"]+)\"##s) ? $1 : '';
 		$self->{'iconurl'} = $self->{'imageurl'};
 		$self->{'total'} = $self->{'cnt'};

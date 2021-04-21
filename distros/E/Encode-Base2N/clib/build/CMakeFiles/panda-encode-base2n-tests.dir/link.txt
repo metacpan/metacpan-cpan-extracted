@@ -1,2 +1,0 @@
-/usr/bin/ar qc libpanda-encode-base2n-tests.a  CMakeFiles/panda-encode-base2n-tests.dir/tests/base16.cc.o CMakeFiles/panda-encode-base2n-tests.dir/tests/base32.cc.o CMakeFiles/panda-encode-base2n-tests.dir/tests/base64.cc.o
-/usr/bin/ranlib libpanda-encode-base2n-tests.a

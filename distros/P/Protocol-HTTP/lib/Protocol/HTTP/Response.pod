@@ -73,6 +73,9 @@ That's way there is no need to have multiple boilerplate code checks.
 
 =head1 METHODS
 
+All methods of L<Protocol::HTTP::Message> also apply.
+
+
 =head2 new([\%params])
 
 Constructs new response from the hash of properties, i.e. C<code>, C<message>, C<cookies>,

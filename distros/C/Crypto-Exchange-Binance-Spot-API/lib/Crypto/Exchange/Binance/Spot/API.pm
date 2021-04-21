@@ -1,5 +1,5 @@
 package Crypto::Exchange::Binance::Spot::API;
-$Crypto::Exchange::Binance::Spot::API::VERSION = '0.01';
+$Crypto::Exchange::Binance::Spot::API::VERSION = '0.02';
 =head1 NAME
 
 Crypto::Exchange::Binance::Spot::API - Binance Spot API

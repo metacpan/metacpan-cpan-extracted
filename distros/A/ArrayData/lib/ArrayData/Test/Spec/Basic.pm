@@ -1,9 +1,9 @@
 package ArrayData::Test::Spec::Basic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-04-11'; # DATE
+our $DATE = '2021-04-20'; # DATE
 our $DIST = 'ArrayData'; # DIST
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ my $elems = [
 
 sub new {
     my $class = shift;
-    bless {index=>0}, $class;
+    bless {pos=>0}, $class;
 }
 
 sub _elems {
@@ -29,26 +29,25 @@ sub _elems {
     $elems;
 }
 
-sub elem {
+sub get_next_item {
     my $self = shift;
-    die "Out of range" unless $self->{index} < @$elems;
-    $elems->[ $self->{index}++ ];
+    die "Out of range" unless $self->{pos} < @$elems;
+    $elems->[ $self->{pos}++ ];
 }
 
-sub get_elem {
+sub has_next_item {
     my $self = shift;
-    return undef unless $self->{index} < @$elems;
-    $elems->[ $self->{index}++ ];
+    $self->{pos} < @$elems;
 }
 
-sub get_iterator_index {
+sub get_iterator_pos {
     my $self = shift;
-    $self->{index};
+    $self->{pos};
 }
 
 sub reset_iterator {
     my $self = shift;
-    $self->{index} = 0;
+    $self->{pos} = 0;
 }
 
 1;
@@ -67,7 +66,7 @@ ArrayData::Test::Spec::Basic - A test table data
 
 =head1 VERSION
 
-This document describes version 0.1.0 of ArrayData::Test::Spec::Basic (from Perl distribution ArrayData), released on 2021-04-11.
+This document describes version 0.2.0 of ArrayData::Test::Spec::Basic (from Perl distribution ArrayData), released on 2021-04-20.
 
 =for Pod::Coverage ^(.+)$
 
@@ -81,7 +80,7 @@ Source repository is at L<https://github.com/perlancar/perl-ArrayData>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ArrayData>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-ArrayData/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

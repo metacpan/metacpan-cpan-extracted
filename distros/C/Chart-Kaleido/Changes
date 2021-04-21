@@ -1,5 +1,8 @@
 Revision history of Chart-Kaleido
 
+0.010       2021-04-20
+    - Try workaround a permission error (likely caused by IPC::Run) on Windows.
+
 0.008       2021-03-19
     - Add --no-sandbox which is needed by recent version of Kaleido.
     - Bumped minimal IPC::Run version requirement.
